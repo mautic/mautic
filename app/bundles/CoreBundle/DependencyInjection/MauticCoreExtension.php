@@ -72,14 +72,13 @@ class MauticCoreExtension extends Extension
                         if ($type == 'menus') {
                             $details = array_merge(
                                 array(
-                                    'class'          => 'Knp\Menu\MenuItem',
-                                    'factoryService' => 'mautic.menu.builder',
-                                    'factoryMethod'  => $details['alias'] . 'Menu'
+                                    'class'   => 'Knp\Menu\MenuItem',
+                                    'factory' => array('@mautic.menu.builder', $details['alias'].'Menu'),
                                 ),
                                 $details
                             );
 
-                            $menus[$details['alias']] = (isset($details['options'])) ? $details['options'] :array();
+                            $menus[$details['alias']] = (isset($details['options'])) ? $details['options'] : array();
                         }
 
                         // Set service alias
