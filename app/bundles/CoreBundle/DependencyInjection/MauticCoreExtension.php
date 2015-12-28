@@ -15,8 +15,6 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Loader;
 
 /**
