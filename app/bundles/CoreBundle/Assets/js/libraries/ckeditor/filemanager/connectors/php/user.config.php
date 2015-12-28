@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 // Boot Symfony
 require_once __DIR__ . '/../../../../../../../../../bootstrap.php.cache';
@@ -37,7 +38,7 @@ $container->get('event_dispatcher')->dispatch(KernelEvents::REQUEST, $event);
 $session       = $container->get('session');
 $securityToken = $container->get('security.token_storage');
 $token         = $securityToken->getToken();
-$authenticated = count($token->getRoles());
+$authenticated = ($token instanceof TokenInterface) ? count($token->getRoles()) : false;
 
 /**
  *	Check if user is authorized
