@@ -176,7 +176,7 @@ class EmailSendEvent extends CommonEvent
     public function setContent($content)
     {
         if ($this->helper !== null) {
-            $this->helper->setBody($content);
+            $this->helper->setBody($content, 'text/html', null, true);
         } else {
             $this->content = $content;
         }
@@ -249,7 +249,7 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
-     * @return Lead
+     * @return array
      */
     public function getLead()
     {
@@ -318,5 +318,15 @@ class EmailSendEvent extends CommonEvent
     public function getTextHeaders()
     {
         return ($this->helper !== null) ? $this->helper->getCustomHeaders() : $this->headers;
+    }
+
+    /**
+     * Check if the listener should append it's own clickthrough in URLs or if the email tracking URL conversion process should take care of it
+     *
+     * @return bool
+     */
+    public function shouldAppendClickthrough()
+    {
+        return (!$this->isInternalSend() && null === $this->getEmail());
     }
 }

@@ -22,6 +22,13 @@ class FormSubmitHelper
      */
     public static function sendEmail($tokens, $config, MauticFactory $factory, Lead $lead)
     {
+        // replace line brakes with <br> for textarea values
+        if ($tokens) {
+            foreach ($tokens as $token => &$value) {
+                $value = nl2br(html_entity_decode($value));
+            }
+        }
+
         $mailer = $factory->getMailer();
         $emails = (!empty($config['to'])) ? explode(',', $config['to']) : array();
 

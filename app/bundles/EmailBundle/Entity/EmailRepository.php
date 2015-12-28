@@ -144,57 +144,82 @@ class EmailRepository extends CommonRepository
      */
     public function getEmailPendingLeads($emailId, $variantIds = null, $listIds = null, $countOnly = false, $limit = null)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
-
-        $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('dne.lead_id')
+        // Do not include leads in the do not email table
+        $dneQb = $this->_em->getConnection()->createQueryBuilder();
+        $dneQb->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'email_donotemail', 'dne')
             ->where(
-                $sq->expr()->isNotNull('dne.lead_id')
+                $dneQb->expr()->eq('dne.lead_id', 'l.id')
             );
 
-        $sq2 = $this->_em->getConnection()->createQueryBuilder();
-        $sqExpr = $sq2->expr()->andX(
-            $sq2->expr()->isNotNull('stat.lead_id')
+        // Do not include leads that have already been emailed
+        $statQb    = $this->_em->getConnection()->createQueryBuilder()
+            ->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat');
+
+        $statExpr = $statQb->expr()->andX(
+            $statQb->expr()->eq('stat.lead_id', 'l.id')
         );
 
         if ($variantIds) {
-            $variantIds[] = $emailId;
-            $sqExpr->add(
-                $sq->expr()->in('stat.email_id', $variantIds)
+            $variantIds[] = (int) $emailId;
+            $statExpr->add(
+                $statQb->expr()->in('stat.email_id', $variantIds)
             );
         } else {
-            $sqExpr->add(
-                $sq->expr()->eq('stat.email_id', $emailId)
+            $statExpr->add(
+                $statQb->expr()->eq('stat.email_id', (int) $emailId)
             );
         }
+        $statQb->where($statExpr);
 
-        $sq2->select('stat.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat')
-            ->where($sqExpr);
+        // Only include those who belong to the associated lead lists
+        if (null === $listIds) {
+            // Get a list of lists associated with this email
+            $lists = $this->_em->getConnection()->createQueryBuilder()
+                ->select('el.leadlist_id')
+                ->from(MAUTIC_TABLE_PREFIX.'email_list_xref', 'el')
+                ->where('el.email_id = ' . (int) $emailId)
+                ->execute()
+                ->fetchAll();
 
+            $listIds = array();
+            foreach ($lists as $list) {
+                $listIds[] = $list['leadlist_id'];
+            }
+
+            if (empty($listIds)) {
+                // Prevent fatal error
+                return ($countOnly) ? 0 : array();
+            }
+        } elseif (!is_array($listIds)) {
+            $listIds = array($listIds);
+        }
+
+        $listQb = $this->_em->getConnection()->createQueryBuilder();
+        $listQb->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
+            ->where(
+                $listQb->expr()->andX(
+                    $listQb->expr()->in('ll.leadlist_id', $listIds),
+                    $listQb->expr()->eq('ll.lead_id', 'l.id'),
+                    $listQb->expr()->eq('ll.manually_removed', ':false')
+                )
+            );
+
+        // Main query
+        $q  = $this->_em->getConnection()->createQueryBuilder();
         if ($countOnly) {
             $q->select('count(l.id) as count');
         } else {
             $q->select('l.*')
                 ->orderBy('l.id');
         }
-        $q->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-            ->join('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll', 'l.id = ll.lead_id')
-            ->join('ll', MAUTIC_TABLE_PREFIX . 'email_list_xref', 'el', 'el.leadlist_id = ll.leadlist_id');
-
-        $q->where($q->expr()->eq('el.email_id', $emailId))
-            ->andWhere('l.id NOT IN ' . sprintf("(%s)",$sq->getSQL()))
-            ->andWhere('l.id NOT IN ' . sprintf("(%s)",$sq2->getSQL()));
-
-        if ($listIds != null) {
-            if (!is_array($listIds)) {
-                $listIds = array($listIds);
-            }
-            $q->andWhere(
-                $q->expr()->in('ll.leadlist_id', $listIds)
-            );
-        }
+        $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->andWhere(sprintf('NOT EXISTS (%s)', $dneQb->getSQL()))
+            ->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()))
+            ->andWhere(sprintf('EXISTS (%s)', $listQb->getSQL()))
+            ->setParameter('false', false, 'boolean');
 
         // Has an email
         $q->andWhere(
@@ -245,7 +270,7 @@ class EmailRepository extends CommonRepository
         }
 
         if (!$viewOther) {
-            $q->andWhere($q->expr()->eq('IDENTITY(e.createdBy)', ':id'))
+            $q->andWhere($q->expr()->eq('e.createdBy', ':id'))
                 ->setParameter('id', $this->currentUser->getId());
         }
 

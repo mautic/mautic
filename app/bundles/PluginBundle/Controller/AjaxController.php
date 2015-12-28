@@ -60,8 +60,10 @@ class AjaxController extends CommonAjaxController
                     // Get a list of custom form fields
                     $leadFields = $this->factory->getModel('plugin')->getLeadFields();
                     list ($specialInstructions, $alertType) = $object->getFormNotes('leadfield_match');
+                    $defaults                               = $object->getIntegrationSettings()->getFeatureSettings();
+                    $data                                   = isset($defaults['leadFields']) ? $defaults['leadFields'] : array();
 
-                    $form = $this->createForm('integration_fields', array(), array(
+                    $form = $this->createForm('integration_fields', $data, array(
                         'lead_fields'          => $leadFields,
                         'integration_fields'   => $integrationFields,
                         'csrf_protection'      => false,

@@ -332,7 +332,7 @@ class LeadApiController extends CommonApiController
             $parameters[$f->getName()] = $f->getData();
         }
 
-        $this->model->setFieldValues($entity, $parameters);
+        $this->model->setFieldValues($entity, $parameters, true);
     }
 
     /**

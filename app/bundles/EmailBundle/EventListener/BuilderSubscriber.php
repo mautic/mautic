@@ -114,6 +114,5 @@ class BuilderSubscriber extends CommonSubscriber
         $event->addToken('{webview_text}', $webviewText);
 
         $event->addToken('{webview_url}', $model->buildUrl('mautic_email_webview', array('idHash' => $idHash)));
-
     }
 }

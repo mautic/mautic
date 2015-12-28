@@ -13,6 +13,9 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
+use Mautic\CoreBundle\IpLookup\AbstractLookup;
+use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -33,7 +36,7 @@ class AjaxController extends CommonController
      */
     protected function sendJsonResponse($dataArray)
     {
-        $response  = new JsonResponse();
+        $response = new JsonResponse();
 
         if ($this->factory->getEnvironment() == 'dev') {
             $dataArray['ignore_wdt'] = 1;
@@ -61,9 +64,9 @@ class AjaxController extends CommonController
         if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             if (strpos($action, ":") !== false) {
                 //call the specified bundle's ajax action
-                $parts = explode(":", $action);
+                $parts     = explode(":", $action);
                 $namespace = 'Mautic';
-                $isPlugin = false;
+                $isPlugin  = false;
                 // @deprecated 1.1.4; will be removed in 2.0; BC support for MauticAddon
                 if (count($parts) == 3 && ($parts[0] == 'addon' || $parts['0'] == 'plugin')) {
                     $namespace = ($parts[0] == 'addon') ? 'MauticAddon' : 'MauticPlugin';
@@ -72,18 +75,22 @@ class AjaxController extends CommonController
                 }
 
                 if (count($parts) == 2) {
-                    $bundle     = ucfirst($parts[0]);
-                    $action     = $parts[1];
+                    $bundle = ucfirst($parts[0]);
+                    $action = $parts[1];
 
-                    if (class_exists($namespace . '\\' . $bundle . 'Bundle\\Controller\\AjaxController')) {
+                    if (class_exists($namespace.'\\'.$bundle.'Bundle\\Controller\\AjaxController')) {
                         if (!$isPlugin) {
-                            $bundle = 'Mautic' . $bundle;
+                            $bundle = 'Mautic'.$bundle;
                         }
-                        return $this->forward("{$bundle}Bundle:Ajax:executeAjax", array(
-                            'action'  => $action,
-                            //forward the request as well as Symfony creates a subrequest without GET/POST
-                            'request' => $this->request
-                        ));
+
+                        return $this->forward(
+                            "{$bundle}Bundle:Ajax:executeAjax",
+                            array(
+                                'action'  => $action,
+                                //forward the request as well as Symfony creates a subrequest without GET/POST
+                                'request' => $this->request
+                            )
+                        );
                     }
                 }
             }
@@ -123,9 +130,11 @@ class AjaxController extends CommonController
         $event = new GlobalSearchEvent($searchStr, $this->get('translator'));
         $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
 
-        $dataArray['newContent'] = $this->renderView('MauticCoreBundle:GlobalSearch:results.html.php',
+        $dataArray['newContent'] = $this->renderView(
+            'MauticCoreBundle:GlobalSearch:results.html.php',
             array('results' => $event->getResults())
         );
+
         return $this->sendJsonResponse($dataArray);
     }
 
@@ -144,18 +153,19 @@ class AjaxController extends CommonController
             if (is_array($c)) {
                 foreach ($c as $subc) {
                     $command = $translator->trans($k);
-                    $command = (strpos($command, ':') === false) ? $command . ':' : $command;
+                    $command = (strpos($command, ':') === false) ? $command.':' : $command;
 
-                    $dataArray[] = array('value' => $command . $translator->trans($subc));
+                    $dataArray[] = array('value' => $command.$translator->trans($subc));
                 }
             } else {
                 $command = $translator->trans($c);
-                $command = (strpos($command, ':') === false) ? $command . ':' : $command;
+                $command = (strpos($command, ':') === false) ? $command.':' : $command;
 
                 $dataArray[] = array('value' => $command);
             }
         }
         sort($dataArray);
+
         return $this->sendJsonResponse($dataArray);
     }
 
@@ -167,7 +177,7 @@ class AjaxController extends CommonController
     protected function globalCommandListAction(Request $request)
     {
         $dispatcher = $this->get('event_dispatcher');
-        $event = new CommandListEvent();
+        $event      = new CommandListEvent();
         $dispatcher->dispatch(CoreEvents::BUILD_COMMAND_LIST, $event);
         $allCommands = $event->getCommands();
         $translator  = $this->get('translator');
@@ -180,21 +190,21 @@ class AjaxController extends CommonController
             foreach ($commands as $k => $c) {
                 if (is_array($c)) {
                     $command = $translator->trans($k);
-                    $command = (strpos($command, ':') === false) ? $command . ':' : $command;
+                    $command = (strpos($command, ':') === false) ? $command.':' : $command;
 
                     foreach ($c as $subc) {
-                        $subcommand = $command . $translator->trans($subc);
+                        $subcommand = $command.$translator->trans($subc);
                         if (!in_array($subcommand, $dupChecker)) {
-                            $dataArray[] = array('value' => $subcommand);
+                            $dataArray[]  = array('value' => $subcommand);
                             $dupChecker[] = $subcommand;
                         }
                     }
                 } else {
                     $command = $translator->trans($k);
-                    $command = (strpos($command, ':') === false) ? $command . ':' : $command;
+                    $command = (strpos($command, ':') === false) ? $command.':' : $command;
 
                     if (!in_array($command, $dupChecker)) {
-                        $dataArray[] = array('value' => $command);
+                        $dataArray[]  = array('value' => $command);
                         $dupChecker[] = $command;
                     }
                 }
@@ -203,6 +213,7 @@ class AjaxController extends CommonController
         }
         //ksort($dataArray);
         sort($dataArray);
+
         return $this->sendJsonResponse($dataArray);
     }
 
@@ -214,12 +225,12 @@ class AjaxController extends CommonController
     protected function togglePublishStatusAction(Request $request)
     {
         $dataArray = array('success' => 0);
-        $name   = InputHelper::clean($request->request->get('model'));
+        $name      = InputHelper::clean($request->request->get('model'));
         if (strpos($name, '.') === false) {
             $name = "$name.$name";
         }
-        $id     = InputHelper::int($request->request->get('id'));
-        $model  = $this->factory->getModel($name);
+        $id    = InputHelper::int($request->request->get('id'));
+        $model = $this->factory->getModel($name);
 
         $post = $request->request->all();
         unset($post['model'], $post['id'], $post['action']);
@@ -232,8 +243,8 @@ class AjaxController extends CommonController
         $entity = $model->getEntity($id);
         if ($entity !== null) {
             $permissionBase = $model->getPermissionBase();
-            $security = $this->factory->getSecurity();
-            $createdBy = (method_exists($entity, 'getCreatedBy')) ? $entity->getCreatedBy() : null;
+            $security       = $this->factory->getSecurity();
+            $createdBy      = (method_exists($entity, 'getCreatedBy')) ? $entity->getCreatedBy() : null;
 
             if ($security->checkPermissionExists($permissionBase.':publishown')) {
                 $hasPermission = $security->hasEntityAccess($permissionBase.':publishown', $permissionBase.':publishother', $createdBy);
@@ -260,16 +271,20 @@ class AjaxController extends CommonController
                     $dataArray['reload'] = 1;
                 } else {
                     //get updated icon HTML
-                    $html = $this->renderView('MauticCoreBundle:Helper:publishstatus_icon.html.php', array(
-                        'item'  => $entity,
-                        'model' => $name,
-                        'query' => $extra,
-                        'size'  => (isset($post['size'])) ? $post['size'] : ''
-                    ));
+                    $html                    = $this->renderView(
+                        'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                        array(
+                            'item'  => $entity,
+                            'model' => $name,
+                            'query' => $extra,
+                            'size'  => (isset($post['size'])) ? $post['size'] : ''
+                        )
+                    );
                     $dataArray['statusHtml'] = $html;
                 }
             }
         }
+
         return $this->sendJsonResponse($dataArray);
     }
 
@@ -388,9 +403,9 @@ class AjaxController extends CommonController
 
         // Fetch the package data
         $update  = $updateHelper->fetchData();
-        $zipFile = $this->factory->getSystemPath('cache') . '/' . basename($update['package']);
+        $zipFile = $this->factory->getSystemPath('cache').'/'.basename($update['package']);
 
-        $zipper = new \ZipArchive();
+        $zipper  = new \ZipArchive();
         $archive = $zipper->open($zipFile);
 
         if ($archive !== true) {
@@ -428,7 +443,7 @@ class AjaxController extends CommonController
             $cookieHelper->delete('mautic_update');
         } else {
             // Extract the archive file now
-            if (!$zipper->extractTo(dirname($this->container->getParameter('kernel.root_dir')) . '/upgrade')) {
+            if (!$zipper->extractTo(dirname($this->container->getParameter('kernel.root_dir')).'/upgrade')) {
                 $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
                 $dataArray['message']    = $translator->trans(
                     'mautic.core.update.error',
@@ -467,30 +482,32 @@ class AjaxController extends CommonController
         $result     = 0;
 
         // Also do the last bit of filesystem cleanup from the upgrade here
-        if (is_dir(dirname($this->container->getParameter('kernel.root_dir')) . '/upgrade')) {
-            $iterator = new \FilesystemIterator(dirname($this->container->getParameter('kernel.root_dir')) . '/upgrade', \FilesystemIterator::SKIP_DOTS);
+        if (is_dir(dirname($this->container->getParameter('kernel.root_dir')).'/upgrade')) {
+            $iterator = new \FilesystemIterator(
+                dirname($this->container->getParameter('kernel.root_dir')).'/upgrade', \FilesystemIterator::SKIP_DOTS
+            );
 
             /** @var \FilesystemIterator $file */
             foreach ($iterator as $file) {
                 // Sanity checks
                 if ($file->isFile()) {
-                    @unlink($file->getPath() . '/' . $file->getFilename());
+                    @unlink($file->getPath().'/'.$file->getFilename());
                 }
             }
 
             // Should be empty now, nuke the folder
-            @rmdir(dirname($this->container->getParameter('kernel.root_dir')) . '/upgrade');
+            @rmdir(dirname($this->container->getParameter('kernel.root_dir')).'/upgrade');
         }
 
         $cacheDir = $this->factory->getSystemPath('cache');
 
         // Cleanup the update cache data now too
-        if (file_exists($cacheDir . '/lastUpdateCheck.txt')) {
-            @unlink($cacheDir . '/lastUpdateCheck.txt');
+        if (file_exists($cacheDir.'/lastUpdateCheck.txt')) {
+            @unlink($cacheDir.'/lastUpdateCheck.txt');
         }
 
-        if (file_exists($cacheDir . '/' . $this->factory->getVersion() . '.zip')) {
-            @unlink($cacheDir . '/' . $this->factory->getVersion() . '.zip');
+        if (file_exists($cacheDir.'/'.$this->factory->getVersion().'.zip')) {
+            @unlink($cacheDir.'/'.$this->factory->getVersion().'.zip');
         }
 
         // Update languages
@@ -522,11 +539,11 @@ class AjaxController extends CommonController
             }
         }
 
-        $iterator = new \FilesystemIterator($this->container->getParameter('kernel.root_dir') . '/migrations', \FilesystemIterator::SKIP_DOTS);
+        $iterator = new \FilesystemIterator($this->container->getParameter('kernel.root_dir').'/migrations', \FilesystemIterator::SKIP_DOTS);
 
         if (iterator_count($iterator)) {
-            $env         = $this->factory->getEnvironment();
-            $args        = array('console', 'doctrine:migrations:migrate', '--no-interaction', '--env=' . $env);
+            $env  = $this->factory->getEnvironment();
+            $args = array('console', 'doctrine:migrations:migrate', '--no-interaction', '--env='.$env);
 
             if ($env == 'prod') {
                 $args[] = '--no-debug';
@@ -535,18 +552,22 @@ class AjaxController extends CommonController
             $input       = new ArgvInput($args);
             $application = new Application($this->get('kernel'));
             $application->setAutoExit(false);
-            $output      = new BufferedOutput();
-            $result      = $application->run($input, $output);
+            $output = new BufferedOutput();
+            $result = $application->run($input, $output);
         }
 
         if ($result !== 0) {
             // Log the output
             $outputBuffer = trim(preg_replace('/\n\s*\n/s', " \\ ", $output->fetch()));
             $outputBuffer = preg_replace('/\s\s+/', ' ', trim($outputBuffer));
-            $this->factory->getLogger()->log('error', '[UPGRADE ERROR] Exit code ' . $result . '; ' . $outputBuffer);
+            $this->factory->getLogger()->log('error', '[UPGRADE ERROR] Exit code '.$result.'; '.$outputBuffer);
 
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
-            $dataArray['message']    = $translator->trans('mautic.core.update.error', array('%error%' => $translator->trans('mautic.core.update.error_performing_migration'))) . ' <a href="' . $this->generateUrl('mautic_core_update_schema', array('update' => 1)) . '" class="btn btn-primary btn-xs" data-toggle="ajax">' . $translator->trans('mautic.core.retry') . '</a>';
+            $dataArray['message']    = $translator->trans(
+                    'mautic.core.update.error',
+                    array('%error%' => $translator->trans('mautic.core.update.error_performing_migration'))
+                ).' <a href="'.$this->generateUrl('mautic_core_update_schema', array('update' => 1))
+                .'" class="btn btn-primary btn-xs" data-toggle="ajax">'.$translator->trans('mautic.core.retry').'</a>';
 
             // A way to keep the upgrade from failing if the session is lost after
             // the cache is cleared by upgrade.php
@@ -593,6 +614,19 @@ class AjaxController extends CommonController
         // Here as a just in case it's needed for a future upgrade
         $dataArray['success'] = 1;
         $dataArray['message'] = $translator->trans('mautic.core.update.update_successful', array('%version%' => $this->factory->getVersion()));
+
+        // Check for a post install message
+        if ($postMessage = $this->container->get('session')->get('post_upgrade_message', false)) {
+            $this->container->get('session')->remove('post_upgrade_message');
+            $postMessage = sprintf('<h4 class="mt-lg">%s</h4><p>%s</p>', $this->container->get('translator')->trans('mautic.core.update.post_message'), $postMessage);
+            if ('1.2.3' == $this->container->get('kernel')->getVersion()) {
+                // @TODO - remove in 2.0
+                $dataArray['message']    .= $postMessage;
+                $dataArray['postmessage'] = false;
+            } else {
+                $dataArray['postmessage'] = $postMessage;
+            }
+        }
 
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
@@ -668,7 +702,7 @@ class AjaxController extends CommonController
         $dataArray = array();
 
         if (method_exists($this, 'getBuilderTokens')) {
-            $query = $request->get('query');
+            $query  = $request->get('query');
             $visual = $request->get('visual');
 
             if ($query && $query !== '{' && $query !== '{@') {
@@ -683,10 +717,101 @@ class AjaxController extends CommonController
                     $dataArray['html'] = $this->render(
                         'MauticCoreBundle:Helper:buildertoken_list.html.php',
                         array(
-                            'tokens' => $tokens,
+                            'tokens'       => $tokens,
                             'visualTokens' => $visualTokens
                         )
                     )->getContent();
+                }
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Fetch remote data store
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function downloadIpLookupDataStoreAction(Request $request)
+    {
+        $dataArray = array('success' => 0);
+
+        if ($request->request->has('service')) {
+            $serviceName   = $request->request->get('service');
+            $serviceAuth   = $request->request->get('auth');
+
+            /** @var \Mautic\CoreBundle\Factory\IpLookupFactory $ipServiceFactory */
+            $ipServiceFactory = $this->container->get('mautic.ip_lookup.factory');
+            $ipService        = $ipServiceFactory->getService($serviceName, $serviceAuth);
+
+            if ($ipService instanceof AbstractLocalDataLookup) {
+                if ($ipService->downloadRemoteDataStore()) {
+                    $dataArray['success'] = 1;
+                    $dataArray['message'] = $this->container->get('translator')->trans('mautic.core.success');
+                } else {
+                    $remoteUrl = $ipService->getRemoteDateStoreDownloadUrl();
+                    $localPath = $ipService->getLocalDataStoreFilepath();
+
+                    if ($remoteUrl && $localPath) {
+                        $dataArray['error'] = $this->container->get('translator')->trans(
+                            'mautic.core.ip_lookup.remote_fetch_error',
+                            array(
+                                '%remoteUrl%' => $remoteUrl,
+                                '%localPath%' => $localPath
+                            )
+                        );
+                    } else {
+                        $dataArray['error'] = $this->container->get('translator')->trans(
+                            'mautic.core.ip_lookup.remote_fetch_error_generic'
+                        );
+                    }
+                }
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Fetch IP Lookup form
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function getIpLookupFormAction(Request $request)
+    {
+        $dataArray = array('html' => '', 'attribution' => '');
+
+        if ($request->request->has('service')) {
+            $serviceName = $request->request->get('service');
+
+            /** @var \Mautic\CoreBundle\Factory\IpLookupFactory $ipServiceFactory */
+            $ipServiceFactory = $this->container->get('mautic.ip_lookup.factory');
+            $ipService        = $ipServiceFactory->getService($serviceName);
+
+            if ($ipService instanceof AbstractLookup) {
+                $dataArray['attribution'] = $ipService->getAttribution();
+                if ($ipService instanceof IpLookupFormInterface) {
+                    if ($formType = $ipService->getConfigFormService()) {
+                        $themes   = $ipService->getConfigFormThemes();
+                        $themes[] = 'MauticCoreBundle:FormTheme\Config';
+
+                        $form = $this->get('form.factory')->create($formType, array(), array('ip_lookup_service' => $ipService));
+                        $html = $this->renderView(
+                            'MauticCoreBundle:FormTheme\Config:ip_lookup_config_row.html.php',
+                            array(
+                                'form' => $this->setFormTheme($form, 'MauticCoreBundle:FormTheme\Config:ip_lookup_config_row.html.php', $themes)
+                            )
+                        );
+
+                        $html              = str_replace($formType.'_', 'config_coreconfig_ip_lookup_config_', $html);
+                        $html              = str_replace($formType, 'config[coreconfig][ip_lookup_config]', $html);
+                        $dataArray['html'] = $html;
+                    }
                 }
             }
         }
