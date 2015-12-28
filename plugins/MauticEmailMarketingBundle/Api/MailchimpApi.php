@@ -15,15 +15,37 @@ class MailchimpApi extends EmailMarketingApi{
 
     private $version = '2.0';
 
+    /**
+     * @param        $endpoint
+     * @param array  $parameters
+     * @param string $method
+     *
+     * @return mixed|string
+     * @throws ApiErrorException
+     */
     protected function request($endpoint, $parameters = array(), $method = 'GET')
     {
-        $url = sprintf('%s/%s/%s', $this->keys['api_endpoint'], $this->version, $endpoint);
+        if (isset($this->keys['password'])) {
+            // Extract the dc from the key
+            $parts   = explode('-', $this->keys['password']);
+            if (count($parts) !== 2) {
 
-        $parameters['apikey'] = $this->keys['access_token'];
+                throw new ApiErrorException('Invalid key');
+            }
+
+            $dc                   = $parts[1];
+            $apiUrl               = 'https://'.$dc.'.api.mailchimp.com';
+            $parameters['apikey'] = $this->keys['password'];
+        } else {
+            $apiUrl               = $this->keys['password'];
+            $parameters['apikey'] = $this->keys['access_token'];
+        }
+        $url = sprintf('%s/%s/%s', $apiUrl, $this->version, $endpoint);
 
         $response = $this->integration->makeRequest($url, $parameters, $method, array('encode_parameters' => 'json'));
 
         if (is_array($response) && !empty($response['status']) && $response['status'] == 'error') {
+
             throw new ApiErrorException($response['error']);
         } elseif (is_array($response) && !empty($response['errors'])) {
             $errors = array();
@@ -33,6 +55,7 @@ class MailchimpApi extends EmailMarketingApi{
 
             throw new ApiErrorException(implode(' ', $errors));
         } else {
+
             return $response;
         }
     }

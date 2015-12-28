@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Symfony\Component\Intl\Intl;
 
 /**
  * Class CommonModel
@@ -201,12 +202,46 @@ class CommonModel
      */
     public function getEntityBySlugs($slug)
     {
-        $slugs = explode('/', $slug);
+        $slugs    = explode('/', $slug);
+        $idSlug   = '';
+        $category = null;
+        $lang     = null;
 
-        if (!empty($slugs[1])) {
-            $idSlug = $slugs[1];
-        } else {
-            $idSlug = $slugs[0];
+        $slugCount = count($slugs);
+        $locales   = Intl::getLocaleBundle()->getLocaleNames();
+
+        switch (true) {
+            case ($slugCount === 3):
+                list($lang, $category, $idSlug) = $slugs;
+
+                break;
+
+            case ($slugCount === 2):
+                list($category, $idSlug) = $slugs;
+
+                // Check if the first slug is actually a locale
+                if (isset($locales[$category])) {
+                    $lang     = $category;
+                    $category = null;
+                }
+
+                break;
+
+            case ($slugCount === 1):
+                $idSlug = $slugs[0];
+
+                break;
+        }
+
+        // Check for uncategorized
+        if ($this->translator->trans('mautic.core.url.uncategorized') == $category) {
+            $category = null;
+        }
+
+        if ($lang && !isset($locales[$lang])) {
+            // Language doesn't exist so return false
+
+            return false;
         }
 
         if (strpos($idSlug, ':') !== false) {
@@ -215,13 +250,15 @@ class CommonModel
                 $entity = $this->getEntity($parts[0]);
 
                 if (!empty($entity)) {
+
                     return $entity;
                 }
             }
         } else {
-            $entity = $this->getEntityByAlias($idSlug);
+            $entity = $this->getRepository()->findOneBySlugs($idSlug, $category, $lang);
 
             if (!empty($entity)) {
+
                 return $entity;
             }
         }
@@ -234,9 +271,9 @@ class CommonModel
      *
      * @return null|object
      */
-    public function getEntityByAlias($alias)
+    public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
     {
-        return $this->getRepository()->findOneBy(array('alias' => $alias));
+
     }
 
 }

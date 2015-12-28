@@ -10,37 +10,45 @@
 namespace Mautic\CoreBundle\IpLookup;
 
 
-class GeoipsIpLookup extends AbstractIpLookup
+class FreegeoipLookup extends AbstractRemoteDataLookup
 {
+    /**
+     * @return string
+     */
+    public function getAttribution()
+    {
+        return '<a href="https://freegeoip.net/" target="_blank">freegeoip.net</a> is a free lookup service that leverages GeoLite2 data created by MaxMind.';
+    }
+
     /**
      * @return string
      */
     protected function getUrl()
     {
-        return "http://api.geoips.com/ip/{$this->ip}/key/ec9e4bbc7ac82d809c20c51c9ad2441f/output/json";
+        return "http://freegeoip.net/json/{$this->ip}";
     }
 
     /**
      * @param $response
      */
-    public function parseData($response)
+    protected function parseResponse($response)
     {
         $data = json_decode($response);
 
-        if ($data && !empty($data->response->location)) {
-            foreach ($data->response->location as $key => $value) {
+        if ($data) {
+            foreach ($data as $key => $value) {
                 switch ($key) {
-                    case 'city_name':
-                        $key = 'city';
-                        break;
                     case 'region_name':
                         $key = 'region';
                         break;
                     case 'country_name':
                         $key = 'country';
                         break;
-                    case 'owner':
-                        $key = 'isp';
+                    case 'zip_code':
+                        $key = 'zipcode';
+                        break;
+                    case 'time_zone':
+                        $key = 'timezone';
                         break;
                 }
 

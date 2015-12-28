@@ -10,8 +10,16 @@
 namespace Mautic\CoreBundle\IpLookup;
 
 
-class IpinfodbIpLookup extends AbstractIpLookup
+class IpinfodbLookup extends AbstractRemoteDataLookup
 {
+    /**
+     * @return string
+     */
+    public function getAttribution()
+    {
+        return '<a href="http://www.ipinfodb.com/" target="_blank">iPInfoDB</a> offers a free service (2 lookups per second) that leverages data from IP2Location. API key required.';
+    }
+
     /**
      * @return string
      */
@@ -23,7 +31,7 @@ class IpinfodbIpLookup extends AbstractIpLookup
     /**
      * @param $response
      */
-    public function parseData($response)
+    protected function parseResponse($response)
     {
         $data = json_decode($response);
 
@@ -38,6 +46,12 @@ class IpinfodbIpLookup extends AbstractIpLookup
                         break;
                     case 'countryName':
                         $key = 'country';
+                        break;
+                    case 'zipCode':
+                        $key = 'zipcode';
+                        break;
+                    case 'timeZone':
+                        $key = 'timezone';
                         break;
                 }
 

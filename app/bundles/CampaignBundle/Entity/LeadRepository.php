@@ -9,8 +9,8 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\GraphHelper;
 
 /**
@@ -23,10 +23,12 @@ class LeadRepository extends CommonRepository
      *
      * @param      $campaignId
      * @param null $leads
+     *
+     * @return array
      */
     public function getLeadDetails($campaignId, $leads = null)
     {
-        $q = $this->_em->createQueryBuilder()
+        $q = $this->getEntityManager()->createQueryBuilder()
             ->from('MauticCampaignBundle:Lead', 'lc')
             ->select('lc')
             ->leftJoin('lc.campaign', 'c')
@@ -54,28 +56,40 @@ class LeadRepository extends CommonRepository
     /**
      * Get leads for a specific campaign
      *
-     * @param      $campaignId
-     * @param null $eventId
+     * @param $args
+     *
+     * @return array
      */
     public function getLeadsWithFields($args)
     {
         //DBAL
-        $dq = $this->_em->getConnection()->createQueryBuilder();
-        $dq->select('count(cl.lead_id) as count')
-            ->from(MAUTIC_TABLE_PREFIX . 'campaign_leads', 'cl')
-            ->leftJoin('cl', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = cl.lead_id')
-            ->where(
-                $dq->expr()->eq('cl.manually_removed', ':false')
-            )
-            ->setParameter('false', false, 'boolean');
+        $dq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $dq->select('count(*) as count')
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
 
         //Fix arguments if necessary
         $args = $this->convertOrmProperties('Mautic\\LeadBundle\\Entity\\Lead', $args);
 
+        $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $sq->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl');
+
+        $expr = $sq->expr()->andX(
+            $sq->expr()->eq('cl.lead_id', 'l.id'),
+            $sq->expr()->eq('cl.manually_removed', ':false')
+        );
+        $dq->setParameter('false', false, 'boolean');
+
         if (isset($args['campaign_id'])) {
-            $dq->andWhere($dq->expr()->eq('cl.campaign_id', ':campaign'))
-                ->setParameter('campaign', $args['campaign_id']);
+            $expr->add(
+                $sq->expr()->eq('cl.campaign_id', (int) $args['campaign_id'])
+            );
         }
+        $sq->where($expr);
+
+        $dq->andWhere(
+            sprintf('EXISTS (%s)', $sq->getSQL())
+        );
 
         //get a total count
         $result = $dq->execute()->fetchAll();
@@ -85,17 +99,8 @@ class LeadRepository extends CommonRepository
         $this->buildOrderByClause($dq, $args);
         $this->buildLimiterClauses($dq, $args);
 
-        $dq->resetQueryPart('select');
-
-        $ipQuery = $this->_em->getConnection()->createQueryBuilder();
-        $ipQuery->select('i.ip_address')
-            ->from(MAUTIC_TABLE_PREFIX . 'ip_addresses', 'i')
-            ->leftJoin('i', MAUTIC_TABLE_PREFIX . 'lead_ips_xref', 'ix', 'i.id = ix.ip_id')
-            ->where('l.id = ix.lead_id')
-            ->orderBy('i.id', 'DESC');
-        $ipQuery->setMaxResults(1);
-
-        $dq->select('l.*, ' . sprintf('(%s)', $ipQuery->getSQL()) . ' as ip_address'); //single IP address
+        $dq->resetQueryPart('select')
+            ->select('l.*');
 
         $leads = $dq->execute()->fetchAll();
 
@@ -111,10 +116,12 @@ class LeadRepository extends CommonRepository
      *
      * @param      $campaignId
      * @param null $eventId
+     *
+     * @return array
      */
     public function getLeads($campaignId, $eventId = null)
     {
-        $q = $this->_em->createQueryBuilder()
+        $q = $this->getEntityManager()->createQueryBuilder()
             ->from('MauticCampaignBundle:Lead', 'lc')
             ->select('lc, l')
             ->leftJoin('lc.campaign', 'c')
@@ -129,7 +136,7 @@ class LeadRepository extends CommonRepository
             ->setParameter('campaign', $campaignId);
 
         if ($eventId != null) {
-            $dq = $this->_em->createQueryBuilder();
+            $dq = $this->getEntityManager()->createQueryBuilder();
             $dq->select('el.id')
                 ->from('MauticCampaignBundle:LeadEventLog', 'ell')
                 ->leftJoin('ell.lead', 'el')
@@ -163,8 +170,11 @@ class LeadRepository extends CommonRepository
         $graphData = GraphHelper::prepareDatetimeLineGraphData($quantity, $unit, array('viewed'));
 
         // Load points for selected period
-        $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('cl.date_added')
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $q->select(
+            sprintf('count(*) as count, DATE(cl.date_added) as date_added')
+        )
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl');
 
         $utc = new \DateTimeZone('UTC');
@@ -178,24 +188,31 @@ class LeadRepository extends CommonRepository
         )
             ->setParameter('date', $graphData['fromDate']->format('Y-m-d H:i:s'))
             ->setParameter('false', false, 'boolean')
-            ->orderBy('cl.date_added', 'ASC');
+            ->groupBy('DATE(cl.date_added)')
+            ->orderBy('date_added', 'ASC');
 
         if (isset($options['campaign_id'])) {
             $q->andwhere($q->expr()->gte('cl.campaign_id', (int) $options['campaign_id']));
         }
 
-        $leads = $q->execute()->fetchAll();
-        $total = false;
+        $datesAdded = $q->execute()->fetchAll();
 
-        if (isset($options['total']) && $options['total']) {
-            // Count total until date
-            $q->select('count(cl.lead_id) as total');
-
-            $total = $q->execute()->fetchAll();
-            $total = (int) $total[0]['total'];
+        $format         = GraphHelper::getDateLabelFormat($unit);
+        $formattedDates = array();
+        $dt             = new DateTimeHelper();
+        foreach ($datesAdded as &$date) {
+            $dt->setDateTime($date['date_added'], 'Y-m-d', 'utc');
+            $key                  = $dt->getDateTime()->format($format);
+            $formattedDates[$key] = (int) $date['count'];
         }
 
-        return GraphHelper::mergeLineGraphData($graphData, $leads, $unit, 0, 'date_added', null, false, $total);
+        foreach ($graphData['labels'] as $key => $label) {
+            $graphData['datasets'][0]['data'][$key] = (isset($formattedDates[$label])) ? $formattedDates[$label] : 0;
+        }
+
+        unset($graphData['fromDate']);
+
+        return $graphData;
     }
 
 
@@ -208,7 +225,7 @@ class LeadRepository extends CommonRepository
     public function updateLead($fromLeadId, $toLeadId)
     {
         // First check to ensure the $toLead doesn't already exist
-        $results = $this->_em->getConnection()->createQueryBuilder()
+        $results = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('cl.campaign_id')
             ->from(MAUTIC_TABLE_PREFIX . 'campaign_leads', 'cl')
             ->where('cl.lead_id = ' . $toLeadId)
@@ -219,7 +236,7 @@ class LeadRepository extends CommonRepository
             $campaigns[] = $r['campaign_id'];
         }
 
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX . 'campaign_leads')
             ->set('lead_id', (int)$toLeadId)
             ->where('lead_id = ' . (int)$fromLeadId);
@@ -230,7 +247,7 @@ class LeadRepository extends CommonRepository
             )->execute();
 
             // Delete remaining leads as the new lead already belongs
-            $this->_em->getConnection()->createQueryBuilder()
+            $this->getEntityManager()->getConnection()->createQueryBuilder()
                 ->delete(MAUTIC_TABLE_PREFIX . 'campaign_leads')
                 ->where('lead_id = ' . (int)$fromLeadId)
                 ->execute();

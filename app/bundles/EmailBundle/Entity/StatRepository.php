@@ -253,9 +253,10 @@ class StatRepository extends CommonRepository
     {
         $query = $this->createQueryBuilder('s');
 
-        $query->select('IDENTITY(s.email) AS email_id, s.id, s.dateRead, s.dateSent, e.name, e.subject, s.isRead, s.isFailed, s.viewedInBrowser, s.retryCount, IDENTITY(s.list) AS list_id, l.name as list_name, s.trackingHash as idHash, s.openDetails')
+        $query->select('IDENTITY(s.email) AS email_id, s.id, s.dateRead, s.dateSent, e.name, e.subject, s.isRead, s.isFailed, s.viewedInBrowser, s.retryCount, IDENTITY(s.list) AS list_id, l.name as list_name, s.trackingHash as idHash, s.openDetails, ec.subject as storedSubject')
             ->leftJoin('MauticEmailBundle:Email', 'e', 'WITH', 'e.id = s.email')
             ->leftJoin('MauticLeadBundle:LeadList', 'l', 'WITH', 'l.id = s.list')
+            ->leftJoin('MauticEmailBundle:Copy', 'ec', 'WITH', 'ec.id = s.storedCopy')
             ->where(
                 $query->expr()->andX(
                     $query->expr()->eq('IDENTITY(s.lead)', $leadId),

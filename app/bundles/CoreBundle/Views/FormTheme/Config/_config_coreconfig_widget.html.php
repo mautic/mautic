@@ -104,20 +104,30 @@ $template = '<div class="col-md-6">{content}</div>';
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_service', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_auth', $template); ?>
+            <div id="ip_lookup_config_container">
+            <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_config', '<div class="col-md-12">{content}</div>'); ?>
+            </div>
         </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="small text-center" id="ip_lookup_attribution"><?php echo $ipLookupAttribution; ?></div>
+            </div>
+        </div>
+
+        <?php if (isset($fields['do_not_track_ips'])): ?>
+        <hr class="text-muted" />
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'do_not_track_ips', $template); ?>
+        </div>
+        <?php endif; ?>
 
         <?php if (isset($fields['transifex_username'])): ?>
         <hr class="text-muted" />
-
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'transifex_username', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'transifex_password', $template); ?>
         </div>
         <?php endif; ?>
-
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'do_not_track_ips', $template); ?>
-        </div>
     </div>
 </div>
 <?php endif; ?>

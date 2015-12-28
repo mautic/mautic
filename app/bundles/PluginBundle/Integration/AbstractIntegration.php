@@ -340,6 +340,8 @@ abstract class AbstractIntegration
     public function getClientIdKey ()
     {
         switch ($this->getAuthenticationType()) {
+            case 'oauth1a':
+                return 'consumer_id';
             case 'oauth2':
                 return 'client_id';
             case 'key':
@@ -357,8 +359,12 @@ abstract class AbstractIntegration
     public function getClientSecretKey ()
     {
         switch ($this->getAuthenticationType()) {
+            case 'oauth1a':
+                return 'consumer_secret';
             case 'oauth2':
                 return 'client_secret';
+            case 'basic':
+                return 'password';
             default:
                 return '';
         }
@@ -409,6 +415,11 @@ abstract class AbstractIntegration
     public function getRequiredKeyFields ()
     {
         switch ($this->getAuthenticationType()) {
+            case 'oauth1a':
+                return array(
+                    'consumer_id'      => 'mautic.integration.keyfield.consumerid',
+                    'consumer_secret'  => 'mautic.integration.keyfield.consumersecret'
+                );
             case 'oauth2':
                 return array(
                     'client_id'      => 'mautic.integration.keyfield.clientid',
@@ -417,6 +428,11 @@ abstract class AbstractIntegration
             case 'key':
                 return array(
                     'key' => 'mautic.integration.keyfield.api'
+                );
+            case 'basic':
+                return array(
+                    'username'  => 'mautic.integration.keyfield.username',
+                    'password'  => 'mautic.integration.keyfield.password'
                 );
             default:
                 return array();
@@ -700,6 +716,11 @@ abstract class AbstractIntegration
             }
         } else {
             switch ($authType) {
+                case 'basic':
+                    $headers = array(
+                        'Authorization' => 'Basic ' . base64_encode($this->keys['username'].':'.$this->keys['password']),
+                    );
+                    break;
                 case 'oauth1a':
                     $oauthHelper = new oAuthHelper($this, $this->factory->getRequest(), $settings);
                     $headers     = $oauthHelper->getAuthorizationHeader($url, $parameters, $method);
@@ -908,7 +929,8 @@ abstract class AbstractIntegration
     {
         $requiredTokens = $this->getRequiredKeyFields();
         foreach ($requiredTokens as $token => $label) {
-            if (!isset($this->keys[$token])) {
+            if (empty($this->keys[$token])) {
+
                 return false;
             }
         }
@@ -924,6 +946,7 @@ abstract class AbstractIntegration
     public function isAuthorized()
     {
         if (!$this->isConfigured()) {
+
             return false;
         }
 
@@ -954,7 +977,9 @@ abstract class AbstractIntegration
             case 'rest':
                 $valid = isset($this->keys[$authTokenKey]);
                 break;
-
+            case 'basic':
+                $valid = (!empty($this->keys['username']) && !empty($this->keys['password']));
+                break;
             default:
                 $valid = true;
                 break;
@@ -1146,6 +1171,7 @@ abstract class AbstractIntegration
             $config = $this->mergeConfigToFeatureSettings($config);
 
             if (empty($config['leadFields'])) {
+
                 return array();
             }
         }
@@ -1383,6 +1409,6 @@ abstract class AbstractIntegration
      */
     public function getFormLeadFields($settings = array())
     {
-        return $this->getAvailableLeadFields($settings);
+        return ($this->isAuthorized()) ? $this->getAvailableLeadFields($settings) : array();
     }
 }

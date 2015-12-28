@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Doctrine\Mapping;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 /**
  * Class ClassMetadataBuilder
@@ -21,6 +22,17 @@ use Doctrine\ORM\Mapping\ClassMetadata;
  */
 class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder
 {
+    /**
+     * @param \Doctrine\ORM\Mapping\ClassMetadataInfo $cm
+     */
+    public function __construct(ClassMetadataInfo $cm)
+    {
+        parent::__construct($cm);
+
+        // Default all Mautic entities to explicit
+        $this->setChangeTrackingPolicyDeferredExplicit();
+    }
+
     /**
      * Creates a ManyToOne Association Builder.
      *

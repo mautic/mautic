@@ -17,27 +17,17 @@ if ($code = $view['analytics']->getCode()) {
 //Set the slots
 foreach ($slots as $slot => $slotConfig) {
 
-	// backward compatibility - if slotConfig array does not exist
+    // backward compatibility - if slotConfig array does not exist
     if (is_numeric($slot)) {
         $slot = $slotConfig;
         $slotConfig = array();
     }
 
-    // define default config if does not exist
-    if (!isset($slotConfig['type'])) {
-        $slotConfig['type'] = 'html';
-    }
-
-    if ($slotConfig['type'] == 'html' || $slotConfig['type'] == 'text') {
-	    $value = isset($content[$slot]) ? $content[$slot] : "";
-	    $view['slots']->set($slot, $value);
-	}
-
-	if ($slotConfig['type'] == 'slideshow') {
-		if (isset($content[$slot])) {
-			$options = json_decode($content[$slot], true);
-		} else {
-			$options = array(
+    if (isset($slotConfig['type']) && $slotConfig['type'] == 'slideshow') {
+        if (isset($content[$slot])) {
+            $options = json_decode($content[$slot], true);
+        } else {
+            $options = array(
                 'width' => '100%',
                 'height' => '250px',
                 'background_color' => 'transparent',
@@ -48,9 +38,9 @@ foreach ($slots as $slot => $slotConfig) {
                 'wrap' => true,
                 'keyboard' => true
             );
-		}
+        }
 
-		// Create sample slides for first time or if all slides were deleted
+        // Create sample slides for first time or if all slides were deleted
         if (empty($options['slides'])) {
             $options['slides'] =  array (
                 array (
@@ -72,9 +62,16 @@ foreach ($slots as $slot => $slotConfig) {
             return strcmp($a['order'], $b['order']);
         });
 
-		$options['slot'] = $slot;
-		$options['public'] = true;
+        $options['slot'] = $slot;
+        $options['public'] = true;
 
         $view['slots']->set($slot, $view->render('MauticPageBundle:Page:Slots/slideshow.html.php', $options));
+    } elseif (isset($slotConfig['type']) && $slotConfig['type'] == 'textarea') {
+        $value = isset($content[$slot]) ? nl2br($content[$slot]) : "";
+        $view['slots']->set($slot, $value);
+    } else {
+        // Fallback for other types like html, text, textarea and all unknown
+        $value = isset($content[$slot]) ? $content[$slot] : "";
+        $view['slots']->set($slot, $value);
     }
 }
