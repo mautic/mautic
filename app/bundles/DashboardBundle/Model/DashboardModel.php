@@ -11,8 +11,8 @@ namespace Mautic\DashboardBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Mautic\DashboardBundle\Entity\Module;
-use Mautic\DashboardBundle\Event\ModuleDetailEvent;
+use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\DashboardEvents;
 
 /**
@@ -27,7 +27,7 @@ class DashboardModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticDashboardBundle:Module');
+        return $this->em->getRepository('MauticDashboardBundle:Widget');
     }
 
     /**
@@ -37,7 +37,7 @@ class DashboardModel extends FormModel
      */
     public function getPermissionBase()
     {
-        return 'dashboard:modules';
+        return 'dashboard:widgets';
     }
 
     /**
@@ -49,7 +49,7 @@ class DashboardModel extends FormModel
     public function getEntity($id = null)
     {
         if ($id === null) {
-            return new Module();
+            return new Widget();
         }
 
         $entity = parent::getEntity($id);
@@ -58,13 +58,13 @@ class DashboardModel extends FormModel
     }
 
     /**
-     * Load modules for the current user from database and dispatch the onModuleDetailGenerate trigger
+     * Load widgets for the current user from database and dispatch the onWidgetDetailGenerate trigger
      *
      * @return array
      */
-    public function getModules()
+    public function getWidgets()
     {
-        $modules = $this->getEntities(array(
+        $widgets = $this->getEntities(array(
             'filter' => array(
                 'force' => array(
                     'column' => 'm.createdBy',
@@ -74,28 +74,28 @@ class DashboardModel extends FormModel
             )
         ));
 
-        foreach ($modules as &$module) {
-            $this->populateModuleContent($module);
+        foreach ($widgets as &$widget) {
+            $this->populateWidgetContent($widget);
         }
 
-        return $modules;
+        return $widgets;
     }
 
     /**
-     * Load module content from the onModuleDetailGenerate event
+     * Load widget content from the onWidgetDetailGenerate event
      *
      * @return array
      */
-    public function populateModuleContent(Module &$module)
+    public function populateWidgetContent(Widget &$widget)
     {
         $dispatcher = $this->factory->getDispatcher();
-        $event      = new ModuleDetailEvent();
-        $event->setType($module->getType());
-        $event->setModule($module);
+        $event      = new WidgetDetailEvent();
+        $event->setType($widget->getType());
+        $event->setWidget($widget);
         $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
-        $module->setErrorMessage($event->getErrorMessage());
-        $module->setTemplate($event->getTemplate());
-        $module->setTemplateData($event->getTemplateData());
+        $widget->setErrorMessage($event->getErrorMessage());
+        $widget->setTemplate($event->getTemplate());
+        $widget->setTemplateData($event->getTemplateData());
     }
 
     /**
@@ -111,14 +111,14 @@ class DashboardModel extends FormModel
      */
     public function createForm($entity, $formFactory, $action = null, $options = array())
     {
-        if (!$entity instanceof Module) {
-            throw new MethodNotAllowedHttpException(array('Module'), 'Entity must be of class Module()');
+        if (!$entity instanceof Widget) {
+            throw new MethodNotAllowedHttpException(array('Widget'), 'Entity must be of class Widget()');
         }
 
         if (!empty($action))  {
             $options['action'] = $action;
         }
 
-        return $formFactory->create('module', $entity, $options);
+        return $formFactory->create('widget', $entity, $options);
     }
 }

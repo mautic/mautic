@@ -57,6 +57,6 @@ class DashboardLeadsInTimeModuleType extends AbstractType
      */
     public function getName()
     {
-        return "lead_dashboard_leads_in_time_module";
+        return "lead_dashboard_leads_in_time_widget";
     }
 }

@@ -10,23 +10,23 @@
 namespace Mautic\DashboardBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
-use Mautic\DashboardBundle\Entity\Module;
+use Mautic\DashboardBundle\Entity\Widget;
 
 /**
- * Class ModuleDetailEvent
+ * Class WidgetDetailEvent
  *
  * @package Mautic\DashboardBundle\Event
  */
-class ModuleDetailEvent extends CommonEvent
+class WidgetDetailEvent extends CommonEvent
 {
-    protected $module;
+    protected $widget;
     protected $type;
     protected $template;
     protected $templateData = array();
     protected $errorMessage;
 
     /**
-     * Set the module type
+     * Set the widget type
      *
      * @param string $type
      */
@@ -36,7 +36,7 @@ class ModuleDetailEvent extends CommonEvent
     }
 
     /**
-     * Get the module type
+     * Get the widget type
      *
      * @return string $type
      */
@@ -46,27 +46,27 @@ class ModuleDetailEvent extends CommonEvent
     }
 
     /**
-     * Set the module entity
+     * Set the widget entity
      *
-     * @param Module $module
+     * @param Widget $widget
      */
-    public function setModule(Module $module)
+    public function setWidget(Widget $widget)
     {
-        $this->module = $module;
+        $this->widget = $widget;
     }
 
     /**
-     * Returns the module entity
+     * Returns the widget entity
      *
-     * @param Module $module
+     * @param Widget $widget
      */
-    public function getModule()
+    public function getWidget()
     {
-        return $this->module;
+        return $this->widget;
     }
 
     /**
-     * Set the module template
+     * Set the widget template
      *
      * @param string $template
      */
@@ -76,7 +76,7 @@ class ModuleDetailEvent extends CommonEvent
     }
 
     /**
-     * Get the module template
+     * Get the widget template
      *
      * @return string $template
      */
@@ -86,7 +86,7 @@ class ModuleDetailEvent extends CommonEvent
     }
 
     /**
-     * Set the module template data
+     * Set the widget template data
      *
      * @param array  $templateData
      */
@@ -96,7 +96,7 @@ class ModuleDetailEvent extends CommonEvent
     }
 
     /**
-     * Get the module template data
+     * Get the widget template data
      *
      * @return string $templateData
      */

@@ -14,7 +14,7 @@ use Symfony\Component\Intl\Intl;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\CoreEvents;
-use Mautic\DashboardBundle\Entity\Module;
+use Mautic\DashboardBundle\Entity\Widget;
 
 /**
  * Class DashboardController
@@ -172,7 +172,7 @@ class DashboardController extends FormController
                 'upcomingEmails'    => $upcomingEmails,
                 'leadLineChart'     => $leadModel->getLeadsLineChartData(30, 'd'),
                 'security'          => $this->factory->getSecurity(),
-                'modules'           => $model->getModules()
+                'widgets'           => $model->getWidgets()
             ),
             'contentTemplate' => 'MauticDashboardBundle:Dashboard:index.html.php',
             'passthroughVars' => array(
@@ -184,7 +184,7 @@ class DashboardController extends FormController
     }
 
     /**
-     * Generate's new dashboard module and processes post data
+     * Generate's new dashboard widget and processes post data
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
@@ -192,13 +192,13 @@ class DashboardController extends FormController
     {
 
         //retrieve the entity
-        $module = new Module();
+        $widget = new Widget();
 
         $model  = $this->factory->getModel('dashboard');
         $action = $this->generateUrl('mautic_dashboard_action', array('objectAction' => 'new'));
 
         //get the user form factory
-        $form       = $model->createForm($module, $this->get('form.factory'), $action);
+        $form       = $model->createForm($widget, $this->get('form.factory'), $action);
         $closeModal = false;
         $valid      = false;
         ///Check for a submitted form and process it
@@ -208,7 +208,7 @@ class DashboardController extends FormController
                     $closeModal = true;
 
                     //form is valid so process the data
-                    $model->saveEntity($module);
+                    $model->saveEntity($widget);
                 }
             } else {
                 $closeModal = true;
@@ -226,20 +226,20 @@ class DashboardController extends FormController
             //just close the modal
             $passthroughVars = array(
                 'closeModal'    => 1,
-                'mauticContent' => 'module'
+                'mauticContent' => 'widget'
             );
 
-            $model->populateModuleContent($module);
+            $model->populateWidgetContent($widget);
 
             if ($valid && !$cancelled) {
-                $passthroughVars['upModuleCount'] = 1;
-                $passthroughVars['moduleHtml'] = $this->renderView('MauticDashboardBundle:Module:module.html.php', array(
-                    'module'      => $module,
+                $passthroughVars['upWidgetCount'] = 1;
+                $passthroughVars['widgetHtml'] = $this->renderView('MauticDashboardBundle:Widget:detail.html.php', array(
+                    'widget'      => $widget,
                     // 'permissions' => $permissions,
                 ));
-                $passthroughVars['moduleId'] = $module->getId();
-                $passthroughVars['moduleWidth'] = $module->getWidth();
-                $passthroughVars['moduleHeight'] = $module->getHeight();
+                $passthroughVars['widgetId'] = $widget->getId();
+                $passthroughVars['widgetWidth'] = $widget->getWidth();
+                $passthroughVars['widgetHeight'] = $widget->getHeight();
             }
 
 
@@ -254,13 +254,13 @@ class DashboardController extends FormController
                     'form'        => $form->createView(),
                     // 'permissions' => $permissions
                 ),
-                'contentTemplate' => 'MauticDashboardBundle:Module:form.html.php'
+                'contentTemplate' => 'MauticDashboardBundle:Widget:form.html.php'
             ));
         }
     }
 
     /**
-     * edit module and processes post data
+     * edit widget and processes post data
      *
      * @param $objectId
      *
@@ -269,11 +269,11 @@ class DashboardController extends FormController
     public function editAction($objectId)
     {
         $model  = $this->factory->getModel('dashboard');
-        $module = $model->getEntity($objectId);
+        $widget = $model->getEntity($objectId);
         $action = $this->generateUrl('mautic_dashboard_action', array('objectAction' => 'edit', 'objectId' => $objectId));
 
         //get the user form factory
-        $form       = $model->createForm($module, $this->get('form.factory'), $action);
+        $form       = $model->createForm($widget, $this->get('form.factory'), $action);
         $closeModal = false;
         $valid      = false;
         ///Check for a submitted form and process it
@@ -283,7 +283,7 @@ class DashboardController extends FormController
                     $closeModal = true;
 
                     //form is valid so process the data
-                    $model->saveEntity($module);
+                    $model->saveEntity($widget);
                 }
             } else {
                 $closeModal = true;
@@ -293,28 +293,28 @@ class DashboardController extends FormController
         // @todo: build permissions
         // $security    = $this->factory->getSecurity();
         // $permissions = array(
-        //     'edit'   => $security->hasEntityAccess('dashobard:widgets:editown', 'dashobard:widgets:editother', $module->getOwner()),
-        //     'delete' => $security->hasEntityAccess('dashobard:widgets:deleteown', 'dashobard:widgets:deleteown', $module->getOwner()),
+        //     'edit'   => $security->hasEntityAccess('dashobard:widgets:editown', 'dashobard:widgets:editother', $widget->getOwner()),
+        //     'delete' => $security->hasEntityAccess('dashobard:widgets:deleteown', 'dashobard:widgets:deleteown', $widget->getOwner()),
         // );
 
         if ($closeModal) {
             //just close the modal
             $passthroughVars = array(
                 'closeModal'    => 1,
-                'mauticContent' => 'module'
+                'mauticContent' => 'widget'
             );
 
-            $model->populateModuleContent($module);
+            $model->populateWidgetContent($widget);
 
             if ($valid && !$cancelled) {
-                $passthroughVars['upModuleCount'] = 1;
-                $passthroughVars['moduleHtml'] = $this->renderView('MauticDashboardBundle:Module:module.html.php', array(
-                    'module'      => $module,
+                $passthroughVars['upWidgetCount'] = 1;
+                $passthroughVars['widgetHtml'] = $this->renderView('MauticDashboardBundle:Widget:detail.html.php', array(
+                    'widget'      => $widget,
                     // 'permissions' => $permissions,
                 ));
-                $passthroughVars['moduleId'] = $module->getId();
-                $passthroughVars['moduleWidth'] = $module->getWidth();
-                $passthroughVars['moduleHeight'] = $module->getHeight();
+                $passthroughVars['widgetId'] = $widget->getId();
+                $passthroughVars['widgetWidth'] = $widget->getWidth();
+                $passthroughVars['widgetHeight'] = $widget->getHeight();
             }
 
 
@@ -329,7 +329,7 @@ class DashboardController extends FormController
                     'form'        => $form->createView(),
                     // 'permissions' => $permissions
                 ),
-                'contentTemplate' => 'MauticDashboardBundle:Module:form.html.php'
+                'contentTemplate' => 'MauticDashboardBundle:Widget:form.html.php'
             ));
         }
     }

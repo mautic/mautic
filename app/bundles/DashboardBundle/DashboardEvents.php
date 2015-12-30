@@ -18,32 +18,32 @@ namespace Mautic\DashboardBundle;
 final class DashboardEvents
 {
     /**
-     * The mautic.dashboard_on_module_list_generate event is dispatched when generating a list of available module types
+     * The mautic.dashboard_on_widget_list_generate event is dispatched when generating a list of available widget types
      *
      * The event listener receives a
-     * Mautic\DashbardBundle\Event\ModuleTypeListEvent instance.
+     * Mautic\DashbardBundle\Event\WidgetTypeListEvent instance.
      *
      * @var string
      */
-    const DASHBOARD_ON_MODULE_LIST_GENERATE = 'mautic.dashboard_on_module_list_generate';
+    const DASHBOARD_ON_MODULE_LIST_GENERATE = 'mautic.dashboard_on_widget_list_generate';
 
     /**
-     * The mautic.dashboard_on_module_form_generate event is dispatched when generating the form of a module type
+     * The mautic.dashboard_on_widget_form_generate event is dispatched when generating the form of a widget type
      *
      * The event listener receives a
-     * Mautic\DashbardBundle\Event\ModuleFormEvent instance.
+     * Mautic\DashbardBundle\Event\WidgetFormEvent instance.
      *
      * @var string
      */
-    const DASHBOARD_ON_MODULE_FORM_GENERATE = 'mautic.dashboard_on_module_form_generate';
+    const DASHBOARD_ON_MODULE_FORM_GENERATE = 'mautic.dashboard_on_widget_form_generate';
 
     /**
-     * The mautic.dashboard_on_module_detail_generate event is dispatched when generating the detail of a module type
+     * The mautic.dashboard_on_widget_detail_generate event is dispatched when generating the detail of a widget type
      *
      * The event listener receives a
-     * Mautic\DashbardBundle\Event\ModuleDetailEvent instance.
+     * Mautic\DashbardBundle\Event\WidgetDetailEvent instance.
      *
      * @var string
      */
-    const DASHBOARD_ON_MODULE_DETAIL_GENERATE = 'mautic.dashboard_on_module_detail_generate';
+    const DASHBOARD_ON_MODULE_DETAIL_GENERATE = 'mautic.dashboard_on_widget_detail_generate';
 }

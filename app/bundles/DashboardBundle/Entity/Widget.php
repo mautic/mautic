@@ -16,11 +16,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Class Module
+ * Class Widget
  *
  * @package Mautic\DashboardBundle\Entity
  */
-class Module extends FormEntity
+class Widget extends FormEntity
 {
     /**
      * @var int
@@ -91,8 +91,8 @@ class Module extends FormEntity
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('modules')
-            ->setCustomRepositoryClass('Mautic\DashboardBundle\Entity\ModuleRepository');
+        $builder->setTable('widgets')
+            ->setCustomRepositoryClass('Mautic\DashboardBundle\Entity\WidgetRepository');
 
         $builder->addIdColumns();
 
@@ -151,7 +151,7 @@ class Module extends FormEntity
      *
      * @param string $name
      *
-     * @return Module
+     * @return Widget
      */
     public function setName($name)
     {
@@ -176,7 +176,7 @@ class Module extends FormEntity
      *
      * @param string $type
      *
-     * @return Module
+     * @return Widget
      */
     public function setType($type)
     {
@@ -201,7 +201,7 @@ class Module extends FormEntity
      *
      * @param integer $width
      *
-     * @return Module
+     * @return Widget
      */
     public function setWidth($width)
     {
@@ -226,7 +226,7 @@ class Module extends FormEntity
      *
      * @param integer $height
      *
-     * @return Module
+     * @return Widget
      */
     public function setHeight($height)
     {
@@ -251,7 +251,7 @@ class Module extends FormEntity
      *
      * @param integer $ordering
      *
-     * @return Module
+     * @return Widget
      */
     public function setOrdering($ordering)
     {
@@ -286,7 +286,7 @@ class Module extends FormEntity
      *
      * @param array $params
      *
-     * @return Module
+     * @return Widget
      */
     public function setParams(array $params)
     {
@@ -301,7 +301,7 @@ class Module extends FormEntity
      *
      * @param string $template
      *
-     * @return Module
+     * @return Widget
      */
     public function setTemplate($template)
     {
@@ -336,7 +336,7 @@ class Module extends FormEntity
      *
      * @param array $templateData
      *
-     * @return Module
+     * @return Widget
      */
     public function setTemplateData(array $templateData)
     {
@@ -351,7 +351,7 @@ class Module extends FormEntity
      *
      * @param string $errorMessage
      *
-     * @return Module
+     * @return Widget
      */
     public function setErrorMessage($errorMessage)
     {

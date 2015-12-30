@@ -14,8 +14,8 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\DashboardBundle\DashboardEvents;
-use Mautic\DashboardBundle\Event\ModuleTypeListEvent;
-use Mautic\DashboardBundle\Event\ModuleFormEvent;
+use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
+use Mautic\DashboardBundle\Event\WidgetFormEvent;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -24,11 +24,11 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 /**
- * Class ModuleType
+ * Class WidgetType
  *
  * @package Mautic\DashboardBundle\Form\Type
  */
-class ModuleType extends AbstractType
+class WidgetType extends AbstractType
 {
 
     private $factory;
@@ -48,29 +48,29 @@ class ModuleType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->add('name', 'text', array(
-            'label'      => 'mautic.dashboard.module.form.name',
+            'label'      => 'mautic.dashboard.widget.form.name',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
         ));
 
         $dispatcher = $this->factory->getDispatcher();
-        $event      = new ModuleTypeListEvent();
+        $event      = new WidgetTypeListEvent();
         $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE, $event);
 
         $builder->add('type', 'choice', array(
-            'label'       => 'mautic.dashboard.module.form.type',
+            'label'       => 'mautic.dashboard.widget.form.type',
             'choices'     => $event->getTypes(),
             'label_attr'  => array('class' => 'control-label'),
             'attr'        => array('class' => 'form-control'),
             'empty_value' => 'mautic.core.select',
             'attr'        => array(
                 'class'     => 'form-control',
-                'onchange'  => 'Mautic.updateModuleForm(this)'
+                'onchange'  => 'Mautic.updateWidgetForm(this)'
             )
         ));
 
         $builder->add('width', 'choice', array(
-            'label'       => 'mautic.dashboard.module.form.width',
+            'label'       => 'mautic.dashboard.widget.form.width',
             'choices'     => array(
                 '25' => '25%',
                 '50' => '50%',
@@ -84,7 +84,7 @@ class ModuleType extends AbstractType
         ));
 
         $builder->add('height', 'choice', array(
-            'label'       => 'mautic.dashboard.module.form.height',
+            'label'       => 'mautic.dashboard.widget.form.height',
             'choices'     => array(
                 '100' => '100px',
                 '215' => '215px',
@@ -101,11 +101,11 @@ class ModuleType extends AbstractType
 
         $ff = $builder->getFormFactory();
 
-        // function to add a form for specific module type dynamically
+        // function to add a form for specific widget type dynamically
         $func = function (FormEvent $e) use ($ff, $dispatcher) {
             $data    = $e->getData();
             $form    = $e->getForm();
-            $event   = new ModuleFormEvent();
+            $event   = new WidgetFormEvent();
             $type    = null;
             $params  = array();
 
@@ -124,11 +124,11 @@ class ModuleType extends AbstractType
 
             $event->setType($type);
             $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE, $event);
-            $moduleForm = $event->getForm();
+            $widgetForm = $event->getForm();
             $form->setData($params);
 
-            if (isset($moduleForm['formAlias'])) {
-                $form->add('params', $moduleForm['formAlias'], array(
+            if (isset($widgetForm['formAlias'])) {
+                $form->add('params', $widgetForm['formAlias'], array(
                     'label' => false
                 ));
             }
@@ -156,6 +156,6 @@ class ModuleType extends AbstractType
      */
     public function getName ()
     {
-        return "module";
+        return "widget";
     }
 }

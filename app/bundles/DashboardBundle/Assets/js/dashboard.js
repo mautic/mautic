@@ -4,7 +4,7 @@ Mautic.dashboardOnLoad = function (container) {
     Mautic.renderReturnRateDoughnut();
     Mautic.renderClickRateDoughnut();
     Mautic.updateActiveVisitorCount();
-    Mautic.initModuleSorting();
+    Mautic.initWidgetSorting();
 
     // Refresh page visits every 5 sec
     Mautic.setModeratedInterval('ActiveVisitorsLoop', 'updateActiveVisitorCount', 5000);
@@ -23,41 +23,41 @@ Mautic.dashboardOnUnload = function(id) {
     Mautic.clearModeratedInterval('ActiveVisitorsLoop');
 };
 
-Mautic.moduleOnLoad = function(container, response) {
-    if (!response.moduleId) return;
-    var module = mQuery('[data-module-id=' + response.moduleId + ']');
-    var moduleHtml = mQuery(response.moduleHtml);
+Mautic.widgetOnLoad = function(container, response) {
+    if (!response.widgetId) return;
+    var widget = mQuery('[data-widget-id=' + response.widgetId + ']');
+    var widgetHtml = mQuery(response.widgetHtml);
 
     // initialize edit button modal again
-    moduleHtml.find("*[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
+    widgetHtml.find("*[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
         event.preventDefault();
         Mautic.ajaxifyModal(this, event);
     });
 
-    // Create the new module wrapper and add it to the 0 position if doesn't exist (probably a new one)
-    if (!module.length) {
-        module = mQuery('<div/>')
-            .addClass('module')
-            .attr('data-module-id', response.moduleId);
-        mQuery('#dashboard-modules').prepend(module);
+    // Create the new widget wrapper and add it to the 0 position if doesn't exist (probably a new one)
+    if (!widget.length) {
+        widget = mQuery('<div/>')
+            .addClass('widget')
+            .attr('data-widget-id', response.widgetId);
+        mQuery('#dashboard-widgets').prepend(widget);
     }
 
-    module.html(moduleHtml)
-        .css('width', response.moduleWidth + '%')
-        .css('height', response.moduleHeight + '%');
-    Mautic.renderCharts(moduleHtml);
-    Mautic.saveModuleSorting();
+    widget.html(widgetHtml)
+        .css('width', response.widgetWidth + '%')
+        .css('height', response.widgetHeight + '%');
+    Mautic.renderCharts(widgetHtml);
+    Mautic.saveWidgetSorting();
 }
 
-Mautic.initModuleSorting = function () {
-    var modulesWrapper = mQuery('#dashboard-modules');
-    modulesWrapper.sortable({
+Mautic.initWidgetSorting = function () {
+    var widgetsWrapper = mQuery('#dashboard-widgets');
+    widgetsWrapper.sortable({
         handle: '.panel-heading',
         placeholder: 'sortable-placeholder',
-        items: '.module',
+        items: '.widget',
         opacity: 0.9,
         stop: function() {
-            Mautic.saveModuleSorting();
+            Mautic.saveWidgetSorting();
         },
         start: function( event, ui ) {
             console.log(ui.item);
@@ -67,14 +67,14 @@ Mautic.initModuleSorting = function () {
     }).disableSelection();
 }
 
-Mautic.saveModuleSorting = function () {
-    var modulesWrapper = mQuery('#dashboard-modules');
-    var modules = modulesWrapper.children();
+Mautic.saveWidgetSorting = function () {
+    var widgetsWrapper = mQuery('#dashboard-widgets');
+    var widgets = widgetsWrapper.children();
     var ordering = [];
-    modules.each(function(index, value) { 
-        ordering.push(mQuery(this).attr('data-module-id')); 
+    widgets.each(function(index, value) { 
+        ordering.push(mQuery(this).attr('data-widget-id')); 
     });
-    Mautic.ajaxActionRequest('dashboard:updateModuleOrdering', {'ordering': ordering}, function(response) {
+    Mautic.ajaxActionRequest('dashboard:updateWidgetOrdering', {'ordering': ordering}, function(response) {
         // @todo handle errors
     });
 }
@@ -212,14 +212,14 @@ Mautic.updateActiveVisitorCount = function () {
     });
 }
 
-Mautic.updateModuleForm = function (element) {
-    Mautic.activateLabelLoadingIndicator('module_type');
+Mautic.updateWidgetForm = function (element) {
+    Mautic.activateLabelLoadingIndicator('widget_type');
     var formWrapper = mQuery(element).closest('form');
-    var ModuleFormValues = formWrapper.serializeArray();
-    Mautic.ajaxActionRequest('dashboard:updateModuleForm', ModuleFormValues, function(response) {
+    var WidgetFormValues = formWrapper.serializeArray();
+    Mautic.ajaxActionRequest('dashboard:updateWidgetForm', WidgetFormValues, function(response) {
         if (response.formHtml) {
             var formHtml = mQuery(response.formHtml);
-            formHtml.find('#module_buttons').addClass('hide hidden');
+            formHtml.find('#widget_buttons').addClass('hide hidden');
             formWrapper.html(formHtml.children());
         }
         Mautic.removeLabelLoadingIndicator();

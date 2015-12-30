@@ -10,20 +10,20 @@
 namespace Mautic\DashboardBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
-use Mautic\DashboardBundle\Entity\Module;
+use Mautic\DashboardBundle\Entity\Widget;
 
 /**
- * Class ModuleFormEvent
+ * Class WidgetFormEvent
  *
  * @package Mautic\DashboardBundle\Event
  */
-class ModuleFormEvent extends CommonEvent
+class WidgetFormEvent extends CommonEvent
 {
     protected $form;
     protected $type;
 
     /**
-     * Set the module type
+     * Set the widget type
      *
      * @param string $type
      */
@@ -33,7 +33,7 @@ class ModuleFormEvent extends CommonEvent
     }
 
     /**
-     * Get the module type
+     * Get the widget type
      *
      * @return string $type
      */
@@ -43,7 +43,7 @@ class ModuleFormEvent extends CommonEvent
     }
 
     /**
-     * Set the module form
+     * Set the widget form
      *
      * @param string $form
      */
@@ -53,7 +53,7 @@ class ModuleFormEvent extends CommonEvent
     }
 
     /**
-     * Returns the module edit form
+     * Returns the widget edit form
      *
      * @param string $form
      */

@@ -7,12 +7,12 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$view['slots']->set('mauticContent', 'module');
+$view['slots']->set('mauticContent', 'widget');
 $userId = $form->vars['data']->getId();
 if (!empty($userId)) {
-    $header = $view['translator']->trans('mautic.dashboard.module.header.edit');
+    $header = $view['translator']->trans('mautic.dashboard.widget.header.edit');
 } else {
-    $header = $view['translator']->trans('mautic.dashboard.module.header.new');
+    $header = $view['translator']->trans('mautic.dashboard.widget.header.new');
 }
 ?>
 <?php echo $view['form']->start($form); ?>

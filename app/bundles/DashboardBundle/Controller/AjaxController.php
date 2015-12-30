@@ -11,9 +11,9 @@ namespace Mautic\DashboardBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Symfony\Component\HttpFoundation\Request;
-use Mautic\DashboardBundle\Entity\Module;
+use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\DashboardEvents;
-use Mautic\DashboardBundle\Event\ModuleFormEvent;
+use Mautic\DashboardBundle\Event\WidgetFormEvent;
 
 /**
  * Class AjaxController
@@ -41,14 +41,14 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * Returns HTML of a new module based on its values.
+     * Returns HTML of a new widget based on its values.
      *
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function updateModuleFormAction(Request $request)
+    protected function updateWidgetFormAction(Request $request)
     {
-        $data = $request->request->get('module');
+        $data = $request->request->get('widget');
         $dataArray = array('success' => 0);
 
         // Clear params if type is not selected
@@ -56,9 +56,9 @@ class AjaxController extends CommonAjaxController
             unset($data['params']);
         }
 
-        $module = new Module();
-        $form = $this->get('form.factory')->create('module', $module);
-        $formHtml = $this->render("MauticDashboardBundle::Module\\form.html.php",
+        $widget = new Widget();
+        $form = $this->get('form.factory')->create('widget', $widget);
+        $formHtml = $this->render("MauticDashboardBundle::Widget\\form.html.php",
             array('form' => $form->bind($data)->createView())
         )->getContent();
 
@@ -69,12 +69,12 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * Saves the new ordering of dashboard modules.
+     * Saves the new ordering of dashboard widgets.
      *
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function updateModuleOrderingAction(Request $request)
+    protected function updateWidgetOrderingAction(Request $request)
     {
         $data = $request->request->get('ordering');
         $repo = $this->factory->getModel('dashboard')->getRepository();

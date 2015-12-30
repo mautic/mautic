@@ -13,9 +13,9 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * ModuleRepository
+ * WidgetRepository
  */
-class ModuleRepository extends CommonRepository
+class WidgetRepository extends CommonRepository
 {
     /**
      * Update ordering
@@ -27,7 +27,7 @@ class ModuleRepository extends CommonRepository
      */
     public function updateOrdering($ordering, $userId)
     {
-        $modules = $this->getEntities(
+        $widgets = $this->getEntities(
             array(
                 'filter' => array(
                     'createdBy' => $userId
@@ -35,9 +35,9 @@ class ModuleRepository extends CommonRepository
             )
         );
 
-        foreach ($modules as &$module) {
-            if (isset($ordering[$module->getId()])) {
-                $module->setOrdering((int) $ordering[$module->getId()]);
+        foreach ($widgets as &$widget) {
+            if (isset($ordering[$widget->getId()])) {
+                $widget->setOrdering((int) $ordering[$widget->getId()]);
             }
         }
 

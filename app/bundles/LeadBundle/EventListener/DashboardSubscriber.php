@@ -9,7 +9,7 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\DashboardBundle\DashboardEvents;
-use Mautic\DashboardBundle\Event\ModuleDetailEvent;
+use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
@@ -21,20 +21,20 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
-     * Define the name of the bundle/category of the module(s)
+     * Define the name of the bundle/category of the widget(s)
      *
      * @var string
      */
     protected $bundle = 'lead';
 
     /**
-     * Define the module(s)
+     * Define the widget(s)
      *
      * @var string
      */
     protected $types = array(
         'created.leads.in.time' => array(
-            'formAlias' => 'lead_dashboard_leads_in_time_module'
+            'formAlias' => 'lead_dashboard_leads_in_time_widget'
         ),
         'anonymous.vs.identified.leads' => array(
             'formAlias' => null
@@ -42,18 +42,18 @@ class DashboardSubscriber extends MainDashboardSubscriber
     );
 
     /**
-     * Set a module detail when needed 
+     * Set a widget detail when needed 
      *
-     * @param ModuleDetailEvent $event
+     * @param WidgetDetailEvent $event
      *
      * @return void
      */
-    public function onModuleDetailGenerate(ModuleDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         if ($event->getType() == 'created.leads.in.time') {
             $model = $this->factory->getModel('lead');
-            $module = $event->getModule();
-            $params = $module->getParams();
+            $widget = $event->getWidget();
+            $params = $widget->getParams();
 
             // Make sure the params exist
             if (empty($params['amount']) || empty($params['timeUnit'])) {
@@ -61,7 +61,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             } else {
                 $data = array(
                     'chartType'   => 'line',
-                    'chartHeight' => $module->getHeight() - 70,
+                    'chartHeight' => $widget->getHeight() - 70,
                     'chartData'   => $model->getLeadsLineChartData($params['amount'], $params['timeUnit'])
                 );
 
@@ -74,12 +74,12 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'anonymous.vs.identified.leads') {
             $model = $this->factory->getModel('lead');
-            $module = $event->getModule();
-            $params = $module->getParams();
+            $widget = $event->getWidget();
+            $params = $widget->getParams();
 
             $data = array(
                 'chartType'   => 'pie',
-                'chartHeight' => $module->getHeight() - 70,
+                'chartHeight' => $widget->getHeight() - 70,
                 'chartData'   => $model->getAnonymousVsIdentifiedPieChartData()
             );
 

@@ -305,9 +305,9 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'leadfields_choices'
             ),
-            'mautic.form.type.lead_dashboard_leads_in_time_module'  => array(
+            'mautic.form.type.lead_dashboard_leads_in_time_widget'  => array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\DashboardLeadsInTimeModuleType',
-                'alias'     => 'lead_dashboard_leads_in_time_module'
+                'alias'     => 'lead_dashboard_leads_in_time_widget'
             )
         ),
         'other'   => array(

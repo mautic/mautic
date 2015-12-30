@@ -40,19 +40,19 @@
     border: 1px dashed #4e5d9d;
     flex-grow: 0;
 }
-#dashboard-modules {
+#dashboard-widgets {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     padding: 5px;
 }
-.module {
+.widget {
     flex-grow: 0;
 }
-.module .panel {
+.widget .panel {
     margin: 5px;
 }
-.module .panel-heading {
+.widget .panel-heading {
     cursor: -moz-grab;
     cursor: -webkit-grab;
     cursor: grab;

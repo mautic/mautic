@@ -57,6 +57,6 @@ class DashboardHitsInTimeModuleType extends AbstractType
      */
     public function getName()
     {
-        return "page_dashboard_hits_in_time_module";
+        return "page_dashboard_hits_in_time_widget";
     }
 }

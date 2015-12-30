@@ -16,10 +16,10 @@ $buttons[] = array(
         'data-toggle' => 'ajaxmodal',
         'data-target' => '#MauticSharedModal',
         'href'        => $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'new')),
-        'data-header' => $view['translator']->trans('mautic.dashboard.module.add'),
+        'data-header' => $view['translator']->trans('mautic.dashboard.widget.add'),
     ),
     'iconClass' => 'fa fa-plus',
-    'btnText'   => 'mautic.dashboard.module.add'
+    'btnText'   => 'mautic.dashboard.widget.add'
 );
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
@@ -38,7 +38,7 @@ $colspan = 12/$cols;
 ?>
 <div class="box-layout">
     <div class="bg-auto bg-dark-xs">
-        <?php echo $view->render('MauticDashboardBundle:Module:list.html.php', array('modules' => $modules)); ?>
+        <?php echo $view->render('MauticDashboardBundle:Widget:list.html.php', array('widgets' => $widgets)); ?>
     </div>
 </div>
 <div class="box-layout">

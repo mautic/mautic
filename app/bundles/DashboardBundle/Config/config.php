@@ -39,10 +39,10 @@ return array(
             // ),
         ),
         'forms'   => array(
-            'mautic.form.type.module' => array(
-                'class'     => 'Mautic\DashboardBundle\Form\Type\ModuleType',
+            'mautic.form.type.widget' => array(
+                'class'     => 'Mautic\DashboardBundle\Form\Type\WidgetType',
                 'arguments' => 'mautic.factory',
-                'alias'     => 'module'
+                'alias'     => 'widget'
             )
         )
     )
