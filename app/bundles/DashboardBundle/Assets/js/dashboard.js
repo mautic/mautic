@@ -1,6 +1,5 @@
 //DashboardBundle
 Mautic.dashboardOnLoad = function (container) {
-    Mautic.renderDashboardMap();
     Mautic.renderReturnRateDoughnut();
     Mautic.renderClickRateDoughnut();
     Mautic.updateActiveVisitorCount();
@@ -14,8 +13,6 @@ Mautic.dashboardOnUnload = function(id) {
     // Trash initialized dashboard vars on app content change.
     mQuery('.jvectormap-tip').remove();
     if (id === '#app-content') {
-        delete Mautic.dashboardMapData;
-        Mautic.dashboardMap.remove();
         delete Mautic.dashboardClickRateDoughnutObject;
         delete Mautic.dashboardReturnRateDoughnutObject;
         delete Mautic.ActiveVisitorsCount;
@@ -46,6 +43,7 @@ Mautic.widgetOnLoad = function(container, response) {
         .css('width', response.widgetWidth + '%')
         .css('height', response.widgetHeight + '%');
     Mautic.renderCharts(widgetHtml);
+    Mautic.renderMaps(widgetHtml);
     Mautic.saveWidgetSorting();
 }
 
@@ -77,50 +75,6 @@ Mautic.saveWidgetSorting = function () {
     Mautic.ajaxActionRequest('dashboard:updateWidgetOrdering', {'ordering': ordering}, function(response) {
         // @todo handle errors
     });
-}
-
-Mautic.renderDashboardMap = function () {
-    // Initilize map only for first time
-    if (typeof Mautic.dashboardMapData === 'object') {
-        return;
-    }
-
-    Mautic.dashboardMapData = mQuery.parseJSON(mQuery('#dashboard-map-data').text());
-    var element = mQuery('#dashboard-map');
-    element.vectorMap({
-        backgroundColor: 'transparent',
-        zoomOnScroll: false,
-        regionStyle: {
-            initial: {
-                fill: '#dce0e5',
-                "fill-opacity": 1,
-                stroke: 'none',
-                "stroke-width": 0,
-                "stroke-opacity": 1
-            },
-            hover: {
-                "fill-opacity": 0.7,
-                cursor: 'pointer'
-            }
-        },
-        map: 'world_mill_en',
-        series: {
-            regions: [{
-                values: Mautic.dashboardMapData,
-                scale: ['#C8EEFF', '#006491'],
-                normalizeFunction: 'polynomial'
-            }]
-        },
-        onRegionTipShow: function (event, label, index) {
-            if(Mautic.dashboardMapData[index] > 0) {
-                label.html(
-                    '<b>'+label.html()+'</b></br>'+
-                    Mautic.dashboardMapData[index]+' Leads'
-                );
-            }
-        }
-    });
-    Mautic.dashboardMap = element.vectorMap('get', 'mapObject');
 }
 
 Mautic.renderReturnRateDoughnut = function () {

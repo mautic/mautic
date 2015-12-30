@@ -29,6 +29,7 @@ use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Intl\Intl;
 
 /**
  * Class LeadModel
@@ -1228,7 +1229,7 @@ class LeadModel extends FormModel
     public function getLeadsLineChartData($amount, $unit, $filter = array())
     {
         $barChart  = new LineChart($unit, $amount);
-        $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
+        $query     = new ChartQuery($this->em->getConnection());
         $chartData = $query->fetchTimeData('leads', 'date_added', $unit, $amount, $filter);
         $barChart->setDataset('All leads', $chartData);
         return $barChart->render();
@@ -1245,7 +1246,7 @@ class LeadModel extends FormModel
     public function getAnonymousVsIdentifiedPieChartData($filters = array())
     {
         $chart = new PieChart();
-        $query = new ChartQuery($this->factory->getEntityManager()->getConnection());
+        $query = new ChartQuery($this->em->getConnection());
 
         $identified = $query->count('leads', 'date_identified', $filters);
         $all = $query->count('leads', 'id', $filters);
@@ -1253,5 +1254,33 @@ class LeadModel extends FormModel
         $chart->setDataset('anonymous', ($all - $identified));
 
         return $chart->render();
+    }
+
+    /**
+     * Get leads count per country name.
+     * Can't use entity, because country is a custom field.
+     *
+     * @return array
+     */
+    public function getLeadMapData($filter = array())
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(l.id) as quantity, l.country')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->groupBy('l.country')
+            ->where($q->expr()->isNotNull('l.country'));
+        $results = $q->execute()->fetchAll();
+
+        $countries = array_flip(Intl::getRegionBundle()->getCountryNames());
+        $mapData = array();
+
+        // Convert country names to 2-char code
+        foreach ($results as $leadCountry) {
+            if (isset($countries[$leadCountry['country']])) {
+                $mapData[$countries[$leadCountry['country']]] = $leadCountry['quantity'];
+            }
+        }
+
+        return $mapData;
     }
 }

@@ -38,6 +38,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
         ),
         'anonymous.vs.identified.leads' => array(
             'formAlias' => null
+        ),
+        'map.of.leads' => array(
+            'formAlias' => null
         )
     );
 
@@ -84,6 +87,22 @@ class DashboardSubscriber extends MainDashboardSubscriber
             );
 
             $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplateData($data);
+            
+            $event->stopPropagation();
+        }
+
+        if ($event->getType() == 'map.of.leads') {
+            $model = $this->factory->getModel('lead');
+            $widget = $event->getWidget();
+            $params = $widget->getParams();
+
+            $data = array(
+                'height' => $widget->getHeight() - 70,
+                'data'   => $model->getLeadMapData()
+            );
+
+            $event->setTemplate('MauticCoreBundle:Helper:map.html.php');
             $event->setTemplateData($data);
             
             $event->stopPropagation();

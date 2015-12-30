@@ -610,6 +610,7 @@ var Mautic = {
         }
 
         Mautic.renderCharts();
+        Mautic.renderMaps();
 
         //instantiate sparkline plugin
         mQuery('.plugin-sparkline').sparkline('html', {enableTagOptions: true});
@@ -904,6 +905,11 @@ var Mautic = {
         // trash created chart objects to save some memory
         if (typeof Mautic.chartObjects !== 'undefined') {
             delete Mautic.chartObjects;
+        }
+
+        // trash created map objects to save some memory
+        if (typeof Mautic.mapObjects !== 'undefined') {
+            delete Mautic.mapObjects;
         }
     },
 
@@ -2983,14 +2989,16 @@ var Mautic = {
             charts = mQuery('canvas.chart');
         }
 
-        charts.each(function(index, canvas) {
-            canvas = mQuery(canvas);
-            if (canvas.hasClass('line-chart')) {
-                Mautic.renderLineChart(canvas)
-            } else if (canvas.hasClass('pie-chart')) {
-                Mautic.renderPieChart(canvas)
-            }
-        });
+        if (charts.length) {
+            charts.each(function(index, canvas) {
+                canvas = mQuery(canvas);
+                if (canvas.hasClass('line-chart')) {
+                    Mautic.renderLineChart(canvas)
+                } else if (canvas.hasClass('pie-chart')) {
+                    Mautic.renderPieChart(canvas)
+                }
+            });
+        }
     },
 
     /**
@@ -3015,5 +3023,57 @@ var Mautic = {
         var data = mQuery.parseJSON(canvas.text());
         var options = {}
         Mautic.chartObjects.push(new Chart(ctx).Pie(data, options));
-    }
+    },
+
+    /**
+     * Render vector maps
+     *
+     * @param mQuery element scope
+     */
+    renderMaps: function(scope) {
+        if (!Mautic.mapObjects) Mautic.mapObjects = [];
+        var maps = mQuery('.vector-map');
+
+        if (maps.length) {
+            maps.each(function(index, element) {
+                var wrapper = mQuery(element);
+                var data = mQuery.parseJSON(wrapper.text());
+                wrapper.text('');
+                wrapper.vectorMap({
+                    backgroundColor: 'transparent',
+                    zoomOnScroll: false,
+                    regionStyle: {
+                        initial: {
+                            "fill": '#dce0e5',
+                            "fill-opacity": 1,
+                            "stroke": 'none',
+                            "stroke-width": 0,
+                            "stroke-opacity": 1
+                        },
+                        hover: {
+                            "fill-opacity": 0.7,
+                            "cursor": 'pointer'
+                        }
+                    },
+                    map: 'world_mill_en',
+                    series: {
+                        regions: [{
+                            values: data,
+                            scale: ['#C8EEFF', '#006491'],
+                            normalizeFunction: 'polynomial'
+                        }]
+                    },
+                    onRegionTipShow: function (event, label, index) {
+                        if (data[index] > 0) {
+                            label.html(
+                                '<b>'+label.html()+'</b></br>'+
+                                data[index]+' Leads'
+                            );
+                        }
+                    }
+                });
+                Mautic.chartObjects.push(wrapper.vectorMap('get', 'mapObject'));
+            });
+        }
+    },
 };

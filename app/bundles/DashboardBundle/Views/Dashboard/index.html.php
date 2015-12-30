@@ -108,10 +108,9 @@ $colspan = 12/$cols;
     		<div class="pa-md mb-lg">
     			<div class="row">
     				<div class="col-sm-12">
-    					<div id="dashboard-map"></div>
+    					<div class="vector-map" ><?php echo json_encode($mapData); ?></div>
     				</div>
     			</div>
-                <div id="dashboard-map-data" class="hide"><?php echo json_encode($mapData); ?></div>
     		</div>
     		<ul class="nav nav-tabs pr-md pl-md">
     	        <li class="active">

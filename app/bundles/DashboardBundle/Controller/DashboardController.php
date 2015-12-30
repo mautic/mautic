@@ -10,7 +10,6 @@
 namespace Mautic\DashboardBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Symfony\Component\Intl\Intl;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\CoreEvents;
@@ -86,19 +85,9 @@ class DashboardController extends FormController
             $clickRate = round($clickthroughCount / $sentReadCount['sent_count'] * 100);
         }
 
-        $countries = array_flip(Intl::getRegionBundle()->getCountryNames());
-        $mapData = array();
-
-        /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepository */
-        $leadRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead');
-        $leadCountries  = $leadRepository->getLeadsCountPerCountries();
-
-        // Convert country names to 2-char code
-        foreach ($leadCountries as $leadCountry) {
-            if (isset($countries[$leadCountry['country']])) {
-                $mapData[$countries[$leadCountry['country']]] = $leadCountry['quantity'];
-            }
-        }
+        /** @var \Mautic\PageBundle\Model\LeadModel $leadModel */
+        $leadModel = $this->factory->getModel('lead');
+        $mapData   = $leadModel->getLeadMapData();
 
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject(null, null);

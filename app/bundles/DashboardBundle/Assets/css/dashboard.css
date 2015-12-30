@@ -28,8 +28,9 @@
 	text-shadow: #fff 0px 0px 50px;
 	transition: text-shadow 1.2s ease;
 }
-#dashboard-map {
+.vector-map {
 	height: 350px;
+    color: transparent;
 }
 .jvectormap-container {
     height:100%;
