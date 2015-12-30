@@ -315,15 +315,17 @@ class FieldType extends AbstractType
             )
         );
 
+        $data = $options['data']->isUniqueIdentifier();
         $builder->add(
             'isUniqueIdentifer',
             'yesno_button_group',
             array(
                 'label'    => 'mautic.lead.field.form.isuniqueidentifer',
                 'attr'     => array(
-                    'tooltip' => 'mautic.lead.field.form.isuniqueidentifer.tooltip'
+                    'tooltip' => 'mautic.lead.field.form.isuniqueidentifer.tooltip',
+                    'onchange' => 'Mautic.displayUniqueIdentifierWarning(this)'
                 ),
-                'disabled' => ($options['data']->getId()) ? true : false
+                'data'     => (!empty($data))
             )
         );
 

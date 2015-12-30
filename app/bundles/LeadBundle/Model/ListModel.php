@@ -372,15 +372,14 @@ class ListModel extends FormModel
 
     /**
      * @param string $alias
-     * @param bool $withLeads
      *
      * @return mixed
      */
-    public function getUserLists($alias = '', $withLeads = false)
+    public function getUserLists($alias = '')
     {
         $user  = (!$this->security->isGranted('lead:lists:viewother')) ?
             $this->factory->getUser() : false;
-        $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getLists($user, $alias, '', $withLeads);
+        $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getLists($user, $alias);
 
         return $lists;
     }
@@ -388,13 +387,11 @@ class ListModel extends FormModel
     /**
      * Get a list of global lead lists
      *
-     * @param bool $withLeads
-     *
      * @return mixed
      */
-    public function getGlobalLists($withLeads = false)
+    public function getGlobalLists()
     {
-        $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getGlobalLists($withLeads);
+        $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getGlobalLists();
         return $lists;
     }
 
@@ -429,8 +426,6 @@ class ListModel extends FormModel
             array(
                 'countOnly'     => true,
                 'newOnly'       => true,
-                'dynamic'       => true,
-                'includeManual' => false,
                 'batchLimiters' => $batchLimiters
             )
         );
@@ -468,9 +463,7 @@ class ListModel extends FormModel
                     $list,
                     true,
                     array(
-                        'dynamic'       => true,
                         'newOnly'       => true,
-                        'includeManual' => false,
                         // No start set because of newOnly thus always at 0
                         'limit'         => $limit,
                         'batchLimiters' => $batchLimiters
@@ -528,26 +521,14 @@ class ListModel extends FormModel
             }
         }
 
-        $fullList = $this->getLeadsByList(
-            $list,
-            true,
-            array(
-                'dynamic'       => true,
-                'existingOnly'  => true,
-                'includeManual' => false,
-                'batchLimiters' => $batchLimiters
-            )
-        );
-
         // Get a count of leads to be removed
         $removeLeadCount = $this->getLeadsByList(
             $list,
             true,
             array(
-                'countOnly'     => true,
-                'includeManual' => false,
-                'filterOutIds'  => $fullList[$id],
-                'batchLimiters' => $batchLimiters
+                'countOnly'      => true,
+                'nonMembersOnly' => true,
+                'batchLimiters'  => $batchLimiters
             )
         );
 
@@ -578,9 +559,9 @@ class ListModel extends FormModel
                     true,
                     array(
                         // No start because the items are deleted so always 0
-                        'limit'         => $limit,
-                        'filterOutIds'  => $fullList[$id],
-                        'batchLimiters' => $batchLimiters
+                        'limit'          => $limit,
+                        'nonMembersOnly' => true,
+                        'batchLimiters'  => $batchLimiters
                     )
                 );
 
@@ -757,6 +738,9 @@ class ListModel extends FormModel
             $this->getRepository()->saveEntities($persistLists);
         }
 
+        // Clear ListLead entities from Doctrine memory
+        $this->em->clear('Mautic\LeadBundle\Entity\ListLead');
+
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
             $this->em->detach($lead);
@@ -879,6 +863,9 @@ class ListModel extends FormModel
             $this->getRepository()->deleteEntities($deleteLists);
         }
 
+        // Clear ListLead entities from Doctrine memory
+        $this->em->clear('Mautic\LeadBundle\Entity\ListLead');
+
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
             $this->em->detach($lead);
@@ -925,7 +912,7 @@ class ListModel extends FormModel
         }
 
         if ($leadSleepTime < 1) {
-            usleep($leadSleepTime * 1000);
+            usleep($leadSleepTime * 1000000);
         } else {
             sleep($leadSleepTime);
         }

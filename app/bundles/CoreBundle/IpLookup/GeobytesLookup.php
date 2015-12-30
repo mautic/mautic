@@ -10,8 +10,16 @@
 namespace Mautic\CoreBundle\IpLookup;
 
 
-class GeobytesIpLookup extends AbstractIpLookup
+class GeobytesLookup extends AbstractRemoteDataLookup
 {
+    /**
+     * @return string
+     */
+    public function getAttribution()
+    {
+        return '<a href="http://geobytes.com/" target="_blank">Geobytes</a> offers both free (16,000 lookups per hour) and VIP (paid) offerings.';
+    }
+
     /**
      * @return string
      */
@@ -23,7 +31,7 @@ class GeobytesIpLookup extends AbstractIpLookup
     /**
      * @param $response
      */
-    public function parseData($response)
+    protected function parseResponse($response)
     {
         $data = json_decode($response);
         foreach ($data as $key => $value) {

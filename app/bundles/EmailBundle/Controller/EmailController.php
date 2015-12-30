@@ -804,12 +804,6 @@ class EmailController extends FormController
 
             /** @var \Mautic\EmailBundle\Entity\Email $clone */
             $clone = clone $clone;
-            $clone->clearStats();
-            $clone->setSentCount(0);
-            $clone->setReadCount(0);
-            $clone->setRevision(0);
-            $clone->setVariantSentCount(0);
-            $clone->setVariantStartDate(null);
         }
 
         return $this->newAction($clone);

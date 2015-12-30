@@ -79,8 +79,11 @@ class LeadType extends AbstractType
                 'custom'   => 'mautic.lead.lead.field.custom_avatar'
             );
 
-            foreach ($options['data']->getSocialCache() as $key => $data) {
-                $imageChoices[$key] = $key;
+            $cache = $options['data']->getSocialCache();
+            if (count($cache)) {
+                foreach ($cache as $key => $data) {
+                    $imageChoices[$key] = $key;
+                }
             }
 
             $builder->add(

@@ -94,7 +94,13 @@ $formId = $form->getId();
                 </td>
                 <td><?php echo $item['ipAddress']['ipAddress']; ?></td>
                 <?php foreach($item['results'] as $r):?>
-                    <td><?php echo $r['value']; ?></td>
+                    <td>
+                        <?php if ($r['type'] == 'textarea') : ?>
+                            <?php echo nl2br(html_entity_decode($r['value'])); ?>
+                        <?php else : ?>
+                            <?php echo $r['value']; ?>
+                        <?php endif; ?>
+                    </td>
                 <?php endforeach; ?>
             </tr>
         <?php endforeach; ?>

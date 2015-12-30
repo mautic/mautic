@@ -165,6 +165,7 @@ class FormEntity extends CommonEntity
         $this->dateModified = null;
         $this->checkedOut   = null;
         $this->isPublished  = false;
+        $this->changes      = array();
     }
 
     /**

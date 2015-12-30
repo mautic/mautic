@@ -90,6 +90,9 @@ return array(
             'mautic.emailbuilder.subscriber'         => array(
                 'class' => 'Mautic\EmailBundle\EventListener\BuilderSubscriber'
             ),
+            'mautic.emailtoken.subscriber'     => array(
+                'class' => 'Mautic\EmailBundle\EventListener\TokenSubscriber'
+            ),
             'mautic.email.campaignbundle.subscriber' => array(
                 'class' => 'Mautic\EmailBundle\EventListener\CampaignSubscriber'
             ),

@@ -79,6 +79,16 @@ class IcontactIntegration extends EmailAbstractIntegration
 
         $response = $this->makeRequest($url, $parameters);
 
+        // Validation kind of error
+        if (isset($response['errors'][0])) {
+            return $response['errors'][0];
+        }
+
+        // Timeout kind of error
+        if (isset($response['errors']['message'])) {
+            return $response['errors']['message'];
+        }
+
         $keys = array();
         if (!empty($response['accounts'])) {
             $keys['accountId'] = $response['accounts'][0]['accountId'];
@@ -89,7 +99,7 @@ class IcontactIntegration extends EmailAbstractIntegration
             if (!empty($response['clientfolders'])) {
                 $keys['clientFolderId'] = $response['clientfolders'][0]['clientFolderId'];
 
-               $this->extractAuthKeys($keys, 'clientFolderId');
+                $this->extractAuthKeys($keys, 'clientFolderId');
             }
         }
     }

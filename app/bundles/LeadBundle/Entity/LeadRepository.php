@@ -30,6 +30,13 @@ class LeadRepository extends CommonRepository
     private $availableSearchFields = array();
 
     /**
+     * Required to get the color based on a lead's points
+     *
+     * @var TriggerModel
+     */
+    private $triggerModel;
+
+    /**
      * Used by search functions to search social profiles
      *
      * @param array $fields
@@ -50,22 +57,23 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * Required to get the color based on a lead's points
-     * @var
+     * Sets trigger model
+     *
+     * @param TriggerModel $triggerModel
      */
-    private $triggerModel;
-
-    public function setTriggerModel (TriggerModel $triggerModel)
+    public function setTriggerModel(TriggerModel $triggerModel)
     {
         $this->triggerModel = $triggerModel;
     }
 
     /**
      * Gets a list of unique values from fields for autocompletes
+     *
      * @param        $field
      * @param string $search
      * @param int    $limit
      * @param int    $start
+     *
      * @return array
      */
     public function getValueList($field, $search = '', $limit = 10, $start = 0)
@@ -210,7 +218,7 @@ class LeadRepository extends CommonRepository
         return $results;
     }
 
-    /*
+    /**
      * Get list of lead Ids by unique field data.
      *
      * @param $uniqueFieldsWithData is an array of columns & values to filter by
@@ -244,7 +252,7 @@ class LeadRepository extends CommonRepository
     /**
      * @param $email
      *
-     * @return null
+     * @return integer|null
      */
     public function getLeadByEmail($email)
     {
@@ -312,14 +320,13 @@ class LeadRepository extends CommonRepository
      *
      * @param $entity
      * @param $flush
-     * @return int
      */
     public function saveEntity($entity, $flush = true)
     {
         $this->_em->persist($entity);
 
         if ($flush)
-            $this->_em->flush();
+            $this->_em->flush($entity);
 
         $fields = $entity->getUpdatedFields();
         if (!empty($fields)) {
@@ -332,8 +339,6 @@ class LeadRepository extends CommonRepository
      * Persist an array of entities
      *
      * @param array $entities
-     *
-     * @return void
      */
     public function saveEntities($entities)
     {
@@ -425,7 +430,8 @@ class LeadRepository extends CommonRepository
     /**
      * {@inheritdoc}
      *
-     * @param int $id
+     * @param integer $id
+     *
      * @return mixed|null
      */
     public function getEntity($id = 0)
@@ -591,7 +597,7 @@ class LeadRepository extends CommonRepository
     /**
      * Function to remove non custom field columns from an arrayed lead row
      *
-     * @param $r
+     * @param array $r
      */
     protected function removeNonFieldColumns(&$r)
     {
@@ -603,8 +609,10 @@ class LeadRepository extends CommonRepository
     }
 
     /**
+     * Adds the "catch all" where clause to the QueryBuilder
      * @param QueryBuilder $q
      * @param              $filter
+     *
      * @return array
      */
     protected function addCatchAllWhereClause(&$q, $filter)
@@ -647,8 +655,11 @@ class LeadRepository extends CommonRepository
     }
 
     /**
+     * Adds the command where clause to the QueryBuilder
+     *
      * @param QueryBuilder $q
      * @param              $filter
+     *
      * @return array
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
@@ -835,6 +846,8 @@ class LeadRepository extends CommonRepository
     }
 
     /**
+     * Returns the array of search commands.
+     *
      * @return array
      */
     public function getSearchCommands()
@@ -860,7 +873,9 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * Returns the array of columns with the default order
+     *
+     * @return array
      */
     protected function getDefaultOrder()
     {
@@ -872,7 +887,7 @@ class LeadRepository extends CommonRepository
     /**
      * Updates lead's lastActive with now date/time
      *
-     * @param $leadId
+     * @param integer $leadId
      */
     public function updateLastActive($leadId)
     {
@@ -884,6 +899,8 @@ class LeadRepository extends CommonRepository
 
     /**
      * Gets the ID of the latest ID
+     *
+     * @return integer
      */
     public function getMaxLeadId()
     {
