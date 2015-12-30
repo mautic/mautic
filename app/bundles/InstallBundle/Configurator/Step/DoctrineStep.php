@@ -9,6 +9,7 @@
 
 namespace Mautic\InstallBundle\Configurator\Step;
 
+use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\InstallBundle\Configurator\Form\DoctrineStepType;
 
 /**
@@ -83,10 +84,12 @@ class DoctrineStep implements StepInterface
     /**
      * Constructor
      *
-     * @param array $parameters
+     * @param Configurator $configurator
      */
-    public function __construct(array $parameters)
+    public function __construct(Configurator $configurator)
     {
+        $parameters = $configurator->getParameters();
+
         foreach ($parameters as $key => $value) {
             if (0 === strpos($key, 'db_')) {
                 $parameters[substr($key, 3)] = $value;

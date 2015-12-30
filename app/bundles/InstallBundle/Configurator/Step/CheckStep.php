@@ -9,7 +9,9 @@
 
 namespace Mautic\InstallBundle\Configurator\Step;
 
+use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\InstallBundle\Configurator\Form\CheckStepType;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Check Step.
@@ -62,14 +64,17 @@ class CheckStep implements StepInterface
     /**
      * Constructor
      *
-     * @param boolean $configIsWritable Flag if the configuration file is writable
-     * @param string  $kernelRoot       Kernel root path
+     * @param Configurator $configurator Configurator service
+     * @param string       $kernelRoot   Kernel root path
+     * @param RequestStack $requestStack Request stack
      */
-    public function __construct($configIsWritable, $kernelRoot, $baseUrl)
+    public function __construct(Configurator $configurator, $kernelRoot, RequestStack $requestStack)
     {
-        $this->configIsWritable = $configIsWritable;
+        $request = $requestStack->getCurrentRequest();
+
+        $this->configIsWritable = $configurator->isFileWritable();
         $this->kernelRoot       = $kernelRoot;
-        $this->site_url         = $baseUrl;
+        $this->site_url         = $request->getSchemeAndHttpHost().$request->getBasePath();
     }
 
     /**
@@ -303,6 +308,13 @@ class CheckStep implements StepInterface
             }
         }
 
+        $memoryLimit = $this->toBytes(ini_get('memory_limit'));
+        $suggestedLimit = 128 * 1024 * 1024;
+
+        if ($memoryLimit < $suggestedLimit) {
+            $messages[] = 'mautic.install.memory.limit';
+        }
+
         if (!class_exists('\\Locale')) {
             $messages[] = 'mautic.install.module.intl';
         }
@@ -385,5 +397,33 @@ class CheckStep implements StepInterface
         }
 
         return $parameters;
+    }
+
+    /**
+     * Takes the memory limit string form php.ini and returns numeric value in bytes.
+     *
+     * @param string $val
+     *
+     * @return integer
+     */
+    public function toBytes($val) {
+        $val = trim($val);
+
+        if ($val == -1) {
+            return PHP_INT_MAX;
+        }
+
+        $last = strtolower($val[strlen($val)-1]);
+        switch($last) {
+            // The 'G' modifier is available since PHP 5.1.0
+            case 'g':
+                $val *= 1024;
+            case 'm':
+                $val *= 1024;
+            case 'k':
+                $val *= 1024;
+        }
+
+        return $val;
     }
 }

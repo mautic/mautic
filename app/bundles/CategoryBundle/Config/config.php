@@ -30,9 +30,10 @@ return array(
     'menu' => array(
         'admin' => array(
             'mautic.category.menu.index' => array(
-                'route'           => 'mautic_category_index',
-                'iconClass'       => 'fa-folder',
-                'id'              => 'mautic_category_index'
+                'route'     => 'mautic_category_index',
+                'access'    => 'category:categories:view',
+                'iconClass' => 'fa-folder',
+                'id'        => 'mautic_category_index'
             )
         )
     ),

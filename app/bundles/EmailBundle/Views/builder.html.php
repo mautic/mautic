@@ -18,9 +18,16 @@ $view['assets']->addScript('app/bundles/EmailBundle/Assets/builder/builder.js');
 $view['assets']->addStylesheet('app/bundles/EmailBundle/Assets/builder/builder.css');
 
 //Set the slots
-foreach ($slots as $slot) {
+foreach ($slots as $slot => $slotConfig) {
+    //support previous format where email slots are not defined with config array
+    if (is_numeric($slot)) {
+        $slot = $slotConfig;		
+        $slotConfig = array();
+    }
+
     $value = isset($content[$slot]) ? $content[$slot] : "";
-    $view['slots']->set($slot, "<div id=\"slot-{$slot}\" class=\"mautic-editable\" contenteditable=true data-placeholder=\"{$view['translator']->trans('mautic.page.builder.addcontent')}\">{$value}</div>");
+    $placeholder = isset($slotConfig['placeholder']) ? $slotConfig['placeholder'] : 'mautic.page.builder.addcontent'; 
+    $view['slots']->set($slot, "<div id=\"slot-{$slot}\" class=\"mautic-editable\" contenteditable=true data-placeholder=\"{$view['translator']->trans($placeholder)}\">{$value}</div>");
 }
 
 //add builder toolbar
