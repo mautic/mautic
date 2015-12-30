@@ -293,8 +293,8 @@ class DashboardController extends FormController
         // @todo: build permissions
         // $security    = $this->factory->getSecurity();
         // $permissions = array(
-        //     'edit'   => $security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner()),
-        //     'delete' => $security->hasEntityAccess('lead:leads:deleteown', 'lead:leads:deleteown', $lead->getOwner()),
+        //     'edit'   => $security->hasEntityAccess('dashobard:widgets:editown', 'dashobard:widgets:editother', $module->getOwner()),
+        //     'delete' => $security->hasEntityAccess('dashobard:widgets:deleteown', 'dashobard:widgets:deleteown', $module->getOwner()),
         // );
 
         if ($closeModal) {
@@ -332,5 +332,65 @@ class DashboardController extends FormController
                 'contentTemplate' => 'MauticDashboardBundle:Module:form.html.php'
             ));
         }
+    }
+
+    /**
+     * Deletes the entity
+     *
+     * @param int $objectId
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function deleteAction($objectId)
+    {
+        // @todo: build permissions
+        // if (!$this->factory->getSecurity()->isGranted('dashobard:widgets:delete')) {
+        //     return $this->accessDenied();
+        // }
+
+        $returnUrl = $this->generateUrl('mautic_dashboard_index');
+        $success   = 0;
+        $flashes   = array();
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'contentTemplate' => 'MauticDashboardBundle:Dashboard:index',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_dashboard_index',
+                'success'       => $success,
+                'mauticContent' => 'dashboard'
+            )
+        );
+
+        /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
+        $model  = $this->factory->getModel('dashboard');
+        $entity = $model->getEntity($objectId);
+        if ($entity === null) {
+            $flashes[] = array(
+                'type'    => 'error',
+                'msg'     => 'mautic.api.client.error.notfound',
+                'msgVars' => array('%id%' => $objectId)
+            );
+        } else {
+            $model->deleteEntity($entity);
+            $name      = $entity->getName();
+            $flashes[] = array(
+                'type'    => 'notice',
+                'msg'     => 'mautic.core.notice.deleted',
+                'msgVars' => array(
+                    '%name%' => $name,
+                    '%id%'   => $objectId
+                )
+            );
+        }
+
+        return $this->postActionRedirect(
+            array_merge(
+                $postActionVars,
+                array(
+                    'flashes' => $flashes
+                )
+            )
+        );
     }
 }

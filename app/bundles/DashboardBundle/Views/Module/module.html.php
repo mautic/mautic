@@ -10,6 +10,11 @@
 <div class="panel panel-default">
     <h3 class="panel-heading">
         <?php echo $module->getName(); ?>
+        <a class="pull-right btn-xs text-danger" 
+            href="<?php echo $this->container->get('router')->generate('mautic_dashboard_action', array('objectAction' => 'delete', 'objectId' => $module->getId())); ?>" 
+            data-header="<?php echo $view['translator']->trans('mautic.dashboard.module.header.delete'); ?>">
+            <i class="fa fa-remove"></i>
+        </a>
         <a class="pull-right btn-xs" 
             href="<?php echo $this->container->get('router')->generate('mautic_dashboard_action', array('objectAction' => 'edit', 'objectId' => $module->getId())); ?>" 
             data-toggle="ajaxmodal" 
