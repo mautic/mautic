@@ -42,16 +42,15 @@ class CampaignEventHelper
      * @param MauticFactory $factory
      * @param               $lead
      * @param               $event
-     *
+     * @param               $email  // Modified by V-Teams (Zeeshan Ahmad)
      * @return bool|mixed
      */
-    public static function sendEmailAction(MauticFactory $factory, $lead, $event)
+    public static function sendEmailAction(MauticFactory $factory, $lead, $event, $email)
     {
         $emailSent = false;
 
         if ($lead instanceof Lead) {
             $fields = $lead->getFields();
-
             /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
             $leadModel             = $factory->getModel('lead');
             $leadCredentials       = $leadModel->flattenFields($fields);
@@ -59,8 +58,8 @@ class CampaignEventHelper
         } else {
             $leadCredentials = $lead;
         }
-
-        if (!empty($leadCredentials['email'])) {
+        
+            $leadCredentials['email'] = $email; // Modified by V-Teams (Zeeshan Ahmad)
             /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
             $emailModel = $factory->getModel('email');
 
@@ -72,9 +71,8 @@ class CampaignEventHelper
                 $options   = array('source' => array('campaign', $event['campaign']['id']));
                 $emailSent = $emailModel->sendEmail($email, $leadCredentials, $options);
             }
-        }
 
-        unset($lead, $leadCredentials, $email, $emailModel, $factory);
+            unset($lead, $leadCredentials, $email, $emailModel, $factory);
 
         return $emailSent;
     }

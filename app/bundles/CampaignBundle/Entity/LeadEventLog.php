@@ -69,7 +69,12 @@ class LeadEventLog
      * @var bool
      */
     private $nonActionPathTaken = false;
-
+    
+    /**
+     * @var string
+     */
+    private $email = null;
+    
     /**
      * @param ORM\ClassMetadata $metadata
      */
@@ -112,7 +117,13 @@ class LeadEventLog
         $builder->createField('systemTriggered', 'boolean')
             ->columnName('system_triggered')
             ->build();
-
+        
+         // Modified by V-Teams (Zeeshan Ahmad)
+        $builder->createField('email', 'string')
+            ->columnName('email')
+            ->isPrimaryKey()
+            ->build();
+        
         $builder->createField('metadata', 'array')
             ->nullable()
             ->build();
@@ -263,7 +274,24 @@ class LeadEventLog
     {
         $this->nonActionPathTaken = $nonActionPathTaken;
     }
+    
+    // Modified by V-Teams (Zeeshan Ahmad)
+    /**
+     * @return string
+     */
+    public function getEmail ()
+    {
+        return $this->email;
+    }
 
+    /**
+     * @param string $email
+     */
+    public function setEmail ($email)
+    {
+       $this->email = $email;
+    }
+    
     /**
      * @return mixed
      */
