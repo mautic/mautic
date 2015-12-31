@@ -71,14 +71,21 @@ class CampaignEventLeadFieldValueType extends AbstractType
 
             if (isset($data['field'])) {
                 $field = $fieldModel->getRepository()->findOneBy(array('alias' => $data['field']));
+                
                 if ($field) {
                     $properties = $field->getProperties();
                     $fieldType = $field->getType();
                     if (!empty($properties['list'])) {
                         // Lookup/Select options
                         $fieldValues = explode('|', $properties['list']);
-                    } elseif (!empty($properties)) {
+                    } elseif (!empty($properties) && $fieldType == 'boolean') {
                         // Boolean options
+                        $fieldValues = array(
+                            0 => $properties['no'],
+                            1 => $properties['yes']
+                        );
+                    } elseif (!empty($properties)) {
+                        // fallback
                         $fieldValues = $properties;
                     }
                 }
