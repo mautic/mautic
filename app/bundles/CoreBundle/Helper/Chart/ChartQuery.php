@@ -186,6 +186,9 @@ class ChartQuery extends AbstractChart
             $query->setParameter('startdate', $start);
         }
 
+        // Count only with dates which are not empty
+        $query->andWhere('t.' . $column . ' IS NOT NULL');
+
         $this->applyFilters($query, $filters);
 
         $query->setMaxResults($limit);
