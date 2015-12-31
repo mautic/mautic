@@ -183,7 +183,7 @@ return array(
             'mautic.webhook.subscriber'             => array(
                 'class' => 'Mautic\LeadBundle\EventListener\WebhookSubscriber'
             ),
-            'mautic.dashboard.subscriber'           => array(
+            'mautic.lead.dashboard.subscriber'           => array(
                 'class' => 'Mautic\LeadBundle\EventListener\DashboardSubscriber'
             ),
         ),
@@ -306,7 +306,7 @@ return array(
                 'alias'     => 'leadfields_choices'
             ),
             'mautic.form.type.lead_dashboard_leads_in_time_widget'  => array(
-                'class'     => 'Mautic\LeadBundle\Form\Type\DashboardLeadsInTimeModuleType',
+                'class'     => 'Mautic\LeadBundle\Form\Type\DashboardLeadsInTimeWidgetType',
                 'alias'     => 'lead_dashboard_leads_in_time_widget'
             )
         ),

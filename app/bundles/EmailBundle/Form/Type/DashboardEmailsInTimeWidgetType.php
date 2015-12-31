@@ -7,17 +7,17 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Form\Type;
+namespace Mautic\EmailBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class DashboardLeadsInTimeModuleType
+ * Class DashboardEmailsInTimeWidgetType
  *
- * @package Mautic\LeadBundle\Form\Type
+ * @package Mautic\EmailBundle\Form\Type
  */
-class DashboardLeadsInTimeModuleType extends AbstractType
+class DashboardEmailsInTimeWidgetType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
@@ -57,6 +57,6 @@ class DashboardLeadsInTimeModuleType extends AbstractType
      */
     public function getName()
     {
-        return "lead_dashboard_leads_in_time_widget";
+        return "email_dashboard_emails_in_time_widget";
     }
 }

@@ -246,7 +246,7 @@ class ChartQuery extends AbstractChart
     }
 
     /**
-     * Fetch data for a time related dataset
+     * Count occurences of a value in a column
      *
      * @param  string     $table without prefix
      * @param  string     $column name
@@ -320,5 +320,26 @@ class ChartQuery extends AbstractChart
         $data = $query->execute()->fetch();
 
         return $data['count'];
+    }
+
+    /**
+     * Sum values in a column
+     *
+     * @param  string     $table without prefix
+     * @param  string     $column name
+     * @param  array      $filters will be added to where claues
+     * @param  array      $options for special behavior
+     */
+    public function sum($table, $column, $filters = array(), $options = array()) {
+        $query = $this->connection->createQueryBuilder();
+
+        $query->select('sum(t.' . $column . ') AS result')
+            ->from(MAUTIC_TABLE_PREFIX . $table, 't');
+
+        $this->applyFilters($query, $filters);
+
+        $data = $query->execute()->fetch();
+
+        return $data['result'];
     }
 }

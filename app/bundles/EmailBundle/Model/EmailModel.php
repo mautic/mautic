@@ -19,6 +19,9 @@ use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -1437,5 +1440,46 @@ class EmailModel extends FormModel
         }
 
         return false;
+    }
+
+    /**
+     * Get bar chart data of hits
+     *
+     * @param integer $amount Number of units
+     * @param char    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param array   $filter
+     *
+     * @return array
+     */
+    public function getEmailsLineChartData($amount, $unit, $filter = array())
+    {
+        $chart = new LineChart($unit, $amount);
+        $query = new ChartQuery($this->em->getConnection());
+        $data  = $query->fetchTimeData('email_stats', 'date_sent', $unit, $amount, $filter);
+        $chart->setDataset('Sent emails', $data);
+        $data  = $query->fetchTimeData('email_stats', 'date_read', $unit, $amount, $filter);
+        $chart->setDataset('Read emails', $data);
+        return $chart->render();
+    }
+
+    /**
+     * Get pie chart data of ignored vs opened emails
+     *
+     * @param array   $filters
+     * @param array   $options
+     *
+     * @return array
+     */
+    public function getIgnoredVsReadPieChartData($filters = array())
+    {
+        $chart = new PieChart();
+        $query = new ChartQuery($this->em->getConnection());
+
+        $sent = $query->sum('emails', 'sent_count', $filters);
+        $read = $query->sum('emails', 'read_count', $filters);
+        $chart->setDataset('sent', $sent);
+        $chart->setDataset('read', $read);
+
+        return $chart->render();
     }
 }
