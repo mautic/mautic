@@ -180,7 +180,7 @@ class FormModel extends CommonFormModel
         foreach ($sessionFields as $fieldId) {
             if (isset($existingFields[$fieldId])) {
                 $entity->removeField($fieldId, $existingFields[$fieldId]);
-                $deleteFields[] = $existingFields[$fieldId];
+                $deleteFields[] = $fieldId;
             }
         }
 
