@@ -1139,22 +1139,29 @@ class EventModel extends CommonFormModel
                         'id'   => $campaignId,
                         'name' => $campaignName
                     );
-
-                    // Execute event
-                    if ($this->executeEvent(
-                        $event,
-                        $campaign,
-                        $lead,
-                        $eventSettings,
-                        false,
-                        null,
-                        true,
-                        true,
-                        $evaluatedEventCount,
-                        $executedEventCount,
-                        $totalEventCount
-                    )) {
-                        $scheduledExecutedCount++;
+                    // Modified by V-Teams (Zeeshan Ahmad)
+                    foreach($lead->getFields(1) as $field)    {
+                        if($field['type'] == 'email' && trim($field['value']) != "")
+                        {    
+                            // Execute event
+                            if ($this->executeEvent(
+                                $event,
+                                $campaign,
+                                $lead,
+                                $eventSettings,
+                                false,
+                                null,
+                                true,
+                                true,
+                                $evaluatedEventCount,
+                                $executedEventCount,
+                                $totalEventCount,
+                                $field['value']
+                            )) {
+                                $scheduledExecutedCount++;
+                            }
+                    
+                        }   
                     }
 
                     if ($max && $totalEventCount >= $max) {
@@ -1501,36 +1508,41 @@ class EventModel extends CommonFormModel
                                 // Set lead in case this is triggered by the system
                                 $leadModel->setSystemCurrentLead($lead);
 
-                                if ($this->executeEvent(
-                                    $event,
-                                    $campaign,
-                                    $lead,
-                                    $eventSettings,
-                                    false,
-                                    null,
-                                    $eventTriggerDate,
-                                    false,
-                                    $evaluatedEventCount,
-                                    $executedEventCount,
-                                    $totalEventCount
-                                )
-                                ) {
-                                    if (!$decisionLogged) {
-                                        // Log the decision
-                                        $log = $this->getLogEntity($parentId, $campaign, $lead, null, true);
-                                        $log->setDateTriggered(new \DateTime());
-                                        $log->setNonActionPathTaken(true);
-                                        $repo->saveEntity($log);
-                                        $this->em->detach($log);
-                                        unset($log);
+                                // Modified by V-Teams (Zeeshan Ahmad)
+                                foreach($lead->getFields(1) as $field)    {
+                                    if($field['type'] == 'email' && trim($field['value']) != "")
+                                    {
+                                        if ($this->executeEvent(
+                                            $event,
+                                            $campaign,
+                                            $lead,
+                                            $eventSettings,
+                                            false,
+                                            null,
+                                            $eventTriggerDate,
+                                            false,
+                                            $evaluatedEventCount,
+                                            $executedEventCount,
+                                            $totalEventCount
+                                        )
+                                        ) {
+                                            if (!$decisionLogged) {
+                                                // Log the decision
+                                                $log = $this->getLogEntity($parentId, $campaign, $lead, null, true);
+                                                $log->setDateTriggered(new \DateTime());
+                                                $log->setNonActionPathTaken(true);
+                                                $repo->saveEntity($log);
+                                                $this->em->detach($log);
+                                                unset($log);
 
-                                        $decisionLogged = true;
+                                                $decisionLogged = true;
+                                            }
+
+                                            $negativeExecutedCount++;
+                                        }
+                                        unset($utcDateString, $grandParentDate);
                                     }
-
-                                    $negativeExecutedCount++;
                                 }
-
-                                unset($utcDateString, $grandParentDate);
                             }
                         } else {
                             $logger->debug('CAMPAIGN: Decision has already been executed.');
