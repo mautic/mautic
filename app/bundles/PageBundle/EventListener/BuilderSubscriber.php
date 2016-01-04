@@ -24,7 +24,6 @@ class BuilderSubscriber extends CommonSubscriber
 {
     private $pageTokenRegex = '{pagelink=(.*?)}';
     private $externalTokenRegex = '{externallink=(.*?)}';
-    private $trackedTokenRegex = '{trackedlink=(.*?)}';
     private $langBarRegex = '{langbar}';
     private $shareButtonsRegex = '{sharebuttons}';
     private $emailIsInternalSend = false;
@@ -577,24 +576,50 @@ class BuilderSubscriber extends CommonSubscriber
      */
     private function validateLink($url, $currentTokens, &$foundLinks)
     {
+        static $doNotTrack;
+
+        if (null === $doNotTrack) {
+            $event = $this->dispatcher->dispatch(
+                PageEvents::REDIRECT_DO_NOT_TRACK,
+                new Events\UntrackableUrlsEvent($this->emailEntity)
+            );
+            $doNotTrack = $event->getDoNotTrackList();
+        }
+
         if (in_array($url, $foundLinks)) {
 
             return;
         }
 
-        // Check for tokenized URLs
-        // @todo - remove in 2.0
-        if (strpos($url, '{externallink') !== false) {
+        $doNotTrackMatcher = function($testUrl, $trackableUrl = null, $trackableKey = null) use ($doNotTrack, &$foundLinks) {
+            $track = true;
 
-            return;
-        }
+            if (null === $trackableUrl) {
+                $trackableUrl = $testUrl;
+            }
+
+            if (null === $trackableKey) {
+                $trackableKey = $testUrl;
+            }
+
+            foreach ($doNotTrack as $notTrackable) {
+                if (preg_match('/'.$notTrackable.'/i', $testUrl)) {
+                    $track = false;
+
+                    break;
+                }
+            }
+
+            if ($track) {
+                $foundLinks[$trackableKey] = $trackableUrl;
+            }
+        };
 
         if (stripos($url, 'http://{') !== false || strpos($url, 'https://{') !== false || strpos($url, '{') === 0) {
             $token = str_ireplace(array('https://', 'http://'), '', $url);
-
-            $foundLinks[$url] = $currentTokens[$token];
+            $doNotTrackMatcher($token, $currentTokens[$token], $url);
         } elseif (substr($url, 0, 4) == 'http' || substr($url, 0, 3) == 'ftp') {
-            $foundLinks[$url] = $url;
+            $doNotTrackMatcher($url);
         }
     }
 }
