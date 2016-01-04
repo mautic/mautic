@@ -756,21 +756,3 @@ Mautic.renderCampaignEmailSentPie = function () {
     var ctx = document.getElementById("emails-sent-rate").getContext("2d");
     Mautic.campaignEmailSentPie = new Chart(ctx).Pie(timesOnSiteData, options);
 };
-
-Mautic.standardEmailUrl = function(options) {
-    if (!options) {
-        return;
-    }
-
-    var url = options.windowUrl;
-    if (url) {
-        var editEmailKey = '/emails/edit/emailId';
-        var previewEmailKey = '/email/preview/emailId';
-        if (url.indexOf(editEmailKey) > -1 ||
-            url.indexOf(previewEmailKey) > -1) {
-            options.windowUrl = url.replace('emailId', mQuery('#campaignevent_properties_email').val());
-        }
-    }
-
-    return options;
-}
