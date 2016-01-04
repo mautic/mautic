@@ -1271,7 +1271,7 @@ class LeadModel extends FormModel
             ->where($q->expr()->isNotNull('l.country'));
         $results = $q->execute()->fetchAll();
 
-        $countries = array_flip(Intl::getRegionBundle()->getCountryNames());
+        $countries = array_flip(Intl::getRegionBundle()->getCountryNames('en'));
         $mapData = array();
 
         // Convert country names to 2-char code
