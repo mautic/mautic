@@ -18,7 +18,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class WidgetRepository extends CommonRepository
 {
     /**
-     * Update ordering
+     * Update widget ordering
      *
      * @param  array   $ordering
      * @param  integer $userId
@@ -41,7 +41,7 @@ class WidgetRepository extends CommonRepository
             }
         }
 
-        $this->_em->flush();
+        $this->saveEntities($widgets);
     }
 
     /**
@@ -50,7 +50,7 @@ class WidgetRepository extends CommonRepository
     protected function getDefaultOrder()
     {
         return array(
-            array('m.ordering', 'ASC')
+            array('w.ordering', 'ASC')
         );
     }
 
@@ -59,6 +59,6 @@ class WidgetRepository extends CommonRepository
      */
     public function getTableAlias()
     {
-        return 'm';
+        return 'w';
     }
 }
