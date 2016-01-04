@@ -51,15 +51,7 @@ class DashboardController extends FormController
         $pageModel            = $this->factory->getModel('page');
         $popularPages   = $pageModel->getRepository()->getPopularPages();
 
-        $popularAssetEntities = $this->factory->getModel('asset')->getRepository()->getPopularAssets();
-        $popularAssets        = array();
-        foreach ($popularAssetEntities as $asset) {
-            $popularAssets[] = array(
-                'id'            => $asset->getId(),
-                'title'         => $asset->getTitle(),
-                'downloadCount' => $asset->getDownloadCount()
-            );
-        }
+        $popularAssets = $this->factory->getModel('asset')->getRepository()->getPopularAssets();
 
         $popularCampaigns = $this->factory->getModel('campaign')->getRepository()->getPopularCampaigns();
 

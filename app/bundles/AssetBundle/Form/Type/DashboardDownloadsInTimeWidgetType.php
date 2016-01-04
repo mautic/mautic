@@ -7,17 +7,17 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\PageBundle\Form\Type;
+namespace Mautic\AssetBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class DashboardHitsInTimeModuleType
+ * Class DashboardDownloadsInTimeWidgetType
  *
- * @package Mautic\PageBundle\Form\Type
+ * @package Mautic\AssetBundle\Form\Type
  */
-class DashboardHitsInTimeModuleType extends AbstractType
+class DashboardDownloadsInTimeWidgetType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
@@ -57,6 +57,6 @@ class DashboardHitsInTimeModuleType extends AbstractType
      */
     public function getName()
     {
-        return "page_dashboard_hits_in_time_widget";
+        return "asset_dashboard_downloads_in_time_widget";
     }
 }

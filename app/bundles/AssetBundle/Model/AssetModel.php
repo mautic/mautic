@@ -20,6 +20,7 @@ use Mautic\AssetBundle\AssetEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -450,5 +451,24 @@ class AssetModel extends FormModel
         $chartData = $query->fetchTimeData('asset_downloads', 'date_download', $unit, $amount, $filter);
         $barChart->setDataset('Download Count', $chartData);
         return $barChart->render();
+    }
+    
+    /**
+     * Get pie chart data of unique vs repetitive downloads
+     *
+     * @param array  $filters
+     *
+     * @return array
+     */
+    public function getUniqueVsRepetitivePieChartData($filters = array())
+    {
+        $chart      = new PieChart();
+        $query      = new ChartQuery($this->factory->getEntityManager()->getConnection());
+        $all        = $query->sum('assets', 'download_count', $filters);
+        $unique     = $query->sum('assets', 'unique_download_count', $filters);
+        $repetitive = $all - $unique;
+        $chart->setDataset('Unique', $unique);
+        $chart->setDataset('Repetitive', $repetitive);
+        return $chart->render();
     }
 }

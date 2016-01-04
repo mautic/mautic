@@ -186,7 +186,7 @@ class AssetRepository extends CommonRepository
     public function getPopularAssets($limit = 10)
     {
         $q  = $this->createQueryBuilder('a');
-        $q->select("partial a.{id, title, downloadCount}")
+        $q->select('a.id, a.title, a.downloadCount')
             ->orderBy('a.downloadCount', 'DESC')
             ->where('a.downloadCount > 0')
             ->setMaxResults($limit);
