@@ -46,7 +46,7 @@ class PageRepository extends CommonRepository
     {
         $q  = $this->createQueryBuilder('p');
 
-        $q->select("partial p.{id, title, hits, alias}")
+        $q->select('p.id, p.title, p.hits, p.alias')
             ->orderBy('p.hits', 'DESC')
             ->where('p.hits > 0')
             ->setMaxResults($limit);

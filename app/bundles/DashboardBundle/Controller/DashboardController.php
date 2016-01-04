@@ -49,17 +49,7 @@ class DashboardController extends FormController
 
         /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
         $pageModel            = $this->factory->getModel('page');
-        $popularPageEntites   = $pageModel->getRepository()->getPopularPages();
-
-        $popularPages         = array();
-        foreach ($popularPageEntites as $page) {
-            $popularPages[] = array(
-                'id'      => $page->getId(),
-                'title'   => $page->getTitle(),
-                'hits'    => $page->getHits(),
-                'url'     => $pageModel->generateUrl($page)
-            );
-        }
+        $popularPages   = $pageModel->getRepository()->getPopularPages();
 
         $popularAssetEntities = $this->factory->getModel('asset')->getRepository()->getPopularAssets();
         $popularAssets        = array();

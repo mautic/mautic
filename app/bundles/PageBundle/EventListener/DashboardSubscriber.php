@@ -41,6 +41,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
         ),
         'dwell.times' => array(
             'formAlias' => null
+        ),
+        'popular.pages' => array(
+            'formAlias' => null
         )
     );
 
@@ -105,6 +108,40 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
             $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
             $event->setTemplateData($data);
+            
+            $event->stopPropagation();
+        }
+
+        if ($event->getType() == 'popular.pages') {
+            $repo = $this->factory->getModel('page')->getRepository();
+            $widget = $event->getWidget();
+            $params = $widget->getParams();
+
+            // Count the pages limit from the widget height
+            $limit = round((($widget->getHeight() - 60) / 35) - 1);
+            $pages = $repo->getPopularPages($limit);
+            $items = array();
+
+            // Build table rows with links
+            if ($pages) {
+                foreach ($pages as &$page) {
+                    $pageUrl = $this->factory->getRouter()->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $page['id']));
+                    $row = array(
+                        $pageUrl => $page['title'],
+                        $page['hits']
+                    );
+                    $items[] = $row;
+                }
+            }
+
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplateData(array(
+                'headItems'   => array(
+                    'mautic.dashboard.label.title',
+                    'mautic.dashboard.label.hits'
+                ),
+                'bodyItems'   => $items
+            ));
             
             $event->stopPropagation();
         }
