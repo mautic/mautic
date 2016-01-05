@@ -694,15 +694,18 @@ class EmailModel extends FormModel
     /**
      * Get the number of leads this email will be sent to
      *
-     * @param Email $email
-     * @param mixed $listId          Leads for a specific lead list
-     * @param bool  $countOnly       If true, return count otherwise array of leads
-     * @param int   $limit           Max number of leads to retrieve
-     * @param bool  $includeVariants If false, emails sent to a variant will not be included
+     * @param Email      $email
+     * @param mixed      $listId              Leads for a specific lead list
+     * @param bool       $countOnly           If true, return count otherwise array of leads
+     * @param int        $limit               Max number of leads to retrieve
+     * @param bool       $includeVariants     If false, emails sent to a variant will not be included
+     * @param int|null   $leadIdBatchDivisor  If $countOnly is true, return the min/max IDs based on this batch size divisor. For example, 4 will return 4 groups of min/max lead Ids
+     * @param int|null   $minLeadId           Minimum lead ID for batching
+     * @param int|null   $maxLeadId           Maximum lead ID for batching
      *
      * @return int|array
      */
-    public function getPendingLeads(Email $email, $listId = null, $countOnly = false, $limit = null, $includeVariants = true)
+    public function getPendingLeads(Email $email, $listId = null, $countOnly = false, $limit = null, $includeVariants = true, $leadIdBatchDivisor = null, $minLeadId = null, $maxLeadId = null)
     {
         if ($includeVariants && $email->isVariant()) {
             $parent = $email->getVariantParent();
@@ -724,7 +727,7 @@ class EmailModel extends FormModel
             $variantIds = null;
         }
 
-        $total = $this->getRepository()->getEmailPendingLeads($email->getId(), $variantIds, $listId, $countOnly, $limit);
+        $total = $this->getRepository()->getEmailPendingLeads($email->getId(), $variantIds, $listId, $countOnly, $limit, $leadIdBatchDivisor, $minLeadId, $maxLeadId);
 
         return $total;
     }
@@ -732,12 +735,15 @@ class EmailModel extends FormModel
     /**
      * Send an email to lead lists
      *
-     * @param Email $email
-     * @param array $lists
-     * @param int   $limit
+     * @param Email    $email
+     * @param array    $lists
+     * @param int      $limit
+     * @param int|null $minLeadId
+     * @param int|null $maxLeadId
+     *
      * @return array array(int $sentCount, int $failedCount, array $failedRecipientsByList)
      */
-    public function sendEmailToLists (Email $email, $lists = null, $limit = null)
+    public function sendEmailToLists (Email $email, $lists = null, $limit = null, $minLeadId = null, $maxLeadId = null)
     {
         //get the leads
         if (empty($lists)) {
@@ -766,7 +772,7 @@ class EmailModel extends FormModel
             }
 
             $options['listId'] = $list->getId();
-            $leads             = $this->getPendingLeads($email, $list->getId(), false, $limit);
+            $leads             = $this->getPendingLeads($email, $list->getId(), false, $limit, true, $minLeadId, $maxLeadId);
             $leadCount         = count($leads);
             $sentCount        += $leadCount;
 
