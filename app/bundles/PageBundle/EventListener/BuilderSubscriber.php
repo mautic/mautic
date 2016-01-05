@@ -617,7 +617,10 @@ class BuilderSubscriber extends CommonSubscriber
 
         if (stripos($url, 'http://{') !== false || strpos($url, 'https://{') !== false || strpos($url, '{') === 0) {
             $token = str_ireplace(array('https://', 'http://'), '', $url);
-            $doNotTrackMatcher($token, $currentTokens[$token], $url);
+            // Ensure the token is valid to prevent errors
+            if (preg_match('/^\{.*?\}(\S+|$)/', $token)) {
+                $doNotTrackMatcher($token, $currentTokens[$token], $url);
+            }
         } elseif (substr($url, 0, 4) == 'http' || substr($url, 0, 3) == 'ftp') {
             $doNotTrackMatcher($url);
         }
