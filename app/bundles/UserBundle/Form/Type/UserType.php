@@ -181,6 +181,15 @@ class UserType extends AbstractType
             'empty_value' => 'mautic.user.user.form.defaultlocale'
         ));
 
+        $builder->add('signature', 'textarea', array(
+            'label'      => 'mautic.email.token.signature',
+            'label_attr' => array('class' => 'control-label'),
+            'required'   => false,
+            'attr'       => array(
+                'class'        => 'form-control'
+            )
+        ));
+
         if (empty($options['in_profile'])) {
             $builder->add(
                 $builder->create('role', 'entity', array(
