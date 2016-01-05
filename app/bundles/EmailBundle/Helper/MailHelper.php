@@ -225,9 +225,17 @@ class MailHelper
      *
      * @return bool
      */
-    public function send($dispatchSendEvent = false, $isQueueFlush = false)
+    public function send($dispatchSendEvent = false, $isQueueFlush = false, $useOwnerAsMailer = true)
     {
         // Set from email
+        if ($useOwnerAsMailer && $this->factory->getParameter('mailer_is_owner') && isset($this->lead['id'])) {
+            $lead = $this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $this->lead['id']);
+            if ($owner = $lead->getOwner()) {
+                $name = $owner->getFirstName() . ' ' . $owner->getLastName();
+                $this->setFrom($owner->getEmail(), $name);
+            }
+        }
+
         $from = $this->message->getFrom();
         if (empty($from)) {
             $this->setFrom($this->from);

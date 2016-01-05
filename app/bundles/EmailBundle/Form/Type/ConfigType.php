@@ -465,6 +465,22 @@ class ConfigType extends AbstractType
                 'required' => false
             )
         );
+
+        $builder->add(
+            'mailer_is_owner',
+            'yesno_button_group',
+            array(
+                'label'      => 'mautic.email.config.mailer.is.owner',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'      => 'form-control',
+                    'tooltip'    => 'mautic.email.config.mailer.is.owner.tooltip',
+                    
+                ),
+                'data'       => empty($options['data']['mailer_is_owner']) ? false : true,
+                'required'   => false
+            )
+        );
     }
 
     /**
