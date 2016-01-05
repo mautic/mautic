@@ -63,7 +63,8 @@ class BuilderSubscriber extends CommonSubscriber
 
         $tokens = array(
             '{unsubscribe_text}' => $this->translator->trans('mautic.email.token.unsubscribe_text'),
-            '{webview_text}'     => $this->translator->trans('mautic.email.token.webview_text')
+            '{webview_text}'     => $this->translator->trans('mautic.email.token.webview_text'),
+            '{signature}'        => $this->translator->trans('mautic.email.token.signature')
         );
 
         if ($event->tokensRequested(array_keys($tokens))) {
@@ -114,5 +115,9 @@ class BuilderSubscriber extends CommonSubscriber
         $event->addToken('{webview_text}', $webviewText);
 
         $event->addToken('{webview_url}', $model->buildUrl('mautic_email_webview', array('idHash' => $idHash)));
+
+        $signatureText = $this->factory->getParameter('default_signature_text');
+        $signatureText = str_replace('|FROM_NAME|', $this->factory->getParameter('mailer_from_name'), $signatureText);
+        $event->addToken('{signature}', $signatureText);
     }
 }
