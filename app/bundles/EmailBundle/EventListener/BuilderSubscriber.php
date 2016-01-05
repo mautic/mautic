@@ -116,8 +116,22 @@ class BuilderSubscriber extends CommonSubscriber
 
         $event->addToken('{webview_url}', $model->buildUrl('mautic_email_webview', array('idHash' => $idHash)));
 
+
+        $lead = $event->getLead();
         $signatureText = $this->factory->getParameter('default_signature_text');
-        $signatureText = str_replace('|FROM_NAME|', $this->factory->getParameter('mailer_from_name'), $signatureText);
+        $fromName = $this->factory->getParameter('mailer_from_name');
+
+        if (!empty($lead['id'])) {
+            $leadEntity = $this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $lead['id']);
+            $owner = $leadEntity->getOwner();
+
+            if ($owner && $owner->getSignature()) {
+                $fromName = $owner->getFirstName() . ' ' . $owner->getLastName();
+                $signatureText = $owner->getSignature();
+            }
+        }
+        
+        $signatureText = str_replace('|FROM_NAME|', $fromName, $signatureText);
         $event->addToken('{signature}', $signatureText);
     }
 }
