@@ -84,7 +84,7 @@ class DefaultController extends CommonController
             $clickRate = round($clickthroughCount / $sentReadCount['sent_count'] * 100);
         }
 
-        $countries = array_flip(Intl::getRegionBundle()->getCountryNames());
+        $countries = array_flip(Intl::getRegionBundle()->getCountryNames('en'));
         $mapData = array();
 
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepository */
