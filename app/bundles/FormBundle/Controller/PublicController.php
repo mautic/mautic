@@ -28,6 +28,7 @@ class PublicController extends CommonFormController
             return $this->accessDenied();
         }
 
+        $form          = null;
         $post          = $this->request->request->get('mauticform');
         $messengerMode = (!empty($post['messenger']));
         $server        = $this->request->server->all();
