@@ -36,7 +36,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'emails.in.time' => array(
             'formAlias' => 'email_dashboard_emails_in_time_widget'
         ),
-        'ignored.vs.read.emails' => array()
+        'ignored.vs.read.emails' => array(),
+        'upcoming.emails' => array()
     );
 
     /**
@@ -83,6 +84,26 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
             $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
             $event->setTemplateData($data);
+            
+            $event->stopPropagation();
+        }
+
+        if ($event->getType() == 'upcoming.emails') {
+            $widget = $event->getWidget();
+            $params = $widget->getParams();
+
+            /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
+            $leadEventLogRepository = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+            $upcomingEmails = $leadEventLogRepository->getUpcomingEvents(array('type' => 'email.send', 'scheduled' => 1, 'eventType' => 'action'));
+
+            $leadModel = $this->factory->getModel('lead.lead');
+
+            foreach ($upcomingEmails as &$email) {
+                $email['lead'] = $leadModel->getEntity($email['lead_id']);
+            }
+
+            $event->setTemplate('MauticDashboardBundle:Dashboard:upcomingemails.html.php');
+            $event->setTemplateData(array('upcomingEmails' => $upcomingEmails));
             
             $event->stopPropagation();
         }
