@@ -592,8 +592,8 @@ class AjaxController extends CommonAjaxController
         $choiceTypes = array('boolean', 'country', 'region', 'lookup', 'timezone', 'select', 'radio');
 
         if ($leadField && in_array($leadField->getType(), $choiceTypes)) {
-            $properties = $field->getProperties();
-            $fieldType = $field->getType();
+            $properties = $leadField->getProperties();
+            $fieldType  = $leadField->getType();
             if (!empty($properties['list'])) {
                 // Lookup/Select options
                 $options = explode('|', $properties['list']);
