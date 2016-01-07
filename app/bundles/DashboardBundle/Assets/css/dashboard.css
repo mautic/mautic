@@ -11,20 +11,89 @@
     border: 1px dashed #4e5d9d;
     flex-grow: 0;
 }
-#dashboard-widgets {
+.cards {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
     display: flex;
-    flex-direction: row;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
     flex-wrap: wrap;
-    padding: 5px;
+    padding: 1.5%;
+    
 }
-.widget {
-    flex-grow: 0;
+.card-flex {
+    position: relative;
 }
-.widget .panel {
+.card {
     margin: 5px;
+    background: #FEFEFE;
+    -moz-box-shadow: rgba(0, 0, 0, 0.19) 0 0 8px 0;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.19) 0 0 8px 0;
+    box-shadow: rgba(0, 0, 0, 0.19) 0 0 8px 0;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -moz-transition-property: background-color, box-shadow, -moz-transform;
+    -o-transition-property: background-color, box-shadow, text-shadow, -o-transform;
+    -webkit-transition-property: background-color, box-shadow, text-shadow, -webkit-transform;
+    transition-property: background-color, box-shadow, text-shadow, transform;
+    -moz-transition-duration: 0.2s;
+    -o-transition-duration: 0.2s;
+    -webkit-transition-duration: 0.2s;
+    transition-duration: 0.2s;
+    -moz-transition-timing-function: linear;
+    -o-transition-timing-function: linear;
+    -webkit-transition-timing-function: linear;
+    transition-timing-function: linear;
 }
-.widget .panel-heading {
+.card-header {
+    padding: 10px 15px;
     cursor: -moz-grab;
     cursor: -webkit-grab;
     cursor: grab;
+}
+.card-header .dropdown {
+    position: absolute;
+    top: 18px;
+    right: 15px;
+}
+.card-header .dropdown-toggle .fa-ellipsis-v {
+    font-size: 15px;
+    color: rgba(0, 0, 0, 0.6);
+    width: 20px;
+    text-align: center;
+}
+.card-header h4 {
+  width: 90%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card table {
+  table-layout: fixed;
+}
+.card table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card table td:last-child {
+  width: 30px;
+}
+@media (max-width: 700px) {
+  .card {
+    width: 100% !important;
+  }
+}
+.card:hover, .card:focus {
+  background: white;
+  -moz-box-shadow: rgba(0, 0, 0, 0.45) 0px 0px 20px 0px;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.45) 0px 0px 20px 0px;
+  box-shadow: rgba(0, 0, 0, 0.45) 0px 0px 20px 0px;
 }

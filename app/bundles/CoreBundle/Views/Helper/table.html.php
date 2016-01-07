@@ -8,7 +8,7 @@
  */
 
 if (!isset($class)) {
-    $class = 'table table-hover table-striped table-bordered';
+    $class = 'table';
 }
 if (!isset($shortenLinkText)) {
     $shortenLinkText = 30;

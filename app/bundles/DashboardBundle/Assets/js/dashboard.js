@@ -38,7 +38,7 @@ Mautic.widgetOnLoad = function(container, response) {
 Mautic.initWidgetSorting = function () {
     var widgetsWrapper = mQuery('#dashboard-widgets');
     widgetsWrapper.sortable({
-        handle: '.panel-heading',
+        handle: '.card-header',
         placeholder: 'sortable-placeholder',
         items: '.widget',
         opacity: 0.9,
@@ -46,7 +46,6 @@ Mautic.initWidgetSorting = function () {
             Mautic.saveWidgetSorting();
         },
         start: function( event, ui ) {
-            console.log(ui.item);
             // Adjust placeholder's size according to dragging element size
             ui.placeholder.css(ui.item.children().css(['width', 'height']));
         }
