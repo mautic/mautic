@@ -482,15 +482,17 @@ class CampaignController extends FormController
                         );
                         $valid = false;
                     } else {
+                        // Set lead sources
                         $model->setLeadSources($entity, $addedSources, $deletedSources);
 
                         $connections = $session->get('mautic.campaign.'.$sessionId.'.events.canvassettings');
+                        // Build and set Event entities
                         $model->setEvents($entity, $campaignEvents, $connections, $deletedEvents, $currentSources);
 
-                        //form is valid so process the data
+                        // Persist to the database before building connection so that IDs are available
                         $model->saveEntity($entity);
 
-                        //update canvas settings with new event IDs then save
+                        // Update canvas settings with new event IDs then save
                         $model->setCanvasSettings($entity, $connections);
 
                         $this->addFlash(
@@ -701,29 +703,27 @@ class CampaignController extends FormController
                         $valid = false;
                     } else {
                         //set sources
-
                         $model->setLeadSources($entity, $addedSources, $deletedSources);
 
                         //set events and connections
                         $connections = $session->get('mautic.campaign.'.$objectId.'.events.canvassettings');
+
                         if ($connections != null) {
+                            // Build and persist events
                             $model->setEvents($entity, $campaignEvents, $connections, $deletedEvents, $currentSources);
 
-                            //form is valid so process the data
-                            $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
-
-                            // Reset objectId to entity ID (can be session ID in case of cloned entity)
-                            $objectId = $entity->getId();
-
-                            //update canvas settings with new event IDs then save
+                            // Update canvas settings with new event IDs if applicable then save
                             $model->setCanvasSettings($entity, $connections);
 
                             if (!empty($deletedEvents)) {
                                 $this->factory->getModel('campaign.event')->deleteEvents($entity->getEvents(), $modifiedEvents, $deletedEvents);
                             }
-                        } else {
-                            $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
                         }
+
+                        $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+
+                        // Reset objectId to entity ID (can be session ID in case of cloned entity)
+                        $objectId = $entity->getId();
 
                         $this->addFlash(
                             'mautic.core.notice.updated',
