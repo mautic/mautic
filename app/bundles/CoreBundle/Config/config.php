@@ -100,7 +100,10 @@ return array(
             ),
             'mautic.core.configbundle.subscriber' => array(
                 'class' => 'Mautic\CoreBundle\EventListener\ConfigSubscriber'
-            )
+            ),
+            'mautic.core.dashboard.subscriber'    => array(
+                'class' => 'Mautic\CoreBundle\EventListener\DashboardSubscriber'
+            ),
         ),
         'forms'   => array(
             'mautic.form.type.spacer'             => array(
