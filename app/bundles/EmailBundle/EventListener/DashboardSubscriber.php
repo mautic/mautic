@@ -91,10 +91,12 @@ class DashboardSubscriber extends MainDashboardSubscriber
         if ($event->getType() == 'upcoming.emails') {
             $widget = $event->getWidget();
             $params = $widget->getParams();
+            $height = $widget->getHeight();
+            $limit  = round(($height - 60) / 60);
 
             /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
             $leadEventLogRepository = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
-            $upcomingEmails = $leadEventLogRepository->getUpcomingEvents(array('type' => 'email.send', 'scheduled' => 1, 'eventType' => 'action'));
+            $upcomingEmails = $leadEventLogRepository->getUpcomingEvents(array('type' => 'email.send', 'scheduled' => 1, 'eventType' => 'action', 'limit' => $limit));
 
             $leadModel = $this->factory->getModel('lead.lead');
 
