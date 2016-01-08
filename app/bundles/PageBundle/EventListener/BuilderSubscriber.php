@@ -588,7 +588,7 @@ class BuilderSubscriber extends CommonSubscriber
     private function validateLink($url, $currentTokens, &$foundLinks)
     {
         static $doNotTrack;
-var_dump($url);
+
         if (null === $doNotTrack) {
             $event      = $this->dispatcher->dispatch(
                 PageEvents::REDIRECT_DO_NOT_TRACK,
