@@ -3022,7 +3022,9 @@ var Mautic = {
         var ctx = canvas[0].getContext("2d");
         var data = mQuery.parseJSON(canvas.text());
         var options = {}
-        Mautic.chartObjects.push(new Chart(ctx).Pie(data, options));
+        var pieChart = new Chart(ctx).Pie(data, options);
+        mQuery(canvas).closest('.chart-wrapper').find('.legend').html(pieChart.generateLegend());
+        Mautic.chartObjects.push(pieChart);
     },
 
     /**
