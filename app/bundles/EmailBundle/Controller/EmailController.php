@@ -633,21 +633,6 @@ class EmailController extends FormController
         )
         ) {
             return $this->accessDenied();
-        } elseif ($entity->getEmailType() == 'list' && $entity->getSentCount()) {
-            return $this->postActionRedirect(
-                array_merge(
-                    $postActionVars,
-                    array(
-                        'flashes' => array(
-                            array(
-                                'type'    => 'error',
-                                'msg'     => 'mautic.email.error.list_type.sent',
-                                'msgVars' => array('%name%' => $entity->getName())
-                            )
-                        )
-                    )
-                )
-            );
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'email');
