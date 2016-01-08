@@ -28,6 +28,7 @@ class BuilderSubscriber extends CommonSubscriber
     private $shareButtonsRegex = '{sharebuttons}';
     private $emailIsInternalSend = false;
     private $emailEntity = null;
+    private $emailTrackedLinkSettings = array();
 
     /**
      * {@inheritdoc}
@@ -304,57 +305,6 @@ class BuilderSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param                $clickthrough
-     * @param EmailSendEvent $event
-     *
-     * @return array
-     */
-    protected function generateEmailTokens($clickthrough, EmailSendEvent $event)
-    {
-        static $emailTrackedLinks = array();
-
-        /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
-        $redirectModel = $this->factory->getModel('page.redirect');
-
-        $emailId = $this->emailEntity->getId();
-
-        if (!isset($emailTrackedLinks[$emailId])) {
-            // Using trackable links which will handle persisting redirect URLs, etc
-            list(
-                $emailTrackedLinks[$emailId]['tokens'],
-                $emailTrackedLinks[$emailId]['contentSearch'],
-                $emailTrackedLinks[$emailId]['contentReplace']
-                ) = $this->generateTrackedLinkTokens($clickthrough, $event);
-        }
-
-        // Generate trackable URLs with lead specific click through
-        $tokens = array();
-        foreach ($emailTrackedLinks[$emailId]['tokens'] as $url => $link) {
-            $tokens['{trackedlink='.$link->getRedirectId().'}'] = $redirectModel->generateRedirectUrl($link, $clickthrough);;
-        }
-
-        // For plain text, just do a search/replace
-        if ($plainText = $event->getPlainText()) {
-            $plainText = str_ireplace($emailTrackedLinks[$emailId]['contentSearch'], $emailTrackedLinks[$emailId]['contentReplace'], $plainText);
-            $event->setPlainText($plainText);
-        }
-
-        // For HTML, replace only the links; leaving the link text (if a URL) intact
-        $content = $event->getContent();
-        foreach ($emailTrackedLinks[$emailId]['contentSearch'] as $key => $value) {
-            $content = preg_replace(
-                '/<a(.*?)href=(["\'])'.preg_quote($value, '/').'\\2(.*?)>/i',
-                '<a$1href=$2'.$emailTrackedLinks[$emailId]['contentReplace'][$key].'$2$3>',
-                $content
-            );
-        }
-
-        $event->setContent($content);
-
-        return $tokens;
-    }
-
-    /**
      * @param $content
      * @param $clickthrough
      *
@@ -393,6 +343,98 @@ class BuilderSubscriber extends CommonSubscriber
     }
 
     /**
+     * @param                $clickthrough
+     * @param EmailSendEvent $event
+     *
+     * @return array
+     */
+    protected function generateEmailTokens($clickthrough, EmailSendEvent $event)
+    {
+        static $emailTrackedLinks = array();
+
+        /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
+        $redirectModel = $this->factory->getModel('page.redirect');
+
+        $emailId = $this->emailEntity->getId();
+
+        if (!isset($emailTrackedLinks[$emailId])) {
+            // Built by multiple functions
+            $this->emailTrackedLinkSettings = array(
+                'trackedLinks'         => array(),
+                'firstContentReplace'  => array(),
+                'secondContentReplace' => array(),
+                'usingClickthrough'    => (!empty($clickthrough))
+            );
+
+            $this->convertTrackableLinks($event);
+
+            if (!empty($this->emailTrackedLinkSettings['trackedLinks'])) {
+                foreach ($this->emailTrackedLinkSettings['trackedLinks'] as $url => $link) {
+                    $this->emailTrackedLinkSettings['secondContentReplace'][$url] = '{trackedlink='.$link->getRedirectId().'}';
+                }
+
+                // Sort longer to shorter strings to ensure that URLs that share the same base are appropriately replaced
+                krsort($this->emailTrackedLinkSettings['secondContentReplace']);
+            }
+
+            $emailTrackedLinks[$emailId] = $this->emailTrackedLinkSettings;
+            unset($this->emailTrackedLinkSettings);
+        }
+
+        $tokens = array();
+
+        // Generate trackable URLs with lead specific click through
+        foreach ($emailTrackedLinks[$emailId]['trackedLinks'] as $url => $link) {
+            $trackedUrl                                         = $redirectModel->generateRedirectUrl($link, $clickthrough);
+            $tokens['{trackedlink='.$link->getRedirectId().'}'] = $trackedUrl;
+        }
+
+        // Search/replace
+        if (!isset($emailTrackedLinks[$emailId]['contentReplaced'])) {
+            // Sort longer to shorter strings to ensure that URLs that share the same base are appropriately replaced
+            krsort($emailTrackedLinks[$emailId]['secondContentReplace']);
+
+            $firstSearch   = array_keys($emailTrackedLinks[$emailId]['firstContentReplace']);
+            $firstReplace  = $emailTrackedLinks[$emailId]['firstContentReplace'];
+            $secondSearch  = array_keys($emailTrackedLinks[$emailId]['secondContentReplace']);
+            $secondReplace = $emailTrackedLinks[$emailId]['secondContentReplace'];
+
+            // Remove tracking tags from content
+            $firstSearch[]  = 'mautic:disable-tracking=""'; // Editor may convert to HTML4
+            $firstSearch[]  = 'mautic:disable-tracking'; // HTML5
+            $firstReplace[] = '';
+            $firstReplace[] = '';
+
+            // For plain text, just do a search/replace
+            if ($plainText = $event->getPlainText()) {
+                $plainText = str_ireplace($firstSearch, $firstReplace, $plainText);
+                $plainText = str_ireplace($secondSearch, $secondReplace, $plainText);
+                $event->setPlainText($plainText);
+            }
+
+            // Main content
+            $content = $event->getContent();
+            // Regular search/replace to prepare for the second pass
+            $content = str_ireplace($firstSearch, $firstReplace, $content);
+            // For HTML, replace only the links; leaving the link text (if a URL) intact
+            foreach ($emailTrackedLinks[$emailId]['secondContentReplace'] as $search => $replace) {
+                $content = preg_replace(
+                    '/<a(.*?)href=(["\'])'.preg_quote($search, '/').'(.*?)\\2(.*?)>/i',
+                    '<a$1href=$2'.$replace.'$3$2$4>',
+                    $content
+                );
+            }
+            $event->setContent($content);
+
+            $emailTrackedLinks[$emailId]['contentReplaced'] = true;
+
+            unset($firstSearch, $firstReplace, $secondSearch, $secondSearch, $content, $plainText);
+        }
+
+        return $tokens;
+    }
+
+    /**
      * @deprecated Since version 1.1; to be removed in 2.0
      *
      * @param $content
@@ -400,7 +442,8 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return array
      */
-    protected function generateExternalLinkTokens($content, $clickthrough = array()) {
+    protected function generateExternalLinkTokens($content, $clickthrough = array())
+    {
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
         $redirectModel = $this->factory->getModel('page.redirect');
 
@@ -444,47 +487,6 @@ class BuilderSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param                $clickthrough
-     * @param EmailSendEvent $event
-     *
-     * @return array
-     */
-    protected function generateTrackedLinkTokens(
-        $clickthrough,
-        EmailSendEvent $event
-    ) {
-        /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
-        $redirectModel = $this->factory->getModel('page.redirect');
-
-        // Parse email content for links
-        $trackedLinks = $this->convertTrackableLinks($event);
-
-        $contentSearch  =
-        $contentReplace = array();
-
-        if (!empty($trackedLinks)) {
-            foreach ($trackedLinks as $url => $link) {
-                $trackedUrl = $redirectModel->generateRedirectUrl($link, $clickthrough);
-
-                $token          = '{trackedlink='.$link->getRedirectId().'}';
-                $contentSearch[]       = $url;
-                $contentReplace[]      = $token;
-                $tokens[$token] = $trackedUrl;
-            }
-
-            // Sort to ensure that URLs that share the same base are appropriately replaced
-            arsort($contentSearch);
-            $tempReplace = array();
-            foreach ($contentSearch as $key => $value) {
-                $tempReplace[$key] = $contentReplace[$key];
-            }
-            $contentReplace = $tempReplace;
-        }
-
-        return array($trackedLinks, $contentSearch, $contentReplace);
-    }
-
-    /**
      * Converts links to trackable links and tokens
      *
      * @param EmailSendEvent $event
@@ -493,11 +495,10 @@ class BuilderSubscriber extends CommonSubscriber
      */
     protected function convertTrackableLinks(EmailSendEvent $event)
     {
+        $taggedDoNotTrack = array();
+
         // Get a list of tokens for the tokenized link conversion
         $currentTokens = $event->getTokens();
-
-        /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
-        $redirectModel = $this->factory->getModel('page.redirect');
 
         // Parse the content for links
         $body = $event->getContent();
@@ -514,11 +515,20 @@ class BuilderSubscriber extends CommonSubscriber
 
         $foundLinks =
         $tokenizedLinks = array();
+
+        /** @var \DOMElement $link */
         foreach ($links as $link) {
             $url = $link->getAttribute('href');
 
             // The editor will have converted & to &amp; but DOMDocument will have converted them back so this must be accounted for
             $url = str_replace('&', '&amp;', $url);
+
+            // Check for a do not track
+            if ($link->hasAttribute('mautic:disable-tracking')) {
+                $taggedDoNotTrack[$url] = true;
+
+                continue;
+            }
 
             $this->validateLink($url, $currentTokens, $foundLinks);
         }
@@ -529,22 +539,25 @@ class BuilderSubscriber extends CommonSubscriber
         if (!empty($plainText)) {
             // Plaintext links
             preg_match_all(
-                '@(?<![.*">])\b(?:(?:https?|ftp|file)://|[a-z]\.)[-A-Z0-9+&#/%=~_|$?!:,.]*[A-Z0-9+&#/%=~_|$]@i',
+                '/((https?|ftps?):\/\/)([a-zA-Z0-9-\.{}]*[a-zA-Z0-9=}]*)(\??)([^\s\]]+)?/i',
                 $plainText,
                 $matches
             );
 
             if (!empty($matches[0])) {
                 foreach ($matches[0] as $url) {
-                    // Remove anything left on at the end; just in case
-                    $url = preg_replace('/^\PL+|\PL\z/', '', trim($url));
-
-                    $this->validateLink($url, $currentTokens, $foundLinks);
+                    $url = trim($url);
+                    // Validate the link if it has not already been marked as do not track by attribute in the HTML version
+                    if (!isset($taggedDoNotTrack[$url])) {
+                        $this->validateLink($url, $currentTokens, $foundLinks);
+                    }
                 }
             }
         }
 
-        $trackedLinks = array();
+        /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
+        $redirectModel = $this->factory->getModel('page.redirect');
+
         if (!empty($foundLinks)) {
             $links = $redirectModel->getRedirectListByUrls($foundLinks, $this->emailEntity);
 
@@ -553,7 +566,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $persistEntities[$url] = $link;
                 }
 
-                $trackedLinks[$url] = $link;
+                $this->emailTrackedLinkSettings['trackedLinks'][$url] = $link;
             }
         }
 
@@ -563,23 +576,21 @@ class BuilderSubscriber extends CommonSubscriber
         }
 
         unset($foundLinks, $links, $persistEntities);
-
-        return $trackedLinks;
     }
 
     /**
-     * Validate link
+     * Validate link and parse query with tokens
      *
-     * @param $url
-     * @param $currentTokens
-     * @param $foundLinks
+     * @param string $url
+     * @param array  $currentTokens Tokens found in the email
+     * @param array  $foundLinks    Array of links to convert to trackables
      */
     private function validateLink($url, $currentTokens, &$foundLinks)
     {
         static $doNotTrack;
-
+var_dump($url);
         if (null === $doNotTrack) {
-            $event = $this->dispatcher->dispatch(
+            $event      = $this->dispatcher->dispatch(
                 PageEvents::REDIRECT_DO_NOT_TRACK,
                 new Events\UntrackableUrlsEvent($this->emailEntity)
             );
@@ -591,7 +602,16 @@ class BuilderSubscriber extends CommonSubscriber
             return;
         }
 
-        $doNotTrackMatcher = function($testUrl, $trackableUrl = null, $trackableKey = null) use ($doNotTrack, &$foundLinks) {
+        /**
+         * Check if the URL is in the do not track list
+         *
+         * @param      $testUrl
+         * @param null $trackableUrl
+         * @param null $trackableKey
+         *
+         * @return bool
+         */
+        $shouldUrlBeTracked = function ($testUrl, $trackableUrl = null, $trackableKey = null) use ($doNotTrack, &$foundLinks) {
             $track = true;
 
             if (null === $trackableUrl) {
@@ -613,16 +633,264 @@ class BuilderSubscriber extends CommonSubscriber
             if ($track) {
                 $foundLinks[$trackableKey] = $trackableUrl;
             }
+
+            return $track;
         };
 
-        if (stripos($url, 'http://{') !== false || strpos($url, 'https://{') !== false || strpos($url, '{') === 0) {
-            $token = str_ireplace(array('https://', 'http://'), '', $url);
-            // Ensure the token is valid to prevent errors
-            if (preg_match('/^\{.*?\}(\S+|$)/', $token)) {
-                $doNotTrackMatcher($token, $currentTokens[$token], $url);
+        /**
+         * Extract tokenized query params
+         *
+         * @param $query
+         *
+         * @return array
+         */
+        $parseTokenizedQuery = function ($query) {
+            $tokenizedParams   =
+            $untokenizedParams = array();
+
+            // Test to see if there are tokens in the query and if so, extract and append them to the end of the tracked link
+            if (preg_match('/(\{\S+?\})/', $query)) {
+                // Equal signs in tokens will confuse parse_str so they need to be encoded
+                $query = preg_replace('/\{(\S+?)=(\S+?)\}/', '{$1%3D$2}', $query);
+                parse_str($query, $queryParts);
+
+                if (is_array($queryParts)) {
+                    foreach ($queryParts as $key => $value) {
+                        if (preg_match('/(\{\S+?\})/', $key) || preg_match('/(\{\S+?\})/', $value)) {
+                            $tokenizedParams[$key] = $value;
+                        } else {
+                            $untokenizedParams[$key] = $value;
+                        }
+                    }
+                }
             }
-        } elseif (substr($url, 0, 4) == 'http' || substr($url, 0, 3) == 'ftp') {
-            $doNotTrackMatcher($url);
+
+            return array($tokenizedParams, $untokenizedParams);
+        };
+
+        // Convert URL
+        $tokenizedParams = false;
+        $tracked         = false;
+        $urlParts        = parse_url($url);
+
+        // Ensure a valid scheme
+        if (isset($urlParts['scheme']) && !in_array($urlParts['scheme'], array('http', 'https', 'ftp', 'ftps'))) {
+
+            return;
         }
+
+        // Check for tokens in the query
+        if (!empty($urlParts['query'])) {
+            list($tokenizedParams, $untokenizedParams) = $parseTokenizedQuery($urlParts['query']);
+            if ($tokenizedParams) {
+                // Rebuild the query without the tokenized query params for now
+                $urlParts['query'] = $this->buildQuery($untokenizedParams);
+            }
+        }
+
+        // Check if URL is trackable
+        $tokenizedHost = (!isset($urlParts['host']) && isset($urlParts['path'])) ? $urlParts['path'] : $urlParts['host'];
+        if (preg_match('/^({\S+?})/', $tokenizedHost, $match)) {
+            // Token as URL
+
+            if (!preg_match('/^({\S+?})$/', $tokenizedHost)) {
+                // Currently this does not apply to something like "{leadfield=firstname}.com" since that could result in URL per lead
+
+                return;
+            }
+
+            // Set the actual token used in the URL
+            $token = $match[1];
+
+            // Tokenized hosts shouldn't use a scheme
+            $scheme = (!empty($urlParts['scheme'])) ? $urlParts['scheme'] : false;
+            unset($urlParts['scheme']);
+            $replaceUrl = $this->buildUrl($urlParts);
+
+            // Acknowledge only known tokens
+            if (isset($currentTokens[$token])) {
+                $tokenUrl = (!empty($urlParts['query'])) ? $currentTokens[$token].'?'.$urlParts['query'] : $currentTokens[$token];
+                $tracked  = $shouldUrlBeTracked($token, $tokenUrl, $replaceUrl);
+
+                if ($tracked && $scheme) {
+                    // Token has a schema so let's get rid of it before replacing tokens
+                    $this->emailTrackedLinkSettings['firstContentReplace'][$scheme.'://'.$tokenizedHost] = $tokenizedHost;
+                }
+            }
+        } else {
+            // Regular URL
+            $replaceUrl = $this->buildUrl($urlParts);
+            $tracked    = $shouldUrlBeTracked($replaceUrl);
+        }
+
+        // Append tokenized params to the end of the URL
+        if ($tracked && $tokenizedParams) {
+            $replaceUrl .= ($this->emailTrackedLinkSettings['usingClickthrough'] ? '&' : '?').$this->buildQuery($tokenizedParams);
+
+            // Store the search/replace
+            $this->emailTrackedLinkSettings['firstContentReplace'][$url] = $replaceUrl;
+        }
+        unset($tokenizedQueryParams, $tokenizedParams, $untokenizedParams);
+    }
+
+    /**
+     * @param $parts
+     *
+     * @return string
+     */
+    private function buildUrl($parts)
+    {
+        if (function_exists('http_build_url')) {
+
+            return http_build_url($parts);
+        } else {
+            /**
+             * http_build_url
+             * Stand alone version of http_build_url (http://php.net/manual/en/function.http-build-url.php)
+             * Based on buggy and inefficient version I found at http://www.mediafire.com/?zjry3tynkg5 by tycoonmaster[at]gmail[dot]com
+             *
+             * @author    Chris Nasr (chris[at]fuelforthefire[dot]ca)
+             * @copyright Fuel for the Fire
+             * @package   http
+             * @version   0.1
+             * @created   2012-07-26
+             */
+
+            if (!defined('HTTP_URL_REPLACE')) {
+                // Define constants
+                define('HTTP_URL_REPLACE', 0x0001);    // Replace every part of the first URL when there's one of the second URL
+                define('HTTP_URL_JOIN_PATH', 0x0002);    // Join relative paths
+                define('HTTP_URL_JOIN_QUERY', 0x0004);    // Join query strings
+                define('HTTP_URL_STRIP_USER', 0x0008);    // Strip any user authentication information
+                define('HTTP_URL_STRIP_PASS', 0x0010);    // Strip any password authentication information
+                define('HTTP_URL_STRIP_PORT', 0x0020);    // Strip explicit port numbers
+                define('HTTP_URL_STRIP_PATH', 0x0040);    // Strip complete path
+                define('HTTP_URL_STRIP_QUERY', 0x0080);    // Strip query string
+                define('HTTP_URL_STRIP_FRAGMENT', 0x0100);    // Strip any fragments (#identifier)
+
+                // Combination constants
+                define('HTTP_URL_STRIP_AUTH', HTTP_URL_STRIP_USER | HTTP_URL_STRIP_PASS);
+                define('HTTP_URL_STRIP_ALL', HTTP_URL_STRIP_AUTH | HTTP_URL_STRIP_PORT | HTTP_URL_STRIP_QUERY | HTTP_URL_STRIP_FRAGMENT);
+            }
+
+            $flags = HTTP_URL_REPLACE;
+            $url   = array();
+
+            // Scheme and Host are always replaced
+            if (isset($parts['scheme'])) {
+                $url['scheme'] = $parts['scheme'];
+            }
+            if (isset($parts['host'])) {
+                $url['host'] = $parts['host'];
+            }
+
+            // (If applicable) Replace the original URL with it's new parts
+            if (HTTP_URL_REPLACE & $flags) {
+                // Go through each possible key
+                foreach (array('user', 'pass', 'port', 'path', 'query', 'fragment') as $key) {
+                    // If it's set in $parts, replace it in $url
+                    if (isset($parts[$key])) {
+                        $url[$key] = $parts[$key];
+                    }
+                }
+            } else {
+                // Join the original URL path with the new path
+                if (isset($parts['path']) && (HTTP_URL_JOIN_PATH & $flags)) {
+                    if (isset($url['path']) && $url['path'] != '') {
+                        // If the URL doesn't start with a slash, we need to merge
+                        if ($url['path'][0] != '/') {
+                            // If the path ends with a slash, store as is
+                            if ('/' == $parts['path'][strlen($parts['path']) - 1]) {
+                                $sBasePath = $parts['path'];
+                            } // Else trim off the file
+                            else {
+                                // Get just the base directory
+                                $sBasePath = dirname($parts['path']);
+                            }
+
+                            // If it's empty
+                            if ('' == $sBasePath) {
+                                $sBasePath = '/';
+                            }
+
+                            // Add the two together
+                            $url['path'] = $sBasePath.$url['path'];
+
+                            // Free memory
+                            unset($sBasePath);
+                        }
+
+                        if (false !== strpos($url['path'], './')) {
+                            // Remove any '../' and their directories
+                            while (preg_match('/\w+\/\.\.\//', $url['path'])) {
+                                $url['path'] = preg_replace('/\w+\/\.\.\//', '', $url['path']);
+                            }
+
+                            // Remove any './'
+                            $url['path'] = str_replace('./', '', $url['path']);
+                        }
+                    } else {
+                        $url['path'] = $parts['path'];
+                    }
+                }
+
+                // Join the original query string with the new query string
+                if (isset($parts['query']) && (HTTP_URL_JOIN_QUERY & $flags)) {
+                    if (isset($url['query'])) {
+                        $url['query'] .= '&'.$parts['query'];
+                    } else {
+                        $url['query'] = $parts['query'];
+                    }
+                }
+            }
+
+            // Strips all the applicable sections of the URL
+            if (HTTP_URL_STRIP_USER & $flags) {
+                unset($url['user']);
+            }
+            if (HTTP_URL_STRIP_PASS & $flags) {
+                unset($url['pass']);
+            }
+            if (HTTP_URL_STRIP_PORT & $flags) {
+                unset($url['port']);
+            }
+            if (HTTP_URL_STRIP_PATH & $flags) {
+                unset($url['path']);
+            }
+            if (HTTP_URL_STRIP_QUERY & $flags) {
+                unset($url['query']);
+            }
+            if (HTTP_URL_STRIP_FRAGMENT & $flags) {
+                unset($url['fragment']);
+            }
+
+            // Combine the new elements into a string and return it
+            return
+                ((isset($url['scheme'])) ? $url['scheme'].'://' : '')
+                .((isset($url['user'])) ? $url['user'].((isset($url['pass'])) ? ':'.$url['pass'] : '').'@' : '')
+                .((isset($url['host'])) ? $url['host'] : '')
+                .((isset($url['port'])) ? ':'.$url['port'] : '')
+                .((isset($url['path'])) ? $url['path'] : '')
+                .((!empty($url['query'])) ? '?'.$url['query'] : '')
+                .((!empty($url['fragment'])) ? '#'.$url['fragment'] : '');
+        }
+    }
+
+    /**
+     * Build query string while accounting for tokens that include an equal sign
+     *
+     * @param array $queryParts
+     *
+     * @return mixed|string
+     */
+    private function buildQuery(array $queryParts)
+    {
+        $query = http_build_query($queryParts);
+
+        // http_build_query likely encoded tokens so that has to be fixed so they get replaced
+        $query = preg_replace('/%7B(\S+?)%3D(\S+?)%7D/i', '{$1=$2}', $query);
+        $query = preg_replace('/%7B(\S+?)%7D/i', '{$1}', $query);
+
+        return $query;
     }
 }
