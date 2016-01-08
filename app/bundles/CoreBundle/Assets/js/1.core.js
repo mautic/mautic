@@ -3059,7 +3059,7 @@ var Mautic = {
                     series: {
                         regions: [{
                             values: data,
-                            scale: ['#C8EEFF', '#006491'],
+                            scale: ['#dce0e5', '#40C7B5'],
                             normalizeFunction: 'polynomial'
                         }]
                     },
