@@ -42,6 +42,7 @@ Mautic.initWidgetSorting = function () {
         placeholder: 'sortable-placeholder',
         items: '.widget',
         opacity: 0.9,
+        forceHelperSize: true,
         stop: function() {
             Mautic.saveWidgetSorting();
         },
