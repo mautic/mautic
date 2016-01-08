@@ -110,7 +110,7 @@
     -webkit-border-radius: 0 0 4px 4px;
     border-radius: 0 0 4px 4px;
     color: #fff;
-    -webkit-transition: all 0.6s ease-in-out;
+    -webkit-transition: all 0.3s ease-in-out;
 }
 .card:hover .legend {
     opacity: 0.8;
