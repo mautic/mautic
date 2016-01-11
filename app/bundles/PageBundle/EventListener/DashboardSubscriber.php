@@ -67,7 +67,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             } else {
                 $data = array(
                     'chartType'   => 'line',
-                    'chartHeight' => $widget->getHeight() - 70,
+                    'chartHeight' => $widget->getHeight() - 80,
                     'chartData'   => $model->getHitsBarChartData($params['amount'], $params['timeUnit'])
                 );
 
@@ -85,7 +85,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
             $data = array(
                 'chartType'   => 'pie',
-                'chartHeight' => $widget->getHeight() - 70,
+                'chartHeight' => $widget->getHeight() - 80,
                 'chartData'   => $model->getNewVsReturningPieChartData()
             );
 
@@ -102,7 +102,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
             $data = array(
                 'chartType'   => 'pie',
-                'chartHeight' => $widget->getHeight() - 70,
+                'chartHeight' => $widget->getHeight() - 80,
                 'chartData'   => $model->getDwellTimesPieChartData()
             );
 
@@ -118,7 +118,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $params = $widget->getParams();
 
             // Count the pages limit from the widget height
-            $limit = round((($widget->getHeight() - 60) / 35) - 1);
+            $limit = round((($widget->getHeight() - 80) / 35) - 1);
             $pages = $repo->getPopularPages($limit);
             $items = array();
 

@@ -104,7 +104,7 @@
     background: #000;
     opacity: 0;
     position: absolute;
-    bottom: 9px;
+    bottom: -1px;
     width: 100%;
     -moz-border-radius: 0 0 4px 4px;
     -webkit-border-radius: 0 0 4px 4px;

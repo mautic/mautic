@@ -52,7 +52,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $params = $widget->getParams();
             $height = $widget->getHeight();
             $model  = $this->factory->getModel('core.auditLog');
-            $limit  = round(($height - 100) / 60);
+            $limit  = round(($height - 80) / 75);
             $logs   = $model->getLogForObject(null, null, null, $limit);
 
             // Get names of log's items

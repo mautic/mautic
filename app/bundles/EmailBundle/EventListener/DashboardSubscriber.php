@@ -60,7 +60,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             } else {
                 $data = array(
                     'chartType'   => 'line',
-                    'chartHeight' => $widget->getHeight() - 70,
+                    'chartHeight' => $widget->getHeight() - 80,
                     'chartData'   => $model->getEmailsLineChartData($params['amount'], $params['timeUnit'])
                 );
 
@@ -78,7 +78,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
             $data = array(
                 'chartType'   => 'pie',
-                'chartHeight' => $widget->getHeight() - 70,
+                'chartHeight' => $widget->getHeight() - 80,
                 'chartData'   => $model->getIgnoredVsReadPieChartData()
             );
 
@@ -92,7 +92,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $widget = $event->getWidget();
             $params = $widget->getParams();
             $height = $widget->getHeight();
-            $limit  = round(($height - 60) / 60);
+            $limit  = round(($height - 80) / 60);
 
             /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
             $leadEventLogRepository = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
