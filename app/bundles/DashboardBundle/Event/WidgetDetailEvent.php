@@ -27,6 +27,7 @@ class WidgetDetailEvent extends CommonEvent
     protected $errorMessage;
     protected $uniqueId;
     protected $cacheDir;
+    protected $cacheTimeout;
 
     /**
      * Set the cache dir
@@ -36,6 +37,16 @@ class WidgetDetailEvent extends CommonEvent
     public function setCacheDir($cacheDir)
     {
         $this->cacheDir = $cacheDir;
+    }
+
+    /**
+     * Set the cache timeout
+     *
+     * @param string $cacheTimeout
+     */
+    public function setCacheTimeout($cacheTimeout)
+    {
+        $this->cacheTimeout = $cacheTimeout;
     }
 
     /**
@@ -171,7 +182,7 @@ class WidgetDetailEvent extends CommonEvent
         }
 
         $cache = new CacheStorageHelper($this->cacheDir);
-        $data  = $cache->get($this->getUniqueWidgetId(), 5);
+        $data  = $cache->get($this->getUniqueWidgetId(), $this->cacheTimeout);
 
         if ($data) {
             $this->templateData = $data;
