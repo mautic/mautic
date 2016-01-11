@@ -54,7 +54,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         if ($event->getType() == 'created.leads.in.time') {
-            $model = $this->factory->getModel('lead');
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -62,49 +61,44 @@ class DashboardSubscriber extends MainDashboardSubscriber
             if (empty($params['amount']) || empty($params['timeUnit'])) {
                 $event->setErrorMessage('mautic.core.configuration.value.not.set');
             } else {
-                $data = array(
-                    'chartType'   => 'line',
-                    'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getLeadsLineChartData($params['amount'], $params['timeUnit'])
-                );
-
-                $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
-                $event->setTemplateData($data);
+                if (!$event->isCached()) {
+                    $model = $this->factory->getModel('lead');
+                    $event->setTemplateData(array(
+                        'chartType'   => 'line',
+                        'chartHeight' => $widget->getHeight() - 80,
+                        'chartData'   => $model->getLeadsLineChartData($params['amount'], $params['timeUnit'])
+                    ));
+                }    
             }
-            
+
+            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
             $event->stopPropagation();
         }
 
         if ($event->getType() == 'anonymous.vs.identified.leads') {
-            $model = $this->factory->getModel('lead');
-            $widget = $event->getWidget();
-            $params = $widget->getParams();
-
-            $data = array(
-                'chartType'   => 'pie',
-                'chartHeight' => $widget->getHeight() - 80,
-                'chartData'   => $model->getAnonymousVsIdentifiedPieChartData()
-            );
+            if (!$event->isCached()) {
+                $model = $this->factory->getModel('lead');
+                $event->setTemplateData(array(
+                    'chartType'   => 'pie',
+                    'chartHeight' => $event->getWidget()->getHeight() - 80,
+                    'chartData'   => $model->getAnonymousVsIdentifiedPieChartData()
+                ));
+            }
 
             $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
-            $event->setTemplateData($data);
-            
             $event->stopPropagation();
         }
 
         if ($event->getType() == 'map.of.leads') {
-            $model = $this->factory->getModel('lead');
-            $widget = $event->getWidget();
-            $params = $widget->getParams();
-
-            $data = array(
-                'height' => $widget->getHeight() - 80,
-                'data'   => $model->getLeadMapData()
-            );
+            if (!$event->isCached()) {
+                $model = $this->factory->getModel('lead');
+                $event->setTemplateData(array(
+                    'height' => $event->getWidget()->getHeight() - 80,
+                    'data'   => $model->getLeadMapData()
+                ));
+            }
 
             $event->setTemplate('MauticCoreBundle:Helper:map.html.php');
-            $event->setTemplateData($data);
-            
             $event->stopPropagation();
         }
     }

@@ -12,6 +12,8 @@
 <div class="pt-md pr-md pb-md pl-md">
     <ul class="media-list media-list-feed">
         <?php foreach ($logs as $log) : ?>
+        <?php // If the data are loaded from cache array: ?>
+        <?php if (is_array($log['dateAdded']) && isset($log['dateAdded']['date'])) $log['dateAdded'] = new \DateTime($log['dateAdded']['date'], (new \DateTimeZone($log['dateAdded']['timezone']))); ?>
         <li class="media">
             <div class="media-object pull-left">
                 <span class="figure featured <?php echo ($log['action'] == 'create') ? 'bg-success' : ''; ?>">

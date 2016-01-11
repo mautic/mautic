@@ -54,7 +54,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         if ($event->getType() == 'asset.downloads.in.time') {
-            $model = $this->factory->getModel('asset');
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -62,67 +61,65 @@ class DashboardSubscriber extends MainDashboardSubscriber
             if (empty($params['amount']) || empty($params['timeUnit'])) {
                 $event->setErrorMessage('mautic.core.configuration.value.not.set');
             } else {
-                $data = array(
-                    'chartType'   => 'line',
-                    'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getDownloadsLineChartData($params['amount'], $params['timeUnit'])
-                );
-
-                $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
-                $event->setTemplateData($data);
+                if (!$event->isCached()) {
+                    $model = $this->factory->getModel('asset');
+                    $event->setTemplateData(array(
+                        'chartType'   => 'line',
+                        'chartHeight' => $widget->getHeight() - 80,
+                        'chartData'   => $model->getDownloadsLineChartData($params['amount'], $params['timeUnit'])
+                    ));
+                }    
             }
-            
+
+            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
             $event->stopPropagation();
         }
 
         if ($event->getType() == 'unique.vs.repetitive.downloads') {
-            $model = $this->factory->getModel('asset');
-            $widget = $event->getWidget();
-            $params = $widget->getParams();
-
-            $data = array(
-                'chartType'   => 'pie',
-                'chartHeight' => $widget->getHeight() - 80,
-                'chartData'   => $model->getUniqueVsRepetitivePieChartData()
-            );
+            if (!$event->isCached()) {
+                $model = $this->factory->getModel('asset');
+                $event->setTemplateData(array(
+                    'chartType'   => 'pie',
+                    'chartHeight' => $event->getWidget()->getHeight() - 80,
+                    'chartData'   => $model->getUniqueVsRepetitivePieChartData()
+                ));
+            }
 
             $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
-            $event->setTemplateData($data);
-            
             $event->stopPropagation();
         }
 
         if ($event->getType() == 'popular.assets') {
-            $repo   = $this->factory->getModel('asset')->getRepository();
-            $widget = $event->getWidget();
-            $params = $widget->getParams();
+            if (!$event->isCached()) {
+                $repo   = $this->factory->getModel('asset')->getRepository();
 
-            // Count the pages limit from the widget height
-            $limit  = round((($widget->getHeight() - 80) / 35) - 1);
-            $assets = $repo->getPopularAssets($limit);
-            $items  = array();
+                // Count the pages limit from the widget height
+                $limit  = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
+                $assets = $repo->getPopularAssets($limit);
+                $items  = array();
 
-            // Build table rows with links
-            if ($assets) {
-                foreach ($assets as &$asset) {
-                    $assetUrl = $this->factory->getRouter()->generate('mautic_asset_action', array('objectAction' => 'view', 'objectId' => $asset['id']));
-                    $row = array(
-                        $assetUrl => $asset['title'],
-                        $asset['downloadCount']
-                    );
-                    $items[] = $row;
+                // Build table rows with links
+                if ($assets) {
+                    foreach ($assets as &$asset) {
+                        $assetUrl = $this->factory->getRouter()->generate('mautic_asset_action', array('objectAction' => 'view', 'objectId' => $asset['id']));
+                        $row = array(
+                            $assetUrl => $asset['title'],
+                            $asset['downloadCount']
+                        );
+                        $items[] = $row;
+                    }
                 }
+                
+                $event->setTemplateData(array(
+                    'headItems'   => array(
+                        'mautic.dashboard.label.title',
+                        'mautic.dashboard.label.downloads'
+                    ),
+                    'bodyItems'   => $items
+                ));
             }
 
             $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
-            $event->setTemplateData(array(
-                'headItems'   => array(
-                    'mautic.dashboard.label.title',
-                    'mautic.dashboard.label.downloads'
-                ),
-                'bodyItems'   => $items
-            ));
-            
             $event->stopPropagation();
         }
     }

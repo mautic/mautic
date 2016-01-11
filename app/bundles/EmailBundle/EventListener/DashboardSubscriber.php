@@ -79,15 +79,15 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
-            $data = array(
-                'chartType'   => 'pie',
-                'chartHeight' => $widget->getHeight() - 80,
-                'chartData'   => $model->getIgnoredVsReadPieChartData()
-            );
+            if (!$event->isCached()) {
+                $event->setTemplateData(array(
+                    'chartType'   => 'pie',
+                    'chartHeight' => $widget->getHeight() - 80,
+                    'chartData'   => $model->getIgnoredVsReadPieChartData()
+                ));
+            }
 
             $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
-            $event->setTemplateData($data);
-            
             $event->stopPropagation();
         }
 

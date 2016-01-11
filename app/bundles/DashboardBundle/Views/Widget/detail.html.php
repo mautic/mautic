@@ -26,7 +26,7 @@
                 </li>
                 <li role="separator" class="divider"></li>
                 <li  class="dropdown-header">
-                    <?php echo $view['translator']->trans('mautic.dashboard.widget.load.time', array('%time%' => round($widget->getLoadTime() * 1000))); ?>
+                    <?php echo $view['translator']->trans('mautic.dashboard.widget.load.time', array('%time%' => round($widget->getLoadTime() * 1000, 1))); ?>
                 </li>
                 <li  class="dropdown-header">
                     <?php if ($widget->isCached()) : ?>
