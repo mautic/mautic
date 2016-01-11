@@ -1456,7 +1456,7 @@ class EmailModel extends FormModel
     {
         $cache = new CacheStorageHelper($this->factory->getSystemPath('cache', true));
         $cacheId = 'EmailsLineChartData.' . $amount . '.' . $unit . '.' . md5(json_encode($filter));
-        $chartData = $cache->get($cacheId);
+        $chartData = $cache->get($cacheId, 5);
 
         if (!$chartData) {
             $chart = new LineChart($unit, $amount);

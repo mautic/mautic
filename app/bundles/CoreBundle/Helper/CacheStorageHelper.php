@@ -66,15 +66,30 @@ class CacheStorageHelper
     }
 
     /**
-     * Reads a file in app/cache/{env}/data/$filename
+     * Reads a file in app/cache/{env}/data/$filename.
+     * If the cache file is expired, it will return false as well as if it doesn't exist.
      *
-     * @param  string $fileName
+     * @param  string  $fileName
+     * @param  integer $maxAge in minutes. 0 == any
+     *
+     * @return array|false
      */
-    public function get($fileName)
+    public function get($fileName, $maxAge = 0)
     {
         $filePath = $this->cacheDir . '/' . $fileName . '.php';
 
         if ($this->fs->exists($filePath)) {
+
+            if ($maxAge) {
+                $modifiedAt = filemtime($filePath);
+                $now = time();
+                $fileAge = round(($now - $modifiedAt) / 60); // in minutes
+
+                if ($fileAge >= $maxAge) {
+                    return false;
+                }
+            }
+
             return json_decode(file_get_contents($filePath), true);
         }
         
