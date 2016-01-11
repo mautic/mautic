@@ -24,6 +24,7 @@ class WidgetDetailEvent extends CommonEvent
     protected $template;
     protected $templateData = array();
     protected $errorMessage;
+    protected $uniqueId;
 
     /**
      * Set the widget type
@@ -123,5 +124,19 @@ class WidgetDetailEvent extends CommonEvent
     public function getErrorMessage()
     {
         return $this->errorMessage;
+    }
+
+    /**
+     * Build a unique ID from type and widget params
+     *
+     * @return string
+     */
+    public function getUniqueWidgetId()
+    {
+        if ($this->uniqueId) {
+            return $this->uniqueId;
+        }
+
+        return $this->uniqueId = $this->getType() . '_' . substr(md5(json_encode($this->getWidget()->getParams())), 0, 16);
     }
 }

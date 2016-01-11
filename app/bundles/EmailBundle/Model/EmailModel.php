@@ -22,7 +22,6 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -1454,22 +1453,15 @@ class EmailModel extends FormModel
      */
     public function getEmailsLineChartData($amount, $unit, $filter = array())
     {
-        $cache = new CacheStorageHelper($this->factory->getSystemPath('cache', true));
-        $cacheId = 'EmailsLineChartData.' . $amount . '.' . $unit . '.' . md5(json_encode($filter));
-        $chartData = $cache->get($cacheId, 5);
+        $chart = new LineChart($unit, $amount);
+        $query = new ChartQuery($this->em->getConnection());
+        
+        $data  = $query->fetchTimeData('email_stats', 'date_sent', $unit, $amount, $filter);
+        $chart->setDataset('Sent emails', $data);
+        $data  = $query->fetchTimeData('email_stats', 'date_read', $unit, $amount, $filter);
+        $chart->setDataset('Read emails', $data);
 
-        if (!$chartData) {
-            $chart = new LineChart($unit, $amount);
-            $query = new ChartQuery($this->em->getConnection());
-            $data  = $query->fetchTimeData('email_stats', 'date_sent', $unit, $amount, $filter);
-            $chart->setDataset('Sent emails', $data);
-            $data  = $query->fetchTimeData('email_stats', 'date_read', $unit, $amount, $filter);
-            $chart->setDataset('Read emails', $data);
-            $chartData = $chart->render();
-            $cache->set($cacheId, $chartData);
-        }
-
-        return $chartData;
+        return $chart->render();
     }
 
     /**

@@ -12,6 +12,7 @@ use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
 
 /**
  * Class DashboardSubscriber
@@ -50,7 +51,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         if ($event->getType() == 'emails.in.time') {
-            $model = $this->factory->getModel('email');
+
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -58,14 +59,23 @@ class DashboardSubscriber extends MainDashboardSubscriber
             if (empty($params['amount']) || empty($params['timeUnit'])) {
                 $event->setErrorMessage('mautic.core.configuration.value.not.set');
             } else {
-                $data = array(
-                    'chartType'   => 'line',
-                    'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getEmailsLineChartData($params['amount'], $params['timeUnit'])
-                );
+                $filter  = array();
+                $cache   = new CacheStorageHelper($this->factory->getSystemPath('cache', true));
+                $cacheId = $event->getUniqueWidgetId();
+                $data    = $cache->get($cacheId, 5);
+
+                if (!$data) {
+                    $model = $this->factory->getModel('email');
+                    $data  = $model->getEmailsLineChartData($params['amount'], $params['timeUnit']);
+                    $cache->set($cacheId, $data);
+                }
 
                 $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
-                $event->setTemplateData($data);
+                $event->setTemplateData(array(
+                    'chartType'   => 'line',
+                    'chartHeight' => $widget->getHeight() - 80,
+                    'chartData'   => $data
+                ));
             }
             
             $event->stopPropagation();
