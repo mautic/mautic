@@ -12,7 +12,6 @@ use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
 
 /**
  * Class DashboardSubscriber
@@ -59,23 +58,17 @@ class DashboardSubscriber extends MainDashboardSubscriber
             if (empty($params['amount']) || empty($params['timeUnit'])) {
                 $event->setErrorMessage('mautic.core.configuration.value.not.set');
             } else {
-                $filter  = array();
-                $cache   = new CacheStorageHelper($this->factory->getSystemPath('cache', true));
-                $cacheId = $event->getUniqueWidgetId();
-                $data    = $cache->get($cacheId, 5);
-
-                if (!$data) {
+                if (!$event->isCached()) {
                     $model = $this->factory->getModel('email');
-                    $data  = $model->getEmailsLineChartData($params['amount'], $params['timeUnit']);
-                    $cache->set($cacheId, $data);
+
+                    $event->setTemplateData(array(
+                        'chartType'   => 'line',
+                        'chartHeight' => $widget->getHeight() - 80,
+                        'chartData'   => $model->getEmailsLineChartData($params['amount'], $params['timeUnit'])
+                    ));
                 }
 
                 $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
-                $event->setTemplateData(array(
-                    'chartType'   => 'line',
-                    'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $data
-                ));
             }
             
             $event->stopPropagation();

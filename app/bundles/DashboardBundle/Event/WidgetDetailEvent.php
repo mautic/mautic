@@ -11,6 +11,7 @@ namespace Mautic\DashboardBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
 
 /**
  * Class WidgetDetailEvent
@@ -25,6 +26,17 @@ class WidgetDetailEvent extends CommonEvent
     protected $templateData = array();
     protected $errorMessage;
     protected $uniqueId;
+    protected $cacheDir;
+
+    /**
+     * Set the cache dir
+     *
+     * @param string $cacheDir
+     */
+    public function setCacheDir($cacheDir)
+    {
+        $this->cacheDir = $cacheDir;
+    }
 
     /**
      * Set the widget type
@@ -94,6 +106,12 @@ class WidgetDetailEvent extends CommonEvent
     public function setTemplateData(array $templateData)
     {
         $this->templateData = $templateData;
+
+        // Store the template data to the cache
+        if ($this->cacheDir) {
+            $cache = new CacheStorageHelper($this->cacheDir);
+            $cache->set($this->getUniqueWidgetId(), $templateData);
+        }
     }
 
     /**
@@ -138,5 +156,28 @@ class WidgetDetailEvent extends CommonEvent
         }
 
         return $this->uniqueId = $this->getType() . '_' . substr(md5(json_encode($this->getWidget()->getParams())), 0, 16);
+    }
+
+    /**
+     * Checks the cache for the widget data.
+     * If cache exists, it sets the TemplateData.
+     *
+     * @return string
+     */
+    public function isCached()
+    {
+        if (!$this->cacheDir) {
+            return false;
+        }
+
+        $cache = new CacheStorageHelper($this->cacheDir);
+        $data  = $cache->get($this->getUniqueWidgetId(), 5);
+
+        if ($data) {
+            $this->templateData = $data;
+            return true;
+        }
+
+        return false;
     }
 }

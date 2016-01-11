@@ -88,10 +88,12 @@ class DashboardModel extends FormModel
      */
     public function populateWidgetContent(Widget &$widget)
     {
+        $cacheDir = $this->factory->getParameter('cached_data_dir', $this->factory->getSystemPath('cache', true));
         $dispatcher = $this->factory->getDispatcher();
         $event      = new WidgetDetailEvent();
         $event->setType($widget->getType());
         $event->setWidget($widget);
+        $event->setCacheDir($cacheDir);
         $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
         $widget->setErrorMessage($event->getErrorMessage());
         $widget->setTemplate($event->getTemplate());

@@ -60,7 +60,7 @@ class CacheStorageHelper
     {
         $filePath = $this->cacheDir . '/' . $fileName . '.php';
 
-        if (is_writable($filePath)) {
+        if (is_writable($this->cacheDir)) {
             file_put_contents($filePath, json_encode($data));
         }
     }
