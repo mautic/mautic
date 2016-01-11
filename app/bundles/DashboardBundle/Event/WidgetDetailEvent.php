@@ -28,6 +28,13 @@ class WidgetDetailEvent extends CommonEvent
     protected $uniqueId;
     protected $cacheDir;
     protected $cacheTimeout;
+    protected $startTime = 0;
+    protected $loadTime = 0;
+
+    public function __construct()
+    {
+        $this->startTime = microtime();
+    }
 
     /**
      * Set the cache dir
@@ -114,12 +121,14 @@ class WidgetDetailEvent extends CommonEvent
      *
      * @param array  $templateData
      */
-    public function setTemplateData(array $templateData)
+    public function setTemplateData(array $templateData, $skipCache = false)
     {
         $this->templateData = $templateData;
 
+        $this->widget->setLoadTime(microtime() - $this->startTime);
+
         // Store the template data to the cache
-        if ($this->cacheDir) {
+        if (!$skipCache && $this->cacheDir) {
             $cache = new CacheStorageHelper($this->cacheDir);
             $cache->set($this->getUniqueWidgetId(), $templateData);
         }
@@ -185,7 +194,8 @@ class WidgetDetailEvent extends CommonEvent
         $data  = $cache->get($this->getUniqueWidgetId(), $this->cacheTimeout);
 
         if ($data) {
-            $this->templateData = $data;
+            $this->widget->setCached(true);
+            $this->setTemplateData($data, true);
             return true;
         }
 

@@ -73,6 +73,16 @@ class Widget extends FormEntity
     private $errorMessage;
 
     /**
+     * @var boolean
+     */
+    private $cached = false;
+
+    /**
+     * @var integer
+     */
+    private $loadTime = 0;
+
+    /**
      * @var array
      */
     private $templateData = array();
@@ -368,5 +378,53 @@ class Widget extends FormEntity
     public function getErrorMessage()
     {
         return $this->errorMessage;
+    }
+
+    /**
+     * Set cached flag
+     *
+     * @param string $cached
+     *
+     * @return Widget
+     */
+    public function setCached($cached)
+    {
+        $this->cached = $cached;
+
+        return $this;
+    }
+
+    /**
+     * Get cached
+     *
+     * @return boolean
+     */
+    public function isCached()
+    {
+        return $this->cached;
+    }
+
+    /**
+     * Set loadTime
+     *
+     * @param string $loadTime
+     *
+     * @return Widget
+     */
+    public function setLoadTime($loadTime)
+    {
+        $this->loadTime = $loadTime;
+
+        return $this;
+    }
+
+    /**
+     * Get loadTime
+     *
+     * @return integer
+     */
+    public function getLoadTime()
+    {
+        return $this->loadTime;
     }
 }

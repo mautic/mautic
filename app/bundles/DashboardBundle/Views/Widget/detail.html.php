@@ -24,6 +24,18 @@
                         <i class="fa fa-pencil"></i> Edit
                     </a>
                 </li>
+                <li role="separator" class="divider"></li>
+                <li  class="dropdown-header">
+                    <?php echo $view['translator']->trans('mautic.dashboard.widget.load.time', array('%time%' => round($widget->getLoadTime() * 1000))); ?>
+                </li>
+                <li  class="dropdown-header">
+                    <?php if ($widget->isCached()) : ?>
+                    <?php echo $view['translator']->trans('mautic.dashboard.widget.data.loaded.from.cache'); ?>
+                    <?php else : ?>
+                    <?php echo $view['translator']->trans('mautic.dashboard.widget.data.loaded.from.database'); ?>
+                    <?php endif; ?>
+                </li>
+                <li role="separator" class="divider"></li>
                 <li>
                     <a  href="<?php echo $this->container->get('router')->generate('mautic_dashboard_action', array('objectAction' => 'delete', 'objectId' => $widget->getId())); ?>" 
                         data-header="<?php echo $view['translator']->trans('mautic.dashboard.widget.header.delete'); ?>">
