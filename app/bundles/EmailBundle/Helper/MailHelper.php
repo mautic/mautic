@@ -247,7 +247,7 @@ class MailHelper
             } elseif (isset($this->leadOwners[$this->lead['owner_id']])) {
                 $owner = $this->leadOwners[$this->lead['owner_id']];
             }
-            $lead = $this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $this->lead['id']);
+
             if ($owner) {
                 $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name']);
             } else {
