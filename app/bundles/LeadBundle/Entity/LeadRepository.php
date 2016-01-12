@@ -929,8 +929,15 @@ class LeadRepository extends CommonRepository
             ->where('u.id = :ownerId')
             ->setParameter('ownerId', (int) $ownerId);
 
-        $results = $q->execute()->fetch();
+        $result = $q->execute()->fetch();
 
-        return $results;
+        // Fix the HTML markup
+        if (is_array($result)) {
+            foreach ($result as &$field) {
+                $field = html_entity_decode($field);
+            }
+        }
+
+        return $result;
     }
 }
