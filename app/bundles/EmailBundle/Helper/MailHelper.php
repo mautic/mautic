@@ -221,23 +221,20 @@ class MailHelper
      * Send the message
      *
      * @param bool $dispatchSendEvent
-     * @param bool $isQueueFlush
+     * @param bool $isQueueFlush (a tokenized/batch send via API such as Mandrill)
      *
      * @return bool
      */
     public function send($dispatchSendEvent = false, $isQueueFlush = false, $useOwnerAsMailer = true)
     {
         // Set from email
-        if ($useOwnerAsMailer && $this->factory->getParameter('mailer_is_owner') && isset($this->lead['id'])) {
+        if (!$isQueueFlush && $useOwnerAsMailer && $this->factory->getParameter('mailer_is_owner') && isset($this->lead['id'])) {
             $lead = $this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $this->lead['id']);
             if ($owner = $lead->getOwner()) {
                 $name = $owner->getFirstName() . ' ' . $owner->getLastName();
                 $this->setFrom($owner->getEmail(), $name);
             }
-        }
-
-        $from = $this->message->getFrom();
-        if (empty($from)) {
+        } elseif (!$from = $this->message->getFrom())
             $this->setFrom($this->from);
         }
 
