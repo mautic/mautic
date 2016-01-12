@@ -121,13 +121,11 @@ class BuilderSubscriber extends CommonSubscriber
         $signatureText = $this->factory->getParameter('default_signature_text');
         $fromName = $this->factory->getParameter('mailer_from_name');
 
-        if (!empty($lead['id'])) {
-            $leadEntity = $this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $lead['id']);
-            $owner = $leadEntity->getOwner();
-
-            if ($owner && $owner->getSignature()) {
-                $fromName = $owner->getFirstName() . ' ' . $owner->getLastName();
-                $signatureText = $owner->getSignature();
+        if (!empty($lead['owner_id'])) {
+            $owner = $this->factory->getModel('lead')->getRepository()->getLeadOwner($lead['owner_id']);
+            if ($owner && !empty($owner['signature'])) {
+                $fromName = $owner['first_name'] . ' ' . $owner['last_name'];
+                $signatureText = $owner['signature'];
             }
         }
         
