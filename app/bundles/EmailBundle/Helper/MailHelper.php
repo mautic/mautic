@@ -180,6 +180,13 @@ class MailHelper
     );
 
     /**
+     * Cache for lead owners
+     *
+     * @var array
+     */
+    protected static $leadOwners = array();
+
+    /**
      * @var bool
      */
     protected $fatal = false;
@@ -229,17 +236,29 @@ class MailHelper
     {
         // Set from email
         if (!$isQueueFlush && $useOwnerAsMailer && $this->factory->getParameter('mailer_is_owner') && isset($this->lead['id'])) {
-            $lead = $this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $this->lead['id']);
-            if ($owner = $lead->getOwner()) {
-                $name = $owner->getFirstName() . ' ' . $owner->getLastName();
-                $this->setFrom($owner->getEmail(), $name);
+            if (!isset($this->lead['owner_id']) ||
+                (isset($this->lead['owner_id']) && !isset($this->leadOwners[$this->lead['owner_id']]))) {
+                if ($owner = $this->factory->getModel('lead')->getRepository()->getLeadOwner($this->lead['owner_id'])) {
+                    $this->leadOwners[$owner['id']] = $owner;
+                    $this->lead['owner_id']         = $owner['id'];
+                } else {
+                    $this->lead['owner_id'] = 0;
+                }
+            } elseif (isset($this->leadOwners[$this->lead['owner_id']])) {
+                $owner = $this->leadOwners[$this->lead['owner_id']];
             }
-        } elseif (!$from = $this->message->getFrom())
+            $lead = $this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $this->lead['id']);
+            if ($owner) {
+                $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name']);
+            } else {
+                $this->setFrom($this->from);
+            }
+        } elseif (!$from = $this->message->getFrom()) {
             $this->setFrom($this->from);
         }
 
         // Set system return path if applicable
-        if (!$isQueueFlush && $bounceEmail = $this->generateBounceEmail($this->idHash)) {
+        if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail($this->idHash))) {
             $this->message->setReturnPath($bounceEmail);
         } elseif (!empty($this->returnPath)) {
             $this->message->setReturnPath($this->returnPath);
