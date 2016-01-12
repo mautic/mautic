@@ -1553,6 +1553,9 @@ class LeadController extends FormController
         $leadEmail        = $leadFields['email'];
         $leadName         = $leadFields['firstname'].' '.$leadFields['lastname'];
 
+        // Set onwer ID to be the current user ID so it will use his signature
+        $leadFields['owner_id'] = $this->factory->getUser()->getId();
+
         // Check if lead has a bounce status
         /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
         $emailModel = $this->factory->getModel('email');
