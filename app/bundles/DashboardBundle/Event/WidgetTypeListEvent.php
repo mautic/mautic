@@ -11,6 +11,7 @@ namespace Mautic\DashboardBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\CoreBundle\Translation\Translator;
 
 /**
  * Class WidgetTypeListEvent
@@ -19,7 +20,15 @@ use Mautic\DashboardBundle\Entity\Widget;
  */
 class WidgetTypeListEvent extends CommonEvent
 {
+    /**
+     * @var array $widgetTypes
+     */
     protected $widgetTypes = array();
+
+    /**
+     * @var Translator $translator
+     */
+    protected $translator;
 
     /**
      * Adds a new widget type to the widget types list
@@ -30,12 +39,28 @@ class WidgetTypeListEvent extends CommonEvent
     public function addType($widgetType, $bundle = 'others')
     {
         $bundle = 'mautic.' . $bundle . '.dashboard.widgets';
+        $widgetTypeName = $bundle . '.' . $widgetType;
+
+        if ($this->translator) {
+            $bundle = $this->translator->trans($bundle);
+            $widgetTypeName = $this->translator->trans($widgetTypeName);
+        }
 
         if (!isset($this->widgetTypes[$bundle])) {
             $this->widgetTypes[$bundle] = array();
         }
 
-        $this->widgetTypes[$bundle][$widgetType] = $bundle . '.' . $widgetType;
+        $this->widgetTypes[$bundle][$widgetType] = $widgetTypeName;
+    }
+
+    /**
+     * Set translator if you want the strings to be translated
+     *
+     * @param Translator $translator
+     */
+    public function setTranslator(Translator $translator)
+    {
+        $this->translator = $translator;
     }
 
     /**
