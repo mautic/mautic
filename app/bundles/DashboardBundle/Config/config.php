@@ -20,9 +20,13 @@ return array(
             )
         ),
         'api' => array(
-            'mautic_data_types'             => array(
-                'path'       => '/data/types',
+            'mautic_widget_types'             => array(
+                'path'       => '/data',
                 'controller' => 'MauticDashboardBundle:Api\WidgetApi:getTypes'
+            ),
+            'mautic_widget_data'             => array(
+                'path'       => '/data/{type}',
+                'controller' => 'MauticDashboardBundle:Api\WidgetApi:getData'
             )
         )
     ),

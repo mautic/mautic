@@ -14,6 +14,8 @@ use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
+use Mautic\DashboardBundle\Event\WidgetDetailEvent;
+use Mautic\DashboardBundle\Entity\Widget;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -24,7 +26,7 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 class WidgetApiController extends CommonApiController
 {
 
-    public function initialize (FilterControllerEvent $event)
+    public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
         $this->model            = $this->factory->getModel('dashboard');
@@ -40,13 +42,47 @@ class WidgetApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getTypesAction ()
+    public function getTypesAction()
     {
         $dispatcher = $this->factory->getDispatcher();
         $event      = new WidgetTypeListEvent();
         $event->setTranslator($this->get('translator'));
         $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE, $event);
         $view = $this->view(array('success' => 1, 'types' => $event->getTypes()), Codes::HTTP_OK);
+
+        return $this->handleView($view);
+    }
+
+    /**
+     * Obtains a list of available widget types
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getDataAction($type)
+    {
+        $params = array(
+            'amount' => $this->request->get('amount', 12),
+            'timeUnit' => $this->request->get('timeUnit', 'Y')
+        );
+
+        $widget = new Widget;
+        $widget->setParams($params);
+        
+        $cacheDir   = $this->factory->getParameter('cached_data_dir', $this->factory->getSystemPath('cache', true));
+        $dispatcher = $this->factory->getDispatcher();
+        $event      = new WidgetDetailEvent();
+        $event->setType($type);
+        $event->setWidget($widget);
+        $event->setCacheDir($cacheDir);
+        $event->setCacheTimeout($this->factory->getParameter('cached_data_timeout'));
+        $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
+        $data = $event->getTemplateData();
+
+        if (!$data) {
+            return $this->notFound();
+        }
+
+        $view = $this->view(array('success' => 1, 'data' => $data), Codes::HTTP_OK);
 
         return $this->handleView($view);
     }
