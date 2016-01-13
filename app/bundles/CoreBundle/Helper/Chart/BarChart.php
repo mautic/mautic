@@ -102,11 +102,16 @@ class BarChart extends AbstractChart implements ChartInterface
     {
         $datasetId = count($this->datasets);
 
+        $dataWithLabels = [];
+        foreach ($data as $key => $value) {
+            $dataWithLabels[$this->labels[$key]] = $value;
+        }
+
         $baseData = array(
             'label' => $label,
-            'data'  => $data,
+            'data'  => $dataWithLabels,
         );
-
+        
         $this->datasets[] = array_merge($baseData, $this->colors[$datasetId]);
 
         return $this;
