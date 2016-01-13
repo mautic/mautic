@@ -18,6 +18,12 @@ return array(
                 'path'         => '/dashboard/{objectAction}/{objectId}',
                 'controller'   => 'MauticDashboardBundle:Dashboard:execute'
             )
+        ),
+        'api' => array(
+            'mautic_data_types'             => array(
+                'path'       => '/data/types',
+                'controller' => 'MauticDashboardBundle:Api\WidgetApi:getTypes'
+            )
         )
     ),
 
