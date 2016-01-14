@@ -22,6 +22,16 @@ $buttons[] = array(
     'btnText'   => 'mautic.dashboard.widget.add'
 );
 
+$buttons[] = array(
+    'attr'      => array(
+        'class'       => 'btn btn-default btn-nospin',
+        'href'        => $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'export')),
+        'data-toggle' => ''
+    ),
+    'iconClass' => 'fa fa-download',
+    'btnText'   => 'mautic.dashboard.export.widgets'
+);
+
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'routeBase' => 'dashboard',
     'langVar'   => 'dashboard',

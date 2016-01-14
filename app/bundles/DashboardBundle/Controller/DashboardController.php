@@ -254,4 +254,43 @@ class DashboardController extends FormController
             )
         );
     }
+
+    /**
+     * Exports the widgets of current user into a json file
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function exportAction()
+    {
+        /** @var \Mautic\DashBundle\Model\DashboardModel $model */
+        $model = $this->factory->getModel('dashboard');
+        $widgetsPaginator = $model->getWidgets(false);
+        $widgets = array();
+
+        foreach ($widgetsPaginator as $widget) {
+            $widgets[] = array(
+                'name' => $widget->getName(),
+                'width' => $widget->getWidth(),
+                'height' => $widget->getHeight(),
+                'ordering' => $widget->getOrdering(),
+                'type' => $widget->getType(),
+                'params' => $widget->getParams(),
+                'template' => $widget->getTemplate(),
+            );
+        }
+
+        $name = 'dashboard-of-' . str_replace(' ', '-', $this->factory->getUser()->getName()) . '-' . (new \DateTime)->format('Y-m-dTH:i:s');
+
+        $response = new JsonResponse($widgets);
+        $response->setEncodingOptions($response->getEncodingOptions() | JSON_PRETTY_PRINT);
+        $response->headers->set('Content-Length', strlen($response->getContent()));
+        $response->headers->set('Content-Type', 'application/force-download');
+        $response->headers->set('Content-Type', 'application/octet-stream');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $name . '.json"');
+        $response->headers->set('Expires', 0);
+        $response->headers->set('Cache-Control', 'must-revalidate');
+        $response->headers->set('Pragma', 'public');
+
+        return $response;
+    }
 }

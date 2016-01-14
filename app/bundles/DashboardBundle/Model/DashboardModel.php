@@ -62,7 +62,7 @@ class DashboardModel extends FormModel
      *
      * @return array
      */
-    public function getWidgets()
+    public function getWidgets($populateContent = true)
     {
         $widgets = $this->getEntities(array(
             'filter' => array(
@@ -74,8 +74,10 @@ class DashboardModel extends FormModel
             )
         ));
 
-        foreach ($widgets as &$widget) {
-            $this->populateWidgetContent($widget);
+        if (count($widgets) && $populateContent) {
+            foreach ($widgets as &$widget) {
+                $this->populateWidgetContent($widget);
+            }
         }
 
         return $widgets;
