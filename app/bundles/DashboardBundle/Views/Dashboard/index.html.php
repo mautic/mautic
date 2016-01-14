@@ -28,8 +28,18 @@ $buttons[] = array(
         'href'        => $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'export')),
         'data-toggle' => ''
     ),
-    'iconClass' => 'fa fa-download',
+    'iconClass' => 'fa fa-cloud-download',
     'btnText'   => 'mautic.dashboard.export.widgets'
+);
+
+$buttons[] = array(
+    'attr'      => array(
+        'class'       => 'btn btn-default',
+        'href'        => $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'import')),
+        'data-header' => $view['translator']->trans('mautic.dashboard.widget.import'),
+    ),
+    'iconClass' => 'fa fa-cloud-upload',
+    'btnText'   => 'mautic.dashboard.widget.import'
 );
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(

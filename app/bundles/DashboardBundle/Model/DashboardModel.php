@@ -14,6 +14,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\DashboardEvents;
+use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
  * Class DashboardModel
@@ -58,11 +59,11 @@ class DashboardModel extends FormModel
     }
 
     /**
-     * Load widgets for the current user from database and dispatch the onWidgetDetailGenerate trigger
+     * Load widgets for the current user from database
      *
      * @return array
      */
-    public function getWidgets($populateContent = true)
+    public function getWidgets()
     {
         $widgets = $this->getEntities(array(
             'filter' => array(
@@ -74,13 +75,47 @@ class DashboardModel extends FormModel
             )
         ));
 
-        if (count($widgets) && $populateContent) {
+        return $widgets;
+    }
+
+    /**
+     * Fill widgets with their content
+     *
+     * @param array $widgets
+     */
+    public function populateWidgetsContent(&$widgets)
+    {
+        if (count($widgets)) {
             foreach ($widgets as &$widget) {
+                if (!($widget instanceof Widget)) {
+                    $widget = $this->populateWidget($widget);
+                }
                 $this->populateWidgetContent($widget);
             }
         }
+    }
 
-        return $widgets;
+    /**
+     * @param $className
+     * @param $data
+     *
+     * @return mixed
+     * @throws \Doctrine\ORM\Mapping\MappingException
+     * @throws \Exception
+     */
+    public function populateWidget($data)
+    {
+        $entity = new Widget;
+
+        foreach ($data as $property => $value) {
+            $method = "set".ucfirst($property);
+            if (method_exists($entity, $method)) {
+                $entity->$method($value);
+            }
+            unset($data[$property]);
+        }
+
+        return $entity;
     }
 
     /**

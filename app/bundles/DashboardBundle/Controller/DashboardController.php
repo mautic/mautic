@@ -30,11 +30,13 @@ class DashboardController extends FormController
     {
         /** @var \Mautic\DashBundle\Model\DashboardModel $model */
         $model = $this->factory->getModel('dashboard');
+        $widgets = $model->getWidgets();
+        $model->populateWidgetsContent($widgets);
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'security'          => $this->factory->getSecurity(),
-                'widgets'           => $model->getWidgets()
+                'widgets'           => $widgets
             ),
             'contentTemplate' => 'MauticDashboardBundle:Dashboard:index.html.php',
             'passthroughVars' => array(
@@ -292,5 +294,80 @@ class DashboardController extends FormController
         $response->headers->set('Pragma', 'public');
 
         return $response;
+    }
+
+    /**
+     * @param int  $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function importAction($objectId = 0)
+    {
+        /** @var \Mautic\DashBundle\Model\DashboardModel $model */
+        $model = $this->factory->getModel('dashboard');
+        $dir = $this->factory->getParameter('dashboard_import_dir');
+        $session = $this->factory->getSession();
+
+        // @todo implement permissions
+        // if (!$this->factory->getSecurity()->isGranted('dashboard:widgets:create')) {
+        //     return $this->accessDenied();
+        // }
+
+        $action     = $this->generateUrl('mautic_dashboard_action', array('objectAction' => 'import'));
+        $form       = $this->get('form.factory')->create('dashboard_upload', array(), array('action' => $action));
+
+        if ($this->request->getMethod() == 'POST') {
+            if (isset($form) && !$cancelled = $this->isFormCancelled($form)) {
+                if ($this->isFormValid($form)) {
+                    $fileData = $form['file']->getData();
+                    if (!empty($fileData)) {
+                        
+
+                        if (!is_dir($dir) && !file_exists($dir)) {
+                            mkdir($dir);
+                        }
+
+                        $fileData->move($dir, $fileData->getClientOriginalName());
+                    } else {
+                        $form->addError(
+                            new FormError(
+                                $this->factory->getTranslator()->trans('mautic.dashboard.upload.filenotfound', array(), 'validators')
+                            )
+                        );
+                    }
+                }
+            }
+        }
+
+        $dashboards = array_diff(scandir($dir), array('..', '.'));
+
+        if (!$dashboards) {
+            $dashboards = array();
+        }
+
+        $widgets = json_decode(file_get_contents($dir . '/' . $dashboards[2]), true);
+        
+        $model->populateWidgetsContent($widgets);
+
+        return $this->delegateView(
+            array(
+                'viewParameters'  => array(
+                    'form'       => $form->createView(),
+                    'dashboards' => $dashboards,
+                    'widgets'    => $widgets
+                ),
+                'contentTemplate' => 'MauticDashboardBundle:Dashboard:import.html.php',
+                'passthroughVars' => array(
+                    'activeLink'    => '#mautic_dashboard_index',
+                    'mauticContent' => 'dashboardImport',
+                    'route'         => $this->generateUrl(
+                        'mautic_dashboard_action',
+                        array(
+                            'objectAction' => 'import'
+                        )
+                    )
+                )
+            )
+        );
     }
 }

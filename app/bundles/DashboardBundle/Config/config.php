@@ -49,11 +49,19 @@ return array(
             // ),
         ),
         'forms'   => array(
-            'mautic.form.type.widget' => array(
+            'mautic.dashboard.form.type.widget' => array(
                 'class'     => 'Mautic\DashboardBundle\Form\Type\WidgetType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'widget'
+            ),
+            'mautic.dashboard.form.uplload' => array(
+                'class'     => 'Mautic\DashboardBundle\Form\Type\UploadType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'dashboard_upload'
             )
         )
+    ),
+    'parameters' => array(
+        'dashboard_import_dir' => '%kernel.root_dir%/../media/dashboards'
     )
 );
