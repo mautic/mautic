@@ -266,7 +266,7 @@ class DashboardController extends FormController
     {
         /** @var \Mautic\DashBundle\Model\DashboardModel $model */
         $model = $this->factory->getModel('dashboard');
-        $widgetsPaginator = $model->getWidgets(false);
+        $widgetsPaginator = $model->getWidgets();
         $widgets = array();
 
         foreach ($widgetsPaginator as $widget) {
@@ -297,12 +297,70 @@ class DashboardController extends FormController
     }
 
     /**
+     * Exports the widgets of current user into a json file
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function deleteDashboardFileAction()
+    {
+        $file = $this->request->get('file');
+        $dir = $this->factory->getParameter('dashboard_import_dir');
+        $path = $dir . '/' . $file;
+
+        if (file_exists($path) && is_writable($path)) {
+            unlink($path);
+        }
+
+        return $this->importAction();
+    }
+
+    /**
+     * Exports the widgets of current user into a json file
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function applyDashboardFileAction()
+    {
+        $file = $this->request->get('file');
+        $dir = $this->factory->getParameter('dashboard_import_dir');
+        $path = $dir . '/' . $file;
+
+        if (file_exists($path) && is_writable($path)) {
+            $widgets = json_decode(file_get_contents($path), true);
+
+            if ($widgets) {
+                /** @var \Mautic\DashBundle\Model\DashboardModel $model */
+                $model = $this->factory->getModel('dashboard');
+
+                $currentWidgets = $model->getWidgets();
+
+                if ($currentWidgets) {
+                    foreach ($currentWidgets as $widget) {
+                        $model->deleteEntity($widget);
+                    }
+                }
+
+                foreach ($widgets as $widget) {
+                    $widget = $model->populateWidgetEntity($widget);
+                    $model->saveEntity($widget);
+                }
+
+                return $this->indexAction();
+            }
+        }
+
+        return $this->importAction();
+    }
+
+    /**
      * @param int  $objectId
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function importAction($objectId = 0)
+    public function importAction()
     {
+        $preview = $this->request->get('preview');
+
         /** @var \Mautic\DashBundle\Model\DashboardModel $model */
         $model = $this->factory->getModel('dashboard');
         $dir = $this->factory->getParameter('dashboard_import_dir');
@@ -322,7 +380,7 @@ class DashboardController extends FormController
                     $fileData = $form['file']->getData();
                     if (!empty($fileData)) {
                         
-
+                        // @todo check is_writable
                         if (!is_dir($dir) && !file_exists($dir)) {
                             mkdir($dir);
                         }
@@ -345,16 +403,21 @@ class DashboardController extends FormController
             $dashboards = array();
         }
 
-        $widgets = json_decode(file_get_contents($dir . '/' . $dashboards[2]), true);
-        
-        $model->populateWidgetsContent($widgets);
+        if ($preview && ($dashId = array_search($preview, $dashboards))) {
+            // @todo check is_writable
+            $widgets = json_decode(file_get_contents($dir . '/' . $dashboards[$dashId]), true);
+            $model->populateWidgetsContent($widgets);
+        } else {
+            $widgets = array();
+        }
 
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
                     'form'       => $form->createView(),
                     'dashboards' => $dashboards,
-                    'widgets'    => $widgets
+                    'widgets'    => $widgets,
+                    'preview'    => $preview
                 ),
                 'contentTemplate' => 'MauticDashboardBundle:Dashboard:import.html.php',
                 'passthroughVars' => array(

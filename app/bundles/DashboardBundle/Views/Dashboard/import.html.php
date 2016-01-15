@@ -12,8 +12,35 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.dashboard.
 ?>
 
 <div class="row">
-    <div class="col-sm-offset-2 col-sm-8">
-        <div class="ml-lg mr-lg mt-md pa-lg">
+<?php if ($dashboards) : ?>
+    <div class="col-sm-6">
+        <div class="ml-sm mt-sm pa-sm">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <div class="panel-title"><?php echo $view['translator']->trans('mautic.dashboard.predefined'); ?></div>
+                </div>
+                <div class="panel-body">
+                    <div class="list-group">
+                        <?php foreach ($dashboards as $dashboard) : ?>
+                            <div class="list-group-item mt-md <?php echo ($dashboard == $preview) ? 'active' : ''; ?>">
+                                <h4 class="list-group-item-heading"><?php echo $dashboard; ?></h4>
+                                <p class="list-group-item-text">
+                                    <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'import', 'preview' => $dashboard)); ?>">
+                                        Preview
+                                    </a>,
+                                    <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'applyDashboardFile', 'file' => $dashboard)); ?>">Apply</a>,
+                                    <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'deleteDashboardFile', 'file' => $dashboard)); ?>">Delete</a>
+                                </p>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+    <div class="col-sm-6">
+        <div class="mr-sm mt-sm pa-sm">
             <div class="panel panel-info">
                 <div class="panel-heading">
                     <div class="panel-title"><?php echo $view['translator']->trans('mautic.dashboard.import.start.instructions'); ?></div>
@@ -29,19 +56,6 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.dashboard.
                     <?php echo $view['form']->end($form); ?>
                 </div>
             </div>
-
-        <?php if ($dashboards) : ?>
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title"><?php echo $view['translator']->trans('mautic.dashboard.predefined'); ?></div>
-                </div>
-                <div class="panel-body">
-                    <?php foreach ($dashboards as $dashboard) : ?>
-                        <?php echo $dashboard; ?>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-        <?php endif; ?>
         </div>
     </div>
 </div>
