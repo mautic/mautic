@@ -175,7 +175,13 @@ class WidgetDetailEvent extends CommonEvent
             return $this->uniqueId;
         }
 
-        return $this->uniqueId = $this->getType() . '_' . substr(md5(json_encode($this->getWidget()->getParams())), 0, 16);
+        $uniqueSettings = array(
+            'params' => $this->getWidget()->getParams(),
+            'width' => $this->getWidget()->getWidth(),
+            'height' => $this->getWidget()->getHeight(),
+        );
+
+        return $this->uniqueId = $this->getType() . '_' . substr(md5(json_encode($uniqueSettings)), 0, 16);
     }
 
     /**
