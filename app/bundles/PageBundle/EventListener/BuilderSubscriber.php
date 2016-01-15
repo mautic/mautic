@@ -679,6 +679,12 @@ class BuilderSubscriber extends CommonSubscriber
             return;
         }
 
+        // Ensure a applicable URL (rule out URLs as just #)
+        if (!isset($urlParts['host']) && !isset($urlParts['path'])) {
+
+            return;
+        }
+
         // Check for tokens in the query
         if (!empty($urlParts['query'])) {
             list($tokenizedParams, $untokenizedParams) = $parseTokenizedQuery($urlParts['query']);
