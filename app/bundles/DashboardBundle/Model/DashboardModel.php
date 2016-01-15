@@ -66,11 +66,14 @@ class DashboardModel extends FormModel
     public function getWidgets()
     {
         $widgets = $this->getEntities(array(
+            'orderBy' => 'w.ordering',
             'filter' => array(
                 'force' => array(
-                    'column' => 'm.createdBy',
-                    'expr'   => 'eq',
-                    'value'  => $this->factory->getUser()->getId()
+                    array(
+                        'column' => 'w.createdBy',
+                        'expr'   => 'eq',
+                        'value'  => $this->factory->getUser()->getId()
+                    )
                 )
             )
         ));
@@ -88,7 +91,7 @@ class DashboardModel extends FormModel
         if (count($widgets)) {
             foreach ($widgets as &$widget) {
                 if (!($widget instanceof Widget)) {
-                    $widget = $this->populateWidget($widget);
+                    $widget = $this->populateWidgetEntity($widget);
                 }
                 $this->populateWidgetContent($widget);
             }
@@ -96,14 +99,13 @@ class DashboardModel extends FormModel
     }
 
     /**
-     * @param $className
-     * @param $data
+     * Creates a new Widget object from an array data
      *
-     * @return mixed
-     * @throws \Doctrine\ORM\Mapping\MappingException
-     * @throws \Exception
+     * @param array $data
+     *
+     * @return Widget
      */
-    public function populateWidget($data)
+    public function populateWidgetEntity($data)
     {
         $entity = new Widget;
 
