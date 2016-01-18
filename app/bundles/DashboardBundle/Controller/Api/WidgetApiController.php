@@ -67,16 +67,9 @@ class WidgetApiController extends CommonApiController
 
         $widget = new Widget;
         $widget->setParams($params);
-        
-        $cacheDir   = $this->factory->getParameter('cached_data_dir', $this->factory->getSystemPath('cache', true));
-        $dispatcher = $this->factory->getDispatcher();
-        $event      = new WidgetDetailEvent();
-        $event->setType($type);
-        $event->setWidget($widget);
-        $event->setCacheDir($cacheDir);
-        $event->setCacheTimeout($this->factory->getParameter('cached_data_timeout'));
-        $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
-        $data = $event->getTemplateData();
+        $widget->setType($type);
+        $this->model->populateWidgetContent($widget);
+        $data = $widget->getTemplateData();
 
         if (!$data) {
             return $this->notFound();
