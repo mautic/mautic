@@ -976,6 +976,19 @@ class LeadModel extends FormModel
         }
         unset($fields['points']);
 
+        // Set unsubscribe status
+        if (!empty($fields['doNotEmail']) && !empty($data[$fields['doNotEmail']]) && $hasEmail) {
+            $doNotEmail = filter_var($data[$fields['doNotEmail']], FILTER_VALIDATE_BOOLEAN);
+            if ($doNotEmail) {
+                $reason = $this->factory->getTranslator()->trans('mautic.lead.import.by.user', array(
+                    "%user%" => $this->factory->getUser()->getUsername()
+                ));
+
+                $this->unsubscribeLead($lead, $reason, false);
+            }
+        }
+        unset($fields['doNotEmail']);
+
         if ($owner !== null) {
             $lead->setOwner($this->em->getReference('MauticUserBundle:User', $owner));
         }
@@ -991,19 +1004,6 @@ class LeadModel extends FormModel
                 $lead->addUpdatedField($leadField, $data[$importField]);
             }
         }
-
-        // Set unsubscribe status
-        if (!empty($fields['doNotEmail']) && !empty($data[$fields['doNotEmail']]) && $hasEmail) {
-            $doNotEmail = filter_var($data[$fields['doNotEmail']], FILTER_VALIDATE_BOOLEAN);
-            if ($doNotEmail) {
-                $reason = $this->factory->getTranslator()->trans('mautic.lead.import.by.user', array(
-                    "%user%" => $this->factory->getUser()->getUsername()
-                ));
-
-                $this->unsubscribeLead($lead, $reason, false);
-            }
-        }
-        unset($fields['doNotEmail']);
 
         $lead->imported = true;
 
