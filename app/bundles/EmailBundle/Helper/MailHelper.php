@@ -791,7 +791,7 @@ class MailHelper
     {
         if (!$ignoreTrackingPixel) {
             // Append tracking pixel
-            $trackingImg = '<img style="display: none;" height="1" width="1" src="{tracking_pixel}" />';
+            $trackingImg = '<img style="display: none;" height="1" width="1" src="{tracking_pixel}" alt="mautic is open source marketing automation" />';
             if (strpos($content, '</body>') !== false) {
                 $content = str_replace('</body>', $trackingImg.'</body>', $content);
             } else {
