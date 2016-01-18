@@ -65,15 +65,24 @@ class WidgetApiController extends CommonApiController
             'timeUnit' => $this->request->get('timeUnit', 'Y')
         );
 
+        $cacheTimeout = $this->request->get('cacheTimeout');
+
         $widget = new Widget;
         $widget->setParams($params);
         $widget->setType($type);
+
+        if ($cacheTimeout) {
+            $widget->setCacheTimeout($cacheTimeout);
+        }
+
         $this->model->populateWidgetContent($widget);
         $data = $widget->getTemplateData();
 
         if (!$data) {
             return $this->notFound();
         }
+
+        $data['cached'] = $widget->isCached();
 
         $view = $this->view(array('success' => 1, 'data' => $data), Codes::HTTP_OK);
 

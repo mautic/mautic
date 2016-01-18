@@ -84,6 +84,9 @@ class WidgetDetailEvent extends CommonEvent
     public function setWidget(Widget $widget)
     {
         $this->widget = $widget;
+
+        $this->setType($widget->getType());
+        $this->setCacheTimeout($widget->getCacheTimeout());
     }
 
     /**
@@ -104,6 +107,7 @@ class WidgetDetailEvent extends CommonEvent
     public function setTemplate($template)
     {
         $this->template = $template;
+        $this->widget->setTemplate($template);
     }
 
     /**
@@ -124,11 +128,11 @@ class WidgetDetailEvent extends CommonEvent
     public function setTemplateData(array $templateData, $skipCache = false)
     {
         $this->templateData = $templateData;
-
+        $this->widget->setTemplateData($templateData);
         $this->widget->setLoadTime(microtime() - $this->startTime);
 
         // Store the template data to the cache
-        if (!$skipCache && $this->cacheDir) {
+        if (!$skipCache && $this->cacheDir && $this->widget->getCacheTimeout() > 0) {
             $cache = new CacheStorageHelper($this->cacheDir);
             $cache->set($this->getUniqueWidgetId(), $templateData);
         }
@@ -152,6 +156,7 @@ class WidgetDetailEvent extends CommonEvent
     public function setErrorMessage($errorMessage)
     {
         $this->errorMessage = $errorMessage;
+        $this->widget->setErrorMessage($errorMessage);
     }
 
     /**

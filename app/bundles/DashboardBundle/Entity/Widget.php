@@ -83,6 +83,11 @@ class Widget extends FormEntity
     private $loadTime = 0;
 
     /**
+     * @var integer (minutes)
+     */
+    private $cacheTimeout;
+
+    /**
      * @var array
      */
     private $templateData = array();
@@ -109,6 +114,11 @@ class Widget extends FormEntity
         $builder->addField('type', 'string');
         $builder->addField('width', 'integer');
         $builder->addField('height', 'integer');
+
+        $builder->createField('cacheTimeout', 'integer')
+            ->columnName('cache_timeout')
+            ->nullable()
+            ->build();
 
         $builder->createField('ordering', 'integer')
             ->nullable()
@@ -242,6 +252,31 @@ class Widget extends FormEntity
     {
         $this->isChanged('height', $height);
         $this->height = $height;
+
+        return $this;
+    }
+
+    /**
+     * Get cache timeout
+     *
+     * @return integer (minutes)
+     */
+    public function getCacheTimeout()
+    {
+        return $this->cacheTimeout;
+    }
+
+    /**
+     * Set cache timeout
+     *
+     * @param integer $cacheTimeout (minutes)
+     *
+     * @return Widget
+     */
+    public function setCacheTimeout($cacheTimeout)
+    {
+        $this->isChanged('cacheTimeout', $cacheTimeout);
+        $this->cacheTimeout = $cacheTimeout;
 
         return $this;
     }

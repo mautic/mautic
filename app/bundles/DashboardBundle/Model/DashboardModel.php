@@ -129,15 +129,15 @@ class DashboardModel extends FormModel
     {
         $cacheDir   = $this->factory->getParameter('cached_data_dir', $this->factory->getSystemPath('cache', true));
         $dispatcher = $this->factory->getDispatcher();
-        $event      = new WidgetDetailEvent();
-        $event->setType($widget->getType());
+
+        if ($widget->getCacheTimeout() == null || $widget->getCacheTimeout() == -1) {
+            $widget->setCacheTimeout($this->factory->getParameter('cached_data_timeout'));
+        }
+
+        $event = new WidgetDetailEvent();
         $event->setWidget($widget);
         $event->setCacheDir($cacheDir);
-        $event->setCacheTimeout($this->factory->getParameter('cached_data_timeout'));
         $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
-        $widget->setErrorMessage($event->getErrorMessage());
-        $widget->setTemplate($event->getTemplate());
-        $widget->setTemplateData($event->getTemplateData());
     }
 
     /**
