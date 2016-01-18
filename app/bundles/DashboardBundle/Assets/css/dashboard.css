@@ -24,9 +24,6 @@
     padding: 1.5%;
     
 }
-.card-flex {
-    position: relative;
-}
 .card {
     margin: 5px;
     background: #FEFEFE;
@@ -51,6 +48,7 @@
     -o-transition-timing-function: linear;
     -webkit-transition-timing-function: linear;
     transition-timing-function: linear;
+    position: relative;
 }
 .card-header {
     padding: 10px 15px;
@@ -60,14 +58,15 @@
 }
 .card-header .dropdown {
     position: absolute;
-    top: 18px;
-    right: 15px;
+    top: 6px;
+    right: 3px;
 }
 .card-header .dropdown-toggle .fa-ellipsis-v {
     font-size: 15px;
     color: rgba(0, 0, 0, 0.6);
-    width: 20px;
+    width: 30px;
     text-align: center;
+    line-height: 30px;
 }
 .card-header h4 {
     width: 90%;
