@@ -685,6 +685,17 @@ class BuilderSubscriber extends CommonSubscriber
             return;
         }
 
+        // Check for a token with a query appended such as {pagelink=1}&key=value
+        if (isset($urlParts['path']) && preg_match('/([https?|ftps?]?{.*?})&amp;(.*?)$/', $urlParts['path'], $match)) {
+            $urlParts['path'] = $match[1];
+            if (isset($urlParts['query'])) {
+                // Likely won't happen but append if this exists
+                $urlParts['query'] .= '&amp;'.$match[2];
+            } else {
+                $urlParts['query'] = $match[2];
+            }
+        }
+
         // Check for tokens in the query
         if (!empty($urlParts['query'])) {
             list($tokenizedParams, $untokenizedParams) = $parseTokenizedQuery($urlParts['query']);
@@ -894,8 +905,12 @@ class BuilderSubscriber extends CommonSubscriber
         $query = http_build_query($queryParts);
 
         // http_build_query likely encoded tokens so that has to be fixed so they get replaced
-        $query = preg_replace('/%7B(\S+?)%3D(\S+?)%7D/i', '{$1=$2}', $query);
-        $query = preg_replace('/%7B(\S+?)%7D/i', '{$1}', $query);
+        $query = preg_replace_callback('/%7B(\S+?)%7D/i',
+            function ($matches) {
+                return urldecode($matches[0]);
+            },
+            $query
+        );
 
         return $query;
     }
