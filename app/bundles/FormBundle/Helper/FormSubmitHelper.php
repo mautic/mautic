@@ -30,23 +30,24 @@ class FormSubmitHelper
         }
 
         $mailer = $factory->getMailer();
-        $emails = (!empty($config['to'])) ? explode(',', $config['to']) : array();
+        $emails = (!empty($config['to'])) ? array_fill_keys(explode(',', $config['to']), null) : array();
 
         $mailer->setTo($emails);
 
         $leadEmail = $lead->getEmail();
+
         if (!empty($leadEmail)) {
             // Reply to lead for user convenience
             $mailer->setReplyTo($leadEmail);
         }
 
         if (!empty($config['cc'])) {
-            $emails = explode(',', $config['cc']);
+            $emails = array_fill_keys(explode(',', $config['cc']), null);
             $mailer->setCc($emails);
         }
 
         if (!empty($config['bcc'])) {
-            $emails = explode(',', $config['bcc']);
+            $emails = array_fill_keys(explode(',', $config['bcc']), null);
             $mailer->setBcc($emails);
         }
 
