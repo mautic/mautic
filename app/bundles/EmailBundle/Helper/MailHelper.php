@@ -185,6 +185,20 @@ class MailHelper
     protected $fatal = false;
 
     /**
+     * Large batch mail sends may result on timeouts with SMTP servers. This will will keep track of the number of sends and restart the connection once met.
+     *
+     * @var int
+     */
+    private $messageSentCount = 0;
+
+    /**
+     * Large batch mail sends may result on timeouts with SMTP servers. This will will keep track of when a transport was last started and force a restart after set number of minutes.
+     *
+     * @var int
+     */
+    private $transportStartTime;
+
+    /**
      * @param MauticFactory $factory
      * @param               $mailer
      * @param null          $from
@@ -194,6 +208,7 @@ class MailHelper
         $this->factory   = $factory;
         $this->mailer    = $mailer;
         $this->transport = $mailer->getTransport();
+
         try {
             $this->logger = new \Swift_Plugins_Loggers_ArrayLogger();
             $this->mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($this->logger));
@@ -317,6 +332,11 @@ class MailHelper
 
             try {
                 $failures = array();
+
+                if (!$this->transport->isStarted()) {
+                    $this->transportStartTime = time();
+                }
+
                 $this->mailer->send($this->message, $failures);
 
                 if (!empty($failures)) {
@@ -338,6 +358,9 @@ class MailHelper
                 );
             }
         }
+
+        $this->messageSentCount++;
+        $this->checkIfTransportNeedsRestart();
 
         $error = empty($this->errors);
 
@@ -791,7 +814,7 @@ class MailHelper
     {
         if (!$ignoreTrackingPixel) {
             // Append tracking pixel
-            $trackingImg = '<img style="display: none;" height="1" width="1" src="{tracking_pixel}" />';
+            $trackingImg = '<img style="display: none;" height="1" width="1" src="{tracking_pixel}" alt="Mautic is open source marketing automation" />';
             if (strpos($content, '</body>') !== false) {
                 $content = str_replace('</body>', $trackingImg.'</body>', $content);
             } else {
@@ -1666,5 +1689,30 @@ class MailHelper
         }
 
         return $monitoredEmail;
+    }
+
+    /**
+     * A large number of mail sends may result on timeouts with SMTP servers. This checks for the number of email sends and restarts the transport if necessary
+     *
+     * @param bool $force
+     */
+    public function checkIfTransportNeedsRestart($force = false)
+    {
+        // Check if we should restart the SMTP transport
+        if ($this->transport instanceof \Swift_SmtpTransport) {
+            $maxNumberOfMessages = (method_exists($this->transport, 'getNumberOfMessagesTillRestart'))
+                ? $this->transport->getNumberOfMessagesTillRestart() : 50;
+
+            $maxNumberOfMinutes = (method_exists($this->transport, 'getNumberOfMinutesTillRestart'))
+                ? $this->transport->getNumberOfMinutesTillRestart() : 2;
+
+            $numberMinutesRunning = floor(time() - $this->transportStartTime) / 60;
+
+            if ($force || $this->messageSentCount >= $maxNumberOfMessages || $numberMinutesRunning >= $maxNumberOfMinutes) {
+                // Stop the transport
+                $this->transport->stop();
+                $this->messageSentCount = 0;
+            }
+        }
     }
 }

@@ -976,6 +976,19 @@ class LeadModel extends FormModel
         }
         unset($fields['points']);
 
+        // Set unsubscribe status
+        if (!empty($fields['doNotEmail']) && !empty($data[$fields['doNotEmail']]) && $hasEmail) {
+            $doNotEmail = filter_var($data[$fields['doNotEmail']], FILTER_VALIDATE_BOOLEAN);
+            if ($doNotEmail) {
+                $reason = $this->factory->getTranslator()->trans('mautic.lead.import.by.user', array(
+                    "%user%" => $this->factory->getUser()->getUsername()
+                ));
+
+                $this->unsubscribeLead($lead, $reason, false);
+            }
+        }
+        unset($fields['doNotEmail']);
+
         if ($owner !== null) {
             $lead->setOwner($this->em->getReference('MauticUserBundle:User', $owner));
         }
@@ -991,19 +1004,6 @@ class LeadModel extends FormModel
                 $lead->addUpdatedField($leadField, $data[$importField]);
             }
         }
-
-        // Set unsubscribe status
-        if (!empty($fields['doNotEmail']) && !empty($data[$fields['doNotEmail']]) && $hasEmail) {
-            $doNotEmail = filter_var($data[$fields['doNotEmail']], FILTER_VALIDATE_BOOLEAN);
-            if ($doNotEmail) {
-                $reason = $this->factory->getTranslator()->trans('mautic.lead.import.by.user', array(
-                    "%user%" => $this->factory->getUser()->getUsername()
-                ));
-
-                $this->unsubscribeLead($lead, $reason, false);
-            }
-        }
-        unset($fields['doNotEmail']);
 
         $lead->imported = true;
 
@@ -1121,9 +1121,9 @@ class LeadModel extends FormModel
             }
         }
 
-        if ($removeTags !== null) {
+        if (!empty($removeTags)) {
 
-            $logger->debug('LEAD: Removing ' . implode(', ', $removeTags) . ' for lead ID# ' . $lead->getId());
+            $logger->debug('LEAD: Removing '.implode(', ', $removeTags).' for lead ID# '.$lead->getId());
 
             array_walk($removeTags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
 
@@ -1134,7 +1134,7 @@ class LeadModel extends FormModel
                 // Tag to be removed
                 if (array_key_exists($tag, $foundRemoveTags) && $leadTags->contains($foundRemoveTags[$tag])) {
                     $lead->removeTag($foundRemoveTags[$tag]);
-                    $logger->debug('LEAD: Removed ' . $tag);
+                    $logger->debug('LEAD: Removed '.$tag);
                 }
             }
         }

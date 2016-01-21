@@ -415,7 +415,7 @@ return array(
             'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindPrecisionLookup'
         ),
         'maxmind_download' => array(
-            'display_name' => 'MaxMind - GeoIP2 City Download',
+            'display_name' => 'MaxMind - GeoLite2 City Download',
             'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindDownloadLookup'
         ),
         'telize' => array(

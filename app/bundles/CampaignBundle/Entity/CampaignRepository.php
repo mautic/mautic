@@ -352,8 +352,7 @@ class CampaignRepository extends CommonRepository
         if ($countOnly) {
             $q->select('max(list_leads.lead_id) as max_id, count(distinct(list_leads.lead_id)) as lead_count');
         } else {
-            $q->select('distinct(list_leads.lead_id) as id')
-                ->orderBy('list_leads.lead_id', 'ASC');
+            $q->select('distinct(list_leads.lead_id) as id');
         }
 
         $q->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'list_leads');
@@ -442,8 +441,7 @@ class CampaignRepository extends CommonRepository
         if ($countOnly) {
             $q->select('max(campaign_leads.lead_id) as max_id, count(campaign_leads.lead_id) as lead_count');
         } else {
-            $q->select('campaign_leads.lead_id as id')
-                ->orderBy('campaign_leads.lead_id', 'ASC');
+            $q->select('campaign_leads.lead_id as id');
         }
 
         $q->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'campaign_leads')
@@ -456,7 +454,7 @@ class CampaignRepository extends CommonRepository
 
         if ($batchLimiters) {
             $expr->add(
-                // Only leads part of the campaign at the time of count
+            // Only leads part of the campaign at the time of count
                 $q->expr()->lte('campaign_leads.date_added', $q->expr()->literal($batchLimiters['dateTime']))
             );
 
