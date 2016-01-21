@@ -43,6 +43,9 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
      */
     protected $integrationHelper;
 
+    /**
+     * @var null|Request
+     */
     protected $request;
 
     /**
@@ -104,7 +107,7 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
                 $failedAuthMessage = $authEvent->getFailedAuthenticationMessage();
             }
 
-            if (!$authenticated && $tryWithPassword) {
+            if (!$authenticated && $tryWithPassword && $user instanceof User) {
                 // Try authenticating with local password
                 $authenticated = $this->encoder->isPasswordValid($user, $token->getCredentials());
             }

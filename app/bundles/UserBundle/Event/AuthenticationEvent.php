@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
  * Class AuthenticationEvent
@@ -88,18 +89,18 @@ class AuthenticationEvent extends Event
     protected $failedAuthMessage;
 
     /**
-     * @param                $user
-     * @param TokenInterface $token
-     * @param UserProvider   $userProvider
-     * @param Request        $request
-     * @param bool           $loginCheck            Event executed from the mautic_sso_login_check route typically used as the SSO callback
-     * @param string         $authenticatingService Service requesting authentication
-     * @param null           $integrations
+     * @param                       $user
+     * @param TokenInterface        $token
+     * @param UserProviderInterface $userProvider
+     * @param Request               $request
+     * @param bool                  $loginCheck            Event executed from the mautic_sso_login_check route typically used as the SSO callback
+     * @param string                $authenticatingService Service Service requesting authentication
+     * @param null                  $integrations
      */
     public function __construct(
         $user,
         TokenInterface $token,
-        UserProvider $userProvider,
+        UserProviderInterface $userProvider,
         Request $request,
         $loginCheck = false,
         $authenticatingService = null,
