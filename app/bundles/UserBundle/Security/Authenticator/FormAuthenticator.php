@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Authentication\SimpleFormAuthenticatorInterf
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -74,6 +75,7 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
         $authenticated         = false;
         $authenticationService = null;
         $response              = null;
+        $failedAuthMessage     = null;
         $user                  = $token->getUser();
         $authenticatingService = ($token instanceof PluginToken) ? $token->getAuthenticatingService() : null;
         if (!$user instanceof User) {
@@ -98,7 +100,8 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
                     $tryWithPassword = false;
                 }
 
-                $response = $authEvent->getResponse();
+                $response          = $authEvent->getResponse();
+                $failedAuthMessage = $authEvent->getFailedAuthenticationMessage();
             }
 
             if (!$authenticated && $tryWithPassword) {
@@ -130,6 +133,10 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
                 array(),
                 $response
             );
+        }
+
+        if ($failedAuthMessage) {
+            throw new AuthenticationException($failedAuthMessage);
         }
 
         throw new BadCredentialsException();

@@ -81,6 +81,13 @@ class AuthenticationEvent extends Event
     protected $request;
 
     /**
+     * Message to display to user if there is a failed authentication
+     *
+     * @var string
+     */
+    protected $failedAuthMessage;
+
+    /**
      * @param                $user
      * @param TokenInterface $token
      * @param UserProvider   $userProvider
@@ -204,6 +211,26 @@ class AuthenticationEvent extends Event
 
         // Authenticated so stop propagation
         $this->stopPropagation();
+    }
+
+    /**
+     * Set the message to display to the user for failing auth
+     *
+     * @param $message
+     */
+    public function setFailedAuthenticationMessage($message)
+    {
+        $this->failedAuthMessage = $message;
+    }
+
+    /**
+     * Returns message to display to user for failing auth
+     *
+     * @return string
+     */
+    public function getFailedAuthenticationMessage()
+    {
+        return $this->failedAuthMessage;
     }
 
     /**
