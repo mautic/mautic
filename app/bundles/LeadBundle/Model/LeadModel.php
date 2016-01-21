@@ -1121,9 +1121,9 @@ class LeadModel extends FormModel
             }
         }
 
-        if ($removeTags !== null) {
+        if (!empty($removeTags)) {
 
-            $logger->debug('LEAD: Removing ' . implode(', ', $removeTags) . ' for lead ID# ' . $lead->getId());
+            $logger->debug('LEAD: Removing '.implode(', ', $removeTags).' for lead ID# '.$lead->getId());
 
             array_walk($removeTags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
 
@@ -1134,7 +1134,7 @@ class LeadModel extends FormModel
                 // Tag to be removed
                 if (array_key_exists($tag, $foundRemoveTags) && $leadTags->contains($foundRemoveTags[$tag])) {
                     $lead->removeTag($foundRemoveTags[$tag]);
-                    $logger->debug('LEAD: Removed ' . $tag);
+                    $logger->debug('LEAD: Removed '.$tag);
                 }
             }
         }
