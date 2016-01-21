@@ -519,6 +519,15 @@ class FormController extends CommonFormController
                         $model->deleteFields($entity, $deletedFields);
 
                         if ($entity->isStandalone()) {
+                            if (!$alias = $entity->getAlias()) {
+                                $alias = $model->cleanAlias($entity->getName(), '', 10);
+                                $entity->setAlias($alias);
+                            }
+
+                            // save the form first so that new fields are available to actions
+                            // use the repository method to not trigger listeners twice
+                            $model->getRepository()->saveEntity($entity);
+
                             if (count($actions)) {
                                 // Now set and persist the actions
                                 $model->setActions($entity, $actions);
