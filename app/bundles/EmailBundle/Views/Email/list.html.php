@@ -60,7 +60,7 @@ if (count($items)):
             <tr>
                 <td>
                     <?php
-                    $edit          = ((($type == 'list' && !$item->getSentCount()) || $type == 'template') && $security->hasEntityAccess($permissions['email:emails:editown'], $permissions['email:emails:editother'], $item->getCreatedBy()));
+                    $edit          = $view['security']->hasEntityAccess($permissions['email:emails:editown'], $permissions['email:emails:editother'], $item->getCreatedBy());
                     $customButtons = ($type == 'list') ? array(
                         array(
                             'attr' => array(
@@ -76,7 +76,7 @@ if (count($items)):
                         'templateButtons' => array(
                             'edit'       => $edit,
                             'clone'      => $permissions['email:emails:create'],
-                            'delete'     => $security->hasEntityAccess($permissions['email:emails:deleteown'], $permissions['email:emails:deleteother'], $item->getCreatedBy()),
+                            'delete'     => $view['security']->hasEntityAccess($permissions['email:emails:deleteown'], $permissions['email:emails:deleteother'], $item->getCreatedBy()),
                             'abtest'     => (!$hasVariants && $edit && $permissions['email:emails:create']),
                         ),
                         'routeBase'       => 'email',
