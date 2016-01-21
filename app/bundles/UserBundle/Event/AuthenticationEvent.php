@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
@@ -108,12 +109,26 @@ class AuthenticationEvent extends Event
     ) {
         $this->token                 = $token;
         $this->user                  = $user;
-        $this->userProvider          = $userProvider;
+
         $this->isFormLogin           = ($token instanceof UsernamePasswordToken);
         $this->integrations          = $integrations;
         $this->request               = $request;
         $this->isLoginCheck          = $loginCheck;
         $this->authenticatingService = $authenticatingService;
+
+        if ($userProvider instanceof ChainUserProvider) {
+            // Chain of user providers so let's find Mautic's
+            $providers = $userProvider->getProviders();
+            foreach ($providers as $provider) {
+                if ($provider instanceof UserProvider) {
+                    $userProvider = $provider;
+
+                    break;
+                }
+            }
+        }
+
+        $this->userProvider = $userProvider;
     }
 
     /**
