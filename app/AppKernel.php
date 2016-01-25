@@ -40,7 +40,7 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const PATCH_VERSION = 3;
+    const PATCH_VERSION = 4;
 
     /**
      * Extra version identifier
