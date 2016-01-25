@@ -15,6 +15,7 @@ use Mautic\UserBundle\Event\AuthenticationEvent;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -104,9 +105,14 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
                 }
 
                 $response = $authEvent->getResponse();
+
+                if (!$authenticated && $loginCheck && !$response) {
+                    // Set an empty JSON response
+                    $response = new JsonResponse(array());
+                }
             }
 
-            if (!$authenticated) {
+            if (!$authenticated && empty($response)) {
 
                 throw new AuthenticationException('mautic.user.auth.error.invalidlogin');
             }
