@@ -134,7 +134,7 @@ class DashboardModel extends FormModel
             $widget->setCacheTimeout($this->factory->getParameter('cached_data_timeout'));
         }
 
-        $event = new WidgetDetailEvent();
+        $event = new WidgetDetailEvent($this->translator);
         $event->setWidget($widget);
         $event->setCacheDir($cacheDir);
         $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
