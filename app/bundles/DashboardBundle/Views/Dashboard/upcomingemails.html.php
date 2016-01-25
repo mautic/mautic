@@ -27,11 +27,11 @@
                     <div class="col-md-4 va-m text-right">
                         <a class="btn btn-sm btn-success"  href="<?php echo $view['router']->generate('mautic_lead_action', array('objectAction' => 'view', 'objectId' => $email['lead_id'])); ?>" data-toggle="ajax">
                             <span class="fa <?php echo isset($icons['lead']) ? $icons['lead'] : ''; ?>"></span>
-                            <?php echo $email['lead']->getName(); ?>
+                            <?php echo $email['lead_name']; ?>
                         </a>
                     </div>
                     <div class="col-md-3 va-m text-right">
-                        <?php echo $view['date']->toFull($email['triggerDate']); ?>
+                        <?php echo $view['date']->toFull($email['trigger_date']); ?>
                     </div>
                 </div>
             </li>

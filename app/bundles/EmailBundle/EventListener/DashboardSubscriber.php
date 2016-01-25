@@ -103,10 +103,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
             $leadModel = $this->factory->getModel('lead.lead');
 
-            foreach ($upcomingEmails as &$email) {
-                $email['lead'] = $leadModel->getEntity($email['lead_id']);
-            }
-
             $event->setTemplate('MauticDashboardBundle:Dashboard:upcomingemails.html.php');
             $event->setTemplateData(array('upcomingEmails' => $upcomingEmails));
             
