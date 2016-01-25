@@ -66,10 +66,12 @@ class WidgetApiController extends CommonApiController
         );
 
         $cacheTimeout = $this->request->get('cacheTimeout');
+        $widgetHeight = $this->request->get('height', 300);
 
         $widget = new Widget;
         $widget->setParams($params);
         $widget->setType($type);
+        $widget->setHeight($widgetHeight);
 
         if ($cacheTimeout) {
             $widget->setCacheTimeout($cacheTimeout);
