@@ -163,7 +163,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
                             );
 
                             // If CC and BCC, remove the ct from URLs to prevent false lead tracking
-                            foreach ($ccMergeVars as &$var) {
+                            foreach ($ccMergeVars['vars'] as &$var) {
                                 if (strpos($var['content'], 'http') !== false && $ctPos = strpos($var['content'], 'ct=') !== false) {
                                     // URL so make sure a ct query is not part of it
                                     $var['content'] = substr($var['content'], 0, $ctPos);
@@ -252,10 +252,16 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
     public function start()
     {
         // Make an API call to the ping endpoint
-        $this->post(array(
-            'url'     => 'https://mandrillapp.com/api/1.0/users/ping.json',
-            'payload' => json_encode(array('key' => $this->getPassword()))
-        ));
+        $this->post(
+            array(
+                'url'     => 'https://mandrillapp.com/api/1.0/users/ping.json',
+                'payload' => json_encode(
+                    array(
+                        'key' => $this->getPassword()
+                    )
+                )
+            )
+        );
 
         $this->started = true;
     }
@@ -276,6 +282,15 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
 
         if ($response === false) {
             $parsedResponse = $response;
+        }
+
+        if (!$this->started) {
+            // Check the response for PONG!
+            if ('PONG!' !== $response) {
+                $this->throwException('Mandrill failed to authenticate');
+            }
+
+            return true;
         }
 
         $return     = array();

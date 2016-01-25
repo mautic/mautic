@@ -37,7 +37,7 @@ class MailchimpApi extends EmailMarketingApi{
             $apiUrl               = 'https://'.$dc.'.api.mailchimp.com';
             $parameters['apikey'] = $this->keys['password'];
         } else {
-            $apiUrl               = $this->keys['password'];
+            $apiUrl               = $this->keys['api_endpoint'];
             $parameters['apikey'] = $this->keys['access_token'];
         }
         $url = sprintf('%s/%s/%s', $apiUrl, $this->version, $endpoint);

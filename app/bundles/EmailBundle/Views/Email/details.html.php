@@ -17,9 +17,6 @@ $emailType    = $email->getEmailType();
 if (empty($emailType)) {
     $emailType = 'template';
 }
-$sentCount    = $email->getSentCount();
-
-$edit = ($emailType == 'template' || empty($sentCount)) && $security->hasEntityAccess($permissions['email:emails:editown'], $permissions['email:emails:editother'], $email->getCreatedBy());
 
 $customButtons = array();
 
@@ -52,11 +49,12 @@ $customButtons[] = array(
         'btnText'   => 'mautic.core.form.clone'
 );
 
+$edit = $view['security']->hasEntityAccess($permissions['email:emails:editown'], $permissions['email:emails:editother'], $email->getCreatedBy());
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'item'       => $email,
     'templateButtons' => array(
         'edit'       => $edit,
-        'delete'     => $security->hasEntityAccess($permissions['email:emails:deleteown'], $permissions['email:emails:deleteother'], $email->getCreatedBy()),
+        'delete'     => $view['security']->hasEntityAccess($permissions['email:emails:deleteown'], $permissions['email:emails:deleteother'], $email->getCreatedBy()),
         'abtest'     => (!$isVariant && $edit && $permissions['email:emails:create'])
     ),
     'routeBase'  => 'email',
