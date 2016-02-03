@@ -81,6 +81,8 @@ class MauticCoreExtension extends Extension
 
                         // Set service alias
                         if (isset($details['serviceAlias'])) {
+                            // Fix escaped sprintf placeholders
+                            $details['serviceAlias'] = str_replace('%%', '%', $details['serviceAlias']);
                             $container->setAlias(sprintf($details['serviceAlias'], $name), $name);
                         }
 
