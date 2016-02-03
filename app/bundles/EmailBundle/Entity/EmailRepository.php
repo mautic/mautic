@@ -196,17 +196,6 @@ class EmailRepository extends CommonRepository
             $listIds = array($listIds);
         }
 
-        $listQb = $this->_em->getConnection()->createQueryBuilder();
-        $listQb->select('null')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
-            ->where(
-                $listQb->expr()->andX(
-                    $listQb->expr()->in('ll.leadlist_id', $listIds),
-                    $listQb->expr()->eq('ll.lead_id', 'l.id'),
-                    $listQb->expr()->eq('ll.manually_removed', ':false')
-                )
-            );
-
         // Main query
         $q  = $this->_em->getConnection()->createQueryBuilder();
         if ($countOnly) {
@@ -216,9 +205,15 @@ class EmailRepository extends CommonRepository
                 ->orderBy('l.id');
         }
         $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->join('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll',
+                $q->expr()->andX(
+                    $q->expr()->in('ll.leadlist_id', $listIds),
+                    $q->expr()->eq('l.id', 'll.lead_id'),
+                    $q->expr()->eq('ll.manually_removed', ':false')
+                )
+            )
             ->andWhere(sprintf('NOT EXISTS (%s)', $dneQb->getSQL()))
             ->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()))
-            ->andWhere(sprintf('EXISTS (%s)', $listQb->getSQL()))
             ->setParameter('false', false, 'boolean');
 
         // Has an email
