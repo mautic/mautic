@@ -3009,7 +3009,7 @@ var Mautic = {
     renderLineChart: function(canvas) {
         var ctx = canvas[0].getContext("2d");
         var data = mQuery.parseJSON(canvas.text());
-        var options = {}
+        var options = {pointDotRadius : 2, datasetStrokeWidth : 1, bezierCurveTension : 0.2}
         Mautic.chartObjects.push(new Chart(ctx).Line(data, options));
     },
 
@@ -3021,7 +3021,7 @@ var Mautic = {
     renderPieChart: function(canvas) {
         var ctx = canvas[0].getContext("2d");
         var data = mQuery.parseJSON(canvas.text());
-        var options = {}
+        var options = {segmentStrokeWidth : 1}
         var pieChart = new Chart(ctx).Pie(data, options);
         mQuery(canvas).closest('.chart-wrapper').find('.legend').html(pieChart.generateLegend());
         Mautic.chartObjects.push(pieChart);

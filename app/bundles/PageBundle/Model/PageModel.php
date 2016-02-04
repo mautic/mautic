@@ -22,6 +22,7 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
@@ -878,6 +879,24 @@ class PageModel extends FormModel
     public function getHitsBarChartData($amount, $unit, $filter = array())
     {
         $barChart  = new BarChart($unit, $amount);
+        $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
+        $chartData = $query->fetchTimeData('page_hits', 'date_hit', $unit, $amount, $filter);
+        $barChart->setDataset('Hit Count', $chartData);
+        return $barChart->render();
+    }
+
+    /**
+     * Get line chart data of hits
+     *
+     * @param integer $amount Number of units
+     * @param char    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param array   $filter
+     *
+     * @return array
+     */
+    public function getHitsLineChartData($amount, $unit, $filter = array())
+    {
+        $barChart  = new LineChart($unit, $amount);
         $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
         $chartData = $query->fetchTimeData('page_hits', 'date_hit', $unit, $amount, $filter);
         $barChart->setDataset('Hit Count', $chartData);
