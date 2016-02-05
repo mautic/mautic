@@ -44,6 +44,8 @@
 
         "sensio/distribution-bundle": "~2.3",
 
+        "twig/twig": "1.*",
+
         "doctrine/annotations": "1.2.*,>=1.2.7",
         "doctrine/cache": "1.4.*,>=1.4.2",
         "doctrine/common": "2.4.*,>=2.4.3",

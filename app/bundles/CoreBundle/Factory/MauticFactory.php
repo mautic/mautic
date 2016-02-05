@@ -545,15 +545,22 @@ class MauticFactory
 
             $themes[$specificFeature] = array();
             foreach ($finder as $theme) {
-                if (file_exists($theme->getRealPath().'/config.php')) {
-                    $config = include $theme->getRealPath().'/config.php';
-                    if ($specificFeature != 'all') {
-                        if (isset($config['features']) && in_array($specificFeature, $config['features'])) {
-                            $themes[$specificFeature][$theme->getBasename()] = $config['name'];
-                        }
-                    } else {
+                if (file_exists($theme->getRealPath().'/config.json')) {
+                    $config = json_decode(file_get_contents($theme->getRealPath() . '/config.json'), true);
+                }
+                // @deprecated Remove support for theme config.php in 2.0
+                elseif (file_exists($theme->getRealPath() . '/config.php')) {
+                    $config = include $theme->getRealPath() . '/config.php';
+                } else {
+                    continue;
+                }
+
+                if ($specificFeature != 'all') {
+                    if (isset($config['features']) && in_array($specificFeature, $config['features'])) {
                         $themes[$specificFeature][$theme->getBasename()] = $config['name'];
                     }
+                } else {
+                    $themes[$specificFeature][$theme->getBasename()] = $config['name'];
                 }
             }
         }
