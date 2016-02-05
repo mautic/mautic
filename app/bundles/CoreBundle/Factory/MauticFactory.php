@@ -751,6 +751,10 @@ class MauticFactory
                 return $this->container->get('templating.helper.slots');
             case 'template.form':
                 return $this->container->get('templating.helper.form');
+            case 'template.translator':
+                return $this->container->get('templating.helper.translator');
+            case 'template.router':
+                return $this->container->get('templating.helper.router');
             default:
                 return $this->container->get('mautic.helper.'.$helper);
         }
