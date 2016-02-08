@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
+use Mautic\CoreBundle\Templating\TemplateNameParser;
 
 /**
  * Class PageController
@@ -809,7 +809,7 @@ class PageController extends FormController
         $this->addAssetsForBuilder();
         $this->processSlots($slots, $entity);
 
-        $logicalName = $this->checkForTwigTemplate(':' . $template . ':page.html.php');
+        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':page.html.php');
 
         return $this->render($logicalName, array(
             'isNew'         => $isNew,
@@ -1037,7 +1037,11 @@ class PageController extends FormController
                     )->getForm()->createView();
                 }
 
-                $renderingEngine = $this->container->get('templating')->getEngine('MauticPageBundle:Page:Slots/slideshow.html.php');
+                $renderingEngine = $this->container->get('templating');
+
+                if (method_exists($renderingEngine, 'getEngine')) {
+                    $renderingEngine->getEngine('MauticPageBundle:Page:Slots/slideshow.html.php');
+                }
                 $slotsHelper->set($slot, $renderingEngine->render('MauticPageBundle:Page:Slots/slideshow.html.php', $options));
             } else {
                 // valback for html and unknown field types
@@ -1051,28 +1055,6 @@ class PageController extends FormController
         <input type="hidden" id="builder_entity_id" value="<?php echo $entity->getSessionId(); ?>" />
         <?php
         $slotsHelper->stop();
-    }
-
-    /**
-     * @param string $template
-     *
-     * @return string The logical name for the template
-     */
-    private function checkForTwigTemplate($template)
-    {
-        $kernel = $this->container->get('kernel');
-        $parser = new TemplateNameParser($kernel);
-
-        $template = $parser->parse($template);
-
-        $twigTemplate = clone $template;
-        $twigTemplate->set('engine', 'twig');
-
-        if ($this->container->get('templating')->exists($twigTemplate)) {
-            return $twigTemplate->getLogicalName();
-        }
-
-        return $template->getLogicalName();
     }
 
     private function addAssetsForBuilder()

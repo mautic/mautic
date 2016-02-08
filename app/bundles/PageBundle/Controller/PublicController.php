@@ -249,7 +249,7 @@ class PublicController extends CommonFormController
                     $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
                 }
 
-                $logicalName = $this->checkForTwigTemplate(':' . $template . ':page.html.php');
+                $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':page.html.php');
 
                 $response = $this->render($logicalName, array(
                     'slots'           => $slots,
@@ -312,7 +312,7 @@ class PublicController extends CommonFormController
                 $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
             }
 
-            $logicalName = $this->checkForTwigTemplate(':' . $template . ':page.html.php');
+            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':page.html.php');
 
             $response = $this->render($logicalName, array(
                 'slots'           => $slots,
@@ -473,27 +473,5 @@ class PublicController extends CommonFormController
                 $slotsHelper->set($slot, $value);
             }
         }
-    }
-
-    /**
-     * @param string $template
-     *
-     * @return string The logical name for the template
-     */
-    private function checkForTwigTemplate($template)
-    {
-        $kernel = $this->container->get('kernel');
-        $parser = new TemplateNameParser($kernel);
-
-        $template = $parser->parse($template);
-
-        $twigTemplate = clone $template;
-        $twigTemplate->set('engine', 'twig');
-
-        if ($this->container->get('templating')->exists($twigTemplate)) {
-            return $twigTemplate->getLogicalName();
-        }
-
-        return $template->getLogicalName();
     }
 }

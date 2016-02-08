@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Helper;
 use Mautic\CoreBundle\Exception as MauticException;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Filesystem\Filesystem;
+use Mautic\CoreBundle\Templating\TemplateNameParser;
 
 class ThemeHelper
 {
@@ -149,5 +150,27 @@ class ThemeHelper
         }
 
         return $minors;
+    }
+
+    /**
+     * @param string $template
+     *
+     * @return string The logical name for the template
+     */
+    public function checkForTwigTemplate($template)
+    {
+        $kernel = $this->factory->getKernel();
+        $parser = new TemplateNameParser($kernel);
+
+        $template = $parser->parse($template);
+
+        $twigTemplate = clone $template;
+        $twigTemplate->set('engine', 'twig');
+
+        if ($this->factory->getTemplating()->exists($twigTemplate)) {
+            return $twigTemplate->getLogicalName();
+        }
+
+        return $template->getLogicalName();
     }
 }

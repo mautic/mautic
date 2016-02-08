@@ -45,6 +45,7 @@
         "sensio/distribution-bundle": "~2.3",
 
         "twig/twig": "1.*",
+        "symfony/twig-bundle": "2.5.*",
 
         "doctrine/annotations": "1.2.*,>=1.2.7",
         "doctrine/cache": "1.4.*,>=1.4.2",
@@ -78,7 +79,6 @@
         "geoip2/geoip2": "~2.0"
     },
     "require-dev": {
-        "symfony/twig-bundle": "2.5.*",
         "symfony/web-profiler-bundle": "2.5.*",
         "liip/functional-test-bundle": "dev-master",
         "sensio/generator-bundle": "~2.3",
