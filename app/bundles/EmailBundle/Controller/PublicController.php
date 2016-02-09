@@ -111,7 +111,7 @@ class PublicController extends CommonFormController
             }
 
             // Add analytics
-            $analytics = htmlspecialchars_decode($this->factory->getParameter('google_analytics', ''));
+            $analytics = $this->factory->getHelper('template.analytics')->getCode();
 
             // Check for html doc
             if (strpos($content, '<html>') === false) {
