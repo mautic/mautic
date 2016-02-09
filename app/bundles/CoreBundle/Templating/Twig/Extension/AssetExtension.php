@@ -34,8 +34,8 @@ class AssetExtension extends Twig_Extension
     public function getFunctions()
     {
         return [
-            'outputScripts' => new Twig_SimpleFunction('outputScripts', [$this, 'outputScripts'], ['is_safe' => ['html']]),
-            'outputHeadDeclarations' => new Twig_SimpleFunction('outputHeadDeclarations', [$this, 'outputHeadDeclarations'], ['is_safe' => ['html']]),
+            'outputScripts' => new Twig_SimpleFunction('outputScripts', [$this, 'outputScripts'], ['is_safe' => ['all']]),
+            'outputHeadDeclarations' => new Twig_SimpleFunction('outputHeadDeclarations', [$this, 'outputHeadDeclarations'], ['is_safe' => ['all']]),
             'getAssetUrl' => new Twig_SimpleFunction('getAssetUrl', [$this, 'getAssetUrl'], ['is_safe' => ['html']]),
             'outputStyles' => new Twig_SimpleFunction('outputStyles', [$this, 'outputStyles'], ['is_safe' => ['html']]),
             'outputSystemScripts' => new Twig_SimpleFunction('outputSystemScripts', [$this, 'outputSystemScripts'], ['is_safe' => ['html']]),

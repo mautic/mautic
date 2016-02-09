@@ -234,7 +234,7 @@ class PublicController extends CommonFormController
                 }
             }
 
-            $analytics = $this->factory->getParameter('google_analytics');
+            $analytics = $this->factory->getHelper('template.analytics')->getCode();
 
             $template = $entity->getTemplate();
             if (!empty($template)) {
@@ -297,7 +297,7 @@ class PublicController extends CommonFormController
             $this->notFound();
         }
 
-        $analytics = $this->factory->getParameter('google_analytics');
+        $analytics = $this->factory->getHelper('template.analytics')->getCode();
 
         $template = $entity->getTemplate();
         if (!empty($template)) {
@@ -319,7 +319,7 @@ class PublicController extends CommonFormController
                 'content'         => $content,
                 'page'            => $entity,
                 'template'        => $template,
-                'public'          => true
+                'public'          => true // @deprecated Remove in 2.0
             ));
 
             $content = $response->getContent();

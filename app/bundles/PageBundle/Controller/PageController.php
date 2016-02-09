@@ -950,6 +950,8 @@ class PageController extends FormController
         $translatorHelper = $this->factory->getHelper('template.translator');
         $formFactory = $this->get('form.factory');
 
+        $slotsHelper->inBuilder(true);
+
         $content = $entity->getContent();
 
         foreach ($slots as $slot => $slotConfig) {
