@@ -42,7 +42,7 @@ class SlotsHelper extends BaseSlotsHelper
      */
     public function hasContent($names)
     {
-        if (array_key_exists('public', $this->slots)) {
+        if (! array_key_exists('public', $this->slots)) {
             return true;
         }
 
