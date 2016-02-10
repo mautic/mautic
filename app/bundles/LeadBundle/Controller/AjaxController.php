@@ -593,11 +593,18 @@ class AjaxController extends CommonAjaxController
 
         if ($leadField && in_array($leadField->getType(), $choiceTypes)) {
             $properties = $leadField->getProperties();
-
+            $fieldType  = $leadField->getType();
             if (!empty($properties['list'])) {
                 // Lookup/Select options
                 $options = explode('|', $properties['list']);
-            } else {
+            } elseif (!empty($properties) && $fieldType == 'boolean') {
+                // Boolean options
+                $options = array(
+                    0 => $properties['no'],
+                    1 => $properties['yes']
+                );
+            } elseif (!empty($properties)) {
+                // fallback
                 $options = $properties;
             }
             $dataArray['options'] = $options;

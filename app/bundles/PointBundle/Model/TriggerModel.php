@@ -199,7 +199,7 @@ class TriggerModel extends CommonFormModel
      *
      * @return void
      */
-    public function setEvents(Trigger &$entity, $sessionEvents)
+    public function setEvents(Trigger $entity, $sessionEvents)
     {
         $order   = 1;
         $existingActions = $entity->getEvents();
@@ -216,11 +216,18 @@ class TriggerModel extends CommonFormModel
                 if (method_exists($event, $func)) {
                     $event->$func($v);
                 }
-                $event->setTrigger($entity);
             }
+            $event->setTrigger($entity);
             $event->setOrder($order);
             $order++;
             $entity->addTriggerEvent($properties['id'], $event);
+        }
+
+        // Persist if editing the trigger
+        if ($entity->getId()) {
+            /** @var \Mautic\PointBundle\Model\TriggerEventModel $eventModel */
+            $eventModel = $this->factory->getModel('point.triggerEvent');
+            $eventModel->saveEntities($entity->getEvents());
         }
     }
 

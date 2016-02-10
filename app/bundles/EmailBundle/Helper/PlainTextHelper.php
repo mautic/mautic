@@ -333,7 +333,7 @@ class PlainTextHelper
             return $display;
         }
 
-        if (preg_match('!^([a-z][a-z0-9.+-]+:)!i', $link) || preg_match('!^{(.*?)}!', $link)) {
+        if (preg_match('!^([a-z][a-z0-9.+-]+:)!i', $link) || preg_match('!({|%7B)(.*?)(}|%7D)!', $link)) {
             $url = $link;
         } else {
             $url = $this->options['base_url'];

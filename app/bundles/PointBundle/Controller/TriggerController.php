@@ -182,7 +182,8 @@ class TriggerController extends FormController
      */
     public function newAction($entity = null)
     {
-        $model     = $this->factory->getModel('point.trigger');
+        /** @var \Mautic\PointBundle\Model\TriggerModel $model */
+        $model = $this->factory->getModel('point.trigger');
 
         if (!($entity instanceof Trigger)) {
             /** @var \Mautic\PointBundle\Entity\Trigger $entity */
@@ -225,7 +226,6 @@ class TriggerController extends FormController
                     } else {
                         $model->setEvents($entity, $events);
 
-                        //form is valid so process the data
                         $model->saveEntity($entity);
 
                         $this->addFlash('mautic.core.notice.created', array(
@@ -241,15 +241,6 @@ class TriggerController extends FormController
                             //return edit view so that all the session stuff is loaded
                             return $this->editAction($entity->getId(), true);
                         }
-
-                        /*
-                        $viewParameters = array(
-                            'objectAction' => 'view',
-                            'objectId'     => $entity->getId()
-                        );
-                        $returnUrl      = $this->generateUrl('mautic_pointtrigger_action', $viewParameters);
-                        $template       = 'MauticPointBundle:Trigger:view';
-                        */
                     }
                 }
             }
@@ -312,10 +303,12 @@ class TriggerController extends FormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
+        /** @var \Mautic\PointBundle\Model\TriggerModel $model */
         $model      = $this->factory->getModel('point.trigger');
         $entity     = $model->getEntity($objectId);
         $session    = $this->factory->getSession();
         $cleanSlate = true;
+
         //set the page we came from
         $page = $this->factory->getSession()->get('mautic.point.trigger.page', 1);
 
@@ -380,7 +373,9 @@ class TriggerController extends FormController
                         $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
                         //delete entities
-                        $this->factory->getModel('point.triggerEvent')->deleteEntities($deletedEvents);
+                        if (count($deletedEvents)) {
+                            $this->factory->getModel('point.triggerEvent')->deleteEntities($deletedEvents);
+                        }
 
                         $this->addFlash('mautic.core.notice.updated', array(
                             '%name%'      => $entity->getName(),
@@ -390,17 +385,6 @@ class TriggerController extends FormController
                                 'objectId'     => $entity->getId()
                             ))
                         ));
-
-                        if ($form->get('buttons')->get('save')->isClicked()) {
-                            /*
-                            $viewParameters = array(
-                                'objectAction' => 'view',
-                                'objectId'     => $entity->getId()
-                            );
-                            $returnUrl      = $this->generateUrl('mautic_pointtrigger_action', $viewParameters);
-                            $template       = 'MauticPointBundle:Trigger:view';
-                            */
-                        }
                     }
                 }
             } else {

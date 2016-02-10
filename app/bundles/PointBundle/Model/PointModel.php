@@ -167,11 +167,12 @@ class PointModel extends CommonFormModel
 
         //find all the actions for published points
         /** @var \Mautic\PointBundle\Entity\PointRepository $repo */
-        $repo         = $this->getRepository();
+        $repo            = $this->getRepository();
         $availablePoints = $repo->getPublishedByType($type);
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel    = $this->factory->getModel('lead');
         $ipAddress    = $this->factory->getIpAddress();
+
         if (null === $lead) {
             $lead = $leadModel->getCurrentLead();
 
@@ -187,9 +188,7 @@ class PointModel extends CommonFormModel
         //get a list of actions that has already been performed on this lead
         $completedActions = $repo->getCompletedLeadActions($type, $lead->getId());
 
-        $persist     = array();
-        $persistLead = false;
-
+        $persist = array();
         foreach ($availablePoints as $action) {
             //if it's already been done, then skip it
             if (isset($completedActions[$action->getId()])) {
@@ -256,21 +255,17 @@ class PointModel extends CommonFormModel
                     $log->setLead($lead);
                     $log->setDateFired(new \DateTime());
 
-                    $action->addLog($log);
-                    $persist[] = $action;
-                    $persistLead = true;
+                    $persist[] = $log;
                 }
             }
         }
 
-        //save the lead
-        if ($persistLead) {
-            $leadModel->saveEntity($lead);
-        }
-
-        //persist the action xref
         if (!empty($persist)) {
+            $leadModel->saveEntity($lead);
             $this->getRepository()->saveEntities($persist);
+
+            // Detach logs to reserve memory
+            $this->em->clear('Mautic\PointBundle\Entity\LeadPointLog');
         }
     }
 }
