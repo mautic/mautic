@@ -40,7 +40,8 @@ class AvatarHelper extends Helper
         $leadEmail  = $lead->getEmail();
 
         if ($preferred == 'custom' ) {
-            if ($fmtime = filemtime($this->getAvatarPath(true) . '/avatar'.$lead->getId())) {
+            $avatarPath = $this->getAvatarPath(true) . '/avatar'.$lead->getId();
+            if (file_exists($avatarPath) && $fmtime = filemtime($avatarPath)) {
                 // Append file modified time to ensure the latest is used by browser
                 $img = $this->factory->getHelper('template.assets')->getUrl(
                     $this->getAvatarPath().'/avatar'.$lead->getId() . '?' . $fmtime,
