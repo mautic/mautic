@@ -3,7 +3,7 @@
 {% block content %}
     {% if message is defined %}
         <div class="well text-center">
-            <h2>{{ message }}</h2>
+            <h2>{{ message|raw }}</h2>
         </div>
     {% endif %}
 
@@ -11,8 +11,6 @@
         {% if header is defined %}
         <h4>{{ header }}</h4>
         {% endif %}
-        {% autoescape false %}
-        {{ content }}
-        {% endautoescape %}
+        {{ content|raw }}
     </div>
 {% endblock %}
