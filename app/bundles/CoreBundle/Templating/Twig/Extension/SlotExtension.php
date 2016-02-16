@@ -35,7 +35,6 @@ class SlotExtension extends Twig_Extension
     {
         return [
             'slot' => new Twig_SimpleFunction('slot', [$this, 'getSlot'], ['is_safe' => ['html']]),
-            'setSlot' => new Twig_SimpleFunction('setSlot', [$this, 'setSlot'], ['is_safe' => ['html']]),
             'slotHasContent' => new Twig_SimpleFunction('slotHasContent', [$this, 'slotHasContent'], ['is_safe' => ['html']])
         ];
     }
@@ -52,11 +51,6 @@ class SlotExtension extends Twig_Extension
         $this->helper->output($name, $default);
 
         return ob_get_clean();
-    }
-
-    public function setSlot($name, $content)
-    {
-        $this->helper->set($name, $content);
     }
 
     public function slotHasContent($name)

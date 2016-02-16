@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\LeadBundle\EventListener\EmailSubscriber;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
+use Mautic\PageBundle\Entity\Page;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -242,7 +243,7 @@ class PublicController extends CommonFormController
                 $slots = $this->factory->getTheme($template)->getSlots('page');
                 $content = $entity->getContent();
 
-                $this->processSlots($slots, $content);
+                $this->processSlots($slots, $entity);
 
                 // Add the GA code to the template assets
                 if (! empty($analytics)) {
@@ -263,7 +264,7 @@ class PublicController extends CommonFormController
             } else {
                 $content = $entity->getCustomHtml();
                 if (!empty($analytics)) {
-                    $content = str_replace('</head>', htmlspecialchars_decode($analytics) . "\n</head>", $content);
+                    $content = str_replace('</head>', $analytics . "\n</head>", $content);
                 }
             }
 
@@ -305,7 +306,7 @@ class PublicController extends CommonFormController
             $slots = $this->factory->getTheme($template)->getSlots('page');
             $content = $entity->getContent();
 
-            $this->processSlots($slots, $content);
+            $this->processSlots($slots, $entity);
 
             // Add the GA code to the template assets
             if (! empty($analytics)) {
@@ -327,7 +328,7 @@ class PublicController extends CommonFormController
             $content = $entity->getCustomHtml();
 
             if (!empty($analytics)) {
-                $content = str_replace('</head>', htmlspecialchars_decode($analytics) . "\n</head>", $content);
+                $content = str_replace('</head>', $analytics . "\n</head>", $content);
             }
         }
 
@@ -404,14 +405,16 @@ class PublicController extends CommonFormController
      * PreProcess page slots for public view.
      *
      * @param array $slots
-     * @param array $content
+     * @param Page $entity
      */
-    private function processSlots($slots, $content)
+    private function processSlots($slots, $entity)
     {
         /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
         $assetsHelper = $this->factory->getHelper('template.assets');
         /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
         $slotsHelper = $this->factory->getHelper('template.slots');
+
+        $content = $entity->getContent();
 
         foreach ($slots as $slot => $slotConfig) {
             // backward compatibility - if slotConfig array does not exist
@@ -473,5 +476,9 @@ class PublicController extends CommonFormController
                 $slotsHelper->set($slot, $value);
             }
         }
+
+        $parentVariant = $entity->getVariantParent();
+        $title = (! empty($parentVariant)) ? $parentVariant->getTitle() : $entity->getTitle();
+        $slotsHelper->set('pageTitle', $title);
     }
 }
