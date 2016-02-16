@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4268634fe2835d787d824b5b267d0229",
-    "content-hash": "44adfe3f585790678afbf8d2a1f266cf",
+    "hash": "f1e68bc3633c8ff5aeb67aa3d71bd08f",
+    "content-hash": "1a973f118007a25e08f9e98ab5e92e2f",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -73,6 +73,42 @@
                 "sdk"
             ],
             "time": "2015-03-26 19:36:25"
+        },
+        {
+            "name": "camspiers/json-pretty",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/camspiers/json-pretty.git",
+                "reference": "73c0bd55ca966f31f79d690a4b0aabaf98ad5d94"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/camspiers/json-pretty/zipball/73c0bd55ca966f31f79d690a4b0aabaf98ad5d94",
+                "reference": "73c0bd55ca966f31f79d690a4b0aabaf98ad5d94",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Camspiers": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Cam Spiers",
+                    "email": "cameron@heyday.co.nz"
+                }
+            ],
+            "description": "Provides support for json pretty printing",
+            "time": "2015-09-17 16:05:48"
         },
         {
             "name": "doctrine/annotations",
@@ -880,7 +916,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/migrations/zipball/80792f4e496659bb0f93488a2b4b7a8935b721cb",
+                "url": "https://api.github.com/repos/doctrine/migrations/zipball/7ab492c6a65ebe7c0f4665bf96320bef4fb31b70",
                 "reference": "65978aa4e9ffca3bb632225ad8c6320077d80d85",
                 "shasum": ""
             },
@@ -1012,7 +1048,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSOAuthServerBundle/zipball/0c72d8baf707dce59c59a4daa1549c06e510bbed",
+                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSOAuthServerBundle/zipball/b7c550fe3ad910d2de112f055f86b11e4525000b",
                 "reference": "bbce53348576e8d6038902e7471a5c258a1bd19e",
                 "shasum": ""
             },
@@ -1932,7 +1968,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KnpLabs/Gaufrette/zipball/434dddb4319bde3ebb3421b77f321440bada8e42",
+                "url": "https://api.github.com/repos/KnpLabs/Gaufrette/zipball/93ba4672b012c74bfe419c033eae1c0a48b1b493",
                 "reference": "4c73bb66ff41d7c9beb57372a82047cf5dcc6d1c",
                 "shasum": ""
             },
@@ -2016,7 +2052,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KnpLabs/KnpMenu/zipball/18253a4467d60614735321387f250b0bc7b0ecad",
+                "url": "https://api.github.com/repos/KnpLabs/KnpMenu/zipball/9917b999a3c3d3901386d60c4888b07679291031",
                 "reference": "c40075bea26f63dd5b81ca5b3cdd2b54d38e811f",
                 "shasum": ""
             },
@@ -2080,7 +2116,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KnpLabs/KnpMenuBundle/zipball/ff3434782588fa371adf8361f5d2e9fd162d5508",
+                "url": "https://api.github.com/repos/KnpLabs/KnpMenuBundle/zipball/3cee352312736ba645759624a73be8e048cc83f2",
                 "reference": "2a2e1295c8f39f39875343934af159957bcdcc06",
                 "shasum": ""
             },
@@ -3916,12 +3952,12 @@
             "target-dir": "Symfony/Component/Routing",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/Routing.git",
+                "url": "https://github.com/symfony/routing.git",
                 "reference": "0a1764d41bbb54f3864808c50569ac382b44d128"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Routing/zipball/0a1764d41bbb54f3864808c50569ac382b44d128",
+                "url": "https://api.github.com/repos/symfony/routing/zipball/0a1764d41bbb54f3864808c50569ac382b44d128",
                 "reference": "0a1764d41bbb54f3864808c50569ac382b44d128",
                 "shasum": ""
             },
@@ -4970,7 +5006,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/liip/LiipFunctionalTestBundle/zipball/16b482be089256f31dbb25feea8d6cfa043ad3b2",
+                "url": "https://api.github.com/repos/liip/LiipFunctionalTestBundle/zipball/0b65790fc70095dacb9c54164996ea0559ef40a8",
                 "reference": "933cde549faae84d4e5ad2f59480f6de86deaaf0",
                 "shasum": ""
             },

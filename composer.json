@@ -76,7 +76,8 @@
         "joomla/filter": "~1.1",
         "mrclay/minify": "2.2.0",
         "jbroadway/urlify": "^1.0",
-        "geoip2/geoip2": "~2.0"
+        "geoip2/geoip2": "~2.0",
+        "camspiers/json-pretty": "1.0.*"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "2.5.*",
