@@ -214,22 +214,11 @@ class ChartQuery extends AbstractChart
             throw new UnexpectedValueException(__CLASS__ . '::' . __METHOD__ . ' supports only MySql a Posgress database platforms.');
         }
 
-        // Apply the start date/time if set
-        if ($dateFrom) {
-            $query->andWhere('t.' . $column . ' >= :dateFrom');
-            $query->setParameter('dateFrom', $dateFrom);
-        }
-
-        // Apply the end date/time if set
-        if ($dateTo) {
-            $query->andWhere('t.' . $column . ' <= :dateTo');
-            $query->setParameter('dateTo', $dateTo);
-        }
-
         // Count only with dates which are not empty
         $query->andWhere('t.' . $column . ' IS NOT NULL');
 
         $this->applyFilters($query, $filters);
+        $this->applyDateFilters($query, $column, $dateFrom, $dateTo);
 
         $query->setMaxResults($limit);
 
