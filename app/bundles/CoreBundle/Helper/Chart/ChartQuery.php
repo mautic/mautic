@@ -161,12 +161,13 @@ class ChartQuery extends AbstractChart
      * @param  string     $unit will be added to where claues
      * @param  integer    $limit will be added to where claues
      * @param  array      $filters will be added to where claues
+     * @param  string     $dateFrom will be added to where claues
      * @param  string     $dateTo will be added to where claues
      * @param  string     $order will be added to where claues
      *
      * @return array
      */
-    public function fetchTimeData($table, $column, $unit = 'm', $limit = 12, $filters = array(), $dateTo = null, $order = 'DESC') {
+    public function fetchTimeData($table, $column, $unit = 'm', $limit = 12, $dateFrom = null, $dateTo = null, $filters = array(), $order = 'DESC') {
         // Convert time unitst to the right form for current database platform
         $dbUnit = $this->translateTimeUnit($unit);
         $query = $this->connection->createQueryBuilder();
@@ -184,6 +185,12 @@ class ChartQuery extends AbstractChart
                 ->orderBy('DATE_FORMAT(t.' . $column . ', \'' . $dbUnit . '\')', $order);
         } else {
             throw new UnexpectedValueException(__CLASS__ . '::' . __METHOD__ . ' supports only MySql a Posgress database platforms.');
+        }
+
+        // Apply the start date/time if set
+        if ($dateFrom) {
+            $query->andWhere('t.' . $column . ' >= :dateFrom');
+            $query->setParameter('dateFrom', $dateFrom);
         }
 
         // Apply the end date/time if set

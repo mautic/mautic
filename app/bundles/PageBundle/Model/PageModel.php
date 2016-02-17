@@ -872,15 +872,17 @@ class PageModel extends FormModel
      *
      * @param integer $amount Number of units
      * @param char    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string  $dateFrom
+     * @param string  $dateTo
      * @param array   $filter
      *
      * @return array
      */
-    public function getHitsBarChartData($amount, $unit, $filter = array())
+    public function getHitsBarChartData($amount, $unit, $dateFrom, $dateTo, $filter = array())
     {
-        $barChart  = new BarChart($unit, $amount);
+        $barChart  = new BarChart($unit, $amount, $dateTo);
         $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
-        $chartData = $query->fetchTimeData('page_hits', 'date_hit', $unit, $amount, $filter);
+        $chartData = $query->fetchTimeData('page_hits', 'date_hit', $unit, $amount, $dateFrom, $dateTo, $filter);
         $barChart->setDataset('Hit Count', $chartData);
         return $barChart->render();
     }
@@ -890,15 +892,17 @@ class PageModel extends FormModel
      *
      * @param integer $amount Number of units
      * @param char    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string  $dateFrom
+     * @param string  $dateTo
      * @param array   $filter
      *
      * @return array
      */
-    public function getHitsLineChartData($amount, $unit, $filter = array())
+    public function getHitsLineChartData($amount, $unit, $dateFrom, $dateTo, $filter = array())
     {
-        $barChart  = new LineChart($unit, $amount);
+        $barChart  = new LineChart($unit, $amount, $dateTo);
         $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
-        $chartData = $query->fetchTimeData('page_hits', 'date_hit', $unit, $amount, $filter);
+        $chartData = $query->fetchTimeData('page_hits', 'date_hit', $unit, $amount, $dateFrom, $dateTo, $filter);
         $barChart->setDataset('Hit Count', $chartData);
         return $barChart->render();
     }

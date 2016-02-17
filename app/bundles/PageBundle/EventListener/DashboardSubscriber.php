@@ -69,7 +69,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $event->setTemplateData(array(
                         'chartType'   => 'line',
                         'chartHeight' => $widget->getHeight() - 80,
-                        'chartData'   => $model->getHitsLineChartData($params['amount'], $params['timeUnit'])
+                        'chartData'   => $model->getHitsLineChartData($params['amount'], $params['timeUnit'], $params['dateFrom'], $params['dateTo'])
                     ));
                 }
             }

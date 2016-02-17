@@ -37,7 +37,7 @@ class AjaxController extends CommonAjaxController
         $model     = $this->factory->getModel('asset.asset');
 
         // Download stats per time period
-        $dataArray['stats'] = $model->getDownloadsLineChartData($amount, $unit, array('asset_id' => $assetId));
+        $dataArray['stats'] = $model->getDownloadsLineChartData($amount, $unit, null, null, array('asset_id' => $assetId));
         $dataArray['success']  = 1;
 
         return $this->sendJsonResponse($dataArray);

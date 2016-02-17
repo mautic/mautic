@@ -200,7 +200,7 @@ class AssetController extends FormController
                     'downloads' => array(
                         'total'     => $activeAsset->getDownloadCount(),
                         'unique'    => $activeAsset->getUniqueDownloadCount(),
-                        'timeStats' => $model->getDownloadsLineChartData(30, 'd', array('asset_id' => $activeAsset->getId()))
+                        'timeStats' => $model->getDownloadsLineChartData(30, 'd', null, null, array('asset_id' => $activeAsset->getId()))
                     )
                 ),
                 'security'         => $security,

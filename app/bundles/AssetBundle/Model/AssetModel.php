@@ -444,11 +444,11 @@ class AssetModel extends FormModel
      *
      * @return array
      */
-    public function getDownloadsLineChartData($amount, $unit, $filter = array())
+    public function getDownloadsLineChartData($amount, $unit, $dateFrom, $dateTo, $filter = array())
     {
-        $barChart  = new LineChart($unit, $amount);
+        $barChart  = new LineChart($unit, $amount, $dateTo);
         $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
-        $chartData = $query->fetchTimeData('asset_downloads', 'date_download', $unit, $amount, $filter);
+        $chartData = $query->fetchTimeData('asset_downloads', 'date_download', $unit, $amount, $dateFrom, $dateTo, $filter);
         $barChart->setDataset('Download Count', $chartData);
         return $barChart->render();
     }

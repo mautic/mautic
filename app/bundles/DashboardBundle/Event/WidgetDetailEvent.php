@@ -88,6 +88,35 @@ class WidgetDetailEvent extends CommonEvent
     {
         $this->widget = $widget;
 
+        $params = $widget->getParams();
+
+        // Set required params if undefined
+        if (!isset($params['dateFrom'])) {
+            $params['dateFrom'] = null;
+        }
+
+        if (!isset($params['dateTo'])) {
+            $params['dateTo'] = null;
+        }
+
+        if (!isset($params['timeUnit'])) {
+            $params['timeUnit'] = null;
+        }
+
+        if (!isset($params['amount'])) {
+            $params['amount'] = null;
+        }
+
+        // Count the amount from the date range if the $dateFrom is provided
+        if ($params['dateFrom']) {
+            $unit   = $params['timeUnit'] == 'd' ? 'a' : $params['timeUnit'];
+            $from   = new \DateTime($params['dateFrom']);
+            $to     = new \DateTime($params['dateTo']);
+            $params['amount'] = ($to->diff($from)->format('%' . $unit) + 1);
+        }
+
+        $widget->setParams($params);
+
         $this->setType($widget->getType());
         $this->setCacheTimeout($widget->getCacheTimeout());
     }
