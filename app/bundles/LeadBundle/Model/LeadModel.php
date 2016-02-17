@@ -1240,18 +1240,19 @@ class LeadModel extends FormModel
     /**
      * Get pie chart data of dwell times
      *
+     * @param string  $dateFrom
+     * @param string  $dateTo
      * @param array   $filters
-     * @param array   $options
      *
      * @return array
      */
-    public function getAnonymousVsIdentifiedPieChartData($filters = array())
+    public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, $filters = array())
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection());
 
-        $identified = $query->count('leads', 'date_identified', $filters);
-        $all = $query->count('leads', 'id', $filters);
+        $identified = $query->count('leads', 'date_identified', 'date_added', $dateFrom, $dateTo, $filters);
+        $all = $query->count('leads', 'id', 'date_added', $dateFrom, $dateTo, $filters);
         $chart->setDataset('identified', $identified);
         $chart->setDataset('anonymous', ($all - $identified));
 

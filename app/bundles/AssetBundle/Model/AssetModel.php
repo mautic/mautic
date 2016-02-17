@@ -440,6 +440,8 @@ class AssetModel extends FormModel
      *
      * @param integer $amount Number of units
      * @param char    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string  $dateFrom
+     * @param string  $dateTo
      * @param array   $filter
      *
      * @return array
@@ -454,18 +456,21 @@ class AssetModel extends FormModel
     }
     
     /**
-     * Get pie chart data of unique vs repetitive downloads
+     * Get pie chart data of unique vs repetitive downloads.
+     * Repetitive in this case mean if a lead downloaded any of the assets more than once
      *
-     * @param array  $filters
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
      *
      * @return array
      */
-    public function getUniqueVsRepetitivePieChartData($filters = array())
+    public function getUniqueVsRepetitivePieChartData($dateFrom, $dateTo, $filters = array())
     {
         $chart      = new PieChart();
         $query      = new ChartQuery($this->factory->getEntityManager()->getConnection());
-        $all        = $query->sum('assets', 'download_count', $filters);
-        $unique     = $query->sum('assets', 'unique_download_count', $filters);
+        $all        = $query->count('asset_downloads', 'id', 'date_download', $dateFrom, $dateTo, $filters);
+        $unique     = $query->count('asset_downloads', 'lead_id', 'date_download', $dateFrom, $dateTo, $filters, array('getUnique' => true));
         $repetitive = $all - $unique;
         $chart->setDataset('Unique', $unique);
         $chart->setDataset('Repetitive', $repetitive);

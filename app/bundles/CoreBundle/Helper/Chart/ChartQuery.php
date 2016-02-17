@@ -115,14 +115,41 @@ class ChartQuery extends AbstractChart
      */
     public function applyFilters(&$query, $filters)
     {
-        foreach ($filters as $column => $value) {
-            $valId = $column . '_val';
-            if (is_array($value)) {
-                $query->andWhere('t.' . $column . ' IN(:' . $valId . ')');
-                $query->setParameter($valId, implode(',', $value));
-            } else {
-                $query->andWhere('t.' . $column . ' = :' . $valId);
-                $query->setParameter($valId, $value);
+        if ($filters && is_array($filters)) {
+            foreach ($filters as $column => $value) {
+                $valId = $column . '_val';
+                if (is_array($value)) {
+                    $query->andWhere('t.' . $column . ' IN(:' . $valId . ')');
+                    $query->setParameter($valId, implode(',', $value));
+                } else {
+                    $query->andWhere('t.' . $column . ' = :' . $valId);
+                    $query->setParameter($valId, $value);
+                }
+            }
+        }
+    }
+
+    /**
+     * Apply date filters to the query
+     *
+     * @param  string
+     */
+    public function applyDateFilters(&$query, $dateColumn, $dateFrom, $dateTo)
+    {
+        if ($dateColumn) {
+            // Apply the start date/time if set
+            if ($dateFrom) {
+                $query->andWhere('t.' . $dateColumn . ' >= :dateFrom');
+                $query->setParameter('dateFrom', $dateFrom);
+            }
+
+            // Apply the end date/time if set
+            if ($dateTo) {
+                // Make sure the dateTo is the end of the day
+                $dateTo = str_replace('00:00:00', '23:59:59', $dateTo);
+
+                $query->andWhere('t.' . $dateColumn . ' <= :dateTo');
+                $query->setParameter('dateTo', $dateTo);
             }
         }
     }
@@ -261,28 +288,32 @@ class ChartQuery extends AbstractChart
      * Count occurences of a value in a column
      *
      * @param  string     $table without prefix
-     * @param  string     $column name
+     * @param  string     $uniqueColumn name
+     * @param  string     $dateColumn name
+     * @param  string     $dateFrom will be added to where claues
+     * @param  string     $dateTo will be added to where claues
      * @param  array      $filters will be added to where claues
      * @param  array      $options for special behavior
      */
-    public function count($table, $column, $filters = array(), $options = array()) {
+    public function count($table, $uniqueColumn, $dateColumn = null, $dateFrom = null, $dateTo = null, $filters = array(), $options = array()) {
         $query = $this->connection->createQueryBuilder();
 
-        $query->select('COUNT(t.' . $column . ') AS count')
+        $query->select('COUNT(t.' . $uniqueColumn . ') AS count')
             ->from(MAUTIC_TABLE_PREFIX . $table, 't');
 
         $this->applyFilters($query, $filters);
+        $this->applyDateFilters($query, $dateColumn, $dateFrom, $dateTo);
 
         // Count only unique values
         if (!empty($options['getUnique'])) {
             // Modify the previous query
-            $query->select('t.' . $column);
+            $query->select('t.' . $uniqueColumn);
             $query->having('COUNT(*) = 1')
-                ->groupBy('t.' . $column);
+                ->groupBy('t.' . $uniqueColumn);
 
             // Create a new query with subquery of the previous query
             $uniqueQuery = $this->connection->createQueryBuilder();
-            $uniqueQuery->select('COUNT(t.' . $column . ') AS count')
+            $uniqueQuery->select('COUNT(t.' . $uniqueColumn . ') AS count')
                 ->from('(' . $query->getSql() . ')', 't');
 
             // Apply params from the previous query to the new query
@@ -308,7 +339,7 @@ class ChartQuery extends AbstractChart
      * @param  integer    $endSecond
      * @param  array      $filters will be added to where claues
      */
-    public function countDateDiff($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $filters = array()) {
+    public function countDateDiff($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $dateFrom, $dateTo, $filters = array()) {
         $query = $this->connection->createQueryBuilder();
 
         $query->select('COUNT(t.' . $dateColumn1 . ') AS count')
@@ -328,6 +359,7 @@ class ChartQuery extends AbstractChart
         $query->setParameter('endSecond', $endSecond);
 
         $this->applyFilters($query, $filters);
+        $this->applyDateFilters($query, $dateColumn1, $dateFrom, $dateTo);
 
         $data = $query->execute()->fetch();
 

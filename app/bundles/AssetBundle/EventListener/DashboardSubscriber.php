@@ -77,11 +77,12 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'unique.vs.repetitive.downloads') {
             if (!$event->isCached()) {
+                $params = $event->getWidget()->getParams();
                 $model = $this->factory->getModel('asset');
                 $event->setTemplateData(array(
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,
-                    'chartData'   => $model->getUniqueVsRepetitivePieChartData()
+                    'chartData'   => $model->getUniqueVsRepetitivePieChartData($params['dateFrom'], $params['dateTo'])
                 ));
             }
 

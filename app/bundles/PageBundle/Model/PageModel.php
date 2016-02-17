@@ -908,18 +908,21 @@ class PageModel extends FormModel
     }
 
     /**
-     * Get bar chart data of hits
+     * Get data for pie chart showing new vs returning leads.
+     * Returning leads are even leads who visits 2 different page once.
      *
-     * @param array  $filters
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
      *
      * @return array
      */
-    public function getNewVsReturningPieChartData($filters = array())
+    public function getNewVsReturningPieChartData($dateFrom, $dateTo, $filters = array())
     {
         $chart     = new PieChart();
         $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
-        $all       = $query->count('page_hits', 'lead_id', $filters);
-        $unique    = $query->count('page_hits', 'lead_id', $filters, array('getUnique' => true));
+        $all       = $query->count('page_hits', 'id', 'date_hit', $dateFrom, $dateTo, $filters);
+        $unique    = $query->count('page_hits', 'lead_id', 'date_hit', $dateFrom, $dateTo, $filters, array('getUnique' => true));
         $returning = $all - $unique;
         $chart->setDataset('Unique', $unique);
         $chart->setDataset('Returning', $returning);
@@ -929,12 +932,13 @@ class PageModel extends FormModel
     /**
      * Get pie chart data of dwell times
      *
+     * @param string  $dateFrom
+     * @param string  $dateTo
      * @param array   $filters
-     * @param array   $options
      *
      * @return array
      */
-    public function getDwellTimesPieChartData($filters = array())
+    public function getDwellTimesPieChartData($dateFrom, $dateTo, $filters = array())
     {
         $timesOnSite = array(
             array(
@@ -960,7 +964,7 @@ class PageModel extends FormModel
         $query = new ChartQuery($this->factory->getEntityManager()->getConnection());
 
         foreach ($timesOnSite as $time) {
-            $chartData = $query->countDateDiff('page_hits', 'date_hit', 'date_left', $time['from'], $time['till'], $filters);
+            $chartData = $query->countDateDiff('page_hits', 'date_hit', 'date_left', $time['from'], $time['till'], $dateFrom, $dateTo, $filters);
             $chart->setDataset($time['label'], $chartData);
         }
 

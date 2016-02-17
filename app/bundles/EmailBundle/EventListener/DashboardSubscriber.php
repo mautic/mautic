@@ -83,7 +83,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData(array(
                     'chartType'   => 'pie',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getIgnoredVsReadPieChartData()
+                    'chartData'   => $model->getIgnoredVsReadPieChartData($params['dateFrom'], $params['dateTo'])
                 ));
             }
 

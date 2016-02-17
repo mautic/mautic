@@ -77,11 +77,12 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'anonymous.vs.identified.leads') {
             if (!$event->isCached()) {
+                $params = $event->getWidget()->getParams();
                 $model = $this->factory->getModel('lead');
                 $event->setTemplateData(array(
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,
-                    'chartData'   => $model->getAnonymousVsIdentifiedPieChartData()
+                    'chartData'   => $model->getAnonymousVsIdentifiedPieChartData($params['dateFrom'], $params['dateTo'])
                 ));
             }
 

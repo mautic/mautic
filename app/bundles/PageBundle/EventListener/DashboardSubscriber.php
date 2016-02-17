@@ -80,11 +80,12 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'unique.vs.returning.leads') {
             if (!$event->isCached()) {
+                $params = $event->getWidget()->getParams();
                 $model = $this->factory->getModel('page');
                 $event->setTemplateData(array(
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,
-                    'chartData'   => $model->getNewVsReturningPieChartData()
+                    'chartData'   => $model->getNewVsReturningPieChartData($params['dateFrom'], $params['dateTo'])
                 ));
             }
 
@@ -94,11 +95,12 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'dwell.times') {
             if (!$event->isCached()) {
+                $params = $event->getWidget()->getParams();
                 $model = $this->factory->getModel('page');
                 $event->setTemplateData(array(
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,
-                    'chartData'   => $model->getDwellTimesPieChartData()
+                    'chartData'   => $model->getDwellTimesPieChartData($params['dateFrom'], $params['dateTo'])
                 ));
             }
 

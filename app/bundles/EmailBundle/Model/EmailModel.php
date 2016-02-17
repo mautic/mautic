@@ -1472,20 +1472,28 @@ class EmailModel extends FormModel
     /**
      * Get pie chart data of ignored vs opened emails
      *
+     * @param string  $dateFrom
+     * @param string  $dateTo
      * @param array   $filters
-     * @param array   $options
      *
      * @return array
      */
-    public function getIgnoredVsReadPieChartData($filters = array())
+    public function getIgnoredVsReadPieChartData($dateFrom, $dateTo, $filters = array())
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection());
 
-        $sent = $query->sum('emails', 'sent_count', $filters);
-        $read = $query->sum('emails', 'read_count', $filters);
-        $chart->setDataset('sent', $sent);
+        $readFilters = $filters;
+        $readFilters['is_read'] = true;
+        $failedFilters = $filters;
+        $failedFilters['is_failed'] = true;
+
+        $sent = $query->count('email_stats', 'id', 'date_sent', $dateFrom, $dateTo, $filters);
+        $read = $query->count('email_stats', 'id', 'date_sent', $dateFrom, $dateTo, $readFilters);
+        $failed = $query->count('email_stats', 'id', 'date_sent', $dateFrom, $dateTo, $failedFilters);
+        $chart->setDataset('ignored', ($sent - $read));
         $chart->setDataset('read', $read);
+        $chart->setDataset('failed', $failed);
 
         return $chart->render();
     }
