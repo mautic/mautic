@@ -158,9 +158,15 @@ class ChartQuery extends AbstractChart
      *
      * @param  string     $table without prefix
      * @param  string     $column name. The column must be type of datetime
+     * @param  string     $unit will be added to where claues
+     * @param  integer    $limit will be added to where claues
      * @param  array      $filters will be added to where claues
+     * @param  string     $dateTo will be added to where claues
+     * @param  string     $order will be added to where claues
+     *
+     * @return array
      */
-    public function fetchTimeData($table, $column, $unit = 'm', $limit = 12, $filters = array(), $start = null, $order = 'DESC') {
+    public function fetchTimeData($table, $column, $unit = 'm', $limit = 12, $filters = array(), $dateTo = null, $order = 'DESC') {
         // Convert time unitst to the right form for current database platform
         $dbUnit = $this->translateTimeUnit($unit);
         $query = $this->connection->createQueryBuilder();
@@ -180,10 +186,10 @@ class ChartQuery extends AbstractChart
             throw new UnexpectedValueException(__CLASS__ . '::' . __METHOD__ . ' supports only MySql a Posgress database platforms.');
         }
 
-        // Apply start date/time if set
-        if ($start) {
-            $query->andWhere('t.' . $column . ' <= :startdate');
-            $query->setParameter('startdate', $start);
+        // Apply the end date/time if set
+        if ($dateTo) {
+            $query->andWhere('t.' . $column . ' <= :dateTo');
+            $query->setParameter('dateTo', $dateTo);
         }
 
         // Count only with dates which are not empty
@@ -195,10 +201,9 @@ class ChartQuery extends AbstractChart
 
         // Fetch the data
         $rawData = $query->execute()->fetchAll();
-
         $data    = array();
         $oneUnit = $this->getUnitObject($unit);
-        $date    = new \DateTime($start);
+        $date    = new \DateTime($dateTo);
         $date->format($this->sqlFormats[$unit]);
 
         // Convert data from DB to the chart.js format

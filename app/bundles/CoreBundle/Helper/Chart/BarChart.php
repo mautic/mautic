@@ -34,11 +34,11 @@ class BarChart extends AbstractChart implements ChartInterface
     protected $limit;
 
     /**
-     * Date and time to start. Now (null) is default.
+     * Date and time to end. Now (null) is default.
      *
      * @var integer
      */
-    protected $start;
+    protected $end;
 
     /**
      * Order
@@ -68,16 +68,16 @@ class BarChart extends AbstractChart implements ChartInterface
      *
      * @param string  $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param integer $limit the number of loaded items
-     * @param string  $start date
+     * @param string  $end date
      * @param string  $order (DESC|ASC)
      */
-    public function __construct($unit = 'm', $limit = 12, $start = null, $order = 'DESC')
+    public function __construct($unit = 'm', $limit = 12, $end = null, $order = 'DESC')
     {
         $this->unit  = $unit;
         $this->limit = $limit;
-        $this->start = $start;
+        $this->end = $end;
         $this->order = $order;
-        $this->generateTimeLabels($unit, $limit, $start, $order);
+        $this->generateTimeLabels($unit, $limit, $end, $order);
     }
 
     /**
@@ -122,16 +122,16 @@ class BarChart extends AbstractChart implements ChartInterface
      *
      * @param  string  $unit
      * @param  integer $limit
-     * @param  string  $startDate
+     * @param  string  $endDate
      * @param  string  $order
      */
-    public function generateTimeLabels($unit, $limit, $startDate = null, $order = 'DESC')
+    public function generateTimeLabels($unit, $limit, $endDate = null, $order = 'DESC')
     {
         if (!isset($this->labelFormats[$unit])) {
             throw new \UnexpectedValueException('Date/Time unit "' . $unit . '" is not available for a label.');
         }
 
-        $date    = new \DateTime($startDate);
+        $date    = new \DateTime($endDate);
         $oneUnit = $this->getUnitObject($unit);
 
         for ($i = 0; $i < $limit; $i++) {
@@ -142,6 +142,7 @@ class BarChart extends AbstractChart implements ChartInterface
                 $date->add($oneUnit);
             }
         }
+        
         $this->labels = array_reverse($this->labels);
     }
 }

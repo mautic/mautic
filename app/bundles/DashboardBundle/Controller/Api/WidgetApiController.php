@@ -56,13 +56,17 @@ class WidgetApiController extends CommonApiController
     /**
      * Obtains a list of available widget types
      *
+     * @param  string $type of the widget
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getDataAction($type)
     {
         $params = array(
-            'amount' => $this->request->get('amount', 12),
-            'timeUnit' => $this->request->get('timeUnit', 'Y')
+            'amount'   => $this->request->get('amount', 12),
+            'timeUnit' => $this->request->get('timeUnit', 'Y'),
+            'dateFrom' => $this->request->get('dateFrom', null),
+            'dateTo'   => $this->request->get('dateTo', null)
         );
 
         $cacheTimeout = $this->request->get('cacheTimeout');

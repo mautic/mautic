@@ -1220,19 +1220,20 @@ class LeadModel extends FormModel
     /**
      * Get bar chart data of hits
      *
-     * @param integer $amount Number of units
-     * @param char    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param array   $filter
+     * @param integer  $amount Number of units
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateTo
+     * @param array    $filter
      *
      * @return array
      */
-    public function getLeadsLineChartData($amount, $unit, $filter = array())
+    public function getLeadsLineChartData($amount, $unit, $dateTo, $filter = array())
     {
-        $barChart  = new LineChart($unit, $amount);
+        $lineChart = new LineChart($unit, $amount, $dateTo);
         $query     = new ChartQuery($this->em->getConnection());
-        $chartData = $query->fetchTimeData('leads', 'date_added', $unit, $amount, $filter);
-        $barChart->setDataset('All leads', $chartData);
-        return $barChart->render();
+        $chartData = $query->fetchTimeData('leads', 'date_added', $unit, $amount, $filter, $dateTo);
+        $lineChart->setDataset('All leads', $chartData);
+        return $lineChart->render();
     }
 
     /**
