@@ -109,10 +109,21 @@ class WidgetDetailEvent extends CommonEvent
 
         // Count the amount from the date range if the $dateFrom is provided
         if ($params['dateFrom']) {
-            $unit   = $params['timeUnit'] == 'd' ? 'a' : $params['timeUnit'];
             $from   = new \DateTime($params['dateFrom']);
             $to     = new \DateTime($params['dateTo']);
-            $params['amount'] = ($to->diff($from)->format('%' . $unit) + 1);
+            $unit   = $params['timeUnit'];
+
+            if ($params['timeUnit'] == 'd' || $params['timeUnit'] == 'W') {
+                $unit = 'a';
+                $diff = ($to->diff($from)->format('%' . $unit) + 1);
+                $diff = $params['timeUnit'] == 'W' ? floor($diff / 7) : $diff;
+            } elseif ($params['timeUnit'] == 'm') {
+                $diff = $to->diff($from)->format('%y') * 12 + $to->diff($from)->format('%m');
+            } else {
+                $diff = ($to->diff($from)->format('%' . $unit) + 1);
+            }
+
+            $params['amount'] = $diff;
         }
 
         $widget->setParams($params);
