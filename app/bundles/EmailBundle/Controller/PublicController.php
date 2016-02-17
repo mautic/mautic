@@ -28,7 +28,10 @@ class PublicController extends CommonFormController
 
         if (!empty($stat)) {
             $emailEntity = $stat->getEmail();
-            $model->hitEmail($stat, $this->request, true);
+
+            if ($this->factory->getSecurity()->isAnonymous()) {
+                $model->hitEmail($stat, $this->request, true);
+            }
 
             $tokens = $stat->getTokens();
             if (is_array($tokens)) {
