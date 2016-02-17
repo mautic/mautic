@@ -1263,24 +1263,35 @@ class LeadModel extends FormModel
      * Get leads count per country name.
      * Can't use entity, because country is a custom field.
      *
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     *
      * @return array
      */
-    public function getLeadMapData($filter = array())
+    public function getLeadMapData($dateFrom, $dateTo, $filters = array())
     {
         $q = $this->em->getConnection()->createQueryBuilder();
-        $q->select('COUNT(l.id) as quantity, l.country')
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->groupBy('l.country')
-            ->where($q->expr()->isNotNull('l.country'));
+        $q->select('COUNT(t.id) as quantity, t.country')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+            ->groupBy('t.country')
+            ->where($q->expr()->isNotNull('t.country'));
+
+        $chartQuery = new ChartQuery($this->em->getConnection());
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_added', $dateFrom, $dateTo);
+
         $results = $q->execute()->fetchAll();
 
         $countries = array_flip(Intl::getRegionBundle()->getCountryNames('en'));
         $mapData = array();
 
         // Convert country names to 2-char code
-        foreach ($results as $leadCountry) {
-            if (isset($countries[$leadCountry['country']])) {
-                $mapData[$countries[$leadCountry['country']]] = $leadCountry['quantity'];
+        if ($results) {
+            foreach ($results as $leadCountry) {
+                if (isset($countries[$leadCountry['country']])) {
+                    $mapData[$countries[$leadCountry['country']]] = $leadCountry['quantity'];
+                }
             }
         }
 

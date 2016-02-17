@@ -92,10 +92,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'map.of.leads') {
             if (!$event->isCached()) {
+                $params = $event->getWidget()->getParams();
                 $model = $this->factory->getModel('lead');
                 $event->setTemplateData(array(
                     'height' => $event->getWidget()->getHeight() - 80,
-                    'data'   => $model->getLeadMapData()
+                    'data'   => $model->getLeadMapData($params['dateFrom'], $params['dateTo'])
                 ));
             }
 
