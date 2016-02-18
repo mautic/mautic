@@ -95,8 +95,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $model = $this->factory->getModel('asset');
                 $params = $event->getWidget()->getParams();
 
-                // Count the pages limit from the widget height
-                $limit  = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
+                if (empty($params['limit'])) {
+                    // Count the pages limit from the widget height
+                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
+                } else {
+                    $limit = $params['limit'];
+                }
+                
                 $assets = $model->getPopularAssets($limit, $params['dateFrom'], $params['dateTo']);
                 $items  = array();
 

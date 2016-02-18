@@ -113,8 +113,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $model  = $this->factory->getModel('page');
                 $params = $event->getWidget()->getParams();
 
-                // Count the pages limit from the widget height
-                $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
+                if (empty($params['limit'])) {
+                    // Count the pages limit from the widget height
+                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
+                } else {
+                    $limit = $params['limit'];
+                }
+
                 $pages = $model->getPopularPages($limit, $params['dateFrom'], $params['dateTo']);
                 $items = array();
 

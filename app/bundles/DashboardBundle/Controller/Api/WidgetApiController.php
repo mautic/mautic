@@ -66,7 +66,8 @@ class WidgetApiController extends CommonApiController
             'amount'   => $this->request->get('amount', 12),
             'timeUnit' => $this->request->get('timeUnit', 'Y'),
             'dateFrom' => $this->request->get('dateFrom', null),
-            'dateTo'   => $this->request->get('dateTo', null)
+            'dateTo'   => $this->request->get('dateTo', null),
+            'limit'    => $this->request->get('limit', null)
         );
 
         $cacheTimeout = $this->request->get('cacheTimeout');
