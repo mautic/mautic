@@ -970,4 +970,33 @@ class PageModel extends FormModel
 
         return $chart->render();
     }
+
+    /**
+     * Get a list of popular (by hits) pages
+     *
+     * @param integer $limit
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     *
+     * @return array
+     */
+    public function getPopularPages($limit = 10, $dateFrom = null, $dateTo = null, $filters = array())
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(DISTINCT t.id) AS hits, p.id, p.title, p.alias')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 't')
+            ->join('t', MAUTIC_TABLE_PREFIX.'pages', 'p', 'p.id = t.page_id')
+            ->orderBy('hits', 'DESC')
+            ->groupBy('p.id')
+            ->setMaxResults($limit);
+
+        $chartQuery = new ChartQuery($this->em->getConnection());
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_hit', $dateFrom, $dateTo);
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
 }

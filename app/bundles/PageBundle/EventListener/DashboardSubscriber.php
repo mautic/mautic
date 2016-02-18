@@ -110,11 +110,12 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'popular.pages') {
             if (!$event->isCached()) {
-                $repo = $this->factory->getModel('page')->getRepository();
+                $model  = $this->factory->getModel('page');
+                $params = $event->getWidget()->getParams();
 
                 // Count the pages limit from the widget height
                 $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
-                $pages = $repo->getPopularPages($limit);
+                $pages = $model->getPopularPages($limit, $params['dateFrom'], $params['dateTo']);
                 $items = array();
 
                 // Build table rows with links
