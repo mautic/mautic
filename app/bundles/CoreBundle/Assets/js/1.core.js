@@ -3009,7 +3009,12 @@ var Mautic = {
     renderLineChart: function(canvas) {
         var ctx = canvas[0].getContext("2d");
         var data = mQuery.parseJSON(canvas.text());
-        var options = {pointDotRadius : 2, datasetStrokeWidth : 1, bezierCurveTension : 0.2}
+        var options = {
+            pointDotRadius : 2,
+            datasetStrokeWidth : 1,
+            bezierCurveTension : 0.2,
+            multiTooltipTemplate: "<%= datasetLabel %>: <%= value %>"
+        }
         Mautic.chartObjects.push(new Chart(ctx).Line(data, options));
     },
 
