@@ -111,19 +111,27 @@ class ChartQuery extends AbstractChart
     /**
      * Apply where filters to the query
      *
-     * @param  string
+     * @param  QueryBuilder $query
+     * @param  array        $filters
      */
     public function applyFilters(&$query, $filters)
     {
         if ($filters && is_array($filters)) {
             foreach ($filters as $column => $value) {
                 $valId = $column . '_val';
-                if (is_array($value)) {
-                    $query->andWhere('t.' . $column . ' IN(:' . $valId . ')');
-                    $query->setParameter($valId, implode(',', $value));
+                if (isset($value['expression']) && method_exists($query->expr(), $value['expression'])) {
+                    $query->andWhere($query->expr()->{$value['expression']}($column));
+                    if (isset($value['value'])) {
+                        $query->setParameter($valId, $value['value']);
+                    }
                 } else {
-                    $query->andWhere('t.' . $column . ' = :' . $valId);
-                    $query->setParameter($valId, $value);
+                    if (is_array($value)) {
+                        $query->andWhere('t.' . $column . ' IN(:' . $valId . ')');
+                        $query->setParameter($valId, implode(',', $value));
+                    } else {
+                        $query->andWhere('t.' . $column . ' = :' . $valId);
+                        $query->setParameter($valId, $value);
+                    }
                 }
             }
         }
