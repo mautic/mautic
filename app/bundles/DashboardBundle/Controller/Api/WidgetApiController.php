@@ -63,22 +63,22 @@ class WidgetApiController extends CommonApiController
     public function getDataAction($type)
     {
         $params = array(
-            'amount'   => $this->request->get('amount', 12),
-            'timeUnit' => $this->request->get('timeUnit', 'Y'),
-            'dateFrom' => $this->request->get('dateFrom', null),
-            'dateTo'   => $this->request->get('dateTo', null),
-            'limit'    => $this->request->get('limit', null)
+            'amount'   => InputHelper::int($this->request->get('amount', 12)),
+            'timeUnit' => InputHelper::clean($this->request->get('timeUnit', 'Y')),
+            'dateFrom' => InputHelper::clean($this->request->get('dateFrom', null)),
+            'dateTo'   => InputHelper::clean($this->request->get('dateTo', null)),
+            'limit'    => InputHelper::int($this->request->get('limit', null))
         );
 
-        $cacheTimeout = $this->request->get('cacheTimeout', 5);
-        $widgetHeight = $this->request->get('height', 300);
+        $cacheTimeout = InputHelper::int($this->request->get('cacheTimeout', null));
+        $widgetHeight = InputHelper::int($this->request->get('height', 300));
 
         $widget = new Widget;
         $widget->setParams($params);
         $widget->setType($type);
         $widget->setHeight($widgetHeight);
 
-        if ($cacheTimeout) {
+        if ($cacheTimeout === null) {
             $widget->setCacheTimeout($cacheTimeout);
         }
 
