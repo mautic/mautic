@@ -476,4 +476,33 @@ class AssetModel extends FormModel
         $chart->setDataset('Repetitive', $repetitive);
         return $chart->render();
     }
+
+    /**
+     * Get a list of popular (by downloads) assets
+     *
+     * @param integer $limit
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     *
+     * @return array
+     */
+    public function getPopularAssets($limit = 10, $dateFrom = null, $dateTo = null, $filters = array())
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(DISTINCT t.id) AS download_count, a.id, a.title')
+            ->from(MAUTIC_TABLE_PREFIX.'asset_downloads', 't')
+            ->join('t', MAUTIC_TABLE_PREFIX.'assets', 'a', 'a.id = t.asset_id')
+            ->orderBy('download_count', 'DESC')
+            ->groupBy('a.id')
+            ->setMaxResults($limit);
+
+        $chartQuery = new ChartQuery($this->em->getConnection());
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_download', $dateFrom, $dateTo);
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
 }

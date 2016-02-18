@@ -92,11 +92,12 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'popular.assets') {
             if (!$event->isCached()) {
-                $repo   = $this->factory->getModel('asset')->getRepository();
+                $model = $this->factory->getModel('asset');
+                $params = $event->getWidget()->getParams();
 
                 // Count the pages limit from the widget height
                 $limit  = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
-                $assets = $repo->getPopularAssets($limit);
+                $assets = $model->getPopularAssets($limit, $params['dateFrom'], $params['dateTo']);
                 $items  = array();
 
                 // Build table rows with links
@@ -105,7 +106,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $assetUrl = $this->factory->getRouter()->generate('mautic_asset_action', array('objectAction' => 'view', 'objectId' => $asset['id']));
                         $row = array(
                             $assetUrl => $asset['title'],
-                            $asset['downloadCount']
+                            $asset['download_count']
                         );
                         $items[] = $row;
                     }
