@@ -1232,8 +1232,18 @@ class LeadModel extends FormModel
     {
         $lineChart = new LineChart($unit, $amount, $dateTo);
         $query     = new ChartQuery($this->em->getConnection());
-        $chartData = $query->fetchTimeData('leads', 'date_added', $unit, $amount, $dateFrom, $dateTo, $filter);
-        $lineChart->setDataset('All leads', $chartData);
+        $anonymousFilter = $filter;
+        $anonymousFilter['date_identified'] = array(
+            'expression' => 'isNull'
+        );
+        $identifiedFilter = $filter;
+        $identifiedFilter['date_identified'] = array(
+            'expression' => 'isNotNull'
+        );
+        $identified = $query->fetchTimeData('leads', 'date_added', $unit, $amount, $dateFrom, $dateTo, $identifiedFilter);
+        $anonymous = $query->fetchTimeData('leads', 'date_added', $unit, $amount, $dateFrom, $dateTo, $anonymousFilter);
+        $lineChart->setDataset('Identified', $identified);
+        $lineChart->setDataset('Anonymous', $anonymous);
         return $lineChart->render();
     }
 
