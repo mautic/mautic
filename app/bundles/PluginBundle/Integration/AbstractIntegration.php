@@ -1396,7 +1396,8 @@ abstract class AbstractIntegration
 
         return array(
             'requires_callback'      => $callback,
-            'requires_authorization' => $authorization
+            'requires_authorization' => $authorization,
+            'default_features'       => array()
         );
     }
 

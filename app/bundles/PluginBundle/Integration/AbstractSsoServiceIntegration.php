@@ -173,5 +173,4 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
             );
         }
     }
-
 }
