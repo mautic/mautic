@@ -70,7 +70,7 @@ class WidgetApiController extends CommonApiController
             'limit'    => $this->request->get('limit', null)
         );
 
-        $cacheTimeout = $this->request->get('cacheTimeout');
+        $cacheTimeout = $this->request->get('cacheTimeout', 5);
         $widgetHeight = $this->request->get('height', 300);
 
         $widget = new Widget;
