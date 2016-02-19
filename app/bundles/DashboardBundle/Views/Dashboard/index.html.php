@@ -48,6 +48,26 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'customButtons' => $buttons
 )));
 ?>
+<div class="pa-md">
+<?php echo $view['form']->start($filterForm); ?>
+
+    <div class="row">
+        <div class="col-xs-3">
+            <?php //echo $view['form']->label($filterForm['date_from']); ?>
+            <?php echo $view['form']->widget($filterForm['date_from']); ?>
+            <div class="has-error"><?php echo $view['form']->errors($filterForm['date_from']); ?></div>
+        </div>
+        <div class="col-xs-3">
+            <?php //echo $view['form']->label($filterForm['date_to']); ?>
+            <?php echo $view['form']->widget($filterForm['date_to']); ?>
+            <div class="has-error"><?php echo $view['form']->errors($filterForm['date_to']); ?></div>
+        </div>
+        <div class="col-xs-6">
+            <?php echo $view['form']->row($filterForm['apply']); ?>
+        </div>
+    </div>
+<?php echo $view['form']->end($filterForm); ?>
+</div>
 
 <div id="dashboard-widgets" class="cards">
     <?php if ($widgets): ?>

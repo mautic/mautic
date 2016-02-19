@@ -58,6 +58,11 @@ return array(
                 'class'     => 'Mautic\DashboardBundle\Form\Type\UploadType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'dashboard_upload'
+            ),
+            'mautic.dashboard.form.filter' => array(
+                'class'     => 'Mautic\DashboardBundle\Form\Type\FilterType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'dashboard_filter'
             )
         )
     ),

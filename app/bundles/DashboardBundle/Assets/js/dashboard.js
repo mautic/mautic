@@ -1,6 +1,7 @@
 //DashboardBundle
 Mautic.dashboardOnLoad = function (container) {
     Mautic.initWidgetSorting();
+    Mautic.initDashboardDateFilter();
 };
 
 Mautic.dashboardOnUnload = function(id) {
@@ -78,3 +79,28 @@ Mautic.updateWidgetForm = function (element) {
         Mautic.removeLabelLoadingIndicator();
     });
 };
+
+Mautic.initDashboardDateFilter = function () {
+    var dateFrom = mQuery('#dashboard_filter_date_from');
+    var dateTo = mQuery('#dashboard_filter_date_to');
+
+    dateFrom.datetimepicker({
+        format: 'M j, Y',
+        onShow: function(ct) {
+            this.setOptions({
+                maxDate: dateTo.val() ? new Date(dateTo.val()) : false
+            });
+        },
+        timepicker: false
+    });
+    dateTo.datetimepicker({
+        format: 'M j, Y',
+        onShow: function(ct) {
+            this.setOptions({
+                maxDate: new Date(),
+                minDate: dateFrom.val() ? new Date(dateFrom.val()) : false
+            });
+        },
+        timepicker: false
+    });
+}

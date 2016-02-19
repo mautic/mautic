@@ -29,14 +29,52 @@ class DashboardController extends FormController
     public function indexAction()
     {
         /** @var \Mautic\DashBundle\Model\DashboardModel $model */
-        $model = $this->factory->getModel('dashboard');
-        $widgets = $model->getWidgets();
-        $model->populateWidgetsContent($widgets);
+        $model           = $this->factory->getModel('dashboard');
+        $widgets         = $model->getWidgets();
+        $action          = $this->generateUrl('mautic_dashboard_index');
+        $filterForm      = $this->get('form.factory')->create('dashboard_filter', null, array('action' => $action));
+        $dashboardFilter = $this->request->get('dashboard_filter', array());
+
+        $session     = $this->factory->getSession();
+        $today       = new \DateTime();
+        $lastMonth   = (new \DateTime())->sub(new \DateInterval('P30D'));
+        $humanFormat = 'M j, Y';
+        $mysqlFormat = 'Y-m-d H:i:s';
+        $dateFrom    = $session->get('mautic.dashboard.date.from', $lastMonth->format($humanFormat));
+        $dateTo      = $session->get('mautic.dashboard.date.to', $today->format($humanFormat));
+
+        // set default filter data if empty
+        if (empty($dashboardFilter['date_from'])) $dashboardFilter['date_from'] = $dateFrom;
+        if (empty($dashboardFilter['date_to']))   $dashboardFilter['date_to']   = $dateTo;
+
+        $from   = new \DateTime($dashboardFilter['date_from']);
+        $to     = new \DateTime($dashboardFilter['date_to']);
+        $diff   = $to->diff($from)->format('%a');
+        $unit   = 'd';
+
+        if ($this->request->isMethod('POST')) {
+            $session->set('mautic.dashboard.date.from', $from->format($humanFormat));
+            $session->set('mautic.dashboard.date.to', $to->format($humanFormat));
+        }
+
+        if ($diff > 31) $unit = 'W';
+        if ($diff > 100) $unit = 'm';
+        if ($diff > 1000) $unit = 'Y';
+
+        $filter = [
+            'dateFrom' => $from->format($mysqlFormat),
+            'dateTo'   => $to->format($mysqlFormat),
+            'timeUnit' => $unit,
+        ];
+
+        $model->populateWidgetsContent($widgets, $filter);
+        $filterForm->setData($dashboardFilter);
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'security'          => $this->factory->getSecurity(),
-                'widgets'           => $widgets
+                'widgets'           => $widgets,
+                'filterForm'        => $filterForm->createView()
             ),
             'contentTemplate' => 'MauticDashboardBundle:Dashboard:index.html.php',
             'passthroughVars' => array(
@@ -271,13 +309,13 @@ class DashboardController extends FormController
 
         foreach ($widgetsPaginator as $widget) {
             $widgets[] = array(
-                'name' => $widget->getName(),
-                'width' => $widget->getWidth(),
-                'height' => $widget->getHeight(),
-                'ordering' => $widget->getOrdering(),
-                'type' => $widget->getType(),
-                'params' => $widget->getParams(),
-                'template' => $widget->getTemplate(),
+                'name'      => $widget->getName(),
+                'width'     => $widget->getWidth(),
+                'height'    => $widget->getHeight(),
+                'ordering'  => $widget->getOrdering(),
+                'type'      => $widget->getType(),
+                'params'    => $widget->getParams(),
+                'template'  => $widget->getTemplate(),
             );
         }
 
@@ -304,7 +342,7 @@ class DashboardController extends FormController
     public function deleteDashboardFileAction()
     {
         $file = $this->request->get('file');
-        $dir = $this->factory->getParameter('dashboard_import_dir');
+        $dir  = $this->factory->getParameter('dashboard_import_dir');
         $path = $dir . '/' . $file;
 
         if (file_exists($path) && is_writable($path)) {

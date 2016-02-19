@@ -85,15 +85,16 @@ class DashboardModel extends FormModel
      * Fill widgets with their content
      *
      * @param array $widgets
+     * @param array $filter
      */
-    public function populateWidgetsContent(&$widgets)
+    public function populateWidgetsContent(&$widgets, $filter = array())
     {
         if (count($widgets)) {
             foreach ($widgets as &$widget) {
                 if (!($widget instanceof Widget)) {
                     $widget = $this->populateWidgetEntity($widget);
                 }
-                $this->populateWidgetContent($widget);
+                $this->populateWidgetContent($widget, $filter);
             }
         }
     }
@@ -123,9 +124,10 @@ class DashboardModel extends FormModel
     /**
      * Load widget content from the onWidgetDetailGenerate event
      *
-     * @return array
+     * @param Widget $widget
+     * @param array  $filter
      */
-    public function populateWidgetContent(Widget &$widget)
+    public function populateWidgetContent(Widget &$widget, $filter = array())
     {
         $cacheDir   = $this->factory->getParameter('cached_data_dir', $this->factory->getSystemPath('cache', true));
         $dispatcher = $this->factory->getDispatcher();
@@ -133,6 +135,11 @@ class DashboardModel extends FormModel
         if ($widget->getCacheTimeout() == null || $widget->getCacheTimeout() == -1) {
             $widget->setCacheTimeout($this->factory->getParameter('cached_data_timeout'));
         }
+
+        // Merge global filter with widget params
+        $widgetParams = $widget->getParams();
+        $resultParams = array_merge($widgetParams, $filter);
+        $widget->setParams($resultParams);
 
         $event = new WidgetDetailEvent($this->translator);
         $event->setWidget($widget);
