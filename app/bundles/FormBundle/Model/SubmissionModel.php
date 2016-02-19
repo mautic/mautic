@@ -18,6 +18,8 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -682,5 +684,82 @@ class SubmissionModel extends CommonFormModel
             default:
                 return new Response();
         }
+    }
+
+    /**
+     * Get line chart data of submissions
+     *
+     * @param integer $amount Number of units
+     * @param char    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filter
+     *
+     * @return array
+     */
+    public function getSubmissionsLineChartData($amount, $unit, $dateFrom, $dateTo, $filter = array())
+    {
+        $lineChart = new LineChart($unit, $amount, $dateTo);
+        $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
+        $chartData = $query->fetchTimeData('form_submissions', 'date_submitted', $unit, $amount, $dateFrom, $dateTo, $filter);
+        $lineChart->setDataset('Submission Count', $chartData);
+        return $lineChart->render();
+    }
+
+    /**
+     * Get a list of top submission referrers
+     *
+     * @param integer $limit
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     *
+     * @return array
+     */
+    public function getTopSubmissionReferrers($limit = 10, $dateFrom = null, $dateTo = null, $filters = array())
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(DISTINCT t.id) AS submissions, t.referer')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 't')
+            ->orderBy('submissions', 'DESC')
+            ->groupBy('t.referer')
+            ->setMaxResults($limit);
+
+        $chartQuery = new ChartQuery($this->em->getConnection());
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_submitted', $dateFrom, $dateTo);
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
+     * Get a list of the most submisions per lead
+     *
+     * @param integer $limit
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     *
+     * @return array
+     */
+    public function getTopSubmitters($limit = 10, $dateFrom = null, $dateTo = null, $filters = array())
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(DISTINCT t.id) AS submissions, t.lead_id, l.firstname, l.lastname, l.email')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 't')
+            ->join('t', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id')
+            ->orderBy('submissions', 'DESC')
+            ->groupBy('t.lead_id, l.firstname, l.lastname, l.email')
+            ->setMaxResults($limit);
+
+        $chartQuery = new ChartQuery($this->em->getConnection());
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_submitted', $dateFrom, $dateTo);
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
     }
 }

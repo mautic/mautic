@@ -900,11 +900,11 @@ class PageModel extends FormModel
      */
     public function getHitsLineChartData($amount, $unit, $dateFrom, $dateTo, $filter = array())
     {
-        $barChart  = new LineChart($unit, $amount, $dateTo);
+        $lineChart = new LineChart($unit, $amount, $dateTo);
         $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
         $chartData = $query->fetchTimeData('page_hits', 'date_hit', $unit, $amount, $dateFrom, $dateTo, $filter);
-        $barChart->setDataset('Hit Count', $chartData);
-        return $barChart->render();
+        $lineChart->setDataset('Hit Count', $chartData);
+        return $lineChart->render();
     }
 
     /**

@@ -56,7 +56,7 @@ class WidgetDetailEvent extends CommonEvent
      */
     public function setCacheTimeout($cacheTimeout)
     {
-        $this->cacheTimeout = $cacheTimeout;
+        $this->cacheTimeout = (int) $cacheTimeout;
     }
 
     /**
