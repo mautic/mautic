@@ -76,6 +76,8 @@ class CacheStorageHelper
      */
     public function get($fileName, $maxAge = 0)
     {
+        if ($maxAge == 0) return false;
+        
         $filePath = $this->cacheDir . '/' . $fileName . '.php';
 
         if ($this->fs->exists($filePath)) {
