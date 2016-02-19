@@ -103,8 +103,9 @@ class AuthenticationListener implements ListenerInterface
                 if ($authToken->isAuthenticated()) {
                     $this->tokenStorage->setToken($authToken);
 
-                    $response = $this->onSuccess($request, $authToken, $response);
-
+                    if ('api' != $this->providerKey) {
+                        $response = $this->onSuccess($request, $authToken, $response);
+                    }
                 } elseif (empty($response)) {
 
                     throw new AuthenticationException('mautic.user.auth.error.invalidlogin');
@@ -112,10 +113,14 @@ class AuthenticationListener implements ListenerInterface
 
             }
         } catch (AuthenticationException $exception) {
-            $response = $this->onFailure($request, $exception);
+            if ('api' != $this->providerKey) {
+                $response = $this->onFailure($request, $exception);
+            }
         }
 
-        $event->setResponse($response);
+        if ($response) {
+            $event->setResponse($response);
+        }
     }
 
     /**

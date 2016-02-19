@@ -168,6 +168,19 @@ class AuthenticationEvent extends Event
     }
 
     /**
+     * @param                $service
+     * @param TokenInterface $token
+     */
+    public function setToken($service, TokenInterface $token)
+    {
+        $this->token = $token;
+        $this->authenticatingService = $service;
+        $this->isAuthenticated       = $token->isAuthenticated();
+
+        $this->stopPropagation();
+    }
+
+    /**
      * Get the username used
      *
      * @return string
