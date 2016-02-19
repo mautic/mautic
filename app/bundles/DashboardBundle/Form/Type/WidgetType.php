@@ -50,7 +50,8 @@ class WidgetType extends AbstractType
         $builder->add('name', 'text', array(
             'label'      => 'mautic.dashboard.widget.form.name',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'required'   => false
         ));
 
         $dispatcher = $this->factory->getDispatcher();

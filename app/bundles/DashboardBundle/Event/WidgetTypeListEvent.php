@@ -39,7 +39,7 @@ class WidgetTypeListEvent extends CommonEvent
     public function addType($widgetType, $bundle = 'others')
     {
         $bundle = 'mautic.' . $bundle . '.dashboard.widgets';
-        $widgetTypeName = $bundle . '.' . $widgetType;
+        $widgetTypeName = 'mautic.widget.' . $widgetType;
 
         if ($this->translator) {
             $bundle = $this->translator->trans($bundle);

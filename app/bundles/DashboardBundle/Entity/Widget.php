@@ -134,10 +134,6 @@ class Widget extends FormEntity
      */
     public static function loadValidatorMetadata (ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('name', new NotBlank(array(
-            'message' => 'mautic.core.name.required'
-        )));
-
         $metadata->addPropertyConstraint('type', new NotBlank(array(
             'message' => 'mautic.core.type.required'
         )));

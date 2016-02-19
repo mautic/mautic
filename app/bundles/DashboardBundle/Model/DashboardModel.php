@@ -163,4 +163,20 @@ class DashboardModel extends FormModel
 
         return $formFactory->create('widget', $entity, $options);
     }
+
+    /**
+     * Create/edit entity
+     *
+     * @param object $entity
+     * @param bool   $unlock
+     */
+    public function saveEntity($entity, $unlock = true)
+    {
+        // Set widget name from widget type if empty
+        if (!$entity->getName()) {
+            $entity->setName($this->translator->trans('mautic.widget.' . $entity->getType()));
+        }
+
+        parent::saveEntity($entity, $unlock);
+    }
 }
