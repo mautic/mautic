@@ -119,7 +119,13 @@ class ChartQuery extends AbstractChart
         if ($filters && is_array($filters)) {
             foreach ($filters as $column => $value) {
                 $valId = $column . '_val';
-                if (isset($value['expression']) && method_exists($query->expr(), $value['expression'])) {
+
+                // Special case: Lead list filter
+                if ($column == 'leadlist_id') {
+                    $query->join('t', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.lead_id = ' . $value['list_column_name']);
+                    $query->andWhere('lll.leadlist_id = :' . $valId);
+                    $query->setParameter($valId, $value['value']);
+                } elseif (isset($value['expression']) && method_exists($query->expr(), $value['expression'])) {
                     $query->andWhere($query->expr()->{$value['expression']}($column));
                     if (isset($value['value'])) {
                         $query->setParameter($valId, $value['value']);

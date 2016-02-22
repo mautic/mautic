@@ -25,28 +25,17 @@ class DashboardLeadsInTimeWidgetType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('amount', 'integer', array(
-                'label'      => 'mautic.core.number',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control'),
-                'empty_data' => '30'
-            )
-        );
-
-        $builder->add('timeUnit', 'choice', array(
-                'label'   => 'mautic.core.time.unit',
+        $builder->add('lists', 'choice', array(
+                'label'   => 'mautic.lead.list.filter',
                 'choices' => array(
-                    's' => 'mautic.core.time.seconds',
-                    'i' => 'mautic.core.time.minutes',
-                    'H' => 'mautic.core.time.hours',
-                    'd' => 'mautic.core.time.days',
-                    'W' => 'mautic.core.time.weeks',
-                    'm' => 'mautic.core.time.months',
-                    'Y' => 'mautic.core.time.years'
+                    ''                          => 'mautic.lead.show.all',
+                    'identifiedVsAnonymous'     => 'mautic.lead.show.identified.vs.anonymous',
+                    'top'                       => 'mautic.lead.show.top',
+                    'topIdentifiedVsAnonymous'  => 'mautic.lead.show.top.leads.identified.vs.anonymous'
                 ),
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
-                'empty_data' => 'd',
+                'empty_data' => '',
                 'required'   => false
             )
         );

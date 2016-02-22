@@ -54,18 +54,17 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
-            // Make sure the params exist
-            if (empty($params['amount']) || empty($params['timeUnit'])) {
-                $event->setErrorMessage('mautic.core.configuration.value.not.set');
-            } else {
-                if (!$event->isCached()) {
-                    $model = $this->factory->getModel('lead');
-                    $event->setTemplateData(array(
-                        'chartType'   => 'line',
-                        'chartHeight' => $widget->getHeight() - 80,
-                        'chartData'   => $model->getLeadsLineChartData($params['amount'], $params['timeUnit'], $params['dateFrom'], $params['dateTo'])
-                    ));
-                }    
+            if (empty($params['lists'])) {
+                $params['lists'] = null;
+            }
+
+            if (!$event->isCached()) {
+                $model = $this->factory->getModel('lead');
+                $event->setTemplateData(array(
+                    'chartType'   => 'line',
+                    'chartHeight' => $widget->getHeight() - 80,
+                    'chartData'   => $model->getLeadsLineChartData($params['amount'], $params['timeUnit'], $params['dateFrom'], $params['dateTo'], $params['lists'])
+                ));
             }
 
             $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
