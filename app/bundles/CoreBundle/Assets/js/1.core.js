@@ -2992,11 +2992,14 @@ var Mautic = {
         if (charts.length) {
             charts.each(function(index, canvas) {
                 canvas = mQuery(canvas);
-                if (canvas.hasClass('line-chart')) {
-                    Mautic.renderLineChart(canvas)
-                } else if (canvas.hasClass('pie-chart')) {
-                    Mautic.renderPieChart(canvas)
+                if (!canvas.hasClass('chart-rendered')) {
+                    if (canvas.hasClass('line-chart')) {
+                        Mautic.renderLineChart(canvas)
+                    } else if (canvas.hasClass('pie-chart')) {
+                        Mautic.renderPieChart(canvas)
+                    }
                 }
+                canvas.addClass('chart-rendered');
             });
         }
     },
