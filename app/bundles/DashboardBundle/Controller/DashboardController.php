@@ -32,43 +32,33 @@ class DashboardController extends FormController
         $model           = $this->factory->getModel('dashboard');
         $widgets         = $model->getWidgets();
         $action          = $this->generateUrl('mautic_dashboard_index');
+        $humanFormat     = 'M j, Y';
         $filterForm      = $this->get('form.factory')->create('dashboard_filter', null, array('action' => $action));
-        $dashboardFilter = $this->request->get('dashboard_filter', array());
-
-        $session     = $this->factory->getSession();
-        $today       = new \DateTime();
-        $lastMonth   = (new \DateTime())->sub(new \DateInterval('P30D'));
-        $humanFormat = 'M j, Y';
-        $mysqlFormat = 'Y-m-d H:i:s';
-        $dateFrom    = $session->get('mautic.dashboard.date.from', $lastMonth->format($humanFormat));
-        $dateTo      = $session->get('mautic.dashboard.date.to', $today->format($humanFormat));
-
-        // set default filter data if empty
-        if (empty($dashboardFilter['date_from'])) $dashboardFilter['date_from'] = $dateFrom;
-        if (empty($dashboardFilter['date_to']))   $dashboardFilter['date_to']   = $dateTo;
-
-        $from   = new \DateTime($dashboardFilter['date_from']);
-        $to     = new \DateTime($dashboardFilter['date_to']);
-        $diff   = $to->diff($from)->format('%a');
-        $unit   = 'd';
 
         if ($this->request->isMethod('POST')) {
-            $session->set('mautic.dashboard.date.from', $from->format($humanFormat));
-            $session->set('mautic.dashboard.date.to', $to->format($humanFormat));
+            $session = $this->factory->getSession();
+            $dashboardFilter = $this->request->get('dashboard_filter', array());
+
+            if (!empty($dashboardFilter['date_from'])) {
+                $from = new \DateTime($dashboardFilter['date_from']);
+                $session->set('mautic.dashboard.date.from', $from->format($humanFormat));
+            }
+
+            if (empty($dashboardFilter['date_to'])) {
+                $to = new \DateTime($dashboardFilter['date_to']);
+                $session->set('mautic.dashboard.date.to', $to->format($humanFormat));
+            }
         }
 
-        if ($diff > 31) $unit = 'W';
-        if ($diff > 100) $unit = 'm';
-        if ($diff > 1000) $unit = 'Y';
-
-        $filter = [
-            'dateFrom' => $from->format($mysqlFormat),
-            'dateTo'   => $to->format($mysqlFormat),
-            'timeUnit' => $unit,
-        ];
-
+        $filter = $model->getDefaultFilter();
         $model->populateWidgetsContent($widgets, $filter);
-        $filterForm->setData($dashboardFilter);
+
+        $filterForm->setData(
+            array(
+                'date_from' => (new \DateTime($filter['dateFrom']))->format($humanFormat),
+                'date_to' => (new \DateTime($filter['dateTo']))->format($humanFormat)
+            )
+        );
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
@@ -130,7 +120,8 @@ class DashboardController extends FormController
                 'mauticContent' => 'widget'
             );
 
-            $model->populateWidgetContent($widget);
+            $filter = $model->getDefaultFilter();
+            $model->populateWidgetContent($widget, $filter);
 
             if ($valid && !$cancelled) {
                 $passthroughVars['upWidgetCount'] = 1;
@@ -142,7 +133,6 @@ class DashboardController extends FormController
                 $passthroughVars['widgetWidth'] = $widget->getWidth();
                 $passthroughVars['widgetHeight'] = $widget->getHeight();
             }
-
 
             $response = new JsonResponse($passthroughVars);
             $response->headers->set('Content-Length', strlen($response->getContent()));
@@ -205,7 +195,8 @@ class DashboardController extends FormController
                 'mauticContent' => 'widget'
             );
 
-            $model->populateWidgetContent($widget);
+            $filter = $model->getDefaultFilter();
+            $model->populateWidgetContent($widget, $filter);
 
             if ($valid && !$cancelled) {
                 $passthroughVars['upWidgetCount'] = 1;
@@ -378,8 +369,9 @@ class DashboardController extends FormController
                     }
                 }
 
+                $filter = $model->getDefaultFilter();
                 foreach ($widgets as $widget) {
-                    $widget = $model->populateWidgetEntity($widget);
+                    $widget = $model->populateWidgetEntity($widget, $filter);
                     $model->saveEntity($widget);
                 }
 
@@ -444,7 +436,8 @@ class DashboardController extends FormController
         if ($preview && ($dashId = array_search($preview, $dashboards))) {
             // @todo check is_writable
             $widgets = json_decode(file_get_contents($dir . '/' . $dashboards[$dashId]), true);
-            $model->populateWidgetsContent($widgets);
+            $filter = $model->getDefaultFilter();
+            $model->populateWidgetsContent($widgets, $filter);
         } else {
             $widgets = array();
         }

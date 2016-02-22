@@ -186,4 +186,34 @@ class DashboardModel extends FormModel
 
         parent::saveEntity($entity, $unlock);
     }
+
+    /**
+     * Generate default date range filter and time unit
+     *
+     * @return array
+     */
+    public function getDefaultFilter()
+    {
+        $session     = $this->factory->getSession();
+        $today       = new \DateTime();
+        $lastMonth   = (new \DateTime())->sub(new \DateInterval('P30D'));
+        $humanFormat = 'M j, Y';
+        $mysqlFormat = 'Y-m-d H:i:s';
+        $dateFrom    = new \DateTime($session->get('mautic.dashboard.date.from', $lastMonth->format($humanFormat)));
+        $dateTo      = new \DateTime($session->get('mautic.dashboard.date.to', $today->format($humanFormat)));
+        $diff        = $dateTo->diff($dateFrom)->format('%a');
+        $unit        = 'd';
+
+        if ($diff > 31) $unit = 'W';
+        if ($diff > 100) $unit = 'm';
+        if ($diff > 1000) $unit = 'Y';
+
+        $filter = [
+            'dateFrom' => $dateFrom->format($mysqlFormat),
+            'dateTo'   => $dateTo->format($mysqlFormat),
+            'timeUnit' => $unit,
+        ];
+
+        return $filter;
+    }
 }
