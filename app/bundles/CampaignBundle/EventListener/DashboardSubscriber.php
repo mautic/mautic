@@ -33,7 +33,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
      * @var string
      */
     protected $types = array(
-        'events.in.time' => array()
+        'events.in.time' => array(),
+        'leads.added.in.time' => array()
     );
 
     /**
@@ -56,6 +57,24 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
                     'chartData'   => $model->getEventLineChartData($params['amount'], $params['timeUnit'], $params['dateFrom'], $params['dateTo'])
+                ));
+            }
+
+            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->stopPropagation();
+        }
+
+        if ($event->getType() == 'leads.added.in.time') {
+            $widget = $event->getWidget();
+            $params = $widget->getParams();
+
+            if (!$event->isCached()) {
+                $model = $this->factory->getModel('campaign');
+
+                $event->setTemplateData(array(
+                    'chartType'   => 'line',
+                    'chartHeight' => $widget->getHeight() - 80,
+                    'chartData'   => $model->getLeadsAddedLineChartData($params['amount'], $params['timeUnit'], $params['dateFrom'], $params['dateTo'])
                 ));
             }
 

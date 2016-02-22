@@ -19,6 +19,9 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -1041,5 +1044,27 @@ class CampaignModel extends CommonFormModel
         } else {
             sleep($eventSleepTime);
         }
+    }
+
+    /**
+     * Get line chart data of leads added to campaigns
+     *
+     * @param integer $amount Number of units
+     * @param char    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filter
+     *
+     * @return array
+     */
+    public function getLeadsAddedLineChartData($amount, $unit, $dateFrom, $dateTo, $filter = array())
+    {
+        $chart = new LineChart($unit, $amount, $dateTo);
+        $query = new ChartQuery($this->em->getConnection());
+        
+        $data  = $query->fetchTimeData('campaign_leads', 'date_added', $unit, $amount, $dateFrom, $dateTo, $filter);
+        $chart->setDataset('Leads added', $data);
+
+        return $chart->render();
     }
 }
