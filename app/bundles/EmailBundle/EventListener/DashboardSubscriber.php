@@ -33,9 +33,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
      * @var string
      */
     protected $types = array(
-        'emails.in.time' => array(
-            'formAlias' => 'email_dashboard_emails_in_time_widget'
-        ),
+        'emails.in.time' => array(),
         'ignored.vs.read.emails' => array(),
         'upcoming.emails' => array()
     );

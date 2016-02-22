@@ -33,15 +33,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
      * @var string
      */
     protected $types = array(
-        'asset.downloads.in.time' => array(
-            'formAlias' => 'asset_dashboard_downloads_in_time_widget'
-        ),
-        'unique.vs.repetitive.downloads' => array(
-            'formAlias' => null
-        ),
-        'popular.assets' => array(
-            'formAlias' => null
-        )
+        'asset.downloads.in.time' => array(),
+        'unique.vs.repetitive.downloads' => array(),
+        'popular.assets' => array()
     );
 
     /**
