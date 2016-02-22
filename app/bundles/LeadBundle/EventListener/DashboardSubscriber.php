@@ -36,12 +36,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'created.leads.in.time' => array(
             'formAlias' => 'lead_dashboard_leads_in_time_widget'
         ),
-        'anonymous.vs.identified.leads' => array(
-            'formAlias' => null
-        ),
-        'map.of.leads' => array(
-            'formAlias' => null
-        )
+        'anonymous.vs.identified.leads' => array(),
+        'map.of.leads' => array(),
+        'top.lists' => array()
     );
 
     /**
@@ -101,6 +98,47 @@ class DashboardSubscriber extends MainDashboardSubscriber
             }
 
             $event->setTemplate('MauticCoreBundle:Helper:map.html.php');
+            $event->stopPropagation();
+        }
+
+        if ($event->getType() == 'top.lists') {
+            if (!$event->isCached()) {
+                $model  = $this->factory->getModel('lead.list');
+                $params = $event->getWidget()->getParams();
+
+                if (empty($params['limit'])) {
+                    // Count the list limit from the widget height
+                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
+                } else {
+                    $limit = $params['limit'];
+                }
+
+                $lists = $model->getTopLists($limit, $params['dateFrom'], $params['dateTo']);
+                $items = array();
+
+                // Build table rows with links
+                if ($lists) {
+                    foreach ($lists as &$list) {
+                        // $listUrl = $this->factory->getRouter()->generate('mautic_leadlist_action', array('objectAction' => 'view', 'objectId' => $list['id']));
+                        $row = array(
+                            // $listUrl => $list['name'],
+                            $list['name'],
+                            $list['leads']
+                        );
+                        $items[] = $row;
+                    }
+                }
+
+                $event->setTemplateData(array(
+                    'headItems'   => array(
+                        $event->getTranslator()->trans('mautic.dashboard.label.title'),
+                        $event->getTranslator()->trans('mautic.lead.leads')
+                    ),
+                    'bodyItems'   => $items
+                ));
+            }
+            
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
             $event->stopPropagation();
         }
     }
