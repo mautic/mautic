@@ -1359,6 +1359,35 @@ class LeadModel extends FormModel
     public function getTopOwners($limit = 10, $dateFrom = null, $dateTo = null, $filters = array())
     {
         $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(t.id) AS leads, t.owner_id, u.first_name, u.last_name')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+            ->join('t', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = t.owner_id')
+            ->where($q->expr()->isNotNull('t.owner_id'))
+            ->orderBy('leads', 'DESC')
+            ->groupBy('t.owner_id, u.first_name, u.last_name')
+            ->setMaxResults($limit);
+
+        $chartQuery = new ChartQuery($this->em->getConnection());
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_added', $dateFrom, $dateTo);
+
+        $results = $q->execute()->fetchAll();
+        return $results;
+    }
+
+    /**
+     * Get a list of top (by leads owned) users
+     *
+     * @param integer $limit
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     *
+     * @return array
+     */
+    public function getTopCreators($limit = 10, $dateFrom = null, $dateTo = null, $filters = array())
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) AS leads, t.created_by, t.created_by_user')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
             ->where($q->expr()->isNotNull('t.created_by'))
