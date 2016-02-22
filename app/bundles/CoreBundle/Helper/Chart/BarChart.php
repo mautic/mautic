@@ -59,7 +59,7 @@ class BarChart extends AbstractChart implements ChartInterface
         'H' => 'l ga',
         'd' => 'M j, y', 'D' => 'M j, y', // ('D' is BC. Can be removed when all charts use this class)
         'W' => 'W',
-        'm' => 'F y', 'M' => 'F y', // ('M' is BC. Can be removed when all charts use this class)
+        'm' => 'M Y', 'M' => 'M Y', // ('M' is BC. Can be removed when all charts use this class)
         'Y' => 'Y',
     );
 
