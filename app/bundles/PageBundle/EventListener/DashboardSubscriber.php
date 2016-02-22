@@ -33,18 +33,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
      * @var string
      */
     protected $types = array(
-        'page.hits.in.time' => array(
-            'formAlias' => 'lead_dashboard_leads_in_time_widget'
-        ),
-        'unique.vs.returning.leads' => array(
-            'formAlias' => null
-        ),
-        'dwell.times' => array(
-            'formAlias' => null
-        ),
-        'popular.pages' => array(
-            'formAlias' => null
-        )
+        'page.hits.in.time' => array(),
+        'unique.vs.returning.leads' => array(),
+        'dwell.times' => array(),
+        'popular.pages' => array()
     );
 
     /**
@@ -60,18 +52,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
-            // Make sure the params exist
-            if (empty($params['amount']) || empty($params['timeUnit'])) {
-                $event->setErrorMessage('mautic.core.configuration.value.not.set');
-            } else {
-                if (!$event->isCached()) {
-                    $model = $this->factory->getModel('page');
-                    $event->setTemplateData(array(
-                        'chartType'   => 'line',
-                        'chartHeight' => $widget->getHeight() - 80,
-                        'chartData'   => $model->getHitsLineChartData($params['amount'], $params['timeUnit'], $params['dateFrom'], $params['dateTo'])
-                    ));
-                }
+            if (!$event->isCached()) {
+                $model = $this->factory->getModel('page');
+                $event->setTemplateData(array(
+                    'chartType'   => 'line',
+                    'chartHeight' => $widget->getHeight() - 80,
+                    'chartData'   => $model->getHitsLineChartData($params['amount'], $params['timeUnit'], $params['dateFrom'], $params['dateTo'])
+                ));
             }
 
             $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
