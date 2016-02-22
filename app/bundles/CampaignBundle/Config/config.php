@@ -87,7 +87,10 @@ return array(
             ),
             'mautic.campaign.search.subscriber'         => array(
                 'class' => 'Mautic\CampaignBundle\EventListener\SearchSubscriber'
-            )
+            ),
+            'mautic.campaign.dashboard.subscriber'           => array(
+                'class' => 'Mautic\CampaignBundle\EventListener\DashboardSubscriber'
+            ),
         ),
         'forms'  => array(
             'mautic.campaign.type.form'                 => array(

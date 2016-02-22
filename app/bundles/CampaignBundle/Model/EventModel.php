@@ -21,6 +21,9 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -1816,5 +1819,27 @@ class EventModel extends CommonFormModel
         } else {
             sleep($eventSleepTime);
         }
+    }
+
+    /**
+     * Get line chart data of campaign events
+     *
+     * @param integer $amount Number of units
+     * @param char    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filter
+     *
+     * @return array
+     */
+    public function getEventLineChartData($amount, $unit, $dateFrom, $dateTo, $filter = array())
+    {
+        $chart = new LineChart($unit, $amount, $dateTo);
+        $query = new ChartQuery($this->em->getConnection());
+        
+        $data  = $query->fetchTimeData('campaign_lead_event_log', 'date_triggered', $unit, $amount, $dateFrom, $dateTo, $filter);
+        $chart->setDataset('Events triggered', $data);
+
+        return $chart->render();
     }
 }

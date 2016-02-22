@@ -1446,7 +1446,7 @@ class EmailModel extends FormModel
     }
 
     /**
-     * Get bar chart data of hits
+     * Get line chart data of emails sent and read
      *
      * @param integer $amount Number of units
      * @param char    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
