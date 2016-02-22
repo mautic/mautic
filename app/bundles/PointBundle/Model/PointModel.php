@@ -17,6 +17,9 @@ use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\PointEvent;
 use Mautic\PointBundle\PointEvents;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -267,5 +270,25 @@ class PointModel extends CommonFormModel
             // Detach logs to reserve memory
             $this->em->clear('Mautic\PointBundle\Entity\LeadPointLog');
         }
+    }
+
+    /**
+     * Get line chart data of points
+     *
+     * @param integer $amount Number of units
+     * @param char    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filter
+     *
+     * @return array
+     */
+    public function getPointLineChartData($amount, $unit, $dateFrom, $dateTo, $filter = array())
+    {
+        $lineChart = new LineChart($unit, $amount, $dateTo);
+        $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
+        $chartData = $query->fetchTimeData('lead_points_change_log', 'date_added', $unit, $amount, $dateFrom, $dateTo, $filter);
+        $lineChart->setDataset('Point changes', $chartData);
+        return $lineChart->render();
     }
 }
