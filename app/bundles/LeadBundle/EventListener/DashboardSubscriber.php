@@ -38,7 +38,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
         ),
         'anonymous.vs.identified.leads' => array(),
         'map.of.leads' => array(),
-        'top.lists' => array()
+        'top.lists' => array(),
+        'top.owners' => array()
     );
 
     /**
@@ -131,6 +132,46 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData(array(
                     'headItems'   => array(
                         $event->getTranslator()->trans('mautic.dashboard.label.title'),
+                        $event->getTranslator()->trans('mautic.lead.leads')
+                    ),
+                    'bodyItems'   => $items
+                ));
+            }
+            
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->stopPropagation();
+        }
+
+        if ($event->getType() == 'top.owners') {
+            if (!$event->isCached()) {
+                $model  = $this->factory->getModel('lead');
+                $params = $event->getWidget()->getParams();
+
+                if (empty($params['limit'])) {
+                    // Count the list limit from the widget height
+                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
+                } else {
+                    $limit = $params['limit'];
+                }
+
+                $owners = $model->getTopOwners($limit, $params['dateFrom'], $params['dateTo']);
+                $items = array();
+
+                // Build table rows with links
+                if ($owners) {
+                    foreach ($owners as &$owner) {
+                        $ownerUrl = $this->factory->getRouter()->generate('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $owner['created_by']));
+                        $row = array(
+                            $ownerUrl => $owner['created_by_user'],
+                            $owner['leads']
+                        );
+                        $items[] = $row;
+                    }
+                }
+
+                $event->setTemplateData(array(
+                    'headItems'   => array(
+                        $event->getTranslator()->trans('mautic.user.account.permissions.editname'),
                         $event->getTranslator()->trans('mautic.lead.leads')
                     ),
                     'bodyItems'   => $items
