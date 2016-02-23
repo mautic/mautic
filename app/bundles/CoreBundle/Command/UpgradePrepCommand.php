@@ -85,8 +85,8 @@ EOT
         $mauticRoot = $this->getContainer()->get('mautic.factory')->getSystemPath('root');
 
         foreach ($files as $file) {
-            $zipPath = str_replace($mauticRoot, '', $file);
-            $localPath = $mauticRoot . '/' . $zipPath;
+            $localPath = $this->sanitizePath($file);
+            $zipPath = $this->sanitizePath($localPath, true);
 
             if (is_dir($localPath)) {
                 // Create the empty directory in the zip
@@ -114,5 +114,33 @@ EOT
                 }
             }
         }
+    }
+
+    /**
+     * @param string $path
+     * @param bool $forZip
+     *
+     * @return string
+     */
+    protected function sanitizePath($path, $forZip = false)
+    {
+        $mauticRoot = $this->getContainer()->get('mautic.factory')->getSystemPath('root');
+
+        // Ensure a normalized root string
+        $mauticRoot = rtrim($mauticRoot, '/');
+
+        // Some declared paths have the mautic root, others do not. Normalize it.
+        $path = str_replace($mauticRoot, '', $path);
+        // Remove any slashes from the beginning of the path string
+        $path = ltrim($path, '/');
+
+        if ($forZip) {
+            return $path;
+        }
+
+        // Rebuild the full path, including the mautic root
+        $path = $mauticRoot . '/' . $path;
+
+        return $path;
     }
 }
