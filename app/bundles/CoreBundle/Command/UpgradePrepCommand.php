@@ -67,11 +67,11 @@ EOT
         $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
 
         if ($zip->close()) {
-            $output->writeln('<info>Successfully created mautic.zip and placed it in your web root. Please make a backup of this file now.</info>');
+            $output->writeln('<info>' . $translator->trans('mautic.core.command.prepare_upgrade_success') . '</info>');
             return 0;
         }
 
-        $output->writeln('<error>There was an error writing your zip file.</error>');
+        $output->writeln('<error>' . $translator->trans('mautic.core.command.prepare_upgrade_fail') . '</error>');
 
         return 1;
     }
