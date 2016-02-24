@@ -1,5 +1,5 @@
 {
-    "name": "mautic/open-source-edition",
+    "name": "mautic/core",
     "license": "GPL-3.0",
     "type": "project",
     "description": "Mautic Open Source Distribution",
