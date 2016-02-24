@@ -31,6 +31,12 @@ class DashboardController extends FormController
         /** @var \Mautic\DashBundle\Model\DashboardModel $model */
         $model           = $this->factory->getModel('dashboard');
         $widgets         = $model->getWidgets();
+
+        // Apply the default dashboard if no widget exists
+        if (!count($widgets)) {
+            return $this->applyDashboardFileAction('default.json');
+        }
+
         $action          = $this->generateUrl('mautic_dashboard_index');
         $humanFormat     = 'M j, Y';
         $filterForm      = $this->get('form.factory')->create('dashboard_filter', null, array('action' => $action));
@@ -348,9 +354,12 @@ class DashboardController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function applyDashboardFileAction()
+    public function applyDashboardFileAction($file = null)
     {
-        $file = $this->request->get('file');
+        if (!$file) {
+            $file = $this->request->get('file');
+        }
+
         $dir = $this->factory->getParameter('dashboard_import_dir');
         $path = $dir . '/' . $file;
 
@@ -363,7 +372,7 @@ class DashboardController extends FormController
 
                 $currentWidgets = $model->getWidgets();
 
-                if ($currentWidgets) {
+                if (count($currentWidgets)) {
                     foreach ($currentWidgets as $widget) {
                         $model->deleteEntity($widget);
                     }

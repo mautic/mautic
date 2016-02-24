@@ -48,7 +48,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'customButtons' => $buttons
 )));
 ?>
-<div class="pt-md">
+<div class="row pt-md pl-md">
 <?php echo $view['form']->start($filterForm, array('attr' => array('class' => 'form-filter'))); ?>
     <div class="col-sm-6">
         <div class="input-group">
@@ -68,12 +68,27 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 <?php echo $view['form']->end($filterForm); ?>
 </div>
 
-<div id="dashboard-widgets" class="cards">
-    <?php if ($widgets): ?>
+<?php if (count($widgets)): ?>
+    <div id="dashboard-widgets" class="cards">
         <?php foreach ($widgets as $widget): ?>
             <div class="card-flex widget" data-widget-id="<?php echo $widget->getId(); ?>" style="width: <?php echo !empty($widget->getWidth()) ? $widget->getWidth() . '' : '100' ?>%; height: <?php echo !empty($widget->getHeight()) ? $widget->getHeight() . 'px' : '300px' ?>">
                 <?php echo $view->render('MauticDashboardBundle:Widget:detail.html.php', array('widget' => $widget)); ?>
             </div>
         <?php endforeach; ?>
-    <?php endif; ?>
-</div>
+    </div>
+<?php else: ?>
+    <div class="well well col-md-6 col-md-offset-3 mt-md">
+        <div class="row">
+            <div class="col-xs-3 text-center">
+                <img class="img-responsive" style="max-height: 125px; margin-left: auto; margin-right: auto;" src="<?php echo $view['mautibot']->getImage('wave'); ?>" />
+            </div>
+            <div class="col-xs-9">
+                <h4><i class="fa fa-quote-left"></i> <?php echo $view['translator']->trans('mautic.dashboard.nowidgets.tip.header'); ?> <i class="fa fa-quote-right"></i></h4>
+                <p class="mt-md"><?php echo $view['translator']->trans('mautic.dashboard.nowidgets.tip'); ?></p>
+                <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'applyDashboardFile', 'file' => 'default.json')); ?>" class="btn btn-success">
+                    Apply the default dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
