@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "833841c327f00f2bfd364ee14b2ffeff",
-    "content-hash": "c56b6285820fe36077cd32a901abeb3e",
+    "hash": "e70d325986682727d19b07da36191f48",
+    "content-hash": "deb8034c66fe008cbfdb0f30c69f3a57",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -1712,24 +1712,23 @@
         },
         {
             "name": "jms/serializer-bundle",
-            "version": "1.1.0",
+            "version": "1.0.0",
             "target-dir": "JMS/SerializerBundle",
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/JMSSerializerBundle.git",
-                "reference": "3e396c980545350c2efb65a50041d2a9f9d6562e"
+                "reference": "0be35615b5bae1ce42567244a321aa1be3ed0280"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/JMSSerializerBundle/zipball/3e396c980545350c2efb65a50041d2a9f9d6562e",
-                "reference": "3e396c980545350c2efb65a50041d2a9f9d6562e",
+                "url": "https://api.github.com/repos/schmittjoh/JMSSerializerBundle/zipball/0be35615b5bae1ce42567244a321aa1be3ed0280",
+                "reference": "0be35615b5bae1ce42567244a321aa1be3ed0280",
                 "shasum": ""
             },
             "require": {
                 "jms/serializer": "^1.0.0",
-                "php": ">=5.4.0",
-                "phpoption/phpoption": "^1.1.0",
-                "symfony/framework-bundle": "~2.3|~3.0"
+                "php": ">=5.3.2",
+                "symfony/framework-bundle": "~2.1"
             },
             "require-dev": {
                 "doctrine/doctrine-bundle": "*",
@@ -1751,7 +1750,7 @@
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.1-dev"
+                    "dev-master": "0.13-dev"
                 }
             },
             "autoload": {
@@ -1778,20 +1777,20 @@
                 "serialization",
                 "xml"
             ],
-            "time": "2015-11-10 12:26:42"
+            "time": "2015-06-23 19:27:08"
         },
         {
             "name": "joomla/filter",
-            "version": "1.2.0",
+            "version": "1.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/joomla-framework/filter.git",
-                "reference": "45a504f0cd6fa2312a0260955e957435ca2cedc9"
+                "reference": "b3114bb10b6f58019f4f038cdb7d6da8b94eb584"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joomla-framework/filter/zipball/45a504f0cd6fa2312a0260955e957435ca2cedc9",
-                "reference": "45a504f0cd6fa2312a0260955e957435ca2cedc9",
+                "url": "https://api.github.com/repos/joomla-framework/filter/zipball/b3114bb10b6f58019f4f038cdb7d6da8b94eb584",
+                "reference": "b3114bb10b6f58019f4f038cdb7d6da8b94eb584",
                 "shasum": ""
             },
             "require": {
@@ -1829,20 +1828,20 @@
                 "framework",
                 "joomla"
             ],
-            "time": "2016-01-08 17:27:47"
+            "time": "2015-07-23 13:26:12"
         },
         {
             "name": "joomla/http",
-            "version": "1.2.1",
+            "version": "1.1.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/joomla-framework/http.git",
-                "reference": "3b667b4dea6b022fedb296c4e88be3de38fd0327"
+                "reference": "4f28aa1351afd1f8dc9a65236690320cc5de8ab1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joomla-framework/http/zipball/3b667b4dea6b022fedb296c4e88be3de38fd0327",
-                "reference": "3b667b4dea6b022fedb296c4e88be3de38fd0327",
+                "url": "https://api.github.com/repos/joomla-framework/http/zipball/4f28aa1351afd1f8dc9a65236690320cc5de8ab1",
+                "reference": "4f28aa1351afd1f8dc9a65236690320cc5de8ab1",
                 "shasum": ""
             },
             "require": {
@@ -1880,7 +1879,7 @@
                 "http",
                 "joomla"
             ],
-            "time": "2015-12-17 22:53:23"
+            "time": "2015-05-03 16:09:17"
         },
         {
             "name": "joomla/string",
@@ -2281,33 +2280,6 @@
             "description": "Internal MaxMind Web Service API",
             "homepage": "https://github.com/maxmind/mm-web-service-api-php",
             "time": "2015-07-21 20:07:31"
-        },
-        {
-            "name": "mikemccabe/json-patch-php",
-            "version": "0.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mikemccabe/json-patch-php.git",
-                "reference": "b3af30a6aec7f6467c773cd49b2d974a70f7c0d4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mikemccabe/json-patch-php/zipball/b3af30a6aec7f6467c773cd49b2d974a70f7c0d4",
-                "reference": "b3af30a6aec7f6467c773cd49b2d974a70f7c0d4",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "mikemccabe\\JsonPatch\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL-3.0"
-            ],
-            "description": "Produce and apply json-patch objects",
-            "time": "2015-01-05 21:19:54"
         },
         {
             "name": "monolog/monolog",
@@ -2737,29 +2709,27 @@
         },
         {
             "name": "rackspace/php-opencloud",
-            "version": "v1.16.0",
+            "version": "v1.12.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rackspace/php-opencloud.git",
-                "reference": "d6b71feed7f9e7a4b52e0240a79f06473ba69c8c"
+                "reference": "9c0ade232ddd1ae23994349406171ffea1127b5d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rackspace/php-opencloud/zipball/d6b71feed7f9e7a4b52e0240a79f06473ba69c8c",
-                "reference": "d6b71feed7f9e7a4b52e0240a79f06473ba69c8c",
+                "url": "https://api.github.com/repos/rackspace/php-opencloud/zipball/9c0ade232ddd1ae23994349406171ffea1127b5d",
+                "reference": "9c0ade232ddd1ae23994349406171ffea1127b5d",
                 "shasum": ""
             },
             "require": {
                 "guzzle/guzzle": "~3.8",
-                "mikemccabe/json-patch-php": "~0.1",
-                "php": ">=5.4",
+                "php": ">=5.3.3",
                 "psr/log": "~1.0"
             },
             "require-dev": {
-                "apigen/apigen": "~4.0",
+                "apigen/apigen": "~2.8",
                 "fabpot/php-cs-fixer": "1.0.*@dev",
                 "jakub-onderka/php-parallel-lint": "0.*",
-                "phpspec/prophecy": "~1.4",
                 "phpunit/phpunit": "4.3.*",
                 "satooshi/php-coveralls": "0.6.*@dev"
             },
@@ -2767,7 +2737,8 @@
             "autoload": {
                 "psr-0": {
                     "OpenCloud": [
-                        "lib/"
+                        "lib/",
+                        "tests/"
                     ]
                 }
             },
@@ -2777,9 +2748,18 @@
             ],
             "authors": [
                 {
+                    "name": "Glen Campbell",
+                    "email": "glen.campbell@rackspace.com"
+                },
+                {
                     "name": "Jamie Hannaford",
                     "email": "jamie.hannaford@rackspace.com",
                     "homepage": "https://github.com/jamiehannaford"
+                },
+                {
+                    "name": "Shaunak Kashyap",
+                    "email": "shaunak.kashyap@rackspace.com",
+                    "homepage": "https://github.com/ycombinator"
                 }
             ],
             "description": "PHP SDK for Rackspace/OpenStack APIs",
@@ -2790,7 +2770,7 @@
                 "rackspace",
                 "swift"
             ],
-            "time": "2016-01-29 10:34:57"
+            "time": "2015-03-16 23:57:58"
         },
         {
             "name": "sensio/distribution-bundle",
@@ -3819,39 +3799,40 @@
         },
         {
             "name": "symfony/monolog-bundle",
-            "version": "v2.8.2",
+            "version": "v2.4.1",
+            "target-dir": "Symfony/Bundle/MonologBundle",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/monolog-bundle.git",
-                "reference": "84785c4d44801c4dd82829fa2e1820cacfe2c46f"
+                "reference": "e81c2e9c4dc0a9ff794674017069e036f575f278"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/monolog-bundle/zipball/84785c4d44801c4dd82829fa2e1820cacfe2c46f",
-                "reference": "84785c4d44801c4dd82829fa2e1820cacfe2c46f",
+                "url": "https://api.github.com/repos/symfony/monolog-bundle/zipball/e81c2e9c4dc0a9ff794674017069e036f575f278",
+                "reference": "e81c2e9c4dc0a9ff794674017069e036f575f278",
                 "shasum": ""
             },
             "require": {
-                "monolog/monolog": "~1.8",
+                "monolog/monolog": "~1.6",
                 "php": ">=5.3.2",
-                "symfony/config": "~2.3|~3.0",
-                "symfony/dependency-injection": "~2.3|~3.0",
-                "symfony/http-kernel": "~2.3|~3.0",
-                "symfony/monolog-bridge": "~2.3|~3.0"
+                "symfony/config": "~2.3",
+                "symfony/dependency-injection": "~2.3",
+                "symfony/http-kernel": "~2.3",
+                "symfony/monolog-bridge": "~2.3"
             },
             "require-dev": {
-                "symfony/console": "~2.3|~3.0",
-                "symfony/yaml": "~2.3|~3.0"
+                "symfony/console": "~2.3",
+                "symfony/yaml": "~2.3"
             },
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.8.x-dev"
+                    "dev-master": "2.4.x-dev"
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Symfony\\Bundle\\MonologBundle\\": ""
+                "psr-0": {
+                    "Symfony\\Bundle\\MonologBundle": ""
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3874,7 +3855,7 @@
                 "log",
                 "logging"
             ],
-            "time": "2015-11-17 10:02:29"
+            "time": "2013-08-26 10:15:04"
         },
         {
             "name": "symfony/options-resolver",
