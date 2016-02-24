@@ -819,6 +819,29 @@ class FormController extends CommonFormController
 
         $viewParams['template'] = $template;
 
+        if (! empty($template)) {
+            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':form.html.php');
+            $assetsHelper = $this->factory->getHelper('template.assets');
+            $slotsHelper = $this->factory->getHelper('template.slots');
+            $analyticsHelper = $this->factory->getHelper('template.analytics');
+
+            if (! empty($customStylesheets)) {
+                foreach ($customStylesheets as $css) {
+                    $assetsHelper->addStylesheet($css);
+                }
+            }
+
+            $slotsHelper->set('pageTitle', $form->getName());
+
+            $analytics = $analyticsHelper->getCode();
+
+            if (! empty($analytics)) {
+                $assetsHelper->addCustomDeclaration($analytics);
+            }
+
+            return $this->render($logicalName, $viewParams);
+        }
+
         return $this->render('MauticFormBundle::form.html.php', $viewParams);
     }
 

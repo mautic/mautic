@@ -132,6 +132,7 @@ class AppKernel extends Kernel
             new FOS\RestBundle\FOSRestBundle(),
             new JMS\SerializerBundle\JMSSerializerBundle(),
             new Oneup\UploaderBundle\OneupUploaderBundle(),
+            new Symfony\Bundle\TwigBundle\TwigBundle(),
         );
 
         //dynamically register Mautic Bundles
@@ -206,7 +207,6 @@ class AppKernel extends Kernel
         }
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
-            $bundles[] = new Symfony\Bundle\TwigBundle\TwigBundle();
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
             $bundles[] = new Sensio\Bundle\DistributionBundle\SensioDistributionBundle();
             $bundles[] = new Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle();

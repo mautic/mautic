@@ -382,6 +382,23 @@ return array(
 
             'twig.controller.exception.class'    => 'Mautic\CoreBundle\Controller\ExceptionController',
             'monolog.handler.stream.class'       => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler',
+
+            // Twig
+            'templating.twig.extension.slot'    => [
+                'class' => 'Mautic\CoreBundle\Templating\Twig\Extension\SlotExtension',
+                'arguments' => [
+                    'mautic.factory'
+                ],
+                'tag' => 'twig.extension'
+            ],
+            'templating.twig.extension.asset'    => [
+                'class' => 'Mautic\CoreBundle\Templating\Twig\Extension\AssetExtension',
+                'arguments' => [
+                    'mautic.factory'
+                ],
+                'tag' => 'twig.extension'
+            ],
+
         )
     ),
 

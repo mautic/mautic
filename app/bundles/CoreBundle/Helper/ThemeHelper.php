@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Helper;
 use Mautic\CoreBundle\Exception as MauticException;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Filesystem\Filesystem;
+use Mautic\CoreBundle\Templating\TemplateNameParser;
 
 class ThemeHelper
 {
@@ -67,17 +68,17 @@ class ThemeHelper
      * @param $theme
      * @param $newName
      *
-     * @throws FileN
+     * @throws MauticException\FileNotFoundException
      * @throws MauticException\FileExistsException
      */
-    public function rename ($theme, $newName)
+    public function rename($theme, $newName)
     {
         $root      = $this->factory->getSystemPath('themes_root') . '/';
         $themes    = $this->factory->getInstalledThemes();
 
         //check to make sure the theme exists
         if (!isset($themes[$theme])) {
-            throw new FileN($theme . ' not found!');
+            throw new MauticException\FileNotFoundException($theme . ' not found!');
         }
 
         $dirName = $this->getDirectoryName($newName);
@@ -113,22 +114,25 @@ class ThemeHelper
     }
 
     /**
+     * Updates the theme configuration and converts
+     * it to json if still using php array
+     *
      * @param $themePath
      * @param $newName
      */
     private function updateConfig($themePath, $newName)
     {
-        $config = include $themePath . '/config.php';
-
-        $docblock = '';
-        $configRaw = file_get_contents($themePath . '/config.php');
-        if (preg_match_all('/@(\w+)\s+(.*)\r?\n/m', $configRaw, $matches)){
-            $docblock = array_combine($matches[1], $matches[2]);
+        if (file_exists($themePath . '/config.json')) {
+            $config = json_decode(file_get_contents($themePath . '/config.json'), true);
+        }
+        // @deprecated Remove support for theme config.php in 2.0
+        elseif (file_exists($themePath . '/config.php')) {
+            $config = include $themePath . '/config.php';
         }
 
         $config['name'] = $newName;
-        $updatedConfig = $this->renderConfig($config, $docblock);
-        file_put_contents($themePath . '/config.php', $updatedConfig);
+
+        file_put_contents($themePath . '/config.json', json_encode($config));
     }
 
     /**
@@ -149,77 +153,24 @@ class ThemeHelper
     }
 
     /**
-     * @param $config
+     * @param string $template
      *
-     * @param $config
-     *
-     * @return string
+     * @return string The logical name for the template
      */
-    public function renderConfig($config)
+    public function checkForTwigTemplate($template)
     {
-        $string = "<?php\n";
+        $kernel = $this->factory->getKernel();
+        $parser = new TemplateNameParser($kernel);
 
-        if (!empty($docblock)) {
-            $string .= "$docblock\n\n";
+        $template = $parser->parse($template);
+
+        $twigTemplate = clone $template;
+        $twigTemplate->set('engine', 'twig');
+
+        if ($this->factory->getTemplating()->exists($twigTemplate)) {
+            return $twigTemplate->getLogicalName();
         }
 
-        $string .= "\$config = array(\n";
-
-        foreach ($config as $key => $value) {
-            if ($value !== '') {
-                if (is_string($value)) {
-                    $value = "'$value'";
-                } elseif (is_bool($value)) {
-                    $value = ($value) ? 'true' : 'false';
-                } elseif (is_null($value)) {
-                    $value = 'null';
-                } elseif (is_array($value)) {
-                    $value = $this->renderArray($value);
-                }
-
-                $string .= "\t'$key' => $value,\n";
-            }
-        }
-
-        $string .= ");\n";
-
-        $string .= 'return $config;\n';
-
-        return $string;
-    }
-
-    /**
-     * @param     $array
-     * @param int $level
-     *
-     * @return string
-     */
-    protected function renderArray($array, $level = 1)
-    {
-        $string = "array(\n";
-
-        $count = $counter = count($array);
-        foreach ($array as $key => $value) {
-            if (is_string($key)) {
-                if ($counter === $count) {
-                    $string .= str_repeat("\t", $level + 1);
-                }
-                $string .= '"'.$key.'" => ';
-            }
-
-            if (is_array($value)) {
-                $string .= $this->renderArray($value, $level + 1);
-            } else {
-                $string .= '"'.addslashes($value).'"';
-            }
-
-            $counter--;
-            if ($counter > 0) {
-                $string .= ", \n" . str_repeat("\t", $level + 1);
-            }
-        }
-        $string .= "\n" . str_repeat("\t", $level) . ")";
-
-        return $string;
+        return $template->getLogicalName();
     }
 }

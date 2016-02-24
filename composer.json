@@ -1,5 +1,5 @@
 {
-    "name": "mautic/open-source-edition",
+    "name": "mautic/core",
     "license": "GPL-3.0",
     "type": "project",
     "description": "Mautic Open Source Distribution",
@@ -45,6 +45,9 @@
 
         "sensio/distribution-bundle": "2.3.*",
 
+        "twig/twig": "1.*",
+        "symfony/twig-bundle": "2.5.*",
+
         "doctrine/annotations": "1.2.*,>=1.2.7",
         "doctrine/cache": "1.4.*,>=1.4.2",
         "doctrine/common": "2.4.*,>=2.4.3",
@@ -75,10 +78,10 @@
         "joomla/filter": "1.2.*",
         "mrclay/minify": "2.2.0",
         "jbroadway/urlify": "^1.0",
-        "geoip2/geoip2": "~2.0"
+        "geoip2/geoip2": "~2.0",
+        "camspiers/json-pretty": "1.0.*"
     },
     "require-dev": {
-        "symfony/twig-bundle": "2.5.*",
         "symfony/web-profiler-bundle": "2.5.*",
         "liip/functional-test-bundle": "^1.3.4",
         "sensio/generator-bundle": "~2.3",

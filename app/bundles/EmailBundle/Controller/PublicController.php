@@ -12,6 +12,7 @@ namespace Mautic\EmailBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceCallbackTransport;
 use Mautic\EmailBundle\EmailEvents;
@@ -28,7 +29,10 @@ class PublicController extends CommonFormController
 
         if (!empty($stat)) {
             $emailEntity = $stat->getEmail();
-            $model->hitEmail($stat, $this->request, true);
+
+            if ($this->factory->getSecurity()->isAnonymous()) {
+                $model->hitEmail($stat, $this->request, true);
+            }
 
             $tokens = $stat->getTokens();
             if (is_array($tokens)) {
@@ -55,8 +59,16 @@ class PublicController extends CommonFormController
                     if (!empty($template)) {
                         $slots = $this->factory->getTheme($template)->getSlots('email');
 
+                        $assetsHelper = $this->factory->getHelper('template.assets');
+
+                        $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
+
+                        $this->processSlots($slots, $emailEntity);
+
+                        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':email.html.php');
+
                         $response = $this->render(
-                            'MauticEmailBundle::public.html.php',
+                            $logicalName,
                             array(
                                 'inBrowser' => true,
                                 'slots'     => $slots,
@@ -102,7 +114,7 @@ class PublicController extends CommonFormController
             }
 
             // Add analytics
-            $analytics = htmlspecialchars_decode($this->factory->getParameter('google_analytics', ''));
+            $analytics = $this->factory->getHelper('template.analytics')->getCode();
 
             // Check for html doc
             if (strpos($content, '<html>') === false) {
@@ -228,11 +240,14 @@ class PublicController extends CommonFormController
             'type'     => 'notice',
             'name'     => $translator->trans('mautic.email.unsubscribe')
         );
-        $contentTemplate = 'MauticCoreBundle::message.html.php';
+
+        $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':message.html.php');
 
         if (!empty($formContent)) {
             $viewParams['content'] = $formContent;
             if (in_array('form', $config['features'])) {
+                $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':form.html.php');
+            } else {
                 $contentTemplate = 'MauticFormBundle::form.html.php';
             }
         }
@@ -306,8 +321,16 @@ class PublicController extends CommonFormController
             $template = $this->factory->getParameter('theme');
         }
 
+        $analytics = $this->factory->getHelper('template.analytics')->getCode();
+
+        if (! empty($analytics)) {
+            $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
+        }
+
+        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':message.html.php');
+
         return $this->render(
-            'MauticCoreBundle::message.html.php',
+            $logicalName,
             array(
                 'message'  => $message,
                 'type'     => 'notice',
@@ -380,8 +403,16 @@ class PublicController extends CommonFormController
         if (!empty($template)) {
             $slots = $this->factory->getTheme($template)->getSlots('email');
 
+            $assetsHelper = $this->factory->getHelper('template.assets');
+
+            $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
+
+            $this->processSlots($slots, $emailEntity);
+
+            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':email.html.php');
+
             $response = $this->render(
-                'MauticEmailBundle::public.html.php',
+                $logicalName,
                 array(
                     'inBrowser' => true,
                     'slots'     => $slots,
@@ -434,5 +465,27 @@ class PublicController extends CommonFormController
 
         return new Response($content);
 
+    }
+
+    /**
+     * @param $slots
+     * @param Email $entity
+     */
+    public function processSlots($slots, $entity)
+    {
+        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
+        $slotsHelper = $this->factory->getHelper('template.slots');
+
+        $content = $entity->getContent();
+
+        foreach ($slots as $slot => $slotConfig) {
+            if (is_numeric($slot)) {
+                $slot = $slotConfig;
+                $slotConfig = array();
+            }
+
+            $value = isset($content[$slot]) ? $content[$slot] : "";
+            $slotsHelper->set($slot, $value);
+        }
     }
 }
