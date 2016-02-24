@@ -48,22 +48,21 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'customButtons' => $buttons
 )));
 ?>
-<div class="pa-md">
-<?php echo $view['form']->start($filterForm); ?>
-
-    <div class="row">
-        <div class="col-xs-3">
-            <?php //echo $view['form']->label($filterForm['date_from']); ?>
+<div class="pt-md">
+<?php echo $view['form']->start($filterForm, array('attr' => array('class' => 'form-filter'))); ?>
+    <div class="col-sm-6">
+        <div class="input-group">
+            <span class="input-group-addon">
+                <?php echo $view['form']->label($filterForm['date_from']); ?>
+            </span>
             <?php echo $view['form']->widget($filterForm['date_from']); ?>
-            <div class="has-error"><?php echo $view['form']->errors($filterForm['date_from']); ?></div>
-        </div>
-        <div class="col-xs-3">
-            <?php //echo $view['form']->label($filterForm['date_to']); ?>
+            <span class="input-group-addon" style="border-left: 0;border-right: 0;">
+                <?php echo $view['form']->label($filterForm['date_to']); ?>
+            </span>
             <?php echo $view['form']->widget($filterForm['date_to']); ?>
-            <div class="has-error"><?php echo $view['form']->errors($filterForm['date_to']); ?></div>
-        </div>
-        <div class="col-xs-6">
-            <?php echo $view['form']->row($filterForm['apply']); ?>
+            <span class="input-group-btn">
+                <?php echo $view['form']->row($filterForm['apply']); ?>
+            </span>
         </div>
     </div>
 <?php echo $view['form']->end($filterForm); ?>
