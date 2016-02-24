@@ -87,7 +87,6 @@ class WidgetType extends AbstractType
         $builder->add('height', 'choice', array(
             'label'       => 'mautic.dashboard.widget.form.height',
             'choices'     => array(
-                '100' => '100px',
                 '215' => '215px',
                 '330' => '330px',
                 '445' => '445px',
