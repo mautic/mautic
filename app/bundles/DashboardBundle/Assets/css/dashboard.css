@@ -53,7 +53,7 @@
     transition-timing-function: linear;
     position: relative;
 }
-.card-header {
+.card-header h4 {
     padding: 10px 15px;
     cursor: -moz-grab;
     cursor: -webkit-grab;

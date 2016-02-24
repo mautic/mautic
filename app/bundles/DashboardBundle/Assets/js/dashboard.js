@@ -39,7 +39,7 @@ Mautic.widgetOnLoad = function(container, response) {
 Mautic.initWidgetSorting = function () {
     var widgetsWrapper = mQuery('#dashboard-widgets');
     widgetsWrapper.sortable({
-        handle: '.card-header',
+        handle: '.card-header h4',
         placeholder: 'sortable-placeholder',
         items: '.widget',
         opacity: 0.9,
