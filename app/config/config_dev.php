@@ -9,6 +9,7 @@ if (file_exists(__DIR__ . '/security_local.php')) {
 
 //Twig Configuration
 $container->loadFromExtension('twig', array(
+    'cache'                => false,
     'debug'                => '%kernel.debug%',
     'strict_variables'     => '%kernel.debug%'
 ));
