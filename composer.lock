@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0f4c68a00a1479889208a32e1db92a11",
-    "content-hash": "b206090078e262ecda5806bfe2237570",
+    "hash": "82aafd8b41d80b5227185cb9e02e23dc",
+    "content-hash": "6303410bc21415f014d9ca49bfc0c8d4",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -1778,16 +1778,16 @@
         },
         {
             "name": "joomla/filter",
-            "version": "1.1.6",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/joomla-framework/filter.git",
-                "reference": "b3114bb10b6f58019f4f038cdb7d6da8b94eb584"
+                "reference": "45a504f0cd6fa2312a0260955e957435ca2cedc9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joomla-framework/filter/zipball/b3114bb10b6f58019f4f038cdb7d6da8b94eb584",
-                "reference": "b3114bb10b6f58019f4f038cdb7d6da8b94eb584",
+                "url": "https://api.github.com/repos/joomla-framework/filter/zipball/45a504f0cd6fa2312a0260955e957435ca2cedc9",
+                "reference": "45a504f0cd6fa2312a0260955e957435ca2cedc9",
                 "shasum": ""
             },
             "require": {
@@ -1825,20 +1825,20 @@
                 "framework",
                 "joomla"
             ],
-            "time": "2015-07-23 13:26:12"
+            "time": "2016-01-08 17:27:47"
         },
         {
             "name": "joomla/http",
-            "version": "1.1.7",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/joomla-framework/http.git",
-                "reference": "4f28aa1351afd1f8dc9a65236690320cc5de8ab1"
+                "reference": "3b667b4dea6b022fedb296c4e88be3de38fd0327"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joomla-framework/http/zipball/4f28aa1351afd1f8dc9a65236690320cc5de8ab1",
-                "reference": "4f28aa1351afd1f8dc9a65236690320cc5de8ab1",
+                "url": "https://api.github.com/repos/joomla-framework/http/zipball/3b667b4dea6b022fedb296c4e88be3de38fd0327",
+                "reference": "3b667b4dea6b022fedb296c4e88be3de38fd0327",
                 "shasum": ""
             },
             "require": {
@@ -1876,7 +1876,7 @@
                 "http",
                 "joomla"
             ],
-            "time": "2015-05-03 16:09:17"
+            "time": "2015-12-17 22:53:23"
         },
         {
             "name": "joomla/string",
@@ -6209,7 +6209,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.3.7"
+        "php": ">=5.3.10"
     },
     "platform-dev": []
 }
