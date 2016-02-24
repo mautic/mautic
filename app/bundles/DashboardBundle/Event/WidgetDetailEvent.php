@@ -172,7 +172,7 @@ class WidgetDetailEvent extends CommonEvent
     {
         $this->templateData = $templateData;
         $this->widget->setTemplateData($templateData);
-        $this->widget->setLoadTime(microtime() - $this->startTime);
+        $this->widget->setLoadTime(abs(microtime() - $this->startTime));
 
         // Store the template data to the cache
         if (!$skipCache && $this->cacheDir && $this->widget->getCacheTimeout() > 0) {
