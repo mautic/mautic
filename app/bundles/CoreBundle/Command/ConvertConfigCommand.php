@@ -39,7 +39,7 @@ class ConvertConfigCommand extends ContainerAwareCommand
                 ),
                 new InputOption(
                     'save-php-config', null, InputOption::VALUE_NONE,
-                    'If false, will delete the PHP config file after confirming a successful conversion to JSON.'
+                    'When used, the theme\'s PHP config file will be saved.'
                 )
             ))
             ->setHelp(<<<EOT
