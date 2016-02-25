@@ -204,7 +204,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
             ->nullable()
             ->build();
 
-        $builder->createField('signature', 'string')
+        $builder->createField('signature', 'text')
             ->nullable()
             ->build();
 
@@ -319,7 +319,8 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
                     'locale',
                     'lastLogin',
                     'lastActive',
-                    'onlineStatus'
+                    'onlineStatus',
+                    'signature'
                 )
             )
             ->build();
