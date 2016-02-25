@@ -250,6 +250,7 @@ return array(
         'unsubscribe_message'          => null,
         'resubscribe_message'          => null,
         'monitored_email'              => array(),
-        'mailer_is_owner'              => false
+        'mailer_is_owner'              => false,
+        'default_signature_text'       => null
     )
 );
