@@ -129,7 +129,7 @@ class BuilderSubscriber extends CommonSubscriber
             }
         }
         
-        $signatureText = str_replace('|FROM_NAME|', $fromName, $signatureText);
+        $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
         $event->addToken('{signature}', $signatureText);
     }
 }
