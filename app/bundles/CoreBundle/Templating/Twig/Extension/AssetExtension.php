@@ -48,20 +48,24 @@ class AssetExtension extends Twig_Extension
         return 'asset';
     }
 
-    public function outputSystemStylesheets($name)
+    public function outputSystemStylesheets()
     {
         ob_start();
 
-        $this->helper->outputSystemStylesheets($name);
+        $this->helper->outputSystemStylesheets();
 
         return ob_get_clean();
     }
 
-    public function outputSystemScripts($name)
+    /**
+     * @param bool $includeEditor
+     * @return string
+     */
+    public function outputSystemScripts($includeEditor = false)
     {
         ob_start();
 
-        $this->helper->outputSystemScripts($name);
+        $this->helper->outputSystemScripts($includeEditor);
 
         return ob_get_clean();
     }
@@ -75,11 +79,11 @@ class AssetExtension extends Twig_Extension
         return ob_get_clean();
     }
 
-    public function outputStyles($name)
+    public function outputStyles()
     {
         ob_start();
 
-        $this->helper->outputStyles($name);
+        $this->helper->outputStyles();
 
         return ob_get_clean();
     }
