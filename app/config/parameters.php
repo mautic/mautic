@@ -114,7 +114,10 @@ if (isset($mauticParams['site_url'])) {
         $container->setParameter('router.request_context.host', $parts['host']);
         $container->setParameter('router.request_context.scheme', $scheme);
         $container->setParameter('router.request_context.base_url', $path);
-        $container->setParameter($portContainerKey, (! empty($parts['port']) ? $parts['port'] : null));
+
+        if (! empty($parts['port'])) {
+            $container->setParameter($portContainerKey, (!empty($parts['port']) ? $parts['port'] : null));
+        }
     }
 }
 
