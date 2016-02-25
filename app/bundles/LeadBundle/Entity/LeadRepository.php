@@ -911,4 +911,33 @@ class LeadRepository extends CommonRepository
 
         return $result[0]['max_lead_id'];
     }
+
+    /**
+     * Gets names, signature and email of the user(lead owner)
+     *
+     * @param  integer $ownerId
+     *
+     * @return array|false
+     */
+    public function getLeadOwner($ownerId)
+    {
+        if (!$ownerId) return false;
+
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->select('u.id, u.first_name, u.last_name, u.email, u.signature')
+            ->from(MAUTIC_TABLE_PREFIX . 'users', 'u')
+            ->where('u.id = :ownerId')
+            ->setParameter('ownerId', (int) $ownerId);
+
+        $result = $q->execute()->fetch();
+
+        // Fix the HTML markup
+        if (is_array($result)) {
+            foreach ($result as &$field) {
+                $field = html_entity_decode($field);
+            }
+        }
+
+        return $result;
+    }
 }

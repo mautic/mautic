@@ -127,6 +127,11 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
     private $preferences = array();
 
     /**
+     * @var string
+     */
+    private $signature;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -198,6 +203,11 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
         $builder->createField('preferences', 'array')
             ->nullable()
             ->build();
+
+        $builder->createField('signature', 'string')
+            ->nullable()
+            ->build();
+
     }
 
     /**
@@ -824,5 +834,30 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
     public function setPreferences (array $preferences)
     {
         $this->preferences = $preferences;
+    }
+
+    /**
+     * Set signature
+     *
+     * @param string $signature
+     *
+     * @return User
+     */
+    public function setSignature($signature)
+    {
+        $this->isChanged('signature', $signature);
+        $this->signature = $signature;
+
+        return $this;
+    }
+
+    /**
+     * Get signature
+     *
+     * @return string
+     */
+    public function getSignature()
+    {
+        return $this->signature;
     }
 }
