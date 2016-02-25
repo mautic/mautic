@@ -97,8 +97,8 @@ class AssetExtension extends Twig_Extension
         return ob_get_clean();
     }
 
-    public function getAssetUrl($path, $packageName = null, $version = null)
+    public function getAssetUrl($path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false)
     {
-        return $this->helper->getUrl($path, $packageName, $version);
+        return $this->helper->getUrl($path, $packageName, $version, $absolute, $ignorePrefix);
     }
 }
