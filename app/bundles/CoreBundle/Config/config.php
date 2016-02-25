@@ -384,20 +384,20 @@ return array(
             'monolog.handler.stream.class'       => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler',
 
             // Twig
-            'templating.twig.extension.slot'    => [
+            'templating.twig.extension.slot'    => array(
                 'class' => 'Mautic\CoreBundle\Templating\Twig\Extension\SlotExtension',
-                'arguments' => [
+                'arguments' => array(
                     'mautic.factory'
-                ],
+                ),
                 'tag' => 'twig.extension'
-            ],
-            'templating.twig.extension.asset'    => [
+            ),
+            'templating.twig.extension.asset'    => array(
                 'class' => 'Mautic\CoreBundle\Templating\Twig\Extension\AssetExtension',
-                'arguments' => [
+                'arguments' => array(
                     'mautic.factory'
-                ],
+                ),
                 'tag' => 'twig.extension'
-            ],
+            ),
 
         )
     ),

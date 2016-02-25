@@ -34,8 +34,8 @@ class SlotExtension extends Twig_Extension
     public function getFunctions()
     {
         return [
-            'slot' => new Twig_SimpleFunction('slot', [$this, 'getSlot'], ['is_safe' => ['html']]),
-            'slotHasContent' => new Twig_SimpleFunction('slotHasContent', [$this, 'slotHasContent'], ['is_safe' => ['html']])
+            'slot' => new Twig_SimpleFunction('slot', array($this, 'getSlot'), array('is_safe' => array('html'))),
+            'slotHasContent' => new Twig_SimpleFunction('slotHasContent', array($this, 'slotHasContent'), array('is_safe' => array('html')))
         ];
     }
 

@@ -34,12 +34,12 @@ class AssetExtension extends Twig_Extension
     public function getFunctions()
     {
         return [
-            'outputScripts' => new Twig_SimpleFunction('outputScripts', [$this, 'outputScripts'], ['is_safe' => ['all']]),
-            'outputHeadDeclarations' => new Twig_SimpleFunction('outputHeadDeclarations', [$this, 'outputHeadDeclarations'], ['is_safe' => ['all']]),
-            'getAssetUrl' => new Twig_SimpleFunction('getAssetUrl', [$this, 'getAssetUrl'], ['is_safe' => ['html']]),
-            'outputStyles' => new Twig_SimpleFunction('outputStyles', [$this, 'outputStyles'], ['is_safe' => ['html']]),
-            'outputSystemScripts' => new Twig_SimpleFunction('outputSystemScripts', [$this, 'outputSystemScripts'], ['is_safe' => ['html']]),
-            'outputSystemStylesheets' => new Twig_SimpleFunction('outputSystemStylesheets', [$this, 'outputSystemStylesheets'], ['is_safe' => ['html']]),
+            'outputScripts' => new Twig_SimpleFunction('outputScripts', array($this, 'outputScripts'), array('is_safe' => array('all'))),
+            'outputHeadDeclarations' => new Twig_SimpleFunction('outputHeadDeclarations', array($this, 'outputHeadDeclarations'), array('is_safe' => array('all'))),
+            'getAssetUrl' => new Twig_SimpleFunction('getAssetUrl', array($this, 'getAssetUrl'), array('is_safe' => array('html'))),
+            'outputStyles' => new Twig_SimpleFunction('outputStyles', array($this, 'outputStyles'), array('is_safe' => array('html'))),
+            'outputSystemScripts' => new Twig_SimpleFunction('outputSystemScripts', array($this, 'outputSystemScripts'), array('is_safe' => array('html'))),
+            'outputSystemStylesheets' => new Twig_SimpleFunction('outputSystemStylesheets', array($this, 'outputSystemStylesheets'), array('is_safe' => array('html'))),
         ];
     }
 
