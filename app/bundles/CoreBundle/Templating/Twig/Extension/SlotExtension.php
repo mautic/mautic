@@ -33,10 +33,10 @@ class SlotExtension extends Twig_Extension
      */
     public function getFunctions()
     {
-        return [
+        return array(
             'slot' => new Twig_SimpleFunction('slot', array($this, 'getSlot'), array('is_safe' => array('html'))),
             'slotHasContent' => new Twig_SimpleFunction('slotHasContent', array($this, 'slotHasContent'), array('is_safe' => array('html')))
-        ];
+        );
     }
 
     public function getName()
