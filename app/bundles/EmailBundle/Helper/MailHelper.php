@@ -237,15 +237,15 @@ class MailHelper
         // Set from email
         if (!$isQueueFlush && $useOwnerAsMailer && $this->factory->getParameter('mailer_is_owner') && isset($this->lead['id'])) {
             if (!isset($this->lead['owner_id']) ||
-                (isset($this->lead['owner_id']) && !isset($this->leadOwners[$this->lead['owner_id']]))) {
+                (isset($this->lead['owner_id']) && !isset(self::$leadOwners[$this->lead['owner_id']]))) {
                 if ($owner = $this->factory->getModel('lead')->getRepository()->getLeadOwner($this->lead['owner_id'])) {
-                    $this->leadOwners[$owner['id']] = $owner;
+                    self::$leadOwners[$owner['id']] = $owner;
                     $this->lead['owner_id']         = $owner['id'];
                 } else {
                     $this->lead['owner_id'] = 0;
                 }
-            } elseif (isset($this->leadOwners[$this->lead['owner_id']])) {
-                $owner = $this->leadOwners[$this->lead['owner_id']];
+            } elseif (isset(self::$leadOwners[$this->lead['owner_id']])) {
+                $owner = self::$leadOwners[$this->lead['owner_id']];
             }
 
             if ($owner) {
