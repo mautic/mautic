@@ -807,24 +807,27 @@ class EmailController extends FormController
     public function cloneAction($objectId)
     {
         $model  = $this->factory->getModel('email');
-        $clone = $model->getEntity($objectId);
+        $entity = $model->getEntity($objectId);
 
-        if ($clone != null) {
+        if ($entity != null) {
             if (!$this->factory->getSecurity()->isGranted('email:emails:create')
                 || !$this->factory->getSecurity()->hasEntityAccess(
                     'email:emails:viewown',
                     'email:emails:viewother',
-                    $clone->getCreatedBy()
+                    $entity->getCreatedBy()
                 )
             ) {
                 return $this->accessDenied();
             }
 
-            /** @var \Mautic\EmailBundle\Entity\Email $clone */
-            $clone = clone $clone;
+            $entity      = clone $entity;
+            $session     = $this->factory->getSession();
+            $contentName = 'mautic.emailbuilder.'.$entity->getSessionId().'.content';
+            
+            $session->set($contentName, $entity->getContent());
         }
 
-        return $this->newAction($clone);
+        return $this->newAction($entity);
     }
 
     /**

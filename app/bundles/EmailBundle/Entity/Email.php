@@ -199,6 +199,7 @@ class Email extends FormEntity
         $this->variantSentCount = 0;
         $this->variantStartDate = null;
         $this->emailType        = null;
+        $this->sessionId        = 'new_' . hash('sha1', uniqid(mt_rand()));
 
         parent::__clone();
     }
