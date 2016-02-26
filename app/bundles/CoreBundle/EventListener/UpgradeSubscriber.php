@@ -1,7 +1,7 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -12,12 +12,18 @@ namespace Mautic\CoreBundle\EventListener;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\UpgradeEvent;
 use Mautic\CoreBundle\Helper\UTF8Helper;
+use Mautic\CoreBundle\IpLookup\AbstractLookup;
 
 /**
  * Class UpgradeSubscriber
  */
 class UpgradeSubscriber extends CommonSubscriber
 {
+    /**
+     * @var AbstractLookup
+     */
+    private $ipLookupService;
+
     /**
      * {@inheritdoc}
      */
@@ -76,14 +82,26 @@ class UpgradeSubscriber extends CommonSubscriber
      */
     private function getIpDetails($ip)
     {
+        $ipDetails = $this->getIpLookupService()->setIpAddress($ip)->getDetails();
+
+        return $this->convertToArrayType($ipDetails);
+    }
+
+    /**
+     * @return AbstractLookup
+     */
+    private function getIpLookupService()
+    {
+        if ($this->ipLookupService instanceof AbstractLookup) {
+            return $this->ipLookupService;
+        }
+
         $serviceName = $this->factory->getParameter('ip_lookup_service');
 
         /** @var \Mautic\CoreBundle\Factory\IpLookupFactory $ipServiceFactory */
         $ipServiceFactory = $this->factory->getKernel()->getContainer()->get('mautic.ip_lookup.factory');
-        $ipService = $ipServiceFactory->getService($serviceName);
-        $ipDetails = $ipService->setIpAddress($ip)->getDetails();
 
-        return $this->convertToArrayType($ipDetails);
+        return $ipServiceFactory->getService($serviceName);
     }
 
     /**
