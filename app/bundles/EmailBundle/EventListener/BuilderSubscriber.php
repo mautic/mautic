@@ -92,6 +92,8 @@ class BuilderSubscriber extends CommonSubscriber
     public function onEmailGenerate(EmailSendEvent $event)
     {
         $idHash  = $event->getIdHash();
+        $lead = $event->getLead();
+
         if ($idHash == null) {
             // Generate a bogus idHash to prevent errors for routes that may include it
             $idHash = uniqid();
@@ -114,10 +116,13 @@ class BuilderSubscriber extends CommonSubscriber
         $webviewText = str_replace('|URL|', $model->buildUrl('mautic_email_webview', array('idHash' => $idHash)), $webviewText);
         $event->addToken('{webview_text}', $webviewText);
 
-        $event->addToken('{webview_url}', $model->buildUrl('mautic_email_webview', array('idHash' => $idHash)));
+        // Show public email preview if the lead is not known to prevent 404
+        if (empty($lead['id']) && $event->getEmail()) {
+            $event->addToken('{webview_url}', $model->buildUrl('mautic_email_preview', array('objectId' => $event->getEmail()->getId())));
+        } else {
+            $event->addToken('{webview_url}', $model->buildUrl('mautic_email_webview', array('idHash' => $idHash)));
+        }
 
-
-        $lead = $event->getLead();
         $signatureText = $this->factory->getParameter('default_signature_text');
         $fromName = $this->factory->getParameter('mailer_from_name');
 
