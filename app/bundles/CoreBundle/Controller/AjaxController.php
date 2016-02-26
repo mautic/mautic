@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\UpgradeEvent;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -627,6 +628,9 @@ class AjaxController extends CommonController
                 $dataArray['postmessage'] = $postMessage;
             }
         }
+
+        // Execute the mautic.post_upgrade event
+        $this->factory->getDispatcher()->dispatch(CoreEvents::POST_UPGRADE, new UpgradeEvent($dataArray));
 
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php

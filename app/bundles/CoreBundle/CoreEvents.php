@@ -67,4 +67,22 @@ final class CoreEvents
      * @var string
      */
     const BUILD_CANVAS_CONTENT = 'mautic.build_canvas_content';
+
+    /**
+     * The mautic.pre_upgrade is dispatched before an upgrade.
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\UpgradeEvent instance.
+     *
+     * @var string
+     */
+    const PRE_UPGRADE = 'mautic.pre_upgrade';
+
+    /**
+     * The mautic.post_upgrade is dispatched after an upgrade.
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\UpgradeEvent instance.
+     *
+     * @var string
+     */
+    const POST_UPGRADE = 'mautic.post_upgrade';
 }
