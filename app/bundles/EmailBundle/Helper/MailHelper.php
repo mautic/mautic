@@ -252,19 +252,20 @@ class MailHelper
     {
         // Set from email
         if (!$isQueueFlush && $useOwnerAsMailer && $this->factory->getParameter('mailer_is_owner') && isset($this->lead['id'])) {
-            if (!isset($this->lead['owner_id']) ||
-                (isset($this->lead['owner_id']) && !isset(self::$leadOwners[$this->lead['owner_id']]))) {
-                if ($owner = $this->factory->getModel('lead')->getRepository()->getLeadOwner($this->lead['owner_id'])) {
-                    self::$leadOwners[$owner['id']] = $owner;
-                    $this->lead['owner_id']         = $owner['id'];
+            if (!isset($this->lead['owner_id'])) {
+                $this->lead['owner_id'] = 0;
+            } elseif (isset($this->lead['owner_id'])) {
+                if (!isset(self::$leadOwners[$this->lead['owner_id']])) {
+                    $owner = $this->factory->getModel('lead')->getRepository()->getLeadOwner($this->lead['owner_id']);
+                    if ($owner) {
+                        self::$leadOwners[$owner['id']] = $owner;
+                    }
                 } else {
-                    $this->lead['owner_id'] = 0;
+                    $owner = self::$leadOwners[$this->lead['owner_id']];
                 }
-            } elseif (isset(self::$leadOwners[$this->lead['owner_id']])) {
-                $owner = self::$leadOwners[$this->lead['owner_id']];
             }
 
-            if ($owner) {
+            if (!empty($owner)) {
                 $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name']);
             } else {
                 $this->setFrom($this->from);
