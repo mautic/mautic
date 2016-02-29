@@ -3029,6 +3029,7 @@ var Mautic = {
     renderPieChart: function(canvas) {
         var ctx = canvas[0].getContext("2d");
         var data = mQuery.parseJSON(canvas.text());
+        data = Mautic.emulateNoDataForPieChart(data);
         var options = {segmentStrokeWidth : 1}
         var pieChart = new Chart(ctx).Pie(data, options);
         mQuery(canvas).closest('.chart-wrapper').find('.legend').html(pieChart.generateLegend());
