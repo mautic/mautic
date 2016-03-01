@@ -95,15 +95,11 @@ function apply_critical_migrations()
 
     foreach ($criticalMigrations as $version) {
 
-        $env  = $this->factory->getEnvironment();
-        $args = array('console', 'doctrine:migrations:migrate', '--no-interaction', '--env=' . $env, $version);
+        $args = array('console', 'doctrine:migrations:migrate', '--no-interaction', '--env=prod', '--no-debug', $version);
 
-        if ($env == 'prod') {
-            $args[] = '--no-debug';
-        }
-
+        $kernel      = new AppKernel;
         $input       = new ArgvInput($args);
-        $application = new Application($this->get('kernel'));
+        $application = new Application($kernel);
         $application->setAutoExit(false);
         $output = new BufferedOutput();
         $application->run($input, $output);
