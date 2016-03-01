@@ -16,6 +16,9 @@ define('MAUTIC_ROOT',              dirname(__DIR__));
 define('MAUTIC_UPGRADE_ROOT',      __DIR__);
 define('MAUTIC_UPGRADE_ERROR_LOG', MAUTIC_ROOT . '/upgrade_errors.txt');
 
+ini_set('display_errors', 'Off');
+date_default_timezone_set('UTC');
+
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -97,9 +100,10 @@ function apply_critical_migrations()
 
         $args = array('console', 'doctrine:migrations:migrate', '--no-interaction', '--env=prod', '--no-debug', $version);
 
-        $kernel      = new AppKernel('prod', false);
+        $kernel      = new AppKernel('prod', true);
         $input       = new ArgvInput($args);
         $application = new Application($kernel);
+        $application->setAutoExit(false);
         $output = new BufferedOutput();
         $application->run($input, $output);
     }
