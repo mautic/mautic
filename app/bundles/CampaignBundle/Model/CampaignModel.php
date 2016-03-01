@@ -10,7 +10,6 @@
 namespace Mautic\CampaignBundle\Model;
 
 use Doctrine\ORM\PersistentCollection;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
@@ -648,6 +647,7 @@ class CampaignModel extends CommonFormModel
                         $this->getRepository()->saveEntity($campaignLead);
                     } catch (\Exception $exception) {
                         $dispatchEvent = false;
+                        $this->factory->getLogger()->log('error', $exception->getMessage());
                     }
                 } else {
                     $this->em->detach($campaignLead);
@@ -670,6 +670,7 @@ class CampaignModel extends CommonFormModel
                     $this->getRepository()->saveEntity($campaignLead);
                 } catch (\Exception $exception) {
                     $dispatchEvent = false;
+                    $this->factory->getLogger()->log('error', $exception->getMessage());
                 }
             }
 
@@ -821,7 +822,6 @@ class CampaignModel extends CommonFormModel
         $batchLimiters = array(
             'dateTime' => $this->factory->getDate()->toUtcString()
         );
-
 
         if (count($lists)) {
             // Get a count of new leads

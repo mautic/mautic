@@ -17,6 +17,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\CoreBundle\Templating\TemplateNameParser;
 
 class EmailController extends FormController
 {
@@ -592,7 +593,7 @@ class EmailController extends FormController
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $this->factory->getModel('email');
-
+        $method  = $this->request->getMethod();
         $entity  = $model->getEntity($objectId);
         $session = $this->factory->getSession();
         $page    = $this->factory->getSession()->get('mautic.email.page', 1);
@@ -640,10 +641,23 @@ class EmailController extends FormController
 
         //Create the form
         $action = $this->generateUrl('mautic_email_action', array('objectAction' => 'edit', 'objectId' => $objectId));
-        $form   = $model->createForm($entity, $this->get('form.factory'), $action);
+
+        $updateSelect = ($method == 'POST')
+            ? $this->request->request->get('emailform[updateSelect]', false, true)
+            : $this->request->get(
+                'updateSelect',
+                false
+            );
+
+        if ($updateSelect) {
+            // Force type to template
+            $entity->setEmailType('template');
+        }
+
+        $form   = $model->createForm($entity, $this->get('form.factory'), $action, array('update_select' => $updateSelect));
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && $method == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -700,19 +714,37 @@ class EmailController extends FormController
                 $model->unlockEntity($entity);
             }
 
+            $passthrough = array(
+                'activeLink'    => 'mautic_email_index',
+                'mauticContent' => 'email'
+            );
+            // Check to see if this is a popup
+            if (isset($form['updateSelect'])) {
+                $passthrough = array_merge(
+                    $passthrough,
+                    array(
+                        'updateSelect' => $form['updateSelect']->getData(),
+                        'emailId'      => $entity->getId(),
+                        'emailSubject' => $entity->getSubject(),
+                        'emailName'    => $entity->getName(),
+                        'emailLang'    => $entity->getLanguage()
+                    )
+                );
+            }
+
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 $viewParameters = array(
                     'objectAction' => 'view',
                     'objectId'     => $entity->getId()
                 );
-
                 return $this->postActionRedirect(
                     array_merge(
                         $postActionVars,
                         array(
                             'returnUrl'       => $this->generateUrl('mautic_email_action', $viewParameters),
                             'viewParameters'  => $viewParameters,
-                            'contentTemplate' => 'MauticEmailBundle:Email:view'
+                            'contentTemplate' => 'MauticEmailBundle:Email:view',
+                            'passthroughVars' => $passthrough
                         )
                     )
                 );
@@ -752,6 +784,7 @@ class EmailController extends FormController
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_email_index',
                     'mauticContent' => 'email',
+                    'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect')),
                     'route'         => $this->generateUrl(
                         'mautic_email_action',
                         array(
@@ -774,24 +807,27 @@ class EmailController extends FormController
     public function cloneAction($objectId)
     {
         $model  = $this->factory->getModel('email');
-        $clone = $model->getEntity($objectId);
+        $entity = $model->getEntity($objectId);
 
-        if ($clone != null) {
+        if ($entity != null) {
             if (!$this->factory->getSecurity()->isGranted('email:emails:create')
                 || !$this->factory->getSecurity()->hasEntityAccess(
                     'email:emails:viewown',
                     'email:emails:viewother',
-                    $clone->getCreatedBy()
+                    $entity->getCreatedBy()
                 )
             ) {
                 return $this->accessDenied();
             }
 
-            /** @var \Mautic\EmailBundle\Entity\Email $clone */
-            $clone = clone $clone;
+            $entity      = clone $entity;
+            $session     = $this->factory->getSession();
+            $contentName = 'mautic.emailbuilder.'.$entity->getSessionId().'.content';
+            
+            $session->set($contentName, $entity->getContent());
         }
 
-        return $this->newAction($clone);
+        return $this->newAction($entity);
     }
 
     /**
@@ -913,8 +949,13 @@ class EmailController extends FormController
         // Replace short codes to emoji
         $content = EmojiHelper::toEmoji($content, 'short');
 
+        $this->addAssetsForBuilder();
+        $this->processSlots($slots, $entity);
+
+        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':email.html.php');
+
         return $this->render(
-            'MauticEmailBundle::builder.html.php',
+            $logicalName,
             array(
                 'isNew'    => $isNew,
                 'slots'    => $slots,
@@ -1311,6 +1352,56 @@ class EmailController extends FormController
         return $this->redirect(
             $this->generateUrl('mautic_email_preview', array('objectId' => $objectId))
         );
+    }
+
+    /**
+     * PreProcess page slots for public view.
+     *
+     * @param array $slots
+     * @param Email $entity
+     */
+    private function processSlots($slots, $entity)
+    {
+        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
+        $slotsHelper = $this->factory->getHelper('template.slots');
+        /** @var \Mautic\CoreBundle\Templating\Helper\TranslatorHelper $translatorHelper */
+        $translatorHelper = $this->factory->getHelper('template.translator');
+
+        $content = $entity->getContent();
+
+        //Set the slots
+        foreach ($slots as $slot => $slotConfig) {
+            //support previous format where email slots are not defined with config array
+            if (is_numeric($slot)) {
+                $slot = $slotConfig;
+                $slotConfig = array();
+            }
+
+            $value = isset($content[$slot]) ? $content[$slot] : "";
+            $placeholder = isset($slotConfig['placeholder']) ? $slotConfig['placeholder'] : 'mautic.page.builder.addcontent';
+            $slotsHelper->set($slot, "<div id=\"slot-{$slot}\" class=\"mautic-editable\" contenteditable=true data-placeholder=\"{$translatorHelper->trans($placeholder)}\">{$value}</div>");
+        }
+
+        //add builder toolbar
+        $slotsHelper->start('builder');?>
+        <input type="hidden" id="builder_entity_id" value="<?php echo $entity->getSessionId(); ?>" />
+        <?php
+        $slotsHelper->stop();
+    }
+
+    private function addAssetsForBuilder()
+    {
+        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
+        $assetsHelper = $this->factory->getHelper('template.assets');
+        /** @var \Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper $routerHelper */
+        $routerHelper = $this->factory->getHelper('template.router');
+
+        $assetsHelper->addScriptDeclaration("var mauticBasePath    = '" . $this->request->getBasePath() . "';");
+        $assetsHelper->addScriptDeclaration("var mauticAjaxUrl     = '" . $routerHelper->generate("mautic_core_ajax") . "';");
+        $assetsHelper->addScriptDeclaration("var mauticAssetPrefix = '" . $assetsHelper->getAssetPrefix(true) . "';");
+        $assetsHelper->addCustomDeclaration($assetsHelper->getSystemScripts(true, true));
+        $assetsHelper->addScript('app/bundles/EmailBundle/Assets/builder/builder.js');
+        $assetsHelper->addStylesheet('app/bundles/EmailBundle/Assets/builder/builder.css');
     }
 
 }

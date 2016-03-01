@@ -21,6 +21,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\CoreBundle\Templating\TemplateNameParser;
 
 /**
  * Class MailHelper
@@ -180,6 +181,13 @@ class MailHelper
     );
 
     /**
+     * Cache for lead owners
+     *
+     * @var array
+     */
+    protected static $leadOwners = array();
+
+    /**
      * @var bool
      */
     protected $fatal = false;
@@ -236,20 +244,38 @@ class MailHelper
      * Send the message
      *
      * @param bool $dispatchSendEvent
-     * @param bool $isQueueFlush
+     * @param bool $isQueueFlush (a tokenized/batch send via API such as Mandrill)
      *
      * @return bool
      */
-    public function send($dispatchSendEvent = false, $isQueueFlush = false)
+    public function send($dispatchSendEvent = false, $isQueueFlush = false, $useOwnerAsMailer = true)
     {
         // Set from email
-        $from = $this->message->getFrom();
-        if (empty($from)) {
+        if (!$isQueueFlush && $useOwnerAsMailer && $this->factory->getParameter('mailer_is_owner') && isset($this->lead['id'])) {
+            if (!isset($this->lead['owner_id'])) {
+                $this->lead['owner_id'] = 0;
+            } elseif (isset($this->lead['owner_id'])) {
+                if (!isset(self::$leadOwners[$this->lead['owner_id']])) {
+                    $owner = $this->factory->getModel('lead')->getRepository()->getLeadOwner($this->lead['owner_id']);
+                    if ($owner) {
+                        self::$leadOwners[$owner['id']] = $owner;
+                    }
+                } else {
+                    $owner = self::$leadOwners[$this->lead['owner_id']];
+                }
+            }
+
+            if (!empty($owner)) {
+                $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name']);
+            } else {
+                $this->setFrom($this->from);
+            }
+        } elseif (!$from = $this->message->getFrom()) {
             $this->setFrom($this->from);
         }
 
         // Set system return path if applicable
-        if (!$isQueueFlush && $bounceEmail = $this->generateBounceEmail($this->idHash)) {
+        if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail($this->idHash))) {
             $this->message->setReturnPath($bounceEmail);
         } elseif (!empty($this->returnPath)) {
             $this->message->setReturnPath($this->returnPath);
@@ -715,7 +741,7 @@ class MailHelper
      * @param bool   $returnContent
      * @param null   $charset
      *
-     * @return void
+     * @return void|string
      */
     public function setTemplate($template, $vars = array(), $returnContent = false, $charset = null)
     {
@@ -1208,7 +1234,11 @@ class MailHelper
                 $slots = $slots[$template];
             }
 
-            $customHtml = $this->setTemplate('MauticEmailBundle::public.html.php', array(
+            $this->processSlots($slots, $email);
+
+            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':email.html.php');
+
+            $customHtml = $this->setTemplate($logicalName, array(
                 'slots'    => $slots,
                 'content'  => $email->getContent(),
                 'email'    => $email,
@@ -1713,6 +1743,28 @@ class MailHelper
                 $this->transport->stop();
                 $this->messageSentCount = 0;
             }
+        }
+    }
+
+    /**
+     * @param $slots
+     * @param Email $entity
+     */
+    public function processSlots($slots, $entity)
+    {
+        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
+        $slotsHelper = $this->factory->getHelper('template.slots');
+
+        $content = $entity->getContent();
+
+        foreach ($slots as $slot => $slotConfig) {
+            if (is_numeric($slot)) {
+                $slot = $slotConfig;
+                $slotConfig = array();
+            }
+
+            $value = isset($content[$slot]) ? $content[$slot] : "";
+            $slotsHelper->set($slot, $value);
         }
     }
 }
