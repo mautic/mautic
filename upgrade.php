@@ -100,7 +100,6 @@ function apply_critical_migrations()
         $kernel      = new AppKernel('prod', false);
         $input       = new ArgvInput($args);
         $application = new Application($kernel);
-        $application->setAutoExit(false);
         $output = new BufferedOutput();
         $application->run($input, $output);
     }
