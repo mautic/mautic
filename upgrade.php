@@ -97,7 +97,7 @@ function apply_critical_migrations()
 
         $args = array('console', 'doctrine:migrations:migrate', '--no-interaction', '--env=prod', '--no-debug', $version);
 
-        $kernel      = new AppKernel;
+        $kernel      = new AppKernel('prod', false);
         $input       = new ArgvInput($args);
         $application = new Application($kernel);
         $application->setAutoExit(false);
