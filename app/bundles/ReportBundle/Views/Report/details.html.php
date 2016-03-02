@@ -57,7 +57,8 @@ if ($tmpl == 'index') {
         'item'              => $report,
         'templateButtons'   => array(
             'edit'   => $security->hasEntityAccess($permissions['report:reports:editown'], $permissions['report:reports:editother'], $report->getCreatedBy()),
-            'delete' => $security->hasEntityAccess($permissions['report:reports:deleteown'], $permissions['report:reports:deleteother'], $report->getCreatedBy())
+            'delete' => $security->hasEntityAccess($permissions['report:reports:deleteown'], $permissions['report:reports:deleteother'], $report->getCreatedBy()),
+            'close' => $security->hasEntityAccess($permissions['report:reports:viewown'], $permissions['report:reports:viewother'], $report->getCreatedBy())
         ),
         'routeBase'         => 'report',
         'langVar'           => 'report.report',
