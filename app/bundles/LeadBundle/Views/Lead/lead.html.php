@@ -31,31 +31,9 @@ $view['slots']->set('headerTitle',
        $avatar . '<div class="pull-left mt-5"><span class="span-block">' . $leadName . '</span><span class="span-block small ml-sm">' . $lead->getSecondaryIdentifier() . '</span></div>');
 
 $groups = array_keys($fields);
-$edit   = $security->hasEntityAccess($permissions['lead:leads:editown'], $permissions['lead:leads:editother'], $lead->getOwner());
 
 $buttons = array();
 
-if ($edit) {
-    $buttons[] = array(
-        'attr' => array(
-            'href' => $view['router']->generate( 'mautic_lead_action', array('objectId' => $lead->getId(), 'objectAction' => 'edit'))
-        ),
-        'btnText'   => $view['translator']->trans('mautic.core.form.edit'),
-        'iconClass' => 'fa fa-pencil-square-o'
-    );
-
-    $buttons[] = array(
-        'attr'      => array(
-            'id'          => 'addNoteButton',
-            'data-toggle' => 'ajaxmodal',
-            'data-target' => '#MauticSharedModal',
-            'data-header' => $view['translator']->trans('mautic.lead.note.header.new'),
-            'href'        => $view['router']->generate('mautic_leadnote_action', array('leadId' => $lead->getId(), 'objectAction' => 'new', 'leadId' => $lead->getId()))
-        ),
-        'btnText'   => $view['translator']->trans('mautic.lead.add.note'),
-        'iconClass' => 'fa fa-file-o'
-    );
-}
 
 if (!empty($fields['core']['email']['value'])) {
     $buttons[] = array(
@@ -83,6 +61,7 @@ $buttons[] = array(
     'iconClass' => 'fa fa-list'
 );
 
+
 if ($security->isGranted('campaign:campaigns:edit')) {
     $buttons[] = array(
         'attr'      => array(
@@ -97,15 +76,6 @@ if ($security->isGranted('campaign:campaigns:edit')) {
     );
 }
 
-if ($security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $lead->getOwner())) {
-    $buttons[] = array(
-        'confirm'      => array(
-            'message'       => $view["translator"]->trans('mautic.lead.lead.form.confirmdelete', array('%name%' => $lead->getName() . ' (' . $lead->getId() . ')')),
-            'confirmAction' => $view['router']->generate('mautic_lead_action', array_merge(array('objectAction' => 'delete', 'objectId' => $lead->getId()))),
-            'template'      => 'delete'
-        )
-    );
-}
 
 if (($security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $lead->getOwner())) && $edit) {
 
@@ -126,7 +96,12 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'item'       => $lead,
     'routeBase'  => 'lead',
     'langVar'    => 'lead.lead',
-    'customButtons' => $buttons
+    'customButtons' => $buttons,
+    'templateButtons' => array(
+        'edit'        => $security->hasEntityAccess($permissions['lead:leads:editown'], $permissions['lead:leads:editother'], $lead->getCreatedBy()),
+        'delete'      => $security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $lead->getOwner()),
+        'close'       => $security->hasEntityAccess($permissions['lead:leads:viewown'], $permissions['lead:leads:viewother'], $lead->getCreatedBy())
+    ),
 )));
 ?>
 
