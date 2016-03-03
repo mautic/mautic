@@ -31,6 +31,7 @@ $view['slots']->set('headerTitle',
        $avatar . '<div class="pull-left mt-5"><span class="span-block">' . $leadName . '</span><span class="span-block small ml-sm">' . $lead->getSecondaryIdentifier() . '</span></div>');
 
 $groups = array_keys($fields);
+$edit   = $security->hasEntityAccess($permissions['lead:leads:editown'], $permissions['lead:leads:editother'], $lead->getOwner());
 
 $buttons = array();
 
