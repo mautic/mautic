@@ -61,6 +61,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'routeBase'  => 'email',
     'preCustomButtons' => $customButtons
 )));
+$view['slots']->set('publishStatus',$view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $email)));
 ?>
 
 <!-- start: box layout -->
@@ -74,9 +75,6 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                     <div class="col-xs-10">
                         <div><?php echo \Mautic\CoreBundle\Helper\EmojiHelper::toHtml($email->getSubject(), 'short'); ?></div>
                         <div class="text-muted"><?php echo $email->getDescription(); ?></div>
-                    </div>
-                    <div class="col-xs-2 text-right">
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $email)); ?>
                     </div>
                 </div>
             </div>

@@ -43,6 +43,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     )
 )));
 
+$view['slots']->set('publishStatus',$view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $activeForm)));
+
 $isStandalone = $activeForm->isStandalone();
 ?>
   <!-- start: box layout -->
@@ -55,9 +57,6 @@ $isStandalone = $activeForm->isStandalone();
                   <div class="box-layout">
                       <div class="col-xs-10">
                           <div class="text-muted"><?php echo $activeForm->getDescription(); ?></div>
-                      </div>
-                      <div class="col-xs-2 text-right">
-                          <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $activeForm)); ?>
                       </div>
                   </div>
               </div>
@@ -137,20 +136,22 @@ $isStandalone = $activeForm->isStandalone();
                           <?php foreach ($groupActions as $action) : ?>
                               <li class="list-group-item bg-auto bg-light-xs">
                                   <div class="box-layout">
+                                      <?php switch ($group) {
+                                          // TODO - Better way of doing this
+                                          case 'lead':
+                                              $icon = 'fa-user';
+                                              break;
+                                          case 'asset':
+                                              $icon = 'fa-cloud-download';
+                                              break;
+                                          default:
+                                              $icon = '';
+                                      } ?>
+                                      <?php if($icon!=''): ?>
                                       <div class="col-md-1 va-m">
-                                          <?php switch ($group) {
-                                              // TODO - Better way of doing this
-                                              case 'lead':
-                                                  $icon = 'fa-user';
-                                                  break;
-                                              case 'asset':
-                                                  $icon = 'fa-cloud-download';
-                                                  break;
-                                              default:
-                                                  $icon = '';
-                                          } ?>
                                           <h3><span class="fa <?php echo $icon; ?> text-white dark-xs"></span></h3>
                                       </div>
+                                      <?php endif; ?>
                                       <div class="col-md-7 va-m">
                                           <h5 class="fw-sb text-primary mb-xs"><?php echo $action->getName(); ?></h5>
                                           <h6 class="text-white dark-sm"><?php echo $action->getDescription(); ?></h6>

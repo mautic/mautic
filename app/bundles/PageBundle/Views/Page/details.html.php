@@ -27,6 +27,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     ),
     'routeBase' => 'page'
 )));
+$view['slots']->set('publishStatus',$view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $activePage)));
 ?>
 
 <!-- start: box layout -->
@@ -39,9 +40,6 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                 <div class="box-layout">
                     <div class="col-xs-10">
                         <div class="text-muted"><?php echo $activePage->getMetaDescription(); ?></div>
-                    </div>
-                    <div class="col-xs-2 text-right">
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $activePage)); ?>
                     </div>
                 </div>
             </div>
@@ -404,7 +402,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <!--/ end: tab-content -->
         <?php elseif ((empty($variants['parent']) || ($variants['parent']->getId() == $activePage->getId())) && $permissions['page:pages:create']): ?>
             <div class="pa-md">
-                <div class="text-center" style="height: 100%; width: 100%; background-color: #4e5d9d; opacity: 0.8;">
+                <div class="text-center" style="height: 100%; width: 100%; ">
                     <h3 style="padding: 30px;">
                         <a class="create-abtest-link" href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'abtest', 'objectId' => $activePage->getId())); ?>" data-toggle="ajax">
                             <?php echo $view['translator']->trans('mautic.page.abtest.create'); ?> <i class="fa fa-angle-right"></i>
@@ -452,12 +450,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             </div>
         </div>
         <!--/ preview URL -->
-
         <hr class="hr-w-2" style="width:50%">
-
         <!-- recent activity -->
         <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', array('logs' => $logs)); ?>
-
     </div>
     <!--/ right section -->
 </div>

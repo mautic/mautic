@@ -35,7 +35,7 @@ $edit   = $security->hasEntityAccess($permissions['lead:leads:editown'], $permis
 
 $buttons = array();
 
-
+//Send email button
 if (!empty($fields['core']['email']['value'])) {
     $buttons[] = array(
         'attr'      => array(
@@ -49,7 +49,7 @@ if (!empty($fields['core']['email']['value'])) {
         'iconClass' => 'fa fa-send'
     );
 }
-
+//View Lead List button
 $buttons[] = array(
     'attr' => array(
         'data-toggle' => 'ajaxmodal',
@@ -62,7 +62,7 @@ $buttons[] = array(
     'iconClass' => 'fa fa-list'
 );
 
-
+//View Campaigns List button
 if ($security->isGranted('campaign:campaigns:edit')) {
     $buttons[] = array(
         'attr'      => array(
@@ -77,7 +77,7 @@ if ($security->isGranted('campaign:campaigns:edit')) {
     );
 }
 
-
+//Merge button
 if (($security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $lead->getOwner())) && $edit) {
 
     $buttons[] = array(

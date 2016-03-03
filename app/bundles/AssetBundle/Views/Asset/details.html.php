@@ -22,6 +22,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'langVar'    => 'asset.asset',
     'nameGetter' => 'getTitle'
 )));
+
+$view['slots']->set('publishStatus',$view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $activeAsset)));
+
 ?>
 
 <!-- start: box layout -->
@@ -34,9 +37,6 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                 <div class="box-layout">
                     <div class="col-xs-10 va-m">
                         <div class="text-white dark-sm mb-0"><?php echo $activeAsset->getDescription(); ?></div>
-                    </div>
-                    <div class="col-xs-2 text-right">
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $activeAsset)); ?>
                     </div>
                 </div>
             </div>

@@ -21,6 +21,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     ),
     'routeBase' => 'campaign'
 )));
+$view['slots']->set('publishStatus',$view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $campaign)));
 ?>
 
 <!-- start: box layout -->
@@ -34,9 +35,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                     <div class="col-xs-6 va-m">
                         <div class="text-white dark-sm mb-0"><?php echo $campaign->getDescription(); ?></div>
                     </div>
-                    <div class="col-xs-6 va-m text-right">
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $campaign)); ?>
-                    </div>
+
                 </div>
             </div>
             <!--/ campaign detail header -->
