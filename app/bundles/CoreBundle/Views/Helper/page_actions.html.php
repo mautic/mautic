@@ -80,7 +80,7 @@ foreach ($buttonGroupTypes as $groupType) {
                 break;
             case 'close':
                 $icon = 'remove';
-                echo '<a class="'.$btnClass.'" href="' . $view['router']->generate('mautic_' . $routeBase. '_action' ,array("objectAction" => "")) . '" data-toggle="' . $editMode . '"' . $editAttr . $menuLink . ">\n";
+                echo '<a class="'.$btnClass.'" href="' . $view['router']->generate('mautic_' . $routeBase. '_index') . '" data-toggle="' . $editMode . '"' . $editAttr . $menuLink . ">\n";
                 echo '  <i class="fa fa-'.$icon.'"></i> ' . $view['translator']->trans('mautic.core.form.' . $action) . "\n";
                 echo "</a>\n";
                 break;
