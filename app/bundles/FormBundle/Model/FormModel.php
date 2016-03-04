@@ -512,8 +512,10 @@ class FormModel extends CommonFormModel
 
             if (isset($leadField) && $isAutoFill) {
                 $value = $lead->getFieldValue($leadField);
-
-                $fieldHelper->populateField($f, $value, $formName, $formHtml);
+                
+		if (!empty($value)) {
+		    $fieldHelper->populateField($f, $value, $formName, $formHtml);
+		}
             }
         }
     }
