@@ -72,8 +72,11 @@ $view->extend('MauticPointBundle:Point:index.html.php');
                 </td>
                 <td>
                     <div>
+
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'point')); ?>
-                        <?php echo $item->getName(); ?>
+                        <a href="<?php echo $view['router']->generate('mautic_point_action', array("objectAction" => "edit", "objectId" => $item->getId())); ?>" data-toggle="ajax">
+                            <?php echo $item->getName(); ?>
+                        </a>
                     </div>
                     <?php if ($description = $item->getDescription()): ?>
                         <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>

@@ -16,13 +16,24 @@ $view['slots']->set("headerTitle", $activePage->getTitle());
 $showVariants     = (count($variants['children']) || (!empty($variants['parent']) && $variants['parent']->getId() != $activePage->getId()));
 $showTranslations = (count($translations['children']) || (!empty($translations['parent']) && $translations['parent']->getId() != $activePage->getId()));
 
+if((empty($variants['parent']) || ($variants['parent']->getId() == $activePage->getId())) && $permissions['page:pages:create']){
+    $customButtons[] = array(
+        'attr' => array(
+            'data-toggle' => 'ajax',
+            'href'        => $view['router']->generate('mautic_page_action', array("objectAction" => 'abtest', 'objectId' => $activePage->getId())),
+        ),
+        'iconClass' =>  'fa fa-sitemap',
+        'btnText'   =>  $view['translator']->trans('mautic.core.form.abtest')
+    );
+}
+
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'item'            => $activePage,
+    'customButtons' =>$customButtons,
     'templateButtons' => array(
         'edit'   => $security->hasEntityAccess($permissions['page:pages:editown'], $permissions['page:pages:editother'], $activePage->getCreatedBy()),
         'clone'  => $security->hasEntityAccess($permissions['page:pages:editown'], $permissions['page:pages:editother'], $activePage->getCreatedBy()),
         'delete' => $permissions['page:pages:create'],
-        'abtest' => ((empty($variants['parent']) || ($variants['parent']->getId() == $activePage->getId())) && $permissions['page:pages:create']),
         'close' =>  $security->hasEntityAccess($permissions['page:pages:viewown'], $permissions['page:pages:viewother'], $activePage->getCreatedBy()),
     ),
     'routeBase' => 'page'
@@ -83,7 +94,7 @@ $view['slots']->set('publishStatus',$view->render('MauticCoreBundle:Helper:publi
                                         <?php echo $view['translator']->trans('mautic.page.pageviews'); ?>
                                     </h5>
                                 </div>
-                                <div class="col-xs-4 va-t text-right">
+                                <div class="col-xs-4 va-t text-right">$hasVariants
                                     <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
                                 </div>
                             </div>

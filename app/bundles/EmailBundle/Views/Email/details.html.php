@@ -14,11 +14,24 @@ $view['slots']->set("headerTitle", $email->getName());
 $isVariant    = $email->isVariant(true);
 $showVariants = count($variants['children']);
 $emailType    = $email->getEmailType();
+$edit = $view['security']->hasEntityAccess($permissions['email:emails:editown'], $permissions['email:emails:editother'], $email->getCreatedBy());
+
 if (empty($emailType)) {
     $emailType = 'template';
 }
 
 $customButtons = array();
+
+if(!$isVariant && $edit && $permissions['email:emails:create']){
+    $customButtons[] = array(
+        'attr' => array(
+            'data-toggle' => 'ajax',
+            'href'        => $view['router']->generate('mautic_email_action', array("objectAction" => 'abtest', 'objectId' => $email->getId())),
+        ),
+        'iconClass' =>  'fa fa-sitemap',
+        'btnText'   =>  $view['translator']->trans('mautic.core.form.abtest')
+    );
+}
 
 if ($emailType == 'list') {
     $customButtons[] = array(
@@ -40,22 +53,12 @@ $customButtons[] = array(
     'btnText'   => 'mautic.email.send.example'
 );
 
-$customButtons[] = array(
-    'attr' => array(
-        'data-toggle' => 'ajax',
-        'href'        => $view['router']->generate('mautic_email_action', array("objectAction" => "clone", "objectId" => $email->getId())),
-        ),
-        'iconClass' => 'fa fa-copy',
-        'btnText'   => 'mautic.core.form.clone'
-);
-
-$edit = $view['security']->hasEntityAccess($permissions['email:emails:editown'], $permissions['email:emails:editother'], $email->getCreatedBy());
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'item'       => $email,
     'templateButtons' => array(
         'edit'       => $edit,
+        'clone'      => (!$isVariant && $edit && $permissions['email:emails:create']),
         'delete'     => $view['security']->hasEntityAccess($permissions['email:emails:deleteown'], $permissions['email:emails:deleteother'], $email->getCreatedBy()),
-        'abtest'     => (!$isVariant && $edit && $permissions['email:emails:create']),
         'close'      => $view['security']->hasEntityAccess($permissions['email:emails:viewown'], $permissions['email:emails:viewother'], $email->getCreatedBy()),
     ),
     'routeBase'  => 'email',

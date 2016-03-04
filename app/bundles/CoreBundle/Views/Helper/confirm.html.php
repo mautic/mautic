@@ -19,6 +19,7 @@ if (isset($template)) {
         case 'delete':
             $confirmText = (!isset($confirmText)) ? $view["translator"]->trans("mautic.core.form.delete") : $confirmText;
             $iconClass   = (!isset($iconClass)) ? 'fa fa-fw fa-trash-o text-danger' : $iconClass;
+          
             $btnText     = (!isset($btnText)) ? $view['translator']->trans('mautic.core.form.delete') : $btnText;
             break;
     }
