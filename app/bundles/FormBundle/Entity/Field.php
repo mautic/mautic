@@ -209,6 +209,7 @@ class Field
         
         $builder->createField('isAutoFill', 'boolean')
             ->columnName('is_auto_fill')
+            ->nullable()
             ->build();
     }
 
