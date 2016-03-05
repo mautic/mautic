@@ -593,6 +593,7 @@ class EmailController extends FormController
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $this->factory->getModel('email');
+        $method  = $this->request->getMethod();
 
         $entity  = $model->getEntity($objectId);
         $session = $this->factory->getSession();
@@ -641,7 +642,6 @@ class EmailController extends FormController
 
         //Create the form
         $action = $this->generateUrl('mautic_email_action', array('objectAction' => 'edit', 'objectId' => $objectId));
-        $form   = $model->createForm($entity, $this->get('form.factory'), $action);
 
         $updateSelect = ($method == 'POST')
             ? $this->request->request->get('emailform[updateSelect]', false, true)
@@ -658,7 +658,7 @@ class EmailController extends FormController
         $form   = $model->createForm($entity, $this->get('form.factory'), $action, array('update_select' => $updateSelect));
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && $method == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -745,7 +745,8 @@ class EmailController extends FormController
                         array(
                             'returnUrl'       => $this->generateUrl('mautic_email_action', $viewParameters),
                             'viewParameters'  => $viewParameters,
-                            'contentTemplate' => 'MauticEmailBundle:Email:view'
+                            'contentTemplate' => 'MauticEmailBundle:Email:view',
+ -                          'passthroughVars' => $passthrough
                         )
                     )
                 );
@@ -785,6 +786,7 @@ class EmailController extends FormController
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_email_index',
                     'mauticContent' => 'email',
+                    'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect')),
                     'route'         => $this->generateUrl(
                         'mautic_email_action',
                         array(
