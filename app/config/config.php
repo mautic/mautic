@@ -125,7 +125,7 @@ $loader->import('parameters.php');
 $container->loadFromExtension('mautic_core');
 
 // Set template engines
-$engines = ($container->getParameter('kernel.environment') == 'dev') ? array('php', 'twig') : array('php');
+$engines = array('php', 'twig');
 
 // Generate session name
 if (isset($_COOKIE['mautic_session_name'])) {

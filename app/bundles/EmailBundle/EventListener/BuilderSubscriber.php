@@ -63,7 +63,8 @@ class BuilderSubscriber extends CommonSubscriber
 
         $tokens = array(
             '{unsubscribe_text}' => $this->translator->trans('mautic.email.token.unsubscribe_text'),
-            '{webview_text}'     => $this->translator->trans('mautic.email.token.webview_text')
+            '{webview_text}'     => $this->translator->trans('mautic.email.token.webview_text'),
+            '{signature}'        => $this->translator->trans('mautic.email.token.signature')
         );
 
         if ($event->tokensRequested(array_keys($tokens))) {
@@ -91,6 +92,8 @@ class BuilderSubscriber extends CommonSubscriber
     public function onEmailGenerate(EmailSendEvent $event)
     {
         $idHash  = $event->getIdHash();
+        $lead = $event->getLead();
+
         if ($idHash == null) {
             // Generate a bogus idHash to prevent errors for routes that may include it
             $idHash = uniqid();
@@ -113,6 +116,25 @@ class BuilderSubscriber extends CommonSubscriber
         $webviewText = str_replace('|URL|', $model->buildUrl('mautic_email_webview', array('idHash' => $idHash)), $webviewText);
         $event->addToken('{webview_text}', $webviewText);
 
-        $event->addToken('{webview_url}', $model->buildUrl('mautic_email_webview', array('idHash' => $idHash)));
+        // Show public email preview if the lead is not known to prevent 404
+        if (empty($lead['id']) && $event->getEmail()) {
+            $event->addToken('{webview_url}', $model->buildUrl('mautic_email_preview', array('objectId' => $event->getEmail()->getId())));
+        } else {
+            $event->addToken('{webview_url}', $model->buildUrl('mautic_email_webview', array('idHash' => $idHash)));
+        }
+
+        $signatureText = $this->factory->getParameter('default_signature_text');
+        $fromName = $this->factory->getParameter('mailer_from_name');
+
+        if (!empty($lead['owner_id'])) {
+            $owner = $this->factory->getModel('lead')->getRepository()->getLeadOwner($lead['owner_id']);
+            if ($owner && !empty($owner['signature'])) {
+                $fromName = $owner['first_name'] . ' ' . $owner['last_name'];
+                $signatureText = $owner['signature'];
+            }
+        }
+        
+        $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
+        $event->addToken('{signature}', $signatureText);
     }
 }

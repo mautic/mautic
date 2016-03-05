@@ -10,7 +10,6 @@
 namespace Mautic\CampaignBundle\Model;
 
 use Doctrine\ORM\PersistentCollection;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
@@ -174,11 +173,12 @@ class CampaignModel extends CommonFormModel
      *
      * @return array
      */
-    public function setEvents (Campaign &$entity, $sessionEvents, $sessionConnections, $deletedEvents)
+    public function setEvents (Campaign $entity, $sessionEvents, $sessionConnections, $deletedEvents)
     {
         $existingEvents = $entity->getEvents();
-
-        $events = $hierarchy = $parentUpdated = array();
+        $events =
+        $hierarchy =
+        $parentUpdated = array();
 
         //set the events from session
         foreach ($sessionEvents as $id => $properties) {
@@ -285,6 +285,11 @@ class CampaignModel extends CommonFormModel
             return ($aOrder < $bOrder) ? -1 : 1;
         });
 
+        // Persist events if campaign is being edited
+        if ($entity->getId()) {
+            $this->getEventRepository()->saveEntities($events);
+        }
+
         return $events;
     }
 
@@ -366,7 +371,7 @@ class CampaignModel extends CommonFormModel
      * @param string   $root
      * @param int      $order
      */
-    private function buildOrder ($hierarchy, &$events, &$entity, $root = 'null', $order = 1)
+    private function buildOrder ($hierarchy, &$events, $entity, $root = 'null', $order = 1)
     {
         $count = count($hierarchy);
 
@@ -374,7 +379,6 @@ class CampaignModel extends CommonFormModel
             if ($parent == $root || $count === 1) {
                 $events[$eventId]->setOrder($order);
                 $entity->addEvent($eventId, $events[$eventId]);
-
                 unset($hierarchy[$eventId]);
                 if (count($hierarchy)) {
                     $this->buildOrder($hierarchy, $events, $entity, $eventId, $order + 1);
@@ -643,6 +647,7 @@ class CampaignModel extends CommonFormModel
                         $this->getRepository()->saveEntity($campaignLead);
                     } catch (\Exception $exception) {
                         $dispatchEvent = false;
+                        $this->factory->getLogger()->log('error', $exception->getMessage());
                     }
                 } else {
                     $this->em->detach($campaignLead);
@@ -665,6 +670,7 @@ class CampaignModel extends CommonFormModel
                     $this->getRepository()->saveEntity($campaignLead);
                 } catch (\Exception $exception) {
                     $dispatchEvent = false;
+                    $this->factory->getLogger()->log('error', $exception->getMessage());
                 }
             }
 
@@ -817,20 +823,26 @@ class CampaignModel extends CommonFormModel
             'dateTime' => $this->factory->getDate()->toUtcString()
         );
 
-        // Get a count of new leads
-        $newLeadsCount = $repo->getCampaignLeadsFromLists(
-            $campaign->getId(),
-            $lists,
-            array(
-                'countOnly' => true,
-                'batchLimiters' => $batchLimiters
-            ));
+        if (count($lists)) {
+            // Get a count of new leads
+            $newLeadsCount = $repo->getCampaignLeadsFromLists(
+                $campaign->getId(),
+                $lists,
+                array(
+                    'countOnly'     => true,
+                    'batchLimiters' => $batchLimiters
+                )
+            );
 
-        // Ensure the same list is used each batch
-        $batchLimiters['maxId'] = (int) $newLeadsCount['maxId'];
+            // Ensure the same list is used each batch
+            $batchLimiters['maxId'] = (int) $newLeadsCount['maxId'];
 
-        // Number of total leads to process
-        $leadCount = (int) $newLeadsCount['count'];
+            // Number of total leads to process
+            $leadCount = (int) $newLeadsCount['count'];
+        } else {
+            // No lists to base campaign membership off of so ignore
+            $leadCount = 0;
+        }
 
         if ($output) {
             $output->writeln($this->translator->trans('mautic.campaign.rebuild.to_be_added', array('%leads%' => $leadCount, '%batch%' => $limit)));
@@ -910,8 +922,9 @@ class CampaignModel extends CommonFormModel
         );
 
         // Restart batching
-        $start     = $lastRoundPercentage = 0;
-        $leadCount = $removeLeadCount['count'];
+        $start                  = $lastRoundPercentage = 0;
+        $leadCount              = $removeLeadCount['count'];
+        $batchLimiters['maxId'] = $removeLeadCount['maxId'];
 
         if ($output) {
             $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', array('%leads%' => $leadCount, '%batch%' => $limit)));

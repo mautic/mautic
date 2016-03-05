@@ -10,8 +10,24 @@ Mautic.emailOnLoad = function (container, response) {
             var el = '#' + response.updateSelect;
             var optgroup = el + " optgroup[label=" + response.emailLang + "]";
             if (opener.mQuery(optgroup).length) {
-                //the optgroup exist so append to it
-                opener.mQuery(optgroup + " option:last").prev().before(newOption);
+                // update option when new option equal with option item in group.
+                var firstOptionGroups = opener.mQuery(el + ' optgroup');
+                var isUpdateOption = false;
+                firstOptionGroups.each(function() {
+                    var firstOptions = mQuery(this).children();
+                    for (var i = 0; i < firstOptions.length; i++) {
+                        if (firstOptions[i].value === response.emailId.toString()) {
+                            firstOptions[i].text = response.emailName;
+                            isUpdateOption = true;
+                            break;
+                        }
+                    }
+                });
+
+                if (!isUpdateOption) {
+                    //the optgroup exist so append to it
+                    opener.mQuery(optgroup + " option:last").prev().before(newOption);
+                }
             } else {
                 //create the optgroup
                 var newOptgroup = mQuery('<optgroup label="' + response.emailLang + '" />');
@@ -31,7 +47,7 @@ Mautic.emailOnLoad = function (container, response) {
                 } else if (aLabel < bLabel) {
                     return -1;
                 } else {
-                    return 0
+                    return 0;
                 }
             });
 
@@ -43,7 +59,7 @@ Mautic.emailOnLoad = function (container, response) {
                     } else if (a.text < b.text) {
                         return -1;
                     } else {
-                        return 0
+                        return 0;
                     }
                 });
                 mQuery(this).html(options);

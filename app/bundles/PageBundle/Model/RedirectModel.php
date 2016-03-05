@@ -91,6 +91,11 @@ class RedirectModel extends FormModel
 
         $return = array();
         foreach ($urls as $key => $url) {
+            if (empty($url)) {
+
+                continue;
+            }
+
             if (isset($byUrl[$url])) {
                 $return[$key] = $byUrl[$url];
             } elseif ($createEntity) {

@@ -333,6 +333,8 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
+     * Returns leads that are part of a lead list that belongs to a campaign
+     *
      * @param       $id
      * @param array $lists
      * @param array $args
@@ -352,8 +354,7 @@ class CampaignRepository extends CommonRepository
         if ($countOnly) {
             $q->select('max(list_leads.lead_id) as max_id, count(distinct(list_leads.lead_id)) as lead_count');
         } else {
-            $q->select('distinct(list_leads.lead_id) as id')
-                ->orderBy('list_leads.lead_id', 'ASC');
+            $q->select('distinct(list_leads.lead_id) as id');
         }
 
         $q->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'list_leads');
@@ -377,14 +378,13 @@ class CampaignRepository extends CommonRepository
             }
         }
 
-        // Exclude leads manually removed from the campaign
+        // Exclude leads already part of or manually removed from the campaign
         $subq = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'campaign_leads')
             ->where(
                 $q->expr()->andX(
                     $q->expr()->eq('campaign_leads.lead_id', 'list_leads.lead_id'),
-                    $q->expr()->eq('campaign_leads.manually_removed', ':false'),
                     $q->expr()->eq('campaign_leads.campaign_id', (int) $id)
                 )
             );
@@ -442,8 +442,7 @@ class CampaignRepository extends CommonRepository
         if ($countOnly) {
             $q->select('max(campaign_leads.lead_id) as max_id, count(campaign_leads.lead_id) as lead_count');
         } else {
-            $q->select('campaign_leads.lead_id as id')
-                ->orderBy('campaign_leads.lead_id', 'ASC');
+            $q->select('campaign_leads.lead_id as id');
         }
 
         $q->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'campaign_leads')
@@ -456,7 +455,7 @@ class CampaignRepository extends CommonRepository
 
         if ($batchLimiters) {
             $expr->add(
-                // Only leads part of the campaign at the time of count
+            // Only leads part of the campaign at the time of count
                 $q->expr()->lte('campaign_leads.date_added', $q->expr()->literal($batchLimiters['dateTime']))
             );
 

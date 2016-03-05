@@ -382,6 +382,23 @@ return array(
 
             'twig.controller.exception.class'    => 'Mautic\CoreBundle\Controller\ExceptionController',
             'monolog.handler.stream.class'       => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler',
+
+            // Twig
+            'templating.twig.extension.slot'    => array(
+                'class' => 'Mautic\CoreBundle\Templating\Twig\Extension\SlotExtension',
+                'arguments' => array(
+                    'mautic.factory'
+                ),
+                'tag' => 'twig.extension'
+            ),
+            'templating.twig.extension.asset'    => array(
+                'class' => 'Mautic\CoreBundle\Templating\Twig\Extension\AssetExtension',
+                'arguments' => array(
+                    'mautic.factory'
+                ),
+                'tag' => 'twig.extension'
+            ),
+
         )
     ),
 
@@ -415,7 +432,7 @@ return array(
             'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindPrecisionLookup'
         ),
         'maxmind_download' => array(
-            'display_name' => 'MaxMind - GeoIP2 City Download',
+            'display_name' => 'MaxMind - GeoLite2 City Download',
             'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindDownloadLookup'
         ),
         'telize' => array(

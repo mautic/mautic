@@ -181,6 +181,23 @@ class UserType extends AbstractType
             'empty_value' => 'mautic.user.user.form.defaultlocale'
         ));
 
+        $defaultSignature = '';
+        if (isset($options['data']) && $options['data']->getSignature() === null) {
+            $defaultSignature = $this->translator->trans('mautic.email.default.signature', array('%from_name%' => '|FROM_NAME|'));
+        } elseif (isset($options['data'])) {
+            $defaultSignature = $options['data']->getSignature();
+        }
+
+        $builder->add('signature', 'textarea', array(
+            'label'      => 'mautic.email.token.signature',
+            'label_attr' => array('class' => 'control-label'),
+            'required'   => false,
+            'attr'       => array(
+                'class'        => 'form-control'
+            ),
+            'data'       => $defaultSignature
+        ));
+
         if (empty($options['in_profile'])) {
             $builder->add(
                 $builder->create('role', 'entity', array(

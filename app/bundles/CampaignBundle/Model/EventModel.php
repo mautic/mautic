@@ -1328,13 +1328,13 @@ class EventModel extends CommonFormModel
                     if ($grandParentId) {
                         $logger->debug('CAMPAIGN: Checking for leads based on grand parent execution.');
 
-                        $leadLog         = $repo->getEventLog($campaignId, $campaignLeadIds, array($grandParentId), array_keys($events));
+                        $leadLog         = $repo->getEventLog($campaignId, $campaignLeadIds, array($grandParentId), array_keys($events), true);
                         $applicableLeads = array_keys($leadLog);
                     } else {
                         $logger->debug('CAMPAIGN: Checking for leads based on exclusion due to being at root level');
 
                         // The event has no grandparent (likely because the decision is first in the campaign) so find leads that HAVE
-                        // already executed the events in the root level
+                        // already executed the events in the root level and exclude them
                         $havingEvents      = (isset($actionEvents[$parentId]))
                             ? array_merge($actionEvents[$parentId], array_keys($events))
                             : array_keys(
@@ -1346,7 +1346,7 @@ class EventModel extends CommonFormModel
                         // Only use leads that are not applicable
                         $applicableLeads = array_diff($campaignLeadIds, $unapplicableLeads);
 
-                        unset($excludeLeads, $unapplicableLeads);
+                        unset($unapplicableLeads);
                     }
 
                     if (empty($applicableLeads)) {
@@ -1698,7 +1698,7 @@ class EventModel extends CommonFormModel
                 if ($triggerOn > $now) {
                     $logger->debug(
                         'CAMPAIGN: Date to execute ('.$triggerOn->format('Y-m-d H:i:s T').') is later than now ('.$now->format('Y-m-d H:i:s T')
-                        .') so schedule'
+                        .')' . (($action['decisionPath'] == 'no') ? ' so ignore' : ' so schedule')
                     );
 
                     // Save some RAM for batch processing
