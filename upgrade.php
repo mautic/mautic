@@ -16,6 +16,13 @@ define('MAUTIC_ROOT',              dirname(__DIR__));
 define('MAUTIC_UPGRADE_ROOT',      __DIR__);
 define('MAUTIC_UPGRADE_ERROR_LOG', MAUTIC_ROOT . '/upgrade_errors.txt');
 
+ini_set('display_errors', 'Off');
+date_default_timezone_set('UTC');
+
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\BufferedOutput;
+
 // Get the local config file location
 /** @var $paths */
 $root = MAUTIC_ROOT . '/app';
@@ -67,6 +74,8 @@ function clear_mautic_cache(array $status)
         process_error_log(array('Could not remove the application cache.  You will need to manually delete ' . MAUTIC_CACHE_DIR . '.'));
     }
 
+    apply_critical_migrations();
+
     //Remove the cached update
 
     $status['complete']                     = true;
@@ -76,6 +85,28 @@ function clear_mautic_cache(array $status)
     $status['updateState']['cacheComplete'] = true;
 
     return $status;
+}
+
+function apply_critical_migrations()
+{
+    include dirname(__DIR__) . '/app/bootstrap.php.cache';
+    include dirname(__DIR__) . '/app/AppKernel.php';
+
+    $criticalMigrations = array(
+        '20160225000000'
+    );
+
+    foreach ($criticalMigrations as $version) {
+
+        $args = array('console', 'doctrine:migrations:migrate', '--no-interaction', '--env=prod', '--no-debug', $version);
+
+        $kernel      = new AppKernel('prod', true);
+        $input       = new ArgvInput($args);
+        $application = new Application($kernel);
+        $application->setAutoExit(false);
+        $output = new BufferedOutput();
+        $application->run($input, $output);
+    }
 }
 
 /**

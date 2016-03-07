@@ -333,6 +333,8 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
+     * Returns leads that are part of a lead list that belongs to a campaign
+     *
      * @param       $id
      * @param array $lists
      * @param array $args
@@ -376,14 +378,13 @@ class CampaignRepository extends CommonRepository
             }
         }
 
-        // Exclude leads manually removed from the campaign
+        // Exclude leads already part of or manually removed from the campaign
         $subq = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'campaign_leads')
             ->where(
                 $q->expr()->andX(
                     $q->expr()->eq('campaign_leads.lead_id', 'list_leads.lead_id'),
-                    $q->expr()->eq('campaign_leads.manually_removed', ':false'),
                     $q->expr()->eq('campaign_leads.campaign_id', (int) $id)
                 )
             );

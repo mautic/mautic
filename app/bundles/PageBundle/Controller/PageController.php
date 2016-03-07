@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Mautic\CoreBundle\Templating\TemplateNameParser;
 
 /**
  * Class PageController
@@ -806,7 +807,12 @@ class PageController extends FormController
             $content = array_merge($content, $newContent);
         }
 
-        return $this->render('MauticPageBundle::builder.html.php', array(
+        $this->addAssetsForBuilder();
+        $this->processSlots($slots, $entity);
+
+        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':page.html.php');
+
+        return $this->render($logicalName, array(
             'isNew'         => $isNew,
             'slots'         => $slots,
             'formFactory'   => $this->get('form.factory'),
@@ -927,5 +933,146 @@ class PageController extends FormController
                 'flashes' => $flashes
             ))
         );
+    }
+
+    /**
+     * PreProcess page slots for public view.
+     *
+     * @param array $slots
+     * @param Page $entity
+     */
+    private function processSlots($slots, $entity)
+    {
+        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
+        $assetsHelper = $this->factory->getHelper('template.assets');
+        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
+        $slotsHelper = $this->factory->getHelper('template.slots');
+        /** @var \Mautic\CoreBundle\Templating\Helper\TranslatorHelper $translatorHelper */
+        $translatorHelper = $this->factory->getHelper('template.translator');
+        $formFactory = $this->get('form.factory');
+
+        $slotsHelper->inBuilder(true);
+
+        $content = $entity->getContent();
+
+        foreach ($slots as $slot => $slotConfig) {
+
+            // backward compatibility - if slotConfig array does not exist
+            if (is_numeric($slot)) {
+                $slot = $slotConfig;
+                $slotConfig = array();
+            }
+
+            // define default config if does not exist
+            if (!isset($slotConfig['type'])) {
+                $slotConfig['type'] = 'html';
+            }
+
+            if (!isset($slotConfig['placeholder'])) {
+                $slotConfig['placeholder'] = 'mautic.page.builder.addcontent';
+            }
+
+            $value = isset($content[$slot]) ? $content[$slot] : "";
+
+            if ($slotConfig['type'] == 'text') {
+                $slotsHelper->set($slot, "<input id=\"slot-{$slot}\" type=\"text\" value=\"{$value}\" class=\"mautic-editable\" placeholder=\"{$translatorHelper->trans($slotConfig['placeholder'])}\"/>");
+            } elseif ($slotConfig['type'] == 'textarea') {
+                $slotsHelper->set($slot, "<textarea id=\"slot-{$slot}\" class=\"mautic-editable\" placeholder=\"{$translatorHelper->trans($slotConfig['placeholder'])}\">{$value}</textarea>");
+            } elseif ($slotConfig['type'] == 'slideshow') {
+                if (isset($content[$slot])) {
+                    $options = json_decode($content[$slot], true);
+                } else {
+                    $options = array(
+                        'width' => '100%',
+                        'height' => '250px',
+                        'background_color' => 'transparent',
+                        'arrow_navigation' => false,
+                        'dot_navigation' => true,
+                        'interval' => 5000,
+                        'pause' => 'hover',
+                        'wrap' => true,
+                        'keyboard' => true
+                    );
+                }
+
+                // Create sample slides for first time or if all slides were deleted
+                if (empty($options['slides'])) {
+                    $options['slides'] =  array (
+                        array (
+                            'order' => 0,
+                            'background-image' => $assetsHelper->getUrl('media/images/mautic_logo_lb200.png'),
+                            'captionheader' => 'Caption 1'
+                        ),
+                        array (
+                            'order' => 1,
+                            'background-image' => $assetsHelper->getUrl('media/images/mautic_logo_db200.png'),
+                            'captionheader' => 'Caption 2'
+                        )
+                    );
+                }
+
+                // Order slides
+                usort($options['slides'], function($a, $b)
+                {
+                    return strcmp($a['order'], $b['order']);
+                });
+
+                $options['slot'] = $slot;
+                $options['public'] = false;
+
+                // create config form
+                $options['configForm'] = $formFactory->createNamedBuilder(
+                    null,
+                    'slideshow_config',
+                    array(),
+                    array('data' => $options)
+                )->getForm()->createView();
+
+                // create slide config forms
+                foreach ($options['slides'] as $key => &$slide) {
+                    $slide['key'] = $key;
+                    $slide['slot'] = $slot;
+                    $slide['form'] = $formFactory->createNamedBuilder(
+                        null,
+                        'slideshow_slide_config',
+                        array(),
+                        array('data' => $slide)
+                    )->getForm()->createView();
+                }
+
+                $renderingEngine = $this->container->get('templating');
+
+                if (method_exists($renderingEngine, 'getEngine')) {
+                    $renderingEngine->getEngine('MauticPageBundle:Page:Slots/slideshow.html.php');
+                }
+                $slotsHelper->set($slot, $renderingEngine->render('MauticPageBundle:Page:Slots/slideshow.html.php', $options));
+            } else {
+                // valback for html and unknown field types
+                $slotsHelper->set($slot, "<div id=\"slot-{$slot}\" class=\"mautic-editable\" contenteditable=true data-placeholder=\"{$translatorHelper->trans($slotConfig['placeholder'])}\">{$value}</div>");
+            }
+        }
+
+        //add builder toolbar
+        $slotsHelper->start('builder');
+        ?>
+        <input type="hidden" id="builder_entity_id" value="<?php echo $entity->getSessionId(); ?>" />
+        <?php
+        $slotsHelper->stop();
+    }
+
+    private function addAssetsForBuilder()
+    {
+        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
+        $assetsHelper = $this->factory->getHelper('template.assets');
+        /** @var \Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper $routerHelper */
+        $routerHelper = $this->factory->getHelper('template.router');
+
+        $assetsHelper->addScriptDeclaration("var mauticBasePath    = '" . $this->request->getBasePath() . "';");
+        $assetsHelper->addScriptDeclaration("var mauticAjaxUrl     = '" . $routerHelper->generate("mautic_core_ajax") . "';");
+        $assetsHelper->addScriptDeclaration("var mauticAssetPrefix = '" . $assetsHelper->getAssetPrefix(true) . "';");
+        $assetsHelper->addCustomDeclaration($assetsHelper->getSystemScripts(true, true));
+        $assetsHelper->addScript('app/bundles/PageBundle/Assets/builder/builder.js');
+        $assetsHelper->addStylesheet('app/bundles/PageBundle/Assets/builder/pick-a-color.css');
+        $assetsHelper->addStylesheet('app/bundles/PageBundle/Assets/builder/builder.css');
     }
 }

@@ -256,6 +256,8 @@ return array(
         'webview_text'                 => null,
         'unsubscribe_message'          => null,
         'resubscribe_message'          => null,
-        'monitored_email'              => array()
+        'monitored_email'              => array(),
+        'mailer_is_owner'              => false,
+        'default_signature_text'       => null
     )
 );

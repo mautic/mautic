@@ -70,7 +70,7 @@ class ListModel extends FormModel
      */
     public function getPermissionBase()
     {
-        return 'lead:list';
+        return 'lead:lists';
     }
 
     /**

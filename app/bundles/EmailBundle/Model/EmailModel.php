@@ -1241,7 +1241,7 @@ class EmailModel extends FormModel
             $dnc->setEmailAddress($address);
             $dnc->setDateAdded(new \DateTime());
             $method = 'set'.ucfirst($tag);
-            if (method_exists($dnc, $method)) {
+            if (!method_exists($dnc, $method)) {
                 $method = 'setBounced';
             }
             $dnc->$method();

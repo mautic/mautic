@@ -52,4 +52,4 @@ A Mautic Core membership can be revoked for any of the following reasons:
 - Willful negligence or intent to harm the Mautic project
 - Upon decision of the project leader
 
-Revoked members may re-apply for core membership following at 12 month period.
+Revoked members may re-apply for core membership following a 12 month period.
