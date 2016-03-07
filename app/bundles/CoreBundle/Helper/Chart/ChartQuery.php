@@ -329,7 +329,7 @@ class ChartQuery extends AbstractChart
         // Fetch the count
         $data = $query->execute()->fetch();
 
-        return $data['count'];
+        return (int) $data['count'];
     }
 
     /**
@@ -366,7 +366,7 @@ class ChartQuery extends AbstractChart
 
         $data = $query->execute()->fetch();
 
-        return $data['count'];
+        return (int) $data['count'];
     }
 
     /**
@@ -387,6 +387,6 @@ class ChartQuery extends AbstractChart
 
         $data = $query->execute()->fetch();
 
-        return $data['result'];
+        return (int) $data['result'];
     }
 }
