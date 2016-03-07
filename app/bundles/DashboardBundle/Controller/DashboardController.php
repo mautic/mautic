@@ -50,7 +50,7 @@ class DashboardController extends FormController
                 $session->set('mautic.dashboard.date.from', $from->format($humanFormat));
             }
 
-            if (empty($dashboardFilter['date_to'])) {
+            if (!empty($dashboardFilter['date_to'])) {
                 $to = new \DateTime($dashboardFilter['date_to']);
                 $session->set('mautic.dashboard.date.to', $to->format($humanFormat));
             }
