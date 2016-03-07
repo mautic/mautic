@@ -56,7 +56,7 @@ class BarChart extends AbstractChart implements ChartInterface
     protected $labelFormats = array(
         's' => 'H:i:s',
         'i' => 'H:i',
-        'H' => 'l ga',
+        'H' => 'M j ga',
         'd' => 'M j, y', 'D' => 'M j, y', // ('D' is BC. Can be removed when all charts use this class)
         'W' => 'W',
         'm' => 'M Y', 'M' => 'M Y', // ('M' is BC. Can be removed when all charts use this class)

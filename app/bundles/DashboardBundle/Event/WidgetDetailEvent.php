@@ -119,6 +119,15 @@ class WidgetDetailEvent extends CommonEvent
                 $diff = $params['timeUnit'] == 'W' ? floor($diff / 7) : $diff;
             } elseif ($params['timeUnit'] == 'm') {
                 $diff = $to->diff($from)->format('%y') * 12 + $to->diff($from)->format('%m');
+            } elseif ($params['timeUnit'] == 'H') {
+                if ($from == $to) {
+                    // a diff of two identical dates returns 0, but we expect 24 hours
+                    $to->modify('+1 day');
+                    $toClone = clone $to;
+                    $params['dateTo'] = $toClone->modify('-1 second')->format('Y-m-d H:i:s');
+                }
+                $dateDiff = $to->diff($from);
+                $diff = $dateDiff->h + $dateDiff->days * 24;
             } else {
                 $diff = ($to->diff($from)->format('%' . $unit) + 1);
             }
