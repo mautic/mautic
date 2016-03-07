@@ -204,6 +204,7 @@ class DashboardModel extends FormModel
         $diff        = $dateTo->diff($dateFrom)->format('%a');
         $unit        = 'd';
 
+        if ($diff <= 1) $unit = 'H';
         if ($diff > 31) $unit = 'W';
         if ($diff > 100) $unit = 'm';
         if ($diff > 1000) $unit = 'Y';
