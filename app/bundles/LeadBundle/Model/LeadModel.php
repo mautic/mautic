@@ -1001,7 +1001,7 @@ class LeadModel extends FormModel
         $this->addDncForLead($lead, 'email', $comments, $reason);
 
         // This is here to duplicate previous behavior for BC
-        if ($persist) {
+        if ($persist !== true) {
             /** @var DoNotContact $dnc */
             foreach ($lead->getDoNotContact() as $dnc) {
                 if ($dnc->getChannel() === 'email') {
@@ -1010,7 +1010,7 @@ class LeadModel extends FormModel
             }
         }
 
-        return true;
+        return false;
     }
 
     /**
