@@ -20,7 +20,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class EmailRepository extends CommonRepository
 {
-
     /**
      * Get an array of do not email emails
      *
@@ -29,11 +28,16 @@ class EmailRepository extends CommonRepository
     public function getDoNotEmailList()
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('lower(e.address) as email')
-            ->from(MAUTIC_TABLE_PREFIX.'email_donotemail', 'e');
+        $q->select('distinct(l.email)')
+            ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', 'dnc')
+            ->leftJoin('dnc', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = dnc.lead_id')
+            ->where('dnc.channel = "email"')
+            ->where('l.email != ""');
+
         $results = $q->execute()->fetchAll();
 
         $dnc = array();
+
         foreach ($results as $r) {
             $dnc[] = $r['email'];
         }

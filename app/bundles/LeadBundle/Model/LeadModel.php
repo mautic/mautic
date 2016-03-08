@@ -22,6 +22,7 @@ use Mautic\EmailBundle\Entity\DoNotEmail;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
+use Mautic\LeadBundle\Event\DoNotContactEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
@@ -831,6 +832,33 @@ class LeadModel extends FormModel
     public function setDoNotContact(Lead $lead, $emailAddress = '', $reason = '', $persist = true, $manual = false)
     {
         return $this->unsubscribeLead($lead, $reason, $persist, $manual);
+    }
+
+    /**
+     * @param Lead $lead
+     * @param string $channel
+     * @param array $parameters
+     *
+     * @return bool
+     */
+    public function isContactable(Lead $lead, $channel, $parameters = [])
+    {
+        /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
+        $dncRepo = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:DoNotContact');
+
+        /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
+        $entries = $dncRepo->getEntriesByLeadAndChannel($lead, $channel);
+
+        // If the lead has no entries in the DNC table, we're good to go
+        if (empty($entries)) {
+            return true;
+        }
+
+        $event = new DoNotContactEvent($lead, $channel, $entries, $parameters);
+
+        $this->factory->getDispatcher()->dispatch(LeadEvents::DO_NOT_CONTACT, $event);
+
+        return $event->isContactable();
     }
 
     /**

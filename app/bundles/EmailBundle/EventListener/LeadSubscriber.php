@@ -1,7 +1,7 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -9,6 +9,8 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Event\DoNotContactEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -28,7 +30,8 @@ class LeadSubscriber extends CommonSubscriber
     {
         return array(
             LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
-            LeadEvents::LEAD_POST_MERGE      => array('onLeadMerge', 0)
+            LeadEvents::LEAD_POST_MERGE      => array('onLeadMerge', 0),
+            LeadEvents::DO_NOT_CONTACT       => array('onDoNotContact', 0)
         );
     }
 
@@ -110,5 +113,20 @@ class LeadSubscriber extends CommonSubscriber
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
+    }
+
+    /**
+     * @param DoNotContactEvent $event
+     */
+    public function onDoNotContact(DoNotContactEvent $event)
+    {
+        if ($event->getChannel() === 'email') {
+            foreach ($event->getEntries() as $entry) {
+                if ($entry->getReason() !== DoNotContact::SUBSCRIBED) {
+                    $event->setContactable(false);
+                    $event->stopPropagation();
+                }
+            }
+        }
     }
 }

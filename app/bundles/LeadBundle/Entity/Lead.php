@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\EmailBundle\Entity\DoNotEmail;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\UserBundle\Entity\User;
 
 /**
@@ -55,7 +55,7 @@ class Lead extends FormEntity
     /**
      * @var ArrayCollection
      */
-    private $doNotEmail;
+    private $doNotContact;
 
     /**
      * @var ArrayCollection
@@ -138,6 +138,16 @@ class Lead extends FormEntity
     private $tags;
 
     /**
+     * @var string
+     */
+    private $mobile;
+
+    /**
+     * @var string
+     */
+    private $phone;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -169,7 +179,7 @@ class Lead extends FormEntity
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createOneToMany('doNotEmail', 'Mautic\EmailBundle\Entity\DoNotEmail')
+        $builder->createOneToMany('doNotContact', 'Mautic\LeadBundle\Entity\DoNotContact')
             ->orphanRemoval()
             ->mappedBy('lead')
             ->cascadePersist()
@@ -227,6 +237,14 @@ class Lead extends FormEntity
             ->cascadeMerge()
             ->cascadePersist()
             ->cascadeDetach()
+            ->build();
+
+        $builder->createField('mobile', 'string')
+            ->nullable()
+            ->build();
+
+        $builder->createField('phone', 'string')
+            ->nullable()
             ->build();
     }
 
@@ -298,7 +316,7 @@ class Lead extends FormEntity
     public function __construct()
     {
         $this->ipAddresses     = new ArrayCollection();
-        $this->doNotEmail      = new ArrayCollection();
+        $this->doNotContact    = new ArrayCollection();
         $this->pointsChangeLog = new ArrayCollection();
         $this->tags            = new ArrayCollection();
     }
@@ -671,47 +689,35 @@ class Lead extends FormEntity
     }
 
     /**
-     * @param DoNotEmail $doNotEmail
+     * @param DoNotContact $doNotContact
      *
      * @return $this
      */
-    public function addDoNotEmailEntry(DoNotEmail $doNotEmail)
+    public function addDoNotContactEntry(DoNotContact $doNotContact)
     {
-        if ($doNotEmail->getBounced()) {
-            $type = $doNotEmail->isManual() ? 'manual' : 'bounced';
-        } elseif ($doNotEmail->getUnsubscribed()) {
-            $type = 'unsubscribed';
-        }
+        $this->changes['dnc_status'] = array($doNotContact->getChannel(), $doNotContact->getComments());
 
-        $this->changes['dnc_status'] = array($type, $doNotEmail->getComments());
-
-        $this->doNotEmail[] = $doNotEmail;
+        $this->doNotContact[] = $doNotContact;
 
         return $this;
     }
 
     /**
-     * @param DoNotEmail $doNotEmail
+     * @param DoNotContact $doNotContact
      */
-    public function removeDoNotEmailEntry(DoNotEmail $doNotEmail)
+    public function removeDoNotContactEntry(DoNotContact $doNotContact)
     {
-        if ($doNotEmail->getBounced()) {
-            $type = $doNotEmail->isManual() ? 'manual' : 'bounced';
-        } elseif ($doNotEmail->getUnsubscribed()) {
-            $type = 'unsubscribed';
-        }
+        $this->changes['dnc_status'] = array('removed', $doNotContact->getChannel());
 
-        $this->changes['dnc_status'] = array('removed', $type);
-
-        $this->doNotEmail->removeElement($doNotEmail);
+        $this->doNotContact->removeElement($doNotContact);
     }
 
     /**
      * @return ArrayCollection
      */
-    public function getDoNotEmail()
+    public function getDoNotContact()
     {
-        return $this->doNotEmail;
+        return $this->doNotContact;
     }
 
     /**
@@ -1011,5 +1017,37 @@ class Lead extends FormEntity
         $this->tags = $tags;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMobile()
+    {
+        return $this->mobile;
+    }
+
+    /**
+     * @param string $mobile
+     */
+    public function setMobile($mobile)
+    {
+        $this->mobile = $mobile;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPhone()
+    {
+        return $this->phone;
+    }
+
+    /**
+     * @param string $phone
+     */
+    public function setPhone($phone)
+    {
+        $this->phone = $phone;
     }
 }
