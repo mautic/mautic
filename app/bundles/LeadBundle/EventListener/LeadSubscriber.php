@@ -1,7 +1,7 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\ApiBundle\Event\RouteEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\UserBundle\Event\UserEvent;
@@ -39,7 +40,8 @@ class LeadSubscriber extends CommonSubscriber
             LeadEvents::NOTE_POST_SAVE       => array('onNotePostSave', 0),
             LeadEvents::NOTE_POST_DELETE     => array('onNoteDelete', 0),
             LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
-            UserEvents::USER_PRE_DELETE      => array('onUserDelete', 0)
+            UserEvents::USER_PRE_DELETE      => array('onUserDelete', 0),
+            LeadEvents::DO_NOT_CONTACT       => array('onDoNotContactCheck', -255)
         );
     }
 
@@ -277,5 +279,23 @@ class LeadSubscriber extends CommonSubscriber
             "ipAddress"  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
+    }
+
+    /**
+     * Universal DNC fallback check.
+     *
+     * This should be the final method to fire on the LeadEvents::DO_NOT_CONTACT
+     * event. It must retain the -255 priority. When adding your own
+     * subscribers to this event, use a positive integer priority number.
+     *
+     * @param Events\DoNotContactEvent $event
+     */
+    public function onDoNotContactCheck(Events\DoNotContactEvent $event)
+    {
+        foreach ($event->getEntries() as $entry) {
+            if ($entry->getReason() !== DoNotContact::IS_CONTACTABLE) {
+                $event->setContactable($entry->getReason());
+            }
+        }
     }
 }

@@ -11,6 +11,7 @@ namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\DoNotContact;
 
 /**
  * Class ContactEvent
@@ -27,7 +28,7 @@ class DoNotContactEvent extends CommonEvent
     /**
      * @var int
      */
-    protected $contactable = 0;
+    protected $contactable = DoNotContact::IS_CONTACTABLE;
 
     /**
      * @var \Mautic\LeadBundle\Entity\DoNotContact[]
@@ -47,7 +48,7 @@ class DoNotContactEvent extends CommonEvent
      */
     public function __construct(Lead &$lead, $channel, array $entries, $parameters = [])
     {
-        $this->lead = $lead;
+        $this->entity = $lead;
         $this->channel = $channel;
         $this->entries = $entries;
         $this->parameters = $parameters;
