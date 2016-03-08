@@ -878,6 +878,9 @@ class LeadModel extends FormModel
      * @param string $comments
      * @param int $reason
      * @param bool $flush
+     *
+     * @return boolean If a DNC entry is added or updated, returns true. If a DNC is already present
+     *                 and has the specified reason, nothing is done and this returns false.
      */
     public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $flush = true)
     {
@@ -902,6 +905,8 @@ class LeadModel extends FormModel
             if ($flush) {
                 $this->em->flush();
             }
+
+            return true;
         }
         // Or if the given reason is different than the stated reason
         elseif ($isContactable !== $reason) {
@@ -927,9 +932,13 @@ class LeadModel extends FormModel
                     if ($flush) {
                         $this->em->flush();
                     }
+
+                    return true;
                 }
             }
         }
+
+        return false;
     }
 
     /**
