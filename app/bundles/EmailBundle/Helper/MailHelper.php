@@ -836,8 +836,21 @@ class MailHelper
      * @param null   $charset
      * @param bool   $ignoreTrackingPixel
      */
-    public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false)
+    public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false, $ignoreEmbedImageConversion = false)
     {
+        if (!$ignoreEmbedImageConversion) {
+          $matches = array();
+          if (preg_match_all('/<img\s+src="([^"]+)"/i', $content, $matches)) {
+            $replaces = array();
+            foreach($matches[1] AS $match) {
+              if (strpos($match, 'cid:') === false) {
+                $replaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
+              }
+            }
+            $content = strtr($content, $replaces);
+          }
+        }
+
         if (!$ignoreTrackingPixel) {
             // Append tracking pixel
             $trackingImg = '<img style="display: none;" height="1" width="1" src="{tracking_pixel}" alt="Mautic is open source marketing automation" />';
