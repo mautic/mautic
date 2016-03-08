@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\EmailBundle\Entity\DoNotEmail;
 use Mautic\UserBundle\Entity\User;
 
 /**
@@ -1017,37 +1017,5 @@ class Lead extends FormEntity
         $this->tags = $tags;
 
         return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMobile()
-    {
-        return $this->mobile;
-    }
-
-    /**
-     * @param string $mobile
-     */
-    public function setMobile($mobile)
-    {
-        $this->mobile = $mobile;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPhone()
-    {
-        return $this->phone;
-    }
-
-    /**
-     * @param string $phone
-     */
-    public function setPhone($phone)
-    {
-        $this->phone = $phone;
     }
 }

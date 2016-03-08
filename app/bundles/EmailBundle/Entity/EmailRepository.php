@@ -12,6 +12,8 @@ namespace Mautic\EmailBundle\Entity;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class EmailRepository
@@ -54,14 +56,30 @@ class EmailRepository extends CommonRepository
      */
     public function checkDoNotEmail($email)
     {
-        $q = $this->_em->createQueryBuilder();
-        $q->select('partial e.{id, unsubscribed, bounced, manual, comments}')
-            ->from('MauticEmailBundle:DoNotEmail', 'e')
-            ->where('e.emailAddress = :email')
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('dnc.*')
+            ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', 'dnc')
+            ->leftJoin('dnc', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = dnc.lead_id')
+            ->where('dnc.channel = "email"')
+            ->where('l.email = :email')
             ->setParameter('email', $email);
-        $results = $q->getQuery()->getArrayResult();
 
-        return (!empty($results)) ? $results[0] : false;
+        $results = $q->execute()->fetchAll();
+        $dnc = count($results) ? $results[0] : null;
+
+        if ($dnc === null) {
+            return false;
+        }
+
+        $dnc['reason'] = (int) $dnc['reason'];
+
+        return array(
+            'id' => $dnc['id'],
+            'unsubscribed' => ($dnc['reason'] === DoNotContact::UNSUBSCRIBED),
+            'bounced' => ($dnc['reason'] === DoNotContact::BOUNCED),
+            'manual' => ($dnc['reason'] === DoNotContact::MANUAL),
+            'comments' => $dnc['comments']
+        );
     }
 
     /**
@@ -71,13 +89,27 @@ class EmailRepository extends CommonRepository
      */
     public function removeFromDoNotEmailList($email)
     {
-        $qb = $this->_em->createQueryBuilder();
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel = $this->factory->getModel('lead.lead');
 
-        $qb->delete('MauticEmailBundle:DoNotEmail', 'd')
-            ->andWhere($qb->expr()->eq('d.emailAddress', ':email'))
-            ->setParameter(':email', $email);
+        /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
+        $leadRepo = $this->_em->getRepository('MauticLeadBundle:Lead');
+        $leadId = $leadRepo->getLeadByEmail($email, true);
 
-        $qb->getQuery()->execute();
+        /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
+        $leads = array();
+
+        if (count($leadId) > 1) {
+            foreach ($leadId as $lead) {
+                $leads[] = $leadRepo->getEntity($lead['id']);
+            }
+        } else {
+            $leads[] = $leadRepo->getEntity($leadId['id']);
+        }
+
+        foreach ($leads as $lead) {
+            $leadModel->removeDncForLead($lead, 'email');
+        }
     }
 
     /**
@@ -87,7 +119,7 @@ class EmailRepository extends CommonRepository
      */
     public function deleteDoNotEmailEntry($id)
     {
-        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_donotemail', array('id' => (int) $id));
+        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'lead_donotcontact', array('id' => (int) $id));
     }
 
     /**

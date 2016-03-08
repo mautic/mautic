@@ -25,9 +25,9 @@ class DoNotContactEvent extends CommonEvent
     protected $channel;
 
     /**
-     * @var bool
+     * @var int
      */
-    protected $contactable = true;
+    protected $contactable = 0;
 
     /**
      * @var \Mautic\LeadBundle\Entity\DoNotContact[]
@@ -122,7 +122,10 @@ class DoNotContactEvent extends CommonEvent
     }
 
     /**
-     * @return boolean
+     * @return int
+     *
+     * @see \Mautic\LeadBundle\Entity\DoNotContact This method can return boolean false, so be
+     * sure to always compare the return value against the class constants of DoNotContact
      */
     public function isContactable()
     {
@@ -130,7 +133,10 @@ class DoNotContactEvent extends CommonEvent
     }
 
     /**
-     * @param boolean $contactable
+     * @param int $contactable
+     *
+     * @see \Mautic\LeadBundle\Entity\DoNotContact This method receives
+     * integers via class constants from the DoNotContact class.
      */
     public function setContactable($contactable)
     {

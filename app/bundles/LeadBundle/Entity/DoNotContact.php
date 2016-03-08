@@ -22,9 +22,9 @@ use Mautic\LeadBundle\Entity\Lead;
 class DoNotContact
 {
     /**
-     * Lead is currently subscribed
+     * Lead is contactable.
      */
-    const SUBSCRIBED = 0;
+    const IS_CONTACTABLE = 0;
 
     /**
      * Lead unsubscribed themselves.

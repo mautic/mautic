@@ -122,8 +122,8 @@ class LeadSubscriber extends CommonSubscriber
     {
         if ($event->getChannel() === 'email') {
             foreach ($event->getEntries() as $entry) {
-                if ($entry->getReason() !== DoNotContact::SUBSCRIBED) {
-                    $event->setContactable(false);
+                if ($entry->getReason() !== DoNotContact::IS_CONTACTABLE) {
+                    $event->setContactable($entry->getReason());
                     $event->stopPropagation();
                 }
             }
