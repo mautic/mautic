@@ -981,10 +981,10 @@ class LeadModel extends FormModel
      * @param bool|true  $persist
      * @param bool|false $manual
      *
-     * @return DoNotEmail|bool
+     * @return DoNotContact|bool
      * @throws \Doctrine\DBAL\DBALException
      *
-     * @deprecated Use unsubscribeLead() instead. To be removed in 2.0.
+     * @deprecated Use addDncForLead() instead. To be removed in 2.0.
      */
     public function setDoNotContact(Lead $lead, $emailAddress = '', $reason = '', $persist = true, $manual = false)
     {
