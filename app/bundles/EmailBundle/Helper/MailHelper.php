@@ -840,7 +840,7 @@ class MailHelper
     {
         if (!$ignoreEmbedImageConversion) {
           $matches = array();
-          if (preg_match_all('/<img\s+src="([^"]+)"/i', $content, $matches)) {
+          if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
             $replaces = array();
             foreach($matches[1] AS $match) {
               if (strpos($match, 'cid:') === false) {
