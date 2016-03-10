@@ -862,7 +862,7 @@ class LeadModel extends FormModel
             if ($dnc->getChannel() === $channel) {
                 $lead->removeDoNotContactEntry($dnc);
 
-                $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+                $this->getRepository()->saveEntity($lead);
 
                 return true;
             }
@@ -885,9 +885,7 @@ class LeadModel extends FormModel
      */
     public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $flush = true)
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead.lead');
-        $isContactable = $leadModel->isContactable($lead, $channel);
+        $isContactable = $this->isContactable($lead, $channel);
         $reason = $this->determineReasonFromTag($reason);
 
         // If they don't have a DNC entry yet
@@ -901,7 +899,7 @@ class LeadModel extends FormModel
 
             $lead->addDoNotContactEntry($dnc);
 
-            $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+            $this->getRepository()->saveEntity($lead);
 
             if ($flush) {
                 $this->em->flush();
@@ -928,7 +926,7 @@ class LeadModel extends FormModel
                     $lead->addDoNotContactEntry($dnc);
 
                     // Persist
-                    $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+                    $this->getRepository()->saveEntity($lead);
 
                     if ($flush) {
                         $this->em->flush();
