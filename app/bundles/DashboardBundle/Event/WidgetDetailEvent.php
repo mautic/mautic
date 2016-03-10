@@ -119,6 +119,8 @@ class WidgetDetailEvent extends CommonEvent
                 $diff = $params['timeUnit'] == 'W' ? floor($diff / 7) : $diff;
             } elseif ($params['timeUnit'] == 'm') {
                 $diff = $to->diff($from)->format('%y') * 12 + $to->diff($from)->format('%m');
+                if ($to->diff($from)->format('%d') > 0) $diff++;
+                if ($from->format('d') >= $to->format('d')) $diff++;
             } elseif ($params['timeUnit'] == 'H') {
                 if ($from == $to) {
                     // a diff of two identical dates returns 0, but we expect 24 hours
