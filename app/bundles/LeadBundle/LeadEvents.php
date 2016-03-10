@@ -257,9 +257,4 @@ final class LeadEvents
      * @var string
      */
     const NOTE_POST_DELETE   = 'mautic.lead_note_post_delete';
-
-    /**
-     *
-     */
-    const DO_NOT_CONTACT = 'mautic.lead_do_not_contact';
 }

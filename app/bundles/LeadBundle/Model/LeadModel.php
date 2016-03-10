@@ -23,7 +23,6 @@ use Mautic\EmailBundle\Entity\DoNotEmail;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
-use Mautic\LeadBundle\Event\DoNotContactEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
@@ -819,31 +818,33 @@ class LeadModel extends FormModel
     /**
      * @param Lead $lead
      * @param string $channel
-     * @param array $parameters
      *
      * @return int
      *
      * @see \Mautic\LeadBundle\Entity\DoNotContact This method can return boolean false, so be
-     * sure to always compare the return value against the class constants of DoNotContact
+     *                                             sure to always compare the return value against
+     *                                             the class constants of DoNotContact
      */
-    public function isContactable(Lead $lead, $channel, $parameters = [])
+    public function isContactable(Lead $lead, $channel)
     {
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
         $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
 
         /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
-        $entries = $dncRepo->getEntriesByLeadAndChannel($lead, $channel);
+        $dncEntries = $dncRepo->getEntriesByLeadAndChannel($lead, $channel);
 
         // If the lead has no entries in the DNC table, we're good to go
-        if (empty($entries)) {
+        if (empty($dncEntries)) {
             return DoNotContact::IS_CONTACTABLE;
         }
 
-        $event = new DoNotContactEvent($lead, $channel, $entries, $parameters);
+        foreach ($dncEntries as $dnc) {
+            if ($dnc->getReason() !== DoNotContact::IS_CONTACTABLE) {
+                return $dnc->getReason();
+            }
+        }
 
-        $this->factory->getDispatcher()->dispatch(LeadEvents::DO_NOT_CONTACT, $event);
-
-        return $event->isContactable();
+        return DoNotContact::IS_CONTACTABLE;
     }
 
     /**
