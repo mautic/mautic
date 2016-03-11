@@ -115,18 +115,18 @@ class BarChart extends AbstractChart implements ChartInterface
     /**
      * Generate array of labels from the form data
      *
-     * @param  string  $unit
-     * @param  integer $limit
-     * @param  string  $endDate
-     * @param  string  $order
+     * @param  string   $unit
+     * @param  integer  $limit
+     * @param  DateTime $endDate
+     * @param  string   $order
      */
-    public function generateTimeLabels($unit, $limit, $endDate = null, $order = 'DESC')
+    public function generateTimeLabels($unit, $limit, \DateTime $endDate = null, $order = 'DESC')
     {
         if (!isset($this->labelFormats[$unit])) {
             throw new \UnexpectedValueException('Date/Time unit "' . $unit . '" is not available for a label.');
         }
 
-        $date    = new \DateTime($endDate);
+        $date    = clone $endDate;
         $oneUnit = $this->getUnitObject($unit);
 
         for ($i = 0; $i < $limit; $i++) {

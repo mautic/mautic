@@ -91,14 +91,6 @@ class WidgetDetailEvent extends CommonEvent
         $params = $widget->getParams();
 
         // Set required params if undefined
-        if (!isset($params['dateFrom'])) {
-            $params['dateFrom'] = null;
-        }
-
-        if (!isset($params['dateTo'])) {
-            $params['dateTo'] = null;
-        }
-
         if (!isset($params['timeUnit'])) {
             $params['timeUnit'] = null;
         }
@@ -109,8 +101,8 @@ class WidgetDetailEvent extends CommonEvent
 
         // Count the amount from the date range if the $dateFrom is provided
         if ($params['dateFrom']) {
-            $from   = new \DateTime($params['dateFrom']);
-            $to     = new \DateTime($params['dateTo']);
+            $from   = $params['dateFrom'];
+            $to     = $params['dateTo'];
             $unit   = $params['timeUnit'];
 
             if ($params['timeUnit'] == 'd' || $params['timeUnit'] == 'W') {
@@ -126,7 +118,7 @@ class WidgetDetailEvent extends CommonEvent
                     // a diff of two identical dates returns 0, but we expect 24 hours
                     $to->modify('+1 day');
                     $toClone = clone $to;
-                    $params['dateTo'] = $toClone->modify('-1 second')->format('Y-m-d H:i:s');
+                    $params['dateTo'] = $toClone->modify('-1 second');
                 }
                 $dateDiff = $to->diff($from);
                 $diff = $dateDiff->h + $dateDiff->days * 24;

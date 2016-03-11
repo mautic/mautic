@@ -65,8 +65,8 @@ class WidgetApiController extends CommonApiController
         $params = array(
             'amount'   => InputHelper::int($this->request->get('amount', 12)),
             'timeUnit' => InputHelper::clean($this->request->get('timeUnit', 'Y')),
-            'dateFrom' => InputHelper::clean($this->request->get('dateFrom', null)),
-            'dateTo'   => InputHelper::clean($this->request->get('dateTo', null)),
+            'dateFrom' => new \DateTime(InputHelper::clean($this->request->get('dateFrom', null))),
+            'dateTo'   => new \DateTime(InputHelper::clean($this->request->get('dateTo', null))),
             'limit'    => InputHelper::int($this->request->get('limit', null))
         );
 

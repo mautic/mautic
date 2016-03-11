@@ -139,6 +139,19 @@ class DashboardModel extends FormModel
         // Merge global filter with widget params
         $widgetParams = $widget->getParams();
         $resultParams = array_merge($widgetParams, $filter);
+
+        // Add the user timezone
+        if (empty($resultParams['timezone'])) {
+            $resultParams['timezone'] = $this->factory->getUser()->getTimezone();
+        }
+
+        // Clone the objects in param array to avoid reference issues if some subscriber changes them
+        foreach ($resultParams as &$param) {
+            if (is_object($param)) {
+                $param = clone $param;
+            }
+        }
+
         $widget->setParams($resultParams);
 
         $event = new WidgetDetailEvent($this->translator);
@@ -197,10 +210,9 @@ class DashboardModel extends FormModel
         $session     = $this->factory->getSession();
         $today       = new \DateTime();
         $lastMonth   = (new \DateTime())->sub(new \DateInterval('P30D'));
-        $humanFormat = 'M j, Y';
         $mysqlFormat = 'Y-m-d H:i:s';
-        $dateFrom    = new \DateTime($session->get('mautic.dashboard.date.from', $lastMonth->format($humanFormat)));
-        $dateTo      = new \DateTime($session->get('mautic.dashboard.date.to', $today->format($humanFormat)));
+        $dateFrom    = new \DateTime($session->get('mautic.dashboard.date.from', $lastMonth->format($mysqlFormat)));
+        $dateTo      = new \DateTime($session->get('mautic.dashboard.date.to', $today->format($mysqlFormat)));
         $diff        = $dateTo->diff($dateFrom)->format('%a');
         $unit        = 'd';
 
@@ -209,12 +221,10 @@ class DashboardModel extends FormModel
         if ($diff > 100) $unit = 'm';
         if ($diff > 1000) $unit = 'Y';
 
-        $filter = [
-            'dateFrom' => $dateFrom->format($mysqlFormat),
-            'dateTo'   => $dateTo->format($mysqlFormat),
+        return array(
+            'dateFrom' => $dateFrom,
+            'dateTo'   => $dateTo,
             'timeUnit' => $unit,
-        ];
-
-        return $filter;
+        );
     }
 }

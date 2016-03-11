@@ -146,24 +146,29 @@ class ChartQuery extends AbstractChart
     /**
      * Apply date filters to the query
      *
+     * @param  QueryBuilder
      * @param  string
+     * @param  DateTime
+     * @param  DateTime
      */
-    public function applyDateFilters(&$query, $dateColumn, $dateFrom, $dateTo)
+    public function applyDateFilters(&$query, $dateColumn, \DateTime $dateFrom, \DateTime $dateTo)
     {
         if ($dateColumn) {
+
+            // Convert the dates to UTC
+            $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
+            $dateTo->setTimeZone(new \DateTimeZone('UTC'));
+
             // Apply the start date/time if set
             if ($dateFrom) {
                 $query->andWhere('t.' . $dateColumn . ' >= :dateFrom');
-                $query->setParameter('dateFrom', $dateFrom);
+                $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
             }
 
             // Apply the end date/time if set
             if ($dateTo) {
-                // Make sure the dateTo is the end of the day
-                $dateTo = str_replace('00:00:00', '23:59:59', $dateTo);
-
                 $query->andWhere('t.' . $dateColumn . ' <= :dateTo');
-                $query->setParameter('dateTo', $dateTo);
+                $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
             }
         }
     }
@@ -202,13 +207,13 @@ class ChartQuery extends AbstractChart
      * @param  string     $unit will be added to where claues
      * @param  integer    $limit will be added to where claues
      * @param  array      $filters will be added to where claues
-     * @param  string     $dateFrom will be added to where claues
-     * @param  string     $dateTo will be added to where claues
+     * @param  DateTime   $dateFrom will be added to where claues
+     * @param  DateTime   $dateTo will be added to where claues
      * @param  string     $order will be added to where claues
      *
      * @return array
      */
-    public function fetchTimeData($table, $column, $unit = 'm', $limit = 12, $dateFrom = null, $dateTo = null, $filters = array(), $order = 'DESC') {
+    public function fetchTimeData($table, $column, $unit = 'm', $limit = 12, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array(), $order = 'DESC') {
         // Convert time unitst to the right form for current database platform
         $dbUnit = $this->translateTimeUnit($unit);
         $query = $this->connection->createQueryBuilder();
@@ -240,7 +245,7 @@ class ChartQuery extends AbstractChart
         $rawData = $query->execute()->fetchAll();
         $data    = array();
         $oneUnit = $this->getUnitObject($unit);
-        $date    = new \DateTime($dateTo);
+        $date    = $dateTo;
         $date->format($this->sqlFormats[$unit]);
 
         // Convert data from DB to the chart.js format
@@ -255,7 +260,7 @@ class ChartQuery extends AbstractChart
             }
 
             foreach ($rawData as $key => $item) {
-                $itemDate = new \DateTime($item['date']);
+                $itemDate = (new \DateTime($item['date'], new \DateTimeZone('UTC')));
 
                 // The right value is between the time unit and time unit +1 for ASC ordering
                 if ($order == 'ASC' && $itemDate >= $date && $itemDate < $nextDate) {
@@ -293,8 +298,8 @@ class ChartQuery extends AbstractChart
      * @param  string     $table without prefix
      * @param  string     $uniqueColumn name
      * @param  string     $dateColumn name
-     * @param  string     $dateFrom will be added to where claues
-     * @param  string     $dateTo will be added to where claues
+     * @param  DateTime   $dateFrom will be added to where claues
+     * @param  DateTime   $dateTo will be added to where claues
      * @param  array      $filters will be added to where claues
      * @param  array      $options for special behavior
      */
@@ -340,9 +345,11 @@ class ChartQuery extends AbstractChart
      * @param  string     $dateColumn2
      * @param  integer    $startSecond
      * @param  integer    $endSecond
+     * @param  DateTime   $dateFrom will be added to where claues
+     * @param  DateTime   $dateTo will be added to where claues
      * @param  array      $filters will be added to where claues
      */
-    public function countDateDiff($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $dateFrom, $dateTo, $filters = array()) {
+    public function countDateDiff($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, \DateTime $dateFrom, \DateTime $dateTo, $filters = array()) {
         $query = $this->connection->createQueryBuilder();
 
         $query->select('COUNT(t.' . $dateColumn1 . ') AS count')

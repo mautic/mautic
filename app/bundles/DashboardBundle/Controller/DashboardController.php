@@ -39,30 +39,29 @@ class DashboardController extends FormController
 
         $action          = $this->generateUrl('mautic_dashboard_index');
         $humanFormat     = 'M j, Y';
+        $mysqlFormat     = 'Y-m-d';
         $filterForm      = $this->get('form.factory')->create('dashboard_filter', null, array('action' => $action));
 
         if ($this->request->isMethod('POST')) {
             $session = $this->factory->getSession();
             $dashboardFilter = $this->request->get('dashboard_filter', array());
-
             if (!empty($dashboardFilter['date_from'])) {
                 $from = new \DateTime($dashboardFilter['date_from']);
-                $session->set('mautic.dashboard.date.from', $from->format($humanFormat));
+                $session->set('mautic.dashboard.date.from', $from->format($mysqlFormat));
             }
 
             if (!empty($dashboardFilter['date_to'])) {
                 $to = new \DateTime($dashboardFilter['date_to']);
-                $session->set('mautic.dashboard.date.to', $to->format($humanFormat));
+                $session->set('mautic.dashboard.date.to', $to->format($mysqlFormat));
             }
         }
 
         $filter = $model->getDefaultFilter();
         $model->populateWidgetsContent($widgets, $filter);
-
         $filterForm->setData(
             array(
-                'date_from' => (new \DateTime($filter['dateFrom']))->format($humanFormat),
-                'date_to' => (new \DateTime($filter['dateTo']))->format($humanFormat)
+                'date_from' => $filter['dateFrom']->format($humanFormat),
+                'date_to' => $filter['dateTo']->format($humanFormat)
             )
         );
 
