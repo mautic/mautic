@@ -99,6 +99,10 @@ class WidgetDetailEvent extends CommonEvent
             $params['amount'] = null;
         }
 
+        if (!isset($params['dateFormat'])) {
+            $params['dateFormat'] = null;
+        }
+
         // Count the amount from the date range if the $dateFrom is provided
         if ($params['dateFrom']) {
             $from   = $params['dateFrom'];

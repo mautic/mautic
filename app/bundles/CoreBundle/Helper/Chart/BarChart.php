@@ -48,6 +48,13 @@ class BarChart extends AbstractChart implements ChartInterface
     protected $order;
 
     /**
+     * Configurable date format
+     *
+     * @var string
+     */
+    protected $dateFormat;
+
+    /**
      * Match date/time unit to a humanly readable label
      * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      *
@@ -69,14 +76,16 @@ class BarChart extends AbstractChart implements ChartInterface
      * @param string  $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param integer $limit the number of loaded items
      * @param string  $end date
+     * @param string  $dateFormat
      * @param string  $order (DESC|ASC)
      */
-    public function __construct($unit = 'm', $limit = 12, $end = null, $order = 'DESC')
+    public function __construct($unit = 'm', $limit = 12, $end = null, $dateFormat = null, $order = 'DESC')
     {
         $this->unit  = $unit;
         $this->limit = $limit;
         $this->end = $end;
         $this->order = $order;
+        $this->dateFormat = $dateFormat;
         $this->generateTimeLabels($unit, $limit, $end, $order);
     }
 
@@ -128,9 +137,10 @@ class BarChart extends AbstractChart implements ChartInterface
 
         $date    = clone $endDate;
         $oneUnit = $this->getUnitObject($unit);
+        $format  = isset($this->dateFormat) ? $this->dateFormat : $this->labelFormats[$unit];
 
         for ($i = 0; $i < $limit; $i++) {
-            $this->labels[] = $date->format($this->labelFormats[$unit]);
+            $this->labels[] = $date->format($format);
             if ($order == 'DESC') {
                 $date->sub($oneUnit);
             } else {

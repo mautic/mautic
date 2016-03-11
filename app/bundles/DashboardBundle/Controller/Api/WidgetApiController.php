@@ -77,11 +77,12 @@ class WidgetApiController extends CommonApiController
         }
 
         $params = array(
-            'amount'   => InputHelper::int($this->request->get('amount', 12)),
-            'timeUnit' => InputHelper::clean($this->request->get('timeUnit', 'Y')),
-            'dateFrom' => $fromDate,
-            'dateTo'   => $toDate,
-            'limit'    => InputHelper::int($this->request->get('limit', null))
+            'amount'     => InputHelper::int($this->request->get('amount', 12)),
+            'timeUnit'   => InputHelper::clean($this->request->get('timeUnit', 'Y')),
+            'dateFormat' => InputHelper::clean($this->request->get('dateFormat', null)),
+            'dateFrom'   => $fromDate,
+            'dateTo'     => $toDate,
+            'limit'      => InputHelper::int($this->request->get('limit', null))
         );
 
         $cacheTimeout = InputHelper::int($this->request->get('cacheTimeout', null));

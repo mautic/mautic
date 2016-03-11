@@ -1222,16 +1222,17 @@ class LeadModel extends FormModel
      *
      * @param integer  $amount Number of units
      * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string   $dateFrom
-     * @param string   $dateTo
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $dateFormat
      * @param array    $filter
      *
      * @return array
      */
-    public function getLeadsLineChartData($amount, $unit, $dateFrom, $dateTo, $lists = null, $filter = array())
+    public function getLeadsLineChartData($amount, $unit, $dateFrom, $dateTo, $lists = null, $dateFormat = null, $filter = array())
     {
         $topLists  = null;
-        $lineChart = new LineChart($unit, $amount, $dateTo);
+        $lineChart = new LineChart($unit, $amount, $dateTo, $dateFormat);
         $query     = new ChartQuery($this->em->getConnection());
         $anonymousFilter = $filter;
         $anonymousFilter['date_identified'] = array(

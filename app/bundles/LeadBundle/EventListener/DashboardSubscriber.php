@@ -65,7 +65,14 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getLeadsLineChartData($params['amount'], $params['timeUnit'], $params['dateFrom'], $params['dateTo'], $params['lists'])
+                    'chartData'   => $model->getLeadsLineChartData(
+                        $params['amount'],
+                        $params['timeUnit'],
+                        $params['dateFrom'],
+                        $params['dateTo'],
+                        $params['lists'],
+                        $params['dateFormat']
+                    )
                 ));
             }
 
