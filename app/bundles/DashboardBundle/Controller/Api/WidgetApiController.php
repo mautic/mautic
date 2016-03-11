@@ -62,9 +62,11 @@ class WidgetApiController extends CommonApiController
      */
     public function getDataAction($type)
     {
+        $start = microtime(true);
         $timezone = InputHelper::clean($this->request->get('timezone', null));
         $from = InputHelper::clean($this->request->get('dateFrom', null));
         $to = InputHelper::clean($this->request->get('dateTo', null));
+        $dataFormat = InputHelper::clean($this->request->get('dataFormat', null));
 
         if ($timezone) {
             $fromDate = new \DateTime($from, new \DateTimeZone($timezone));
@@ -101,7 +103,19 @@ class WidgetApiController extends CommonApiController
             return $this->notFound();
         }
 
+        if ($dataFormat == 'raw' && isset($data['chartData']['labels']) && isset($data['chartData']['datasets'])) {
+            $rawData = array();
+            foreach ($data['chartData']['datasets'] as $dataset) {
+                $rawData[$dataset['label']] = array();
+                foreach ($dataset['data'] as $key => $value) {
+                    $rawData[$dataset['label']][$data['chartData']['labels'][$key]] = $value;
+                }
+            }
+            $data = $rawData;
+        }
+
         $data['cached'] = $widget->isCached();
+        $data['execution_time'] = microtime(true) - $start;
 
         $view = $this->view(array('success' => 1, 'data' => $data), Codes::HTTP_OK);
 
