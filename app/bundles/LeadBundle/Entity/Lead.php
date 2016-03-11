@@ -138,16 +138,6 @@ class Lead extends FormEntity
     private $tags;
 
     /**
-     * @var string
-     */
-    private $mobile;
-
-    /**
-     * @var string
-     */
-    private $phone;
-
-    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -237,14 +227,6 @@ class Lead extends FormEntity
             ->cascadeMerge()
             ->cascadePersist()
             ->cascadeDetach()
-            ->build();
-
-        $builder->createField('mobile', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('phone', 'string')
-            ->nullable()
             ->build();
     }
 
