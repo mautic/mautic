@@ -62,11 +62,23 @@ class WidgetApiController extends CommonApiController
      */
     public function getDataAction($type)
     {
+        $timezone = InputHelper::clean($this->request->get('timezone', null));
+        $from = InputHelper::clean($this->request->get('dateFrom', null));
+        $to = InputHelper::clean($this->request->get('dateTo', null));
+
+        if ($timezone) {
+            $fromDate = new \DateTime($from, new \DateTimeZone($timezone));
+            $toDate = new \DateTime($to, new \DateTimeZone($timezone));
+        } else {
+            $fromDate = new \DateTime($from);
+            $toDate = new \DateTime($to);
+        }
+
         $params = array(
             'amount'   => InputHelper::int($this->request->get('amount', 12)),
             'timeUnit' => InputHelper::clean($this->request->get('timeUnit', 'Y')),
-            'dateFrom' => new \DateTime(InputHelper::clean($this->request->get('dateFrom', null))),
-            'dateTo'   => new \DateTime(InputHelper::clean($this->request->get('dateTo', null))),
+            'dateFrom' => $fromDate,
+            'dateTo'   => $toDate,
             'limit'    => InputHelper::int($this->request->get('limit', null))
         );
 
