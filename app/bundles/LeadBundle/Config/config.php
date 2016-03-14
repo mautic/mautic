@@ -105,6 +105,10 @@ return array(
                 'path'       => '/leads/list/fields',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getFields'
             ),
+        	'mautic_api_editpointslead' => array(
+        		'path' => '/leads/{leadId}/setpoints/{points}',
+        		'controller' => 'MauticLeadBundle:Api\LeadApi:setPoints',
+        	),
             'mautic_api_getleadlists'      => array(
                 'path'       => '/leads/list/lists',
                 'controller' => 'MauticLeadBundle:Api\ListApi:getLists'
