@@ -389,8 +389,10 @@ class BuilderSubscriber extends CommonSubscriber
             $tokens['{trackedlink='.$link->getRedirectId().'}'] = $trackedUrl;
         }
 
+        $leadId = !empty($clickthrough) ? $clickthrough['lead'] : '0';
+
         // Search/replace
-        if (!isset($emailTrackedLinks[$emailId]['contentReplaced'])) {
+        if (!isset($emailTrackedLinks[$emailId]['contentReplaced'][$leadId])) {
             // Sort longer to shorter strings to ensure that URLs that share the same base are appropriately replaced
             krsort($emailTrackedLinks[$emailId]['secondContentReplace']);
 
@@ -426,7 +428,7 @@ class BuilderSubscriber extends CommonSubscriber
             }
             $event->setContent($content);
 
-            $emailTrackedLinks[$emailId]['contentReplaced'] = true;
+            $emailTrackedLinks[$emailId]['contentReplaced'][$leadId] = true;
 
             unset($firstSearch, $firstReplace, $secondSearch, $secondSearch, $content, $plainText);
         }
