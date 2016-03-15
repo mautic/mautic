@@ -109,6 +109,14 @@ return array(
         		'path' => '/leads/{leadId}/setpoints/{points}',
         		'controller' => 'MauticLeadBundle:Api\LeadApi:setPoints',
         	),
+        	'mautic_api_addpointslead' => array(
+        			'path' => '/leads/{leadId}/addpoints/{points}',
+        			'controller' => 'MauticLeadBundle:Api\LeadApi:addPoints',
+        	),
+        	'mautic_api_removepointslead' => array(
+        			'path' => '/leads/{leadId}/removepoints/{points}',
+        			'controller' => 'MauticLeadBundle:Api\LeadApi:removePoints',
+        	),
             'mautic_api_getleadlists'      => array(
                 'path'       => '/leads/list/lists',
                 'controller' => 'MauticLeadBundle:Api\ListApi:getLists'
