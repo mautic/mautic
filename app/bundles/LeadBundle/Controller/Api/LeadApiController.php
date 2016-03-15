@@ -292,6 +292,31 @@ class LeadApiController extends CommonApiController
     }
 
     /**
+     * Change the number of points a lead
+     *
+     * @param int $leadId
+     * @param int $points
+     *
+     * @return 
+     */
+    public function setPointsAction($leadId, $points) {
+    	// recover lead
+    	$lead = $this->model->getEntity($leadId);
+    	if (!$lead instanceof $this->entityClass) {
+    		return $this->notFound();
+    	}
+    	if (!$this->checkEntityAccess($lead, 'edit')) {
+    		return $this->accessDenied();
+    	}
+    	 
+    	// change the numbre of points
+    	$lead->setPoints($points);
+    	
+    	// sauv bdd
+    	$this->editEntityAction($leadId);
+    }
+    
+    /**
      * {@inheritdoc}
      *
      * @param \Mautic\LeadBundle\Entity\Lead  &$entity
