@@ -67,6 +67,7 @@ class WidgetApiController extends CommonApiController
         $from = InputHelper::clean($this->request->get('dateFrom', null));
         $to = InputHelper::clean($this->request->get('dateTo', null));
         $dataFormat = InputHelper::clean($this->request->get('dataFormat', null));
+        $response = array('success' => 0);
 
         if ($timezone) {
             $fromDate = new \DateTime($from, new \DateTimeZone($timezone));
@@ -115,10 +116,12 @@ class WidgetApiController extends CommonApiController
             $data = $rawData;
         }
 
-        $data['cached'] = $widget->isCached();
-        $data['execution_time'] = microtime(true) - $start;
+        $response['cached'] = $widget->isCached();
+        $response['execution_time'] = microtime(true) - $start;
+        $response['success'] = 1;
+        $response['data'] = $data;
 
-        $view = $this->view(array('success' => 1, 'data' => $data), Codes::HTTP_OK);
+        $view = $this->view($response, Codes::HTTP_OK);
 
         return $this->handleView($view);
     }
