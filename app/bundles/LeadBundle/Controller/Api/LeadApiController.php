@@ -313,7 +313,7 @@ class LeadApiController extends CommonApiController
     	$lead->setPoints($points);
     	
     	// sauv bdd
-    	$this->editEntityAction($leadId);
+    	$this->model->saveEntity($lead, false);
     }
     
     /**
@@ -336,14 +336,13 @@ class LeadApiController extends CommonApiController
     	
     	// collect the points
     	$pointslead = $lead->getPoints();
-    	
     	$points = $pointslead + $points;
-    
+ 
     	// change the numbre of points
     	$lead->setPoints($points);
-    	 
+    	
     	// sauv bdd
-    	$this->editEntityAction($leadId);
+    	$this->model->saveEntity($lead, false);
     }
     
     /**
@@ -366,14 +365,13 @@ class LeadApiController extends CommonApiController
     	 
     	// collect the points
     	$pointslead = $lead->getPoints();
-    	 
     	$points = $pointslead - $points;
     
     	// change the numbre of points
     	$lead->setPoints($points);
     
     	// sauv bdd
-    	$this->editEntityAction($leadId);
+    	$this->model->saveEntity($lead, false);
     }
     
     /**
