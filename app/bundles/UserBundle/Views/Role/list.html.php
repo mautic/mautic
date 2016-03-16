@@ -35,6 +35,11 @@ endif;
                 'text'       => 'mautic.core.description',
                 'class'      => 'visible-md visible-lg col-role-desc'
             ));
+            ?>
+            <th class="visible-md visible-lg col-rolelist-usercount">
+                <?php echo $view['translator']->trans('mautic.user.role.list.thead.usercount'); ?>
+            </th>
+            <?php
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'role',
                 'orderBy'    => 'r.id',
@@ -62,12 +67,25 @@ endif;
                     ?>
                 </td>
                 <td>
-                    <a href="<?php echo $view['router']->generate('mautic_user_index', array("search" => $view['translator']->trans('mautic.user.user.searchcommand.role') . ':' .  $item->getName())); ?>" data-toggle="ajax">
+                    <?php if ($permissions['edit']) : ?>
+                    <a href="<?php echo $view['router']->generate('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajax">
                         <?php echo $item->getName(); ?>
                     </a>
+                    <?php else : ?>
+                        <?php echo $item->getName(); ?>
+                    <?php endif; ?>
                 </td>
-                <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
-                <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
+                <td class="visible-md visible-lg">
+                    <?php echo $item->getDescription(); ?>
+                </td>
+                <td class="visible-md visible-lg">
+                    <a class="label label-primary" href="<?php echo $view['router']->generate('mautic_user_index', array("search" => $view['translator']->trans('mautic.user.user.searchcommand.role') . ':&quot;' .  $item->getName() . '&quot;')); ?>" data-toggle="ajax"<?php echo ($userCounts[$item->getId()] == 0) ? "disabled=disabled" : ""; ?>>
+                        <?php echo $view['translator']->transChoice('mautic.user.role.list.viewusers_count', $userCounts[$item->getId()], array('%count%' => $userCounts[$item->getId()])); ?>
+                    </a>
+                </td>
+                <td class="visible-md visible-lg">
+                    <?php echo $item->getId(); ?>
+                </td>
             </tr>
         <?php endforeach; ?>
         </tbody>
