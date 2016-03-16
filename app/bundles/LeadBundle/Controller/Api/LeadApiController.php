@@ -15,6 +15,8 @@ use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\CoreBundle\Entity\IpAddress;
 
 /**
  * Class LeadApiController
@@ -312,6 +314,8 @@ class LeadApiController extends CommonApiController
     	// change the numbre of points
     	$lead->setPoints($points);
     	
+		$this->historyEventsPointsApi($lead, $points, "Mise à jour");
+    	
     	// sauv bdd
     	$this->model->saveEntity($lead, false);
     }
@@ -337,6 +341,8 @@ class LeadApiController extends CommonApiController
     	// collect the points
     	$pointslead = $lead->getPoints();
     	$points = $pointslead + $points;
+    	
+		$this->historyEventsPointsApi($lead, $points, "Addition");
  
     	// change the numbre of points
     	$lead->setPoints($points);
@@ -366,12 +372,39 @@ class LeadApiController extends CommonApiController
     	// collect the points
     	$pointslead = $lead->getPoints();
     	$points = $pointslead - $points;
+    	
+		$this->historyEventsPointsApi($lead, $points, "Soustraction");
     
     	// change the numbre of points
     	$lead->setPoints($points);
     
     	// sauv bdd
     	$this->model->saveEntity($lead, false);
+    }
+    
+    /**
+     * 
+     */
+    protected function historyEventsPointsApi ($lead, $points, $actionName) {
+    	$ip = new IpAddress();
+    	$ip->setIpAddress($this->request->server->get('SERVER_ADDR'));
+    	 
+    	// $eventName = $this->factory->getTranslator()->trans('mautic.lead.report.points.action_name', array(), null, 'fr');
+    	// $actionName = $this->factory->getTranslator()->trans('mautic.lead.field.website', array(), 'fixtures', 'fr');
+    	
+    	$eventName = "Points API";
+    	 
+    	$event = new PointsChangeLog();
+    	$event->setType('API');
+    	$event->setEventName($eventName);
+    	$event->setActionName($actionName);
+    	$event->setIpAddress($ip);
+    	$event->setDateAdded(new \DateTime());
+    	 
+    	$event->setDelta($points);
+    	$event->setLead($lead);
+    	 
+    	$lead->addPointsChangeLog($event);
     }
     
     /**
