@@ -448,11 +448,11 @@ class AssetModel extends FormModel
      */
     public function getDownloadsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
     {
-        $barChart  = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
-        $chartData = $query->fetchTimeData('asset_downloads', 'date_download', $unit, $dateFrom, $dateTo, $filter);
-        $barChart->setDataset('Download Count', $chartData);
-        return $barChart->render();
+        $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $chartData = $query->fetchTimeData('asset_downloads', 'date_download', $filter);
+        $chart->setDataset('Download Count', $chartData);
+        return $chart->render();
     }
     
     /**
@@ -468,7 +468,7 @@ class AssetModel extends FormModel
     public function getUniqueVsRepetitivePieChartData($dateFrom, $dateTo, $filters = array())
     {
         $chart      = new PieChart();
-        $query      = new ChartQuery($this->factory->getEntityManager()->getConnection());
+        $query      = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
         $all        = $query->count('asset_downloads', 'id', 'date_download', $dateFrom, $dateTo, $filters);
         $unique     = $query->count('asset_downloads', 'lead_id', 'date_download', $dateFrom, $dateTo, $filters, array('getUnique' => true));
         $repetitive = $all - $unique;

@@ -8,36 +8,18 @@
  */
 ?>
 
-<div class="dropdown pull-right">
-    <button id="time-scopes" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-        <span class="button-label"><?php echo $view['translator']->trans('mautic.core.timeframe.daily'); ?></span>
-        <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu" role="menu" aria-labelledby="time-scopes">
-        <li role="presentation">
-            <a href="#" onclick="Mautic.<?php echo $callback; ?>(this, 24, 'H');return false;" role="menuitem" tabindex="-1">
-                <?php echo $view['translator']->trans('mautic.core.timeframe.hourly'); ?>
-            </a>
-        </li>
-        <li role="presentation">
-            <a href="#" class="bg-primary" onclick="Mautic.<?php echo $callback; ?>(this, 30, 'D');return false;" role="menuitem" tabindex="-1">
-                <?php echo $view['translator']->trans('mautic.core.timeframe.daily'); ?>
-            </a>
-        </li>
-        <li role="presentation">
-            <a href="#" onclick="Mautic.<?php echo $callback; ?>(this, 20, 'W');return false;" role="menuitem" tabindex="-1">
-                <?php echo $view['translator']->trans('mautic.core.timeframe.weekly'); ?>
-            </a>
-        </li>
-        <li role="presentation">
-            <a href="#" onclick="Mautic.<?php echo $callback; ?>(this, 24, 'M');return false;" role="menuitem" tabindex="-1">
-                <?php echo $view['translator']->trans('mautic.core.timeframe.monthly'); ?>
-            </a>
-        </li>
-        <li role="presentation">
-            <a href="#" onclick="Mautic.<?php echo $callback; ?>(this, 10, 'Y');return false;" role="menuitem" tabindex="-1">
-                <?php echo $view['translator']->trans('mautic.core.timeframe.yearly'); ?>
-            </a>
-        </li>
-    </ul>
-</div>
+<?php echo $view['form']->start($dateRangeForm, array('attr' => array('class' => 'form-filter'))); ?>
+    <div class="input-group" style="max-width: 380px">
+        <span class="input-group-addon">
+            <?php echo $view['form']->label($dateRangeForm['date_from']); ?>
+        </span>
+        <?php echo $view['form']->widget($dateRangeForm['date_from']); ?>
+        <span class="input-group-addon" style="border-left: 0;border-right: 0;">
+            <?php echo $view['form']->label($dateRangeForm['date_to']); ?>
+        </span>
+        <?php echo $view['form']->widget($dateRangeForm['date_to']); ?>
+        <span class="input-group-btn">
+            <?php echo $view['form']->row($dateRangeForm['apply']); ?>
+        </span>
+    </div>
+<?php echo $view['form']->end($dateRangeForm); ?>
