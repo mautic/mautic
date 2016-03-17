@@ -41,7 +41,7 @@ class EmailRepository extends CommonRepository
         $dnc = array();
 
         foreach ($results as $r) {
-            $dnc[] = $r['email'];
+            $dnc[] = strtolower($r['email']);
         }
 
         return $dnc;
@@ -180,18 +180,19 @@ class EmailRepository extends CommonRepository
      */
     public function getEmailPendingLeads($emailId, $variantIds = null, $listIds = null, $countOnly = false, $limit = null)
     {
-        // Do not include leads in the do not email table
-        $dneQb = $this->_em->getConnection()->createQueryBuilder();
-        $dneQb->select('null')
-            ->from(MAUTIC_TABLE_PREFIX.'email_donotemail', 'dne')
+        // Do not include leads in the do not contact table
+        $dncQb = $this->_em->getConnection()->createQueryBuilder();
+        $dncQb->select('null')
+            ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', 'dnc')
             ->where(
-                $dneQb->expr()->eq('dne.lead_id', 'l.id')
-            );
+                $dncQb->expr()->eq('dnc.lead_id', 'l.id')
+            )
+            ->where('dnc.channel = "email"');
 
         // Do not include leads that have already been emailed
         $statQb    = $this->_em->getConnection()->createQueryBuilder()
             ->select('null')
-            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat');
+            ->from(MAUTIC_TABLE_PREFIX . 'email_stats', 'stat');
 
         $statExpr = $statQb->expr()->andX(
             $statQb->expr()->eq('stat.lead_id', 'l.id')
@@ -214,7 +215,7 @@ class EmailRepository extends CommonRepository
             // Get a list of lists associated with this email
             $lists = $this->_em->getConnection()->createQueryBuilder()
                 ->select('el.leadlist_id')
-                ->from(MAUTIC_TABLE_PREFIX.'email_list_xref', 'el')
+                ->from(MAUTIC_TABLE_PREFIX . 'email_list_xref', 'el')
                 ->where('el.email_id = ' . (int) $emailId)
                 ->execute()
                 ->fetchAll();
@@ -234,7 +235,7 @@ class EmailRepository extends CommonRepository
 
         $listQb = $this->_em->getConnection()->createQueryBuilder();
         $listQb->select('null')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
+            ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll')
             ->where(
                 $listQb->expr()->andX(
                     $listQb->expr()->in('ll.leadlist_id', $listIds),
@@ -252,7 +253,7 @@ class EmailRepository extends CommonRepository
                 ->orderBy('l.id');
         }
         $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->andWhere(sprintf('NOT EXISTS (%s)', $dneQb->getSQL()))
+            ->andWhere(sprintf('NOT EXISTS (%s)', $dncQb->getSQL()))
             ->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()))
             ->andWhere(sprintf('EXISTS (%s)', $listQb->getSQL()))
             ->setParameter('false', false, 'boolean');
