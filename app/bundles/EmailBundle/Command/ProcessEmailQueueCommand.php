@@ -106,7 +106,7 @@ EOT
                     rename($failedFile, $tmpFilename);
 
                     $message = unserialize(file_get_contents($tmpFilename));
-					if ($message!==false && is_object($message) && get_class($message)==='Swift_Message'){
+			if ($message!==false && is_object($message) && get_class($message)==='Swift_Message'){
 	                    $tryAgain = false;
 	                    if ($dispatcher->hasListeners(EmailEvents::EMAIL_RESEND)) {
 	                        $event = new QueueEmailEvent($message);
@@ -122,11 +122,11 @@ EOT
 	                            $dispatcher->dispatch(EmailEvents::EMAIL_FAILED, $event);
 	                        }
 	                    }
-					}
-					else{
-						// $message isn't a valid message file
-						$tryAgain=false;
-					}
+			}
+			else{
+				// $message isn't a valid message file
+				$tryAgain=false;
+			}
                     if ($tryAgain) {
                         $retryFilename = str_replace('.finalretry', '.tryagain', $tmpFilename);
                         rename($tmpFilename, $retryFilename);
