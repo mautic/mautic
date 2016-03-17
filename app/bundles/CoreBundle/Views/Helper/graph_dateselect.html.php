@@ -6,10 +6,12 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+if (!isset($class)) $class = '';
 ?>
 
-<?php echo $view['form']->start($dateRangeForm, array('attr' => array('class' => 'form-filter'))); ?>
-    <div class="input-group" style="max-width: 380px">
+<?php echo $view['form']->start($dateRangeForm, array('attr' => array('class' => 'form-filter ' . $class, 'style' => 'max-width: 380px'))); ?>
+    <div class="input-group">
         <span class="input-group-addon">
             <?php echo $view['form']->label($dateRangeForm['date_from']); ?>
         </span>

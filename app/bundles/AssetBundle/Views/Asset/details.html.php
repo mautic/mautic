@@ -99,9 +99,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                     <span class="text-white dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.asset.asset.downloads.unique', array('count' => $stats['downloads']['unique'])); ?></span>
                                 </div>
                                 <div class="col-md-8 va-m">
-                                    <div class="pull-right">
-                                        <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', array('dateRangeForm' => $dateRangeForm)); ?>
-                                    </div>
+                                    <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', array('dateRangeForm' => $dateRangeForm, 'class' => 'pull-right')); ?>
                                 </div>
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
