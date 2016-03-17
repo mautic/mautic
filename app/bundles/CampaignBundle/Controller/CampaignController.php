@@ -277,7 +277,7 @@ class CampaignController extends FormController
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('campaign', $objectId, $entity->getDateAdded());
 
         // Hit count per day for last 30 days
-        $hits = $pageModel->getHitsBarChartData(30, 'd', null, null, array('source_id' => $objectId, 'source' => 'campaign'));
+        $hits = $pageModel->getHitsBarChartData(null, new \DateTime('-30 days'), new \DateTime, null, array('source_id' => $objectId, 'source' => 'campaign'));
 
         // Sent emails stats
         $emailsSent = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat')->getIgnoredReadFailed(
