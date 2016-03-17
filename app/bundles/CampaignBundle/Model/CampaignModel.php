@@ -1060,9 +1060,9 @@ class CampaignModel extends CommonFormModel
     public function getLeadsAddedLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query = new ChartQuery($this->em->getConnection());
+        $query = $chart->getChartQuery($this->em->getConnection());
         
-        $data  = $query->fetchTimeData('campaign_leads', 'date_added', $unit, $dateFrom, $dateTo, $filter);
+        $data  = $query->fetchTimeData('campaign_leads', 'date_added', $filter);
         $chart->setDataset('Leads added', $data);
 
         return $chart->render();

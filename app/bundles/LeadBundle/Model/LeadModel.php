@@ -1231,8 +1231,8 @@ class LeadModel extends FormModel
     public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $lists = null, $dateFormat = null, $filter = array())
     {
         $topLists  = null;
-        $lineChart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = new ChartQuery($this->em->getConnection());
+        $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query     = $chart->getChartQuery($this->em->getConnection());
         $anonymousFilter = $filter;
         $anonymousFilter['date_identified'] = array(
             'expression' => 'isNull'
@@ -1250,8 +1250,8 @@ class LeadModel extends FormModel
                         'value' => $list['id'],
                         'list_column_name' => 't.id'
                     );
-                    $all = $query->fetchTimeData('leads', 'date_added', $unit, $dateFrom, $dateTo, $filter);
-                    $lineChart->setDataset($list['name'] . ': All Leads', $all);
+                    $all = $query->fetchTimeData('leads', 'date_added', $filter);
+                    $chart->setDataset($list['name'] . ': All Leads', $all);
                 }
             }
         } elseif ($lists == 'topIdentifiedVsAnonymous') {
@@ -1266,23 +1266,23 @@ class LeadModel extends FormModel
                         'value' => $list['id'],
                         'list_column_name' => 't.id'
                     );
-                    $identified = $query->fetchTimeData('leads', 'date_added', $unit, $dateFrom, $dateTo, $identifiedFilter);
-                    $anonymous = $query->fetchTimeData('leads', 'date_added', $unit, $dateFrom, $dateTo, $anonymousFilter);
-                    $lineChart->setDataset($list['name'] . ': Identified', $identified);
-                    $lineChart->setDataset($list['name'] . ': Anonymous', $anonymous);
+                    $identified = $query->fetchTimeData('leads', 'date_added', $identifiedFilter);
+                    $anonymous = $query->fetchTimeData('leads', 'date_added', $anonymousFilter);
+                    $chart->setDataset($list['name'] . ': Identified', $identified);
+                    $chart->setDataset($list['name'] . ': Anonymous', $anonymous);
                 }
             }
         } elseif ($lists == 'identifiedVsAnonymous'){
-            $identified = $query->fetchTimeData('leads', 'date_added', $unit, $dateFrom, $dateTo, $identifiedFilter);
-            $anonymous = $query->fetchTimeData('leads', 'date_added', $unit, $dateFrom, $dateTo, $anonymousFilter);
-            $lineChart->setDataset('Identified', $identified);
-            $lineChart->setDataset('Anonymous', $anonymous);
+            $identified = $query->fetchTimeData('leads', 'date_added', $identifiedFilter);
+            $anonymous = $query->fetchTimeData('leads', 'date_added', $anonymousFilter);
+            $chart->setDataset('Identified', $identified);
+            $chart->setDataset('Anonymous', $anonymous);
         } else {
-            $all = $query->fetchTimeData('leads', 'date_added', $unit, $dateFrom, $dateTo, $filter);
-            $lineChart->setDataset('All Leads', $all);
+            $all = $query->fetchTimeData('leads', 'date_added', $filter);
+            $chart->setDataset('All Leads', $all);
         }
         
-        return $lineChart->render();
+        return $chart->render();
     }
 
     /**
@@ -1297,10 +1297,10 @@ class LeadModel extends FormModel
     public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, $filters = array())
     {
         $chart = new PieChart();
-        $query = new ChartQuery($this->em->getConnection());
+        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
-        $identified = $query->count('leads', 'date_identified', 'date_added', $dateFrom, $dateTo, $filters);
-        $all = $query->count('leads', 'id', 'date_added', $dateFrom, $dateTo, $filters);
+        $identified = $query->count('leads', 'date_identified', 'date_added', $filters);
+        $all = $query->count('leads', 'id', 'date_added', $filters);
         $chart->setDataset('identified', $identified);
         $chart->setDataset('anonymous', ($all - $identified));
 
@@ -1325,9 +1325,9 @@ class LeadModel extends FormModel
             ->groupBy('t.country')
             ->where($q->expr()->isNotNull('t.country'));
 
-        $chartQuery = new ChartQuery($this->em->getConnection());
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
-        $chartQuery->applyDateFilters($q, 'date_added', $dateFrom, $dateTo);
+        $chartQuery->applyDateFilters($q, 'date_added');
 
         $results = $q->execute()->fetchAll();
 
@@ -1367,9 +1367,9 @@ class LeadModel extends FormModel
             ->groupBy('t.owner_id, u.first_name, u.last_name')
             ->setMaxResults($limit);
 
-        $chartQuery = new ChartQuery($this->em->getConnection());
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
-        $chartQuery->applyDateFilters($q, 'date_added', $dateFrom, $dateTo);
+        $chartQuery->applyDateFilters($q, 'date_added');
 
         $results = $q->execute()->fetchAll();
         return $results;
@@ -1396,9 +1396,9 @@ class LeadModel extends FormModel
             ->groupBy('t.created_by, t.created_by_user')
             ->setMaxResults($limit);
 
-        $chartQuery = new ChartQuery($this->em->getConnection());
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
-        $chartQuery->applyDateFilters($q, 'date_added', $dateFrom, $dateTo);
+        $chartQuery->applyDateFilters($q, 'date_added');
 
         $results = $q->execute()->fetchAll();
         return $results;

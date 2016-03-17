@@ -699,11 +699,11 @@ class SubmissionModel extends CommonFormModel
      */
     public function getSubmissionsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
     {
-        $lineChart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
-        $chartData = $query->fetchTimeData('form_submissions', 'date_submitted', $unit, $dateFrom, $dateTo, $filter);
-        $lineChart->setDataset('Submission Count', $chartData);
-        return $lineChart->render();
+        $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $chartData = $query->fetchTimeData('form_submissions', 'date_submitted', $filter);
+        $chart->setDataset('Submission Count', $chartData);
+        return $chart->render();
     }
 
     /**
@@ -725,9 +725,9 @@ class SubmissionModel extends CommonFormModel
             ->groupBy('t.referer')
             ->setMaxResults($limit);
 
-        $chartQuery = new ChartQuery($this->em->getConnection());
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
-        $chartQuery->applyDateFilters($q, 'date_submitted', $dateFrom, $dateTo);
+        $chartQuery->applyDateFilters($q, 'date_submitted');
 
         $results = $q->execute()->fetchAll();
 
@@ -754,9 +754,9 @@ class SubmissionModel extends CommonFormModel
             ->groupBy('t.lead_id, l.firstname, l.lastname, l.email')
             ->setMaxResults($limit);
 
-        $chartQuery = new ChartQuery($this->em->getConnection());
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
-        $chartQuery->applyDateFilters($q, 'date_submitted', $dateFrom, $dateTo);
+        $chartQuery->applyDateFilters($q, 'date_submitted');
 
         $results = $q->execute()->fetchAll();
 

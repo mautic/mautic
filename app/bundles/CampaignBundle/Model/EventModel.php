@@ -1835,9 +1835,9 @@ class EventModel extends CommonFormModel
     public function getEventLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query = new ChartQuery($this->em->getConnection());
+        $query = $chart->getChartQuery($this->em->getConnection());
         
-        $data  = $query->fetchTimeData('campaign_lead_event_log', 'date_triggered', $unit, $dateFrom, $dateTo, $filter);
+        $data  = $query->fetchTimeData('campaign_lead_event_log', 'date_triggered', $filter);
         $chart->setDataset('Events triggered', $data);
 
         return $chart->render();

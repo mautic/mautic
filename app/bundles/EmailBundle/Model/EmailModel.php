@@ -1459,11 +1459,11 @@ class EmailModel extends FormModel
     public function getEmailsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query = new ChartQuery($this->em->getConnection());
+        $query = $chart->getChartQuery($this->em->getConnection());
         
-        $data  = $query->fetchTimeData('email_stats', 'date_sent', $unit, $dateFrom, $dateTo, $filter);
+        $data  = $query->fetchTimeData('email_stats', 'date_sent', $filter);
         $chart->setDataset('Sent emails', $data);
-        $data  = $query->fetchTimeData('email_stats', 'date_read', $unit, $dateFrom, $dateTo, $filter);
+        $data  = $query->fetchTimeData('email_stats', 'date_read', $filter);
         $chart->setDataset('Read emails', $data);
 
         return $chart->render();
@@ -1481,16 +1481,16 @@ class EmailModel extends FormModel
     public function getIgnoredVsReadPieChartData($dateFrom, $dateTo, $filters = array())
     {
         $chart = new PieChart();
-        $query = new ChartQuery($this->em->getConnection());
+        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         $readFilters = $filters;
         $readFilters['is_read'] = true;
         $failedFilters = $filters;
         $failedFilters['is_failed'] = true;
 
-        $sent = $query->count('email_stats', 'id', 'date_sent', $dateFrom, $dateTo, $filters);
-        $read = $query->count('email_stats', 'id', 'date_sent', $dateFrom, $dateTo, $readFilters);
-        $failed = $query->count('email_stats', 'id', 'date_sent', $dateFrom, $dateTo, $failedFilters);
+        $sent = $query->count('email_stats', 'id', 'date_sent', $filters);
+        $read = $query->count('email_stats', 'id', 'date_sent', $readFilters);
+        $failed = $query->count('email_stats', 'id', 'date_sent', $failedFilters);
         $chart->setDataset('ignored', ($sent - $read));
         $chart->setDataset('read', $read);
         $chart->setDataset('failed', $failed);

@@ -943,9 +943,9 @@ class ListModel extends FormModel
             ->groupBy('ll.id')
             ->setMaxResults($limit);
 
-        $chartQuery = new ChartQuery($this->em->getConnection());
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
-        $chartQuery->applyDateFilters($q, 'date_added', $dateFrom, $dateTo);
+        $chartQuery->applyDateFilters($q, 'date_added');
 
         $results = $q->execute()->fetchAll();
 

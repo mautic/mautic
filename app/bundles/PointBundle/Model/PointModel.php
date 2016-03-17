@@ -285,10 +285,10 @@ class PointModel extends CommonFormModel
      */
     public function getPointLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
     {
-        $lineChart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
-        $chartData = $query->fetchTimeData('lead_points_change_log', 'date_added', $unit, $dateFrom, $dateTo, $filter);
-        $lineChart->setDataset('Point changes', $chartData);
-        return $lineChart->render();
+        $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $chartData = $query->fetchTimeData('lead_points_change_log', 'date_added', $filter);
+        $chart->setDataset('Point changes', $chartData);
+        return $chart->render();
     }
 }

@@ -880,11 +880,11 @@ class PageModel extends FormModel
      */
     public function getHitsBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
     {
-        $barChart  = new BarChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
-        $chartData = $query->fetchTimeData('page_hits', 'date_hit', $unit, $dateFrom, $dateTo, $filter);
-        $barChart->setDataset('Hit Count', $chartData);
-        return $barChart->render();
+        $chart     = new BarChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $chartData = $query->fetchTimeData('page_hits', 'date_hit', $filter);
+        $chart->setDataset('Hit Count', $chartData);
+        return $chart->render();
     }
 
     /**
@@ -900,11 +900,11 @@ class PageModel extends FormModel
      */
     public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
     {
-        $lineChart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
-        $chartData = $query->fetchTimeData('page_hits', 'date_hit', $unit, $dateFrom, $dateTo, $filter);
-        $lineChart->setDataset('Hit Count', $chartData);
-        return $lineChart->render();
+        $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $chartData = $query->fetchTimeData('page_hits', 'date_hit', $filter);
+        $chart->setDataset('Hit Count', $chartData);
+        return $chart->render();
     }
 
     /**
@@ -920,9 +920,9 @@ class PageModel extends FormModel
     public function getNewVsReturningPieChartData($dateFrom, $dateTo, $filters = array())
     {
         $chart     = new PieChart();
-        $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
-        $all       = $query->count('page_hits', 'id', 'date_hit', $dateFrom, $dateTo, $filters);
-        $unique    = $query->count('page_hits', 'lead_id', 'date_hit', $dateFrom, $dateTo, $filters, array('getUnique' => true));
+        $query     = new ChartQuery($this->factory->getEntityManager()->getConnection(), $dateFrom, $dateTo);
+        $all       = $query->count('page_hits', 'id', 'date_hit', $filters);
+        $unique    = $query->count('page_hits', 'lead_id', 'date_hit', $filters, array('getUnique' => true));
         $returning = $all - $unique;
         $chart->setDataset('Unique', $unique);
         $chart->setDataset('Returning', $returning);
@@ -961,10 +961,10 @@ class PageModel extends FormModel
         );
 
         $chart = new PieChart();
-        $query = new ChartQuery($this->factory->getEntityManager()->getConnection());
+        $query = new ChartQuery($this->factory->getEntityManager()->getConnection(), $dateFrom, $dateTo);
 
         foreach ($timesOnSite as $time) {
-            $chartData = $query->countDateDiff('page_hits', 'date_hit', 'date_left', $time['from'], $time['till'], $dateFrom, $dateTo, $filters);
+            $chartData = $query->countDateDiff('page_hits', 'date_hit', 'date_left', $time['from'], $time['till'], $filters);
             $chart->setDataset($time['label'], $chartData);
         }
 
@@ -991,9 +991,9 @@ class PageModel extends FormModel
             ->groupBy('p.id')
             ->setMaxResults($limit);
 
-        $chartQuery = new ChartQuery($this->em->getConnection());
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
-        $chartQuery->applyDateFilters($q, 'date_hit', $dateFrom, $dateTo);
+        $chartQuery->applyDateFilters($q, 'date_hit');
 
         $results = $q->execute()->fetchAll();
 

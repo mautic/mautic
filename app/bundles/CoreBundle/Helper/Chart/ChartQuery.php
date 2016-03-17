@@ -84,7 +84,7 @@ class ChartQuery extends AbstractChart
      * @param  DateTime   $dateTo
      * @param  string     $unit
      */
-    public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, $unit)
+    public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, $unit = null)
     {
         $this->setDateRange($dateFrom, $dateTo);
         $this->connection = $connection;
