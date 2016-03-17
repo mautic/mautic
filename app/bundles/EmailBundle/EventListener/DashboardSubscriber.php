@@ -58,7 +58,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getEmailsLineChartData($params['timeUnit'], $params['dateFrom'], $params['dateTo'])
+                    'chartData'   => $model->getEmailsLineChartData($params['timeUnit'], $params['dateFrom'], $params['dateTo'], $params['dateFormat'])
                 ));
             }
 

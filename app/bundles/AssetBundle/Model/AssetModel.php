@@ -441,13 +441,14 @@ class AssetModel extends FormModel
      * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param DateTime $dateFrom
      * @param DateTime $dateTo
+     * @param string   $dateFormat
      * @param array    $filter
      *
      * @return array
      */
-    public function getDownloadsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $filter = array())
+    public function getDownloadsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
     {
-        $barChart  = new LineChart($unit, $dateFrom, $dateTo);
+        $barChart  = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
         $chartData = $query->fetchTimeData('asset_downloads', 'date_download', $unit, $dateFrom, $dateTo, $filter);
         $barChart->setDataset('Download Count', $chartData);

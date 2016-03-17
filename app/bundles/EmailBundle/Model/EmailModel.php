@@ -1451,13 +1451,14 @@ class EmailModel extends FormModel
      * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param DateTime $dateFrom
      * @param DateTime $dateTo
+     * @param string   $dateFormat
      * @param array    $filter
      *
      * @return array
      */
-    public function getEmailsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $filter = array())
+    public function getEmailsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
     {
-        $chart = new LineChart($unit, $dateFrom, $dateTo);
+        $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection());
         
         $data  = $query->fetchTimeData('email_stats', 'date_sent', $unit, $dateFrom, $dateTo, $filter);

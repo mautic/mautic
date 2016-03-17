@@ -54,7 +54,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getPointLineChartData($params['timeUnit'], $params['dateFrom'], $params['dateTo'])
+                    'chartData'   => $model->getPointLineChartData($params['timeUnit'], $params['dateFrom'], $params['dateTo'], $params['dateFormat'])
                 ));
             }
 

@@ -870,19 +870,19 @@ class PageModel extends FormModel
     /**
      * Get bar chart data of hits
      *
-     * @param integer $amount Number of units
-     * @param char    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string  $dateFrom
-     * @param string  $dateTo
-     * @param array   $filter
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $dateFormat
+     * @param array    $filter
      *
      * @return array
      */
-    public function getHitsBarChartData($amount, $unit, $dateFrom, $dateTo, $filter = array())
+    public function getHitsBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
     {
-        $barChart  = new BarChart($unit, $amount, $dateTo);
+        $barChart  = new BarChart($unit, $amount, $dateTo, $dateFormat);
         $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
-        $chartData = $query->fetchTimeData('page_hits', 'date_hit', $unit, $amount, $dateFrom, $dateTo, $filter);
+        $chartData = $query->fetchTimeData('page_hits', 'date_hit', $unit, $dateFrom, $dateTo, $filter);
         $barChart->setDataset('Hit Count', $chartData);
         return $barChart->render();
     }
@@ -893,13 +893,14 @@ class PageModel extends FormModel
      * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param DateTime $dateFrom
      * @param DateTime $dateTo
+     * @param string   $dateFormat
      * @param array    $filter
      *
      * @return array
      */
-    public function getHitsLineChartData($unit, $dateFrom, $dateTo, $filter = array())
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
     {
-        $lineChart = new LineChart($unit, $dateFrom, $dateTo);
+        $lineChart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
         $chartData = $query->fetchTimeData('page_hits', 'date_hit', $unit, $dateFrom, $dateTo, $filter);
         $lineChart->setDataset('Hit Count', $chartData);
@@ -910,9 +911,9 @@ class PageModel extends FormModel
      * Get data for pie chart showing new vs returning leads.
      * Returning leads are even leads who visits 2 different page once.
      *
-     * @param string  $dateFrom
-     * @param string  $dateTo
-     * @param array   $filters
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param array    $filters
      *
      * @return array
      */
@@ -931,13 +932,13 @@ class PageModel extends FormModel
     /**
      * Get pie chart data of dwell times
      *
-     * @param string  $dateFrom
-     * @param string  $dateTo
-     * @param array   $filters
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param array    $filters
      *
      * @return array
      */
-    public function getDwellTimesPieChartData($dateFrom, $dateTo, $filters = array())
+    public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = array())
     {
         $timesOnSite = array(
             array(
@@ -973,14 +974,14 @@ class PageModel extends FormModel
     /**
      * Get a list of popular (by hits) pages
      *
-     * @param integer $limit
-     * @param string  $dateFrom
-     * @param string  $dateTo
-     * @param array   $filters
+     * @param integer  $limit
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param array    $filters
      *
      * @return array
      */
-    public function getPopularPages($limit = 10, $dateFrom = null, $dateTo = null, $filters = array())
+    public function getPopularPages($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array())
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS hits, p.id, p.title, p.alias')

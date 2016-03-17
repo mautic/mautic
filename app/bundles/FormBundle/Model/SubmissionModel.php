@@ -692,13 +692,14 @@ class SubmissionModel extends CommonFormModel
      * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param DateTime $dateFrom
      * @param DateTime $dateTo
+     * @param string   $dateFormat
      * @param array    $filter
      *
      * @return array
      */
-    public function getSubmissionsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $filter = array())
+    public function getSubmissionsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
     {
-        $lineChart = new LineChart($unit, $dateFrom, $dateTo);
+        $lineChart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
         $chartData = $query->fetchTimeData('form_submissions', 'date_submitted', $unit, $dateFrom, $dateTo, $filter);
         $lineChart->setDataset('Submission Count', $chartData);
