@@ -880,7 +880,7 @@ class PageModel extends FormModel
      */
     public function getHitsBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
     {
-        $barChart  = new BarChart($unit, $amount, $dateTo, $dateFormat);
+        $barChart  = new BarChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
         $chartData = $query->fetchTimeData('page_hits', 'date_hit', $unit, $dateFrom, $dateTo, $filter);
         $barChart->setDataset('Hit Count', $chartData);
