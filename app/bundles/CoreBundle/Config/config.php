@@ -167,6 +167,11 @@ return array(
                 'class'     => 'Mautic\CoreBundle\Form\Type\ThemeListType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'theme_list'
+            ),
+            'mautic.form.type.daterange'          => array(
+                'class'     => 'Mautic\CoreBundle\Form\Type\DateRangeType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'daterange'
             )
         ),
         'helpers' => array(

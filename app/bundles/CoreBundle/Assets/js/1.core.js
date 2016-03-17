@@ -3087,4 +3087,29 @@ var Mautic = {
             });
         }
     },
+
+    initDateRangePicker: function () {
+        var dateFrom = mQuery('#daterange_date_from');
+        var dateTo = mQuery('#daterange_date_to');
+
+        dateFrom.datetimepicker({
+            format: 'M j, Y',
+            onShow: function(ct) {
+                this.setOptions({
+                    maxDate: dateTo.val() ? new Date(dateTo.val()) : false
+                });
+            },
+            timepicker: false
+        });
+        dateTo.datetimepicker({
+            format: 'M j, Y',
+            onShow: function(ct) {
+                this.setOptions({
+                    maxDate: new Date(),
+                    minDate: dateFrom.val() ? new Date(dateFrom.val()) : false
+                });
+            },
+            timepicker: false
+        });
+    }
 };
