@@ -286,7 +286,7 @@ class CampaignController extends FormController
         );
 
         // Lead count stats
-        $leadStats = $campaignLeadRepo->getLeadStats(30, 'D', array('campaign_id' => $entity->getId()));
+        $leadStats = $model->getLeadsAddedLineChartData(null, new \DateTime('-30 days'), new \DateTime, null, array('campaign_id' => $objectId));
 
         return $this->delegateView(
             array(
