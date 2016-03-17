@@ -2997,6 +2997,8 @@ var Mautic = {
                         Mautic.renderLineChart(canvas)
                     } else if (canvas.hasClass('pie-chart')) {
                         Mautic.renderPieChart(canvas)
+                    } else if (canvas.hasClass('simple-bar-chart')) {
+                        Mautic.renderSimpleBarChart(canvas)
                     }
                 }
                 canvas.addClass('chart-rendered');
@@ -3022,7 +3024,7 @@ var Mautic = {
     },
 
     /**
-     * Render the chart.js line chart
+     * Render the chart.js pie chart
      *
      * @param mQuery element canvas
      */
@@ -3034,6 +3036,25 @@ var Mautic = {
         var pieChart = new Chart(ctx).Pie(data, options);
         mQuery(canvas).closest('.chart-wrapper').find('.legend').html(pieChart.generateLegend());
         Mautic.chartObjects.push(pieChart);
+    },
+
+    /**
+     * Render the chart.js simple bar chart
+     *
+     * @param mQuery element canvas
+     */
+    renderSimpleBarChart: function(canvas) {
+        var ctx = canvas[0].getContext("2d");
+        var data = mQuery.parseJSON(canvas.text());
+        var options = {
+            scaleShowGridLines : false,
+            barShowStroke : false,
+            barValueSpacing : 1,
+            showScale: false,
+            tooltipFontSize: 10,
+            tooltipCaretSize: 0
+        };
+        Mautic.chartObjects.push(new Chart(ctx).Bar(data, options));
     },
 
     /**
