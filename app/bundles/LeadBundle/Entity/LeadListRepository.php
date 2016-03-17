@@ -470,7 +470,7 @@ class LeadListRepository extends CommonRepository
         if (null === $leadTable) {
             $schema = $this->_em->getConnection()->getSchemaManager();
             /** @var \Doctrine\DBAL\Schema\Column[] $leadTable */
-            $leadTable = $schema->listTableColumns(MAUTIC_TABLE_PREFIX.'leads');
+            $leadTable = $schema->listTableColumns(MAUTIC_TABLE_PREFIX . 'leads');
         }
 
         $options   = $this->getFilterExpressionFunctions();
