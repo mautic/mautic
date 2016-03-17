@@ -1824,20 +1824,19 @@ class EventModel extends CommonFormModel
     /**
      * Get line chart data of campaign events
      *
-     * @param integer $amount Number of units
-     * @param char    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string  $dateFrom
-     * @param string  $dateTo
-     * @param array   $filter
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param array    $filter
      *
      * @return array
      */
-    public function getEventLineChartData($amount, $unit, $dateFrom, $dateTo, $filter = array())
+    public function getEventLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $filter = array())
     {
-        $chart = new LineChart($unit, $amount, $dateTo);
+        $chart = new LineChart($unit, $dateFrom, $dateTo);
         $query = new ChartQuery($this->em->getConnection());
         
-        $data  = $query->fetchTimeData('campaign_lead_event_log', 'date_triggered', $unit, $amount, $dateFrom, $dateTo, $filter);
+        $data  = $query->fetchTimeData('campaign_lead_event_log', 'date_triggered', $unit, $dateFrom, $dateTo, $filter);
         $chart->setDataset('Events triggered', $data);
 
         return $chart->render();

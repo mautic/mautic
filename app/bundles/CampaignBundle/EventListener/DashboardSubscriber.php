@@ -56,7 +56,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getEventLineChartData($params['amount'], $params['timeUnit'], $params['dateFrom'], $params['dateTo'])
+                    'chartData'   => $model->getEventLineChartData($params['timeUnit'], $params['dateFrom'], $params['dateTo'])
                 ));
             }
 
@@ -74,7 +74,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getLeadsAddedLineChartData($params['amount'], $params['timeUnit'], $params['dateFrom'], $params['dateTo'])
+                    'chartData'   => $model->getLeadsAddedLineChartData($params['timeUnit'], $params['dateFrom'], $params['dateTo'])
                 ));
             }
 

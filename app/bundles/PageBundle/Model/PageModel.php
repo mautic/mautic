@@ -890,19 +890,18 @@ class PageModel extends FormModel
     /**
      * Get line chart data of hits
      *
-     * @param integer $amount Number of units
-     * @param char    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string  $dateFrom
-     * @param string  $dateTo
-     * @param array   $filter
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param array    $filter
      *
      * @return array
      */
-    public function getHitsLineChartData($amount, $unit, $dateFrom, $dateTo, $filter = array())
+    public function getHitsLineChartData($unit, $dateFrom, $dateTo, $filter = array())
     {
-        $lineChart = new LineChart($unit, $amount, $dateTo);
+        $lineChart = new LineChart($unit, $dateFrom, $dateTo);
         $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
-        $chartData = $query->fetchTimeData('page_hits', 'date_hit', $unit, $amount, $dateFrom, $dateTo, $filter);
+        $chartData = $query->fetchTimeData('page_hits', 'date_hit', $unit, $dateFrom, $dateTo, $filter);
         $lineChart->setDataset('Hit Count', $chartData);
         return $lineChart->render();
     }

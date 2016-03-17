@@ -438,19 +438,18 @@ class AssetModel extends FormModel
     /**
      * Get line chart data of downloads
      *
-     * @param integer $amount Number of units
-     * @param char    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string  $dateFrom
-     * @param string  $dateTo
-     * @param array   $filter
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param array    $filter
      *
      * @return array
      */
-    public function getDownloadsLineChartData($amount, $unit, $dateFrom, $dateTo, $filter = array())
+    public function getDownloadsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $filter = array())
     {
-        $barChart  = new LineChart($unit, $amount, $dateTo);
+        $barChart  = new LineChart($unit, $dateFrom, $dateTo);
         $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
-        $chartData = $query->fetchTimeData('asset_downloads', 'date_download', $unit, $amount, $dateFrom, $dateTo, $filter);
+        $chartData = $query->fetchTimeData('asset_downloads', 'date_download', $unit, $dateFrom, $dateTo, $filter);
         $barChart->setDataset('Download Count', $chartData);
         return $barChart->render();
     }

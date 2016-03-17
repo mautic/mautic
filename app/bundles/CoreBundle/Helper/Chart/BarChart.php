@@ -27,18 +27,18 @@ class BarChart extends AbstractChart implements ChartInterface
     protected $unit;
 
     /**
-     * Limit of items
+     * amount of items
      *
      * @var integer
      */
-    protected $limit;
+    protected $amount;
 
     /**
-     * Date and time to end. Now (null) is default.
+     * Date and time to dateTo. Now (null) is default.
      *
      * @var integer
      */
-    protected $end;
+    protected $dateTo;
 
     /**
      * Order
@@ -74,19 +74,20 @@ class BarChart extends AbstractChart implements ChartInterface
      * Defines the basic chart values, generates the time axe labels from it
      *
      * @param string  $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param integer $limit the number of loaded items
-     * @param string  $end date
+     * @param integer $amount the number of loaded items
+     * @param string  $dateTo date
      * @param string  $dateFormat
      * @param string  $order (DESC|ASC)
      */
-    public function __construct($unit = 'm', $limit = 12, $end = null, $dateFormat = null, $order = 'DESC')
+    public function __construct($unit = 'm', $dateFrom = null, $dateTo = null, $dateFormat = null, $order = 'DESC')
     {
         $this->unit  = $unit;
-        $this->limit = $limit;
-        $this->end = $end;
+        $this->dateFrom = $dateFrom;
+        $this->dateTo = $dateTo;
         $this->order = $order;
         $this->dateFormat = $dateFormat;
-        $this->generateTimeLabels($unit, $limit, $end, $order);
+        $this->amount = $this->countAmountFromDateRange($unit, $dateFrom, $dateTo);
+        $this->generateTimeLabels($unit, $this->amount, $dateTo, $order);
     }
 
     /**
@@ -125,21 +126,21 @@ class BarChart extends AbstractChart implements ChartInterface
      * Generate array of labels from the form data
      *
      * @param  string   $unit
-     * @param  integer  $limit
-     * @param  DateTime $endDate
+     * @param  integer  $amount
+     * @param  DateTime $dateTo
      * @param  string   $order
      */
-    public function generateTimeLabels($unit, $limit, \DateTime $endDate = null, $order = 'DESC')
+    public function generateTimeLabels($unit, $amount, \DateTime $dateTo = null, $order = 'DESC')
     {
         if (!isset($this->labelFormats[$unit])) {
             throw new \UnexpectedValueException('Date/Time unit "' . $unit . '" is not available for a label.');
         }
 
-        $date    = clone $endDate;
+        $date    = clone $dateTo;
         $oneUnit = $this->getUnitObject($unit);
         $format  = isset($this->dateFormat) ? $this->dateFormat : $this->labelFormats[$unit];
 
-        for ($i = 0; $i < $limit; $i++) {
+        for ($i = 0; $i < $amount; $i++) {
             $this->labels[] = $date->format($format);
             if ($order == 'DESC') {
                 $date->sub($oneUnit);

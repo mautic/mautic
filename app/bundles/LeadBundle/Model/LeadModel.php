@@ -1220,7 +1220,6 @@ class LeadModel extends FormModel
     /**
      * Get bar chart data of hits
      *
-     * @param integer  $amount Number of units
      * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param DateTime $dateFrom
      * @param DateTime $dateTo
@@ -1229,10 +1228,10 @@ class LeadModel extends FormModel
      *
      * @return array
      */
-    public function getLeadsLineChartData($amount, $unit, $dateFrom, $dateTo, $lists = null, $dateFormat = null, $filter = array())
+    public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $lists = null, $dateFormat = null, $filter = array())
     {
         $topLists  = null;
-        $lineChart = new LineChart($unit, $amount, $dateTo, $dateFormat);
+        $lineChart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query     = new ChartQuery($this->em->getConnection());
         $anonymousFilter = $filter;
         $anonymousFilter['date_identified'] = array(
@@ -1251,7 +1250,7 @@ class LeadModel extends FormModel
                         'value' => $list['id'],
                         'list_column_name' => 't.id'
                     );
-                    $all = $query->fetchTimeData('leads', 'date_added', $unit, $amount, $dateFrom, $dateTo, $filter);
+                    $all = $query->fetchTimeData('leads', 'date_added', $unit, $dateFrom, $dateTo, $filter);
                     $lineChart->setDataset($list['name'] . ': All Leads', $all);
                 }
             }
@@ -1267,19 +1266,19 @@ class LeadModel extends FormModel
                         'value' => $list['id'],
                         'list_column_name' => 't.id'
                     );
-                    $identified = $query->fetchTimeData('leads', 'date_added', $unit, $amount, $dateFrom, $dateTo, $identifiedFilter);
-                    $anonymous = $query->fetchTimeData('leads', 'date_added', $unit, $amount, $dateFrom, $dateTo, $anonymousFilter);
+                    $identified = $query->fetchTimeData('leads', 'date_added', $unit, $dateFrom, $dateTo, $identifiedFilter);
+                    $anonymous = $query->fetchTimeData('leads', 'date_added', $unit, $dateFrom, $dateTo, $anonymousFilter);
                     $lineChart->setDataset($list['name'] . ': Identified', $identified);
                     $lineChart->setDataset($list['name'] . ': Anonymous', $anonymous);
                 }
             }
         } elseif ($lists == 'identifiedVsAnonymous'){
-            $identified = $query->fetchTimeData('leads', 'date_added', $unit, $amount, $dateFrom, $dateTo, $identifiedFilter);
-            $anonymous = $query->fetchTimeData('leads', 'date_added', $unit, $amount, $dateFrom, $dateTo, $anonymousFilter);
+            $identified = $query->fetchTimeData('leads', 'date_added', $unit, $dateFrom, $dateTo, $identifiedFilter);
+            $anonymous = $query->fetchTimeData('leads', 'date_added', $unit, $dateFrom, $dateTo, $anonymousFilter);
             $lineChart->setDataset('Identified', $identified);
             $lineChart->setDataset('Anonymous', $anonymous);
         } else {
-            $all = $query->fetchTimeData('leads', 'date_added', $unit, $amount, $dateFrom, $dateTo, $filter);
+            $all = $query->fetchTimeData('leads', 'date_added', $unit, $dateFrom, $dateTo, $filter);
             $lineChart->setDataset('All Leads', $all);
         }
         

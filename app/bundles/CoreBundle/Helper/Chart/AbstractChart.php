@@ -118,4 +118,43 @@ abstract class AbstractChart
 
         return $string;
     }
+
+    /**
+     * Count amount of time slots of a time unit from a date range
+     *
+     * @param string   $timeUnit
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     *
+     * @return int
+     */
+    public function countAmountFromDateRange($timeUnit, \DateTime $dateFrom, \DateTime $dateTo)
+    {
+        switch ($timeUnit) {
+            case 'd':
+            case 'W':
+                $unit = 'a';
+                $amount = ($dateTo->diff($dateFrom)->format('%' . $unit) + 1);
+                $amount = $timeUnit == 'W' ? floor($amount / 7) : $amount;
+                break;
+            case 'm':
+                $amount = $dateTo->diff($dateFrom)->format('%y') * 12 + $dateTo->diff($dateFrom)->format('%m');
+                if ($dateTo->diff($dateFrom)->format('%d') > 0) $amount++;
+                if ($dateFrom->format('d') >= $dateTo->format('d')) $amount++;
+                break;
+            case 'H':
+                if ($dateFrom == $dateTo) {
+                    // a diff of two identical dates returns 0, but we expect 24 hours
+                    $dateTo->modify('+1 day');
+                    $toClone = clone $dateTo;
+                    $params['dateTo'] = $toClone->modify('-1 second');
+                }
+                $dateDiff = $dateTo->diff($dateFrom);
+                $amount = $dateDiff->h + $dateDiff->days * 24;
+            default:
+                $amount = ($dateTo->diff($dateFrom)->format('%' . $timeUnit) + 1);
+        }
+
+        return $amount;
+    }
 }

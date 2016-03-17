@@ -66,7 +66,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
                     'chartData'   => $model->getLeadsLineChartData(
-                        $params['amount'],
                         $params['timeUnit'],
                         $params['dateFrom'],
                         $params['dateTo'],

@@ -275,19 +275,18 @@ class PointModel extends CommonFormModel
     /**
      * Get line chart data of points
      *
-     * @param integer $amount Number of units
-     * @param char    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string  $dateFrom
-     * @param string  $dateTo
-     * @param array   $filter
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param array    $filter
      *
      * @return array
      */
-    public function getPointLineChartData($amount, $unit, $dateFrom, $dateTo, $filter = array())
+    public function getPointLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $filter = array())
     {
-        $lineChart = new LineChart($unit, $amount, $dateTo);
+        $lineChart = new LineChart($unit, $dateFrom, $dateTo);
         $query     = new ChartQuery($this->factory->getEntityManager()->getConnection());
-        $chartData = $query->fetchTimeData('lead_points_change_log', 'date_added', $unit, $amount, $dateFrom, $dateTo, $filter);
+        $chartData = $query->fetchTimeData('lead_points_change_log', 'date_added', $unit, $dateFrom, $dateTo, $filter);
         $lineChart->setDataset('Point changes', $chartData);
         return $lineChart->render();
     }

@@ -51,18 +51,12 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
-            // Make sure the params exist
-            if (empty($params['amount']) || empty($params['timeUnit'])) {
-                $params['amount'] = 12;
-                $params['timeUnit'] = 'm';
-            }
-
             if (!$event->isCached()) {
                 $model = $this->factory->getModel('form.submission');
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getSubmissionsLineChartData($params['amount'], $params['timeUnit'], $params['dateFrom'], $params['dateTo'])
+                    'chartData'   => $model->getSubmissionsLineChartData($params['timeUnit'], $params['dateFrom'], $params['dateTo'])
                 ));
             }
 

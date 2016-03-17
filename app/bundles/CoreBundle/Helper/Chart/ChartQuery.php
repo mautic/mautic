@@ -205,7 +205,6 @@ class ChartQuery extends AbstractChart
      * @param  string     $table without prefix
      * @param  string     $column name. The column must be type of datetime
      * @param  string     $unit will be added to where claues
-     * @param  integer    $limit will be added to where claues
      * @param  array      $filters will be added to where claues
      * @param  DateTime   $dateFrom will be added to where claues
      * @param  DateTime   $dateTo will be added to where claues
@@ -213,10 +212,11 @@ class ChartQuery extends AbstractChart
      *
      * @return array
      */
-    public function fetchTimeData($table, $column, $unit = 'm', $limit = 12, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array(), $order = 'DESC') {
+    public function fetchTimeData($table, $column, $unit = 'm', \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array(), $order = 'DESC') {
         // Convert time unitst to the right form for current database platform
         $dbUnit = $this->translateTimeUnit($unit);
         $query = $this->connection->createQueryBuilder();
+        $limit = $this->countAmountFromDateRange($unit, $dateFrom, $dateTo);
 
         // Postgres and MySql are handeling date/time SQL funciton differently
         if ($this->isPostgres()) {

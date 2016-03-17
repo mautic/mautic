@@ -1049,20 +1049,19 @@ class CampaignModel extends CommonFormModel
     /**
      * Get line chart data of leads added to campaigns
      *
-     * @param integer $amount Number of units
-     * @param char    $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string  $dateFrom
-     * @param string  $dateTo
-     * @param array   $filter
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param array    $filter
      *
      * @return array
      */
-    public function getLeadsAddedLineChartData($amount, $unit, $dateFrom, $dateTo, $filter = array())
+    public function getLeadsAddedLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $filter = array())
     {
-        $chart = new LineChart($unit, $amount, $dateTo);
+        $chart = new LineChart($unit, $dateFrom, $dateTo);
         $query = new ChartQuery($this->em->getConnection());
         
-        $data  = $query->fetchTimeData('campaign_leads', 'date_added', $unit, $amount, $dateFrom, $dateTo, $filter);
+        $data  = $query->fetchTimeData('campaign_leads', 'date_added', $unit, $dateFrom, $dateTo, $filter);
         $chart->setDataset('Leads added', $data);
 
         return $chart->render();
