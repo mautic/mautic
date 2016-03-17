@@ -73,21 +73,20 @@ class BarChart extends AbstractChart implements ChartInterface
     /**
      * Defines the basic chart values, generates the time axe labels from it
      *
-     * @param string  $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param integer $amount the number of loaded items
-     * @param string  $dateTo date
-     * @param string  $dateFormat
-     * @param string  $order (DESC|ASC)
+     * @param string   $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $dateFormat
+     * @param string   $order (DESC|ASC)
      */
-    public function __construct($unit = 'm', $dateFrom = null, $dateTo = null, $dateFormat = null, $order = 'DESC')
+    public function __construct($unit, $dateFrom, $dateTo, $dateFormat = null, $order = 'DESC')
     {
-        $this->unit  = $unit;
-        $this->dateFrom = $dateFrom;
-        $this->dateTo = $dateTo;
+        $this->setDateRange($dateFrom, $dateTo);
+        $this->unit  = !$unit ? $this->getTimeUnitFromDateRange() : $unit;
         $this->order = $order;
         $this->dateFormat = $dateFormat;
-        $this->amount = $this->countAmountFromDateRange($unit, $dateFrom, $dateTo);
-        $this->generateTimeLabels($unit, $this->amount, $dateTo, $order);
+        $this->amount = $this->countAmountFromDateRange();
+        $this->generateTimeLabels($this->amount, $order);
     }
 
     /**
@@ -125,20 +124,18 @@ class BarChart extends AbstractChart implements ChartInterface
     /**
      * Generate array of labels from the form data
      *
-     * @param  string   $unit
      * @param  integer  $amount
-     * @param  DateTime $dateTo
      * @param  string   $order
      */
-    public function generateTimeLabels($unit, $amount, \DateTime $dateTo = null, $order = 'DESC')
+    public function generateTimeLabels($amount, $order = 'DESC')
     {
-        if (!isset($this->labelFormats[$unit])) {
-            throw new \UnexpectedValueException('Date/Time unit "' . $unit . '" is not available for a label.');
+        if (!isset($this->labelFormats[$this->unit])) {
+            throw new \UnexpectedValueException('Date/Time unit "' . $this->unit . '" is not available for a label.');
         }
 
-        $date    = clone $dateTo;
-        $oneUnit = $this->getUnitObject($unit);
-        $format  = isset($this->dateFormat) ? $this->dateFormat : $this->labelFormats[$unit];
+        $date    = clone $this->dateTo;
+        $oneUnit = $this->getUnitObject($this->unit);
+        $format  = isset($this->dateFormat) ? $this->dateFormat : $this->labelFormats[$this->unit];
 
         for ($i = 0; $i < $amount; $i++) {
             $this->labels[] = $date->format($format);

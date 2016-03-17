@@ -80,10 +80,15 @@ class ChartQuery extends AbstractChart
      * Construct a new ChartQuery object
      *
      * @param  Connection $connection
+     * @param  DateTime   $dateFrom
+     * @param  DateTime   $dateTo
+     * @param  string     $unit
      */
-    public function __construct(Connection $connection)
+    public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, $unit)
     {
+        $this->setDateRange($dateFrom, $dateTo);
         $this->connection = $connection;
+        $this->unit = $unit;
     }
 
     /**
@@ -151,24 +156,24 @@ class ChartQuery extends AbstractChart
      * @param  DateTime
      * @param  DateTime
      */
-    public function applyDateFilters(&$query, $dateColumn, \DateTime $dateFrom, \DateTime $dateTo)
+    public function applyDateFilters(&$query, $dateColumn)
     {
         if ($dateColumn) {
 
             // Convert the dates to UTC
-            $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
-            $dateTo->setTimeZone(new \DateTimeZone('UTC'));
+            $this->dateFrom->setTimeZone(new \DateTimeZone('UTC'));
+            $this->dateTo->setTimeZone(new \DateTimeZone('UTC'));
 
             // Apply the start date/time if set
-            if ($dateFrom) {
+            if ($this->dateFrom) {
                 $query->andWhere('t.' . $dateColumn . ' >= :dateFrom');
-                $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
+                $query->setParameter('dateFrom', $this->dateFrom->format('Y-m-d H:i:s'));
             }
 
             // Apply the end date/time if set
-            if ($dateTo) {
+            if ($this->dateTo) {
                 $query->andWhere('t.' . $dateColumn . ' <= :dateTo');
-                $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
+                $query->setParameter('dateTo', $this->dateTo->format('Y-m-d H:i:s'));
             }
         }
     }
@@ -204,19 +209,16 @@ class ChartQuery extends AbstractChart
      *
      * @param  string     $table without prefix
      * @param  string     $column name. The column must be type of datetime
-     * @param  string     $unit will be added to where claues
      * @param  array      $filters will be added to where claues
-     * @param  DateTime   $dateFrom will be added to where claues
-     * @param  DateTime   $dateTo will be added to where claues
      * @param  string     $order will be added to where claues
      *
      * @return array
      */
-    public function fetchTimeData($table, $column, $unit = 'm', \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array(), $order = 'DESC') {
+    public function fetchTimeData($table, $column, $filters = array(), $order = 'DESC') {
         // Convert time unitst to the right form for current database platform
-        $dbUnit = $this->translateTimeUnit($unit);
+        $dbUnit = $this->translateTimeUnit($this->unit);
         $query = $this->connection->createQueryBuilder();
-        $limit = $this->countAmountFromDateRange($unit, $dateFrom, $dateTo);
+        $limit = $this->countAmountFromDateRange($this->unit);
 
         // Postgres and MySql are handeling date/time SQL funciton differently
         if ($this->isPostgres()) {
@@ -237,16 +239,16 @@ class ChartQuery extends AbstractChart
         $query->andWhere('t.' . $column . ' IS NOT NULL');
 
         $this->applyFilters($query, $filters);
-        $this->applyDateFilters($query, $column, $dateFrom, $dateTo);
+        $this->applyDateFilters($query, $column);
 
         $query->setMaxResults($limit);
 
         // Fetch the data
         $rawData = $query->execute()->fetchAll();
         $data    = array();
-        $oneUnit = $this->getUnitObject($unit);
-        $date    = $dateTo;
-        $date->format($this->sqlFormats[$unit]);
+        $oneUnit = $this->getUnitObject($this->unit);
+        $date    = $this->dateTo;
+        $date->format($this->sqlFormats[$this->unit]);
 
         // Convert data from DB to the chart.js format
         for ($i = 0; $i < $limit; $i++) {
@@ -298,19 +300,17 @@ class ChartQuery extends AbstractChart
      * @param  string     $table without prefix
      * @param  string     $uniqueColumn name
      * @param  string     $dateColumn name
-     * @param  DateTime   $dateFrom will be added to where claues
-     * @param  DateTime   $dateTo will be added to where claues
      * @param  array      $filters will be added to where claues
      * @param  array      $options for special behavior
      */
-    public function count($table, $uniqueColumn, $dateColumn = null, $dateFrom = null, $dateTo = null, $filters = array(), $options = array()) {
+    public function count($table, $uniqueColumn, $dateColumn = null, $filters = array(), $options = array()) {
         $query = $this->connection->createQueryBuilder();
 
         $query->select('COUNT(t.' . $uniqueColumn . ') AS count')
             ->from(MAUTIC_TABLE_PREFIX . $table, 't');
 
         $this->applyFilters($query, $filters);
-        $this->applyDateFilters($query, $dateColumn, $dateFrom, $dateTo);
+        $this->applyDateFilters($query, $dateColumn);
 
         // Count only unique values
         if (!empty($options['getUnique'])) {
@@ -345,11 +345,9 @@ class ChartQuery extends AbstractChart
      * @param  string     $dateColumn2
      * @param  integer    $startSecond
      * @param  integer    $endSecond
-     * @param  DateTime   $dateFrom will be added to where claues
-     * @param  DateTime   $dateTo will be added to where claues
      * @param  array      $filters will be added to where claues
      */
-    public function countDateDiff($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, \DateTime $dateFrom, \DateTime $dateTo, $filters = array()) {
+    public function countDateDiff($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $filters = array()) {
         $query = $this->connection->createQueryBuilder();
 
         $query->select('COUNT(t.' . $dateColumn1 . ') AS count')
@@ -369,7 +367,7 @@ class ChartQuery extends AbstractChart
         $query->setParameter('endSecond', $endSecond);
 
         $this->applyFilters($query, $filters);
-        $this->applyDateFilters($query, $dateColumn1, $dateFrom, $dateTo);
+        $this->applyDateFilters($query, $dateColumn1);
 
         $data = $query->execute()->fetch();
 

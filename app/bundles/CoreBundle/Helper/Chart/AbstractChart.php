@@ -31,6 +31,27 @@ abstract class AbstractChart
     protected $labels = array();
 
     /**
+     * Date from
+     *
+     * @var DateTime
+     */
+    protected $dateFrom;
+
+    /**
+     * Date to
+     *
+     * @var DateTime
+     */
+    protected $dateTo;
+
+    /**
+     * Time unit
+     *
+     * @var string
+     */
+    protected $unit;
+
+    /**
      * Colors which can be used in graphs
      *
      * @var array
@@ -120,41 +141,78 @@ abstract class AbstractChart
     }
 
     /**
-     * Count amount of time slots of a time unit from a date range
+     * Sets the clones of the date range and validates it
      *
-     * @param string   $timeUnit
      * @param DateTime $dateFrom
      * @param DateTime $dateTo
+     */
+    public function setDateRange(\DateTime $dateFrom, \DateTime $dateTo)
+    {
+        $this->dateFrom = clone $dateFrom;
+        $this->dateTo = clone $dateTo;
+
+        // a diff of two identical dates returns 0, but we expect 24 hours
+        if ($dateFrom == $dateTo) {
+            $this->dateTo->modify('+1 day')->modify('-1 second');
+        }
+    }
+
+    /**
+     * Count amount of time slots of a time unit from a date range
      *
      * @return int
      */
-    public function countAmountFromDateRange($timeUnit, \DateTime $dateFrom, \DateTime $dateTo)
+    public function countAmountFromDateRange()
     {
-        switch ($timeUnit) {
+        switch ($this->unit) {
             case 'd':
             case 'W':
                 $unit = 'a';
-                $amount = ($dateTo->diff($dateFrom)->format('%' . $unit) + 1);
-                $amount = $timeUnit == 'W' ? floor($amount / 7) : $amount;
+                $amount = ($this->dateTo->diff($this->dateFrom)->format('%' . $unit) + 1);
+                $amount = $this->unit == 'W' ? floor($amount / 7) : $amount;
                 break;
             case 'm':
-                $amount = $dateTo->diff($dateFrom)->format('%y') * 12 + $dateTo->diff($dateFrom)->format('%m');
-                if ($dateTo->diff($dateFrom)->format('%d') > 0) $amount++;
-                if ($dateFrom->format('d') >= $dateTo->format('d')) $amount++;
+                $amount = $this->dateTo->diff($this->dateFrom)->format('%y') * 12 + $this->dateTo->diff($this->dateFrom)->format('%m');
+                if ($this->dateTo->diff($this->dateFrom)->format('%d') > 0) $amount++;
+                if ($this->dateFrom->format('d') >= $this->dateTo->format('d')) $amount++;
                 break;
             case 'H':
-                if ($dateFrom == $dateTo) {
-                    // a diff of two identical dates returns 0, but we expect 24 hours
-                    $dateTo->modify('+1 day');
-                    $toClone = clone $dateTo;
-                    $params['dateTo'] = $toClone->modify('-1 second');
-                }
-                $dateDiff = $dateTo->diff($dateFrom);
+                $dateDiff = $this->dateTo->diff($this->dateFrom);
                 $amount = $dateDiff->h + $dateDiff->days * 24;
             default:
-                $amount = ($dateTo->diff($dateFrom)->format('%' . $timeUnit) + 1);
+                $amount = ($this->dateTo->diff($this->dateFrom)->format('%' . $this->unit) + 1);
         }
 
         return $amount;
+    }
+
+    /**
+     * Returns appropriate time unit from a date range so the line/bar charts won't be too full/empty
+     *
+     * @return string
+     */
+    public function getTimeUnitFromDateRange()
+    {
+        $diff = $this->dateTo->diff($this->dateFrom)->format('%a');
+        $unit = 'd';
+
+        if ($diff <= 1) $unit = 'H';
+        if ($diff > 31) $unit = 'W';
+        if ($diff > 100) $unit = 'm';
+        if ($diff > 1000) $unit = 'Y';
+
+        return $unit;
+    }
+
+    /**
+     * Returns the initiated chart query object
+     *
+     * @param Connection $connection
+     *
+     * @return ChartQuery
+     */
+    public function getChartQuery(Connection $connection)
+    {
+        return new ChartQuery($connection, $this->dateFrom, $this->dateTo, $this->unit);
     }
 }

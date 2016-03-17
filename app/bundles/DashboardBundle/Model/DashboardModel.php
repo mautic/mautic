@@ -213,18 +213,10 @@ class DashboardModel extends FormModel
         $mysqlFormat = 'Y-m-d H:i:s';
         $dateFrom    = new \DateTime($session->get('mautic.dashboard.date.from', $lastMonth->format($mysqlFormat)));
         $dateTo      = new \DateTime($session->get('mautic.dashboard.date.to', $today->format($mysqlFormat)));
-        $diff        = $dateTo->diff($dateFrom)->format('%a');
-        $unit        = 'd';
-
-        if ($diff <= 1) $unit = 'H';
-        if ($diff > 31) $unit = 'W';
-        if ($diff > 100) $unit = 'm';
-        if ($diff > 1000) $unit = 'Y';
 
         return array(
             'dateFrom' => $dateFrom,
             'dateTo'   => $dateTo,
-            'timeUnit' => $unit,
         );
     }
 }

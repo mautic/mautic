@@ -37,9 +37,9 @@ class DashboardController extends FormController
             return $this->applyDashboardFileAction('default.json');
         }
 
-        $action          = $this->generateUrl('mautic_dashboard_index');
         $humanFormat     = 'M j, Y';
         $mysqlFormat     = 'Y-m-d';
+        $action          = $this->generateUrl('mautic_dashboard_index');
         $filterForm      = $this->get('form.factory')->create('dashboard_filter', null, array('action' => $action));
 
         if ($this->request->isMethod('POST')) {
