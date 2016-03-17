@@ -115,9 +115,9 @@ return array(
         			'controller' => 'MauticLeadBundle:Api\LeadApi:addPoints',
         			'method' => 'PATCH'
         	),
-        	'mautic_api_removepointslead' => array(
-        			'path' => '/leads/{id}/removepoints/{points}',
-        			'controller' => 'MauticLeadBundle:Api\LeadApi:removePoints',
+        	'mautic_api_subtractpointslead' => array(
+        			'path' => '/leads/{id}/subtractpoints/{points}',
+        			'controller' => 'MauticLeadBundle:Api\LeadApi:subtractPoints',
         			'method'     => 'PATCH'
         	),
             'mautic_api_getleadlists'      => array(

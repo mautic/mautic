@@ -363,7 +363,7 @@ class LeadApiController extends CommonApiController
      *
      * @return
      */
-    public function removePointsAction($id, $points) {
+    public function subtractPointsAction($id, $points) {
     	$parameters = $this->request->request->all();
     	
     	// recover lead
