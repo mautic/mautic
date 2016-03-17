@@ -106,16 +106,19 @@ return array(
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getFields'
             ),
         	'mautic_api_editpointslead' => array(
-        		'path' => '/leads/{leadId}/setpoints/{points}',
+        		'path' => '/leads/{id}/setpoints/{points}',
         		'controller' => 'MauticLeadBundle:Api\LeadApi:setPoints',
+        		'method'     => 'PATCH'
         	),
         	'mautic_api_addpointslead' => array(
-        			'path' => '/leads/{leadId}/addpoints/{points}',
+        			'path' => '/leads/{id}/addpoints/{points}',
         			'controller' => 'MauticLeadBundle:Api\LeadApi:addPoints',
+        			'method' => 'PATCH'
         	),
         	'mautic_api_removepointslead' => array(
-        			'path' => '/leads/{leadId}/removepoints/{points}',
+        			'path' => '/leads/{id}/removepoints/{points}',
         			'controller' => 'MauticLeadBundle:Api\LeadApi:removePoints',
+        			'method'     => 'PATCH'
         	),
             'mautic_api_getleadlists'      => array(
                 'path'       => '/leads/list/lists',

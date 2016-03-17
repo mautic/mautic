@@ -301,9 +301,11 @@ class LeadApiController extends CommonApiController
      *
      * @return 
      */
-    public function setPointsAction($leadId, $points) {
+    public function setPointsAction($id, $points) {
+    	$parameters = $this->request->request->all();
+    	
     	// recover lead
-    	$lead = $this->model->getEntity($leadId);
+    	$lead = $this->model->getEntity($id);
     	if (!$lead instanceof $this->entityClass) {
     		return $this->notFound();
     	}
@@ -314,7 +316,7 @@ class LeadApiController extends CommonApiController
     	// change the numbre of points
     	$lead->setPoints($points);
     	
-		$this->historyEventsPointsApi($lead, $points, "Mise à jour");
+		$this->historyEventsPointsApi($lead, $points, $parameters);
     	
     	// sauv bdd
     	$this->model->saveEntity($lead, false);
@@ -328,9 +330,11 @@ class LeadApiController extends CommonApiController
      *
      * @return
      */
-    public function addPointsAction($leadId, $points) {
+    public function addPointsAction($id, $points) {
+   		$parameters = $this->request->request->all();
+
     	// recover lead
-    	$lead = $this->model->getEntity($leadId);
+    	$lead = $this->model->getEntity($id);
     	if (!$lead instanceof $this->entityClass) {
     		return $this->notFound();
     	}
@@ -340,12 +344,12 @@ class LeadApiController extends CommonApiController
     	
     	// collect the points
     	$pointslead = $lead->getPoints();
-    	$points = $pointslead + $points;
+    	$totalPoints = $pointslead + $points;
     	
-		$this->historyEventsPointsApi($lead, $points, "Addition");
+		$this->historyEventsPointsApi($lead, +$points,  $parameters);
  
     	// change the numbre of points
-    	$lead->setPoints($points);
+    	$lead->setPoints($totalPoints);
     	
     	// sauv bdd
     	$this->model->saveEntity($lead, false);
@@ -359,9 +363,11 @@ class LeadApiController extends CommonApiController
      *
      * @return
      */
-    public function removePointsAction($leadId, $points) {
+    public function removePointsAction($id, $points) {
+    	$parameters = $this->request->request->all();
+    	
     	// recover lead
-    	$lead = $this->model->getEntity($leadId);
+    	$lead = $this->model->getEntity($id);
     	if (!$lead instanceof $this->entityClass) {
     		return $this->notFound();
     	}
@@ -371,12 +377,12 @@ class LeadApiController extends CommonApiController
     	 
     	// collect the points
     	$pointslead = $lead->getPoints();
-    	$points = $pointslead - $points;
+    	$totalPoints = $pointslead - $points;
     	
-		$this->historyEventsPointsApi($lead, $points, "Soustraction");
+		$this->historyEventsPointsApi($lead, -$points, $parameters);
     
     	// change the numbre of points
-    	$lead->setPoints($points);
+    	$lead->setPoints($totalPoints);
     
     	// sauv bdd
     	$this->model->saveEntity($lead, false);
@@ -385,23 +391,26 @@ class LeadApiController extends CommonApiController
     /**
      * 
      */
-    protected function historyEventsPointsApi ($lead, $points, $actionName) {
+    protected function historyEventsPointsApi ($lead, $points, $parameters) {
+    	$eventName = (array_key_exists ('eventname', $parameters)) ? $parameters['eventname'] : null;
+    	$actionName = (array_key_exists ('actionname', $parameters)) ? $parameters['actionname'] : null;
+    	
+    	$en = $this->factory->getTranslator()->trans('mautic.lead.report.points.action_name');
+    	$an = $this->factory->getTranslator()->trans('mautic.lead.event.api');
+
+    	$eventName = ($eventName === null)? $en : $eventName;
+    	$actionName = ($actionName === null)? $an : $actionName;
+    	
     	$ip = new IpAddress();
     	$ip->setIpAddress($this->request->server->get('SERVER_ADDR'));
-    	 
-    	// $eventName = $this->factory->getTranslator()->trans('mautic.lead.report.points.action_name', array(), null, 'fr');
-    	// $actionName = $this->factory->getTranslator()->trans('mautic.lead.field.website', array(), 'fixtures', 'fr');
-    	
-    	$eventName = "Points API";
-    	 
+
     	$event = new PointsChangeLog();
     	$event->setType('API');
     	$event->setEventName($eventName);
     	$event->setActionName($actionName);
     	$event->setIpAddress($ip);
     	$event->setDateAdded(new \DateTime());
-    	 
-    	$event->setDelta($points);
+    	$event->setDelta($points); 
     	$event->setLead($lead);
     	 
     	$lead->addPointsChangeLog($event);
