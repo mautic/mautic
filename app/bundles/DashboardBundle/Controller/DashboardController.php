@@ -40,36 +40,37 @@ class DashboardController extends FormController
         $humanFormat     = 'M j, Y';
         $mysqlFormat     = 'Y-m-d';
         $action          = $this->generateUrl('mautic_dashboard_index');
-        $filterForm      = $this->get('form.factory')->create('dashboard_filter', null, array('action' => $action));
+        $dateRangeFilter = $this->request->get('daterange', array());
 
+        // Set new date range to the session
         if ($this->request->isMethod('POST')) {
             $session = $this->factory->getSession();
-            $dashboardFilter = $this->request->get('dashboard_filter', array());
-            if (!empty($dashboardFilter['date_from'])) {
-                $from = new \DateTime($dashboardFilter['date_from']);
+            if (!empty($dateRangeFilter['date_from'])) {
+                $from = new \DateTime($dateRangeFilter['date_from']);
                 $session->set('mautic.dashboard.date.from', $from->format($mysqlFormat));
             }
 
-            if (!empty($dashboardFilter['date_to'])) {
-                $to = new \DateTime($dashboardFilter['date_to']);
+            if (!empty($dateRangeFilter['date_to'])) {
+                $to = new \DateTime($dateRangeFilter['date_to']);
                 $session->set('mautic.dashboard.date.to', $to->format($mysqlFormat));
             }
         }
 
-        $filter = $model->getDefaultFilter();
+        // Load date range from session
+        $filter          = $model->getDefaultFilter();
+
+        // Set the final date range to the form
+        $dateRangeFilter['date_from'] = $filter['dateFrom']->format($humanFormat);
+        $dateRangeFilter['date_to'] = $filter['dateTo']->format($humanFormat);
+        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeFilter, array('action' => $action));
+
         $model->populateWidgetsContent($widgets, $filter);
-        $filterForm->setData(
-            array(
-                'date_from' => $filter['dateFrom']->format($humanFormat),
-                'date_to' => $filter['dateTo']->format($humanFormat)
-            )
-        );
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'security'          => $this->factory->getSecurity(),
                 'widgets'           => $widgets,
-                'filterForm'        => $filterForm->createView()
+                'dateRangeForm'     => $dateRangeForm->createView()
             ),
             'contentTemplate' => 'MauticDashboardBundle:Dashboard:index.html.php',
             'passthroughVars' => array(
@@ -97,6 +98,7 @@ class DashboardController extends FormController
         $form       = $model->createForm($widget, $this->get('form.factory'), $action);
         $closeModal = false;
         $valid      = false;
+        
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
             if (!$cancelled = $this->isFormCancelled($form)) {

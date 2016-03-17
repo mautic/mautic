@@ -49,23 +49,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 )));
 ?>
 <div class="row pt-md pl-md">
-<?php echo $view['form']->start($filterForm, array('attr' => array('class' => 'form-filter'))); ?>
     <div class="col-sm-6">
-        <div class="input-group">
-            <span class="input-group-addon">
-                <?php echo $view['form']->label($filterForm['date_from']); ?>
-            </span>
-            <?php echo $view['form']->widget($filterForm['date_from']); ?>
-            <span class="input-group-addon" style="border-left: 0;border-right: 0;">
-                <?php echo $view['form']->label($filterForm['date_to']); ?>
-            </span>
-            <?php echo $view['form']->widget($filterForm['date_to']); ?>
-            <span class="input-group-btn">
-                <?php echo $view['form']->row($filterForm['apply']); ?>
-            </span>
-        </div>
+        <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', array('dateRangeForm' => $dateRangeForm)); ?>
     </div>
-<?php echo $view['form']->end($filterForm); ?>
 </div>
 
 <?php if (count($widgets)): ?>
