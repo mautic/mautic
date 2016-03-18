@@ -83,4 +83,33 @@ class AjaxController extends CommonAjaxController
 
         return $this->sendJsonResponse($dataArray);
     }
+
+    /**
+     * Deletes the entity
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function deleteAction(Request $request)
+    {
+        $objectId = $request->request->get('widget');
+        $dataArray = array('success' => 0);
+
+        // @todo: build permissions
+        // if (!$this->factory->getSecurity()->isGranted('dashobard:widgets:delete')) {
+        //     return $this->accessDenied();
+        // }
+
+        /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
+        $model  = $this->factory->getModel('dashboard');
+        $entity = $model->getEntity($objectId);
+        if ($entity) {
+            $model->deleteEntity($entity);
+            $name = $entity->getName();
+            $dataArray['success'] = 1;
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
 }

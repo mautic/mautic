@@ -2,6 +2,7 @@
 Mautic.dashboardOnLoad = function (container) {
     Mautic.initWidgetSorting();
     Mautic.initDateRangePicker();
+    Mautic.initWidgetRemoveButtons(mQuery('#dashboard-widgets'));
 };
 
 Mautic.dashboardOnUnload = function(id) {
@@ -33,6 +34,7 @@ Mautic.widgetOnLoad = function(container, response) {
         .css('height', response.widgetHeight + '%');
     Mautic.renderCharts(widgetHtml);
     Mautic.renderMaps(widgetHtml);
+    Mautic.initWidgetRemoveButtons(widgetHtml);
     Mautic.saveWidgetSorting();
 }
 
@@ -79,4 +81,20 @@ Mautic.updateWidgetForm = function (element) {
         }
         Mautic.removeLabelLoadingIndicator();
     });
+};
+
+Mautic.initWidgetRemoveButtons = function (scope) {
+    scope.find('.remove-widget').on('click', function(e) {
+        e.preventDefault();
+        var button = mQuery(this);
+        var wrapper = button.closest('.widget');
+        var widgetId = wrapper.attr('data-widget-id');
+        wrapper.hide('slow');
+        Mautic.ajaxActionRequest('dashboard:delete', {widget: widgetId}, function(response) {
+            if (!response.success) {
+                wrapper.show('slow');
+            }
+        });
+    });
+    
 };

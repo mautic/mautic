@@ -39,7 +39,8 @@
                 <li role="separator" class="divider"></li>
                 <li>
                     <a  href="<?php echo $this->container->get('router')->generate('mautic_dashboard_action', array('objectAction' => 'delete', 'objectId' => $widget->getId())); ?>" 
-                        data-header="<?php echo $view['translator']->trans('mautic.dashboard.widget.header.delete'); ?>">
+                        data-header="<?php echo $view['translator']->trans('mautic.dashboard.widget.header.delete'); ?>"
+                        class="remove-widget">
                         <i class="fa fa-remove"></i> Remove
                     </a>
                 </li>
