@@ -610,7 +610,7 @@ var Mautic = {
         }
 
         Mautic.renderCharts();
-        Mautic.renderMaps();
+        Mautic.renderMaps(container);
 
         //instantiate sparkline plugin
         mQuery('.plugin-sparkline').sparkline('html', {enableTagOptions: true});
@@ -2977,13 +2977,15 @@ var Mautic = {
     /**
      * Render the chart.js charts
      *
-     * @param mQuery element scope
+     * @param mQuery|string scope
      */
     renderCharts: function(scope) {
         var charts = [];
         if (!Mautic.chartObjects) Mautic.chartObjects = [];
 
-        if (scope) {
+        if (mQuery.type(scope) === 'string') {
+            charts = mQuery(scope).find('canvas.chart');
+        } else if (scope) {
             charts = scope.find('canvas.chart');
         } else {
             charts = mQuery('canvas.chart');
@@ -3064,7 +3066,15 @@ var Mautic = {
      */
     renderMaps: function(scope) {
         if (!Mautic.mapObjects) Mautic.mapObjects = [];
-        var maps = mQuery('.vector-map');
+        var maps = [];
+
+        if (mQuery.type(scope) === 'string') {
+            maps = mQuery(scope).find('.vector-map');
+        } else if (scope) {
+            maps = scope.find('.vector-map');
+        } else {
+            maps = mQuery('.vector-map');
+        }
 
         if (maps.length) {
             maps.each(function(index, element) {
@@ -3104,7 +3114,7 @@ var Mautic = {
                         }
                     }
                 });
-                Mautic.chartObjects.push(wrapper.vectorMap('get', 'mapObject'));
+                Mautic.mapObjects.push(wrapper.vectorMap('get', 'mapObject'));
             });
         }
     },

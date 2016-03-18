@@ -61,6 +61,7 @@ Mautic.saveWidgetSorting = function () {
     widgets.each(function(index, value) { 
         ordering.push(mQuery(this).attr('data-widget-id')); 
     });
+
     Mautic.ajaxActionRequest('dashboard:updateWidgetOrdering', {'ordering': ordering}, function(response) {
         // @todo handle errors
     });
