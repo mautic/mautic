@@ -400,9 +400,12 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
     public function getRoles ()
     {
         $roles = array(
-            "ROLE_API",
             (($this->isAdmin()) ? "ROLE_ADMIN" : "ROLE_USER")
         );
+
+        if (defined('MAUTIC_API_REQUEST') && MAUTIC_API_REQUEST) {
+            $roles[] = "ROLE_API";
+        }
 
         return $roles;
     }
