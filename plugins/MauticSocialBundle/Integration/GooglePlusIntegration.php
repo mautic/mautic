@@ -9,12 +9,15 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
+use Mautic\LeadBundle\Entity\Lead;
+
 /**
  * Class GooglePlusIntegration
  */
 class GooglePlusIntegration extends SocialIntegration
 {
-    /**
+
+     /**
      * {@inheritdoc}
      */
     public function getName ()
@@ -150,118 +153,6 @@ class GooglePlusIntegration extends SocialIntegration
     }
 
     /**
-     * Convert and assign the data to assignable fields
-     *
-     * @param $data
-     *
-     * @return array
-     */
-    protected function matchUpData ($data)
-    {
-        $info              = array();
-        $available         = $this->getAvailableLeadFields();
-        $translator        = $this->factory->getTranslator();
-        $socialProfileUrls = $this->factory->getHelper('integration')->getSocialProfileUrlRegex();
-
-        foreach ($available as $field => $fieldDetails) {
-            if (!isset($data->$field)) {
-                $info[$field] = '';
-            } else {
-                $values = $data->$field;
-
-                switch ($fieldDetails['type']) {
-                    case 'string':
-                    case 'boolean':
-                        $info[$field] = $values;
-                        break;
-                    case 'object':
-                        foreach ($fieldDetails['fields'] as $f) {
-                            $name = (stripos($f, $field) === false) ? $f . ucfirst($field) : $f;
-                            if (isset($values->$f)) {
-                                $info[$name] = $values->$f;
-                            }
-                        }
-                        break;
-                    case 'array_object':
-                        if ($field == "urls") {
-                            foreach ($values as $k => $v) {
-                                $socialMatch = false;
-                                foreach ($socialProfileUrls as $service => $regex) {
-                                    if (is_array($regex)) {
-                                        foreach ($regex as $r) {
-                                            preg_match($r, $v->value, $match);
-                                            if (!empty($match[1])) {
-                                                $info[$service . 'ProfileHandle'] = $match[1];
-                                                $socialMatch                      = true;
-                                                break;
-                                            }
-                                        }
-                                        if ($socialMatch)
-                                            break;
-                                    } else {
-                                        preg_match($regex, $v->value, $match);
-                                        if (!empty($match[1])) {
-                                            $info[$service . 'ProfileHandle'] = $match[1];
-                                            $socialMatch                      = true;
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                if (!$socialMatch) {
-                                    $name = $v->type . 'Urls';
-                                    if (isset($info[$name])) {
-                                        $info[$name] .= ", {$v->label} ({$v->value})";
-                                    } else {
-                                        $info[$name] = "{$v->label} ({$v->value})";
-                                    }
-                                }
-                            }
-                        } elseif ($field == "organizations") {
-                            $organizations = array();
-
-                            foreach ($values as $k => $v) {
-                                if (!empty($v->name) && !empty($v->title))
-                                    $organization = $v->name . ', ' . $v->title;
-                                elseif (!empty($v->name)) {
-                                    $organization = $v->name;
-                                } elseif (!empty($v->title)) {
-                                    $organization = $v->title;
-                                }
-
-                                if (!empty($v->startDate) && !empty($v->endDate)) {
-                                    $organization .= " " . $v->startDate . ' - ' . $v->endDate;
-                                } elseif (!empty($v->startDate)) {
-                                    $organization .= ' ' . $v->startDate;
-                                } elseif (!empty($v->endDate)) {
-                                    $organization .= ' ' . $v->endDate;
-                                }
-
-                                if (!empty($v->primary)) {
-                                    $organization .= " (" . $translator->trans('mautic.lead.lead.primary') . ")";
-                                }
-                                $organizations[$v->type][] = $organization;
-                            }
-                            foreach ($organizations as $type => $orgs) {
-                                $info[$type . "Organizations"] = implode("; ", $orgs);
-                            }
-                        } elseif ($field == "placesLived") {
-                            $places = array();
-                            foreach ($values as $k => $v) {
-                                $primary  = (!empty($v->primary)) ? ' (' . $translator->trans('mautic.lead.lead.primary') . ')' : '';
-                                $places[] = $v->value . $primary;
-                            }
-                            $info[$field] = implode('; ', $places);
-                        }
-                        break;
-                }
-            }
-        }
-
-        return $info;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getAvailableLeadFields($settings = array())
@@ -273,9 +164,10 @@ class GooglePlusIntegration extends SocialIntegration
             "skills"             => array("type" => "string"),
             "birthday"           => array("type" => "string"),
             "gender"             => array("type" => "string"),
+            'url'                => array("type" => "string"),
             "urls"               => array(
                 "type"   => "array_object",
-                "fields" => array(
+                "fields" => array( 
                     "otherProfile",
                     "contributor",
                     "website",
@@ -291,6 +183,12 @@ class GooglePlusIntegration extends SocialIntegration
                     "middleName",
                     "honorificPrefix",
                     "honorificSuffix"
+                )
+            ),
+            "emails"               => array(
+                "type"   => "array_object",
+                "fields" => array(
+                    "account"
                 )
             ),
             "tagline"            => array("type" => "string"),
@@ -319,13 +217,15 @@ class GooglePlusIntegration extends SocialIntegration
         );
     }
 
-    /**
+      /**
      * {@inheritdoc}
      */
-    public function getRequiredKeyFields ()
+    public function getRequiredKeyFields()
     {
         return array(
-            'key' => 'mautic.integration.keyfield.api'
+            'key' => 'mautic.integration.keyfield.api',
+            'client_id'      => 'mautic.integration.keyfield.clientid',
+            'client_secret'  => 'mautic.integration.keyfield.clientsecret'
         );
     }
 

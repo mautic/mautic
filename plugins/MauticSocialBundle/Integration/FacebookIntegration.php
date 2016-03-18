@@ -9,6 +9,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
+use Mautic\LeadBundle\Entity\Lead;
 /**
  * Class FacebookIntegration
  */
@@ -45,7 +46,8 @@ class FacebookIntegration extends SocialIntegration
     public function getSupportedFeatures()
     {
         return array(
-            'share_button'
+            'share_button',
+            'login_button'
         );
     }
 
@@ -135,7 +137,7 @@ class FacebookIntegration extends SocialIntegration
         }
     }
 
-    /**
+    /**$post
      * {@inheritdoc}
      */
     public function getUserId($identifier, &$socialCache)
@@ -169,15 +171,17 @@ class FacebookIntegration extends SocialIntegration
      */
     public function getAvailableLeadFields($settings = array())
     {
-        // Until lead profile support is restored
-        return array();
+	    // Until lead profile support is restored
+	    //return array();
 
-        return array(
-            'first_name' => array('type' => 'string'),
-            'last_name'  => array('type' => 'string'),
-            'name'       => array('type' => 'string'),
-            'gender'     => array('type' => 'string'),
-            'locale'     => array('type' => 'string')
-        );
+	    return array(
+		    'first_name' => array('type' => 'string'),
+		    'last_name'  => array('type' => 'string'),
+		    'name'       => array('type' => 'string'),
+		    'gender'     => array('type' => 'string'),
+		    'locale'     => array('type' => 'string'),
+		    'email'      => array('type' => 'string'),
+		    'link'       => array('type' => 'string'),
+	    );
     }
 }
