@@ -192,7 +192,7 @@ class LeadRepository extends CommonRepository
             ->orderBy('date_added', 'ASC');
 
         if (isset($options['campaign_id'])) {
-            $q->andwhere($q->expr()->gte('cl.campaign_id', (int) $options['campaign_id']));
+            $q->andwhere($q->expr()->eq('cl.campaign_id', (int) $options['campaign_id']));
         }
 
         $datesAdded = $q->execute()->fetchAll();
