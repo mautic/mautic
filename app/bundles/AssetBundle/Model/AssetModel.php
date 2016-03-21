@@ -468,9 +468,9 @@ class AssetModel extends FormModel
     public function getUniqueVsRepetitivePieChartData($dateFrom, $dateTo, $filters = array())
     {
         $chart      = new PieChart();
-        $query      = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
-        $all        = $query->count('asset_downloads', 'id', 'date_download', $dateFrom, $dateTo, $filters);
-        $unique     = $query->count('asset_downloads', 'lead_id', 'date_download', $dateFrom, $dateTo, $filters, array('getUnique' => true));
+        $query      = new ChartQuery($this->factory->getEntityManager()->getConnection(), $dateFrom, $dateTo);
+        $all        = $query->count('asset_downloads', 'id', 'date_download', $filters);
+        $unique     = $query->count('asset_downloads', 'lead_id', 'date_download', $filters, array('getUnique' => true));
         $repetitive = $all - $unique;
         $chart->setDataset('Unique', $unique);
         $chart->setDataset('Repetitive', $repetitive);
