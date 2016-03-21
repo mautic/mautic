@@ -497,9 +497,9 @@ class AssetModel extends FormModel
             ->groupBy('a.id')
             ->setMaxResults($limit);
 
-        $chartQuery = new ChartQuery($this->em->getConnection());
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
-        $chartQuery->applyDateFilters($q, 'date_download', $dateFrom, $dateTo);
+        $chartQuery->applyDateFilters($q, 'date_download');
 
         $results = $q->execute()->fetchAll();
 
