@@ -153,7 +153,7 @@ abstract class AbstractChart
 
         // a diff of two identical dates returns 0, but we expect 24 hours
         if ($dateFrom == $dateTo) {
-            $this->dateTo->modify('+1 day')->modify('-1 second');
+            $this->dateTo->modify('+1 day');
         }
     }
 
