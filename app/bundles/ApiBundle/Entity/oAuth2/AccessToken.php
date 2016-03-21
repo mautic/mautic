@@ -1,0 +1,150 @@
+<?php
+/**
+ * @package     Mautic
+ * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.org
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace Mautic\ApiBundle\Entity\oAuth2;
+
+use FOS\OAuthServerBundle\Model\AccessToken as BaseAccessToken;
+use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Symfony\Component\Security\Core\User\UserInterface;
+use FOS\OAuthServerBundle\Model\ClientInterface;
+
+/**
+ * Class AccessToken
+ *
+ * @package Mautic\ApiBundle\Entity\oAuth2
+ */
+class AccessToken extends BaseAccessToken
+{
+
+    /**
+     * @var int
+     */
+    protected $id;
+
+    /**
+     * @var Client
+     */
+    protected $client;
+
+    /**
+     * @var \Mautic\UserBundle\Entity\User
+     */
+    protected $user;
+
+    /**
+     * @var string
+     */
+    protected $token;
+
+    /**
+     * @var int
+     */
+    protected $expiresAt;
+
+    /**
+     * @var string
+     */
+    protected $scope;
+
+    /**
+     * @param ORM\ClassMetadata $metadata
+     */
+    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('oauth2_accesstokens')
+            ->addIndex(array('token'), 'oauth2_access_token_search');
+
+        $builder->createField('id', 'integer')
+            ->isPrimaryKey()
+            ->generatedValue()
+            ->build();
+
+        $builder->createManyToOne('client', 'Client')
+            ->addJoinColumn('client_id', 'id', false, false, 'CASCADE')
+            ->build();
+
+        $builder->createManyToOne('user', 'Mautic\UserBundle\Entity\User')
+            ->addJoinColumn('user_id', 'id', false, false, 'CASCADE')
+            ->build();
+
+        $builder->createField('token', 'string')
+            ->unique()
+            ->build();
+
+        $builder->createField('expiresAt', 'bigint')
+            ->columnName('expires_at')
+            ->nullable()
+            ->build();
+
+        $builder->createField('scope', 'string')
+            ->nullable()
+            ->build();
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId ()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set client
+     *
+     * @param ClientInterface $client
+     *
+     * @return AccessToken
+     */
+    public function setClient (ClientInterface $client)
+    {
+        $this->client = $client;
+
+        return $this;
+    }
+
+    /**
+     * Get client
+     *
+     * @return ClientInterface
+     */
+    public function getClient ()
+    {
+        return $this->client;
+    }
+
+    /**
+     * Set user
+     *
+     * @param UserInterface $user
+     *
+     * @return AccessToken
+     */
+    public function setUser (UserInterface $user = null)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get user
+     *
+     * @return UserInterface
+     */
+    public function getUser ()
+    {
+        return $this->user;
+    }
+}

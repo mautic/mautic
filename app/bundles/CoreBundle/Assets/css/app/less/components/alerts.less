@@ -1,0 +1,55 @@
+//
+// Alerts
+// --------------------------------------------------
+
+// Dismissible alerts
+//
+// Expand the right padding and account for the close button's positioning.
+
+.alert-dismissable, // The misspelled .alert-dismissable was deprecated in 3.2.0.
+.alert-dismissible {
+  // Adjust close link position
+  .close {
+    top: -1px;
+  }
+}
+
+.alert-primary {
+	background: lighten(@mautic-primary, 30%);
+}
+
+.alert-secondary {
+	background: lighten(@mautic-secondary, 30%);
+}
+
+.alert-tertiary {
+	background: lighten(@mautic-tertiary, 30%);
+}
+
+.alert-growl {
+	background: rgba(0,0,0,.8);
+	color: #FFFFFF;
+	border: 1px solid #000;
+}
+
+.alert-growl-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 100000;
+
+  .alert-growl {
+	margin-bottom: 5px;
+  }
+}
+
+.alert-growl .close {
+  font-size: (@font-size-base);
+  color: #fff;
+  margin-left: 10px;
+}
+
+.alert .close {
+  font-size: (@font-size-base);
+  margin-left: 10px;
+}

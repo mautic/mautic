@@ -1,0 +1,41 @@
+.col-point-id, .col-pointtrigger-id {
+    width: 75px;
+}
+
+.trigger-event-group-header {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+#triggerEvents .trigger-event-row {
+    padding: 20px;
+    margin-bottom: 0 !important;
+    border: 1px solid #ecf0f1;
+}
+
+#triggerEvents .trigger-event-row .event-label {
+    font-size: 1.1em;
+    font-weight: bold;
+    display: block;
+}
+
+#triggerEvents .trigger-event-row .event-descr {
+    font-size: 0.9em;
+    display: block;
+}
+
+#triggerEvents .trigger-event-row:hover {
+    background-color: #ecf0f1;
+}
+
+#triggerEvents .trigger-event-row.bg-danger:hover {
+    background-color: #f2d4d2;
+}
+
+#triggerEvents .form-buttons {
+    float: right;
+}
+
+.col-pointtrigger-color {
+    width: 50px;
+}

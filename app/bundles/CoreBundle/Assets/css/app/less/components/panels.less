@@ -1,0 +1,54 @@
+//
+// Panels
+// --------------------------------------------------
+
+.panel {
+  border: 1px solid @panel-default-border;
+  .box-shadow(0px 1px 1px darken(@body-bg, 2%));
+  //background-clip: padding-box;
+}
+
+// Panel heading
+// ------------------------
+.panel-heading {
+  padding: 0 15px;
+  .clearfix();
+
+  // Panel title
+  .panel-title {
+    padding: ((33 - @font-size-base) / 2) 0;
+    display: table-cell;
+    width: 1%;
+    vertical-align: middle;
+    //font-size: inherit;
+    font-weight: 600;
+  }
+
+  // Panel toolbar
+  .panel-toolbar {
+    display: table-cell;
+    width: 1%;
+    vertical-align: middle;
+  }
+}
+
+// Panel group
+// ------------------------
+.panel-group {
+  .panel {
+    .box-shadow(none);
+  }
+}
+
+// Panel footer
+.panel-footer {
+  overflow: hidden;
+  background-color: #fbfbfb;
+}
+
+.panel-toolbar-wrapper {
+  display: block;
+  background-color: #fbfbfb;
+  border-bottom: 1px solid #cfd9db;
+  padding: 0px 15px;
+}

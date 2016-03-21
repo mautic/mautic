@@ -1,0 +1,59 @@
+/* FormBundle */
+.form-submitaction-group-header {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+#mauticforms_fields .mauticform-row {
+    padding: 10px;
+    margin-bottom: 0 !important;
+}
+
+#mauticforms_actions .mauticform-row {
+    padding: 20px;
+    margin-bottom: 0 !important;
+    border: 1px solid #ecf0f1;
+}
+
+#mauticforms_actions .mauticform-row .action-label {
+    font-size: 1.1em;
+    font-weight: bold;
+    display: block;
+}
+
+#mauticforms_actions .mauticform-row .action-descr {
+    font-size: 0.9em;
+    display: block;
+}
+
+#mauticforms_fields .mauticform-row:hover, #mauticforms_actions .mauticform-row:hover {
+    background-color: #ecf0f1;
+}
+
+#mauticforms_fields .mauticform-row.bg-danger:hover, #mauticforms_actions .mauticform-row.bg-danger:hover {
+    background-color: #f2d4d2;
+}
+
+#mauticforms_fields .form-buttons, #mauticforms_actions .form-buttons {
+    float: right;
+}
+
+textarea.form-html {
+    height: 200px;
+}
+
+.col-form-id, .col-formresult-id {
+    width: 75px;
+}
+
+.col-form-submissions {
+    width: 100px;
+}
+
+.formresult-list th .input-group {
+    margin-top: 10px;
+}
+
+.formresult-list th:not(.col-formresult-id):not(.col-actions) {
+    min-width: 125px;
+}

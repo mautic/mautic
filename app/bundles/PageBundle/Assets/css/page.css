@@ -1,0 +1,9 @@
+/* PageBundle */
+
+.col-page-id {
+    width: 75px;
+}
+
+.page-builder .builder-panel .panel-body {
+    padding: 5px 0;
+}

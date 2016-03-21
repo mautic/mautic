@@ -1,0 +1,19 @@
+//
+// bullet
+// --------------------------------------------------
+
+.bullet {
+  display: inline-block;
+  vertical-align: middle;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: @gray-light;
+
+  // contextual
+  &.bullet-primary { background-color: @brand-primary; }
+  &.bullet-success { background-color: @brand-success; }
+  &.bullet-info { background-color: @brand-info; }
+  &.bullet-warning { background-color: @brand-warning; }
+  &.bullet-danger { background-color: @brand-danger; }
+}

@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>File Manager</title>
+<link rel="stylesheet" type="text/css" href="styles/reset.css" />
+<link rel="stylesheet" type="text/css" href="scripts/jquery.filetree/jqueryFileTree.css" />
+<link rel="stylesheet" type="text/css" href="scripts/jquery.contextmenu/jquery.contextMenu-1.01.css" />
+<link rel="stylesheet" type="text/css" href="../../../../css/libraries/libraries.css" />
+<link rel="stylesheet" type="text/css" href="../../../../css/app.css" />
+<!-- CSS dynamically added using 'config.options.theme' defined in config file -->
+</head>
+<body>
+<div>
+    <form id="uploader" method="post">
+        <button class="btn btn-success btn-xs fa fa-home" id="home" name="home" type="button"></button>
+        <h1></h1>
+        <div id="uploadresponse"></div>
+        <input id="mode" name="mode" type="hidden" value="add" />
+        <input id="currentpath" name="currentpath" type="hidden" />
+        <div id="file-input-container">
+            <div id="alt-fileinput">
+                <input id="filepath" name="filepath" type="text" class="input-sm"/><button id="browse" class="btn btn-success btn-xs" name="browse" type="button" value="Browse"></button>
+            </div>
+            <input	id="newfile" name="newfile" type="file" />
+        </div>
+        <button class="btn btn-success btn-xs" id="upload" name="upload" type="submit"><i class="btn-xs fa fa-upload mr-3"></i></button>
+        <button class="btn btn-success btn-xs" id="newfolder" name="newfolder" type="button"><i class="btn-xs fa fa-fw fa-folder mr-3"></i></button>
+        <button class="btn btn-success btn-xs" id="grid" class="ON" type="button"><i class="fa fa-th-large"></i></button>
+        <button class="btn btn-success btn-xs" id="list" type="button"><i class="fa fa-list"></i></button>
+    </form>
+    <div id="splitter">
+        <div id="filetree"></div>
+        <div id="fileinfo">
+            <h1></h1>
+        </div>
+    </div>
+    <div id="footer">
+        <form name="search" id="search" method="get">
+            <div>
+                <input type="text" value="" name="q" id="q" />
+                <a id="reset" href="#" class="q-reset"></a>
+                <span class="q-inactive"></span>
+            </div>
+        </form>
+        <a href="" id="link-to-project"></a>
+        <div id="folder-info"></div>
+    </div>
+
+    <ul id="itemOptions" class="contextMenu">
+        <li class="select"><a href="#select"></a></li>
+        <li class="download"><a href="#download"></a></li>
+        <li class="rename"><a href="#rename"></a></li>
+        <li class="move"><a href="#move"></a></li>
+        <li class="replace"><a href="#replace"></a></li>
+        <li class="delete separator"><a href="#delete"></a></li>
+    </ul>
+
+    <script type="text/javascript" src="scripts/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="scripts/jquery-browser.js"></script>
+    <script type="text/javascript" src="../../3.bootstrap.js"></script>
+    <script type="text/javascript" src="scripts/jquery.form-3.24.js"></script>
+    <script type="text/javascript" src="scripts/jquery.splitter/jquery.splitter-1.5.1.js"></script>
+    <script type="text/javascript" src="scripts/jquery.filetree/jqueryFileTree.js"></script>
+    <script type="text/javascript" src="scripts/jquery.contextmenu/jquery.contextMenu-1.01.js"></script>
+    <script type="text/javascript" src="scripts/jquery.impromptu-3.2.min.js"></script>
+    <script type="text/javascript" src="scripts/jquery.tablesorter-2.7.2.min.js"></script>
+    <script type="text/javascript" src="scripts/filemanager.js"></script>
+</div>
+</body>
+</html>

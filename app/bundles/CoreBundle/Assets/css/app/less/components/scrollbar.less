@@ -1,0 +1,35 @@
+//
+// Scrollbar
+// --------------------------------------------------
+
+// Scrollbar on devices with touch support
+.touch {
+  .scroll-content {
+    height: 100%;
+    overflow-y: scroll;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+// Scrollbar on devices with no touch support
+.no-touch {
+  .scroll-wrapper,
+  .scroll-wrapper > .scroll-content {
+    height: 100%;
+  }
+
+  .scroll-wrapper {
+    // scroll-rail
+    > .scroll-rail {
+      display: none !important;
+    }
+
+    // scrollbar
+    > .scroll-bar {
+      //opacity: 0.8 !important;
+      background-color: gray !important;
+      right: 3px !important;
+    }
+  }
+}

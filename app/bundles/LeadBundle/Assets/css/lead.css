@@ -1,0 +1,129 @@
+/* LeadBundle */
+
+.col-leadfield-id, .col-leadlist-id, .col-lead-id {
+    width: 75px;
+}
+
+.col-leadfield-statusicons, .col-leadlist-leadcount {
+    width: 100px;
+}
+
+.col-leadfield-orderhandle {
+    width: 25px;
+}
+
+.col-leadfield-type {
+    width: 125px;
+}
+
+.leadfield-list .fa-asterisk:hover, .leadfield-list .fa-eye:hover, .leadfield-list .fa-lock:hover, .leadfield-list .fa-list:hover {
+    color: #7D5B71;
+}
+
+.leadlist-filter a {
+    text-decoration: none;
+}
+
+.leadlist-filter:hover {
+    background-color: #ecf0f1;
+}
+
+.leadlist-filter {
+    height: 40px;
+    border-bottom: 1px solid #cccccc;
+    overflow: hidden;
+}
+
+.leadlist-filter-name {
+    font-size: 1.1em;
+}
+
+.available-filters .rounded-corners {
+    height: 300px;
+    overflow: auto;
+}
+
+.selected-filters .rounded-corners {
+    height: 300px;
+    overflow: auto;
+}
+
+.col-leadpoints-date {
+    width: 175px;
+}
+.col-leadpoints-delta {
+    width: 75px;
+}
+
+.panel-googleplus .panel-heading {
+    background: #dd4b39;
+    color: #FFFFFF;
+}
+
+.panel-foursquare .panel-heading {
+    background: #0072b1;
+    color: #FFFFFF;
+}
+
+.panel-facebook .panel-heading {
+    background: #3b5998;
+    color: #FFFFFF;
+}
+
+.panel-linkedin .panel-heding {
+    background: #007bb6;
+    color: #FFFFFF;
+}
+
+.panel-twitter .panel-heading {
+    background: #00aced;
+    color: #FFFFFF;
+}
+.panel-instagram .panel-heading {
+    background: #517fa4;
+    color: #FFFFFF;
+}
+
+.btn-leadnote-add {
+    margin-left: 0 !important;
+    border-bottom-left-radius: 2px !important;
+    border-top-left-radius: 2px !important;
+}
+
+ul.tag-cloud li {
+    list-style-type: none;
+    float:left;
+    margin: 0 10px;
+    height: 35px;
+}
+
+#social-container div.tab-pane {
+    height: 250px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.card.highlight {
+    background-color: #faf2cc;
+    border: 3px solid #4e5d9d !important;
+}
+
+.lead-avatar-panel {
+    position: relative;
+}
+
+.lead-avatar-panel .avatar-collapser a.arrow {
+    position: absolute;
+    top:0;
+    right: 0px;
+    margin: 0 3px 0 0;
+    padding: 0 10px;
+}
+
+.lead-avatar-panel .img-responsive {
+    min-width: 100%;
+}
+
+.lead-merge-options {
+    position: relative;
+}

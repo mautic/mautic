@@ -1,0 +1,40 @@
+//
+// List groups
+// --------------------------------------------------
+
+.list-group-item {
+  > a {
+    position: relative;
+    z-index: 1;
+    display: block;
+  }
+}
+
+// Linked list items
+//
+// Use anchor elements instead of `li`s or `div`s to create linked list items.
+// Includes an extra `.active` modifier class for showing selected items.
+
+a.list-group-item {
+  // Hover state
+  &:hover,
+  &:focus {
+    z-index: 2;
+  }
+}
+
+label.list-group-item {
+  color: @list-group-link-color;
+
+  .list-group-item-heading {
+    color: @list-group-link-heading-color;
+  }
+
+  // Hover state
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    color: @list-group-link-hover-color;
+    background-color: @list-group-hover-bg;
+  }
+}

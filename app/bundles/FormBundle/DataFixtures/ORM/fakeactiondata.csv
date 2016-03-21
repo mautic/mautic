@@ -1,0 +1,3 @@
+form,type,name,description,order,properties
+1,lead.create,Create a lead,NULL,1,"a:2:{s:6:\"points\";d:10;s:12:\"mappedFields\";a:22:{i:1;i:1;i:2;N;i:3;N;i:4;N;i:5;N;i:6;i:2;i:7;N;i:8;N;i:9;N;i:10;N;i:11;N;i:12;N;i:13;N;i:14;N;i:15;N;i:16;N;i:17;N;i:18;N;i:19;N;i:20;N;i:21;N;i:22;N;}}"
+2,lead.create,Create a lead,NULL,1,"a:2:{s:6:\"points\";d:10;s:12:\"mappedFields\";a:22:{i:1;i:5;i:2;N;i:3;N;i:4;N;i:5;N;i:6;i:6;i:7;N;i:8;N;i:9;N;i:10;N;i:11;N;i:12;N;i:13;N;i:14;N;i:15;N;i:16;N;i:17;N;i:18;N;i:19;N;i:20;N;i:21;N;i:22;N;}}"

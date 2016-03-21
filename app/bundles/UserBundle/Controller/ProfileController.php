@@ -1,0 +1,199 @@
+<?php
+/**
+ * @package     Mautic
+ * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.org
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace Mautic\UserBundle\Controller;
+
+use Mautic\CoreBundle\Controller\FormController;
+
+/**
+ * Class ProfileController
+ */
+class ProfileController extends FormController
+{
+
+    /**
+     * Generate's account profile
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function indexAction ()
+    {
+        //get current user
+        $me    = $this->get('security.context')->getToken()->getUser();
+        $model = $this->factory->getModel('user.user');
+
+        //set some permissions
+        $permissions = array(
+            'apiAccess'    => ($this->factory->getParameter('api_enabled')) ?
+                $this->factory->getSecurity()->isGranted('api:access:full')
+                : 0,
+            'editName'     => $this->factory->getSecurity()->isGranted('user:profile:editname'),
+            'editUsername' => $this->factory->getSecurity()->isGranted('user:profile:editusername'),
+            'editPosition' => $this->factory->getSecurity()->isGranted('user:profile:editposition'),
+            'editEmail'    => $this->factory->getSecurity()->isGranted('user:profile:editemail')
+        );
+
+        $action = $this->generateUrl('mautic_user_account');
+        $form   = $model->createForm($me, $this->get('form.factory'), $action, array('in_profile' => true));
+
+        $overrides = array();
+
+        //make sure this user has access to edit privileged fields
+        foreach ($permissions as $permName => $hasAccess) {
+            if ($permName == 'apiAccess')
+                continue;
+
+            if (!$hasAccess) {
+                //set the value to its original
+                switch ($permName) {
+                    case 'editName':
+                        $overrides['firstName'] = $me->getFirstName();
+                        $overrides['lastName']  = $me->getLastName();
+                        $form->remove('firstName');
+                        $form->add('firstName_unbound', 'text', array(
+                            'label'      => 'mautic.core.firstname',
+                            'label_attr' => array('class' => 'control-label'),
+                            'attr'       => array('class' => 'form-control'),
+                            'mapped'     => false,
+                            'disabled'   => true,
+                            'data'       => $me->getFirstName(),
+                            'required'   => false
+                        ));
+
+                        $form->remove('lastName');
+                        $form->add('lastName_unbound', 'text', array(
+                            'label'      => 'mautic.core.lastname',
+                            'label_attr' => array('class' => 'control-label'),
+                            'attr'       => array('class' => 'form-control'),
+                            'mapped'     => false,
+                            'disabled'   => true,
+                            'data'       => $me->getLastName(),
+                            'required'   => false
+                        ));
+                        break;
+
+                    case 'editUsername':
+                        $overrides['username'] = $me->getUsername();
+                        $form->remove('username');
+                        $form->add('username_unbound', 'text', array(
+                            'label'      => 'mautic.core.username',
+                            'label_attr' => array('class' => 'control-label'),
+                            'attr'       => array('class' => 'form-control'),
+                            'mapped'     => false,
+                            'disabled'   => true,
+                            'data'       => $me->getUsername(),
+                            'required'   => false
+                        ));
+                        break;
+                    case 'editPosition':
+                        $overrides['position'] = $me->getPosition();
+                        $form->remove('position');
+                        $form->add('position_unbound', 'text', array(
+                            'label'      => 'mautic.core.position',
+                            'label_attr' => array('class' => 'control-label'),
+                            'attr'       => array('class' => 'form-control'),
+                            'mapped'     => false,
+                            'disabled'   => true,
+                            'data'       => $me->getPosition(),
+                            'required'   => false
+                        ));
+                        break;
+                    case 'editEmail':
+                        $overrides['email'] = $me->getEmail();
+                        $form->remove('email');
+                        $form->add('email_unbound', 'text', array(
+                            'label'      => 'mautic.core.type.email',
+                            'label_attr' => array('class' => 'control-label'),
+                            'attr'       => array('class' => 'form-control'),
+                            'mapped'     => false,
+                            'disabled'   => true,
+                            'data'       => $me->getEmail(),
+                            'required'   => false
+                        ));
+                        break;
+
+                }
+            }
+        }
+
+        //Check for a submitted form and process it
+        $submitted = $this->factory->getSession()->get('formProcessed', 0);
+        if ($this->request->getMethod() == 'POST' && !$submitted) {
+            $this->factory->getSession()->set('formProcessed', 1);
+
+            //check to see if the password needs to be rehashed
+            $submittedPassword     = $this->request->request->get('user[plainPassword][password]', null, true);
+            $encoder               = $this->get('security.encoder_factory')->getEncoder($me);
+            $overrides['password'] = $model->checkNewPassword($me, $encoder, $submittedPassword);
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($this->isFormValid($form)) {
+                    foreach ($overrides as $k => $v) {
+                        $func = 'set' . ucfirst($k);
+                        $me->$func($v);
+                    }
+
+                    //form is valid so process the data
+                    $model->saveEntity($me);
+
+                    //check if the user's locale has been downloaded already, fetch it if not
+                    $installedLanguages = $this->factory->getParameter('supported_languages');
+
+                    if ($me->getLocale() && !array_key_exists($me->getLocale(), $installedLanguages)) {
+                        /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
+                        $languageHelper = $this->factory->getHelper('language');
+
+                        $fetchLanguage = $languageHelper->extractLanguagePackage($me->getLocale());
+
+                        // If there is an error, we need to reset the user's locale to the default
+                        if ($fetchLanguage['error']) {
+                            $me->setLocale(null);
+                            $model->saveEntity($me);
+                            $this->addFlash('mautic.core.could.not.set.language');
+                        }
+                    }
+
+                    $returnUrl = $this->generateUrl('mautic_user_account');
+
+                    return $this->postActionRedirect(array(
+                        'returnUrl'       => $returnUrl,
+                        'contentTemplate' => 'MauticUserBundle:Profile:index',
+                        'passthroughVars' => array(
+                            'mauticContent' => 'user'
+                        ),
+                        'flashes'         => array( //success
+                            array(
+                                'type' => 'notice',
+                                'msg'  => 'mautic.user.account.notice.updated'
+                            )
+                        )
+                    ));
+                }
+            } else {
+                return $this->redirect($this->generateUrl('mautic_dashboard_index'));
+            }
+        }
+        $this->factory->getSession()->set('formProcessed', 0);
+
+        $parameters = array(
+            'permissions'       => $permissions,
+            'me'                => $me,
+            'userForm'          => $form->createView(),
+            'authorizedClients' => $this->forward('MauticApiBundle:Client:authorizedClients')->getContent()
+        );
+
+        return $this->delegateView(array(
+            'viewParameters'  => $parameters,
+            'contentTemplate' => 'MauticUserBundle:Profile:index.html.php',
+            'passthroughVars' => array(
+                'route'         => $this->generateUrl('mautic_user_account'),
+                'mauticContent' => 'user'
+            )
+        ));
+    }
+}

@@ -1,0 +1,497 @@
+//
+// bootstrap-chosen.less
+//
+// An alternate stylesheet for Chosen (http://harvesthq.github.com/chosen/).
+// This one is supposed to integrate better with Bootstrap.
+//
+// Submit bugfixes to: http://github.com/alxlit/bootstrap-chosen
+//
+
+@import "bootstrap-chosen-variables.less";
+
+.chosen-select { width: 100%; }
+.chosen-select-deselect { width: 100%; }
+
+.chosen-container {
+  display: inline-block;
+  font-size: @font-size-base;
+  position: relative;
+  vertical-align: middle;
+
+  .group-name {
+    margin-right: 2px;
+  }
+
+  .chosen-drop {
+    background: @chosen-background;
+    border: 1px solid @chosen-drop-border;
+    .border-bottom-radius(@chosen-border-radius);
+    .box-shadow(@chosen-drop-box-shadow);
+    margin-top: -1px;
+    position: absolute;
+    top: 100%;
+    left: -9000px;
+    z-index: @chosen-drop-zindex;
+  }
+
+  &.chosen-with-drop .chosen-drop {
+    left: 0;
+    right: 0;
+  }
+
+  .chosen-results {
+    color: @gray;
+    margin: 0 4px 4px 0;
+    max-height: 240px;
+    padding: 0 0 0 4px;
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+
+    li {
+      display: none;
+      line-height: @line-height-base; // 15px;
+      list-style: none;
+      margin: 0;
+      padding: 5px 6px;
+
+      em {
+        background: #feffde;
+        font-style: normal;
+      }
+
+      &.group-result {
+        display: list-item;
+        cursor: default;
+        color: #999;
+        font-weight: bold;
+      }
+
+      &.group-option {
+        padding-left: 15px;
+      }
+
+      &.active-result {
+        cursor: pointer;
+        display: list-item;
+      }
+
+      &.highlighted {
+        background-color: @link-color;
+        background-image: none;
+        color: white;
+
+        em {
+          background: transparent;
+        }
+      }
+
+      &.disabled-result {
+        display: list-item;
+        color: @gray-light;
+      }
+    }
+
+    .no-results {
+      background: @gray-lighter;
+      display: list-item;
+    }
+  }
+
+  .chosen-results-scroll {
+    background: white;
+    margin: 0 4px;
+    position: absolute;
+    text-align: center;
+    width: 321px;
+    z-index: 1;
+
+    span {
+      display: inline-block;
+      height: @line-height-base; // 17px;
+      text-indent: -5000px;
+      width: 9px;
+    }
+  }
+
+  .chosen-results-scroll-down {
+    bottom: 0;
+
+    span {
+      background: url("@{chosen-sprite-path}") no-repeat -4px -3px;
+    }
+  }
+
+  .chosen-results-scroll-up {
+    span {
+      background: url("@{chosen-sprite-path}") no-repeat -22px -3px;
+    }
+  }
+}
+
+.chosen-container-single {
+  .chosen-single {
+    background-color: @chosen-background;
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding;
+    background-clip: padding-box;
+    border: @chosen-border;
+    .border-top-radius(@chosen-border-radius);
+    .border-bottom-radius(@chosen-border-radius);
+    .box-shadow(@chosen-box-shadow);
+    color: @gray;
+    display: block;
+    height: @chosen-height;
+    overflow: hidden;
+    line-height: @chosen-height;
+    padding: 0 0 0 8px;
+    position: relative;
+    text-decoration: none;
+    white-space: nowrap;
+
+    span {
+      display: block;
+      margin-right: 26px;
+      .text-overflow();
+    }
+
+    abbr {
+      background: url("@{chosen-sprite-path}") right top no-repeat;
+      display: block;
+      font-size: 1px;
+      height: 10px;
+      position: absolute;
+      right: 26px;
+      top: ((@chosen-height - 10px) / 2);
+      width: 12px;
+
+      &:hover {
+        background-position: right -11px;
+      }
+    }
+
+    &.chosen-disabled .chosen-single abbr:hover {
+      background-position: right 2px;
+    }
+
+    div {
+      display: block;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 18px;
+
+      b {
+        background: url("@{chosen-sprite-path}") no-repeat 0 7px;
+        display: block;
+        height: 100%;
+        width: 100%;
+      }
+    }
+  }
+
+  .chosen-search {
+    margin: 0;
+    padding: 3px 4px;
+    position: relative;
+    white-space: nowrap;
+    z-index: @zindex-dropdown;
+
+    input[type="text"] {
+      background: url("@{chosen-sprite-path}") no-repeat 100% -20px, @chosen-background;
+      border: @chosen-border;
+      .border-top-radius(@chosen-border-radius);
+      .border-bottom-radius(@chosen-border-radius);
+      .box-shadow(@chosen-box-shadow);
+      margin: 1px 0;
+      padding: 4px 20px 4px 4px;
+      width: 100%;
+    }
+  }
+
+  .chosen-drop {
+    margin-top: -1px;
+    .border-bottom-radius(@chosen-border-radius);
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding;
+    background-clip: padding-box;
+  }
+}
+
+.chosen-container-single-nosearch {
+  .chosen-search {
+    input {
+      position: absolute;
+      left: -9000px;
+    }
+  }
+}
+
+.chosen-container-multi {
+  .chosen-choices {
+    background-color: @chosen-background;
+    border: @chosen-border;
+    .border-top-radius(@chosen-multi-border-radius);
+    .border-bottom-radius(@chosen-multi-border-radius);
+    .box-shadow(@chosen-box-shadow);
+    cursor: text;
+    height: auto !important;
+    height: 1%;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+
+    li {
+      float: left;
+      list-style: none;
+    }
+
+    .search-field {
+      margin: 0;
+      padding: 0;
+      white-space: nowrap;
+
+      input[type="text"] {
+        background: transparent !important;
+        border: 0 !important;
+        .box-shadow(none);
+        color: @gray;
+        height: @chosen-multi-height - 8px;
+        margin: 0;
+        padding: 4px;
+        outline: 0;
+      }
+
+      .default {
+        //color: #999;
+      }
+    }
+
+    .search-choice {
+      -webkit-background-clip: padding-box;
+      -moz-background-clip: padding;
+      background-clip: padding-box;
+      background-color: @gray-lighter;
+      border: @chosen-border;
+      .border-top-radius(@chosen-border-radius);
+      .border-bottom-radius(@chosen-border-radius);
+      .box-shadow(@chosen-box-shadow);
+      color: @gray-dark;
+      cursor: default;
+      line-height: 13px;
+      margin: 6px 0 3px 5px;
+      padding: 3px 20px 3px 5px;
+      position: relative;
+
+      .search-choice-close {
+        background: url("@{chosen-sprite-path}") right top no-repeat;
+        display: block;
+        font-size: 1px;
+        height: 10px;
+        position: absolute;
+        right: 4px;
+        top: 5px;
+        width: 12px;
+        cursor: pointer;
+
+        &:hover {
+          background-position: right -11px;
+        }
+      }
+    }
+
+    .search-choice-focus {
+      background: #d4d4d4;
+
+      .search-choice-close {
+        background-position: right -11px;
+      }
+    }
+  }
+
+  .chosen-results {
+    margin: 0 0 0 0;
+    padding: 0;
+  }
+
+  .chosen-drop {
+    .result-selected {
+      display: none;
+    }
+  }
+}
+
+.chosen-container-active {
+  .chosen-single {
+    border: @chosen-focus-border;
+    .box-shadow(@chosen-focus-box-shadow);
+    .transition(@chosen-focus-transition);
+  }
+
+  &.chosen-with-drop .chosen-single {
+    background-color: @input-bg;
+    border: @chosen-focus-border;
+    .border-bottom-radius(0);
+    .box-shadow(@chosen-focus-box-shadow);
+    .transition(@chosen-focus-transition);
+
+    div {
+      background: transparent;
+      border-left: none;
+
+      b {
+        background-position: -18px 7px;
+      }
+    }
+  }
+
+  .chosen-choices {
+    border: @chosen-focus-border;
+    .border-bottom-radius(0);
+    .box-shadow(@chosen-focus-box-shadow);
+    .transition(@chosen-focus-transition);
+
+    .search-field input[type="text"] {
+      color: #111 !important;
+    }
+  }
+
+  &.chosen-with-drop .chosen-choices {
+    .border-bottom-radius(0);
+  }
+}
+
+.chosen-disabled {
+  cursor: default;
+  opacity: 0.5 !important;
+
+  .chosen-single {
+    cursor: default;
+  }
+
+  .chosen-choices .search-choice .search-choice-close {
+    cursor: default;
+  }
+}
+
+.chosen-rtl {
+  text-align: right;
+
+  .chosen-single {
+    padding: 0 8px 0 0;
+    overflow: visible;
+
+    span {
+      margin-left: 26px;
+      margin-right: 0;
+      direction: rtl;
+    }
+
+    div {
+      left: 7px;
+      right: auto;
+    }
+
+    abbr {
+      left: 26px;
+      right: auto;
+    }
+  }
+
+  .chosen-choices {
+    .search-field input[type="text"] {
+      direction: rtl;
+    }
+
+    li {
+      float: right;
+    }
+
+    .search-choice {
+      margin: 6px 5px 3px 0;
+      padding: 3px 5px 3px 19px;
+
+      .search-choice-close {
+        background-position: right top;
+        left: 4px;
+        right: auto;
+      }
+    }
+  }
+
+  &.chosen-container-single .chosen-results {
+    margin: 0 0 4px 4px;
+    padding: 0 4px 0 0;
+  }
+
+  .chosen-results .group-option {
+    padding-left: 0;
+    padding-right: 15px;
+  }
+
+  &.chosen-container-active.chosen-with-drop .chosen-single div {
+    border-right: none;
+  }
+
+  .chosen-search input[type="text"] {
+    background: url("@{chosen-sprite-path}") no-repeat -28px -20px, @chosen-background;
+    direction: rtl;
+    padding: 4px 5px 4px 20px;
+  }
+}
+
+.input-group {
+  .chosen-container:last-child {
+    .chosen-single, .chosen-default, .chosen-choices {
+      border-top-left-radius: 0px;
+      border-bottom-left-radius: 0px;
+    }
+  }
+  .chosen-container:not(:last-child) {
+    .chosen-single, .chosen-default, .chosen-choices {
+      border-top-right-radius: 0px;
+      border-bottom-right-radius: 0px;
+    }
+  }
+}
+
+.form-inline {
+  .chosen-container {
+    display: inline-table;
+    vertical-align: middle;
+    min-width: 200px;
+  }
+}
+
+.chosen-container {
+  .default, .chosen-default {
+    color: @gray-light !important;
+  }
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-resolution: 2dppx) {
+  .chosen-rtl .chosen-search input[type="text"],
+  .chosen-container-single .chosen-single abbr,
+  .chosen-container-single .chosen-single div b,
+  .chosen-container-single .chosen-search input[type="text"],
+  .chosen-container-multi .chosen-choices .search-choice .search-choice-close,
+  .chosen-container .chosen-results-scroll-down span,
+  .chosen-container .chosen-results-scroll-up span {
+    background-image: url("@{chosen-sprite-retina-path}") !important;
+    background-size: 52px 37px !important;
+    background-repeat: no-repeat !important;
+  }
+}
+
+.has-error select.form-control + .chosen-container.chosen-container-single .chosen-single,
+.has-error select.form-control + .chosen-container-multi .chosen-choices {
+  border-color: @state-danger-text;
+}
+
+.has-error select.form-control + .chosen-container.chosen-container-single .chosen-single,
+.has-error select.form-control + .chosen-container-multi .chosen-choices {
+  border-color: @state-danger-text;
+}

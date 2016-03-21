@@ -1,0 +1,429 @@
+<?php
+/**
+ * @package     Mautic
+ * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.org
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace Mautic\InstallBundle\Configurator\Step;
+
+use Mautic\CoreBundle\Configurator\Configurator;
+use Mautic\InstallBundle\Configurator\Form\CheckStepType;
+use Symfony\Component\HttpFoundation\RequestStack;
+
+/**
+ * Check Step.
+ */
+class CheckStep implements StepInterface
+{
+
+    /**
+     * Flag if the configuration file is writable
+     *
+     * @var bool
+     */
+    private $configIsWritable;
+
+    /**
+     * Path to the kernel root
+     *
+     * @var string
+     */
+    private $kernelRoot;
+
+    /**
+     * Absolute path to cache directory
+     *
+     * @var string
+     */
+    public $cache_path = '%kernel.root_dir%/cache';
+
+    /**
+     * Absolute path to log directory
+     *
+     * @var string
+     */
+    public $log_path   = '%kernel.root_dir%/logs';
+
+    /**
+     * Set the domain URL for use in getting the absolute URL for cli/cronjob generated URLs
+     *
+     * @var string
+     */
+    public $site_url;
+
+    /**
+     * Set the name of the source that installed Mautic
+     *
+     * @var string
+     */
+    public $install_source = 'Mautic';
+
+    /**
+     * Constructor
+     *
+     * @param Configurator $configurator Configurator service
+     * @param string       $kernelRoot   Kernel root path
+     * @param RequestStack $requestStack Request stack
+     */
+    public function __construct(Configurator $configurator, $kernelRoot, RequestStack $requestStack)
+    {
+        $request = $requestStack->getCurrentRequest();
+
+        $this->configIsWritable = $configurator->isFileWritable();
+        $this->kernelRoot       = $kernelRoot;
+        $this->site_url         = $request->getSchemeAndHttpHost().$request->getBasePath();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormType()
+    {
+        return new CheckStepType();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function checkRequirements()
+    {
+        $messages = array();
+
+        if (version_compare(PHP_VERSION, '5.3.16', '==')) {
+            $messages[] = 'mautic.install.buggy.php.version';
+        }
+
+        if (!is_dir(dirname($this->kernelRoot) . '/vendor/composer')) {
+            $messages[] = 'mautic.install.composer.dependencies';
+        }
+
+        if (!$this->configIsWritable) {
+            $messages[] = 'mautic.install.config.unwritable';
+        }
+
+        if (!is_writable($this->kernelRoot . '/cache')) {
+            $messages[] = 'mautic.install.cache.unwritable';
+        }
+
+        if (!is_writable($this->kernelRoot . '/logs')) {
+            $messages[] = 'mautic.install.logs.unwritable';
+        }
+
+        $timezones = array();
+
+        foreach (\DateTimeZone::listAbbreviations() as $abbreviations) {
+            foreach ($abbreviations as $abbreviation) {
+                $timezones[$abbreviation['timezone_id']] = true;
+            }
+        }
+
+        if (!isset($timezones[date_default_timezone_get()])) {
+            $messages[] = 'mautic.install.timezone.not.supported';
+        }
+
+        if (get_magic_quotes_gpc()) {
+            $messages[] = 'mautic.install.magic_quotes_enabled';
+        }
+
+        if (!function_exists('json_encode')) {
+            $messages[] = 'mautic.install.function.jsonencode';
+        }
+
+        if (!function_exists('session_start')) {
+            $messages[] = 'mautic.install.function.sessionstart';
+        }
+
+        if (!function_exists('ctype_alpha')) {
+            $messages[] = 'mautic.install.function.ctypealpha';
+        }
+
+        if (!function_exists('token_get_all')) {
+            $messages[] = 'mautic.install.function.tokengetall';
+        }
+
+        if (!function_exists('simplexml_import_dom')) {
+            $messages[] = 'mautic.install.function.simplexml';
+        }
+
+        if (!extension_loaded('mcrypt')) {
+            $messages[] = 'mautic.install.extension.mcrypt';
+        }
+
+        if (!function_exists('finfo_open')) {
+            $messages[] = 'mautic.install.extension.fileinfo';
+        }
+
+        if (function_exists('apc_store') && ini_get('apc.enabled')) {
+            $minimumAPCversion = version_compare(PHP_VERSION, '5.4.0', '>=') ? '3.1.13' : '3.0.17';
+
+            if (!version_compare(phpversion('apc'), $minimumAPCversion, '>=')) {
+                $messages[] = 'mautic.install.apc.version';
+            }
+        }
+
+        $unicodeIni = version_compare(PHP_VERSION, '5.4.0', '>=') ? 'zend.detect_unicode' : 'detect_unicode';
+
+        // Commented for now, no idea what this check was actually supposed to be doing in the distro bundle
+        /*if (ini_get($unicodeIni)) {
+            $messages[] = 'mautic.install.detect.unicode';
+        }*/
+
+        if (extension_loaded('suhosin')) {
+            $cfgValue = ini_get('suhosin.executor.include.whitelist');
+
+            if (!call_user_func(create_function('$cfgValue', 'return false !== stripos($cfgValue, "phar");'), $cfgValue)) {
+                $messages[] = 'mautic.install.suhosin.whitelist';
+            }
+        }
+
+        if (extension_loaded('xdebug')) {
+            if (ini_get('xdebug.show_exception_trace')) {
+                $messages[] = 'mautic.install.xdebug.exception.trace';
+            }
+
+            if (ini_get('xdebug.scream')) {
+                $messages[] = 'mautic.install.xdebug.scream';
+            }
+        }
+
+        $pcreVersion = defined('PCRE_VERSION') ? (float) PCRE_VERSION : null;
+
+        if (is_null($pcreVersion)) {
+            $messages[] = 'mautic.install.function.pcre';
+        }
+
+        return $messages;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function checkOptionalSettings()
+    {
+        $phpSupportData = array(
+            '5.3' => array(
+                'security' => '2013-07-11',
+                'eos'      => '2014-08-14',
+            ),
+            '5.4' => array(
+                'security' => '2014-09-14',
+                'eos'      => '2015-09-14',
+            ),
+            '5.5' => array(
+                'security' => '2015-07-10',
+                'eos'      => '2016-07-10'
+            ),
+            '5.6' => array(
+                'security' => '2016-08-28',
+                'eos'      => '2017-08-28'
+            ),
+        );
+
+        $messages = array();
+
+        // Check the PHP version's support status
+        $activePhpVersion = PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;
+
+        // Do we have the PHP version's data?
+        if (isset($phpSupportData[$activePhpVersion])) {
+            // First check if the version has reached end of support
+            $today = new \DateTime();
+            $phpEndOfSupport = new \DateTime($phpSupportData[$activePhpVersion]['eos']);
+
+            if ($phpNotSupported = $today > $phpEndOfSupport) {
+                $messages[] = 'mautic.install.php.version.not.supported';
+            }
+
+            // If the version is still supported, check if it has reached security support only
+            $phpSecurityOnlyDate = new \DateTime($phpSupportData[$activePhpVersion]['security']);
+
+            if (!$phpNotSupported && $today > $phpSecurityOnlyDate) {
+                $messages[] = 'mautic.install.php.version.has.only.security.support';
+            }
+        }
+
+        if (version_compare(PHP_VERSION, '5.3.8', '<')) {
+            $messages[] = 'mautic.install.php.version.annotations';
+        }
+
+        if (version_compare(PHP_VERSION, '5.4.0', '=')) {
+            $messages[] = 'mautic.install.php.version.dump';
+        }
+
+        if ((PHP_MINOR_VERSION == 3 && PHP_RELEASE_VERSION < 18) || (PHP_MINOR_VERSION == 4 && PHP_RELEASE_VERSION < 8)) {
+            $messages[] = 'mautic.install.php.version.pretty.error';
+        }
+
+        $pcreVersion = defined('PCRE_VERSION') ? (float) PCRE_VERSION : null;
+
+        if (!is_null($pcreVersion)) {
+            if (version_compare($pcreVersion, '8.0', '<')) {
+                $messages[] = 'mautic.install.pcre.version';
+            }
+        }
+
+        if (extension_loaded('xdebug')) {
+            $cfgValue = ini_get('xdebug.max_nesting_level');
+
+            if (!call_user_func(create_function('$cfgValue', 'return $cfgValue > 100;'), $cfgValue)) {
+                $messages[] = 'mautic.install.xdebug.nesting';
+            }
+        }
+
+        if (!extension_loaded('zip')) {
+            $messages[] = 'mautic.install.extension.zip';
+        }
+
+        // We set a default timezone in the app bootstrap, but advise the user if their PHP config is missing it
+        if (!ini_get('date.timezone')) {
+            $messages[] = 'mautic.install.date.timezone.not.set';
+        }
+
+        if (!class_exists('\\DomDocument')) {
+            $messages[] = 'mautic.install.module.phpxml';
+        }
+
+        if (!function_exists('mb_strlen')) {
+            $messages[] = 'mautic.install.function.mbstring';
+        }
+
+        if (!function_exists('iconv')) {
+            $messages[] = 'mautic.install.function.iconv';
+        }
+
+        if (!function_exists('utf8_decode')) {
+            $messages[] = 'mautic.install.function.xml';
+        }
+
+        if (!function_exists('imap_open')) {
+            $messages[] = 'mautic.install.extension.imap';
+        }
+
+        if (!defined('PHP_WINDOWS_VERSION_BUILD')) {
+            if (!function_exists('posix_isatty')) {
+                $messages[] = 'mautic.install.function.posix';
+            }
+        }
+
+        $memoryLimit = $this->toBytes(ini_get('memory_limit'));
+        $suggestedLimit = 128 * 1024 * 1024;
+
+        if ($memoryLimit < $suggestedLimit) {
+            $messages[] = 'mautic.install.memory.limit';
+        }
+
+        if (!class_exists('\\Locale')) {
+            $messages[] = 'mautic.install.module.intl';
+        }
+
+        if (class_exists('\\Collator')) {
+            try {
+                if (is_null(new \Collator('fr_FR'))) {
+                    $messages[] = 'mautic.install.intl.config';
+                }
+            } catch (\Exception $exception) {
+                $messages[] = 'mautic.install.intl.config';
+            }
+        }
+
+        if (class_exists('\\Locale')) {
+            if (defined('INTL_ICU_VERSION')) {
+                $version = INTL_ICU_VERSION;
+            } else {
+                try {
+                    $reflector = new \ReflectionExtension('intl');
+
+                    ob_start();
+                    $reflector->info();
+                    $output = strip_tags(ob_get_clean());
+
+                    preg_match('/^ICU version +(?:=> )?(.*)$/m', $output, $matches);
+                    $version = $matches[1];
+                } catch (\ReflectionException $exception) {
+                    $messages[] = 'mautic.install.module.intl';
+
+                    // Fake the version here for the next check
+                    $version = '4.0';
+                }
+            }
+
+            if (version_compare($version, '4.0', '<')) {
+                $messages[] = 'mautic.install.intl.icu.version';
+            }
+        }
+
+        $accelerator =
+            (extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'))
+            ||
+            (extension_loaded('apc') && ini_get('apc.enabled'))
+            ||
+            (extension_loaded('Zend OPcache') && ini_get('opcache.enable'))
+            ||
+            (extension_loaded('xcache') && ini_get('xcache.cacher'))
+            ||
+            (extension_loaded('wincache') && ini_get('wincache.ocenabled'))
+        ;
+
+        if (!$accelerator) {
+            $messages[] = 'mautic.install.accelerator';
+        }
+
+        return $messages;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTemplate()
+    {
+        return 'MauticInstallBundle:Install:check.html.php';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function update(StepInterface $data)
+    {
+        $parameters = array();
+
+        foreach ($data as $key => $value) {
+            // Exclude keys from the config
+            if (!in_array($key, array('configIsWritable', 'kernelRoot'))) {
+                $parameters[$key] = $value;
+            }
+        }
+
+        return $parameters;
+    }
+
+    /**
+     * Takes the memory limit string form php.ini and returns numeric value in bytes.
+     *
+     * @param string $val
+     *
+     * @return integer
+     */
+    public function toBytes($val) {
+        $val = trim($val);
+
+        if ($val == -1) {
+            return PHP_INT_MAX;
+        }
+
+        $last = strtolower($val[strlen($val)-1]);
+        switch($last) {
+            // The 'G' modifier is available since PHP 5.1.0
+            case 'g':
+                $val *= 1024;
+            case 'm':
+                $val *= 1024;
+            case 'k':
+                $val *= 1024;
+        }
+
+        return $val;
+    }
+}

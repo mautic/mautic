@@ -1,0 +1,310 @@
+//
+// Forms
+// --------------------------------------------------
+
+// Normalize non-controls
+//
+// Restyle and baseline non-control form elements.
+
+label {
+  font-weight: 600;
+}
+
+// control label
+// -------------------------
+.control-label {
+  &.text-left {
+    text-align: left;
+  }
+}
+
+// form control
+// -------------------------
+.form-control {
+  .box-shadow(none);
+  .transition(~"border-color ease-in-out .15s");
+  // Rounded
+  // -------------------------
+  &.form-control-rounded {
+    border-radius: @input-height-base;
+  }
+}
+
+// stacked form
+.form-stack {
+  .form-control {
+    position: relative;
+    border-radius: 0;
+    // focus state
+    &:focus {
+      z-index: 1;
+    }
+    + .form-control {
+      margin-top: -1px;
+    }
+
+    // reset radius
+    &:first-child {
+      border-radius: @border-radius-base @border-radius-base 0 0;
+    }
+    &:last-child {
+      border-radius: 0 0 @border-radius-base @border-radius-base;
+    }
+
+    // input-lg reset radius
+    &.input-lg {
+      &:first-child {
+        border-radius: @border-radius-large @border-radius-large 0 0;
+      }
+      &:last-child {
+        border-radius: 0 0 @border-radius-large @border-radius-large;
+      }
+    }
+
+    // input-sm reset radius
+    &.input-sm {
+      &:first-child {
+        border-radius: @border-radius-small @border-radius-small 0 0;
+      }
+      &:last-child {
+        border-radius: 0 0 @border-radius-small @border-radius-small;
+      }
+    }
+  }
+  .form-control-icon {
+    &:first-child {
+      > .form-control {
+        border-radius: @border-radius-base @border-radius-base 0 0;
+        // input-lg reset radius
+        &.input-lg {
+          border-radius: @border-radius-large @border-radius-large 0 0;
+        }
+        // input-sm reset radius
+        &.input-sm {
+          border-radius: @border-radius-small @border-radius-small 0 0;
+        }
+      }
+    }
+    &:last-child {
+      > .form-control {
+        border-radius: 0 0 @border-radius-base @border-radius-base;
+        // input-lg reset radius
+        &.input-lg {
+          border-radius: 0 0 @border-radius-large @border-radius-large;
+        }
+        // input-lg reset radius
+        &.input-sm {
+          border-radius: 0 0 @border-radius-small @border-radius-small;
+        }
+      }
+    }
+    + .form-control-icon {
+      margin-top: -1px;
+    }
+  }
+}
+
+// Form with icon
+// -------------------------
+.form-control-icon {
+  position: relative;
+  .form-control {
+    padding-left: @input-height-base;
+    &.input-lg {
+      padding-left: @input-height-large;
+      + .the-icon {
+        font-size: @font-size-large;
+        line-height: @input-height-large;
+        width: @input-height-large;
+      }
+    }
+    &.input-sm {
+      padding-left: @input-height-small;
+      + .the-icon {
+        font-size: @font-size-small;
+        line-height: @input-height-small;
+        width: @input-height-small;
+      }
+    }
+  }
+  .the-icon {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    line-height: @input-height-base - 1;
+    width: @input-height-base;
+    text-align: center;
+  }
+  &.form-control-icon-right {
+    .the-icon {
+      right: 0;
+      left: auto;
+    }
+    .form-control {
+      padding-left: @padding-base-horizontal;
+      padding-right: @input-height-base;
+      &.input-lg {
+        padding-left: @padding-large-horizontal;
+        padding-right: @input-height-large;
+      }
+      &.input-sm {
+        padding-left: @padding-small-horizontal;
+        padding-right: @input-height-small;
+      }
+    }
+  }
+}
+
+// Custom file input
+// -------------------------
+.btn-file {
+  position: relative;
+  overflow: hidden;
+}
+.btn-file input[type=file] {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  min-width: 100%;
+  min-height: 100%;
+  font-size: 999px;
+  text-align: right;
+  opacity: 0;
+  background: red;
+  cursor: inherit;
+  display: block;
+}
+
+// Custom radio & checkbox
+// -------------------------
+.checkbox,
+.radio,
+.checkbox-inline,
+.radio-inline {
+  label {
+    font-weight: normal;
+  }
+
+  &[class*=" custom"],
+  &[class^="custom"] {
+    position: relative;
+    label {
+      padding-left: 24px;
+      input {
+        position: absolute;
+        opacity: 0;
+        + span {
+          display: inline-block;
+          vertical-align: top;
+          position: relative;
+          width: 16px;
+          height: 16px;
+          margin-left: -25px;
+          margin-right: 4px;
+          margin-top: 1px;
+          background-color: transparent;
+          border-radius: @border-radius-base;
+          border: 1px solid rgba(0,0,0,0.2);
+
+          &:after {
+            content: "";
+            display: block;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            background-color: @gray-dark;
+            height: 10px;
+            width: 10px;
+            border-radius: @border-radius-base - 1;
+            .scale(0);
+            .transition(all .1s ease);
+          }
+        }
+        // disabled state
+        &:disabled {
+          + span {
+            opacity: 0.4;
+            &:hover {
+              cursor: not-allowed;
+            }
+          }
+        }
+        // checked state
+        &:checked {
+          + span {
+            border: 1px solid @gray-dark;
+            &:after { 
+              .scale(1);
+              .transition(all .1s ease);
+            }
+          }
+        }
+      }
+      // hover state
+      &:hover {
+        input {
+          + span {
+            border: 1px solid rgba(0,0,0,0.3);
+          }
+          &:checked {
+            + span {
+              border: 1px solid @gray-dark;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // checkbox & radio color
+  &.custom-primary {
+    .checkbox-radio-color(@brand-primary);
+  }
+  &.custom-info {
+    .checkbox-radio-color(@brand-info);
+  }
+  &.custom-success {
+    .checkbox-radio-color(@brand-success);
+  }
+  &.custom-warning {
+    .checkbox-radio-color(@brand-warning);
+  }
+  &.custom-danger {
+    .checkbox-radio-color(@brand-danger);
+  }
+}
+
+// radio radius reset
+.radio-inline,
+.radio {
+  &[class*=" custom"],
+  &[class^="custom"] {
+    label {
+      input {
+        + span,
+        + span:after {
+          border-radius: 50%;
+        }
+      }
+    }
+  }
+}
+
+// label reset
+.checkbox-inline,
+.radio-inline {
+  &[class*=" custom"],
+  &[class^="custom"] {
+    label {
+      padding-left: 4px;
+    }
+  }
+}
+
+// time input (3 select boxes hh:mm:ss)
+.time-input {
+  select {
+    margin: 0 3px 0 3px;
+  }
+}

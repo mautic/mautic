@@ -1,0 +1,22 @@
+/* ReportBundle */
+
+.col-report-actions, .col-report-count {
+    width: 25px;
+}
+
+#reportTable th:not(.col-report-count) {
+	min-width: 125px;
+}
+
+.columnSelectorButtons {
+	padding-top: 40px;
+}
+
+.columnSelectorButtons div:not(:last-child) {
+	margin-bottom: 10px;
+}
+
+/* Fix of ChosenJS zero width */
+#report_columns_chosen {
+	width: 100% !important;
+}

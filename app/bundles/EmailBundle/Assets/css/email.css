@@ -1,0 +1,27 @@
+/* EmailBundle */
+
+.col-email-id {
+    width: 75px;
+}
+
+.email-builder .builder-panel .panel-body {
+    padding: 5px 0;
+}
+
+.table-bordered {
+	border-left: 0;
+}
+
+.table-bordered.email-list > thead > tr > th:first-child, .table-bordered.email-list > tbody > tr > td:first-child,
+.table-bordered.email-template > thead > tr > th:first-child, .table-bordered.email-template > tbody > tr > td:first-child {
+	border-left: 0px;
+}
+
+.table-bordered.email-list > thead > tr > th:last-child, .table-bordered.email-list > tbody > tr > td:last-child,
+.table-bordered.email-template > thead > tr > th:last-child, .table-bordered.email-template > tbody > tr > td:last-child {
+    border-right: 0px;
+}
+
+.email-filters {
+
+}
