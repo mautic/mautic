@@ -9,38 +9,41 @@
 
 
 $defaultInputClass = 'hidden';
-$containerType = 'div-wrapper';
+$containerType     = 'div-wrapper';
 
-include __DIR__ . '/../../../../../app/bundles/FormBundle/Views/Field/field_helper.php';
+include __DIR__.'/../../../../../app/bundles/FormBundle/Views/Field/field_helper.php';
 
 $settings = $field['properties'];
 
-$locale    = $app->getRequest()->getLocale();
-$clientId  = (!empty($settings['clientId'])) ? $settings['clientId'] : '';
-$action = $app->getRequest()->get('objectAction');
-
+$locale   = $app->getRequest()->getLocale();
+$clientId = (!empty($settings['clientId'])) ? $settings['clientId'] : '';
+$action   = $app->getRequest()->get('objectAction');
 
 
 $socialProfile = (!empty($settings['socialProfile'])) ? $settings['socialProfile'] : '';
 
 $socialHiddenFields = explode(',', $socialProfile);
-$inputName = 'mauticform[' . $field['alias'] . '_GooglePlus]';
-$name = ' name="' . $inputName . '"';
-$formName = str_replace("_", "", $formName);
-$formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
-	array(
-		'deleted' => false,
-		'id' => $id,
-		'formId' => $formId,
-		'formName' => $formName,
-		'disallowDelete' => false)
+$inputName          = 'mauticform['.$field['alias'].'_GooglePlus]';
+$name               = ' name="'.$inputName.'"';
+$formName           = str_replace("_", "", $formName);
+$formButtons        = (!empty($inForm)) ? $view->render(
+    'MauticFormBundle:Builder:actions.html.php',
+    array(
+        'deleted'        => false,
+        'id'             => $id,
+        'formId'         => $formId,
+        'formName'       => $formName,
+        'disallowDelete' => false
+    )
 ) : '';
 
-$label = (!$field['showLabel']) ? '' : <<<HTML
+$label = (!$field['showLabel'])
+    ? ''
+    : <<<HTML
 <label $labelAttr>{$view->escape($field['label'])}</label>
 HTML;
 
-$js = <<<JS
+$js   = <<<JS
 	var isLive='{$action}';
 	
 	function onSuccess(resp) {
@@ -108,9 +111,9 @@ $html = <<<HTML
 HTML;
 ?>
 <script>
-<?php echo $js; ?>
+    <?php echo $js; ?>
 </script>
 <?php
-	echo $html;
+echo $html;
 ?>
 <script src="https://apis.google.com/js/client:platform.js?onload=renderButton" async defer></script>

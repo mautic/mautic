@@ -13,35 +13,35 @@ return array(
     'version'     => '1.0',
     'author'      => 'Mautic',
 
-    'services'    => array(
+    'services' => array(
         'forms' => array(
-            'mautic.form.type.social.facebook'   => array(
+            'mautic.form.type.social.facebook'        => array(
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\FacebookType',
                 'alias' => 'socialmedia_facebook'
             ),
             'mautic.form.type.social.facebooklogin'   => array(
-                'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\FacebookLoginType',
+                'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\FacebookLoginType',
                 'arguments' => 'mautic.factory',
-                'alias' => 'sociallogin_facebook'
+                'alias'     => 'sociallogin_facebook'
             ),
-            'mautic.form.type.social.twitter'    => array(
+            'mautic.form.type.social.twitter'         => array(
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterType',
                 'alias' => 'socialmedia_twitter'
             ),
-            'mautic.form.type.social.googleplus' => array(
+            'mautic.form.type.social.googleplus'      => array(
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\GooglePlusType',
                 'alias' => 'socialmedia_googleplus'
             ),
-            'mautic.form.type.social.googlepluslogin'   => array(
-                'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\GooglePlusLoginType',
+            'mautic.form.type.social.googlepluslogin' => array(
+                'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\GooglePlusLoginType',
                 'arguments' => 'mautic.factory',
-                'alias' => 'sociallogin_googleplus'
+                'alias'     => 'sociallogin_googleplus'
             ),
-            'mautic.form.type.social.linkedin'   => array(
+            'mautic.form.type.social.linkedin'        => array(
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\LinkedInType',
                 'alias' => 'socialmedia_linkedin'
             )
         ),
-        
+
     )
 );

@@ -17,10 +17,10 @@ use Mautic\LeadBundle\Entity\Lead;
 class GooglePlusIntegration extends SocialIntegration
 {
 
-     /**
+    /**
      * {@inheritdoc}
      */
-    public function getName ()
+    public function getName()
     {
         return 'GooglePlus';
     }
@@ -33,7 +33,7 @@ class GooglePlusIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getPriority ()
+    public function getPriority()
     {
         return 1;
     }
@@ -42,7 +42,7 @@ class GooglePlusIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getIdentifierFields ()
+    public function getIdentifierFields()
     {
         return array(
             'googleplus',
@@ -53,7 +53,7 @@ class GooglePlusIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getSupportedFeatures ()
+    public function getSupportedFeatures()
     {
         return array(
             'public_activity',
@@ -65,7 +65,7 @@ class GooglePlusIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getUserData ($identifier, &$socialCache)
+    public function getUserData($identifier, &$socialCache)
     {
         if ($userid = $this->getUserId($identifier, $socialCache)) {
             $url  = $this->getApiUrl("people/{$userid}");
@@ -90,7 +90,7 @@ class GooglePlusIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getPublicActivity ($identifier, &$socialCache)
+    public function getPublicActivity($identifier, &$socialCache)
     {
         if ($id = $this->getUserId($identifier, $socialCache)) {
             $data = $this->makeRequest($this->getApiUrl("people/$id/activities/public"), array('maxResults' => 10));
@@ -112,7 +112,11 @@ class GooglePlusIntegration extends SocialIntegration
 
                     //extract hashtags from content
                     if (isset($page->object->content)) {
-                        preg_match_all('/\<a rel="nofollow" class="ot-hashtag" href="(.*?)">#(.*?)\<\/a>/', $page->object->content, $tags);
+                        preg_match_all(
+                            '/\<a rel="nofollow" class="ot-hashtag" href="(.*?)">#(.*?)\<\/a>/',
+                            $page->object->content,
+                            $tags
+                        );
                         if (!empty($tags[2])) {
                             foreach ($tags[2] as $k => $tag) {
                                 if (isset($socialCache['activity']['tags'][$tag])) {
@@ -167,7 +171,7 @@ class GooglePlusIntegration extends SocialIntegration
             'url'                => array("type" => "string"),
             "urls"               => array(
                 "type"   => "array_object",
-                "fields" => array( 
+                "fields" => array(
                     "otherProfile",
                     "contributor",
                     "website",
@@ -185,7 +189,7 @@ class GooglePlusIntegration extends SocialIntegration
                     "honorificSuffix"
                 )
             ),
-            "emails"               => array(
+            "emails"             => array(
                 "type"   => "array_object",
                 "fields" => array(
                     "account"
@@ -217,22 +221,22 @@ class GooglePlusIntegration extends SocialIntegration
         );
     }
 
-      /**
+    /**
      * {@inheritdoc}
      */
     public function getRequiredKeyFields()
     {
         return array(
-            'key' => 'mautic.integration.keyfield.api',
-            'client_id'      => 'mautic.integration.keyfield.clientid',
-            'client_secret'  => 'mautic.integration.keyfield.clientsecret'
+            'key'           => 'mautic.integration.keyfield.api',
+            'client_id'     => 'mautic.integration.keyfield.clientid',
+            'client_secret' => 'mautic.integration.keyfield.clientsecret'
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAuthenticationType ()
+    public function getAuthenticationType()
     {
 
         return 'key';
@@ -251,7 +255,7 @@ class GooglePlusIntegration extends SocialIntegration
      *
      * @return string
      */
-    public function getApiUrl ($endpoint)
+    public function getApiUrl($endpoint)
     {
         return "https://www.googleapis.com/plus/v1/$endpoint";
     }
@@ -259,7 +263,7 @@ class GooglePlusIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getUserId ($identifier, &$socialCache)
+    public function getUserId($identifier, &$socialCache)
     {
         if (!empty($socialCache['id'])) {
             return $socialCache['id'];
