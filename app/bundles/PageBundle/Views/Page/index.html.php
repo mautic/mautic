@@ -11,22 +11,31 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'page');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.page.pages'));
 
-$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
-    'templateButtons' => array(
-        'new'=> $permissions['page:pages:create']
-    ),
-    'routeBase' => 'page'
-)));
+$view['slots']->set(
+    'actions',
+    $view->render(
+        'MauticCoreBundle:Helper:page_actions.html.php',
+        array(
+            'templateButtons' => array(
+                'new' => $permissions['page:pages:create']
+            ),
+            'routeBase'       => 'page'
+        )
+    )
+);
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
-    <?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', array(
-        'action'      => $currentRoute,
-        'routeBase'   => 'page',
-        'templateButtons' => array(
-            'delete' => $permissions['page:pages:deleteown'] || $permissions['page:pages:deleteother']
+    <?php echo $view->render(
+        'MauticCoreBundle:Helper:list_toolbar.html.php',
+        array(
+            'action'          => $currentRoute,
+            'routeBase'       => 'page',
+            'templateButtons' => array(
+                'delete' => $permissions['page:pages:deleteown'] || $permissions['page:pages:deleteother']
+            )
         )
-    )); ?>
+    ); ?>
     <div class="page-list">
         <?php $view['slots']->output('_content'); ?>
     </div>

@@ -11,19 +11,40 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'asset');
 $view['slots']->set("headerTitle", $activeAsset->getTitle());
 
-$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
-    'item'       => $activeAsset,
-    'templateButtons' => array(
-        'edit'       => $security->hasEntityAccess($permissions['asset:assets:editown'], $permissions['asset:assets:editother'], $activeAsset->getCreatedBy()),
-        'delete'     => $security->hasEntityAccess($permissions['asset:assets:deleteown'], $permissions['asset:assets:deleteother'], $activeAsset->getCreatedBy()),
-        'close'     => $security->hasEntityAccess($permissions['asset:assets:viewown'], $permissions['asset:assets:viewother'], $activeAsset->getCreatedBy())
-    ),
-    'routeBase'  => 'asset',
-    'langVar'    => 'asset.asset',
-    'nameGetter' => 'getTitle'
-)));
+$view['slots']->set(
+    'actions',
+    $view->render(
+        'MauticCoreBundle:Helper:page_actions.html.php',
+        array(
+            'item'            => $activeAsset,
+            'templateButtons' => array(
+                'edit'   => $security->hasEntityAccess(
+                    $permissions['asset:assets:editown'],
+                    $permissions['asset:assets:editother'],
+                    $activeAsset->getCreatedBy()
+                ),
+                'delete' => $security->hasEntityAccess(
+                    $permissions['asset:assets:deleteown'],
+                    $permissions['asset:assets:deleteother'],
+                    $activeAsset->getCreatedBy()
+                ),
+                'close'  => $security->hasEntityAccess(
+                    $permissions['asset:assets:viewown'],
+                    $permissions['asset:assets:viewother'],
+                    $activeAsset->getCreatedBy()
+                )
+            ),
+            'routeBase'       => 'asset',
+            'langVar'         => 'asset.asset',
+            'nameGetter'      => 'getTitle'
+        )
+    )
+);
 
-$view['slots']->set('publishStatus',$view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $activeAsset)));
+$view['slots']->set(
+    'publishStatus',
+    $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $activeAsset))
+);
 
 ?>
 
@@ -47,23 +68,35 @@ $view['slots']->set('publishStatus',$view->render('MauticCoreBundle:Helper:publi
                     <div class="panel shd-none mb-0">
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
-                            <?php echo $view->render('MauticCoreBundle:Helper:details.html.php', array('entity' => $activeAsset)); ?>
+                            <?php echo $view->render(
+                                'MauticCoreBundle:Helper:details.html.php',
+                                array('entity' => $activeAsset)
+                            ); ?>
                             <tr>
-                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.asset.asset.size'); ?></span></td>
+                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans(
+                                            'mautic.asset.asset.size'
+                                        ); ?></span></td>
                                 <td><?php echo $activeAsset->getSize(); ?></td>
                             </tr>
                             <tr>
-                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.asset.asset.path.relative'); ?></span></td>
+                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans(
+                                            'mautic.asset.asset.path.relative'
+                                        ); ?></span></td>
                                 <td><?php echo $assetDownloadUrl; ?></td>
                             </tr>
                             <tr>
-                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.asset.filename.original'); ?></span></td>
+                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans(
+                                            'mautic.asset.filename.original'
+                                        ); ?></span></td>
                                 <td><?php echo $activeAsset->getOriginalFilename(); ?></td>
                             </tr>
                             <tr>
                                 <?php $location = $activeAsset->getStorageLocation(); ?>
-                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.asset.filename.' . $location); ?></span></td>
-                                <td><?php echo ($location == 'local') ? $activeAsset->getPath() : $activeAsset->getRemotePath(); ?></td>
+                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans(
+                                            'mautic.asset.filename.'.$location
+                                        ); ?></span></td>
+                                <td><?php echo ($location == 'local') ? $activeAsset->getPath()
+                                        : $activeAsset->getRemotePath(); ?></td>
                             </tr>
                             </tbody>
                         </table>
@@ -77,7 +110,10 @@ $view['slots']->set('publishStatus',$view->render('MauticCoreBundle:Helper:publi
             <!-- asset detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#asset-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?></a>
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse"
+                       data-target="#asset-details"><span class="caret"></span> <?php echo $view['translator']->trans(
+                            'mautic.core.details'
+                        ); ?></a>
                 </span>
             </div>
             <!--/ asset detail collapseable toggler -->
@@ -95,12 +131,21 @@ $view['slots']->set('publishStatus',$view->render('MauticCoreBundle:Helper:publi
                                     </h5>
                                 </div>
                                 <div class="col-xs-4 va-m text-center">
-                                    <span class="text-white dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.asset.asset.downloads.total', array('count' => $stats['downloads']['total'])); ?></span>
+                                    <span class="text-white dark-md fw-sb mb-xs"><?php echo $view['translator']->trans(
+                                            'mautic.asset.asset.downloads.total',
+                                            array('count' => $stats['downloads']['total'])
+                                        ); ?></span>
                                     <span class="text-white dark-md fw-sb mb-xs">|</span>
-                                    <span class="text-white dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.asset.asset.downloads.unique', array('count' => $stats['downloads']['unique'])); ?></span>
+                                    <span class="text-white dark-md fw-sb mb-xs"><?php echo $view['translator']->trans(
+                                            'mautic.asset.asset.downloads.unique',
+                                            array('count' => $stats['downloads']['unique'])
+                                        ); ?></span>
                                 </div>
                                 <div class="col-xs-4 va-m">
-                                    <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', array('callback' => 'updateDownloadChart')); ?>
+                                    <?php echo $view->render(
+                                        'MauticCoreBundle:Helper:graph_dateselect.html.php',
+                                        array('callback' => 'updateDownloadChart')
+                                    ); ?>
                                 </div>
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
@@ -108,7 +153,9 @@ $view['slots']->set('publishStatus',$view->render('MauticCoreBundle:Helper:publi
                                     <canvas id="download-chart" height="300"></canvas>
                                 </div>
                             </div>
-                            <div id="download-chart-data" class="hide"><?php echo json_encode($stats['downloads']['timeStats']); ?></div>
+                            <div id="download-chart-data" class="hide"><?php echo json_encode(
+                                    $stats['downloads']['timeStats']
+                                ); ?></div>
                         </div>
                     </div>
                 </div>
@@ -118,7 +165,10 @@ $view['slots']->set('publishStatus',$view->render('MauticCoreBundle:Helper:publi
 
         <!-- start: tab-content -->
         <div class="tab-content pa-md preview-detail">
-            <?php echo $view->render('MauticAssetBundle:Asset:preview.html.php', array('activeAsset' => $activeAsset, 'assetDownloadUrl' => $assetDownloadUrl)); ?>
+            <?php echo $view->render(
+                'MauticAssetBundle:Asset:preview.html.php',
+                array('activeAsset' => $activeAsset, 'assetDownloadUrl' => $assetDownloadUrl)
+            ); ?>
         </div>
         <!--/ end: tab-content -->
     </div>
@@ -133,13 +183,15 @@ $view['slots']->set('publishStatus',$view->render('MauticCoreBundle:Helper:publi
             </div>
             <div class="panel-body pt-xs">
                 <div class="input-group">
-                <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="<?php echo $assetDownloadUrl; ?>" />
+                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
+                           readonly value="<?php echo $assetDownloadUrl; ?>"/>
                 <span class="input-group-btn">
-                    <button class="btn btn-default btn-nospin" onclick="window.open('<?php echo $assetDownloadUrl; ?>', '_blank');">
+                    <button class="btn btn-default btn-nospin"
+                            onclick="window.open('<?php echo $assetDownloadUrl; ?>', '_blank');">
                         <i class="fa fa-external-link"></i>
                     </button>
                 </span>
-            </div>
+                </div>
             </div>
         </div>
         <!--/ preview URL -->
@@ -150,6 +202,6 @@ $view['slots']->set('publishStatus',$view->render('MauticCoreBundle:Helper:publi
         <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', array('logs' => $logs)); ?>
     </div>
     <!--/ right section -->
-    <input name="entityId" id="entityId" type="hidden" value="<?php echo $activeAsset->getId(); ?>" />
+    <input name="entityId" id="entityId" type="hidden" value="<?php echo $activeAsset->getId(); ?>"/>
 </div>
 <!--/ end: box layout -->

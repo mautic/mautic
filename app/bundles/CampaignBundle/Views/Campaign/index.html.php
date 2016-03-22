@@ -10,25 +10,34 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'campaign');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.campaign.campaigns'));
 
-$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
-    'templateButtons' => array(
-        'new'    => $permissions['campaign:campaigns:create']
-    ),
-    'routeBase' => 'campaign'
-)));
+$view['slots']->set(
+    'actions',
+    $view->render(
+        'MauticCoreBundle:Helper:page_actions.html.php',
+        array(
+            'templateButtons' => array(
+                'new' => $permissions['campaign:campaigns:create']
+            ),
+            'routeBase'       => 'campaign'
+        )
+    )
+);
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0">
-	<?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', array(
-        'action'      => $currentRoute,
-        'routeBase'   => 'campaign',
-        'templateButtons' => array(
-            'delete' => $permissions['campaign:campaigns:delete']
-        ),
-        'filters'     => $filters
-    )); ?>
+    <?php echo $view->render(
+        'MauticCoreBundle:Helper:list_toolbar.html.php',
+        array(
+            'action'          => $currentRoute,
+            'routeBase'       => 'campaign',
+            'templateButtons' => array(
+                'delete' => $permissions['campaign:campaigns:delete']
+            ),
+            'filters'         => $filters
+        )
+    ); ?>
 
     <div class="page-list">
-		<?php $view['slots']->output('_content'); ?>
-	</div>
+        <?php $view['slots']->output('_content'); ?>
+    </div>
 </div>
