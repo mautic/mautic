@@ -10,6 +10,7 @@
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
 use Mautic\LeadBundle\Entity\Lead;
+
 /**
  * Class FacebookIntegration
  */
@@ -114,13 +115,13 @@ class FacebookIntegration extends SocialIntegration
                 //getUserId has already obtained the data
                 $data = $id;
             } else {
-                $url    = $this->getApiUrl("$id");
+                $url = $this->getApiUrl("$id");
                 //@todo - can't use access token to do a global search; may not work after April
-                $data   = $this->makeRequest($url, array(), 'GET', array('auth_type' => 'rest'));
+                $data = $this->makeRequest($url, array(), 'GET', array('auth_type' => 'rest'));
             }
 
             if (is_object($data) && !isset($data->error)) {
-                $info                  = $this->matchUpData($data);
+                $info = $this->matchUpData($data);
                 if (isset($data->username)) {
                     $info['profileHandle'] = $data->username;
                 } elseif (isset($data->link)) {
@@ -129,7 +130,7 @@ class FacebookIntegration extends SocialIntegration
                     $info['profileHandle'] = $data->id;
                 }
 
-                $info['profileImage']  = "https://graph.facebook.com/{$data->id}/picture?type=large";
+                $info['profileImage'] = "https://graph.facebook.com/{$data->id}/picture?type=large";
 
                 $socialCache['profile'] = $info;
             }
@@ -151,9 +152,9 @@ class FacebookIntegration extends SocialIntegration
         $identifiers = $this->cleanIdentifier($identifier);
 
         if (isset($identifiers['facebook'])) {
-            $url    = $this->getApiUrl($identifiers["facebook"]);
+            $url = $this->getApiUrl($identifiers["facebook"]);
             //@todo - can't use access token to do a global search; may not work after April
-            $data   = $this->makeRequest($url, array(), 'GET', array('auth_type' => 'rest'));
+            $data = $this->makeRequest($url, array(), 'GET', array('auth_type' => 'rest'));
 
             if ($data && isset($data->id)) {
                 $socialCache['id'] = $data->id;
@@ -171,17 +172,17 @@ class FacebookIntegration extends SocialIntegration
      */
     public function getAvailableLeadFields($settings = array())
     {
-	    // Until lead profile support is restored
-	    //return array();
+        // Until lead profile support is restored
+        //return array();
 
-	    return array(
-		    'first_name' => array('type' => 'string'),
-		    'last_name'  => array('type' => 'string'),
-		    'name'       => array('type' => 'string'),
-		    'gender'     => array('type' => 'string'),
-		    'locale'     => array('type' => 'string'),
-		    'email'      => array('type' => 'string'),
-		    'link'       => array('type' => 'string'),
-	    );
+        return array(
+            'first_name' => array('type' => 'string'),
+            'last_name'  => array('type' => 'string'),
+            'name'       => array('type' => 'string'),
+            'gender'     => array('type' => 'string'),
+            'locale'     => array('type' => 'string'),
+            'email'      => array('type' => 'string'),
+            'link'       => array('type' => 'string'),
+        );
     }
 }

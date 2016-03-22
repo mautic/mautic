@@ -23,81 +23,97 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class GooglePlusLoginType extends AbstractType
 {
-	/**
-	 * @var MauticFactory
-	 */
-	private $factory;
+    /**
+     * @var MauticFactory
+     */
+    private $factory;
 
-	public function __construct(MauticFactory $factory)
-	{
-		$this->factory = $factory;
-	}
-	/**
-	 * @param FormBuilderInterface $builder
-	 * @param array                $options
-	 */
-	public function buildForm (FormBuilderInterface $builder, array $options)
-	{
-		$builder->add('annotation', 'choice', array(
-			'choices'     => array(
-				'inline'            => 'mautic.integration.GooglePlus.share.annotation.inline',
-				'bubble'            => 'mautic.integration.GooglePlus.share.annotation.bubble',
-				'vertical-bubble'   => 'mautic.integration.GooglePlus.share.annotation.verticalbubble',
-				'none'              => 'mautic.integration.GooglePlus.share.annotation.none'
-			),
-			'label'       => 'mautic.integration.GooglePlus.share.annotation',
-			'required'    => false,
-			'empty_value' => false,
-			'label_attr'  => array('class' => 'control-label'),
-			'attr'        => array('class'   => 'form-control')
-		));
+    public function __construct(MauticFactory $factory)
+    {
+        $this->factory = $factory;
+    }
 
-		$builder->add('height', 'choice', array(
-			'choices'     => array(
-				''    => 'mautic.integration.GooglePlus.share.height.standard',
-				'15'  => 'mautic.integration.GooglePlus.share.height.small',
-				'24'  => 'mautic.integration.GooglePlus.share.height.large',
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array                $options
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder->add(
+            'annotation',
+            'choice',
+            array(
+                'choices'     => array(
+                    'inline'          => 'mautic.integration.GooglePlus.share.annotation.inline',
+                    'bubble'          => 'mautic.integration.GooglePlus.share.annotation.bubble',
+                    'vertical-bubble' => 'mautic.integration.GooglePlus.share.annotation.verticalbubble',
+                    'none'            => 'mautic.integration.GooglePlus.share.annotation.none'
+                ),
+                'label'       => 'mautic.integration.GooglePlus.share.annotation',
+                'required'    => false,
+                'empty_value' => false,
+                'label_attr'  => array('class' => 'control-label'),
+                'attr'        => array('class' => 'form-control')
+            )
+        );
 
-			),
-			'label'       => 'mautic.integration.GooglePlus.share.height',
-			'required'    => false,
-			'empty_value' => false,
-			'label_attr'  => array('class' => 'control-label'),
-			'attr'        => array('class'   => 'form-control')
-		));
+        $builder->add(
+            'height',
+            'choice',
+            array(
+                'choices'     => array(
+                    ''   => 'mautic.integration.GooglePlus.share.height.standard',
+                    '15' => 'mautic.integration.GooglePlus.share.height.small',
+                    '24' => 'mautic.integration.GooglePlus.share.height.large',
 
-		/** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-		$integrationHelper = $this->factory->getHelper('integration');
-		$integrationObject = $integrationHelper->getIntegrationObject('GooglePlus');
-	
+                ),
+                'label'       => 'mautic.integration.GooglePlus.share.height',
+                'required'    => false,
+                'empty_value' => false,
+                'label_attr'  => array('class' => 'control-label'),
+                'attr'        => array('class' => 'form-control')
+            )
+        );
 
-		$keys = $integrationObject->getDecryptedApiKeys();
-		$clientId = $keys[$integrationObject->getClientIdKey()];
-
-		$builder->add('clientId', 'hidden', array(
-			'data' => $clientId,
-		));
-
-		$mappedLeadFields = $integrationObject->getAvailableLeadFields();
-		$socialFields = '';
-
-		foreach ($mappedLeadFields as $key => $field)
-		{
-			$socialFields .= $key . ",";
-		}
-
-		$builder->add('socialProfile', 'hidden', array(
-
-			'data' => substr($socialFields, 0, -1),
-		));
-	}
+        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
+        $integrationHelper = $this->factory->getHelper('integration');
+        $integrationObject = $integrationHelper->getIntegrationObject('GooglePlus');
 
 
-	/**
-	 * @return string
-	 */
-	public function getName ()
-	{
-		return "sociallogin_googleplus";
-	}
+        $keys     = $integrationObject->getDecryptedApiKeys();
+        $clientId = $keys[$integrationObject->getClientIdKey()];
+
+        $builder->add(
+            'clientId',
+            'hidden',
+            array(
+                'data' => $clientId,
+            )
+        );
+
+        $mappedLeadFields = $integrationObject->getAvailableLeadFields();
+        $socialFields     = '';
+
+        foreach ($mappedLeadFields as $key => $field) {
+            $socialFields .= $key.",";
+        }
+
+        $builder->add(
+            'socialProfile',
+            'hidden',
+            array(
+
+                'data' => substr($socialFields, 0, -1),
+            )
+        );
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return "sociallogin_googleplus";
+    }
 }
