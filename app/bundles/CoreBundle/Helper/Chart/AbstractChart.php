@@ -179,6 +179,7 @@ abstract class AbstractChart
             case 'H':
                 $dateDiff = $this->dateTo->diff($this->dateFrom);
                 $amount = $dateDiff->h + $dateDiff->days * 24;
+                $amount++;
                 break;
             default:
                 $amount = ($this->dateTo->diff($this->dateFrom)->format('%' . $this->unit) + 1);
