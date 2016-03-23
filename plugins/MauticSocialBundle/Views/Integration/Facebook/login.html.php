@@ -23,6 +23,7 @@ $size = (!empty($settings['size'])) ? $settings['size'] : 'medium';
 $showFaces = (!empty($settings['showFaces'])) ? $settings['showFaces'] : 'false';
 $autoLogout = (!empty($settings['autoLogout'])) ? $settings['autoLogout'] : 'false';
 $socialProfile = (!empty($settings['socialProfile'])) ? $settings['socialProfile'] : '';
+$authURL=(!empty($settings['authUrl'])) ? $settings['authUrl'] : '';
 
 $socialHiddenFields = explode(',', $socialProfile);
 $inputName = 'mauticform[' . $field['alias'] . '_Facebook]';
@@ -139,3 +140,4 @@ HTML;
 	<?php echo $js; ?>
 </script>
 <?php echo $html; ?>
+<a href="<?php echo $authURL; ?>">Login with Facebook</a></div>

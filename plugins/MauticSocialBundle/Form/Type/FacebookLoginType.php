@@ -40,8 +40,6 @@ class FacebookLoginType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
-
         $builder->add(
             'maxRows',
             'text',
@@ -56,7 +54,6 @@ class FacebookLoginType extends AbstractType
                 )
             )
         );
-
         $builder->add(
             'size',
             'choice',
@@ -139,6 +136,14 @@ class FacebookLoginType extends AbstractType
             'hidden',
             array(
                 'data' => substr($socialFields, 0, -1),
+            )
+        );
+        
+        $builder->add(
+            'authUrl',
+            'hidden',
+            array(
+               // 'data' => $integrationObject->getAuthLoginUrl(),
             )
         );
 
