@@ -185,4 +185,8 @@ class FacebookIntegration extends SocialIntegration
             'link'       => array('type' => 'string'),
         );
     }
+
+    public function authorizeUser(){
+        $auth = $this->getAuthLoginUrl();
+    }
 }
