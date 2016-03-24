@@ -21,6 +21,25 @@
         chosenNoResults: '<?php echo $view['translator']->trans('mautic.core.form.nomatches'); ?>',
         pleaseWait: '<?php echo $view['translator']->trans('mautic.core.wait'); ?>'
     };
+    <?php if ($webNotificationsEnabled) : ?>
+    var OneSignal = OneSignal || [];
+    OneSignal.push(["init", {
+        appId: "ab44aea7-ebe8-4bf4-bb7c-aa47e22d0364",
+        safari_web_id: 'web.onesignal.auto.31ba082c-c81b-42a5-be17-ec59d526e60e',
+        autoRegister: true,
+        subdomainName: 'dev-mautic',
+        notifyButton: {
+            enable: true // Set to false to hide
+        }
+    }]);
+    OneSignal.push(function() {
+        // Occurs when the user's subscription changes to a new value.
+        OneSignal.on('subscriptionChange', function (isSubscribed) {
+            console.log("The user's subscription state is now:", isSubscribed);
+            console.log("The user's OneSignal ID is now:", OneSignal.getUserId());
+        });
+    });
+    <?php endif; ?>
 </script>
 <?php $view['assets']->outputSystemScripts(); ?>
 <?php $view['assets']->loadEditor(); ?>
