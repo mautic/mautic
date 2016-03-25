@@ -15,7 +15,7 @@ namespace Mautic\CoreBundle\Helper\Chart;
 interface ChartInterface
 {
     /**
-     * @param string $engine
+     * Render the chart data
      */
     public function render();
 }
