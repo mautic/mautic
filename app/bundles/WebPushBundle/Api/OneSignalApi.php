@@ -60,25 +60,42 @@ class OneSignalApi extends AbstractWebPushApi
      * @param string|array $playerId Player ID as string, or an array of player ID's
      * @param string|array $message Message as string, or lang => message array
      *                              ['en' => 'English Message', 'es' => 'Spanish Message']
+     * @param string|array $title Title as string, or lang => title array
+     *                            ['en' => 'English Title', 'es' => 'Spanish Title']
      *
      * @return Response
      *
      * @throws \Exception
      */
-    public function sendNotification($playerId, $message)
+    public function sendNotification($playerId, $message, $title = '')
     {
+        $data = array();
+
         if (! is_array($playerId)) {
             $playerId = array($playerId);
         }
+
+        $data['include_player_ids'] = $playerId;
 
         if (! is_array($message)) {
             $message = array("en" => $message);
         }
 
-        $data = array(
-            'include_player_ids' => $playerId,
-            'contents' => $message
-        );
+        $data['contents'] = $message;
+
+        if (! empty($title)) {
+            switch(gettype($title))
+            {
+                case 'string':
+                    $title = array('en' => $title);
+                    break;
+                case 'array':
+                default:
+                    break;
+            }
+
+            $data['headings'] = $title;
+        }
 
         return $this->send('/notifications', $data);
     }

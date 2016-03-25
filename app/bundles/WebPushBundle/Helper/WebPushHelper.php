@@ -57,11 +57,19 @@ class WebPushHelper
             return false;
         }
 
-        $playerId = $lead->getFieldValue('player_id');
+        // If lead has subscribed on multiple channels, get all of them.
+        /** @var \Mautic\WebPushBundle\Entity\PushID[] $pushIDs */
+        $pushIDs = $lead->getPushIDs();
+
+        $playerID = array();
+
+        foreach ($pushIDs as $pushID) {
+            $playerID[] = $pushID->getPushID();
+        }
 
         /** @var \Mautic\WebPushBundle\Api\OneSignalApi $webpush */
         $webpush = $factory->getKernel()->getContainer()->get('mautic.webpush.api');
 
-        return $webpush->sendNotification($playerId, $config['webpush_message_template']);
+        return $webpush->sendNotification($playerID, $config['webpush_message_template'], $config['webpush_message_headings']);
     }
 }

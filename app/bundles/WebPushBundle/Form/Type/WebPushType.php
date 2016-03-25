@@ -25,6 +25,16 @@ class WebPushType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
+        $builder->add('webpush_message_headings', 'textarea', array(
+            'label_attr' => array('class' => 'control-label'),
+            'label' => 'mautic.webpush.headings',
+            'required' => true,
+            'attr' => array(
+                'class' => 'form-control',
+                'placeholder' => 'mautic.webpush.headings.placeholder'
+            )
+        ));
+
         $builder->add('webpush_message_template', 'textarea', array(
             'label_attr' => array('class' => 'control-label'),
             'label' => 'mautic.webpush.text',

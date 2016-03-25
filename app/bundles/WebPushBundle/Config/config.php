@@ -50,6 +50,10 @@ return array(
             'mautic_receive_webpush' => array(
                 'path'       => '/webpush/receive',
                 'controller' => 'MauticWebPushBundle:Api\WebPushApi:receive'
+            ),
+            'mautic_subscribe_webpush' => array(
+                'path'       => '/webpush/subscribe',
+                'controller' => 'MauticWebPushBundle:Api\WebPushApi:subscribe'
             )
         )
     ),
