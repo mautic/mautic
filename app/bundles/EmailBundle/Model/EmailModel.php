@@ -1497,4 +1497,33 @@ class EmailModel extends FormModel
 
         return $chart->render();
     }
+
+    /**
+     * Get a list of emails in a date range
+     *
+     * @param integer  $limit
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param array    $filters
+     *
+     * @return array
+     */
+    public function getEmailList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array())
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(DISTINCT t.id) AS sends, e.id, e.name')
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 't')
+            ->join('t', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = t.email_id')
+            ->orderBy('sends', 'DESC')
+            ->groupBy('e.id')
+            ->setMaxResults($limit);
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_sent');
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
 }

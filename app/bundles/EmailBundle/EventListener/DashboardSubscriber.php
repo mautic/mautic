@@ -35,7 +35,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $types = array(
         'emails.in.time' => array(),
         'ignored.vs.read.emails' => array(),
-        'upcoming.emails' => array()
+        'upcoming.emails' => array(),
+        'most.sent.emails' => array()
     );
 
     /**
@@ -98,6 +99,46 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->setTemplate('MauticDashboardBundle:Dashboard:upcomingemails.html.php');
             $event->setTemplateData(array('upcomingEmails' => $upcomingEmails));
             
+            $event->stopPropagation();
+        }
+
+        if ($event->getType() == 'most.sent.emails') {
+            if (!$event->isCached()) {
+                $model  = $this->factory->getModel('email');
+                $params = $event->getWidget()->getParams();
+
+                if (empty($params['limit'])) {
+                    // Count the emails limit from the widget height
+                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
+                } else {
+                    $limit = $params['limit'];
+                }
+
+                $emails = $model->getEmailList($limit, $params['dateFrom'], $params['dateTo']);
+                $items = array();
+
+                // Build table rows with links
+                if ($emails) {
+                    foreach ($emails as &$email) {
+                        $pageUrl = $this->factory->getRouter()->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $email['id']));
+                        $row = array(
+                            $pageUrl => $email['name'],
+                            $email['sends']
+                        );
+                        $items[] = $row;
+                    }
+                }
+
+                $event->setTemplateData(array(
+                    'headItems'   => array(
+                        $event->getTranslator()->trans('mautic.dashboard.label.title'),
+                        $event->getTranslator()->trans('mautic.email.label.sends')
+                    ),
+                    'bodyItems'   => $items
+                ));
+            }
+            
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
             $event->stopPropagation();
         }
     }
