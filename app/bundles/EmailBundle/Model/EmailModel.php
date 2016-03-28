@@ -1499,7 +1499,7 @@ class EmailModel extends FormModel
     }
 
     /**
-     * Get a list of emails in a date range
+     * Get a list of emails in a date range, grouped by a stat date count
      *
      * @param integer  $limit
      * @param DateTime $dateFrom
@@ -1509,7 +1509,7 @@ class EmailModel extends FormModel
      *
      * @return array
      */
-    public function getEmailList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array(), $options = array())
+    public function getEmailStatList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array(), $options = array())
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS count, e.id, e.name')
@@ -1529,6 +1529,33 @@ class EmailModel extends FormModel
         if (isset($options['groupBy']) && $options['groupBy'] == 'reads') {
             $chartQuery->applyDateFilters($q, 'date_read');
         }        
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
+     * Get a list of emails in a date range
+     *
+     * @param integer  $limit
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param array    $filters
+     * @param array    $options
+     *
+     * @return array
+     */
+    public function getEmailList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array(), $options = array())
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('t.id, t.name')
+            ->from(MAUTIC_TABLE_PREFIX.'emails', 't')
+            ->setMaxResults($limit);
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_added');
 
         $results = $q->execute()->fetchAll();
 

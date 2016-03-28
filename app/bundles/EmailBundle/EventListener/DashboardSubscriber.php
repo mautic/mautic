@@ -37,7 +37,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'ignored.vs.read.emails' => array(),
         'upcoming.emails' => array(),
         'most.sent.emails' => array(),
-        'most.read.emails' => array()
+        'most.read.emails' => array(),
+        'emails.created' => array()
     );
 
     /**
@@ -115,15 +116,15 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $emails = $model->getEmailList($limit, $params['dateFrom'], $params['dateTo'], array(), array('groupBy' => 'sends'));
+                $emails = $model->getEmailStatList($limit, $params['dateFrom'], $params['dateTo'], array(), array('groupBy' => 'sends'));
                 $items = array();
 
                 // Build table rows with links
                 if ($emails) {
                     foreach ($emails as &$email) {
-                        $pageUrl = $this->factory->getRouter()->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $email['id']));
+                        $emailUrl = $this->factory->getRouter()->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $email['id']));
                         $row = array(
-                            $pageUrl => $email['name'],
+                            $emailUrl => $email['name'],
                             $email['count']
                         );
                         $items[] = $row;
@@ -155,15 +156,15 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $emails = $model->getEmailList($limit, $params['dateFrom'], $params['dateTo'], array(), array('groupBy' => 'reads'));
+                $emails = $model->getEmailStatList($limit, $params['dateFrom'], $params['dateTo'], array(), array('groupBy' => 'reads'));
                 $items = array();
 
                 // Build table rows with links
                 if ($emails) {
                     foreach ($emails as &$email) {
-                        $pageUrl = $this->factory->getRouter()->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $email['id']));
+                        $emailUrl = $this->factory->getRouter()->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $email['id']));
                         $row = array(
-                            $pageUrl => $email['name'],
+                            $emailUrl => $email['name'],
                             $email['count']
                         );
                         $items[] = $row;
@@ -174,6 +175,44 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'headItems'   => array(
                         $event->getTranslator()->trans('mautic.dashboard.label.title'),
                         $event->getTranslator()->trans('mautic.email.label.reads')
+                    ),
+                    'bodyItems'   => $items
+                ));
+            }
+            
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->stopPropagation();
+        }
+
+        if ($event->getType() == 'emails.created') {
+            if (!$event->isCached()) {
+                $model  = $this->factory->getModel('email');
+                $params = $event->getWidget()->getParams();
+
+                if (empty($params['limit'])) {
+                    // Count the emails limit from the widget height
+                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
+                } else {
+                    $limit = $params['limit'];
+                }
+
+                $emails = $model->getEmailList($limit, $params['dateFrom'], $params['dateTo'], array(), array('groupBy' => 'creations'));
+                $items = array();
+
+                // Build table rows with links
+                if ($emails) {
+                    foreach ($emails as &$email) {
+                        $emailUrl = $this->factory->getRouter()->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $email['id']));
+                        $row = array(
+                            $emailUrl => $email['name'],
+                        );
+                        $items[] = $row;
+                    }
+                }
+
+                $event->setTemplateData(array(
+                    'headItems'   => array(
+                        $event->getTranslator()->trans('mautic.dashboard.label.title')
                     ),
                     'bodyItems'   => $items
                 ));
