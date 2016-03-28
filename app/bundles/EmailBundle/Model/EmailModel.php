@@ -1505,22 +1505,30 @@ class EmailModel extends FormModel
      * @param DateTime $dateFrom
      * @param DateTime $dateTo
      * @param array    $filters
+     * @param array    $options
      *
      * @return array
      */
-    public function getEmailList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array())
+    public function getEmailList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array(), $options = array())
     {
         $q = $this->em->getConnection()->createQueryBuilder();
-        $q->select('COUNT(DISTINCT t.id) AS sends, e.id, e.name')
+        $q->select('COUNT(DISTINCT t.id) AS count, e.id, e.name')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 't')
             ->join('t', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = t.email_id')
-            ->orderBy('sends', 'DESC')
+            ->orderBy('count', 'DESC')
             ->groupBy('e.id')
             ->setMaxResults($limit);
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
-        $chartQuery->applyDateFilters($q, 'date_sent');
+
+        if (isset($options['groupBy']) && $options['groupBy'] == 'sends') {
+            $chartQuery->applyDateFilters($q, 'date_sent');
+        }
+
+        if (isset($options['groupBy']) && $options['groupBy'] == 'reads') {
+            $chartQuery->applyDateFilters($q, 'date_read');
+        }        
 
         $results = $q->execute()->fetchAll();
 
