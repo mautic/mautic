@@ -36,7 +36,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'page.hits.in.time' => array(),
         'unique.vs.returning.leads' => array(),
         'dwell.times' => array(),
-        'popular.pages' => array()
+        'popular.pages' => array(),
+        'created.pages' => array(),
     );
 
     /**
@@ -132,6 +133,49 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'headItems'   => array(
                         $event->getTranslator()->trans('mautic.dashboard.label.title'),
                         $event->getTranslator()->trans('mautic.dashboard.label.hits')
+                    ),
+                    'bodyItems'   => $items,
+                    'raw'         => $pages
+                ));
+            }
+            
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->stopPropagation();
+        }
+
+        if ($event->getType() == 'created.pages') {
+            if (!$event->isCached()) {
+                $model  = $this->factory->getModel('page');
+                $params = $event->getWidget()->getParams();
+
+                if (empty($params['limit'])) {
+                    // Count the pages limit from the widget height
+                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
+                } else {
+                    $limit = $params['limit'];
+                }
+
+                $pages = $model->getPageList($limit, $params['dateFrom'], $params['dateTo']);
+                $items = array();
+
+                // Build table rows with links
+                if ($pages) {
+                    foreach ($pages as &$page) {
+                        $pageUrl = $this->factory->getRouter()->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $page['id']));
+                        $row = array(
+                            array(
+                                'value' => $page['name'],
+                                'type' => 'link',
+                                'link' => $pageUrl
+                            )
+                        );
+                        $items[] = $row;
+                    }
+                }
+
+                $event->setTemplateData(array(
+                    'headItems'   => array(
+                        $event->getTranslator()->trans('mautic.dashboard.label.title')
                     ),
                     'bodyItems'   => $items,
                     'raw'         => $pages

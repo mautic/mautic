@@ -38,7 +38,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'upcoming.emails' => array(),
         'most.sent.emails' => array(),
         'most.read.emails' => array(),
-        'emails.created' => array()
+        'created.emails' => array()
     );
 
     /**
@@ -198,7 +198,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'emails.created') {
+        if ($event->getType() == 'created.emails') {
             if (!$event->isCached()) {
                 $model  = $this->factory->getModel('email');
                 $params = $event->getWidget()->getParams();
