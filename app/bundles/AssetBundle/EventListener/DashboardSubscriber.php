@@ -99,8 +99,14 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     foreach ($assets as &$asset) {
                         $assetUrl = $this->factory->getRouter()->generate('mautic_asset_action', array('objectAction' => 'view', 'objectId' => $asset['id']));
                         $row = array(
-                            $assetUrl => $asset['title'],
-                            $asset['download_count']
+                            array(
+                                'value' => $asset['title'],
+                                'type' => 'link',
+                                'link' => $assetUrl
+                            ),
+                            array(
+                                'value' => $asset['download_count']
+                            )
                         );
                         $items[] = $row;
                     }
@@ -111,7 +117,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $event->getTranslator()->trans('mautic.dashboard.label.title'),
                         $event->getTranslator()->trans('mautic.dashboard.label.downloads')
                     ),
-                    'bodyItems'   => $items
+                    'bodyItems'   => $items,
+                    'raw'         => $assets
                 ));
             }
 

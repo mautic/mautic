@@ -124,8 +124,14 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     foreach ($emails as &$email) {
                         $emailUrl = $this->factory->getRouter()->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $email['id']));
                         $row = array(
-                            $emailUrl => $email['name'],
-                            $email['count']
+                            array(
+                                'value' => $email['name'],
+                                'type' => 'link',
+                                'link' => $emailUrl
+                            ),
+                            array(
+                                'value' => $email['count']
+                            )
                         );
                         $items[] = $row;
                     }
@@ -136,7 +142,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $event->getTranslator()->trans('mautic.dashboard.label.title'),
                         $event->getTranslator()->trans('mautic.email.label.sends')
                     ),
-                    'bodyItems'   => $items
+                    'bodyItems'   => $items,
+                    'raw'         => $emails
                 ));
             }
             
@@ -164,8 +171,14 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     foreach ($emails as &$email) {
                         $emailUrl = $this->factory->getRouter()->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $email['id']));
                         $row = array(
-                            $emailUrl => $email['name'],
-                            $email['count']
+                            array(
+                                'value' => $email['name'],
+                                'type' => 'link',
+                                'link' => $emailUrl
+                            ),
+                            array(
+                                'value' => $email['count']
+                            )
                         );
                         $items[] = $row;
                     }
@@ -176,7 +189,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $event->getTranslator()->trans('mautic.dashboard.label.title'),
                         $event->getTranslator()->trans('mautic.email.label.reads')
                     ),
-                    'bodyItems'   => $items
+                    'bodyItems'   => $items,
+                    'raw'         => $emails
                 ));
             }
             
@@ -202,9 +216,19 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 // Build table rows with links
                 if ($emails) {
                     foreach ($emails as &$email) {
-                        $emailUrl = $this->factory->getRouter()->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $email['id']));
+                        $emailUrl = $this->factory->getRouter()->generate(
+                            'mautic_email_action', 
+                            array(
+                                'objectAction' => 'view',
+                                'objectId' => $email['id']
+                            )
+                        );
                         $row = array(
-                            $emailUrl => $email['name'],
+                            array(
+                                'value' => $email['name'],
+                                'type' => 'link',
+                                'link' => $emailUrl
+                            )
                         );
                         $items[] = $row;
                     }
@@ -214,7 +238,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'headItems'   => array(
                         $event->getTranslator()->trans('mautic.dashboard.label.title')
                     ),
-                    'bodyItems'   => $items
+                    'bodyItems'   => $items,
+                    'raw'         => $emails
                 ));
             }
             

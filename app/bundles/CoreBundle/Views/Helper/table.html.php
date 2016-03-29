@@ -30,15 +30,22 @@ if (!isset($shortenLinkText)) {
             <?php foreach ($bodyItems as $row) : ?>
                 <tr>
                     <?php if (is_array($row)) : ?>
-                        <?php foreach ($row as $key => $item) : ?>
+                        <?php foreach ($row as $item) : ?>
                             <td>
-                                <?php if (is_string($key)) : ?>
-                                    <a href="<?php echo $key; ?>" title="<?php echo $item; ?>">
+                                <?php if (isset($item['type']) && $item['type'] == 'link') : ?>
+                                    <a href="<?php echo $item['link']; ?>" 
+                                        title="<?php echo $item['value']; ?>" 
+                                        <?php if (!empty($item['external'])) : ?>
+                                        target="_blank"
+                                        <?php else : ?>
+                                        data-toggle="ajax"
+                                        <?php endif; ?>
+                                        >
                                         <?php $item = str_replace(array('http://', 'https://'), '', $item); ?>
-                                        <?php echo $view['assets']->shortenText($item, $shortenLinkText); ?>
+                                        <?php echo $view['assets']->shortenText($item['value'], $shortenLinkText); ?>
                                     </a>
                                 <?php else: ?>
-                                    <?php echo $item; ?>
+                                    <?php echo $item['value']; ?>
                                 <?php endif; ?>
                             </td>
                         <?php endforeach; ?>

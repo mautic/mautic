@@ -115,8 +115,14 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     foreach ($pages as &$page) {
                         $pageUrl = $this->factory->getRouter()->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $page['id']));
                         $row = array(
-                            $pageUrl => $page['title'],
-                            $page['hits']
+                            array(
+                                'value' => $page['title'],
+                                'type' => 'link',
+                                'link' => $pageUrl
+                            ),
+                            array(
+                                'value' => $page['hits']
+                            )
                         );
                         $items[] = $row;
                     }
@@ -127,7 +133,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $event->getTranslator()->trans('mautic.dashboard.label.title'),
                         $event->getTranslator()->trans('mautic.dashboard.label.hits')
                     ),
-                    'bodyItems'   => $items
+                    'bodyItems'   => $items,
+                    'raw'         => $pages
                 ));
             }
             

@@ -83,8 +83,15 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 if ($referrers) {
                     foreach ($referrers as &$referrer) {
                         $row = array(
-                            $referrer['referer'] => $referrer['referer'],
-                            $referrer['submissions']
+                            array(
+                                'value' => $referrer['referer'],
+                                'type' => 'link',
+                                'external' => true,
+                                'link' => $referrer['referer']
+                            ),
+                            array(
+                                'value' => $referrer['submissions']
+                            )
                         );
                         $items[] = $row;
                     }
@@ -95,7 +102,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $event->getTranslator()->trans('mautic.form.result.thead.referrer'),
                         $event->getTranslator()->trans('mautic.form.graph.line.submissions')
                     ),
-                    'bodyItems'   => $items
+                    'bodyItems'   => $items,
+                    'raw'         => $referrers
                 ));
             }
             
@@ -130,8 +138,14 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         }
 
                         $row = array(
-                            $leadUrl => $name,
-                            $submitter['submissions']
+                            array(
+                                'value' => $name,
+                                'type' => 'link',
+                                'link' => $leadUrl
+                            ),
+                            array(
+                                'value' => $submitter['submissions']
+                            )
                         );
                         $items[] = $row;
                     }
@@ -142,7 +156,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $event->getTranslator()->trans('mautic.form.lead'),
                         $event->getTranslator()->trans('mautic.form.graph.line.submissions')
                     ),
-                    'bodyItems'   => $items
+                    'bodyItems'   => $items,
+                    'raw'         => $submitters
                 ));
             }
             

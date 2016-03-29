@@ -126,11 +126,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 // Build table rows with links
                 if ($lists) {
                     foreach ($lists as &$list) {
-                        // $listUrl = $this->factory->getRouter()->generate('mautic_leadlist_action', array('objectAction' => 'view', 'objectId' => $list['id']));
+                        $listUrl = $this->factory->getRouter()->generate('mautic_leadlist_action', array('objectAction' => 'edit', 'objectId' => $list['id']));
                         $row = array(
-                            // $listUrl => $list['name'],
-                            $list['name'],
-                            $list['leads']
+                            array(
+                                'value' => $list['name'],
+                                'type' => 'link',
+                                'link' => $listUrl
+                            ),
+                            array(
+                                'value' => $list['leads']
+                            )
                         );
                         $items[] = $row;
                     }
@@ -141,7 +146,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $event->getTranslator()->trans('mautic.dashboard.label.title'),
                         $event->getTranslator()->trans('mautic.lead.leads')
                     ),
-                    'bodyItems'   => $items
+                    'bodyItems'   => $items,
+                    'raw'         => $lists
                 ));
             }
             
@@ -169,8 +175,14 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     foreach ($owners as &$owner) {
                         $ownerUrl = $this->factory->getRouter()->generate('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $owner['owner_id']));
                         $row = array(
-                            $ownerUrl => $owner['first_name'] . ' ' . $owner['last_name'],
-                            $owner['leads']
+                            array(
+                                'value' => $owner['first_name'] . ' ' . $owner['last_name'],
+                                'type' => 'link',
+                                'link' => $ownerUrl
+                            ),
+                            array(
+                                'value' => $owner['leads']
+                            )
                         );
                         $items[] = $row;
                     }
@@ -181,7 +193,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $event->getTranslator()->trans('mautic.user.account.permissions.editname'),
                         $event->getTranslator()->trans('mautic.lead.leads')
                     ),
-                    'bodyItems'   => $items
+                    'bodyItems'   => $items,
+                    'raw'         => $owners
                 ));
             }
             
@@ -209,8 +222,14 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     foreach ($creators as &$creator) {
                         $creatorUrl = $this->factory->getRouter()->generate('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $creator['created_by']));
                         $row = array(
-                            $creatorUrl => $creator['created_by_user'],
-                            $creator['leads']
+                            array(
+                                'value' => $creator['created_by_user'],
+                                'type' => 'link',
+                                'link' => $creatorUrl
+                            ),
+                            array(
+                                'value' => $creator['leads']
+                            )
                         );
                         $items[] = $row;
                     }
@@ -221,7 +240,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $event->getTranslator()->trans('mautic.user.account.permissions.editname'),
                         $event->getTranslator()->trans('mautic.lead.leads')
                     ),
-                    'bodyItems'   => $items
+                    'bodyItems'   => $items,
+                    'raw'         => $creators
                 ));
             }
             
