@@ -1549,7 +1549,7 @@ class EmailModel extends FormModel
     public function getEmailList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array(), $options = array())
     {
         $q = $this->em->getConnection()->createQueryBuilder();
-        $q->select('t.id, t.name')
+        $q->select('t.id, t.name, t.date_added, t.date_modified')
             ->from(MAUTIC_TABLE_PREFIX.'emails', 't')
             ->setMaxResults($limit);
 
