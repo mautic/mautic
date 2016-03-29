@@ -105,15 +105,23 @@ class WidgetApiController extends CommonApiController
             return $this->notFound();
         }
 
-        if ($dataFormat == 'raw' && isset($data['chartData']['labels']) && isset($data['chartData']['datasets'])) {
-            $rawData = array();
-            foreach ($data['chartData']['datasets'] as $dataset) {
-                $rawData[$dataset['label']] = array();
-                foreach ($dataset['data'] as $key => $value) {
-                    $rawData[$dataset['label']][$data['chartData']['labels'][$key]] = $value;
+        if ($dataFormat == 'raw') {
+            if (isset($data['chartData']['labels']) && isset($data['chartData']['datasets'])) {
+                $rawData = array();
+                foreach ($data['chartData']['datasets'] as $dataset) {
+                    $rawData[$dataset['label']] = array();
+                    foreach ($dataset['data'] as $key => $value) {
+                        $rawData[$dataset['label']][$data['chartData']['labels'][$key]] = $value;
+                    }
                 }
+                $data = $rawData;
+            } elseif (isset($data['raw'])) {
+                $data = $data['raw'];
             }
-            $data = $rawData;
+        } else {
+            if (isset($data['raw'])) {
+                unset($data['raw']);
+            }
         }
 
         $response['cached'] = $widget->isCached();
