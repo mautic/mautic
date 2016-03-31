@@ -129,6 +129,16 @@ if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) 
                 ),
                 'tooltip' => $view['translator']->trans('mautic.lead.batch.dnc'),
                 'iconClass' => 'fa fa-ban text-danger'
+            ),
+            array(
+                'attr'      => array(
+                    'class'       => 'hidden-xs btn btn-default btn-sm btn-nospin',
+                    'data-toggle' => 'download',
+                    'href'        => $view['router']->generate('mautic_contact_action', array('objectAction' => 'exportCurrentList')),
+                    'data-header' => $view['translator']->trans('mautic.form.result.export.csv'),
+                ),
+                'tooltip' => $view['translator']->trans('mautic.form.result.export.csv'),
+                'iconClass' => 'fa fa-file-text-o'
             )
         )
     );

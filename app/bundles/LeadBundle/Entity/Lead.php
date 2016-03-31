@@ -1136,7 +1136,7 @@ class Lead extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return \DateTime
      */
     public function getLastActive()
     {
