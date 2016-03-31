@@ -83,7 +83,8 @@ class WidgetApiController extends CommonApiController
             'dateFormat' => InputHelper::clean($this->request->get('dateFormat', null)),
             'dateFrom'   => $fromDate,
             'dateTo'     => $toDate,
-            'limit'      => InputHelper::int($this->request->get('limit', null))
+            'limit'      => InputHelper::int($this->request->get('limit', null)),
+            'filter'     => $this->request->get('filter', array())
         );
 
         $cacheTimeout = InputHelper::int($this->request->get('cacheTimeout', null));

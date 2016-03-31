@@ -103,6 +103,10 @@ class WidgetDetailEvent extends CommonEvent
             $params['dateFormat'] = null;
         }
 
+        if (!isset($params['filter'])) {
+            $params['filter'] = array();
+        }
+
         $widget->setParams($params);
 
         $this->setType($widget->getType());
