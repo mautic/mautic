@@ -522,7 +522,9 @@ class CampaignController extends FormController
                             return $this->editAction($entity->getId(), true);
                         }
                     }
-                } else {
+                }
+
+                if (!$valid) {
                     $connections = $session->get('mautic.campaign.'.$sessionId.'.events.canvassettings');
                     $model->setCanvasSettings($entity, $connections, false, $modifiedEvents);
 
