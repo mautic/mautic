@@ -33,7 +33,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
      * @var string
      */
     protected $types = array(
-        'emails.in.time' => array(),
+        'emails.in.time' => array(
+            'formAlias' => 'email_dashboard_emails_in_time_widget'
+        ),
         'ignored.vs.read.emails' => array(),
         'upcoming.emails' => array(),
         'most.sent.emails' => array(),
@@ -55,6 +57,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
+            if (empty($params['states'])) {
+                $params['states'] = null;
+            }
+
             if (!$event->isCached()) {
                 $model = $this->factory->getModel('email');
 
@@ -66,7 +72,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $params['dateFrom'],
                         $params['dateTo'],
                         $params['dateFormat'],
-                        $params['filter']
+                        $params['filter'],
+                        $params['states']
                     )
                 ));
             }

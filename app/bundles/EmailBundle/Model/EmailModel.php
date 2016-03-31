@@ -1453,18 +1453,24 @@ class EmailModel extends FormModel
      * @param DateTime $dateTo
      * @param string   $dateFormat
      * @param array    $filter
+     * @param string   $states
      *
      * @return array
      */
-    public function getEmailsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
+    public function getEmailsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $states = null)
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = $chart->getChartQuery($this->em->getConnection());
-        
-        $data  = $query->fetchTimeData('email_stats', 'date_sent', $filter);
-        $chart->setDataset('Sent emails', $data);
-        $data  = $query->fetchTimeData('email_stats', 'date_read', $filter);
-        $chart->setDataset('Read emails', $data);
+
+        if ($states == 'sent_and_opened' || !$states) {
+            $data  = $query->fetchTimeData('email_stats', 'date_sent', $filter);
+            $chart->setDataset('Sent emails', $data);
+        }
+
+        if ($states == 'sent_and_opened' || $states == 'opened') {
+            $data  = $query->fetchTimeData('email_stats', 'date_read', $filter);
+            $chart->setDataset('Read emails', $data);
+        }
 
         return $chart->render();
     }
