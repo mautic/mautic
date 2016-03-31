@@ -247,7 +247,7 @@ class ChartQuery extends AbstractChart
         $rawData = $query->execute()->fetchAll();
         $data    = array();
         $oneUnit = $this->getUnitObject($this->unit);
-        $date    = $this->dateTo;
+        $date    = clone $this->dateTo;
         $date->format($this->sqlFormats[$this->unit]);
 
         // Convert data from DB to the chart.js format

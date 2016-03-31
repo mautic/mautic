@@ -18,28 +18,6 @@ use Mautic\CoreBundle\Helper\Chart\ChartInterface;
 class BarChart extends AbstractChart implements ChartInterface
 {
     /**
-     * Date/time unit
-     * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     *
-     * @var string
-     */
-    protected $unit;
-
-    /**
-     * amount of items
-     *
-     * @var integer
-     */
-    protected $amount;
-
-    /**
-     * Date and time to dateTo. Now (null) is default.
-     *
-     * @var integer
-     */
-    protected $dateTo;
-
-    /**
      * Order
      *
      * @var string (ASC|DESC)

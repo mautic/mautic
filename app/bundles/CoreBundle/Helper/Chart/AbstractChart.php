@@ -52,6 +52,13 @@ abstract class AbstractChart
     protected $unit;
 
     /**
+     * amount of items
+     *
+     * @var integer
+     */
+    protected $amount;
+
+    /**
      * Colors which can be used in graphs
      *
      * @var array
