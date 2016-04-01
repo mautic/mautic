@@ -8,21 +8,17 @@
  */
 
 
-$defaultInputClass = 'hidden';
+$defaultInputClass = 'button';
 $containerType     = 'div-wrapper';
 
 include __DIR__.'/../../../../../app/bundles/FormBundle/Views/Field/field_helper.php';
 
 $settings = $field['properties'];
 
-$locale   = $app->getRequest()->getLocale();
-$clientId = (!empty($settings['clientId'])) ? $settings['clientId'] : '';
-$action   = $app->getRequest()->get('objectAction');
+$width = (!empty($settings['width'])) ? $settings['width'].'px' : '252px';
+$buttonLabel = (!empty($settings['buttonLabel'])) ? $settings['buttonLabel'] : '';
+$authURL=(!empty($settings['authUrl'])) ? $settings['authUrl'] : '';
 
-
-$socialProfile = (!empty($settings['socialProfile'])) ? $settings['socialProfile'] : '';
-
-$socialHiddenFields = explode(',', $socialProfile);
 $inputName          = 'mauticform['.$field['alias'].'_GooglePlus]';
 $name               = ' name="'.$inputName.'"';
 $formName           = str_replace("_", "", $formName);
@@ -44,69 +40,61 @@ $label = (!$field['showLabel'])
 HTML;
 
 $js   = <<<JS
-	var isLive='{$action}';
-	
-	function onSuccess(resp) {
-    	gapi.client.load('plus', 'v1', apiClientLoaded);
-	}
-
-  /**
-   * Sets up an API call after the Google API client loads.
-   */
-  	function apiClientLoaded() {
-    	gapi.client.plus.people.get({userId: 'me'}).execute(fillinForm);
-  	}
-
-	function onFailure(error) {
-		console.log(error);
-	}
-
-	function renderButton() {
-		gapi.signin2.render('mautic-googleplussignin', {
-			'scope': 'email',
-			'width': 240,
-			'height': 50,
-			'longtitle': true,
-			'theme': 'dark',
-			'onsuccess': onSuccess,
-			'onfailure': onFailure
-		});
-	}
-	function fillinForm(response){
-  		var elements = document.getElementById("mauticform_{$formName}").elements;
-  		var field, fieldName;
-  
-		for (var i = 0, element; element = elements[i++];) {
-			field = element.name
-			fieldName= field.replace("mauticform[","");
-			fieldName= fieldName.replace("]","");
-			
-			if (response && !response.error) {
-				values = JSON.parse(JSON.stringify(response));
-				
-				
-				for(var key in values) {
-					if(key.indexOf(fieldName) > -1){
-						var element = document.getElementsByName("mauticform["+fieldName+"]");
-						console.log(values[key][0]['value']);
-						element[0].value = values[key][0]['value'];
-					}
-				}
-			}
-		}
-		if (response && !response.error) {
-		var element = document.getElementsByName("{$inputName}");
-			element[0].value = JSON.stringify(response);
-		}
-	}
+	function openOAuthWindow(authUrl){
+	  if (authUrl) {
+          var generator = window.open(authUrl, 'integrationauth', 'height=500,width=500');
+		 
+          if (!generator || generator.closed || typeof generator.closed == 'undefined') {
+                alert('popupmessage');
+            }
+      }       
+    }
+    function fillinForm(response){
+        var elements = document.getElementById("mauticform_{$formName}").elements;
+        var field, fieldName;
+    
+        for (var i = 0, element; element = elements[i++];) {
+            field = element.name
+            fieldName= field.replace("mauticform[","");
+            fieldName= fieldName.replace("]","");
+            
+            values = JSON.parse(JSON.stringify(response));
+            for(var key in values) {
+                if(key!='id' && fieldName==key) {
+                    var element = document.getElementsByName("mauticform["+key+"]");
+                    element[0].value = values[key];
+                }
+            }	
+        }
+    }
 
 JS;
 $html = <<<HTML
-	
+<style>
+	.g-plus-login{
+		position: relative;
+		z-index: 10;
+		white-space: nowrap;
+		font-size: 14px;
+		width: {$width};
+		cursor: pointer;
+		background-color: #cc0800;
+		border-color: #c60a00;
+		border: 1px solid;
+		border-radius: 2px;
+		box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+		box-sizing: content-box;
+		-webkit-font-smoothing: antialiased;
+		font-weight: bold;
+		text-align: center;
+		vertical-align: middle;
+		color: #fff;
+		padding:10px;
+    	text-shadow: 0 -1px 0 rgba(0, 0, 0, .2);
+	}
+	</style>
 	<div $containerAttr>{$formButtons}{$label}
-		<meta name="google-signin-client_id" content="{$clientId}">
-		<div id="mautic-googleplussignin"></div>	 
-		<input type="hidden" value="" {$inputId} {$name} {$inputAttr}  >
+		<div  class="g-plus-login"><a onclick="openOAuthWindow('{$authURL}')">{$buttonLabel}</a></div>
 	</div>
 HTML;
 ?>
@@ -116,4 +104,3 @@ HTML;
 <?php
 echo $html;
 ?>
-<script src="https://apis.google.com/js/client:platform.js?onload=renderButton" async defer></script>

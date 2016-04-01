@@ -603,6 +603,7 @@ abstract class AbstractIntegration
 
             return $result;
         } else {
+            
             $response = $this->parseCallbackResponse($result->body, !empty($settings['authorize_session']));
 
             return $response;
@@ -820,7 +821,6 @@ abstract class AbstractIntegration
 
         $method = (!isset($settings['method'])) ? 'POST' : $settings['method'];
         $data   = $this->makeRequest($this->getAccessTokenUrl(), $parameters, $method, $settings);
-
         return $this->extractAuthKeys($data);
 
     }
@@ -853,7 +853,13 @@ abstract class AbstractIntegration
             $entity->setApiKeys($encrypted);
 
             $error = false;
-        } else {
+        }
+        elseif(is_array($data) && isset($data['access_token'])){
+            $this->factory->getSession()->set($this->getName().'_tokenResponse', $data);
+
+            $error = false;
+        }
+        else {
             $error = $this->getErrorsFromResponse($data);
             if (empty($error)) {
                 $error = $this->factory->getTranslator()->trans(
@@ -1036,18 +1042,18 @@ abstract class AbstractIntegration
      */
     protected function cleanIdentifier($identifier)
     {
-        if (is_array($identifier)) {
+        /*if (is_array($identifier)) {
             foreach ($identifier as &$i) {
                 $i = urlencode($i);
             }
         } else {
             $identifier = urlencode($identifier);
-        }
+        }*/
 
         return $identifier;
     }
 
-    /**
+    /**ids=me
      * Gets the ID of the user for the integration
      *
      * @param       $identifier
@@ -1171,7 +1177,7 @@ abstract class AbstractIntegration
     public function populateMauticLeadData($data, $config = array())
     {
         // Glean supported fields from what was returned by the integration
-        $gleanedData = $this->matchUpData($data);
+        $gleanedData = $data;
 
         if (!isset($config['leadFields'])) {
             $config = $this->mergeConfigToFeatureSettings($config);
@@ -1185,16 +1191,14 @@ abstract class AbstractIntegration
         $leadFields      = $config['leadFields'];
         $availableFields = $this->getAvailableLeadFields($config);
         $matched         = array();
-        $this->factory->getLogger()->addError(print_r($leadFields, true));
-        $this->factory->getLogger()->addError(print_r($gleanedData, true));
-
 
         foreach ($gleanedData as $key => $field) {
             if (isset($leadFields[$key]) && isset($gleanedData[$key])) {
                 $matched[$leadFields[$key]] = $gleanedData[$key];
             }
         }
-        $this->factory->getLogger()->addError(print_r($matched, true));
+
+
 
         return $matched;
     }
@@ -1207,7 +1211,7 @@ abstract class AbstractIntegration
      *
      * @return Lead
      */
-    public function getMauticLead($data, $persist = true)
+    public function getMauticLead($data, $persist = true, $socialCache=null)
     {
         if (is_object($data)) {
             // Convert to array in all levels
@@ -1236,6 +1240,7 @@ abstract class AbstractIntegration
         $lead->setNewlyCreated(true);
 
         if (count($uniqueLeadFieldData)) {
+
             $existingLeads = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')
                 ->getLeadsByUniqueFields($uniqueLeadFieldData);
 
@@ -1244,19 +1249,25 @@ abstract class AbstractIntegration
 
                 // Update remaining leads
                 if (count($existingLeads)) {
-                    foreach ($existingLeads as $existingLead) {
-                        $leadModel->setFieldValues($existingLead, $matchedFields, false);
-                        $lead->setLastActive(new \DateTime());
 
+                    foreach ($existingLeads as $existingLead) {
+
+                        $leadModel->setFieldValues($existingLead, $matchedFields, false);
+                        $existingLead->setLastActive(new \DateTime());
+                        $existingLead->setSocialCache($socialCache);
                         // Because multiple leads were found; use repository to persist to bypass events
                         $leadModel->getRepository->saveEntity($existingLead, false);
                     }
                 }
             }
         }
-
+        
+        $lead->setSocialCache($socialCache);
+       
         $leadModel->setFieldValues($lead, $matchedFields, false);
+
         $lead->setLastActive(new \DateTime());
+        $lead->setSocialCache($socialCache);
 
         if ($persist) {
             // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
@@ -1363,19 +1374,21 @@ abstract class AbstractIntegration
                 case 'object':
                     $values = $values;
                     foreach ($fieldDetails['fields'] as $f) {
-                        if (isset($values[$f])) {
+                        if (isset($values->$f)) {
                             $fn = $this->matchFieldName($field, $f);
 
-                            $info[$fn] = $values[$f];
+                            $info[$fn] = $values->$f;
                         }
                     }
                     break;
                 case 'array_object':
                     $objects = array();
-                    foreach ($values as $k => $v) {
-                        $v = $v;
-                        if (isset($v['value'])) {
-                            $objects[] = $v['value'];
+                    if(!empty($values)) {
+                        foreach ($values as $k => $v) {
+                            $v = $v;
+                            if (isset($v->value)) {
+                                $objects[] = $v->value;
+                            }
                         }
                     }
                     $fn        = (isset($fieldDetails['fields'][0])) ? $this->matchFieldName(
@@ -1383,6 +1396,7 @@ abstract class AbstractIntegration
                         $fieldDetails['fields'][0]
                     ) : $field;
                     $info[$fn] = implode('; ', $objects);
+
                     break;
             }
         }
@@ -1488,5 +1502,16 @@ abstract class AbstractIntegration
     public function getFormLeadFields($settings = array())
     {
         return ($this->isAuthorized()) ? $this->getAvailableLeadFields($settings) : array();
+    }
+
+    /**
+     * returns template to render on popup window after trying to run OAuth
+     *
+     *
+     * @return null|string
+     */
+    public function getPostAuthTemplate()
+    {
+        return null;
     }
 }

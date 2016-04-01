@@ -40,72 +40,52 @@ class GooglePlusLoginType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
-            'annotation',
-            'choice',
+            'width',
+            'text',
             array(
-                'choices'     => array(
-                    'inline'          => 'mautic.integration.GooglePlus.share.annotation.inline',
-                    'bubble'          => 'mautic.integration.GooglePlus.share.annotation.bubble',
-                    'vertical-bubble' => 'mautic.integration.GooglePlus.share.annotation.verticalbubble',
-                    'none'            => 'mautic.integration.GooglePlus.share.annotation.none'
-                ),
-                'label'       => 'mautic.integration.GooglePlus.share.annotation',
-                'required'    => false,
-                'empty_value' => false,
-                'label_attr'  => array('class' => 'control-label'),
-                'attr'        => array('class' => 'form-control')
+                'label_attr' => array('class' => 'control-label'),
+                'label'      => 'mautic.integration.GooglePlus.login.width',
+                'required'   => false,
+                'attr'       => array(
+                    'class'       => 'form-control',
+                    'placeholder' => 'mautic.integration.GooglePlus.login.width',
+                    'preaddon'    => 'fa'
+                )
             )
         );
-
         $builder->add(
-            'height',
-            'choice',
+            'buttonLabel',
+            'text',
             array(
-                'choices'     => array(
-                    ''   => 'mautic.integration.GooglePlus.share.height.standard',
-                    '15' => 'mautic.integration.GooglePlus.share.height.small',
-                    '24' => 'mautic.integration.GooglePlus.share.height.large',
-
-                ),
-                'label'       => 'mautic.integration.GooglePlus.share.height',
-                'required'    => false,
-                'empty_value' => false,
-                'label_attr'  => array('class' => 'control-label'),
-                'attr'        => array('class' => 'form-control')
+                'label_attr' => array('class' => 'control-label'),
+                'label'      => 'mautic.integration.GooglePlus.login.buttonlabel',
+                'required'   => false,
+                'attr'       => array(
+                    'class'       => 'form-control',
+                    'placeholder' => 'mautic.integration.GooglePlus.login.buttonlabel',
+                    'preaddon'    => 'fa'
+                )
             )
         );
-
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $this->factory->getHelper('integration');
         $integrationObject = $integrationHelper->getIntegrationObject('GooglePlus');
 
+        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
+        $model = $this->factory->getModel('form');
 
-        $keys     = $integrationObject->getDecryptedApiKeys();
-        $clientId = $keys[$integrationObject->getClientIdKey()];
-
-        $builder->add(
-            'clientId',
-            'hidden',
-            array(
-                'data' => $clientId,
-            )
+        $integration = array(
+            'integration' => $integrationObject->getName(),
         );
 
-        $mappedLeadFields = $integrationObject->getAvailableLeadFields();
-        $socialFields     = '';
-
-        foreach ($mappedLeadFields as $key => $field) {
-            $socialFields .= $key.",";
-        }
-
         $builder->add(
-            'socialProfile',
+            'authUrl',
             'hidden',
             array(
-
-                'data' => substr($socialFields, 0, -1),
+                'data' => $model->buildUrl('mautic_integration_auth_user',$integration,true,array()),
             )
         );
+        
     }
 
 
