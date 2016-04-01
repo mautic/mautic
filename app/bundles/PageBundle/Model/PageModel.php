@@ -902,7 +902,7 @@ class PageModel extends FormModel
     {
         $flag = null;
 
-        if (!empty($filter['flag'])) {
+        if (isset($filter['flag'])) {
             $flag = $filter['flag'];
             unset($filter['flag']);
         }

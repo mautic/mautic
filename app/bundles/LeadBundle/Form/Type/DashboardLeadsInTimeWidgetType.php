@@ -25,7 +25,7 @@ class DashboardLeadsInTimeWidgetType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('lists', 'choice', array(
+        $builder->add('flag', 'choice', array(
                 'label'   => 'mautic.lead.list.filter',
                 'choices' => array(
                     ''                          => 'mautic.lead.show.all',

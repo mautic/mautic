@@ -1228,9 +1228,16 @@ class LeadModel extends FormModel
      *
      * @return array
      */
-    public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $lists = null, $dateFormat = null, $filter = array())
+    public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $dateFormat = null, $filter = array())
     {
+        $flag = null;
         $topLists  = null;
+
+        if (isset($filter['flag'])) {
+            $flag = $filter['flag'];
+            unset($filter['flag']);
+        }
+
         $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query     = $chart->getChartQuery($this->em->getConnection());
         $anonymousFilter = $filter;
@@ -1242,7 +1249,7 @@ class LeadModel extends FormModel
             'expression' => 'isNotNull'
         );
 
-        if ($lists == 'top') {
+        if ($flag == 'top') {
             $topLists = $this->factory->getModel('lead.list')->getTopLists(6, $dateFrom, $dateTo);
             if ($topLists) {
                 foreach ($topLists as $list) {
@@ -1254,7 +1261,7 @@ class LeadModel extends FormModel
                     $chart->setDataset($list['name'] . ': All Leads', $all);
                 }
             }
-        } elseif ($lists == 'topIdentifiedVsAnonymous') {
+        } elseif ($flag == 'topIdentifiedVsAnonymous') {
             $topLists = $this->factory->getModel('lead.list')->getTopLists(3, $dateFrom, $dateTo);
             if ($topLists) {
                 foreach ($topLists as $list) {
@@ -1272,7 +1279,7 @@ class LeadModel extends FormModel
                     $chart->setDataset($list['name'] . ': Anonymous', $anonymous);
                 }
             }
-        } elseif ($lists == 'identifiedVsAnonymous'){
+        } elseif ($flag == 'identifiedVsAnonymous') {
             $identified = $query->fetchTimeData('leads', 'date_added', $identifiedFilter);
             $anonymous = $query->fetchTimeData('leads', 'date_added', $anonymousFilter);
             $chart->setDataset('Identified', $identified);

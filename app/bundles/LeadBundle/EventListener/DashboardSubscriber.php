@@ -56,8 +56,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
-            if (empty($params['lists'])) {
-                $params['lists'] = null;
+            if (isset($params['flag'])) {
+                $params['filter']['flag'] = $params['flag'];
             }
 
             if (!$event->isCached()) {
@@ -69,8 +69,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $params['timeUnit'],
                         $params['dateFrom'],
                         $params['dateTo'],
-                        $params['lists'],
-                        $params['dateFormat']
+                        $params['dateFormat'],
+                        $params['filter']
                     )
                 ));
             }
