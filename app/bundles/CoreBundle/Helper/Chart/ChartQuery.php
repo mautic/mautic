@@ -218,21 +218,33 @@ class ChartQuery extends AbstractChart
         $dbUnit = $this->translateTimeUnit($this->unit);
         $query = $this->connection->createQueryBuilder();
         $limit = $this->countAmountFromDateRange($this->unit);
+        $groupBy = '';
 
         // Postgres and MySql are handeling date/time SQL funciton differently
         if ($this->isPostgres()) {
-            $query->select('DATE_TRUNC(\'' . $dbUnit . '\', t.' . $column . ') AS date, COUNT(t) AS count')
-                ->from(MAUTIC_TABLE_PREFIX . $table, 't')
-                ->groupBy('DATE_TRUNC(\'' . $dbUnit . '\', t.' . $column . ')')
-                ->orderBy('DATE_TRUNC(\'' . $dbUnit . '\', t.' . $column . ')', $order);
+            if (isset($filters['groupBy'])) {
+                $count = 'COUNT(DISTINCT(t.' . $filters['groupBy'] . '))';
+                unset($filters['groupBy']);
+            } else {
+                $count = 'COUNT(*)';
+            }
+            $dateConstruct = 'DATE_TRUNC(\'' . $dbUnit . '\', t.' . $column . ')';
+            $query->select($dateConstruct . ' AS date, ' . $count . ' AS count')
+                ->groupBy($dateConstruct);
         } elseif ($this->isMysql()) {
-            $query->select('DATE_FORMAT(t.' . $column . ', \'' . $dbUnit . '\') AS date, COUNT(*) AS count')
-                ->from(MAUTIC_TABLE_PREFIX . $table, 't')
-                ->groupBy('DATE_FORMAT(t.' . $column . ', \'' . $dbUnit . '\')')
-                ->orderBy('DATE_FORMAT(t.' . $column . ', \'' . $dbUnit . '\')', $order);
+            if (isset($filters['groupBy'])) {
+                $groupBy = ', t.' . $filters['groupBy'];
+                unset($filters['groupBy']);
+            }
+            $dateConstruct = 'DATE_FORMAT(t.' . $column . ', \'' . $dbUnit . '\')';
+            $query->select($dateConstruct . ' AS date, COUNT(*) AS count')
+                ->groupBy($dateConstruct . $groupBy);
         } else {
-            throw new UnexpectedValueException(__CLASS__ . '::' . __METHOD__ . ' supports only MySql a Posgress database platforms.');
+            throw new UnexpectedValueException(__CLASS__ . '::' . __METHOD__ . ' supports only MySql a PosgreSQL database platforms.');
         }
+
+        $query->from(MAUTIC_TABLE_PREFIX . $table, 't')
+            ->orderBy($dateConstruct, $order);
 
         // Count only with dates which are not empty
         $query->andWhere('t.' . $column . ' IS NOT NULL');
