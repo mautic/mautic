@@ -41,71 +41,31 @@ class FacebookLoginType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
-            'maxRows',
+            'width',
             'text',
             array(
                 'label_attr' => array('class' => 'control-label'),
-                'label'      => 'mautic.integration.Facebook.login.maxRows',
+                'label'      => 'mautic.integration.Facebook.login.width',
                 'required'   => false,
                 'attr'       => array(
                     'class'       => 'form-control',
-                    'placeholder' => 'mautic.integration.Facebook.login.maxRows',
-                    'preaddon'    => 'fa fa-at'
+                    'placeholder' => 'mautic.integration.Facebook.login.width',
+                    'preaddon'    => 'fa'
                 )
             )
         );
         $builder->add(
-            'size',
-            'choice',
+            'buttonLabel',
+            'text',
             array(
-                'choices'     => array(
-                    'icon'   => 'mautic.integration.Facebook.login.size.icon',
-                    'small'  => 'mautic.integration.Facebook.login.size.small',
-                    'medium' => 'mautic.integration.Facebook.login.size.medium',
-                    'large'  => 'mautic.integration.Facebook.login.size.large',
-                    'xlarge' => 'mautic.integration.Facebook.login.size.xlarge',
-                ),
-                'label'       => 'mautic.integration.Facebook.login.size',
-                'required'    => false,
-                'empty_value' => false,
-                'label_attr'  => array('class' => 'control-label'),
-                'attr'        => array('class' => 'form-control')
-            )
-        );
-
-        $builder->add(
-            'showFaces',
-            'yesno_button_group',
-            array(
-                'choice_list' => new ChoiceList(
-                    array(
-                        0,
-                        1
-                    ), array(
-                    'mautic.core.form.no',
-                    'mautic.core.form.yes'
+                'label_attr' => array('class' => 'control-label'),
+                'label'      => 'mautic.integration.Facebook.login.buttonlabel',
+                'required'   => false,
+                'attr'       => array(
+                    'class'       => 'form-control',
+                    'placeholder' => 'mautic.integration.Facebook.login.buttonlabel',
+                    'preaddon'    => 'fa'
                 )
-                ),
-                'label'       => 'mautic.integration.Facebook.share.showfaces',
-                'data'        => (!isset($options['data']['showFaces'])) ? 1 : $options['data']['showFaces']
-            )
-        );
-
-        $builder->add(
-            'autoLogout',
-            'yesno_button_group',
-            array(
-                'choice_list' => new ChoiceList(
-                    array(
-                        0,
-                        1
-                    ), array(
-                    'mautic.core.form.no',
-                    'mautic.core.form.yes'
-                )
-                ),
-                'label'       => 'mautic.integration.Facebook.login.autologout',
-                'data'        => (!isset($options['data']['showShare'])) ? 1 : $options['data']['showShare']
             )
         );
 
@@ -113,40 +73,20 @@ class FacebookLoginType extends AbstractType
         $integrationHelper = $this->factory->getHelper('integration');
         $integrationObject = $integrationHelper->getIntegrationObject('Facebook');
 
-        $keys       = $integrationObject->getDecryptedApiKeys();
-        $FBclientId = $keys[$integrationObject->getClientIdKey()];
+        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
+        $model = $this->factory->getModel('form');
 
-        $builder->add(
-            'clientId',
-            'hidden',
-            array(
-                'data' => $FBclientId,
-            )
+        $integration = array(
+            'integration' => $integrationObject->getName(),
         );
 
-        $mappedLeadFields = $integrationObject->getAvailableLeadFields();
-        $socialFields     = '';
-
-        foreach ($mappedLeadFields as $key => $field) {
-            $socialFields .= $key.",";
-        }
-
-        $builder->add(
-            'socialProfile',
-            'hidden',
-            array(
-                'data' => substr($socialFields, 0, -1),
-            )
-        );
-        
         $builder->add(
             'authUrl',
             'hidden',
             array(
-               // 'data' => $integrationObject->getAuthLoginUrl(),
+                'data' => $model->buildUrl('mautic_integration_auth_user',$integration,true,array()),
             )
         );
-
     }
 
     /**
