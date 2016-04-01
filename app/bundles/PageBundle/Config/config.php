@@ -174,8 +174,8 @@ return array(
                 'alias' => 'redirect_list'
             ),
             'mautic.form.type.page_dashboard_hits_in_time_widget' => array(
-                'class'     => 'Mautic\PageBundle\Form\Type\DashboardHitsInTimeWidgetType',
-                'alias'     => 'page_dashboard_hits_in_time_widget'
+                'class' => 'Mautic\PageBundle\Form\Type\DashboardHitsInTimeWidgetType',
+                'alias' => 'page_dashboard_hits_in_time_widget'
             )
         )
     ),

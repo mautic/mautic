@@ -900,10 +900,28 @@ class PageModel extends FormModel
      */
     public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
     {
-        $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
-        $chartData = $query->fetchTimeData('page_hits', 'date_hit', $filter);
-        $chart->setDataset('Hit Count', $chartData);
+        $flag = null;
+
+        if (!empty($filter['flag'])) {
+            $flag = $filter['flag'];
+            unset($filter['flag']);
+        }
+
+        $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
+
+        if (!$flag || $flag == 'total_and_unique') {
+            $data  = $query->fetchTimeData('page_hits', 'date_hit', $filter);
+            $chart->setDataset('Total visits', $data);
+        }
+        
+        if ($flag == 'unique' || $flag == 'total_and_unique') {
+            $filter['groupBy'] = 'lead_id';
+            $data  = $query->fetchTimeData('page_hits', 'date_hit', $filter);
+            $chart->setDataset('Unique visits', $data);
+            unset($filter['groupBy']);
+        }
+
         return $chart->render();
     }
 

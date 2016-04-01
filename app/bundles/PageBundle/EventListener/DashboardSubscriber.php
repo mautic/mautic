@@ -33,7 +33,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
      * @var string
      */
     protected $types = array(
-        'page.hits.in.time' => array(),
+        'page.hits.in.time' => array(
+            'formAlias' => 'page_dashboard_hits_in_time_widget'
+        ),
         'unique.vs.returning.leads' => array(),
         'dwell.times' => array(),
         'popular.pages' => array(),
@@ -53,12 +55,22 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
+            if (isset($params['flag'])) {
+                $params['filter']['flag'] = $params['flag'];
+            }
+
             if (!$event->isCached()) {
                 $model = $this->factory->getModel('page');
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getHitsLineChartData($params['timeUnit'], $params['dateFrom'], $params['dateTo'], $params['dateFormat'])
+                    'chartData'   => $model->getHitsLineChartData(
+                        $params['timeUnit'],
+                        $params['dateFrom'],
+                        $params['dateTo'],
+                        $params['dateFormat'],
+                        $params['filter']
+                    )
                 ));
             }
 

@@ -25,28 +25,16 @@ class DashboardHitsInTimeWidgetType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('amount', 'integer', array(
-                'label'      => 'mautic.core.number',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control'),
-                'empty_data' => '30'
-            )
-        );
-
-        $builder->add('timeUnit', 'choice', array(
-                'label'   => 'mautic.core.time.unit',
+        $builder->add('flag', 'choice', array(
+                'label'   => 'mautic.page.visit.flag.filter',
                 'choices' => array(
-                    's' => 'mautic.core.time.seconds',
-                    'i' => 'mautic.core.time.minutes',
-                    'H' => 'mautic.core.time.hours',
-                    'd' => 'mautic.core.time.days',
-                    'W' => 'mautic.core.time.weeks',
-                    'm' => 'mautic.core.time.months',
-                    'Y' => 'mautic.core.time.years'
+                    ''                  => 'mautic.page.show.total.visits',
+                    'unique'            => 'mautic.lead.show.unique.visits',
+                    'total_and_unique'  => 'mautic.lead.show.unique.and.total.visits'
                 ),
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
-                'empty_data' => 'd',
+                'empty_data' => '',
                 'required'   => false
             )
         );
