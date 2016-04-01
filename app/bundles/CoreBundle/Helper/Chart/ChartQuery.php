@@ -159,21 +159,20 @@ class ChartQuery extends AbstractChart
     public function applyDateFilters(&$query, $dateColumn)
     {
         if ($dateColumn) {
-
-            // Convert the dates to UTC
-            $this->dateFrom->setTimeZone(new \DateTimeZone('UTC'));
-            $this->dateTo->setTimeZone(new \DateTimeZone('UTC'));
-
             // Apply the start date/time if set
             if ($this->dateFrom) {
+                $dateFrom = clone $this->dateFrom;
+                $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
                 $query->andWhere('t.' . $dateColumn . ' >= :dateFrom');
-                $query->setParameter('dateFrom', $this->dateFrom->format('Y-m-d H:i:s'));
+                $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
             }
 
             // Apply the end date/time if set
             if ($this->dateTo) {
+                $dateTo = clone $this->dateTo;
+                $dateTo->setTimeZone(new \DateTimeZone('UTC'));
                 $query->andWhere('t.' . $dateColumn . ' <= :dateTo');
-                $query->setParameter('dateTo', $this->dateTo->format('Y-m-d H:i:s'));
+                $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
             }
         }
     }
