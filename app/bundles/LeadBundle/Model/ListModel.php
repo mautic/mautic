@@ -320,7 +320,20 @@ class ListModel extends FormModel
                     )
                 ),
                 'operators'  => $operators['bool']
+            ),
+            'hit_url'   => array(
+                'label'      => $this->translator->trans('mautic.page.url'),
+                'properties' => array(
+                    'type'     => 'text'
+                ),
+                'operators'  => array(
+                    'include' => array(
+                        '=',
+	                    'like'
+                    )
+                )
             )
+        		
         );
 
         //get list of custom fields
