@@ -3016,6 +3016,7 @@ var Mautic = {
     renderLineChart: function(canvas) {
         var ctx = canvas[0].getContext("2d");
         var data = mQuery.parseJSON(canvas.text());
+        if (!data.labels.length || !data.datasets.length) return;
         var options = {
             pointDotRadius : 2,
             datasetStrokeWidth : 1,
