@@ -29,6 +29,8 @@ class DashboardLeadsInTimeWidgetType extends AbstractType
                 'label'   => 'mautic.lead.list.filter',
                 'choices' => array(
                     ''                          => 'mautic.lead.show.all',
+                    'identified'                => 'mautic.lead.show.identified',
+                    'anonymous'                 => 'mautic.lead.show.anonymous',
                     'identifiedVsAnonymous'     => 'mautic.lead.show.identified.vs.anonymous',
                     'top'                       => 'mautic.lead.show.top',
                     'topIdentifiedVsAnonymous'  => 'mautic.lead.show.top.leads.identified.vs.anonymous'

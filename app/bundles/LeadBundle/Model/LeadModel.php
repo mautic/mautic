@@ -1279,6 +1279,12 @@ class LeadModel extends FormModel
                     $chart->setDataset($list['name'] . ': Anonymous', $anonymous);
                 }
             }
+        } elseif ($flag == 'identified') {
+            $identified = $query->fetchTimeData('leads', 'date_added', $identifiedFilter);
+            $chart->setDataset('Identified', $identified);
+        } elseif ($flag == 'anonymous') {
+            $anonymous = $query->fetchTimeData('leads', 'date_added', $anonymousFilter);
+            $chart->setDataset('Anonymous', $anonymous);
         } elseif ($flag == 'identifiedVsAnonymous') {
             $identified = $query->fetchTimeData('leads', 'date_added', $identifiedFilter);
             $anonymous = $query->fetchTimeData('leads', 'date_added', $anonymousFilter);
