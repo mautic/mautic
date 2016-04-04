@@ -40,7 +40,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'map.of.leads' => array(),
         'top.lists' => array(),
         'top.creators' => array(),
-        'top.owners' => array()
+        'top.owners' => array(),
+        'created.leads' => array()
     );
 
     /**
@@ -242,6 +243,49 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     ),
                     'bodyItems'   => $items,
                     'raw'         => $creators
+                ));
+            }
+            
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->stopPropagation();
+        }
+
+        if ($event->getType() == 'created.leads') {
+            if (!$event->isCached()) {
+                $model  = $this->factory->getModel('lead');
+                $params = $event->getWidget()->getParams();
+
+                if (empty($params['limit'])) {
+                    // Count the leads limit from the widget height
+                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
+                } else {
+                    $limit = $params['limit'];
+                }
+
+                $leads = $model->getLeadList($limit, $params['dateFrom'], $params['dateTo']);
+                $items = array();
+
+                // Build table rows with links
+                if ($leads) {
+                    foreach ($leads as &$lead) {
+                        $leadUrl = $this->factory->getRouter()->generate('mautic_lead_action', array('objectAction' => 'view', 'objectId' => $lead['id']));
+                        $row = array(
+                            array(
+                                'value' => $lead['name'],
+                                'type' => 'link',
+                                'link' => $leadUrl
+                            )
+                        );
+                        $items[] = $row;
+                    }
+                }
+
+                $event->setTemplateData(array(
+                    'headItems'   => array(
+                        $event->getTranslator()->trans('mautic.dashboard.label.title')
+                    ),
+                    'bodyItems'   => $items,
+                    'raw'         => $leads
                 ));
             }
             
