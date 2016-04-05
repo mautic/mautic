@@ -1310,7 +1310,11 @@ class LeadController extends FormController
                                         } else {
                                             $stats['created']++;
                                         }
-                                    }  
+                                    }     
+                                    else {
+                                        $stats['ignored']++;
+                                        $stats['failures'][$lineNumber] = $this->factory->getTranslator()->trans('mautic.lead.import.error.line_empty');
+                                    }        
                                 } catch (\Exception $e) {
                                     // Email validation likely failed
                                     $stats['ignored']++;
