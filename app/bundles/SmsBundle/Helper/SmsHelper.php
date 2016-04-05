@@ -15,6 +15,8 @@ use libphonenumber\PhoneNumber;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\SmsBundle\Event\SmsSendEvent;
+use Mautic\SmsBundle\SmsEvents;
 
 class SmsHelper
 {
@@ -110,6 +112,12 @@ class SmsHelper
 
         $client = new \Services_Twilio($smsUsername, $smsPassword);
 
-        return $client->account->messages->sendMessage($sendingPhoneNumber, $leadPhoneNumber, $config['sms_message_template']);
+        $dispatcher = $factory->getDispatcher();
+
+        $event = new SmsSendEvent($config['sms_message_template'], $lead);
+
+        $dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $event);
+
+        return $client->account->messages->sendMessage($sendingPhoneNumber, $leadPhoneNumber, $event->getContent());
     }
 }
