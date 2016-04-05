@@ -28,7 +28,7 @@ class DashboardController extends FormController
      */
     public function indexAction()
     {
-        /** @var \Mautic\DashBundle\Model\DashboardModel $model */
+        /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
         $model           = $this->factory->getModel('dashboard');
         $widgets         = $model->getWidgets();
 
