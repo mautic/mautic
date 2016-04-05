@@ -16,6 +16,10 @@ return array(
             'mautic.webpush.configbundle.subscriber' => array(
                 'class' => 'Mautic\WebPushBundle\EventListener\ConfigSubscriber'
             ),
+            'mautic.webpush.pagebundle.subscriber' => array(
+                'class' => 'Mautic\WebPushBundle\EventListener\PageSubscriber',
+                'arguments' => 'mautic.factory'
+            ),
         ),
         'forms' => array(
             'mautic.form.type.webpush' => array(
@@ -50,6 +54,18 @@ return array(
             'mautic_receive_webpush' => array(
                 'path'       => '/webpush/receive',
                 'controller' => 'MauticWebPushBundle:Api\WebPushApi:receive'
+            ),
+            'mautic_onesignal_worker' => array(
+                'path'       => '/OneSignalSDKWorker.js',
+                'controller' => 'MauticWebPushBundle:Js:worker'
+            ),
+            'mautic_onesignal_updater' => array(
+                'path'       => '/OneSignalSDKUpdaterWorker.js',
+                'controller' => 'MauticWebPushBundle:Js:updater'
+            ),
+            'mautic_onesignal_manifest' => array(
+                'path'       => '/manifest.json',
+                'controller' => 'MauticWebPushBundle:Js:manifest'
             )
         )
     ),
