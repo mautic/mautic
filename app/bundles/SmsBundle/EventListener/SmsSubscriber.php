@@ -62,9 +62,7 @@ class SmsSubscriber extends CommonSubscriber
             }
         }
 
-        foreach ($tokens as $search => $replace) {
-            str_ireplace($search, $replace, $content);
-        }
+        $content = str_ireplace(array_keys($tokens), array_values($tokens), $content);
 
         $event->setContent($content);
     }
@@ -90,6 +88,6 @@ class SmsSubscriber extends CommonSubscriber
     {
         $response = $this->http->get('https://api-ssl.bitly.com/v3/shorten?access_token=080e684d77f2d592a2a5a1fc92978fcfe33cc80d&format=txt&longurl=' . urlencode($url));
 
-        return ($response->code === 200) ? $response->body : $url;
+        return ($response->code === 200) ? rtrim($response->body) : $url;
     }
 }
