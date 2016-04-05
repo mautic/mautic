@@ -10,7 +10,7 @@
 namespace Mautic\WebPushBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Class WebPushApiController
@@ -20,17 +20,27 @@ use Symfony\Component\HttpFoundation\Response;
 class WebPushApiController extends CommonApiController
 {
     /**
-     * Receive Web Push webhook
+     * Receive Web Push subscription request
      *
      * @return Response
      */
-    public function receiveAction()
+    public function subscribeAction()
     {
-        /** @var \Mautic\WebPushBundle\Api\OneSignalApi $webpush */
-        $webpush = $this->container->get('mautic.webpush.api');
+        $osid = $this->request->get('osid');
 
-        $response = $webpush->sendNotification('beb0e3a5-5df4-42c8-89a7-d8750543cfe3', 'Works fantastically!');
+        if ($osid) {
+            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+            $leadModel = $this->factory->getModel('lead');
 
-        var_dump($response);die;
+            $currentLead = $leadModel->getCurrentLead();
+
+            $currentLead->addPushIDEntry($osid);
+
+            $leadModel->saveEntity($currentLead);
+
+            return new JsonResponse(array('success' => true), 200, array('Access-Control-Allow-Origin' => '*'));
+        }
+
+        return new JsonResponse;
     }
 }

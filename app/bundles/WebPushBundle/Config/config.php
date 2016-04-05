@@ -55,6 +55,10 @@ return array(
                 'path'       => '/webpush/receive',
                 'controller' => 'MauticWebPushBundle:Api\WebPushApi:receive'
             ),
+            'mautic_subscribe_webpush' => array(
+                'path'       => '/webpush/subscribe',
+                'controller' => 'MauticWebPushBundle:Api\WebPushApi:subscribe'
+            ),
             'mautic_onesignal_worker' => array(
                 'path'       => '/OneSignalSDKWorker.js',
                 'controller' => 'MauticWebPushBundle:Js:worker'
@@ -65,7 +69,7 @@ return array(
             ),
             'mautic_onesignal_manifest' => array(
                 'path'       => '/manifest.json',
-                'controller' => 'MauticWebPushBundle:Js:manifest'
+                'controller' => 'MauticWebPushBundle:Js:manifest',
             )
         )
     ),
