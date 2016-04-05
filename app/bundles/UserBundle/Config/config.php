@@ -91,6 +91,10 @@ return array(
             'mautic_user_passwordreset' => array(
                 'path'       => '/passwordreset',
                 'controller' => 'MauticUserBundle:Public:passwordReset'
+            ),
+            'mautic_user_passwordresetconfirm' => array(
+                'path'       => '/passwordresetconfirm',
+                'controller' => 'MauticUserBundle:Public:passwordResetConfirm'
             )
         )
     ),
@@ -125,6 +129,10 @@ return array(
             'mautic.form.type.passwordreset'  => array(
                 'class' => 'Mautic\UserBundle\Form\Type\PasswordResetType',
                 'alias' => 'passwordreset'
+            ),
+            'mautic.form.type.passwordresetconfirm'  => array(
+                'class' => 'Mautic\UserBundle\Form\Type\PasswordResetConfirmType',
+                'alias' => 'passwordresetconfirm'
             ),
             'mautic.form.type.user_list'      => array(
                 'class'     => 'Mautic\UserBundle\Form\Type\UserListType',
