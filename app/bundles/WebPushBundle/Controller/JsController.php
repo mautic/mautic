@@ -26,7 +26,7 @@ class JsController extends CommonController
     {
         $data = array(
             'start_url' => '/',
-            'gcm_sender_id' => 446150739532,
+            'gcm_sender_id' => '446150739532',
             'gcm_user_visible_only' => true
         );
 

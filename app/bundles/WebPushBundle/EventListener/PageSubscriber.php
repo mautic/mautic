@@ -49,7 +49,7 @@ class PageSubscriber extends CommonSubscriber
         $assetsHelper->addScript($router->generate('mautic_webpush_embed'), 'onPageDisplay_headClose', true);
         $assetsHelper->addScript('https://cdn.onesignal.com/sdks/OneSignalSDK.js', 'onPageDisplay_headClose');
 
-        $manifestUrl = $router->generate('mautic_onesignal_manifest', null, UrlGeneratorInterface::ABSOLUTE_URL);
+        $manifestUrl = $router->generate('mautic_onesignal_manifest');
         $assetsHelper->addCustomDeclaration('<link rel="manifest" href="' . $manifestUrl . '" />', 'onPageDisplay_headClose');
 
         $oneSignalInit = <<<JS

@@ -307,50 +307,12 @@
             background-color: #eaeaea;
         }
 
-        #mobile-footer-message {
-            text-align: center;
-            color: #aaa;
-            position: relative;
-            bottom: 5px;
-            font-size: 11px;
-            margin-bottom: 5px;
-            margin-top: 10px;
-        }
-
         a:not(.default-link) {
             color: inherit;
             text-decoration: none;
         }
 
         #intercom-container {
-            display: none;
-        }
-
-        #error-box {
-            display: none;
-            width: 80%;
-            left: 10%;
-            top: 60%;
-            z-index: 20;
-            position: absolute;
-            background-color: white;
-            border: 1px solid #aaa;
-            -webkit-border-radius: 5px;
-            -moz-border-radius: 5px;
-            border-radius: 5px;
-            -webkit-box-shadow: 0px 9px 20px -15px rgba(0, 0, 0, 0.85);
-            -moz-box-shadow: 0px 9px 20px -15px rgba(0, 0, 0, 0.85);
-            box-shadow: 0px 9px 20px -15px rgba(0, 0, 0, 0.85);
-        }
-
-        #error-message-padding {
-            padding-top: 0px;
-            padding-right: 15px;
-            padding-bottom: 0px;
-            padding-left: 15px;
-        }
-
-        .error {
             display: none;
         }
 
@@ -385,11 +347,6 @@
     <div id="mobile-top-section">
         <div id="mobile-top-section-wrapper">
             <div id="mobile-top-section-content">
-
-                <div style="height: 25px;">
-                    <a href="#" onclick="rejectPrompt()" class="btn-close default-link">x</a>
-                </div>
-
                 <div class="title domainName">This website</div>
                 <p id="mobile-directions">wants to show notifications:</p>
 
@@ -400,7 +357,7 @@
 
                     <p id="mobile-notification-message" class="truncatable short desktop message">Notifications will appear on your device</p>
 
-                    <p id="mobile-notification-url" class="truncatable short desktop message">dbhurley.onesignal.com</p>
+                    <p id="mobile-notification-url" class="truncatable short desktop message">dbhurley.mautic.com</p>
                 </div>
 
                 <div id="desktop-notification">
@@ -412,188 +369,12 @@
 
                     <p id="desktop-notification-message" class="truncatable mobile message">Notifications will appear on your desktop</p>
 
-                    <p id="desktop-notification-url" class="truncatable mobile message">dbhurley.onesignal.com</p>
+                    <p id="desktop-notification-url" class="truncatable mobile message">dbhurley.mautic.com</p>
                 </div>
 
                 <p id="mobile-opt-out" class="truncatable opt-out message">(you can unsubscribe anytime)</p>
             </div>
         </div>
     </div>
-
-
-    <footer id="mobile-footer">
-        <hr>
-        <div id="mobile-button-container">
-            <div class="mobile-button-wrapper">
-                <button class="truncatable mobile-button" onclick="rejectPrompt()" id="close-button">NO THANKS</button>
-            </div>
-            <div class="mobile-button-wrapper">
-                <button class="truncatable mobile-button" onclick="continuePressed()" id="show-prompt-button">CONTINUE</button>
-            </div>
-        </div>
-    </footer>
-
 </div>
-
-
-<div id="error-box">
-    <div id="error-message-padding">
-
-        <!-- if on ios -->
-        <div class="error" id="ios">
-            <p> Web Push Notifications are not supported by iOS. </p>
-        </div>
-
-        <!-- if not on chrome (Desktop) -->
-        <div class="error" id="not-chrome-desktop">
-            <p> Web Push Notifications are not supported by your browser. Please install
-                <a class="default-link" href="https://www.google.com/chrome/browser/desktop" target="_blank">Chrome</a> to get
-                notifications. </p>
-        </div>
-
-        <!-- if not on chrome (Android) -->
-        <div class="error" id="not-chrome-Android">
-            <p> Please install Chrome web browser to get notifications. </p>
-
-            <p><a class="default-link" href="https://play.google.com/store/apps/details?id=com.android.chrome">Tap here</a> to
-                download from the Google Play Store.</p>
-        </div>
-
-        <!-- not have latest version of chrome (desktop) -->
-        <div class="error" id="outdated-chrome-desktop">
-            <p> Please update your Chrome web browser to get notifications. </p>
-        </div>
-
-        <!-- not have latest version of chrome (mobile) -->
-        <div class="error" id="outdated-chrome-mobile">
-            <p> Please update your Chrome web browser to get notifications. </p>
-
-            <p><a class="default-link" href="https://play.google.com/store/apps/details?id=com.android.chrome">Tap here</a> to
-                download from the Google Play Store.</p>
-        </div>
-
-        <!-- if notifications are disabled (desktop)-->
-        <div class="error" id="disabled-notifications-desktop">
-            <p> Notifications are currently disabled.</p>
-
-            <p>Please re-enable them by clicking on the lock icon in the top left of this window. </p>
-        </div>
-
-        <!-- if notifications are disabled (mobile) -->
-        <div class="error" id="disabled-notifications-mobile">
-            <p> Notifications are currently disabled.</p>
-
-            <p>Please re-enable them by tapping on the lock icon on the top left. </p>
-        </div>
-
-        <!-- if notifications are already enabled -->
-        <div class="error" id="notifications-already-enabled">
-            <p> Notifications are already enabled, you may close this window. </p>
-
-            <p style="font-size: 12px">If you would like to unsubscribe from all notifications from
-                <span class="domainName">This website</span> click on the lock icon to the left of the address. </p>
-        </div>
-
-    </div>
-</div>
-
-<script>
-    document.getElementById("desktop-notification-url").innerHTML = notificationDomain;
-    document.getElementById("mobile-notification-url").innerHTML = notificationDomain;
-
-    /* returns true if device is mobile or tablet */
-    function detectmob() {
-        return navigator.userAgent.match(/Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone/i) != null;
-    }
-
-    /* show mobile example notification on mobile, desktop notification on desktop */
-    if (detectmob()) {
-        document.getElementById("desktop-notification").style.display = 'none';
-    } else {
-        document.getElementById("mobile-notification").style.display = "none";
-    }
-
-    /* ERROR MESSAGES */
-
-    /* instantiate parser */
-    var parser = new UAParser();
-
-    // get the UA string result
-    var result = parser.getResult();
-
-    // get user agent info
-    var browser = result.browser.name;
-    var browser_version = result.browser.version;
-    var os = result.os.name;
-    var engine = result.engine.name;
-
-    if (OneSignal.isPushNotificationsSupported());
-    else if (os == "iOS")
-        showError("ios");
-    else if (browser != "Chrome") {
-        if (os == "Android")
-            showError("not-chrome-Android");
-        else
-            showError("not-chrome-desktop");
-    } // TODO: Show generic error if SDK reports push notifications not supported.
-    else { // They are on Chrome
-        if (parseInt(browser_version.substring(0, 2)) < 42) // Check Chrome version
-            showError(detectmob() ? "outdated-chrome-mobile" : "outdated-chrome-desktop");
-        else if (isHttpsPrompt) {
-            if (!isPushEnabled) {
-                if (isPermissionBlocked)
-                    showError(detectmob() ? "disabled-notifications-mobile" : "disabled-notifications-desktop");
-            } else
-                showError("notifications-already-enabled");
-        } else { // HTTP
-            if (Notification.permission == "denied") // Check if the Notification permission is disabled.
-                showError(detectmob() ? "disabled-notifications-mobile" : "disabled-notifications-desktop");
-            else if (Notification.permission == "granted") {
-                navigator.serviceWorker.ready.then(function (event) {
-                    if (event) {
-                        OneSignal.getIdsAvailable(function (ids) {
-                            if (ids.registrationId != null) {
-                                OneSignal._getSubscription(function (isSet) {
-                                    if (isSet)
-                                        showError("notifications-already-enabled");
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-        }
-    }
-
-    if (!isHttpsPrompt) {
-        if (Notification.permission == "denied") // Check if the Notification permission is disabled.
-            showError(detectmob() ? "disabled-notifications-mobile" : "disabled-notifications-desktop");
-        else if (Notification.permission == "granted") {
-            OneSignal._initOptions = {};
-            (OneSignal.isPushNotificationsEnabled(function (enabled) {
-                if (enabled) {
-                    showError("notifications-already-enabled");
-                }
-            }));
-        }
-    } else {
-        if (isPermissionBlocked) // Check if the Notification permission is disabled.
-            showError(detectmob() ? "disabled-notifications-mobile" : "disabled-notifications-desktop");
-        else if (isPushEnabled) {
-            showError("notifications-already-enabled");
-        }
-    }
-
-    function showError(error) {
-        // put a white overlay over all existing content
-        // this also disables all functionality
-        document.getElementById("white-wrapper").style.zIndex = "10";
-        document.getElementById("white-wrapper").style.opacity = ".75";
-        document.getElementById("error-box").style.opacity = "1";
-        document.getElementById("error-box").style.display = "block";
-        document.getElementById(error).style.display = "block";
-    }
-</script>
-
-
 </body></html>
