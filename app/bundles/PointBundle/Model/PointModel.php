@@ -149,12 +149,15 @@ class PointModel extends CommonFormModel
      */
     public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null)
     {
-        //only trigger actions for anonymous users
-        if (!$this->security->isAnonymous()) {
-            return;
-        }
-
-        if ($typeId !== null && $this->factory->getEnvironment() == 'prod') {
+    	
+    	if($type != "api.call") {
+        	//only trigger actions for anonymous users
+    		if (!$this->security->isAnonymous()) {
+    			return;
+    		}
+    	}
+    	
+        if ($typeId !== null && $this->factory->getEnvironment() == 'prod') { 	
             //let's prevent some unnecessary DB calls
             $session = $this->factory->getSession();
             $triggeredEvents = $session->get('mautic.triggered.point.actions', array());
@@ -177,11 +180,10 @@ class PointModel extends CommonFormModel
             $lead = $leadModel->getCurrentLead();
 
             if (null === $lead || !$lead->getId()) {
-
                 return;
             }
         }
-
+        
         //get available actions
         $availableActions = $this->getPointActions();
 
@@ -234,9 +236,9 @@ class PointModel extends CommonFormModel
                     } else {
                         $pass[] = null;
                     }
-                }
+                }        
                 $pointsChange = $reflection->invokeArgs($this, $pass);
-
+                
                 if ($pointsChange) {
                     $delta = $action->getDelta();
                     $lead->addToPoints($delta);
@@ -259,7 +261,7 @@ class PointModel extends CommonFormModel
                 }
             }
         }
-
+        
         if (!empty($persist)) {
             $leadModel->saveEntity($lead);
             $this->getRepository()->saveEntities($persist);

@@ -104,7 +104,10 @@ return array(
             ),
             'mautic.api.search.subscriber'       => array(
                 'class' => 'Mautic\ApiBundle\EventListener\SearchSubscriber'
-            )
+            ),
+        	'mautic.api.pointbundle.subscriber' => array(
+        		'class' => 'Mautic\ApiBundle\EventListener\PointSubscriber'
+        	)
         ),
         'forms'  => array(
             'mautic.form.type.apiclients' => array(
@@ -115,7 +118,11 @@ return array(
             'mautic.form.type.apiconfig'  => array(
                 'class' => 'Mautic\ApiBundle\Form\Type\ConfigType',
                 'alias' => 'apiconfig'
-            )
+            ),
+        	'mautic.form.type.pointaction_apicall'    => array(
+        			'class' => 'Mautic\ApiBundle\Form\Type\PointActionApiCallType',
+        			'alias' => 'pointaction_apicall'
+        	)
         ),
         'other'  => array(
             'mautic.api.oauth.event_listener'                         => array(

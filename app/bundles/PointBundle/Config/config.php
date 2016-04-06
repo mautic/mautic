@@ -40,6 +40,11 @@ return array(
                 'path'       => '/points/{id}',
                 'controller' => 'MauticPointBundle:Api\PointApi:getEntity'
             ),
+        	'mautic_api_applyrule'    => array(
+        			'path'       => '/points/{id}/lead/{leadId}',
+        			'controller' => 'MauticPointBundle:Api\PointApi:applyRule',
+        			'method'     => 'PATCH'
+        	),
             'mautic_api_gettriggers' => array(
                 'path'       => '/points/triggers',
                 'controller' => 'MauticPointBundle:Api\TriggerApi:getEntities'
