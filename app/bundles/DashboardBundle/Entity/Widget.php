@@ -33,11 +33,6 @@ class Widget extends FormEntity
     private $name;
 
     /**
-     * @var string
-     */
-    private $description;
-
-    /**
      * @var integer
      */
     private $width;
@@ -109,7 +104,7 @@ class Widget extends FormEntity
         $builder->setTable('widgets')
             ->setCustomRepositoryClass('Mautic\DashboardBundle\Entity\WidgetRepository');
 
-        $builder->addIdColumns();
+        $builder->addIdColumns('name', false);
 
         $builder->addField('type', 'string');
         $builder->addField('width', 'integer');
@@ -137,19 +132,6 @@ class Widget extends FormEntity
         $metadata->addPropertyConstraint('type', new NotBlank(array(
             'message' => 'mautic.core.type.required'
         )));
-    }
-
-    /**
-     * Set id
-     *
-     * @param integer $id
-     */
-    public function setId($id)
-    {
-        $this->isChanged('id', $id);
-        $this->id = $id;
-
-        return $this;
     }
 
     /**
