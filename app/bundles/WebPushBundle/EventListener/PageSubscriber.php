@@ -12,6 +12,7 @@ namespace Mautic\WebPushBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Class PageSubscriber
@@ -48,7 +49,7 @@ class PageSubscriber extends CommonSubscriber
         $assetsHelper->addScript($router->generate('mautic_webpush_embed'), 'onPageDisplay_headClose', true);
         $assetsHelper->addScript('https://cdn.onesignal.com/sdks/OneSignalSDK.js', 'onPageDisplay_headClose');
 
-        $manifestUrl = $router->generate('mautic_onesignal_manifest');
+        $manifestUrl = $router->generate('mautic_onesignal_manifest', null, UrlGeneratorInterface::ABSOLUTE_URL);
         $assetsHelper->addCustomDeclaration('<link rel="manifest" src="' . $manifestUrl . '" />', 'onPageDisplay_headClose');
 
         $oneSignalInit = <<<JS
