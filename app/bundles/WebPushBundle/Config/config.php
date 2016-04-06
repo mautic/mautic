@@ -59,6 +59,16 @@ return array(
                 'path'       => '/webpush/subscribe',
                 'controller' => 'MauticWebPushBundle:Api\WebPushApi:subscribe'
             ),
+            'mautic_webpush_popup' => array(
+                'path'       => '/webpush/popup',
+                'controller' => 'MauticWebPushBundle:Popup:index'
+            ),
+
+            // JS / Manifest URL's
+            'mautic_webpush_embed' => array(
+                'path'       => '/webpush.js',
+                'controller' => 'MauticWebPushBundle:Js:embed'
+            ),
             'mautic_onesignal_worker' => array(
                 'path'       => '/OneSignalSDKWorker.js',
                 'controller' => 'MauticWebPushBundle:Js:worker'

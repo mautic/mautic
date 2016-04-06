@@ -318,7 +318,7 @@ class AssetsHelper extends CoreAssetsHelper
         if (isset($this->assets['scripts'][$location])) {
             foreach (array_reverse($this->assets['scripts'][$location]) as $s) {
                 list($script, $async) = $s;
-                echo '<script src="'.$this->getUrl($script).'" ' . ($async ? ' async' : '') . '></script>'."\n";
+                echo '<script src="'.$this->getUrl($script).'"' . ($async ? ' async' : '') . '></script>'."\n";
             }
         }
 

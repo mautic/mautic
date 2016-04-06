@@ -45,7 +45,8 @@ class PageSubscriber extends CommonSubscriber
         /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
         $assetsHelper = $this->factory->getHelper('template.assets');
 
-        $assetsHelper->addScript('https://cdn.onesignal.com/sdks/OneSignalSDK.js', 'onPageDisplay_headClose', true);
+        $assetsHelper->addScript($router->generate('mautic_webpush_embed'), 'onPageDisplay_headClose', true);
+        $assetsHelper->addScript('https://cdn.onesignal.com/sdks/OneSignalSDK.js', 'onPageDisplay_headClose');
 
         $manifestUrl = $router->generate('mautic_onesignal_manifest');
         $assetsHelper->addCustomDeclaration('<link rel="manifest" src="' . $manifestUrl . '" />', 'onPageDisplay_headClose');
@@ -57,9 +58,9 @@ class PageSubscriber extends CommonSubscriber
         appId: "{$appId}",
         safari_web_id: 'web.onesignal.auto.31ba082c-c81b-42a5-be17-ec59d526e60e',
         autoRegister: true,
-        subdomainName: 'dev-mautic',
+        subdomainName: 'dbhurley',
         notifyButton: {
-            enable: true // Set to false to hide
+            enable: false // Set to false to hide
         }
     }]);
 JS;
