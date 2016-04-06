@@ -92,7 +92,7 @@ class JsController extends CommonController
 var MauticWebPush = MauticWebPush || [];
 
 MauticWebPush.popup = function () {
-        var subscribeUrl = '{$subscribeUrl}';
+        var subscribeUrl = '{$subscribeUrl}?session=' + OneSignal._sessionNonce;
         var subscribeTitle = '{$subscribeTitle}';
         var w = {$width};
         var h = {$height};

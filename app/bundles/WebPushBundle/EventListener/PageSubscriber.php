@@ -58,7 +58,6 @@ class PageSubscriber extends CommonSubscriber
         appId: "{$appId}",
         safari_web_id: 'web.onesignal.auto.31ba082c-c81b-42a5-be17-ec59d526e60e',
         autoRegister: true,
-        subdomainName: 'dbhurley',
         notifyButton: {
             enable: false // Set to false to hide
         }

@@ -37,6 +37,8 @@ class PopupController extends CommonController
 
     protected function getJsEmbed()
     {
+        $appId = $this->factory->getParameter('webpush_app_id', 'ab44aea7-ebe8-4bf4-bb7c-aa47e22d0364');
+
         return <<<JS
         var entityMap = {
             "&": "&amp;",
@@ -86,8 +88,7 @@ class PopupController extends CommonController
             } else {
                 setTimeout(function () {
                     OneSignal._initHttp({
-                        appId: "ab44aea7-ebe8-4bf4-bb7c-aa47e22d0364",
-                        subdomainName: "dbhurley",
+                        appId: "{$appId}",
                         origin: "*",
                         continuePressed: true
                     });
@@ -121,8 +122,7 @@ class PopupController extends CommonController
 
         if (Number(OneSignal._VERSION) > SDK_VERSION_POSTMAM) {
             OneSignal._initHttp.apply(this.window, [{
-                appId: "ab44aea7-ebe8-4bf4-bb7c-aa47e22d0364",
-                subdomainName: "dbhurley",
+                appId: "{$appId}",
                 origin: "*",
                 isPopup: isPopup,
                 isModal: isModal

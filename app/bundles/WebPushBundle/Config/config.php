@@ -60,7 +60,7 @@ return array(
                 'controller' => 'MauticWebPushBundle:Api\WebPushApi:subscribe'
             ),
             'mautic_webpush_popup' => array(
-                'path'       => '/webpush/popup',
+                'path'       => '/webpush',
                 'controller' => 'MauticWebPushBundle:Popup:index'
             ),
 
