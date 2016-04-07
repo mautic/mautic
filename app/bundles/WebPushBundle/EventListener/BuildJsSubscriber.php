@@ -43,6 +43,8 @@ class BuildJsSubscriber extends CommonSubscriber
         $height = 450;
 
         $js = <<<JS
+var MauticJS = MauticJS || [];
+
 MauticJS.webPush = {
     init: function () {
         var subscribeButton = document.getElementById('mautic-webpush-subscribe');
