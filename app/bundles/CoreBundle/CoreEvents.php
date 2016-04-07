@@ -67,4 +67,13 @@ final class CoreEvents
      * @var string
      */
     const BUILD_CANVAS_CONTENT = 'mautic.build_canvas_content';
+
+    /**
+     * The mautic.build_embeddable_js event is dispatched to allow plugins to extend the mautic tracking js
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\BuildJsEvent instance.
+     *
+     * @var string
+     */
+    const BUILD_MAUTIC_JS = 'mautic.build_embeddable_js';
 }
