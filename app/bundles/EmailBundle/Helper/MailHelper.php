@@ -839,16 +839,16 @@ class MailHelper
     public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false, $ignoreEmbedImageConversion = false)
     {
         if (!$ignoreEmbedImageConversion) {
-          $matches = array();
-          if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
-            $replaces = array();
-            foreach($matches[1] AS $match) {
-              if (strpos($match, 'cid:') === false) {
-                $replaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
-              }
+            $matches = array();
+            if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
+                $replaces = array();
+                foreach($matches[1] AS $match) {
+                    if (strpos($match, 'cid:') === false) {
+                        $replaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
+                    }
+                }
+                $content = strtr($content, $replaces);
             }
-            $content = strtr($content, $replaces);
-          }
         }
 
         if (!$ignoreTrackingPixel) {
