@@ -1582,7 +1582,7 @@ class LeadController extends FormController
 
 
     public function exportCurrentListAction(){
-
+    	$formatter = $this->factory->getHelper('template.formatter');
     	$date      = $this->factory->getDate()->toLocalString();
     	$name      = str_replace(' ', '_', $date) . '_' . InputHelper::alphanum('export_lead', false, '-');
 
@@ -1626,28 +1626,31 @@ class LeadController extends FormController
         }
         $leads = $model->getEntities(
             array(
+            	'start'          => 0,
+            	'limit'          => 2000,
                 'filter'         => $filter,
                 'orderBy'        => $orderBy,
                 'orderByDir'     => $orderByDir,
                 'withTotalCount' => false
             )
         );
-    	$response = new StreamedResponse(function () use ($leads) {
+    	$response = new StreamedResponse(function () use ($leads, $formatter) {
     		$handle = fopen('php://output', 'r+');
     		$header = array('lead_id', 'lead_name', 'lead_email', 'lead_company', 'lead_phone', 'lead_website', 'lead_location', 'lead_point', 'lead_lastActive');
     		fputcsv($handle, $header);
 
+    		//build the data rows
     		foreach ($leads as &$lead) {
     			$row = array();
     			$row[] = $lead->getId();
-    			$row[] = $lead->getName();
-    			$row[] = $lead->getEmail();
-    			$row[] = $lead->getCompany();
-    			$row[] = $lead->getFieldValue('phone');
-    			$row[] = $lead->getFieldValue('website');
-    			$row[] = $lead->getLocation();
-    			$row[] = $lead->getPoints();
-    			$row[] = $lead->getLastActive()->format(\DateTime::ISO8601);
+    			$row[] = $formatter->_($lead->getName(), 'string', true);
+    			$row[] = $formatter->_($lead->getEmail(), 'email', true);
+    			$row[] = $formatter->_($lead->getCompany(), 'string', true);
+    			$row[] = $formatter->_($lead->getFieldValue('phone'), 'string', true);
+    			$row[] = $formatter->_($lead->getFieldValue('website'), 'url', true);
+    			$row[] = $formatter->_($lead->getLocation(), 'string', true);
+    			$row[] = $formatter->_($lead->getPoints(), 'int', true);
+    			$row[] = $formatter->_($lead->getLastActive(), 'datetime', true);
 
     			fputcsv($handle, $row);
     		}
