@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Class LeadApiController
@@ -320,6 +321,8 @@ class LeadApiController extends CommonApiController
     	
     	// sauv bdd
     	$this->model->saveEntity($lead, false);
+    	
+    	return new JsonResponse(array("success" => true));
     }
     
     /**
@@ -353,6 +356,8 @@ class LeadApiController extends CommonApiController
     	
     	// sauv bdd
     	$this->model->saveEntity($lead, false);
+    	
+    	return new JsonResponse(array("success" => true));
     }
     
     /**
@@ -386,6 +391,8 @@ class LeadApiController extends CommonApiController
     
     	// sauv bdd
     	$this->model->saveEntity($lead, false);
+    	
+    	return new JsonResponse(array("success" => true));
     }
     
     /**
