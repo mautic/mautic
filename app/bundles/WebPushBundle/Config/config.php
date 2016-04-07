@@ -20,6 +20,9 @@ return array(
                 'class' => 'Mautic\WebPushBundle\EventListener\PageSubscriber',
                 'arguments' => 'mautic.factory'
             ),
+            'mautic.core.js.subscriber'           => array(
+                'class' => 'Mautic\WebPushBundle\EventListener\BuildJsSubscriber'
+            )
         ),
         'forms' => array(
             'mautic.form.type.webpush' => array(
@@ -65,10 +68,6 @@ return array(
             ),
 
             // JS / Manifest URL's
-            'mautic_webpush_embed' => array(
-                'path'       => '/webpush.js',
-                'controller' => 'MauticWebPushBundle:Js:embed'
-            ),
             'mautic_onesignal_worker' => array(
                 'path'       => '/OneSignalSDKWorker.js',
                 'controller' => 'MauticWebPushBundle:Js:worker'
