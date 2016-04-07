@@ -35,8 +35,12 @@ class BuildJsSubscriber extends CommonSubscriber
      */
     public function onBuildJs(BuildJsEvent $event)
     {
-        $trackingUrl = $this->factory->getRouter()->generate('mautic_page_tracker', [], UrlGeneratorInterface::ABSOLUTE_URL);
-        $trackingUrl = str_replace(array('http://', 'https://'), '', $trackingUrl);
+        $router = $this->factory->getRouter();
+        $trackingUrl = str_replace(
+            array('http://', 'https://'),
+            '',
+            $router->generate('mautic_page_tracker', [], UrlGeneratorInterface::ABSOLUTE_URL)
+        );
 
         $js = <<<JS
 (function(w, l){
@@ -48,6 +52,6 @@ class BuildJsSubscriber extends CommonSubscriber
 })(window, location);
 JS;
 
-        $event->appendJs('Mautic Tracking Pixel', $js);
+        $event->appendJs($js, 'Mautic Tracking Pixel');
     }
 }

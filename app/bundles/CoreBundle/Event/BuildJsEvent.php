@@ -21,14 +21,20 @@ class BuildJsEvent extends Event
     /**
      * @var string
      */
-    protected $js;
+    protected $js = '';
 
     /**
-     * @param string $js
+     * @var bool
      */
-    public function __construct($js = '')
+    protected $debugMode;
+
+    /**
+     * @param bool $debugMode
+     */
+    public function __construct($js, $debugMode = false)
     {
         $this->js = $js;
+        $this->debugMode = $debugMode;
     }
 
     /**
@@ -36,31 +42,42 @@ class BuildJsEvent extends Event
      */
     public function getJs()
     {
-        return $this->js;
+        return $this->debugMode ? $this->js : \JSMin::minify($this->js);
     }
 
     /**
-     * @param string $section
+     * Append JS
+     *
      * @param string $js
+     * @param string $section The section name. Shows when in debug mode.
+     *
+     * @return $this
      */
-    public function appendJs($section, $js)
+    public function appendJs($js, $section = '')
     {
-        $slashes = str_repeat('/', strlen($section) + 10);
-        $this->js .= "\n\n";
-        $this->js .= <<<JS
+        if ($section && $this->debugMode) {
+            $slashes = str_repeat('/', strlen($section) + 10);
+            $this->js .= <<<JS
+\n
 {$slashes}
 // {$section} Start
 {$slashes}
 \n
 JS;
+        }
+
         $this->js .= $js;
-        $this->js .= <<<JS
+
+        if ($section && $this->debugMode) {
+            $this->js .= <<<JS
 \n
 {$slashes}
 // {$section} End
 {$slashes}
 \n
 JS;
+        }
 
+        return $this;
     }
 }

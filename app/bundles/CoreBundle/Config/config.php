@@ -32,7 +32,7 @@ return array(
         ),
         'public' => array(
             'mautic_js'                    => array(
-                'path'       => '/mautic.js',
+                'path'       => '/mtc.js',
                 'controller' => 'MauticCoreBundle:Js:index'
             ),
             'mautic_base_index'            => array(

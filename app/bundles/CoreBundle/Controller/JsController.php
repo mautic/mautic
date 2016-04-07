@@ -24,7 +24,8 @@ class JsController extends CommonController
     public function indexAction()
     {
         $dispatcher = $this->factory->getDispatcher();
-        $event = new BuildJsEvent($this->getJsHeader());
+        $debug = $this->factory->getKernel()->isDebug();
+        $event = new BuildJsEvent($this->getJsHeader(), $debug);
 
         if ($dispatcher->hasListeners(CoreEvents::BUILD_MAUTIC_JS)) {
             $dispatcher->dispatch(CoreEvents::BUILD_MAUTIC_JS, $event);
@@ -50,6 +51,7 @@ class JsController extends CommonController
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 JS;
     }
 }
