@@ -86,7 +86,7 @@ MauticJS.webPush = {
     }
 };
 
-MauticJS.webPush.ready('MauticWebPush.init');
+MauticJS.webPush.ready('MauticJS.webPush.init');
 JS;
 
         $event->appendJs($js, 'Mautic WebPush JS');
