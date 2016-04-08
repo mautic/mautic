@@ -475,7 +475,7 @@ class LeadListRepository extends CommonRepository
         $options   = $this->getFilterExpressionFunctions();
         $groups    = array();
         $groupExpr = $q->expr()->andX();
-
+#print_r($filters); die();
         foreach ($filters as $k => $details) {
             $column = isset($leadTable[$details['field']]) ? $leadTable[$details['field']] : false;
 
@@ -529,7 +529,7 @@ class LeadListRepository extends CommonRepository
             $parameter        = $this->generateRandomParameterName();
             $exprParameter    = ":$parameter";
             $ignoreAutoFilter = false;
-
+            
             // Special handling of relative date strings
             if ($details['type'] == 'datetime' || $details['type'] == 'date') {
                 $relativeDateStrings = $this->getRelativeDateStrings();
@@ -678,6 +678,16 @@ class LeadListRepository extends CommonRepository
                             break;
                     }
 
+                    // check does this match php date params pattern?
+                    if(stristr($string[0], '-') or stristr($string[0], '+')){
+                        $date = new \DateTime('now');
+                        $date->modify($string);
+                        $dateTime = $date->format('Y-m-d H:i:s');
+                        $dtHelper->setDateTime($dateTime, null);
+                        $key = $string;
+                        $isRelative = true;
+                    }
+                    
                     if ($isRelative) {
                         if ($requiresBetween) {
                             $startWith = ($isTimestamp) ? $dtHelper->toUtcString('Y-m-d H:i:s') : $dtHelper->toUtcString('Y-m-d');
@@ -1112,7 +1122,6 @@ class LeadListRepository extends CommonRepository
         foreach ($keys as $key) {
             $strings[$key] = $this->translator->trans($key);
         }
-
         return $strings;
     }
 
