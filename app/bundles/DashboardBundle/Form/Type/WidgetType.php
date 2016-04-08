@@ -135,7 +135,9 @@ class WidgetType extends AbstractType
             
         };
 
-        $builder->add('id', 'hidden');
+        $builder->add('id', 'hidden', array(
+            'mapped' => false
+        ));
 
         $builder->add('buttons', 'form_buttons', array(
             'apply_text' => false,
