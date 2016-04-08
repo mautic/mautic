@@ -45,13 +45,17 @@ Mautic.initWidgetSorting = function () {
         placeholder: 'sortable-placeholder',
         items: '.widget',
         opacity: 0.9,
-        forceHelperSize: true,
+        scroll: false,
+        scrollSensitivity: 5,
+        scrollSpeed: 5,
+        tolerance: "pointer",
+        cursor: 'move',
+        cursorAt: { left: 0, top: 0 },
+        forcePlaceholderSize: true,
+        appendTo: 'body',
+        helper: 'clone',
         stop: function() {
             Mautic.saveWidgetSorting();
-        },
-        start: function( event, ui ) {
-            // Adjust placeholder's size according to dragging element size
-            ui.placeholder.css(ui.item.children().css(['width', 'height']));
         }
     }).disableSelection();
 }
