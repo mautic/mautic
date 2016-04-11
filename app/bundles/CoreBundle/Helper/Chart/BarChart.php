@@ -112,7 +112,7 @@ class BarChart extends AbstractChart implements ChartInterface
 
         $date    = clone $this->dateTo;
         $oneUnit = $this->getUnitObject($this->unit);
-        $format  = isset($this->dateFormat) ? $this->dateFormat : $this->labelFormats[$this->unit];
+        $format  = !empty($this->dateFormat) ? $this->dateFormat : $this->labelFormats[$this->unit];
 
         for ($i = 0; $i < $amount; $i++) {
             $this->labels[] = $date->format($format);
