@@ -40,6 +40,11 @@ return array(
             'mautic.form.type.social.linkedin'        => array(
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\LinkedInType',
                 'alias' => 'socialmedia_linkedin'
+            ),
+            'mautic.form.type.social.linkedinlogin'   => array(
+                'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\LinkedInLoginType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'sociallogin_linkedin'
             )
         ),
 
