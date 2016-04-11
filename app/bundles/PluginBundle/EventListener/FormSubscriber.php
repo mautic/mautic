@@ -60,5 +60,13 @@ class FormSubscriber extends CommonSubscriber
         );
 
         $event->addFormField('plugin.loginGooglePlus', $action);
+
+        $action = array(
+            'label'    => 'mautic.plugin.actions.linkedInLogin',
+            'formType' => 'sociallogin_linkedin',
+            'template' => 'MauticSocialBundle:Integration\LinkedIn:login.html.php',
+        );
+
+        $event->addFormField('plugin.loginLinkedIn', $action);
     }
 }

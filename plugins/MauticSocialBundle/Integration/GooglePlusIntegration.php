@@ -95,12 +95,14 @@ class GooglePlusIntegration extends SocialIntegration
                     $image                = preg_replace('/\?.*/', '', $image);
                     $info["profileImage"] = $image;
                 }
+                if(!empty($info)){
+                    $socialCache[$this->getName()]['profile']     = $info;
+                    $socialCache[$this->getName()]['lastRefresh'] = new \DateTime();
+                    $socialCache[$this->getName()]['accessToken'] = $identifier['access_token'];
 
-                $socialCache[$this->getName()]['profile']     = $info;
-                $socialCache[$this->getName()]['lastRefresh'] = new \DateTime();
-                $socialCache[$this->getName()]['accessToken'] = $identifier['access_token'];
+                    $this->getMauticLead($info, true, $socialCache);
+                }
 
-                $this->getMauticLead($info, true, $socialCache);
                 return $data;
 
                 $this->preventDoubleCall = false;
@@ -117,7 +119,7 @@ class GooglePlusIntegration extends SocialIntegration
             $data = $this->makeRequest($this->getApiUrl("people/$id/activities/public"), array('maxResults' => 10));
 
             if (!empty($data) && isset($data->items) && count($data->items)) {
-                $socialCache['activity'] = array(
+                $socialCache[$this->getName()]['activity'] = array(
                     'posts'  => array(),
                     'photos' => array(),
                     'tags'   => array()
@@ -129,7 +131,7 @@ class GooglePlusIntegration extends SocialIntegration
                         'published' => $page->published,
                         'updated'   => $page->updated
                     );
-                    $socialCache['activity']['posts'][] = $post;
+                    $socialCache[$this->getName()]['activity']['posts'][] = $post;
 
                     //extract hashtags from content
                     if (isset($page->object->content)) {
@@ -140,10 +142,10 @@ class GooglePlusIntegration extends SocialIntegration
                         );
                         if (!empty($tags[2])) {
                             foreach ($tags[2] as $k => $tag) {
-                                if (isset($socialCache['activity']['tags'][$tag])) {
-                                    $socialCache['activity']['tags'][$tag]['count']++;
+                                if (isset($socialCache[$this->getName()]['activity']['tags'][$tag])) {
+                                    $socialCache[$this->getName()]['activity']['tags'][$tag]['count']++;
                                 } else {
-                                    $socialCache['activity']['tags'][$tag] = array(
+                                    $socialCache[$this->getName()]['activity']['tags'][$tag] = array(
                                         'count' => 1,
                                         'url'   => $tags[1][$k]
                                     );
@@ -168,7 +170,7 @@ class GooglePlusIntegration extends SocialIntegration
                                 $photo                               = array(
                                     'url' => $url
                                 );
-                                $socialCache['activity']['photos'][] = $photo;
+                                $socialCache[$this->getName()]['activity']['photos'][] = $photo;
                             }
                         }
                     }

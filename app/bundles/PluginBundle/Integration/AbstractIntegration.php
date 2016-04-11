@@ -491,6 +491,7 @@ abstract class AbstractIntegration
      */
     public function makeRequest($url, $parameters = array(), $method = 'GET', $settings = array())
     {
+
         $method   = strtoupper($method);
         $authType = (empty($settings['auth_type'])) ? $this->getAuthenticationType() : $settings['auth_type'];
 
@@ -603,7 +604,7 @@ abstract class AbstractIntegration
 
             return $result;
         } else {
-            
+
             $response = $this->parseCallbackResponse($result->body, !empty($settings['authorize_session']));
 
             return $response;
@@ -821,6 +822,7 @@ abstract class AbstractIntegration
 
         $method = (!isset($settings['method'])) ? 'POST' : $settings['method'];
         $data   = $this->makeRequest($this->getAccessTokenUrl(), $parameters, $method, $settings);
+
         return $this->extractAuthKeys($data);
 
     }
@@ -852,14 +854,13 @@ abstract class AbstractIntegration
             $encrypted = $this->encryptApiKeys($keys);
             $entity->setApiKeys($encrypted);
 
-            $error = false;
-        }
-        elseif(is_array($data) && isset($data['access_token'])){
             $this->factory->getSession()->set($this->getName().'_tokenResponse', $data);
 
             $error = false;
-        }
-        else {
+        } elseif (is_array($data) && isset($data['access_token'])) {
+            $this->factory->getSession()->set($this->getName().'_tokenResponse', $data);
+            $error = false;
+        } else {
             $error = $this->getErrorsFromResponse($data);
             if (empty($error)) {
                 $error = $this->factory->getTranslator()->trans(
@@ -1042,13 +1043,13 @@ abstract class AbstractIntegration
      */
     protected function cleanIdentifier($identifier)
     {
-        /*if (is_array($identifier)) {
+        if (is_array($identifier)) {
             foreach ($identifier as &$i) {
                 $i = urlencode($i);
             }
         } else {
             $identifier = urlencode($identifier);
-        }*/
+        }
 
         return $identifier;
     }
@@ -1199,7 +1200,6 @@ abstract class AbstractIntegration
         }
 
 
-
         return $matched;
     }
 
@@ -1211,7 +1211,7 @@ abstract class AbstractIntegration
      *
      * @return Lead
      */
-    public function getMauticLead($data, $persist = true, $socialCache=null)
+    public function getMauticLead($data, $persist = true, $socialCache = null)
     {
         if (is_object($data)) {
             // Convert to array in all levels
@@ -1235,8 +1235,11 @@ abstract class AbstractIntegration
             }
         }
 
+
         // Default to new lead
-        $lead = new Lead();
+        $lead            = new Lead();
+        $leadSocialCache = array();
+
         $lead->setNewlyCreated(true);
 
         if (count($uniqueLeadFieldData)) {
@@ -1254,25 +1257,26 @@ abstract class AbstractIntegration
 
                         $leadModel->setFieldValues($existingLead, $matchedFields, false);
                         $existingLead->setLastActive(new \DateTime());
-                        $existingLead->setSocialCache($socialCache);
-                        // Because multiple leads were found; use repository to persist to bypass events
-                        $leadModel->getRepository->saveEntity($existingLead, false);
                     }
                 }
             }
         }
-        
-        $lead->setSocialCache($socialCache);
-       
+
+
         $leadModel->setFieldValues($lead, $matchedFields, false);
 
-        $lead->setLastActive(new \DateTime());
+        $leadSocialCache = $lead->getSocialCache();
+        $socialCache     = array_merge($leadSocialCache, $socialCache);
+
         $lead->setSocialCache($socialCache);
+
+        $lead->setLastActive(new \DateTime());
 
         if ($persist) {
             // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
             $leadModel->saveEntity($lead, false);
         }
+
 
         return $lead;
     }
@@ -1383,7 +1387,7 @@ abstract class AbstractIntegration
                     break;
                 case 'array_object':
                     $objects = array();
-                    if(!empty($values)) {
+                    if (!empty($values)) {
                         foreach ($values as $k => $v) {
                             $v = $v;
                             if (isset($v->value)) {
