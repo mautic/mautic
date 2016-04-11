@@ -475,7 +475,7 @@ class LeadListRepository extends CommonRepository
         $options   = $this->getFilterExpressionFunctions();
         $groups    = array();
         $groupExpr = $q->expr()->andX();
-#print_r($filters); die();
+
         foreach ($filters as $k => $details) {
             $column = isset($leadTable[$details['field']]) ? $leadTable[$details['field']] : false;
 
@@ -529,7 +529,7 @@ class LeadListRepository extends CommonRepository
             $parameter        = $this->generateRandomParameterName();
             $exprParameter    = ":$parameter";
             $ignoreAutoFilter = false;
-            
+
             // Special handling of relative date strings
             if ($details['type'] == 'datetime' || $details['type'] == 'date') {
                 $relativeDateStrings = $this->getRelativeDateStrings();
