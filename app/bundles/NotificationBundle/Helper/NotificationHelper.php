@@ -62,7 +62,7 @@ class NotificationHelper
             return false;
         }
 
-        // If lead has subscribed on multiple channels, get all of them.
+        // If lead has subscribed on multiple devices, get all of them.
         /** @var \Mautic\NotificationBundle\Entity\PushID[] $pushIDs */
         $pushIDs = $lead->getPushIDs();
 

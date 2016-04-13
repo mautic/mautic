@@ -13,11 +13,11 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class NotificationType
+ * Class NotificationSendType
  *
  * @package Mautic\FormBundle\Form\Type
  */
-class NotificationType extends AbstractType
+class NotificationSendType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
