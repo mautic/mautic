@@ -66,7 +66,7 @@ class Lead extends FormEntity
     /**
      * @var ArrayCollection
      */
-    private $webPushIds;
+    private $pushIds;
 
     /**
      * @var \DateTime
@@ -192,7 +192,7 @@ class Lead extends FormEntity
             ->cascadeDetach()
             ->build();
 
-        $builder->createOneToMany('webPushIds', 'Mautic\WebPushBundle\Entity\PushID')
+        $builder->createOneToMany('pushIds', 'Mautic\NotificationBundle\Entity\PushID')
             ->orphanRemoval()
             ->mappedBy('lead')
             ->cascadeAll()
