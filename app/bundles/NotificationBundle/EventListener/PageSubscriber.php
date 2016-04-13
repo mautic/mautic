@@ -70,7 +70,7 @@ class PageSubscriber extends CommonSubscriber
         var xhr = new XMLHttpRequest();
 
         xhr.open('post', '{$leadAssociationUrl}', true);
-        xhr.setRequestHeader('Content-Type', 'text/plain');
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xhr.send('osid=' + userId);
     }]);
 JS;

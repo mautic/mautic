@@ -28,8 +28,6 @@ class NotificationApiController extends CommonApiController
     {
         $osid = $this->request->get('osid');
 
-        $this->factory->getLogger()->addInfo('One Signal ID:' . $osid);
-
         if ($osid) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
             $leadModel = $this->factory->getModel('lead');
@@ -43,6 +41,6 @@ class NotificationApiController extends CommonApiController
             return new JsonResponse(array('success' => true), 200, array('Access-Control-Allow-Origin' => '*'));
         }
 
-        return new JsonResponse;
+        return new JsonResponse(array('success' => 'false'), 200, array('Access-Control-Allow-Origin' => '*'));
     }
 }

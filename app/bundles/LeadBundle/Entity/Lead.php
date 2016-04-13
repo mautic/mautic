@@ -311,7 +311,7 @@ class Lead extends FormEntity
     public function __construct()
     {
         $this->ipAddresses     = new ArrayCollection();
-        $this->webPushIds      = new ArrayCollection();
+        $this->pushIds         = new ArrayCollection();
         $this->doNotContact    = new ArrayCollection();
         $this->pointsChangeLog = new ArrayCollection();
         $this->tags            = new ArrayCollection();
@@ -707,7 +707,7 @@ class Lead extends FormEntity
      */
     public function addPushID(PushID $pushID)
     {
-        $this->webPushIds[] = $pushID;
+        $this->pushIds[] = $pushID;
 
         return $this;
     }
@@ -717,7 +717,7 @@ class Lead extends FormEntity
      */
     public function removePushID(PushID $pushID)
     {
-        $this->webPushIds->removeElement($pushID);
+        $this->pushIds->removeElement($pushID);
     }
 
     /**
@@ -725,7 +725,7 @@ class Lead extends FormEntity
      */
     public function getPushIDs()
     {
-        return $this->webPushIds;
+        return $this->pushIds;
     }
 
     /**
