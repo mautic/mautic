@@ -505,4 +505,31 @@ class AssetModel extends FormModel
 
         return $results;
     }
+
+    /**
+     * Get a list of assets in a date range
+     *
+     * @param integer  $limit
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param array    $filters
+     * @param array    $options
+     *
+     * @return array
+     */
+    public function getAssetList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array(), $options = array())
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('t.id, t.title, t.date_added, t.date_modified')
+            ->from(MAUTIC_TABLE_PREFIX.'assets', 't')
+            ->setMaxResults($limit);
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_added');
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
 }

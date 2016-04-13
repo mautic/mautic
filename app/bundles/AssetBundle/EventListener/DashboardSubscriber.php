@@ -35,7 +35,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $types = array(
         'asset.downloads.in.time' => array(),
         'unique.vs.repetitive.downloads' => array(),
-        'popular.assets' => array()
+        'popular.assets' => array(),
+        'created.assets' => array()
     );
 
     /**
@@ -122,6 +123,49 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ));
             }
 
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->stopPropagation();
+        }
+
+        if ($event->getType() == 'created.assets') {
+            if (!$event->isCached()) {
+                $model  = $this->factory->getModel('asset');
+                $params = $event->getWidget()->getParams();
+
+                if (empty($params['limit'])) {
+                    // Count the assets limit from the widget height
+                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
+                } else {
+                    $limit = $params['limit'];
+                }
+
+                $assets = $model->getAssetList($limit, $params['dateFrom'], $params['dateTo']);
+                $items = array();
+
+                // Build table rows with links
+                if ($assets) {
+                    foreach ($assets as &$asset) {
+                        $assetUrl = $this->factory->getRouter()->generate('mautic_asset_action', array('objectAction' => 'view', 'objectId' => $asset['id']));
+                        $row = array(
+                            array(
+                                'value' => $asset['title'],
+                                'type' => 'link',
+                                'link' => $assetUrl
+                            )
+                        );
+                        $items[] = $row;
+                    }
+                }
+
+                $event->setTemplateData(array(
+                    'headItems'   => array(
+                        $event->getTranslator()->trans('mautic.dashboard.label.title')
+                    ),
+                    'bodyItems'   => $items,
+                    'raw'         => $assets
+                ));
+            }
+            
             $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
             $event->stopPropagation();
         }

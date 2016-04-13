@@ -11,7 +11,6 @@ namespace Mautic\CoreBundle\Helper\Chart;
 
 use Mautic\CoreBundle\Helper\Chart\AbstactChart;
 use Mautic\CoreBundle\Helper\Chart\ChartInterface;
-use Doctrine\DBAL\Connection;
 
 /**
  * Class PieChart
