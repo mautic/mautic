@@ -172,7 +172,7 @@ class EventModel extends CommonFormModel
 
         //only trigger events for anonymous users (to prevent populating full of user/company data)
         if (!$systemTriggered && !$this->security->isAnonymous()) {
-            $logger->debug('CAMPAIGN: lead not anonymous; abort');
+            $logger->debug('CAMPAIGN: contact not anonymous; abort');
 
             return false;
         }
@@ -445,7 +445,7 @@ class EventModel extends CommonFormModel
         }
 
         if (empty($leadCount)) {
-            $logger->debug('CAMPAIGN: No leads to process');
+            $logger->debug('CAMPAIGN: No contacts to process');
 
             unset($events);
 
@@ -485,7 +485,7 @@ class EventModel extends CommonFormModel
 
             if (empty($campaignLeads)) {
                 // No leads found
-                $logger->debug('CAMPAIGN: No campaign leads found.');
+                $logger->debug('CAMPAIGN: No campaign contacts found.');
 
                 break;
             }
@@ -506,11 +506,11 @@ class EventModel extends CommonFormModel
                 )
             );
 
-            $logger->debug('CAMPAIGN: Processing the following leads: '.implode(', ', array_keys($leads)));
+            $logger->debug('CAMPAIGN: Processing the following contacts: '.implode(', ', array_keys($leads)));
 
             if (!count($leads)) {
                 // Just a precaution in case non-existent leads are lingering in the campaign leads table
-                $logger->debug('CAMPAIGN: No lead entities found.');
+                $logger->debug('CAMPAIGN: No contact entities found.');
 
                 break;
             }
@@ -569,7 +569,7 @@ class EventModel extends CommonFormModel
                             $rootExecutedCount++;
 
                             $logger->debug(
-                                'CAMPAIGN: Decision ID# '.$event['id'].' for lead ID# '.$lead->getId()
+                                'CAMPAIGN: Decision ID# '.$event['id'].' for contact ID# '.$lead->getId()
                                 .' noted as completed by event listener thus executing children.'
                             );
 
@@ -719,7 +719,7 @@ class EventModel extends CommonFormModel
             $thisEventSettings = $eventSettings[$event['eventType']][$event['type']];
         } else {
             $logger->debug(
-                'CAMPAIGN: Settings not found for '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '.$lead->getId()
+                'CAMPAIGN: Settings not found for '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
             );
             unset($event);
 
@@ -774,7 +774,7 @@ class EventModel extends CommonFormModel
 
             //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
             $logger->debug(
-                'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '.$lead->getId()
+                'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
                 .' has timing that is not appropriate and thus scheduled for '
                 .$eventTriggerDate->format('Y-m-d H:m:i T')
             );
@@ -810,14 +810,14 @@ class EventModel extends CommonFormModel
             } catch (EntityNotFoundException $exception) {
                 // The lead has been likely removed from this lead/list
                 $logger->debug(
-                    'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '.$lead->getId()
+                    'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
                     .' wasn\'t found: '.$exception->getMessage()
                 );
 
                 return false;
             } catch (DBALException $exception) {
                 $logger->debug(
-                    'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '.$lead->getId()
+                    'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
                     .' failed with DB error: '.$exception->getMessage()
                 );
 
@@ -835,7 +835,7 @@ class EventModel extends CommonFormModel
                 $executedEventCount++;
 
                 $logger->debug(
-                    'CAMPAIGN: Listener handled event for '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '.$lead->getId()
+                    'CAMPAIGN: Listener handled event for '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
                 );
             } elseif ($response === false && $event['eventType'] == 'action') {
                 $result = false;
@@ -854,7 +854,7 @@ class EventModel extends CommonFormModel
                 }
 
                 $logger->debug(
-                    'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '.$lead->getId().' failed with a response of '
+                    'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId().' failed with a response of '
                     .var_export($response, true)
                 );
             } else {
@@ -873,7 +873,7 @@ class EventModel extends CommonFormModel
                 }
 
                 $logger->debug(
-                    'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '.$lead->getId()
+                    'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
                     .' successfully executed and logged with a response of '.var_export($response, true)
                 );
             }
@@ -883,7 +883,7 @@ class EventModel extends CommonFormModel
             //else do nothing
             $result = false;
             $logger->debug(
-                'CAMPAIGN: Timing failed ('.gettype($eventTriggerDate).') for '.ucfirst($event['eventType']).' ID# '.$event['id'].' for lead ID# '
+                'CAMPAIGN: Timing failed ('.gettype($eventTriggerDate).') for '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '
                 .$lead->getId()
             );
         }
@@ -1082,12 +1082,12 @@ class EventModel extends CommonFormModel
 
             if (!count($leads)) {
                 // Just a precaution in case non-existent leads are lingering in the campaign leads table
-                $logger->debug('CAMPAIGN: No leads entities found');
+                $logger->debug('CAMPAIGN: No contacts entities found');
 
                 break;
             }
 
-            $logger->debug('CAMPAIGN: Processing the following leads '.implode(', ', array_keys($events)));
+            $logger->debug('CAMPAIGN: Processing the following contacts '.implode(', ', array_keys($events)));
             $leadDebugCounter = 1;
             foreach ($events as $leadId => $leadEvents) {
                 if (!isset($leads[$leadId])) {
@@ -1104,7 +1104,7 @@ class EventModel extends CommonFormModel
                 // Set lead in case this is triggered by the system
                 $leadModel->setSystemCurrentLead($lead);
 
-                $logger->debug('CAMPAIGN: Processing the following events for lead ID '.$leadId.': '.implode(', ', array_keys($leadEvents)));
+                $logger->debug('CAMPAIGN: Processing the following events for contact ID '.$leadId.': '.implode(', ', array_keys($leadEvents)));
 
                 foreach ($leadEvents as $log) {
                     $scheduledEvaluatedCount++;
@@ -1310,7 +1310,7 @@ class EventModel extends CommonFormModel
 
                 unset($campaignLeads);
 
-                $logger->debug('CAMPAIGN: Processing the following leads: '.implode(', ', $campaignLeadIds));
+                $logger->debug('CAMPAIGN: Processing the following contacts: '.implode(', ', $campaignLeadIds));
 
                 foreach ($nonActionEvents as $parentId => $events) {
                     // Just a check to ensure this is an appropriate action
@@ -1326,12 +1326,12 @@ class EventModel extends CommonFormModel
                     // Get the lead log for this batch of leads limiting to those that have already triggered
                     // the decision's parent and haven't executed this level in the path yet
                     if ($grandParentId) {
-                        $logger->debug('CAMPAIGN: Checking for leads based on grand parent execution.');
+                        $logger->debug('CAMPAIGN: Checking for contacts based on grand parent execution.');
 
                         $leadLog         = $repo->getEventLog($campaignId, $campaignLeadIds, array($grandParentId), array_keys($events), true);
                         $applicableLeads = array_keys($leadLog);
                     } else {
-                        $logger->debug('CAMPAIGN: Checking for leads based on exclusion due to being at root level');
+                        $logger->debug('CAMPAIGN: Checking for contacts based on exclusion due to being at root level');
 
                         // The event has no grandparent (likely because the decision is first in the campaign) so find leads that HAVE
                         // already executed the events in the root level and exclude them
@@ -1355,7 +1355,7 @@ class EventModel extends CommonFormModel
                         continue;
                     }
 
-                    $logger->debug('CAMPAIGN: These leads have have not gone down the positive path: '.implode(', ', $applicableLeads));
+                    $logger->debug('CAMPAIGN: These contacts have have not gone down the positive path: '.implode(', ', $applicableLeads));
 
                     // Get the leads
                     $leads = $leadModel->getEntities(
@@ -1376,7 +1376,7 @@ class EventModel extends CommonFormModel
 
                     if (!count($leads)) {
                         // Just a precaution in case non-existent leads are lingering in the campaign leads table
-                        $logger->debug('CAMPAIGN: No lead entities found.');
+                        $logger->debug('CAMPAIGN: No contact entities found.');
 
                         continue;
                     }
@@ -1391,7 +1391,7 @@ class EventModel extends CommonFormModel
                         // Set lead for listeners
                         $leadModel->setSystemCurrentLead($lead);
 
-                        $logger->debug('CAMPAIGN: Lead ID #'.$lead->getId().'; #'.$leadDebugCounter.' in batch #'.$batchDebugCounter);
+                        $logger->debug('CAMPAIGN: contact ID #'.$lead->getId().'; #'.$leadDebugCounter.' in batch #'.$batchDebugCounter);
 
                         // Prevent path if lead has already gone down this path
                         if (!isset($leadLog[$lead->getId()]) || !array_key_exists($parentId, $leadLog[$lead->getId()])) {
@@ -1472,7 +1472,7 @@ class EventModel extends CommonFormModel
 
                             // Execute or schedule events
                             $logger->debug(
-                                'CAMPAIGN: Processing the following events for lead ID# '.$lead->getId().': '.implode(', ', array_keys($eventTiming))
+                                'CAMPAIGN: Processing the following events for contact ID# '.$lead->getId().': '.implode(', ', array_keys($eventTiming))
                             );
 
                             foreach ($eventTiming as $id => $eventTriggerDate) {

@@ -80,7 +80,7 @@ $buttons[] = array(
         'href' => $view['router']->generate( 'mautic_lead_action', array("objectId" => $lead->getId(), "objectAction" => "list")),
     ),
     'btnText'   => $view['translator']->trans('mautic.lead.lead.lists'),
-    'iconClass' => 'fa fa-list'
+    'iconClass' => 'fa fa-pie-chart'
 );
 
 if ($security->isGranted('campaign:campaigns:edit')) {

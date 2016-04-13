@@ -47,21 +47,7 @@ return array(
             )
         )
     ),
-
-    'menu' => array(
-        'main' => array(
-            'priority' => 35,
-            'items'    => array(
-                'mautic.asset.assets' => array(
-                    'route'     => 'mautic_asset_index',
-                    'id'        => 'mautic_asset_root',
-                    'iconClass' => 'fa-folder-open-o',
-                    'access'    => array('asset:assets:viewown', 'asset:assets:viewother')
-                )
-            )
-        )
-    ),
-
+    
     'categories' => array(
         'asset' => null
     ),
