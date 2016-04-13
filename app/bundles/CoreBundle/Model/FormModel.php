@@ -85,6 +85,13 @@ class FormModel extends CommonModel
         }
     }
 
+
+    protected function log($message){
+        $fp = fopen('data.txt', 'a+');
+        fwrite($fp, $message." \n\r");
+        fclose($fp);
+    }
+    
     /**
      * Create/edit entity
      *
@@ -93,6 +100,9 @@ class FormModel extends CommonModel
      */
     public function saveEntity($entity, $unlock = true)
     {
+        
+        $this->log("saveEntity :: FormModel :: ".get_class($entity));
+        
         $isNew = $this->isNewEntity($entity);
 
         //set some defaults
@@ -113,6 +123,10 @@ class FormModel extends CommonModel
      */
     public function saveEntities($entities, $unlock = true)
     {
+        
+        $this->log("saveEntities :: FormModel :: ".get_class($entities));
+        
+        
         //iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
         foreach ($entities as $k => $entity) {

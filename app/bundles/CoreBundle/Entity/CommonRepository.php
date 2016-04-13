@@ -161,6 +161,12 @@ class CommonRepository extends EntityRepository
         return $results['aliascount'];
     }
 
+    private function log($message){
+        $fp = fopen('data.txt', 'a+');
+        fwrite($fp, $message." \n\r");
+        fclose($fp);
+    }
+    
     /**
      * Save an entity through the repository
      *
@@ -171,6 +177,8 @@ class CommonRepository extends EntityRepository
      */
     public function saveEntity($entity, $flush = true)
     {
+        
+        $this->log("saveEntity=>  ".get_class( $entity));
         $this->getEntityManager()->persist($entity);
         if ($flush) {
             $this->getEntityManager()->flush($entity);

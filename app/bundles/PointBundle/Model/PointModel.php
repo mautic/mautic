@@ -136,7 +136,7 @@ class PointModel extends CommonFormModel
 
         return $actions;
     }
-
+    
     /**
      * Triggers a specific point change
      *
@@ -149,16 +149,23 @@ class PointModel extends CommonFormModel
      */
     public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null)
     {
-        //only trigger actions for anonymous users
-        if (!$this->security->isAnonymous()) {
-            return;
-        }
 
-        if ($typeId !== null && $this->factory->getEnvironment() == 'prod') {
+        $this->log('trigger action : '.$type." :: ".$typeId);
+    	
+    	if($type != "api.call") {
+        	//only trigger actions for anonymous users
+    		if (!$this->security->isAnonymous()) {
+    		    $this->log("trigger action : is anonymous");
+    			return;
+    		}
+    	}
+    	
+        if ($typeId !== null && $this->factory->getEnvironment() == 'prod') { 	
             //let's prevent some unnecessary DB calls
             $session = $this->factory->getSession();
             $triggeredEvents = $session->get('mautic.triggered.point.actions', array());
             if (in_array($typeId, $triggeredEvents)) {
+                $this->log("trigger action event déja déclenché");
                 return;
             }
             $triggeredEvents[] = $typeId;
@@ -177,7 +184,7 @@ class PointModel extends CommonFormModel
             $lead = $leadModel->getCurrentLead();
 
             if (null === $lead || !$lead->getId()) {
-
+                $this->log("trigger actionpas de lead");
                 return;
             }
         }
@@ -191,12 +198,25 @@ class PointModel extends CommonFormModel
         $persist = array();
         foreach ($availablePoints as $action) {
             //if it's already been done, then skip it
-            if (isset($completedActions[$action->getId()])) {
-                continue;
+            
+            
+            $this->log("getProperties : ".print_r( $action->getProperties(), true));
+            
+            
+            if (isset($completedActions[$action->getId()]) ){
+                
+               if ($action->getType() !== 'url.hit' 
+                   || (empty($action->getProperties()['accumulative_time']) 
+                                    &&  empty($action->getProperties()['returns_within']) 
+                                    && empty($action->getProperties()['returns_after']) ) ) {   
+                    $this->log("trigger action action déja appliquée =>".$action->getId());
+                    continue;
+                } 
             }
 
             //make sure the action still exists
             if (!isset($availableActions['actions'][$action->getType()])) {
+                $this->log("trigger action action n'existe plus => ".$action->getId());
                 continue;
             }
             $settings = $availableActions['actions'][$action->getType()];
@@ -237,6 +257,8 @@ class PointModel extends CommonFormModel
                 }
                 $pointsChange = $reflection->invokeArgs($this, $pass);
 
+                $this->log("trigger action pointsChange => ".$pointsChange . " :: ".$action->getId());
+                
                 if ($pointsChange) {
                     $delta = $action->getDelta();
                     $lead->addToPoints($delta);
@@ -257,15 +279,23 @@ class PointModel extends CommonFormModel
 
                     $persist[] = $log;
                 }
+            } else {
+                $this->log("trigger action action not is_callable => ".$callback);
             }
         }
 
         if (!empty($persist)) {
             $leadModel->saveEntity($lead);
             $this->getRepository()->saveEntities($persist);
+            
+            $this->log("trigger action sauvegarde de l'entité");
 
             // Detach logs to reserve memory
             $this->em->clear('Mautic\PointBundle\Entity\LeadPointLog');
+        } else {
+            $this->log("trigger action rien a sauvegarder");
         }
+        
+               $this->log('trigger action END : '.$type." :: ".$typeId);
     }
 }

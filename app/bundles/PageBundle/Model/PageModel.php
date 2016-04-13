@@ -72,6 +72,9 @@ class PageModel extends FormModel
      */
     public function saveEntity ($entity, $unlock = true)
     {
+        
+        $this->log("saveEntity :: PageModel :: ".get_class($entity));
+        
         if (empty($this->inConversion)) {
             $alias = $entity->getAlias();
             if (empty($alias)) {
