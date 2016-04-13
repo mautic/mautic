@@ -165,7 +165,7 @@ class PointModel extends CommonFormModel
             $session = $this->factory->getSession();
             $triggeredEvents = $session->get('mautic.triggered.point.actions', array());
             if (in_array($typeId, $triggeredEvents)) {
-                $this->log("trigger action event déja déclenché");
+                $this->log("trigger action :: event already triggered");
                 return;
             }
             $triggeredEvents[] = $typeId;
@@ -184,7 +184,7 @@ class PointModel extends CommonFormModel
             $lead = $leadModel->getCurrentLead();
 
             if (null === $lead || !$lead->getId()) {
-                $this->log("trigger actionpas de lead");
+                $this->log("trigger action no lead");
                 return;
             }
         }
@@ -209,14 +209,14 @@ class PointModel extends CommonFormModel
                    || (empty($action->getProperties()['accumulative_time']) 
                                     &&  empty($action->getProperties()['returns_within']) 
                                     && empty($action->getProperties()['returns_after']) ) ) {   
-                    $this->log("trigger action action déja appliquée =>".$action->getId());
+                    $this->log("trigger action action already applied =>".$action->getId());
                     continue;
                 } 
             }
 
             //make sure the action still exists
             if (!isset($availableActions['actions'][$action->getType()])) {
-                $this->log("trigger action action n'existe plus => ".$action->getId());
+                $this->log("trigger action acrtion doesn't exists anymore  => ".$action->getId());
                 continue;
             }
             $settings = $availableActions['actions'][$action->getType()];
@@ -288,12 +288,12 @@ class PointModel extends CommonFormModel
             $leadModel->saveEntity($lead);
             $this->getRepository()->saveEntities($persist);
             
-            $this->log("trigger action sauvegarde de l'entité");
+            $this->log("trigger action save entity");
 
             // Detach logs to reserve memory
             $this->em->clear('Mautic\PointBundle\Entity\LeadPointLog');
         } else {
-            $this->log("trigger action rien a sauvegarder");
+            $this->log("trigger action nothing to save ");
         }
         
                $this->log('trigger action END : '.$type." :: ".$typeId);
