@@ -51,6 +51,6 @@ class NotificationSendType extends AbstractType
      */
     public function getName()
     {
-        return "notification";
+        return "notificationsend_list";
     }
 }
