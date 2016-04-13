@@ -31,7 +31,7 @@ class NotificationSendType extends AbstractType
             'required' => true,
             'attr' => array(
                 'class' => 'form-control',
-                'placeholder' => 'mautic.notification.headings.placeholder'
+                'tooltip' => 'mautic.notification.headings.tooltip'
             )
         ));
 
@@ -41,7 +41,7 @@ class NotificationSendType extends AbstractType
             'required' => true,
             'attr' => array(
                 'class' => 'form-control',
-                'placeholder' => 'mautic.notification.placeholder'
+                'tooltip' => 'mautic.notification.text.tooltip'
             )
         ));
 

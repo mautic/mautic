@@ -75,6 +75,11 @@ class NotificationHelper
         /** @var \Mautic\NotificationBundle\Api\OneSignalApi $notification */
         $notification = $factory->getKernel()->getContainer()->get('mautic.notification.api');
 
-        return $notification->sendNotification($playerID, $config['notification_message_template'], $config['notification_message_headings']);
+        return $notification->sendNotification(
+            $playerID,
+            $config['notification_message_template'],
+            $config['notification_message_headings'],
+            $config['notification_link']
+        );
     }
 }

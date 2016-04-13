@@ -34,10 +34,10 @@ class CampaignSubscriber extends CommonSubscriber
     {
         if ($this->factory->getParameter('notification_enabled')) {
             $event->addAction(
-                'notification.send_notification_notification',
+                'notification.send_notification',
                 array(
-                    'label' => 'mautic.notification.campaign.send_notification_notification',
-                    'description' => 'mautic.notification.campaign.send_notification_notification.tooltip',
+                    'label' => 'mautic.notification.campaign.send_notification',
+                    'description' => 'mautic.notification.campaign.send_notification.tooltip',
                     'callback' => array('\Mautic\NotificationBundle\Helper\NotificationHelper', 'send'),
                     'formType' => 'notificationsend_list'
                 )
