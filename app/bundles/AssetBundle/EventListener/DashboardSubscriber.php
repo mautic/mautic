@@ -148,7 +148,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $assetUrl = $this->factory->getRouter()->generate('mautic_asset_action', array('objectAction' => 'view', 'objectId' => $asset['id']));
                         $row = array(
                             array(
-                                'value' => $asset['title'],
+                                'value' => $asset['name'],
                                 'type' => 'link',
                                 'link' => $assetUrl
                             )
