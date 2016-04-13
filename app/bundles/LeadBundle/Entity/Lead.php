@@ -17,7 +17,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\DoNotEmail;
 use Mautic\UserBundle\Entity\User;
-use Mautic\WebPushBundle\Entity\PushID;
+use Mautic\NotificationBundle\Entity\PushID;
 
 /**
  * Class Lead
