@@ -691,6 +691,13 @@ class Lead extends FormEntity
      */
     public function addPushIDEntry($identifier)
     {
+        /** @var PushID $id */
+        foreach ($this->pushIds as $id) {
+            if ($id->getPushID() === $identifier) {
+                return $this;
+            }
+        }
+
         $entity = new PushID();
         $entity->setPushID($identifier);
         $entity->setLead($this);
