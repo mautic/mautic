@@ -62,12 +62,13 @@ class OneSignalApi extends AbstractNotificationApi
      *                              ['en' => 'English Message', 'es' => 'Spanish Message']
      * @param string|array $title Title as string, or lang => title array
      *                            ['en' => 'English Title', 'es' => 'Spanish Title']
+     * @param string $url The URL where the user should be sent when clicking the notification
      *
      * @return Response
      *
      * @throws \Exception
      */
-    public function sendNotification($playerId, $message, $title = null)
+    public function sendNotification($playerId, $message, $title = null, $url = null)
     {
         $data = array();
 
@@ -89,6 +90,10 @@ class OneSignalApi extends AbstractNotificationApi
             }
 
             $data['headings'] = $title;
+        }
+
+        if ($url) {
+            $data['url'] = $url;
         }
 
         return $this->send('/notifications', $data);

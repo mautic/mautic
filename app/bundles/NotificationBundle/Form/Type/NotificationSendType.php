@@ -44,6 +44,17 @@ class NotificationSendType extends AbstractType
                 'placeholder' => 'mautic.notification.placeholder'
             )
         ));
+
+        $builder->add('notification_link', 'url', array(
+            'label_attr' => array('class' => 'control-label'),
+            'label' => 'mautic.notification.link',
+            'required' => false,
+            'attr' => array(
+                'class' => 'form-control',
+                'tooltip' => 'mautic.notification.link.tooltip',
+                'placeholder' => 'mautic.notification.link.placeholder'
+            )
+        ));
     }
 
     /**
