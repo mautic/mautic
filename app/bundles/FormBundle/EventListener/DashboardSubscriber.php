@@ -35,7 +35,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $types = array(
         'submissions.in.time' => array(),
         'top.submission.referrers' => array(),
-        'top.submitters' => array()
+        'top.submitters' => array(),
+        'created.forms' => array()
     );
 
     /**
@@ -158,6 +159,49 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     ),
                     'bodyItems'   => $items,
                     'raw'         => $submitters
+                ));
+            }
+            
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->stopPropagation();
+        }
+
+        if ($event->getType() == 'created.forms') {
+            if (!$event->isCached()) {
+                $model  = $this->factory->getModel('form');
+                $params = $event->getWidget()->getParams();
+
+                if (empty($params['limit'])) {
+                    // Count the forms limit from the widget height
+                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
+                } else {
+                    $limit = $params['limit'];
+                }
+
+                $forms = $model->getFormList($limit, $params['dateFrom'], $params['dateTo']);
+                $items = array();
+
+                // Build table rows with links
+                if ($forms) {
+                    foreach ($forms as &$form) {
+                        $formUrl = $this->factory->getRouter()->generate('mautic_form_action', array('objectAction' => 'view', 'objectId' => $form['id']));
+                        $row = array(
+                            array(
+                                'value' => $form['name'],
+                                'type' => 'link',
+                                'link' => $formUrl
+                            )
+                        );
+                        $items[] = $row;
+                    }
+                }
+
+                $event->setTemplateData(array(
+                    'headItems'   => array(
+                        $event->getTranslator()->trans('mautic.dashboard.label.title')
+                    ),
+                    'bodyItems'   => $items,
+                    'raw'         => $forms
                 ));
             }
             
