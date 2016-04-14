@@ -18,13 +18,6 @@ use Mautic\CoreBundle\Helper\Chart\ChartInterface;
 class BarChart extends AbstractChart implements ChartInterface
 {
     /**
-     * Order
-     *
-     * @var string (ASC|DESC)
-     */
-    protected $order;
-
-    /**
      * Configurable date format
      *
      * @var string
@@ -54,16 +47,14 @@ class BarChart extends AbstractChart implements ChartInterface
      * @param DateTime $dateFrom
      * @param DateTime $dateTo
      * @param string   $dateFormat
-     * @param string   $order (DESC|ASC)
      */
-    public function __construct($unit, $dateFrom, $dateTo, $dateFormat = null, $order = 'DESC')
+    public function __construct($unit, $dateFrom, $dateTo, $dateFormat = null)
     {
         $this->setDateRange($dateFrom, $dateTo);
         $this->unit  = !$unit ? $this->getTimeUnitFromDateRange() : $unit;
-        $this->order = $order;
         $this->dateFormat = $dateFormat;
         $this->amount = $this->countAmountFromDateRange();
-        $this->generateTimeLabels($this->amount, $order);
+        $this->generateTimeLabels($this->amount);
     }
 
     /**
@@ -102,27 +93,22 @@ class BarChart extends AbstractChart implements ChartInterface
      * Generate array of labels from the form data
      *
      * @param  integer  $amount
-     * @param  string   $order
      */
-    public function generateTimeLabels($amount, $order = 'DESC')
+    public function generateTimeLabels($amount)
     {
         if (!isset($this->labelFormats[$this->unit])) {
             throw new \UnexpectedValueException('Date/Time unit "' . $this->unit . '" is not available for a label.');
         }
 
-        $date    = clone $this->dateTo;
+        $date    = clone $this->dateFrom;
         $oneUnit = $this->getUnitObject($this->unit);
         $format  = !empty($this->dateFormat) ? $this->dateFormat : $this->labelFormats[$this->unit];
 
         for ($i = 0; $i < $amount; $i++) {
             $this->labels[] = $date->format($format);
-            if ($order == 'DESC') {
-                $date->sub($oneUnit);
-            } else {
-                $date->add($oneUnit);
-            }
+            $date->add($oneUnit);
         }
         
-        $this->labels = array_reverse($this->labels);
+        $this->labels = $this->labels;
     }
 }
