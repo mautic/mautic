@@ -88,10 +88,6 @@ Mautic.leadOnLoad = function (container) {
         Mautic.activateSearchAutocomplete('NoteFilter', 'lead.note');
     }
 
-    if (typeof Mautic.leadEngagementChart === 'undefined') {
-        Mautic.renderEngagementChart();
-    }
-
     if (mQuery('#lead_preferred_profile_image').length) {
         mQuery('#lead_preferred_profile_image').on('change', function() {
             if (mQuery(this).val() == 'custom') {
@@ -124,10 +120,6 @@ Mautic.leadOnLoad = function (container) {
 };
 
 Mautic.leadOnUnload = function(id) {
-    if (id === '#app-content') {
-        delete Mautic.leadEngagementChart;
-    }
-
     if (typeof MauticVars.moderatedIntervals['leadListLiveUpdate'] != 'undefined') {
         Mautic.clearModeratedInterval('leadListLiveUpdate');
     }
@@ -688,20 +680,6 @@ Mautic.leadNoteOnLoad = function (container, response) {
 
         mQuery('#NoteCount').html(count);
     }
-};
-
-Mautic.renderEngagementChart = function() {
-    if (!mQuery("#chart-engagement").length) {
-        return;
-    }
-    var canvas = document.getElementById("chart-engagement");
-    var chartData = mQuery.parseJSON(mQuery('#chart-engagement-data').text());
-    Mautic.leadEngagementChart = new Chart(canvas.getContext("2d")).Line(chartData);
-
-    var legendHolder = document.createElement('div');
-    legendHolder.innerHTML = Mautic.leadEngagementChart.generateLegend();
-    mQuery('#engagement-legend').html(legendHolder.firstChild);
-    Mautic.leadEngagementChart.update();
 };
 
 Mautic.showSocialMediaImageModal = function(imgSrc) {
