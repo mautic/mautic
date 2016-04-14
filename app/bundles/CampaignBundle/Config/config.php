@@ -64,20 +64,9 @@ return array(
                     'children'  => array(
                         'mautic.campaign.menu.index'  => array(
                             'route'     => 'mautic_campaign_index',
-                            'access'    => 'campaign:campaigns:view'
-                        ),
-                        'mautic.form.forms'  => array(
-                            'route'     => 'mautic_form_index',
-                            'access'    =>  array('form:forms:viewown', 'form:forms:viewother')
-                        ),
-                        'mautic.page.pages'  => array(
-                            'route'     => 'mautic_page_index',
-                            'access'    => array('page:pages:viewown', 'page:pages:viewother')
-                        ),
-                        'mautic.asset.assets'  => array(
-                            'route'     => 'mautic_asset_index',
-                            'access'    => array('asset:assets:viewown', 'asset:assets:viewother')
-                        ),
+                            'access'    => 'campaign:campaigns:view',
+                            'priority'  => 110
+                        )
                     )
                 )
             )

@@ -84,14 +84,12 @@ return array(
 
     'menu'     => array(
         'main' => array(
-            'priority' => 50,
             'items'    => array(
                 'mautic.form.forms' => array(
                     'route'     => 'mautic_form_index',
-                    'id'        => 'mautic_form_root',
-                    'iconClass' => 'fa-pencil-square-o',
                     'access'    => array('form:forms:viewown', 'form:forms:viewother'),
-                    'parent'    => 'mautic.campaign.campaigns'
+                    'parent'    => 'mautic.campaigns.menu.root',
+                    'priority'  => 80
                 )
             )
         )
