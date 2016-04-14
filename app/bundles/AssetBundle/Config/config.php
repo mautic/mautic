@@ -56,7 +56,8 @@ return array(
                     'route'     => 'mautic_asset_index',
                     'id'        => 'mautic_asset_root',
                     'iconClass' => 'fa-folder-open-o',
-                    'access'    => array('asset:assets:viewown', 'asset:assets:viewother')
+                    'access'    => array('asset:assets:viewown', 'asset:assets:viewother'),
+                    'parent'    => 'mautic.campaign.campaigns'
                 )
             )
         )

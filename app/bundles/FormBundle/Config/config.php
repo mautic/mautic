@@ -90,7 +90,8 @@ return array(
                     'route'     => 'mautic_form_index',
                     'id'        => 'mautic_form_root',
                     'iconClass' => 'fa-pencil-square-o',
-                    'access'    => array('form:forms:viewown', 'form:forms:viewother')
+                    'access'    => array('form:forms:viewown', 'form:forms:viewother'),
+                    'parent'    => 'mautic.campaign.campaigns'
                 )
             )
         )
