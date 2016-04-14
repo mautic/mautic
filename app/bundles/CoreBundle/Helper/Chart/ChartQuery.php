@@ -275,15 +275,17 @@ class ChartQuery extends AbstractChart
         $oneUnit = $this->getUnitObject($this->unit);
         $limit   = $this->countAmountFromDateRange($this->unit);
         $previousDate = clone $this->dateFrom;
+        $previousDate->setTimezone(new \DateTimeZone("UTC"));
 
         // Convert data from DB to the chart.js format
         for ($i = 0; $i < $limit; $i++) {
 
             $nextDate = clone $previousDate;
+            $nextDate->setTimezone(new \DateTimeZone("UTC"));
             $nextDate->add($oneUnit);
 
             foreach ($rawData as $key => $item) {
-                $itemDate = (new \DateTime($item['date']));
+                $itemDate = new \DateTime($item['date'], new \DateTimeZone("UTC"));
 
                 // Place the right suma is between the time unit and time unit +1
                 if (isset($item['count']) && $itemDate >= $previousDate && $itemDate < $nextDate) {
