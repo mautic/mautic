@@ -8,7 +8,8 @@
  */
 ?>
 <div class="chart-wrapper">
-    <div class="pt-md pr-md pb-md pl-md">
+    <div class="pt-sd pr-md pb-md pl-md">
+        <div class="chart-legend pull-right"></div>
         <div style="height:<?php echo $chartHeight; ?>px">
             <canvas class="chart <?php echo $chartType; ?>-chart"><?php echo json_encode($chartData); ?></canvas>
         </div>

@@ -3023,7 +3023,9 @@ var Mautic = {
             bezierCurveTension : 0.2,
             multiTooltipTemplate: "<%= datasetLabel %>: <%= value %>"
         }
-        Mautic.chartObjects.push(new Chart(ctx).Line(data, options));
+        var chart = new Chart(ctx).Line(data, options);
+        canvas.closest('.chart-wrapper').find('.chart-legend').html(chart.generateLegend());
+        Mautic.chartObjects.push(chart);
     },
 
     /**
