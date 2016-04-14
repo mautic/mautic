@@ -540,7 +540,7 @@ class AssetsHelper extends CoreAssetsHelper
     public function shortenText($text, $charCount = null)
     {
         if ($charCount && strlen($text) > $charCount) {
-            return substr($text, 0, $charCount) . '...';
+            return mb_substr($text, 0, $charCount, "utf-8") . '...';
         }
 
         return $text;
