@@ -68,7 +68,7 @@ return array(
     ),
     'menu'       => array(
         'main' => array(
-            'priority' => 15,
+            'priority' => 60,
             'items'    => array(
                 'mautic.email.emails' => array(
                     'route'     => 'mautic_email_index',

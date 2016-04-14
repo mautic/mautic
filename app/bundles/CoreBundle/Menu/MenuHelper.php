@@ -327,7 +327,7 @@ class MenuHelper extends Helper
                 return 0;
             }
 
-            return ($ap < $bp) ? -1 : 1;
+            return ($ap > $bp) ? -1 : 1;
         });
     }
 }
