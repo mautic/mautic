@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Helper\Chart;
 
+use Mautic\CoreBundle\Helper\ColorHelper;
 use Doctrine\DBAL\Connection;
 
 /**
@@ -59,52 +60,11 @@ abstract class AbstractChart
     protected $amount;
 
     /**
-     * Colors which can be used in graphs
+     * Default Mautic colors
      *
      * @var array
      */
-    public $colors = array(
-        array(
-            'fillColor' => 'rgba(78, 93, 157, 0.5)',
-            'strokeColor' => 'rgba(78, 93, 157, 0.8)',
-            'highlightFill' => 'rgba(78, 93, 157, 0.75)',
-            'highlightStroke' => 'rgba(78, 93, 157, 1)'),
-        array(
-            'fillColor' => 'rgba(0, 180, 156, 0.5)',
-            'strokeColor' => 'rgba(0, 180, 156, 0.8)',
-            'highlightFill' => 'rgba(0, 180, 156, 0.75)',
-            'highlightStroke' => 'rgba(0, 180, 156, 1)'),
-        array(
-            'fillColor' => 'rgba(253, 149, 114, 0.5)',
-            'strokeColor' => 'rgba(253, 149, 114, 0.8)',
-            'highlightFill' => 'rgba(253, 149, 114, 0.75)',
-            'highlightStroke' => 'rgba(253, 149, 114, 1)'),
-        array(
-            'fillColor' => 'rgba(253, 185, 51, 0.5)',
-            'strokeColor' => 'rgba(253, 185, 51, 0.8)',
-            'highlightFill' => 'rgba(253, 185, 51, 0.75)',
-            'highlightStroke' => 'rgba(253, 185, 51, 1)'),
-        array(
-            'fillColor' => 'rgba(117, 117, 117, 0.5)',
-            'strokeColor' => 'rgba(117, 117, 117, 0.8)',
-            'highlightFill' => 'rgba(117, 117, 117, 0.75)',
-            'highlightStroke' => 'rgba(117, 117, 117, 1)'),
-        array(
-            'fillColor' => 'rgba(156, 78, 92, 0.5)',
-            'strokeColor' => 'rgba(156, 78, 92, 0.8)',
-            'highlightFill' => 'rgba(156, 78, 92, 0.75)',
-            'highlightStroke' => 'rgba(156, 78, 92, 1)'),
-        array(
-            'fillColor' => 'rgba(105, 69, 53, 0.5)',
-            'strokeColor' => 'rgba(105, 69, 53, 0.8)',
-            'highlightFill' => 'rgba(105, 69, 53, 0.75)',
-            'highlightStroke' => 'rgba(105, 69, 53, 1)'),
-        array(
-            'fillColor' => 'rgba(89, 105, 53, 0.5)',
-            'strokeColor' => 'rgba(89, 105, 53, 0.8)',
-            'highlightFill' => 'rgba(89, 105, 53, 0.75)',
-            'highlightStroke' => 'rgba(89, 105, 53, 1)'),
-    );
+    public $colors = array('#4E5D9D', '#00B49C', '#FD9572', '#FDB933', '#757575', '#9C4E5C', '#694535', '#596935');
 
     /**
      * Create a DateInterval time unit
@@ -224,5 +184,25 @@ abstract class AbstractChart
     public function getChartQuery(Connection $connection)
     {
         return new ChartQuery($connection, $this->dateFrom, $this->dateTo, $this->unit);
+    }
+
+    /**
+     * Generate unique color for the dataset
+     *
+     * @param  integer  $datasetId
+     *
+     * @return ColorHelper
+     */
+    public function configureColorHelper($datasetId)
+    {
+        $colorHelper = new ColorHelper;
+
+        if (isset($this->colors[$datasetId])) {
+            $color = $colorHelper->setHex($this->colors[$datasetId]);
+        } else {
+            $color = $colorHelper->buildRandomColor();
+        }
+        
+        return $color;
     }
 }

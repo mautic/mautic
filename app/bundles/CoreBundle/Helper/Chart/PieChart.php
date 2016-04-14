@@ -47,12 +47,13 @@ class PieChart extends AbstractChart implements ChartInterface
     {
         $this->totalCount += $value;
         $datasetId = count($this->datasets);
+        $color = $this->configureColorHelper($datasetId);
 
         $this->datasets[] = array(
             'label'     => $label,
             'value'     => $value,
-            'color'     => $this->colors[$datasetId]['highlightFill'],
-            'highlight' => $this->colors[$datasetId]['highlightStroke']
+            'color'     => $color->toRgba(0.6),
+            'highlight' => $color->toRgba(1)
         );
 
         return $this;

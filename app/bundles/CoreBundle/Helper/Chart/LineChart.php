@@ -17,54 +17,24 @@ use Mautic\CoreBundle\Helper\Chart\ChartInterface;
  *
  * Line chart requires the same data as Bar chart
  */
-class LineChart extends BarChart implements ChartInterface {
-
-
+class LineChart extends BarChart implements ChartInterface
+{
     /**
-     * Colors which can be used in the line graphs
+     * Generate unique color for the dataset
      *
-     * @var array
+     * @param  integer  $datasetId
+     *
+     * @return array
      */
-    public $colors = array(
-        array(
-            'fillColor' => 'rgba(78, 93, 157, 0.1)',
-            'strokeColor' => 'rgba(78, 93, 157, 0.8)',
-            'pointColor' => 'rgba(78, 93, 157, 0.75)',
-            'pointHighlightStroke' => 'rgba(78, 93, 157, 1)'),
-        array(
-            'fillColor' => 'rgba(0, 180, 156, 0.1)',
-            'strokeColor' => 'rgba(0, 180, 156, 0.8)',
-            'pointColor' => 'rgba(0, 180, 156, 0.75)',
-            'pointHighlightStroke' => 'rgba(0, 180, 156, 1)'),
-        array(
-            'fillColor' => 'rgba(253, 149, 114, 0.1)',
-            'strokeColor' => 'rgba(253, 149, 114, 0.8)',
-            'pointColor' => 'rgba(253, 149, 114, 0.75)',
-            'pointHighlightStroke' => 'rgba(253, 149, 114, 1)'),
-        array(
-            'fillColor' => 'rgba(253, 185, 51, 0.1)',
-            'strokeColor' => 'rgba(253, 185, 51, 0.8)',
-            'pointColor' => 'rgba(253, 185, 51, 0.75)',
-            'pointHighlightStroke' => 'rgba(253, 185, 51, 1)'),
-        array(
-            'fillColor' => 'rgba(117, 117, 117, 0.1)',
-            'strokeColor' => 'rgba(117, 117, 117, 0.8)',
-            'pointColor' => 'rgba(117, 117, 117, 0.75)',
-            'pointHighlightStroke' => 'rgba(117, 117, 117, 1)'),
-        array(
-            'fillColor' => 'rgba(156, 78, 92, 0.1)',
-            'strokeColor' => 'rgba(156, 78, 92, 0.8)',
-            'pointColor' => 'rgba(156, 78, 92, 0.75)',
-            'pointHighlightStroke' => 'rgba(156, 78, 92, 1)'),
-        array(
-            'fillColor' => 'rgba(105, 69, 53, 0.1)',
-            'strokeColor' => 'rgba(105, 69, 53, 0.8)',
-            'pointColor' => 'rgba(105, 69, 53, 0.75)',
-            'pointHighlightStroke' => 'rgba(105, 69, 53, 1)'),
-        array(
-            'fillColor' => 'rgba(89, 105, 53, 0.1)',
-            'strokeColor' => 'rgba(89, 105, 53, 0.8)',
-            'pointColor' => 'rgba(89, 105, 53, 0.75)',
-            'pointHighlightStroke' => 'rgba(89, 105, 53, 1)'),
-    );
+    public function generateColors($datasetId)
+    {
+        $color = $this->configureColorHelper($datasetId);
+
+        return array(
+            'fillColor'             => $color->toRgba(0.1),
+            'strokeColor'           => $color->toRgba(0.8),
+            'pointColor'            => $color->toRgba(0.75),
+            'pointHighlightStroke'  => $color->toRgba(1)
+        );
+    }
 }

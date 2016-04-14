@@ -84,7 +84,7 @@ class BarChart extends AbstractChart implements ChartInterface
             'data'  => $data,
         );
         
-        $this->datasets[] = array_merge($baseData, $this->colors[$datasetId]);
+        $this->datasets[] = array_merge($baseData, $this->generateColors($datasetId));
 
         return $this;
     }
@@ -110,5 +110,24 @@ class BarChart extends AbstractChart implements ChartInterface
         }
         
         $this->labels = $this->labels;
+    }
+
+    /**
+     * Generate unique color for the dataset
+     *
+     * @param  integer  $datasetId
+     *
+     * @return array
+     */
+    public function generateColors($datasetId)
+    {
+        $color = $this->configureColorHelper($datasetId);
+
+        return array(
+            'fillColor'         => $color->toRgba(0.1),
+            'strokeColor'       => $color->toRgba(0.8),
+            'highlightFill'     => $color->toRgba(0.75),
+            'highlightStroke'   => $color->toRgba(1)
+        );
     }
 }
