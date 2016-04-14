@@ -209,15 +209,15 @@ class ChartQuery extends AbstractChart
      * @param  string     $table without prefix
      * @param  string     $column name. The column must be type of datetime
      * @param  array      $filters will be added to where claues
-     * @param  string     $order will be added to where claues
      *
      * @return array
      */
-    public function fetchTimeData($table, $column, $filters = array(), $order = 'DESC') {
+    public function fetchTimeData($table, $column, $filters = array())
+    {
         // Convert time unitst to the right form for current database platform
-        $dbUnit = $this->translateTimeUnit($this->unit);
-        $query = $this->connection->createQueryBuilder();
-        $limit = $this->countAmountFromDateRange($this->unit);
+        $dbUnit  = $this->translateTimeUnit($this->unit);
+        $query   = $this->connection->createQueryBuilder();
+        $limit   = $this->countAmountFromDateRange($this->unit);
         $groupBy = '';
 
         // Postgres and MySql are handeling date/time SQL funciton differently
@@ -244,7 +244,7 @@ class ChartQuery extends AbstractChart
         }
 
         $query->from(MAUTIC_TABLE_PREFIX . $table, 't')
-            ->orderBy($dateConstruct, $order);
+            ->orderBy($dateConstruct, 'ASC');
 
         // Count only with dates which are not empty
         $query->andWhere('t.' . $column . ' IS NOT NULL');
@@ -256,35 +256,49 @@ class ChartQuery extends AbstractChart
 
         // Fetch the data
         $rawData = $query->execute()->fetchAll();
+
+        return $this->completeTimeData($rawData);
+    }
+
+    /**
+     * Go through the raw data and add the missing times
+     *
+     * @param  string     $table without prefix
+     * @param  string     $column name. The column must be type of datetime
+     * @param  array      $filters will be added to where claues
+     *
+     * @return array
+     */
+    public function completeTimeData($rawData)
+    {
         $data    = array();
         $oneUnit = $this->getUnitObject($this->unit);
-        $date    = clone $this->dateTo;
-        $date->format($this->sqlFormats[$this->unit]);
+        $limit   = $this->countAmountFromDateRange($this->unit);
+        $previousDate = clone $this->dateFrom;
 
         // Convert data from DB to the chart.js format
         for ($i = 0; $i < $limit; $i++) {
 
-            $nextDate = clone $date;
-
-            if ($order == 'DESC') {
-                $nextDate->sub($oneUnit);
-            } else {
-                $nextDate->add($oneUnit);
-            }
+            $nextDate = clone $previousDate;
+            $nextDate->add($oneUnit);
 
             foreach ($rawData as $key => $item) {
-                $itemDate = (new \DateTime($item['date'], new \DateTimeZone('UTC')));
+                $itemDate = (new \DateTime($item['date']));
 
-                // The right value is between the time unit and time unit +1 for ASC ordering
-                if ($order == 'ASC' && $itemDate >= $date && $itemDate < $nextDate) {
+                // Place the right suma is between the time unit and time unit +1
+                if (isset($item['count']) && $itemDate >= $previousDate && $itemDate < $nextDate) {
                     $data[$i] = $item['count'];
                     unset($rawData[$key]);
                     continue;
                 }
 
-                // The right value is between the time unit and time unit -1 for DESC ordering
-                if ($order == 'DESC' && $itemDate <= $date && $itemDate > $nextDate) {
-                    $data[$i] = $item['count'];
+                // Add the right item is between the time unit and time unit +1
+                if (isset($item['data']) && $itemDate >= $previousDate && $itemDate < $nextDate) {
+                    if (isset($data[$i])) {
+                        $data[$i] += $item['data'];
+                    } else {
+                        $data[$i] = $item['data'];
+                    }
                     unset($rawData[$key]);
                     continue;
                 }
@@ -295,14 +309,10 @@ class ChartQuery extends AbstractChart
                 $data[$i] = 0;
             }
 
-            if ($order == 'DESC') {
-                $date->sub($oneUnit);
-            } else {
-                $date->add($oneUnit);
-            }
+            $previousDate->add($oneUnit);
         }
 
-        return array_reverse($data);
+        return $data;
     }
 
     /**
@@ -314,7 +324,8 @@ class ChartQuery extends AbstractChart
      * @param  array      $filters will be added to where claues
      * @param  array      $options for special behavior
      */
-    public function count($table, $uniqueColumn, $dateColumn = null, $filters = array(), $options = array()) {
+    public function count($table, $uniqueColumn, $dateColumn = null, $filters = array(), $options = array())
+    {
         $query = $this->connection->createQueryBuilder();
 
         $query->select('COUNT(t.' . $uniqueColumn . ') AS count')
@@ -358,7 +369,8 @@ class ChartQuery extends AbstractChart
      * @param  integer    $endSecond
      * @param  array      $filters will be added to where claues
      */
-    public function countDateDiff($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $filters = array()) {
+    public function countDateDiff($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $filters = array())
+    {
         $query = $this->connection->createQueryBuilder();
 
         $query->select('COUNT(t.' . $dateColumn1 . ') AS count')
@@ -393,7 +405,8 @@ class ChartQuery extends AbstractChart
      * @param  array      $filters will be added to where claues
      * @param  array      $options for special behavior
      */
-    public function sum($table, $column, $filters = array(), $options = array()) {
+    public function sum($table, $column, $filters = array(), $options = array())
+    {
         $query = $this->connection->createQueryBuilder();
 
         $query->select('sum(t.' . $column . ') AS result')
