@@ -44,6 +44,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
     );
 
     /**
+     * Define permissions to see those widgets
+     *
+     * @var array
+     */
+    protected $permissions = array(
+        'email:emails:viewown',
+        'email:emails:viewother'
+    );
+
+    /**
      * Set a widget detail when needed 
      *
      * @param WidgetDetailEvent $event

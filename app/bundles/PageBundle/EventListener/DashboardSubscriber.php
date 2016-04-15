@@ -43,6 +43,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
     );
 
     /**
+     * Define permissions to see those widgets
+     *
+     * @var array
+     */
+    protected $permissions = array(
+        'page:pages:viewown',
+        'page:pages:viewother'
+    );
+
+    /**
      * Set a widget detail when needed 
      *
      * @param WidgetDetailEvent $event

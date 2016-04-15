@@ -37,6 +37,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
     );
 
     /**
+     * Define permissions to see those widgets
+     *
+     * @var array
+     */
+    protected $permissions = array(
+        'point:points:viewown',
+        'point:points:viewother'
+    );
+
+    /**
      * Set a widget detail when needed 
      *
      * @param WidgetDetailEvent $event

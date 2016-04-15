@@ -13,7 +13,6 @@ use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
 use Mautic\DashboardBundle\Event\WidgetFormEvent;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
  * Class DashboardSubscriber
@@ -22,8 +21,26 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class DashboardSubscriber extends CommonSubscriber
 {
+    /**
+     * Define the name of the bundle/category of the widget(s)
+     *
+     * @var string
+     */
     protected $bundle = 'others';
+
+    /**
+     * Define the widget(s)
+     *
+     * @var array
+     */
     protected $types = array();
+
+    /**
+     * Define permissions to see those widgets
+     *
+     * @var array
+     */
+    protected $permissions = array();
 
     /**
      * @return array
@@ -46,6 +63,8 @@ class DashboardSubscriber extends CommonSubscriber
      */
     public function onWidgetListGenerate(WidgetTypeListEvent $event)
     {
+        if ($this->permissions && !$event->hasPermissions($this->permissions)) return;
+
         $widgetTypes = array_keys($this->types);
 
         foreach ($widgetTypes as $type) {

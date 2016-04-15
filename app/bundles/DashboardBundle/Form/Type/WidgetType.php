@@ -56,6 +56,7 @@ class WidgetType extends AbstractType
 
         $dispatcher = $this->factory->getDispatcher();
         $event      = new WidgetTypeListEvent();
+        $event->setSecurity($this->factory->getSecurity());
         $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE, $event);
 
         $builder->add('type', 'choice', array(

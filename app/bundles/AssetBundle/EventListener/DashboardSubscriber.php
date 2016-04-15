@@ -30,7 +30,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     /**
      * Define the widget(s)
      *
-     * @var string
+     * @var array
      */
     protected $types = array(
         'asset.downloads.in.time' => array(),
@@ -38,6 +38,17 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'popular.assets' => array(),
         'created.assets' => array()
     );
+
+    /**
+     * Define permissions to see those widgets
+     *
+     * @var array
+     */
+    protected $permissions = array(
+        'asset:assets:viewown',
+        'asset:assets:viewother'
+    );
+
 
     /**
      * Set a widget detail when needed 

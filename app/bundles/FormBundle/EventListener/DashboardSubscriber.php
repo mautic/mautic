@@ -38,6 +38,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'top.submitters' => array(),
         'created.forms' => array()
     );
+    
+    /**
+     * Define permissions to see those widgets
+     *
+     * @var array
+     */
+    protected $permissions = array(
+        'form:forms:viewown',
+        'form:forms:viewother'
+    );
 
     /**
      * Set a widget detail when needed 

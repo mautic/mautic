@@ -38,6 +38,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
     );
 
     /**
+     * Define permissions to see those widgets
+     *
+     * @var array
+     */
+    protected $permissions = array(
+        'campaign:campaigns:viewown',
+        'campaign:campaigns:viewother'
+    );
+
+    /**
      * Set a widget detail when needed 
      *
      * @param WidgetDetailEvent $event

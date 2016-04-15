@@ -12,6 +12,7 @@ namespace Mautic\DashboardBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
 /**
  * Class WidgetTypeListEvent
@@ -29,6 +30,11 @@ class WidgetTypeListEvent extends CommonEvent
      * @var Translator $translator
      */
     protected $translator;
+
+    /**
+     * @var CorePermissions $security
+     */
+    protected $security = null;
 
     /**
      * Adds a new widget type to the widget types list
@@ -61,6 +67,30 @@ class WidgetTypeListEvent extends CommonEvent
     public function setTranslator(Translator $translator)
     {
         $this->translator = $translator;
+    }
+
+    /**
+     * Set security object to check the perimissions
+     *
+     * @param CorePermissions $security
+     */
+    public function setSecurity(CorePermissions $security)
+    {
+        $this->security = $security;
+    }
+
+    /**
+     * Check if the user has permission to see the widgets
+     *
+     * @param array $permissions
+     *
+     * @return boolean
+     */
+    public function hasPermissions(array $permissions)
+    {
+        if (!$this->security) return true;
+        $perm = $this->security->isGranted($permissions, "RETURN_ARRAY");
+        return !in_array(false, $perm);
     }
 
     /**
