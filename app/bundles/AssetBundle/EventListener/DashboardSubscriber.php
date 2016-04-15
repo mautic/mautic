@@ -59,6 +59,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
+        $this->checkPermissions($event);
+        
         if ($event->getType() == 'asset.downloads.in.time') {
             $widget = $event->getWidget();
             $params = $widget->getParams();

@@ -97,4 +97,22 @@ class DashboardSubscriber extends CommonSubscriber
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
     }
+
+    /**
+     * Set a widget detail when needed 
+     *
+     * @param WidgetDetailEvent $event
+     *
+     * @return void
+     */
+    public function checkPermissions(WidgetDetailEvent $event)
+    {
+        $widgetTypes = array_keys($this->types);
+        if ($this->permissions && !$event->hasPermissions($this->permissions) && in_array($event->getType(), $widgetTypes)) {
+            $translator = $event->getTranslator();
+            $event->setErrorMessage($translator->trans('mautic.dashboard.missing.permission', array('%section%' => $this->bundle)));
+            $event->stopPropagation();
+            return;
+        }
+    }
 }

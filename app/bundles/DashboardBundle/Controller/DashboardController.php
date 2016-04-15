@@ -113,13 +113,6 @@ class DashboardController extends FormController
             }
         }
 
-        // @todo: build permissions
-        // $security    = $this->factory->getSecurity();
-        // $permissions = array(
-        //     'edit'   => $security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner()),
-        //     'delete' => $security->hasEntityAccess('lead:leads:deleteown', 'lead:leads:deleteown', $lead->getOwner()),
-        // );
-
         if ($closeModal) {
             //just close the modal
             $passthroughVars = array(
@@ -134,7 +127,6 @@ class DashboardController extends FormController
                 $passthroughVars['upWidgetCount'] = 1;
                 $passthroughVars['widgetHtml'] = $this->renderView('MauticDashboardBundle:Widget:detail.html.php', array(
                     'widget'      => $widget,
-                    // 'permissions' => $permissions,
                 ));
                 $passthroughVars['widgetId'] = $widget->getId();
                 $passthroughVars['widgetWidth'] = $widget->getWidth();
@@ -149,8 +141,7 @@ class DashboardController extends FormController
 
             return $this->delegateView(array(
                 'viewParameters'  => array(
-                    'form'        => $form->createView(),
-                    // 'permissions' => $permissions
+                    'form'        => $form->createView()
                 ),
                 'contentTemplate' => 'MauticDashboardBundle:Widget:form.html.php'
             ));
@@ -188,13 +179,6 @@ class DashboardController extends FormController
             }
         }
 
-        // @todo: build permissions
-        // $security    = $this->factory->getSecurity();
-        // $permissions = array(
-        //     'edit'   => $security->hasEntityAccess('dashobard:widgets:editown', 'dashobard:widgets:editother', $widget->getOwner()),
-        //     'delete' => $security->hasEntityAccess('dashobard:widgets:deleteown', 'dashobard:widgets:deleteown', $widget->getOwner()),
-        // );
-
         if ($closeModal) {
             //just close the modal
             $passthroughVars = array(
@@ -209,7 +193,6 @@ class DashboardController extends FormController
                 $passthroughVars['upWidgetCount'] = 1;
                 $passthroughVars['widgetHtml'] = $this->renderView('MauticDashboardBundle:Widget:detail.html.php', array(
                     'widget'      => $widget,
-                    // 'permissions' => $permissions,
                 ));
                 $passthroughVars['widgetId'] = $widget->getId();
                 $passthroughVars['widgetWidth'] = $widget->getWidth();
@@ -226,7 +209,6 @@ class DashboardController extends FormController
             return $this->delegateView(array(
                 'viewParameters'  => array(
                     'form'        => $form->createView(),
-                    // 'permissions' => $permissions
                 ),
                 'contentTemplate' => 'MauticDashboardBundle:Widget:form.html.php'
             ));
@@ -242,11 +224,6 @@ class DashboardController extends FormController
      */
     public function deleteAction($objectId)
     {
-        // @todo: build permissions
-        // if (!$this->factory->getSecurity()->isGranted('dashobard:widgets:delete')) {
-        //     return $this->accessDenied();
-        // }
-
         $returnUrl = $this->generateUrl('mautic_dashboard_index');
         $success   = 0;
         $flashes   = array();
@@ -405,11 +382,6 @@ class DashboardController extends FormController
         $model = $this->factory->getModel('dashboard');
         $dir = $this->factory->getParameter('dashboard_import_dir');
         $session = $this->factory->getSession();
-
-        // @todo implement permissions
-        // if (!$this->factory->getSecurity()->isGranted('dashboard:widgets:create')) {
-        //     return $this->accessDenied();
-        // }
 
         $action     = $this->generateUrl('mautic_dashboard_action', array('objectAction' => 'import'));
         $form       = $this->get('form.factory')->create('dashboard_upload', array(), array('action' => $action));

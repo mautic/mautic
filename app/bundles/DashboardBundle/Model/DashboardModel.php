@@ -157,6 +157,7 @@ class DashboardModel extends FormModel
         $event = new WidgetDetailEvent($this->translator);
         $event->setWidget($widget);
         $event->setCacheDir($cacheDir);
+        $event->setSecurity($this->factory->getSecurity());
         $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
     }
 

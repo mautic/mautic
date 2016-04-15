@@ -55,6 +55,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
+        $this->checkPermissions($event);
+        
         if ($event->getType() == 'points.in.time') {
             $widget = $event->getWidget();
             $params = $widget->getParams();

@@ -63,6 +63,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
+        $this->checkPermissions($event);
+        
         if ($event->getType() == 'created.leads.in.time') {
             $widget = $event->getWidget();
             $params = $widget->getParams();
