@@ -73,8 +73,9 @@ abstract class AbstractChart
      *
      * @return DateInterval
      */
-    public function getUnitObject($unit)
+    public function getUnitInterval($unit = null)
     {
+        if (!$unit) $unit = $this->unit;
         $isTime  = in_array($unit, array('H', 'i', 's')) ? 'T' : '';
         $toUpper = array('d', 'i');
 

@@ -272,7 +272,7 @@ class ChartQuery extends AbstractChart
     public function completeTimeData($rawData)
     {
         $data    = array();
-        $oneUnit = $this->getUnitObject($this->unit);
+        $oneUnit = $this->getUnitInterval();
         $limit   = $this->countAmountFromDateRange($this->unit);
         $previousDate = clone $this->dateFrom;
         $previousDate->setTimezone(new \DateTimeZone("UTC"));
