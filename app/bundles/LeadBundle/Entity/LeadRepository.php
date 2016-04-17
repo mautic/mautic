@@ -831,7 +831,7 @@ class LeadRepository extends CommonRepository
 
 
 
-                $query_ps = "SELECT x.lead_id FROM (SELECT *, COUNT(lead_id) FROM lead_lists_leads WHERE leadlist_id IN (".$imploder.") GROUP BY lead_id  HAVING COUNT(lead_id) > ".$pluck." AND SUM(manually_removed) < ".$pluck.") AS X";
+                $query_ps = "SELECT X.lead_id FROM (SELECT *, COUNT(lead_id) FROM ".MAUTIC_TABLE_PREFIX."lead_lists_leads WHERE leadlist_id IN (".$imploder.") GROUP BY lead_id  HAVING COUNT(lead_id) > ".$pluck." AND SUM(manually_removed) < ".$pluck.") AS X";
                 $stmt = $this->getEntityManager()
                             ->getConnection()  
                             ->prepare($query_ps);  
