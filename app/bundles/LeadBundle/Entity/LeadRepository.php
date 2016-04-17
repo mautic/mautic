@@ -13,6 +13,7 @@ use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\PointBundle\Model\TriggerModel;
+use Doctrine\ORM\Query\ResultSetMapping;
 
 /**
  * LeadRepository
@@ -799,6 +800,54 @@ class LeadRepository extends CommonRepository
                 }
                 $expr = $q->expr()->in('l.id', $leadIds);
                 break;
+
+            case $this->translator->trans('mautic.lead.lead.searchcommand.duplicate'):
+                    
+                //doing the thing here. 
+
+                $prateek = explode("+", $string);
+              
+                $imploder = array();
+
+                foreach ($prateek as $key => $value) {
+                    $list = $this->_em->getRepository("MauticLeadBundle:LeadList")->findOneByAlias($value);
+                    if (!empty($list)) {
+                        $imploder[] = (int) $list->getId();
+                    }
+                    else 
+                        $imploder[] = 0;
+                }
+                
+
+                //logic. In query, Sum(manuall_removed should be less than the current)
+                $pluck = sizeof($imploder);
+                $pluck--; 
+
+
+                $imploder = implode(",", $imploder);
+                
+                $return = array();
+                $rsm = new ResultSetMapping();
+
+
+
+                $query_ps = "SELECT x.lead_id FROM (SELECT *, COUNT(lead_id) FROM lead_lists_leads WHERE leadlist_id IN (".$imploder.") GROUP BY lead_id  HAVING COUNT(lead_id) > ".$pluck." AND SUM(manually_removed) < ".$pluck.") AS X";
+                $stmt = $this->getEntityManager()
+                            ->getConnection()  
+                            ->prepare($query_ps);  
+                 
+                $stmt->execute();  
+                
+                $results = $stmt->fetchAll();
+                $leadIds = array();
+                foreach ($results as $row) {
+                    $leadIds[] = $row['lead_id'];
+                }
+                if (!sizeof($leadIds)) $leadIds[0] = 0;
+                $expr = $q->expr()->in('l.id', $leadIds);
+
+                break;
+
             case $this->translator->trans('mautic.lead.lead.searchcommand.tag'):
                 // search by tag
                 $sq = $this->_em->getConnection()->createQueryBuilder();
@@ -862,7 +911,8 @@ class LeadRepository extends CommonRepository
             'mautic.core.searchcommand.email',
             'mautic.lead.lead.searchcommand.owner',
             'mautic.core.searchcommand.ip',
-            'mautic.lead.lead.searchcommand.tag'
+            'mautic.lead.lead.searchcommand.tag',
+            'mautic.lead.lead.searchcommand.duplicate'
         );
 
         if (!empty($this->availableSearchFields)) {
@@ -910,34 +960,5 @@ class LeadRepository extends CommonRepository
             ->execute()->fetchAll();
 
         return $result[0]['max_lead_id'];
-    }
-
-    /**
-     * Gets names, signature and email of the user(lead owner)
-     *
-     * @param  integer $ownerId
-     *
-     * @return array|false
-     */
-    public function getLeadOwner($ownerId)
-    {
-        if (!$ownerId) return false;
-
-        $q = $this->_em->getConnection()->createQueryBuilder()
-            ->select('u.id, u.first_name, u.last_name, u.email, u.signature')
-            ->from(MAUTIC_TABLE_PREFIX . 'users', 'u')
-            ->where('u.id = :ownerId')
-            ->setParameter('ownerId', (int) $ownerId);
-
-        $result = $q->execute()->fetch();
-
-        // Fix the HTML markup
-        if (is_array($result)) {
-            foreach ($result as &$field) {
-                $field = html_entity_decode($field);
-            }
-        }
-
-        return $result;
     }
 }
