@@ -1225,10 +1225,11 @@ class LeadModel extends FormModel
      * @param DateTime $dateTo
      * @param string   $dateFormat
      * @param array    $filter
+     * @param boolean  $canViewOthers
      *
      * @return array
      */
-    public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $dateFormat = null, $filter = array(), $canViewOther = true)
+    public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
     {
         $flag = null;
         $topLists  = null;
@@ -1238,7 +1239,7 @@ class LeadModel extends FormModel
             unset($filter['flag']);
         }
 
-        if (!$canViewOther) {
+        if (!$canViewOthers) {
             $filter['owner_id'] = $this->factory->getUser()->getId();
         }
 
@@ -1308,13 +1309,18 @@ class LeadModel extends FormModel
      * @param string  $dateFrom
      * @param string  $dateTo
      * @param array   $filters
+     * @param boolean $canViewOthers
      *
      * @return array
      */
-    public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, $filters = array())
+    public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, $filters = array(), $canViewOthers = true)
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+
+        if (!$canViewOthers) {
+            $filter['owner_id'] = $this->factory->getUser()->getId();
+        }
 
         $identified = $query->count('leads', 'date_identified', 'date_added', $filters);
         $all = $query->count('leads', 'id', 'date_added', $filters);
@@ -1331,11 +1337,16 @@ class LeadModel extends FormModel
      * @param string  $dateFrom
      * @param string  $dateTo
      * @param array   $filters
+     * @param boolean $canViewOthers
      *
      * @return array
      */
-    public function getLeadMapData($dateFrom, $dateTo, $filters = array())
+    public function getLeadMapData($dateFrom, $dateTo, $filters = array(), $canViewOthers = true)
     {
+        if (!$canViewOthers) {
+            $filter['owner_id'] = $this->factory->getUser()->getId();
+        }
+
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) as quantity, t.country')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
@@ -1434,6 +1445,10 @@ class LeadModel extends FormModel
      */
     public function getLeadList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array(), $options = array())
     {
+        if (!empty($options['canViewOthers'])) {
+            $filter['owner_id'] = $this->factory->getUser()->getId();
+        }
+
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.firstname, t.lastname, t.email, t.date_added, t.date_modified')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 't')

@@ -64,7 +64,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
-        $canViewOther = $event->hasPermission('form:forms:viewother');
+        $canViewOthers = $event->hasPermission('form:forms:viewother');
         
         if ($event->getType() == 'created.leads.in.time') {
             $widget = $event->getWidget();
@@ -85,13 +85,14 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $params['dateTo'],
                         $params['dateFormat'],
                         $params['filter'],
-                        $canViewOther
+                        $canViewOthers
                     )
                 ));
             }
 
             $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
             $event->stopPropagation();
+            return;
         }
 
         if ($event->getType() == 'anonymous.vs.identified.leads') {
@@ -101,12 +102,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData(array(
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,
-                    'chartData'   => $model->getAnonymousVsIdentifiedPieChartData($params['dateFrom'], $params['dateTo'])
+                    'chartData'   => $model->getAnonymousVsIdentifiedPieChartData($params['dateFrom'], $params['dateTo'], $canViewOthers)
                 ));
             }
 
             $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
             $event->stopPropagation();
+            return;
         }
 
         if ($event->getType() == 'map.of.leads') {
@@ -115,12 +117,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $model = $this->factory->getModel('lead');
                 $event->setTemplateData(array(
                     'height' => $event->getWidget()->getHeight() - 80,
-                    'data'   => $model->getLeadMapData($params['dateFrom'], $params['dateTo'])
+                    'data'   => $model->getLeadMapData($params['dateFrom'], $params['dateTo'], $canViewOthers)
                 ));
             }
 
             $event->setTemplate('MauticCoreBundle:Helper:map.html.php');
             $event->stopPropagation();
+            return;
         }
 
         if ($event->getType() == 'top.lists') {
@@ -135,7 +138,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $lists = $model->getTopLists($limit, $params['dateFrom'], $params['dateTo']);
+                $lists = $model->getTopLists($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers);
                 $items = array();
 
                 // Build table rows with links
@@ -168,9 +171,17 @@ class DashboardSubscriber extends MainDashboardSubscriber
             
             $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
             $event->stopPropagation();
+            return;
         }
 
         if ($event->getType() == 'top.owners') {
+
+            if (!$canViewOthers) {
+                $event->setErrorMessage($translator->trans('mautic.dashboard.missing.permission', array('%section%' => $this->bundle)));
+                $event->stopPropagation();
+                return;
+            }
+
             if (!$event->isCached()) {
                 $model  = $this->factory->getModel('lead');
                 $params = $event->getWidget()->getParams();
@@ -215,9 +226,17 @@ class DashboardSubscriber extends MainDashboardSubscriber
             
             $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
             $event->stopPropagation();
+            return;
         }
 
         if ($event->getType() == 'top.creators') {
+
+            if (!$canViewOthers) {
+                $event->setErrorMessage($translator->trans('mautic.dashboard.missing.permission', array('%section%' => $this->bundle)));
+                $event->stopPropagation();
+                return;
+            }
+
             if (!$event->isCached()) {
                 $model  = $this->factory->getModel('lead');
                 $params = $event->getWidget()->getParams();
@@ -262,6 +281,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             
             $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
             $event->stopPropagation();
+            return;
         }
 
         if ($event->getType() == 'created.leads') {
@@ -276,7 +296,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $leads = $model->getLeadList($limit, $params['dateFrom'], $params['dateTo']);
+                $leads = $model->getLeadList($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers, array(), array('canViewOthers' => $canViewOthers));
                 $items = array();
 
                 // Build table rows with links
@@ -305,6 +325,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             
             $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
             $event->stopPropagation();
+            return;
         }
     }
 }
