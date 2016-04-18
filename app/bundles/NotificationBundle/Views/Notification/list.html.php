@@ -51,7 +51,11 @@ if (count($items)):
         </tr>
         </thead>
         <tbody>
-        <?php foreach ($items as $item): ?>
+        <?php
+        /** @var \Mautic\NotificationBundle\Entity\Notification $item */
+        foreach ($items as $item):
+            $type = $item->getNotificationType();
+            ?>
             <tr>
                 <td>
                     <?php

@@ -122,12 +122,8 @@ class NotificationModel extends FormModel
     {
         if ($id === null) {
             $entity = new Notification;
-            $entity->setSessionId('new_' . hash('sha1', uniqid(mt_rand())));
         } else {
             $entity = parent::getEntity($id);
-            if ($entity !== null) {
-                $entity->setSessionId($entity->getId());
-            }
         }
 
         return $entity;

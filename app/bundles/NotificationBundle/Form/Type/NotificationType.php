@@ -58,6 +58,47 @@ class NotificationType extends AbstractType
             )
         );
 
+        $builder->add(
+            'description',
+            'textarea',
+            array(
+                'label'      => 'mautic.notification.form.internal.description',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control')
+            )
+        );
+
+        $builder->add(
+            'heading',
+            'text',
+            array(
+                'label'      => 'mautic.notification.form.heading',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control')
+            )
+        );
+
+        $builder->add(
+            'message',
+            'textarea',
+            array(
+                'label'      => 'mautic.notification.form.message',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control')
+            )
+        );
+
+        $builder->add(
+            'url',
+            'url',
+            array(
+                'label'      => 'mautic.notification.form.url',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control'),
+                'required'   => false
+            )
+        );
+
         $builder->add('isPublished', 'yesno_button_group');
 
         $builder->add(
@@ -134,7 +175,8 @@ class NotificationType extends AbstractType
             )
         );
 
-        $builder->add('sessionId', 'hidden');
+        $builder->add('buttons', 'form_buttons');
+        $builder->add('notificationType', 'hidden');
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);

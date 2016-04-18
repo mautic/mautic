@@ -26,7 +26,17 @@ class RedirectRepository extends CommonRepository
      */
     public function findBySource($source, $id)
     {
-        $column = ($source == 'email') ? 'r.email_id' : 'r.source';
+        switch ($source) {
+            case 'email':
+                $column = 'r.email_id';
+                break;
+            case 'notification':
+                $column = 'r.notification_id';
+                break;
+            default:
+                $column = 'r.' . $source;
+                break;
+        }
 
         $q = $this->_em->getConnection()->createQueryBuilder();
 

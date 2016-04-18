@@ -16,7 +16,10 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
@@ -47,9 +50,19 @@ class Notification extends FormEntity
     private $language = 'en';
 
     /**
-     * @var array
+     * @var string
      */
-    private $content = array();
+    private $url;
+
+    /**
+     * @var string
+     */
+    private $heading;
+
+    /**
+     * @var string
+     */
+    private $message;
 
     /**
      * @var \DateTime
@@ -87,11 +100,9 @@ class Notification extends FormEntity
     private $stats;
 
     /**
-     * Used to identify the page for the builder
-     *
-     * @var
+     * @var string
      */
-    private $sessionId;
+    private $notificationType;
 
     public function __clone()
     {
@@ -99,7 +110,6 @@ class Notification extends FormEntity
         $this->stats            = new ArrayCollection();
         $this->sentCount        = 0;
         $this->readCount        = 0;
-        $this->sessionId        = 'new_' . hash('sha1', uniqid(mt_rand()));
 
         parent::__clone();
     }
@@ -134,7 +144,18 @@ class Notification extends FormEntity
             ->columnName('lang')
             ->build();
 
-        $builder->createField('content', 'array')
+        $builder->createField('url', 'text')
+            ->nullable()
+            ->build();
+
+        $builder->createField('heading', 'text')
+            ->build();
+
+        $builder->createField('message', 'text')
+            ->build();
+
+        $builder->createField('notificationType', 'text')
+            ->columnName('notification_type')
             ->nullable()
             ->build();
 
@@ -179,6 +200,37 @@ class Notification extends FormEntity
                 )
             )
         );
+
+        $metadata->addConstraint(new Callback(array(
+            'callback' => function (Notification $notification, ExecutionContextInterface $context) {
+                $type = $notification->getNotificationType();
+                if ($type == 'list') {
+                    $validator  = $context->getValidator();
+                    $violations = $validator->validate(
+                        $notification->getLists(),
+                        array(
+                            new LeadListAccess(
+                                array(
+                                    'message' => 'mautic.lead.lists.required'
+                                )
+                            ),
+                            new NotBlank(
+                                array(
+                                    'message' => 'mautic.lead.lists.required'
+                                )
+                            )
+                        )
+                    );
+
+                    if (count($violations) > 0) {
+                        $string = (string) $violations;
+                        $context->buildViolation($string)
+                            ->atPath('lists')
+                            ->addViolation();
+                    }
+                }
+            }
+        )));
     }
 
     /**
@@ -193,6 +245,9 @@ class Notification extends FormEntity
                 array(
                     'id',
                     'name',
+                    'heading',
+                    'message',
+                    'url',
                     'language',
                     'category'
                 )
@@ -296,27 +351,51 @@ class Notification extends FormEntity
     }
 
     /**
-     * @return array
+     * @return string
      */
-    public function getContent()
+    public function getHeading()
     {
-        return $this->content;
+        return $this->heading;
     }
 
     /**
-     * @param $content
-     *
-     * @return $this
+     * @param string $heading
      */
-    public function setContent($content)
+    public function setHeading($heading)
     {
-        // Ensure safe emoji
-        $content = EmojiHelper::toShort($content);
+        $this->heading = $heading;
+    }
 
-        $this->isChanged('content', $content);
-        $this->content = $content;
+    /**
+     * @return string
+     */
+    public function getMessage()
+    {
+        return $this->message;
+    }
 
-        return $this;
+    /**
+     * @param string $message
+     */
+    public function setMessage($message)
+    {
+        $this->message = $message;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param string $url
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
     }
 
     /**
@@ -356,26 +435,6 @@ class Notification extends FormEntity
     {
         $this->isChanged('language', $language);
         $this->language = $language;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getSessionId()
-    {
-        return $this->sessionId;
-    }
-
-    /**
-     * @param $sessionId
-     *
-     * @return $this
-     */
-    public function setSessionId($sessionId)
-    {
-        $this->sessionId = $sessionId;
 
         return $this;
     }
@@ -423,8 +482,6 @@ class Notification extends FormEntity
     }
 
     /**
-     * @param bool $includeVariants
-     *
      * @return mixed
      */
     public function getSentCount()
@@ -481,5 +538,21 @@ class Notification extends FormEntity
     public function getStats()
     {
         return $this->stats;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNotificationType()
+    {
+        return $this->notificationType;
+    }
+
+    /**
+     * @param string $notificationType
+     */
+    public function setNotificationType($notificationType)
+    {
+        $this->notificationType = $notificationType;
     }
 }

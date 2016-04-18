@@ -10,7 +10,7 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'notification');
 
-$notificationType = 'list';
+$notificationType = $form['notificationType']->vars['data'];
 
 $header = ($notification->getId()) ?
     $view['translator']->trans('mautic.notification.header.edit',
@@ -32,10 +32,36 @@ if (!isset($attachmentSize)) {
                 <!-- tabs controls -->
                 <ul class="bg-auto nav nav-tabs pr-md pl-md">
                     <li class="active"><a href="#notification-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.notification.notification'); ?></a></li>
-                    <li class=""><a href="#advanced-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.advanced'); ?></a></li>
                 </ul>
                 <!--/ tabs controls -->
                 <div class="tab-content pa-md">
+                    <div class="tab-pane fade in active bdr-w-0" id="notification-container">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['name']); ?>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="pull-left">
+                                    <?php echo $view['form']->label($form['description']); ?>
+                                </div>
+                                <div class="clearfix"></div>
+                                <?php echo $view['form']->widget($form['description']); ?>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['heading']); ?>
+                                <?php echo $view['form']->row($form['url']); ?>
+                            </div>
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['message']); ?>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -61,14 +87,14 @@ if (!isset($attachmentSize)) {
 <?php echo $view['form']->end($form); ?>
 
 <?php
-$type = $notificationType;
-if (empty($type) || !empty($forceTypeSelection)):
+$type = $notification->getNotificationType();
+if (empty($type) || ! empty($forceTypeSelection)):
     echo $view->render('MauticCoreBundle:Helper:form_selecttype.html.php',
         array(
             'item'               => $notification,
             'mauticLang'         => array(
-                'newListNotification' => 'mautic.notification.type.list.header',
-                'newTemplateNotification'   => 'mautic.notification.type.template.header'
+                'newListNotification'     => 'mautic.notification.type.list.header',
+                'newTemplateNotification' => 'mautic.notification.type.template.header'
             ),
             'typePrefix'         => 'notification',
             'cancelUrl'          => 'mautic_notification_index',

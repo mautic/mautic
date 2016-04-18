@@ -113,7 +113,7 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('push_notification_stats')
-            ->setCustomRepositoryClass('Mautic\NotificationBundle\Entity\NotificationRepository')
+            ->setCustomRepositoryClass('Mautic\NotificationBundle\Entity\StatRepository')
             ->addIndex(array('notification_id', 'lead_id'), 'stat_notification_search')
             ->addIndex(array('is_read'), 'stat_notification_clicked_search')
             ->addIndex(array('tracking_hash'), 'stat_email_hash_search')

@@ -291,10 +291,9 @@ class NotificationController extends FormController
                     )
                 ),
                 'viewParameters'  => array(
-                    'email'          => $notification,
+                    'notification'   => $notification,
                     'stats'          => $stats,
                     'trackableLinks' => $trackableLinks,
-                    'pending'        => $model->getPendingLeads($notification, null, true),
                     'logs'           => $logs,
                     'permissions'    => $security->isGranted(
                         array(
@@ -310,14 +309,9 @@ class NotificationController extends FormController
                         ),
                         "RETURN_ARRAY"
                     ),
-                    'security'       => $security,
-                    'previewUrl'     => $this->generateUrl(
-                        'mautic_notification_preview',
-                        array('objectId' => $notification->getId()),
-                        true
-                    )
+                    'security'       => $security
                 ),
-                'contentTemplate' => 'NotificationBundle:Notification:details.html.php',
+                'contentTemplate' => 'MauticNotificationBundle:Notification:details.html.php',
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_notification_index',
                     'mauticContent' => 'notification'
@@ -335,6 +329,7 @@ class NotificationController extends FormController
      */
     public function newAction($entity = null)
     {
+        /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
         $model = $this->factory->getModel('notification');
 
         if (! $entity instanceof Notification) {
@@ -344,6 +339,7 @@ class NotificationController extends FormController
 
         $method  = $this->request->getMethod();
         $session = $this->factory->getSession();
+
         if (!$this->factory->getSecurity()->isGranted('notification:notifications:create')) {
             return $this->accessDenied();
         }
@@ -354,10 +350,7 @@ class NotificationController extends FormController
 
         $updateSelect = ($method == 'POST')
             ? $this->request->request->get('notificationform[updateSelect]', false, true)
-            : $this->request->get(
-                'updateSelect',
-                false
-            );
+            : $this->request->get('updateSelect', false);
 
         //create the form
         $form = $model->createForm($entity, $this->get('form.factory'), $action, array('update_select' => $updateSelect));
@@ -367,37 +360,13 @@ class NotificationController extends FormController
             $valid = false;
             if (! $cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $session     = $this->factory->getSession();
-                    $contentName = 'mautic.notification.'.$entity->getSessionId().'.content';
-
-                    $template = $entity->getTemplate();
-                    if (!empty($template)) {
-                        $content = $session->get($contentName, array());
-                        $entity->setCustomHtml(null);
-                    } else {
-                        $content = $entity->getCustomHtml();
-                        $entity->setContent(array());
-                    }
-
-                    // Parse visual placeholders into tokens
-                    BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($content);
-
-                    if (!empty($template)) {
-                        $entity->setContent($content);
-                    } else {
-                        $entity->setCustomHtml($content);
-                    }
-
                     //form is valid so process the data
                     $model->saveEntity($entity);
-
-                    //clear the session
-                    $session->remove($contentName);
 
                     $this->addFlash(
                         'mautic.core.notice.created',
                         array(
-                            '%name%'      => $entity->getTitle(),
+                            '%name%'      => $entity->getName(),
                             '%menu_link%' => 'mautic_notification_index',
                             '%url%'       => $this->generateUrl(
                                 'mautic_notification_action',
@@ -415,7 +384,7 @@ class NotificationController extends FormController
                             'objectId'     => $entity->getId()
                         );
                         $returnUrl      = $this->generateUrl('mautic_notification_action', $viewParameters);
-                        $template       = 'MauticEmailBundle:Email:view';
+                        $template       = 'MauticNotificationBundle:Notification:view';
                     } else {
                         //return edit view so that all the session stuff is loaded
                         return $this->editAction($entity->getId(), true);
@@ -543,10 +512,7 @@ class NotificationController extends FormController
 
         $updateSelect = ($method == 'POST')
             ? $this->request->request->get('notificationform[updateSelect]', false, true)
-            : $this->request->get(
-                'updateSelect',
-                false
-            );
+            : $this->request->get('updateSelect', false);
 
         $form   = $model->createForm($entity, $this->get('form.factory'), $action, array('update_select' => $updateSelect));
 
@@ -555,40 +521,13 @@ class NotificationController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $contentName = 'mautic.notification.'.$entity->getSessionId().'.content';
-                    $template    = $entity->getTemplate();
-                    if (!empty($template)) {
-                        $existingContent = $entity->getContent();
-                        $newContent      = $session->get($contentName, array());
-                        $viewContent     = array_merge($existingContent, $newContent);
-
-                        $entity->setCustomHtml(null);
-                    } else {
-                        $entity->setContent(array());
-
-                        $viewContent = $entity->getCustomHtml();
-                    }
-
-                    // Copy model content then parse from visual to tokens
-                    $modelContent = $viewContent;
-                    BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($modelContent);
-
-                    if (!empty($template)) {
-                        $entity->setContent($modelContent);
-                    } else {
-                        $entity->setCustomHtml($modelContent);
-                    }
-
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
-
-                    //clear the session
-                    $session->remove($contentName);
 
                     $this->addFlash(
                         'mautic.core.notice.updated',
                         array(
-                            '%name%'      => $entity->getTitle(),
+                            '%name%'      => $entity->getName(),
                             '%menu_link%' => 'mautic_notification_index',
                             '%url%'       => $this->generateUrl(
                                 'mautic_notification_action',
@@ -645,31 +584,13 @@ class NotificationController extends FormController
         } else {
             //lock the entity
             $model->lockEntity($entity);
-
-            //clear any modified content
-            $session->remove('mautic.notification.'.$objectId.'.content');
-
-            // Parse tokens into view data
-            $tokens = $model->getBuilderComponents($entity, array('tokens', 'visualTokens', 'tokenSections'));
-
-            // Set to view content
-            $template = $entity->getTemplate();
-            if (empty($template)) {
-                $content = $entity->getCustomHtml();
-                BuilderTokenHelper::replaceTokensWithVisualPlaceholders($tokens, $content);
-                $form['customHtml']->setData($content);
-            }
         }
-
-        $assets         = $form['assetAttachments']->getData();
-        $attachmentSize = $this->factory->getModel('asset')->getTotalFilesize($assets);
 
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
                     'form'               => $this->setFormTheme($form, 'MauticNotificationBundle:Notification:form.html.php', 'MauticNotificationBundle:FormTheme\Notification'),
-                    'tokens'             => (!empty($tokens)) ? $tokens['tokenSections'] : $model->getBuilderComponents($entity, 'tokenSections'),
-                    'notification'            => $entity,
+                    'notification'       => $entity,
                     'forceTypeSelection' => $forceTypeSelection
                 ),
                 'contentTemplate' => 'MauticNotificationBundle:Notification:form.html.php',

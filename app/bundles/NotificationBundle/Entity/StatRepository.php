@@ -294,7 +294,7 @@ class StatRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostEmails($query, $limit = 10, $offset = 0)
+    public function getMostNotifications($query, $limit = 10, $offset = 0)
     {
         $query
             ->setMaxResults($limit)
