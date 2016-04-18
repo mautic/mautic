@@ -178,4 +178,44 @@ class NotificationRepository extends CommonRepository
 
         $q->execute();
     }
+
+    /**
+     * @param string $search
+     * @param int    $limit
+     * @param int    $start
+     * @param bool   $viewOther
+     * @param string $notificationType
+     *
+     * @return array
+     */
+    public function getNotificationList($search = '', $limit = 10, $start = 0, $viewOther = false, $notificationType = null)
+    {
+        $q = $this->createQueryBuilder('e');
+        $q->select('partial e.{id, name, language}');
+
+        if (!empty($search)) {
+            $q->andWhere($q->expr()->like('e.name', ':search'))
+                ->setParameter('search', "{$search}%");
+        }
+
+        if (!$viewOther) {
+            $q->andWhere($q->expr()->eq('e.createdBy', ':id'))
+                ->setParameter('id', $this->currentUser->getId());
+        }
+
+        if (!empty($notificationType)) {
+            $q->andWhere(
+                $q->expr()->eq('e.notificationType', $q->expr()->literal($notificationType))
+            );
+        }
+
+        $q->orderBy('e.name');
+
+        if (!empty($limit)) {
+            $q->setFirstResult($start)
+                ->setMaxResults($limit);
+        }
+
+        return $q->getQuery()->getArrayResult();
+    }
 }

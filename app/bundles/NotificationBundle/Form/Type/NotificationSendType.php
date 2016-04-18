@@ -9,8 +9,11 @@
 
 namespace Mautic\NotificationBundle\Form\Type;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class NotificationSendType
@@ -20,41 +23,83 @@ use Symfony\Component\Form\FormBuilderInterface;
 class NotificationSendType extends AbstractType
 {
     /**
+     * @var MauticFactory
+     */
+    protected $factory;
+
+    /**
+     * @param MauticFactory $factory
+     */
+    public function __construct(MauticFactory $factory)
+    {
+        $this->factory = $factory;
+    }
+
+    /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('notification_message_headings', 'textarea', array(
-            'label_attr' => array('class' => 'control-label'),
-            'label' => 'mautic.notification.headings',
-            'required' => true,
-            'attr' => array(
-                'class' => 'form-control',
-                'tooltip' => 'mautic.notification.headings.tooltip'
+        $builder->add('notification', 'notification_list', array(
+            'label'       => 'mautic.notification.send.selectnotifications',
+            'label_attr'  => array('class' => 'control-label'),
+            'attr'        => array(
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.notification.choose.notifications',
+                'onchange'=> 'Mautic.disabledNotificationAction()'
+            ),
+            'multiple'    => false,
+            'constraints' => array(
+                new NotBlank(
+                    array('message' => 'mautic.notification.choosenotification.notblank')
+                )
             )
         ));
 
-        $builder->add('notification_message_template', 'textarea', array(
-            'label_attr' => array('class' => 'control-label'),
-            'label' => 'mautic.notification.text',
-            'required' => true,
-            'attr' => array(
-                'class' => 'form-control',
-                'tooltip' => 'mautic.notification.text.tooltip'
-            )
-        ));
+        if (! empty($options['update_select'])) {
+            $windowUrl = $this->factory->getRouter()->generate('mautic_notification_action', array(
+                'objectAction' => 'new',
+                'contentOnly'  => 1,
+                'updateSelect' => $options['update_select']
+            ));
 
-        $builder->add('notification_link', 'url', array(
-            'label_attr' => array('class' => 'control-label'),
-            'label' => 'mautic.notification.link',
-            'required' => false,
-            'attr' => array(
-                'class' => 'form-control',
-                'tooltip' => 'mautic.notification.link.tooltip',
-                'placeholder' => 'mautic.notification.link.placeholder'
-            )
-        ));
+            $builder->add('newNotificationButton', 'button', array(
+                'attr'  => array(
+                    'class'   => 'btn btn-primary',
+                    'onclick' => 'Mautic.loadNewNotificationWindow({
+                        "windowUrl": "' . $windowUrl . '"
+                    })',
+                    'icon'    => 'fa fa-plus'
+                ),
+                'label' => 'mautic.notification.send.new.notification'
+            ));
+
+            $email = $options['data']['notification'];
+
+            // create button edit notification
+            $windowUrlEdit = $this->factory->getRouter()->generate('mautic_notification_action', array(
+                'objectAction' => 'edit',
+                'objectId'     => 'notificationId',
+                'contentOnly'  => 1,
+                'updateSelect' => $options['update_select']
+            ));
+
+            $builder->add('editNotificationButton', 'button', array(
+                'attr'  => array(
+                    'class'     => 'btn btn-primary',
+                    'onclick'   => 'Mautic.loadNewNotificationWindow(Mautic.standardNotificationUrl({"windowUrl": "' . $windowUrlEdit . '"}))',
+                    'disabled'  => !isset($email),
+                    'icon'      => 'fa fa-edit'
+                ),
+                'label' => 'mautic.notification.send.edit.notification'
+            ));
+        }
+    }
+
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setOptional(array('update_select'));
     }
 
     /**

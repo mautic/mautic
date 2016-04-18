@@ -36,10 +36,12 @@ class CampaignSubscriber extends CommonSubscriber
             $event->addAction(
                 'notification.send_notification',
                 array(
-                    'label' => 'mautic.notification.campaign.send_notification',
-                    'description' => 'mautic.notification.campaign.send_notification.tooltip',
-                    'callback' => array('\Mautic\NotificationBundle\Helper\NotificationHelper', 'send'),
-                    'formType' => 'notificationsend_list'
+                    'label'           => 'mautic.notification.campaign.send_notification',
+                    'description'     => 'mautic.notification.campaign.send_notification.tooltip',
+                    'callback'        => array('\Mautic\NotificationBundle\Helper\NotificationHelper', 'send'),
+                    'formType'        => 'notificationsend_list',
+                    'formTypeOptions' => array('update_select' => 'campaignevent_properties_notification'),
+                    'formTheme'       => 'MauticNotificationBundle:FormTheme\NotificationSendList'
                 )
             );
         }

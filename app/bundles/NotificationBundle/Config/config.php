@@ -35,9 +35,15 @@ return array(
                 'alias' => 'notificationconfig'
             ),
             'mautic.form.type.notificationsend_list' => array(
-                'class' => 'Mautic\NotificationBundle\Form\Type\NotificationSendType',
-                'alias' => 'notificationsend_list'
-            )
+                'class'     => 'Mautic\NotificationBundle\Form\Type\NotificationSendType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'notificationsend_list'
+            ),
+            'mautic.form.type.notification_list'     => array(
+                'class'     => 'Mautic\NotificationBundle\Form\Type\NotificationListType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'notification_list'
+            ),
         ),
         'helpers' => array(
             'mautic.helper.notification' => array(

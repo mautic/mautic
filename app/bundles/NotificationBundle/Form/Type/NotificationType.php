@@ -94,7 +94,10 @@ class NotificationType extends AbstractType
             array(
                 'label'      => 'mautic.notification.form.url',
                 'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control'),
+                'attr'       => array(
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.notification.form.url.tooltip'
+                ),
                 'required'   => false
             )
         );
