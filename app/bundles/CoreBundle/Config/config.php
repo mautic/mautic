@@ -80,13 +80,7 @@ return array(
             'items'    => array(
                 'mautic.core.channels' => array(
                     'id'        => 'mautic_channels_root',
-                    'iconClass' => 'fa-rss',
-                    'children'  => array(
-                        'mautic.email.emails'  => array(
-                            'route'     => 'mautic_email_index',
-                            'access'    => array('email:emails:viewown', 'email:emails:viewother')
-                        )
-                    )
+                    'iconClass' => 'fa-rss'
                 )
             )
         ),

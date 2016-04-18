@@ -82,6 +82,19 @@ return array(
         )
     ),
 
+    'menu'     => array(
+        'main' => array(
+            'items'    => array(
+                'mautic.form.forms' => array(
+                    'route'     => 'mautic_form_index',
+                    'access'    => array('form:forms:viewown', 'form:forms:viewother'),
+                    'parent'    => 'mautic.campaigns.menu.root',
+                    'priority'  => 80
+                )
+            )
+        )
+    ),
+
     'categories' => array(
         'form' => null
     ),

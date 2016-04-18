@@ -47,7 +47,21 @@ return array(
             )
         )
     ),
-    
+
+    'menu' => array(
+        'main' => array(
+            'items'    => array(
+                'mautic.asset.assets' => array(
+                    'route'     => 'mautic_asset_index',
+                    'id'        => 'mautic_asset_root',
+                    'access'    => array('asset:assets:viewown', 'asset:assets:viewother'),
+                    'parent'    => 'mautic.campaigns.menu.root',
+                    'priority'  => 100,
+                )
+            )
+        )
+    ),
+
     'categories' => array(
         'asset' => null
     ),

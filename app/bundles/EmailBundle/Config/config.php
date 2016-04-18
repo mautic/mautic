@@ -66,6 +66,17 @@ return array(
             )
         )
     ),
+    'menu'       => array(
+        'main' => array(
+            'items'    => array(
+                'mautic.email.emails' => array(
+                    'route'     => 'mautic_email_index',
+                    'access'    => array('email:emails:viewown', 'email:emails:viewother'),
+                    'parent'    => 'mautic.core.channels'
+                )
+            )
+        )
+    ),
     'categories' => array(
         'email' => null
     ),

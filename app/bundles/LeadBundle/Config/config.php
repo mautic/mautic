@@ -128,7 +128,7 @@ return array(
     ),
     'menu'     => array(
         'main' => array(
-            'priority' => 5,
+            'priority' => 80,
             'items'    => array(
                 'mautic.lead.leads' => array(
                     'id'        => 'menu_lead_contact',
