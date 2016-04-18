@@ -64,6 +64,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
+        $canViewOther = $event->hasPermission('form:forms:viewother');
         
         if ($event->getType() == 'created.leads.in.time') {
             $widget = $event->getWidget();
@@ -83,7 +84,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $params['dateFrom'],
                         $params['dateTo'],
                         $params['dateFormat'],
-                        $params['filter']
+                        $params['filter'],
+                        $canViewOther
                     )
                 ));
             }

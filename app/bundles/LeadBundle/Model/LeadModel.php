@@ -1228,7 +1228,7 @@ class LeadModel extends FormModel
      *
      * @return array
      */
-    public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $dateFormat = null, $filter = array())
+    public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $dateFormat = null, $filter = array(), $canViewOther = true)
     {
         $flag = null;
         $topLists  = null;
@@ -1236,6 +1236,10 @@ class LeadModel extends FormModel
         if (isset($filter['flag'])) {
             $flag = $filter['flag'];
             unset($filter['flag']);
+        }
+
+        if (!$canViewOther) {
+            $filter['owner_id'] = $this->factory->getUser()->getId();
         }
 
         $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);

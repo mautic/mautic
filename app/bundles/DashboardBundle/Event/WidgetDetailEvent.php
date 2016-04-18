@@ -264,9 +264,9 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Check if the user has permission to see the widgets
+     * Check if the user has at least one permission of defined array of permissions
      *
-     * @param array $permissions
+     * @param  array $permissions
      *
      * @return boolean
      */
@@ -274,6 +274,19 @@ class WidgetDetailEvent extends CommonEvent
     {
         if (!$this->security) return true;
         $perm = $this->security->isGranted($permissions, "RETURN_ARRAY");
-        return !in_array(false, $perm);
+        return in_array(true, $perm);
+    }
+
+    /**
+     * Check if the user has defined permission to see the widgets
+     *
+     * @param  string $permission
+     *
+     * @return boolean
+     */
+    public function hasPermission($permission)
+    {
+        if (!$this->security) return true;
+        return $this->security->isGranted($permission);
     }
 }
