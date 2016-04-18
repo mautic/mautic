@@ -605,8 +605,7 @@ class CampaignRepository extends CommonRepository
         }
 
         if (!empty($limit)) {
-            $q->setFirstResult($start)
-                ->setMaxResults($limit);
+            $q->setMaxResults($limit);
         }
 
         $results = $q->execute()->fetchAll();
