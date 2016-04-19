@@ -62,6 +62,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
+        $canViewOthers = $event->hasPermission('email:emails:viewother');
         
         if ($event->getType() == 'page.hits.in.time') {
             $widget = $event->getWidget();
@@ -81,7 +82,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $params['dateFrom'],
                         $params['dateTo'],
                         $params['dateFormat'],
-                        $params['filter']
+                        $params['filter'],
+                        $canViewOthers
                     )
                 ));
             }
@@ -97,7 +99,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData(array(
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,
-                    'chartData'   => $model->getNewVsReturningPieChartData($params['dateFrom'], $params['dateTo'])
+                    'chartData'   => $model->getNewVsReturningPieChartData($params['dateFrom'], $params['dateTo'], array(), $canViewOthers)
                 ));
             }
 
@@ -112,7 +114,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData(array(
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,
-                    'chartData'   => $model->getDwellTimesPieChartData($params['dateFrom'], $params['dateTo'])
+                    'chartData'   => $model->getDwellTimesPieChartData($params['dateFrom'], $params['dateTo'], array(), $canViewOthers)
                 ));
             }
 
@@ -132,7 +134,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $pages = $model->getPopularPages($limit, $params['dateFrom'], $params['dateTo']);
+                $pages = $model->getPopularPages($limit, $params['dateFrom'], $params['dateTo'], array(), $canViewOthers);
                 $items = array();
 
                 // Build table rows with links
@@ -179,7 +181,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $pages = $model->getPageList($limit, $params['dateFrom'], $params['dateTo']);
+                $pages = $model->getPageList($limit, $params['dateFrom'], $params['dateTo'], array(), $canViewOthers);
                 $items = array();
 
                 // Build table rows with links

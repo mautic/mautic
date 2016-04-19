@@ -18,13 +18,14 @@ use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Doctrine\DBAL\Query\QueryBuilder;
 
 /**
  * Class PageModel
@@ -868,6 +869,19 @@ class PageModel extends FormModel
     }
 
     /**
+     * Joins the page table and limits created_by to currently logged in user
+     *
+     * @param QueryBuilder  $query
+     *
+     */
+    public function limitQueryToCreator(QueryBuilder &$q)
+    {
+        $q->join('t', MAUTIC_TABLE_PREFIX.'pages', 'p', 'p.id = t.page_id')
+            ->andWhere('p.created_by = :userId')
+            ->setParameter('userId', $this->factory->getUser()->getId());
+    }
+
+    /**
      * Get bar chart data of hits
      *
      * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
@@ -895,10 +909,11 @@ class PageModel extends FormModel
      * @param DateTime $dateTo
      * @param string   $dateFormat
      * @param array    $filter
+     * @param boolean $canViewOthers
      *
      * @return array
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
     {
         $flag = null;
 
@@ -911,13 +926,25 @@ class PageModel extends FormModel
         $query = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
 
         if (!$flag || $flag == 'total_and_unique') {
-            $data  = $query->fetchTimeData('page_hits', 'date_hit', $filter);
+            $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', $filter);
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+
+            $data = $query->loadAndBuildTimeData($q);
             $chart->setDataset('Total visits', $data);
         }
         
         if ($flag == 'unique' || $flag == 'total_and_unique') {
             $filter['groupBy'] = 'lead_id';
-            $data  = $query->fetchTimeData('page_hits', 'date_hit', $filter);
+            $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', $filter);
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+
+            $data = $query->loadAndBuildTimeData($q);
             $chart->setDataset('Unique visits', $data);
             unset($filter['groupBy']);
         }
@@ -932,15 +959,24 @@ class PageModel extends FormModel
      * @param DateTime $dateFrom
      * @param DateTime $dateTo
      * @param array    $filters
+     * @param boolean  $canViewOthers
      *
      * @return array
      */
-    public function getNewVsReturningPieChartData($dateFrom, $dateTo, $filters = array())
+    public function getNewVsReturningPieChartData($dateFrom, $dateTo, $filters = array(), $canViewOthers = true)
     {
         $chart     = new PieChart();
         $query     = new ChartQuery($this->factory->getEntityManager()->getConnection(), $dateFrom, $dateTo);
-        $all       = $query->count('page_hits', 'id', 'date_hit', $filters);
-        $unique    = $query->count('page_hits', 'lead_id', 'date_hit', $filters, array('getUnique' => true));
+        $allQ      = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
+        $uniqueQ   = $query->getCountQuery('page_hits', 'lead_id', 'date_hit', $filters, array('getUnique' => true, 'selectAlso' => array('t.page_id')));
+
+        if (!$canViewOthers) {
+            $this->limitQueryToCreator($allQ);
+            $this->limitQueryToCreator($uniqueQ);
+        }
+
+        $all       = $query->fetchCount($allQ);
+        $unique    = $query->fetchCount($uniqueQ);
         $returning = $all - $unique;
         $chart->setDataset('Unique', $unique);
         $chart->setDataset('Returning', $returning);
@@ -953,10 +989,11 @@ class PageModel extends FormModel
      * @param DateTime $dateFrom
      * @param DateTime $dateTo
      * @param array    $filters
+     * @param boolean  $canViewOthers
      *
      * @return array
      */
-    public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = array())
+    public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = array(), $canViewOthers = true)
     {
         $timesOnSite = array(
             array(
@@ -982,8 +1019,14 @@ class PageModel extends FormModel
         $query = new ChartQuery($this->factory->getEntityManager()->getConnection(), $dateFrom, $dateTo);
 
         foreach ($timesOnSite as $time) {
-            $chartData = $query->countDateDiff('page_hits', 'date_hit', 'date_left', $time['from'], $time['till'], $filters);
-            $chart->setDataset($time['label'], $chartData);
+            $q = $query->getCountDateDiffQuery('page_hits', 'date_hit', 'date_left', $time['from'], $time['till'], $filters);
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+
+            $data = $query->fetchCountDateDiff($q);
+            $chart->setDataset($time['label'], $data);
         }
 
         return $chart->render();
@@ -996,10 +1039,11 @@ class PageModel extends FormModel
      * @param DateTime $dateFrom
      * @param DateTime $dateTo
      * @param array    $filters
+     * @param boolean  $canViewOthers
      *
      * @return array
      */
-    public function getPopularPages($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array())
+    public function getPopularPages($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array(), $canViewOthers = true)
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS hits, p.id, p.title, p.alias')
@@ -1008,6 +1052,11 @@ class PageModel extends FormModel
             ->orderBy('hits', 'DESC')
             ->groupBy('p.id')
             ->setMaxResults($limit);
+        
+        if (!$canViewOthers) {
+            $q->andWhere('p.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
@@ -1025,15 +1074,21 @@ class PageModel extends FormModel
      * @param DateTime $dateFrom
      * @param DateTime $dateTo
      * @param array    $filters
+     * @param boolean  $canViewOthers
      *
      * @return array
      */
-    public function getPageList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array())
+    public function getPageList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array(), $canViewOthers = true)
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title AS name, t.date_added, t.date_modified')
             ->from(MAUTIC_TABLE_PREFIX.'pages', 't')
             ->setMaxResults($limit);
+
+        if (!$canViewOthers) {
+            $q->andWhere('t.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);

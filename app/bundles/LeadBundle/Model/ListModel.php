@@ -943,6 +943,11 @@ class ListModel extends FormModel
             ->groupBy('ll.id')
             ->setMaxResults($limit);
 
+        if (!empty($options['canViewOthers'])) {
+            $q->andWhere('ll.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');

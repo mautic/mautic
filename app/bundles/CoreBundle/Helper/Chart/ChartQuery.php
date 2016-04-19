@@ -352,7 +352,7 @@ class ChartQuery extends AbstractChart
      * @param  array      $filters will be added to where claues
      * @param  array      $options for special behavior
      *
-     * @param  QueryBuilder $query
+     * @return QueryBuilder $query
      */
     public function getCountQuery($table, $uniqueColumn, $dateColumn = null, $filters = array(), $options = array())
     {
@@ -366,10 +366,14 @@ class ChartQuery extends AbstractChart
 
         // Count only unique values
         if (!empty($options['getUnique'])) {
+            $selectAlso = '';
+            if (isset($options['selectAlso'])) {
+                $selectAlso = ', ' . implode(', ', $options['selectAlso']);
+            }
             // Modify the previous query
-            $query->select('t.' . $uniqueColumn);
+            $query->select('t.' . $uniqueColumn . $selectAlso);
             $query->having('COUNT(*) = 1')
-                ->groupBy('t.' . $uniqueColumn);
+                ->groupBy('t.' . $uniqueColumn . $selectAlso);
 
             // Create a new query with subquery of the previous query
             $uniqueQuery = $this->connection->createQueryBuilder();
@@ -417,7 +421,7 @@ class ChartQuery extends AbstractChart
     }
 
     /**
-     * Count how many rows is between a range of date diff in seconds
+     * Get the query to count how many rows is between a range of date diff in seconds
      *
      * @param  string     $table without prefix
      * @param  string     $dateColumn1
@@ -425,8 +429,10 @@ class ChartQuery extends AbstractChart
      * @param  integer    $startSecond
      * @param  integer    $endSecond
      * @param  array      $filters will be added to where claues
+     *
+     * @return QueryBuilder $query
      */
-    public function countDateDiff($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $filters = array())
+    public function getCountDateDiffQuery($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $filters = array())
     {
         $query = $this->connection->createQueryBuilder();
 
@@ -449,8 +455,37 @@ class ChartQuery extends AbstractChart
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $dateColumn1);
 
-        $data = $query->execute()->fetch();
+        return $query;
+    }
 
+    /**
+     * Count how many rows is between a range of date diff in seconds
+     *
+     * @param  string     $table without prefix
+     * @param  string     $dateColumn1
+     * @param  string     $dateColumn2
+     * @param  integer    $startSecond
+     * @param  integer    $endSecond
+     * @param  array      $filters will be added to where claues
+     *
+     * @return integer
+     */
+    public function countDateDiff($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $filters = array())
+    {
+        $query = $this->getCountDateDiffQuery($table, $dateColumn1, $dateColumn2, $startSecond, $endSecond, $filters);
+        return $this->fetchCountDateDiff($query);
+    }
+
+    /**
+     * Count how many rows is between a range of date diff in seconds
+     *
+     * @param  string     $query
+     *
+     * @return integer
+     */
+    public function fetchCountDateDiff($query)
+    {
+        $data = $query->execute()->fetch();
         return (int) $data['count'];
     }
 
