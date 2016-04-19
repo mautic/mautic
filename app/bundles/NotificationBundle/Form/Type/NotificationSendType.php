@@ -9,7 +9,7 @@
 
 namespace Mautic\NotificationBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -23,16 +23,16 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class NotificationSendType extends AbstractType
 {
     /**
-     * @var MauticFactory
+     * @var RouterInterface
      */
-    protected $factory;
+    protected $router;
 
     /**
-     * @param MauticFactory $factory
+     * @param RouterInterface $router
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(RouterInterface $router)
     {
-        $this->factory = $factory;
+        $this->router = $router;
     }
 
     /**
@@ -58,7 +58,7 @@ class NotificationSendType extends AbstractType
         ));
 
         if (! empty($options['update_select'])) {
-            $windowUrl = $this->factory->getRouter()->generate('mautic_notification_action', array(
+            $windowUrl = $this->router->generate('mautic_notification_action', array(
                 'objectAction' => 'new',
                 'contentOnly'  => 1,
                 'updateSelect' => $options['update_select']
@@ -78,7 +78,7 @@ class NotificationSendType extends AbstractType
             $email = $options['data']['notification'];
 
             // create button edit notification
-            $windowUrlEdit = $this->factory->getRouter()->generate('mautic_notification_action', array(
+            $windowUrlEdit = $this->router->generate('mautic_notification_action', array(
                 'objectAction' => 'edit',
                 'objectId'     => 'notificationId',
                 'contentOnly'  => 1,
@@ -89,7 +89,7 @@ class NotificationSendType extends AbstractType
                 'attr'  => array(
                     'class'     => 'btn btn-primary',
                     'onclick'   => 'Mautic.loadNewNotificationWindow(Mautic.standardNotificationUrl({"windowUrl": "' . $windowUrlEdit . '"}))',
-                    'disabled'  => !isset($email),
+                    'disabled'  => !isset($notification),
                     'icon'      => 'fa fa-edit'
                 ),
                 'label' => 'mautic.notification.send.edit.notification'

@@ -42,6 +42,7 @@ class PageSubscriber extends CommonSubscriber
 
         $router = $this->factory->getRouter();
         $appId = $this->factory->getParameter('notification_app_id', 'ab44aea7-ebe8-4bf4-bb7c-aa47e22d0364');
+        $safariWebId = $this->factory->getParameter('notification_safari_web_id', 'web.onesignal.auto.31ba082c-c81b-42a5-be17-ec59d526e60e');
 
         /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
         $assetsHelper = $this->factory->getHelper('template.assets');
@@ -59,20 +60,26 @@ class PageSubscriber extends CommonSubscriber
     var OneSignal = OneSignal || [];
     OneSignal.push(["init", {
         appId: "{$appId}",
-        safari_web_id: 'web.onesignal.auto.31ba082c-c81b-42a5-be17-ec59d526e60e',
+        safari_web_id: "{$safariWebId}",
         autoRegister: true,
         notifyButton: {
             enable: false // Set to false to hide
         }
     }]);
 
-    OneSignal.push(['getUserId', function(userId) {
-        var xhr = new XMLHttpRequest();
+    var pushUserIdToMautic = function(userId) {
+        if (userId == null) {
+            OneSignal.push(['getUserId', pushUserIdToMautic]);
+        } else {
+            var xhr = new XMLHttpRequest();
 
-        xhr.open('post', '{$leadAssociationUrl}', true);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.send('osid=' + userId);
-    }]);
+            xhr.open('post', '{$leadAssociationUrl}', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.send('osid=' + userId);
+        }
+    };
+
+    OneSignal.push(['getUserId', pushUserIdToMautic]);
 JS;
 
         $assetsHelper->addScriptDeclaration($oneSignalInit, 'onPageDisplay_headClose');

@@ -36,7 +36,7 @@ return array(
             ),
             'mautic.form.type.notificationsend_list' => array(
                 'class'     => 'Mautic\NotificationBundle\Form\Type\NotificationSendType',
-                'arguments' => 'mautic.factory',
+                'arguments' => 'router',
                 'alias'     => 'notificationsend_list'
             ),
             'mautic.form.type.notification_list'     => array(
@@ -122,6 +122,7 @@ return array(
     'parameters' => array(
         'notification_enabled' => false,
         'notification_app_id' => null,
-        'notification_rest_api_key' => null
+        'notification_rest_api_key' => null,
+        'notification_safari_web_id' => null
     )
 );

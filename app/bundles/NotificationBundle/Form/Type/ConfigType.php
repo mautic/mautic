@@ -54,6 +54,20 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'notification_safari_web_id',
+            'text',
+            array(
+                'label' => 'mautic.notification.config.form.notification.safari_web_id',
+                'data'  => $options['data']['notification_safari_web_id'],
+                'attr'  => array(
+                    'tooltip'      => 'mautic.notification.config.form.notification.safari_web_id.tooltip',
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_notificationconfig_notification_enabled_1":"checked"}',
+                )
+            )
+        );
+
+        $builder->add(
             'notification_rest_api_key',
             'text',
             array(
