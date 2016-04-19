@@ -461,24 +461,6 @@ class ChartQuery extends AbstractChart
     /**
      * Count how many rows is between a range of date diff in seconds
      *
-     * @param  string     $table without prefix
-     * @param  string     $dateColumn1
-     * @param  string     $dateColumn2
-     * @param  integer    $startSecond
-     * @param  integer    $endSecond
-     * @param  array      $filters will be added to where claues
-     *
-     * @return integer
-     */
-    public function countDateDiff($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $filters = array())
-    {
-        $query = $this->getCountDateDiffQuery($table, $dateColumn1, $dateColumn2, $startSecond, $endSecond, $filters);
-        return $this->fetchCountDateDiff($query);
-    }
-
-    /**
-     * Count how many rows is between a range of date diff in seconds
-     *
      * @param  string     $query
      *
      * @return integer
@@ -487,27 +469,5 @@ class ChartQuery extends AbstractChart
     {
         $data = $query->execute()->fetch();
         return (int) $data['count'];
-    }
-
-    /**
-     * Sum values in a column
-     *
-     * @param  string     $table without prefix
-     * @param  string     $column name
-     * @param  array      $filters will be added to where claues
-     * @param  array      $options for special behavior
-     */
-    public function sum($table, $column, $filters = array(), $options = array())
-    {
-        $query = $this->connection->createQueryBuilder();
-
-        $query->select('sum(t.' . $column . ') AS result')
-            ->from(MAUTIC_TABLE_PREFIX . $table, 't');
-
-        $this->applyFilters($query, $filters);
-
-        $data = $query->execute()->fetch();
-
-        return (int) $data['result'];
     }
 }
