@@ -160,10 +160,11 @@ class ChartQuery extends AbstractChart
     public function applyDateFilters(&$query, $dateColumn)
     {
         if ($dateColumn) {
+            $isTime = (in_array($this->unit, array('H', 'i', 's')));
             // Apply the start date/time if set
             if ($this->dateFrom) {
                 $dateFrom = clone $this->dateFrom;
-                $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
+                if ($isTime) $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
                 $query->andWhere('t.' . $dateColumn . ' >= :dateFrom');
                 $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
             }
@@ -171,7 +172,7 @@ class ChartQuery extends AbstractChart
             // Apply the end date/time if set
             if ($this->dateTo) {
                 $dateTo = clone $this->dateTo;
-                $dateTo->setTimeZone(new \DateTimeZone('UTC'));
+                if ($isTime) $dateTo->setTimeZone(new \DateTimeZone('UTC'));
                 $query->andWhere('t.' . $dateColumn . ' <= :dateTo');
                 $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
             }

@@ -55,6 +55,7 @@ class BarChart extends AbstractChart implements ChartInterface
         $this->dateFormat = $dateFormat;
         $this->amount = $this->countAmountFromDateRange();
         $this->generateTimeLabels($this->amount);
+        $this->addOneUnitMinusOneSec($this->dateTo);
     }
 
     /**

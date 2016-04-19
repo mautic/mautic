@@ -126,6 +126,17 @@ abstract class AbstractChart
     }
 
     /**
+     * Modify the date to add one current time unit to it and subtract 1 second.
+     * Can be used to get the current day results.
+     *
+     * @param DateTime $date
+     */
+    public function addOneUnitMinusOneSec(\DateTime &$date)
+    {
+        $date->add($this->getUnitInterval())->modify('-1 sec');
+    }
+
+    /**
      * Count amount of time slots of a time unit from a date range
      *
      * @return int
