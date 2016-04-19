@@ -1829,15 +1829,23 @@ class EventModel extends CommonFormModel
      * @param DateTime $dateTo
      * @param string   $dateFormat
      * @param array    $filter
+     * @param boolean  $canViewOthers
      *
      * @return array
      */
-    public function getEventLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
+    public function getEventLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = $chart->getChartQuery($this->em->getConnection());
-        
-        $data  = $query->fetchTimeData('campaign_lead_event_log', 'date_triggered', $filter);
+        $q     = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
+
+        if (!$canViewOthers) {
+            $q->join('t', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = c.campaign_id')
+                ->andWhere('c.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $data = $query->loadAndBuildTimeData($q);
         $chart->setDataset('Events triggered', $data);
 
         return $chart->render();

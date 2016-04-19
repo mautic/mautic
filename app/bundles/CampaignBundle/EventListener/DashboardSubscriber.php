@@ -57,7 +57,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
-        
+        $canViewOthers = $event->hasPermission('campaign:campaigns:viewother');
+
         if ($event->getType() == 'events.in.time') {
             $widget = $event->getWidget();
             $params = $widget->getParams();
@@ -68,7 +69,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getEventLineChartData($params['timeUnit'], $params['dateFrom'], $params['dateTo'], $params['dateFormat'])
+                    'chartData'   => $model->getEventLineChartData(
+                        $params['timeUnit'],
+                        $params['dateFrom'],
+                        $params['dateTo'],
+                        $params['dateFormat'],
+                        $canViewOthers
+                    )
                 ));
             }
 
@@ -86,7 +93,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getLeadsAddedLineChartData($params['timeUnit'], $params['dateFrom'], $params['dateTo'], $params['dateFormat'])
+                    'chartData'   => $model->getLeadsAddedLineChartData(
+                        $params['timeUnit'],
+                        $params['dateFrom'],
+                        $params['dateTo'],
+                        $params['dateFormat'],
+                        $canViewOthers
+                    )
                 ));
             }
 
