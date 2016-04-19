@@ -694,15 +694,24 @@ class SubmissionModel extends CommonFormModel
      * @param DateTime $dateTo
      * @param string   $dateFormat
      * @param array    $filter
+     * @param boolean  $canViewOthers
      *
      * @return array
      */
-    public function getSubmissionsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
+    public function getSubmissionsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
     {
         $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
-        $chartData = $query->fetchTimeData('form_submissions', 'date_submitted', $filter);
-        $chart->setDataset('Submission Count', $chartData);
+        $q = $query->prepareTimeDataQuery('form_submissions', 'date_submitted', $filter);
+
+        if (!$canViewOthers) {
+            $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
+                ->andWhere('f.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $data = $query->loadAndBuildTimeData($q);
+        $chart->setDataset('Submission Count', $data);
         return $chart->render();
     }
 
@@ -713,10 +722,11 @@ class SubmissionModel extends CommonFormModel
      * @param string  $dateFrom
      * @param string  $dateTo
      * @param array   $filters
+     * @param boolean $canViewOthers
      *
      * @return array
      */
-    public function getTopSubmissionReferrers($limit = 10, $dateFrom = null, $dateTo = null, $filters = array())
+    public function getTopSubmissionReferrers($limit = 10, $dateFrom = null, $dateTo = null, $filters = array(), $canViewOthers = true)
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.referer')
@@ -724,6 +734,12 @@ class SubmissionModel extends CommonFormModel
             ->orderBy('submissions', 'DESC')
             ->groupBy('t.referer')
             ->setMaxResults($limit);
+
+        if (!$canViewOthers) {
+            $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
+                ->andWhere('f.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
@@ -741,10 +757,11 @@ class SubmissionModel extends CommonFormModel
      * @param string  $dateFrom
      * @param string  $dateTo
      * @param array   $filters
+     * @param boolean $canViewOthers
      *
      * @return array
      */
-    public function getTopSubmitters($limit = 10, $dateFrom = null, $dateTo = null, $filters = array())
+    public function getTopSubmitters($limit = 10, $dateFrom = null, $dateTo = null, $filters = array(), $canViewOthers = true)
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.lead_id, l.firstname, l.lastname, l.email')
@@ -753,6 +770,12 @@ class SubmissionModel extends CommonFormModel
             ->orderBy('submissions', 'DESC')
             ->groupBy('t.lead_id, l.firstname, l.lastname, l.email')
             ->setMaxResults($limit);
+
+        if (!$canViewOthers) {
+            $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
+                ->andWhere('f.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);

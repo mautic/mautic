@@ -636,6 +636,11 @@ class FormModel extends CommonFormModel
             ->from(MAUTIC_TABLE_PREFIX.'forms', 't')
             ->setMaxResults($limit);
 
+        if (!empty($options['canViewOthers'])) {
+            $q->andWhere('t.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');

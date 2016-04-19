@@ -204,15 +204,15 @@ class ChartQuery extends AbstractChart
     }
 
     /**
-     * Fetch data for a time related dataset
+     * Prepare database query for fetching the line time chart data
      *
      * @param  string     $table without prefix
      * @param  string     $column name. The column must be type of datetime
      * @param  array      $filters will be added to where claues
      *
-     * @return array
+     * @return Doctrine\DBAL\Query\QueryBuilder
      */
-    public function fetchTimeData($table, $column, $filters = array())
+    public function prepareTimeDataQuery($table, $column, $filters = array())
     {
         // Convert time unitst to the right form for current database platform
         $dbUnit  = $this->translateTimeUnit($this->unit);
@@ -254,9 +254,34 @@ class ChartQuery extends AbstractChart
 
         $query->setMaxResults($limit);
 
-        // Fetch the data
-        $rawData = $query->execute()->fetchAll();
+        return $query;
+    }
 
+    /**
+     * Fetch data for a time related dataset
+     *
+     * @param  string     $table without prefix
+     * @param  string     $column name. The column must be type of datetime
+     * @param  array      $filters will be added to where claues
+     *
+     * @return array
+     */
+    public function fetchTimeData($table, $column, $filters = array())
+    {
+        $query = $this->prepareTimeDataQuery($table, $column, $filters);
+        return $this->loadAndBuildTimeData($query);
+    }
+
+    /**
+     * Loads data from prepared query and builds the chart data
+     *
+     * @param  QueryBuilder $query
+     *
+     * @return array
+     */
+    public function loadAndBuildTimeData($query)
+    {
+        $rawData = $query->execute()->fetchAll();
         return $this->completeTimeData($rawData);
     }
 

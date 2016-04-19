@@ -59,6 +59,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
+        $canViewOthers = $event->hasPermission('form:forms:viewother');
 
         if ($event->getType() == 'submissions.in.time') {
             $widget = $event->getWidget();
@@ -69,7 +70,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getSubmissionsLineChartData($params['timeUnit'], $params['dateFrom'], $params['dateTo'], $params['dateFormat'])
+                    'chartData'   => $model->getSubmissionsLineChartData(
+                        $params['timeUnit'],
+                        $params['dateFrom'],
+                        $params['dateTo'],
+                        $params['dateFormat'],
+                        $canViewOthers
+                    )
                 ));
             }
 
@@ -89,7 +96,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $referrers = $model->getTopSubmissionReferrers($limit, $params['dateFrom'], $params['dateTo']);
+                $referrers = $model->getTopSubmissionReferrers($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers);
                 $items = array();
 
                 // Build table rows with links
@@ -136,7 +143,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $submitters = $model->getTopSubmitters($limit, $params['dateFrom'], $params['dateTo']);
+                $submitters = $model->getTopSubmitters($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers);
                 $items = array();
 
                 // Build table rows with links
@@ -190,7 +197,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $forms = $model->getFormList($limit, $params['dateFrom'], $params['dateTo']);
+                $forms = $model->getFormList($limit, $params['dateFrom'], $params['dateTo'], array(), array('canViewOthers' => true));
                 $items = array();
 
                 // Build table rows with links
