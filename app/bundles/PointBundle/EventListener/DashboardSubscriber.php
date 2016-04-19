@@ -56,6 +56,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
+        $canViewOthers = $event->hasPermission('point:points:viewother');
         
         if ($event->getType() == 'points.in.time') {
             $widget = $event->getWidget();
@@ -66,7 +67,14 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getPointLineChartData($params['timeUnit'], $params['dateFrom'], $params['dateTo'], $params['dateFormat'])
+                    'chartData'   => $model->getPointLineChartData(
+                        $params['timeUnit'],
+                        $params['dateFrom'],
+                        $params['dateTo'],
+                        $params['dateFormat'],
+                        array(),
+                        $canViewOthers
+                    )
                 ));
             }
 

@@ -280,15 +280,24 @@ class PointModel extends CommonFormModel
      * @param DateTime $dateTo
      * @param string   $dateFormat
      * @param array    $filter
+     * @param boolean  $canViewOthers
      *
      * @return array
      */
-    public function getPointLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
+    public function getPointLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
     {
         $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
-        $chartData = $query->fetchTimeData('lead_points_change_log', 'date_added', $filter);
-        $chart->setDataset('Point changes', $chartData);
+        $q         = $query->prepareTimeDataQuery('lead_points_change_log', 'date_added', $filter);
+
+        if (!$canViewOthers) {
+            $q->join('t', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id')
+                ->andWhere('l.owner_id = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $data = $query->loadAndBuildTimeData($q);
+        $chart->setDataset('Point changes', $data);
         return $chart->render();
     }
 }

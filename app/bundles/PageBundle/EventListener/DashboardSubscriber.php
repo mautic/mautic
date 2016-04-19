@@ -62,7 +62,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
-        $canViewOthers = $event->hasPermission('email:emails:viewother');
+        $canViewOthers = $event->hasPermission('page:pages:viewother');
         
         if ($event->getType() == 'page.hits.in.time') {
             $widget = $event->getWidget();
