@@ -63,6 +63,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
+        $canViewOthers = $event->hasPermission('email:emails:viewother');
         
         if ($event->getType() == 'emails.in.time') {
 
@@ -84,7 +85,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $params['dateFrom'],
                         $params['dateTo'],
                         $params['dateFormat'],
-                        $params['filter']
+                        $params['filter'],
+                        $canViewOthers
                     )
                 ));
             }
@@ -102,7 +104,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData(array(
                     'chartType'   => 'pie',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getIgnoredVsReadPieChartData($params['dateFrom'], $params['dateTo'])
+                    'chartData'   => $model->getIgnoredVsReadPieChartData($params['dateFrom'], $params['dateTo'], array(), $canViewOthers)
                 ));
             }
 
@@ -111,20 +113,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
         }
 
         if ($event->getType() == 'upcoming.emails') {
+            $model = $this->factory->getModel('email');
             $widget = $event->getWidget();
             $params = $widget->getParams();
             $height = $widget->getHeight();
             $limit  = round(($height - 80) / 60);
 
-            /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
-            $leadEventLogRepository = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
-            $upcomingEmails = $leadEventLogRepository->getUpcomingEvents(array('type' => 'email.send', 'scheduled' => 1, 'eventType' => 'action', 'limit' => $limit));
-
-            $leadModel = $this->factory->getModel('lead.lead');
+            $upcomingEmails = $model->getUpcomingEmails($limit, $canViewOthers);
 
             $event->setTemplate('MauticDashboardBundle:Dashboard:upcomingemails.html.php');
             $event->setTemplateData(array('upcomingEmails' => $upcomingEmails));
-            
             $event->stopPropagation();
         }
 
@@ -140,7 +138,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $emails = $model->getEmailStatList($limit, $params['dateFrom'], $params['dateTo'], array(), array('groupBy' => 'sends'));
+                $emails = $model->getEmailStatList(
+                    $limit,
+                    $params['dateFrom'],
+                    $params['dateTo'],
+                    array(),
+                    array('groupBy' => 'sends', 'canViewOthers' => $canViewOthers)
+                );
                 $items = array();
 
                 // Build table rows with links
@@ -187,7 +191,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $emails = $model->getEmailStatList($limit, $params['dateFrom'], $params['dateTo'], array(), array('groupBy' => 'reads'));
+                $emails = $model->getEmailStatList(
+                    $limit,
+                    $params['dateFrom'],
+                    $params['dateTo'],
+                    array(),
+                    array('groupBy' => 'reads', 'canViewOthers' => $canViewOthers)
+                );
                 $items = array();
 
                 // Build table rows with links
@@ -234,7 +244,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $emails = $model->getEmailList($limit, $params['dateFrom'], $params['dateTo'], array(), array('groupBy' => 'creations'));
+                $emails = $model->getEmailList(
+                    $limit,
+                    $params['dateFrom'],
+                    $params['dateTo'],
+                    array(),
+                    array('groupBy' => 'creations', 'canViewOthers' => $canViewOthers)
+                );
                 $items = array();
 
                 // Build table rows with links

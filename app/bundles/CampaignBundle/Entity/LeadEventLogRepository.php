@@ -10,6 +10,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\UserBundle\Entity\User;
 use Doctrine\ORM\EntityRepository;
 
 /**
@@ -17,6 +18,23 @@ use Doctrine\ORM\EntityRepository;
  */
 class LeadEventLogRepository extends EntityRepository
 {
+    /**
+     * @var User
+     */
+    protected $currentUser;
+
+    /**
+     * Set the current user (i.e. from security context) for use within repositories
+     *
+     * @param User $user
+     *
+     * @return void
+     */
+    public function setCurrentUser(User $user)
+    {
+        $this->currentUser = $user;
+    }
+
 	/**
      * Get a lead's page event log
      *
@@ -137,6 +155,11 @@ class LeadEventLogRepository extends EntityRepository
 
         if (!empty($ipIds)) {
             $query->orWhere('ll.ip_address IN (' . implode(',', $ipIds) . ')');
+        }
+
+        if (!empty($options['canViewOthers']) && isset($this->currentUser)) {
+            $query->andWhere('c.created_by = :userId')
+                ->setParameter('userId', $this->currentUser->getId());
         }
 
         return $query->execute()->fetchAll();

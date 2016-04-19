@@ -22,6 +22,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -1446,6 +1447,19 @@ class EmailModel extends FormModel
     }
 
     /**
+     * Joins the email table and limits created_by to currently logged in user
+     *
+     * @param QueryBuilder  $query
+     *
+     */
+    public function limitQueryToCreator(QueryBuilder &$q)
+    {
+        $q->join('t', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = t.email_id')
+            ->andWhere('e.created_by = :userId')
+            ->setParameter('userId', $this->factory->getUser()->getId());
+    }
+
+    /**
      * Get line chart data of emails sent and read
      *
      * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
@@ -1453,10 +1467,11 @@ class EmailModel extends FormModel
      * @param DateTime $dateTo
      * @param string   $dateFormat
      * @param array    $filter
+     * @param boolean  $canViewOthers
      *
      * @return array
      */
-    public function getEmailsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
+    public function getEmailsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
     {
         $flag = null;
 
@@ -1469,12 +1484,20 @@ class EmailModel extends FormModel
         $query = $chart->getChartQuery($this->em->getConnection());
 
         if ($flag == 'sent_and_opened' || !$flag) {
-            $data  = $query->fetchTimeData('email_stats', 'date_sent', $filter);
+            $q = $query->prepareTimeDataQuery('email_stats', 'date_sent', $filter);
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+            $data = $query->loadAndBuildTimeData($q);
             $chart->setDataset('Sent emails', $data);
         }
 
         if ($flag == 'sent_and_opened' || $flag == 'opened') {
-            $data  = $query->fetchTimeData('email_stats', 'date_read', $filter);
+            $q = $query->prepareTimeDataQuery('email_stats', 'date_read', $filter);
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+            $data = $query->loadAndBuildTimeData($q);
             $chart->setDataset('Read emails', $data);
         }
 
@@ -1487,10 +1510,11 @@ class EmailModel extends FormModel
      * @param string  $dateFrom
      * @param string  $dateTo
      * @param array   $filters
+     * @param boolean $canViewOthers
      *
      * @return array
      */
-    public function getIgnoredVsReadPieChartData($dateFrom, $dateTo, $filters = array())
+    public function getIgnoredVsReadPieChartData($dateFrom, $dateTo, $filters = array(), $canViewOthers = true)
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1500,9 +1524,20 @@ class EmailModel extends FormModel
         $failedFilters = $filters;
         $failedFilters['is_failed'] = true;
 
-        $sent = $query->count('email_stats', 'id', 'date_sent', $filters);
-        $read = $query->count('email_stats', 'id', 'date_sent', $readFilters);
-        $failed = $query->count('email_stats', 'id', 'date_sent', $failedFilters);
+        $sentQ = $query->getCountQuery('email_stats', 'id', 'date_sent', $filters);
+        $readQ = $query->getCountQuery('email_stats', 'id', 'date_sent', $readFilters);
+        $failedQ = $query->getCountQuery('email_stats', 'id', 'date_sent', $failedFilters);
+
+        if (!$canViewOthers) {
+            $this->limitQueryToCreator($sentQ);
+            $this->limitQueryToCreator($readQ);
+            $this->limitQueryToCreator($failedQ);
+        }
+
+        $sent = $query->fetchCount($sentQ);
+        $read = $query->fetchCount($readQ);
+        $failed = $query->fetchCount($failedQ);
+
         $chart->setDataset('ignored', ($sent - $read));
         $chart->setDataset('read', $read);
         $chart->setDataset('failed', $failed);
@@ -1530,6 +1565,11 @@ class EmailModel extends FormModel
             ->orderBy('count', 'DESC')
             ->groupBy('e.id')
             ->setMaxResults($limit);
+
+        if (!empty($options['canViewOthers'])) {
+            $q->andWhere('e.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
@@ -1565,6 +1605,11 @@ class EmailModel extends FormModel
             ->from(MAUTIC_TABLE_PREFIX.'emails', 't')
             ->setMaxResults($limit);
 
+        if (!empty($options['canViewOthers'])) {
+            $q->andWhere('t.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
@@ -1572,5 +1617,31 @@ class EmailModel extends FormModel
         $results = $q->execute()->fetchAll();
 
         return $results;
+    }
+
+    /**
+     * Get a list of upcoming emails
+     *
+     * @param integer $limit
+     * @param boolean $canViewOthers
+     *
+     * @return array
+     */
+    public function getUpcomingEmails($limit = 10, $canViewOthers = true)
+    {
+        /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
+        $leadEventLogRepository = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+        $leadEventLogRepository->setCurrentUser($this->factory->getUser());
+        $upcomingEmails = $leadEventLogRepository->getUpcomingEvents(
+            array(
+                'type' => 'email.send',
+                'scheduled' => 1,
+                'eventType' => 'action',
+                'limit' => $limit,
+                'canViewOthers' => $canViewOthers
+            )
+        );
+
+        return $upcomingEmails;
     }
 }
