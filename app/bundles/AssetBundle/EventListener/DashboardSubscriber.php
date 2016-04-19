@@ -60,6 +60,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
+        $canViewOthers = $event->hasPermission('asset:assets:viewother');
         
         if ($event->getType() == 'asset.downloads.in.time') {
             $widget = $event->getWidget();
@@ -70,7 +71,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getDownloadsLineChartData($params['timeUnit'], $params['dateFrom'], $params['dateTo'], $params['dateFormat'])
+                    'chartData'   => $model->getDownloadsLineChartData($params['timeUnit'], $params['dateFrom'], $params['dateTo'], $params['dateFormat'], $canViewOthers)
                 ));
             }
 
@@ -85,7 +86,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData(array(
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,
-                    'chartData'   => $model->getUniqueVsRepetitivePieChartData($params['dateFrom'], $params['dateTo'])
+                    'chartData'   => $model->getUniqueVsRepetitivePieChartData($params['dateFrom'], $params['dateTo'], $canViewOthers)
                 ));
             }
 
@@ -105,7 +106,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
                 
-                $assets = $model->getPopularAssets($limit, $params['dateFrom'], $params['dateTo']);
+                $assets = $model->getPopularAssets($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers);
                 $items  = array();
 
                 // Build table rows with links
@@ -152,7 +153,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $assets = $model->getAssetList($limit, $params['dateFrom'], $params['dateTo']);
+                $assets = $model->getAssetList($limit, $params['dateFrom'], $params['dateTo'], array(), array('canViewOthers' => $canViewOthers));
                 $items = array();
 
                 // Build table rows with links

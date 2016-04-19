@@ -443,15 +443,25 @@ class AssetModel extends FormModel
      * @param DateTime $dateTo
      * @param string   $dateFormat
      * @param array    $filter
+     * @param boolean  $canViewOthers
      *
      * @return array
      */
-    public function getDownloadsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
+    public function getDownloadsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
     {
         $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
-        $chartData = $query->fetchTimeData('asset_downloads', 'date_download', $filter);
-        $chart->setDataset('Download Count', $chartData);
+        $q         = $query->prepareTimeDataQuery('asset_downloads', 'date_download', $filter);
+
+        if (!$canViewOthers) {
+            $q->join('t', MAUTIC_TABLE_PREFIX.'assets', 'a', 'a.id = t.asset_id')
+                ->andWhere('a.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $data = $query->loadAndBuildTimeData($q);
+
+        $chart->setDataset('Download Count', $data);
         return $chart->render();
     }
     
@@ -462,18 +472,33 @@ class AssetModel extends FormModel
      * @param string  $dateFrom
      * @param string  $dateTo
      * @param array   $filters
+     * @param boolean $canViewOthers
      *
      * @return array
      */
-    public function getUniqueVsRepetitivePieChartData($dateFrom, $dateTo, $filters = array())
+    public function getUniqueVsRepetitivePieChartData($dateFrom, $dateTo, $filters = array(), $canViewOthers = true)
     {
         $chart      = new PieChart();
         $query      = new ChartQuery($this->factory->getEntityManager()->getConnection(), $dateFrom, $dateTo);
-        $all        = $query->count('asset_downloads', 'id', 'date_download', $filters);
-        $unique     = $query->count('asset_downloads', 'lead_id', 'date_download', $filters, array('getUnique' => true));
+        $allQ       = $query->getCountQuery('asset_downloads', 'id', 'date_download', $filters);
+        $uniqueQ    = $query->getCountQuery('asset_downloads', 'lead_id', 'date_download', $filters, array('getUnique' => true));
+
+        if (!$canViewOthers) {
+            $allQ->join('t', MAUTIC_TABLE_PREFIX.'assets', 'a', 'a.id = t.asset_id')
+                ->andWhere('a.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+            $uniqueQ->join('t', MAUTIC_TABLE_PREFIX.'assets', 'a', 'a.id = t.asset_id')
+                ->andWhere('a.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $all = $query->fetchCount($allQ);
+        $unique = $query->fetchCount($uniqueQ);
+
         $repetitive = $all - $unique;
         $chart->setDataset('Unique', $unique);
         $chart->setDataset('Repetitive', $repetitive);
+
         return $chart->render();
     }
 
@@ -484,10 +509,11 @@ class AssetModel extends FormModel
      * @param string  $dateFrom
      * @param string  $dateTo
      * @param array   $filters
+     * @param boolean $canViewOthers
      *
      * @return array
      */
-    public function getPopularAssets($limit = 10, $dateFrom = null, $dateTo = null, $filters = array())
+    public function getPopularAssets($limit = 10, $dateFrom = null, $dateTo = null, $filters = array(), $canViewOthers = true)
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS download_count, a.id, a.title')
@@ -496,6 +522,11 @@ class AssetModel extends FormModel
             ->orderBy('download_count', 'DESC')
             ->groupBy('a.id')
             ->setMaxResults($limit);
+
+        if (!$canViewOthers) {
+            $q->andWhere('a.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
@@ -523,6 +554,11 @@ class AssetModel extends FormModel
         $q->select('t.id, t.title as name, t.date_added, t.date_modified')
             ->from(MAUTIC_TABLE_PREFIX.'assets', 't')
             ->setMaxResults($limit);
+
+        if (!empty($options['canViewOthers'])) {
+            $q->andWhere('t.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);

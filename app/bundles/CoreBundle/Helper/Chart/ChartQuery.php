@@ -11,6 +11,7 @@ namespace Mautic\CoreBundle\Helper\Chart;
 
 use Mautic\CoreBundle\Helper\Chart\AbstactChart;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
 
 /**
  * Class ChartQuery
@@ -350,8 +351,10 @@ class ChartQuery extends AbstractChart
      * @param  string     $dateColumn name
      * @param  array      $filters will be added to where claues
      * @param  array      $options for special behavior
+     *
+     * @param  QueryBuilder $query
      */
-    public function count($table, $uniqueColumn, $dateColumn = null, $filters = array(), $options = array())
+    public function getCountQuery($table, $uniqueColumn, $dateColumn = null, $filters = array(), $options = array())
     {
         $query = $this->connection->createQueryBuilder();
 
@@ -380,9 +383,36 @@ class ChartQuery extends AbstractChart
             $query = $uniqueQuery;
         }
 
-        // Fetch the count
-        $data = $query->execute()->fetch();
+        return $query;
+    }
 
+    /**
+     * Count occurences of a value in a column
+     *
+     * @param  string     $table without prefix
+     * @param  string     $uniqueColumn name
+     * @param  string     $dateColumn name
+     * @param  array      $filters will be added to where claues
+     * @param  array      $options for special behavior
+     *
+     * @return integer
+     */
+    public function count($table, $uniqueColumn, $dateColumn = null, $filters = array(), $options = array())
+    {
+        $query = $this->getCountQuery($table, $uniqueColumn, $dateColumn, $filters);
+        return $this->fetchCount($query);
+    }
+
+    /**
+     * Fetch the count integet from a query
+     *
+     * @param  QueryBuilder $query
+     *
+     * @return integer
+     */
+    public function fetchCount(QueryBuilder $query)
+    {
+        $data = $query->execute()->fetch();
         return (int) $data['count'];
     }
 
