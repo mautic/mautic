@@ -182,7 +182,12 @@ class LeadType extends AbstractType
                     'constraints' => $constraints
                 );
 
-                $dtHelper = new DateTimeHelper($value, null, 'local');
+                try {
+                    $dtHelper = new DateTimeHelper($value, null, 'local');
+                } catch (\Exception $e) {
+                    // Rather return empty value than break the page
+                    $value = '';
+                }
 
                 if ($type == 'datetime') {
                     $opts['model_timezone'] = 'UTC';
