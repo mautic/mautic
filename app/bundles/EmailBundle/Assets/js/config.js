@@ -66,6 +66,7 @@ Mautic.testMonitoredEmailServerConnection = function(mailbox) {
 Mautic.testEmailServerConnection = function(sendEmail) {
     var data = {
         transport:  mQuery('#config_emailconfig_mailer_transport').val(),
+        amazon_region:  mQuery('#config_emailconfig_mailer_amazon_region').val(),
         host:       mQuery('#config_emailconfig_mailer_host').val(),
         port:       mQuery('#config_emailconfig_mailer_port').val(),
         encryption: mQuery('#config_emailconfig_mailer_encryption').val(),
