@@ -14,6 +14,8 @@ $view['slots']->set("headerTitle", $email->getName());
 $isVariant    = $email->isVariant(true);
 $showVariants = count($variants['children']);
 $emailType    = $email->getEmailType();
+$edit = $view['security']->hasEntityAccess($permissions['email:emails:editown'], $permissions['email:emails:editother'], $email->getCreatedBy());
+
 if (empty($emailType)) {
     $emailType = 'template';
 }
@@ -40,16 +42,17 @@ $customButtons[] = array(
     'btnText'   => 'mautic.email.send.example'
 );
 
-$customButtons[] = array(
-    'attr' => array(
-        'data-toggle' => 'ajax',
-        'href'        => $view['router']->generate('mautic_email_action', array("objectAction" => "clone", "objectId" => $email->getId())),
+if ($edit) {
+    $customButtons[] = array(
+        'attr' => array(
+            'data-toggle' => 'ajax',
+            'href'        => $view['router']->generate('mautic_email_action', array("objectAction" => "clone", "objectId" => $email->getId())),
         ),
         'iconClass' => 'fa fa-copy',
         'btnText'   => 'mautic.core.form.clone'
-);
+    );
+}
 
-$edit = $view['security']->hasEntityAccess($permissions['email:emails:editown'], $permissions['email:emails:editother'], $email->getCreatedBy());
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'item'       => $email,
     'templateButtons' => array(
