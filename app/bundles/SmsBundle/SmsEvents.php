@@ -18,7 +18,7 @@ namespace Mautic\SmsBundle;
 final class SmsEvents
 {
     /**
-     * The mautic.sms_on_send event is thrown when an email is sent
+     * The mautic.sms_on_send event is thrown when a sms is sent
      *
      * The event listener receives a
      * Mautic\SmsBundle\Event\SmsSendEvent instance.
@@ -26,4 +26,44 @@ final class SmsEvents
      * @var string
      */
     const SMS_ON_SEND = 'mautic.sms_on_send';
+
+    /**
+     * The mautic.sms_pre_save event is thrown right before a sms is persisted.
+     *
+     * The event listener receives a
+     * Mautic\SmsBundle\Event\SmsEvent instance.
+     *
+     * @var string
+     */
+    const SMS_PRE_SAVE = 'mautic.sms_pre_save';
+
+    /**
+     * The mautic.sms_post_save event is thrown right after a sms is persisted.
+     *
+     * The event listener receives a
+     * Mautic\SmsBundle\Event\SmsEvent instance.
+     *
+     * @var string
+     */
+    const SMS_POST_SAVE = 'mautic.sms_post_save';
+
+    /**
+     * The mautic.sms_pre_delete event is thrown prior to when a sms is deleted.
+     *
+     * The event listener receives a
+     * Mautic\SmsBundle\Event\SmsEvent instance.
+     *
+     * @var string
+     */
+    const SMS_PRE_DELETE = 'mautic.sms_pre_delete';
+
+    /**
+     * The mautic.sms_post_delete event is thrown after a sms is deleted.
+     *
+     * The event listener receives a
+     * Mautic\SmsBundle\Event\SmsEvent instance.
+     *
+     * @var string
+     */
+    const SMS_POST_DELETE = 'mautic.sms_post_delete';
 }

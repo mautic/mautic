@@ -11,7 +11,6 @@ namespace Mautic\SmsBundle\Helper;
 
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
-use libphonenumber\PhoneNumber;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -93,9 +92,6 @@ class SmsHelper
             return false;
         }
 
-        $smsUsername = $factory->getParameter('sms_username');
-        $smsPassword = $factory->getParameter('sms_password');
-        $sendingPhoneNumber = $factory->getParameter('sms_sending_phone_number');
         $leadPhoneNumber = $lead->getFieldValue('mobile');
 
         if (empty($leadPhoneNumber)) {
@@ -106,18 +102,14 @@ class SmsHelper
             return false;
         }
 
-        $phoneUtil = PhoneNumberUtil::getInstance();
-        $phoneNumber = $phoneUtil->parse($leadPhoneNumber, 'US');
-        $leadPhoneNumber = $phoneUtil->format($phoneNumber, PhoneNumberFormat::E164);
-
-        $client = new \Services_Twilio($smsUsername, $smsPassword);
+        /** @var \Mautic\SmsBundle\Api\AbstractSmsApi $sms */
+        $sms = $factory->getKernel()->getContainer()->get('mautic.sms.api');
 
         $dispatcher = $factory->getDispatcher();
-
         $event = new SmsSendEvent($config['sms_message_template'], $lead);
 
         $dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $event);
 
-        return $client->account->messages->sendMessage($sendingPhoneNumber, $leadPhoneNumber, $event->getContent());
+        return $sms->sendSms($leadPhoneNumber, $event->getContent());
     }
 }

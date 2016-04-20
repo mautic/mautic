@@ -12,6 +12,7 @@ namespace Mautic\SmsBundle\Controller\Api;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Event\SmsSendEvent;
+use Mautic\SmsBundle\Helper\SmsHelper;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\HttpFoundation\Response;
 

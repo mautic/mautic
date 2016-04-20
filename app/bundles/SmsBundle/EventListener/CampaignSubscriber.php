@@ -34,10 +34,10 @@ class CampaignSubscriber extends CommonSubscriber
     {
         if ($this->factory->getParameter('sms_enabled')) {
             $event->addAction(
-                'sms.send_text_notification',
+                'sms.send_text_sms',
                 array(
-                    'label' => 'mautic.sms.campaign.send_sms_notification',
-                    'description' => 'mautic.sms.campaign.send_sms_notification.tooltip',
+                    'label' => 'mautic.sms.campaign.send_sms_sms',
+                    'description' => 'mautic.sms.campaign.send_sms_sms.tooltip',
                     'callback' => array('\Mautic\SmsBundle\Helper\SmsHelper', 'send'),
                     'formType' => 'sms'
                 )
