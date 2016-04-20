@@ -108,7 +108,7 @@ Mautic.loadNewNotificationWindow = function(options) {
         Mautic.startModalLoadingBar();
 
         setTimeout(function() {
-            var generator = window.open(options.windowUrl, 'newnotificationwindow', 'height=600,width=1100');
+            var generator = window.open(options.windowUrl, 'newnotificationwindow', 'height=600,width=340');
 
             if (!generator || generator.closed || typeof generator.closed == 'undefined') {
                 alert(response.popupBlockerMessage);
