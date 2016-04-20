@@ -17,7 +17,7 @@ $settings = $field['properties'];
 
 $width = (!empty($settings['width'])) ? $settings['width'].'px' : '252px';
 $buttonLabel = (!empty($settings['buttonLabel'])) ? $settings['buttonLabel'] : '';
-$authURL=(!empty($settings['authUrl'])) ? $settings['authUrl'] : '';
+$authURL=(isset($settings['authUrl']) and !empty($settings['authUrl'])) ? $settings['authUrl'] : false;
 
 $inputName = 'mauticform[' . $field['alias'] . '_LinkedIn]';
 $name = ' name="' . $inputName . '"';
@@ -67,7 +67,12 @@ $js = <<<JS
 }
 JS;
 
-$html = <<<HTML
+if(!$authURL){
+	$html = <<<HTML
+<div $containerAttr>{$formButtons}{$label} {$view['translator']->trans('mautic.integration.enabled')}</div>
+HTML;
+}else {
+	$html = <<<HTML
 	<style>
 	.fb-login{
 		position: relative;
@@ -96,9 +101,15 @@ $html = <<<HTML
 		<a onclick="openOAuthWindow('{$authURL}')" class="fb-login">{$buttonLabel}</a>
 	</div>
 HTML;
+}
+?>
+<?php
+if ($authURL) {
+
 ?>
 <script>
 	<?php echo $js; ?>
 </script>
+<?php } ?>
 <?php echo $html; ?>
 

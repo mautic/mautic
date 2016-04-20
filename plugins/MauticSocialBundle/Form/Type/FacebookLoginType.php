@@ -36,21 +36,46 @@ class FacebookLoginType extends AbstractType
 
     /**
      * @param FormBuilderInterface $builder
-     * @param array                $options
+     * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
+        $integrationHelper = $this->factory->getHelper('integration');
+        $integrationObject = $integrationHelper->getIntegrationObject('Facebook');
+        $disabled = true;
+
+        if ($integrationObject->getIntegrationSettings()->isPublished()) {
+            /** @var \Mautic\AssetBundle\Model\AssetModel $model */
+            $model = $this->factory->getModel('form');
+
+            $integration = array(
+                'integration' => $integrationObject->getName(),
+            );
+
+            $builder->add(
+                'authUrl',
+                'hidden',
+                array(
+                    'data' => $model->buildUrl('mautic_integration_auth_user', $integration, true, array()),
+                )
+            );
+            $disabled = false;
+
+        }
+
         $builder->add(
             'width',
             'text',
             array(
                 'label_attr' => array('class' => 'control-label'),
-                'label'      => 'mautic.integration.Facebook.login.width',
-                'required'   => false,
-                'attr'       => array(
-                    'class'       => 'form-control',
+                'label' => 'mautic.integration.Facebook.login.width',
+                'disabled' => $disabled,
+                'required' => false,
+                'attr' => array(
+                    'class' => 'form-control',
                     'placeholder' => 'mautic.integration.Facebook.login.width',
-                    'preaddon'    => 'fa'
+                    'preaddon' => 'fa'
                 )
             )
         );
@@ -59,32 +84,14 @@ class FacebookLoginType extends AbstractType
             'text',
             array(
                 'label_attr' => array('class' => 'control-label'),
-                'label'      => 'mautic.integration.Facebook.login.buttonlabel',
-                'required'   => false,
-                'attr'       => array(
-                    'class'       => 'form-control',
+                'label' => 'mautic.integration.Facebook.login.buttonlabel',
+                'disabled' => $disabled,
+                'required' => false,
+                'attr' => array(
+                    'class' => 'form-control',
                     'placeholder' => 'mautic.integration.Facebook.login.buttonlabel',
-                    'preaddon'    => 'fa'
-                )
-            )
-        );
-
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->factory->getHelper('integration');
-        $integrationObject = $integrationHelper->getIntegrationObject('Facebook');
-
-        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-        $model = $this->factory->getModel('form');
-
-        $integration = array(
-            'integration' => $integrationObject->getName(),
-        );
-
-        $builder->add(
-            'authUrl',
-            'hidden',
-            array(
-                'data' => $model->buildUrl('mautic_integration_auth_user',$integration,true,array()),
+                    'preaddon' => 'fa'
+                ),
             )
         );
     }

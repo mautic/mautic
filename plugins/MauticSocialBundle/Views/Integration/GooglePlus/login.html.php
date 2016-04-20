@@ -9,26 +9,26 @@
 
 
 $defaultInputClass = 'button';
-$containerType     = 'div-wrapper';
+$containerType = 'div-wrapper';
 
-include __DIR__.'/../../../../../app/bundles/FormBundle/Views/Field/field_helper.php';
+include __DIR__ . '/../../../../../app/bundles/FormBundle/Views/Field/field_helper.php';
 
 $settings = $field['properties'];
 
-$width = (!empty($settings['width'])) ? $settings['width'].'px' : '252px';
+$width = (!empty($settings['width'])) ? $settings['width'] . 'px' : '252px';
 $buttonLabel = (!empty($settings['buttonLabel'])) ? $settings['buttonLabel'] : '';
-$authURL=(!empty($settings['authUrl'])) ? $settings['authUrl'] : '';
+$authURL = (isset($settings['authUrl']) and !empty($settings['authUrl'])) ? $settings['authUrl'] : false;
 
-$inputName          = 'mauticform['.$field['alias'].'_GooglePlus]';
-$name               = ' name="'.$inputName.'"';
-$formName           = str_replace("_", "", $formName);
-$formButtons        = (!empty($inForm)) ? $view->render(
+$inputName = 'mauticform[' . $field['alias'] . '_GooglePlus]';
+$name = ' name="' . $inputName . '"';
+$formName = str_replace("_", "", $formName);
+$formButtons = (!empty($inForm)) ? $view->render(
     'MauticFormBundle:Builder:actions.html.php',
     array(
-        'deleted'        => false,
-        'id'             => $id,
-        'formId'         => $formId,
-        'formName'       => $formName,
+        'deleted' => false,
+        'id' => $id,
+        'formId' => $formId,
+        'formName' => $formName,
         'disallowDelete' => false
     )
 ) : '';
@@ -39,7 +39,7 @@ $label = (!$field['showLabel'])
 <label $labelAttr>{$view->escape($field['label'])}</label>
 HTML;
 
-$js   = <<<JS
+$js = <<<JS
 	function openOAuthWindow(authUrl){
 	  if (authUrl) {
           var generator = window.open(authUrl, 'integrationauth', 'height=500,width=500');
@@ -69,7 +69,12 @@ $js   = <<<JS
     }
 
 JS;
-$html = <<<HTML
+if (!$authURL) {
+    $html = <<<HTML
+<div $containerAttr>{$formButtons}{$label} {$view['translator']->trans('mautic.integration.enabled')}</div>
+HTML;
+} else {
+    $html = <<<HTML
 <style>
 	.g-plus-login{
 		position: relative;
@@ -97,10 +102,16 @@ $html = <<<HTML
 		<div  class="g-plus-login"><a onclick="openOAuthWindow('{$authURL}')">{$buttonLabel}</a></div>
 	</div>
 HTML;
+}
 ?>
-<script>
-    <?php echo $js; ?>
-</script>
+<?php
+if ($authURL) {
+
+    ?>
+    <script>
+        <?php echo $js; ?>
+    </script>
+<?php } ?>
 <?php
 echo $html;
 ?>
