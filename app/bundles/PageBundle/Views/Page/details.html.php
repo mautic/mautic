@@ -22,7 +22,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         'edit'   => $security->hasEntityAccess($permissions['page:pages:editown'], $permissions['page:pages:editother'], $activePage->getCreatedBy()),
         'clone'  => $security->hasEntityAccess($permissions['page:pages:editown'], $permissions['page:pages:editother'], $activePage->getCreatedBy()),
         'delete' => $permissions['page:pages:create'],
-        'abtest' => ((empty($variants['parent']) || ($variants['parent']->getId() == $activePage->getId())) && $permissions['page:pages:create'])
+        'abtest' => ((empty($variants['parent']) || ($variants['parent']->getId() == $activePage->getId())) && $permissions['page:pages:create']),
+        'close' =>  $security->hasEntityAccess($permissions['page:pages:viewown'], $permissions['page:pages:viewother'], $activePage->getCreatedBy()),
     ),
     'routeBase' => 'page'
 )));
