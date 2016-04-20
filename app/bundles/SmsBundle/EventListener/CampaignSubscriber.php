@@ -39,7 +39,9 @@ class CampaignSubscriber extends CommonSubscriber
                     'label' => 'mautic.sms.campaign.send_sms_sms',
                     'description' => 'mautic.sms.campaign.send_sms_sms.tooltip',
                     'callback' => array('\Mautic\SmsBundle\Helper\SmsHelper', 'send'),
-                    'formType' => 'smssend'
+                    'formType' => 'smssend_list',
+                    'formTypeOptions' => array('update_select' => 'campaignevent_properties_sms'),
+                    'formTheme'       => 'MauticSmsBundle:FormTheme\SmsSendList'
                 )
             );
         }
