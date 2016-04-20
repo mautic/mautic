@@ -129,6 +129,7 @@ $counter = 3;
 		            <?php endif; ?>
 		            <?php endif; ?>
 				</dl>
+		        hola
 	        </div>
 	    <?php endif; ?>
 	</div>

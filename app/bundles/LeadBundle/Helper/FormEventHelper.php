@@ -70,4 +70,22 @@ class FormEventHelper
             $leadModel->removeFromLists($lead, $removeFrom);
         }
     }
+
+    /**
+     * @param $action
+     * @param $factory
+     */
+    public static function addUtmTags ($action, $factory)
+    {
+        $properties = $action->getProperties();
+
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel  = $factory->getModel('lead');
+        $lead       = $leadModel->getCurrentLead();
+
+        $addUtmTags    = (!empty($config['add_tags'])) ? $config['add_tags'] : array();
+        $removeUtmTags = (!empty($config['remove_tags'])) ? $config['remove_tags'] : array();
+
+        $leadModel->modifyUtmTags($lead, $addUtmTags, $removeUtmTags);
+    }
 }

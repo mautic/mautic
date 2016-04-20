@@ -1070,6 +1070,58 @@ class LeadModel extends FormModel
     }
 
     /**
+     * Update a leads tags
+     *
+     * @param Lead  $lead
+     * @param array $utmTags
+     * @param bool|false $removeUtmTags
+     */
+    public function modifyUtmTags(Lead $lead, array $utmTags, $removeUtmTags = false)
+    {
+        $currentUtmTags  = $lead->getUtmTags();
+        $leadModified = $utmTagsDeleted = false;
+
+        foreach ($currentUtmTags as $utmTagName => $utmTag) {
+            if (!in_array($utmTag->getId(), $utmTags)) {
+                // Tag has been removed
+                $lead->removeTag($utmTag);
+                $leadModified = $utmTagsDeleted = true;
+            } else {
+                // Remove tag so that what's left are new tags
+                $key = array_search($utmTag->getId(), $utmTags);
+                unset($utmTags[$key]);
+            }
+        }
+
+        if (!empty($utmTags)) {
+            foreach($utmTags as $utmTag) {
+                if (is_numeric($utmTag)) {
+                    // Existing tag being added to this lead
+                    $lead->addUtmTag(
+                        $this->factory->getEntityManager()->getReference('MauticLeadBundle:UtmTag', $utmTag)
+                    );
+                } else {
+                    // New tag
+                    $newUtmTag = new UtmTag();
+                    $newUtmTag->setTag(InputHelper::clean($utmTag));
+                    $lead->addUtmTag($newUtmTag);
+                }
+            }
+            $leadModified = true;
+        }
+
+        if ($leadModified) {
+            $this->saveEntity($lead);
+
+            // Delete orphaned tags
+            if ($utmTagsDeleted && $removeUtmTags) {
+                $this->getUtmTagRepository()->deleteOrphans();
+            }
+        }
+    }
+
+
+    /**
      * Modify tags with support to remove via a prefixed minus sign
      *
      * @param Lead $lead

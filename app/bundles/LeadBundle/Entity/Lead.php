@@ -138,6 +138,11 @@ class Lead extends FormEntity
     private $tags;
 
     /**
+     * @var ArrayCollection
+     */
+    private $utmTags;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -1009,6 +1014,41 @@ class Lead extends FormEntity
     public function setTags($tags)
     {
         $this->tags = $tags;
+
+        return $this;
+    }
+
+    /**
+     * Remove tag
+     *
+     * @param Tag $tag
+     */
+    public function removeUtmTag(UtmTag $utmTag)
+    {
+        $this->isChanged('utmtags', $utmTag->getUtmTag());
+        $this->utmTags->removeElement($utmTag);
+    }
+
+    /**
+     * Get tags
+     *
+     * @return mixed
+     */
+    public function getUtmTags ()
+    {
+        return $this->utmTags;
+    }
+
+    /**
+     * Set tags
+     *
+     * @param $tags
+     *
+     * @return $this
+     */
+    public function setUtmTags($utmTags)
+    {
+        $this->utmTags = $utmTags;
 
         return $this;
     }
