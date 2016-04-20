@@ -1846,7 +1846,7 @@ class EventModel extends CommonFormModel
         }
 
         $data = $query->loadAndBuildTimeData($q);
-        $chart->setDataset('Events triggered', $data);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.campaign.triggered.events'), $data);
 
         return $chart->render();
     }

@@ -711,7 +711,7 @@ class SubmissionModel extends CommonFormModel
         }
 
         $data = $query->loadAndBuildTimeData($q);
-        $chart->setDataset('Submission Count', $data);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.form.submission.count'), $data);
         return $chart->render();
     }
 

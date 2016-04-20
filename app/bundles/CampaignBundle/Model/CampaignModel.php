@@ -1071,7 +1071,7 @@ class CampaignModel extends CommonFormModel
         }
 
         $data = $query->loadAndBuildTimeData($q);
-        $chart->setDataset('Leads added', $data);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.campaign.campaign.leads'), $data);
 
         return $chart->render();
     }

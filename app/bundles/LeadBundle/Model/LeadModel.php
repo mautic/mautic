@@ -1233,6 +1233,9 @@ class LeadModel extends FormModel
     {
         $flag = null;
         $topLists  = null;
+        $allLeadsT = $this->factory->getTranslator()->trans('mautic.lead.all.leads');
+        $identifiedT = $this->factory->getTranslator()->trans('mautic.lead.identified');
+        $anonymousT = $this->factory->getTranslator()->trans('mautic.lead.lead.anonymous');
 
         if (isset($filter['flag'])) {
             $flag = $filter['flag'];
@@ -1263,7 +1266,7 @@ class LeadModel extends FormModel
                         'list_column_name' => 't.id'
                     );
                     $all = $query->fetchTimeData('leads', 'date_added', $filter);
-                    $chart->setDataset($list['name'] . ': All Leads', $all);
+                    $chart->setDataset($list['name'] . ': ' . $allLeadsT, $all);
                 }
             }
         } elseif ($flag == 'topIdentifiedVsAnonymous') {
@@ -1280,24 +1283,24 @@ class LeadModel extends FormModel
                     );
                     $identified = $query->fetchTimeData('leads', 'date_added', $identifiedFilter);
                     $anonymous = $query->fetchTimeData('leads', 'date_added', $anonymousFilter);
-                    $chart->setDataset($list['name'] . ': Identified', $identified);
-                    $chart->setDataset($list['name'] . ': Anonymous', $anonymous);
+                    $chart->setDataset($list['name'] . ': ' . $identifiedT, $identified);
+                    $chart->setDataset($list['name'] . ': ' . $anonymousT, $anonymous);
                 }
             }
         } elseif ($flag == 'identified') {
             $identified = $query->fetchTimeData('leads', 'date_added', $identifiedFilter);
-            $chart->setDataset('Identified', $identified);
+            $chart->setDataset($identifiedT, $identified);
         } elseif ($flag == 'anonymous') {
             $anonymous = $query->fetchTimeData('leads', 'date_added', $anonymousFilter);
-            $chart->setDataset('Anonymous', $anonymous);
+            $chart->setDataset($anonymousT, $anonymous);
         } elseif ($flag == 'identifiedVsAnonymous') {
             $identified = $query->fetchTimeData('leads', 'date_added', $identifiedFilter);
             $anonymous = $query->fetchTimeData('leads', 'date_added', $anonymousFilter);
-            $chart->setDataset('Identified', $identified);
-            $chart->setDataset('Anonymous', $anonymous);
+            $chart->setDataset($identifiedT, $identified);
+            $chart->setDataset($anonymousT, $anonymous);
         } else {
             $all = $query->fetchTimeData('leads', 'date_added', $filter);
-            $chart->setDataset('All Leads', $all);
+            $chart->setDataset($allLeadsT, $all);
         }
         
         return $chart->render();
@@ -1324,8 +1327,8 @@ class LeadModel extends FormModel
 
         $identified = $query->count('leads', 'date_identified', 'date_added', $filters);
         $all = $query->count('leads', 'id', 'date_added', $filters);
-        $chart->setDataset('identified', $identified);
-        $chart->setDataset('anonymous', ($all - $identified));
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.lead.identified'), $identified);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.lead.lead.anonymous'), ($all - $identified));
 
         return $chart->render();
     }

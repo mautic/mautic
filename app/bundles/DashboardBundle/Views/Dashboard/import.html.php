@@ -26,10 +26,14 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.dashboard.
                                 <h4 class="list-group-item-heading"><?php echo $dashboard; ?></h4>
                                 <p class="list-group-item-text">
                                     <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'import', 'preview' => $dashboard)); ?>">
-                                        Preview
-                                    </a>,
-                                    <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'applyDashboardFile', 'file' => $dashboard)); ?>">Apply</a>,
-                                    <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'deleteDashboardFile', 'file' => $dashboard)); ?>">Delete</a>
+                                        <?php echo $view['translator']->trans('mautic.dashboard.preview'); ?>
+                                    </a>&#183;
+                                    <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'applyDashboardFile', 'file' => $dashboard)); ?>">
+                                        <?php echo $view['translator']->trans('mautic.core.form.apply'); ?>
+                                    </a>&#183;
+                                    <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'deleteDashboardFile', 'file' => $dashboard)); ?>">
+                                        <?php echo $view['translator']->trans('mautic.core.form.delete'); ?>
+                                    </a>
                                 </p>
                             </div>
                         <?php endforeach; ?>

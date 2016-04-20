@@ -461,7 +461,7 @@ class AssetModel extends FormModel
 
         $data = $query->loadAndBuildTimeData($q);
 
-        $chart->setDataset('Download Count', $data);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.asset.downloadcount'), $data);
         return $chart->render();
     }
     
@@ -496,8 +496,8 @@ class AssetModel extends FormModel
         $unique = $query->fetchCount($uniqueQ);
 
         $repetitive = $all - $unique;
-        $chart->setDataset('Unique', $unique);
-        $chart->setDataset('Repetitive', $repetitive);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.asset.unique'), $unique);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.asset.repetitive'), $repetitive);
 
         return $chart->render();
     }

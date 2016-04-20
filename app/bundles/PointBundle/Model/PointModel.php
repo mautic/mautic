@@ -297,7 +297,7 @@ class PointModel extends CommonFormModel
         }
 
         $data = $query->loadAndBuildTimeData($q);
-        $chart->setDataset('Point changes', $data);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.point.changes'), $data);
         return $chart->render();
     }
 }

@@ -29,8 +29,8 @@ class DashboardHitsInTimeWidgetType extends AbstractType
                 'label'   => 'mautic.page.visit.flag.filter',
                 'choices' => array(
                     ''                  => 'mautic.page.show.total.visits',
-                    'unique'            => 'mautic.lead.show.unique.visits',
-                    'total_and_unique'  => 'mautic.lead.show.unique.and.total.visits'
+                    'unique'            => 'mautic.page.show.unique.visits',
+                    'total_and_unique'  => 'mautic.page.show.unique.and.total.visits'
                 ),
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),

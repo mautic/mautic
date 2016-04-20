@@ -1489,7 +1489,7 @@ class EmailModel extends FormModel
                 $this->limitQueryToCreator($q);
             }
             $data = $query->loadAndBuildTimeData($q);
-            $chart->setDataset('Sent emails', $data);
+            $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.sent.emails'), $data);
         }
 
         if ($flag == 'sent_and_opened' || $flag == 'opened') {
@@ -1498,7 +1498,7 @@ class EmailModel extends FormModel
                 $this->limitQueryToCreator($q);
             }
             $data = $query->loadAndBuildTimeData($q);
-            $chart->setDataset('Read emails', $data);
+            $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.read.emails'), $data);
         }
 
         return $chart->render();
@@ -1538,9 +1538,9 @@ class EmailModel extends FormModel
         $read = $query->fetchCount($readQ);
         $failed = $query->fetchCount($failedQ);
 
-        $chart->setDataset('ignored', ($sent - $read));
-        $chart->setDataset('read', $read);
-        $chart->setDataset('failed', $failed);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.graph.pie.ignored.read.failed.ignored'), ($sent - $read));
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.graph.pie.ignored.read.failed.read'), $read);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.graph.pie.ignored.read.failed.failed'), $failed);
 
         return $chart->render();
     }

@@ -897,7 +897,7 @@ class PageModel extends FormModel
         $chart     = new BarChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
         $chartData = $query->fetchTimeData('page_hits', 'date_hit', $filter);
-        $chart->setDataset('Hit Count', $chartData);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.field.hits'), $chartData);
         return $chart->render();
     }
 
@@ -933,7 +933,7 @@ class PageModel extends FormModel
             }
 
             $data = $query->loadAndBuildTimeData($q);
-            $chart->setDataset('Total visits', $data);
+            $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.show.total.visits'), $data);
         }
         
         if ($flag == 'unique' || $flag == 'total_and_unique') {
@@ -945,7 +945,7 @@ class PageModel extends FormModel
             }
 
             $data = $query->loadAndBuildTimeData($q);
-            $chart->setDataset('Unique visits', $data);
+            $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.show.unique.visits'), $data);
             unset($filter['groupBy']);
         }
 
@@ -978,8 +978,8 @@ class PageModel extends FormModel
         $all       = $query->fetchCount($allQ);
         $unique    = $query->fetchCount($uniqueQ);
         $returning = $all - $unique;
-        $chart->setDataset('Unique', $unique);
-        $chart->setDataset('Returning', $returning);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.unique'), $unique);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.graph.pie.new.vs.returning.returning'), $returning);
         return $chart->render();
     }
 
