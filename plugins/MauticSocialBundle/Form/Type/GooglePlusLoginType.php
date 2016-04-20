@@ -35,21 +35,46 @@ class GooglePlusLoginType extends AbstractType
 
     /**
      * @param FormBuilderInterface $builder
-     * @param array                $options
+     * @param array $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
+        $integrationHelper = $this->factory->getHelper('integration');
+        $integrationObject = $integrationHelper->getIntegrationObject('GooglePlus');
+        $disabled = true;
+
+        if ($integrationObject->getIntegrationSettings()->isPublished()) {
+
+            /** @var \Mautic\AssetBundle\Model\AssetModel $model */
+            $model = $this->factory->getModel('form');
+
+            $integration = array(
+                'integration' => $integrationObject->getName(),
+            );
+
+            $builder->add(
+                'authUrl',
+                'hidden',
+                array(
+                    'data' => $model->buildUrl('mautic_integration_auth_user', $integration, true, array()),
+                )
+            );
+            $disabled = false;
+        }
+
         $builder->add(
             'width',
             'text',
             array(
                 'label_attr' => array('class' => 'control-label'),
-                'label'      => 'mautic.integration.GooglePlus.login.width',
-                'required'   => false,
-                'attr'       => array(
-                    'class'       => 'form-control',
+                'label' => 'mautic.integration.GooglePlus.login.width',
+                'required' => false,
+                'disabled' => $disabled,
+                'attr' => array(
+                    'class' => 'form-control',
                     'placeholder' => 'mautic.integration.GooglePlus.login.width',
-                    'preaddon'    => 'fa'
+                    'preaddon' => 'fa'
                 )
             )
         );
@@ -58,34 +83,16 @@ class GooglePlusLoginType extends AbstractType
             'text',
             array(
                 'label_attr' => array('class' => 'control-label'),
-                'label'      => 'mautic.integration.GooglePlus.login.buttonlabel',
-                'required'   => false,
-                'attr'       => array(
-                    'class'       => 'form-control',
+                'label' => 'mautic.integration.GooglePlus.login.buttonlabel',
+                'required' => false,
+                'disabled' => $disabled,
+                'attr' => array(
+                    'class' => 'form-control',
                     'placeholder' => 'mautic.integration.GooglePlus.login.buttonlabel',
-                    'preaddon'    => 'fa'
+                    'preaddon' => 'fa'
                 )
             )
         );
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->factory->getHelper('integration');
-        $integrationObject = $integrationHelper->getIntegrationObject('GooglePlus');
-
-        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-        $model = $this->factory->getModel('form');
-
-        $integration = array(
-            'integration' => $integrationObject->getName(),
-        );
-
-        $builder->add(
-            'authUrl',
-            'hidden',
-            array(
-                'data' => $model->buildUrl('mautic_integration_auth_user',$integration,true,array()),
-            )
-        );
-        
     }
 
 
