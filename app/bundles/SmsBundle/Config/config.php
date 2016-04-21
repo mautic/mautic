@@ -86,15 +86,13 @@ return array(
             )
         )
     ),
-    'menu' => array(
+    'menu'       => array(
         'main' => array(
-            'priority' => 15,
             'items'    => array(
                 'mautic.sms.smses' => array(
                     'route'     => 'mautic_sms_index',
-                    'id'        => 'mautic_sms_root',
-                    'iconClass' => 'fa-mobile',
-                    'access'    => array('sms:smses:viewown', 'sms:smses:viewother')
+                    'access'    => array('sms:smses:viewown', 'sms:smses:viewother'),
+                    'parent'    => 'mautic.core.channels'
                 )
             )
         )
