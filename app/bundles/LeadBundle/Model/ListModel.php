@@ -462,7 +462,7 @@ class ListModel extends FormModel
         $leadCount = (int) $newLeadsCount[$id]['count'];
 
         if ($output) {
-            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_added', array('%leads%' => $leadCount, '%batch%' => $limit)));
+            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_added', array('%contacts%' => $leadCount, '%batch%' => $limit)));
         }
 
         // Handle by batches
@@ -562,7 +562,7 @@ class ListModel extends FormModel
         $leadCount = $removeLeadCount[$id]['count'];
 
         if ($output) {
-            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', array('%leads%' => $leadCount, '%batch%' => $limit)));
+            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', array('%contacts%' => $leadCount, '%batch%' => $limit)));
         }
 
         if ($leadCount) {

@@ -80,10 +80,12 @@ return array(
     ),
     'menu'       => array(
         'main'  => array(
-            'priority' => -1000,
+            'priority' => 15,
             'items'    => array(
-                'name'     => 'root',
-                'children' => array()
+                'mautic.core.channels' => array(
+                    'id'        => 'mautic_channels_root',
+                    'iconClass' => 'fa-rss'
+                )
             )
         ),
         'admin' => array(

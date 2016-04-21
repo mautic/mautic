@@ -70,7 +70,7 @@ class CampaignBuilderEvent extends Event
     public function addLeadDecision ($key, array $action)
     {
         if (array_key_exists($key, $this->leadDecisions)) {
-            throw new InvalidArgumentException("The key, '$key' is already used by another lead action. Please use a different key.");
+            throw new InvalidArgumentException("The key, '$key' is already used by another contact action. Please use a different key.");
         }
 
         //check for required keys and that given functions are callable
@@ -128,7 +128,7 @@ class CampaignBuilderEvent extends Event
     public function addLeadCondition ($key, array $event)
     {
         if (array_key_exists($key, $this->leadConditions)) {
-            throw new InvalidArgumentException("The key, '$key' is already used by another lead action. Please use a different key.");
+            throw new InvalidArgumentException("The key, '$key' is already used by another contact action. Please use a different key.");
         }
 
         //check for required keys and that given functions are callable
