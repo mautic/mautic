@@ -88,7 +88,7 @@ return array(
                 'mautic.form.forms' => array(
                     'route'     => 'mautic_form_index',
                     'access'    => array('form:forms:viewown', 'form:forms:viewother'),
-                    'parent'    => 'mautic.campaigns.menu.root',
+                    'parent'    => 'mautic.core.components',
                     'priority'  => 80
                 )
             )

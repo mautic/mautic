@@ -81,6 +81,10 @@ return array(
                 'mautic.core.channels' => array(
                     'id'        => 'mautic_channels_root',
                     'iconClass' => 'fa-rss'
+                ),
+                'mautic.core.components' => array(
+                    'id'        => 'mautic_components_root',
+                    'iconClass' => 'fa-puzzle-piece'
                 )
             )
         ),
