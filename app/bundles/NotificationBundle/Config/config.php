@@ -103,15 +103,13 @@ return array(
             )
         )
     ),
-    'menu' => array(
+    'menu'       => array(
         'main' => array(
-            'priority' => 15,
             'items'    => array(
                 'mautic.notification.notifications' => array(
                     'route'     => 'mautic_notification_index',
-                    'id'        => 'mautic_notification_root',
-                    'iconClass' => 'fa-bell',
-                    'access'    => array('notification:notifications:viewown', 'notification:notifications:viewother')
+                    'access'    => array('notification:notifications:viewown', 'notification:notifications:viewother'),
+                    'parent'    => 'mautic.core.channels'
                 )
             )
         )
