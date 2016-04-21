@@ -40,6 +40,7 @@
     position: absolute;
     padding: 10px 15px;
     z-index: 1010;
+    background: #FFFFFF;
     border-radius: 3px;
 }
 
