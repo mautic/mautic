@@ -835,10 +835,11 @@ class MailHelper
      * @param string $contentType
      * @param null   $charset
      * @param bool   $ignoreTrackingPixel
+     * @param bool   $ignoreEmbedImageConversion
      */
     public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false, $ignoreEmbedImageConversion = false)
     {
-        if (!$ignoreEmbedImageConversion) {
+        if (!$ignoreEmbedImageConversion && $this->factory->getParameter('mailer_convert_embed_images')) {
             $matches = array();
             if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
                 $replaces = array();

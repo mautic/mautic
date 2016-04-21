@@ -80,6 +80,9 @@ $template = '<div class="col-md-6">{content}</div>';
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_recover_timeout', $template); ?>
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_clear_timeout', $template); ?>
             </div>
+            <div class="row">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_convert_embed_images', $template); ?>
+            </div>
         </div>
     </div>
 <?php endif; ?>
