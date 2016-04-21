@@ -336,10 +336,10 @@ Mautic.launchCampaignEditor = function() {
             );
         });
 
-        var overlayOptions = [["Arrow", {width: 15, length: 15, location: 0.5}]];
+        var overlayOptions = [["Arrow", {width: 8, length: 8, location: 0.5}]];
         var endpoint = "Dot";
         var connector = ["Bezier", {curviness: 25}];
-        var connectorStyleLineWidth = 3;
+        var connectorStyleLineWidth = 1;
 
         Mautic.campaignBuilderTopAnchor = [0.5, 0, 0, -1, 0, 0];
         Mautic.campaignBuilderTopEndpoint = {
