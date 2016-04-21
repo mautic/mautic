@@ -197,25 +197,61 @@ class UserModel extends FormModel
      * Resets the user password and emails it
      *
      * @param User $user
+     * @param PasswordEncoderInterface $encoder
+     * @param string $newPassword
      */
-    public function resetPassword (User $user, PasswordEncoderInterface $encoder)
+    public function resetPassword(User $user, PasswordEncoderInterface $encoder, $newPassword)
     {
-        $newPassword     = hash('sha1', uniqid(mt_rand()));
         $encodedPassword = $this->checkNewPassword($user, $encoder, $newPassword);
 
         $user->setPassword($encodedPassword);
         $this->saveEntity($user);
+    }
 
-        // Email the user
+    /**
+     * @param User $user
+     *
+     * @return string
+     */
+    protected function getResetToken(User $user)
+    {
+        /** @var \DateTime $lastLogin */
+        $lastLogin = $user->getLastLogin();
+
+        $dateTime = ($lastLogin instanceof \DateTime) ? $lastLogin->format('Y-m-d H:i:s') : null;
+
+        return hash('sha256', $user->getUsername() . $user->getEmail() . $dateTime);
+    }
+
+    /**
+     * @param User $user
+     * @param string $token
+     *
+     * @return boolean
+     */
+    public function confirmResetToken(User $user, $token)
+    {
+        $resetToken = $this->getResetToken($user);
+
+        return hash_equals($token, $resetToken);
+    }
+
+    /**
+     * @param User $user
+     */
+    public function sendResetEmail(User $user)
+    {
         $mailer = $this->factory->getMailer();
+
+        $resetToken = $this->getResetToken($user);
+        $resetLink = $this->factory->getKernel()->getContainer()->get('router')->generate('mautic_user_passwordresetconfirm', array('token' => $resetToken), true);
 
         $mailer->setTo(array($user->getEmail() => $user->getName()));
         $mailer->setSubject($this->translator->trans('mautic.user.user.passwordreset.subject'));
-        $body = $this->translator->trans('mautic.user.user.passwordreset.body', array('%name%' => $user->getFirstName(), '%password%' => $newPassword));
+        $body = $this->translator->trans('mautic.user.user.passwordreset.email.body', array('%name%' => $user->getFirstName(), '%resetlink%' => $resetLink));
         $body = str_replace('\\n', "\n", $body);
-        $mailer->setBody($body);
+        $mailer->setBody($body, 'text/plain');
 
-        //queue the message
         $mailer->send();
     }
 
