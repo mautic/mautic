@@ -73,13 +73,24 @@ class NotificationHelper
         }
 
         /** @var \Mautic\NotificationBundle\Api\OneSignalApi $notification */
-        $notification = $factory->getKernel()->getContainer()->get('mautic.notification.api');
+        $notificationApi = $factory->getKernel()->getContainer()->get('mautic.notification.api');
 
-        return $notification->sendNotification(
+        /** @var \Mautic\NotificationBundle\Model\NotificationModel $notificationModel */
+        $notificationModel = $factory->getModel('notification');
+        $notificationId = (int) $config['notification'];
+
+        /** @var \Mautic\NotificationBundle\Entity\Notification $notification */
+        $notification = $notificationModel->getEntity($notificationId);
+
+        if ($notification->getId() !== $notificationId) {
+            return false;
+        }
+
+        return $notificationApi->sendNotification(
             $playerID,
-            $config['notification_message_template'],
-            $config['notification_message_headings'],
-            $config['notification_link']
+            $notification->getMessage(),
+            $notification->getHeading(),
+            $notification->getUrl()
         );
     }
 }
