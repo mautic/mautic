@@ -18,40 +18,9 @@ if (empty($notificationType)) {
 
 $customButtons = array();
 
-if ($notificationType == 'list') {
-    $customButtons[] = array(
-        'attr' => array(
-            'data-toggle' => 'ajax',
-            'href'        => $view['router']->generate('mautic_notification_action', array('objectAction' => 'send', 'objectId' => $notification->getId())),
-        ),
-        'iconClass' => 'fa fa-send-o',
-        'btnText'   => 'mautic.notification.send'
-    );
-}
-
-//$customButtons[] = array(
-//    'attr' => array(
-//        'data-toggle' => 'ajax',
-//        'href'        => $view['router']->generate('mautic_notification_action', array('objectAction' => 'example', 'objectId' => $notification->getId())),
-//    ),
-//    'iconClass' => 'fa fa-send',
-//    'btnText'   => 'mautic.notification.send.example'
-//);
-
-$customButtons[] = array(
-    'attr' => array(
-        'data-toggle' => 'ajax',
-        'href'        => $view['router']->generate('mautic_notification_action', array("objectAction" => "clone", "objectId" => $notification->getId())),
-        ),
-        'iconClass' => 'fa fa-copy',
-        'btnText'   => 'mautic.core.form.clone'
-);
-
-$edit = $view['security']->hasEntityAccess($permissions['notification:notifications:editown'], $permissions['notification:notifications:editother'], $notification->getCreatedBy());
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'item'       => $notification,
     'templateButtons' => array(
-        'edit'       => $edit,
         'delete'     => $view['security']->hasEntityAccess($permissions['notification:notifications:deleteown'], $permissions['notification:notifications:deleteother'], $notification->getCreatedBy())
     ),
     'routeBase'  => 'notification',

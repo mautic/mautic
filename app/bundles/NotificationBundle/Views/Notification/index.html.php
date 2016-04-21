@@ -10,14 +10,6 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'notification');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.notification.notifications'));
-
-$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
-    'templateButtons' => array(
-        'new'    => $permissions['notification:notifications:create']
-    ),
-    'routeBase' => 'notification'
-)));
-
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">

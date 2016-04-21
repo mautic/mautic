@@ -349,8 +349,12 @@ class NotificationController extends FormController
         $action = $this->generateUrl('mautic_notification_action', array('objectAction' => 'new'));
 
         $updateSelect = ($method == 'POST')
-            ? $this->request->request->get('notificationform[updateSelect]', false, true)
+            ? $this->request->request->get('notification[updateSelect]', false, true)
             : $this->request->get('updateSelect', false);
+
+        if ($updateSelect) {
+            $entity->setNotificationType('template');
+        }
 
         //create the form
         $form = $model->createForm($entity, $this->get('form.factory'), $action, array('update_select' => $updateSelect));
@@ -410,7 +414,7 @@ class NotificationController extends FormController
                     array(
                         'updateSelect' => $form['updateSelect']->getData(),
                         'notificationId'    => $entity->getId(),
-                        'notificationTitle' => $entity->getTitle(),
+                        'notificationName' => $entity->getName(),
                         'notificationLang'  => $entity->getLanguage()
                     )
                 );
@@ -693,7 +697,7 @@ class NotificationController extends FormController
                 'type'    => 'notice',
                 'msg'     => 'mautic.core.notice.deleted',
                 'msgVars' => array(
-                    '%name%' => $entity->getTitle(),
+                    '%name%' => $entity->getName(),
                     '%id%'   => $objectId
                 )
             );

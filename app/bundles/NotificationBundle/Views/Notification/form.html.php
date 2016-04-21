@@ -36,21 +36,6 @@ if (!isset($attachmentSize)) {
                         <div class="row">
                             <div class="col-md-6">
                                 <?php echo $view['form']->row($form['name']); ?>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="pull-left">
-                                    <?php echo $view['form']->label($form['description']); ?>
-                                </div>
-                                <div class="clearfix"></div>
-                                <?php echo $view['form']->widget($form['description']); ?>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
                                 <?php echo $view['form']->row($form['heading']); ?>
                                 <?php echo $view['form']->row($form['url']); ?>
                             </div>
@@ -65,19 +50,20 @@ if (!isset($attachmentSize)) {
     </div>
     <div class="col-md-3 bg-white height-auto bdr-l">
         <div class="pr-lg pl-lg pt-md pb-md">
-            <?php echo $view['form']->row($form['name']); ?>
             <div id="leadList"<?php echo ($notificationType == 'template') ? ' class="hide"' : ''; ?>>
                 <?php echo $view['form']->row($form['lists']); ?>
             </div>
             <?php echo $view['form']->row($form['category']); ?>
             <?php echo $view['form']->row($form['language']); ?>
-            <div id="publishStatus"<?php echo ($notificationType == 'list') ? ' class="hide"' : ''; ?>>
-                <?php echo $view['form']->row($form['isPublished']); ?>
-                <?php echo $view['form']->row($form['publishUp']); ?>
-                <?php echo $view['form']->row($form['publishDown']); ?>
-            </div>
+            <div class="hide">
+                <div id="publishStatus"<?php echo ($notificationType == 'list') ? ' class="hide"' : ''; ?>>
+                    <?php echo $view['form']->row($form['isPublished']); ?>
+                    <?php echo $view['form']->row($form['publishUp']); ?>
+                    <?php echo $view['form']->row($form['publishDown']); ?>
+                </div>
 
-            <?php echo $view['form']->rest($form); ?>
+                <?php echo $view['form']->rest($form); ?>
+            </div>
         </div>
     </div>
 </div>
