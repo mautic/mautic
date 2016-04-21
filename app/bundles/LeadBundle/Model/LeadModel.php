@@ -984,6 +984,8 @@ class LeadModel extends FormModel
                     "%user%" => $this->factory->getUser()->getUsername()
                 ));
 
+                // The email must be set for successful unsubscribtion
+                $lead->addUpdatedField('email', $data[$fields['email']]);
                 $this->unsubscribeLead($lead, $reason, false);
             }
         }
