@@ -21,6 +21,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 
 /**
@@ -155,6 +156,15 @@ class FieldType extends AbstractType
             )
         );
 
+        $constraints = array();
+        if ($default === 'datetime') {
+            $constraints = array(new Assert\DateTime);
+        } elseif ($default === 'date') {
+            $constraints = array(new Assert\Date);
+        } elseif ($default === 'time') {
+            $constraints = array(new Assert\Time);
+        }
+
         $builder->add(
             'defaultValue',
             'text',
@@ -162,14 +172,14 @@ class FieldType extends AbstractType
                 'label'      => 'mautic.core.defaultvalue',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
-                'required'   => false
+                'required'   => false,
+                'constraints' => $constraints
             )
         );
 
         $formModifier = function (FormEvent $event, $eventName) {
             $form = $event->getForm();
             $data = $event->getData();
-
             $type = (is_array($data)) ? (isset($data['type']) ? $data['type'] : null) : $data->getType();
 
             if ($type == 'select' || $type == 'lookup') {
