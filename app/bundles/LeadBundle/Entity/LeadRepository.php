@@ -578,6 +578,34 @@ class LeadRepository extends CommonRepository
             ) : $results;
     }
 
+
+    public function getEntitiesLight($args = array()){
+    	$results = $this->requestEntitiesLight($args, 0, 40000);
+    	if(count($results) === 40000){
+    		$result = $this->requestEntitiesLight($args, 40001, 40000);
+    		$results = array_merge($results, $result);
+    		if(count($result) === 40000){
+				$result = $this->requestEntitiesLight($args, 80001, 15000);
+    			$results = array_merge($results,$result);
+			}
+    	}
+
+    	return $results;
+    }
+
+    public function requestEntitiesLight($args,$first,$limit){
+     	$q = $this->_em->getConnection()->createQueryBuilder();
+    	$q->select('l.id,l.lastname, l.email,l.points,l.company, l.phone, l.website,l.country,l.last_active')
+    	  ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+    	  ->setFirstResult($first)
+    	  ->setMaxResults($limit);
+    	$this->buildWhereClause($q, $args);
+    	$this->buildOrderByClause($q, $args);
+    	$results = $q->execute()->fetchAll(Query::HYDRATE_ARRAY);
+    	unset($q);
+    	return $results;
+    }
+
     /**
      * Function to remove non custom field columns from an arrayed lead row
      *

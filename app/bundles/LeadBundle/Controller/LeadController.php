@@ -1580,7 +1580,6 @@ class LeadController extends FormController
         unlink($filepath);
     }
 
-
     public function exportCurrentListAction(){
     	$formatter = $this->factory->getHelper('template.formatter');
     	$date      = $this->factory->getDate()->toLocalString();
@@ -1624,33 +1623,33 @@ class LeadController extends FormController
         if (!$permissions['lead:leads:viewother']) {
             $filter['force'] .= " $mine";
         }
-        $leads = $model->getEntities(
+        $leads = $model->getEntitiesLight(
             array(
-            	'start'          => 0,
-            	'limit'          => 2000,
                 'filter'         => $filter,
                 'orderBy'        => $orderBy,
-                'orderByDir'     => $orderByDir,
-                'withTotalCount' => false
+                'orderByDir'     => $orderByDir
             )
         );
+
+
+        $this->factory->getLogger(true)->info("leads : ".count($leads));
+
     	$response = new StreamedResponse(function () use ($leads, $formatter) {
     		$handle = fopen('php://output', 'r+');
-    		$header = array('lead_id', 'lead_name', 'lead_email', 'lead_company', 'lead_phone', 'lead_website', 'lead_location', 'lead_point', 'lead_lastActive');
+    		$header = array('lead_id', 'lead_name', 'lead_email', 'lead_company', 'lead_phone', 'lead_website', 'lead_location', 'lead_point', 'lead_last_active');
     		fputcsv($handle, $header);
-
     		//build the data rows
-    		foreach ($leads as &$lead) {
+    		for($i=0;$i<count($leads);$i++) {
     			$row = array();
-    			$row[] = $lead->getId();
-    			$row[] = $formatter->_($lead->getName(), 'string', true);
-    			$row[] = $formatter->_($lead->getEmail(), 'email', true);
-    			$row[] = $formatter->_($lead->getCompany(), 'string', true);
-    			$row[] = $formatter->_($lead->getFieldValue('phone'), 'string', true);
-    			$row[] = $formatter->_($lead->getFieldValue('website'), 'url', true);
-    			$row[] = $formatter->_($lead->getLocation(), 'string', true);
-    			$row[] = $formatter->_($lead->getPoints(), 'int', true);
-    			$row[] = $formatter->_($lead->getLastActive(), 'datetime', true);
+    			$row[] = $leads[$i]['id'];
+    			$row[] = $formatter->_($leads[$i]['lastname'], 'string', true);
+    			$row[] = $formatter->_($leads[$i]['email'], 'email', true);
+    			$row[] = $formatter->_($leads[$i]['company'], 'string', true);
+    			$row[] = $formatter->_($leads[$i]['phone'], 'string', true);
+    			$row[] = $formatter->_($leads[$i]['website'], 'url', true);
+    			$row[] = $formatter->_($leads[$i]['country'], 'string', true);
+    			$row[] = $formatter->_($leads[$i]['points'], 'int', true);
+    			$row[] = $formatter->_($leads[$i]['last_active'], 'date', true);
 
     			fputcsv($handle, $row);
     		}
