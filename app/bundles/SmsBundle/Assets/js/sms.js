@@ -108,7 +108,7 @@ Mautic.loadNewSmsWindow = function(options) {
         Mautic.startModalLoadingBar();
 
         setTimeout(function() {
-            var generator = window.open(options.windowUrl, 'newsmswindow', 'height=600,width=340');
+            var generator = window.open(options.windowUrl, 'newsmswindow', 'height=600,width=530');
 
             if (!generator || generator.closed || typeof generator.closed == 'undefined') {
                 alert(response.popupBlockerMessage);

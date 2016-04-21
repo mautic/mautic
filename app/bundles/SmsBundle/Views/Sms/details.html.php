@@ -18,40 +18,10 @@ if (empty($smsType)) {
 
 $customButtons = array();
 
-if ($smsType == 'list') {
-    $customButtons[] = array(
-        'attr' => array(
-            'data-toggle' => 'ajax',
-            'href'        => $view['router']->generate('mautic_sms_action', array('objectAction' => 'send', 'objectId' => $sms->getId())),
-        ),
-        'iconClass' => 'fa fa-send-o',
-        'btnText'   => 'mautic.sms.send'
-    );
-}
-
-//$customButtons[] = array(
-//    'attr' => array(
-//        'data-toggle' => 'ajax',
-//        'href'        => $view['router']->generate('mautic_sms_action', array('objectAction' => 'example', 'objectId' => $sms->getId())),
-//    ),
-//    'iconClass' => 'fa fa-send',
-//    'btnText'   => 'mautic.sms.send.example'
-//);
-
-$customButtons[] = array(
-    'attr' => array(
-        'data-toggle' => 'ajax',
-        'href'        => $view['router']->generate('mautic_sms_action', array("objectAction" => "clone", "objectId" => $sms->getId())),
-        ),
-        'iconClass' => 'fa fa-copy',
-        'btnText'   => 'mautic.core.form.clone'
-);
-
 $edit = $view['security']->hasEntityAccess($permissions['sms:smses:editown'], $permissions['sms:smses:editother'], $sms->getCreatedBy());
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'item'       => $sms,
     'templateButtons' => array(
-        'edit'       => $edit,
         'delete'     => $view['security']->hasEntityAccess($permissions['sms:smses:deleteown'], $permissions['sms:smses:deleteother'], $sms->getCreatedBy())
     ),
     'routeBase'  => 'sms',

@@ -63,7 +63,8 @@ class SmsType extends AbstractType
             array(
                 'label'      => 'mautic.sms.form.internal.description',
                 'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
+                'attr'       => array('class' => 'form-control'),
+                'required'   => false
             )
         );
 
@@ -73,7 +74,10 @@ class SmsType extends AbstractType
             array(
                 'label'      => 'mautic.sms.form.message',
                 'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
+                'attr'       => array(
+                    'class' => 'form-control',
+                    'rows'  => 6
+                )
             )
         );
 
@@ -155,6 +159,44 @@ class SmsType extends AbstractType
 
         $builder->add('buttons', 'form_buttons');
         $builder->add('smsType', 'hidden');
+
+        $customButtons = array(
+            array(
+                'name'  => 'builder',
+                'label' => 'mautic.core.builder',
+                'attr'  => array(
+                    'class'   => 'btn btn-default btn-dnd btn-nospin text-primary btn-builder',
+                    'icon'    => 'fa fa-cube',
+                    'onclick' => "Mautic.launchBuilder('smsform', 'sms');"
+                )
+            )
+        );
+        if (!empty($options['update_select'])) {
+            $builder->add(
+                'buttons',
+                'form_buttons',
+                array(
+                    'apply_text'        => false,
+                    'pre_extra_buttons' => $customButtons
+                )
+            );
+            $builder->add(
+                'updateSelect',
+                'hidden',
+                array(
+                    'data'   => $options['update_select'],
+                    'mapped' => false
+                )
+            );
+        } else {
+            $builder->add(
+                'buttons',
+                'form_buttons',
+                array(
+                    'pre_extra_buttons' => $customButtons
+                )
+            );
+        }
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
