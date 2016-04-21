@@ -90,6 +90,7 @@ class FieldType extends AbstractType
 
         $new         = (!empty($options['data']) && $options['data']->getAlias()) ? false : true;
         $default     = ($new) ? 'text' : $options['data']->getType();
+        $type        = (is_array($options['data'])) ? (isset($options['data']['type']) ? $options['data']['type'] : null) : $options['data']->getType();
         $fieldHelper = new FormFieldHelper();
         $fieldHelper->setTranslator($this->translator);
         $builder->add(
@@ -157,11 +158,11 @@ class FieldType extends AbstractType
         );
 
         $constraints = array();
-        if ($default === 'datetime') {
+        if ($type === 'datetime') {
             $constraints = array(new Assert\DateTime);
-        } elseif ($default === 'date') {
+        } elseif ($type === 'date') {
             $constraints = array(new Assert\Date);
-        } elseif ($default === 'time') {
+        } elseif ($type === 'time') {
             $constraints = array(new Assert\Time);
         }
 
