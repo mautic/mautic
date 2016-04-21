@@ -30,9 +30,6 @@ if (!isset($attachmentSize)) {
         <div class="row">
             <div class="col-xs-12">
                 <!-- tabs controls -->
-                <ul class="bg-auto nav nav-tabs pr-md pl-md">
-                    <li class="active"><a href="#notification-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.notification.notification'); ?></a></li>
-                </ul>
                 <!--/ tabs controls -->
                 <div class="tab-content pa-md">
                     <div class="tab-pane fade in active bdr-w-0" id="notification-container">

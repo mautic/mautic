@@ -58,6 +58,7 @@ class PageSubscriber extends CommonSubscriber
         $oneSignalInit = <<<JS
 
     var OneSignal = OneSignal || [];
+    
     OneSignal.push(["init", {
         appId: "{$appId}",
         safari_web_id: "{$safariWebId}",
@@ -67,19 +68,27 @@ class PageSubscriber extends CommonSubscriber
         }
     }]);
 
-    var pushUserIdToMautic = function(userId) {
-        if (userId == null) {
-            OneSignal.push(['getUserId', pushUserIdToMautic]);
-        } else {
-            var xhr = new XMLHttpRequest();
+    var postUserIdToMautic = function(userId) {
+        var xhr = new XMLHttpRequest();
 
-            xhr.open('post', '{$leadAssociationUrl}', true);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.send('osid=' + userId);
-        }
+        xhr.open('post', '{$leadAssociationUrl}', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.send('osid=' + userId);
     };
 
-    OneSignal.push(['getUserId', pushUserIdToMautic]);
+    OneSignal.getUserId(function(userId) {
+        if (! userId) {
+            OneSignal.on('subscriptionChange', function(isSubscribed) {
+                if (isSubscribed) {
+                    OneSignal.getUserId(function(newUserId) {
+                        postUserIdToMautic(newUserId);
+                    });
+                }
+            });
+        } else {
+            postUserIdToMautic(userId);
+        }
+    });
 JS;
 
         $assetsHelper->addScriptDeclaration($oneSignalInit, 'onPageDisplay_headClose');
