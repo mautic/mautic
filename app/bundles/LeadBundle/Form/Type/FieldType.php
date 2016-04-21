@@ -22,6 +22,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 
 /**
@@ -90,7 +91,6 @@ class FieldType extends AbstractType
 
         $new         = (!empty($options['data']) && $options['data']->getAlias()) ? false : true;
         $default     = ($new) ? 'text' : $options['data']->getType();
-        $type        = (is_array($options['data'])) ? (isset($options['data']['type']) ? $options['data']['type'] : null) : $options['data']->getType();
         $fieldHelper = new FormFieldHelper();
         $fieldHelper->setTranslator($this->translator);
         $builder->add(
@@ -157,15 +157,6 @@ class FieldType extends AbstractType
             )
         );
 
-        $constraints = array();
-        if ($type === 'datetime') {
-            $constraints = array(new Assert\DateTime);
-        } elseif ($type === 'date') {
-            $constraints = array(new Assert\Date);
-        } elseif ($type === 'time') {
-            $constraints = array(new Assert\Time);
-        }
-
         $builder->add(
             'defaultValue',
             'text',
@@ -174,7 +165,6 @@ class FieldType extends AbstractType
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
                 'required'   => false,
-                'constraints' => $constraints
             )
         );
 
@@ -228,6 +218,34 @@ class FieldType extends AbstractType
                             array(false, true),
                             array($noLabel, $yesLabel)
                         )
+                    )
+                );
+            } elseif (in_array($type, array('datetime', 'date', 'time'))) {
+                $constraints = array();
+                if ($type === 'datetime') {
+                    $constraints = array(new Assert\Callback(function ($object, ExecutionContextInterface $context) {
+                        if (\DateTime::createFromFormat('Y-m-d H:i', $object) === false) {
+                            $context->buildViolation('mautic.lead.datetime.invalid')->addViolation();
+                        }
+                    }));
+                } elseif ($type === 'date') {
+                    $constraints = array(new Assert\Date);
+                } elseif ($type === 'time') {
+                    $constraints = array(new Assert\Regex(array(
+                        'pattern' => '/(2[0-3]|[01][0-9]):([0-5][0-9])/',
+                        'message' => $this->translator->trans('mautic.lead.time.invalid', array(), 'validators')
+                    )));
+                }
+
+                $form->add(
+                    'defaultValue',
+                    'text',
+                    array(
+                        'label'      => 'mautic.core.defaultvalue',
+                        'label_attr' => array('class' => 'control-label'),
+                        'attr'       => array('class' => 'form-control'),
+                        'required'   => false,
+                        'constraints' => $constraints
                     )
                 );
             }
