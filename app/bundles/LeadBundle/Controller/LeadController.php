@@ -204,7 +204,6 @@ class LeadController extends FormController
     /*
      * Quick form controller route and view
      */
-
     public function quickAddAction()
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
@@ -234,6 +233,10 @@ class LeadController extends FormController
         );
 
         $quickForm = $model->createForm($model->getEntity(), $this->get('form.factory'), $action, array('fields' => $fields, 'isShortForm' => true));
+
+        //set the default owner to the currently logged in user
+        $currentUser = $this->get('security.context')->getToken()->getUser();
+        $quickForm->get('owner')->setData($currentUser);
 
         return $this->delegateView(
             array(
