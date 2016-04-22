@@ -241,7 +241,7 @@ class PublicController extends CommonFormController
     public function previewAction($id = 0)
     {
         $objectId          = (empty($id)) ? InputHelper::int($this->request->get('id')) : $id;
-        $css               = InputHelper::raw($this->request->get('css'));
+        $css               = InputHelper::string($this->request->get('css'));
         $model             = $this->factory->getModel('form.form');
         $form              = $model->getEntity($objectId);
         $customStylesheets = (!empty($css)) ? explode(',', $css) : array();

@@ -117,16 +117,9 @@ class CommonSubscriber implements EventSubscriberInterface
                 }
             }
 
-            usort($menuItems, function ($a, $b) {
-                $ap = $a['priority'];
-                $bp = $b['priority'];
-
-                if ($ap == $bp) {
-                    return 0;
-                }
-
-                return ($ap < $bp) ? -1 : 1;
-            });
+            /** @var \Mautic\CoreBundle\Menu\MenuHelper $menuHelper */
+            $menuHelper = $this->factory->getHelper('menu');
+            $menuHelper->sortByPriority($menuItems);
 
             foreach ($menuItems as $items) {
                 $event->addMenuItems($items['items']);
