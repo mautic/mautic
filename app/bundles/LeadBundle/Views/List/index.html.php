@@ -12,7 +12,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.list.
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
     'templateButtons' => array(
-        'new' => $permissions['lead:lists:editother']
+        'new' => true // this is intentional. Each lead can segment leads
     ),
     'routeBase' => 'leadlist',
     'langVar'   => 'lead.list'

@@ -128,7 +128,7 @@ class ListController extends FormController
      */
     public function newAction ()
     {
-        if (!$this->factory->getSecurity()->isGranted('lead:lists:editother')) {
+        if (!$this->factory->getSecurity()->isGranted('lead:leads:viewown')) {
             return $this->accessDenied();
         }
 
