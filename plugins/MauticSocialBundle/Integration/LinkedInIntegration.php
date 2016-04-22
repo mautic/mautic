@@ -107,39 +107,42 @@ class LinkedInIntegration extends SocialIntegration
             $identifier[$this->getName()] = "v1/people/~:(id,picture-url,".$profileFields.")";
         }
 
-        $identifier['access_token'] = $access_token['access_token'];
+        if(isset($access_token['access_token'])) {
+            $identifier['access_token'] = $access_token['access_token'];
 
-        $this->preventDoubleCall = true;
+            $this->preventDoubleCall = true;
 
-        if ($id = $this->getUserId($identifier, $socialCache)) {
+            if ($id = $this->getUserId($identifier, $socialCache)) {
 
-            if (is_object($id)) {
-                //getUserId has already obtained the data
-                $data = $id;
-            } else {
-                $url = $this->getApiUrl("$id");
-                $data = $this->makeRequest($url, array(), 'GET', array('auth_type' => 'rest'));
+                if (is_object($id)) {
+                    //getUserId has already obtained the data
+                    $data = $id;
+                } else {
+                    $url  = $this->getApiUrl("$id");
+                    $data = $this->makeRequest($url, array(), 'GET', array('auth_type' => 'rest'));
+                }
+
+                $info = $this->matchUpData($data);
+
+                if (isset($data->publicProfileUrl)) {
+                    $info['profileHandle'] = str_replace("https://www.linkedin.com/", '', $data->publicProfileUrl);
+                }
+
+                $info['profileImage'] = preg_replace('/\?.*/', '', $data->pictureUrl);
+
+
+                $socialCache[$this->getName()]['profile']     = $info;
+                $socialCache[$this->getName()]['lastRefresh'] = new \DateTime();
+                $socialCache[$this->getName()]['accessToken'] = $this->encryptApiKeys($access_token);
+
+                $this->getMauticLead($info, true, $socialCache);
+
+                return $data;
+
+                //$this->preventDoubleCall = false;
             }
-
-            $info = $this->matchUpData($data);
-
-            if (isset($data->publicProfileUrl)) {
-                $info['profileHandle'] = str_replace("https://www.linkedin.com/", '', $data->publicProfileUrl);
-            }
-
-            $info['profileImage'] = preg_replace('/\?.*/', '', $data->pictureUrl);
-
-
-            $socialCache[$this->getName()]['profile']     = $info;
-            $socialCache[$this->getName()]['lastRefresh'] = new \DateTime();
-            $socialCache[$this->getName()]['accessToken'] = $identifier['access_token'];
-
-            $this->getMauticLead($info, true, $socialCache);
-
-            return $data;
-
-            //$this->preventDoubleCall = false;
         }
+        return null;
     }
 
     /**

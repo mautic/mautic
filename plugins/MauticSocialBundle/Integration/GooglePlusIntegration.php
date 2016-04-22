@@ -73,41 +73,49 @@ class GooglePlusIntegration extends SocialIntegration
         }
         $access_token = $this->factory->getSession()->get($this->getName().'_tokenResponse');
 
-        $identifier['access_token'] =$access_token['access_token'];
+        if(isset($access_token['access_token'])) {
+            $identifier['access_token'] = $access_token['access_token'];
 
-        $this->preventDoubleCall = true;
+            $this->preventDoubleCall = true;
 
-        if ($userid = $this->getUserId($identifier, $socialCache)) {
-            $url  = $this->getApiUrl("people/{$userid}");
-            $data = $this->makeRequest($url, array('access_token'=>$identifier['access_token']),'GET',array('auth_type'=>'access_token'));
-           
-            if (is_object($data) && !isset($data->error)) {
-                $info = $this->matchUpData($data);
-                
-                if (isset($data->url)) {
-                    preg_match("/plus.google.com\/(.*?)($|\/)/", $data->url, $matches);
-                    $info['profileHandle'] = $matches[1];
+            if ($userid = $this->getUserId($identifier, $socialCache)) {
+                $url  = $this->getApiUrl("people/{$userid}");
+                $data = $this->makeRequest(
+                    $url,
+                    array('access_token' => $identifier['access_token']),
+                    'GET',
+                    array('auth_type' => 'access_token')
+                );
+
+                if (is_object($data) && !isset($data->error)) {
+                    $info = $this->matchUpData($data);
+
+                    if (isset($data->url)) {
+                        preg_match("/plus.google.com\/(.*?)($|\/)/", $data->url, $matches);
+                        $info['profileHandle'] = $matches[1];
+                    }
+
+                    if (isset($data->image->url)) {
+                        //remove the size from the end
+                        $image                = $data->image->url;
+                        $image                = preg_replace('/\?.*/', '', $image);
+                        $info["profileImage"] = $image;
+                    }
+                    if (!empty($info)) {
+                        $socialCache[$this->getName()]['profile']     = $info;
+                        $socialCache[$this->getName()]['lastRefresh'] = new \DateTime();
+                        $socialCache[$this->getName()]['accessToken'] = $this->encryptApiKeys($access_token);
+
+                        $this->getMauticLead($info, true, $socialCache);
+                    }
+
+                    return $data;
+
+                    $this->preventDoubleCall = false;
                 }
-
-                if (isset($data->image->url)) {
-                    //remove the size from the end
-                    $image                = $data->image->url;
-                    $image                = preg_replace('/\?.*/', '', $image);
-                    $info["profileImage"] = $image;
-                }
-                if(!empty($info)){
-                    $socialCache[$this->getName()]['profile']     = $info;
-                    $socialCache[$this->getName()]['lastRefresh'] = new \DateTime();
-                    $socialCache[$this->getName()]['accessToken'] = $identifier['access_token'];
-
-                    $this->getMauticLead($info, true, $socialCache);
-                }
-
-                return $data;
-
-                $this->preventDoubleCall = false;
             }
         }
+        return null;
     }
 
     /**
