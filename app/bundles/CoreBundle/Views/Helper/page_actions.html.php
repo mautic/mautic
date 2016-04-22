@@ -30,13 +30,15 @@ if (isset($buttonFormat)) {
         }
     }
 
-    $buttonGroupTypes = ($count > 4) ? array('button-dropdown') : array('group', 'button-dropdown');
+    $buttonGroupTypes = ($count > 5) ? array('button-dropdown') : array('group', 'button-dropdown');
 }
 
 $forceVisible = (count($buttonGroupTypes) === 1);
 
+
 foreach ($buttonGroupTypes as $groupType) {
     $buttonCount = 0;
+
     if ($groupType == 'group') {
         echo '<div class="std-toolbar btn-group' . ((!$forceVisible) ? ' hidden-xs hidden-sm' : '') .'">';
         $dropdownOpenHtml = '';
@@ -47,7 +49,7 @@ foreach ($buttonGroupTypes as $groupType) {
     }
 
     include 'action_button_helper.php';
-
+    
     echo $view['buttons']->renderPreCustomButtons($buttonCount, $dropdownOpenHtml);
 
     foreach ($templateButtons as $action => $enabled) {
@@ -73,6 +75,12 @@ foreach ($buttonGroupTypes as $groupType) {
             case 'abtest':
                 $icon = ($action == 'clone') ? 'copy' : 'sitemap';
                 echo '<a class="'.$btnClass.'" href="' . $view['router']->generate('mautic_' . $routeBase . '_action', array_merge(array("objectAction" => $action), $query)) . '" data-toggle="ajax"' . $menuLink . ">\n";
+                echo '  <i class="fa fa-'.$icon.'"></i> ' . $view['translator']->trans('mautic.core.form.' . $action) . "\n";
+                echo "</a>\n";
+                break;
+            case 'close':
+                $icon = 'remove';
+                echo '<a class="'.$btnClass.'" href="' . $view['router']->generate('mautic_' . $routeBase. '_index') . '" data-toggle="' . $editMode . '"' . $editAttr . $menuLink . ">\n";
                 echo '  <i class="fa fa-'.$icon.'"></i> ' . $view['translator']->trans('mautic.core.form.' . $action) . "\n";
                 echo "</a>\n";
                 break;
