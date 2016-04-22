@@ -81,6 +81,8 @@ class AuthController extends FormController
     }
 
     /**
+     * @param $integration
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function authStatusAction ($integration)
@@ -94,14 +96,14 @@ class AuthController extends FormController
         if(isset($integration)){
             $integrationHelper = $this->factory->getHelper('integration');
             $integrationObject = $integrationHelper->getIntegrationObject($integration);
-            
+
             $userData = $session->get('mautic.integration.'.$integration.'.userdata');
-            
+
             if($integrationObject->getPostAuthTemplate() != null){
                 $postAuthTemplate=$integrationObject->getPostAuthTemplate();
             }
         }
-        
+
         $message     = $type = '';
         $alert       = 'success';
         if (!empty($postMessage)) {
@@ -117,19 +119,32 @@ class AuthController extends FormController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param $integration
+     *
+     * @return RedirectResponse
      */
     public function authUserAction ($integration)
     {
+        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $this->factory->getHelper('integration');
         $integrationObject = $integrationHelper->getIntegrationObject($integration);
 
         $session = $this->factory->getSession();
 
-        $settings['method'] = 'GET';
+        $settings['method']      = 'GET';
         $settings['integration'] = $integrationObject->getName();
 
-        $response = new RedirectResponse($integrationObject->getAuthLoginUrl());
+        /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
+        $event = $this->factory->getDispatcher()->dispatch(
+            PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT,
+            new PluginIntegrationAuthRedirectEvent(
+                $integrationObject,
+                $integrationObject->getAuthLoginUrl()
+            )
+        );
+        $oauthUrl = $event->getAuthUrl();
+
+        $response = new RedirectResponse($oauthUrl);
         $identifier[$integrationObject->getName()] = null;
         $socialCache = array();
         $userData = $integrationObject->getUserData($identifier,$socialCache);
@@ -138,6 +153,6 @@ class AuthController extends FormController
 
         return $response;
     }
-    
-    
+
+
 }
