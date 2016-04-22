@@ -41,7 +41,8 @@ class CampaignSubscriber extends CommonSubscriber
                     'callback' => array('\Mautic\SmsBundle\Helper\SmsHelper', 'send'),
                     'formType' => 'smssend_list',
                     'formTypeOptions' => array('update_select' => 'campaignevent_properties_sms'),
-                    'formTheme'       => 'MauticSmsBundle:FormTheme\SmsSendList'
+                    'formTheme'       => 'MauticSmsBundle:FormTheme\SmsSendList',
+                    'timelineTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.php'
                 )
             );
         }
