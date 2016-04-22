@@ -422,11 +422,12 @@ return array(
             'display_name' => 'Telize',
             'class'        => 'Mautic\CoreBundle\IpLookup\TelizeLookup'
         ),
-
-		'ip2loctionlocal'=>array('display_name' => 'IP2Location Local Bin File',
+		'ip2loctionlocal'=>array(
+		    'display_name' => 'IP2Location Local Bin File',
             'class'        => 'Mautic\CoreBundle\IpLookup\IP2LocationBinLookup'
         ),
-		'ip2loctionapi'=>array('display_name' => 'IP2Location Web Service',
+		'ip2loctionapi'=>array(
+		    'display_name' => 'IP2Location Web Service',
             'class'        => 'Mautic\CoreBundle\IpLookup\IP2LocationAPILookup'
         )
     ),
