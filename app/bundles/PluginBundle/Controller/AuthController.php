@@ -44,9 +44,9 @@ class AuthController extends FormController
         if (!array_key_exists(strtolower($integration), $objects)) {
             $session->set('mautic.integration.postauth.message', array('mautic.integration.notfound', array('%name%' => $integration), 'error'));
             if ($isAjax) {
-                return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_auth_postauth')));
+                return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_auth_postauth',array('integration'=>$integration))));
             } else {
-                return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth'));
+                return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth',array('integration'=>$integration)));
             }
         }
 
@@ -56,9 +56,9 @@ class AuthController extends FormController
             $session->remove($integration . '_csrf_token');
             $session->set('mautic.integration.postauth.message', array('mautic.integration.auth.invalid.state', array(), 'error'));
             if ($isAjax) {
-                return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_auth_postauth')));
+                return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_auth_postauth',array('integration'=>$integration))));
             } else {
-                return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth'));
+                return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth',array('integration'=>$integration)));
             }
         }
 
@@ -77,16 +77,31 @@ class AuthController extends FormController
 
         $session->set('mautic.integration.postauth.message', array($message, $params, $type));
 
-        return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth'));
+        return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth',array('integration'=>$integration)));
     }
 
     /**
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function authStatusAction ()
+    public function authStatusAction ($integration)
     {
+        $postAuthTemplate = 'MauticPluginBundle:Auth:postauth.html.php';
+
         $session     = $this->factory->getSession();
         $postMessage = $session->get('mautic.integration.postauth.message');
+        $userData = array();
+
+        if(isset($integration)){
+            $integrationHelper = $this->factory->getHelper('integration');
+            $integrationObject = $integrationHelper->getIntegrationObject($integration);
+            
+            $userData = $session->get('mautic.integration.'.$integration.'.userdata');
+            
+            if($integrationObject->getPostAuthTemplate() != null){
+                $postAuthTemplate=$integrationObject->getPostAuthTemplate();
+            }
+        }
+        
         $message     = $type = '';
         $alert       = 'success';
         if (!empty($postMessage)) {
@@ -98,6 +113,31 @@ class AuthController extends FormController
             }
         }
 
-        return $this->render('MauticPluginBundle:Auth:postauth.html.php', array('message' => $message, 'alert' => $alert));
+        return $this->render($postAuthTemplate, array('message' => $message, 'alert' => $alert,'data'=>$userData));
     }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function authUserAction ($integration)
+    {
+        $integrationHelper = $this->factory->getHelper('integration');
+        $integrationObject = $integrationHelper->getIntegrationObject($integration);
+
+        $session = $this->factory->getSession();
+
+        $settings['method'] = 'GET';
+        $settings['integration'] = $integrationObject->getName();
+
+        $response = new RedirectResponse($integrationObject->getAuthLoginUrl());
+        $identifier[$integrationObject->getName()] = null;
+        $socialCache = array();
+        $userData = $integrationObject->getUserData($identifier,$socialCache);
+
+        $session->set('mautic.integration.'.$integration.'.userdata', $userData);
+
+        return $response;
+    }
+    
+    
 }

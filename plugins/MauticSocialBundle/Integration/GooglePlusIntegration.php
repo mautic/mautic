@@ -9,15 +9,18 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
+use Mautic\LeadBundle\Entity\Lead;
+
 /**
  * Class GooglePlusIntegration
  */
 class GooglePlusIntegration extends SocialIntegration
 {
+
     /**
      * {@inheritdoc}
      */
-    public function getName ()
+    public function getName()
     {
         return 'GooglePlus';
     }
@@ -30,7 +33,7 @@ class GooglePlusIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getPriority ()
+    public function getPriority()
     {
         return 1;
     }
@@ -39,7 +42,7 @@ class GooglePlusIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getIdentifierFields ()
+    public function getIdentifierFields()
     {
         return array(
             'googleplus',
@@ -50,7 +53,7 @@ class GooglePlusIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getSupportedFeatures ()
+    public function getSupportedFeatures()
     {
         return array(
             'public_activity',
@@ -62,38 +65,61 @@ class GooglePlusIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getUserData ($identifier, &$socialCache)
+    public function getUserData($identifier, &$socialCache)
     {
+
+        if(!isset($identifier['googleplus']) || $identifier['googleplus']===null){
+            $identifier['googleplus'] = "people/me";
+        }
+        $access_token = $this->factory->getSession()->get($this->getName().'_tokenResponse');
+
+        $identifier['access_token'] =$access_token['access_token'];
+
+        $this->preventDoubleCall = true;
+
         if ($userid = $this->getUserId($identifier, $socialCache)) {
             $url  = $this->getApiUrl("people/{$userid}");
-            $data = $this->makeRequest($url);
-            $info = $this->matchUpData($data);
+            $data = $this->makeRequest($url, array('access_token'=>$identifier['access_token']),'GET',array('auth_type'=>'access_token'));
+           
+            if (is_object($data) && !isset($data->error)) {
+                $info = $this->matchUpData($data);
+                
+                if (isset($data->url)) {
+                    preg_match("/plus.google.com\/(.*?)($|\/)/", $data->url, $matches);
+                    $info['profileHandle'] = $matches[1];
+                }
 
-            if (isset($data->url)) {
-                preg_match("/plus.google.com\/(.*?)($|\/)/", $data->url, $matches);
-                $info['profileHandle'] = $matches[1];
-            }
+                if (isset($data->image->url)) {
+                    //remove the size from the end
+                    $image                = $data->image->url;
+                    $image                = preg_replace('/\?.*/', '', $image);
+                    $info["profileImage"] = $image;
+                }
+                if(!empty($info)){
+                    $socialCache[$this->getName()]['profile']     = $info;
+                    $socialCache[$this->getName()]['lastRefresh'] = new \DateTime();
+                    $socialCache[$this->getName()]['accessToken'] = $identifier['access_token'];
 
-            if (isset($data->image->url)) {
-                //remove the size from the end
-                $image                = $data->image->url;
-                $image                = preg_replace('/\?.*/', '', $image);
-                $info["profileImage"] = $image;
+                    $this->getMauticLead($info, true, $socialCache);
+                }
+
+                return $data;
+
+                $this->preventDoubleCall = false;
             }
-            $socialCache['profile'] = $info;
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPublicActivity ($identifier, &$socialCache)
+    public function getPublicActivity($identifier, &$socialCache)
     {
         if ($id = $this->getUserId($identifier, $socialCache)) {
             $data = $this->makeRequest($this->getApiUrl("people/$id/activities/public"), array('maxResults' => 10));
 
             if (!empty($data) && isset($data->items) && count($data->items)) {
-                $socialCache['activity'] = array(
+                $socialCache[$this->getName()]['activity'] = array(
                     'posts'  => array(),
                     'photos' => array(),
                     'tags'   => array()
@@ -105,17 +131,21 @@ class GooglePlusIntegration extends SocialIntegration
                         'published' => $page->published,
                         'updated'   => $page->updated
                     );
-                    $socialCache['activity']['posts'][] = $post;
+                    $socialCache[$this->getName()]['activity']['posts'][] = $post;
 
                     //extract hashtags from content
                     if (isset($page->object->content)) {
-                        preg_match_all('/\<a rel="nofollow" class="ot-hashtag" href="(.*?)">#(.*?)\<\/a>/', $page->object->content, $tags);
+                        preg_match_all(
+                            '/\<a rel="nofollow" class="ot-hashtag" href="(.*?)">#(.*?)\<\/a>/',
+                            $page->object->content,
+                            $tags
+                        );
                         if (!empty($tags[2])) {
                             foreach ($tags[2] as $k => $tag) {
-                                if (isset($socialCache['activity']['tags'][$tag])) {
-                                    $socialCache['activity']['tags'][$tag]['count']++;
+                                if (isset($socialCache[$this->getName()]['activity']['tags'][$tag])) {
+                                    $socialCache[$this->getName()]['activity']['tags'][$tag]['count']++;
                                 } else {
-                                    $socialCache['activity']['tags'][$tag] = array(
+                                    $socialCache[$this->getName()]['activity']['tags'][$tag] = array(
                                         'count' => 1,
                                         'url'   => $tags[1][$k]
                                     );
@@ -140,125 +170,13 @@ class GooglePlusIntegration extends SocialIntegration
                                 $photo                               = array(
                                     'url' => $url
                                 );
-                                $socialCache['activity']['photos'][] = $photo;
+                                $socialCache[$this->getName()]['activity']['photos'][] = $photo;
                             }
                         }
                     }
                 }
             }
         }
-    }
-
-    /**
-     * Convert and assign the data to assignable fields
-     *
-     * @param $data
-     *
-     * @return array
-     */
-    protected function matchUpData ($data)
-    {
-        $info              = array();
-        $available         = $this->getAvailableLeadFields();
-        $translator        = $this->factory->getTranslator();
-        $socialProfileUrls = $this->factory->getHelper('integration')->getSocialProfileUrlRegex();
-
-        foreach ($available as $field => $fieldDetails) {
-            if (!isset($data->$field)) {
-                $info[$field] = '';
-            } else {
-                $values = $data->$field;
-
-                switch ($fieldDetails['type']) {
-                    case 'string':
-                    case 'boolean':
-                        $info[$field] = $values;
-                        break;
-                    case 'object':
-                        foreach ($fieldDetails['fields'] as $f) {
-                            $name = (stripos($f, $field) === false) ? $f . ucfirst($field) : $f;
-                            if (isset($values->$f)) {
-                                $info[$name] = $values->$f;
-                            }
-                        }
-                        break;
-                    case 'array_object':
-                        if ($field == "urls") {
-                            foreach ($values as $k => $v) {
-                                $socialMatch = false;
-                                foreach ($socialProfileUrls as $service => $regex) {
-                                    if (is_array($regex)) {
-                                        foreach ($regex as $r) {
-                                            preg_match($r, $v->value, $match);
-                                            if (!empty($match[1])) {
-                                                $info[$service . 'ProfileHandle'] = $match[1];
-                                                $socialMatch                      = true;
-                                                break;
-                                            }
-                                        }
-                                        if ($socialMatch)
-                                            break;
-                                    } else {
-                                        preg_match($regex, $v->value, $match);
-                                        if (!empty($match[1])) {
-                                            $info[$service . 'ProfileHandle'] = $match[1];
-                                            $socialMatch                      = true;
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                if (!$socialMatch) {
-                                    $name = $v->type . 'Urls';
-                                    if (isset($info[$name])) {
-                                        $info[$name] .= ", {$v->label} ({$v->value})";
-                                    } else {
-                                        $info[$name] = "{$v->label} ({$v->value})";
-                                    }
-                                }
-                            }
-                        } elseif ($field == "organizations") {
-                            $organizations = array();
-
-                            foreach ($values as $k => $v) {
-                                if (!empty($v->name) && !empty($v->title))
-                                    $organization = $v->name . ', ' . $v->title;
-                                elseif (!empty($v->name)) {
-                                    $organization = $v->name;
-                                } elseif (!empty($v->title)) {
-                                    $organization = $v->title;
-                                }
-
-                                if (!empty($v->startDate) && !empty($v->endDate)) {
-                                    $organization .= " " . $v->startDate . ' - ' . $v->endDate;
-                                } elseif (!empty($v->startDate)) {
-                                    $organization .= ' ' . $v->startDate;
-                                } elseif (!empty($v->endDate)) {
-                                    $organization .= ' ' . $v->endDate;
-                                }
-
-                                if (!empty($v->primary)) {
-                                    $organization .= " (" . $translator->trans('mautic.lead.lead.primary') . ")";
-                                }
-                                $organizations[$v->type][] = $organization;
-                            }
-                            foreach ($organizations as $type => $orgs) {
-                                $info[$type . "Organizations"] = implode("; ", $orgs);
-                            }
-                        } elseif ($field == "placesLived") {
-                            $places = array();
-                            foreach ($values as $k => $v) {
-                                $primary  = (!empty($v->primary)) ? ' (' . $translator->trans('mautic.lead.lead.primary') . ')' : '';
-                                $places[] = $v->value . $primary;
-                            }
-                            $info[$field] = implode('; ', $places);
-                        }
-                        break;
-                }
-            }
-        }
-
-        return $info;
     }
 
     /**
@@ -273,6 +191,7 @@ class GooglePlusIntegration extends SocialIntegration
             "skills"             => array("type" => "string"),
             "birthday"           => array("type" => "string"),
             "gender"             => array("type" => "string"),
+            'url'                => array("type" => "string"),
             "urls"               => array(
                 "type"   => "array_object",
                 "fields" => array(
@@ -291,6 +210,12 @@ class GooglePlusIntegration extends SocialIntegration
                     "middleName",
                     "honorificPrefix",
                     "honorificSuffix"
+                )
+            ),
+            "emails"             => array(
+                "type"   => "array_object",
+                "fields" => array(
+                    "account"
                 )
             ),
             "tagline"            => array("type" => "string"),
@@ -322,22 +247,15 @@ class GooglePlusIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getRequiredKeyFields ()
+    public function getRequiredKeyFields()
     {
         return array(
-            'key' => 'mautic.integration.keyfield.api'
+            'key'           => 'mautic.integration.keyfield.api',
+            'client_id'     => 'mautic.integration.keyfield.clientid',
+            'client_secret' => 'mautic.integration.keyfield.clientsecret'
         );
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthenticationType ()
-    {
-
-        return 'key';
-    }
-
+    
     /**
      * @return string
      */
@@ -345,13 +263,31 @@ class GooglePlusIntegration extends SocialIntegration
     {
         return 'key';
     }
+    /**
+     * {@inheritdoc}
+     */
+    public function getAuthenticationUrl()
+    {
+        return 'https://accounts.google.com/o/oauth2/auth';
+    }
 
+    public function getAuthScope()
+    {
+        return 'email';
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getAccessTokenUrl()
+    {
+        return 'https://accounts.google.com/o/oauth2/token';
+    }
     /**
      * @param $endpoint
      *
      * @return string
      */
-    public function getApiUrl ($endpoint)
+    public function getApiUrl($endpoint)
     {
         return "https://www.googleapis.com/plus/v1/$endpoint";
     }
@@ -359,10 +295,10 @@ class GooglePlusIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getUserId ($identifier, &$socialCache)
+    public function getUserId($identifier, &$socialCache)
     {
-        if (!empty($socialCache['id'])) {
-            return $socialCache['id'];
+        if (!empty($socialCache[$this->getName()]['id'])) {
+            return $socialCache[$this->getName()]['id'];
         } elseif (empty($identifier)) {
             return false;
         }
@@ -370,27 +306,30 @@ class GooglePlusIntegration extends SocialIntegration
         if (!is_array($identifier)) {
             $identifier = array($identifier);
         }
+        if(!isset($identifier['access_token'])){
+            return;
+        }
 
-        foreach ($identifier as $type => $id) {
-            if (empty($id)) {
-                continue;
-            }
-            if ($type == 'googleplus' && is_numeric($id)) {
-                //this is a google user ID
-                $socialCache['id'] = $id;
 
-                return $id;
-            }
+        $data = $this->makeRequest($this->getApiUrl('people/me'), array('access_token'=>$identifier['access_token']),'GET',array('auth_type'=>'access_token'));
 
-            $data = $this->makeRequest($this->getApiUrl('people'), array('query' => $id));
+        if (!empty($data) && isset($data->id) && count($data->id)) {
+            $socialCache[$this->getName()]['id'] = $data->id;
 
-            if (!empty($data) && isset($data->items) && count($data->items)) {
-                $socialCache['id'] = $data->items[0]->id;
-
-                return $socialCache['id'];
-            }
+            return $socialCache[$this->getName()]['id'];
         }
 
         return false;
+    }
+
+    /**
+     * returns template to render on popup window after trying to run OAuth
+     *
+     *
+     * @return null|string
+     */
+    public function getPostAuthTemplate()
+    {
+        return 'MauticSocialBundle:Integration\GooglePlus:postauth.html.php';
     }
 }
