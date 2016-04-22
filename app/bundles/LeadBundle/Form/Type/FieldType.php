@@ -229,11 +229,13 @@ class FieldType extends AbstractType
                         }
                     }));
                 } elseif ($type === 'date') {
-                    $constraints = array(new Assert\Date);
+                    $constraints = array(new Assert\Date(array(
+                        'message' => 'mautic.lead.date.invalid'
+                    )));
                 } elseif ($type === 'time') {
                     $constraints = array(new Assert\Regex(array(
                         'pattern' => '/(2[0-3]|[01][0-9]):([0-5][0-9])/',
-                        'message' => $this->translator->trans('mautic.lead.time.invalid', array(), 'validators')
+                        'message' => 'mautic.lead.time.invalid'
                     )));
                 }
 
