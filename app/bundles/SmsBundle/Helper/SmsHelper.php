@@ -103,13 +103,22 @@ class SmsHelper
         }
 
         /** @var \Mautic\SmsBundle\Api\AbstractSmsApi $sms */
-        $sms = $factory->getKernel()->getContainer()->get('mautic.sms.api');
+        $smsApi = $factory->getKernel()->getContainer()->get('mautic.sms.api');
+        /** @var \Mautic\SmsBundle\Model\SmsModel $smsModel */
+        $smsModel = $factory->getModel('sms');
+        $smsId = (int) $config['sms'];
+        /** @var \Mautic\SmsBundle\Entity\Sms $sms */
+        $sms = $smsModel->getEntity($smsId);
+
+        if ($sms->getId() !== $smsId) {
+            return false;
+        }
 
         $dispatcher = $factory->getDispatcher();
-        $event = new SmsSendEvent($config['sms_message_template'], $lead);
+        $event = new SmsSendEvent($sms->getMessage(), $lead);
 
         $dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $event);
 
-        return $sms->sendSms($leadPhoneNumber, $event->getContent());
+        return $smsApi->sendSms($leadPhoneNumber, $event->getContent());
     }
 }
