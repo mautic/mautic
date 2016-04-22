@@ -233,6 +233,7 @@ return array(
         'mailer_from_email'            => 'email@yoursite.com',
         'mailer_return_path'           => null,
         'mailer_transport'             => 'mail',
+        'mailer_append_tracking_pixel' => true,
         'mailer_host'                  => '',
         'mailer_port'                  => null,
         'mailer_user'                  => null,
