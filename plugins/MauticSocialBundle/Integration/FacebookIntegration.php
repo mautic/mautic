@@ -9,6 +9,8 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
+use Mautic\LeadBundle\Entity\Lead;
+
 /**
  * Class FacebookIntegration
  */
@@ -45,7 +47,8 @@ class FacebookIntegration extends SocialIntegration
     public function getSupportedFeatures()
     {
         return array(
-            'share_button'
+            'share_button',
+            'login_button'
         );
     }
 
@@ -77,7 +80,7 @@ class FacebookIntegration extends SocialIntegration
     {
         if ($postAuthorization) {
             parse_str($data, $values);
-
+            $this->factory->getSession()->set($this->getName().'_tokenResponse', $values);
             return $values;
         } else {
             return parent::parseCallbackResponse($data, $postAuthorization);
@@ -105,59 +108,88 @@ class FacebookIntegration extends SocialIntegration
     public function getUserData($identifier, &$socialCache)
     {
         //tell getUserId to return a user array if it obtains it
+
+        $access_token = $this->factory->getSession()->get($this->getName().'_tokenResponse');
+
+        if($identifier[$this->getName()]===null){
+            $identifier[$this->getName()] = "v2.5/me";
+        }
+
+        $identifier['access_token'] =$access_token['access_token'];
+
         $this->preventDoubleCall = true;
 
         if ($id = $this->getUserId($identifier, $socialCache)) {
+
             if (is_object($id)) {
                 //getUserId has already obtained the data
                 $data = $id;
             } else {
-                $url    = $this->getApiUrl("$id");
+                $url = $this->getApiUrl("$id");
                 //@todo - can't use access token to do a global search; may not work after April
-                $data   = $this->makeRequest($url, array(), 'GET', array('auth_type' => 'rest'));
+                $data = $this->makeRequest($url, array(), 'GET', array('auth_type' => 'rest'));
+
             }
 
-            if (is_object($data) && !isset($data->error)) {
-                $info                  = $this->matchUpData($data);
-                if (isset($data->username)) {
-                    $info['profileHandle'] = $data->username;
-                } elseif (isset($data->link)) {
-                    $info['profileHandle'] = str_replace('https://www.facebook.com/', '', $data->link);
-                } else {
-                    $info['profileHandle'] = $data->id;
-                }
+            $info = $this->matchUpData($data);
 
-                $info['profileImage']  = "https://graph.facebook.com/{$data->id}/picture?type=large";
-
-                $socialCache['profile'] = $info;
+            if (isset($data->username)) {
+                $info['profileHandle'] = $data->username;
+            } elseif (isset($data->link)) {
+                $info['profileHandle'] = str_replace('https://www.facebook.com/', '', $data->link);
+            } else {
+                $info['profileHandle'] = $data->id;
             }
+
+            $info['profileImage'] = "https://graph.facebook.com/{$data->id}/picture?type=large";
+
+
+            $socialCache[$this->getName()]['profile'] = $info;
+            $socialCache[$this->getName()]['lastRefresh'] = new \DateTime();
+            $socialCache[$this->getName()]['accessToken'] = $identifier['access_token'];
+
+            $this->getMauticLead($info, true,$socialCache);
+
+            return $data;
+            
             $this->preventDoubleCall = false;
         }
     }
 
-    /**
+    /**$post
      * {@inheritdoc}
      */
     public function getUserId($identifier, &$socialCache)
     {
-        if (!empty($socialCache['id'])) {
-            return $socialCache['id'];
+        if (!empty($socialCache[$this->getName()]['id'])) {
+            return $socialCache[$this->getName()]['id'];
         } elseif (empty($identifier)) {
             return false;
         }
 
         $identifiers = $this->cleanIdentifier($identifier);
+        
+        if(!isset($identifier['access_token'])){
+            return;
+        }
+        
+        if (isset($identifiers['Facebook'])) {
+            $url = $this->getApiUrl($identifiers["Facebook"]);
 
-        if (isset($identifiers['facebook'])) {
-            $url    = $this->getApiUrl($identifiers["facebook"]);
-            //@todo - can't use access token to do a global search; may not work after April
-            $data   = $this->makeRequest($url, array(), 'GET', array('auth_type' => 'rest'));
+            if(isset($identifier['access_token'])){
+                $parameters['access_token']=$identifier['access_token'];
+            }
+
+            $fields = array_keys($this->getAvailableLeadFields());
+            $parameters['fields'] = implode(",",$fields);
+
+            $data = $this->makeRequest($url, $parameters, 'GET', array('auth_type' => 'rest'));
 
             if ($data && isset($data->id)) {
-                $socialCache['id'] = $data->id;
+                $socialCache[$this->getName()]['id'] = $data->id;
 
                 //return the entire data set if the function has been called from getUserData()
-                return ($this->preventDoubleCall) ? $data : $socialCache['id'];
+                return ($this->preventDoubleCall) ? $data : $socialCache[$this->getName()]['id'];
             }
         }
 
@@ -170,14 +202,27 @@ class FacebookIntegration extends SocialIntegration
     public function getAvailableLeadFields($settings = array())
     {
         // Until lead profile support is restored
-        return array();
+        //return array();
 
         return array(
             'first_name' => array('type' => 'string'),
             'last_name'  => array('type' => 'string'),
             'name'       => array('type' => 'string'),
             'gender'     => array('type' => 'string'),
-            'locale'     => array('type' => 'string')
+            'locale'     => array('type' => 'string'),
+            'email'      => array('type' => 'string'),
+            'link'       => array('type' => 'string'),
         );
+    }
+
+    /**
+     * returns template to render on popup window after trying to run OAuth
+     *
+     *
+     * @return null|string
+     */
+    public function getPostAuthTemplate()
+    {
+        return 'MauticSocialBundle:Integration\Facebook:postauth.html.php';
     }
 }

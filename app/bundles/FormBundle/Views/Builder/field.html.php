@@ -132,10 +132,14 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
 
                         <?php foreach ($properties as $name => $property): ?>
                             <?php if ($form['properties'][$name]->isRendered() || $name == 'labelAttributes') continue; ?>
-                            <?php $col = ($name == 'text') ? 12 : 6; ?>
+
+                            <?php  if ($form['properties'][$name]->vars['block_prefixes'][1] == 'hidden') : echo $view['form']->row($form['properties'][$name]); ?>
+                            <?php else:
+                                $col = ($name == 'text') ? 12 : 6; ?>
                             <div class="col-md-<?php echo $col; ?>">
                                 <?php echo $view['form']->row($form['properties'][$name]); ?>
                             </div>
+                            <?php endif; ?>
                         <?php endforeach; ?>
 
                     <?php endif; ?>
