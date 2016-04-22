@@ -72,7 +72,7 @@ class NotificationHelper
             $playerID[] = $pushID->getPushID();
         }
 
-        /** @var \Mautic\NotificationBundle\Api\OneSignalApi $notification */
+        /** @var \Mautic\NotificationBundle\Api\AbstractNotificationApi $notification */
         $notificationApi = $factory->getKernel()->getContainer()->get('mautic.notification.api');
 
         /** @var \Mautic\NotificationBundle\Model\NotificationModel $notificationModel */
@@ -86,11 +86,19 @@ class NotificationHelper
             return false;
         }
 
+        $url = $notificationApi->convertToTrackedUrl(
+            $notification->getUrl(),
+            array(
+                'notification' => $notification->getId(),
+                'lead' => $lead->getId()
+            )
+        );
+
         return $notificationApi->sendNotification(
             $playerID,
             $notification->getMessage(),
             $notification->getHeading(),
-            $notification->getUrl()
+            $url
         );
     }
 }

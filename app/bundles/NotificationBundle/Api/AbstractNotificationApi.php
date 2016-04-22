@@ -56,4 +56,24 @@ abstract class AbstractNotificationApi
      * @return Response
      */
     abstract public function sendNotification($id, $message, $title = '');
+
+    /**
+     * Convert a non-tracked url to a tracked url
+     * 
+     * @param string $url
+     * @param array $clickthrough
+     * 
+     * @return string
+     */
+    public function convertToTrackedUrl($url, array $clickthrough = array())
+    {
+        /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
+        $redirectModel = $this->factory->getModel('page.redirect');
+        /** @var \Mautic\PageBundle\Entity\Redirect $redirect */
+        $redirect = $redirectModel->getRedirectByUrl($url);
+
+        $redirectModel->getRepository()->saveEntity($redirect);
+
+       return $redirectModel->generateRedirectUrl($redirect, $clickthrough);
+    }
 }
