@@ -24,20 +24,21 @@ class FormSubmitActionAddUtmTagsType extends AbstractType
     private $factory;
 
     /**
-     * @param MauticFactory       $factory
+     * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory) {
-        $this->factory    = $factory;
+    public function __construct(MauticFactory $factory)
+    {
+        $this->factory = $factory;
     }
 
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['add_transformer']) {
-            $transformer = new TagEntityModelTransformer(
+            $transformer = new UtmTagEntityModelTransformer(
                 $this->factory->getEntityManager(),
                 'MauticLeadBundle:UtmTag',
                 'id',
@@ -50,9 +51,32 @@ class FormSubmitActionAddUtmTagsType extends AbstractType
     }
 
     /**
+     * @param OptionsResolverInterface $resolver
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(
+            array(
+                'label'           => 'mautic.lead.tags',
+                'class'           => 'MauticLeadBundle:Tag',
+                'query_builder'   => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('t')
+                        ->orderBy('t.tag', 'ASC');
+                },
+                'property'        => 'tag',
+                'multiple'        => true,
+                'required'        => false,
+                'disabled'        => false,
+                'add_transformer' => false
+            )
+        );
+    }
+
+    /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return "lead_submitaction_addutmtags";
     }
 }

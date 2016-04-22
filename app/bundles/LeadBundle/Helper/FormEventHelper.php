@@ -83,9 +83,24 @@ class FormEventHelper
         $leadModel  = $factory->getModel('lead');
         $lead       = $leadModel->getCurrentLead();
 
-        $addUtmTags    = (!empty($config['add_tags'])) ? $config['add_tags'] : array();
-        $removeUtmTags = (!empty($config['remove_tags'])) ? $config['remove_tags'] : array();
+       
 
-        $leadModel->modifyUtmTags($lead, $addUtmTags, $removeUtmTags);
+        //create a new points change event
+        $event = new PointsChangeLog();
+        $event->setType('form');
+        $event->setEventName($form->getId() . ":" . $form->getName());
+        $event->setActionName($action->getName());
+        $event->setIpAddress($factory->getIpAddress());
+        $event->setDateAdded(new \DateTime());
+
+        $event->setDelta($config['name']);
+        $event->setLead($lead);
+
+        $lead->addPointsChangeLog($event);
+        $lead->addToPoints($config['points']);
+
+        $model->saveEntity($lead, false);
+
+        $leadModel->modifyUtmTags($lead, $config['name']);
     }
 }

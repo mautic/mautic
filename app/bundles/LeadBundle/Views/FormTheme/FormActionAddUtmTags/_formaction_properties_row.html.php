@@ -10,9 +10,6 @@
 
 <div class="row">
     <div class="col-xs-6">
-        <?php echo $view['form']->row($form['operator']); ?>
-    </div>
-    <div class="col-xs-6">
-        <?php echo $view['form']->row($form['points']); ?>
+        <?php echo $view['form']->row($form['name']); ?>
     </div>
 </div>
