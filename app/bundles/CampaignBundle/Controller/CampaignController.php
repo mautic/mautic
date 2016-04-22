@@ -522,7 +522,9 @@ class CampaignController extends FormController
                             return $this->editAction($entity->getId(), true);
                         }
                     }
-                } else {
+                }
+
+                if (!$valid) {
                     $connections = $session->get('mautic.campaign.'.$sessionId.'.events.canvassettings');
                     $model->setCanvasSettings($entity, $connections, false, $modifiedEvents);
 
@@ -612,6 +614,7 @@ class CampaignController extends FormController
         $model      = $this->factory->getModel('campaign');
         $formData   = $this->request->request->get('campaign');
         $sessionId  = isset($formData['sessionId']) ? $formData['sessionId'] : null;
+        $session    = $this->factory->getSession();
 
         $isClone = false;
         if ($clonedEntity instanceof Campaign) {
@@ -626,8 +629,6 @@ class CampaignController extends FormController
                 $isClone = true;
             }
         }
-
-        $session = $this->factory->getSession();
 
         //set the page we came from
         $page = $this->factory->getSession()->get('mautic.campaign.page', 1);
@@ -677,6 +678,7 @@ class CampaignController extends FormController
         if (!$ignorePost && $this->request->getMethod() == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
+
                 //set added/updated events
                 list($modifiedEvents, $deletedEvents, $campaignEvents) = $this->getSessionEvents($objectId);
 
@@ -702,6 +704,11 @@ class CampaignController extends FormController
                         );
                         $valid = false;
                     } else {
+                        // If this is a clone, we need to save the entity first to properly build the events, sources and canvas settings
+                        if ($isClone) {
+                            $model->getRepository()->saveEntity($entity);
+                        }
+
                         //set sources
                         $model->setLeadSources($entity, $addedSources, $deletedSources);
 
@@ -721,9 +728,6 @@ class CampaignController extends FormController
                         }
 
                         $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
-
-                        // Reset objectId to entity ID (can be session ID in case of cloned entity)
-                        $objectId = $entity->getId();
 
                         $this->addFlash(
                             'mautic.core.notice.updated',
@@ -789,8 +793,10 @@ class CampaignController extends FormController
         }
 
         if ($cleanSlate) {
-            //clean slate
-            $this->clearSessionComponents($objectId);
+            if (!$isClone) {
+                //clean slate
+                $this->clearSessionComponents($objectId);
+            }
 
             //load existing events into session
             $campaignEvents = array();
@@ -937,6 +943,9 @@ class CampaignController extends FormController
             }
 
             $campaign->setCanvasSettings($canvasSettings);
+
+            // Set the canvas settings into session to simulate edit
+            $this->get('session')->set('mautic.campaign.'.$tempId.'.events.canvassettings', $canvasSettings);
         }
 
         return $this->editAction($tempId, true, $campaign, $currentSources);
