@@ -144,7 +144,6 @@ class TwitterIntegration extends SocialIntegration
         if(!isset($identifier[$this->getName()])){
             $identifier[$this->getName()] = "account/verify_credentials";
         }
-        $identifier['oauth_token']='26902763-HUr8a9PsgT4EaBlw1SXF1ktx3HlRBI0x8nuZbe51M';
 
         $authTokenKey    = $this->getAuthTokenKey();
         $authToken       = (isset($this->keys[$authTokenKey])) ? $this->keys[$authTokenKey] : '';
