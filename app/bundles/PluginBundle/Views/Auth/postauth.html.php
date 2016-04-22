@@ -14,7 +14,7 @@ $js = <<<JS
 function postFormHandler() {
     var opener = window.opener;
     if(opener && typeof opener.fillInForm == 'function') {
-            opener.fillinForm({$data});
+            opener.fillInForm({$data});
     }else {
         Mautic.refreshIntegrationForm();
     }

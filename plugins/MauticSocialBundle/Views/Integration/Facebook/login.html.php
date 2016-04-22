@@ -47,7 +47,7 @@ $js = <<<JS
       }       
   }
 
-  function fillinForm(response){
+  function fillInForm(response){
   	var elements = document.getElementById("mauticform_{$formName}").elements;
   	var field, fieldName;
   
