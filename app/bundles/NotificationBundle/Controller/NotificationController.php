@@ -516,7 +516,7 @@ class NotificationController extends FormController
         $action = $this->generateUrl('mautic_notification_action', array('objectAction' => 'edit', 'objectId' => $objectId));
 
         $updateSelect = ($method == 'POST')
-            ? $this->request->request->get('notificationform[updateSelect]', false, true)
+            ? $this->request->request->get('notification[updateSelect]', false, true)
             : $this->request->get('updateSelect', false);
 
         $form   = $model->createForm($entity, $this->get('form.factory'), $action, array('update_select' => $updateSelect));
