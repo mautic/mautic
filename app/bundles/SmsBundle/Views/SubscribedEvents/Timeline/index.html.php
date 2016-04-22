@@ -17,7 +17,7 @@ $sms = $event['extra']['sms'];
             <h3>
                 <a href="<?php echo $view['router']->generate('mautic_sms_action',
                     array("objectAction" => "preview", "objectId" => $sms->getId())); ?>"
-                   data-toggle="ajaxmosal" data-target="#MauticSharedModal" data-header="<?php echo $view['translator']->trans('mautic.sms.smses.header.preview'); ?>" data-footer="false">
+                   data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="<?php echo $view['translator']->trans('mautic.sms.smses.header.preview'); ?>" data-footer="false">
                     <?php echo $sms->getName(); ?>
                 </a>
             </h3>
