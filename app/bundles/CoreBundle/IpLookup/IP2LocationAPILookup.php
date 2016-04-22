@@ -27,29 +27,29 @@ class IP2LocationAPILookup extends AbstractRemoteDataLookup
     {
         return "api.ip2location.com/?ip={$this->ip}&key={$this->auth}&package=WS9&format=json";
     }
-	
-	
+
+
 
     /**
      * @param $response
      */
     protected function parseResponse($response)
     {
-	  try {
-		$record = json_decode($response);
-		if(isset($record->country_name)){
-			$this->country = $record->country_name;
-			$this->region = $record->region_name;
-			$this->city = $record->city_name;
-			$this->latitude  = $record->latitude;
-			$this->longitude = $record->longitude;
-			//$this->timezone  = $record->location->timeZone;
-			$this->zipcode   = $records->zip_code;
-		}
-	  }catch (\Exception $exception) {
+        try {
+            $record = json_decode($response);
+            if(isset($record->country_name)){
+                $this->country = $record->country_name;
+                $this->region = $record->region_name;
+                $this->city = $record->city_name;
+                $this->latitude  = $record->latitude;
+                $this->longitude = $record->longitude;
+                //$this->timezone  = $record->location->timeZone;
+                $this->zipcode   = $record->zip_code;
+            }
+        }catch (\Exception $exception) {
             if ($this->logger) {
                 $this->logger->warn("IP LOOKUP: " . $exception->getMessage());
             }
-      }
+        }
     }
 }
