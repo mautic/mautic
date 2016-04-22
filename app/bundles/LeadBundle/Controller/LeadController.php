@@ -377,6 +377,20 @@ class LeadController extends FormController
         $socialProfiles    = $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
 
+        // Set the social profile templates
+        foreach ($socialProfiles as $integration => &$details) {
+            if ($integrationObject = $integrationHelper->getIntegrationObject($integration)) {
+                if ($template = $integrationObject->getSocialProfileTemplate()) {
+                    $details['social_profile_template'] = $template;
+                }
+            }
+
+            if (!isset($details['social_profile_template'])) {
+                // No profile template found
+                unset($socialProfiles[$integration]);
+            }
+        }
+
         $event = new IconEvent($this->factory->getSecurity());
         $this->factory->getDispatcher()->dispatch(CoreEvents::FETCH_ICONS, $event);
         $icons = $event->getIcons();

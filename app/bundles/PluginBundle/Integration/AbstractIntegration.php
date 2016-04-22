@@ -11,9 +11,12 @@ namespace Mautic\PluginBundle\Integration;
 
 use Joomla\Http\HttpFactory;
 use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
+use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\Form\FormBuilder;
 
 /**
@@ -201,9 +204,12 @@ abstract class AbstractIntegration
         $withKeys = array_merge($withKeys, $mergeKeys);
 
         if ($return) {
-            $this->keys = $withKeys;
+            $this->keys = $this->dispatchIntegrationKeyEvent(
+                PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_MERGE,
+                $withKeys
+            );
 
-            return $withKeys;
+            return $this->keys;
         } else {
             $this->encryptAndSetApiKeys($withKeys, $settings);
 
@@ -220,6 +226,11 @@ abstract class AbstractIntegration
      */
     public function encryptAndSetApiKeys(array $keys, Integration $entity)
     {
+        $keys = $this->dispatchIntegrationKeyEvent(
+            PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT,
+            $keys
+        );
+
         $encrypted = $this->encryptApiKeys($keys);
         $entity->setApiKeys($encrypted);
     }
@@ -253,7 +264,10 @@ abstract class AbstractIntegration
 
         $serialized = serialize($keys);
         if (empty($decryptedKeys[$serialized])) {
-            $decryptedKeys[$serialized] = $this->decryptApiKeys($keys);;
+            $decryptedKeys[$serialized] = $this->dispatchIntegrationKeyEvent(
+                PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_DECRYPT,
+                $this->decryptApiKeys($keys)
+            );
         }
 
         return $decryptedKeys[$serialized];
@@ -491,11 +505,20 @@ abstract class AbstractIntegration
      */
     public function makeRequest($url, $parameters = array(), $method = 'GET', $settings = array())
     {
-
         $method   = strtoupper($method);
         $authType = (empty($settings['auth_type'])) ? $this->getAuthenticationType() : $settings['auth_type'];
 
         list($parameters, $headers) = $this->prepareRequest($url, $parameters, $method, $settings, $authType);
+
+        if (empty($settings['ignore_event_dispatch'])) {
+            $event = $this->factory->getDispatcher()->dispatch(
+                PluginEvents::PLUGIN_ON_INTEGRATION_REQUEST,
+                new PluginIntegrationRequestEvent($this, $url, $parameters, $headers, $method, $settings, $authType)
+            );
+
+            $headers    = $event->getHeaders();
+            $parameters = $event->getParameters();
+        }
 
         if (!isset($settings['query'])) {
             $settings['query'] = array();
@@ -598,6 +621,14 @@ abstract class AbstractIntegration
         } catch (\Exception $exception) {
 
             return array('error' => array('message' => $exception->getMessage(), 'code' => $exception->getCode()));
+        }
+
+        if (empty($settings['ignore_event_dispatch'])) {
+            $event->setResponse($result);
+            $this->factory->getDispatcher()->dispatch(
+                PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE,
+                $event
+            );
         }
 
         if (!empty($settings['return_raw'])) {
@@ -885,6 +916,8 @@ abstract class AbstractIntegration
      * Called in extractAuthKeys before key comparison begins to give opportunity to set expiry, rename keys, etc
      *
      * @param $data
+     *
+     * @return mixed
      */
     public function prepareResponseForExtraction($data)
     {
@@ -1206,9 +1239,9 @@ abstract class AbstractIntegration
     /**
      * Create or update existing Mautic lead from the integration's profile data
      *
-     * @param mixed     $data    Profile data from integration
-     * @param bool|true $persist Set to false to not persist lead to the database in this method
-     *
+     * @param mixed      $data    Profile data from integration
+     * @param bool|true  $persist Set to false to not persist lead to the database in this method
+     * @param array|null $socialCache
      * @return Lead
      */
     public function getMauticLead($data, $persist = true, $socialCache = null)
@@ -1409,6 +1442,16 @@ abstract class AbstractIntegration
     }
 
     /**
+     * Get the path to the profile templates for this integration 
+     * 
+     * @return null
+     */
+    public function getSocialProfileTemplate()
+    {
+        return null;
+    }
+
+    /**
      * Checks to ensure an image still exists before caching
      *
      * @param string $url
@@ -1517,5 +1560,22 @@ abstract class AbstractIntegration
     public function getPostAuthTemplate()
     {
         return null;
+    }
+
+    /**
+     * @param       $eventName
+     * @param array $keys
+     *
+     * @return array
+     */
+    protected function dispatchIntegrationKeyEvent($eventName, $keys = array())
+    {
+        /** @var PluginIntegrationKeyEvent $event */
+        $event = $this->factory->getDispatcher()->dispatch(
+            $eventName,
+            new PluginIntegrationKeyEvent($this, $keys)
+        );
+
+        return $event->getKeys();
     }
 }

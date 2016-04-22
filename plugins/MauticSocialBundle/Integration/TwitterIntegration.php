@@ -68,6 +68,9 @@ class TwitterIntegration extends SocialIntegration
         return 'https://api.twitter.com/oauth/access_token';
     }
 
+    /**
+     * @return string
+     */
     public function getAuthLoginUrl()
     {
         $url = 'https://api.twitter.com/oauth/authorize';
@@ -145,10 +148,6 @@ class TwitterIntegration extends SocialIntegration
             $identifier[$this->getName()] = "account/verify_credentials";
         }
 
-        $authTokenKey    = $this->getAuthTokenKey();
-        $authToken       = (isset($this->keys[$authTokenKey])) ? $this->keys[$authTokenKey] : '';
-        $authTokenKey    = (empty($settings[$authTokenKey])) ? $authTokenKey : $settings[$authTokenKey];
-
         if ($id = $this->getUserId($identifier, $socialCache)) {
             if (is_array($id)) {
                 //getUserId has already obtained the data
@@ -162,12 +161,16 @@ class TwitterIntegration extends SocialIntegration
                 ),'GET',array('auth_type'=>'oauth1a'));
             }
 
-            $this->factory->getLogger()->addError(print_r($data,true));
             if (isset($data[0])) {
-                $info                  = $this->matchUpData($data[0]);
-                $info['profileHandle'] = $data[0]['screen_name'];
+                $data  = $data[0];
+            }
+
+            $this->factory->getLogger()->addError(print_r($data,true));
+            if (isset($data)) {
+                $info                  = $this->matchUpData($data);
+                $info['profileHandle'] = $data['screen_name'];
                 //remove the size variant
-                $image                = $data[0]['profile_image_url_https'];
+                $image                = $data['profile_image_url_https'];
                 $image                = str_replace(array('_normal', '_bigger', '_mini'), '', $image);
                 $info['profileImage'] = $image;
 
@@ -322,16 +325,5 @@ class TwitterIntegration extends SocialIntegration
             return $parsed;
         }
         return json_decode($data, true);
-    }
-
-    /**
-     * returns template to render on popup window after trying to run OAuth
-     *
-     *
-     * @return null|string
-     */
-    public function getPostAuthTemplate()
-    {
-        return 'MauticSocialBundle:Integration\Twitter:postauth.html.php';
     }
 }

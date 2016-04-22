@@ -9,8 +9,6 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-use Mautic\LeadBundle\Entity\Lead;
-
 /**
  * Class GooglePlusIntegration
  */
@@ -37,7 +35,6 @@ class GooglePlusIntegration extends SocialIntegration
     {
         return 1;
     }
-
 
     /**
      * {@inheritdoc}
@@ -263,7 +260,7 @@ class GooglePlusIntegration extends SocialIntegration
             'client_secret' => 'mautic.integration.keyfield.clientsecret'
         );
     }
-    
+
     /**
      * @return string
      */
@@ -279,10 +276,14 @@ class GooglePlusIntegration extends SocialIntegration
         return 'https://accounts.google.com/o/oauth2/auth';
     }
 
+    /**
+     * @return string
+     */
     public function getAuthScope()
     {
         return 'email';
     }
+
     /**
      * {@inheritdoc}
      */

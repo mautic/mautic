@@ -24,12 +24,12 @@
 </div>
 <div class="np panel-body tab-content">
     <div class="pa-20 tab-pane active" id="InstagramProfile">
-        <?php echo $view->render('MauticLeadBundle:Social/Instagram:profile.html.php', array(
+        <?php echo $view->render('MauticSocialBundle:Integration/Instagram/Profile:profile.html.php', array(
             'profile' => $details['profile']
         )); ?>
     </div>
     <div class="pa-20 tab-pane" id="InstagramPhotos">
-        <?php echo $view->render('MauticLeadBundle:Social/Instagram:photos.html.php', array(
+        <?php echo $view->render('MauticSocialBundle:Integration/Instagram/Profile:photos.html.php', array(
             'activity' => (!empty($details['activity']['photos'])) ? $details['activity']['photos'] : array()
         )); ?>
     </div>
