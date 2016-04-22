@@ -516,7 +516,7 @@ class SmsController extends FormController
         $action = $this->generateUrl('mautic_sms_action', array('objectAction' => 'edit', 'objectId' => $objectId));
 
         $updateSelect = ($method == 'POST')
-            ? $this->request->request->get('smsform[updateSelect]', false, true)
+            ? $this->request->request->get('sms[updateSelect]', false, true)
             : $this->request->get('updateSelect', false);
 
         $form   = $model->createForm($entity, $this->get('form.factory'), $action, array('update_select' => $updateSelect));
@@ -563,7 +563,7 @@ class SmsController extends FormController
                     array(
                         'updateSelect' => $form['updateSelect']->getData(),
                         'smsId'    => $entity->getId(),
-                        'smsTitle' => $entity->getTitle(),
+                        'smsName' => $entity->getName(),
                         'smsLang'  => $entity->getLanguage()
                     )
                 );
