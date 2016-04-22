@@ -18,7 +18,9 @@ abstract class SocialIntegration extends AbstractIntegration
 {
 
     /**
-     * @param FormBuilder|Form $builder
+     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
+     * @param array                                             $data
+     * @param string                                            $formArea
      */
     public function appendToForm(&$builder, $data, $formArea)
     {

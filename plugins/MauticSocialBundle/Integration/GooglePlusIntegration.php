@@ -9,8 +9,6 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-use Mautic\LeadBundle\Entity\Lead;
-
 /**
  * Class GooglePlusIntegration
  */
@@ -37,7 +35,6 @@ class GooglePlusIntegration extends SocialIntegration
     {
         return 1;
     }
-
 
     /**
      * {@inheritdoc}
@@ -80,10 +77,10 @@ class GooglePlusIntegration extends SocialIntegration
         if ($userid = $this->getUserId($identifier, $socialCache)) {
             $url  = $this->getApiUrl("people/{$userid}");
             $data = $this->makeRequest($url, array('access_token'=>$identifier['access_token']),'GET',array('auth_type'=>'access_token'));
-           
+
             if (is_object($data) && !isset($data->error)) {
                 $info = $this->matchUpData($data);
-                
+
                 if (isset($data->url)) {
                     preg_match("/plus.google.com\/(.*?)($|\/)/", $data->url, $matches);
                     $info['profileHandle'] = $matches[1];
@@ -255,7 +252,7 @@ class GooglePlusIntegration extends SocialIntegration
             'client_secret' => 'mautic.integration.keyfield.clientsecret'
         );
     }
-    
+
     /**
      * @return string
      */
@@ -271,10 +268,14 @@ class GooglePlusIntegration extends SocialIntegration
         return 'https://accounts.google.com/o/oauth2/auth';
     }
 
+    /**
+     * @return string
+     */
     public function getAuthScope()
     {
         return 'email';
     }
+
     /**
      * {@inheritdoc}
      */
