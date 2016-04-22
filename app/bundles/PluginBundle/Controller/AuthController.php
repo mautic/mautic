@@ -9,6 +9,8 @@
 
 namespace Mautic\PluginBundle\Controller;
 
+use Mautic\PluginBundle\PluginEvents;
+use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
