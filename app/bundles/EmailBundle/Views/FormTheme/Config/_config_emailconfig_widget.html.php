@@ -117,6 +117,7 @@ $template = '<div class="col-md-6">{content}</div>';
         </div>
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'mailer_convert_embed_images', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_append_tracking_pixel', $template); ?>
         </div>
     </div>
 </div>

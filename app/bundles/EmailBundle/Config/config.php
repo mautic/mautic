@@ -234,6 +234,7 @@ return array(
         'mailer_return_path'           => null,
         'mailer_transport'             => 'mail',
         'mailer_convert_embed_images'  => false,
+        'mailer_append_tracking_pixel' => true,
         'mailer_host'                  => '',
         'mailer_port'                  => null,
         'mailer_user'                  => null,
