@@ -9,7 +9,7 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'sms');
-$view['slots']->set("headerTitle", $view['translator']->trans('mautic.sms.smss'));
+$view['slots']->set("headerTitle", $view['translator']->trans('mautic.sms.smses'));
 
 ?>
 
