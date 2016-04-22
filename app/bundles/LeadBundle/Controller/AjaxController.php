@@ -116,12 +116,17 @@ class AjaxController extends CommonAjaxController
                 } else {
                     foreach ($socialProfiles as $name => $details) {
                         if ($integrationObject = $integrationHelper->getIntegrationObject($name)) {
-                            $integrations[$name]['newContent'] = $this->renderView($integrationObject->getSocialProfileTemplate(), array(
-                                'lead'              => $lead,
-                                'details'           => $details,
-                                'integrationName'   => $name,
-                                'socialProfileUrls' => $socialProfileUrls
-                            ));
+                            if ($template = $integrationObject->getSocialProfileTemplate()) {
+                                $integrations[$name]['newContent'] = $this->renderView(
+                                    $template,
+                                    array(
+                                        'lead'              => $lead,
+                                        'details'           => $details,
+                                        'integrationName'   => $name,
+                                        'socialProfileUrls' => $socialProfileUrls
+                                    )
+                                );
+                            }
                         }
                     }
                     $dataArray['profiles'] = $integrations;

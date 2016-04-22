@@ -379,9 +379,14 @@ class LeadController extends FormController
 
         // Set the social profile templates
         foreach ($socialProfiles as $integration => &$details) {
-            if ($integration = $integrationHelper->getIntegrationObject($integration)) {
-                $details['social_profile_template'] = $integration->getSocialProfileTemplate();
-            } else {
+            if ($integrationObject = $integrationHelper->getIntegrationObject($integration)) {
+                if ($template = $integrationObject->getSocialProfileTemplate()) {
+                    $details['social_profile_template'] = $template;
+                }
+            }
+
+            if (!isset($details['social_profile_template'])) {
+                // No profile template found
                 unset($socialProfiles[$integration]);
             }
         }

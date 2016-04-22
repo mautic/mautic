@@ -183,4 +183,14 @@ abstract class SocialIntegration extends AbstractIntegration
     {
         return array('', 'info');
     }
+
+    /**
+     * Get the template for social profiles
+     *
+     * @return string
+     */
+    public function getSocialProfileTemplate()
+    {
+        return "MauticSocialBundle:Integration/{$this->getName()}/Profile:view.html.php";
+    }
 }

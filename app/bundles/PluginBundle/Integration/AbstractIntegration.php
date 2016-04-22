@@ -1442,6 +1442,16 @@ abstract class AbstractIntegration
     }
 
     /**
+     * Get the path to the profile templates for this integration 
+     * 
+     * @return null
+     */
+    public function getSocialProfileTemplate()
+    {
+        return null;
+    }
+
+    /**
      * Checks to ensure an image still exists before caching
      *
      * @param string $url

@@ -24,7 +24,7 @@
 </div>
 <div class="np panel-body tab-content">
     <div class="pa-20 tab-pane active" id="LinkedInProfile">
-        <?php echo $view->render('MauticLeadBundle:Social/LinkedIn:profile.html.php', array(
+        <?php echo $view->render('MauticSocialBundle:Integration/LinkedIn/Profile:profile.html.php', array(
             'profile' => $details['profile']
         )); ?>
     </div>
