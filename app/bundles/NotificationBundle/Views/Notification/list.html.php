@@ -90,7 +90,7 @@ if (count($items)):
                         <?php else: ?>
                         <i class="fa fa-fw fa-lg fa-toggle-on text-muted disabled"></i>
                         <?php endif; ?>
-                        <a href="<?php echo $view['router']->generate('mautic_notification_action', array("objectAction" => "preview", "objectId" => $item->getId())); ?>" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-footer="" data-header="<?php echo $view['translator']->trans('mautic.notification.notification.header.preview')?>">
+                        <a href="<?php echo $view['router']->generate('mautic_notification_action', array("objectAction" => "preview", "objectId" => $item->getId())); ?>" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-footer="false" data-header="<?php echo $view['translator']->trans('mautic.notification.notification.header.preview')?>">
                             <?php echo $item->getName(); ?>
                             <?php if ($type == 'list'): ?>
                             <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.notification.icon_tooltip.list_notification'); ?>"><i class="fa fa-fw fa-list"></i></span>
