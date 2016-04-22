@@ -582,7 +582,7 @@ class LeadRepository extends CommonRepository
     public function getEntitiesLight($args = array()){
     	$limit = 20000; //lines
     	$results = array();
-    	$offset=0;
+    	$offset = 0;
     	$result = $this->requestEntitiesLight($args, $offset, $limit);
     	$results = array_merge($results, $result);
     	while (count($result) === $limit){
@@ -595,7 +595,7 @@ class LeadRepository extends CommonRepository
 
     private function requestEntitiesLight($args,$first,$limit){
      	$q = $this->_em->getConnection()->createQueryBuilder();
-    	$q->select('l.id,l.lastname, l.email,l.points,l.company, l.phone, l.website,l.country,l.last_active')
+    	$q->select('l.id,l.lastname, l.email,l.points,l.company, l.phone, l.website,l.country,l.date_identified')
     	  ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
     	  ->setFirstResult($first)
     	  ->setMaxResults($limit);

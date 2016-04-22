@@ -1636,9 +1636,10 @@ class LeadController extends FormController
 
     	$response = new StreamedResponse(function () use ($leads, $formatter) {
     		$handle = fopen('php://output', 'r+');
-    		$header = array('lead_id', 'lead_name', 'lead_email', 'lead_company', 'lead_phone', 'lead_website', 'lead_location', 'lead_point', 'lead_last_active');
+    		$header = array('lead_id', 'lead_name', 'lead_email', 'lead_company', 'lead_phone', 'lead_website', 'lead_location', 'lead_point', 'date_identified');
     		fputcsv($handle, $header);
-    		//build the data rows
+
+    		// Build the data rows
     		for($i=0;$i<count($leads);$i++) {
     			$row = array();
     			$row[] = $leads[$i]['id'];
@@ -1649,7 +1650,7 @@ class LeadController extends FormController
     			$row[] = $formatter->_($leads[$i]['website'], 'url', true);
     			$row[] = $formatter->_($leads[$i]['country'], 'string', true);
     			$row[] = $formatter->_($leads[$i]['points'], 'int', true);
-    			$row[] = $formatter->_($leads[$i]['last_active'], 'date', true);
+    			$row[] = $formatter->_($leads[$i]['date_identified'], 'date', true);
 
     			fputcsv($handle, $row);
     		}
