@@ -99,9 +99,12 @@ return array(
             'mautic.page.search.subscriber'         => array(
                 'class' => 'Mautic\PageBundle\EventListener\SearchSubscriber'
             ),
-            'mautic.page.webhook.subscriber'                => array(
+            'mautic.page.webhook.subscriber'        => array(
                 'class' => 'Mautic\PageBundle\EventListener\WebhookSubscriber'
-            )
+            ),
+            'mautic.page.dashboard.subscriber'      => array(
+                'class' => 'Mautic\PageBundle\EventListener\DashboardSubscriber'
+            ),
         ),
         'forms'  => array(
             'mautic.form.type.page'                     => array(
@@ -155,6 +158,10 @@ return array(
                 'class' => 'Mautic\PageBundle\Form\Type\RedirectListType',
                 'arguments' => 'mautic.factory',
                 'alias' => 'redirect_list'
+            ),
+            'mautic.form.type.page_dashboard_hits_in_time_widget' => array(
+                'class' => 'Mautic\PageBundle\Form\Type\DashboardHitsInTimeWidgetType',
+                'alias' => 'page_dashboard_hits_in_time_widget'
             )
         )
     ),

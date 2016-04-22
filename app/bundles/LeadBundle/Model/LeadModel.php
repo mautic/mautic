@@ -24,8 +24,12 @@ use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Intl\Intl;
 
 /**
  * Class LeadModel
@@ -1211,5 +1215,269 @@ class LeadModel extends FormModel
         );
 
         return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
+    }
+
+    /**
+     * Get bar chart data of hits
+     *
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $dateFormat
+     * @param array    $filter
+     * @param boolean  $canViewOthers
+     *
+     * @return array
+     */
+    public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
+    {
+        $flag = null;
+        $topLists  = null;
+        $allLeadsT = $this->factory->getTranslator()->trans('mautic.lead.all.leads');
+        $identifiedT = $this->factory->getTranslator()->trans('mautic.lead.identified');
+        $anonymousT = $this->factory->getTranslator()->trans('mautic.lead.lead.anonymous');
+
+        if (isset($filter['flag'])) {
+            $flag = $filter['flag'];
+            unset($filter['flag']);
+        }
+
+        if (!$canViewOthers) {
+            $filter['owner_id'] = $this->factory->getUser()->getId();
+        }
+
+        $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query     = $chart->getChartQuery($this->em->getConnection());
+        $anonymousFilter = $filter;
+        $anonymousFilter['date_identified'] = array(
+            'expression' => 'isNull'
+        );
+        $identifiedFilter = $filter;
+        $identifiedFilter['date_identified'] = array(
+            'expression' => 'isNotNull'
+        );
+
+        if ($flag == 'top') {
+            $topLists = $this->factory->getModel('lead.list')->getTopLists(6, $dateFrom, $dateTo);
+            if ($topLists) {
+                foreach ($topLists as $list) {
+                    $filter['leadlist_id'] = array(
+                        'value' => $list['id'],
+                        'list_column_name' => 't.id'
+                    );
+                    $all = $query->fetchTimeData('leads', 'date_added', $filter);
+                    $chart->setDataset($list['name'] . ': ' . $allLeadsT, $all);
+                }
+            }
+        } elseif ($flag == 'topIdentifiedVsAnonymous') {
+            $topLists = $this->factory->getModel('lead.list')->getTopLists(3, $dateFrom, $dateTo);
+            if ($topLists) {
+                foreach ($topLists as $list) {
+                    $anonymousFilter['leadlist_id'] = array(
+                        'value' => $list['id'],
+                        'list_column_name' => 't.id'
+                    );
+                    $identifiedFilter['leadlist_id'] = array(
+                        'value' => $list['id'],
+                        'list_column_name' => 't.id'
+                    );
+                    $identified = $query->fetchTimeData('leads', 'date_added', $identifiedFilter);
+                    $anonymous = $query->fetchTimeData('leads', 'date_added', $anonymousFilter);
+                    $chart->setDataset($list['name'] . ': ' . $identifiedT, $identified);
+                    $chart->setDataset($list['name'] . ': ' . $anonymousT, $anonymous);
+                }
+            }
+        } elseif ($flag == 'identified') {
+            $identified = $query->fetchTimeData('leads', 'date_added', $identifiedFilter);
+            $chart->setDataset($identifiedT, $identified);
+        } elseif ($flag == 'anonymous') {
+            $anonymous = $query->fetchTimeData('leads', 'date_added', $anonymousFilter);
+            $chart->setDataset($anonymousT, $anonymous);
+        } elseif ($flag == 'identifiedVsAnonymous') {
+            $identified = $query->fetchTimeData('leads', 'date_added', $identifiedFilter);
+            $anonymous = $query->fetchTimeData('leads', 'date_added', $anonymousFilter);
+            $chart->setDataset($identifiedT, $identified);
+            $chart->setDataset($anonymousT, $anonymous);
+        } else {
+            $all = $query->fetchTimeData('leads', 'date_added', $filter);
+            $chart->setDataset($allLeadsT, $all);
+        }
+        
+        return $chart->render();
+    }
+
+    /**
+     * Get pie chart data of dwell times
+     *
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     * @param boolean $canViewOthers
+     *
+     * @return array
+     */
+    public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, $filters = array(), $canViewOthers = true)
+    {
+        $chart = new PieChart();
+        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+
+        if (!$canViewOthers) {
+            $filter['owner_id'] = $this->factory->getUser()->getId();
+        }
+
+        $identified = $query->count('leads', 'date_identified', 'date_added', $filters);
+        $all = $query->count('leads', 'id', 'date_added', $filters);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.lead.identified'), $identified);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.lead.lead.anonymous'), ($all - $identified));
+
+        return $chart->render();
+    }
+
+    /**
+     * Get leads count per country name.
+     * Can't use entity, because country is a custom field.
+     *
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     * @param boolean $canViewOthers
+     *
+     * @return array
+     */
+    public function getLeadMapData($dateFrom, $dateTo, $filters = array(), $canViewOthers = true)
+    {
+        if (!$canViewOthers) {
+            $filter['owner_id'] = $this->factory->getUser()->getId();
+        }
+
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(t.id) as quantity, t.country')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+            ->groupBy('t.country')
+            ->where($q->expr()->isNotNull('t.country'));
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_added');
+
+        $results = $q->execute()->fetchAll();
+
+        $countries = array_flip(Intl::getRegionBundle()->getCountryNames('en'));
+        $mapData = array();
+
+        // Convert country names to 2-char code
+        if ($results) {
+            foreach ($results as $leadCountry) {
+                if (isset($countries[$leadCountry['country']])) {
+                    $mapData[$countries[$leadCountry['country']]] = $leadCountry['quantity'];
+                }
+            }
+        }
+
+        return $mapData;
+    }
+
+    /**
+     * Get a list of top (by leads owned) users
+     *
+     * @param integer $limit
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     *
+     * @return array
+     */
+    public function getTopOwners($limit = 10, $dateFrom = null, $dateTo = null, $filters = array())
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(t.id) AS leads, t.owner_id, u.first_name, u.last_name')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+            ->join('t', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = t.owner_id')
+            ->where($q->expr()->isNotNull('t.owner_id'))
+            ->orderBy('leads', 'DESC')
+            ->groupBy('t.owner_id, u.first_name, u.last_name')
+            ->setMaxResults($limit);
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_added');
+
+        $results = $q->execute()->fetchAll();
+        return $results;
+    }
+
+    /**
+     * Get a list of top (by leads owned) users
+     *
+     * @param integer $limit
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     *
+     * @return array
+     */
+    public function getTopCreators($limit = 10, $dateFrom = null, $dateTo = null, $filters = array())
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(t.id) AS leads, t.created_by, t.created_by_user')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+            ->where($q->expr()->isNotNull('t.created_by'))
+            ->andWhere($q->expr()->isNotNull('t.created_by_user'))
+            ->orderBy('leads', 'DESC')
+            ->groupBy('t.created_by, t.created_by_user')
+            ->setMaxResults($limit);
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_added');
+
+        $results = $q->execute()->fetchAll();
+        return $results;
+    }
+
+    /**
+     * Get a list of leads in a date range
+     *
+     * @param integer  $limit
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param array    $filters
+     * @param array    $options
+     *
+     * @return array
+     */
+    public function getLeadList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array(), $options = array())
+    {
+        if (!empty($options['canViewOthers'])) {
+            $filter['owner_id'] = $this->factory->getUser()->getId();
+        }
+
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('t.id, t.firstname, t.lastname, t.email, t.date_added, t.date_modified')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+            ->setMaxResults($limit);
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_added');
+
+        $results = $q->execute()->fetchAll();
+
+        if ($results) {
+            foreach ($results as &$result) {
+                if ($result['firstname'] || $result['lastname']) {
+                    $result['name'] = trim($result['firstname'] . ' ' . $result['lastname']);
+                } elseif ($result['email']) {
+                    $result['name'] = $result['email'];
+                } else {
+                    $result['name'] = 'anonymous';
+                }
+                unset($result['firstname']);
+                unset($result['lastname']);
+                unset($result['email']);
+            }
+        }
+
+        return $results;
     }
 }

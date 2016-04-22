@@ -88,27 +88,24 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                     <div class="col-sm-12">
                         <div class="panel">
                             <div class="panel-body box-layout">
-                                <div class="col-xs-4 va-m">
+                                <div class="col-md-2 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
                                         <span class="fa fa-download"></span>
                                         <?php echo $view['translator']->trans('mautic.asset.graph.line.downloads'); ?>
                                     </h5>
                                 </div>
-                                <div class="col-xs-4 va-m text-center">
+                                <div class="col-md-2 va-m text-center">
                                     <span class="text-white dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.asset.asset.downloads.total', array('count' => $stats['downloads']['total'])); ?></span>
                                     <span class="text-white dark-md fw-sb mb-xs">|</span>
                                     <span class="text-white dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.asset.asset.downloads.unique', array('count' => $stats['downloads']['unique'])); ?></span>
                                 </div>
-                                <div class="col-xs-4 va-m">
-                                    <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', array('callback' => 'updateDownloadChart')); ?>
+                                <div class="col-md-8 va-m">
+                                    <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', array('dateRangeForm' => $dateRangeForm, 'class' => 'pull-right')); ?>
                                 </div>
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
-                                <div>
-                                    <canvas id="download-chart" height="300"></canvas>
-                                </div>
+                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $stats['downloads']['timeStats'], 'chartType' => 'line', 'chartHeight' => 300)); ?>
                             </div>
-                            <div id="download-chart-data" class="hide"><?php echo json_encode($stats['downloads']['timeStats']); ?></div>
                         </div>
                     </div>
                 </div>

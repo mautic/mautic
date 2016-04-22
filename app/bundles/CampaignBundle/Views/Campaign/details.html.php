@@ -81,11 +81,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                 </div>
                             </div>
                             <div class="pt-0 pl-10 pb-0 pr-10">
-                                <div>
-                                    <canvas id="campaign-leads-chart" height="93"></canvas>
-                                </div>
+                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $leadStats, 'chartType' => 'simple-bar', 'chartHeight' => 93)); ?>
                             </div>
-                            <div id="campaign-leads-chart-data" class="hide"><?php echo json_encode($leadStats); ?></div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -101,10 +98,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                 </div>
                             </div>
                             <div class="text-center">
-                                <canvas id="emails-sent-rate" width="110" height="110"></canvas>
-                                <div id="emails-sent-data" class="hide">
-                                    <?php echo json_encode($emailsSent); ?>
-                                </div>
+                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $emailsSent, 'chartType' => 'pie', 'chartHeight' => 93)); ?>
                             </div>
                         </div>
                     </div>
@@ -121,11 +115,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                 </div>
                             </div>
                             <div class="pt-0 pl-10 pb-0 pr-10">
-                                <div>
-                                    <canvas id="campaign-views-chart" height="93"></canvas>
-                                </div>
+                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $hits, 'chartType' => 'simple-bar', 'chartHeight' => 93)); ?>
                             </div>
-                            <div id="campaign-views-chart-data" class="hide"><?php echo json_encode($hits); ?></div>
                         </div>
                     </div>
                 </div>

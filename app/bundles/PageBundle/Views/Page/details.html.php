@@ -90,12 +90,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                 </div>
                             </div>
                             <div class="pt-0 pl-10 pb-0 pr-10">
-                                <div>
-                                    <canvas id="page-views-chart" height="93"></canvas>
-                                </div>
-                            </div>
-                            <div id="page-views-chart-data" class="hide">
-                                <?php echo json_encode($last30); ?>
+                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $last30, 'chartType' => 'simple-bar', 'chartHeight' => 93)); ?>
                             </div>
                         </div>
                     </div>
@@ -112,14 +107,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                 </div>
                             </div>
                             <div class="text-center">
-                                <canvas id="returning-rate" width="110" height="110"></canvas>
-                                <div id="returning-data" class="hide">
-                                <?php if (isset($stats['dwellTime']['newVsReturning'])) : ?>
-                                    <?php echo json_encode($stats['dwellTime']['newVsReturning']); ?>
-                                <?php else : ?>
-                                    []
-                                <?php endif; ?>
-                                </div>
+                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $stats['newVsReturning'], 'chartType' => 'pie', 'chartHeight' => 93)); ?>
                             </div>
                         </div>
                     </div>
@@ -136,18 +124,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                 </div>
                             </div>
                             <div class="text-center">
-                                <canvas
-                                    id="time-rate"
-                                    width="110"
-                                    height="110">
-                                </canvas>
-                                <div id="times-on-site-data" class="hide">
-                                <?php if (isset($stats['dwellTime']['timesOnSite'])) : ?>
-                                    <?php echo json_encode($stats['dwellTime']['timesOnSite']); ?>
-                                <?php else : ?>
-                                    []
-                                <?php endif; ?>
-                                </div>
+                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $stats['dwellTime'], 'chartType' => 'pie', 'chartHeight' => 93)); ?>
                             </div>
                         </div>
                     </div>
