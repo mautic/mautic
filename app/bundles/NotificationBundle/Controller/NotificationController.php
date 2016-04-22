@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\NotificationBundle\Event\NotificationSendEvent;
 use Mautic\NotificationBundle\Entity\Notification;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Templating\TemplateNameParser;
 
@@ -784,6 +785,36 @@ class NotificationController extends FormController
                 array(
                     'flashes' => $flashes
                 )
+            )
+        );
+    }
+
+    /**
+     * @param $objectId
+     * 
+     * @return JsonResponse|Response
+     */
+    public function previewAction($objectId)
+    {
+        /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
+        $model = $this->factory->getModel('notification');
+        $notification = $model->getEntity($objectId);
+        
+        if ($notification != null
+            && $this->factory->getSecurity()->hasEntityAccess(
+                'notification:notifications:editown',
+                'notification:notifications:editother'
+            )
+        ) {
+            
+        }
+        
+        return $this->delegateView(
+            array(
+                'viewParameters' => array(
+                    'notification' => $notification
+                ),
+                'contentTemplate' => 'MauticNotificationBundle:Notification:preview.html.php'
             )
         );
     }
