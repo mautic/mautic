@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\SmsBundle\SmsEvents;
 use Mautic\SmsBundle\Event\SmsSendEvent;
 use Mautic\SmsBundle\Entity\Sms;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Templating\TemplateNameParser;
 
@@ -784,6 +785,36 @@ class SmsController extends FormController
                 array(
                     'flashes' => $flashes
                 )
+            )
+        );
+    }
+
+    /**
+     * @param $objectId
+     *
+     * @return JsonResponse|Response
+     */
+    public function previewAction($objectId)
+    {
+        /** @var \Mautic\SmsBundle\Model\SmsModel $model */
+        $model = $this->factory->getModel('sms');
+        $sms = $model->getEntity($objectId);
+
+        if ($sms != null
+            && $this->factory->getSecurity()->hasEntityAccess(
+                'sms:smses:editown',
+                'sms:smses:editother'
+            )
+        ) {
+
+        }
+
+        return $this->delegateView(
+            array(
+                'viewParameters' => array(
+                    'sms' => $sms
+                ),
+                'contentTemplate' => 'MauticSmsBundle:Sms:preview.html.php'
             )
         );
     }

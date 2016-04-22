@@ -60,16 +60,19 @@ if (count($items)):
                 <td>
                     <?php
                     $edit          = $view['security']->hasEntityAccess($permissions['sms:smses:editown'], $permissions['sms:smses:editother'], $item->getCreatedBy());
-                    $customButtons = ($type == 'list') ? array(
+                    $customButtons = array(
                         array(
                             'attr' => array(
-                                'data-toggle' => 'ajax',
-                                'href'        => $view['router']->generate('mautic_sms_action', array('objectAction' => 'send', 'objectId' => $item->getId())),
+                                'data-toggle' => 'ajaxmodal',
+                                'data-target' => '#MauticSharedModal',
+                                'data-header' => $view['translator']->trans('mautic.sms.smses.header.preview'),
+                                'data-footer' => 'false',
+                                'href' => $view['router']->generate('mautic_sms_action', array("objectId" => $item->getId(), "objectAction" => "preview")),
                             ),
-                            'iconClass' => 'fa fa-send-o',
-                            'btnText'   => 'mautic.sms.send'
+                            'btnText'   => $view['translator']->trans('mautic.sms.preview'),
+                            'iconClass' => 'fa fa-share'
                         )
-                    ) : array();
+                    );
                     echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                         'item'            => $item,
                         'templateButtons' => array(
@@ -89,16 +92,13 @@ if (count($items)):
                         <?php else: ?>
                         <i class="fa fa-fw fa-lg fa-toggle-on text-muted disabled"></i>
                         <?php endif; ?>
-                        <a href="<?php echo $view['router']->generate('mautic_sms_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
+                        <a href="<?php echo $view['router']->generate('mautic_sms_action', array("objectAction" => "preview", "objectId" => $item->getId())); ?>" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-footer="" data-header="<?php echo $view['translator']->trans('mautic.sms.smses.header.preview')?>">
                             <?php echo $item->getName(); ?>
                             <?php if ($type == 'list'): ?>
                             <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.sms.icon_tooltip.list_sms'); ?>"><i class="fa fa-fw fa-list"></i></span>
                             <?php endif; ?>
                         </a>
                     </div>
-                    <?php if ($description = $item->getDescription()): ?>
-                        <div class="text-muted mt-4"><small><?php echo $description; ?></small></div>
-                    <?php endif; ?>
                 </td>
                 <td class="visible-md visible-lg">
                     <?php $category = $item->getCategory(); ?>
