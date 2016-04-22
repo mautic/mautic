@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\NotificationBundle\Event\NotificationSendEvent;
 use Mautic\NotificationBundle\Entity\Notification;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Templating\TemplateNameParser;
 
@@ -784,6 +785,78 @@ class NotificationController extends FormController
                 array(
                     'flashes' => $flashes
                 )
+            )
+        );
+    }
+
+    /**
+     * Add/remove lead from a list
+     *
+     * @param $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function listAction($objectId)
+    {
+        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        $model = $this->factory->getModel('lead');
+        $lead  = $model->getEntity($objectId);
+
+        if ($lead != null
+            && $this->factory->getSecurity()->hasEntityAccess(
+                'lead:leads:editown',
+                'lead:leads:editother',
+                $lead->getOwner()
+            )
+        ) {
+            /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
+            $listModel = $this->factory->getModel('lead.list');
+            $lists     = $listModel->getUserLists();
+
+            // Get a list of lists for the lead
+            $leadsLists = $model->getLists($lead, true, true);
+        } else {
+            $lists = $leadsLists = array();
+        }
+
+        return $this->delegateView(
+            array(
+                'viewParameters'  => array(
+                    'lists'      => $lists,
+                    'leadsLists' => $leadsLists,
+                    'lead'       => $lead
+                ),
+                'contentTemplate' => 'MauticLeadBundle:LeadLists:index.html.php'
+            )
+        );
+    }
+
+    /**
+     * @param $objectId
+     * 
+     * @return JsonResponse|Response
+     */
+    public function previewAction($objectId)
+    {
+        /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
+        $model = $this->factory->getModel('notification');
+        $notification = $model->getEntity($objectId);
+        
+        if ($notification != null
+            && $this->factory->getSecurity()->hasEntityAccess(
+                'notification:notifications:editown',
+                'notification:notifications:editother'
+            )
+        ) {
+            
+        }
+        
+        return $this->delegateView(
+            array(
+                'viewParameters' => array(
+                    'notification' => $notification
+                ),
+                'contentTemplate' => 'MauticNotificationBundle:Notification:preview.html.php'
             )
         );
     }
