@@ -239,15 +239,4 @@ class LinkedInIntegration extends SocialIntegration
             'emailAddress'     => array('type' => 'string', 'fieldName' => 'email-address')
         );
     }
-
-    /**
-     * returns template to render on popup window after trying to run OAuth
-     *
-     *
-     * @return null|string
-     */
-    public function getPostAuthTemplate()
-    {
-        return 'MauticSocialBundle:Integration\LinkedIn:postauth.html.php';
-    }
 }

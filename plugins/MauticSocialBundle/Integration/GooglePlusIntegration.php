@@ -330,15 +330,4 @@ class GooglePlusIntegration extends SocialIntegration
 
         return false;
     }
-
-    /**
-     * returns template to render on popup window after trying to run OAuth
-     *
-     *
-     * @return null|string
-     */
-    public function getPostAuthTemplate()
-    {
-        return 'MauticSocialBundle:Integration\GooglePlus:postauth.html.php';
-    }
 }

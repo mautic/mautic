@@ -218,15 +218,4 @@ class FacebookIntegration extends SocialIntegration
             'link'       => array('type' => 'string'),
         );
     }
-
-    /**
-     * returns template to render on popup window after trying to run OAuth
-     *
-     *
-     * @return null|string
-     */
-    public function getPostAuthTemplate()
-    {
-        return 'MauticSocialBundle:Integration\Facebook:postauth.html.php';
-    }
 }

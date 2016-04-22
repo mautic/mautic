@@ -96,14 +96,7 @@ class AuthController extends FormController
         $userData = array();
 
         if(isset($integration)){
-            $integrationHelper = $this->factory->getHelper('integration');
-            $integrationObject = $integrationHelper->getIntegrationObject($integration);
-
             $userData = $session->get('mautic.integration.'.$integration.'.userdata');
-
-            if($integrationObject->getPostAuthTemplate() != null){
-                $postAuthTemplate=$integrationObject->getPostAuthTemplate();
-            }
         }
 
         $message     = $type = '';
