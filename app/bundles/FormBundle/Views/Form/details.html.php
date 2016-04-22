@@ -16,7 +16,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'templateButtons' => array(
         'edit'      => $security->hasEntityAccess($permissions['form:forms:editown'], $permissions['form:forms:editother'], $activeForm->getCreatedBy()),
         'clone'     => $permissions['form:forms:create'],
-        'delete'    => $security->hasEntityAccess($permissions['form:forms:deleteown'], $permissions['form:forms:deleteother'], $activeForm->getCreatedBy())
+        'delete'    => $security->hasEntityAccess($permissions['form:forms:deleteown'], $permissions['form:forms:deleteother'], $activeForm->getCreatedBy()),
+        'close'     => $security->hasEntityAccess($permissions['form:forms:viewown'], $permissions['form:forms:viewother'], $activeForm->getCreatedBy())
     ),
     'routeBase' => 'form',
     'langVar'   => 'form',

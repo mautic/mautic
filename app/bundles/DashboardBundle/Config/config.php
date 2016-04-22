@@ -33,7 +33,7 @@ return array(
 
     'menu' => array(
         'main' => array(
-            'priority' => -100,
+            'priority' => 100,
             'items'    => array(
                 'mautic.dashboard.menu.index' => array(
                     'route'     => 'mautic_dashboard_index',

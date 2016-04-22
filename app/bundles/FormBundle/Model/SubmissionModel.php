@@ -357,7 +357,7 @@ class SubmissionModel extends CommonFormModel
             $leadId        = $lead->getId();
             $currentFields = $model->flattenFields($lead->getFields());
 
-            $logger->debug('FORM: Not in kiosk mode so using current lead ID #' . $lead->getId());
+            $logger->debug('FORM: Not in kiosk mode so using current contact ID #' . $lead->getId());
         } else {
             // Default to a new lead in kiosk mode
             $lead = new Lead();
@@ -366,7 +366,7 @@ class SubmissionModel extends CommonFormModel
 
             $leadId = null;
 
-            $logger->debug('FORM: In kiosk mode so assuming a new lead');
+            $logger->debug('FORM: In kiosk mode so assuming a new contact');
         }
 
         $uniqueLeadFields = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
@@ -427,7 +427,7 @@ class SubmissionModel extends CommonFormModel
             /** @var \Mautic\LeadBundle\Entity\Lead $foundLead */
             $foundLead = $leads[0];
 
-            $logger->debug('FORM: Testing lead ID# ' . $foundLead->getId() . ' for conflicts');
+            $logger->debug('FORM: Testing contact ID# ' . $foundLead->getId() . ' for conflicts');
 
             // Check for a conflict with the currently tracked lead
             $foundLeadFields =  $model->flattenFields($foundLead->getFields());
@@ -447,7 +447,7 @@ class SubmissionModel extends CommonFormModel
                 }
 
             } else {
-                $logger->debug('FORM: Merging leads ' . $lead->getId() . ' and ' . $foundLead->getId());
+                $logger->debug('FORM: Merging contacts ' . $lead->getId() . ' and ' . $foundLead->getId());
 
                 // Merge the found lead with currently tracked lead
                 $lead = $model->mergeLeads($lead, $foundLead);
@@ -462,15 +462,15 @@ class SubmissionModel extends CommonFormModel
             // Check for conflicts with the submitted data and the currently tracked lead
             list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsWithData, $uniqueFieldsCurrent);
 
-            $logger->debug('FORM: Current unique lead fields ' . implode(', ', array_keys($uniqueFieldsCurrent)) . ' = ' . implode(', ', $uniqueFieldsCurrent));
+            $logger->debug('FORM: Current unique contact fields ' . implode(', ', array_keys($uniqueFieldsCurrent)) . ' = ' . implode(', ', $uniqueFieldsCurrent));
 
-            $logger->debug('FORM: Submitted unique lead fields ' . implode(', ', array_keys($uniqueFieldsWithData)) . ' = ' . implode(', ', $uniqueFieldsWithData));
+            $logger->debug('FORM: Submitted unique contact fields ' . implode(', ', array_keys($uniqueFieldsWithData)) . ' = ' . implode(', ', $uniqueFieldsWithData));
             if ($hasConflict) {
                 // There's a conflict so create a new lead
                 $lead = new Lead();
                 $lead->setNewlyCreated(true);
 
-                $logger->debug('FORM: Conflicts found in ' . implode(', ' , $conflicts) . ' between current tracked lead and submitted data so assuming a new lead');
+                $logger->debug('FORM: Conflicts found in ' . implode(', ' , $conflicts) . ' between current tracked contact and submitted data so assuming a new contact');
             }
         }
 
@@ -481,7 +481,7 @@ class SubmissionModel extends CommonFormModel
         if ($lead->isNewlyCreated()) {
             if (!$inKioskMode) {
                 $lead->addIpAddress($ipAddress);
-                $logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to lead');
+                $logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to contact');
             }
 
         } elseif (!$inKioskMode) {
@@ -489,7 +489,7 @@ class SubmissionModel extends CommonFormModel
             if (!$leadIpAddresses->contains($ipAddress)) {
                 $lead->addIpAddress($ipAddress);
 
-                $logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to lead');
+                $logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to contact');
             }
         }
 

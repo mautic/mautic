@@ -14,4 +14,13 @@ RemoveHandler .cgi .pl .py .pyc .pyo .phtml .php .php3 .php4 .php5 .php6 .pcgi .
 RemoveType .cgi .pl .py .pyc .pyo .phtml .php .php3 .php4 .php5 .php6 .pcgi .pcgi3 .pcgi4 .pcgi5 .pchi6 .inc
 SetHandler None
 SetHandler default-handler
+
 ForceType text/plain
+
+<FilesMatch "\.css$">
+    ForceType text/css
+</FilesMatch>
+
+<FilesMatch "\.js$">
+    ForceType text/js
+</FilesMatch>

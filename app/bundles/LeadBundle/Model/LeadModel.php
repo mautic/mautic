@@ -1094,7 +1094,7 @@ class LeadModel extends FormModel
             $tags = explode(',', $tags);
         }
 
-        $logger->debug('LEAD: Adding ' . implode(', ', $tags) . ' to lead ID# ' . $lead->getId());
+        $logger->debug('CONTACT: Adding ' . implode(', ', $tags) . ' to contact ID# ' . $lead->getId());
 
         array_walk($tags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
 
@@ -1127,7 +1127,7 @@ class LeadModel extends FormModel
 
         if (!empty($removeTags)) {
 
-            $logger->debug('LEAD: Removing '.implode(', ', $removeTags).' for lead ID# '.$lead->getId());
+            $logger->debug('CONTACT: Removing '.implode(', ', $removeTags).' for contact ID# '.$lead->getId());
 
             array_walk($removeTags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
 

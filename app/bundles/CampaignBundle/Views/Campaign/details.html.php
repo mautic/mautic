@@ -17,6 +17,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         'edit'      => $permissions['campaign:campaigns:edit'],
         'clone'     => $permissions['campaign:campaigns:create'],
         'delete'    => $permissions['campaign:campaigns:delete'],
+        'close'     => $permissions['campaign:campaigns:view'],
     ),
     'routeBase' => 'campaign'
 )));
