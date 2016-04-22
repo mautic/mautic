@@ -20,6 +20,11 @@ use Mautic\LeadBundle\Entity\Lead;
 class SmsSendEvent extends CommonEvent
 {
     /**
+     * @var int
+     */
+    protected $smsId;
+
+    /**
      * @var string
      */
     protected $content;
@@ -69,5 +74,21 @@ class SmsSendEvent extends CommonEvent
     public function setLead($lead)
     {
         $this->lead = $lead;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSmsId()
+    {
+        return $this->smsId;
+    }
+
+    /**
+     * @param int $smsId
+     */
+    public function setSmsId($smsId)
+    {
+        $this->smsId = $smsId;
     }
 }

@@ -11,6 +11,7 @@ namespace Mautic\SmsBundle\EventListener;
 
 use Joomla\Http\Http;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\SmsBundle\Event\SmsSendEvent;
 use Mautic\SmsBundle\SmsEvents;
 
@@ -31,9 +32,17 @@ class SmsSubscriber extends CommonSubscriber
      */
     protected $urlRegEx = '/https?\:\/\/([a-zA-Z0-9\-\.]+\.[a-zA-Z]+(\.[a-zA-Z])?)(\/\S*)?/i';
 
-    public function __construct(Http $http)
+    /**
+     * SmsSubscriber constructor.
+     * 
+     * @param MauticFactory $factory
+     * @param Http $http
+     */
+    public function __construct(MauticFactory $factory, Http $http)
     {
         $this->http = $http;
+        
+        parent::__construct($factory);
     }
 
     /**
@@ -53,12 +62,22 @@ class SmsSubscriber extends CommonSubscriber
     {
         $content = $event->getContent();
         $tokens = array();
+        /** @var \Mautic\SmsBundle\Api\AbstractSmsApi $smsApi */
+        $smsApi = $this->factory->getKernel()->getContainer()->get('mautic.sms.api');
 
         if ($this->contentHasLinks($content)) {
             preg_match_all($this->urlRegEx, $content, $matches);
 
             foreach ($matches[0] as $url) {
-                $tokens[$url] = $this->buildShortLink($url);
+                $tokens[$url] = $this->buildShortLink(
+                    $smsApi->convertToTrackedUrl(
+                        $url,
+                        array(
+                            'sms' => $event->getSmsId(),
+                            'lead' => $event->getLead()->getId()
+                        )
+                    )
+                );
             }
         }
 
@@ -86,7 +105,13 @@ class SmsSubscriber extends CommonSubscriber
      */
     protected function buildShortLink($url)
     {
-        $response = $this->http->get('https://api-ssl.bitly.com/v3/shorten?access_token=080e684d77f2d592a2a5a1fc92978fcfe33cc80d&format=txt&longurl=' . urlencode($url));
+        $linkShortenerUrl = $this->factory->getParameter('link_shortener_url');
+        
+        if (! $linkShortenerUrl) {
+            return $url;
+        }
+
+        $response = $this->http->get($linkShortenerUrl . urlencode($url));
 
         return ($response->code === 200) ? rtrim($response->body) : $url;
     }

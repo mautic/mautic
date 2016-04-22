@@ -17,10 +17,43 @@ use Mautic\LeadBundle\Entity\Lead;
 abstract class AbstractSmsApi
 {
     /**
+     * @var MauticFactory
+     */
+    protected $factory;
+    
+    /**
+     * @param MauticFactory $factory
+     */
+    public function __construct(MauticFactory $factory)
+    {
+        $this->factory = $factory;
+    }
+
+    /**
      * @param string $number
      * @param string $content
      *
      * @return mixed
      */
     abstract public function sendSms($number, $content);
+
+    /**
+     * Convert a non-tracked url to a tracked url
+     *
+     * @param string $url
+     * @param array $clickthrough
+     *
+     * @return string
+     */
+    public function convertToTrackedUrl($url, array $clickthrough = array())
+    {
+        /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
+        $redirectModel = $this->factory->getModel('page.redirect');
+        /** @var \Mautic\PageBundle\Entity\Redirect $redirect */
+        $redirect = $redirectModel->getRedirectByUrl($url);
+
+        $redirectModel->getRepository()->saveEntity($redirect);
+
+        return $redirectModel->generateRedirectUrl($redirect, $clickthrough);
+    }
 }

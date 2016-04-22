@@ -18,7 +18,10 @@ return array(
             ),
             'mautic.sms.smsbundle.subscriber' => array(
                 'class' => 'Mautic\SmsBundle\EventListener\SmsSubscriber',
-                'arguments' => 'mautic.http.connector'
+                'arguments' => array(
+                    'mautic.factory',
+                    'mautic.http.connector'
+                )
             )
         ),
         'forms' => array(
@@ -53,6 +56,7 @@ return array(
             'mautic.sms.api' => array(
                 'class'     => 'Mautic\SmsBundle\Api\TwilioApi',
                 'arguments' => array(
+                    'mautic.factory',
                     'mautic.twilio.service',
                     '%mautic.sms_sending_phone_number%'
                 ),

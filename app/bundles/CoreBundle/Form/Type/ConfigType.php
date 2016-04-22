@@ -661,6 +661,20 @@ class ConfigType extends AbstractType
                 )
             )
         );
+
+        $builder->add(
+            'link_shortener_url',
+            'text',
+            array(
+                'label'      => 'mautic.core.config.form.link.shortener',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.core.config.form.link.shortener.tooltip'
+                ),
+                'required'   => false
+            )
+        );
     }
 
     /**

@@ -116,6 +116,7 @@ class SmsHelper
 
         $dispatcher = $factory->getDispatcher();
         $event = new SmsSendEvent($sms->getMessage(), $lead);
+        $event->setSmsId($smsId);
 
         $dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $event);
 

@@ -12,6 +12,7 @@ namespace Mautic\SmsBundle\Api;
 use Joomla\Http\Response;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Exception\MissingUsernameException;
 use Mautic\SmsBundle\Exception\MissingPasswordException;
@@ -29,13 +30,16 @@ class TwilioApi extends AbstractSmsApi
     protected $sendingPhoneNumber;
 
     /**
+     * @param MauticFactory $factory
      * @param \Services_Twilio $client
      * @param string $sendingPhoneNumber
      */
-    public function __construct(\Services_Twilio $client, $sendingPhoneNumber)
+    public function __construct(MauticFactory $factory, \Services_Twilio $client, $sendingPhoneNumber)
     {
         $this->client = $client;
         $this->sendingPhoneNumber = $this->sanitizeNumber($sendingPhoneNumber);
+        
+        parent::__construct($factory);
     }
 
     /**
