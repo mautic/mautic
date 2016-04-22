@@ -13,7 +13,7 @@ $data = json_encode($data);
 $js = <<<JS
 function refreshIntegrationForm() {
     var opener = window.opener;
-    if(opener) {
+    if(opener && typeof opener.fillinForm == 'function') {
             opener.fillinForm({$data});
     }
     window.close()
