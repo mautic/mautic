@@ -36,28 +36,6 @@ class PageRepository extends CommonRepository
     }
 
     /**
-     * Get a list of popular (by hits) pages
-     *
-     * @param integer $limit
-     *
-     * @return array
-     */
-    public function getPopularPages($limit = 10)
-    {
-        $q  = $this->createQueryBuilder('p');
-
-        $q->select("partial p.{id, title, hits, alias}")
-            ->orderBy('p.hits', 'DESC')
-            ->where('p.hits > 0')
-            ->setMaxResults($limit);
-
-        $expr = $this->getPublishedByDateExpression($q, 'p');
-        $q->andWhere($expr);
-
-        return $q->getQuery()->getResult();
-    }
-
-    /**
      * @param string $alias
      * @param Page   $entity
      *

@@ -55,7 +55,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'templateButtons' => array(
         'edit'       => $edit,
         'delete'     => $view['security']->hasEntityAccess($permissions['email:emails:deleteown'], $permissions['email:emails:deleteother'], $email->getCreatedBy()),
-        'abtest'     => (!$isVariant && $edit && $permissions['email:emails:create'])
+        'abtest'     => (!$isVariant && $edit && $permissions['email:emails:create']),
+        'close'      => $view['security']->hasEntityAccess($permissions['email:emails:viewown'], $permissions['email:emails:viewother'], $email->getCreatedBy()),
     ),
     'routeBase'  => 'email',
     'preCustomButtons' => $customButtons
