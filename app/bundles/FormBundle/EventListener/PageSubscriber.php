@@ -97,7 +97,9 @@ class PageSubscriber extends CommonSubscriber
 
                     //pouplate get parameters
                     //priority populate value order by: query string (parameters) -> with lead
-                    $model->populateValuesWithLead($form, $formHtml);
+                    if (!$form->getInKioskMode()) {
+                        $model->populateValuesWithLead($form, $formHtml);
+                    }
                     $model->populateValuesWithGetParameters($form, $formHtml);
 
                     $content = preg_replace('#{form=' . $id . '}#', $formHtml, $content);
