@@ -28,8 +28,8 @@ class Version20160114000000 extends AbstractMauticMigration
     public function preUp(Schema $schema)
     {
         // Test to see if this migration has already been applied
-        $oauthTable = $schema->getTable($this->prefix . 'form_fields');
-        if ($oauthTable->hasColumn('is_auto_fill')) {
+        $formTable = $schema->getTable($this->prefix . 'form_fields');
+        if ($formTable->hasColumn('is_auto_fill')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
