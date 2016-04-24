@@ -63,6 +63,19 @@ return array(
         )
     ),
 
+    'menu'     => array(
+        'main' => array(
+            'items'    => array(
+                'mautic.page.pages' => array(
+                    'route'     => 'mautic_page_index',
+                    'access'    => array('page:pages:viewown', 'page:pages:viewother'),
+                    'parent'    => 'mautic.campaigns.menu.root',
+                    'priority'  => 101
+                )
+            )
+        )
+    ),
+
     'categories' => array(
         'page' => null
     ),
