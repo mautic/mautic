@@ -68,13 +68,11 @@ return array(
     ),
     'menu'       => array(
         'main' => array(
-            'priority' => 15,
             'items'    => array(
                 'mautic.email.emails' => array(
                     'route'     => 'mautic_email_index',
-                    'id'        => 'mautic_email_root',
-                    'iconClass' => 'fa-send',
-                    'access'    => array('email:emails:viewown', 'email:emails:viewother')
+                    'access'    => array('email:emails:viewown', 'email:emails:viewother'),
+                    'parent'    => 'mautic.core.channels'
                 )
             )
         )
@@ -122,7 +120,10 @@ return array(
             ),
             'mautic.email.pagebundle.subscriber'   => array(
                 'class' => 'Mautic\EmailBundle\EventListener\PageSubscriber'
-            )
+            ),
+            'mautic.email.dashboard.subscriber'           => array(
+                'class' => 'Mautic\EmailBundle\EventListener\DashboardSubscriber'
+            ),
         ),
         'forms'  => array(
             'mautic.form.type.email'                          => array(
@@ -171,11 +172,15 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'monitored_mailboxes'
             ),
-            'mautic.form.type.coreconfig_monitored_email' => array(
+            'mautic.form.type.coreconfig_monitored_email'     => array(
                 'class'     => 'Mautic\EmailBundle\Form\Type\ConfigMonitoredEmailType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'monitored_email'
             ),
+            'mautic.form.type.email_dashboard_emails_in_time_widget' => array(
+                'class'     => 'Mautic\EmailBundle\Form\Type\DashboardEmailsInTimeWidgetType',
+                'alias'     => 'email_dashboard_emails_in_time_widget'
+            )
         ),
         'other'  => array(
             'mautic.validator.leadlistaccess' => array(

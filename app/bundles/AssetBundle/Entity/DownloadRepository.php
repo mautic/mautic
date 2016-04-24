@@ -82,33 +82,6 @@ class DownloadRepository extends CommonRepository
     }
 
     /**
-     * Get hit count per day for last 30 days
-     *
-     * @param integer $assetId
-     * @param integer $amount of units
-     * @param char $unit: php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters
-     *
-     * @return array
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    public function getDownloads($assetId, $amount = 30, $unit = 'D')
-    {
-        $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('downloaded'));
-
-        $query = $this->createQueryBuilder('d');
-
-        $query->select('IDENTITY(d.asset), d.dateDownload')
-            ->where($query->expr()->eq('IDENTITY(d.asset)', (int) $assetId))
-            ->andwhere($query->expr()->gte('d.dateDownload', ':date'))
-            ->setParameter('date', $data['fromDate']);
-
-        $downloads = $query->getQuery()->getArrayResult();
-
-        return GraphHelper::mergeLineGraphData($data, $downloads, $unit, 0, 'dateDownload');
-    }
-
-    /**
      * Get list of assets ordered by it's download count
      *
      * @param QueryBuilder $query
