@@ -16,7 +16,7 @@ $notification = $data['notification'];
     <div class="figure"><span class="fa <?php echo isset($icons['notification']) ? $icons['notification'] : '' ?>"></span></div>
     <div class="panel">
         <div class="panel-body">
-            <h3><?php echo $notification->getName(); ?></h3>
+            <h3><?php echo $notification['name']; ?></h3>
             <p class="mb-0"><?php echo $view['translator']->trans('mautic.core.timeline.event.time', array('%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel'])); ?></p>
         </div>
         <div class="panel-footer">
