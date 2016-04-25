@@ -196,6 +196,9 @@ return array(
             'mautic.transport.amazon'            => array(
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
+                'arguments' => array(
+                    '%mautic.mailer_amazon_region%'
+                    ),
                 'methodCalls'  => array(
                     'setUsername' => array('%mautic.mailer_user%'),
                     'setPassword' => array('%mautic.mailer_password%')
@@ -239,6 +242,7 @@ return array(
         'mailer_password'              => null,
         'mailer_encryption'            => null, //tls or ssl,
         'mailer_auth_mode'             => null, //plain, login or cram-md5
+        'mailer_amazon_region'         => 'email-smtp.us-east-1.amazonaws.com',
         'mailer_spool_type'            => 'memory', //memory = immediate; file = queue
         'mailer_spool_path'            => '%kernel.root_dir%/spool',
         'mailer_spool_msg_limit'       => null,
