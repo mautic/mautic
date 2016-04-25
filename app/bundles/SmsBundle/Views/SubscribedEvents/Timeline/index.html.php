@@ -16,13 +16,7 @@ $sms = $data['sms'];
     <div class="figure"><span class="fa <?php echo isset($icons['sms']) ? $icons['sms'] : '' ?>"></span></div>
     <div class="panel">
         <div class="panel-body">
-            <h3>
-                <a href="<?php echo $view['router']->generate('mautic_sms_action',
-                    array("objectAction" => "preview", "objectId" => $sms->getId())); ?>"
-                   data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="<?php echo $view['translator']->trans('mautic.sms.smses.header.preview'); ?>" data-footer="false">
-                    <?php echo $sms->getName(); ?>
-                </a>
-            </h3>
+            <h3><?php echo $sms['name']; ?></h3>
             <p class="mb-0"><?php echo $view['translator']->trans('mautic.core.timeline.event.time', array('%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel'])); ?></p>
         </div>
         <div class="panel-footer">
@@ -32,6 +26,12 @@ $sms = $data['sms'];
                 <dt><?php echo $view['translator']->trans('mautic.sms.timeline.type'); ?></dt>
                 <dd class="ellipsis"><?php echo $view['translator']->trans($data['type']); ?></dd>
             </dl>
+            <div class="small">
+                <hr />
+                <strong><?php echo $view['translator']->trans('mautic.sms.timeline.content.heading') ?></strong>
+                <br />
+                <?php echo $sms['content']; ?>
+            </div>
         </div>
     </div>
 </li>

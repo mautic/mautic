@@ -121,7 +121,11 @@ class SmsHelper
         $dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $event);
 
         $metadata = $smsApi->sendSms($leadPhoneNumber, $event->getContent());
-        $metadata['sms'] = $sms;
+        $metadata['sms'] = array(
+            'id' => $sms->getId(),
+            'name' => $sms->getName(),
+            'content' => $event->getContent()
+        );
         
         return $metadata;
     }
