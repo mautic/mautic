@@ -30,9 +30,7 @@
 .card {
     margin: 5px;
     background: #FEFEFE;
-    -moz-box-shadow: rgba(0, 0, 0, 0.19) 0 0 8px 0;
-    -webkit-box-shadow: rgba(0, 0, 0, 0.19) 0 0 8px 0;
-    box-shadow: rgba(0, 0, 0, 0.19) 0 0 8px 0;
+    border: 1px solid rgba(0, 0, 0, 0.1);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -89,12 +87,6 @@
     .card {
         width: 100% !important;
     }
-}
-.card:hover, .card:focus {
-    background: white;
-    -moz-box-shadow: rgba(0, 0, 0, 0) 0px 0px 10px 0px;
-    -webkit-box-shadow: rgba(0, 0, 0, 0) 0px 0px 10px 0px;
-    box-shadow: rgba(0, 0, 0, 0) 0px 0px 10px 0px;
 }
 .chart-wrapper {
     position: relative;
