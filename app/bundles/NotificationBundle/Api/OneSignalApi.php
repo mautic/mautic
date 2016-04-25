@@ -100,7 +100,7 @@ class OneSignalApi extends AbstractNotificationApi
 
         return array(
             'status' => ($response->code === 200) ? 'mautic.notification.timeline.status.delivered' : 'mautic.notification.timeline.status.failed',
-            'type' => 'mautic.notification.timeline.type'
+            'type' => 'mautic.notification.notification'
         );
     }
 }
