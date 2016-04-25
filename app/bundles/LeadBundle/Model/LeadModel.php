@@ -82,6 +82,16 @@ class LeadModel extends FormModel
     }
 
     /**
+     * Get the tags repository
+     *
+     * @return \Mautic\LeadBundle\Entity\UtmTagRepository
+     */
+    public function getUtmTagRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:UtmTag');
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string

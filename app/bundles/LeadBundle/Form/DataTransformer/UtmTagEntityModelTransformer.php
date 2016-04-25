@@ -131,7 +131,7 @@ class UtmTagEntityModelTransformer implements DataTransformerInterface
         if (!count($entities)) {
             throw new TransformationFailedException(sprintf(
                 'UtmTags for "%s" does not exist!',
-                $id
+                $id[0]
             ));
         }
 

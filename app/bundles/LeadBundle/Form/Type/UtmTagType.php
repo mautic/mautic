@@ -59,7 +59,7 @@ class UtmTagType extends AbstractType
                 'query_builder'   => function (EntityRepository $er) {
                     return $er->createQueryBuilder('ut');
                 },
-                'property'        => 'utmTag',
+                'property'        => 'utmtag',
                 'multiple'        => true,
                 'required'        => false,
                 'disabled'        => false,

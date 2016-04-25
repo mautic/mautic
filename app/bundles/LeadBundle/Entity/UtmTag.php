@@ -78,7 +78,7 @@ class UtmTag
     /**
      * @var string
      */
-    private $utmTag;
+    private $utmtag;
 
     /**
      * @var string
@@ -106,10 +106,10 @@ class UtmTag
 
         $builder->setTable('lead_utmtags')
             ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\UtmTagRepository')
-            ->addIndex(array('utmTag'), 'lead_utmtag_search');
+            ->addIndex(array('utmtag'), 'lead_utmtag_search');
         
         $builder->addId();
-        $builder->addField('utmTag', 'string');
+        $builder->addField('utmtag', 'string');
     }
 
 
@@ -132,7 +132,7 @@ class UtmTag
                     'url',
                     'urlTitle',
                     'userAgent',
-                    'utmTag',
+                    'utmtag',
                     'utmValue',
                     'remoteHost',
                     'query'
@@ -441,7 +441,7 @@ class UtmTag
      */
     public function getUtmTag()
     {
-        return $this->utmTag;
+        return $this->utmtag;
     }
 
     /**
@@ -449,9 +449,9 @@ class UtmTag
      *
      * @return Hit
      */
-    public function setUtmTag($utmTag)
+    public function setUtmTag($utmtag)
     {
-        $this->utmTag = $utmTag;
+        $this->utmtag = $utmtag;
 
         return $this;
     }

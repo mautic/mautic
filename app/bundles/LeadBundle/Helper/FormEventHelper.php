@@ -83,7 +83,7 @@ class FormEventHelper
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel  = $factory->getModel('lead');
         $lead       = $leadModel->getCurrentLead();
-
-        $leadModel->modifyUtmTags($lead, $config['name']);
+        $factory->getLogger()->addError(print_r($config,true));
+        $leadModel->modifyUtmTags($lead, $config['add_utmtags']);
     }
 }
