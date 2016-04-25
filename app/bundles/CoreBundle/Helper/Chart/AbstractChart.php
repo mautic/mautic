@@ -34,14 +34,14 @@ abstract class AbstractChart
     /**
      * Date from
      *
-     * @var DateTime
+     * @var \DateTime
      */
     protected $dateFrom;
 
     /**
      * Date to
      *
-     * @var DateTime
+     * @var \DateTime
      */
     protected $dateTo;
 
@@ -71,7 +71,7 @@ abstract class AbstractChart
      *
      * @param  string  $unit
      *
-     * @return DateInterval
+     * @return \DateInterval
      */
     public function getUnitInterval($unit = null)
     {
@@ -111,8 +111,8 @@ abstract class AbstractChart
     /**
      * Sets the clones of the date range and validates it
      *
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
      */
     public function setDateRange(\DateTime $dateFrom, \DateTime $dateTo)
     {
@@ -129,7 +129,7 @@ abstract class AbstractChart
      * Modify the date to add one current time unit to it and subtract 1 second.
      * Can be used to get the current day results.
      *
-     * @param DateTime $date
+     * @param \DateTime $date
      */
     public function addOneUnitMinusOneSec(\DateTime &$date)
     {
