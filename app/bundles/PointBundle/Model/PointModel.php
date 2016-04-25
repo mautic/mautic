@@ -27,6 +27,7 @@ class PointModel extends CommonFormModel
 {
 
     /**
+     *
      * {@inheritdoc}
      *
      * @return \Mautic\PointBundle\Entity\PointRepository
@@ -37,7 +38,9 @@ class PointModel extends CommonFormModel
     }
 
     /**
+     *
      * {@inheritdoc}
+     *
      */
     public function getPermissionBase()
     {
@@ -45,6 +48,7 @@ class PointModel extends CommonFormModel
     }
 
     /**
+     *
      * {@inheritdoc}
      *
      * @throws MethodNotAllowedHttpException
@@ -52,7 +56,9 @@ class PointModel extends CommonFormModel
     public function createForm($entity, $formFactory, $action = null, $options = array())
     {
         if (!$entity instanceof Point) {
-            throw new MethodNotAllowedHttpException(array('Point'));
+            throw new MethodNotAllowedHttpException(array(
+                'Point'
+            ));
         }
         if (!empty($action)) {
             $options['action'] = $action;
@@ -61,6 +67,7 @@ class PointModel extends CommonFormModel
     }
 
     /**
+     *
      * {@inheritdoc}
      *
      * @return Point|null
@@ -70,11 +77,12 @@ class PointModel extends CommonFormModel
         if ($id === null) {
             return new Point();
         }
-
+        
         return parent::getEntity($id);
     }
 
     /**
+     *
      * {@inheritdoc}
      *
      * @throws MethodNotAllowedHttpException
@@ -82,9 +90,11 @@ class PointModel extends CommonFormModel
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Point) {
-            throw new MethodNotAllowedHttpException(array('Point'));
+            throw new MethodNotAllowedHttpException(array(
+                'Point'
+            ));
         }
-
+        
         switch ($action) {
             case "pre_save":
                 $name = PointEvents::POINT_PRE_SAVE;
@@ -101,17 +111,17 @@ class PointModel extends CommonFormModel
             default:
                 return null;
         }
-
+        
         if ($this->dispatcher->hasListeners($name)) {
             if (empty($event)) {
                 $event = new PointEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
-
+            
             $this->dispatcher->dispatch($name, $event);
             return $event;
         }
-
+        
         return null;
     }
 
@@ -123,42 +133,44 @@ class PointModel extends CommonFormModel
     public function getPointActions()
     {
         static $actions;
-
+        
         if (empty($actions)) {
-            //build them
+            // build them
             $actions = array();
             $event = new PointBuilderEvent($this->translator);
             $this->dispatcher->dispatch(PointEvents::POINT_ON_BUILD, $event);
             $actions['actions'] = $event->getActions();
-            $actions['list']    = $event->getActionList();
+            $actions['list'] = $event->getActionList();
             $actions['choices'] = $event->getActionChoices();
         }
-
+        
         return $actions;
     }
 
     /**
      * Triggers a specific point change
      *
-     * @param $type
-     * @param mixed $eventDetails passthrough from function triggering action to the callback function
-     * @param mixed $typeId Something unique to the triggering event to prevent  unnecessary duplicate calls
-     * @param Lead  $lead
+     * @param
+     *            $type
+     * @param mixed $eventDetails
+     *            passthrough from function triggering action to the callback function
+     * @param mixed $typeId
+     *            Something unique to the triggering event to prevent unnecessary duplicate calls
+     * @param Lead $lead            
      *
      * @return void
      */
     public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null)
     {
-    	
-    	if($type != "api.call") {
-        	//only trigger actions for anonymous users
-    		if (!$this->security->isAnonymous()) {
-    			return;
-    		}
-    	}
-    	
-        if ($typeId !== null && $this->factory->getEnvironment() == 'prod') { 	
-            //let's prevent some unnecessary DB calls
+        if ($type != "api.call") {
+            // only trigger actions for anonymous users
+            if (!$this->security->isAnonymous()) {
+                return;
+            }
+        }
+        
+        if ($typeId !== null && $this->factory->getEnvironment() == 'prod') {
+            // let's prevent some unnecessary DB calls
             $session = $this->factory->getSession();
             $triggeredEvents = $session->get('mautic.triggered.point.actions', array());
             if (in_array($typeId, $triggeredEvents)) {
@@ -167,68 +179,70 @@ class PointModel extends CommonFormModel
             $triggeredEvents[] = $typeId;
             $session->set('mautic.triggered.point.actions', $triggeredEvents);
         }
-
-        //find all the actions for published points
+        
+        // find all the actions for published points
         /** @var \Mautic\PointBundle\Entity\PointRepository $repo */
-        $repo            = $this->getRepository();
+        $repo = $this->getRepository();
         $availablePoints = $repo->getPublishedByType($type);
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel    = $this->factory->getModel('lead');
-        $ipAddress    = $this->factory->getIpAddress();
-
+        $leadModel = $this->factory->getModel('lead');
+        $ipAddress = $this->factory->getIpAddress();
+        
         if (null === $lead) {
             $lead = $leadModel->getCurrentLead();
-
+            
             if (null === $lead || !$lead->getId()) {
                 return;
             }
         }
         
-        //get available actions
+        // get available actions
         $availableActions = $this->getPointActions();
-
-        //get a list of actions that has already been performed on this lead
+        
+        // get a list of actions that has already been performed on this lead
         $completedActions = $repo->getCompletedLeadActions($type, $lead->getId());
-
+        
         $persist = array();
         foreach ($availablePoints as $action) {
-            //if it's already been done, then skip it
+            // if it's already been done, then skip it
             if (isset($completedActions[$action->getId()])) {
                 continue;
             }
-
-            //make sure the action still exists
+            
+            // make sure the action still exists
             if (!isset($availableActions['actions'][$action->getType()])) {
                 continue;
             }
             $settings = $availableActions['actions'][$action->getType()];
-
+            
             $args = array(
-                'action'      => array(
-                    'id'         => $action->getId(),
-                    'type'       => $action->getType(),
-                    'name'       => $action->getName(),
+                'action' => array(
+                    'id' => $action->getId(),
+                    'type' => $action->getType(),
+                    'name' => $action->getName(),
                     'properties' => $action->getProperties(),
-                    'points'     => $action->getDelta()
+                    'points' => $action->getDelta()
                 ),
-                'lead'        => $lead,
-                'factory'     => $this->factory,
+                'lead' => $lead,
+                'factory' => $this->factory,
                 'eventDetails' => $eventDetails
             );
-
-            $callback = (isset($settings['callback'])) ? $settings['callback'] :
-                array('\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction');
-
+            
+            $callback = (isset($settings['callback'])) ? $settings['callback'] : array(
+                '\\Mautic\\PointBundle\\Helper\\EventHelper',
+                'engagePointAction'
+            );
+            
             if (is_callable($callback)) {
                 if (is_array($callback)) {
                     $reflection = new \ReflectionMethod($callback[0], $callback[1]);
                 } elseif (strpos($callback, '::') !== false) {
-                    $parts      = explode('::', $callback);
+                    $parts = explode('::', $callback);
                     $reflection = new \ReflectionMethod($parts[0], $parts[1]);
                 } else {
                     $reflection = new \ReflectionMethod(null, $callback);
                 }
-
+                
                 $pass = array();
                 foreach ($reflection->getParameters() as $param) {
                     if (isset($args[$param->getName()])) {
@@ -236,27 +250,21 @@ class PointModel extends CommonFormModel
                     } else {
                         $pass[] = null;
                     }
-                }        
+                }
                 $pointsChange = $reflection->invokeArgs($this, $pass);
                 
                 if ($pointsChange) {
                     $delta = $action->getDelta();
                     $lead->addToPoints($delta);
                     $parsed = explode('.', $action->getType());
-                    $lead->addPointsChangeLogEntry(
-                        $parsed[0],
-                        $action->getId() . ": " . $action->getName(),
-                        $parsed[1],
-                        $delta,
-                        $ipAddress
-                    );
-
+                    $lead->addPointsChangeLogEntry($parsed[0], $action->getId() . ": " . $action->getName(), $parsed[1], $delta, $ipAddress);
+                    
                     $log = new LeadPointLog();
                     $log->setIpAddress($ipAddress);
                     $log->setPoint($action);
                     $log->setLead($lead);
                     $log->setDateFired(new \DateTime());
-
+                    
                     $persist[] = $log;
                 }
             }
@@ -265,7 +273,7 @@ class PointModel extends CommonFormModel
         if (!empty($persist)) {
             $leadModel->saveEntity($lead);
             $this->getRepository()->saveEntities($persist);
-
+            
             // Detach logs to reserve memory
             $this->em->clear('Mautic\PointBundle\Entity\LeadPointLog');
         }

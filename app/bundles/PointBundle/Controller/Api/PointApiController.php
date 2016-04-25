@@ -22,38 +22,50 @@ class PointApiController extends CommonApiController
 {
 
     /**
+     *
      * {@inheritdoc}
+     *
      */
-    public function initialize (FilterControllerEvent $event)
+    public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
-        $this->model            = $this->factory->getModel('point');
-        $this->entityClass      = 'Mautic\PointBundle\Entity\Point';
-        $this->entityNameOne    = 'point';
-        $this->entityNameMulti  = 'points';
-        $this->permissionBase   = 'point:points';
-        $this->serializerGroups = array('pointDetails', 'categoryList', 'publishDetails');
+        $this->model = $this->factory->getModel('point');
+        $this->entityClass = 'Mautic\PointBundle\Entity\Point';
+        $this->entityNameOne = 'point';
+        $this->entityNameMulti = 'points';
+        $this->permissionBase = 'point:points';
+        $this->serializerGroups = array(
+            'pointDetails',
+            'categoryList',
+            'publishDetails'
+        );
     }
-    
+
     /**
-     * 
-     * @param unknown $id
-     * @param unknown $leadId
-     * 
+     *
+     * @param unknown $id            
+     * @param unknown $leadId            
+     *
      * @return
+     *
      */
-    public function applyRuleAction ($id, $leadId) {	
-    	
-    	if (empty($id) || empty($leadId)) {
-    		return new JsonResponse(array("message" => "Vous devez avoir un id de règle de points et un id de lead", "success" => false));
-    	}
-    	   	
-    	$lead = $this->factory->getModel('lead')->getEntity($leadId);
- 
-    	$event = new ApiEvent($lead, $id);
-    	
-    	$this->factory->getDispatcher()->dispatch(ApiEvents::API_CALL_APPLYRULE, $event);
-    	
-    	return new JsonResponse(array("success" => true));
+    public function applyRuleAction($id, $leadId)
+    {
+        if (empty($id) || empty($leadId)) {
+            return new JsonResponse(array(
+                "message" => "Vous devez avoir un id de règle de points et un id de lead",
+                "success" => false
+            ));
+        }
+        
+        $lead = $this->factory->getModel('lead')->getEntity($leadId);
+        
+        $event = new ApiEvent($lead, $id);
+        
+        $this->factory->getDispatcher()->dispatch(ApiEvents::API_CALL_APPLYRULE, $event);
+        
+        return new JsonResponse(array(
+            "success" => true
+        ));
     }
 }
