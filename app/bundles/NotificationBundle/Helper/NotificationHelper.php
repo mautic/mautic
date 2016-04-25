@@ -101,7 +101,12 @@ class NotificationHelper
             $url
         );
 
-        $metadata['notification'] = $notification;
+        $metadata['notification'] = array(
+            'id' => $notification->getId(),
+            'name' => $notification->getName(),
+            'heading' => $notification->getHeading(),
+            'content' => $notification->getMessage()
+        );
 
         return $metadata;
     }

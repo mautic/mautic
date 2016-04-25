@@ -16,13 +16,7 @@ $notification = $data['notification'];
     <div class="figure"><span class="fa <?php echo isset($icons['notification']) ? $icons['notification'] : '' ?>"></span></div>
     <div class="panel">
         <div class="panel-body">
-            <h3>
-                <a href="<?php echo $view['router']->generate('mautic_notification_action',
-                    array("objectAction" => "preview", "objectId" => $notification->getId())); ?>"
-                   data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="<?php echo $view['translator']->trans('mautic.notification.notificationes.header.preview'); ?>" data-footer="false">
-                    <?php echo $notification->getName(); ?>
-                </a>
-            </h3>
+            <h3><?php echo $notification->getName(); ?></h3>
             <p class="mb-0"><?php echo $view['translator']->trans('mautic.core.timeline.event.time', array('%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel'])); ?></p>
         </div>
         <div class="panel-footer">
@@ -32,6 +26,12 @@ $notification = $data['notification'];
                 <dt><?php echo $view['translator']->trans('mautic.notification.timeline.type'); ?></dt>
                 <dd class="ellipsis"><?php echo $view['translator']->trans($data['type']); ?></dd>
             </dl>
+            <div class="small">
+                <hr />
+                <strong><?php echo $notification['heading']; ?></strong>
+                <br />
+                <?php echo $notification['content']; ?>
+            </div>
         </div>
     </div>
 </li>
