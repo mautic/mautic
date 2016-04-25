@@ -149,7 +149,6 @@ class Point extends FormEntity
                 array(
                     'id',
                     'name',
-                    'alias',
                     'category',
                     'type',
                     'description'

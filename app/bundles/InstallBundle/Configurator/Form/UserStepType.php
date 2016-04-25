@@ -147,7 +147,7 @@ class UserStepType extends AbstractType
                     new Assert\Length(
                         array(
                             'min'        => 6,
-                            'minMessage' => 'mautic.install.password.minlengt'
+                            'minMessage' => 'mautic.install.password.minlength'
                         )
                     )
                 )
