@@ -64,7 +64,7 @@ class OneSignalApi extends AbstractNotificationApi
      *                            ['en' => 'English Title', 'es' => 'Spanish Title']
      * @param string $url The URL where the user should be sent when clicking the notification
      *
-     * @return Response
+     * @return array
      *
      * @throws \Exception
      */
@@ -96,6 +96,11 @@ class OneSignalApi extends AbstractNotificationApi
             $data['url'] = $url;
         }
 
-        return $this->send('/notifications', $data);
+        $response = $this->send('/notifications', $data);
+
+        return array(
+            'status' => ($response->code === 200) ? 'mautic.notification.timeline.status.delivered' : 'mautic.notification.timeline.status.failed',
+            'type' => 'mautic.notification.timeline.type'
+        );
     }
 }

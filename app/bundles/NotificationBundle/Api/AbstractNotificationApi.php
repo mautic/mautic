@@ -53,7 +53,7 @@ abstract class AbstractNotificationApi
      * @param string|array $message
      * @param string|array $title
      *
-     * @return Response
+     * @return array
      */
     abstract public function sendNotification($id, $message, $title = '');
 

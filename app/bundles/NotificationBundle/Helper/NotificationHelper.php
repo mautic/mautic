@@ -94,11 +94,17 @@ class NotificationHelper
             )
         );
 
-        return $notificationApi->sendNotification(
+        $metadata = $notificationApi->sendNotification(
             $playerID,
             $notification->getMessage(),
             $notification->getHeading(),
             $url
         );
+
+        $metadata['notification'] = $notification;
+
+        return $metadata;
     }
 }
+
+
