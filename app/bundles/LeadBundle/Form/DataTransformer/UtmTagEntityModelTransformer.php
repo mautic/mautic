@@ -63,7 +63,7 @@ class UtmTagEntityModelTransformer implements DataTransformerInterface
                 return '';
             }
 
-            return $entity->getTag();
+            return $entity->getUtmTag();
         }
 
         if (is_null($entity) && !is_array($entity) && !$entity instanceof PersistentCollection) {
@@ -72,7 +72,7 @@ class UtmTagEntityModelTransformer implements DataTransformerInterface
 
         $return = array();
         foreach ($entity as $e) {
-            $return[] = $e->getTag();
+            $return[] = $e->getUtmTag();
         }
 
         return $return;

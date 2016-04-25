@@ -1093,6 +1093,11 @@ class LeadModel extends FormModel
             }
         }
 
+        $ipAddress = $this->factory->getIpAddress();
+        if ($this->factory->getRequest()->server->get('QUERY_STRING')) {
+            parse_str($this->factory->getRequest()->server->get('QUERY_STRING'), $query);
+        }
+
         if (!empty($utmTags)) {
             foreach($utmTags as $utmTag) {
                 if (is_numeric($utmTag)) {

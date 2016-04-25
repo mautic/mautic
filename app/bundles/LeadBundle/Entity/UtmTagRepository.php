@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\UtmTagBundle\Entity;
+namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -17,27 +17,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class UtmTagRepository extends CommonRepository
 {
-    /**
-     * Get array of published actions based on type
-     *
-     * @param string $type
-     *
-     * @return array
-     */
-    public function getUtmTagsByType($type)
-    {
-        $q = $this->createQueryBuilder('u')
-            ->select('partial u.{id, type, name, referrer}')
-            ->setParameter('type', $type);
 
-        //make sure the published up and down dates are good
-        $expr = $this->getPublishedByDateExpression($q);
-        $expr->add($q->expr()->eq('u.type', ':type'));
-
-        $q->where($expr);
-
-        return $q->getQuery()->getResult();
-    }
     /**
      * Delete orphan tags that are not associated with any lead
      */
@@ -48,10 +28,10 @@ class UtmTagRepository extends CommonRepository
 
         $havingQb->select('count(x.lead_id) as the_count')
             ->from(MAUTIC_TABLE_PREFIX.'lead_utmtags_xref', 'x')
-            ->where('x.tag_id = t.id');
+            ->where('x.utmtag_id = ut.id');
 
-        $qb->select('t.id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_utmtags', 't')
+        $qb->select('ut.id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_utmtags', 'ut')
             ->having(sprintf('(%s)', $havingQb->getSQL()) . ' = 0');
         $delete = $qb->execute()->fetch();
 
@@ -81,12 +61,12 @@ class UtmTagRepository extends CommonRepository
 
         array_walk($utmTags, create_function('&$val', 'if (strpos($val, "-") === 0) $val = substr($val, 1);'));
         $qb = $this->_em->createQueryBuilder()
-            ->select('t')
-            ->from('MauticLeadBundle:UtmTag', 't', 't.utmtag');
+            ->select('ut')
+            ->from('MauticLeadBundle:UtmTag', 'ut', 'ut.utmtag');
 
         if ($utmTags) {
             $qb->where(
-                $qb->expr()->in('t.utmtag', ':utmtags')
+                $qb->expr()->in('ut.utmtag', ':utmtags')
             )
                 ->setParameter('utmtags', $utmTags);
         }

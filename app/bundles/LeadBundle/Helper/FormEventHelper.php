@@ -11,6 +11,7 @@ namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 
 /**
@@ -75,31 +76,13 @@ class FormEventHelper
      * @param $action
      * @param $factory
      */
-    public static function addUtmTags ($action, $factory)
+    public static function addUtmTags ($action, $factory,$config)
     {
         $properties = $action->getProperties();
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel  = $factory->getModel('lead');
         $lead       = $leadModel->getCurrentLead();
-
-       
-
-        //create a new points change event
-        $event = new PointsChangeLog();
-        $event->setType('form');
-        $event->setEventName($form->getId() . ":" . $form->getName());
-        $event->setActionName($action->getName());
-        $event->setIpAddress($factory->getIpAddress());
-        $event->setDateAdded(new \DateTime());
-
-        $event->setDelta($config['name']);
-        $event->setLead($lead);
-
-        $lead->addPointsChangeLog($event);
-        $lead->addToPoints($config['points']);
-
-        $model->saveEntity($lead, false);
 
         $leadModel->modifyUtmTags($lead, $config['name']);
     }

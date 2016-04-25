@@ -83,6 +83,12 @@ class UtmTag
     /**
      * @var string
      */
+    private $utmValue;
+
+
+    /**
+     * @var string
+     */
     private $remoteHost;
 
     /**
@@ -98,42 +104,12 @@ class UtmTag
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('tmutmtags')
-            ->setCustomRepositoryClass('Mautic\UtmTagBundle\Entity\UtmTagRepository')
-            ->addIndex(array('type'), 'tmutmtag_type_search');
-
+        $builder->setTable('lead_utmtags')
+            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\UtmTagRepository')
+            ->addIndex(array('utmTag'), 'lead_utmtag_search');
+        
         $builder->addId();
-
-        $builder->createField('type', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->addPublishDates();
-
-        $builder->addField('referrer', 'string');
-
-        $builder->addLead(true, 'SET NULL');
-
-        $builder->createField('url', 'text')
-            ->nullable()
-            ->build();
-
-        $builder->createField('urlTitle', 'string')
-            ->columnName('url_title')
-            ->nullable()
-            ->build();
-
-        $builder->createField('userAgent', 'text')
-            ->columnName('user_agent')
-            ->nullable()
-            ->build();
-
-        $builder->createField('remoteHost', 'string')
-            ->columnName('remote_host')
-            ->nullable()
-            ->build();
-
-        $builder->addNullableField('query', 'array');
+        $builder->addField('utmTag', 'string');
     }
 
 
@@ -156,6 +132,8 @@ class UtmTag
                     'url',
                     'urlTitle',
                     'userAgent',
+                    'utmTag',
+                    'utmValue',
                     'remoteHost',
                     'query'
                 )
@@ -386,7 +364,7 @@ class UtmTag
 
     /**
      * Set publishUp
-     *
+     *its peppa pig for me (which I feel to send on a vacation
      * @param \DateTime $publishUp
      *
      * @return Point
@@ -456,6 +434,46 @@ class UtmTag
     public function getUrlTitle()
     {
         return $this->urlTitle;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUtmTag()
+    {
+        return $this->utmTag;
+    }
+
+    /**
+     * @param array $query
+     *
+     * @return Hit
+     */
+    public function setUtmTag($utmTag)
+    {
+        $this->utmTag = $utmTag;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUtmValue()
+    {
+        return $this->utmValue;
+    }
+
+    /**
+     * @param array $query
+     *
+     * @return Hit
+     */
+    public function setUtmValue($utmValue)
+    {
+        $this->utmValue = $utmValue;
+
+        return $this;
     }
 
 }

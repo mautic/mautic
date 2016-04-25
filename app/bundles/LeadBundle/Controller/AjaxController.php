@@ -561,6 +561,53 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
+    protected function addLeadUtmTagsAction(Request $request)
+    {
+        $utmTags = $request->request->get('utmtags');
+        $utmTags = json_decode($utmTags, true);
+
+        if (is_array($utmTags)) {
+            $newUtmTags = array();
+            foreach ($utmTags as $utmTag) {
+                if (!is_numeric($utmTag)) {
+                    // New tag
+                    $utmTagEntity = new UtmTag();
+                    $utmTagEntity->setTag(InputHelper::clean($utmTag));
+                    $newUtmTags[] = $utmTagEntity;
+                }
+            }
+
+            $leadModel = $this->factory->getModel('lead');
+
+            if (!empty($newUtmTags)) {
+                $leadModel->getUtmTagRepository()->saveEntities($newUtmTags);
+            }
+
+            // Get an updated list of tags
+            $allUtmTags    = $leadModel->getUtmTagRepository()->getSimpleList(null, array(), 'utmtag');
+            $utmTagOptions = '';
+
+            foreach ($allUtmTags as $utmTag) {
+                $selected = (in_array($utmTag['value'], $utmTags) || in_array($utmTag['label'], $utmTags)) ? ' selected="selected"' : '';
+                $utmTagOptions .= '<option'.$selected.' value="'.$utmTag['value'].'">'.$utmTag['label'].'</option>';
+            }
+
+            $data = array(
+                'success' => 1,
+                'tags'    => $utmTagOptions
+            );
+        } else {
+            $data = array('success' => 0);
+        }
+
+        return $this->sendJsonResponse($data);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     protected function reorderAction(Request $request)
     {
         $dataArray   = array('success' => 0);
