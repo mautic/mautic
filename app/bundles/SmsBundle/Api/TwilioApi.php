@@ -59,14 +59,24 @@ class TwilioApi extends AbstractSmsApi
      * @param string $number
      * @param string $content
      *
-     * @return \Services_Twilio_Rest_Message
+     * @return array
      */
     public function sendSms($number, $content)
     {
-        return $this->client->account->messages->sendMessage(
-            $this->sendingPhoneNumber,
-            $this->sanitizeNumber($number),
-            $content
+        try
+        {
+            $response = $this->client->account->messages->sendMessage(
+                $this->sendingPhoneNumber,
+                $this->sanitizeNumber($number),
+                $content
+            );
+        } catch (\Services_Twilio_RestException $e) {
+            $response = false;
+        }
+
+        return array(
+            'status' => ($response instanceof \Services_Twilio_Rest_Message) ? 'mautic.sms.timeline.status.delivered' : 'mautic.sms.timeline.status.failed',
+            'type' => 'mautic.sms.sms'
         );
     }
 }

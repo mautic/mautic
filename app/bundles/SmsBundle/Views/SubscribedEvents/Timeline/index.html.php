@@ -7,7 +7,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$sms = $event['extra']['sms'];
+
+$data = $event['extra']['log']['metadata'];
+$sms = $data['sms'];
 ?>
 
 <li class="wrapper form-submitted">
@@ -23,15 +25,13 @@ $sms = $event['extra']['sms'];
             </h3>
             <p class="mb-0"><?php echo $view['translator']->trans('mautic.core.timeline.event.time', array('%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel'])); ?></p>
         </div>
-        <?php if (isset($event['extra'])) : ?>
-            <div class="panel-footer">
-                <dl class="dl-horizontal">
-                    <?php if (isset($link)) : ?>
-                        <dt><?php echo $view['translator']->trans('mautic.core.channel'); ?></dt>
-                        <dd class="ellipsis"><?php echo $view['translator']->trans('mautic.sms.sms'); ?></dd>
-                    <?php endif; ?>
-                </dl>
-            </div>
-        <?php endif; ?>
+        <div class="panel-footer">
+            <dl class="dl-horizontal">
+                <dt><?php echo $view['translator']->trans('mautic.sms.timeline.status'); ?></dt>
+                <dd class="ellipsis"><?php echo $view['translator']->trans($data['status']); ?></dd>
+                <dt><?php echo $view['translator']->trans('mautic.sms.timeline.type'); ?></dt>
+                <dd class="ellipsis"><?php echo $view['translator']->trans($data['type']); ?></dd>
+            </dl>
+        </div>
     </div>
 </li>

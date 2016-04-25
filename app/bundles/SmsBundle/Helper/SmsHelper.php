@@ -120,6 +120,9 @@ class SmsHelper
 
         $dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $event);
 
-        return $smsApi->sendSms($leadPhoneNumber, $event->getContent());
+        $metadata = $smsApi->sendSms($leadPhoneNumber, $event->getContent());
+        $metadata['sms'] = $sms;
+        
+        return $metadata;
     }
 }
