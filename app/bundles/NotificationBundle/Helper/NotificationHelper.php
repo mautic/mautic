@@ -105,14 +105,19 @@ class NotificationHelper
             $url
         );
 
-        $metadata['notification'] = array(
+        // If for some reason the call failed, tell mautic to try again by return false        
+        if ($metadata === false) {
+            return false;
+        }
+        
+        return array(
+            'status' => 'mautic.notification.timeline.status.delivered',
+            'type' => 'mautic.notification.notification',
             'id' => $notification->getId(),
             'name' => $notification->getName(),
             'heading' => $notification->getHeading(),
             'content' => $notification->getMessage()
         );
-
-        return $metadata;
     }
 }
 

@@ -97,10 +97,7 @@ class OneSignalApi extends AbstractNotificationApi
         }
 
         $response = $this->send('/notifications', $data);
-
-        return array(
-            'status' => ($response->code === 200) ? 'mautic.notification.timeline.status.delivered' : 'mautic.notification.timeline.status.failed',
-            'type' => 'mautic.notification.notification'
-        );
+        
+        return $response === 200;
     }
 }
