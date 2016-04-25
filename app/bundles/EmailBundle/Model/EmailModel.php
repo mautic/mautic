@@ -1277,7 +1277,10 @@ class EmailModel extends FormModel
      */
     public function removeDoNotContact($email)
     {
-        $this->getRepository()->removeFromDoNotEmailList($email);
+        $repo = $this->getRepository();
+
+        $repo->setFactory($this->factory);
+        $repo->removeFromDoNotEmailList($email);
     }
 
     /**
