@@ -415,7 +415,7 @@ Mautic.addLeadListFilter = function (elId) {
         }).remove();
     } else if (typeof operators.exclude != 'undefined') {
         mQuery('#' + filterIdBase + 'operator option').filter(function () {
-            return mQuery.inArray(mQuery(this).val(), operators['exclude']) > 0
+            return mQuery.inArray(mQuery(this).val(), operators['exclude']) !== -1
         }).remove();
     }
 
