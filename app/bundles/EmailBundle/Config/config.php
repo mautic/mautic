@@ -198,7 +198,7 @@ return array(
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'arguments' => array(
                     '%mautic.mailer_amazon_region%'
-                    ),
+                ),
                 'methodCalls'  => array(
                     'setUsername' => array('%mautic.mailer_user%'),
                     'setPassword' => array('%mautic.mailer_password%')
