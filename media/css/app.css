@@ -476,7 +476,7 @@ h4{padding:10px
 .dropdown{position:absolute;top:6px;right:3px}.card-header .dropdown-toggle .fa-ellipsis-v{font-size:15px;color:rgba(0, 0, 0, 0.6);width:30px;text-align:center;line-height:30px}.card-header
 h4{width:90%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.card
 table{table-layout:fixed}.card table
-td{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.card table td:last-child{width:30px}@media (max-width: 700px){.card{width:100% !important}}.card:hover,.card:focus{background:white;-moz-box-shadow:rgba(0, 0, 0, 0.45) 0px 0px 10px 0px;-webkit-box-shadow:rgba(0, 0, 0, 0.45) 0px 0px 10px 0px;box-shadow:rgba(0, 0, 0, 0.45) 0px 0px 10px 0px}.chart-wrapper{position:relative}.legend{background:#000;opacity:0;position:absolute;bottom:-17px;width:100%;-moz-border-radius:0 0 4px 4px;-webkit-border-radius:0 0 4px 4px;border-radius:0 0 4px 4px;color:#fff;-webkit-transition:all 0.3s ease-in-out}.card:hover
+td{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.card table td:last-child{width:30px}@media (max-width: 700px){.card{width:100% !important}}.card:hover,.card:focus{background:white;-moz-box-shadow:rgba(0, 0, 0, 0) 0px 0px 10px 0px;-webkit-box-shadow:rgba(0, 0, 0, 0) 0px 0px 10px 0px;box-shadow:rgba(0, 0, 0, 0) 0px 0px 10px 0px}.chart-wrapper{position:relative}.legend{background:#000;opacity:0;position:absolute;bottom:-17px;width:100%;-moz-border-radius:0 0 4px 4px;-webkit-border-radius:0 0 4px 4px;border-radius:0 0 4px 4px;color:#fff;-webkit-transition:all 0.3s ease-in-out}.card:hover
 .legend{opacity:0.8}.legend
 ul{list-style:none;margin:0;padding:5px
 0}.legend

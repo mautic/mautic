@@ -92,9 +92,9 @@
 }
 .card:hover, .card:focus {
     background: white;
-    -moz-box-shadow: rgba(0, 0, 0, 0.45) 0px 0px 10px 0px;
-    -webkit-box-shadow: rgba(0, 0, 0, 0.45) 0px 0px 10px 0px;
-    box-shadow: rgba(0, 0, 0, 0.45) 0px 0px 10px 0px;
+    -moz-box-shadow: rgba(0, 0, 0, 0) 0px 0px 10px 0px;
+    -webkit-box-shadow: rgba(0, 0, 0, 0) 0px 0px 10px 0px;
+    box-shadow: rgba(0, 0, 0, 0) 0px 0px 10px 0px;
 }
 .chart-wrapper {
     position: relative;
