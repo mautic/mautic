@@ -51,7 +51,7 @@ class NotificationHelper
      * @param Lead $lead
      * @param MauticFactory $factory
      *
-     * @return boolean
+     * @return array
      */
     public static function send(array $config, Lead $lead, MauticFactory $factory)
     {
@@ -59,7 +59,7 @@ class NotificationHelper
         $leadModel = $factory->getModel('lead.lead');
 
         if ($leadModel->isContactable($lead, 'notification') !== DoNotContact::IS_CONTACTABLE) {
-            return false;
+            return array('failed' => 1);
         }
 
         // If lead has subscribed on multiple devices, get all of them.
@@ -70,6 +70,10 @@ class NotificationHelper
 
         foreach ($pushIDs as $pushID) {
             $playerID[] = $pushID->getPushID();
+        }
+
+        if (empty($playerID)) {
+            return array('failed' => 1);
         }
 
         /** @var \Mautic\NotificationBundle\Api\AbstractNotificationApi $notification */
@@ -83,7 +87,7 @@ class NotificationHelper
         $notification = $notificationModel->getEntity($notificationId);
 
         if ($notification->getId() !== $notificationId) {
-            return false;
+            return array('failed' => 1);
         }
 
         $url = $notificationApi->convertToTrackedUrl(
