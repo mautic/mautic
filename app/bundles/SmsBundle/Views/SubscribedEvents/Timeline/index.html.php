@@ -9,6 +9,11 @@
 
 
 $data = $event['extra']['log']['metadata'];
+
+if (isset($data['failed'])) {
+    return;
+}
+
 $sms = $data['sms'];
 ?>
 

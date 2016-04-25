@@ -65,18 +65,15 @@ class TwilioApi extends AbstractSmsApi
     {
         try
         {
-            $response = $this->client->account->messages->sendMessage(
+            $this->client->account->messages->sendMessage(
                 $this->sendingPhoneNumber,
                 $this->sanitizeNumber($number),
                 $content
             );
+            
+            return true;
         } catch (\Services_Twilio_RestException $e) {
-            $response = false;
+            return false;
         }
-
-        return array(
-            'status' => ($response instanceof \Services_Twilio_Rest_Message) ? 'mautic.sms.timeline.status.delivered' : 'mautic.sms.timeline.status.failed',
-            'type' => 'mautic.sms.sms'
-        );
     }
 }

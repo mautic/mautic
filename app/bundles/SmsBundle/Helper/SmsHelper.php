@@ -89,7 +89,7 @@ class SmsHelper
         $leadModel = $factory->getModel('lead.lead');
 
         if ($leadModel->isContactable($lead, 'sms') !== DoNotContact::IS_CONTACTABLE) {
-            return false;
+            return array('failed' => 1);
         }
 
         $leadPhoneNumber = $lead->getFieldValue('mobile');
@@ -99,7 +99,7 @@ class SmsHelper
         }
 
         if (empty($leadPhoneNumber)) {
-            return false;
+            return array('failed' => 1);
         }
 
         /** @var \Mautic\SmsBundle\Api\AbstractSmsApi $sms */
@@ -111,7 +111,7 @@ class SmsHelper
         $sms = $smsModel->getEntity($smsId);
 
         if ($sms->getId() !== $smsId) {
-            return false;
+            return array('failed' => 1);
         }
 
         $dispatcher = $factory->getDispatcher();
@@ -121,12 +121,18 @@ class SmsHelper
         $dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $event);
 
         $metadata = $smsApi->sendSms($leadPhoneNumber, $event->getContent());
-        $metadata['sms'] = array(
+
+        // If there was a problem sending at this point, it's an API problem and should be requeued
+        if ($metadata === false) {
+            return false;
+        }
+
+        return array(
+            'type' => 'mautic.sms.sms',
+            'status' => 'mautic.sms.timeline.status.delivered',
             'id' => $sms->getId(),
             'name' => $sms->getName(),
             'content' => $event->getContent()
         );
-        
-        return $metadata;
     }
 }
