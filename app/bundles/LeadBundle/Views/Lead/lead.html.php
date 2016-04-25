@@ -221,6 +221,16 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                     </a>
                 </li>
                 <?php endif; ?>
+                <?php if ($places): ?>
+                <li class="">
+                    <a href="#place-container" role="tab" data-toggle="tab" id="load-lead-map">
+                        <span class="label label-primary mr-sm" id="PlaceCount">
+                            <?php echo count($places); ?>
+                        </span>
+                        <?php echo $view['translator']->trans('mautic.lead.lead.tab.places'); ?>
+                    </a>
+                </li>
+                <?php endif; ?>
             </ul>
             <!--/ tabs controls -->
         </div>
@@ -249,6 +259,14 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             </div>
             <?php endif; ?>
             <!--/ #social-container -->
+
+            <!-- #place-container -->
+            <?php if ($places): ?>
+            <div class="tab-pane fade bdr-w-0" id="place-container">
+                <?php echo $view->render('MauticLeadBundle:Lead:map.html.php', array('places' => $places)); ?>
+            </div>
+            <?php endif; ?>
+            <!--/ #place-container -->
         </div>
         <!--/ end: tab-content -->
     </div>
