@@ -141,29 +141,32 @@ return array(
         )
         
     ),
-    'menu' => array(
+    'menu'     => array(
         'main' => array(
-            'priority' => 5,
-            'items' => array(
+            'priority' => 80,
+            'items'    => array(
                 'mautic.lead.leads' => array(
-                    'id' => 'menu_lead_parent',
+                    'id'        => 'menu_lead_contact',
                     'iconClass' => 'fa-user',
-                    'access' => array(
-                        'lead:leads:viewown',
-                        'lead:leads:viewother'
-                    ),
-                    'children' => array(
-                        'mautic.lead.lead.menu.index' => array(
-                            'route' => 'mautic_lead_index'
-                        ),
-                        'mautic.lead.list.menu.index' => array(
-                            'route' => 'mautic_leadlist_index'
-                        ),
-                        'mautic.lead.field.menu.index' => array(
-                            'route' => 'mautic_leadfield_index',
-                            'access' => 'lead:fields:full'
-                        )
-                    )
+                    'access'    => array('lead:leads:viewown', 'lead:leads:viewother'),
+                    'route' => 'mautic_lead_index'
+                ),
+                'mautic.lead.list.menu.index'  => array(
+                    'id'        => 'menu_lead_segment',
+                    'iconClass' => 'fa-pie-chart',
+                    'access'    => array('lead:leads:viewown', 'lead:leads:viewother'),
+                    'route' => 'mautic_leadlist_index',
+                )
+            )
+        ),
+        'admin' => array(
+            'priority' => 50,
+            'items'    => array(
+                'mautic.lead.field.menu.index' => array(
+                    'id'        => 'mautic_lead_field',
+                    'iconClass' => 'fa-list',
+                    'route'  => 'mautic_leadfield_index',
+                    'access' => 'lead:fields:full'
                 )
             )
         )
@@ -200,7 +203,10 @@ return array(
             ),
             'mautic.webhook.subscriber' => array(
                 'class' => 'Mautic\LeadBundle\EventListener\WebhookSubscriber'
-            )
+            ),
+            'mautic.lead.dashboard.subscriber'      => array(
+                'class' => 'Mautic\LeadBundle\EventListener\DashboardSubscriber'
+            ),
         ),
         'forms' => array(
             'mautic.form.type.lead' => array(
@@ -319,6 +325,10 @@ return array(
                 'class' => 'Mautic\LeadBundle\Form\Type\LeadFieldsType',
                 'arguments' => 'mautic.factory',
                 'alias' => 'leadfields_choices'
+            ),
+            'mautic.form.type.lead_dashboard_leads_in_time_widget'  => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\DashboardLeadsInTimeWidgetType',
+                'alias'     => 'lead_dashboard_leads_in_time_widget'
             )
         ),
         'other' => array(

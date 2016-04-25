@@ -53,27 +53,6 @@ class LeadType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('lead.lead', $options));
 
         if (!$options['isShortForm']) {
-            $transformer = new IdToEntityModelTransformer(
-                $this->factory->getEntityManager(),
-                'MauticUserBundle:User'
-            );
-            $builder->add(
-                $builder->create(
-                    'owner',
-                    'user_list',
-                    array(
-                        'label'      => 'mautic.lead.lead.field.owner',
-                        'label_attr' => array('class' => 'control-label'),
-                        'attr'       => array(
-                            'class' => 'form-control'
-                        ),
-                        'required'   => false,
-                        'multiple'   => false
-                    )
-                )
-                    ->addModelTransformer($transformer)
-            );
-
             $imageChoices = array(
                 'gravatar' => 'Gravatar',
                 'custom'   => 'mautic.lead.lead.field.custom_avatar'
@@ -130,6 +109,7 @@ class LeadType extends AbstractType
 
         $fieldValues = (!empty($options['data'])) ? $options['data']->getFields() : array('filter' => array('isVisible' => true));
         foreach ($options['fields'] as $field) {
+            if ($field['isPublished'] === false) continue;
             $attr        = array('class' => 'form-control');
             $properties  = $field['properties'];
             $type        = $field['type'];
@@ -299,6 +279,28 @@ class LeadType extends AbstractType
                     'onchange'              => 'Mautic.createLeadTag(this)'
                 )
             )
+        );
+
+        $transformer = new IdToEntityModelTransformer(
+            $this->factory->getEntityManager(),
+            'MauticUserBundle:User'
+        );
+
+        $builder->add(
+            $builder->create(
+                'owner',
+                'user_list',
+                array(
+                    'label'      => 'mautic.lead.lead.field.owner',
+                    'label_attr' => array('class' => 'control-label'),
+                    'attr'       => array(
+                        'class' => 'form-control'
+                    ),
+                    'required'   => false,
+                    'multiple'   => false
+                )
+            )
+            ->addModelTransformer($transformer)
         );
 
         if (!$options['isShortForm']) {

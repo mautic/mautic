@@ -18,6 +18,8 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -355,7 +357,7 @@ class SubmissionModel extends CommonFormModel
             $leadId        = $lead->getId();
             $currentFields = $model->flattenFields($lead->getFields());
 
-            $logger->debug('FORM: Not in kiosk mode so using current lead ID #' . $lead->getId());
+            $logger->debug('FORM: Not in kiosk mode so using current contact ID #' . $lead->getId());
         } else {
             // Default to a new lead in kiosk mode
             $lead = new Lead();
@@ -364,7 +366,7 @@ class SubmissionModel extends CommonFormModel
 
             $leadId = null;
 
-            $logger->debug('FORM: In kiosk mode so assuming a new lead');
+            $logger->debug('FORM: In kiosk mode so assuming a new contact');
         }
 
         $uniqueLeadFields = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
@@ -425,7 +427,7 @@ class SubmissionModel extends CommonFormModel
             /** @var \Mautic\LeadBundle\Entity\Lead $foundLead */
             $foundLead = $leads[0];
 
-            $logger->debug('FORM: Testing lead ID# ' . $foundLead->getId() . ' for conflicts');
+            $logger->debug('FORM: Testing contact ID# ' . $foundLead->getId() . ' for conflicts');
 
             // Check for a conflict with the currently tracked lead
             $foundLeadFields =  $model->flattenFields($foundLead->getFields());
@@ -445,7 +447,7 @@ class SubmissionModel extends CommonFormModel
                 }
 
             } else {
-                $logger->debug('FORM: Merging leads ' . $lead->getId() . ' and ' . $foundLead->getId());
+                $logger->debug('FORM: Merging contacts ' . $lead->getId() . ' and ' . $foundLead->getId());
 
                 // Merge the found lead with currently tracked lead
                 $lead = $model->mergeLeads($lead, $foundLead);
@@ -460,15 +462,15 @@ class SubmissionModel extends CommonFormModel
             // Check for conflicts with the submitted data and the currently tracked lead
             list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsWithData, $uniqueFieldsCurrent);
 
-            $logger->debug('FORM: Current unique lead fields ' . implode(', ', array_keys($uniqueFieldsCurrent)) . ' = ' . implode(', ', $uniqueFieldsCurrent));
+            $logger->debug('FORM: Current unique contact fields ' . implode(', ', array_keys($uniqueFieldsCurrent)) . ' = ' . implode(', ', $uniqueFieldsCurrent));
 
-            $logger->debug('FORM: Submitted unique lead fields ' . implode(', ', array_keys($uniqueFieldsWithData)) . ' = ' . implode(', ', $uniqueFieldsWithData));
+            $logger->debug('FORM: Submitted unique contact fields ' . implode(', ', array_keys($uniqueFieldsWithData)) . ' = ' . implode(', ', $uniqueFieldsWithData));
             if ($hasConflict) {
                 // There's a conflict so create a new lead
                 $lead = new Lead();
                 $lead->setNewlyCreated(true);
 
-                $logger->debug('FORM: Conflicts found in ' . implode(', ' , $conflicts) . ' between current tracked lead and submitted data so assuming a new lead');
+                $logger->debug('FORM: Conflicts found in ' . implode(', ' , $conflicts) . ' between current tracked contact and submitted data so assuming a new contact');
             }
         }
 
@@ -479,7 +481,7 @@ class SubmissionModel extends CommonFormModel
         if ($lead->isNewlyCreated()) {
             if (!$inKioskMode) {
                 $lead->addIpAddress($ipAddress);
-                $logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to lead');
+                $logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to contact');
             }
 
         } elseif (!$inKioskMode) {
@@ -487,7 +489,7 @@ class SubmissionModel extends CommonFormModel
             if (!$leadIpAddresses->contains($ipAddress)) {
                 $lead->addIpAddress($ipAddress);
 
-                $logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to lead');
+                $logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to contact');
             }
         }
 
@@ -682,5 +684,105 @@ class SubmissionModel extends CommonFormModel
             default:
                 return new Response();
         }
+    }
+
+    /**
+     * Get line chart data of submissions
+     *
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $dateFormat
+     * @param array    $filter
+     * @param boolean  $canViewOthers
+     *
+     * @return array
+     */
+    public function getSubmissionsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
+    {
+        $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $q = $query->prepareTimeDataQuery('form_submissions', 'date_submitted', $filter);
+
+        if (!$canViewOthers) {
+            $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
+                ->andWhere('f.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $data = $query->loadAndBuildTimeData($q);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.form.submission.count'), $data);
+        return $chart->render();
+    }
+
+    /**
+     * Get a list of top submission referrers
+     *
+     * @param integer $limit
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     * @param boolean $canViewOthers
+     *
+     * @return array
+     */
+    public function getTopSubmissionReferrers($limit = 10, $dateFrom = null, $dateTo = null, $filters = array(), $canViewOthers = true)
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(DISTINCT t.id) AS submissions, t.referer')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 't')
+            ->orderBy('submissions', 'DESC')
+            ->groupBy('t.referer')
+            ->setMaxResults($limit);
+
+        if (!$canViewOthers) {
+            $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
+                ->andWhere('f.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_submitted');
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
+     * Get a list of the most submisions per lead
+     *
+     * @param integer $limit
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     * @param boolean $canViewOthers
+     *
+     * @return array
+     */
+    public function getTopSubmitters($limit = 10, $dateFrom = null, $dateTo = null, $filters = array(), $canViewOthers = true)
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(DISTINCT t.id) AS submissions, t.lead_id, l.firstname, l.lastname, l.email')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 't')
+            ->join('t', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id')
+            ->orderBy('submissions', 'DESC')
+            ->groupBy('t.lead_id, l.firstname, l.lastname, l.email')
+            ->setMaxResults($limit);
+
+        if (!$canViewOthers) {
+            $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
+                ->andWhere('f.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_submitted');
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
     }
 }

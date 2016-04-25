@@ -350,7 +350,9 @@ class AjaxController extends CommonAjaxController
                 case 'smtp':
                     $mailer = new \Swift_SmtpTransport($settings['host'], $settings['port'], $settings['encryption']);
                     break;
-
+                case 'mautic.transport.amazon':
+                    $mailer = new AmazonTransport($settings['amazon_region']);
+                    break;
                 default:
                     if ($this->container->has($transport)) {
                         $mailer = $this->container->get($transport);

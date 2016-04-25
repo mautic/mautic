@@ -35,27 +35,6 @@ $edit   = $security->hasEntityAccess($permissions['lead:leads:editown'], $permis
 
 $buttons = array();
 
-if ($edit) {
-    $buttons[] = array(
-        'attr' => array(
-            'href' => $view['router']->generate( 'mautic_lead_action', array('objectId' => $lead->getId(), 'objectAction' => 'edit'))
-        ),
-        'btnText'   => $view['translator']->trans('mautic.core.form.edit'),
-        'iconClass' => 'fa fa-pencil-square-o'
-    );
-
-    $buttons[] = array(
-        'attr'      => array(
-            'id'          => 'addNoteButton',
-            'data-toggle' => 'ajaxmodal',
-            'data-target' => '#MauticSharedModal',
-            'data-header' => $view['translator']->trans('mautic.lead.note.header.new'),
-            'href'        => $view['router']->generate('mautic_leadnote_action', array('leadId' => $lead->getId(), 'objectAction' => 'new', 'leadId' => $lead->getId()))
-        ),
-        'btnText'   => $view['translator']->trans('mautic.lead.add.note'),
-        'iconClass' => 'fa fa-file-o'
-    );
-}
 
 if (!empty($fields['core']['email']['value'])) {
     $buttons[] = array(
@@ -80,8 +59,9 @@ $buttons[] = array(
         'href' => $view['router']->generate( 'mautic_lead_action', array("objectId" => $lead->getId(), "objectAction" => "list")),
     ),
     'btnText'   => $view['translator']->trans('mautic.lead.lead.lists'),
-    'iconClass' => 'fa fa-list'
+    'iconClass' => 'fa fa-pie-chart'
 );
+
 
 if ($security->isGranted('campaign:campaigns:edit')) {
     $buttons[] = array(
@@ -97,15 +77,6 @@ if ($security->isGranted('campaign:campaigns:edit')) {
     );
 }
 
-if ($security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $lead->getOwner())) {
-    $buttons[] = array(
-        'confirm'      => array(
-            'message'       => $view["translator"]->trans('mautic.lead.lead.form.confirmdelete', array('%name%' => $lead->getName() . ' (' . $lead->getId() . ')')),
-            'confirmAction' => $view['router']->generate('mautic_lead_action', array_merge(array('objectAction' => 'delete', 'objectId' => $lead->getId()))),
-            'template'      => 'delete'
-        )
-    );
-}
 
 if (($security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $lead->getOwner())) && $edit) {
 
@@ -126,7 +97,12 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'item'       => $lead,
     'routeBase'  => 'lead',
     'langVar'    => 'lead.lead',
-    'customButtons' => $buttons
+    'customButtons' => $buttons,
+    'templateButtons' => array(
+        'edit'        => $security->hasEntityAccess($permissions['lead:leads:editown'], $permissions['lead:leads:editother'], $lead->getCreatedBy()),
+        'delete'      => $security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $lead->getOwner()),
+        'close'       => $security->hasEntityAccess($permissions['lead:leads:viewown'], $permissions['lead:leads:viewother'], $lead->getCreatedBy())
+    ),
 )));
 ?>
 
@@ -202,24 +178,16 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                     <div class="col-sm-12">
                         <div class="panel">
                             <div class="panel-body box-layout">
-                                <div class="col-xs-4 va-m">
+                                <div class="col-xs-8 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
                                         <?php echo $view['translator']->trans('mautic.lead.field.header.engagements'); ?>
                                     </h5>
-                                </div>
-                                <div class="col-xs-4 text-center">
-                                    <div id="engagement-legend" class="legend-container"></div>
                                 </div>
                                 <div class="col-xs-4 va-t text-right">
                                     <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
                                 </div>
                             </div>
-                            <div class="pt-0 pl-15 pb-10 pr-15">
-                                <div>
-                                    <canvas class="chart" id="chart-engagement" height="250"></canvas>
-                                </div>
-                            </div>
-                            <div id="chart-engagement-data" class="hide"><?php echo json_encode($engagementData); ?></div>
+                            <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $engagementData, 'chartType' => 'line', 'chartHeight' => 250)); ?>
                         </div>
                     </div>
                 </div>
@@ -394,7 +362,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                         <div class="media-body">
                             <?php $link = '<a href="' . $view['router']->generate('mautic_campaign_action', array("objectAction" => "view", "objectId" => $event['campaign_id'])) . '" data-toggle="ajax">' . $event['campaign_name'] . '</a>'; ?>
                             <?php echo $view['translator']->trans('mautic.lead.lead.upcoming.event.triggered.at', array('%event%' => $event['event_name'], '%link%' => $link)); ?>
-                            <p class="fs-12 dark-sm"><?php echo $view['date']->toFull($event['triggerDate']); ?></p>
+                            <p class="fs-12 dark-sm"><?php echo $view['date']->toFull($event['trigger_date']); ?></p>
                         </div>
                     </li>
                     <?php endforeach; ?>

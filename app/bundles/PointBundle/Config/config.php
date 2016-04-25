@@ -56,24 +56,21 @@ return array(
         )
     ),
     
-    'menu' => array(
+    'menu'     => array(
         'main' => array(
-            'priority' => 25,
-            'items' => array(
+            'priority' => 40,
+            'items'    => array(
                 'mautic.points.menu.root' => array(
-                    'id' => 'mautic_points_root',
+                    'id'        => 'mautic_points_root',
                     'iconClass' => 'fa-calculator',
-                    'access' => array(
-                        'point:points:view',
-                        'point:triggers:view'
-                    ),
-                    'children' => array(
-                        'mautic.point.menu.index' => array(
-                            'route' => 'mautic_point_index',
+                    'access'    => array('point:points:view', 'point:triggers:view'),
+                    'children'  => array(
+                        'mautic.point.menu.index'         => array(
+                            'route'  => 'mautic_point_index',
                             'access' => 'point:points:view'
                         ),
                         'mautic.point.trigger.menu.index' => array(
-                            'route' => 'mautic_pointtrigger_index',
+                            'route'  => 'mautic_pointtrigger_index',
                             'access' => 'point:triggers:view'
                         )
                     )
@@ -96,7 +93,10 @@ return array(
             ),
             'mautic.point.search.subscriber' => array(
                 'class' => 'Mautic\PointBundle\EventListener\SearchSubscriber'
-            )
+            ),
+            'mautic.point.dashboard.subscriber'  => array(
+                'class' => 'Mautic\PointBundle\EventListener\DashboardSubscriber'
+            ),
         ),
         'forms' => array(
             'mautic.point.type.form' => array(

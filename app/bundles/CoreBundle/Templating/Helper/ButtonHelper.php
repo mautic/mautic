@@ -173,10 +173,11 @@ class ButtonHelper extends Helper
 
     public function renderPreCustomButtons(&$buttonCount, $dropdownHtml = '') {
         $preCustomButtonContent = '';
-
         foreach ($this->preCustomButtons as $c) {
+
             if ($this->groupType == 'button-dropdown' && $buttonCount === 1) {
                 $preCustomButtonContent .= $dropdownHtml;
+
             }
             $preCustomButtonContent .= $this->buildCustom($c, $buttonCount);
             $buttonCount++;

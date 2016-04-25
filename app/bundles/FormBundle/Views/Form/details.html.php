@@ -16,7 +16,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'templateButtons' => array(
         'edit'      => $security->hasEntityAccess($permissions['form:forms:editown'], $permissions['form:forms:editother'], $activeForm->getCreatedBy()),
         'clone'     => $permissions['form:forms:create'],
-        'delete'    => $security->hasEntityAccess($permissions['form:forms:deleteown'], $permissions['form:forms:deleteother'], $activeForm->getCreatedBy())
+        'delete'    => $security->hasEntityAccess($permissions['form:forms:deleteown'], $permissions['form:forms:deleteother'], $activeForm->getCreatedBy()),
+        'close'     => $security->hasEntityAccess($permissions['form:forms:viewown'], $permissions['form:forms:viewother'], $activeForm->getCreatedBy())
     ),
     'routeBase' => 'form',
     'langVar'   => 'form',
@@ -93,21 +94,18 @@ $isStandalone = $activeForm->isStandalone();
                           <div class="panel">
                               <div class="panel-body box-layout">
                                   <div class="col-xs-6 va-m">
-                                      <h5 class="text-white dark-md fw-sb mb-xs">
-                                          <span class="fa fa-download"></span>
-                                          <?php echo $view['translator']->trans('mautic.form.graph.line.submissions'); ?>
-                                      </h5>
-                                  </div>
-                                  <div class="col-xs-6 va-m">
-                                      <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', array('callback' => 'updateSubmissionChart')); ?>
-                                  </div>
-                              </div>
-                              <div class="pt-0 pl-15 pb-10 pr-15">
-                                  <div>
-                                      <canvas id="submission-chart" height="300"></canvas>
-                                  </div>
-                              </div>
-                              <div id="submission-chart-data" class="hide"><?php echo json_encode($stats['submissionsInTime']); ?></div>
+                                        <h5 class="text-white dark-md fw-sb mb-xs">
+                                            <span class="fa fa-download"></span>
+                                            <?php echo $view['translator']->trans('mautic.form.graph.line.submissions'); ?>
+                                        </h5>
+                                    </div>
+                                    <div class="col-xs-6 va-m">
+                                        <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', array('dateRangeForm' => $dateRangeForm, 'class' => 'pull-right')); ?>
+                                    </div>
+                                </div>
+                                <div class="pt-0 pl-15 pb-10 pr-15">
+                                    <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $stats['submissionsInTime'], 'chartType' => 'line', 'chartHeight' => 300)); ?>
+                                </div>
                           </div>
                       </div>
                   </div>

@@ -28,9 +28,11 @@ require_once __DIR__ . '/../../../../../../../../../AppKernel.php';
 $kernel = new AppKernel('prod', false);
 $kernel->boot();
 $container  = $kernel->getContainer();
+$request    = Request::createFromGlobals();
+$container->enterScope('request');
+$container->set('request', $request, 'request');
 
 // Dispatch REQUEST event to setup authentication
-$request    = Request::createFromGlobals();
 $httpKernel = $container->get('http_kernel');
 $event      = new GetResponseEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST);
 $container->get('event_dispatcher')->dispatch(KernelEvents::REQUEST, $event);
