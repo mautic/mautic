@@ -449,9 +449,14 @@ Mautic.leadfieldOnLoad = function (container) {
         });
     }
 
+    if (mQuery(container + ' form[name="leadfield"]').length) {
+        Mautic.updateLeadFieldProperties(mQuery('#leadfield_type').val());
+    }
+
 };
 
 Mautic.updateLeadFieldProperties = function(selectedVal) {
+    var defaultValueField = mQuery('input#leadfield_defaultValue');
     if (selectedVal == 'lookup') {
         // Use select
         selectedVal = 'select';
@@ -472,7 +477,6 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
 
     // Switch default field if applicable
     var defaultFieldType = mQuery('input[name="leadfield[defaultValue]"]').attr('type');
-
     if (selectedVal == 'boolean') {
         if (defaultFieldType == 'text') {
             // Convert to a select
@@ -482,13 +486,19 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
 
             mQuery(defaultBool).appendTo(newDiv);
 
-            mQuery('#leadfield_defaultValue').replaceWith(newDiv);
+            defaultValueField.replaceWith(newDiv);
         }
     } else if (defaultFieldType == 'radio') {
         // Convert to input
         var html = mQuery('#field-templates .default').html();
         html     = html.replace(/default_template/g, 'defaultValue');
-        mQuery('#leadfield_defaultValue').replaceWith(html);
+        defaultValueField.replaceWith(html);
+    }
+
+    if (selectedVal === 'datetime' || selectedVal === 'date' || selectedVal === 'time') {
+        Mautic.activateDateTimeInputs(defaultValueField, selectedVal);
+    } else {
+        defaultValueField.datetimepicker('destroy').removeClass('calendar-activated');
     }
 };
 
