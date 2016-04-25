@@ -196,7 +196,7 @@ return array(
             'mautic.transport.amazon'            => array(
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-                'arguments' => array(
+                'arguments'    => array(
                     '%mautic.mailer_amazon_region%'
                 ),
                 'methodCalls'  => array(
