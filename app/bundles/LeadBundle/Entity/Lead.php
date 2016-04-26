@@ -1019,6 +1019,21 @@ class Lead extends FormEntity
     }
 
     /**
+     * Add tag
+     *
+     * @param Tag $tag
+     *
+     * @return Lead
+     */
+    public function addUtmTag(UtmTag $utmTag)
+    {
+        $this->isChanged('tags', $utmTag);
+        $this->tags[$utmTag->getTag()] = $utmTag;
+
+        return $this;
+    }
+
+    /**
      * Remove tag
      *
      * @param Tag $tag
@@ -1038,6 +1053,8 @@ class Lead extends FormEntity
     {
         return $this->utmTags;
     }
+    
+    
 
     /**
      * Set tags

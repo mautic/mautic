@@ -1083,6 +1083,57 @@ class LeadModel extends FormModel
      * Update a leads tags
      *
      * @param Lead  $lead
+     * @param array $tags
+     * @param bool|false $removeOrphans
+     */
+    public function setUtmTags(Lead $lead, array $utmTags, $removeOrphans = false)
+    {
+        $currentUtmTags  = $lead->getUtmTags();
+        $leadModified = $utmTagsDeleted = false;
+
+        foreach ($currentUtmTags as $utmTagName => $utmTag) {
+            if (!in_array($tag->getId(), $tags)) {
+                // Tag has been removed
+                $lead->removeTag($tag);
+                $leadModified = $tagsDeleted = true;
+            } else {
+                // Remove tag so that what's left are new tags
+                $key = array_search($tag->getId(), $tags);
+                unset($tags[$key]);
+            }
+        }
+
+        if (!empty($tags)) {
+            foreach($tags as $tag) {
+                if (is_numeric($tag)) {
+                    // Existing tag being added to this lead
+                    $lead->addTag(
+                        $this->factory->getEntityManager()->getReference('MauticLeadBundle:Tag', $tag)
+                    );
+                } else {
+                    // New tag
+                    $newTag = new Tag();
+                    $newTag->setTag(InputHelper::clean($tag));
+                    $lead->addTag($newTag);
+                }
+            }
+            $leadModified = true;
+        }
+
+        if ($leadModified) {
+            $this->saveEntity($lead);
+
+            // Delete orphaned tags
+            if ($tagsDeleted && $removeOrphans) {
+                $this->getTagRepository()->deleteOrphans();
+            }
+        }
+    }
+
+    /**
+     * Update a leads tags
+     *
+     * @param Lead  $lead
      * @param array $utmTags
      * @param bool|false $removeUtmTags
      */

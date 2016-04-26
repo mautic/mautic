@@ -84,6 +84,16 @@ class FormEventHelper
         $leadModel  = $factory->getModel('lead');
         $lead       = $leadModel->getCurrentLead();
         $factory->getLogger()->addError(print_r($config,true));
+        foreach($config['add_utmtags'] as $utmTag){
+            if ($factory->getRequest()->server->get('QUERY_STRING')) {
+                parse_str($factory->getRequest()->server->get('QUERY_STRING'), $query);
+                $pageURL = $factory->getRequest()->server->get('HTTP_REFERER');
+                $pageURI = $factory->getRequest()->server->get('REQUEST_URI');
+                parse_str($pageURL,$queryReferrer);
+                $factory->getLogger()->addError(print_r($queryReferrer,true));
+                $factory->getLogger()->addError(print_r($pageURI,true));
+            }
+        }
         $leadModel->modifyUtmTags($lead, $config['add_utmtags']);
     }
 }
