@@ -65,8 +65,13 @@ class ResultController extends CommonFormController
             $start = 0;
         }
 
+        // Set order direction to desc if not set
+        if (!$session->get('mautic.formresult.'.$objectId.'.orderbydir', null)) {
+            $session->set('mautic.formresult.'.$objectId.'.orderbydir', 'DESC');
+        }
+
         $orderBy    = $session->get('mautic.formresult.'.$objectId.'.orderby', 's.date_submitted');
-        $orderByDir = $session->get('mautic.formresult.'.$objectId.'.orderbydir', 'ASC');
+        $orderByDir = $session->get('mautic.formresult.'.$objectId.'.orderbydir', 'DESC');
         $filters    = $session->get('mautic.formresult.'.$objectId.'.filters', array());
 
         $model = $this->factory->getModel('form.submission');
@@ -170,7 +175,7 @@ class ResultController extends CommonFormController
         }
 
         $orderBy    = $session->get('mautic.formresult.'.$objectId.'.orderby', 's.date_submitted');
-        $orderByDir = $session->get('mautic.formresult.'.$objectId.'.orderbydir', 'ASC');
+        $orderByDir = $session->get('mautic.formresult.'.$objectId.'.orderbydir', 'DESC');
         $filters    = $session->get('mautic.formresult.'.$objectId.'.filters', array());
 
         $args = array(

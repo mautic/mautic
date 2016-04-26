@@ -81,44 +81,46 @@ if ($indexMode == 'list') {
     );
 }
 
-$customButtons = array_merge(
-    $customButtons,
-    array(
+if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) {
+    $customButtons = array_merge(
+        $customButtons,
         array(
-            'attr'      => array(
-                'class'       => 'btn btn-default btn-sm btn-nospin',
-                'data-toggle' => 'ajaxmodal',
-                'data-target' => '#MauticSharedModal',
-                'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'batchLists')),
-                'data-header' => $view['translator']->trans('mautic.lead.batch.lists')
+            array(
+                'attr'      => array(
+                    'class'       => 'btn btn-default btn-sm btn-nospin',
+                    'data-toggle' => 'ajaxmodal',
+                    'data-target' => '#MauticSharedModal',
+                    'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'batchLists')),
+                    'data-header' => $view['translator']->trans('mautic.lead.batch.lists')
+                ),
+                'tooltip' => $view['translator']->trans('mautic.lead.batch.lists'),
+                'iconClass' => 'fa fa-list'
             ),
-            'tooltip' => $view['translator']->trans('mautic.lead.batch.lists'),
-            'iconClass' => 'fa fa-list'
-        ),
-        array(
-            'attr'      => array(
-                'class'       => 'btn btn-default btn-sm btn-nospin',
-                'data-toggle' => 'ajaxmodal',
-                'data-target' => '#MauticSharedModal',
-                'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'batchCampaigns')),
-                'data-header' => $view['translator']->trans('mautic.lead.batch.campaigns'),
+            array(
+                'attr'      => array(
+                    'class'       => 'btn btn-default btn-sm btn-nospin',
+                    'data-toggle' => 'ajaxmodal',
+                    'data-target' => '#MauticSharedModal',
+                    'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'batchCampaigns')),
+                    'data-header' => $view['translator']->trans('mautic.lead.batch.campaigns'),
+                ),
+                'tooltip' => $view['translator']->trans('mautic.lead.batch.campaigns'),
+                'iconClass' => 'fa fa-clock-o'
             ),
-            'tooltip' => $view['translator']->trans('mautic.lead.batch.campaigns'),
-            'iconClass' => 'fa fa-clock-o'
-        ),
-        array(
-            'attr'      => array(
-                'class'       => 'hidden-xs btn btn-default btn-sm btn-nospin',
-                'data-toggle' => 'ajaxmodal',
-                'data-target' => '#MauticSharedModal',
-                'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'batchDnc')),
-                'data-header' => $view['translator']->trans('mautic.lead.batch.dnc'),
-            ),
-            'tooltip' => $view['translator']->trans('mautic.lead.batch.dnc'),
-            'iconClass' => 'fa fa-send text-danger'
+            array(
+                'attr'      => array(
+                    'class'       => 'hidden-xs btn btn-default btn-sm btn-nospin',
+                    'data-toggle' => 'ajaxmodal',
+                    'data-target' => '#MauticSharedModal',
+                    'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'batchDnc')),
+                    'data-header' => $view['translator']->trans('mautic.lead.batch.dnc'),
+                ),
+                'tooltip' => $view['translator']->trans('mautic.lead.batch.dnc'),
+                'iconClass' => 'fa fa-send text-danger'
+            )
         )
-    )
-);
+    );
+}
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
