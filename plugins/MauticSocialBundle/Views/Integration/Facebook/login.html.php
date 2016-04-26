@@ -77,6 +77,7 @@ HTML;
 		position: relative;
 		z-index: 10;
 		margin-right: 10px;
+		height:46px;
 		white-space: nowrap;
 		font-size: 14px;
 		width: {$width};

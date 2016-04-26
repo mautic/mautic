@@ -83,7 +83,7 @@ class LinkedInLoginType extends AbstractType
             array(
                 'label_attr' => array('class' => 'control-label'),
                 'label' => 'mautic.integration.LinkedIn.login.buttonlabel',
-                'required' => false,
+                'required' => true,
                 'disabled' => $disabled,
                 'attr' => array(
                     'class' => 'form-control',

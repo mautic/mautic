@@ -84,13 +84,12 @@ class GooglePlusLoginType extends AbstractType
             array(
                 'label_attr' => array('class' => 'control-label'),
                 'label' => 'mautic.integration.GooglePlus.login.buttonlabel',
-                'required' => false,
                 'disabled' => $disabled,
                 'attr' => array(
                     'class' => 'form-control',
                     'placeholder' => 'mautic.integration.GooglePlus.login.buttonlabel',
-                    'preaddon' => 'fa'
-                )
+                ),
+                'required' => true
             )
         );
     }

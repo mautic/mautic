@@ -86,7 +86,7 @@ class FacebookLoginType extends AbstractType
                 'label_attr' => array('class' => 'control-label'),
                 'label' => 'mautic.integration.Facebook.login.buttonlabel',
                 'disabled' => $disabled,
-                'required' => false,
+                'required' => true,
                 'attr' => array(
                     'class' => 'form-control',
                     'placeholder' => 'mautic.integration.Facebook.login.buttonlabel',
