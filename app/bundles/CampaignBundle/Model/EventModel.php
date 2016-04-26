@@ -1274,7 +1274,7 @@ class EventModel extends CommonFormModel
             $output->writeln(
                 $this->translator->trans(
                     'mautic.campaign.trigger.lead_count_analyzed',
-                    array('%leads%' => $leadCount, '%batch%' => $limit)
+                    array('%contacts%' => $leadCount, '%batch%' => $limit)
                 )
             );
         }

@@ -855,7 +855,7 @@ class CampaignModel extends CommonFormModel
         }
 
         if ($output) {
-            $output->writeln($this->translator->trans('mautic.campaign.rebuild.to_be_added', array('%leads%' => $leadCount, '%batch%' => $limit)));
+            $output->writeln($this->translator->trans('mautic.campaign.rebuild.to_be_added', array('%contacts%' => $leadCount, '%batch%' => $limit)));
         }
 
         // Handle by batches
@@ -937,7 +937,7 @@ class CampaignModel extends CommonFormModel
         $batchLimiters['maxId'] = $removeLeadCount['maxId'];
 
         if ($output) {
-            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', array('%leads%' => $leadCount, '%batch%' => $limit)));
+            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', array('%contacts%' => $leadCount, '%batch%' => $limit)));
         }
 
         if ($leadCount) {
