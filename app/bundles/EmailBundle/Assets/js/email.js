@@ -113,10 +113,6 @@ Mautic.emailOnLoad = function (container, response) {
             Mautic.renderListCompareChart();
         }
 
-        if (typeof Mautic.emailStatsLineGraph === 'undefined') {
-            Mautic.renderEmailStatsChart();
-        }
-
         Mautic.variantChartData = 'variant';
         var switchChartData;
         switchChartData = function() {
@@ -147,12 +143,13 @@ Mautic.emailOnLoad = function (container, response) {
         };
         mQuery('a[data-chart]').on('click', switchChartData);
     }
+
+    Mautic.initDateRangePicker();
 };
 
 Mautic.emailOnUnload = function(id) {
     if (id === '#app-content') {
         delete Mautic.listCompareChart;
-        delete Mautic.emailStatsLineGraph;
     }
 
     if (mQuery('#emailform_plainText').length) {
@@ -191,39 +188,6 @@ Mautic.updateListCompareChart = function() {
     Mautic.ajaxActionRequest('email:updateStatsChart', query, function(response) {
         Mautic.renderListCompareChart(response);
     }, true);
-};
-
-Mautic.renderEmailStatsChart = function (chartData) {
-    if (!mQuery("#stat-chart").length) {
-        return;
-    }
-
-    var canvas = document.getElementById("stat-chart");
-
-    if (!chartData) {
-        var chartData = mQuery.parseJSON(mQuery('#stat-chart-data').text());
-    } else if (chartData.stats) {
-        chartData = chartData.stats;
-    }
-
-    if (typeof Mautic.emailStatsLineGraph !== 'undefined') {
-        Mautic.emailStatsLineGraph.destroy();
-    }
-
-    Mautic.emailStatsLineGraph = new Chart(canvas.getContext("2d")).Line(chartData);
-
-    var legendHolder = document.createElement('div');
-    legendHolder.innerHTML = Mautic.emailStatsLineGraph.generateLegend();
-    mQuery('#legend').html(legendHolder.firstChild);
-    Mautic.emailStatsLineGraph.update();
-};
-
-Mautic.updateEmailStatsChart = function(element, amount, unit) {
-    var emailId         = Mautic.getEntityId();
-    var includeVariants = (Mautic.variantChartData == 'all');
-    var query           = "emailType=template&amount=" + amount + "&unit=" + unit + "&emailId=" + emailId + "&includeVariants=" + includeVariants;
-
-    Mautic.getChartData(element, 'email:updateStatsChart', query, 'renderEmailStatsChart');
 };
 
 Mautic.insertEmailBuilderToken = function(editorId, token) {

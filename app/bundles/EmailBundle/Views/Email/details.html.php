@@ -190,7 +190,8 @@ $view['slots']->set(
                     'stats'        => $stats,
                     'email'        => $email,
                     'showVariants' => $showVariants,
-                    'isVariant'    => $isVariant
+                    'isVariant'    => $isVariant,
+                    'dateRangeForm' => $dateRangeForm
                 )
             ); ?>
 
