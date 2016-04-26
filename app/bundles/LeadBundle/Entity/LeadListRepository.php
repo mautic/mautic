@@ -711,52 +711,40 @@ class LeadListRepository extends CommonRepository
             $alias = $this->generateRandomParameterName();
 
             switch ($details['field']) {
-            	case 'hit_url':
-			$operand = (($func == 'eq') || ($func == 'like')) ? 'EXISTS' : 'NOT EXISTS';
-            		
-            		$subqb = $this->_em->getConnection()->createQueryBuilder()
-            		->select('null')
-            		->from(MAUTIC_TABLE_PREFIX.'page_hits', $alias);
-            		
-            		switch($func){
-            			case 'eq':
-            			case 'neq':
-            			$parameters[$parameter]  = $details['filter'];
-            				
-				$subqb->where(
-					$q->expr()->andX(
-					$q->expr()->eq($alias.'.url', $exprParameter),
-					$q->expr()->eq($alias.'.lead_id', 'l.id')
-					)
-				);
-				break;
+                case 'hit_url':
+                    $operand = (($func == 'eq') || ($func == 'like')) ? 'EXISTS' : 'NOT EXISTS';
+                    
+                    $subqb = $this->_em->getConnection()
+                        ->createQueryBuilder()
+                        ->select('null')
+                        ->from(MAUTIC_TABLE_PREFIX . 'page_hits', $alias);
+                    switch ($func) {
+                        case 'eq':
+                        case 'neq':
+                            $parameters[$parameter] = $details['filter'];
+                            
+                            $subqb->where($q->expr()
+                                ->andX($q->expr()
+                                ->eq($alias . '.url', $exprParameter), $q->expr()
+                                ->eq($alias . '.lead_id', 'l.id')));
+                            break;
+                        case 'like':
+                        case '!like':
+                            $details['filter'] = '%' . $details['filter'] . '%';
+                            $subqb->where($q->expr()
+                                ->andX($q->expr()
+                                ->like($alias . '.url', $exprParameter), $q->expr()
+                                ->eq($alias . '.lead_id', 'l.id')));
+                            break;
+                    }
+                    // Specific lead
+                    if (! empty($leadId)) {
+                        $subqb->andWhere($subqb->expr()
+                            ->eq($alias . '.lead_id', $leadId));
+                    }
+                    $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
+                    break;
 
-				case 'like':
-				case '!like':
-					$details['filter']  = '%'.$details['filter'].'%';
-					$subqb->where(
-						$q->expr()->andX(
-						$q->expr()->like($alias.'.url', $exprParameter),
-						$q->expr()->eq($alias.'.lead_id', 'l.id')
-						)
-					);            				
-				break;
-			    	
-			}
-			
-			// Specific lead
-			if (!empty($leadId)) {
-				$subqb->andWhere(
-				$subqb->expr()->eq($alias.'.lead_id', $leadId)
-				);
-			}
-			
-			$groupExpr->add(
-				sprintf('%s (%s)', $operand, $subqb->getSQL())
-			);
-            		
-            	break;
-            	
                 case 'dnc_bounced':
                 case 'dnc_unsubscribed':
                     // Special handling of do not email
