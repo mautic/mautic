@@ -65,7 +65,6 @@ class FormController extends CommonFormController
 
         $filter = array('string' => $search, 'force' => array());
 
-
         if (!$permissions['form:forms:viewother']) {
             $filter['force'][] = array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
         }
@@ -185,11 +184,22 @@ class FormController extends CommonFormController
 
         ), "RETURN_ARRAY");
 
-        // Submission stats per time period
-        $timeStats = $this->factory->getEntityManager()->getRepository('MauticFormBundle:Submission')->getSubmissionsSince($activeForm->getId());
-
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('form', $objectId, $activeForm->getDateAdded());
+
+        // Init the date range filter form
+        $dateRangeValues = $this->request->get('daterange', array());
+        $action          = $this->generateUrl('mautic_form_action', array('objectAction' => 'view', 'objectId' => $objectId));
+        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, array('action' => $action));
+
+        // Submission stats per time period
+        $timeStats = $this->factory->getModel('form.submission')->getSubmissionsLineChartData(
+            null, 
+            new \DateTime($dateRangeForm->get('date_from')->getData()), 
+            new \DateTime($dateRangeForm->get('date_to')->getData()), 
+            null, 
+            array('form_id' => $objectId)
+        );
 
         // Only show actions and fields that still exist
         $customComponents  = $model->getCustomComponents();
@@ -223,6 +233,7 @@ class FormController extends CommonFormController
                 'stats'       => array(
                     'submissionsInTime' => $timeStats,
                 ),
+                'dateRangeForm'     => $dateRangeForm->createView(),
                 'activeFormActions' => $activeFormActions,
                 'activeFormFields'  => $activeFormFields,
                 'formScript'   => htmlspecialchars($model->getFormScript($activeForm), ENT_QUOTES, "UTF-8"),
@@ -232,10 +243,7 @@ class FormController extends CommonFormController
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_form_index',
                 'mauticContent' => 'form',
-                'route'         => $this->generateUrl('mautic_form_action', array(
-                    'objectAction' => 'view',
-                    'objectId'     => $activeForm->getId())
-                )
+                'route'         => $action
             )
         ));
     }

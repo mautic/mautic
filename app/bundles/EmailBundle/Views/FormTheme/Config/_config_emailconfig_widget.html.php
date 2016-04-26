@@ -46,6 +46,9 @@ $template = '<div class="col-md-6">{content}</div>';
                     </div>
                 </div>
             <?php endif; ?>
+            <div class="row">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_amazon_region', $template); ?>
+            </div>
 
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_host', $template); ?>
@@ -85,18 +88,18 @@ $template = '<div class="col-md-6">{content}</div>';
 <?php endif; ?>
 
 <?php if (isset($fields['monitored_email'])): ?>
-<div class="panel panel-primary">
-    <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.email.config.header.monitored_email'); ?></h3>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.email.config.header.monitored_email'); ?></h3>
+        </div>
+        <div class="panel-body">
+            <?php if (function_exists('imap_open')): ?>
+                <?php echo $view['form']->widget($form['monitored_email']); ?>
+            <?php else: ?>
+                <div class="alert alert-info"><?php echo $view['translator']->trans('mautic.email.imap_extension_missing'); ?></div>
+            <?php endif; ?>
+        </div>
     </div>
-    <div class="panel-body">
-        <?php if (function_exists('imap_open')): ?>
-        <?php echo $view['form']->widget($form['monitored_email']); ?>
-        <?php else: ?>
-            <div class="alert alert-info"><?php echo $view['translator']->trans('mautic.email.imap_extension_missing'); ?></div>
-        <?php endif; ?>
-    </div>
-</div>
 <?php endif; ?>
 
 <div class="panel panel-primary">

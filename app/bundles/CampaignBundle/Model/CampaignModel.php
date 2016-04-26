@@ -18,6 +18,9 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -225,7 +228,11 @@ class CampaignModel extends CommonFormModel
                 $source = $connection['sourceId'];
                 $target = $connection['targetId'];
 
-                $sourceDecision = (!empty($connection['anchors'])) ? $connection['anchors'][0]['endpoint'] : null;
+                if (in_array($source, array('lists', 'forms'))) {
+                    // Only concerned with events and not sources
+                    continue;
+                }
+                $sourceDecision = (!empty($connection['anchors'][0])) ? $connection['anchors'][0]['endpoint'] : null;
 
                 if ($sourceDecision == 'leadsource') {
                     // Lead source connection that does not matter
@@ -346,12 +353,15 @@ class CampaignModel extends CommonFormModel
             }
 
             // Rebuild anchors
-            $anchors = array();
-            foreach ($connection['anchors'] as $k => $anchor) {
-                $type           = ($k === 0) ? 'source' : 'target';
-                $anchors[$type] = $anchor['endpoint'];
+            if (!isset($connection['anchors']['source'])) {
+                $anchors = array();
+                foreach ($connection['anchors'] as $k => $anchor) {
+                    $type           = ($k === 0) ? 'source' : 'target';
+                    $anchors[$type] = $anchor['endpoint'];
+                }
+
+                $connection['anchors'] = $anchors;
             }
-            $connection['anchors'] = $anchors;
         }
 
         $entity->setCanvasSettings($settings);
@@ -1041,5 +1051,35 @@ class CampaignModel extends CommonFormModel
         } else {
             sleep($eventSleepTime);
         }
+    }
+
+    /**
+     * Get line chart data of leads added to campaigns
+     *
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $dateFormat
+     * @param array    $filter
+     * @param boolean  $canViewOthers
+     *
+     * @return array
+     */
+    public function getLeadsAddedLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
+    {
+        $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query = $chart->getChartQuery($this->em->getConnection());
+        $q     = $query->prepareTimeDataQuery('campaign_leads', 'date_added', $filter);
+
+        if (!$canViewOthers) {
+            $q->join('t', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = c.campaign_id')
+                ->andWhere('c.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $data = $query->loadAndBuildTimeData($q);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.campaign.campaign.leads'), $data);
+
+        return $chart->render();
     }
 }

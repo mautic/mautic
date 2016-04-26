@@ -257,7 +257,7 @@ class PageController extends FormController
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('page', $activePage->getId(), $activePage->getDateAdded());
 
         // Hit count per day for last 30 days
-        $last30 = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->getHits(30, 'D', array('page_id' => $activePage->getId()));
+        $last30 = $model->getHitsBarChartData('d', new \DateTime('-30 days'), new \DateTime, null, array('page_id' => $activePage->getId()));
 
         //get related translations
         list($translationParent, $translationChildren) = $model->getTranslations($activePage);
@@ -296,7 +296,8 @@ class PageController extends FormController
                         'total'  => $activePage->getHits(),
                         'unique' => $activePage->getUniqueHits()
                     ),
-                    'dwellTime' => $model->getDwellTimeStats($activePage)
+                    'newVsReturning' => $model->getNewVsReturningPieChartData(new \DateTime('-30 days'), new \DateTime, array('page_id' => $objectId)),
+                    'dwellTime' => $model->getDwellTimesPieChartData(new \DateTime('-30 days'), new \DateTime, array('page_id' => $objectId))
                 ),
                 'abTestResults' => $abTestResults,
                 'security'      => $security,

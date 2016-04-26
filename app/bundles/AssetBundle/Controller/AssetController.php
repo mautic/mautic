@@ -150,6 +150,11 @@ class AssetController extends FormController
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'details') : 'details';
 
+        // Init the date range filter form
+        $dateRangeValues = $this->request->get('daterange', array());
+        $action          = $this->generateUrl('mautic_asset_action', array('objectAction' => 'view', 'objectId' => $objectId));
+        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, array('action' => $action));
+
         if ($activeAsset === null) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_asset_index', array('page' => $page));
@@ -174,17 +179,11 @@ class AssetController extends FormController
             return $this->accessDenied();
         }
 
-        // Download stats per time period
-        $timeStats = $this->factory->getEntityManager()->getRepository('MauticAssetBundle:Download')->getDownloads($activeAsset->getId());
-
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
 
         return $this->delegateView(array(
-            'returnUrl'       => $this->generateUrl('mautic_asset_action', array(
-                    'objectAction' => 'view',
-                    'objectId'     => $activeAsset->getId())
-            ),
+            'returnUrl'       => $action,
             'viewParameters'  => array(
                 'activeAsset'      => $activeAsset,
                 'tmpl'             => $tmpl,
@@ -203,12 +202,19 @@ class AssetController extends FormController
                     'downloads' => array(
                         'total'     => $activeAsset->getDownloadCount(),
                         'unique'    => $activeAsset->getUniqueDownloadCount(),
-                        'timeStats' => $timeStats
+                        'timeStats' => $model->getDownloadsLineChartData(
+                            null, 
+                            new \DateTime($dateRangeForm->get('date_from')->getData()), 
+                            new \DateTime($dateRangeForm->get('date_to')->getData()), 
+                            null, 
+                            array('asset_id' => $activeAsset->getId())
+                        )
                     )
                 ),
                 'security'         => $security,
                 'assetDownloadUrl' => $model->generateUrl($activeAsset, true),
                 'logs'             => $logs,
+                'dateRangeForm'    => $dateRangeForm->createView()
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:' . $tmpl . '.html.php',
             'passthroughVars' => array(
