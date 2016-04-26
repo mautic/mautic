@@ -135,12 +135,7 @@ $view['slots']->set(
                                 </div>
                             </div>
                             <div class="pt-0 pl-10 pb-0 pr-10">
-                                <div>
-                                    <canvas id="page-views-chart" height="93"></canvas>
-                                </div>
-                            </div>
-                            <div id="page-views-chart-data" class="hide">
-                                <?php echo json_encode($last30); ?>
+                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $last30, 'chartType' => 'simple-bar', 'chartHeight' => 93)); ?>
                             </div>
                         </div>
                     </div>
@@ -157,6 +152,7 @@ $view['slots']->set(
                                 </div>
                             </div>
                             <div class="text-center">
+<<<<<<< HEAD
                                 <canvas id="returning-rate" width="110" height="110"></canvas>
                                 <div id="returning-data" class="hide">
                                     <?php if (isset($stats['dwellTime']['newVsReturning'])) : ?>
@@ -165,6 +161,9 @@ $view['slots']->set(
                                         []
                                     <?php endif; ?>
                                 </div>
+=======
+                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $stats['newVsReturning'], 'chartType' => 'pie', 'chartHeight' => 93)); ?>
+>>>>>>> 23ff430eb509f8fa59ac054e74406750cfc44cbf
                             </div>
                         </div>
                     </div>
@@ -181,6 +180,7 @@ $view['slots']->set(
                                 </div>
                             </div>
                             <div class="text-center">
+<<<<<<< HEAD
                                 <canvas
                                     id="time-rate"
                                     width="110"
@@ -193,6 +193,9 @@ $view['slots']->set(
                                         []
                                     <?php endif; ?>
                                 </div>
+=======
+                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $stats['dwellTime'], 'chartType' => 'pie', 'chartHeight' => 93)); ?>
+>>>>>>> 23ff430eb509f8fa59ac054e74406750cfc44cbf
                             </div>
                         </div>
                     </div>

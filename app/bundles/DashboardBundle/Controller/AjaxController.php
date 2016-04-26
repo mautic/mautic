@@ -11,6 +11,9 @@ namespace Mautic\DashboardBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Symfony\Component\HttpFoundation\Request;
+use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\DashboardBundle\DashboardEvents;
+use Mautic\DashboardBundle\Event\WidgetFormEvent;
 
 /**
  * Class AjaxController
@@ -33,6 +36,79 @@ class AjaxController extends CommonAjaxController
         $dataArray['viewingVisitors'] = $pageRepository->countVisitors(60, true);
 
         $dataArray['success'] = 1;
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Returns HTML of a new widget based on its values.
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function updateWidgetFormAction(Request $request)
+    {
+        $data = $request->request->get('widget');
+        $dataArray = array('success' => 0);
+
+        // Clear params if type is not selected
+        if (empty($data['type'])) {
+            unset($data['params']);
+        }
+
+        $widget = new Widget();
+        $form = $this->get('form.factory')->create('widget', $widget);
+        $formHtml = $this->render("MauticDashboardBundle::Widget\\form.html.php",
+            array('form' => $form->bind($data)->createView())
+        )->getContent();
+
+        $dataArray['formHtml'] = $formHtml;
+        $dataArray['success']  = 1;
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Saves the new ordering of dashboard widgets.
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function updateWidgetOrderingAction(Request $request)
+    {
+        $data = $request->request->get('ordering');
+        $repo = $this->factory->getModel('dashboard')->getRepository();
+        $repo->updateOrdering(array_flip($data), $this->factory->getUser()->getId());
+        $dataArray = array('success' => 1);
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Deletes the entity
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function deleteAction(Request $request)
+    {
+        $objectId = $request->request->get('widget');
+        $dataArray = array('success' => 0);
+
+        // @todo: build permissions
+        // if (!$this->factory->getSecurity()->isGranted('dashobard:widgets:delete')) {
+        //     return $this->accessDenied();
+        // }
+
+        /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
+        $model  = $this->factory->getModel('dashboard');
+        $entity = $model->getEntity($objectId);
+        if ($entity) {
+            $model->deleteEntity($entity);
+            $name = $entity->getName();
+            $dataArray['success'] = 1;
+        }
 
         return $this->sendJsonResponse($dataArray);
     }

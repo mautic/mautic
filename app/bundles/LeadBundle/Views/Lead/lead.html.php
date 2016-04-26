@@ -77,7 +77,7 @@ $buttons[] = array(
         ),
     ),
     'btnText'   => $view['translator']->trans('mautic.lead.lead.lists'),
-    'iconClass' => 'fa fa-list'
+    'iconClass' => 'fa fa-pie-chart'
 );
 
 //View Campaigns List button
@@ -236,6 +236,7 @@ $view['slots']->set(
             <!--/ lead detail collapseable toggler -->
 
             <?php if (!$isAnonymous): ?>
+<<<<<<< HEAD
                 <div class="pa-md">
                     <div class="row">
                         <div class="col-sm-12">
@@ -264,6 +265,23 @@ $view['slots']->set(
                                         $engagementData
                                     ); ?></div>
                             </div>
+=======
+            <div class="pa-md">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="panel">
+                            <div class="panel-body box-layout">
+                                <div class="col-xs-8 va-m">
+                                    <h5 class="text-white dark-md fw-sb mb-xs">
+                                        <?php echo $view['translator']->trans('mautic.lead.field.header.engagements'); ?>
+                                    </h5>
+                                </div>
+                                <div class="col-xs-4 va-t text-right">
+                                    <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
+                                </div>
+                            </div>
+                            <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $engagementData, 'chartType' => 'line', 'chartHeight' => 250)); ?>
+>>>>>>> 23ff430eb509f8fa59ac054e74406750cfc44cbf
                         </div>
                     </div>
                 </div>
@@ -295,6 +313,16 @@ $view['slots']->set(
                             <?php echo $view['translator']->trans('mautic.lead.lead.tab.social'); ?>
                         </a>
                     </li>
+                <?php endif; ?>
+                <?php if ($places): ?>
+                <li class="">
+                    <a href="#place-container" role="tab" data-toggle="tab" id="load-lead-map">
+                        <span class="label label-primary mr-sm" id="PlaceCount">
+                            <?php echo count($places); ?>
+                        </span>
+                        <?php echo $view['translator']->trans('mautic.lead.lead.tab.places'); ?>
+                    </a>
+                </li>
                 <?php endif; ?>
             </ul>
             <!--/ tabs controls -->
@@ -342,6 +370,14 @@ $view['slots']->set(
                 </div>
             <?php endif; ?>
             <!--/ #social-container -->
+
+            <!-- #place-container -->
+            <?php if ($places): ?>
+            <div class="tab-pane fade bdr-w-0" id="place-container">
+                <?php echo $view->render('MauticLeadBundle:Lead:map.html.php', array('places' => $places)); ?>
+            </div>
+            <?php endif; ?>
+            <!--/ #place-container -->
         </div>
         <!--/ end: tab-content -->
     </div>
@@ -458,6 +494,7 @@ $view['slots']->set(
         <?php if ($upcomingEvents) : ?>
             <hr class="hr-w-2" style="width:50%">
 
+<<<<<<< HEAD
             <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0">
                 <div class="panel-heading">
                     <div class="panel-title"><?php echo $view['translator']->trans(
@@ -488,6 +525,27 @@ $view['slots']->set(
                         <?php endforeach; ?>
                     </ul>
                 </div>
+=======
+        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0">
+            <div class="panel-heading">
+                <div class="panel-title"><?php echo $view['translator']->trans('mautic.lead.lead.upcoming.events'); ?></div>
+            </div>
+            <div class="panel-body pt-sm">
+                <ul class="media-list media-list-feed">
+                    <?php foreach ($upcomingEvents as $event) : ?>
+                    <li class="media">
+                        <div class="media-object pull-left mt-xs">
+                            <span class="figure"></span>
+                        </div>
+                        <div class="media-body">
+                            <?php $link = '<a href="' . $view['router']->generate('mautic_campaign_action', array("objectAction" => "view", "objectId" => $event['campaign_id'])) . '" data-toggle="ajax">' . $event['campaign_name'] . '</a>'; ?>
+                            <?php echo $view['translator']->trans('mautic.lead.lead.upcoming.event.triggered.at', array('%event%' => $event['event_name'], '%link%' => $link)); ?>
+                            <p class="fs-12 dark-sm"><?php echo $view['date']->toFull($event['trigger_date']); ?></p>
+                        </div>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+>>>>>>> 23ff430eb509f8fa59ac054e74406750cfc44cbf
             </div>
         <?php endif; ?>
         <div class="pa-sm">
