@@ -66,7 +66,9 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
+     * @param null $id
+     *
+     * @return Form
      */
     public function getEntity($id = null)
     {

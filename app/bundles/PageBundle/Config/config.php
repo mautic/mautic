@@ -63,6 +63,20 @@ return array(
         )
     ),
 
+    'menu' => array(
+        'main' => array(
+            'priority' => 65,
+            'items'    => array(
+                'mautic.page.pages' => array(
+                    'route' => 'mautic_page_index',
+                    'id'        => 'mautic_page_root',
+                    'iconClass' => 'fa-file-text-o',
+                    'access'    => array('page:pages:viewown', 'page:pages:viewother')
+                )
+            )
+        )
+    ),
+
     'categories' => array(
         'page' => null
     ),
