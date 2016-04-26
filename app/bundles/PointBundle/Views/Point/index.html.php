@@ -29,6 +29,8 @@ $view['slots']->set(
     <?php echo $view->render(
         'MauticCoreBundle:Helper:list_toolbar.html.php',
         array(
+            'searchValue' => $searchValue,
+            'searchHelp'  => 'mautic.core.help.searchcommands',
             'action'          => $currentRoute,
             'routeBase'       => 'point',
             'templateButtons' => array(

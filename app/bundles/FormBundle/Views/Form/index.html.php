@@ -30,6 +30,9 @@ $view['slots']->set(
     <?php echo $view->render(
         'MauticCoreBundle:Helper:list_toolbar.html.php',
         array(
+            'searchValue' => $searchValue,
+            'searchHelp'  => 'mautic.form.form.help.searchcommands',
+            'searchId'    => 'form-search',
             'action'           => $currentRoute,
             'routeBase'        => 'form',
             'templateButtons'  => array(

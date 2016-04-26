@@ -25,17 +25,16 @@ $view['slots']->set(
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0">
-    <?php echo $view->render(
-        'MauticCoreBundle:Helper:list_toolbar.html.php',
-        array(
-            'action'          => $currentRoute,
-            'routeBase'       => 'campaign',
-            'templateButtons' => array(
-                'delete' => $permissions['campaign:campaigns:delete']
-            ),
-            'filters'         => $filters
-        )
-    ); ?>
+	<?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', array(
+        'searchValue' => $searchValue,
+        'searchHelp'  => 'mautic.core.help.searchcommands',
+        'action'      => $currentRoute,
+        'routeBase'   => 'campaign',
+        'templateButtons' => array(
+            'delete' => $permissions['campaign:campaigns:delete']
+        ),
+        'filters'     => $filters
+    )); ?>
 
     <div class="page-list">
         <?php $view['slots']->output('_content'); ?>

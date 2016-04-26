@@ -14,15 +14,11 @@ $view['slots']->set("headerTitle", $email->getName());
 $isVariant    = $email->isVariant(true);
 $showVariants = count($variants['children']);
 $emailType    = $email->getEmailType();
-<<<<<<< HEAD
 $edit         = $view['security']->hasEntityAccess(
     $permissions['email:emails:editown'],
     $permissions['email:emails:editother'],
     $email->getCreatedBy()
 );
-=======
-$edit = $view['security']->hasEntityAccess($permissions['email:emails:editown'], $permissions['email:emails:editother'], $email->getCreatedBy());
->>>>>>> 23ff430eb509f8fa59ac054e74406750cfc44cbf
 
 if (empty($emailType)) {
     $emailType = 'template';
@@ -70,7 +66,6 @@ $customButtons[] = array(
     'btnText'   => 'mautic.email.send.example'
 );
 
-<<<<<<< HEAD
 $view['slots']->set(
     'actions',
     $view->render(
@@ -100,30 +95,6 @@ $view['slots']->set(
     'publishStatus',
     $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $email))
 );
-=======
-if ($edit) {
-    $customButtons[] = array(
-        'attr' => array(
-            'data-toggle' => 'ajax',
-            'href'        => $view['router']->generate('mautic_email_action', array("objectAction" => "clone", "objectId" => $email->getId())),
-        ),
-        'iconClass' => 'fa fa-copy',
-        'btnText'   => 'mautic.core.form.clone'
-    );
-}
-
-$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
-    'item'       => $email,
-    'templateButtons' => array(
-        'edit'       => $edit,
-        'delete'     => $view['security']->hasEntityAccess($permissions['email:emails:deleteown'], $permissions['email:emails:deleteother'], $email->getCreatedBy()),
-        'abtest'     => (!$isVariant && $edit && $permissions['email:emails:create']),
-        'close'      => $view['security']->hasEntityAccess($permissions['email:emails:viewown'], $permissions['email:emails:viewother'], $email->getCreatedBy()),
-    ),
-    'routeBase'  => 'email',
-    'preCustomButtons' => $customButtons
-)));
->>>>>>> 23ff430eb509f8fa59ac054e74406750cfc44cbf
 ?>
 
 <!-- start: box layout -->

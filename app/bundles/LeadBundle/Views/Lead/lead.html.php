@@ -236,36 +236,6 @@ $view['slots']->set(
             <!--/ lead detail collapseable toggler -->
 
             <?php if (!$isAnonymous): ?>
-<<<<<<< HEAD
-                <div class="pa-md">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <div class="panel">
-                                <div class="panel-body box-layout">
-                                    <div class="col-xs-4 va-m">
-                                        <h5 class="text-white dark-md fw-sb mb-xs">
-                                            <?php echo $view['translator']->trans(
-                                                'mautic.lead.field.header.engagements'
-                                            ); ?>
-                                        </h5>
-                                    </div>
-                                    <div class="col-xs-4 text-center">
-                                        <div id="engagement-legend" class="legend-container"></div>
-                                    </div>
-                                    <div class="col-xs-4 va-t text-right">
-                                        <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
-                                    </div>
-                                </div>
-                                <div class="pt-0 pl-15 pb-10 pr-15">
-                                    <div>
-                                        <canvas class="chart" id="chart-engagement" height="250"></canvas>
-                                    </div>
-                                </div>
-                                <div id="chart-engagement-data" class="hide"><?php echo json_encode(
-                                        $engagementData
-                                    ); ?></div>
-                            </div>
-=======
             <div class="pa-md">
                 <div class="row">
                     <div class="col-sm-12">
@@ -281,10 +251,10 @@ $view['slots']->set(
                                 </div>
                             </div>
                             <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $engagementData, 'chartType' => 'line', 'chartHeight' => 250)); ?>
->>>>>>> 23ff430eb509f8fa59ac054e74406750cfc44cbf
                         </div>
                     </div>
                 </div>
+            </div>
             <?php endif; ?>
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md mt-10">
@@ -494,38 +464,6 @@ $view['slots']->set(
         <?php if ($upcomingEvents) : ?>
             <hr class="hr-w-2" style="width:50%">
 
-<<<<<<< HEAD
-            <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0">
-                <div class="panel-heading">
-                    <div class="panel-title"><?php echo $view['translator']->trans(
-                            'mautic.lead.lead.upcoming.events'
-                        ); ?></div>
-                </div>
-                <div class="panel-body pt-sm">
-                    <ul class="media-list media-list-feed">
-                        <?php foreach ($upcomingEvents as $event) : ?>
-                            <li class="media">
-                                <div class="media-object pull-left mt-xs">
-                                    <span class="figure"></span>
-                                </div>
-                                <div class="media-body">
-                                    <?php $link = '<a href="'.$view['router']->generate(
-                                            'mautic_campaign_action',
-                                            array("objectAction" => "view", "objectId" => $event['campaign_id'])
-                                        ).'" data-toggle="ajax">'.$event['campaign_name'].'</a>'; ?>
-                                    <?php echo $view['translator']->trans(
-                                        'mautic.lead.lead.upcoming.event.triggered.at',
-                                        array('%event%' => $event['event_name'], '%link%' => $link)
-                                    ); ?>
-                                    <p class="fs-12 dark-sm"><?php echo $view['date']->toFull(
-                                            $event['triggerDate']
-                                        ); ?></p>
-                                </div>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-=======
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0">
             <div class="panel-heading">
                 <div class="panel-title"><?php echo $view['translator']->trans('mautic.lead.lead.upcoming.events'); ?></div>
@@ -545,8 +483,8 @@ $view['slots']->set(
                     </li>
                     <?php endforeach; ?>
                 </ul>
->>>>>>> 23ff430eb509f8fa59ac054e74406750cfc44cbf
             </div>
+        </div>
         <?php endif; ?>
         <div class="pa-sm">
             <?php $tags = $lead->getTags(); ?>
