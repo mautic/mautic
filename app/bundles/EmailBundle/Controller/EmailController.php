@@ -255,6 +255,11 @@ class EmailController extends FormController
         //set the page we came from
         $page = $this->factory->getSession()->get('mautic.email.page', 1);
 
+        // Init the date range filter form
+        $dateRangeValues = $this->request->get('daterange', array());
+        $action          = $this->generateUrl('mautic_email_action', array('objectAction' => 'view', 'objectId' => $objectId));
+        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, array('action' => $action));
+
         if ($email === null) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_email_index', array('page' => $page));
@@ -360,7 +365,14 @@ class EmailController extends FormController
 
         // Prepare stats for bargraph
         $variant = ($parent && $parent === $email);
-        $stats   = ($email->getEmailType() == 'template') ? $model->getEmailGeneralStats($email, $variant) : $model->getEmailListStats($email, $variant);
+        $stats   = ($email->getEmailType() == 'template') ? 
+            $model->getEmailGeneralStats(
+                $email, 
+                $variant,
+                null,
+                new \DateTime($dateRangeForm->get('date_from')->getData()), 
+                new \DateTime($dateRangeForm->get('date_to')->getData())) :
+            $model->getEmailListStats($email, $variant);
 
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('email', $email->getId(), $email->getDateAdded());
@@ -409,7 +421,8 @@ class EmailController extends FormController
                         'mautic_email_preview',
                         array('objectId' => $email->getId()),
                         true
-                    )
+                    ),
+                    'dateRangeForm'  => $dateRangeForm->createView()
                 ),
                 'contentTemplate' => 'MauticEmailBundle:Email:details.html.php',
                 'passthroughVars' => array(
