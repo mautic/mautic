@@ -184,8 +184,11 @@ return array(
             'mautic.lead.search.subscriber'         => array(
                 'class' => 'Mautic\LeadBundle\EventListener\SearchSubscriber'
             ),
-            'mautic.webhook.subscriber'                => array(
+            'mautic.webhook.subscriber'             => array(
                 'class' => 'Mautic\LeadBundle\EventListener\WebhookSubscriber'
+            ),
+            'mautic.lead.dashboard.subscriber'      => array(
+                'class' => 'Mautic\LeadBundle\EventListener\DashboardSubscriber'
             ),
         ),
         'forms'   => array(
@@ -305,6 +308,10 @@ return array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\LeadFieldsType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'leadfields_choices'
+            ),
+            'mautic.form.type.lead_dashboard_leads_in_time_widget'  => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\DashboardLeadsInTimeWidgetType',
+                'alias'     => 'lead_dashboard_leads_in_time_widget'
             )
         ),
         'other'   => array(

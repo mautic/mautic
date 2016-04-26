@@ -18,6 +18,8 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -682,5 +684,105 @@ class SubmissionModel extends CommonFormModel
             default:
                 return new Response();
         }
+    }
+
+    /**
+     * Get line chart data of submissions
+     *
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $dateFormat
+     * @param array    $filter
+     * @param boolean  $canViewOthers
+     *
+     * @return array
+     */
+    public function getSubmissionsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
+    {
+        $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $q = $query->prepareTimeDataQuery('form_submissions', 'date_submitted', $filter);
+
+        if (!$canViewOthers) {
+            $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
+                ->andWhere('f.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $data = $query->loadAndBuildTimeData($q);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.form.submission.count'), $data);
+        return $chart->render();
+    }
+
+    /**
+     * Get a list of top submission referrers
+     *
+     * @param integer $limit
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     * @param boolean $canViewOthers
+     *
+     * @return array
+     */
+    public function getTopSubmissionReferrers($limit = 10, $dateFrom = null, $dateTo = null, $filters = array(), $canViewOthers = true)
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(DISTINCT t.id) AS submissions, t.referer')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 't')
+            ->orderBy('submissions', 'DESC')
+            ->groupBy('t.referer')
+            ->setMaxResults($limit);
+
+        if (!$canViewOthers) {
+            $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
+                ->andWhere('f.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_submitted');
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
+     * Get a list of the most submisions per lead
+     *
+     * @param integer $limit
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     * @param boolean $canViewOthers
+     *
+     * @return array
+     */
+    public function getTopSubmitters($limit = 10, $dateFrom = null, $dateTo = null, $filters = array(), $canViewOthers = true)
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(DISTINCT t.id) AS submissions, t.lead_id, l.firstname, l.lastname, l.email')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 't')
+            ->join('t', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id')
+            ->orderBy('submissions', 'DESC')
+            ->groupBy('t.lead_id, l.firstname, l.lastname, l.email')
+            ->setMaxResults($limit);
+
+        if (!$canViewOthers) {
+            $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
+                ->andWhere('f.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_submitted');
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
     }
 }

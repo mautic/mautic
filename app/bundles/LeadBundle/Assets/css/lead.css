@@ -127,3 +127,9 @@ ul.tag-cloud li {
 .lead-merge-options {
     position: relative;
 }
+
+/* Following can be removed when the chart-improvement PR will be merged (it'll be part of dashboard css) */
+.jvectormap-container {
+    height:100%;
+    width:100%;
+}
