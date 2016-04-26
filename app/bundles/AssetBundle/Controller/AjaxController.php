@@ -23,25 +23,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class AjaxController extends CommonAjaxController
 {
-
-    /**
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function updateDownloadChartAction(Request $request)
-    {
-        $assetId   = InputHelper::int($request->request->get('assetId'));
-        $amount    = InputHelper::int($request->request->get('amount'));
-        $unit      = InputHelper::clean($request->request->get('unit'));
-        $dataArray = array('success' => 0);
-
-        // Download stats per time period
-        $dataArray['stats'] = $this->factory->getEntityManager()->getRepository('MauticAssetBundle:Download')->getDownloads($assetId, $amount, $unit);
-        $dataArray['success']  = 1;
-
-        return $this->sendJsonResponse($dataArray);
-    }
-
     /**
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse

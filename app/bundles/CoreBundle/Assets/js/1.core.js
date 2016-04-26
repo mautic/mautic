@@ -609,6 +609,9 @@ var Mautic = {
             }
         }
 
+        Mautic.renderCharts();
+        Mautic.renderMaps(container);
+
         //instantiate sparkline plugin
         mQuery('.plugin-sparkline').sparkline('html', {enableTagOptions: true});
 
@@ -897,6 +900,16 @@ var Mautic = {
             if (typeof (Mautic.loadedContent[contentSpecific])) {
                 delete Mautic.loadedContent[contentSpecific];
             }
+        }
+
+        // trash created chart objects to save some memory
+        if (typeof Mautic.chartObjects !== 'undefined') {
+            delete Mautic.chartObjects;
+        }
+
+        // trash created map objects to save some memory
+        if (typeof Mautic.mapObjects !== 'undefined') {
+            delete Mautic.mapObjects;
         }
     },
 
@@ -2959,5 +2972,178 @@ var Mautic = {
         Mautic.loadContent(url);
 
         mQuery('body').removeClass('noscroll');
+    },
+
+    /**
+     * Render the chart.js charts
+     *
+     * @param mQuery|string scope
+     */
+    renderCharts: function(scope) {
+        var charts = [];
+        if (!Mautic.chartObjects) Mautic.chartObjects = [];
+
+        if (mQuery.type(scope) === 'string') {
+            charts = mQuery(scope).find('canvas.chart');
+        } else if (scope) {
+            charts = scope.find('canvas.chart');
+        } else {
+            charts = mQuery('canvas.chart');
+        }
+
+        if (charts.length) {
+            charts.each(function(index, canvas) {
+                canvas = mQuery(canvas);
+                if (!canvas.hasClass('chart-rendered')) {
+                    if (canvas.hasClass('line-chart')) {
+                        Mautic.renderLineChart(canvas)
+                    } else if (canvas.hasClass('pie-chart')) {
+                        Mautic.renderPieChart(canvas)
+                    } else if (canvas.hasClass('simple-bar-chart')) {
+                        Mautic.renderSimpleBarChart(canvas)
+                    }
+                }
+                canvas.addClass('chart-rendered');
+            });
+        }
+    },
+
+    /**
+     * Render the chart.js line chart
+     *
+     * @param mQuery element canvas
+     */
+    renderLineChart: function(canvas) {
+        var ctx = canvas[0].getContext("2d");
+        var data = mQuery.parseJSON(canvas.text());
+        if (!data.labels.length || !data.datasets.length) return;
+        var options = {
+            pointDotRadius : 2,
+            datasetStrokeWidth : 1,
+            bezierCurveTension : 0.2,
+            multiTooltipTemplate: "<%= datasetLabel %>: <%= value %>"
+        }
+        var chart = new Chart(ctx).Line(data, options);
+        canvas.closest('.chart-wrapper').find('.chart-legend').html(chart.generateLegend());
+        Mautic.chartObjects.push(chart);
+    },
+
+    /**
+     * Render the chart.js pie chart
+     *
+     * @param mQuery element canvas
+     */
+    renderPieChart: function(canvas) {
+        var ctx = canvas[0].getContext("2d");
+        var data = mQuery.parseJSON(canvas.text());
+        data = Mautic.emulateNoDataForPieChart(data);
+        var options = {segmentStrokeWidth : 1}
+        var pieChart = new Chart(ctx).Pie(data, options);
+        mQuery(canvas).closest('.chart-wrapper').find('.legend').html(pieChart.generateLegend());
+        Mautic.chartObjects.push(pieChart);
+    },
+
+    /**
+     * Render the chart.js simple bar chart
+     *
+     * @param mQuery element canvas
+     */
+    renderSimpleBarChart: function(canvas) {
+        var ctx = canvas[0].getContext("2d");
+        var data = mQuery.parseJSON(canvas.text());
+        var options = {
+            scaleShowGridLines : false,
+            barShowStroke : false,
+            barValueSpacing : 1,
+            showScale: false,
+            tooltipFontSize: 10,
+            tooltipCaretSize: 0
+        };
+        Mautic.chartObjects.push(new Chart(ctx).Bar(data, options));
+    },
+
+    /**
+     * Render vector maps
+     *
+     * @param mQuery element scope
+     */
+    renderMaps: function(scope) {
+        if (!Mautic.mapObjects) Mautic.mapObjects = [];
+        var maps = [];
+
+        if (mQuery.type(scope) === 'string') {
+            maps = mQuery(scope).find('.vector-map');
+        } else if (scope) {
+            maps = scope.find('.vector-map');
+        } else {
+            maps = mQuery('.vector-map');
+        }
+
+        if (maps.length) {
+            maps.each(function(index, element) {
+                var wrapper = mQuery(element);
+                var data = mQuery.parseJSON(wrapper.text());
+                wrapper.text('');
+                wrapper.vectorMap({
+                    backgroundColor: 'transparent',
+                    zoomOnScroll: false,
+                    regionStyle: {
+                        initial: {
+                            "fill": '#dce0e5',
+                            "fill-opacity": 1,
+                            "stroke": 'none',
+                            "stroke-width": 0,
+                            "stroke-opacity": 1
+                        },
+                        hover: {
+                            "fill-opacity": 0.7,
+                            "cursor": 'pointer'
+                        }
+                    },
+                    map: 'world_mill_en',
+                    series: {
+                        regions: [{
+                            values: data,
+                            scale: ['#dce0e5', '#40C7B5'],
+                            normalizeFunction: 'polynomial'
+                        }]
+                    },
+                    onRegionTipShow: function (event, label, index) {
+                        if (data[index] > 0) {
+                            label.html(
+                                '<b>'+label.html()+'</b></br>'+
+                                data[index]+' Leads'
+                            );
+                        }
+                    }
+                });
+                Mautic.mapObjects.push(wrapper.vectorMap('get', 'mapObject'));
+            });
+        }
+    },
+
+    initDateRangePicker: function () {
+        var dateFrom = mQuery('#daterange_date_from');
+        var dateTo = mQuery('#daterange_date_to');
+
+        dateFrom.datetimepicker({
+            format: 'M j, Y',
+            onShow: function(ct) {
+                this.setOptions({
+                    maxDate: dateTo.val() ? new Date(dateTo.val()) : false
+                });
+            },
+            timepicker: false
+        });
+        dateTo.datetimepicker({
+            format: 'M j, Y',
+            onShow: function(ct) {
+                this.setOptions({
+                    maxDate: new Date(),
+                    minDate: dateFrom.val() ? new Date(dateFrom.val()) : false
+                });
+            },
+            timepicker: false
+        });
     }
 };
