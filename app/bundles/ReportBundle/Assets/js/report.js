@@ -222,7 +222,12 @@ Mautic.updateReportGraph = function(element, amount, unit) {
 }
 
 Mautic.renderReportLineGraph = function (canvas, chartData) {
-    var options = {};
+    var options = {
+        pointDotRadius : 2,
+        datasetStrokeWidth : 1,
+        bezierCurveTension : 0.2,
+        multiTooltipTemplate: "<%= datasetLabel %>: <%= value %>"
+    }
     return new Chart(canvas).Line(chartData, options);
 };
 
@@ -230,6 +235,7 @@ Mautic.renderReportPieGraph = function (canvas, chartData) {
     var options = {
         responsive: false,
         tooltipFontSize: 10,
-        tooltipTemplate: "<%if (label){%><%}%><%= value %>x <%=label%>"};
+        tooltipTemplate: "<%if (label){%><%}%><%= value %>x <%=label%>",
+	    segmentStrokeWidth : 1};
     Mautic.pageTimePie = new Chart(canvas).Pie(chartData, options);
 }
