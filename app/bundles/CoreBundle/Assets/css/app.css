@@ -4517,9 +4517,7 @@ label.required:after {
   z-index: 9999;
 }
 body.noscroll {
-  position: fixed;
-  overflow-y: scroll;
-  width: 100%;
+  overflow: hidden;
 }
 .form-select-modal .panel-body {
   min-height: 150px;

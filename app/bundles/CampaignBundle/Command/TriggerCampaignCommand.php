@@ -43,7 +43,7 @@ class TriggerCampaignCommand extends ModeratedCommand
             )
             ->addOption('--scheduled-only', null, InputOption::VALUE_NONE, 'Trigger only scheduled events')
             ->addOption('--negative-only', null, InputOption::VALUE_NONE, 'Trigger only negative events, i.e. with a "no" decision path.')
-            ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of leads to process per round. Defaults to 100.', 100)
+            ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of contacts to process per round. Defaults to 100.', 100)
             ->addOption(
                 '--max-events',
                 '-m',

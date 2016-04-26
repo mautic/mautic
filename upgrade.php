@@ -74,9 +74,11 @@ function clear_mautic_cache(array $status)
         process_error_log(array('Could not remove the application cache.  You will need to manually delete ' . MAUTIC_CACHE_DIR . '.'));
     }
 
-    apply_critical_migrations();
+    // Build the cache for migrations
+    build_cache();
 
-    //Remove the cached update
+    // Apply critical migrations
+    apply_critical_migrations();
 
     $status['complete']                     = true;
     $status['stepStatus']                   = 'Success';
@@ -87,25 +89,54 @@ function clear_mautic_cache(array $status)
     return $status;
 }
 
+/**
+ * @param       $command
+ * @param array $args
+ *
+ * @return array
+ * @throws Exception
+ */
+function run_symfony_command($command, array $args)
+{
+    static $application;
+
+    require_once dirname(__DIR__) . '/app/bootstrap.php.cache';
+    require_once dirname(__DIR__) . '/app/AppKernel.php';
+
+    $args = array_merge(
+        array('console', $command),
+        $args
+    );
+
+    if (null == $application) {
+        $kernel      = new AppKernel('prod', true);
+        $application = new Application($kernel);
+        $application->setAutoExit(false);
+    }
+
+    $input  = new ArgvInput($args);
+    $output = new BufferedOutput();
+    $exitCode   = $application->run($input, $output);
+    $bufferOutput = $output->fetch();
+
+    unset($input, $output);
+
+    return array($exitCode, $bufferOutput);
+}
+
+function build_cache()
+{
+    run_symfony_command('cache:clear',  array('--no-interaction', '--env=prod', '--no-debug'));
+}
+
 function apply_critical_migrations()
 {
-    include dirname(__DIR__) . '/app/bootstrap.php.cache';
-    include dirname(__DIR__) . '/app/AppKernel.php';
-
     $criticalMigrations = array(
         '20160225000000'
     );
 
     foreach ($criticalMigrations as $version) {
-
-        $args = array('console', 'doctrine:migrations:migrate', '--no-interaction', '--env=prod', '--no-debug', $version);
-
-        $kernel      = new AppKernel('prod', true);
-        $input       = new ArgvInput($args);
-        $application = new Application($kernel);
-        $application->setAutoExit(false);
-        $output = new BufferedOutput();
-        $application->run($input, $output);
+        run_symfony_command('doctrine:migrations:migrate',  array('--no-interaction', '--env=prod', '--no-debug', $version));
     }
 }
 
