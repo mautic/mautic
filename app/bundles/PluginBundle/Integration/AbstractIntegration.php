@@ -1267,12 +1267,9 @@ abstract class AbstractIntegration
                 $uniqueLeadFieldData[$leadField] = $value;
             }
         }
-
-
+        
         // Default to new lead
         $lead            = new Lead();
-        $leadSocialCache = array();
-
         $lead->setNewlyCreated(true);
 
         if (count($uniqueLeadFieldData)) {
@@ -1282,19 +1279,14 @@ abstract class AbstractIntegration
 
             if (!empty($existingLeads)) {
                 $lead = array_shift($existingLeads);
-
                 // Update remaining leads
                 if (count($existingLeads)) {
-
                     foreach ($existingLeads as $existingLead) {
-
-                        $leadModel->setFieldValues($existingLead, $matchedFields, false);
                         $existingLead->setLastActive(new \DateTime());
                     }
                 }
             }
         }
-
 
         $leadModel->setFieldValues($lead, $matchedFields, false);
 

@@ -55,7 +55,8 @@ class GooglePlusIntegration extends SocialIntegration
         return array(
             'public_activity',
             'public_profile',
-            'share_button'
+            'share_button',
+            'login_button'
         );
     }
 
