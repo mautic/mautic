@@ -27,27 +27,21 @@ class AuthController extends FormController
      */
     public function authCallbackAction ($integration)
     {
-        $isAjax = $this->request->isXmlHttpRequest();
+        $isAjax  = $this->request->isXmlHttpRequest();
+        $session = $this->factory->getSession();
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper  = $this->factory->getHelper('integration');
-        $integrationObjects = $integrationHelper->getIntegrationObjects(null, null, true);
-
-        // We receive a lowercase name, so we need to convert the $integrationObjects array keys to lowercase
-        $objects = array();
-
-        foreach ($integrationObjects as $key => $value) {
-            $objects[strtolower($key)] = $value;
-        }
-
-        $session = $this->factory->getSession();
+        $integrationObject  = $integrationHelper->getIntegrationObject($integration);
 
         //check to see if the service exists
-        if (!array_key_exists(strtolower($integration), $objects)) {
+        if (!$integrationObject) {
             $session->set('mautic.integration.postauth.message', array('mautic.integration.notfound', array('%name%' => $integration), 'error'));
             if ($isAjax) {
+
                 return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_auth_postauth',array('integration'=>$integration))));
             } else {
+
                 return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth',array('integration'=>$integration)));
             }
         }
@@ -64,7 +58,7 @@ class AuthController extends FormController
             }
         }
 
-        $error = $integrationObjects[$integration]->authCallback();
+        $error = $integrationObject->authCallback();
 
         //check for error
         if ($error) {
@@ -79,9 +73,9 @@ class AuthController extends FormController
 
         $session->set('mautic.integration.postauth.message', array($message, $params, $type));
 
-        $identifier[$integrationObjects[$integration]->getName()] = null;
-        $socialCache = array();
-        $userData = $integrationObjects[$integration]->getUserData($identifier,$socialCache[$integrationObjects[$integration]->getName()]);
+        $identifier[$integration] = null;
+        $socialCache              = array();
+        $userData                 = $integrationObject->getUserData($identifier, $socialCache);
 
         $session->set('mautic.integration.'.$integration.'.userdata', $userData);
 
@@ -99,14 +93,14 @@ class AuthController extends FormController
 
         $session     = $this->factory->getSession();
         $postMessage = $session->get('mautic.integration.postauth.message');
-        $userData = array();
+        $userData    = array();
 
-        if(isset($integration)){
+        if (isset($integration)) {
             $userData = $session->get('mautic.integration.'.$integration.'.userdata');
         }
 
-        $message     = $type = '';
-        $alert       = 'success';
+        $message = $type = '';
+        $alert   = 'success';
         if (!empty($postMessage)) {
             $message = $this->factory->getTranslator()->trans($postMessage[0], $postMessage[1], 'flashes');
             $session->remove('mautic.integration.postauth.message');
@@ -116,7 +110,7 @@ class AuthController extends FormController
             }
         }
 
-        return $this->render($postAuthTemplate, array('message' => $message, 'alert' => $alert,'data'=>$userData));
+        return $this->render($postAuthTemplate, array('message' => $message, 'alert' => $alert, 'data' => $userData));
     }
 
     /**
@@ -129,8 +123,6 @@ class AuthController extends FormController
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $this->factory->getHelper('integration');
         $integrationObject = $integrationHelper->getIntegrationObject($integration);
-
-        $session = $this->factory->getSession();
 
         $settings['method']      = 'GET';
         $settings['integration'] = $integrationObject->getName();
