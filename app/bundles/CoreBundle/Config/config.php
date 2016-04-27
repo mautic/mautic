@@ -31,6 +31,10 @@ return array(
             )
         ),
         'public' => array(
+            'mautic_js'                    => array(
+                'path'       => '/mtc.js',
+                'controller' => 'MauticCoreBundle:Js:index'
+            ),
             'mautic_base_index'            => array(
                 'path'       => '/',
                 'controller' => 'MauticCoreBundle:Default:index'
@@ -107,9 +111,12 @@ return array(
             'mautic.core.configbundle.subscriber' => array(
                 'class' => 'Mautic\CoreBundle\EventListener\ConfigSubscriber'
             ),
+            'mautic.core.js.subscriber'           => array(
+                'class' => 'Mautic\CoreBundle\EventListener\BuildJsSubscriber'
+            ),
             'mautic.core.dashboard.subscriber'    => array(
                 'class' => 'Mautic\CoreBundle\EventListener\DashboardSubscriber'
-            ),
+            )
         ),
         'forms'   => array(
             'mautic.form.type.spacer'             => array(
