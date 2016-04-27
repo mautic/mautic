@@ -9,7 +9,7 @@
 ?>
 
 <div class="panel-body">
-    <?php echo $view->render('MauticLeadBundle:Social/Facebook:profile.html.php', array(
+    <?php echo $view->render('MauticSocialBundle:Integration/Facebook/Profile:profile.html.php', array(
         'lead'      => $lead,
         'profile'   => $details['profile']
     )); ?>

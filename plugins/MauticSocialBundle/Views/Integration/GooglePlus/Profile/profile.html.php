@@ -18,7 +18,7 @@ $tableFields = array('gender', 'birthday', 'occupation', 'skills', 'braggingRigh
 
     <div class="media-body">
         <h4 class="media-heading"><?php echo $profile['displayName']; ?></h4>
-        <p class="text-muted"><a href="<?php echo $profile['profileHandle']; ?>" target="_blank"><?php echo $profile['profileHandle']; ?></a></p>
+        <p class="text-muted"><a href="https://plus.google.com/<?php echo $profile['profileHandle']; ?>" target="_blank"><?php echo $profile['profileHandle']; ?></a></p>
         <?php if (!empty($profile['aboutMe'])): ?>
         <p class="text-muted"><?php echo $profile['aboutMe']; ?></p>
         <?php endif; ?>

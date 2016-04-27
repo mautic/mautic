@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\PluginBundle\EventListener;
+namespace MauticPlugin\MauticSocialBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event\FormBuilderEvent;
@@ -35,13 +35,17 @@ class FormSubscriber extends CommonSubscriber
     public function onFormBuild(FormBuilderEvent $event)
     {
         $action = array(
-            'group'       => 'mautic.plugin.actions',
-            'description' => 'mautic.plugin.actions.tooltip',
-            'label'       => 'mautic.plugin.actions.push_lead',
-            'formType'    => 'integration_list',
-            'formTheme'   => 'MauticPluginBundle:FormTheme\Integration',
-            'callback'    => array('\\Mautic\\PluginBundle\\Helper\\EventHelper', 'pushLead')
+            'label'    => 'mautic.plugin.actions.socialLogin',
+            'formType' => 'sociallogin',
+            'template' => 'MauticSocialBundle:Integration:login.html.php',
+            'builderOptions' => array(
+                'addLeadFieldList' => false,
+                'addIsRequired'    => false,
+                'addDefaultValue'  => false,
+                'addSaveResult'    => false
+            )
         );
-        $event->addSubmitAction('plugin.leadpush', $action);
+
+        $event->addFormField('plugin.loginSocial', $action);
     }
 }

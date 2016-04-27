@@ -25,13 +25,13 @@
 
 <div class="np panel-body tab-content">
     <div class="pa-20 tab-pane active" id="FoursquareProfile">
-        <?php echo $view->render('MauticLeadBundle:Social/Foursquare:profile.html.php', array(
+        <?php echo $view->render('MauticSocialBundle:Integration/Foursquare/Profile:profile.html.php', array(
             'lead'      => $lead,
             'profile'   => $details['profile']
         )); ?>
     </div>
     <div class="tab-pane" id="FoursquareTips">
-        <?php echo $view->render('MauticLeadBundle:Social/Foursquare:tips.html.php', array(
+        <?php echo $view->render('MauticSocialBundle:Integration/Foursquare/Profile:tips.html.php', array(
             'lead'      => $lead,
             'activity'  => (!empty($details['activity']['tips'])) ? $details['activity']['tips'] : array()
         )); ?>

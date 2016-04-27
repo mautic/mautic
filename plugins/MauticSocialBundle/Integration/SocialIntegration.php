@@ -9,7 +9,6 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Form;
@@ -18,7 +17,9 @@ abstract class SocialIntegration extends AbstractIntegration
 {
 
     /**
-     * @param FormBuilder|Form $builder
+     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
+     * @param array                                             $data
+     * @param string                                            $formArea
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
@@ -180,5 +181,38 @@ abstract class SocialIntegration extends AbstractIntegration
     public function getFormNotes ($section)
     {
         return array('', 'info');
+    }
+
+    /**
+     * Get the template for social profiles
+     *
+     * @return string
+     */
+    public function getSocialProfileTemplate()
+    {
+        return "MauticSocialBundle:Integration/{$this->getName()}/Profile:view.html.php";
+    }
+
+    /**
+     * Get the access token from session or socialCache
+     *
+     * @param $socialCache
+     *
+     * @return array|null
+     */
+    protected function getAccessToken($socialCache)
+    {
+        $accessToken = $this->factory->getSession()->get($this->getName().'_tokenResponse', array());
+        if (!isset($accessToken['access_token'])) {
+            if (isset($socialCache['accessToken'])) {
+                $accessToken = $this->decryptApiKeys($socialCache['accessToken']);
+            } else {
+                return null;
+            }
+        } else {
+            $accessToken['persist_lead'] = true;
+        }
+
+        return $accessToken;
     }
 }
