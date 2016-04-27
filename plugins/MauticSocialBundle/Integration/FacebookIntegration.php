@@ -149,7 +149,7 @@ class FacebookIntegration extends SocialIntegration
             $socialCache['lastRefresh'] = new \DateTime();
             $socialCache['accessToken'] = $this->encryptApiKeys($access_token);
 
-            $this->getMauticLead($info, true,$socialCache);
+            $this->getMauticLead($info, true, $socialCache, $identifier);
 
             $this->preventDoubleCall = false;
 
@@ -174,7 +174,7 @@ class FacebookIntegration extends SocialIntegration
         if(!isset($access_token['access_token'])){
             return;
         }
-        
+
         if (isset($identifiers['Facebook'])) {
             $url = $this->getApiUrl($identifiers["Facebook"]);
 
