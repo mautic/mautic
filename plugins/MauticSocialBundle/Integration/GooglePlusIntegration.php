@@ -322,7 +322,7 @@ class GooglePlusIntegration extends SocialIntegration
         if (!isset($identifier['access_token'])) {
             return;
         }
-    print_r($this->getAuthenticationType());
+    
         if ('oauth2' == $this->getAuthenticationType()) {
             $data = $this->makeRequest(
                 $this->getApiUrl('people/me'),
