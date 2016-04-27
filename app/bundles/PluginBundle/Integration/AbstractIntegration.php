@@ -226,6 +226,8 @@ abstract class AbstractIntegration
      */
     public function encryptAndSetApiKeys(array $keys, Integration $entity)
     {
+        $this->keys = $keys;
+
         $keys = $this->dispatchIntegrationKeyEvent(
             PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT,
             $keys
@@ -1257,6 +1259,11 @@ abstract class AbstractIntegration
 
         // Match that data with mapped lead fields
         $matchedFields = $this->populateMauticLeadData($data);
+
+        if (empty($matchedFields)) {
+
+            return;
+        }
 
         // Find unique identifier fields used by the integration
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
