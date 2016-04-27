@@ -69,7 +69,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
                 $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', array('%id%' => $id)).'</info>');
                 $processed = $listModel->rebuildListLeads($list, $batch, $max, $output);
                 $output->writeln(
-                    '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', array('%contacts%' => $processed)).'</comment>'
+                    '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', array('%leads%' => $processed)).'</comment>'
                 );
             } else {
                 $output->writeln('<error>'.$translator->trans('mautic.lead.list.rebuild.not_found', array('%id%' => $id)).'</error>');
@@ -89,7 +89,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
 
                 $processed = $listModel->rebuildListLeads($l, $batch, $max, $output);
                 $output->writeln(
-                    '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', array('%contacts%' => $processed)).'</comment>'."\n"
+                    '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', array('%leads%' => $processed)).'</comment>'."\n"
                 );
 
                 unset($l);
