@@ -194,10 +194,10 @@ class FormController extends CommonFormController
 
         // Submission stats per time period
         $timeStats = $this->factory->getModel('form.submission')->getSubmissionsLineChartData(
-            null, 
-            new \DateTime($dateRangeForm->get('date_from')->getData()), 
-            new \DateTime($dateRangeForm->get('date_to')->getData()), 
-            null, 
+            null,
+            new \DateTime($dateRangeForm->get('date_from')->getData()),
+            new \DateTime($dateRangeForm->get('date_to')->getData()),
+            null,
             array('form_id' => $objectId)
         );
 
@@ -641,6 +641,7 @@ class FormController extends CommonFormController
             $modifiedFields = array();
             $usedLeadFields = array();
             $existingFields = $entity->getFields()->toArray();
+
             foreach ($existingFields as $formField) {
                 // Check to see if the field still exists
                 if ($formField->getType() !== 'button' && !isset($availableFields[$formField->getType()])) {
@@ -650,7 +651,14 @@ class FormController extends CommonFormController
                 $id    = $formField->getId();
                 $field = $formField->convertToArray();
                 unset($field['form']);
+
+                if (isset($customComponents['fields'][$field['type']])) {
+                    // Set the custom parameters
+                    $field['customParameters'] = $customComponents['fields'][$field['type']];
+                }
+
                 $modifiedFields[$id] = $field;
+
 
                 if (!empty($field['leadField'])) {
                     $usedLeadFields[$id] = $field['leadField'];
@@ -684,6 +692,7 @@ class FormController extends CommonFormController
                 $id     = $formAction->getId();
                 $action = $formAction->convertToArray();
                 unset($action['form']);
+
                 $modifiedActions[$id] = $action;
             }
 
