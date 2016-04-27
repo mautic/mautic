@@ -24,8 +24,41 @@ class BuildJsSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return array(
-            CoreEvents::BUILD_MAUTIC_JS => array('onBuildJs', 255)
+            CoreEvents::BUILD_MAUTIC_JS => array(
+                array('onBuildJs', 255),
+                array('onBuildJsMauticCoreJs', 1000)
+            )
         );
+    }
+
+    /**
+     * Adds the MauticJS definition and core
+     * JS functions for use in Bundles. This
+     * must retain top priority of 1000
+     * 
+     * @param BuildJsEvent $event
+     * 
+     * @return void
+     */
+    public function onBuildJsMauticCoreJs(BuildJsEvent $event)
+    {
+        $js = <<<JS
+var MauticJS = MauticJS || {};
+
+MauticJS.serialize = function(obj) {
+    var str = [];
+    for(var p in obj)
+        if (obj.hasOwnProperty(p)) {
+            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+        }
+    return str.join("&");
+};
+
+MauticJS.documentReady = function(f) {
+    /in/.test(document.readyState) ? setTimeout('MauticJS.documentReady(' + f + ')', 9) : f();
+};
+JS;
+        $event->appendJs($js, 'Mautic Core');
     }
 
     /**
@@ -41,15 +74,17 @@ class BuildJsSubscriber extends CommonSubscriber
             '',
             $router->generate('mautic_page_tracker', [], UrlGeneratorInterface::ABSOLUTE_URL)
         );
-
+        
         $js = <<<JS
-(function(w, l){
-    var MauticJS = MauticJS || [];
-
-    MauticJS.trackingPixel = (new Image()).src = (l.protocol == 'https:' ? 'https:' : 'http:') + '//{$trackingUrl}';
-
-    w.MauticJS = MauticJS;
-})(window, location);
+(function(m, l){
+    m.trackingPixelUrl = (l.protocol == 'https:' ? 'https:' : 'http:') + '//{$trackingUrl}';
+    
+    if (m.hasOwnProperty("trackingPixelParams")) {
+        m.trackingPixelUrl += "?" + m.trackingPixelParams;
+    }
+    
+    m.trackingPixel = (new Image()).src = m.trackingPixelUrl;
+})(MauticJS, location);
 JS;
 
         $event->appendJs($js, 'Mautic Tracking Pixel');
