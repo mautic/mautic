@@ -8,7 +8,12 @@
  */
 
 namespace Mautic\CoreBundle\IpLookup;
-use IP2Location;
+
+use IP2Location\Database;
+
+/**
+ * Class IP2LocationBinLookup
+ */
 class IP2LocationBinLookup extends AbstractLocalDataLookup
 {
     /**
@@ -33,20 +38,21 @@ class IP2LocationBinLookup extends AbstractLocalDataLookup
      */
     public function getRemoteDateStoreDownloadUrl()
     {
-        $usernamePass = explode(':',$this->auth);
-        $data= array();
-        if(isset($usernamePass[0]) && isset($usernamePass[1])){
-            $data['login'] = $usernamePass[0];
-            $data['password'] = $usernamePass[1];
+        $usernamePass = explode(':', $this->auth);
+        $data         = array();
+
+        if (isset($usernamePass[0]) && isset($usernamePass[1])) {
+            $data['login']       = $usernamePass[0];
+            $data['password']    = $usernamePass[1];
             $data['productcode'] = 'DB9BIN';
-            $queryString =  http_build_query($data);
+            $queryString         = http_build_query($data);
             // the system gets the file name from end of remove file path url so use hardedcoded name
-            $queryString .='&filename=/ip2locaion.zip';
+            $queryString .= '&filename=/ip2locaion.zip';
+
             return 'https://www.ip2location.com/download?'.$queryString;
-        }else{
+        } else {
             $this->logger->warn('Both username and password are required');
         }
-
     }
 
     /**
@@ -54,19 +60,19 @@ class IP2LocationBinLookup extends AbstractLocalDataLookup
      */
     protected function lookup()
     {
-
-
         try {
-            $reader = new IP2Location($this->getLocalDataStoreFilepath().'/IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE-ZIPCODE.BIN', IP2Location::FILE_IO);
-            $record = $reader->lookup($this->ip, IP2Location::ALL);
+            $reader = new Database($this->getLocalDataStoreFilepath().'/IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE-ZIPCODE.BIN', Database::FILE_IO);
+            $record = $reader->lookup($this->ip, Database::ALL);
 
-            if(isset($record->countryName)){
-                $this->country = $record->countryName;
-                $this->region = $record->regionName;
-                $this->city = $record->cityName;
-                $this->latitude  = $record->latitude;
-                $this->longitude = $record->longitude;
-                $this->zipcode   = $record->zipCode;
+            if (isset($record['countryName'])) {
+                $this->country   = $record['countryName'];
+                $this->region    = $record['regionName'];
+                $this->city      = $record['cityName'];
+                $this->latitude  = $record['latitude'];
+                $this->longitude = $record['longitude'];
+                $this->zipcode   = $record['zipCode'];
+                $this->isp       = $record['isp'];
+                $this->timezone  = $record['timeZone'];
             }
         } catch (\Exception $exception) {
             if ($this->logger) {
@@ -74,4 +80,4 @@ class IP2LocationBinLookup extends AbstractLocalDataLookup
             }
         }
     }
-} 
+}
