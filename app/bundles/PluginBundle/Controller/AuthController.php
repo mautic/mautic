@@ -79,6 +79,12 @@ class AuthController extends FormController
 
         $session->set('mautic.integration.postauth.message', array($message, $params, $type));
 
+        $identifier[$integrationObjects[$integration]->getName()] = null;
+        $socialCache = array();
+        $userData = $integrationObjects[$integration]->getUserData($identifier,$socialCache);
+
+        $session->set('mautic.integration.'.$integration.'.userdata', $userData);
+
         return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth',array('integration'=>$integration)));
     }
 
@@ -140,11 +146,6 @@ class AuthController extends FormController
         $oauthUrl = $event->getAuthUrl();
 
         $response = new RedirectResponse($oauthUrl);
-        $identifier[$integrationObject->getName()] = null;
-        $socialCache = array();
-        $userData = $integrationObject->getUserData($identifier,$socialCache);
-
-        $session->set('mautic.integration.'.$integration.'.userdata', $userData);
 
         return $response;
     }

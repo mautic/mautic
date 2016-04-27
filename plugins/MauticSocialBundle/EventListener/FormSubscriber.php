@@ -38,6 +38,12 @@ class FormSubscriber extends CommonSubscriber
             'label'    => 'mautic.plugin.actions.socialLogin',
             'formType' => 'sociallogin',
             'template' => 'MauticSocialBundle:Integration:login.html.php',
+            'builderOptions' => array(
+                'addLeadFieldList' => false,
+                'addIsRequired'     => false,
+                'addDefaultValue'  => false,
+                'addSaveResult'    => false
+            )
         );
 
         $event->addFormField('plugin.loginSocial', $action);

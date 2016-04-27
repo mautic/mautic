@@ -43,7 +43,7 @@ $js = <<<JS
       }       
   }
 
-  function fillInForm(response){
+  function postAuthCallback(response){
   	var elements = document.getElementById("mauticform_{$formName}").elements;
   	var field, fieldName;
   
@@ -64,10 +64,7 @@ $js = <<<JS
 JS;
 $html = <<<HTML
 	<div $containerAttr>{$formButtons}{$label}
-		
-	
 HTML;
-
 ?>
 		<script>
 			<?php echo $js; ?>
@@ -76,7 +73,7 @@ HTML;
 		<?php
 		echo $html;
 			foreach($integrations as $integration){
-				echo '<a onclick="openOAuthWindow(\''.$settings['authUrl_'.$integration].'\')"><img src="'.$view['assets']->getUrl("media/images/btn_".$integration.".png").'"></a>';
+				echo '<a href="#" onclick="openOAuthWindow(\''.$settings['authUrl_'.$integration].'\')"><img src="'.$view['assets']->getUrl("media/images/btn_".$integration.".png").'"></a>';
 				
 			}
 		

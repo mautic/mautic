@@ -115,49 +115,46 @@ class FacebookIntegration extends SocialIntegration
             $identifier[$this->getName()] = "v2.5/me";
         }
 
-        if(isset($access_token['access_token'])){
 
-            $identifier['access_token'] =$access_token['access_token'];
+        $identifier['access_token'] =$access_token['access_token'];
 
-            $this->preventDoubleCall = true;
+        $this->preventDoubleCall = true;
 
-            if ($id = $this->getUserId($identifier, $socialCache)) {
+        if ($id = $this->getUserId($identifier, $socialCache)) {
 
-                if (is_object($id)) {
-                    //getUserId has already obtained the data
-                    $data = $id;
-                } else {
-                    $url = $this->getApiUrl("$id");
-                    //@todo - can't use access token to do a global search; may not work after April
-                    $data = $this->makeRequest($url, array(), 'GET', array('auth_type' => 'rest'));
+            if (is_object($id)) {
+                //getUserId has already obtained the data
+                $data = $id;
+            } else {
+                $url = $this->getApiUrl("$id");
 
-                }
+                $data = $this->makeRequest($url, array(), 'GET', array('auth_type' => 'rest'));
 
-                $info = $this->matchUpData($data);
-
-                if (isset($data->username)) {
-                    $info['profileHandle'] = $data->username;
-                } elseif (isset($data->link)) {
-                    $info['profileHandle'] = str_replace('https://www.facebook.com/', '', $data->link);
-                } else {
-                    $info['profileHandle'] = $data->id;
-                }
-
-                $info['profileImage'] = "https://graph.facebook.com/{$data->id}/picture?type=large";
-
-
-                $socialCache[$this->getName()]['profile'] = $info;
-                $socialCache[$this->getName()]['lastRefresh'] = new \DateTime();
-                $socialCache[$this->getName()]['accessToken'] = $this->encryptApiKeys($access_token);
-
-                $this->getMauticLead($info, true,$socialCache);
-
-                return $data;
-
-                $this->preventDoubleCall = false;
             }
+
+            $info = $this->matchUpData($data);
+
+            if (isset($data->username)) {
+                $info['profileHandle'] = $data->username;
+            } elseif (isset($data->link)) {
+                $info['profileHandle'] = str_replace('https://www.facebook.com/', '', $data->link);
+            } else {
+                $info['profileHandle'] = $data->id;
+            }
+
+            $info['profileImage'] = "https://graph.facebook.com/{$data->id}/picture?type=large";
+
+
+            $socialCache[$this->getName()]['profile'] = $info;
+            $socialCache[$this->getName()]['lastRefresh'] = new \DateTime();
+            $socialCache[$this->getName()]['accessToken'] = $this->encryptApiKeys($access_token);
+
+            $this->getMauticLead($info, true,$socialCache);
+
+            $this->preventDoubleCall = false;
+
+            return $data;
         }
-        return null;
     }
 
     /**$post
@@ -172,8 +169,9 @@ class FacebookIntegration extends SocialIntegration
         }
 
         $identifiers = $this->cleanIdentifier($identifier);
-        
-        if(!isset($identifier['access_token'])){
+        $access_token = $this->factory->getSession()->get($this->getName().'_tokenResponse');
+
+        if(!isset($access_token['access_token'])){
             return;
         }
         

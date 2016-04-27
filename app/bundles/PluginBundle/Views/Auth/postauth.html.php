@@ -13,8 +13,8 @@ $data = json_encode($data);
 $js = <<<JS
 function postFormHandler() {
     var opener = window.opener;
-    if(opener && typeof opener.fillInForm == 'function') {
-            opener.fillInForm({$data});
+    if(opener && typeof opener.postAuthCallback == 'function') {
+            opener.postAuthCallback({$data});
     }else {
         Mautic.refreshIntegrationForm();
     }

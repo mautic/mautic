@@ -66,12 +66,12 @@ class GooglePlusIntegration extends SocialIntegration
     public function getUserData($identifier, &$socialCache)
     {
 
-        if(!isset($identifier['googleplus']) || $identifier['googleplus']===null){
+        if (!isset($identifier['googleplus']) || $identifier['googleplus'] === null) {
             $identifier['googleplus'] = "people/me";
         }
         $access_token = $this->factory->getSession()->get($this->getName().'_tokenResponse');
 
-        if(isset($access_token['access_token'])) {
+        if (isset($access_token['access_token'])) {
             $identifier['access_token'] = $access_token['access_token'];
 
             $this->preventDoubleCall = true;
@@ -113,6 +113,7 @@ class GooglePlusIntegration extends SocialIntegration
                 }
             }
         }
+
         return null;
     }
 
@@ -131,7 +132,7 @@ class GooglePlusIntegration extends SocialIntegration
                     'tags'   => array()
                 );
                 foreach ($data->items as $page) {
-                    $post                               = array(
+                    $post                                                 = array(
                         'title'     => $page->title,
                         'url'       => $page->url,
                         'published' => $page->published,
@@ -173,7 +174,7 @@ class GooglePlusIntegration extends SocialIntegration
                                     $url = substr($url, 0, $pos);
                                 }
 
-                                $photo                               = array(
+                                $photo                                                 = array(
                                     'url' => $url
                                 );
                                 $socialCache[$this->getName()]['activity']['photos'][] = $photo;
@@ -269,6 +270,7 @@ class GooglePlusIntegration extends SocialIntegration
     {
         return 'key';
     }
+
     /**
      * {@inheritdoc}
      */
@@ -292,6 +294,7 @@ class GooglePlusIntegration extends SocialIntegration
     {
         return 'https://accounts.google.com/o/oauth2/token';
     }
+
     /**
      * @param $endpoint
      *
@@ -316,12 +319,31 @@ class GooglePlusIntegration extends SocialIntegration
         if (!is_array($identifier)) {
             $identifier = array($identifier);
         }
-        if(!isset($identifier['access_token'])){
+        if (!isset($identifier['access_token'])) {
             return;
         }
+    print_r($this->getAuthenticationType());
+        if ('oauth2' == $this->getAuthenticationType()) {
+            $data = $this->makeRequest(
+                $this->getApiUrl('people/me'),
+                array('access_token' => $identifier['access_token']),
+                'GET',
+                array('auth_type' => 'access_token')
+            );
+        } else {
+            foreach ($identifier as $type => $id) {
+                if (empty($id)) {
+                    continue;
+                }
+                if ($type == 'googleplus' && is_numeric($id)) {
+                    //this is a google user ID
+                    $socialCache['id'] = $id;
 
-
-        $data = $this->makeRequest($this->getApiUrl('people/me'), array('access_token'=>$identifier['access_token']),'GET',array('auth_type'=>'access_token'));
+                    return $id;
+                }
+                $data = $this->makeRequest($this->getApiUrl('people'), array('query' => $id));
+            }
+        }
 
         if (!empty($data) && isset($data->id) && count($data->id)) {
             $socialCache[$this->getName()]['id'] = $data->id;
