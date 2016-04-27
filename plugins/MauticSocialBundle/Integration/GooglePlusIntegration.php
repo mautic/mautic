@@ -310,8 +310,14 @@ class GooglePlusIntegration extends SocialIntegration
      */
     public function getUserId($identifier, &$socialCache)
     {
-        if (!empty($socialCache[$this->getName()]['id'])) {
-            return $socialCache[$this->getName()]['id'];
+        if (!empty($socialCache)) {
+            return $socialCache['id'];
+        } elseif (empty($identifier)) {
+            return false;
+        }
+
+        if (!empty($socialCache['id'])) {
+            return $socialCache['id'];
         } elseif (empty($identifier)) {
             return false;
         }
@@ -319,11 +325,12 @@ class GooglePlusIntegration extends SocialIntegration
         if (!is_array($identifier)) {
             $identifier = array($identifier);
         }
-        if (!isset($identifier['access_token'])) {
-            return;
-        }
-    
+
+
         if ('oauth2' == $this->getAuthenticationType()) {
+            if (!isset($identifier['access_token'])) {
+                return;
+            }
             $data = $this->makeRequest(
                 $this->getApiUrl('people/me'),
                 array('access_token' => $identifier['access_token']),
@@ -334,6 +341,9 @@ class GooglePlusIntegration extends SocialIntegration
             foreach ($identifier as $type => $id) {
                 if (empty($id)) {
                     continue;
+                }
+                if (!empty($data) && isset($data->id) && count($data->id)) {
+                    break;
                 }
                 if ($type == 'googleplus' && is_numeric($id)) {
                     //this is a google user ID
@@ -346,9 +356,9 @@ class GooglePlusIntegration extends SocialIntegration
         }
 
         if (!empty($data) && isset($data->id) && count($data->id)) {
-            $socialCache[$this->getName()]['id'] = $data->id;
+            $socialCache['id'] = $data->id;
 
-            return $socialCache[$this->getName()]['id'];
+            return $socialCache['id'];
         }
 
         return false;

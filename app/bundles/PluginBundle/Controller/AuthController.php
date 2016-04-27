@@ -81,7 +81,7 @@ class AuthController extends FormController
 
         $identifier[$integrationObjects[$integration]->getName()] = null;
         $socialCache = array();
-        $userData = $integrationObjects[$integration]->getUserData($identifier,$socialCache);
+        $userData = $integrationObjects[$integration]->getUserData($identifier,$socialCache[$integrationObjects[$integration]->getName()]);
 
         $session->set('mautic.integration.'.$integration.'.userdata', $userData);
 

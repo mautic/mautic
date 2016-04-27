@@ -131,9 +131,9 @@ class LinkedInIntegration extends SocialIntegration
                 $info['profileImage'] = preg_replace('/\?.*/', '', $data->pictureUrl);
 
 
-                $socialCache[$this->getName()]['profile']     = $info;
-                $socialCache[$this->getName()]['lastRefresh'] = new \DateTime();
-                $socialCache[$this->getName()]['accessToken'] = $this->encryptApiKeys($access_token);
+                $socialCache['profile']     = $info;
+                $socialCache['lastRefresh'] = new \DateTime();
+                $socialCache['accessToken'] = $this->encryptApiKeys($access_token);
 
                 $this->getMauticLead($info, true, $socialCache);
 
@@ -173,8 +173,8 @@ class LinkedInIntegration extends SocialIntegration
      */
     public function getUserId($identifier, &$socialCache)
     {
-        if (!empty($socialCache[$this->getName()]['id'])) {
-            return $socialCache[$this->getName()]['id'];
+        if (!empty($socialCache['id'])) {
+            return $socialCache['id'];
         } elseif (empty($identifier)) {
             return false;
         }
@@ -195,10 +195,10 @@ class LinkedInIntegration extends SocialIntegration
             $data                 = $this->makeRequest($url, $parameters, 'GET', array('auth_type' => 'rest'));
 
             if ($data && isset($data->id)) {
-                $socialCache[$this->getName()]['id'] = $data->id;
+                $socialCache['id'] = $data->id;
 
                 //return the entire data set if the function has been called from getUserData()
-                return ($this->preventDoubleCall) ? $data : $socialCache[$this->getName()]['id'];
+                return ($this->preventDoubleCall) ? $data : $socialCache['id'];
             }
         }
 

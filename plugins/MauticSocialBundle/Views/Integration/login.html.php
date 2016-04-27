@@ -54,7 +54,7 @@ $js = <<<JS
 			 
 		values = JSON.parse(JSON.stringify(response));
 		for(var key in values) {
-		if(key!='id' && fieldName==key) {
+		if(key!='id' && fieldName.indexOf(key) >= 0) {
 			var element = document.getElementsByName("mauticform["+key+"]");
 			element[0].value = values[key];
 		}
