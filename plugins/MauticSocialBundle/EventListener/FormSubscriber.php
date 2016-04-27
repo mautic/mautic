@@ -40,7 +40,7 @@ class FormSubscriber extends CommonSubscriber
             'template' => 'MauticSocialBundle:Integration:login.html.php',
             'builderOptions' => array(
                 'addLeadFieldList' => false,
-                'addIsRequired'     => false,
+                'addIsRequired'    => false,
                 'addDefaultValue'  => false,
                 'addSaveResult'    => false
             )

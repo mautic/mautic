@@ -12,7 +12,7 @@ $containerType = 'div-wrapper';
 
 include __DIR__ . '/../../../../app/bundles/FormBundle/Views/Field/field_helper.php';
 
-$action = $app->getRequest()->get('objectAction');
+$action   = $app->getRequest()->get('objectAction');
 $settings = $field['properties'];
 
 $integrations=(isset($settings['integrations']) and !empty($settings['integrations'])) ? explode(",",substr($settings['integrations'],0,-1)) : array();
@@ -79,8 +79,8 @@ HTML;
 		echo $html;
 			foreach($integrations as $integration){
 				echo '<a href="#" onclick="openOAuthWindow(\''.$settings['authUrl_'.$integration].'\')"><img src="'.$view['assets']->getUrl("media/images/btn_".$integration.".png").'"></a>';
-				
+
 			}
-		
+
 		?>
 </div>

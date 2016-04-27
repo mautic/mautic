@@ -9,20 +9,11 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-use Mautic\LeadBundle\Entity\Lead;
-
 /**
  * Class FacebookIntegration
  */
 class FacebookIntegration extends SocialIntegration
 {
-    /**
-     * Used in getUserData to prevent a double user search call with getUserId
-     *
-     * @var bool
-     */
-    private $preventDoubleCall = false;
-
     /**
      * {@inheritdoc}
      */
@@ -48,7 +39,8 @@ class FacebookIntegration extends SocialIntegration
     {
         return array(
             'share_button',
-            'login_button'
+            'login_button',
+            'public_profile'
         );
     }
 
@@ -78,13 +70,16 @@ class FacebookIntegration extends SocialIntegration
      */
     public function parseCallbackResponse($data, $postAuthorization = false)
     {
-        if ($postAuthorization) {
+        // Facebook is inconsistent in that it returns errors as json and data as parameter list
+        $values = parent::parseCallbackResponse($data, $postAuthorization);
+
+        if (null === $values) {
             parse_str($data, $values);
+
             $this->factory->getSession()->set($this->getName().'_tokenResponse', $values);
-            return $values;
-        } else {
-            return parent::parseCallbackResponse($data, $postAuthorization);
         }
+
+        return $values;
     }
 
     /**
@@ -107,95 +102,52 @@ class FacebookIntegration extends SocialIntegration
      */
     public function getUserData($identifier, &$socialCache)
     {
-        //tell getUserId to return a user array if it obtains it
+        $persistLead = false;
+        $accessToken = $this->getAccessToken($socialCache);
 
-        $access_token = $this->factory->getSession()->get($this->getName().'_tokenResponse');
+        if (!isset($accessToken['access_token'])) {
 
-        if($identifier[$this->getName()]===null){
-            $identifier[$this->getName()] = "v2.5/me";
+            return;
+        } elseif (isset($accessToken['persist_lead'])) {
+            $persistLead = $accessToken['persist_lead'];
+            unset($accessToken['persist_lead']);
         }
 
+        $url    = $this->getApiUrl("v2.5/me");
+        $fields = array_keys($this->getAvailableLeadFields());
 
-        $identifier['access_token'] =$access_token['access_token'];
+        $parameters = array(
+            'access_token' => $accessToken['access_token'],
+            'fields'       => implode(",",$fields)
+        );
 
-        $this->preventDoubleCall = true;
+        $data = $this->makeRequest($url, $parameters, 'GET', array('auth_type' => 'rest'));
 
-        if ($id = $this->getUserId($identifier, $socialCache)) {
-
-            if (is_object($id)) {
-                //getUserId has already obtained the data
-                $data = $id;
-            } else {
-                $url = $this->getApiUrl("$id");
-
-                $data = $this->makeRequest($url, array(), 'GET', array('auth_type' => 'rest'));
-
-            }
-
+        if (is_object($data) && isset($data->id)) {
             $info = $this->matchUpData($data);
 
             if (isset($data->username)) {
                 $info['profileHandle'] = $data->username;
             } elseif (isset($data->link)) {
-                $info['profileHandle'] = str_replace('https://www.facebook.com/', '', $data->link);
+                if (preg_match("/www.facebook.com\/(app_scoped_user_id\/)?(.*?)($|\/)/", $data->link, $matches)) {
+                    $info['profileHandle'] = $matches[2];
+                }
             } else {
                 $info['profileHandle'] = $data->id;
             }
-
             $info['profileImage'] = "https://graph.facebook.com/{$data->id}/picture?type=large";
 
-
-            $socialCache['profile'] = $info;
+            $socialCache['id']          = $data->id;
+            $socialCache['profile']     = $info;
             $socialCache['lastRefresh'] = new \DateTime();
-            $socialCache['accessToken'] = $this->encryptApiKeys($access_token);
+            $socialCache['accessToken'] = $this->encryptApiKeys($accessToken);
 
-            $this->getMauticLead($info, true, $socialCache, $identifier);
-
-            $this->preventDoubleCall = false;
+            $this->getMauticLead($info, $persistLead, $socialCache, $identifier);
 
             return $data;
         }
-    }
 
-    /**$post
-     * {@inheritdoc}
-     */
-    public function getUserId($identifier, &$socialCache)
-    {
-        if (!empty($socialCache['id'])) {
-            return $socialCache['id'];
-        } elseif (empty($identifier)) {
-            return false;
-        }
-
-        $identifiers = $this->cleanIdentifier($identifier);
-        $access_token = $this->factory->getSession()->get($this->getName().'_tokenResponse');
-
-        if(!isset($access_token['access_token'])){
-            return;
-        }
-
-        if (isset($identifiers['Facebook'])) {
-            $url = $this->getApiUrl($identifiers["Facebook"]);
-
-            if(isset($identifier['access_token'])){
-                $parameters['access_token']=$identifier['access_token'];
-            }
-
-            $fields = array_keys($this->getAvailableLeadFields());
-            $parameters['fields'] = implode(",",$fields);
-
-            $data = $this->makeRequest($url, $parameters, 'GET', array('auth_type' => 'rest'));
-
-            if ($data && isset($data->id)) {
-                $socialCache['id'] = $data->id;
-
-                //return the entire data set if the function has been called from getUserData()
-                return ($this->preventDoubleCall) ? $data : $socialCache['id'];
-            }
-        }
-
-        return false;
+        return null;
     }
 
     /**
@@ -203,17 +155,23 @@ class FacebookIntegration extends SocialIntegration
      */
     public function getAvailableLeadFields($settings = array())
     {
-        // Until lead profile support is restored
-        //return array();
-
         return array(
-            'first_name' => array('type' => 'string'),
-            'last_name'  => array('type' => 'string'),
-            'name'       => array('type' => 'string'),
-            'gender'     => array('type' => 'string'),
-            'locale'     => array('type' => 'string'),
-            'email'      => array('type' => 'string'),
-            'link'       => array('type' => 'string'),
+            'about'       => array('type' => 'string'),
+            'bio'         => array('type' => 'string'),
+            'birthday'    => array('type' => 'string'),
+            'email'       => array('type' => 'string'),
+            'first_name'  => array('type' => 'string'),
+            'gender'      => array('type' => 'string'),
+            'last_name'   => array('type' => 'string'),
+            'link'        => array('type' => 'string'),
+            'locale'      => array('type' => 'string'),
+            'middle_name' => array('type' => 'string'),
+            'name'        => array('type' => 'string'),
+            'political'   => array('type' => 'string'),
+            'quotes'      => array('type' => 'string'),
+            'religion'    => array('type' => 'string'),
+            'timezone'    => array('type' => 'string'),
+            'website'     => array('type' => 'string')
         );
     }
 }
