@@ -46,19 +46,24 @@ $js = <<<JS
   function postAuthCallback(response){
   	var elements = document.getElementById("mauticform_{$formName}").elements;
   	var field, fieldName;
-  
+  	values = JSON.parse(JSON.stringify(response));	
+  	
 	for (var i = 0, element; element = elements[i++];) {
 		field = element.name
 		fieldName= field.replace("mauticform[","");
 		fieldName= fieldName.replace("]","");
-			 
-		values = JSON.parse(JSON.stringify(response));
-		for(var key in values) {
-		if(key!='id' && fieldName.indexOf(key) >= 0) {
-			var element = document.getElementsByName("mauticform["+key+"]");
-			element[0].value = values[key];
-		}
-	    }	
+		
+		for(var key in values) {		
+		var element = document.getElementsByName("mauticform["+fieldName+"]");
+		if(key!='id' && key.indexOf(fieldName) >= 0 && element[0].value=="") {
+			if(values[key].constructor === Array && values[key][0].value){
+				console.log(values[key][0].value);
+				element[0].value = values[key][0].value;
+		    }else{
+		    	element[0].value = values[key];
+		    }
+		}		
+	    }
 	}
 }
 JS;
