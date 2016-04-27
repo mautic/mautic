@@ -135,7 +135,7 @@ class LinkedInIntegration extends SocialIntegration
                 $socialCache['lastRefresh'] = new \DateTime();
                 $socialCache['accessToken'] = $this->encryptApiKeys($access_token);
 
-                $this->getMauticLead($info, true, $socialCache);
+                $this->getMauticLead($info, true, $socialCache, $identifier);
 
                 return $data;
 

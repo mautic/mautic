@@ -1239,12 +1239,13 @@ abstract class AbstractIntegration
     /**
      * Create or update existing Mautic lead from the integration's profile data
      *
-     * @param mixed      $data    Profile data from integration
-     * @param bool|true  $persist Set to false to not persist lead to the database in this method
-     * @param array|null $socialCache
+     * @param mixed       $data    Profile data from integration
+     * @param bool|true   $persist Set to false to not persist lead to the database in this method
+     * @param array|null  $socialCache
+     * @param mixed||null $identifiers
      * @return Lead
      */
-    public function getMauticLead($data, $persist = true, $socialCache = null)
+    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null)
     {
         if (is_object($data)) {
             // Convert to array in all levels
@@ -1297,6 +1298,12 @@ abstract class AbstractIntegration
             $leadSocialCache[$this->getName()] = array();
         }
         $leadSocialCache[$this->getName()] = array_merge($leadSocialCache[$this->getName()], $socialCache);
+
+        // Check for activity while here
+        if (null !== $identifiers && in_array('public_activity', $this->getSupportedFeatures())) {
+            $this->getPublicActivity($identifiers, $leadSocialCache[$this->getName()]);
+        }
+
         $lead->setSocialCache($leadSocialCache);
 
         $lead->setLastActive(new \DateTime());
@@ -1305,7 +1312,6 @@ abstract class AbstractIntegration
             // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
             $leadModel->saveEntity($lead, false);
         }
-
 
         return $lead;
     }

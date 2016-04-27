@@ -110,6 +110,9 @@ class GooglePlusIntegration extends SocialIntegration
             }
 
             if (is_object($data) && !isset($data->error)) {
+                // Store ID for public activity
+                $socialCache['id'] = $data->id;
+
                 $info = $this->matchUpData($data);
 
                 if (isset($data->url)) {
@@ -129,7 +132,7 @@ class GooglePlusIntegration extends SocialIntegration
                     $socialCache['lastRefresh'] = new \DateTime();
                     $socialCache['accessToken'] = $this->encryptApiKeys($accessToken);
 
-                    $this->getMauticLead($info, $persistLead, $socialCache);
+                    $this->getMauticLead($info, $persistLead, $socialCache, $identifier);
                 }
 
                 return $data;
