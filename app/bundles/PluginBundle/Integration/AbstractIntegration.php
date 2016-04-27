@@ -1258,6 +1258,7 @@ abstract class AbstractIntegration
         $matchedFields = $this->populateMauticLeadData($data);
 
         // Find unique identifier fields used by the integration
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel           = $this->factory->getModel('lead');
         $uniqueLeadFields    = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
         $uniqueLeadFieldData = array();
@@ -1267,7 +1268,7 @@ abstract class AbstractIntegration
                 $uniqueLeadFieldData[$leadField] = $value;
             }
         }
-        
+
         // Default to new lead
         $lead            = new Lead();
         $lead->setNewlyCreated(true);
@@ -1288,12 +1289,15 @@ abstract class AbstractIntegration
             }
         }
 
-        $leadModel->setFieldValues($lead, $matchedFields, false);
+        $leadModel->setFieldValues($lead, $matchedFields, false, false);
 
+        // Update the social cache
         $leadSocialCache = $lead->getSocialCache();
-        $socialCache     = array_merge($leadSocialCache, $socialCache);
-
-        $lead->setSocialCache($socialCache);
+        if (!isset($leadSocialCache[$this->getName()])) {
+            $leadSocialCache[$this->getName()] = array();
+        }
+        $leadSocialCache[$this->getName()] = array_merge($leadSocialCache[$this->getName()], $socialCache);
+        $lead->setSocialCache($leadSocialCache);
 
         $lead->setLastActive(new \DateTime());
 
@@ -1434,8 +1438,8 @@ abstract class AbstractIntegration
     }
 
     /**
-     * Get the path to the profile templates for this integration 
-     * 
+     * Get the path to the profile templates for this integration
+     *
      * @return null
      */
     public function getSocialProfileTemplate()

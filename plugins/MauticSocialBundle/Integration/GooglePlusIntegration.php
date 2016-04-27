@@ -14,7 +14,6 @@ namespace MauticPlugin\MauticSocialBundle\Integration;
  */
 class GooglePlusIntegration extends SocialIntegration
 {
-
     /**
      * {@inheritdoc}
      */
@@ -23,6 +22,9 @@ class GooglePlusIntegration extends SocialIntegration
         return 'GooglePlus';
     }
 
+    /**
+     * @return string
+     */
     public function getDisplayName()
     {
         return 'Google+';
@@ -62,55 +64,75 @@ class GooglePlusIntegration extends SocialIntegration
 
     /**
      * {@inheritdoc}
+     *
+     * @todo remove key support in 2.0
      */
     public function getUserData($identifier, &$socialCache)
     {
+        // Only persist if fetching the data after a form login
+        $persistLead = false;
 
-        if (!isset($identifier['googleplus']) || $identifier['googleplus'] === null) {
-            $identifier['googleplus'] = "people/me";
+        if ('oauth2' == $this->getAuthenticationType()) {
+            $accessToken = $this->getAccessToken($socialCache);
+
+            if (!isset($accessToken['access_token'])) {
+                // Try searching for the contact using Mautic's plugin authentication
+                $userId = $this->getUserId($identifier, $socialCache);
+            } else {
+                // Use the contact's access token for fetching profile data
+                $identifier['access_token'] = $accessToken['access_token'];
+
+                if (isset($accessToken['persist_lead'])) {
+                    $persistLead = $accessToken['persist_lead'];
+                    unset($accessToken['persist_lead']);
+                }
+
+                $userId = 'me';
+            }
+        } else {
+            // Try searching for the lead using Mautic's plugin authentication
+            $userId = $this->getUserId($identifier, $socialCache);
         }
-        $access_token = $this->factory->getSession()->get($this->getName().'_tokenResponse');
 
-        if (isset($access_token['access_token'])) {
-            $identifier['access_token'] = $access_token['access_token'];
-
-            $this->preventDoubleCall = true;
-
-            if ($userid = $this->getUserId($identifier, $socialCache)) {
-                $url  = $this->getApiUrl("people/{$userid}");
+        if ($userId) {
+            $url  = $this->getApiUrl("people/{$userId}");
+            if (isset($identifier['access_token'])) {
+                // Request using contact's access token
                 $data = $this->makeRequest(
                     $url,
                     array('access_token' => $identifier['access_token']),
                     'GET',
                     array('auth_type' => 'access_token')
                 );
+            } else {
+                // Request using Mautic's plugin authentication
+                $data = $this->makeRequest($url);
+            }
 
-                if (is_object($data) && !isset($data->error)) {
-                    $info = $this->matchUpData($data);
+            if (is_object($data) && !isset($data->error)) {
+                $info = $this->matchUpData($data);
 
-                    if (isset($data->url)) {
-                        preg_match("/plus.google.com\/(.*?)($|\/)/", $data->url, $matches);
-                        $info['profileHandle'] = $matches[1];
-                    }
-
-                    if (isset($data->image->url)) {
-                        //remove the size from the end
-                        $image                = $data->image->url;
-                        $image                = preg_replace('/\?.*/', '', $image);
-                        $info["profileImage"] = $image;
-                    }
-                    if (!empty($info)) {
-                        $socialCache[$this->getName()]['profile']     = $info;
-                        $socialCache[$this->getName()]['lastRefresh'] = new \DateTime();
-                        $socialCache[$this->getName()]['accessToken'] = $this->encryptApiKeys($access_token);
-
-                        $this->getMauticLead($info, true, $socialCache);
-                    }
-
-                    return $data;
-
-                    $this->preventDoubleCall = false;
+                if (isset($data->url)) {
+                    preg_match("/plus.google.com\/(.*?)($|\/)/", $data->url, $matches);
+                    $info['profileHandle'] = $matches[1];
                 }
+
+                if (isset($data->image->url)) {
+                    //remove the size from the end
+                    $image                = $data->image->url;
+                    $image                = preg_replace('/\?.*/', '', $image);
+                    $info["profileImage"] = $image;
+                }
+
+                if (!empty($info)) {
+                    $socialCache['profile']     = $info;
+                    $socialCache['lastRefresh'] = new \DateTime();
+                    $socialCache['accessToken'] = $this->encryptApiKeys($accessToken);
+
+                    $this->getMauticLead($info, $persistLead, $socialCache);
+                }
+
+                return $data;
             }
         }
 
@@ -126,19 +148,19 @@ class GooglePlusIntegration extends SocialIntegration
             $data = $this->makeRequest($this->getApiUrl("people/$id/activities/public"), array('maxResults' => 10));
 
             if (!empty($data) && isset($data->items) && count($data->items)) {
-                $socialCache[$this->getName()]['activity'] = array(
+                $socialCache['activity'] = array(
                     'posts'  => array(),
                     'photos' => array(),
                     'tags'   => array()
                 );
                 foreach ($data->items as $page) {
-                    $post                                                 = array(
+                    $post                               = array(
                         'title'     => $page->title,
                         'url'       => $page->url,
                         'published' => $page->published,
                         'updated'   => $page->updated
                     );
-                    $socialCache[$this->getName()]['activity']['posts'][] = $post;
+                    $socialCache['activity']['posts'][] = $post;
 
                     //extract hashtags from content
                     if (isset($page->object->content)) {
@@ -149,10 +171,10 @@ class GooglePlusIntegration extends SocialIntegration
                         );
                         if (!empty($tags[2])) {
                             foreach ($tags[2] as $k => $tag) {
-                                if (isset($socialCache[$this->getName()]['activity']['tags'][$tag])) {
-                                    $socialCache[$this->getName()]['activity']['tags'][$tag]['count']++;
+                                if (isset($socialCache['activity']['tags'][$tag])) {
+                                    $socialCache['activity']['tags'][$tag]['count']++;
                                 } else {
-                                    $socialCache[$this->getName()]['activity']['tags'][$tag] = array(
+                                    $socialCache['activity']['tags'][$tag] = array(
                                         'count' => 1,
                                         'url'   => $tags[1][$k]
                                     );
@@ -174,10 +196,10 @@ class GooglePlusIntegration extends SocialIntegration
                                     $url = substr($url, 0, $pos);
                                 }
 
-                                $photo                                                 = array(
+                                $photo                               = array(
                                     'url' => $url
                                 );
-                                $socialCache[$this->getName()]['activity']['photos'][] = $photo;
+                                $socialCache['activity']['photos'][] = $photo;
                             }
                         }
                     }
@@ -257,18 +279,37 @@ class GooglePlusIntegration extends SocialIntegration
     public function getRequiredKeyFields()
     {
         return array(
-            'key'           => 'mautic.integration.keyfield.api',
             'client_id'     => 'mautic.integration.keyfield.clientid',
             'client_secret' => 'mautic.integration.keyfield.clientsecret'
         );
     }
 
     /**
+     * @todo Remove key support in 2.0
+     */
+    public function getAuthenticationType()
+    {
+        if (empty($this->keys['client_id']) && !empty($this->keys['key'])) {
+
+            return 'key';
+        }
+
+        return 'oauth2';
+    }
+
+    /**
+     * @todo Remove key support in 2.0
+     *
      * @return string
      */
     public function getAuthTokenKey()
     {
-        return 'key';
+        if (empty($this->keys['client_id']) && !empty($this->keys['key'])) {
+
+            return 'key';
+        }
+
+        return 'access_token';
     }
 
     /**
@@ -310,15 +351,11 @@ class GooglePlusIntegration extends SocialIntegration
      */
     public function getUserId($identifier, &$socialCache)
     {
-        if (!empty($socialCache)) {
-            return $socialCache['id'];
-        } elseif (empty($identifier)) {
-            return false;
-        }
-
         if (!empty($socialCache['id'])) {
+
             return $socialCache['id'];
         } elseif (empty($identifier)) {
+
             return false;
         }
 
@@ -326,41 +363,51 @@ class GooglePlusIntegration extends SocialIntegration
             $identifier = array($identifier);
         }
 
-
-        if ('oauth2' == $this->getAuthenticationType()) {
-            if (!isset($identifier['access_token'])) {
-                return;
+        foreach ($identifier as $type => $id) {
+            if (empty($id)) {
+                continue;
             }
-            $data = $this->makeRequest(
-                $this->getApiUrl('people/me'),
-                array('access_token' => $identifier['access_token']),
-                'GET',
-                array('auth_type' => 'access_token')
-            );
-        } else {
-            foreach ($identifier as $type => $id) {
-                if (empty($id)) {
-                    continue;
-                }
-                if (!empty($data) && isset($data->id) && count($data->id)) {
-                    break;
-                }
-                if ($type == 'googleplus' && is_numeric($id)) {
-                    //this is a google user ID
-                    $socialCache['id'] = $id;
 
-                    return $id;
-                }
-                $data = $this->makeRequest($this->getApiUrl('people'), array('query' => $id));
+            if ($type == 'googleplus' && is_numeric($id)) {
+                //this is a google user ID
+                $socialCache['id'] = $id;
+
+                return $id;
             }
-        }
 
-        if (!empty($data) && isset($data->id) && count($data->id)) {
-            $socialCache['id'] = $data->id;
+            // Get user ID using the Mautic users access token/key
+            $data = $this->makeRequest($this->getApiUrl('people'), array('query' => $id));
 
-            return $socialCache['id'];
+            if (!empty($data) && isset($data->id) && count($data->id)) {
+                $socialCache['id'] = $data->id;
+
+                return $socialCache['id'];
+            }
         }
 
         return false;
+    }
+
+    /**
+     * Get the access token from session or socialCache
+     *
+     * @param $socialCache
+     *
+     * @return array|null
+     */
+    private function getAccessToken($socialCache)
+    {
+        $accessToken = $this->factory->getSession()->get($this->getName().'_tokenResponse', array());
+        if (!isset($accessToken['access_token'])) {
+            if (isset($socialCache['accessToken'])) {
+                $accessToken = $this->decryptApiKeys($socialCache['accessToken']);
+            } else {
+                return null;
+            }
+        } else {
+            $accessToken['persist_lead'] = true;
+        }
+
+        return $accessToken;
     }
 }
