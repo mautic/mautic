@@ -37,7 +37,7 @@ class BuildJsSubscriber extends CommonSubscriber
      * 
      * @return void
      */
-    public function onBuildJsMauticCoreJs(BuildJsEvent $event)
+    public function onBuildJs(BuildJsEvent $event)
     {
         $js = <<<JS
 var MauticJS = MauticJS || {};
