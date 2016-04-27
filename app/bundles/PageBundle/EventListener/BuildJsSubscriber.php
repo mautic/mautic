@@ -36,10 +36,10 @@ class BuildJsSubscriber extends CommonSubscriber
         $js = <<<JS
 (function(m, l, n, d){
     var params = {
-        title: d.title,
-        language: n.language,
-        referrer: (d.referrer) ? d.referrer.split('/')[2] : '',
-        url: l.href
+        page_title: d.title,
+        page_language: n.language,
+        page_referrer: (d.referrer) ? d.referrer.split('/')[2] : '',
+        page_url: l.href
     };
     
     m.trackingPixelParams = m.serialize(params);
