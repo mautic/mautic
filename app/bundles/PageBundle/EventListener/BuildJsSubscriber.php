@@ -22,7 +22,7 @@ class BuildJsSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return array(
-            CoreEvents::BUILD_MAUTIC_JS => array('onBuildJs', 256)
+            CoreEvents::BUILD_MAUTIC_JS => array('onBuildJs', 255)
         );
     }
 
@@ -33,8 +33,17 @@ class BuildJsSubscriber extends CommonSubscriber
      */
     public function onBuildJs(BuildJsEvent $event)
     {
+        $router = $this->factory->getRouter();
+        $trackingUrl = str_replace(
+            array('http://', 'https://'),
+            '',
+            $router->generate('mautic_page_tracker', [], UrlGeneratorInterface::ABSOLUTE_URL)
+        );
+
         $js = <<<JS
 (function(m, l, n, d){
+    m.trackingPixelUrl = (l.protocol == 'https:' ? 'https:' : 'http:') + '//{$trackingUrl}';
+    
     var params = {
         page_title: d.title,
         page_language: n.language,
@@ -42,9 +51,19 @@ class BuildJsSubscriber extends CommonSubscriber
         page_url: l.href
     };
     
-    m.trackingPixelParams = m.serialize(params);
+    // Merge user defined tracking pixel parameters.
+    if (m.hasOwnProperty("trackingPixelParams")) {
+        for (var attr in m.trackingPixelParams) {
+            params[attr] = m.trackingPixelParams[attr];
+        }
+    }
+    
+    m.trackingPixelUrl += '?' + m.serialize(params);
+    
+    m.trackingPixel = (new Image()).src = m.trackingPixelUrl;
 })(MauticJS, location, navigator, document);
 JS;
-        $event->appendJs($js, 'Page Info');
+
+        $event->appendJs($js, 'Mautic Tracking Pixel');
     }
 }

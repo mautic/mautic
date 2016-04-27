@@ -24,10 +24,7 @@ class BuildJsSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return array(
-            CoreEvents::BUILD_MAUTIC_JS => array(
-                array('onBuildJs', 255),
-                array('onBuildJsMauticCoreJs', 1000)
-            )
+            CoreEvents::BUILD_MAUTIC_JS => array('onBuildJs', 1000)
         );
     }
 
@@ -59,34 +56,5 @@ MauticJS.documentReady = function(f) {
 };
 JS;
         $event->appendJs($js, 'Mautic Core');
-    }
-
-    /**
-     * @param BuildJsEvent $event
-     *
-     * @return void
-     */
-    public function onBuildJs(BuildJsEvent $event)
-    {
-        $router = $this->factory->getRouter();
-        $trackingUrl = str_replace(
-            array('http://', 'https://'),
-            '',
-            $router->generate('mautic_page_tracker', [], UrlGeneratorInterface::ABSOLUTE_URL)
-        );
-        
-        $js = <<<JS
-(function(m, l){
-    m.trackingPixelUrl = (l.protocol == 'https:' ? 'https:' : 'http:') + '//{$trackingUrl}';
-    
-    if (m.hasOwnProperty("trackingPixelParams")) {
-        m.trackingPixelUrl += "?" + m.trackingPixelParams;
-    }
-    
-    m.trackingPixel = (new Image()).src = m.trackingPixelUrl;
-})(MauticJS, location);
-JS;
-
-        $event->appendJs($js, 'Mautic Tracking Pixel');
     }
 }
