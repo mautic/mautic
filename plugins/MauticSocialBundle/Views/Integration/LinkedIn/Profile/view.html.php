@@ -11,26 +11,21 @@
 <div class="panel-toolbar np">
     <ul class="nav nav-tabs pr-md pl-md">
         <li class="active">
-            <a href="#InstagramProfile" role="tab" data-toggle="tab">
+            <a href="#LinkedInProfile" role="tab" data-toggle="tab">
                 <?php echo $view['translator']->trans('mautic.lead.lead.social.profile'); ?>
             </a>
         </li>
         <li>
-            <a href="#InstagramPhotos" role="tab" data-toggle="tab">
+            <a href="#LinkedInPhotos" role="tab" data-toggle="tab">
                 <?php echo $view['translator']->trans('mautic.lead.lead.social.photos'); ?>
             </a>
         </li>
     </ul>
 </div>
 <div class="np panel-body tab-content">
-    <div class="pa-20 tab-pane active" id="InstagramProfile">
-        <?php echo $view->render('MauticLeadBundle:Social/Instagram:profile.html.php', array(
+    <div class="pa-20 tab-pane active" id="LinkedInProfile">
+        <?php echo $view->render('MauticSocialBundle:Integration/LinkedIn/Profile:profile.html.php', array(
             'profile' => $details['profile']
-        )); ?>
-    </div>
-    <div class="pa-20 tab-pane" id="InstagramPhotos">
-        <?php echo $view->render('MauticLeadBundle:Social/Instagram:photos.html.php', array(
-            'activity' => (!empty($details['activity']['photos'])) ? $details['activity']['photos'] : array()
         )); ?>
     </div>
 </div>
