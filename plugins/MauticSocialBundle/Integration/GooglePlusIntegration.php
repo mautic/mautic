@@ -390,27 +390,4 @@ class GooglePlusIntegration extends SocialIntegration
 
         return false;
     }
-
-    /**
-     * Get the access token from session or socialCache
-     *
-     * @param $socialCache
-     *
-     * @return array|null
-     */
-    private function getAccessToken($socialCache)
-    {
-        $accessToken = $this->factory->getSession()->get($this->getName().'_tokenResponse', array());
-        if (!isset($accessToken['access_token'])) {
-            if (isset($socialCache['accessToken'])) {
-                $accessToken = $this->decryptApiKeys($socialCache['accessToken']);
-            } else {
-                return null;
-            }
-        } else {
-            $accessToken['persist_lead'] = true;
-        }
-
-        return $accessToken;
-    }
 }
