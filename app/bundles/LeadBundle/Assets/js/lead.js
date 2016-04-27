@@ -88,10 +88,6 @@ Mautic.leadOnLoad = function (container) {
         Mautic.activateSearchAutocomplete('NoteFilter', 'lead.note');
     }
 
-    if (typeof Mautic.leadEngagementChart === 'undefined') {
-        Mautic.renderEngagementChart();
-    }
-
     if (mQuery('#lead_preferred_profile_image').length) {
         mQuery('#lead_preferred_profile_image').on('change', function() {
             if (mQuery(this).val() == 'custom') {
@@ -128,10 +124,6 @@ Mautic.leadOnLoad = function (container) {
 };
 
 Mautic.leadOnUnload = function(id) {
-    if (id === '#app-content') {
-        delete Mautic.leadEngagementChart;
-    }
-
     if (typeof MauticVars.moderatedIntervals['leadListLiveUpdate'] != 'undefined') {
         Mautic.clearModeratedInterval('leadListLiveUpdate');
     }
@@ -423,7 +415,7 @@ Mautic.addLeadListFilter = function (elId) {
         }).remove();
     } else if (typeof operators.exclude != 'undefined') {
         mQuery('#' + filterIdBase + 'operator option').filter(function () {
-            return mQuery.inArray(mQuery(this).val(), operators['exclude']) > 0
+            return mQuery.inArray(mQuery(this).val(), operators['exclude']) !== -1
         }).remove();
     }
 
@@ -457,9 +449,14 @@ Mautic.leadfieldOnLoad = function (container) {
         });
     }
 
+    if (mQuery(container + ' form[name="leadfield"]').length) {
+        Mautic.updateLeadFieldProperties(mQuery('#leadfield_type').val());
+    }
+
 };
 
 Mautic.updateLeadFieldProperties = function(selectedVal) {
+    var defaultValueField = mQuery('input#leadfield_defaultValue');
     if (selectedVal == 'lookup') {
         // Use select
         selectedVal = 'select';
@@ -480,7 +477,6 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
 
     // Switch default field if applicable
     var defaultFieldType = mQuery('input[name="leadfield[defaultValue]"]').attr('type');
-
     if (selectedVal == 'boolean') {
         if (defaultFieldType == 'text') {
             // Convert to a select
@@ -490,13 +486,19 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
 
             mQuery(defaultBool).appendTo(newDiv);
 
-            mQuery('#leadfield_defaultValue').replaceWith(newDiv);
+            defaultValueField.replaceWith(newDiv);
         }
     } else if (defaultFieldType == 'radio') {
         // Convert to input
         var html = mQuery('#field-templates .default').html();
         html     = html.replace(/default_template/g, 'defaultValue');
-        mQuery('#leadfield_defaultValue').replaceWith(html);
+        defaultValueField.replaceWith(html);
+    }
+
+    if (selectedVal === 'datetime' || selectedVal === 'date' || selectedVal === 'time') {
+        Mautic.activateDateTimeInputs(defaultValueField, selectedVal);
+    } else {
+        defaultValueField.datetimepicker('destroy').removeClass('calendar-activated');
     }
 };
 
@@ -696,20 +698,6 @@ Mautic.leadNoteOnLoad = function (container, response) {
 
         mQuery('#NoteCount').html(count);
     }
-};
-
-Mautic.renderEngagementChart = function() {
-    if (!mQuery("#chart-engagement").length) {
-        return;
-    }
-    var canvas = document.getElementById("chart-engagement");
-    var chartData = mQuery.parseJSON(mQuery('#chart-engagement-data').text());
-    Mautic.leadEngagementChart = new Chart(canvas.getContext("2d")).Line(chartData);
-
-    var legendHolder = document.createElement('div');
-    legendHolder.innerHTML = Mautic.leadEngagementChart.generateLegend();
-    mQuery('#engagement-legend').html(legendHolder.firstChild);
-    Mautic.leadEngagementChart.update();
 };
 
 Mautic.showSocialMediaImageModal = function(imgSrc) {

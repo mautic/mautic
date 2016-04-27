@@ -74,6 +74,10 @@ class ConfigController extends FormController
                     $dispatcher->dispatch(ConfigEvents::CONFIG_PRE_SAVE, $configEvent);
                     $formValues = $configEvent->getConfig();
 
+                    foreach ($configEvent->getErrors() as $message => $messageVars) {
+                        $this->addFlash($message, $messageVars);
+                    }
+
                     // Prevent these from getting overwritten with empty values
                     $unsetIfEmpty = $configEvent->getPreservedFields();
 

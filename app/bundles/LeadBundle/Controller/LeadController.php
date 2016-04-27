@@ -22,6 +22,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -204,7 +205,6 @@ class LeadController extends FormController
     /*
      * Quick form controller route and view
      */
-
     public function quickAddAction()
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
@@ -234,6 +234,10 @@ class LeadController extends FormController
         );
 
         $quickForm = $model->createForm($model->getEntity(), $this->get('form.factory'), $action, array('fields' => $fields, 'isShortForm' => true));
+
+        //set the default owner to the currently logged in user
+        $currentUser = $this->get('security.context')->getToken()->getUser();
+        $quickForm->get('owner')->setData($currentUser);
 
         return $this->delegateView(
             array(
@@ -356,13 +360,10 @@ class LeadController extends FormController
 
         // Get an engagement count
         $translator     = $this->factory->getTranslator();
-        $graphData      = GraphHelper::prepareDatetimeLineGraphData(
-            6,
-            'M',
-            array($translator->trans('mautic.lead.graph.line.all_engagements'), $translator->trans('mautic.lead.graph.line.points'))
-        );
-        $fromDate       = $graphData['fromDate'];
-        $allEngagements = array();
+
+        $fromDate       = (new \DateTime('first day of this month 00:00:00'))->modify('-6 months');
+        $toDate         = new \DateTime;
+        $engagements = array();
         $total          = 0;
 
         $events = array();
@@ -370,20 +371,21 @@ class LeadController extends FormController
             $datetime = \DateTime::createFromFormat('Y-m-d H:i', $eventDate);
             if ($datetime > $fromDate) {
                 $total++;
-                $allEngagements[] = array(
-                    'date' => $datetime,
+                $engagements[] = array(
+                    'date' => $eventDate,
                     'data' => 1
                 );
             }
             $events = array_merge($events, array_reverse($dateEvents));
         }
 
-        $graphData = GraphHelper::mergeLineGraphData($graphData, $allEngagements, 'M', 0, 'date', 'data', false, false);
-
-        /** @var \Mautic\LeadBundle\Entity\PointChangeLogRepository $pointsLogRepository */
-        $pointsLogRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');
-        $pointStats          = $pointsLogRepository->getLeadPoints($fromDate, array('lead_id' => $lead->getId()));
-        $engagementGraphData = GraphHelper::mergeLineGraphData($graphData, $pointStats, 'M', 1, 'date', 'data', false, false);
+        $lineChart   = new LineChart(null, $fromDate, $toDate);
+        $query       = $lineChart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $engagements = $query->completeTimeData($engagements);
+        $pointStats  = $query->fetchTimeData('lead_points_change_log', 'date_added', array('lead_id' => $lead->getId()));
+        $lineChart->setDataset($translator->trans('mautic.lead.graph.line.all_engagements'), $engagements);
+        $lineChart->setDataset($translator->trans('mautic.lead.graph.line.points'), $pointStats);
+        $engagementChart = $lineChart->render();
 
         // Upcoming events from Campaign Bundle
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
@@ -420,7 +422,7 @@ class LeadController extends FormController
                     'eventFilters'      => $filters,
                     'upcomingEvents'    => $upcomingEvents,
                     'icons'             => $icons,
-                    'engagementData'    => $engagementGraphData,
+                    'engagementData'    => $engagementChart,
                     'noteCount'         => $this->factory->getModel('lead.note')->getNoteCount($lead, true),
                     'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value']),
                     'leadNotes'         => $this->forward(

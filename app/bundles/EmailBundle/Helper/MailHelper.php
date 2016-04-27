@@ -252,19 +252,20 @@ class MailHelper
     {
         // Set from email
         if (!$isQueueFlush && $useOwnerAsMailer && $this->factory->getParameter('mailer_is_owner') && isset($this->lead['id'])) {
-            if (!isset($this->lead['owner_id']) ||
-                (isset($this->lead['owner_id']) && !isset(self::$leadOwners[$this->lead['owner_id']]))) {
-                if ($owner = $this->factory->getModel('lead')->getRepository()->getLeadOwner($this->lead['owner_id'])) {
-                    self::$leadOwners[$owner['id']] = $owner;
-                    $this->lead['owner_id']         = $owner['id'];
+            if (!isset($this->lead['owner_id'])) {
+                $this->lead['owner_id'] = 0;
+            } elseif (isset($this->lead['owner_id'])) {
+                if (!isset(self::$leadOwners[$this->lead['owner_id']])) {
+                    $owner = $this->factory->getModel('lead')->getRepository()->getLeadOwner($this->lead['owner_id']);
+                    if ($owner) {
+                        self::$leadOwners[$owner['id']] = $owner;
+                    }
                 } else {
-                    $this->lead['owner_id'] = 0;
+                    $owner = self::$leadOwners[$this->lead['owner_id']];
                 }
-            } elseif (isset(self::$leadOwners[$this->lead['owner_id']])) {
-                $owner = self::$leadOwners[$this->lead['owner_id']];
             }
 
-            if ($owner) {
+            if (!empty($owner)) {
                 $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name']);
             } else {
                 $this->setFrom($this->from);
@@ -834,9 +835,23 @@ class MailHelper
      * @param string $contentType
      * @param null   $charset
      * @param bool   $ignoreTrackingPixel
+     * @param bool   $ignoreEmbedImageConversion
      */
-    public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false)
+    public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false, $ignoreEmbedImageConversion = false)
     {
+        if (!$ignoreEmbedImageConversion && $this->factory->getParameter('mailer_convert_embed_images')) {
+            $matches = array();
+            if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
+                $replaces = array();
+                foreach($matches[1] AS $match) {
+                    if (strpos($match, 'cid:') === false) {
+                        $replaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
+                    }
+                }
+                $content = strtr($content, $replaces);
+            }
+        }
+
         if (!$ignoreTrackingPixel) {
             // Append tracking pixel
             $trackingImg = '<img style="display: none;" height="1" width="1" src="{tracking_pixel}" alt="Mautic is open source marketing automation" />';

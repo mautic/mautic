@@ -76,10 +76,16 @@ return array(
     ),
     'menu'       => array(
         'main'  => array(
-            'priority' => -1000,
+            'priority' => 15,
             'items'    => array(
-                'name'     => 'root',
-                'children' => array()
+                'mautic.core.channels' => array(
+                    'id'        => 'mautic_channels_root',
+                    'iconClass' => 'fa-rss'
+                ),
+                'mautic.core.components' => array(
+                    'id'        => 'mautic_components_root',
+                    'iconClass' => 'fa-puzzle-piece'
+                )
             )
         ),
         'admin' => array(
@@ -100,7 +106,10 @@ return array(
             ),
             'mautic.core.configbundle.subscriber' => array(
                 'class' => 'Mautic\CoreBundle\EventListener\ConfigSubscriber'
-            )
+            ),
+            'mautic.core.dashboard.subscriber'    => array(
+                'class' => 'Mautic\CoreBundle\EventListener\DashboardSubscriber'
+            ),
         ),
         'forms'   => array(
             'mautic.form.type.spacer'             => array(
@@ -164,6 +173,11 @@ return array(
                 'class'     => 'Mautic\CoreBundle\Form\Type\ThemeListType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'theme_list'
+            ),
+            'mautic.form.type.daterange'          => array(
+                'class'     => 'Mautic\CoreBundle\Form\Type\DateRangeType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'daterange'
             )
         ),
         'helpers' => array(
@@ -481,5 +495,6 @@ return array(
         'cookie_secure'                  => null,
         'cookie_httponly'                => false,
         'do_not_track_ips'               => array(),
+        'cached_data_timeout'            => 10
     )
 );

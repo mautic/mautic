@@ -17,6 +17,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\FormEvents;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -65,7 +66,9 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
+     * @param null $id
+     *
+     * @return Form
      */
     public function getEntity($id = null)
     {
@@ -615,5 +618,37 @@ class FormModel extends CommonFormModel
         );
 
         return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
+    }
+
+    /**
+     * Get a list of assets in a date range
+     *
+     * @param integer  $limit
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param array    $filters
+     * @param array    $options
+     *
+     * @return array
+     */
+    public function getFormList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array(), $options = array())
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('t.id, t.name, t.date_added, t.date_modified')
+            ->from(MAUTIC_TABLE_PREFIX.'forms', 't')
+            ->setMaxResults($limit);
+
+        if (!empty($options['canViewOthers'])) {
+            $q->andWhere('t.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_added');
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
     }
 }

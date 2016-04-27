@@ -55,12 +55,11 @@ return array(
 
     'menu'     => array(
         'main' => array(
-            'priority' => 10,
+            'priority' => 70,
             'items'    => array(
-                'mautic.campaign.campaigns' => array(
-                    'route'     => 'mautic_campaign_index',
-                    'id'        => 'mautic_campaigns_root',
+                'mautic.campaign.menu.index' => array(
                     'iconClass' => 'fa-clock-o',
+                    'route'     => 'mautic_campaign_index',
                     'access'    => 'campaign:campaigns:view'
                 )
             )
@@ -87,7 +86,10 @@ return array(
             ),
             'mautic.campaign.search.subscriber'         => array(
                 'class' => 'Mautic\CampaignBundle\EventListener\SearchSubscriber'
-            )
+            ),
+            'mautic.campaign.dashboard.subscriber'           => array(
+                'class' => 'Mautic\CampaignBundle\EventListener\DashboardSubscriber'
+            ),
         ),
         'forms'  => array(
             'mautic.campaign.type.form'                 => array(
