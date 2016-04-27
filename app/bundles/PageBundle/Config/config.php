@@ -119,6 +119,9 @@ return array(
             'mautic.page.dashboard.subscriber'      => array(
                 'class' => 'Mautic\PageBundle\EventListener\DashboardSubscriber'
             ),
+            'mautic.page.js.subscriber'           => array(
+                'class' => 'Mautic\PageBundle\EventListener\BuildJsSubscriber'
+            )
         ),
         'forms'  => array(
             'mautic.form.type.page'                     => array(
