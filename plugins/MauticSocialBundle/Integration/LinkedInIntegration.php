@@ -29,10 +29,14 @@ class LinkedInIntegration extends SocialIntegration
     {
         return array(
             'share_button',
-            'login_button'
+            'login_button',
+            'public_profile'
         );
     }
 
+    /**
+     * @return string
+     */
     public function getAuthScope()
     {
         return 'r_emailaddress';
@@ -74,7 +78,6 @@ class LinkedInIntegration extends SocialIntegration
         );
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -96,59 +99,55 @@ class LinkedInIntegration extends SocialIntegration
      */
     public function getUserData($identifier, &$socialCache)
     {
-        //tell getUserId to return a user array if it obtains it
-        $socialCache  = array();
-        $access_token = $this->factory->getSession()->get($this->getName().'_tokenResponse');
+        $persistLead = false;
+        $accessToken = $this->getAccessToken($socialCache);
+
+        if (!isset($accessToken['access_token'])) {
+
+            return;
+        } elseif (isset($accessToken['persist_lead'])) {
+            $persistLead = $accessToken['persist_lead'];
+            unset($accessToken['persist_lead']);
+        }
 
         $fields        = $this->getFieldNames($this->getAvailableLeadFields());
         $profileFields = implode(",", array_keys($fields));
+        $url           = $this->getApiUrl("v1/people/~:(id,picture-url,".$profileFields.")");
+        $parameters    = array(
+            'oauth2_access_token' => $accessToken['access_token'],
+            'format'              => 'json'
+        );
 
-        if ($identifier[$this->getName()] === null) {
-            $identifier[$this->getName()] = "v1/people/~:(id,picture-url,".$profileFields.")";
-        }
+        $data = $this->makeRequest($url, $parameters, 'GET', array('auth_type' => 'rest'));
 
-        if(isset($access_token['access_token'])) {
-            $identifier['access_token'] = $access_token['access_token'];
+        if (true) {
+            $info = $this->matchUpData($data);
 
-            $this->preventDoubleCall = true;
-
-            if ($id = $this->getUserId($identifier, $socialCache)) {
-
-                if (is_object($id)) {
-                    //getUserId has already obtained the data
-                    $data = $id;
-                } else {
-                    $url  = $this->getApiUrl("$id");
-                    $data = $this->makeRequest($url, array(), 'GET', array('auth_type' => 'rest'));
-                }
-
-                $info = $this->matchUpData($data);
-
-                if (isset($data->publicProfileUrl)) {
-                    $info['profileHandle'] = str_replace("https://www.linkedin.com/", '', $data->publicProfileUrl);
-                }
-
-                $info['profileImage'] = preg_replace('/\?.*/', '', $data->pictureUrl);
-
-
-                $socialCache['profile']     = $info;
-                $socialCache['lastRefresh'] = new \DateTime();
-                $socialCache['accessToken'] = $this->encryptApiKeys($access_token);
-
-                $this->getMauticLead($info, true, $socialCache, $identifier);
-
-                return $data;
-
-                //$this->preventDoubleCall = false;
+            if (isset($data->publicProfileUrl)) {
+                $info['profileHandle'] = str_replace("https://www.linkedin.com/", '', $data->publicProfileUrl);
             }
+
+            $info['profileImage'] = preg_replace('/\?.*/', '', $data->pictureUrl);
+
+
+            $socialCache['profile']     = $info;
+            $socialCache['lastRefresh'] = new \DateTime();
+            $socialCache['accessToken'] = $this->encryptApiKeys($accessToken);
+
+            $this->getMauticLead($info, $persistLead, $socialCache, $identifier);
+
+            return $data;
         }
+
         return null;
     }
 
     /**
      * gets the name of field to sent to linked in API to fetch social profile data
      *
-     * @return array()
+     * @param $leadFields
+     *
+     * @return array
      */
     protected function getFieldNames($leadFields)
     {
@@ -166,43 +165,6 @@ class LinkedInIntegration extends SocialIntegration
     protected function cleanIdentifier($identifier)
     {
         return $identifier;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getUserId($identifier, &$socialCache)
-    {
-        if (!empty($socialCache['id'])) {
-            return $socialCache['id'];
-        } elseif (empty($identifier)) {
-            return false;
-        }
-
-        $identifiers = $this->cleanIdentifier($identifier);
-
-        if (!isset($identifier['access_token'])) {
-            return;
-        }
-
-        if (isset($identifiers['LinkedIn'])) {
-            $url = $this->getApiUrl($identifiers["LinkedIn"]);
-
-            if (isset($identifier['access_token'])) {
-                $parameters['oauth2_access_token'] = $identifier['access_token'];
-            }
-            $parameters['format'] = "json";
-            $data                 = $this->makeRequest($url, $parameters, 'GET', array('auth_type' => 'rest'));
-
-            if ($data && isset($data->id)) {
-                $socialCache['id'] = $data->id;
-
-                //return the entire data set if the function has been called from getUserData()
-                return ($this->preventDoubleCall) ? $data : $socialCache['id'];
-            }
-        }
-
-        return false;
     }
 
     /**
