@@ -11,6 +11,11 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ListController extends FormController
 {
@@ -19,11 +24,11 @@ class ListController extends FormController
      * Generate's default list view
      *
      * @param int $page
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse | Response
      */
     public function indexAction($page = 1)
     {
-        /** @var \Mautic\LeadBundle\Model\ListModel $model */
+        /** @var ListModel $model */
         $model = $this->factory->getModel('lead.list');
 
         //set some permissions
@@ -124,7 +129,7 @@ class ListController extends FormController
     /**
      * Generate's new form and processes post data
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse | RedirectResponse | Response
      */
     public function newAction ()
     {
@@ -134,7 +139,7 @@ class ListController extends FormController
 
         //retrieve the entity
         $list     = new LeadList();
-        /** @var \Mautic\LeadBundle\Model\ListModel $model */
+        /** @var ListModel $model */
         $model      =$this->factory->getModel('lead.list');
         //set the page we came from
         $page       = $this->factory->getSession()->get('mautic.leadlist.page', 1);
@@ -197,10 +202,11 @@ class ListController extends FormController
      * @param            $objectId
      * @param bool|false $ignorePost
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return array | JsonResponse | RedirectResponse | Response
      */
     public function editAction ($objectId, $ignorePost = false)
     {
+        /** @var ListModel $model */
         $model   = $this->factory->getModel('lead.list');
         $list    = $model->getEntity($objectId);
 
@@ -292,7 +298,7 @@ class ListController extends FormController
      * Delete a list
      *
      * @param         $objectId
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse | RedirectResponse
      */
     public function deleteAction($objectId)
     {
@@ -311,6 +317,7 @@ class ListController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
+            /** @var ListModel $model */
             $model  =$this->factory->getModel('lead.list');
             $list = $model->getEntity($objectId);
 
@@ -351,7 +358,7 @@ class ListController extends FormController
     /**
      * Deletes a group of entities
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse | RedirectResponse
      */
     public function batchDeleteAction() {
         $page        = $this->factory->getSession()->get('mautic.leadlist.page', 1);
@@ -369,6 +376,7 @@ class ListController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
+            /** @var ListModel $model */
             $model     = $this->factory->getModel('lead.list');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = array();
@@ -418,7 +426,7 @@ class ListController extends FormController
     /**
      * @param $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse | RedirectResponse
      */
     public function removeLeadAction($objectId)
     {
@@ -428,7 +436,7 @@ class ListController extends FormController
     /**
      * @param $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse | RedirectResponse
      */
     public function addLeadAction($objectId)
     {
@@ -439,7 +447,7 @@ class ListController extends FormController
      * @param $listId
      * @param $action
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return array | JsonResponse | RedirectResponse
      */
     protected function changeList($listId, $action) {
         $page        = $this->factory->getSession()->get('mautic.lead.page', 1);
@@ -458,12 +466,11 @@ class ListController extends FormController
 
         $leadId = $this->request->get('leadId');
         if (!empty($leadId) && $this->request->getMethod() == 'POST') {
-            /** @var \Mautic\LeadBundle\Model\ListModel $model */
+            /** @var ListModel $model */
             $model  = $this->factory->getModel('lead.list');
-            /** @var \Mautic\LeadBundle\Entity\LeadList $model */
+            /** @var LeadList $list */
             $list   = $model->getEntity($listId);
-
-            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            /** @var LeadModel $leadModel */
             $leadModel = $this->factory->getModel('lead');
             $lead      = $leadModel->getEntity($leadId);
 
