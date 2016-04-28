@@ -414,7 +414,7 @@ class ListModel extends FormModel
         uasort($choices, $cmp);
 
         foreach ($choices as $key => $choice) {
-            if (array_key_exists('operators', $choice) && is_string($choice['operators'] && in_array($choice['operators'], $operators)) {
+            if (array_key_exists('operators', $choice) && is_string($choice['operators']) && array_key_exists($choice['operators'], $operators)) {
                 $choices[$key]['operators'] = $operators[$choice['operators']];
             }
         }

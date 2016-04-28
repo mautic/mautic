@@ -62,23 +62,6 @@ SQL;
      */
     public function postgresqlUp(Schema $schema)
     {
-        $leadIdIdx = $this->generatePropertyName($this->prefix . 'lead_donotcontact', 'idx', array('lead_id'));
-        $leadIdFk = $this->generatePropertyName($this->prefix . 'lead_donotcontact', 'fk', array('lead_id'));
-
-        $sql = <<<SQL
-CREATE TABLE {$this->prefix}lead_donotcontact (
-  id INT NOT NULL,
-  lead_id INT DEFAULT NULL,
-  channel VARCHAR(255) NOT NULL,
-  channel_id INT DEFAULT NULL,
-  date_added TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL,
-  reason INT NOT NULL DEFAULT '0',
-  comments TEXT DEFAULT NULL,
-  PRIMARY KEY(id)
-SQL;
-        $this->addSql($sql);
-        $this->addSql('COMMENT ON COLUMN ' . $this->prefix . 'lead_donotcontact.date_added IS \'(DC2Type:datetime)\'');
-        $this->addSql('CREATE INDEX ' . $leadIdIdx . ' ON ' . $this->prefix . 'lead_donotcontact (lead_id)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_donotcontact ADD CONSTRAINT ' . $leadIdFk . ' FOREIGN KEY (lead_id) REFERENCES ' . $this->prefix . 'leads (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        
     }
 }
