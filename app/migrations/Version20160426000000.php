@@ -50,7 +50,7 @@ CREATE TABLE `{$this->prefix}lead_donotcontact` (
   `comments` longtext COLLATE utf8_unicode_ci,
   PRIMARY KEY (`id`),
   KEY `{$leadIdIdx}` (`lead_id`),
-  CONSTRAINT `{$leadIdFk}` FOREIGN KEY (`lead_id`) REFERENCES `mtc_leads` (`id`) ON DELETE CASCADE
+  CONSTRAINT `{$leadIdFk}` FOREIGN KEY (`lead_id`) REFERENCES `{$this->prefix}leads` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 SQL;
 
