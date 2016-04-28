@@ -89,6 +89,15 @@ class PageSubscriber extends CommonSubscriber
             postUserIdToMautic(userId);
         }
     });
+    
+    // Just to be sure we've grabbed the ID
+    window.onbeforeunload = function() {
+        OneSignal.getUserId(function(userId) {
+            if (userId) {
+                postUserIdToMautic(userId);
+            }        
+        });    
+    };
 JS;
 
         $assetsHelper->addScriptDeclaration($oneSignalInit, 'onPageDisplay_headClose');
