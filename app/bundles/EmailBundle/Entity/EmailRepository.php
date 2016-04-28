@@ -34,7 +34,7 @@ class EmailRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', 'dnc')
             ->leftJoin('dnc', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = dnc.lead_id')
             ->where('dnc.channel = "email"')
-            ->where('l.email != ""');
+            ->andWhere('l.email != ""');
 
         $results = $q->execute()->fetchAll();
 
@@ -61,7 +61,7 @@ class EmailRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', 'dnc')
             ->leftJoin('dnc', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = dnc.lead_id')
             ->where('dnc.channel = "email"')
-            ->where('l.email = :email')
+            ->andWhere('l.email = :email')
             ->setParameter('email', $email);
 
         $results = $q->execute()->fetchAll();
@@ -94,17 +94,13 @@ class EmailRepository extends CommonRepository
 
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
         $leadRepo = $this->_em->getRepository('MauticLeadBundle:Lead');
-        $leadId = $leadRepo->getLeadByEmail($email, true);
+        $leadId = (array) $leadRepo->getLeadByEmail($email, true);
 
         /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
         $leads = array();
 
-        if (count($leadId) > 1) {
-            foreach ($leadId as $lead) {
-                $leads[] = $leadRepo->getEntity($lead['id']);
-            }
-        } else {
-            $leads[] = $leadRepo->getEntity($leadId['id']);
+        foreach ($leadId as $lead) {
+            $leads[] = $leadRepo->getEntity($lead['id']);
         }
 
         foreach ($leads as $lead) {
@@ -187,7 +183,7 @@ class EmailRepository extends CommonRepository
             ->where(
                 $dncQb->expr()->eq('dnc.lead_id', 'l.id')
             )
-            ->where('dnc.channel = "email"');
+            ->andWhere('dnc.channel = "email"');
 
         // Do not include leads that have already been emailed
         $statQb    = $this->_em->getConnection()->createQueryBuilder()
@@ -332,7 +328,7 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
+     * @param \Doctrine\ORM\QueryBuilder $q
      * @param              $filter
      * @return array
      */
@@ -356,7 +352,7 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
+     * @param \Doctrine\ORM\QueryBuilder $q
      * @param              $filter
      * @return array
      */

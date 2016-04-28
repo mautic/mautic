@@ -1237,17 +1237,13 @@ class EmailModel extends FormModel
 
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
         $leadRepo = $this->em->getRepository('MauticLeadBundle:Lead');
-        $leadId = $leadRepo->getLeadByEmail($email, true);
+        $leadId = (array) $leadRepo->getLeadByEmail($email, true);
 
         /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
         $leads = array();
 
-        if (count($leadId) > 1) {
-            foreach ($leadId as $lead) {
-                $leads[] = $leadRepo->getEntity($lead['id']);
-            }
-        } else {
-            $leads[] = $leadRepo->getEntity($leadId['id']);
+        foreach ($leadId as $lead) {
+            $leads[] = $leadRepo->getEntity($lead['id']);
         }
 
         foreach ($leads as $lead) {
@@ -1262,7 +1258,10 @@ class EmailModel extends FormModel
      */
     public function removeDoNotContact($email)
     {
-        $this->getRepository()->removeFromDoNotEmailList($email);
+        $repo = $this->getRepository();
+
+        $repo->setFactory($this->factory);
+        $repo->removeFromDoNotEmailList($email);
     }
 
     /**
