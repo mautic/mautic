@@ -35,7 +35,7 @@ class BarChart extends AbstractChart implements ChartInterface
         'i' => 'H:i',
         'H' => 'M j ga',
         'd' => 'M j, y', 'D' => 'M j, y', // ('D' is BC. Can be removed when all charts use this class)
-        'W' => 'W',
+        'W' => '\W\e\e\k W', // (Week is escaped here so it's not interpreted when creating labels)
         'm' => 'M Y', 'M' => 'M Y', // ('M' is BC. Can be removed when all charts use this class)
         'Y' => 'Y',
     );
@@ -44,8 +44,8 @@ class BarChart extends AbstractChart implements ChartInterface
      * Defines the basic chart values, generates the time axe labels from it
      *
      * @param string   $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
      * @param string   $dateFormat
      */
     public function __construct($unit, $dateFrom, $dateTo, $dateFormat = null)

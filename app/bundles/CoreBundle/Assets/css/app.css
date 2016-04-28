@@ -4535,3 +4535,6 @@ body.noscroll {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
+.input-group .input-group-btn button {
+  height: 32px;
+}

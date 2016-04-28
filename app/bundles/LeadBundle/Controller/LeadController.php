@@ -328,6 +328,28 @@ class LeadController extends FormController
             )
         );
 
+        // Get Places from IP addresses
+        $places = array();
+        if ($lead->getIpAddresses()) {
+            foreach ($lead->getIpAddresses() as $ip) {
+                if ($details = $ip->getIpDetails()) {
+                    if (!empty($details['latitude']) && !empty($details['longitude'])) {
+                        $name = 'N/A';
+                        if (!empty($details['city'])) {
+                            $name = $details['city'];
+                        } elseif (!empty($details['region'])) {
+                            $name = $details['region'];
+                        }
+                        $place = array(
+                            'latLng' => array($details['latitude'], $details['longitude']),
+                            'name' => $name,
+                        );
+                        $places[] = $place;
+                    }
+                }
+            }
+        }
+
         // Trigger the TIMELINE_ON_GENERATE event to fetch the timeline events from subscribed bundles
         $dispatcher = $this->factory->getDispatcher();
         $event      = new LeadTimelineEvent($lead, $filters);
@@ -376,6 +398,20 @@ class LeadController extends FormController
         $socialProfiles    = $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
 
+        // Set the social profile templates
+        foreach ($socialProfiles as $integration => &$details) {
+            if ($integrationObject = $integrationHelper->getIntegrationObject($integration)) {
+                if ($template = $integrationObject->getSocialProfileTemplate()) {
+                    $details['social_profile_template'] = $template;
+                }
+            }
+
+            if (!isset($details['social_profile_template'])) {
+                // No profile template found
+                unset($socialProfiles[$integration]);
+            }
+        }
+
         $event = new IconEvent($this->factory->getSecurity());
         $this->factory->getDispatcher()->dispatch(CoreEvents::FETCH_ICONS, $event);
         $icons = $event->getIcons();
@@ -392,6 +428,7 @@ class LeadController extends FormController
                     'fields'            => $fields,
                     'socialProfiles'    => $socialProfiles,
                     'socialProfileUrls' => $socialProfileUrls,
+                    'places'            => $places,
                     'security'          => $this->factory->getSecurity(),
                     'permissions'       => $permissions,
                     'events'            => $events,

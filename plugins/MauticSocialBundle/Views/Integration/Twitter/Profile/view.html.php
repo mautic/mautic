@@ -34,25 +34,25 @@
 </div>
 <div class="np panel-body tab-content">
     <div class="pa-20 tab-pane active" id="TwitterProfile">
-        <?php echo $view->render('MauticLeadBundle:Social/Twitter:profile.html.php', array(
+        <?php echo $view->render('MauticSocialBundle:Integration/Twitter/Profile:profile.html.php', array(
             'lead'      => $lead,
             'profile'   => $details['profile']
         )); ?>
     </div>
     <div class="tab-pane" id="TwitterTweets">
-        <?php echo $view->render('MauticLeadBundle:Social/Twitter:tweets.html.php', array(
+        <?php echo $view->render('MauticSocialBundle:Integration/Twitter/Profile:tweets.html.php', array(
             'lead'        => $lead,
             'activity'    => (!empty($details['activity']['tweets'])) ? $details['activity']['tweets'] : array()
         )); ?>
     </div>
     <div class="pa-20 tab-pane" id="TwitterPhotos">
-        <?php echo $view->render('MauticLeadBundle:Social/Twitter:photos.html.php', array(
+        <?php echo $view->render('MauticSocialBundle:Integration/Twitter/Profile:photos.html.php', array(
             'lead'      => $lead,
              'activity' => (!empty($details['activity']['photos'])) ? $details['activity']['photos'] : array()
         )); ?>
     </div>
     <div class="pa-20 tab-pane" id="TwitterTags">
-        <?php echo $view->render('MauticLeadBundle:Social/Twitter:tags.html.php', array(
+        <?php echo $view->render('MauticSocialBundle:Integration/Twitter/Profile:tags.html.php', array(
             'lead'      => $lead,
             'activity' => (!empty($details['activity']['tags'])) ? $details['activity']['tags'] : array()
         )); ?>

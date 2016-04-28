@@ -48,7 +48,12 @@ class ReportSubscriber extends CommonSubscriber
         if ($event->checkContext(array('leads', 'lead.pointlog'))) {
             $prefix     = 'l.';
             $userPrefix = 'u.';
+            $ipPrefix = 'i.';
             $columns    = array(
+                $ipPrefix . 'ip_address' => array(
+                    'label' => 'mautic.core.ipaddress',
+                    'type'  => 'text'
+                ),
                 $prefix . 'date_identified' => array(
                     'label' => 'mautic.lead.report.date_identified',
                     'type'  => 'datetime'
@@ -167,6 +172,8 @@ class ReportSubscriber extends CommonSubscriber
 
             $qb->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
             $qb->leftJoin('l', MAUTIC_TABLE_PREFIX . 'users', 'u', 'u.id = l.owner_id');
+            $qb->leftJoin('l', MAUTIC_TABLE_PREFIX . 'lead_ips_xref', 'lip', 'lip.lead_id = l.id');
+            $qb->leftJoin('lip', MAUTIC_TABLE_PREFIX . 'ip_addresses', 'i', 'i.id = lip.ip_id');
 
             $event->setQueryBuilder($qb);
         } elseif ($context == 'lead.pointlog') {

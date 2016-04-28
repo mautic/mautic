@@ -896,12 +896,12 @@ textarea {
   line-height: inherit;
 }
 a {
-  color: #6978b5;
+  color: #4e5d9d;
   text-decoration: none;
 }
 a:hover,
 a:focus {
-  color: #4e5d9d;
+  color: #3d497b;
   text-decoration: underline;
 }
 a:focus {
@@ -3014,7 +3014,7 @@ fieldset[disabled] .btn-danger.active {
   border-left-color: #f75f40;
 }
 .btn-link {
-  color: #6978b5;
+  color: #4e5d9d;
   font-weight: normal;
   cursor: pointer;
   border-radius: 0;
@@ -3035,7 +3035,7 @@ fieldset[disabled] .btn-link {
 }
 .btn-link:hover,
 .btn-link:focus {
-  color: #4e5d9d;
+  color: #3d497b;
   text-decoration: underline;
   background-color: transparent;
 }
@@ -3608,7 +3608,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .nav .open > a,
 .nav .open > a:hover,
 .nav .open > a:focus {
-  border-color: #6978b5;
+  border-color: #4e5d9d;
 }
 .nav .nav-divider {
   height: 1px;
@@ -4327,7 +4327,7 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
   padding: 6px 12px;
   line-height: 1.3856;
   text-decoration: none;
-  color: #6978b5;
+  color: #4e5d9d;
   background-color: #ffffff;
   border: 1px solid #dddddd;
   margin-left: -1px;
@@ -4347,7 +4347,7 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
 .pagination > li > span:hover,
 .pagination > li > a:focus,
 .pagination > li > span:focus {
-  color: #4e5d9d;
+  color: #3d497b;
   background-color: #ebedf0;
   border-color: #dddddd;
 }
@@ -4358,7 +4358,7 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
 .pagination > .active > a:focus,
 .pagination > .active > span:focus {
   z-index: 2;
-  color: #4e5d9d;
+  color: #3d497b;
   background-color: #ebedf0;
   border-color: #dddddd;
   cursor: default;
@@ -4557,7 +4557,7 @@ a.badge:focus {
 }
 a.list-group-item.active > .badge,
 .nav-pills > .active > a > .badge {
-  color: #6978b5;
+  color: #4e5d9d;
   background-color: #ffffff;
 }
 .nav-pills > li > a > .badge {
@@ -4626,7 +4626,7 @@ a.list-group-item.active > .badge,
 a.thumbnail:hover,
 a.thumbnail:focus,
 a.thumbnail.active {
-  border-color: #6978b5;
+  border-color: #4e5d9d;
 }
 .thumbnail .caption {
   padding: 9px;
@@ -8130,7 +8130,7 @@ button.close {
   display: list-item;
 }
 .chosen-container .chosen-results li.highlighted {
-  background-color: #6978b5;
+  background-color: #4e5d9d;
   background-image: none;
   color: white;
 }

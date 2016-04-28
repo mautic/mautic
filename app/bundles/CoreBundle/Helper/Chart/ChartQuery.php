@@ -212,7 +212,7 @@ class ChartQuery extends AbstractChart
      * @param  string     $column name. The column must be type of datetime
      * @param  array      $filters will be added to where claues
      *
-     * @return Doctrine\DBAL\Query\QueryBuilder
+     * @return \Doctrine\DBAL\Query\QueryBuilder
      */
     public function prepareTimeDataQuery($table, $column, $filters = array())
     {
@@ -242,7 +242,7 @@ class ChartQuery extends AbstractChart
             $query->select($dateConstruct . ' AS date, COUNT(*) AS count')
                 ->groupBy($dateConstruct . $groupBy);
         } else {
-            throw new UnexpectedValueException(__CLASS__ . '::' . __METHOD__ . ' supports only MySql a PosgreSQL database platforms.');
+            throw new \UnexpectedValueException(__CLASS__ . '::' . __METHOD__ . ' supports only MySql a PosgreSQL database platforms.');
         }
 
         $query->from(MAUTIC_TABLE_PREFIX . $table, 't')
@@ -312,6 +312,17 @@ class ChartQuery extends AbstractChart
             $nextDate->add($oneUnit);
 
             foreach ($rawData as $key => $item) {
+                /**
+                 * PHP DateTime cannot parse the Y W (ex 2016 09)
+                 * format, so we transform it into d-M-Y.
+                 */
+                if ($this->unit === 'W') {
+                    list($year, $week)  = explode(' ', $item['date']);
+                    $newDate = new \DateTime();
+                    $newDate->setISODate($year, $week);
+                    $item['date'] = $newDate->format('d-M-Y');
+                }
+
                 $itemDate = new \DateTime($item['date'], new \DateTimeZone("UTC"));
 
                 // Place the right suma is between the time unit and time unit +1

@@ -228,6 +228,38 @@ class ConfigType extends AbstractType
             )
         );
 
+        $builder->add(
+            'mailer_convert_embed_images',
+            'yesno_button_group',
+            array(
+                'label'      => 'mautic.email.config.mailer.convert.embed.images',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'      => 'form-control',
+                    'tooltip'    => 'mautic.email.config.mailer.convert.embed.images.tooltip',
+
+                ),
+                'data'       => empty($options['data']['mailer_convert_embed_images']) ? false : true,
+                'required'   => false
+            )
+        );
+
+        $builder->add(
+            'mailer_append_tracking_pixel',
+            'yesno_button_group',
+            array(
+                'label'      => 'mautic.email.config.mailer.append.tracking.pixel',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'      => 'form-control',
+                    'tooltip'    => 'mautic.email.config.mailer.append.tracking.pixel.tooltip',
+
+                ),
+                'data'       => empty($options['data']['mailer_append_tracking_pixel']) ? false : true,
+                'required'   => false
+            )
+        );
+
         $smtpServiceShowConditions = '{"config_emailconfig_mailer_transport":["smtp"]}';
         $amazonRegionShowConditions = '{"config_emailconfig_mailer_transport":["mautic.transport.amazon"]}';
 

@@ -117,11 +117,19 @@ Mautic.leadOnLoad = function (container) {
             mQuery('#anonymousLeadButton').removeClass('btn-primary');
         }
     }
+    
+    mQuery(document).on('shown.bs.tab', 'a#load-lead-map', function (e) {
+        Mautic.renderLeadMap();
+    })
 };
 
 Mautic.leadOnUnload = function(id) {
     if (typeof MauticVars.moderatedIntervals['leadListLiveUpdate'] != 'undefined') {
         Mautic.clearModeratedInterval('leadListLiveUpdate');
+    }
+
+    if (typeof Mautic.mapObjects !== 'undefined') {
+        delete Mautic.mapObjects;
     }
 };
 
@@ -287,7 +295,7 @@ Mautic.addLeadListFilter = function (elId) {
 
     var prototype = mQuery('.available-filters').data('prototype');
     var fieldType = mQuery(filterId).data('field-type');
-    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'tags', 'boolean', 'select', 'country', 'timezone', 'region']) != -1);
+    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'boolean', 'select', 'country', 'timezone', 'region']) != -1);
 
     prototype = prototype.replace(/__name__/g, filterNum);
     prototype = prototype.replace(/__label__/g, label);
@@ -407,7 +415,7 @@ Mautic.addLeadListFilter = function (elId) {
         }).remove();
     } else if (typeof operators.exclude != 'undefined') {
         mQuery('#' + filterIdBase + 'operator option').filter(function () {
-            return mQuery.inArray(mQuery(this).val(), operators['exclude']) > 0
+            return mQuery.inArray(mQuery(this).val(), operators['exclude']) !== -1
         }).remove();
     }
 
@@ -441,9 +449,14 @@ Mautic.leadfieldOnLoad = function (container) {
         });
     }
 
+    if (mQuery(container + ' form[name="leadfield"]').length) {
+        Mautic.updateLeadFieldProperties(mQuery('#leadfield_type').val());
+    }
+
 };
 
 Mautic.updateLeadFieldProperties = function(selectedVal) {
+    var defaultValueField = mQuery('input#leadfield_defaultValue');
     if (selectedVal == 'lookup') {
         // Use select
         selectedVal = 'select';
@@ -464,7 +477,6 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
 
     // Switch default field if applicable
     var defaultFieldType = mQuery('input[name="leadfield[defaultValue]"]').attr('type');
-
     if (selectedVal == 'boolean') {
         if (defaultFieldType == 'text') {
             // Convert to a select
@@ -474,13 +486,19 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
 
             mQuery(defaultBool).appendTo(newDiv);
 
-            mQuery('#leadfield_defaultValue').replaceWith(newDiv);
+            defaultValueField.replaceWith(newDiv);
         }
     } else if (defaultFieldType == 'radio') {
         // Convert to input
         var html = mQuery('#field-templates .default').html();
         html     = html.replace(/default_template/g, 'defaultValue');
-        mQuery('#leadfield_defaultValue').replaceWith(html);
+        defaultValueField.replaceWith(html);
+    }
+
+    if (selectedVal === 'datetime' || selectedVal === 'date' || selectedVal === 'time') {
+        Mautic.activateDateTimeInputs(defaultValueField, selectedVal);
+    } else {
+        defaultValueField.datetimepicker('destroy').removeClass('calendar-activated');
     }
 };
 
@@ -954,3 +972,55 @@ Mautic.displayUniqueIdentifierWarning = function (el) {
         mQuery('.unique-identifier-warning').fadeIn('fast');
     }
 };
+
+/**
+ * Render Lead Map
+ *
+ * This method can be merged with the one in the core.js when the new dashboard PR is merged
+ */
+Mautic.renderLeadMap = function() {
+    if (!Mautic.mapObjects) Mautic.mapObjects = [];
+    var maps = mQuery('.vector-map');
+
+    if (maps.length) {
+        maps.each(function(index, element) {
+            var wrapper = mQuery(element);
+            var data = mQuery.parseJSON(wrapper.text());
+            wrapper.text('');
+            wrapper.vectorMap({
+                backgroundColor: 'transparent',
+                zoomOnScroll: false,
+                markerStyle: {
+                    initial: {
+                        fill: 'rgba(0, 180, 156, 0.8)',
+                        stroke: '#4e5d9d'
+                    }
+                },
+                regionStyle: {
+                    initial: {
+                        "fill": '#dce0e5',
+                        "fill-opacity": 1,
+                        "stroke": 'none',
+                        "stroke-width": 0,
+                        "stroke-opacity": 1
+                    },
+                    hover: {
+                        "fill-opacity": 0.7,
+                        "cursor": 'pointer'
+                    }
+                },
+                map: 'world_mill_en',
+                markers: data,
+                onRegionTipShow: function (event, label, index) {
+                    if (data[index] > 0) {
+                        label.html(
+                            '<b>'+label.html()+'</b></br>'+
+                            data[index]+' Leads'
+                        );
+                    }
+                }
+            });
+            Mautic.mapObjects.push(wrapper.vectorMap('get', 'mapObject'));
+        });
+    }
+}

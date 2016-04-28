@@ -292,6 +292,18 @@ class ListModel extends FormModel
                 ),
                 'operators'  => 'multiselect'
             ),
+            'lead_email_received'       => array(
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received'),
+                'properties' => array(
+                    'type' => 'lead_email_received'
+                ),
+                'operators'  => array(
+                    'include' => array(
+                        'in',
+                        '!in'
+                    )
+                )
+            ),
             'tags'       => array(
                 'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
                 'properties' => array(
@@ -342,6 +354,18 @@ class ListModel extends FormModel
                     )
                 ),
                 'operators'  => 'bool'
+            ),
+            'hit_url' => array(
+                'label' => $this->translator->trans('mautic.lead.list.filter.visited_url'),
+                'properties' => array(
+                    'type' => 'text'
+                ),
+                'operators' => array(
+                    'include' => array(
+                        '=',
+                        'like'
+                    )
+                )
             )
         );
 
@@ -465,7 +489,7 @@ class ListModel extends FormModel
         $leadCount = (int) $newLeadsCount[$id]['count'];
 
         if ($output) {
-            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_added', array('%contacts%' => $leadCount, '%batch%' => $limit)));
+            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_added', array('%leads%' => $leadCount, '%batch%' => $limit)));
         }
 
         // Handle by batches
@@ -565,7 +589,7 @@ class ListModel extends FormModel
         $leadCount = $removeLeadCount[$id]['count'];
 
         if ($output) {
-            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', array('%contacts%' => $leadCount, '%batch%' => $limit)));
+            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', array('%leads%' => $leadCount, '%batch%' => $limit)));
         }
 
         if ($leadCount) {

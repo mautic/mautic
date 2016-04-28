@@ -35,25 +35,25 @@
 </div>
 <div class="panel-body tab-content">
     <div class="tab-pane active" id="GoogleProfile">
-        <?php echo $view->render('MauticLeadBundle:Social/GooglePlus:profile.html.php', array(
+        <?php echo $view->render('MauticSocialBundle:Integration/GooglePlus/Profile:profile.html.php', array(
             'lead'      => $lead,
             'profile'   => $details['profile']
         )); ?>
     </div>
     <div class="tab-pane" id="GooglePosts">
-        <?php echo $view->render('MauticLeadBundle:Social/GooglePlus:posts.html.php', array(
+        <?php echo $view->render('MauticSocialBundle:Integration/GooglePlus/Profile:posts.html.php', array(
             'lead'      => $lead,
             'activity'  => (!empty($details['activity']['posts'])) ? $details['activity']['posts'] : array()
         )); ?>
     </div>
     <div class="tab-pane" id="GooglePhotos">
-        <?php echo $view->render('MauticLeadBundle:Social/GooglePlus:photos.html.php', array(
+        <?php echo $view->render('MauticSocialBundle:Integration/GooglePlus/Profile:photos.html.php', array(
             'lead'      => $lead,
             'activity'  => (!empty($details['activity']['photos'])) ? $details['activity']['photos'] : array()
         )); ?>
     </div>
     <div class="tab-pane" id="GoogleTags">
-        <?php echo $view->render('MauticLeadBundle:Social/GooglePlus:tags.html.php', array(
+        <?php echo $view->render('MauticSocialBundle:Integration/GooglePlus/Profile:tags.html.php', array(
             'lead'     => $lead,
             'activity' => (!empty($details['activity']['tags'])) ? $details['activity']['tags'] : array()
         )); ?>

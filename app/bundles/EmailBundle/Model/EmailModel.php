@@ -632,14 +632,15 @@ class EmailModel extends FormModel
     }
 
     /**
-     * @param int|Email $email
+     * @param Email $email
      * @param bool      $includeVariants
-     * @param int       $amount
      * @param string    $unit
+     * @param DateTime  $dateFrom
+     * @param DateTime  $dateTo
      *
      * @return array
      */
-    public function getEmailGeneralStats ($email, $includeVariants = false, $amount = 30, $unit = 'D')
+    public function getEmailGeneralStats($email, $includeVariants = false, $unit, \DateTime $dateFrom, \DateTime $dateTo)
     {
         if (!$email instanceof Email) {
             $email = $this->getEntity($email);
@@ -661,28 +662,12 @@ class EmailModel extends FormModel
             $emailIds = array($email->getId());
         }
 
-        /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
-        $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
-
-        $graphData = GraphHelper::prepareDatetimeLineGraphData($amount, $unit,
-            array(
-                $this->translator->trans('mautic.email.stat.sent'),
-                $this->translator->trans('mautic.email.stat.read'),
-                $this->translator->trans('mautic.email.stat.failed')
-            )
+        $filter = array(
+            'email_id' => $emailIds,
+            'flag'=> 'sent_and_opened_and_failed'
         );
-        $fromDate = $graphData['fromDate'];
 
-        $sentData  = $statRepo->getEmailStats($emailIds, $fromDate, 'sent');
-        $graphData = GraphHelper::mergeLineGraphData($graphData, $sentData, $unit, 0, 'date', 'data');
-
-        $readData  = $statRepo->getEmailStats($emailIds, $fromDate, 'read');
-        $graphData = GraphHelper::mergeLineGraphData($graphData, $readData, $unit, 1, 'date', 'data');
-
-        $failedData  = $statRepo->getEmailStats($emailIds, $fromDate, 'failed');
-        $graphData = GraphHelper::mergeLineGraphData($graphData, $failedData, $unit, 2, 'date', 'data');
-
-        return $graphData;
+        return $this->getEmailsLineChartData($unit, $dateFrom, $dateTo, null, $filter);
     }
 
     /**
@@ -1430,7 +1415,7 @@ class EmailModel extends FormModel
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = $chart->getChartQuery($this->em->getConnection());
 
-        if ($flag == 'sent_and_opened' || !$flag) {
+        if ($flag == 'sent_and_opened_and_failed' || $flag == 'sent_and_opened' || !$flag) {
             $q = $query->prepareTimeDataQuery('email_stats', 'date_sent', $filter);
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
@@ -1439,13 +1424,24 @@ class EmailModel extends FormModel
             $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.sent.emails'), $data);
         }
 
-        if ($flag == 'sent_and_opened' || $flag == 'opened') {
+        if ($flag == 'sent_and_opened_and_failed' || $flag == 'sent_and_opened' || $flag == 'opened') {
             $q = $query->prepareTimeDataQuery('email_stats', 'date_read', $filter);
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
             }
             $data = $query->loadAndBuildTimeData($q);
             $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.read.emails'), $data);
+        }
+
+        if ($flag == 'sent_and_opened_and_failed' || $flag == 'failed') {
+            $q = $query->prepareTimeDataQuery('email_stats', 'date_sent', $filter);
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+            $q->andWhere($q->expr()->eq('t.is_failed', ':true'))
+                ->setParameter('true', true, 'boolean');
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.failed.emails'), $data);
         }
 
         return $chart->render();

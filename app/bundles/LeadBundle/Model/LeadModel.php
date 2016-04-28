@@ -246,20 +246,31 @@ class LeadModel extends FormModel
     /**
      * Populates custom field values for updating the lead. Also retrieves social media data
      *
-     * @param Lead  $lead
-     * @param array $data
-     * @param $overwriteWithBlank
+     * @param Lead       $lead
+     * @param array      $data
+     * @param bool|false $overwriteWithBlank
+     * @param bool|true  $fetchSocialProfiles
+     *
      * @return array
      */
-    public function setFieldValues(Lead &$lead, array $data, $overwriteWithBlank = false)
+    public function setFieldValues(Lead &$lead, array $data, $overwriteWithBlank = false, $fetchSocialProfiles = true)
     {
-        //@todo - add a catch to NOT do social gleaning if a lead is created via a form, etc as we do not want the user to experience the wait
-        //generate the social cache
-        list($socialCache, $socialFeatureSettings) = $this->factory->getHelper('integration')->getUserProfiles($lead, $data, true, null, false, true);
+        if ($fetchSocialProfiles) {
+            //@todo - add a catch to NOT do social gleaning if a lead is created via a form, etc as we do not want the user to experience the wait
+            //generate the social cache
+            list($socialCache, $socialFeatureSettings) = $this->factory->getHelper('integration')->getUserProfiles(
+                $lead,
+                $data,
+                true,
+                null,
+                false,
+                true
+            );
 
-        //set the social cache while we have it
-        if (!empty($socialCache)) {
-            $lead->setSocialCache($socialCache);
+            //set the social cache while we have it
+            if (!empty($socialCache)) {
+                $lead->setSocialCache($socialCache);
+            }
         }
 
         //save the field values
@@ -1132,6 +1143,8 @@ class LeadModel extends FormModel
                     "%user%" => $this->factory->getUser()->getUsername()
                 ));
 
+                // The email must be set for successful unsubscribtion
+                $lead->addUpdatedField('email', $data[$fields['email']]);
                 $this->unsubscribeLead($lead, $reason, false);
             }
         }

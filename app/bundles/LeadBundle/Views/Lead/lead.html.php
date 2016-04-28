@@ -24,68 +24,104 @@ $view['slots']->set('mauticContent', 'lead');
 $avatar = '';
 if (!$isAnonymous) {
     $img    = $view['lead_avatar']->getAvatar($lead);
-    $avatar = '<span class="pull-left img-wrapper img-rounded mr-10" style="width:33px"><img src="' . $img . '" alt="" /></span>';
+    $avatar = '<span class="pull-left img-wrapper img-rounded mr-10" style="width:33px"><img src="'.$img.'" alt="" /></span>';
 }
 
-$view['slots']->set('headerTitle',
-       $avatar . '<div class="pull-left mt-5"><span class="span-block">' . $leadName . '</span><span class="span-block small ml-sm">' . $lead->getSecondaryIdentifier() . '</span></div>');
+$view['slots']->set(
+    'headerTitle',
+    $avatar.'<div class="pull-left mt-5"><span class="span-block">'.$leadName.'</span><span class="span-block small ml-sm">'.$lead->getSecondaryIdentifier().'</span></div>'
+);
 
 $groups = array_keys($fields);
-$edit   = $security->hasEntityAccess($permissions['lead:leads:editown'], $permissions['lead:leads:editother'], $lead->getOwner());
+$edit   = $security->hasEntityAccess(
+    $permissions['lead:leads:editown'],
+    $permissions['lead:leads:editother'],
+    $lead->getOwner()
+);
 
 $buttons = array();
 
-
+//Send email button
 if (!empty($fields['core']['email']['value'])) {
     $buttons[] = array(
         'attr'      => array(
             'id'          => 'sendEmailButton',
             'data-toggle' => 'ajaxmodal',
             'data-target' => '#MauticSharedModal',
-            'data-header' => $view['translator']->trans('mautic.lead.email.send_email.header', array('%email%' => $fields['core']['email']['value'])),
-            'href'        => $view['router']->generate('mautic_lead_action', array('objectId' => $lead->getId(), 'objectAction' => 'email'))
+            'data-header' => $view['translator']->trans(
+                'mautic.lead.email.send_email.header',
+                array('%email%' => $fields['core']['email']['value'])
+            ),
+            'href'        => $view['router']->generate(
+                'mautic_lead_action',
+                array('objectId' => $lead->getId(), 'objectAction' => 'email')
+            )
         ),
         'btnText'   => $view['translator']->trans('mautic.lead.email.send_email'),
         'iconClass' => 'fa fa-send'
     );
 }
-
+//View Lead List button
 $buttons[] = array(
-    'attr' => array(
+    'attr'      => array(
         'data-toggle' => 'ajaxmodal',
         'data-target' => '#MauticSharedModal',
-        'data-header' => $view['translator']->trans('mautic.lead.lead.header.lists', array('%name%' => $lead->getPrimaryIdentifier())),
+        'data-header' => $view['translator']->trans(
+            'mautic.lead.lead.header.lists',
+            array('%name%' => $lead->getPrimaryIdentifier())
+        ),
         'data-footer' => 'false',
-        'href' => $view['router']->generate( 'mautic_lead_action', array("objectId" => $lead->getId(), "objectAction" => "list")),
+        'href'        => $view['router']->generate(
+            'mautic_lead_action',
+            array("objectId" => $lead->getId(), "objectAction" => "list")
+        ),
     ),
     'btnText'   => $view['translator']->trans('mautic.lead.lead.lists'),
     'iconClass' => 'fa fa-pie-chart'
 );
 
-
+//View Campaigns List button
 if ($security->isGranted('campaign:campaigns:edit')) {
     $buttons[] = array(
         'attr'      => array(
             'data-toggle' => 'ajaxmodal',
             'data-target' => '#MauticSharedModal',
-            'data-header' => $view['translator']->trans('mautic.lead.lead.header.campaigns', array('%name%' => $lead->getPrimaryIdentifier())),
+            'data-header' => $view['translator']->trans(
+                'mautic.lead.lead.header.campaigns',
+                array('%name%' => $lead->getPrimaryIdentifier())
+            ),
             'data-footer' => 'false',
-            'href'        => $view['router']->generate('mautic_lead_action', array("objectId" => $lead->getId(), "objectAction" => "campaign"))
+            'href'        => $view['router']->generate(
+                'mautic_lead_action',
+                array("objectId" => $lead->getId(), "objectAction" => "campaign")
+            )
         ),
         'btnText'   => $view['translator']->trans('mautic.campaign.campaigns'),
         'iconClass' => 'fa fa-clock-o'
     );
 }
 
-
-if (($security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $lead->getOwner())) && $edit) {
+//Merge button
+if (($security->hasEntityAccess(
+        $permissions['lead:leads:deleteown'],
+        $permissions['lead:leads:deleteother'],
+        $lead->getOwner()
+    ))
+    && $edit
+) {
 
     $buttons[] = array(
-        'attr' => array(
+        'attr'      => array(
             'data-toggle' => 'ajaxmodal',
             'data-target' => '#MauticSharedModal',
-            'data-header' => $view['translator']->trans('mautic.lead.lead.header.merge', array('%name%' => $lead->getPrimaryIdentifier())),
-            'href' => $view['router']->generate( 'mautic_lead_action', array("objectId" => $lead->getId(), "objectAction" => "merge"))
+            'data-header' => $view['translator']->trans(
+                'mautic.lead.lead.header.merge',
+                array('%name%' => $lead->getPrimaryIdentifier())
+            ),
+            'href'        => $view['router']->generate(
+                'mautic_lead_action',
+                array("objectId" => $lead->getId(), "objectAction" => "merge")
+            )
         ),
         'btnText'   => $view['translator']->trans('mautic.lead.merge'),
         'iconClass' => 'fa fa-user'
@@ -93,17 +129,35 @@ if (($security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissio
 }
 
 
-$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
-    'item'       => $lead,
-    'routeBase'  => 'lead',
-    'langVar'    => 'lead.lead',
-    'customButtons' => $buttons,
-    'templateButtons' => array(
-        'edit'        => $security->hasEntityAccess($permissions['lead:leads:editown'], $permissions['lead:leads:editother'], $lead->getCreatedBy()),
-        'delete'      => $security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $lead->getOwner()),
-        'close'       => $security->hasEntityAccess($permissions['lead:leads:viewown'], $permissions['lead:leads:viewother'], $lead->getCreatedBy())
-    ),
-)));
+$view['slots']->set(
+    'actions',
+    $view->render(
+        'MauticCoreBundle:Helper:page_actions.html.php',
+        array(
+            'item'            => $lead,
+            'routeBase'       => 'lead',
+            'langVar'         => 'lead.lead',
+            'customButtons'   => $buttons,
+            'templateButtons' => array(
+                'edit'   => $security->hasEntityAccess(
+                    $permissions['lead:leads:editown'],
+                    $permissions['lead:leads:editother'],
+                    $lead->getCreatedBy()
+                ),
+                'delete' => $security->hasEntityAccess(
+                    $permissions['lead:leads:deleteown'],
+                    $permissions['lead:leads:deleteother'],
+                    $lead->getOwner()
+                ),
+                'close'  => $security->hasEntityAccess(
+                    $permissions['lead:leads:viewown'],
+                    $permissions['lead:leads:viewother'],
+                    $lead->getCreatedBy()
+                )
+            ),
+        )
+    )
+);
 ?>
 
 <!-- start: box layout -->
@@ -116,41 +170,47 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <!-- lead detail collapseable -->
             <div class="collapse" id="lead-details">
                 <ul class="pt-md nav nav-tabs pr-md pl-md" role="tablist">
-                <?php $step = 0; ?>
-                <?php foreach ($groups as $g): ?>
-                    <?php if (!empty($fields[$g])): ?>
-                        <li class="<?php if ($step === 0) echo "active"; ?>">
-                            <a href="#<?php echo $g; ?>" class="group" data-toggle="tab">
-                                <?php echo $view['translator']->trans('mautic.lead.field.group.' . $g); ?>
-                            </a>
-                        </li>
-                        <?php $step++; ?>
-                    <?php endif; ?>
-                <?php endforeach; ?>
+                    <?php $step = 0; ?>
+                    <?php foreach ($groups as $g): ?>
+                        <?php if (!empty($fields[$g])): ?>
+                            <li class="<?php if ($step === 0) {
+                                echo "active";
+                            } ?>">
+                                <a href="#<?php echo $g; ?>" class="group" data-toggle="tab">
+                                    <?php echo $view['translator']->trans('mautic.lead.field.group.'.$g); ?>
+                                </a>
+                            </li>
+                            <?php $step++; ?>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
                 </ul>
 
                 <!-- start: tab-content -->
                 <div class="tab-content pa-md bg-white">
                     <?php $i = 0; ?>
                     <?php foreach ($groups as $group): ?>
-                        <div class="tab-pane fade <?php echo $i == 0 ? 'in active' : ''; ?> bdr-w-0" id="<?php echo $group; ?>">
+                        <div class="tab-pane fade <?php echo $i == 0 ? 'in active' : ''; ?> bdr-w-0"
+                             id="<?php echo $group; ?>">
                             <div class="pr-md pl-md pb-md">
                                 <div class="panel shd-none mb-0">
                                     <table class="table table-bordered table-striped mb-0">
                                         <tbody>
-                                            <?php foreach ($fields[$group] as $field): ?>
-                                                <tr>
-                                                    <td width="20%"><span class="fw-b"><?php echo $field['label']; ?></span></td>
-                                                    <td>
-                                                        <?php if ($group == 'core' && $field['alias'] == 'country' && !empty($flag)): ?>
-                                                            <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;" />
+                                        <?php foreach ($fields[$group] as $field): ?>
+                                            <tr>
+                                                <td width="20%"><span class="fw-b"><?php echo $field['label']; ?></span>
+                                                </td>
+                                                <td>
+                                                    <?php if ($group == 'core' && $field['alias'] == 'country'
+                                                    && !empty($flag)): ?>
+                                                    <img class="mr-sm" src="<?php echo $flag; ?>" alt=""
+                                                         style="max-height: 24px;"/>
                                                             <span class="mt-1"><?php echo $field['value']; ?>
-                                                        <?php else: ?>
-                                                            <?php echo $field['value']; ?>
-                                                        <?php endif; ?>
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach; ?>
+                                                                <?php else: ?>
+                                                                    <?php echo $field['value']; ?>
+                                                                <?php endif; ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -167,7 +227,10 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <!-- lead detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.details'); ?>">
-                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#lead-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?></a>
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse"
+                       data-target="#lead-details"><span class="caret"></span> <?php echo $view['translator']->trans(
+                            'mautic.core.details'
+                        ); ?></a>
                 </span>
             </div>
             <!--/ lead detail collapseable toggler -->
@@ -212,12 +275,22 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                     </a>
                 </li>
                 <?php if (!$isAnonymous): ?>
-                <li class="">
-                    <a href="#social-container" role="tab" data-toggle="tab">
+                    <li class="">
+                        <a href="#social-container" role="tab" data-toggle="tab">
                         <span class="label label-primary mr-sm" id="SocialCount">
                             <?php echo count($socialProfiles); ?>
                         </span>
-                        <?php echo $view['translator']->trans('mautic.lead.lead.tab.social'); ?>
+                            <?php echo $view['translator']->trans('mautic.lead.lead.tab.social'); ?>
+                        </a>
+                    </li>
+                <?php endif; ?>
+                <?php if ($places): ?>
+                <li class="">
+                    <a href="#place-container" role="tab" data-toggle="tab" id="load-lead-map">
+                        <span class="label label-primary mr-sm" id="PlaceCount">
+                            <?php echo count($places); ?>
+                        </span>
+                        <?php echo $view['translator']->trans('mautic.lead.lead.tab.places'); ?>
                     </a>
                 </li>
                 <?php endif; ?>
@@ -229,9 +302,20 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <div class="tab-content pa-md">
             <!-- #history-container -->
             <div class="tab-pane fade in active bdr-w-0" id="history-container">
-                <?php echo $view->render('MauticLeadBundle:Lead:historyfilter.html.php', array('eventTypes' => $eventTypes, 'eventFilters' => $eventFilters, 'lead' => $lead, 'icons' => $icons)); ?>
+                <?php echo $view->render(
+                    'MauticLeadBundle:Lead:historyfilter.html.php',
+                    array(
+                        'eventTypes'   => $eventTypes,
+                        'eventFilters' => $eventFilters,
+                        'lead'         => $lead,
+                        'icons'        => $icons
+                    )
+                ); ?>
                 <div id="timeline-container">
-                    <?php echo $view->render('MauticLeadBundle:Lead:history.html.php', array('events' => $events, 'icons' => $icons)); ?>
+                    <?php echo $view->render(
+                        'MauticLeadBundle:Lead:history.html.php',
+                        array('events' => $events, 'icons' => $icons)
+                    ); ?>
                 </div>
             </div>
             <!--/ #history-container -->
@@ -244,11 +328,26 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 
             <!-- #social-container -->
             <?php if (!$isAnonymous): ?>
-            <div class="tab-pane fade bdr-w-0" id="social-container">
-                <?php echo $view->render('MauticLeadBundle:Social:index.html.php', array('socialProfiles' => $socialProfiles, 'lead' => $lead, 'socialProfileUrls' => $socialProfileUrls)); ?>
-            </div>
+                <div class="tab-pane fade bdr-w-0" id="social-container">
+                    <?php echo $view->render(
+                        'MauticLeadBundle:Social:index.html.php',
+                        array(
+                            'socialProfiles'    => $socialProfiles,
+                            'lead'              => $lead,
+                            'socialProfileUrls' => $socialProfileUrls
+                        )
+                    ); ?>
+                </div>
             <?php endif; ?>
             <!--/ #social-container -->
+
+            <!-- #place-container -->
+            <?php if ($places): ?>
+            <div class="tab-pane fade bdr-w-0" id="place-container">
+                <?php echo $view->render('MauticLeadBundle:Lead:map.html.php', array('places' => $places)); ?>
+            </div>
+            <?php endif; ?>
+            <!--/ #place-container -->
         </div>
         <!--/ end: tab-content -->
     </div>
@@ -259,62 +358,78 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <!-- form HTML -->
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
             <?php if (!$lead->isAnonymous()): ?>
-            <div class="lead-avatar-panel">
-                <div class="avatar-collapser hr-expand nm">
-                    <a href="javascript:void(0)" class="arrow text-muted text-center<?php echo ($avatarPanelState == 'expanded') ? '' : ' collapsed'; ?>" data-toggle="collapse" data-target="#lead-avatar-block"><span class="caret"></span></a>
-                </div>
-                <div class="collapse<?php echo ($avatarPanelState == 'expanded') ? ' in' : ''; ?>" id="lead-avatar-block">
-                    <img class="img-responsive" src="<?php echo $img; ?>" alt="<?php echo $leadName; ?> "/>
-                    <div class="pa-sm">
-                        <?php if ($leadActualName && $leadCompany): ?>
-                        <h2>
-                            <div>
-                                <?php echo $leadName; ?>
-                            </div>
-                            <div class="mt-xs span-block small">
-                                <?php echo $leadCompany; ?>
-                            </div>
-                        <?php elseif ($leadActualName || $leadCompany): ?>
-                        <h2>
-                            <?php echo ($leadActualName) ? $leadActualName : $leadCompany; ?>
-                        </h2>
-                        <?php endif; ?>
+                <div class="lead-avatar-panel">
+                    <div class="avatar-collapser hr-expand nm">
+                        <a href="javascript:void(0)"
+                           class="arrow text-muted text-center<?php echo ($avatarPanelState == 'expanded') ? ''
+                               : ' collapsed'; ?>" data-toggle="collapse" data-target="#lead-avatar-block"><span
+                                class="caret"></span></a>
                     </div>
-                    <hr />
+                    <div class="collapse<?php echo ($avatarPanelState == 'expanded') ? ' in' : ''; ?>"
+                         id="lead-avatar-block">
+                        <img class="img-responsive" src="<?php echo $img; ?>" alt="<?php echo $leadName; ?> "/>
+                        <div class="pa-sm">
+                            <?php if ($leadActualName && $leadCompany): ?>
+                            <h2>
+                                <div>
+                                    <?php echo $leadName; ?>
+                                </div>
+                                <div class="mt-xs span-block small">
+                                    <?php echo $leadCompany; ?>
+                                </div>
+                                <?php elseif ($leadActualName || $leadCompany): ?>
+                                    <h2>
+                                        <?php echo ($leadActualName) ? $leadActualName : $leadCompany; ?>
+                                    </h2>
+                                <?php endif; ?>
+                        </div>
+                        <hr/>
+                    </div>
                 </div>
-            </div>
 
             <?php endif; ?>
             <div class="mt-sm points-panel text-center">
                 <?php
                 $color = $lead->getColor();
-                $style = !empty($color) ? ' style="font-color: ' . $color . ' !important;"' : '';
+                $style = !empty($color) ? ' style="font-color: '.$color.' !important;"' : '';
                 ?>
                 <h1 <?php echo $style; ?>>
-                    <?php echo $view['translator']->transChoice('mautic.lead.points.count', $lead->getPoints(), array('%points%' => $lead->getPoints())); ?>
+                    <?php echo $view['translator']->transChoice(
+                        'mautic.lead.points.count',
+                        $lead->getPoints(),
+                        array('%points%' => $lead->getPoints())
+                    ); ?>
                 </h1>
-                <hr />
+                <hr/>
             </div>
             <?php if ($doNotContact) : ?>
                 <div id="bounceLabel<?php echo $doNotContact['id']; ?>">
                     <div class="panel-heading text-center">
                         <h4 class="fw-sb">
                             <?php if ($doNotContact['unsubscribed']): ?>
-                                <span class="label label-<?php echo (!empty($doNotContact['manual']) ? 'warning' : 'danger'); ?>" data-toggle="tooltip" title="<?php echo $doNotContact['comments']; ?>">
+                                <span class="label label-<?php echo(!empty($doNotContact['manual']) ? 'warning'
+                                    : 'danger'); ?>" data-toggle="tooltip"
+                                      title="<?php echo $doNotContact['comments']; ?>">
                                     <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
                                     <?php if (!empty($doNotContact['manual'])): ?>
-                                    <i class="fa fa-times has-click-event" onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact['id']; ?>);"></i>
+                                        <i class="fa fa-times has-click-event"
+                                           onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact['id']; ?>);"></i>
                                     <?php endif; ?>
                                 </span>
                             <?php elseif ($doNotContact['bounced']): ?>
-                            <span class="label label-warning" data-toggle="tooltip" title="<?php echo $doNotContact['comments']; ?>">
+                                <span class="label label-warning" data-toggle="tooltip"
+                                      title="<?php echo $doNotContact['comments']; ?>">
                                 <?php echo $view['translator']->trans('mautic.lead.do.not.contact_bounced'); ?>
-                                <span data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans('mautic.lead.remove_bounce_status'); ?>"><i class="fa fa-times has-click-event" onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact['id']; ?>);"></i></span>
+                                    <span data-toggle="tooltip" data-placement="bottom"
+                                          title="<?php echo $view['translator']->trans(
+                                              'mautic.lead.remove_bounce_status'
+                                          ); ?>"><i class="fa fa-times has-click-event"
+                                                    onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact['id']; ?>);"></i></span>
                             </span>
                             <?php endif; ?>
                         </h4>
                     </div>
-                    <hr />
+                    <hr/>
                 </div>
             <?php endif; ?>
             <div class="panel-heading">
@@ -328,7 +443,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                 </h6>
                 <address class="text-muted">
                     <?php echo $fields['core']['address1']['value']; ?><br>
-                    <?php if (!empty($fields['core']['address2']['value'])) : echo $fields['core']['address2']['value'] . '<br>'; endif ?>
+                    <?php if (!empty($fields['core']['address2']['value'])) : echo $fields['core']['address2']['value']
+                        .'<br>'; endif ?>
                     <?php echo $lead->getLocation(); ?> <?php echo $fields['core']['zipcode']['value']; ?><br>
                     <abbr title="Phone">P:</abbr> <?php echo $fields['core']['phone']['value']; ?>
                 </address>
@@ -346,7 +462,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <!--/ form HTML -->
 
         <?php if ($upcomingEvents) : ?>
-        <hr class="hr-w-2" style="width:50%">
+            <hr class="hr-w-2" style="width:50%">
 
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0">
             <div class="panel-heading">
@@ -373,7 +489,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <div class="pa-sm">
             <?php $tags = $lead->getTags(); ?>
             <?php foreach ($tags as $tag): ?>
-            <h5 class="pull-left mt-xs mr-xs"><span class="label label-success"><?php echo $tag->getTag(); ?></span></h5>
+                <h5 class="pull-left mt-xs mr-xs"><span class="label label-success"><?php echo $tag->getTag(); ?></span>
+                </h5>
             <?php endforeach; ?>
             <div class="clearfix"></div>
         </div>
