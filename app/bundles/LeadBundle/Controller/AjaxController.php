@@ -69,9 +69,14 @@ class AjaxController extends CommonAjaxController
                         "id"    => $r['id']
                     );
                 }
+            } 
+            elseif ($field == "hit_url") {
+                $dataArray[] = array(
+                    'value' => ''
+                );
             } else {
                 $results = $this->factory->getModel('lead.field')->getLookupResults($field, $filter);
-                foreach ($results as $r) {
+                foreach ($results as $r) { 
                     $dataArray[] = array('value' => $r[$field]);
                 }
             }
