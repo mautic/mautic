@@ -787,13 +787,45 @@ class LeadListRepository extends CommonRepository
                         );
                         $parameters[$falseParameter] = false;
                     }
-
+    
                     $subqb->where($subExpr);
-
+    
                     $groupExpr->add(
                         sprintf('%s (%s)', $func, $subqb->getSQL())
                     );
+                        
+                    break;
+                case 'lead_email_received':
+                    $ignoreAutoFilter = true;
 
+                    $func = (in_array($func, array('neq', 'notIn'))) ? 'NOT IN' : 'IN';
+                    // Special handling of lead lists
+                    foreach ($details['filter'] as &$value) {
+                        $value = (int) $value;
+                    }
+
+                    // Generate a unique alias
+                    $alias = $this->generateRandomParameterName();
+
+                    $subqb = $this->_em->getConnection()->createQueryBuilder();
+                    $subqb->select($alias . '.lead_id')
+                        ->from(MAUTIC_TABLE_PREFIX.'email_stats', $alias)
+                        ->where(
+                            $subqb->expr()->in($alias . '.email_id', $details['filter'])
+                        )
+                        ->andWhere(
+                            $subqb->expr()->eq($alias.'.is_read', true));
+
+                    // Specific lead
+                    if (!empty($leadId)) {
+                        $subqb->andWhere(
+                            $subqb->expr()->eq($alias.'.lead_id', $leadId)
+                        );
+                    }
+
+                    $groupExpr->add(
+                        $q->expr()->comparison('l.id', $func, sprintf('(%s)', $subqb->getSQL()))
+                    );
                     break;
                 default:
                     switch ($func) {
