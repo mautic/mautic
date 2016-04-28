@@ -337,7 +337,7 @@ class ListModel extends FormModel
                 'operators'  => $operators['bool']
             ),
             'hit_url' => array(
-                'label' => $this->translator->trans('mautic.page.url'),
+                'label' => $this->translator->trans('mautic.lead.list.filter.visited_url'),
                 'properties' => array(
                     'type' => 'text'
                 ),
