@@ -15,7 +15,7 @@ $buttons = $preButtons = array();
 if ($permissions['lead:leads:create']) {
     $preButtons[] = array(
         'attr'      => array(
-            'class'       => 'btn btn-default btn-nospin',
+            'class'       => 'btn btn-default btn-nospin quickadd',
             'data-toggle' => 'ajaxmodal',
             'data-target' => '#MauticSharedModal',
             'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'quickAdd')),
