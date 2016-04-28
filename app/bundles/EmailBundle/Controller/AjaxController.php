@@ -247,30 +247,6 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function updateStatsChartAction(Request $request)
-    {
-        $emailId         = InputHelper::int($request->request->get('emailId'));
-        $emailType       = InputHelper::clean($request->request->get('emailType'));
-        $includeVariants = InputHelper::boolean($request->request->get('includeVariants', false));
-        $amount          = InputHelper::int($request->request->get('amount'));
-        $unit            = InputHelper::clean($request->request->get('unit'));
-        $dataArray       = array('success' => 0);
-
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model           = $this->factory->getModel('email');
-
-        $dataArray['stats']   = ($emailType == 'template') ? $model->getEmailGeneralStats($emailId, $includeVariants, $amount, $unit) :
-            $model->getEmailListStats($emailId, $includeVariants);
-        $dataArray['success'] = 1;
-
-        return $this->sendJsonResponse($dataArray);
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
     protected function getAttachmentsSizeAction(Request $request)
     {
         $assets = $request->get('assets', array(), true);

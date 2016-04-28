@@ -74,7 +74,6 @@ JS;
 {$slashes}
 // {$section} End
 {$slashes}
-\n
 JS;
         }
 

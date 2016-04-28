@@ -712,6 +712,40 @@ class LeadListRepository extends CommonRepository
             $alias = $this->generateRandomParameterName();
 
             switch ($details['field']) {
+                case 'hit_url':
+                    $operand = (($func == 'eq') || ($func == 'like')) ? 'EXISTS' : 'NOT EXISTS';
+                    
+                    $subqb = $this->_em->getConnection()
+                        ->createQueryBuilder()
+                        ->select('null')
+                        ->from(MAUTIC_TABLE_PREFIX . 'page_hits', $alias);
+                    switch ($func) {
+                        case 'eq':
+                        case 'neq':
+                            $parameters[$parameter] = $details['filter'];
+                            
+                            $subqb->where($q->expr()
+                                ->andX($q->expr()
+                                ->eq($alias . '.url', $exprParameter), $q->expr()
+                                ->eq($alias . '.lead_id', 'l.id')));
+                            break;
+                        case 'like':
+                        case '!like':
+                            $details['filter'] = '%' . $details['filter'] . '%';
+                            $subqb->where($q->expr()
+                                ->andX($q->expr()
+                                ->like($alias . '.url', $exprParameter), $q->expr()
+                                ->eq($alias . '.lead_id', 'l.id')));
+                            break;
+                    }
+                    // Specific lead
+                    if (! empty($leadId)) {
+                        $subqb->andWhere($subqb->expr()
+                            ->eq($alias . '.lead_id', $leadId));
+                    }
+                    $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
+                    break;
+
                 case 'dnc_bounced':
                 case 'dnc_unsubscribed':
                 case 'dnc_bounced_sms':
@@ -759,51 +793,65 @@ class LeadListRepository extends CommonRepository
 
                 case 'leadlist':
                 case 'tags':
+                case 'lead_email_received':
+
                     // Special handling of lead lists and tags
-                    $func  = in_array($func, array('eq', 'in')) ? 'EXISTS' : 'NOT EXISTS';
+                    $func = in_array($func, array('eq', 'in')) ? 'EXISTS' : 'NOT EXISTS';
 
-                    if ($details['field'] == 'leadlist') {
-                        $table  = 'lead_lists_leads';
-                        $column = 'leadlist_id';
-                    } else {
-                        $table  = 'lead_tags_xref';
-                        $column = 'tag_id';
-                    }
-
-                    // DBAL requires an array for in()
                     $ignoreAutoFilter = true;
                     foreach ($details['filter'] as &$value) {
                         $value = (int) $value;
                     }
 
-                    $subExpr = $q->expr()->andX(
-                        $q->expr()->in(sprintf('%s.%s', $alias, $column), $details['filter']),
-                        $q->expr()->eq($alias.'.lead_id', 'l.id')
+                    $subQb   = $this->_em->getConnection()->createQueryBuilder();
+                    $subExpr = $subQb->expr()->andX(
+                        $subQb->expr()->eq($alias.'.lead_id', 'l.id')
                     );
-
-                    $subqb = $this->_em->getConnection()->createQueryBuilder()
-                        ->select('null')
-                        ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
 
                     // Specific lead
                     if (!empty($leadId)) {
                         $subExpr->add(
-                            $subqb->expr()->eq($alias.'.lead_id', $leadId)
+                            $subQb->expr()->eq($alias.'.lead_id', $leadId)
                         );
                     }
 
-                    if ($table == 'lead_lists_leads') {
-                        $falseParameter = $this->generateRandomParameterName();
-                        $subExpr->add(
-                            $subqb->expr()->eq($alias.'.manually_removed', ":$falseParameter")
-                        );
-                        $parameters[$falseParameter] = false;
+                    switch ($details['field']) {
+                        case 'leadlist':
+                            $table  = 'lead_lists_leads';
+                            $column = 'leadlist_id';
+
+                            $falseParameter = $this->generateRandomParameterName();
+                            $subExpr->add(
+                                $subQb->expr()->eq($alias.'.manually_removed', ":$falseParameter")
+                            );
+                            $parameters[$falseParameter] = false;
+                            break;
+                        case 'tags':
+                            $table  = 'lead_tags_xref';
+                            $column = 'tag_id';
+                            break;
+                        case 'lead_email_received':
+                            $table  = 'email_stats';
+                            $column = 'email_id';
+
+                            $trueParameter = $this->generateRandomParameterName();
+                            $subExpr->add(
+                                $subQb->expr()->eq($alias.'.is_read', ":$trueParameter")
+                            );
+                            $parameters[$trueParameter] = true;
+                            break;
                     }
 
-                    $subqb->where($subExpr);
+                    $subExpr->add(
+                        $subQb->expr()->in(sprintf('%s.%s', $alias, $column), $details['filter'])
+                    );
+
+                    $subQb->select('null')
+                        ->from(MAUTIC_TABLE_PREFIX.$table, $alias)
+                        ->where($subExpr);
 
                     $groupExpr->add(
-                        sprintf('%s (%s)', $func, $subqb->getSQL())
+                        sprintf('%s (%s)', $func, $subQb->getSQL())
                     );
 
                     break;

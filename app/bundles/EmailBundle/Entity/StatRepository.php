@@ -409,53 +409,6 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * Fetch stats for some period of time.
-     *
-     * @param $emailIds
-     * @param $fromDate
-     * @param $state
-     *
-     * @return mixed
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    public function getEmailStats($emailIds, $fromDate, $state)
-    {
-        if (!is_array($emailIds)) {
-            $emailIds = array((int) $emailIds);
-        }
-
-        // Load points for selected period
-        $q = $this->createQueryBuilder('s');
-
-        $dateColumn = ($state == 'sent') ? 'dateSent' : 'dateRead';
-
-        $q->select('s.id, 1 as data, s.'.$dateColumn.' as date');
-
-        $q->where(
-            $q->expr()->in('IDENTITY(s.email)', ':emails')
-        )
-            ->setParameter('emails', $emailIds);
-
-        if ($state != 'sent') {
-            $q->andWhere(
-                $q->expr()->eq('s.is'.ucfirst($state), ':true')
-            )
-                ->setParameter('true', true, 'boolean');
-        }
-
-        $q->andwhere(
-            $q->expr()->gte('s.'.$dateColumn, ':date')
-        )
-            ->setParameter('date', $fromDate)
-            ->orderBy('s.'.$dateColumn, 'ASC');
-
-        $stats = $q->getQuery()->getArrayResult();
-
-        return $stats;
-    }
-
-    /**
      * @return string
      */
     public function getTableAlias()

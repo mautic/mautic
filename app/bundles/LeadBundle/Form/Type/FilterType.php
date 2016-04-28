@@ -109,6 +109,17 @@ class FilterType extends AbstractType
                     $customOptions['multiple'] = true;
                     $type                      = 'choice';
                     break;
+                case 'lead_email_received':
+                    if (!isset($data['filter'])) {
+                        $data['filter'] = array();
+                    } elseif (!is_array($data['filter'])) {
+                        $data['filter'] = array($data['filter']);
+                    }
+
+                    $customOptions['choices']  = $options['emails'];
+                    $customOptions['multiple'] = true;
+                    $type                      = 'choice';
+                    break;
                 case 'tags':
                     if (!isset($data['filter'])) {
                         $data['filter'] = array();
@@ -351,6 +362,7 @@ class FilterType extends AbstractType
                 'regions',
                 'fields',
                 'lists',
+                'emails',
                 'tags'
             )
         );

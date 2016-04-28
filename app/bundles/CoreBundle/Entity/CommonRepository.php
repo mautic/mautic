@@ -982,12 +982,20 @@ class CommonRepository extends EntityRepository
                 }
             }
 
-            if ($lang && isset($metadata->fieldMappings['language'])) {
-                $q->setParameter('lang', $lang);
+            if (isset($metadata->fieldMappings['language'])) {
+                if ($lang) {
+                    // Find the landing page with the specific requested locale
+                    $q->setParameter('lang', $lang);
 
-                $expr->add(
-                    $q->expr()->eq($this->getTableAlias().'.language', ':lang')
-                );
+                    $expr->add(
+                        $q->expr()->eq($this->getTableAlias().'.language', ':lang')
+                    );
+                } elseif (isset($metadata->associationMappings['translationParent'])) {
+                    // Find the parent translation
+                    $expr->add(
+                        $q->expr()->isNull($this->getTableAlias().'.translationParent')
+                    );
+                }
             }
 
             // Check for variants and return parent only

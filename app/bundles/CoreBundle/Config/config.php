@@ -85,6 +85,10 @@ return array(
                 'mautic.core.channels' => array(
                     'id'        => 'mautic_channels_root',
                     'iconClass' => 'fa-rss'
+                ),
+                'mautic.core.components' => array(
+                    'id'        => 'mautic_components_root',
+                    'iconClass' => 'fa-puzzle-piece'
                 )
             )
         ),
@@ -109,6 +113,9 @@ return array(
             ),
             'mautic.webpush.js.subscriber'           => array(
                 'class' => 'Mautic\CoreBundle\EventListener\BuildJsSubscriber'
+            ),
+            'mautic.core.dashboard.subscriber'    => array(
+                'class' => 'Mautic\CoreBundle\EventListener\DashboardSubscriber'
             )
         ),
         'forms'   => array(
@@ -173,6 +180,11 @@ return array(
                 'class'     => 'Mautic\CoreBundle\Form\Type\ThemeListType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'theme_list'
+            ),
+            'mautic.form.type.daterange'          => array(
+                'class'     => 'Mautic\CoreBundle\Form\Type\DateRangeType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'daterange'
             )
         ),
         'helpers' => array(
@@ -447,6 +459,14 @@ return array(
         'telize' => array(
             'display_name' => 'Telize',
             'class'        => 'Mautic\CoreBundle\IpLookup\TelizeLookup'
+        ),
+		'ip2loctionlocal'=>array(
+		    'display_name' => 'IP2Location Local Bin File',
+            'class'        => 'Mautic\CoreBundle\IpLookup\IP2LocationBinLookup'
+        ),
+		'ip2loctionapi'=>array(
+		    'display_name' => 'IP2Location Web Service',
+            'class'        => 'Mautic\CoreBundle\IpLookup\IP2LocationAPILookup'
         )
     ),
 
@@ -490,5 +510,6 @@ return array(
         'cookie_secure'                  => null,
         'cookie_httponly'                => false,
         'do_not_track_ips'               => array(),
+        'cached_data_timeout'            => 10
     )
 );

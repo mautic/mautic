@@ -9,6 +9,8 @@
 
 namespace Mautic\PluginBundle\Controller;
 
+use Mautic\PluginBundle\PluginEvents;
+use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -25,28 +27,22 @@ class AuthController extends FormController
      */
     public function authCallbackAction ($integration)
     {
-        $isAjax = $this->request->isXmlHttpRequest();
+        $isAjax  = $this->request->isXmlHttpRequest();
+        $session = $this->factory->getSession();
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper  = $this->factory->getHelper('integration');
-        $integrationObjects = $integrationHelper->getIntegrationObjects(null, null, true);
-
-        // We receive a lowercase name, so we need to convert the $integrationObjects array keys to lowercase
-        $objects = array();
-
-        foreach ($integrationObjects as $key => $value) {
-            $objects[strtolower($key)] = $value;
-        }
-
-        $session = $this->factory->getSession();
+        $integrationObject  = $integrationHelper->getIntegrationObject($integration);
 
         //check to see if the service exists
-        if (!array_key_exists(strtolower($integration), $objects)) {
+        if (!$integrationObject) {
             $session->set('mautic.integration.postauth.message', array('mautic.integration.notfound', array('%name%' => $integration), 'error'));
             if ($isAjax) {
-                return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_auth_postauth')));
+
+                return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_auth_postauth',array('integration'=>$integration))));
             } else {
-                return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth'));
+
+                return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth',array('integration'=>$integration)));
             }
         }
 
@@ -56,13 +52,13 @@ class AuthController extends FormController
             $session->remove($integration . '_csrf_token');
             $session->set('mautic.integration.postauth.message', array('mautic.integration.auth.invalid.state', array(), 'error'));
             if ($isAjax) {
-                return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_auth_postauth')));
+                return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_auth_postauth',array('integration'=>$integration))));
             } else {
-                return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth'));
+                return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth',array('integration'=>$integration)));
             }
         }
 
-        $error = $integrationObjects[$integration]->authCallback();
+        $error = $integrationObject->authCallback();
 
         //check for error
         if ($error) {
@@ -77,18 +73,34 @@ class AuthController extends FormController
 
         $session->set('mautic.integration.postauth.message', array($message, $params, $type));
 
-        return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth'));
+        $identifier[$integration] = null;
+        $socialCache              = array();
+        $userData                 = $integrationObject->getUserData($identifier, $socialCache);
+
+        $session->set('mautic.integration.'.$integration.'.userdata', $userData);
+
+        return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth',array('integration'=>$integration)));
     }
 
     /**
+     * @param $integration
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function authStatusAction ()
+    public function authStatusAction ($integration)
     {
+        $postAuthTemplate = 'MauticPluginBundle:Auth:postauth.html.php';
+
         $session     = $this->factory->getSession();
         $postMessage = $session->get('mautic.integration.postauth.message');
-        $message     = $type = '';
-        $alert       = 'success';
+        $userData    = array();
+
+        if (isset($integration)) {
+            $userData = $session->get('mautic.integration.'.$integration.'.userdata');
+        }
+
+        $message = $type = '';
+        $alert   = 'success';
         if (!empty($postMessage)) {
             $message = $this->factory->getTranslator()->trans($postMessage[0], $postMessage[1], 'flashes');
             $session->remove('mautic.integration.postauth.message');
@@ -98,6 +110,37 @@ class AuthController extends FormController
             }
         }
 
-        return $this->render('MauticPluginBundle:Auth:postauth.html.php', array('message' => $message, 'alert' => $alert));
+        return $this->render($postAuthTemplate, array('message' => $message, 'alert' => $alert, 'data' => $userData));
     }
+
+    /**
+     * @param $integration
+     *
+     * @return RedirectResponse
+     */
+    public function authUserAction ($integration)
+    {
+        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
+        $integrationHelper = $this->factory->getHelper('integration');
+        $integrationObject = $integrationHelper->getIntegrationObject($integration);
+
+        $settings['method']      = 'GET';
+        $settings['integration'] = $integrationObject->getName();
+
+        /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
+        $event = $this->factory->getDispatcher()->dispatch(
+            PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT,
+            new PluginIntegrationAuthRedirectEvent(
+                $integrationObject,
+                $integrationObject->getAuthLoginUrl()
+            )
+        );
+        $oauthUrl = $event->getAuthUrl();
+
+        $response = new RedirectResponse($oauthUrl);
+
+        return $response;
+    }
+
+
 }

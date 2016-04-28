@@ -17,6 +17,9 @@ use Mautic\LeadBundle\Event\FilterChoiceEvent;
 use Mautic\LeadBundle\Event\LeadListEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
@@ -289,6 +292,18 @@ class ListModel extends FormModel
                 ),
                 'operators'  => 'multiselect'
             ),
+            'lead_email_received'       => array(
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received'),
+                'properties' => array(
+                    'type' => 'lead_email_received'
+                ),
+                'operators'  => array(
+                    'include' => array(
+                        'in',
+                        '!in'
+                    )
+                )
+            ),
             'tags'       => array(
                 'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
                 'properties' => array(
@@ -339,6 +354,18 @@ class ListModel extends FormModel
                     )
                 ),
                 'operators'  => 'bool'
+            ),
+            'hit_url' => array(
+                'label' => $this->translator->trans('mautic.lead.list.filter.visited_url'),
+                'properties' => array(
+                    'type' => 'text'
+                ),
+                'operators' => array(
+                    'include' => array(
+                        '=',
+                        'like'
+                    )
+                )
             )
         );
 
@@ -462,7 +489,7 @@ class ListModel extends FormModel
         $leadCount = (int) $newLeadsCount[$id]['count'];
 
         if ($output) {
-            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_added', array('%contacts%' => $leadCount, '%batch%' => $limit)));
+            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_added', array('%leads%' => $leadCount, '%batch%' => $limit)));
         }
 
         // Handle by batches
@@ -562,7 +589,7 @@ class ListModel extends FormModel
         $leadCount = $removeLeadCount[$id]['count'];
 
         if ($output) {
-            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', array('%contacts%' => $leadCount, '%batch%' => $limit)));
+            $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', array('%leads%' => $leadCount, '%batch%' => $limit)));
         }
 
         if ($leadCount) {
@@ -941,5 +968,41 @@ class ListModel extends FormModel
         } else {
             sleep($leadSleepTime);
         }
+    }
+
+    /**
+     * Get a list of top (by leads added) lists
+     *
+     * @param integer $limit
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     *
+     * @return array
+     */
+    public function getTopLists($limit = 10, $dateFrom = null, $dateTo = null, $filters = array())
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 't')
+            ->join('t', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = t.leadlist_id')
+            ->orderBy('leads', 'DESC')
+            ->where($q->expr()->eq('ll.is_published', ':published'))
+            ->setParameter('published', true)
+            ->groupBy('ll.id')
+            ->setMaxResults($limit);
+
+        if (!empty($options['canViewOthers'])) {
+            $q->andWhere('ll.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_added');
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
     }
 }
