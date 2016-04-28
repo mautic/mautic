@@ -133,7 +133,7 @@
 
     /* instantiate parser */
     var parser = new UAParser();
-    var isHttpsPrompt = false;
+    var isHttpsPrompt = true;
 
     // get the UA string result
     var result = parser.getResult();
