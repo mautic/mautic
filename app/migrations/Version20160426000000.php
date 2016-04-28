@@ -55,13 +55,6 @@ CREATE TABLE `{$this->prefix}lead_donotcontact` (
 SQL;
 
         $this->addSql($sql);
-
-        $smsIdIdx = $this->generatePropertyName('page_redirects', 'idx', array('sms_id'));
-        $smsIdFk  = $this->generatePropertyName('page_redirects', 'fk', array('sms_id'));
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_redirects ADD sms_id INT(11) DEFAULT NULL AFTER `email_id`');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_redirects ADD CONSTRAINT ' . $smsIdFk . ' FOREIGN KEY (sms_id) REFERENCES ' . $this->prefix . 'sms_messages (id) ON DELETE SET NULL');
-        $this->addSql('CREATE INDEX ' . $smsIdIdx . ' ON ' . $this->prefix . 'page_redirects (sms_id)');
     }
 
     /**
