@@ -111,7 +111,7 @@
             <p> Notifications are already enabled, you may close this window. </p>
 
             <p style="font-size: 12px">If you would like to unsubscribe from all notifications from
-                <span class="domainName">http://dbhurley.mautic.com</span> click on the lock icon to the left of the address. </p>
+                <span class="domainName"><?php echo $siteUrl; ?></span> click on the lock icon to the left of the address. </p>
         </div>
 
     </div>
