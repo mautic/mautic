@@ -99,12 +99,8 @@ class EmailRepository extends CommonRepository
         /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
         $leads = array();
 
-        if (count($leadId) > 1) {
-            foreach ($leadId as $lead) {
-                $leads[] = $leadRepo->getEntity($lead['id']);
-            }
-        } else {
-            $leads[] = $leadRepo->getEntity($leadId['id']);
+        foreach ($leadId as $lead) {
+            $leads[] = $leadRepo->getEntity($lead['id']);
         }
 
         foreach ($leads as $lead) {
