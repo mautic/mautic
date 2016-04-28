@@ -92,6 +92,5 @@ class PageSubscriber extends CommonSubscriber
 JS;
 
         $assetsHelper->addScriptDeclaration($oneSignalInit, 'onPageDisplay_headClose');
-
     }
 }

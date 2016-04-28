@@ -77,14 +77,12 @@ MauticJS.notification = {
         if (window.focus) {
             subscribeWindow.focus();
         }
-    },
-
-    ready: function (f) {
-        /in/.test(document.readyState) ? setTimeout('MauticJS.notification.ready(' + f + ')', 9) : f();
+        
+        window.closeSubscribeWindow = function() { subscribeWindow.close(); };
     }
 };
 
-MauticJS.notification.ready('MauticJS.notification.init');
+MauticJS.documentReady('MauticJS.notification.init');
 JS;
 
         $event->appendJs($js, 'Mautic Notification JS');
