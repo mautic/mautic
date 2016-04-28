@@ -111,6 +111,9 @@ return array(
             'mautic.core.configbundle.subscriber' => array(
                 'class' => 'Mautic\CoreBundle\EventListener\ConfigSubscriber'
             ),
+            'mautic.upgrade.subscriber'           => array(
+                'class' => 'Mautic\CoreBundle\EventListener\UpgradeSubscriber'
+            ),
             'mautic.core.js.subscriber'           => array(
                 'class' => 'Mautic\CoreBundle\EventListener\BuildJsSubscriber'
             ),
