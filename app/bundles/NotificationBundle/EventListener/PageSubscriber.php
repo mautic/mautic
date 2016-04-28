@@ -41,8 +41,8 @@ class PageSubscriber extends CommonSubscriber
         }
 
         $router = $this->factory->getRouter();
-        $appId = $this->factory->getParameter('notification_app_id', 'ab44aea7-ebe8-4bf4-bb7c-aa47e22d0364');
-        $safariWebId = $this->factory->getParameter('notification_safari_web_id', 'web.onesignal.auto.31ba082c-c81b-42a5-be17-ec59d526e60e');
+        $appId = $this->factory->getParameter('notification_app_id');
+        $safariWebId = $this->factory->getParameter('notification_safari_web_id');
 
         /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
         $assetsHelper = $this->factory->getHelper('template.assets');
