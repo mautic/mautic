@@ -14,7 +14,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
- * Auto-generated Migration: Please modify to your needs!
+ * Web Notification Channel Migration
  */
 class Version20160414000000 extends AbstractMauticMigration
 {
@@ -27,7 +27,6 @@ class Version20160414000000 extends AbstractMauticMigration
     public function preUp(Schema $schema)
     {
         if ($schema->hasTable($this->prefix . 'push_notifications')) {
-
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -37,6 +36,9 @@ class Version20160414000000 extends AbstractMauticMigration
      */
     public function mysqlUp(Schema $schema)
     {
+        $categoryIdIdx = $this->generatePropertyName('push_notifications', 'idx', array('category_id'));
+        $categoryIdFk  = $this->generatePropertyName('push_notifications', 'fk', array('category_id'));
+
         $mainTableSql = <<<SQL
 CREATE TABLE `{$this->prefix}push_notifications` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -54,69 +56,80 @@ CREATE TABLE `{$this->prefix}push_notifications` (
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `description` longtext COLLATE utf8_unicode_ci,
   `lang` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `content` longtext COLLATE utf8_unicode_ci COMMENT '(DC2Type:array)',
-  `url` longtext COLLATE utf8_unicode_ci DEFAULT NULL,
-  `heading` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `message` longtext COLLATE utf8_unicode_ci NOT NULL,
-  `notification_type` longtext COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sms_type` longtext COLLATE utf8_unicode_ci DEFAULT NULL,
   `publish_up` datetime DEFAULT NULL,
   `publish_down` datetime DEFAULT NULL,
   `read_count` int(11) NOT NULL,
   `sent_count` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `IDX_1C66029812469DEN` (`category_id`),
-  CONSTRAINT `FK_1C66029812469DEN` FOREIGN KEY (`category_id`) REFERENCES `mtc_categories` (`id`) ON DELETE SET NULL
+  KEY `{$categoryIdIdx}` (`category_id`),
+  CONSTRAINT `{$categoryIdFk}` FOREIGN KEY (`category_id`) REFERENCES `{$this->prefix}categories` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 SQL;
 
         $this->addSql($mainTableSql);
 
+        $smsIdIdx = $this->generatePropertyName('push_notification_stats', 'idx', array('sms_id'));
+        $leadIdIdx = $this->generatePropertyName('push_notification_stats', 'idx', array('lead_id'));
+        $listIdIdx = $this->generatePropertyName('push_notification_stats', 'idx', array('list_id'));
+        $ipIdIdx = $this->generatePropertyName('push_notification_stats', 'idx', array('ip_id'));
+        $smsIdFk = $this->generatePropertyName('push_notification_stats', 'fk', array('sms_id'));
+        $leadIdFk = $this->generatePropertyName('push_notification_stats', 'fk', array('lead_id'));
+        $listIdFk = $this->generatePropertyName('push_notification_stats', 'fk', array('list_id'));
+        $ipIdFk = $this->generatePropertyName('push_notification_stats', 'fk', array('ip_id'));
+
         $statsSql = <<<SQL
 CREATE TABLE `{$this->prefix}push_notification_stats` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `notification_id` int(11) DEFAULT NULL,
+  `sms_id` int(11) DEFAULT NULL,
   `lead_id` int(11) DEFAULT NULL,
   `list_id` int(11) DEFAULT NULL,
   `ip_id` int(11) DEFAULT NULL,
   `date_sent` datetime NOT NULL,
-  `is_read` tinyint(1) NOT NULL,
-  `date_read` datetime DEFAULT NULL,
   `tracking_hash` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `source` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `source_id` int(11) DEFAULT NULL,
   `tokens` longtext COLLATE utf8_unicode_ci COMMENT '(DC2Type:array)',
-  `open_count` int(11) DEFAULT NULL,
-  `last_opened` datetime DEFAULT NULL,
-  `open_details` longtext COLLATE utf8_unicode_ci COMMENT '(DC2Type:array)',
   PRIMARY KEY (`id`),
-  KEY `IDX_C67BEC72A832C1CN` (`notification_id`),
-  KEY `IDX_C67BEC7255458N` (`lead_id`),
-  KEY `IDX_C67BEC723DAE168N` (`list_id`),
-  KEY `IDX_C67BEC72A03F5E9N` (`ip_id`),
-  KEY `mtc_stat_notification_search` (`notification_id`,`lead_id`),
-  KEY `mtc_stat_notification_read_search` (`is_read`),
-  KEY `mtc_stat_notification_hash_search` (`tracking_hash`),
-  KEY `mtc_stat_notification_source_search` (`source`,`source_id`),
-  CONSTRAINT `FK_C67BEC723DAE168N` FOREIGN KEY (`list_id`) REFERENCES `mtc_lead_lists` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `FK_C67BEC7255458N` FOREIGN KEY (`lead_id`) REFERENCES `mtc_leads` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `FK_C67BEC72A03F5E9N` FOREIGN KEY (`ip_id`) REFERENCES `mtc_ip_addresses` (`id`),
-  CONSTRAINT `FK_C67BEC72A832C1CN` FOREIGN KEY (`notification_id`) REFERENCES `mtc_push_notifications` (`id`) ON DELETE SET NULL
+  KEY `{$smsIdIdx}` (`sms_id`),
+  KEY `{$leadIdIdx}` (`lead_id`),
+  KEY `{$listIdIdx}` (`list_id`),
+  KEY `{$ipIdIdx}` (`ip_id`),
+  KEY `mtc_stat_sms_search` (`sms_id`,`lead_id`),
+  KEY `mtc_stat_sms_hash_search` (`tracking_hash`),
+  KEY `mtc_stat_sms_source_search` (`source`,`source_id`),
+  CONSTRAINT `{$listIdFk}` FOREIGN KEY (`list_id`) REFERENCES `{$this->prefix}lead_lists` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `{$leadIdFk}` FOREIGN KEY (`lead_id`) REFERENCES `{$this->prefix}leads` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `{$ipIdFk}` FOREIGN KEY (`ip_id`) REFERENCES `{$this->prefix}ip_addresses` (`id`),
+  CONSTRAINT `{$smsIdFk}` FOREIGN KEY (`sms_id`) REFERENCES `{$this->prefix}push_notifications` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 SQL;
         $this->addSql($statsSql);
 
+        $smsIdIdx = $this->generatePropertyName('push_notification_list_xref', 'idx', array('sms_id'));
+        $leadlistIdIdx = $this->generatePropertyName('push_notification_list_xref', 'idx', array('leadlist_id'));
+        $smsIdFk = $this->generatePropertyName('push_notification_list_xref', 'fk', array('sms_id'));
+        $leadlistIdFk = $this->generatePropertyName('push_notification_list_xref', 'fk', array('leadlist_id'));
+
         $listXrefSql = <<<SQL
 CREATE TABLE `{$this->prefix}push_notification_list_xref` (
-  `notification_id` int(11) NOT NULL,
+  `sms_id` int(11) NOT NULL,
   `leadlist_id` int(11) NOT NULL,
-  PRIMARY KEY (`notification_id`,`leadlist_id`),
-  KEY `IDX_DB54D00DA832C1CN` (`notification_id`),
-  KEY `IDX_DB54D00DB9FC887N` (`leadlist_id`),
-  CONSTRAINT `FK_DB54D00DA832C1CN` FOREIGN KEY (`notification_id`) REFERENCES `mtc_push_notifications` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_DB54D00DB9FC887N` FOREIGN KEY (`leadlist_id`) REFERENCES `mtc_lead_lists` (`id`) ON DELETE CASCADE
+  PRIMARY KEY (`sms_id`,`leadlist_id`),
+  KEY `{$smsIdIdx}` (`sms_id`),
+  KEY `{$leadlistIdIdx}` (`leadlist_id`),
+  CONSTRAINT `{$smsIdFk}` FOREIGN KEY (`sms_id`) REFERENCES `{$this->prefix}push_notifications` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `{$leadlistIdFk}` FOREIGN KEY (`leadlist_id`) REFERENCES `{$this->prefix}lead_lists` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 SQL;
         $this->addSql($listXrefSql);
+
+        $notificationIdIdx = $this->generatePropertyName('page_redirects', 'idx', array('notification_id'));
+        $notificationIdFk  = $this->generatePropertyName('page_redirects', 'fk', array('notification_id'));
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_redirects ADD notification_id INT(11) DEFAULT NULL AFTER `email_id`');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_redirects ADD CONSTRAINT ' . $notificationIdFk . ' FOREIGN KEY (notification_id) REFERENCES ' . $this->prefix . 'push_notifications (id) ON DELETE SET NULL');
+        $this->addSql('CREATE INDEX ' . $notificationIdIdx . ' ON ' . $this->prefix . 'page_redirects (notification_id)');
     }
 
     /**
