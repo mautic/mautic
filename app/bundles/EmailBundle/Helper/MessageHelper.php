@@ -117,10 +117,18 @@ class MessageHelper
             }
 
             if (empty($messageDetails['email']) || $messageDetails['rule_cat'] == 'unrecognized') {
-                $this->logger->debug('Bounce email or reason not found so attempting to parse the body.');
+                // Check for the X-Failed-Recipients header
+                $bouncedEmail = (isset($message->xHeaders['x-failed-recipients'])) ? $message->xHeaders['x-failed-recipients'] : null;
+
+                if ($bouncedEmail) {
+                    // Definitely a bounced email but need to find the reason
+                    $this->logger->debug('Email found through x-failed-recipients header but need to search for a reason.');
+                } else {
+                    $this->logger->debug('Bounce email or reason not found so attempting to parse the body.');
+                }
 
                 // Let's try parsing through the body parser
-                $messageDetails = $this->parseBody($message->textPlain);
+                $messageDetails = $this->parseBody($message->textPlain, $bouncedEmail);
             }
 
             if (!$isBounce && !empty($messageDetails['email'])) {
@@ -129,8 +137,6 @@ class MessageHelper
                 $isUnsubscribe = false;
             }
         }
-
-        $this->logger->debug(print_r($messageDetails, true));
 
         if (!$isBounce && !$isUnsubscribe) {
             $this->logger->debug('No reason found to process.');
@@ -354,17 +360,18 @@ class MessageHelper
     /**
      * Defined bounce parsing rules for non-standard DSN
      *
-     * @param string  $body       body of the email
-     * @param boolean $debug_mode show debug info. or not
+     * @param string      $body       body of the email
+     * @param string|null $knownEmail Bounced email if known through a x-failed-recipient header or the like and need to parse the body for a reason
+     * @param boolean     $debug_mode show debug info. or not
      *
      * @return array    $result an array include the following fields: 'email', 'bounce_type','remove','rule_no','rule_cat'
      *                      if we could NOT detect the type of bounce, return rule_no = '0000'
      */
-    static public function parseBody($body, $debug_mode = false)
+    static public function parseBody($body, $knownEmail = '', $debug_mode = false)
     {
         // initialize the result array
         $result = array(
-            'email'       => '',
+            'email'       => $knownEmail,
             'bounce_type' => false,
             'remove'      => 0,
             'rule_cat'    => 'unrecognized',
@@ -372,6 +379,112 @@ class MessageHelper
         );
 
         // ======== rule =========
+
+        /**
+         * Email is already known likely for a x-failed-recipients header; most likely Gmail bounce
+         */
+        if ('' !== $knownEmail) {
+            /*
+             * rule: mailbox unknown;
+             * sample:
+             * The error that the other server returned was:
+             * 550-5.1.1 The email account that you tried to reach does not exist.
+             */
+            if (preg_match("/email.*?does not exist/i", $body, $match)) {
+                $result['rule_cat'] = 'unknown';
+                $result['rule_no'] = '0237';
+            }
+
+            /*
+             * rule: mailbox unknown;
+             * sample:
+             * The error that the other server returned was:
+             * 553-5.1.2 We weren't able to find the recipient domain.
+             */
+            elseif (preg_match("/find the recipient domain/i", $body, $match)) {
+                $result['rule_cat'] = 'unknown';
+                $result['rule_no'] = '0237';
+            }
+
+            /*
+             * rule: mailbox inactive;
+             * sample:
+             * The error that the other server returned was:
+             * 550-5.2.1 The email account that you tried to reach is disabled.
+             */
+            elseif (preg_match("/email.*?disabled/i", $body, $match)) {
+                $result['rule_cat'] = 'inactive';
+                $result['rule_no'] = '0171';
+            }
+
+            /*
+             * rule: mailbox warning;
+             * sample:
+             * The error that the other server returned was:
+             * 550-5.2.1 The user you are trying to contact is receiving mail at a rate that prevents additional messages from being delivered.
+             */
+            elseif (preg_match("/user.*?rate that prevents/i", $body, $match)) {
+                $result['rule_cat'] = 'warning';
+                $result['rule_no'] = '0000';
+            }
+
+            /*
+            * rule: mailbox full;
+            * sample:
+            * The error that the other server returned was:
+            * 550-5.7.1 Email quota exceeded.
+            */
+            elseif (preg_match("/email quota exceeded/i", $body, $match)) {
+                $result['rule_cat'] = 'full';
+                $result['rule_no']  = '0219';
+            }
+
+            /*
+            * rule: mailbox full;
+            * sample:
+            * The error that the other server returned was:
+            * 552-5.2.2 The email account that you tried to reach is over quota.
+            */
+            if (preg_match("/email.*?over quota/i", $body, $match)) {
+                $result['rule_cat'] = 'full';
+                $result['rule_no']  = '0219';
+            }
+
+            /*
+            * rule: mailbox antispam;
+            * sample:
+            * The error that the other server returned was:
+            * 550-5.7.1 Our system has detected an unusual rate of unsolicited mail originating from your IP address. To protect our users from spam,
+            * mail sent from your IP address has been blocked.
+            */
+            elseif (preg_match("/unsolicited mail/i", $body, $match)) {
+                $result['rule_cat'] = 'antispam';
+                $result['rule_no']  = '0230';
+            }
+
+            /*
+            * rule: mailbox antispam;
+            * sample:
+            * The error that the other server returned was:
+            * 550-5.7.1 The user or domain that you are sending to (or from) has a policy that prohibited the mail that you sent.
+            */
+            elseif (preg_match("/policy that prohibited/i", $body, $match)) {
+                $result['rule_cat'] = 'antispam';
+                $result['rule_no']  = '0230';
+            }
+
+            /*
+            * rule: mailbox oversize;
+            * sample:
+            * The error that the other server returned was:
+            * 552-5.2.3 Your message exceeded Google's message size limits.
+            */
+            elseif (preg_match("/message size limits/i", $body, $match)) {
+                $result['rule_cat'] = 'oversize';
+                $result['rule_no']  = '0146';
+            }
+        }
+
         /*
         * rule: mailbox unknown;
         * sample:
@@ -382,14 +495,13 @@ class MessageHelper
             $result['rule_cat'] = 'unknown';
             $result['rule_no']  = '0237';
             $result['email']    = $match[1];
-
         }
 
         /*
-            * <xxxxx@yourdomain.com>:
-            * 111.111.111.111 does not like recipient.
-            * Remote host said: 550 User unknown
-            */
+        * <xxxxx@yourdomain.com>:
+        * 111.111.111.111 does not like recipient.
+        * Remote host said: 550 User unknown
+        */
         elseif (preg_match("/<(\S+@\S+\w)>.*\n?.*\n?.*user unknown/i", $body, $match)) {
             $result['rule_cat'] = 'unknown';
             $result['rule_no']  = '0236';
@@ -407,10 +519,9 @@ class MessageHelper
             $result['rule_cat'] = 'unknown';
             $result['rule_no']  = '0157';
             $result['email']    = $match[1];
-
         }
 
-/*
+       /*
         * rule: mailbox unknown;
         * sample:
         * xxxxx@yourdomain.com<br>
@@ -467,17 +578,16 @@ class MessageHelper
         }
 
         /*
-        * rule: mailbox unknow;
+        * rule: mailbox unknown;
         * sample:
         * Delivery to the following recipients failed.
         * xxxxx@yourdomain.com
         */
-        elseif (preg_match("/delivery[^\n\r]+failed\S*\s+(\S+@\S+\w)\s/is", $body, $match)) {
+        elseif (preg_match("/delivery[^\n\r]+failed[ \S]*\s+(\S+@\S+\w)\s/is", $body, $match)) {
             $result['rule_cat'] = 'unknown';
             $result['rule_no']  = '0013';
             $result['email']    = $match[1];
         }
-        
 
         /*
         * rule: mailbox error (Amazon SES);
@@ -489,13 +599,13 @@ class MessageHelper
             $result['rule_cat'] = 'unknown';
             $result['rule_no']  = '0013';
             $result['bounce_type'] = 'hard';
-            $result['remove']      = 1;                 
+            $result['remove']      = 1;
             $result['email']    = $match[1];
             $result['email'] = preg_replace("/Reporting\-MTA/","",$result['email']);
-        } 
+        }
 
         /*
-        * rule: mailbox unknow;
+        * rule: mailbox unknown;
         * sample:
         * A message that you sent could not be delivered to one or more of its^M
         * recipients. This is a permanent error. The following address(es) failed:^M
@@ -510,7 +620,7 @@ class MessageHelper
         }
 
         /*
-        * rule: mailbox unknow;
+        * rule: mailbox unknown;
         * sample:
         * <xxxxx@yourdomain.com>:^M
         * 111.111.111.11 does not like recipient.^M
@@ -523,7 +633,7 @@ class MessageHelper
         }
 
         /*
-        * rule: mailbox unknow;
+        * rule: mailbox unknown;
         * sample:
         * Sent >>> RCPT TO: <xxxxx@yourdomain.com>^M
         * Received <<< 550 xxxxx@yourdomain.com... No such user^M
@@ -539,7 +649,7 @@ class MessageHelper
         }
 
         /*
-        * rule: mailbox unknow;
+        * rule: mailbox unknown;
         * sample:
         * <xxxxx@yourdomain.com>:^M
         * This address no longer accepts mail.
