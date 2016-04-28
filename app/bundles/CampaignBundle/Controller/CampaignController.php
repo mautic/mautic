@@ -215,9 +215,13 @@ class CampaignController extends FormController
         $page = $this->factory->getSession()->get('mautic.campaign.page', 1);
 
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
-        $model    = $this->factory->getModel('campaign');
-        $security = $this->factory->getSecurity();
-        $entity   = $model->getEntity($objectId);
+        $model     = $this->factory->getModel('campaign');
+
+        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        $pageModel = $this->factory->getModel('page');
+
+        $security  = $this->factory->getSecurity();
+        $entity    = $model->getEntity($objectId);
 
         $permissions = $security->isGranted(
             array(
@@ -273,11 +277,7 @@ class CampaignController extends FormController
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('campaign', $objectId, $entity->getDateAdded());
 
         // Hit count per day for last 30 days
-        $hits = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->getHits(
-            30,
-            'D',
-            array('source_id' => $entity->getId(), 'source' => 'campaign')
-        );
+        $hits = $pageModel->getHitsBarChartData(null, new \DateTime('-30 days'), new \DateTime, null, array('source_id' => $objectId, 'source' => 'campaign'));
 
         // Sent emails stats
         $emailsSent = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat')->getIgnoredReadFailed(
@@ -286,7 +286,7 @@ class CampaignController extends FormController
         );
 
         // Lead count stats
-        $leadStats = $campaignLeadRepo->getLeadStats(30, 'D', array('campaign_id' => $entity->getId()));
+        $leadStats = $model->getLeadsAddedLineChartData(null, new \DateTime('-30 days'), new \DateTime, null, array('campaign_id' => $objectId));
 
         return $this->delegateView(
             array(

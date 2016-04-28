@@ -88,7 +88,10 @@ return array(
             ),
             'mautic.point.search.subscriber'     => array(
                 'class' => 'Mautic\PointBundle\EventListener\SearchSubscriber'
-            )
+            ),
+            'mautic.point.dashboard.subscriber'  => array(
+                'class' => 'Mautic\PointBundle\EventListener\DashboardSubscriber'
+            ),
         ),
         'forms'  => array(
             'mautic.point.type.form'                  => array(

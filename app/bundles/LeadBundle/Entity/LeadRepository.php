@@ -299,24 +299,6 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * Get leads count per country name.
-     * Can't use entity, because country is custom field.
-     *
-     * @return array
-     */
-    public function getLeadsCountPerCountries()
-    {
-        $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('COUNT(l.id) as quantity, l.country')
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->groupBy('l.country')
-            ->where($q->expr()->isNotNull('l.country'));
-        $results = $q->execute()->fetchAll();
-
-        return $results;
-    }
-
-    /**
      * {@inheritdoc}
      *
      * @param $entity

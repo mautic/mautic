@@ -18,36 +18,6 @@ use Doctrine\ORM\Query;
  */
 class PointsChangeLogRepository extends CommonRepository
 {
-
-    /**
-     * Fetch Lead's points for some period of time.
-     *
-     * @param $fromDate
-     *
-     * @return mixed
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    public function getLeadPoints($fromDate, $args = array())
-    {
-        // Load points for selected period
-        $q = $this->createQueryBuilder('pl');
-        $q->select('pl.delta as data, pl.dateAdded as date');
-
-        if (isset($args['lead_id'])) {
-            $q->where($q->expr()->eq('IDENTITY(pl.lead)', ':lead'))
-                ->setParameter('lead', $args['lead_id']);
-        }
-
-        $q->andwhere($q->expr()->gte('pl.dateAdded', ':date'))
-            ->setParameter('date', $fromDate)
-            ->orderBy('pl.dateAdded', 'ASC');
-
-        $points = $q->getQuery()->getArrayResult();
-
-        return $points;
-    }
-
     /**
      * Get a lead's point log
      *

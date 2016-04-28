@@ -19,9 +19,18 @@ class UpdateLeadListsCommand extends ModeratedCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:leadlists:update')
+            ->setName('mautic:contactsegments:update')
             ->setAliases(
                 array(
+                    'mautic:segments:update',
+                    'mautic:update:contactsegments',
+                    'mautic:update:segments',
+                    'mautic:rebuild:contactsegments',
+                    'mautic:contactsegments:rebuild',
+                    'mautic:segments:rebuild',
+                    'mautic:rebuild:segments',
+
+                    // Following aliases: BC support; @deprecated 1.1.4; to be removed in 2.0
                     'mautic:lists:update',
                     'mautic:update:leadlists',
                     'mautic:update:lists',
@@ -29,15 +38,16 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     'mautic:leadlists:rebuild',
                     'mautic:lists:rebuild',
                     'mautic:rebuild:lists',
+                    'mautic:leadlists:update'
                 )
             )
-            ->setDescription('Update contacts in smart lists based on new lead data.')
+            ->setDescription('Update contacts in smart segments based on new contact data.')
             ->addOption('--batch-limit', '-b', InputOption::VALUE_OPTIONAL, 'Set batch size of contacts to process per round. Defaults to 300.', 300)
             ->addOption(
                 '--max-contacts',
                 '-m',
                 InputOption::VALUE_OPTIONAL,
-                'Set max number of contacts to process per list for this script execution. Defaults to all.',
+                'Set max number of contacts to process per segment for this script execution. Defaults to all.',
                 false
             )
             ->addOption('--list-id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to rebuild. Defaults to all.', false);
@@ -69,7 +79,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
                 $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', array('%id%' => $id)).'</info>');
                 $processed = $listModel->rebuildListLeads($list, $batch, $max, $output);
                 $output->writeln(
-                    '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', array('%contacts%' => $processed)).'</comment>'
+                    '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', array('%leads%' => $processed)).'</comment>'
                 );
             } else {
                 $output->writeln('<error>'.$translator->trans('mautic.lead.list.rebuild.not_found', array('%id%' => $id)).'</error>');
@@ -89,7 +99,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
 
                 $processed = $listModel->rebuildListLeads($l, $batch, $max, $output);
                 $output->writeln(
-                    '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', array('%contacts%' => $processed)).'</comment>'."\n"
+                    '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', array('%leads%' => $processed)).'</comment>'."\n"
                 );
 
                 unset($l);

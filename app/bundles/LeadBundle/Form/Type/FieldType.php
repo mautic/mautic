@@ -21,6 +21,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 
 /**
@@ -162,14 +164,13 @@ class FieldType extends AbstractType
                 'label'      => 'mautic.core.defaultvalue',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
-                'required'   => false
+                'required'   => false,
             )
         );
 
         $formModifier = function (FormEvent $event, $eventName) {
             $form = $event->getForm();
             $data = $event->getData();
-
             $type = (is_array($data)) ? (isset($data['type']) ? $data['type'] : null) : $data->getType();
 
             if ($type == 'select' || $type == 'lookup') {
@@ -217,6 +218,36 @@ class FieldType extends AbstractType
                             array(false, true),
                             array($noLabel, $yesLabel)
                         )
+                    )
+                );
+            } elseif (in_array($type, array('datetime', 'date', 'time'))) {
+                $constraints = array();
+                if ($type === 'datetime') {
+                    $constraints = array(new Assert\Callback(function ($object, ExecutionContextInterface $context) {
+                        if (\DateTime::createFromFormat('Y-m-d H:i', $object) === false) {
+                            $context->buildViolation('mautic.lead.datetime.invalid')->addViolation();
+                        }
+                    }));
+                } elseif ($type === 'date') {
+                    $constraints = array(new Assert\Date(array(
+                        'message' => 'mautic.lead.date.invalid'
+                    )));
+                } elseif ($type === 'time') {
+                    $constraints = array(new Assert\Regex(array(
+                        'pattern' => '/(2[0-3]|[01][0-9]):([0-5][0-9])/',
+                        'message' => 'mautic.lead.time.invalid'
+                    )));
+                }
+
+                $form->add(
+                    'defaultValue',
+                    'text',
+                    array(
+                        'label'      => 'mautic.core.defaultvalue',
+                        'label_attr' => array('class' => 'control-label'),
+                        'attr'       => array('class' => 'form-control'),
+                        'required'   => false,
+                        'constraints' => $constraints
                     )
                 );
             }

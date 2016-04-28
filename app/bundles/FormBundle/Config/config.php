@@ -88,7 +88,7 @@ return array(
                 'mautic.form.forms' => array(
                     'route'     => 'mautic_form_index',
                     'access'    => array('form:forms:viewown', 'form:forms:viewother'),
-                    'parent'    => 'mautic.campaigns.menu.root',
+                    'parent'    => 'mautic.core.components',
                     'priority'  => 80
                 )
             )
@@ -128,9 +128,12 @@ return array(
             'mautic.form.search.subscriber'         => array(
                 'class' => 'Mautic\FormBundle\EventListener\SearchSubscriber'
             ),
-            'mautic.form.webhook.subscriber'                => array(
+            'mautic.form.webhook.subscriber'        => array(
                 'class' => 'Mautic\FormBundle\EventListener\WebhookSubscriber'
-            )
+            ),
+            'mautic.form.dashboard.subscriber'      => array(
+                'class' => 'Mautic\FormBundle\EventListener\DashboardSubscriber'
+            ),
         ),
         'forms'  => array(
             'mautic.form.type.form'                      => array(

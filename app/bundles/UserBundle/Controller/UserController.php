@@ -168,7 +168,18 @@ class UserController extends FormController
                         if ($fetchLanguage['error']) {
                             $user->setLocale(null);
                             $model->saveEntity($user);
-                            $this->addFlash('mautic.core.could.not.set.language');
+                            $message = 'mautic.core.could.not.set.language';
+                            $messageVars = array();
+
+                            if (isset($fetchLanguage['message'])) {
+                                $message = $fetchLanguage['message'];
+                            }
+
+                            if (isset($fetchLanguage['vars'])) {
+                                $messageVars = $fetchLanguage['vars'];
+                            }
+
+                            $this->addFlash($message, $messageVars);
                         }
                     }
 
@@ -289,7 +300,18 @@ class UserController extends FormController
                         if ($fetchLanguage['error']) {
                             $user->setLocale(null);
                             $model->saveEntity($user);
-                            $this->addFlash('mautic.core.could.not.set.language');
+                            $message = 'mautic.core.could.not.set.language';
+                            $messageVars = array();
+
+                            if (isset($fetchLanguage['message'])) {
+                                $message = $fetchLanguage['message'];
+                            }
+
+                            if (isset($fetchLanguage['vars'])) {
+                                $messageVars = $fetchLanguage['vars'];
+                            }
+
+                            $this->addFlash($message, $messageVars);
                         }
                     }
 

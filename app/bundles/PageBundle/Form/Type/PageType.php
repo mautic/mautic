@@ -263,7 +263,8 @@ class PageType extends AbstractType
                         'tooltip' => 'mautic.page.form.language.help',
                     ),
                     'required'   => false,
-                    'disabled'   => $isVariant
+                    'disabled'   => $isVariant,
+                    'empty_data' => 'en'
                 )
             );
 
