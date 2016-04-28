@@ -63,14 +63,15 @@ return array(
         )
     ),
 
-    'menu'     => array(
+    'menu' => array(
         'main' => array(
+            'priority' => 65,
             'items'    => array(
                 'mautic.page.pages' => array(
-                    'route'     => 'mautic_page_index',
-                    'access'    => array('page:pages:viewown', 'page:pages:viewother'),
-                    'parent'    => 'mautic.campaigns.menu.root',
-                    'priority'  => 101
+                    'route' => 'mautic_page_index',
+                    'id'        => 'mautic_page_root',
+                    'iconClass' => 'fa-file-text-o',
+                    'access'    => array('page:pages:viewown', 'page:pages:viewother')
                 )
             )
         )
@@ -118,6 +119,9 @@ return array(
             'mautic.page.dashboard.subscriber'      => array(
                 'class' => 'Mautic\PageBundle\EventListener\DashboardSubscriber'
             ),
+            'mautic.page.js.subscriber'           => array(
+                'class' => 'Mautic\PageBundle\EventListener\BuildJsSubscriber'
+            )
         ),
         'forms'  => array(
             'mautic.form.type.page'                     => array(

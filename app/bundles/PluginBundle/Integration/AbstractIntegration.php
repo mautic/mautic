@@ -11,9 +11,12 @@ namespace Mautic\PluginBundle\Integration;
 
 use Joomla\Http\HttpFactory;
 use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
+use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\Form\FormBuilder;
 
 /**
@@ -201,9 +204,12 @@ abstract class AbstractIntegration
         $withKeys = array_merge($withKeys, $mergeKeys);
 
         if ($return) {
-            $this->keys = $withKeys;
+            $this->keys = $this->dispatchIntegrationKeyEvent(
+                PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_MERGE,
+                $withKeys
+            );
 
-            return $withKeys;
+            return $this->keys;
         } else {
             $this->encryptAndSetApiKeys($withKeys, $settings);
 
@@ -220,6 +226,13 @@ abstract class AbstractIntegration
      */
     public function encryptAndSetApiKeys(array $keys, Integration $entity)
     {
+        $this->keys = $keys;
+
+        $keys = $this->dispatchIntegrationKeyEvent(
+            PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT,
+            $keys
+        );
+
         $encrypted = $this->encryptApiKeys($keys);
         $entity->setApiKeys($encrypted);
     }
@@ -253,7 +266,10 @@ abstract class AbstractIntegration
 
         $serialized = serialize($keys);
         if (empty($decryptedKeys[$serialized])) {
-            $decryptedKeys[$serialized] = $this->decryptApiKeys($keys);;
+            $decryptedKeys[$serialized] = $this->dispatchIntegrationKeyEvent(
+                PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_DECRYPT,
+                $this->decryptApiKeys($keys)
+            );
         }
 
         return $decryptedKeys[$serialized];
@@ -491,11 +507,20 @@ abstract class AbstractIntegration
      */
     public function makeRequest($url, $parameters = array(), $method = 'GET', $settings = array())
     {
-
         $method   = strtoupper($method);
         $authType = (empty($settings['auth_type'])) ? $this->getAuthenticationType() : $settings['auth_type'];
 
         list($parameters, $headers) = $this->prepareRequest($url, $parameters, $method, $settings, $authType);
+
+        if (empty($settings['ignore_event_dispatch'])) {
+            $event = $this->factory->getDispatcher()->dispatch(
+                PluginEvents::PLUGIN_ON_INTEGRATION_REQUEST,
+                new PluginIntegrationRequestEvent($this, $url, $parameters, $headers, $method, $settings, $authType)
+            );
+
+            $headers    = $event->getHeaders();
+            $parameters = $event->getParameters();
+        }
 
         if (!isset($settings['query'])) {
             $settings['query'] = array();
@@ -598,6 +623,14 @@ abstract class AbstractIntegration
         } catch (\Exception $exception) {
 
             return array('error' => array('message' => $exception->getMessage(), 'code' => $exception->getCode()));
+        }
+
+        if (empty($settings['ignore_event_dispatch'])) {
+            $event->setResponse($result);
+            $this->factory->getDispatcher()->dispatch(
+                PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE,
+                $event
+            );
         }
 
         if (!empty($settings['return_raw'])) {
@@ -885,6 +918,8 @@ abstract class AbstractIntegration
      * Called in extractAuthKeys before key comparison begins to give opportunity to set expiry, rename keys, etc
      *
      * @param $data
+     *
+     * @return mixed
      */
     public function prepareResponseForExtraction($data)
     {
@@ -1206,12 +1241,13 @@ abstract class AbstractIntegration
     /**
      * Create or update existing Mautic lead from the integration's profile data
      *
-     * @param mixed     $data    Profile data from integration
-     * @param bool|true $persist Set to false to not persist lead to the database in this method
-     *
+     * @param mixed       $data    Profile data from integration
+     * @param bool|true   $persist Set to false to not persist lead to the database in this method
+     * @param array|null  $socialCache
+     * @param mixed||null $identifiers
      * @return Lead
      */
-    public function getMauticLead($data, $persist = true, $socialCache = null)
+    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null)
     {
         if (is_object($data)) {
             // Convert to array in all levels
@@ -1224,7 +1260,13 @@ abstract class AbstractIntegration
         // Match that data with mapped lead fields
         $matchedFields = $this->populateMauticLeadData($data);
 
+        if (empty($matchedFields)) {
+
+            return;
+        }
+
         // Find unique identifier fields used by the integration
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel           = $this->factory->getModel('lead');
         $uniqueLeadFields    = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
         $uniqueLeadFieldData = array();
@@ -1235,11 +1277,8 @@ abstract class AbstractIntegration
             }
         }
 
-
         // Default to new lead
         $lead            = new Lead();
-        $leadSocialCache = array();
-
         $lead->setNewlyCreated(true);
 
         if (count($uniqueLeadFieldData)) {
@@ -1249,26 +1288,30 @@ abstract class AbstractIntegration
 
             if (!empty($existingLeads)) {
                 $lead = array_shift($existingLeads);
-
                 // Update remaining leads
                 if (count($existingLeads)) {
-
                     foreach ($existingLeads as $existingLead) {
-
-                        $leadModel->setFieldValues($existingLead, $matchedFields, false);
                         $existingLead->setLastActive(new \DateTime());
                     }
                 }
             }
         }
 
+        $leadModel->setFieldValues($lead, $matchedFields, false, false);
 
-        $leadModel->setFieldValues($lead, $matchedFields, false);
-
+        // Update the social cache
         $leadSocialCache = $lead->getSocialCache();
-        $socialCache     = array_merge($leadSocialCache, $socialCache);
+        if (!isset($leadSocialCache[$this->getName()])) {
+            $leadSocialCache[$this->getName()] = array();
+        }
+        $leadSocialCache[$this->getName()] = array_merge($leadSocialCache[$this->getName()], $socialCache);
 
-        $lead->setSocialCache($socialCache);
+        // Check for activity while here
+        if (null !== $identifiers && in_array('public_activity', $this->getSupportedFeatures())) {
+            $this->getPublicActivity($identifiers, $leadSocialCache[$this->getName()]);
+        }
+
+        $lead->setSocialCache($leadSocialCache);
 
         $lead->setLastActive(new \DateTime());
 
@@ -1276,7 +1319,6 @@ abstract class AbstractIntegration
             // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
             $leadModel->saveEntity($lead, false);
         }
-
 
         return $lead;
     }
@@ -1409,6 +1451,16 @@ abstract class AbstractIntegration
     }
 
     /**
+     * Get the path to the profile templates for this integration
+     *
+     * @return null
+     */
+    public function getSocialProfileTemplate()
+    {
+        return null;
+    }
+
+    /**
      * Checks to ensure an image still exists before caching
      *
      * @param string $url
@@ -1517,5 +1569,22 @@ abstract class AbstractIntegration
     public function getPostAuthTemplate()
     {
         return null;
+    }
+
+    /**
+     * @param       $eventName
+     * @param array $keys
+     *
+     * @return array
+     */
+    protected function dispatchIntegrationKeyEvent($eventName, $keys = array())
+    {
+        /** @var PluginIntegrationKeyEvent $event */
+        $event = $this->factory->getDispatcher()->dispatch(
+            $eventName,
+            new PluginIntegrationKeyEvent($this, $keys)
+        );
+
+        return $event->getKeys();
     }
 }

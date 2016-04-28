@@ -67,7 +67,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
                 $output->writeln('<info>'.$translator->trans('mautic.campaign.rebuild.rebuilding', array('%id%' => $id)).'</info>');
                 $processed = $campaignModel->rebuildCampaignLeads($campaign, $batch, $max, $output);
                 $output->writeln(
-                    '<comment>'.$translator->trans('mautic.campaign.rebuild.leads_affected', array('%contacts%' => $processed)).'</comment>'."\n"
+                    '<comment>'.$translator->trans('mautic.campaign.rebuild.leads_affected', array('%leads%' => $processed)).'</comment>'."\n"
                 );
             } else {
                 $output->writeln('<error>'.$translator->trans('mautic.campaign.rebuild.not_found', array('%id%' => $id)).'</error>');
@@ -88,7 +88,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
 
                     $processed = $campaignModel->rebuildCampaignLeads($c, $batch, $max, $output);
                     $output->writeln(
-                        '<comment>'.$translator->trans('mautic.campaign.rebuild.leads_affected', array('%contacts%' => $processed)).'</comment>'."\n"
+                        '<comment>'.$translator->trans('mautic.campaign.rebuild.leads_affected', array('%leads%' => $processed)).'</comment>'."\n"
                     );
                 }
 

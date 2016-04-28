@@ -54,9 +54,7 @@ class FieldController extends CommonFormController
 
         //fire the form builder event
         $customComponents = $this->factory->getModel('form.form')->getCustomComponents();
-
-        $customParams = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
-
+        $customParams     = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
 
         // Only show the lead fields not already used
         $usedLeadFields = $session->get('mautic.form.'.$formId.'.fields.leadfields', array());

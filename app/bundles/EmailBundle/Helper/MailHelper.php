@@ -852,7 +852,7 @@ class MailHelper
             }
         }
 
-        if (!$ignoreTrackingPixel) {
+        if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
             // Append tracking pixel
             $trackingImg = '<img style="display: none;" height="1" width="1" src="{tracking_pixel}" alt="Mautic is open source marketing automation" />';
             if (strpos($content, '</body>') !== false) {

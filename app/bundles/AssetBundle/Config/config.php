@@ -53,9 +53,8 @@ return array(
             'items'    => array(
                 'mautic.asset.assets' => array(
                     'route'     => 'mautic_asset_index',
-                    'id'        => 'mautic_asset_root',
                     'access'    => array('asset:assets:viewown', 'asset:assets:viewother'),
-                    'parent'    => 'mautic.campaigns.menu.root',
+                    'parent'    => 'mautic.core.components',
                     'priority'  => 100,
                 )
             )

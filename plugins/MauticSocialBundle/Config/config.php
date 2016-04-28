@@ -14,15 +14,20 @@ return array(
     'author'      => 'Mautic',
 
     'services' => array(
+        'events' => array(
+            'mautic.socialplugin.formbundle.subscriber' => array(
+                'class' => 'MauticPlugin\MauticSocialBundle\EventListener\FormSubscriber'
+            )
+        ),
         'forms' => array(
+            'mautic.form.type.social.sociallogin'        => array(
+                'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\SocialLoginType',
+                'arguments' => 'mautic.factory',
+                'alias' => 'sociallogin'
+            ),
             'mautic.form.type.social.facebook'        => array(
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\FacebookType',
                 'alias' => 'socialmedia_facebook'
-            ),
-            'mautic.form.type.social.facebooklogin'   => array(
-                'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\FacebookLoginType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'sociallogin_facebook'
             ),
             'mautic.form.type.social.twitter'         => array(
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterType',
@@ -32,19 +37,9 @@ return array(
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\GooglePlusType',
                 'alias' => 'socialmedia_googleplus'
             ),
-            'mautic.form.type.social.googlepluslogin' => array(
-                'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\GooglePlusLoginType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'sociallogin_googleplus'
-            ),
             'mautic.form.type.social.linkedin'        => array(
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\LinkedInType',
                 'alias' => 'socialmedia_linkedin'
-            ),
-            'mautic.form.type.social.linkedinlogin'   => array(
-                'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\LinkedInLoginType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'sociallogin_linkedin'
             )
         ),
 

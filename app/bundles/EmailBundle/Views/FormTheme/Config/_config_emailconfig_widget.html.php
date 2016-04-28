@@ -119,6 +119,7 @@ $template = '<div class="col-md-6">{content}</div>';
             <?php echo $view['form']->rowIfExists($fields, 'default_signature_text', $template); ?>
         </div>
         <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_append_tracking_pixel', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'mailer_convert_embed_images', $template); ?>
         </div>
     </div>

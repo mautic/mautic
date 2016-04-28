@@ -131,13 +131,11 @@ return array(
             'priority' => 80,
             'items'    => array(
                 'mautic.lead.leads' => array(
-                    'id'        => 'menu_lead_contact',
                     'iconClass' => 'fa-user',
                     'access'    => array('lead:leads:viewown', 'lead:leads:viewother'),
                     'route' => 'mautic_lead_index'
                 ),
                 'mautic.lead.list.menu.index'  => array(
-                    'id'        => 'menu_lead_segment',
                     'iconClass' => 'fa-pie-chart',
                     'access'    => array('lead:leads:viewown', 'lead:leads:viewother'),
                     'route' => 'mautic_leadlist_index',
