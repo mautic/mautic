@@ -1219,7 +1219,9 @@ class EmailModel extends FormModel
             /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
             $leadModel = $this->factory->getModel('lead.lead');
 
-            $leadModel->addDncForLead($lead, 'email', $comments, $reason, $flush);
+            $email   = $stat->getEmail();
+            $channel = ($email) ? array('email' => $email->getId()) : 'email';
+            $leadModel->addDncForLead($lead, $channel, $comments, $reason, $flush);
         }
     }
 
@@ -1519,7 +1521,7 @@ class EmailModel extends FormModel
 
         if (isset($options['groupBy']) && $options['groupBy'] == 'reads') {
             $chartQuery->applyDateFilters($q, 'date_read');
-        }        
+        }
 
         $results = $q->execute()->fetchAll();
 
