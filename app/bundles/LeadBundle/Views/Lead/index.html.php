@@ -94,7 +94,7 @@ if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) 
                     'data-header' => $view['translator']->trans('mautic.lead.batch.lists')
                 ),
                 'tooltip' => $view['translator']->trans('mautic.lead.batch.lists'),
-                'iconClass' => 'fa fa-list'
+                'iconClass' => 'fa fa-pie-chart'
             ),
             array(
                 'attr'      => array(
