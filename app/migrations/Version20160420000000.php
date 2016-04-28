@@ -14,7 +14,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
- * Auto-generated Migration: Please modify to your needs!
+ * SMS Channel Migration
  */
 class Version20160420000000 extends AbstractMauticMigration
 {
@@ -27,7 +27,6 @@ class Version20160420000000 extends AbstractMauticMigration
     public function preUp(Schema $schema)
     {
         if ($schema->hasTable($this->prefix . 'sms_messages')) {
-
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -37,6 +36,9 @@ class Version20160420000000 extends AbstractMauticMigration
      */
     public function mysqlUp(Schema $schema)
     {
+        $categoryIdIdx = $this->generatePropertyName('sms_messages', 'idx', array('category_id'));
+        $categoryIdFk  = $this->generatePropertyName('sms_messages', 'fk', array('category_id'));
+
         $mainTableSql = <<<SQL
 CREATE TABLE `{$this->prefix}sms_messages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -60,12 +62,21 @@ CREATE TABLE `{$this->prefix}sms_messages` (
   `publish_down` datetime DEFAULT NULL,
   `sent_count` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `IDX_1C66029812469DES` (`category_id`),
-  CONSTRAINT `FK_1C66029812469DES` FOREIGN KEY (`category_id`) REFERENCES `mtc_categories` (`id`) ON DELETE SET NULL
+  KEY `{$categoryIdIdx}` (`category_id`),
+  CONSTRAINT `{$categoryIdFk}` FOREIGN KEY (`category_id`) REFERENCES `{$this->prefix}categories` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 SQL;
 
         $this->addSql($mainTableSql);
+
+        $smsIdIdx = $this->generatePropertyName('sms_message_stats', 'idx', array('sms_id'));
+        $leadIdIdx = $this->generatePropertyName('sms_message_stats', 'idx', array('lead_id'));
+        $listIdIdx = $this->generatePropertyName('sms_message_stats', 'idx', array('list_id'));
+        $ipIdIdx = $this->generatePropertyName('sms_message_stats', 'idx', array('ip_id'));
+        $smsIdFk = $this->generatePropertyName('sms_message_stats', 'fk', array('sms_id'));
+        $leadIdFk = $this->generatePropertyName('sms_message_stats', 'fk', array('lead_id'));
+        $listIdFk = $this->generatePropertyName('sms_message_stats', 'fk', array('list_id'));
+        $ipIdFk = $this->generatePropertyName('sms_message_stats', 'fk', array('ip_id'));
 
         $statsSql = <<<SQL
 CREATE TABLE `{$this->prefix}sms_message_stats` (
@@ -80,30 +91,35 @@ CREATE TABLE `{$this->prefix}sms_message_stats` (
   `source_id` int(11) DEFAULT NULL,
   `tokens` longtext COLLATE utf8_unicode_ci COMMENT '(DC2Type:array)',
   PRIMARY KEY (`id`),
-  KEY `IDX_C67BEC72A832C1CS` (`sms_id`),
-  KEY `IDX_C67BEC7255458S` (`lead_id`),
-  KEY `IDX_C67BEC723DAE168S` (`list_id`),
-  KEY `IDX_C67BEC72A03F5E9S` (`ip_id`),
+  KEY `{$smsIdIdx}` (`sms_id`),
+  KEY `{$leadIdIdx}` (`lead_id`),
+  KEY `{$listIdIdx}` (`list_id`),
+  KEY `{$ipIdIdx}` (`ip_id`),
   KEY `mtc_stat_sms_search` (`sms_id`,`lead_id`),
   KEY `mtc_stat_sms_hash_search` (`tracking_hash`),
   KEY `mtc_stat_sms_source_search` (`source`,`source_id`),
-  CONSTRAINT `FK_C67BEC723DAE168S` FOREIGN KEY (`list_id`) REFERENCES `mtc_lead_lists` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `FK_C67BEC7255458S` FOREIGN KEY (`lead_id`) REFERENCES `mtc_leads` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `FK_C67BEC72A03F5E9S` FOREIGN KEY (`ip_id`) REFERENCES `mtc_ip_addresses` (`id`),
-  CONSTRAINT `FK_C67BEC72A832C1CS` FOREIGN KEY (`sms_id`) REFERENCES `mtc_sms_messages` (`id`) ON DELETE SET NULL
+  CONSTRAINT `{$listIdFk}` FOREIGN KEY (`list_id`) REFERENCES `{$this->prefix}lead_lists` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `{$leadIdFk}` FOREIGN KEY (`lead_id`) REFERENCES `{$this->prefix}leads` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `{$ipIdFk}` FOREIGN KEY (`ip_id`) REFERENCES `{$this->prefix}ip_addresses` (`id`),
+  CONSTRAINT `{$smsIdFk}` FOREIGN KEY (`sms_id`) REFERENCES `{$this->prefix}sms_messages` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 SQL;
         $this->addSql($statsSql);
+
+        $smsIdIdx = $this->generatePropertyName('sms_message_list_xref', 'idx', array('sms_id'));
+        $leadlistIdIdx = $this->generatePropertyName('sms_message_list_xref', 'idx', array('leadlist_id'));
+        $smsIdFk = $this->generatePropertyName('sms_message_list_xref', 'fk', array('sms_id'));
+        $leadlistIdFk = $this->generatePropertyName('sms_message_list_xref', 'fk', array('leadlist_id'));
 
         $listXrefSql = <<<SQL
 CREATE TABLE `{$this->prefix}sms_message_list_xref` (
   `sms_id` int(11) NOT NULL,
   `leadlist_id` int(11) NOT NULL,
   PRIMARY KEY (`sms_id`,`leadlist_id`),
-  KEY `IDX_DB54D00DA832C1CS` (`sms_id`),
-  KEY `IDX_DB54D00DB9FC887S` (`leadlist_id`),
-  CONSTRAINT `FK_DB54D00DA832C1CS` FOREIGN KEY (`sms_id`) REFERENCES `mtc_sms_messages` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_DB54D00DB9FC887S` FOREIGN KEY (`leadlist_id`) REFERENCES `mtc_lead_lists` (`id`) ON DELETE CASCADE
+  KEY `{$smsIdIdx}` (`sms_id`),
+  KEY `{$leadlistIdIdx}` (`leadlist_id`),
+  CONSTRAINT `{$smsIdFk}` FOREIGN KEY (`sms_id`) REFERENCES `{$this->prefix}sms_messages` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `{$leadlistIdFk}` FOREIGN KEY (`leadlist_id`) REFERENCES `{$this->prefix}lead_lists` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 SQL;
         $this->addSql($listXrefSql);
