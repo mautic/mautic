@@ -16,13 +16,13 @@
 
            $img = $view['lead_avatar']->getAvatar($item);
            ?>
-            <div class="shuffle shuffle-item grid col-sm-6 col-lg-4">
+            <div class="shuffle shuffle-item grid col-sm-6 col-lg-4 contact-cards">
                 <div data-color="#<?php echo $color; ?>" class="panel<?php if (!empty($highlight)) echo " highlight"; ?> card ovf-h" style="border-top: 3px solid #<?php echo $color; ?>;">
                     <div class="box-layout">
                         <div class="col-xs-4 va-m">
                             <div class="panel-body">
-                        <span class="img-wrapper img-rounded" style="width:100%">
-                            <img class="img img-responsive" src="<?php echo $img; ?>" />
+                        <span class="img-wrapper img-rounded">
+                            <img class="img" src="<?php echo $img; ?>" />
                         </span>
                             </div>
                         </div>

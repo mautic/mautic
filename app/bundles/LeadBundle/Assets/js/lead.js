@@ -1,10 +1,10 @@
 //LeadBundle
 Mautic.leadOnLoad = function (container) {
     Mousetrap.bind('a', function(e) {
-        if(mQuery('#lead-quick-add').length) {
-            mQuery('#lead-quick-add').modal();
-        } else if (mQuery('#addNoteButton').length) {
-            mQuery('#addNoteButton').click();
+        if(mQuery('a.quickadd').length) {
+            mQuery('a.quickadd').click();
+        } else if (mQuery('a.btn-leadnote-add').length) {
+            mQuery('a.btn-leadnote-add').click();
         }
     });
 
@@ -117,7 +117,7 @@ Mautic.leadOnLoad = function (container) {
             mQuery('#anonymousLeadButton').removeClass('btn-primary');
         }
     }
-    
+
     mQuery(document).on('shown.bs.tab', 'a#load-lead-map', function (e) {
         Mautic.renderLeadMap();
     })
