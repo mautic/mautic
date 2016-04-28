@@ -510,6 +510,7 @@ return array(
         'cookie_secure'                  => null,
         'cookie_httponly'                => false,
         'do_not_track_ips'               => array(),
+        'link_shortener_url'             => null,
         'cached_data_timeout'            => 10
     )
 );

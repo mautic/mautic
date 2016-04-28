@@ -12,6 +12,8 @@ namespace Mautic\EmailBundle\Entity;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class EmailRepository
@@ -20,7 +22,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class EmailRepository extends CommonRepository
 {
-
     /**
      * Get an array of do not email emails
      *
@@ -29,13 +30,18 @@ class EmailRepository extends CommonRepository
     public function getDoNotEmailList()
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('lower(e.address) as email')
-            ->from(MAUTIC_TABLE_PREFIX.'email_donotemail', 'e');
+        $q->select('distinct(l.email)')
+            ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', 'dnc')
+            ->leftJoin('dnc', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = dnc.lead_id')
+            ->where('dnc.channel = "email"')
+            ->andWhere('l.email != ""');
+
         $results = $q->execute()->fetchAll();
 
         $dnc = array();
+
         foreach ($results as $r) {
-            $dnc[] = $r['email'];
+            $dnc[] = strtolower($r['email']);
         }
 
         return $dnc;
@@ -50,14 +56,30 @@ class EmailRepository extends CommonRepository
      */
     public function checkDoNotEmail($email)
     {
-        $q = $this->_em->createQueryBuilder();
-        $q->select('partial e.{id, unsubscribed, bounced, manual, comments}')
-            ->from('MauticEmailBundle:DoNotEmail', 'e')
-            ->where('e.emailAddress = :email')
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('dnc.*')
+            ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', 'dnc')
+            ->leftJoin('dnc', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = dnc.lead_id')
+            ->where('dnc.channel = "email"')
+            ->andWhere('l.email = :email')
             ->setParameter('email', $email);
-        $results = $q->getQuery()->getArrayResult();
 
-        return (!empty($results)) ? $results[0] : false;
+        $results = $q->execute()->fetchAll();
+        $dnc = count($results) ? $results[0] : null;
+
+        if ($dnc === null) {
+            return false;
+        }
+
+        $dnc['reason'] = (int) $dnc['reason'];
+
+        return array(
+            'id' => $dnc['id'],
+            'unsubscribed' => ($dnc['reason'] === DoNotContact::UNSUBSCRIBED),
+            'bounced' => ($dnc['reason'] === DoNotContact::BOUNCED),
+            'manual' => ($dnc['reason'] === DoNotContact::MANUAL),
+            'comments' => $dnc['comments']
+        );
     }
 
     /**
@@ -67,13 +89,23 @@ class EmailRepository extends CommonRepository
      */
     public function removeFromDoNotEmailList($email)
     {
-        $qb = $this->_em->createQueryBuilder();
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel = $this->factory->getModel('lead.lead');
 
-        $qb->delete('MauticEmailBundle:DoNotEmail', 'd')
-            ->andWhere($qb->expr()->eq('d.emailAddress', ':email'))
-            ->setParameter(':email', $email);
+        /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
+        $leadRepo = $this->_em->getRepository('MauticLeadBundle:Lead');
+        $leadId = (array) $leadRepo->getLeadByEmail($email, true);
 
-        $qb->getQuery()->execute();
+        /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
+        $leads = array();
+
+        foreach ($leadId as $lead) {
+            $leads[] = $leadRepo->getEntity($lead['id']);
+        }
+
+        foreach ($leads as $lead) {
+            $leadModel->removeDncForLead($lead, 'email');
+        }
     }
 
     /**
@@ -83,7 +115,7 @@ class EmailRepository extends CommonRepository
      */
     public function deleteDoNotEmailEntry($id)
     {
-        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_donotemail', array('id' => (int) $id));
+        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'lead_donotcontact', array('id' => (int) $id));
     }
 
     /**
@@ -144,18 +176,19 @@ class EmailRepository extends CommonRepository
      */
     public function getEmailPendingLeads($emailId, $variantIds = null, $listIds = null, $countOnly = false, $limit = null)
     {
-        // Do not include leads in the do not email table
-        $dneQb = $this->_em->getConnection()->createQueryBuilder();
-        $dneQb->select('null')
-            ->from(MAUTIC_TABLE_PREFIX.'email_donotemail', 'dne')
+        // Do not include leads in the do not contact table
+        $dncQb = $this->_em->getConnection()->createQueryBuilder();
+        $dncQb->select('null')
+            ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', 'dnc')
             ->where(
-                $dneQb->expr()->eq('dne.lead_id', 'l.id')
-            );
+                $dncQb->expr()->eq('dnc.lead_id', 'l.id')
+            )
+            ->andWhere('dnc.channel = "email"');
 
         // Do not include leads that have already been emailed
         $statQb    = $this->_em->getConnection()->createQueryBuilder()
             ->select('null')
-            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat');
+            ->from(MAUTIC_TABLE_PREFIX . 'email_stats', 'stat');
 
         $statExpr = $statQb->expr()->andX(
             $statQb->expr()->eq('stat.lead_id', 'l.id')
@@ -178,7 +211,7 @@ class EmailRepository extends CommonRepository
             // Get a list of lists associated with this email
             $lists = $this->_em->getConnection()->createQueryBuilder()
                 ->select('el.leadlist_id')
-                ->from(MAUTIC_TABLE_PREFIX.'email_list_xref', 'el')
+                ->from(MAUTIC_TABLE_PREFIX . 'email_list_xref', 'el')
                 ->where('el.email_id = ' . (int) $emailId)
                 ->execute()
                 ->fetchAll();
@@ -198,7 +231,7 @@ class EmailRepository extends CommonRepository
 
         $listQb = $this->_em->getConnection()->createQueryBuilder();
         $listQb->select('null')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
+            ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll')
             ->where(
                 $listQb->expr()->andX(
                     $listQb->expr()->in('ll.leadlist_id', $listIds),
@@ -216,7 +249,7 @@ class EmailRepository extends CommonRepository
                 ->orderBy('l.id');
         }
         $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->andWhere(sprintf('NOT EXISTS (%s)', $dneQb->getSQL()))
+            ->andWhere(sprintf('NOT EXISTS (%s)', $dncQb->getSQL()))
             ->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()))
             ->andWhere(sprintf('EXISTS (%s)', $listQb->getSQL()))
             ->setParameter('false', false, 'boolean');
@@ -295,7 +328,7 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
+     * @param \Doctrine\ORM\QueryBuilder $q
      * @param              $filter
      * @return array
      */
@@ -319,7 +352,7 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
+     * @param \Doctrine\ORM\QueryBuilder $q
      * @param              $filter
      * @return array
      */

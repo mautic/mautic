@@ -257,4 +257,14 @@ final class LeadEvents
      * @var string
      */
     const NOTE_POST_DELETE   = 'mautic.lead_note_post_delete';
+
+    /**
+     * The mautic.filter_choice_fields event is dispatched when the list filter dropdown is populated.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\FilterChoiceEvent
+     *
+     * @var string
+     */
+    const FILTER_CHOICE_FIELDS = 'mautic.filter_choice_fields';
 }
