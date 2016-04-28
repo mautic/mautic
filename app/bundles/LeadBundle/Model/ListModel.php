@@ -400,17 +400,6 @@ class ListModel extends FormModel
     }
 
     /**
-     *
-     * @return mixed
-     */
-    public function getUserEmails()
-    {
-        $emails = $this->em->getRepository('MauticEmailBundle:Email')->getEmailList('', 10, 0, true, false, null);
-
-        return $emails;
-    }
-
-    /**
      * Get a list of global lead lists
      *
      * @return mixed

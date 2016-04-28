@@ -30,13 +30,13 @@ class ListType extends AbstractType
 {
 
     private $translator;
-    private $fieldChoices;
-    private $timezoneChoices;
-    private $countryChoices;
-    private $regionChoices;
-    private $listChoices;
-    private $emailChoices;
-    private $tagChoices;
+    private $fieldChoices = array();
+    private $timezoneChoices = array();
+    private $countryChoices = array();
+    private $regionChoices = array();
+    private $listChoices = array();
+    private $emailChoices = array();
+    private $tagChoices = array();
 
     /**
      * @param MauticFactory $factory
@@ -49,23 +49,30 @@ class ListType extends AbstractType
         $listModel          = $factory->getModel('lead.list');
         $this->fieldChoices = $listModel->getChoiceFields();
 
+        // Locales
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
         $this->countryChoices  = FormFieldHelper::getCountryChoices();
         $this->regionChoices   = FormFieldHelper::getRegionChoices();
+
+        // Segments
         $lists                 = $listModel->getUserLists();
-        $this->listChoices     = array();
         foreach ($lists as $list) {
             $this->listChoices[$list['id']] = $list['name'];
         }
 
-        $emails                = $listModel->getUserEmails();
-        $this->emailChoices     = array();
+        // Emails
+        /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
+        $emailModel = $factory->getModel('email');
+        $viewOther  = $factory->getSecurity()->isGranted('email:emails:viewother');
+        $emails     = $emailModel->getRepository()->getEmailList('', 0, 0, $viewOther, true);
         foreach ($emails as $email) {
-            $this->emailChoices[$email['id']] = $email['subject'];
+            $this->emailChoices[$email['language']][$email['id']] = $email['name'];
         }
+        ksort($this->emailChoices);
 
+        // Tags
         $leadModel = $factory->getModel('lead');
-        $tags = $leadModel->getTagList();
+        $tags      = $leadModel->getTagList();
         foreach ($tags as $tag) {
             $this->tagChoices[$tag['value']] = $tag['label'];
         }
@@ -181,7 +188,7 @@ class ListType extends AbstractType
         $view->vars['regions']   = $this->regionChoices;
         $view->vars['timezones'] = $this->timezoneChoices;
         $view->vars['lists']     = $this->listChoices;
-        $view->vars['emails']     = $this->emailChoices;
+        $view->vars['emails']    = $this->emailChoices;
         $view->vars['tags']      = $this->tagChoices;
     }
 

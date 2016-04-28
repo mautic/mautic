@@ -747,85 +747,67 @@ class LeadListRepository extends CommonRepository
 
                 case 'leadlist':
                 case 'tags':
-                    // Special handling of lead lists and tags
-                    $func  = in_array($func, array('eq', 'in')) ? 'EXISTS' : 'NOT EXISTS';
-
-                    if ($details['field'] == 'leadlist') {
-                        $table  = 'lead_lists_leads';
-                        $column = 'leadlist_id';
-                    } else {
-                        $table  = 'lead_tags_xref';
-                        $column = 'tag_id';
-                    }
-
-                    // DBAL requires an array for in()
-                    $ignoreAutoFilter = true;
-                    foreach ($details['filter'] as &$value) {
-                        $value = (int) $value;
-                    }
-
-                    $subExpr = $q->expr()->andX(
-                        $q->expr()->in(sprintf('%s.%s', $alias, $column), $details['filter']),
-                        $q->expr()->eq($alias.'.lead_id', 'l.id')
-                    );
-
-                    $subqb = $this->_em->getConnection()->createQueryBuilder()
-                        ->select('null')
-                        ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
-
-                    // Specific lead
-                    if (!empty($leadId)) {
-                        $subExpr->add(
-                            $subqb->expr()->eq($alias.'.lead_id', $leadId)
-                        );
-                    }
-
-                    if ($table == 'lead_lists_leads') {
-                        $falseParameter = $this->generateRandomParameterName();
-                        $subExpr->add(
-                            $subqb->expr()->eq($alias.'.manually_removed', ":$falseParameter")
-                        );
-                        $parameters[$falseParameter] = false;
-                    }
-    
-                    $subqb->where($subExpr);
-    
-                    $groupExpr->add(
-                        sprintf('%s (%s)', $func, $subqb->getSQL())
-                    );
-                        
-                    break;
                 case 'lead_email_received':
-                    $ignoreAutoFilter = true;
 
-                    $func = (in_array($func, array('neq', 'notIn'))) ? 'NOT IN' : 'IN';
-                    // Special handling of lead lists
+                    // Special handling of lead lists and tags
+                    $func = in_array($func, array('eq', 'in')) ? 'EXISTS' : 'NOT EXISTS';
+
+                    $ignoreAutoFilter = true;
                     foreach ($details['filter'] as &$value) {
                         $value = (int) $value;
                     }
 
-                    // Generate a unique alias
-                    $alias = $this->generateRandomParameterName();
-
-                    $subqb = $this->_em->getConnection()->createQueryBuilder();
-                    $subqb->select($alias . '.lead_id')
-                        ->from(MAUTIC_TABLE_PREFIX.'email_stats', $alias)
-                        ->where(
-                            $subqb->expr()->in($alias . '.email_id', $details['filter'])
-                        )
-                        ->andWhere(
-                            $subqb->expr()->eq($alias.'.is_read', true));
+                    $subQb   = $this->_em->getConnection()->createQueryBuilder();
+                    $subExpr = $subQb->expr()->andX(
+                        $subQb->expr()->eq($alias.'.lead_id', 'l.id')
+                    );
 
                     // Specific lead
                     if (!empty($leadId)) {
-                        $subqb->andWhere(
-                            $subqb->expr()->eq($alias.'.lead_id', $leadId)
+                        $subExpr->add(
+                            $subQb->expr()->eq($alias.'.lead_id', $leadId)
                         );
                     }
 
-                    $groupExpr->add(
-                        $q->expr()->comparison('l.id', $func, sprintf('(%s)', $subqb->getSQL()))
+                    switch ($details['field']) {
+                        case 'leadlist':
+                            $table  = 'lead_lists_leads';
+                            $column = 'leadlist_id';
+
+                            $falseParameter = $this->generateRandomParameterName();
+                            $subExpr->add(
+                                $subQb->expr()->eq($alias.'.manually_removed', ":$falseParameter")
+                            );
+                            $parameters[$falseParameter] = false;
+                            break;
+                        case 'tags':
+                            $table  = 'lead_tags_xref';
+                            $column = 'tag_id';
+                            break;
+                        case 'lead_email_received':
+                            $table  = 'email_stats';
+                            $column = 'email_id';
+
+                            $trueParameter = $this->generateRandomParameterName();
+                            $subExpr->add(
+                                $subQb->expr()->eq($alias.'.is_read', ":$trueParameter")
+                            );
+                            $parameters[$trueParameter] = true;
+                            break;
+                    }
+
+                    $subExpr->add(
+                        $subQb->expr()->in(sprintf('%s.%s', $alias, $column), $details['filter'])
                     );
+
+                    $subQb->select('null')
+                        ->from(MAUTIC_TABLE_PREFIX.$table, $alias)
+                        ->where($subExpr);
+
+                    $groupExpr->add(
+                        sprintf('%s (%s)', $func, $subQb->getSQL())
+                    );
+
                     break;
                 default:
                     switch ($func) {
