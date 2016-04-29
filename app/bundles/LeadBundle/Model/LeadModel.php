@@ -889,11 +889,11 @@ class LeadModel extends FormModel
     /**
      * Create a DNC entry for a lead
      *
-     * @param Lead $lead
-     * @param string $channel
-     * @param string $comments
-     * @param int $reason
-     * @param bool $flush
+     * @param Lead         $lead
+     * @param string|array $channel  If an array with an ID, use the structure ['email' => 123]
+     * @param string       $comments
+     * @param int          $reason
+     * @param bool         $flush
      *
      * @return boolean If a DNC entry is added or updated, returns true. If a DNC is already present
      *                 and has the specified reason, nothing is done and this returns false.
@@ -906,6 +906,14 @@ class LeadModel extends FormModel
         // If they don't have a DNC entry yet
         if ($isContactable === DoNotContact::IS_CONTACTABLE) {
             $dnc = new DoNotContact();
+
+            if (is_array($channel)) {
+                $channelId = reset($channel);
+                $channel   = key($channel);
+
+                $dnc->setChannelId((int) $channelId);
+            }
+
             $dnc->setChannel($channel);
             $dnc->setReason($reason);
             $dnc->setLead($lead);
@@ -1459,7 +1467,7 @@ class LeadModel extends FormModel
             $all = $query->fetchTimeData('leads', 'date_added', $filter);
             $chart->setDataset($allLeadsT, $all);
         }
-        
+
         return $chart->render();
     }
 

@@ -34,7 +34,8 @@ class EmailRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', 'dnc')
             ->leftJoin('dnc', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = dnc.lead_id')
             ->where('dnc.channel = "email"')
-            ->andWhere('l.email != ""');
+            ->andWhere($q->expr()->neq('l.email', $q->expr()->literal('')));
+
 
         $results = $q->execute()->fetchAll();
 
