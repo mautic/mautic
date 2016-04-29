@@ -13,8 +13,6 @@ $data = $event['extra']['log']['metadata'];
 if (isset($data['failed'])) {
     return;
 }
-
-$notification = $data['notification'];
 ?>
 
 <li class="wrapper form-submitted">
@@ -33,9 +31,9 @@ $notification = $data['notification'];
             </dl>
             <div class="small">
                 <hr />
-                <strong><?php echo $notification['heading']; ?></strong>
+                <strong><?php echo $data['heading']; ?></strong>
                 <br />
-                <?php echo $notification['content']; ?>
+                <?php echo $data['content']; ?>
             </div>
         </div>
     </div>
