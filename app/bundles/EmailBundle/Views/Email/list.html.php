@@ -97,7 +97,7 @@ if (count($items)):
                             <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.email.icon_tooltip.abtest'); ?>"><i class="fa fa-fw fa-sitemap"></i></span>
                             <?php endif; ?>
                             <?php if ($type == 'list'): ?>
-                            <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.email.icon_tooltip.list_email'); ?>"><i class="fa fa-fw fa-list"></i></span>
+                            <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.email.icon_tooltip.list_email'); ?>"><i class="fa fa-fw fa-pie-chart"></i></span>
                             <?php endif; ?>
                         </a>
                     </div>

@@ -80,16 +80,15 @@ return array(
     ),
     'menu'       => array(
         'main'  => array(
-            'priority' => 15,
-            'items'    => array(
-                'mautic.core.channels' => array(
-                    'id'        => 'mautic_channels_root',
-                    'iconClass' => 'fa-rss'
-                ),
-                'mautic.core.components' => array(
-                    'id'        => 'mautic_components_root',
-                    'iconClass' => 'fa-puzzle-piece'
-                )
+            'mautic.core.components' => array(
+                'id'        => 'mautic_components_root',
+                'iconClass' => 'fa-puzzle-piece',
+                'priority'  => 60
+            ),
+            'mautic.core.channels' => array(
+                'id'        => 'mautic_channels_root',
+                'iconClass' => 'fa-rss',
+                'priority'  => 40
             )
         ),
         'admin' => array(

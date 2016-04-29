@@ -55,13 +55,11 @@ return array(
 
     'menu'     => array(
         'main' => array(
-            'priority' => 70,
-            'items'    => array(
-                'mautic.campaign.menu.index' => array(
-                    'iconClass' => 'fa-clock-o',
-                    'route'     => 'mautic_campaign_index',
-                    'access'    => 'campaign:campaigns:view'
-                )
+            'mautic.campaign.menu.index' => array(
+                'iconClass' => 'fa-clock-o',
+                'route'     => 'mautic_campaign_index',
+                'access'    => 'campaign:campaigns:view',
+                'priority'  => 50
             )
         )
     ),

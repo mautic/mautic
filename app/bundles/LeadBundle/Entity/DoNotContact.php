@@ -71,6 +71,8 @@ class DoNotContact
      */
     private $channel;
 
+    private $channelId;
+
     /**
      * @param ORM\ClassMetadata $metadata
      */
@@ -80,7 +82,7 @@ class DoNotContact
 
         $builder->setTable('lead_donotcontact')
             ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\DoNotContactRepository')
-            ->addIndex(array('reason'), 'dnc_search');
+            ->addIndex(array('reason'), 'dnc_reason_search');
 
         $builder->addId();
 
@@ -88,11 +90,13 @@ class DoNotContact
 
         $builder->addDateAdded();
 
-        $builder->createField('reason', 'integer')
+        $builder->createField('reason', 'smallint')
             ->build();
 
         $builder->createField('channel', 'string')
             ->build();
+
+        $builder->addNamedField('channelId', 'integer', 'channel_id', true);
 
         $builder->createField('comments', 'text')
             ->nullable()
@@ -129,6 +133,24 @@ class DoNotContact
     public function setChannel($channel)
     {
         $this->channel = $channel;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getChannelId()
+    {
+        return $this->channelId;
+    }
+
+    /**
+     * @param mixed $channelId
+     *
+     * @return DoNotContact
+     */
+    public function setChannelId($channelId)
+    {
+        $this->channelId = $channelId;
     }
 
     /**
