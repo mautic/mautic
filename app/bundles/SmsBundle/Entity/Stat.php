@@ -13,9 +13,9 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\LeadBundle\Entity\LeadList;
 
 /**
  * Class Stat
@@ -56,24 +56,9 @@ class Stat
     private $dateSent;
 
     /**
-     * @var bool
-     */
-    private $isRead = false;
-
-    /**
-     * @var \DateTime
-     */
-    private $dateRead;
-
-    /**
      * @var string
      */
     private $trackingHash;
-
-    /**
-     * @var int
-     */
-    private $retryCount = 0;
 
     /**
      * @var string
@@ -91,21 +76,6 @@ class Stat
     private $tokens = array();
 
     /**
-     * @var int
-     */
-    private $clickCount;
-
-    /**
-     * @var array
-     */
-    private $clickDetails = array();
-
-    /**
-     * @var \DateTime
-     */
-    private $lastClicked;
-
-    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -115,8 +85,7 @@ class Stat
         $builder->setTable('sms_message_stats')
             ->setCustomRepositoryClass('Mautic\SmsBundle\Entity\StatRepository')
             ->addIndex(array('sms_id', 'lead_id'), 'stat_sms_search')
-            ->addIndex(array('is_read'), 'stat_sms_clicked_search')
-            ->addIndex(array('tracking_hash'), 'stat_email_hash_search')
+            ->addIndex(array('tracking_hash'), 'stat_sms_hash_search')
             ->addIndex(array('source', 'source_id'), 'stat_sms_source_search');
 
         $builder->addId();
@@ -138,22 +107,8 @@ class Stat
             ->columnName('date_sent')
             ->build();
 
-        $builder->createField('isRead', 'boolean')
-            ->columnName('is_read')
-            ->build();
-
-        $builder->createField('dateRead', 'datetime')
-            ->columnName('date_read')
-            ->nullable()
-            ->build();
-
         $builder->createField('trackingHash', 'string')
             ->columnName('tracking_hash')
-            ->nullable()
-            ->build();
-
-        $builder->createField('retryCount', 'integer')
-            ->columnName('retry_count')
             ->nullable()
             ->build();
 
@@ -169,12 +124,6 @@ class Stat
         $builder->createField('tokens', 'array')
             ->nullable()
             ->build();
-
-        $builder->addNullableField('clickCount', 'integer', 'click_count');
-
-        $builder->addNullableField('lastClicked', 'datetime', 'last_clicked');
-
-        $builder->addNullableField('clickDetails', 'array', 'click_details');
     }
 
     /**
@@ -190,12 +139,7 @@ class Stat
                     'id',
                     'ipAddress',
                     'dateSent',
-                    'isRead',
-                    'dateRead',
-                    'retryCount',
                     'source',
-                    'clickCount',
-                    'lastClicked',
                     'sourceId',
                     'trackingHash',
                     'lead',
@@ -206,35 +150,11 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getDateRead()
+    public function getId()
     {
-        return $this->dateRead;
-    }
-
-    /**
-     * @param mixed $dateRead
-     */
-    public function setDateRead($dateRead)
-    {
-        $this->dateRead = $dateRead;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDateSent()
-    {
-        return $this->dateSent;
-    }
-
-    /**
-     * @param mixed $dateSent
-     */
-    public function setDateSent($dateSent)
-    {
-        $this->dateSent = $dateSent;
+        return $this->id;
     }
 
     /**
@@ -247,50 +167,14 @@ class Stat
 
     /**
      * @param Sms $sms
+     *
+     * @return Stat
      */
-    public function setSms(Sms $sms = null)
+    public function setSms(Sms $sms)
     {
         $this->sms = $sms;
-    }
 
-    /**
-     * @return mixed
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @return IpAddress
-     */
-    public function getIpAddress()
-    {
-        return $this->ipAddress;
-    }
-
-    /**
-     * @param mixed $ip
-     */
-    public function setIpAddress(IpAddress $ip)
-    {
-        $this->ipAddress = $ip;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getIsRead()
-    {
-        return $this->isRead;
-    }
-
-    /**
-     * @param mixed $isRead
-     */
-    public function setIsRead($isRead)
-    {
-        $this->isRead = $isRead;
+        return $this;
     }
 
     /**
@@ -302,31 +186,19 @@ class Stat
     }
 
     /**
-     * @param mixed $lead
+     * @param Lead $lead
+     *
+     * @return Stat
      */
-    public function setLead(Lead $lead = null)
+    public function setLead(Lead $lead)
     {
         $this->lead = $lead;
+
+        return $this;
     }
 
     /**
-     * @return mixed
-     */
-    public function getTrackingHash()
-    {
-        return $this->trackingHash;
-    }
-
-    /**
-     * @param mixed $trackingHash
-     */
-    public function setTrackingHash($trackingHash)
-    {
-        $this->trackingHash = $trackingHash;
-    }
-
-    /**
-     * @return \Mautic\LeadBundle\Entity\LeadList
+     * @return LeadList
      */
     public function getList()
     {
@@ -334,39 +206,79 @@ class Stat
     }
 
     /**
-     * @param mixed $list
+     * @param LeadList $list
+     *
+     * @return Stat
      */
-    public function setList($list)
+    public function setList(LeadList $list)
     {
         $this->list = $list;
+
+        return $this;
     }
 
     /**
-     * @return mixed
+     * @return IpAddress
      */
-    public function getRetryCount()
+    public function getIpAddress()
     {
-        return $this->retryCount;
+        return $this->ipAddress;
     }
 
     /**
-     * @param mixed $retryCount
-     */
-    public function setRetryCount($retryCount)
-    {
-        $this->retryCount = $retryCount;
-    }
-
-    /**
+     * @param IpAddress $ipAddress
      *
+     * @return Stat
      */
-    public function upRetryCount()
+    public function setIpAddress(IpAddress $ipAddress)
     {
-        $this->retryCount++;
+        $this->ipAddress = $ipAddress;
+
+        return $this;
     }
 
     /**
-     * @return mixed
+     * @return \DateTime
+     */
+    public function getDateSent()
+    {
+        return $this->dateSent;
+    }
+
+    /**
+     * @param \DateTime $dateSent
+     *
+     * @return Stat
+     */
+    public function setDateSent($dateSent)
+    {
+        $this->dateSent = $dateSent;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTrackingHash()
+    {
+        return $this->trackingHash;
+    }
+
+    /**
+     * @param string $trackingHash
+     *
+     * @return Stat
+     */
+    public function setTrackingHash($trackingHash)
+    {
+        $this->trackingHash = $trackingHash;
+
+        return $this;
+    }
+
+    /**
+     * @return string
      */
     public function getSource()
     {
@@ -374,15 +286,19 @@ class Stat
     }
 
     /**
-     * @param mixed $source
+     * @param string $source
+     *
+     * @return Stat
      */
     public function setSource($source)
     {
         $this->source = $source;
+
+        return $this;
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getSourceId()
     {
@@ -390,15 +306,19 @@ class Stat
     }
 
     /**
-     * @param mixed $sourceId
+     * @param int $sourceId
+     *
+     * @return Stat
      */
     public function setSourceId($sourceId)
     {
-        $this->sourceId = (int) $sourceId;
+        $this->sourceId = $sourceId;
+
+        return $this;
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getTokens()
     {
@@ -406,92 +326,13 @@ class Stat
     }
 
     /**
-     * @param mixed $tokens
+     * @param array $tokens
+     *
+     * @return Stat
      */
-    public function setTokens($tokens)
+    public function setTokens(array $tokens)
     {
         $this->tokens = $tokens;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getClickCount()
-    {
-        return $this->clickCount;
-    }
-
-    /**
-     * @param mixed $clickCount
-     *
-     * @return Stat
-     */
-    public function setClickCount($clickCount)
-    {
-        $this->clickCount = $clickCount;
-
-        return $this;
-    }
-
-    /**
-     * @param $details
-     */
-    public function addClickDetails($details)
-    {
-        $this->clickDetails[] = $details;
-
-        $this->clickCount++;
-    }
-
-    /**
-     * Up the sent count
-     *
-     * @return Stat
-     */
-    public function upClickCount()
-    {
-        $count = (int) $this->clickCount + 1;
-        $this->clickCount = $count;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getLastClicked()
-    {
-        return $this->lastClicked;
-    }
-
-    /**
-     * @param \DateTime $lastClicked
-     *
-     * @return Stat
-     */
-    public function setLastClicked(\DateTime $lastClicked)
-    {
-        $this->lastClicked = $lastClicked;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getClickDetails()
-    {
-        return $this->clickDetails;
-    }
-
-    /**
-     * @param mixed $clickDetails
-     *
-     * @return Stat
-     */
-    public function setClickDetails($clickDetails)
-    {
-        $this->clickDetails = $clickDetails;
 
         return $this;
     }
