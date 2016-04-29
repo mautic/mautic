@@ -116,7 +116,7 @@ if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) 
                     'data-header' => $view['translator']->trans('mautic.lead.batch.dnc'),
                 ),
                 'tooltip' => $view['translator']->trans('mautic.lead.batch.dnc'),
-                'iconClass' => 'fa fa-send text-danger'
+                'iconClass' => 'fa fa-ban text-danger'
             )
         )
     );
