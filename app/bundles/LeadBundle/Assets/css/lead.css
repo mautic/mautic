@@ -127,3 +127,11 @@ ul.tag-cloud li {
 .lead-merge-options {
     position: relative;
 }
+
+.contact-cards .panel-body {
+    max-height: 150px;
+}
+
+.contact-cards .img {
+    max-height: 115px;
+}

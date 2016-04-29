@@ -15,7 +15,7 @@ $buttons = $preButtons = array();
 if ($permissions['lead:leads:create']) {
     $preButtons[] = array(
         'attr'      => array(
-            'class'       => 'btn btn-default btn-nospin',
+            'class'       => 'btn btn-default btn-nospin quickadd',
             'data-toggle' => 'ajaxmodal',
             'data-target' => '#MauticSharedModal',
             'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'quickAdd')),
@@ -94,7 +94,7 @@ if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) 
                     'data-header' => $view['translator']->trans('mautic.lead.batch.lists')
                 ),
                 'tooltip' => $view['translator']->trans('mautic.lead.batch.lists'),
-                'iconClass' => 'fa fa-list'
+                'iconClass' => 'fa fa-pie-chart'
             ),
             array(
                 'attr'      => array(

@@ -205,7 +205,7 @@ if (empty($type) || !empty($forceTypeSelection)):
             'typeOneDescription' => 'mautic.email.type.template.description',
             'typeOneOnClick'     => "Mautic.selectEmailType('template');",
             'typeTwoHeader'      => 'mautic.email.type.list.header',
-            'typeTwoIconClass'   => 'fa-list',
+            'typeTwoIconClass'   => 'fa-pie-chart',
             'typeTwoDescription' => 'mautic.email.type.list.description',
             'typeTwoOnClick'     => "Mautic.selectEmailType('list');",
         ));
