@@ -809,8 +809,6 @@ class LeadController extends FormController
         $mainLead = $model->getEntity($objectId);
         $page     = $this->factory->getSession()->get('mautic.lead.page', 1);
 
-        $valid = true;
-
         //set the return URL
         $returnUrl = $this->generateUrl('mautic_lead_index', array('page' => $page));
 
@@ -890,6 +888,7 @@ class LeadController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
+            $valid =  true;
             if (!$this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $data = $form->getData();
@@ -927,9 +926,12 @@ class LeadController extends FormController
                     //Both leads are good so now we merge them
                     $mainLead = $model->mergeLeads($mainLead, $secLead, false);
                 }
-            };
+            }
+
+
 
             if ($valid) {
+
                 $viewParameters = array(
                     'objectId'     => $mainLead->getId(),
                     'objectAction' => 'view',
