@@ -62,15 +62,18 @@ class MenuEvent extends Event
     /**
      * Add items to the menu
      *
-     * @param array $items
+     * @param array $menuItems
      *
      * @return void
      */
-    public function addMenuItems(array $items)
+    public function addMenuItems(array $menuItems)
     {
+        $defaultPriority = isset($menuItems['priority']) ? $menuItems['priority'] : 9999;
+        $items           = isset($menuItems['items']) ? $menuItems['items'] : $menuItems;
+
         $isRoot = isset($items['name']) && ($items['name'] == 'root' || $items['name'] == 'admin');
         if (!$isRoot) {
-            $this->helper->createMenuStructure($items);
+            $this->helper->createMenuStructure($items, 0, $defaultPriority);
 
             $this->menuItems['children'] = array_merge_recursive($this->menuItems['children'], $items);
         } else {
@@ -95,7 +98,8 @@ class MenuEvent extends Event
     public function getMenuItems()
     {
         $this->helper->placeOrphans($this->menuItems['children'], true);
-
+        $this->helper->sortByPriority($this->menuItems['children']);
+        
         return $this->menuItems;
     }
 

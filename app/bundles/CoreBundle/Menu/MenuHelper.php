@@ -162,8 +162,9 @@ class MenuHelper extends Helper
      *
      * @param     $items
      * @param int $depth
+     * @param int $defaultPriority
      */
-    public function createMenuStructure(&$items, $depth = 0)
+    public function createMenuStructure(&$items, $depth = 0, $defaultPriority = 9999)
     {
         foreach ($items as $k => &$i) {
             if (!is_array($i) || empty($i)) {
@@ -243,7 +244,7 @@ class MenuHelper extends Helper
 
             //Repeat for sub items
             if (isset($i['children'])) {
-                $this->createMenuStructure($i['children'], $depth + 1);
+                $this->createMenuStructure($i['children'], $depth + 1, $defaultPriority);
             }
 
             // Determine if this item needs to be listed in a bundle outside it's own
@@ -255,6 +256,11 @@ class MenuHelper extends Helper
                 $this->orphans[$i['parent']][$k] = $i;
 
                 unset($items[$k]);
+
+                // Don't set a default priority here as it'll assume that of it's parent
+            } elseif (!isset($i['priority'])) {
+                // Ensure a priority for non-orphans
+                $i['priority'] = $defaultPriority;
             }
         }
     }
@@ -283,20 +289,20 @@ class MenuHelper extends Helper
     {
         foreach ($menuItems as $key => &$items) {
             if (isset($this->orphans[$key])) {
+                $priority = (isset($items['priority'])) ? $items['priority'] : 9999;
                 foreach ($this->orphans[$key] as &$orphan) {
                     if (!isset($orphan['extras'])) {
                         $orphan['extras'] = array();
                     }
                     $orphan['extras']['depth'] = $depth;
+                    if (!isset($orphan['priority'])) {
+                        $orphan['priority']  = $priority;
+                    }
                 }
 
                 $items['children'] = (!isset($items['children'])) ?
                     $this->orphans[$key] :
                     $items['children'] = array_merge($items['children'], $this->orphans[$key]);
-
-                // Sort by priority
-                $this->sortByPriority($items['children']);
-
                 unset($this->orphans[$key]);
             } elseif (isset($items['children'])) {
                 foreach ($items['children'] as $subKey => $subItems) {
@@ -316,18 +322,29 @@ class MenuHelper extends Helper
      * Sort menu items by priority
      *
      * @param $menuItems
+     * @param $defaultPriority
      */
-    public function sortByPriority(&$menuItems)
+    public function sortByPriority(&$menuItems, $defaultPriority = 9999)
     {
-        uasort($menuItems, function ($a, $b) {
-            $ap = (isset($a['priority']) ? (int) $a['priority'] : 9999);
-            $bp = (isset($b['priority']) ? (int) $b['priority'] : 9999);
-
-            if ($ap == $bp) {
-                return 0;
+        foreach ($menuItems as &$items) {
+            $parentPriority = (isset($items['priority'])) ? $items['priority'] : $defaultPriority;
+            if (isset($items['children'])) {
+                $this->sortByPriority($items['children'], $parentPriority);
             }
+        }
 
-            return ($ap > $bp) ? -1 : 1;
-        });
+        uasort(
+            $menuItems,
+            function ($a, $b) use ($defaultPriority) {
+                $ap = (isset($a['priority']) ? (int) $a['priority'] : $defaultPriority);
+                $bp = (isset($b['priority']) ? (int) $b['priority'] : $defaultPriority);
+
+                if ($ap == $bp) {
+                    return 0;
+                }
+
+                return ($ap > $bp) ? -1 : 1;
+            }
+        );
     }
 }

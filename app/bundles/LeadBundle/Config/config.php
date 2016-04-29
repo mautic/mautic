@@ -128,17 +128,18 @@ return array(
     ),
     'menu'     => array(
         'main' => array(
-            'priority' => 80,
             'items'    => array(
                 'mautic.lead.leads' => array(
                     'iconClass' => 'fa-user',
                     'access'    => array('lead:leads:viewown', 'lead:leads:viewother'),
-                    'route' => 'mautic_lead_index'
+                    'route' => 'mautic_lead_index',
+                    'priority' => 80
                 ),
                 'mautic.lead.list.menu.index'  => array(
                     'iconClass' => 'fa-pie-chart',
                     'access'    => array('lead:leads:viewown', 'lead:leads:viewother'),
                     'route' => 'mautic_leadlist_index',
+                    'priority' => 70
                 )
             )
         ),
