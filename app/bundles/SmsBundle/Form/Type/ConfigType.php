@@ -10,8 +10,9 @@
 namespace Mautic\SmsBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -39,46 +40,74 @@ class ConfigType extends AbstractType
             )
         );
 
-        $builder->add(
-            'sms_username',
-            'text',
-            array(
-                'label' => 'mautic.sms.config.form.sms.username',
-                'data'  => $options['data']['sms_username'],
-                'attr'  => array(
-                    'tooltip'      => 'mautic.sms.config.form.sms.username.tooltip',
-                    'class'        => 'form-control',
-                    'data-show-on' => '{"config_smsconfig_sms_enabled_1":"checked"}',
+        $formModifier = function(FormEvent $event) {
+            $form        = $event->getForm();
+            $data        = $event->getData();
+
+            // Add required restraints if sms is enabled
+            $constraints = (empty($data['sms_enabled'])) ?
+                array() :
+                array(
+                    new NotBlank(
+                        array(
+                            'message' => 'mautic.core.value.required'
+                        )
+                    )
+                );
+
+            $form->add(
+                'sms_username',
+                'text',
+                array(
+                    'label'       => 'mautic.sms.config.form.sms.username',
+                    'attr'        => array(
+                        'tooltip'      => 'mautic.sms.config.form.sms.username.tooltip',
+                        'class'        => 'form-control',
+                        'data-show-on' => '{"config_smsconfig_sms_enabled_1":"checked"}',
+                    ),
+                    'constraints' => $constraints
                 )
-            )
+            );
+
+            $form->add(
+                'sms_password',
+                'text',
+                array(
+                    'label'       => 'mautic.sms.config.form.sms.password',
+                    'attr'        => array(
+                        'tooltip'      => 'mautic.sms.config.form.sms.password.tooltip',
+                        'class'        => 'form-control',
+                        'data-show-on' => '{"config_smsconfig_sms_enabled_1":"checked"}',
+                    ),
+                    'constraints' => $constraints
+                )
+            );
+
+            $form->add(
+                'sms_sending_phone_number',
+                'text',
+                array(
+                    'label'       => 'mautic.sms.config.form.sms.sending_phone_number',
+                    'attr'        => array(
+                        'tooltip'      => 'mautic.sms.config.form.sms.sending_phone_number.tooltip',
+                        'class'        => 'form-control',
+                        'data-show-on' => '{"config_smsconfig_sms_enabled_1":"checked"}',
+                    ),
+                    'constraints' => $constraints
+                )
+            );
+        };
+
+        // Before submit
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            $formModifier
         );
 
-        $builder->add(
-            'sms_password',
-            'text',
-            array(
-                'label' => 'mautic.sms.config.form.sms.password',
-                'data'  => $options['data']['sms_password'],
-                'attr'  => array(
-                    'tooltip'      => 'mautic.sms.config.form.sms.password.tooltip',
-                    'class'        => 'form-control',
-                    'data-show-on' => '{"config_smsconfig_sms_enabled_1":"checked"}',
-                )
-            )
-        );
-
-        $builder->add(
-            'sms_sending_phone_number',
-            'text',
-            array(
-                'label' => 'mautic.sms.config.form.sms.sending_phone_number',
-                'data'  => $options['data']['sms_sending_phone_number'],
-                'attr'  => array(
-                    'tooltip'      => 'mautic.sms.config.form.sms.sending_phone_number.tooltip',
-                    'class'        => 'form-control',
-                    'data-show-on' => '{"config_smsconfig_sms_enabled_1":"checked"}',
-                )
-            )
+        // After submit
+        $builder->addEventListener(
+            FormEvents::PRE_SET_DATA,
+            $formModifier
         );
     }
 
