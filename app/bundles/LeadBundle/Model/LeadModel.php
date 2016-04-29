@@ -934,7 +934,8 @@ class LeadModel extends FormModel
         elseif ($isContactable !== $reason) {
             /** @var DoNotContact $dnc */
             foreach ($lead->getDoNotContact() as $dnc) {
-                if ($dnc->getChannel() === $channel) {
+                // Only update if the contact did not unsubscribe themselves
+                if ($dnc->getChannel() === $channel && $dnc->getReason() !== DoNotContact::UNSUBSCRIBED) {
                     // Remove the outdated entry
                     $lead->removeDoNotContactEntry($dnc);
 

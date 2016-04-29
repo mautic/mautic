@@ -26,9 +26,12 @@ class RedirectRepository extends CommonRepository
      */
     public function findBySource($source, $id)
     {
-        switch ($source) {
+        switch($source) {
             case 'email':
                 $column = 'r.email_id';
+                break;
+            case 'sms':
+                $column = 'r.sms_id';
                 break;
             case 'notification':
                 $column = 'r.notification_id';
