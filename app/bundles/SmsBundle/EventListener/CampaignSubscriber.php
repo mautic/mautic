@@ -36,12 +36,12 @@ class CampaignSubscriber extends CommonSubscriber
             $event->addAction(
                 'sms.send_text_sms',
                 array(
-                    'label' => 'mautic.sms.campaign.send_sms_sms',
-                    'description' => 'mautic.sms.campaign.send_sms_sms.tooltip',
-                    'callback' => array('\Mautic\SmsBundle\Helper\SmsHelper', 'send'),
-                    'formType' => 'smssend_list',
-                    'formTypeOptions' => array('update_select' => 'campaignevent_properties_sms'),
-                    'formTheme'       => 'MauticSmsBundle:FormTheme\SmsSendList',
+                    'label'            => 'mautic.campaign.sms.send_text_sms',
+                    'description'      => 'mautic.campaign.sms.send_text_sms.tooltip',
+                    'callback'         => array('\Mautic\SmsBundle\Helper\SmsHelper', 'send'),
+                    'formType'         => 'smssend_list',
+                    'formTypeOptions'  => array('update_select' => 'campaignevent_properties_sms'),
+                    'formTheme'        => 'MauticSmsBundle:FormTheme\SmsSendList',
                     'timelineTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.php'
                 )
             );

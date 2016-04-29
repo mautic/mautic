@@ -229,9 +229,7 @@ class SmsModel extends FormModel
         );
 
         $labels = array(
-            $this->translator->trans('mautic.sms.sent'),
-            $this->translator->trans('mautic.sms.read'),
-            $this->translator->trans('mautic.sms.failed')
+            $this->translator->trans('mautic.sms.sent')
         );
 
         if ($listCount) {
@@ -244,14 +242,10 @@ class SmsModel extends FormModel
                 $sentCount = $statRepo->getSentCount($smsIds, $l->getId());
                 $datasets[$combined][0] += $sentCount;
 
-                $readCount = $statRepo->getReadCount($smsIds, $l->getId());
-                $datasets[$combined][1] += $readCount;
-
                 $datasets[$name] = array();
 
                 $datasets[$name] = array(
-                    $sentCount,
-                    $readCount
+                    $sentCount
                 );
 
                 $datasets[$name]['datasetKey'] = $l->getId();

@@ -38,7 +38,7 @@ class TwilioApi extends AbstractSmsApi
     {
         $this->client = $client;
         $this->sendingPhoneNumber = $this->sanitizeNumber($sendingPhoneNumber);
-        
+
         parent::__construct($factory);
     }
 
@@ -70,9 +70,14 @@ class TwilioApi extends AbstractSmsApi
                 $this->sanitizeNumber($number),
                 $content
             );
-            
+
             return true;
         } catch (\Services_Twilio_RestException $e) {
+            $this->factory->getLogger()->addError(
+                $e->getMessage(),
+                array('exception' => $e)
+            );
+
             return false;
         }
     }

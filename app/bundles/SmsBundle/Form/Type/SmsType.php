@@ -160,24 +160,12 @@ class SmsType extends AbstractType
         $builder->add('buttons', 'form_buttons');
         $builder->add('smsType', 'hidden');
 
-        $customButtons = array(
-            array(
-                'name'  => 'builder',
-                'label' => 'mautic.core.builder',
-                'attr'  => array(
-                    'class'   => 'btn btn-default btn-dnd btn-nospin text-primary btn-builder',
-                    'icon'    => 'fa fa-cube',
-                    'onclick' => "Mautic.launchBuilder('smsform', 'sms');"
-                )
-            )
-        );
         if (!empty($options['update_select'])) {
             $builder->add(
                 'buttons',
                 'form_buttons',
                 array(
-                    'apply_text'        => false,
-                    'pre_extra_buttons' => $customButtons
+                    'apply_text' => false
                 )
             );
             $builder->add(
@@ -191,10 +179,7 @@ class SmsType extends AbstractType
         } else {
             $builder->add(
                 'buttons',
-                'form_buttons',
-                array(
-                    'pre_extra_buttons' => $customButtons
-                )
+                'form_buttons'
             );
         }
 

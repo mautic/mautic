@@ -66,7 +66,7 @@ class SmsSendType extends AbstractType
 
             $builder->add('newSmsButton', 'button', array(
                 'attr'  => array(
-                    'class'   => 'btn btn-primary',
+                    'class'   => 'btn btn-primary btn-nospin',
                     'onclick' => 'Mautic.loadNewSmsWindow({
                         "windowUrl": "' . $windowUrl . '"
                     })',
@@ -75,7 +75,7 @@ class SmsSendType extends AbstractType
                 'label' => 'mautic.sms.send.new.sms'
             ));
 
-            $email = $options['data']['sms'];
+            $sms = $options['data']['sms'];
 
             // create button edit sms
             $windowUrlEdit = $this->router->generate('mautic_sms_action', array(
@@ -87,7 +87,7 @@ class SmsSendType extends AbstractType
 
             $builder->add('editSmsButton', 'button', array(
                 'attr'  => array(
-                    'class'     => 'btn btn-primary',
+                    'class'     => 'btn btn-primary btn-nospin',
                     'onclick'   => 'Mautic.loadNewSmsWindow(Mautic.standardSmsUrl({"windowUrl": "' . $windowUrlEdit . '"}))',
                     'disabled'  => !isset($sms),
                     'icon'      => 'fa fa-edit'
