@@ -75,7 +75,7 @@ CREATE TABLE {$this->prefix}lead_donotcontact (
   id INT NOT NULL, 
   lead_id INT DEFAULT NULL, 
   date_added TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, 
-  reason INT NOT NULL, 
+  reason SMALLINT NOT NULL, 
   channel VARCHAR(255) NOT NULL, 
   channel_id INT DEFAULT NULL, 
   comments TEXT DEFAULT NULL, 
@@ -124,6 +124,14 @@ SQL;
                     'comments'   => $row['comments']
                 );
 
+                if ('postgresql' == $this->platform) {
+                    // Get ID from sequence
+                    $nextVal = (int)$this->connection->fetchColumn(
+                        $this->connection->getDatabasePlatform()->getSequenceNextValSQL("{$this->prefix}lead_donotcontact_id_seq")
+                    );
+                    $insert['id'] = $nextVal;
+                }
+
                 switch (true) {
                     case (!empty($row['unsubscribed'])):
                         $insert['reason'] = DoNotContact::UNSUBSCRIBED;
@@ -137,6 +145,7 @@ SQL;
                 }
 
                 $this->connection->insert($this->prefix.'lead_donotcontact', $insert);
+
                 unset($insert);
             }
 
