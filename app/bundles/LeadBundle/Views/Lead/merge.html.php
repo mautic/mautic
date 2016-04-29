@@ -10,16 +10,7 @@
 
 <?php if ($tmpl == 'index'): ?>
 <div class="lead-merge-form">
-    <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', array(
-        'searchId'      => (empty($searchId)) ? null : $searchId,
-        'searchValue'   => $searchValue,
-        'action'        => $currentRoute,
-        'searchHelp'    => false,
-        'target'        => '.lead-merge-options',
-        'tmpl'          => 'update'
-    )); ?>
-
-    <div class="lead-merge-options mt-sm">
+   <div class="lead-merge-options mt-sm">
 <?php endif; ?>
 
         <?php echo $view['form']->start($form); ?>
