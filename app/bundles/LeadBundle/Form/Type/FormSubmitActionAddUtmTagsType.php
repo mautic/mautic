@@ -39,37 +39,7 @@ class FormSubmitActionAddUtmTagsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add(
-            'add_utmtags',
-            'lead_utmtag',
-            array(
-                'label' => 'mautic.lead.utmtags.add',
-                'attr' => array(
-                    'data-placeholder'      => $this->factory->getTranslator()->trans('mautic.lead.utmtags.select_or_create'),
-                    'data-no-results-text'  => $this->factory->getTranslator()->trans('mautic.lead.utmtags.enter_to_create'),
-                    'data-allow-add'        => 'true',
-                    'onchange'              => 'Mautic.createLeadUtmTag(this)'
-                ),
-                'data' => (isset($options['data']['add_utmtags'])) ? $options['data']['add_utmtags'] : null,
-                'add_transformer' => true
-            )
-        );
-
-        $builder->add(
-            'remove_utmtags',
-            'lead_utmtag',
-            array(
-                'label' => 'mautic.lead.utmtags.remove',
-                'attr' => array(
-                    'data-placeholder'      => $this->factory->getTranslator()->trans('mautic.lead.utmtags.select_or_create'),
-                    'data-no-results-text'  => $this->factory->getTranslator()->trans('mautic.lead.utmtags.enter_to_create'),
-                    'data-allow-add'        => 'true',
-                    'onchange'              => 'Mautic.createLeadUtmTag(this)'
-                ),
-                'data' => (isset($options['data']['remove_utmtags'])) ? $options['data']['remove_utmtags'] : null,
-                'add_transformer' => true
-            )
-        );
+        
 
     }
 

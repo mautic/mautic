@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\EmailBundle\Entity\DoNotEmail;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
@@ -1088,33 +1089,66 @@ class LeadModel extends FormModel
      */
     public function setUtmTags(Lead $lead, array $utmTags, $removeOrphans = false)
     {
+        $emailAddress = $lead->getEmail();
+
+        if (empty($emailAddress)) {
+
+            return false;
+        }
+
+        if (null === $reason) {
+            $reason = $this->factory->getTranslator()->trans('mautic.email.dnc.unsubscribed');
+        }
+
+        $em   = $this->factory->getEntityManager();
+        $repo = $em->getRepository('MauticEmailBundle:Email');
+        if (!$repo->checkDoNotEmail($emailAddress)) {
+            $dnc = new DoNotEmail();
+            $dnc->setLead($lead);
+            $dnc->setEmailAddress($emailAddress);
+            $dnc->setDateAdded(new \DateTime());
+            $dnc->setUnsubscribed();
+            $dnc->setManual($manual);
+            $dnc->setComments($reason);
+
+            if ($persist) {
+                $repo->saveEntity($dnc);
+            } else {
+                $lead->addDoNotEmailEntry($dnc);
+
+                return $dnc;
+            }
+        }
+
+        return false;
+
         $currentUtmTags  = $lead->getUtmTags();
         $leadModified = $utmTagsDeleted = false;
 
         foreach ($currentUtmTags as $utmTagName => $utmTag) {
-            if (!in_array($tag->getId(), $tags)) {
+            if (!in_array($utmTag->getId(), $utmTag)) {
                 // Tag has been removed
-                $lead->removeTag($tag);
+                $lead->removeUtmTag($utmTag);
                 $leadModified = $tagsDeleted = true;
             } else {
                 // Remove tag so that what's left are new tags
-                $key = array_search($tag->getId(), $tags);
-                unset($tags[$key]);
+                $key = array_search($utmTag->getId(), $utmTags);
+                unset($utmTag[$key]);
             }
         }
 
-        if (!empty($tags)) {
-            foreach($tags as $tag) {
-                if (is_numeric($tag)) {
+        if (!empty($utmTags)) {
+            foreach($utmTags as $utmTag) {
+                if (is_numeric($utmTag)) {
                     // Existing tag being added to this lead
-                    $lead->addTag(
-                        $this->factory->getEntityManager()->getReference('MauticLeadBundle:Tag', $tag)
+                    $lead->addUtmTag(
+                        $this->factory->getEntityManager()->getReference('MauticLeadBundle:UtmTag', $utmTag)
                     );
                 } else {
                     // New tag
-                    $newTag = new Tag();
-                    $newTag->setTag(InputHelper::clean($tag));
-                    $lead->addTag($newTag);
+                    $newUtmTag = new UtmTag();
+                    $newUtmTag->setUtmTag(InputHelper::clean($utmTag));
+                    $lead->addTag($newUtmTag);
                 }
             }
             $leadModified = true;
@@ -1125,7 +1159,7 @@ class LeadModel extends FormModel
 
             // Delete orphaned tags
             if ($tagsDeleted && $removeOrphans) {
-                $this->getTagRepository()->deleteOrphans();
+                $this->getUtmTagRepository()->deleteOrphans();
             }
         }
     }
@@ -1142,18 +1176,22 @@ class LeadModel extends FormModel
         $currentUtmTags  = $lead->getUtmTags();
         $leadModified = $utmTagsDeleted = false;
 
-        foreach ($currentUtmTags as $utmTagName => $utmTag) {
-            if (!in_array($utmTag->getId(), $utmTags)) {
-                // Tag has been removed
-                $lead->removeTag($utmTag);
-                $leadModified = $utmTagsDeleted = true;
-            } else {
-                // Remove tag so that what's left are new tags
-                $key = array_search($utmTag->getId(), $utmTags);
-                unset($utmTags[$key]);
+        //$this->factory->getLogger()->addError(print_r($currentUtmTags,true));
+
+        if($currentUtmTags!=null){
+            foreach ($currentUtmTags as $utmTagName => $utmTag) {
+                if (!in_array($utmTag->getId(), $utmTags)) {
+                    // Tag has been removed
+                    $lead->removeUtmTag($utmTag);
+                    $leadModified = $utmTagsDeleted = true;
+                } else {
+                    // Remove tag so that what's left are new tags
+                    $key = array_search($utmTag->getId(), $utmTags);
+                    unset($utmTags[$key]);
+                }
             }
         }
-
+        $this->factory->getLogger()->addDebug(print_r($utmTags,true));
         $ipAddress = $this->factory->getIpAddress();
         if ($this->factory->getRequest()->server->get('QUERY_STRING')) {
             parse_str($this->factory->getRequest()->server->get('QUERY_STRING'), $query);
@@ -1169,7 +1207,7 @@ class LeadModel extends FormModel
                 } else {
                     // New tag
                     $newUtmTag = new UtmTag();
-                    $newUtmTag->setTag(InputHelper::clean($utmTag));
+                    $newUtmTag->setUtmTag(InputHelper::clean($utmTag));
                     $lead->addUtmTag($newUtmTag);
                 }
             }

@@ -140,7 +140,7 @@ class Lead extends FormEntity
     /**
      * @var ArrayCollection
      */
-    private $utmTags;
+    private $utmtags;
 
     /**
      * @param ORM\ClassMetadata $metadata
@@ -233,6 +233,17 @@ class Lead extends FormEntity
             ->cascadePersist()
             ->cascadeDetach()
             ->build();
+        $builder->createManyToMany('utmtags', 'Mautic\LeadBundle\Entity\UtmTag')
+            ->setJoinTable('lead_utmtags_xref')
+            ->addInverseJoinColumn('utmtag_id', 'id', false)
+            ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
+            ->setOrderBy(array('utmtag' => 'ASC'))
+            ->setIndexBy('utmtag')
+            ->fetchLazy()
+            ->cascadeMerge()
+            ->cascadePersist()
+            ->cascadeDetach()
+            ->build();
     }
 
     /**
@@ -258,6 +269,7 @@ class Lead extends FormEntity
                     'owner',
                     'ipAddresses',
                     'tags',
+                    'utmtags',
                     'dateIdentified',
                     'preferredProfileImage'
                 )
@@ -292,6 +304,12 @@ class Lead extends FormEntity
             } else {
                 $this->changes['tags']['removed'][] = $val;
             }
+        } elseif ($prop == 'utmtags') {
+            if ($val instanceof Tag) {
+                $this->changes['utmtags']['added'][] = $val->getTag();
+            } else {
+                $this->changes['utmtags']['removed'][] = $val;
+            }
         } elseif ($this->$getter() != $val) {
             $this->changes[$prop] = array($this->$getter(), $val);
         }
@@ -306,6 +324,7 @@ class Lead extends FormEntity
         $this->doNotEmail      = new ArrayCollection();
         $this->pointsChangeLog = new ArrayCollection();
         $this->tags            = new ArrayCollection();
+        $this->utmtags         = new ArrayCollection();
     }
 
     /**
@@ -952,7 +971,7 @@ class Lead extends FormEntity
     }
 
     /**
-     * @param mixed $lastActive
+     * @param mixed $lastActive $this->tags            = new ArrayCollection();
      */
     public function setLastActive($lastActive)
     {
@@ -1027,8 +1046,8 @@ class Lead extends FormEntity
      */
     public function addUtmTag(UtmTag $utmTag)
     {
-        $this->isChanged('tags', $utmTag);
-        $this->tags[$utmTag->getTag()] = $utmTag;
+        $this->isChanged('utmtags', $utmTag);
+        $this->utmtags[$utmTag->getUtmTag()] = $utmTag;
 
         return $this;
     }
@@ -1041,7 +1060,7 @@ class Lead extends FormEntity
     public function removeUtmTag(UtmTag $utmTag)
     {
         $this->isChanged('utmtags', $utmTag->getUtmTag());
-        $this->utmTags->removeElement($utmTag);
+        $this->utmtags->removeElement($utmTag);
     }
 
     /**
@@ -1051,7 +1070,7 @@ class Lead extends FormEntity
      */
     public function getUtmTags ()
     {
-        return $this->utmTags;
+        return $this->utmtags;
     }
     
     
@@ -1065,7 +1084,7 @@ class Lead extends FormEntity
      */
     public function setUtmTags($utmTags)
     {
-        $this->utmTags = $utmTags;
+        $this->utmtags = $utmTags;
 
         return $this;
     }

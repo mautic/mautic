@@ -25,25 +25,14 @@ class UtmTag
     private $id;
 
     /**
-     * @var string
+     * @var \Mautic\LeadBundle\Entity\Lead
      */
-    private $name;
-    
-    /**
-     * @var string
-     */
-    private $type;
+    private $lead;
 
     /**
-     * @var \DateTime
+     * @var array
      */
-    private $publishUp;
-
-    /**
-     * @var \DateTime
-     */
-    private $publishDown;
-
+    private $query = array();
 
     /**
      * @var string
@@ -51,14 +40,9 @@ class UtmTag
     private $referrer;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var string
      */
-    private $lead;
-
-    /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
-     */
-    private $ipAddress;
+    private $remoteHost;
 
     /**
      * @var
@@ -68,34 +52,32 @@ class UtmTag
     /**
      * @var string
      */
-    private $urlTitle;
-
-    /**
-     * @var string
-     */
     private $userAgent;
 
     /**
      * @var string
      */
-    private $utmtag;
+    private $utmCampaign;
 
     /**
      * @var string
      */
-    private $utmValue;
-
+    private $utmContent;
 
     /**
      * @var string
      */
-    private $remoteHost;
+    private $utmMedium;
 
     /**
-     * @var array
+     * @var string
      */
-    private $query = array();
-    
+    private $utmSource;
+
+    /**
+     * @var string
+     */
+    private $utmTerm;
 
     /**
      * @param ORM\ClassMetadata $metadata
@@ -109,9 +91,43 @@ class UtmTag
             ->addIndex(array('utmtag'), 'lead_utmtag_search');
         
         $builder->addId();
-        $builder->addField('utmtag', 'string');
-    }
 
+        $builder->addLead(false, 'CASCADE', false, 'utmTags');
+
+        $builder->addNullableField('query', 'array');
+
+        $builder->addField('referrer', 'string');
+
+        $builder->createField('remoteHost', 'string')
+            ->columnName('remote_host')
+            ->build();
+
+        $builder->addField('url', 'string');
+
+        $builder->createField('userAgent', 'string')
+            ->columnName('user_agent')
+            ->build();
+
+        $builder->createField('utmCampaign', 'string')
+            ->columnName('utm_campaign')
+            ->build();
+
+        $builder->createField('utmContent', 'string')
+            ->columnName('utm_content')
+            ->build();
+
+        $builder->createField('utmMedium', 'string')
+            ->columnName('utm_medium')
+            ->build();
+
+        $builder->createField('utmSource', 'string')
+            ->columnName('utm_source')
+            ->build();
+
+        $builder->createField('utmTerm', 'string')
+            ->columnName('utm_term')
+            ->build();
+    }
 
     /**
      * Prepares the metadata for API usage
@@ -124,24 +140,23 @@ class UtmTag
             ->addListProperties(
                 array(
                     'id',
-                    'name',
-                    'category',
-                    'type',
-                    'referrer',
                     'lead',
-                    'url',
-                    'urlTitle',
-                    'userAgent',
-                    'utmtag',
-                    'utmValue',
+                    'query',
+                    'referrer',
                     'remoteHost',
-                    'query'
+                    'url',
+                    'userAgent',
+                    'utmCampaign',
+                    'utmContent',
+                    'utmMedium',
+                    'utmSource',
+                    'utmTerm'
                 )
             )
             ->build();
     }
 
-    /**poin
+    /**
      * Get id
      *
      * @return integer
@@ -149,81 +164,6 @@ class UtmTag
     public function getId ()
     {
         return $this->id;
-    }
-
-    /**
-     * Set type
-     *
-     * @param string $type
-     *
-     * @return Action
-     */
-    public function setType ($type)
-    {
-        $this->isChanged('type', $type);
-        $this->type = $type;
-
-        return $this;
-    }
-
-    /**
-     * Get type
-     *
-     * @return string
-     */
-    public function getType ()
-    {
-        return $this->type;
-    }
-
-    /**
-     * Set name
-     *
-     * @param string $name
-     *
-     * @return ActionDESC
-     */
-    public function setName ($name)
-    {
-        $this->isChanged('name', $name);
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * Get name
-     *
-     * @return string
-     */
-    public function getName ()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Set name
-     *
-     * @param string $name
-     *
-     * @return Action
-     */
-    public function setReferrer ($referrer)
-    {
-        $this->isChanged('referrer', $referrer);
-        $this->referrer = $referrer;
-
-        return $this;
-    }
-
-    /**
-     * Get name
-     *
-     * @return string
-     */
-    public function getReferrer ()
-    {
-        return $this->referrer;
     }
 
     /**
@@ -247,27 +187,72 @@ class UtmTag
     }
 
     /**
-     * Set ipAddress
-     *
-     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
+     * @return array
+     */
+    public function getQuery()
+    {
+        return $this->query;
+    }
+
+    /**
+     * @param array $query
      *
      * @return Hit
      */
-    public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
+    public function setQuery($query)
     {
-        $this->ipAddress = $ipAddress;
+        $this->query = $query;
 
         return $this;
     }
 
     /**
-     * Get ipAddress
+     * Set referrer
      *
-     * @return \Mautic\CoreBundle\Entity\IpAddress
+     * @param string $referrer
+     *
+     * @return Action
      */
-    public function getIpAddress()
+    public function setReferrer ($referrer)
     {
-        return $this->ipAddress;
+        $this->isChanged('referrer', $referrer);
+        $this->referrer = $referrer;
+
+        return $this;
+    }
+
+    /**
+     * Get referrer
+     *
+     * @return string
+     */
+    public function getReferrer ()
+    {
+        return $this->referrer;
+    }
+
+    /**
+     * Set remoteHost
+     *
+     * @param string $remoteHost
+     *
+     * @return Hit
+     */
+    public function setRemoteHost($remoteHost)
+    {
+        $this->remoteHost = $remoteHost;
+
+        return $this;
+    }
+
+    /**
+     * Get remoteHost
+     *
+     * @return string
+     */
+    public function getRemoteHost()
+    {
+        return $this->remoteHost;
     }
 
     /**
@@ -318,36 +303,12 @@ class UtmTag
         return $this->userAgent;
     }
 
-    /**
-     * Set remoteHost
-     *
-     * @param string $remoteHost
-     *
-     * @return Hit
-     */
-    public function setRemoteHost($remoteHost)
-    {
-        $this->remoteHost = $remoteHost;
-
-        return $this;
-    }
-
-    /**
-     * Get remoteHost
-     *
-     * @return string
-     */
-    public function getRemoteHost()
-    {
-        return $this->remoteHost;
-    }
-
-    /**
+     /**
      * @return array
      */
-    public function getQuery()
+    public function getUtmCampaign()
     {
-        return $this->query;
+        return $this->utmCampaign;
     }
 
     /**
@@ -355,103 +316,9 @@ class UtmTag
      *
      * @return Hit
      */
-    public function setQuery($query)
+    public function setUtmCampaign($utmCampaign)
     {
-        $this->query = $query;
-
-        return $this;
-    }
-
-    /**
-     * Set publishUp
-     *its peppa pig for me (which I feel to send on a vacation
-     * @param \DateTime $publishUp
-     *
-     * @return Point
-     */
-    public function setPublishUp ($publishUp)
-    {
-        $this->isChanged('publishUp', $publishUp);
-        $this->publishUp = $publishUp;
-
-        return $this;
-    }
-
-    /**
-     * Get publishUp
-     *
-     * @return \DateTime
-     */
-    public function getPublishUp ()
-    {
-        return $this->publishUp;
-    }
-
-    /**
-     * Set publishDown
-     *
-     * @param \DateTime $publishDown
-     *
-     * @return Point
-     */
-    public function setPublishDown ($publishDown)
-    {
-        $this->isChanged('publishDown', $publishDown);
-        $this->publishDown = $publishDown;
-
-        return $this;
-    }
-
-    /**
-     * Get publishDown
-     *
-     * @return \DateTime
-     */
-    public function getPublishDown ()
-    {
-        return $this->publishDown;
-    }
-
-    /**
-     * Set url title
-     *
-     * @param string $urlTitle
-     *
-     * @return Hit
-     */
-    public function setUrlTitle($urlTitle)
-    {
-        $this->urlTitle = $urlTitle;
-
-        return $this;
-    }
-
-    /**
-     * Get url title
-     *
-     * @return string
-     */
-    public function getUrlTitle()
-    {
-        return $this->urlTitle;
-    }
-
-    /**
-     * @return array
-     */
-    public function getUtmTag()
-    {
-        return $this->utmtag;
-    }
-
-    /**
-     * @param array $query
-     *
-     * @return Hit
-     */
-    public function setUtmTag($utmtag)
-    {
-        $this->utmtag = $utmtag;
+        $this->utmCampaign = $utmCampaign;
 
         return $this;
     }
@@ -459,9 +326,9 @@ class UtmTag
     /**
      * @return array
      */
-    public function getUtmValue()
+    public function getUtmContent()
     {
-        return $this->utmValue;
+        return $this->utmContent;
     }
 
     /**
@@ -469,9 +336,69 @@ class UtmTag
      *
      * @return Hit
      */
-    public function setUtmValue($utmValue)
+    public function setUtmConent($utmContent)
     {
-        $this->utmValue = $utmValue;
+        $this->utmContent = $utmContent;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUtmMedium()
+    {
+        return $this->utmMedium;
+    }
+
+    /**
+     * @param array $query
+     *
+     * @return Hit
+     */
+    public function setUtmMedium($utmMedium)
+    {
+        $this->utmMedium = $utmMedium;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUtmSource()
+    {
+        return $this->utmSource;
+    }
+
+    /**
+     * @param array $query
+     *
+     * @return Hit
+     */
+    public function setUtmSource($utmSource)
+    {
+        $this->utmSource = $utmSource;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUtmTerm()
+    {
+        return $this->utmTerm;
+    }
+
+    /**
+     * @param array $query
+     *
+     * @return Hit
+     */
+    public function setUtmTerm($utmTerm)
+    {
+        $this->utmTerm = $utmTerm;
 
         return $this;
     }

@@ -281,11 +281,6 @@ return array(
                 'alias'     => 'lead_tag',
                 'arguments' => 'mautic.factory'
             ),
-            'mautic.form.type.lead_utmtag'                       => array(
-                'class'     => 'Mautic\LeadBundle\Form\Type\UtmTagType',
-                'alias'     => 'lead_utmtag',
-                'arguments' => 'mautic.factory'
-            ),
             'mautic.form.type.modify_lead_tags'               => array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\ModifyLeadTagsType',
                 'alias'     => 'modify_lead_tags',
