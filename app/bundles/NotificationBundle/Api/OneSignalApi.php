@@ -64,7 +64,7 @@ class OneSignalApi extends AbstractNotificationApi
      *                            ['en' => 'English Title', 'es' => 'Spanish Title']
      * @param string $url The URL where the user should be sent when clicking the notification
      *
-     * @return array
+     * @return Response
      *
      * @throws \Exception
      */
@@ -96,8 +96,6 @@ class OneSignalApi extends AbstractNotificationApi
             $data['url'] = $url;
         }
 
-        $response = $this->send('/notifications', $data);
-        
-        return $response === 200;
+        return $this->send('/notifications', $data);
     }
 }

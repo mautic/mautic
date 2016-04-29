@@ -57,8 +57,10 @@ class NotificationHelper
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $factory->getModel('lead.lead');
+        $logger = $factory->getLogger();
 
         if ($leadModel->isContactable($lead, 'notification') !== DoNotContact::IS_CONTACTABLE) {
+            $logger->error('Error: Lead ' . $lead->getId() . ' is not contactable on the web push channel.');
             return array('failed' => 1);
         }
 
@@ -73,6 +75,7 @@ class NotificationHelper
         }
 
         if (empty($playerID)) {
+            $logger->error('Error: Lead ' . $lead->getId() . ' has not subscribed to web push channel.');
             return array('failed' => 1);
         }
 
@@ -87,6 +90,7 @@ class NotificationHelper
         $notification = $notificationModel->getEntity($notificationId);
 
         if ($notification->getId() !== $notificationId) {
+            $logger->error('Error: The requested notification cannot be found.');
             return array('failed' => 1);
         }
 
@@ -98,7 +102,7 @@ class NotificationHelper
             )
         );
 
-        $metadata = $notificationApi->sendNotification(
+        $response = $notificationApi->sendNotification(
             $playerID,
             $notification->getMessage(),
             $notification->getHeading(),
@@ -106,10 +110,11 @@ class NotificationHelper
         );
 
         // If for some reason the call failed, tell mautic to try again by return false        
-        if ($metadata === false) {
+        if ($response->code !== 200) {
+            $logger->error('Error: The notification failed to send and returned a ' . $response->code . ' HTTP response with a body of: ' . $response->body);
             return false;
         }
-        
+
         return array(
             'status' => 'mautic.notification.timeline.status.delivered',
             'type' => 'mautic.notification.notification',
