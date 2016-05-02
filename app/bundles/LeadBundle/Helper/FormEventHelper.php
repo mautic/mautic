@@ -84,16 +84,42 @@ class FormEventHelper
         $leadModel  = $factory->getModel('lead');
         $lead       = $leadModel->getCurrentLead();
         $factory->getLogger()->addError(print_r($config,true));
-        foreach($config['add_utmtags'] as $utmTag){
-            if ($factory->getRequest()->server->get('QUERY_STRING')) {
-                parse_str($factory->getRequest()->server->get('QUERY_STRING'), $query);
-                $pageURL = $factory->getRequest()->server->get('HTTP_REFERER');
-                $pageURI = $factory->getRequest()->server->get('REQUEST_URI');
-                parse_str($pageURL,$queryReferrer);
-                $factory->getLogger()->addError(print_r($queryReferrer,true));
-                $factory->getLogger()->addError(print_r($pageURI,true));
+
+        if ($factory->getRequest()->server->get('QUERY_STRING')) {
+            parse_str($factory->getRequest()->server->get('QUERY_STRING'), $query);
+            $referrerURL = $factory->getRequest()->server->get('HTTP_REFERER');
+            $pageURI = $factory->getRequest()->server->get('REQUEST_URI');
+            $referrerParsedUrl = parse_url($referrerURL);
+            parse_str($referrerParsedUrl['query'],$queryReferrer);
+
+            if(key_exists('utm_campaign',$queryReferrer)){
+                $utmValues['utm_campaign'] =  $queryReferrer['utm_campaign'];
             }
+
+            if(key_exists('utm_content', $queryReferrer)){
+                $utmValues['utm_content'] =  $queryReferrer['utm_content'];
+            }
+
+            if(key_exists('utm_medium', $queryReferrer)){
+                $utmValues['utm_medium'] =  $queryReferrer['utm_medium'];
+            }
+
+            if(key_exists('utm_source', $queryReferrer)){
+                $utmValues['utm_source'] =  $queryReferrer['utm_source'];
+            }
+
+            if(key_exists('utm_term', $queryReferrer)){
+                $utmValues['utm_term'] =  $queryReferrer['utm_term'];
+            }
+            $utmValues['query'] = $queryReferrer;
+            $utmValues['referrer'] = $referrerURL;
+            $utmValues['remote_host'] = $referrerParsedUrl['host'];
+            $utmValues['url'] = $pageURI;
+            $utmValues['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+            
+            $factory->getLogger()->addError(print_r($utmValues,true));
         }
-        $leadModel->modifyUtmTags($lead, $config['add_utmtags']);
+
+       // $leadModel->modifyUtmTags($lead, $config['add_utmtags']);
     }
 }
