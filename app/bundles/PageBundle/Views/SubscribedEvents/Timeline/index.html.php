@@ -112,7 +112,7 @@ $counter = 3;
                     if (! empty($query)) {
                         foreach ($query as $k => $v) {
                             if (in_array($v, array('', null, array()))) continue;
-                            if (in_array($k, array('ct', 'page_title', 'page_referrer'))) continue;
+                            if (in_array($k, array('ct', 'page_title', 'page_referrer', 'page_url'))) continue;
                             if (is_array($v)) {
                                 foreach ($v as $k2 => $v2) {
                                     $counter++;
