@@ -844,32 +844,35 @@ class LeadController extends FormController
         $session = $this->factory->getSession();
         $search  = $this->request->get('search', $session->get('mautic.lead.merge.filter', ''));
         $session->set('mautic.lead.merge.filter', $search);
+        $leads = array();
 
-        $filter = array(
-            'string' => $search,
-            'force'  => array(
-                array(
-                    'column' => 'l.date_identified',
-                    'expr'   => 'isNotNull',
-                    'value'  => $mainLead->getId()
-                ),
-                array(
-                    'column' => 'l.id',
-                    'expr'   => 'neq',
-                    'value'  => $mainLead->getId()
+        if (! empty($search)) {
+            $filter = array(
+                'string' => $search,
+                'force' => array(
+                    array(
+                        'column' => 'l.date_identified',
+                        'expr' => 'isNotNull',
+                        'value' => $mainLead->getId()
+                    ),
+                    array(
+                        'column' => 'l.id',
+                        'expr' => 'neq',
+                        'value' => $mainLead->getId()
+                    )
                 )
-            )
-        );
+            );
 
-        $leads = $model->getEntities(
-            array(
-                'limit'          => 25,
-                'filter'         => $filter,
-                'orderBy'        => 'l.firstname,l.lastname,l.company,l.email',
-                'orderByDir'     => 'ASC',
-                'withTotalCount' => false
-            )
-        );
+            $leads = $model->getEntities(
+                array(
+                    'limit' => 25,
+                    'filter' => $filter,
+                    'orderBy' => 'l.firstname,l.lastname,l.company,l.email',
+                    'orderByDir' => 'ASC',
+                    'withTotalCount' => false
+                )
+            );
+        }
 
         $leadChoices = array();
         foreach ($leads as $l) {
