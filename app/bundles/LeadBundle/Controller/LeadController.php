@@ -888,6 +888,7 @@ class LeadController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
+            $valid =  true;
             if (!$this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $data = $form->getData();
@@ -925,9 +926,12 @@ class LeadController extends FormController
                     //Both leads are good so now we merge them
                     $mainLead = $model->mergeLeads($mainLead, $secLead, false);
                 }
-            };
+            }
+
+
 
             if ($valid) {
+
                 $viewParameters = array(
                     'objectId'     => $mainLead->getId(),
                     'objectAction' => 'view',
