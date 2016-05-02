@@ -17,34 +17,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class UtmTagRepository extends CommonRepository
 {
-
-    /**
-     * Delete orphan tags that are not associated with any lead
-     */
-    public function deleteOrphans()
-    {
-        $qb  = $this->_em->getConnection()->createQueryBuilder();
-        $havingQb = $this->_em->getConnection()->createQueryBuilder();
-
-        $havingQb->select('count(x.lead_id) as the_count')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_utmtags_xref', 'x')
-            ->where('x.utmtag_id = ut.id');
-
-        $qb->select('ut.id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_utmtags', 'ut')
-            ->having(sprintf('(%s)', $havingQb->getSQL()) . ' = 0');
-        $delete = $qb->execute()->fetch();
-
-        if (count($delete)) {
-            $qb->resetQueryParts();
-            $qb->delete(MAUTIC_TABLE_PREFIX.'lead_utmtags')
-                ->where(
-                    $qb->expr()->in('id', $delete)
-                )
-                ->execute();
-        }
-    }
-
     /**
      * Get tag entities by name
      *

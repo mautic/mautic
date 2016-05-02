@@ -11,6 +11,7 @@ namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 
@@ -92,12 +93,13 @@ class FormEventHelper
             $referrerParsedUrl = parse_url($referrerURL);
             parse_str($referrerParsedUrl['query'],$queryReferrer);
 
+            $utmValues = new UtmTag();
             if(key_exists('utm_campaign',$queryReferrer)){
-                $utmValues['utm_campaign'] =  $queryReferrer['utm_campaign'];
+                $utmValues->setUtmCampaign($queryReferrer['utm_campaign']);
             }
 
             if(key_exists('utm_content', $queryReferrer)){
-                $utmValues['utm_content'] =  $queryReferrer['utm_content'];
+                $utmValues->setUtmConent($queryReferrer['utm_content']);
             }
 
             if(key_exists('utm_medium', $queryReferrer)){
@@ -105,21 +107,26 @@ class FormEventHelper
             }
 
             if(key_exists('utm_source', $queryReferrer)){
-                $utmValues['utm_source'] =  $queryReferrer['utm_source'];
+                $utmValues->setUtmSource($queryReferrer['utm_source']);
             }
 
             if(key_exists('utm_term', $queryReferrer)){
-                $utmValues['utm_term'] =  $queryReferrer['utm_term'];
+                $utmValues->setUtmTerm($queryReferrer['utm_term']);
             }
-            $utmValues['query'] = $queryReferrer;
-            $utmValues['referrer'] = $referrerURL;
-            $utmValues['remote_host'] = $referrerParsedUrl['host'];
-            $utmValues['url'] = $pageURI;
-            $utmValues['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
-            
-            $factory->getLogger()->addError(print_r($utmValues,true));
+
+            $query = $factory->getRequest()->query->all();
+
+            $utmValues->setLead($lead);
+            $utmValues->setQuery($query);
+            $utmValues->setReferrer($referrerURL);
+            $utmValues->setRemoteHost($referrerParsedUrl['host']);
+            $utmValues->setUrl($pageURI);
+            $utmValues->setUserAgent($_SERVER['HTTP_USER_AGENT']);
+            $em   = $factory->getEntityManager();
+            $repo = $em->getRepository('MauticLeadBundle:UtmTag');
+            $repo->saveEntity($utmValues);
         }
 
-       // $leadModel->modifyUtmTags($lead, $config['add_utmtags']);
+        $leadModel->setUtmTags($lead, $utmValues);
     }
 }

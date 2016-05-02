@@ -233,16 +233,11 @@ class Lead extends FormEntity
             ->cascadePersist()
             ->cascadeDetach()
             ->build();
-        $builder->createManyToMany('utmtags', 'Mautic\LeadBundle\Entity\UtmTag')
-            ->setJoinTable('lead_utmtags_xref')
-            ->addInverseJoinColumn('utmtag_id', 'id', false)
-            ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
-            ->setOrderBy(array('utmtag' => 'ASC'))
-            ->setIndexBy('utmtag')
-            ->fetchLazy()
-            ->cascadeMerge()
-            ->cascadePersist()
-            ->cascadeDetach()
+        $builder->createOneToMany('utmtags', 'Mautic\LeadBundle\Entity\UtmTag')
+            ->orphanRemoval()
+            ->mappedBy('lead')
+            ->cascadeAll()
+            ->fetchExtraLazy()
             ->build();
     }
 
@@ -1038,32 +1033,6 @@ class Lead extends FormEntity
     }
 
     /**
-     * Add tag
-     *
-     * @param Tag $tag
-     *
-     * @return Lead
-     */
-    public function addUtmTag(UtmTag $utmTag)
-    {
-        $this->isChanged('utmtags', $utmTag);
-        $this->utmtags[$utmTag->getUtmTag()] = $utmTag;
-
-        return $this;
-    }
-
-    /**
-     * Remove tag
-     *
-     * @param Tag $tag
-     */
-    public function removeUtmTag(UtmTag $utmTag)
-    {
-        $this->isChanged('utmtags', $utmTag->getUtmTag());
-        $this->utmtags->removeElement($utmTag);
-    }
-
-    /**
      * Get tags
      *
      * @return mixed
@@ -1084,7 +1053,7 @@ class Lead extends FormEntity
      */
     public function setUtmTags($utmTags)
     {
-        $this->utmtags = $utmTags;
+        $this->utmtags[] = $utmTags;
 
         return $this;
     }

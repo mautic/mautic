@@ -215,7 +215,6 @@ class UtmTag
      */
     public function setReferrer ($referrer)
     {
-        $this->isChanged('referrer', $referrer);
         $this->referrer = $referrer;
 
         return $this;
