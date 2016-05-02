@@ -20,7 +20,7 @@ abstract class AbstractSmsApi
      * @var MauticFactory
      */
     protected $factory;
-    
+
     /**
      * @param MauticFactory $factory
      */
@@ -47,13 +47,12 @@ abstract class AbstractSmsApi
      */
     public function convertToTrackedUrl($url, array $clickthrough = array())
     {
-        /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
-        $redirectModel = $this->factory->getModel('page.redirect');
+        /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
+        $trackableModel = $this->factory->getModel('page.trackable');
+        
         /** @var \Mautic\PageBundle\Entity\Redirect $redirect */
-        $redirect = $redirectModel->getRedirectByUrl($url);
+        $trackable = $trackableModel->getTrackableByUrl($url, 'sms', $clickthrough['sms']);
 
-        $redirectModel->getRepository()->saveEntity($redirect);
-
-        return $redirectModel->generateRedirectUrl($redirect, $clickthrough);
+        return $trackableModel->generateTrackableUrl($trackable, $clickthrough);
     }
 }

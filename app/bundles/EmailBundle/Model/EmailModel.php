@@ -679,7 +679,7 @@ class EmailModel extends FormModel
      */
     public function getEmailClickStats($emailId)
     {
-        return $this->factory->getModel('page.redirect')->getRedirectListBySource('email', $emailId);
+        return $this->factory->getModel('page.redirect')->getChannelTrackables('email', $emailId);
     }
 
     /**

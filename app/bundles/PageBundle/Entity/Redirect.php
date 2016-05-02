@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use Mautic\EmailBundle\Entity\Email;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Class Redirect
@@ -49,9 +49,12 @@ class Redirect extends FormEntity
     private $uniqueHits = 0;
 
     /**
-     * @var Email
+     * Redirect constructor.
      */
-    private $email;
+    public function __construct()
+    {
+        $this->trackables = new ArrayCollection();
+    }
 
     /**
      * @param ORM\ClassMetadata $metadata
@@ -78,8 +81,9 @@ class Redirect extends FormEntity
             ->columnName('unique_hits')
             ->build();
 
-        $builder->createManyToOne('email', 'Mautic\EmailBundle\Entity\Email')
-            ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
+        $builder->createOneToMany('trackables', 'Trackable')
+            ->mappedBy('redirect')
+            ->fetchExtraLazy()
             ->build();
     }
 
@@ -196,25 +200,5 @@ class Redirect extends FormEntity
     public function getUniqueHits()
     {
         return $this->uniqueHits;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    /**
-     * @param Email $email
-     *
-     * @return Redirect
-     */
-    public function setEmail(Email $email = null)
-    {
-        $this->email = $email;
-
-        return $this;
     }
 }

@@ -14,7 +14,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -104,6 +103,9 @@ class Notification extends FormEntity
      */
     private $notificationType;
 
+    /**
+     *
+     */
     public function __clone()
     {
         $this->id               = null;
@@ -114,6 +116,9 @@ class Notification extends FormEntity
         parent::__clone();
     }
 
+    /**
+     * Notification constructor.
+     */
     public function __construct ()
     {
         $this->lists = new ArrayCollection();

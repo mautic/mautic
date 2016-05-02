@@ -312,6 +312,6 @@ class NotificationModel extends FormModel
      */
     public function getNotificationClickStats($notificationId)
     {
-        return $this->factory->getModel('page.redirect')->getRedirectListBySource('notification', $notificationId);
+        return $this->factory->getModel('page.redirect')->getChannelTrackables('notification', $notificationId);
     }
 }

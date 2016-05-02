@@ -10,6 +10,7 @@
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
@@ -27,12 +28,22 @@ class Trackable
     /**
      * @var string
      */
-    private $source;
+    private $channel;
 
     /**
      * @var int
      */
-    private $sourceId;
+    private $channelId;
+
+    /**
+     * @var int
+     */
+    private $hits;
+
+    /**
+     * @var int
+     */
+    private $uniqueHits;
 
     /**
      * @param ORM\ClassMetadata $metadata
@@ -41,15 +52,46 @@ class Trackable
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('redirect_entity_xref');
+        $builder->setTable('channel_url_trackables')
+            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\TrackableRepository');
 
         $builder->createManyToOne('redirect', 'Mautic\PageBundle\Entity\Redirect')
-            ->addJoinColumn('redirect_id', 'id', true, false, 'DELETE')
+            ->addJoinColumn('redirect_id', 'id', true, false, 'CASCADE')
+            ->cascadePersist()
+            ->inversedBy('trackables')
+            ->isPrimaryKey()
             ->build();
 
-        $builder->addNamedField('sourceId', 'integer', 'source_id');
+        $builder->createField('channelId', 'integer')
+            ->columnName('channel_id')
+            ->isPrimaryKey()
+            ->build();
 
-        $builder->addField('source', 'string');
+        $builder->addField('channel', 'string');
+
+        $builder->addField('hits', 'integer');
+
+        $builder->addNamedField('uniqueHits', 'integer', 'unique_hits');
+    }
+
+    /**
+     * Prepares the metadata for API usage
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('trackable')
+            ->addListProperties(
+                array(
+                    'redirect',
+                    'channelId',
+                    'channel',
+                    'hits',
+                    'uniqueHits'
+                )
+            )
+            ->build();
     }
 
     /**
@@ -63,9 +105,9 @@ class Trackable
     /**
      * @param Redirect $redirect
      *
-     * @return RedirectXref
+     * @return Trackable
      */
-    public function setRedirect($redirect)
+    public function setRedirect(Redirect $redirect)
     {
         $this->redirect = $redirect;
 
@@ -75,19 +117,19 @@ class Trackable
     /**
      * @return string
      */
-    public function getSource()
+    public function getChannel()
     {
-        return $this->source;
+        return $this->channel;
     }
 
     /**
-     * @param string $source
+     * @param string $channel
      *
-     * @return RedirectXref
+     * @return Trackable
      */
-    public function setSource($source)
+    public function setChannel($channel)
     {
-        $this->source = $source;
+        $this->channel = $channel;
 
         return $this;
     }
@@ -95,19 +137,59 @@ class Trackable
     /**
      * @return int
      */
-    public function getSourceId()
+    public function getChannelId()
     {
-        return $this->sourceId;
+        return $this->channelId;
     }
 
     /**
-     * @param int $sourceId
+     * @param int $channelId
      *
-     * @return RedirectXref
+     * @return Trackable
      */
-    public function setSourceId($sourceId)
+    public function setChannelId($channelId)
     {
-        $this->sourceId = $sourceId;
+        $this->channelId = $channelId;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getHits()
+    {
+        return $this->hits;
+    }
+
+    /**
+     * @param int $hits
+     *
+     * @return Trackable
+     */
+    public function setHits($hits)
+    {
+        $this->hits = $hits;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUniqueHits()
+    {
+        return $this->uniqueHits;
+    }
+
+    /**
+     * @param int $uniqueHits
+     *
+     * @return Trackable
+     */
+    public function setUniqueHits($uniqueHits)
+    {
+        $this->uniqueHits = $uniqueHits;
 
         return $this;
     }

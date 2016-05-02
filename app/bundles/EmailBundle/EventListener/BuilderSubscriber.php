@@ -13,6 +13,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\PageBundle\Entity\Trackable;
 
 /**
  * Class BuilderSubscriber
@@ -28,8 +29,16 @@ class BuilderSubscriber extends CommonSubscriber
     {
         return array(
             EmailEvents::EMAIL_ON_BUILD   => array('onEmailBuild', 0),
-            EmailEvents::EMAIL_ON_SEND    => array('onEmailGenerate', 0),
-            EmailEvents::EMAIL_ON_DISPLAY => array('onEmailGenerate', 0)
+            EmailEvents::EMAIL_ON_SEND    => array(
+                array('onEmailGenerate', 0),
+                // Ensure this is done last in order to catch all tokenized URLs
+                array('convertUrlsToTokens', -9999)
+            ),
+            EmailEvents::EMAIL_ON_DISPLAY => array(
+                array('onEmailGenerate', 0),
+                // Ensure this is done last in order to catch all tokenized URLs
+                array('convertUrlsToTokens', -9999)
+            )
         );
     }
 
@@ -133,8 +142,65 @@ class BuilderSubscriber extends CommonSubscriber
                 $signatureText = $owner['signature'];
             }
         }
-        
+
         $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
         $event->addToken('{signature}', $signatureText);
+    }
+
+    /**
+     * @param EmailSendEvent $event
+     *
+     * @return array
+     */
+    public function convertUrlsToTokens(EmailSendEvent $event)
+    {
+        $email        = $event->getEmail();
+        $emailId      = ($email) ? $email->getId() : 0;
+        $trackables   = $this->parseContentForUrls($event, $emailId);
+        $clickthrough = $event->generateClickthrough();
+
+        return $this->generateTrackedLinkTokens($trackables, $clickthrough);
+    }
+
+    /**
+     * Parses content for URLs and tokens
+     *
+     * @param EmailSendEvent $event
+     * @param                $emailId
+     *
+     * @return mixed
+     */
+    protected function parseContentForUrls(EmailSendEvent $event, $emailId)
+    {
+        static $convertedContent = array();
+
+        $html      = $event->getContent();
+        $text      = $event->getPlainText();
+        $contentId = md5($html.$text);
+
+        // Prevent parsing the exact same content over and over
+        if (!isset($convertedContent[$contentId])) {
+            /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
+            $trackableModel = $this->factory->getModel('page.redirect');
+            $contentTokens = $event->getTokens();
+
+            list($trackables, $content) = $trackableModel->parseContentForTrackables(
+                array($html, $text),
+                $contentTokens,
+                'email',
+                $emailId
+            );
+
+            list($html, $text) = $content;
+            unset($content);
+
+            // Rehash so that the parsed content is not parsed again
+            $contentId                    = md5($html.$text);
+            $convertedContent[$contentId] = $trackables;
+
+            unset($html, $text, $trackables);
+        }
+
+        return $convertedContent[$contentId];
     }
 }

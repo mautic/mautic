@@ -935,7 +935,7 @@ class PageModel extends FormModel
             $data = $query->loadAndBuildTimeData($q);
             $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.show.total.visits'), $data);
         }
-        
+
         if ($flag == 'unique' || $flag == 'total_and_unique') {
             $filter['groupBy'] = 'lead_id';
             $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', $filter);
@@ -1052,7 +1052,7 @@ class PageModel extends FormModel
             ->orderBy('hits', 'DESC')
             ->groupBy('p.id')
             ->setMaxResults($limit);
-        
+
         if (!$canViewOthers) {
             $q->andWhere('p.created_by = :userId')
                 ->setParameter('userId', $this->factory->getUser()->getId());

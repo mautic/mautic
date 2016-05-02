@@ -105,7 +105,7 @@ class MailHelper
     protected $source = array();
 
     /**
-     * @var null
+     * @var Email|null
      */
     protected $email = null;
 
@@ -245,6 +245,7 @@ class MailHelper
      *
      * @param bool $dispatchSendEvent
      * @param bool $isQueueFlush (a tokenized/batch send via API such as Mandrill)
+     * @param bool $useOwnerAsMailer
      *
      * @return bool
      */
@@ -1429,6 +1430,8 @@ class MailHelper
         $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_SEND, $event);
 
         $this->eventTokens = array_merge($this->eventTokens, $event->getTokens());
+
+        unset($event);
     }
 
     /**
@@ -1567,12 +1570,20 @@ class MailHelper
         if (substr($url, 0, 4) !== 'http' && substr($url, 0, 3) !== 'ftp') {
             return null;
         }
+
+        if ($this->email) {
+            // Get a Trackable which is channel aware
+            /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
+            $trackableModel = $this->factory->getModel('page.trackable');
+            $trackable      = $trackableModel->getTrackableByUrl($url, 'email', $this->email->getId());
+
+            return $trackable->getRedirect();
+        }
+
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
         $redirectModel = $this->factory->getModel('page.redirect');
 
-        $link = $redirectModel->getRedirectByUrl($url, $this->email);
-
-        return $link;
+        return $redirectModel->getRedirectByUrl($url);
     }
 
     /**
