@@ -20,7 +20,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Form\Type\TagListType;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Symfony\Component\Form\FormError;
