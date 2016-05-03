@@ -55,7 +55,7 @@ class Lead extends FormEntity
     /**
      * @var ArrayCollection
      */
-    private $doNotEmail;
+    private $doNotContact;
 
     /**
      * @var ArrayCollection
@@ -169,7 +169,7 @@ class Lead extends FormEntity
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createOneToMany('doNotEmail', 'Mautic\EmailBundle\Entity\DoNotEmail')
+        $builder->createOneToMany('doNotContact', 'Mautic\LeadBundle\Entity\DoNotContact')
             ->orphanRemoval()
             ->mappedBy('lead')
             ->cascadePersist()
@@ -298,7 +298,7 @@ class Lead extends FormEntity
     public function __construct()
     {
         $this->ipAddresses     = new ArrayCollection();
-        $this->doNotEmail      = new ArrayCollection();
+        $this->doNotContact    = new ArrayCollection();
         $this->pointsChangeLog = new ArrayCollection();
         $this->tags            = new ArrayCollection();
     }
@@ -671,47 +671,35 @@ class Lead extends FormEntity
     }
 
     /**
-     * @param DoNotEmail $doNotEmail
+     * @param DoNotContact $doNotContact
      *
      * @return $this
      */
-    public function addDoNotEmailEntry(DoNotEmail $doNotEmail)
+    public function addDoNotContactEntry(DoNotContact $doNotContact)
     {
-        if ($doNotEmail->getBounced()) {
-            $type = $doNotEmail->isManual() ? 'manual' : 'bounced';
-        } elseif ($doNotEmail->getUnsubscribed()) {
-            $type = 'unsubscribed';
-        }
+        $this->changes['dnc_status'] = array($doNotContact->getChannel(), $doNotContact->getComments());
 
-        $this->changes['dnc_status'] = array($type, $doNotEmail->getComments());
-
-        $this->doNotEmail[] = $doNotEmail;
+        $this->doNotContact[] = $doNotContact;
 
         return $this;
     }
 
     /**
-     * @param DoNotEmail $doNotEmail
+     * @param DoNotContact $doNotContact
      */
-    public function removeDoNotEmailEntry(DoNotEmail $doNotEmail)
+    public function removeDoNotContactEntry(DoNotContact $doNotContact)
     {
-        if ($doNotEmail->getBounced()) {
-            $type = $doNotEmail->isManual() ? 'manual' : 'bounced';
-        } elseif ($doNotEmail->getUnsubscribed()) {
-            $type = 'unsubscribed';
-        }
+        $this->changes['dnc_status'] = array('removed', $doNotContact->getChannel());
 
-        $this->changes['dnc_status'] = array('removed', $type);
-
-        $this->doNotEmail->removeElement($doNotEmail);
+        $this->doNotContact->removeElement($doNotContact);
     }
 
     /**
      * @return ArrayCollection
      */
-    public function getDoNotEmail()
+    public function getDoNotContact()
     {
-        return $this->doNotEmail;
+        return $this->doNotContact;
     }
 
     /**
