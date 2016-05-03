@@ -58,12 +58,12 @@ class Stat
     /**
      * @var bool
      */
-    private $isRead = false;
+    private $isClicked = false;
 
     /**
      * @var \DateTime
      */
-    private $dateRead;
+    private $dateClicked;
 
     /**
      * @var string
@@ -115,7 +115,7 @@ class Stat
         $builder->setTable('push_notification_stats')
             ->setCustomRepositoryClass('Mautic\NotificationBundle\Entity\StatRepository')
             ->addIndex(array('notification_id', 'lead_id'), 'stat_notification_search')
-            ->addIndex(array('is_read'), 'stat_notification_clicked_search')
+            ->addIndex(array('is_clicked'), 'stat_notification_clicked_search')
             ->addIndex(array('tracking_hash'), 'stat_notification_hash_search')
             ->addIndex(array('source', 'source_id'), 'stat_notification_source_search');
 
@@ -138,12 +138,12 @@ class Stat
             ->columnName('date_sent')
             ->build();
 
-        $builder->createField('isRead', 'boolean')
-            ->columnName('is_read')
+        $builder->createField('isClicked', 'boolean')
+            ->columnName('is_clicked')
             ->build();
 
-        $builder->createField('dateRead', 'datetime')
-            ->columnName('date_read')
+        $builder->createField('dateClicked', 'datetime')
+            ->columnName('date_clicked')
             ->nullable()
             ->build();
 
@@ -190,8 +190,8 @@ class Stat
                     'id',
                     'ipAddress',
                     'dateSent',
-                    'isRead',
-                    'dateRead',
+                    'isClicked',
+                    'dateClicked',
                     'retryCount',
                     'source',
                     'clickCount',
@@ -208,17 +208,17 @@ class Stat
     /**
      * @return mixed
      */
-    public function getDateRead()
+    public function getDateClicked()
     {
-        return $this->dateRead;
+        return $this->dateClicked;
     }
 
     /**
-     * @param mixed $dateRead
+     * @param mixed $dateClicked
      */
-    public function setDateRead($dateRead)
+    public function setDateClicked($dateClicked)
     {
-        $this->dateRead = $dateRead;
+        $this->dateClicked = $dateClicked;
     }
 
     /**
@@ -280,17 +280,17 @@ class Stat
     /**
      * @return mixed
      */
-    public function getIsRead()
+    public function getIsClicked()
     {
-        return $this->isRead;
+        return $this->isClicked;
     }
 
     /**
-     * @param mixed $isRead
+     * @param mixed $isClicked
      */
-    public function setIsRead($isRead)
+    public function setIsClicked($isClicked)
     {
-        $this->isRead = $isRead;
+        $this->isClicked = $isClicked;
     }
 
     /**

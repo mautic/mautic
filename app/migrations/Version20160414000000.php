@@ -142,8 +142,8 @@ CREATE TABLE {$this->prefix}push_notification_stats (
   list_id INT DEFAULT NULL, 
   ip_id INT DEFAULT NULL, 
   date_sent DATETIME NOT NULL COMMENT '(DC2Type:datetime)', 
-  is_read TINYINT(1) NOT NULL, 
-  date_read DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)', 
+  is_clicked TINYINT(1) NOT NULL, 
+  date_clicked DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)', 
   tracking_hash VARCHAR(255) DEFAULT NULL, 
   retry_count INT DEFAULT NULL, 
   source VARCHAR(255) DEFAULT NULL, 
@@ -157,7 +157,7 @@ CREATE TABLE {$this->prefix}push_notification_stats (
   INDEX {$this->keys['push_notification_stats']['idx']['list']} (list_id), 
   INDEX {$this->keys['push_notification_stats']['idx']['ip']} (ip_id), 
   INDEX {$this->prefix}stat_notification_search (notification_id, lead_id), 
-  INDEX {$this->prefix}stat_notification_clicked_search (is_read), 
+  INDEX {$this->prefix}stat_notification_clicked_search (is_clicked), 
   INDEX {$this->prefix}stat_notification_hash_search (tracking_hash), 
   INDEX {$this->prefix}stat_notification_source_search (source, source_id), 
   PRIMARY KEY(id)
@@ -249,8 +249,8 @@ CREATE TABLE {$this->prefix}push_notification_stats (
   list_id INT DEFAULT NULL, 
   ip_id INT DEFAULT NULL, 
   date_sent TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, 
-  is_read BOOLEAN NOT NULL, 
-  date_read TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, 
+  is_clicked BOOLEAN NOT NULL, 
+  date_clicked TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, 
   tracking_hash VARCHAR(255) DEFAULT NULL, 
   retry_count INT DEFAULT NULL, 
   source VARCHAR(255) DEFAULT NULL, 
@@ -269,12 +269,12 @@ SQL;
         $this->addSql("CREATE INDEX {$this->keys['push_notification_stats']['idx']['list']} ON {$this->prefix}push_notification_stats (list_id)");
         $this->addSql("CREATE INDEX {$this->keys['push_notification_stats']['idx']['ip']} ON {$this->prefix}push_notification_stats (ip_id)");
         $this->addSql("CREATE INDEX {$this->prefix}stat_notification_search ON {$this->prefix}push_notification_stats (notification_id, lead_id)");
-        $this->addSql("CREATE INDEX {$this->prefix}stat_notification_clicked_search ON {$this->prefix}push_notification_stats (is_read)");
+        $this->addSql("CREATE INDEX {$this->prefix}stat_notification_clicked_search ON {$this->prefix}push_notification_stats (is_clicked)");
         $this->addSql("CREATE INDEX {$this->prefix}stat_notification_hash_search ON {$this->prefix}push_notification_stats (tracking_hash)");
         $this->addSql("CREATE INDEX {$this->prefix}stat_notification_source_search ON {$this->prefix}push_notification_stats (source, source_id)");
 
         $this->addSql("COMMENT ON COLUMN {$this->prefix}push_notification_stats.date_sent IS '(DC2Type:datetime)'");
-        $this->addSql("COMMENT ON COLUMN {$this->prefix}push_notification_stats.date_read IS '(DC2Type:datetime)'");
+        $this->addSql("COMMENT ON COLUMN {$this->prefix}push_notification_stats.date_clicked IS '(DC2Type:datetime)'");
         $this->addSql("COMMENT ON COLUMN {$this->prefix}push_notification_stats.tokens IS '(DC2Type:array)'");
         $this->addSql("COMMENT ON COLUMN {$this->prefix}push_notification_stats.last_clicked IS '(DC2Type:datetime)'");
         $this->addSql("COMMENT ON COLUMN {$this->prefix}push_notification_stats.click_details IS '(DC2Type:array)'");
