@@ -29,7 +29,8 @@ class ListController extends FormController
     public function indexAction($page = 1)
     {
         /** @var ListModel $model */
-        $model = $this->factory->getModel('lead.list');
+        $model   = $this->factory->getModel('lead.list');
+        $session = $this->factory->getSession();
 
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(array(
@@ -45,16 +46,28 @@ class ListController extends FormController
             return $this->accessDenied();
         }
 
+        if ($this->request->getMethod() == 'POST') {
+            $this->setListFilters();
+        }
+
         //set limits
-        $limit = $this->factory->getSession()->get('mautic.leadlist.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.leadlist.limit', $this->factory->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
-        $filter           = array();
-        $filter['string'] = $this->request->get('search', $this->factory->getSession()->get('mautic.leadlist.filter', ''));
-        $this->factory->getSession()->set('mautic.leadlist.filter', $filter['string']);
+        $search = $this->request->get('search', $session->get('mautic.leadlist.filter', ''));
+        $session->set('mautic.leadlist.filter', $search);
+
+        //do some default filtering
+        $orderBy    = $session->get('mautic.leadlist.orderby', 'l.name');
+        $orderByDir = $session->get('mautic.leadlist.orderbydir', 'ASC');
+
+        $filter     = array(
+            'string' => $search
+        );
+
         $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         if (!$permissions['lead:lists:viewother']) {
@@ -68,7 +81,9 @@ class ListController extends FormController
             array(
                 'start'      => $start,
                 'limit'      => $limit,
-                'filter'     => $filter
+                'filter'     => $filter,
+                'orderBy'    => $orderBy,
+                'orderByDir' => $orderByDir,
             ));
 
         $count = count($items);
@@ -80,7 +95,7 @@ class ListController extends FormController
             } else {
                 $lastPage = (ceil($count / $limit)) ?: 1;
             }
-            $this->factory->getSession()->set('mautic.leadlist.page', $lastPage);
+            $session->set('mautic.leadlist.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_leadlist_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(array(
@@ -98,7 +113,7 @@ class ListController extends FormController
         }
 
         //set what page currently on so that we can return here after form submission/cancellation
-        $this->factory->getSession()->set('mautic.leadlist.page', $page);
+        $session->set('mautic.leadlist.page', $page);
 
         $listIds    = array_keys($items->getIterator()->getArrayCopy());
         $leadCounts = (!empty($listIds)) ? $model->getRepository()->getLeadCount($listIds) : array();
@@ -112,7 +127,7 @@ class ListController extends FormController
             'security'    => $this->factory->getSecurity(),
             'tmpl'        => $tmpl,
             'currentUser' => $this->factory->getUser(),
-            'searchValue' => $filter['string']
+            'searchValue' => $search
         );
 
         return $this->delegateView(array(
