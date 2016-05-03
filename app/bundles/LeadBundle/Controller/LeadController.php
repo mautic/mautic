@@ -412,10 +412,6 @@ class LeadController extends FormController
             }
         }
 
-        $event = new IconEvent($this->factory->getSecurity());
-        $this->factory->getDispatcher()->dispatch(CoreEvents::FETCH_ICONS, $event);
-        $icons = $event->getIcons();
-
         // We need the EmailRepository to check if a lead is flagged as do not contact
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
         $emailRepo = $this->factory->getModel('email')->getRepository();
@@ -435,7 +431,6 @@ class LeadController extends FormController
                     'eventTypes'        => $eventTypes,
                     'eventFilters'      => $filters,
                     'upcomingEvents'    => $upcomingEvents,
-                    'icons'             => $icons,
                     'engagementData'    => $engagementChart,
                     'noteCount'         => $this->factory->getModel('lead.note')->getNoteCount($lead, true),
                     'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value']),
