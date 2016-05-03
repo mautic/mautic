@@ -353,4 +353,20 @@ class EmailSendEvent extends CommonEvent
 
         return $clickthrough;
     }
+
+    /**
+     * Get the content hash to note if the content has been changed
+     *
+     * @return string
+     */
+    public function getContentHash()
+    {
+        if (null !== $this->helper) {
+
+            return $this->helper->getContentHash();
+        } else {
+
+            return md5($this->getContent().$this->getPlainText());
+        }
+    }
 }

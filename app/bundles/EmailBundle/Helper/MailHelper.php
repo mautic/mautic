@@ -21,7 +21,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\CoreBundle\Helper\EmojiHelper;
-use Mautic\CoreBundle\Templating\TemplateNameParser;
 
 /**
  * Class MailHelper
@@ -205,6 +204,13 @@ class MailHelper
      * @var int
      */
     private $transportStartTime;
+
+    /**
+     * Simply a md5 of the content so that event listeners can easily determine if the content has been changed
+     *
+     * @var string
+     */
+    private $contentHash;
 
     /**
      * @param MauticFactory $factory
@@ -524,7 +530,7 @@ class MailHelper
         unset($this->lead, $this->idHash, $this->eventTokens, $this->queuedRecipients, $this->errors);
 
         $this->eventTokens  = $this->queuedRecipients = $this->errors = array();
-        $this->lead         = $this->idHash = null;
+        $this->lead         = $this->idHash = $this->contentHash = null;
         $this->internalSend = $this->fatal = false;
 
         $this->logger->clear();
@@ -789,6 +795,9 @@ class MailHelper
     public function setPlainText($content)
     {
         $this->plainText = $content;
+
+        // Update the identifier for the content
+        $this->contentHash = md5($this->body['content'].$this->plainText);
     }
 
     /**
@@ -863,6 +872,9 @@ class MailHelper
             }
         }
 
+        // Update the identifier for the content
+        $this->contentHash = md5($content.$this->plainText);
+
         $this->body = array(
             'content'     => $content,
             'contentType' => $contentType,
@@ -878,6 +890,16 @@ class MailHelper
     public function getBody()
     {
         return $this->body['content'];
+    }
+
+    /**
+     * Return the content identifier
+     *
+     * @return string
+     */
+    public function getcontentHash()
+    {
+        return $this->contentHash;
     }
 
     /**

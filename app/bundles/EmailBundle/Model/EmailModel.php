@@ -632,11 +632,11 @@ class EmailModel extends FormModel
     }
 
     /**
-     * @param Email $email
+     * @param           $email
      * @param bool      $includeVariants
-     * @param string    $unit
-     * @param DateTime  $dateFrom
-     * @param DateTime  $dateTo
+     * @param           $unit
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
      *
      * @return array
      */
@@ -664,7 +664,7 @@ class EmailModel extends FormModel
 
         $filter = array(
             'email_id' => $emailIds,
-            'flag'=> 'sent_and_opened_and_failed'
+            'flag'     => 'sent_and_opened_and_failed'
         );
 
         return $this->getEmailsLineChartData($unit, $dateFrom, $dateTo, null, $filter);
@@ -679,7 +679,7 @@ class EmailModel extends FormModel
      */
     public function getEmailClickStats($emailId)
     {
-        return $this->factory->getModel('page.redirect')->getChannelTrackables('email', $emailId);
+        return $this->factory->getModel('page.trackable')->getTrackableList('email', $emailId);
     }
 
     /**

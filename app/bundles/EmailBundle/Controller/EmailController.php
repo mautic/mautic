@@ -392,7 +392,7 @@ class EmailController extends FormController
                 'viewParameters'  => array(
                     'email'          => $email,
                     'stats'          => $stats,
-                    'trackableLinks' => $trackableLinks,
+                    'trackables    ' => $trackableLinks,
                     'pending'        => $model->getPendingLeads($email, null, true),
                     'logs'           => $logs,
                     'variants'       => array(
@@ -733,7 +733,7 @@ class EmailController extends FormController
                 'activeLink'    => 'mautic_email_index',
                 'mauticContent' => 'email'
             );
-            
+
             // Check to see if this is a popup
             if (isset($form['updateSelect'])) {
                 $template    = false;

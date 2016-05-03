@@ -154,12 +154,25 @@ class BuilderSubscriber extends CommonSubscriber
      */
     public function convertUrlsToTokens(EmailSendEvent $event)
     {
-        $email        = $event->getEmail();
-        $emailId      = ($email) ? $email->getId() : 0;
-        $trackables   = $this->parseContentForUrls($event, $emailId);
-        $clickthrough = $event->generateClickthrough();
+        /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
+        $trackableModel = $this->factory->getModel('page.trackable');
 
-        return $this->generateTrackedLinkTokens($trackables, $clickthrough);
+        $email   = $event->getEmail();
+        $emailId = ($email) ? $email->getId() : null;
+
+        $clickthrough = $event->generateClickthrough();
+        $trackables   = $this->parseContentForUrls($event, $emailId);
+
+        /**
+         * @var string $token
+         * @var Trackable $trackable
+         */
+        foreach ($trackables as $token => $trackable) {
+            $event->addToken(
+                $token,
+                $trackableModel->generateTrackableUrl($trackable, $clickthrough)
+            );
+        }
     }
 
     /**
@@ -174,33 +187,41 @@ class BuilderSubscriber extends CommonSubscriber
     {
         static $convertedContent = array();
 
-        $html      = $event->getContent();
-        $text      = $event->getPlainText();
-        $contentId = md5($html.$text);
-
         // Prevent parsing the exact same content over and over
-        if (!isset($convertedContent[$contentId])) {
-            /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
-            $trackableModel = $this->factory->getModel('page.redirect');
-            $contentTokens = $event->getTokens();
+        if (!isset($convertedContent[$event->getContentHash()])) {
+            $html  = $event->getContent();
+            $text  = $event->getPlainText();
 
-            list($trackables, $content) = $trackableModel->parseContentForTrackables(
+            /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
+            $trackableModel = $this->factory->getModel('page.trackable');
+            $contentTokens  = $event->getTokens();
+
+            list($content, $trackables) = $trackableModel->parseContentForTrackables(
                 array($html, $text),
                 $contentTokens,
-                'email',
+                ($emailId) ? 'email' : null,
                 $emailId
             );
 
             list($html, $text) = $content;
             unset($content);
 
-            // Rehash so that the parsed content is not parsed again
-            $contentId                    = md5($html.$text);
-            $convertedContent[$contentId] = $trackables;
+            if ($html) {
+                $event->setContent($html);
+            }
+            if ($text) {
+                $event->setPlainText($text);
+            }
+
+            $convertedContent[$event->getContentHash()] = $trackables;
+
+            // Don't need to preserve Trackable or Redirect entities in memory
+            $this->factory->getEntityManager()->clear('Mautic\PageBundle\Entity\Redirect');
+            $this->factory->getEntityManager()->clear('Mautic\PageBundle\Entity\Trackable');
 
             unset($html, $text, $trackables);
         }
 
-        return $convertedContent[$contentId];
+        return $convertedContent[$event->getContentHash()];
     }
 }
