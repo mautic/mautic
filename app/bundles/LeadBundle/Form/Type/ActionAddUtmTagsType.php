@@ -48,6 +48,6 @@ class FormSubmitActionAddUtmTagsType extends AbstractType
      */
     public function getName()
     {
-        return "lead_submitaction_addutmtags";
+        return "lead_action_addutmtags";
     }
 }

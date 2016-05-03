@@ -74,9 +74,9 @@ class FormSubscriber extends CommonSubscriber
             'group'       => 'mautic.lead.lead.submitaction',
             'label'       => 'mautic.lead.lead.events.addutmtags',
             'description' => 'mautic.lead.lead.events.addutmtags_descr',
-            'formType'    => 'lead_submitaction_addutmtags',
-            'formTheme'   => 'MauticLeadBundle:FormTheme\\FormActionAddUtmTags',
-            'callback'    => '\Mautic\LeadBundle\Helper\FormEventHelper::addUtmTags'
+            'formType'    => 'lead_action_addutmtags',
+            'formTheme'   => 'MauticLeadBundle:FormTheme\\ActionAddUtmTags',
+            'callback'    => '\Mautic\LeadBundle\Helper\EventHelper::addUtmTags'
         );
         $event->addSubmitAction('lead.addutmtags', $action);
     }
