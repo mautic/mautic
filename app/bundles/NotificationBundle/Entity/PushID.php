@@ -52,6 +52,7 @@ class PushID
 
         $builder->createManyToOne('lead', 'Mautic\LeadBundle\Entity\Lead')
             ->addJoinColumn('lead_id', 'id', true, false, 'SET NULL')
+            ->inversedBy('pushIds')
             ->build();
     }
 
