@@ -49,10 +49,10 @@ abstract class AbstractSmsApi
     {
         /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
         $trackableModel = $this->factory->getModel('page.trackable');
-        
+
         /** @var \Mautic\PageBundle\Entity\Redirect $redirect */
         $trackable = $trackableModel->getTrackableByUrl($url, 'sms', $clickthrough['sms']);
 
-        return $trackableModel->generateTrackableUrl($trackable, $clickthrough);
+        return $trackableModel->generateTrackableUrl($trackable, $clickthrough, true);
     }
 }

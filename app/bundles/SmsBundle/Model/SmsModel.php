@@ -302,6 +302,6 @@ class SmsModel extends FormModel
      */
     public function getSmsClickStats($smsId)
     {
-        return $this->factory->getModel('page.redirect')->getChannelTrackables('sms', $smsId);
+        return $this->factory->getModel('page.trackable')->getTrackableList('sms', $smsId);
     }
 }

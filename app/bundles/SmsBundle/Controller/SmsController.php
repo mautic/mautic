@@ -294,7 +294,7 @@ class SmsController extends FormController
                 'viewParameters'  => array(
                     'sms'         => $sms,
                     'stats'       => $stats,
-                    'trackableLinks' => $trackableLinks,
+                    'trackables'  => $trackableLinks,
                     'logs'        => $logs,
                     'permissions' => $security->isGranted(
                         array(

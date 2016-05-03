@@ -17,11 +17,7 @@ return array(
                 'class' => 'Mautic\SmsBundle\EventListener\ConfigSubscriber'
             ),
             'mautic.sms.smsbundle.subscriber' => array(
-                'class' => 'Mautic\SmsBundle\EventListener\SmsSubscriber',
-                'arguments' => array(
-                    'mautic.factory',
-                    'mautic.http.connector'
-                )
+                'class' => 'Mautic\SmsBundle\EventListener\SmsSubscriber'
             )
         ),
         'forms' => array(
