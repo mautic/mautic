@@ -410,6 +410,7 @@ class NotificationController extends FormController
 
             // Check to see if this is a popup
             if (isset($form['updateSelect'])) {
+                $template    = false;
                 $passthrough = array_merge(
                     $passthrough,
                     array(
@@ -552,16 +553,19 @@ class NotificationController extends FormController
                 $model->unlockEntity($entity);
             }
 
+            $template    = 'MauticNotificationBundle:Notification:view';
             $passthrough = array(
                 'activeLink'    => 'mautic_notification_index',
                 'mauticContent' => 'notification'
             );
+
             // Check to see if this is a popup
             if (isset($form['updateSelect'])) {
+                $template    = false;
                 $passthrough = array_merge(
                     $passthrough,
                     array(
-                        'updateSelect' => $form['updateSelect']->getData(),
+                        'updateSelect'      => $form['updateSelect']->getData(),
                         'notificationId'    => $entity->getId(),
                         'notificationTitle' => $entity->getTitle(),
                         'notificationLang'  => $entity->getLanguage()
@@ -580,7 +584,7 @@ class NotificationController extends FormController
                         array(
                             'returnUrl'       => $this->generateUrl('mautic_notification_action', $viewParameters),
                             'viewParameters'  => $viewParameters,
-                            'contentTemplate' => 'MauticNotificationBundle:Notification:view',
+                            'contentTemplate' => $template,
                             'passthroughVars' => $passthrough
                         )
                     )
@@ -641,7 +645,7 @@ class NotificationController extends FormController
             $entity      = clone $entity;
             $session     = $this->factory->getSession();
             $contentName = 'mautic.notification.'.$entity->getSessionId().'.content';
-            
+
             $session->set($contentName, $entity->getContent());
         }
 
@@ -791,7 +795,7 @@ class NotificationController extends FormController
 
     /**
      * @param $objectId
-     * 
+     *
      * @return JsonResponse|Response
      */
     public function previewAction($objectId)
@@ -799,16 +803,16 @@ class NotificationController extends FormController
         /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
         $model = $this->factory->getModel('notification');
         $notification = $model->getEntity($objectId);
-        
+
         if ($notification != null
             && $this->factory->getSecurity()->hasEntityAccess(
                 'notification:notifications:editown',
                 'notification:notifications:editother'
             )
         ) {
-            
+
         }
-        
+
         return $this->delegateView(
             array(
                 'viewParameters' => array(
