@@ -121,3 +121,30 @@ Mautic.loadNewNotificationWindow = function(options) {
         }, 100);
     }
 };
+
+Mautic.standardNotificationUrl = function(options) {
+    if (!options) {
+        return;
+    }
+
+    var url = options.windowUrl;
+    if (url) {
+        var editEmailKey = '/notifications/edit/notificationId';
+        var previewEmailKey = '/notifications/preview/notificationId';
+        if (url.indexOf(editEmailKey) > -1 ||
+            url.indexOf(previewEmailKey) > -1) {
+            options.windowUrl = url.replace('notificationId', mQuery('#campaignevent_properties_notification').val());
+        }
+    }
+
+    return options;
+};
+
+Mautic.disabledNotificationAction = function() {
+    var email = mQuery('#campaignevent_properties_notification').val();
+
+    var disabled = email === '' || email === null;
+
+    mQuery('#campaignevent_properties_editNotificationButton').prop('disabled', disabled);
+    mQuery('#campaignevent_properties_previewNotificationButton').prop('disabled', disabled);
+};
