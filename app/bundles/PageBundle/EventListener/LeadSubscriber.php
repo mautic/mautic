@@ -132,7 +132,8 @@ class LeadSubscriber extends CommonSubscriber
                         'page' => $model->getEntity($hit['page_id']),
                         'hit'  => $hit
                     ),
-                    'contentTemplate' => $template
+                    'contentTemplate' => $template,
+                    'icon'            => 'fa-link'
                 )
             );
         }

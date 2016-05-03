@@ -209,7 +209,8 @@ class LeadSubscriber extends CommonSubscriber
                     'extra'           => array(
                         'log' => $log
                     ),
-                    'contentTemplate' => $template
+                    'contentTemplate' => $template,
+                    'icon'            => 'fa-clock-o'
                 )
             );
         }
