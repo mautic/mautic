@@ -42,12 +42,14 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             </div>
             <!--/ sms detail collapseable toggler -->
 
-           <?php echo $view->render('MauticSmsBundle:Sms:' . $smsType . '_graph.html.php',
-               array(
-                   'stats'        => $stats,
-                   'sms' => $sms
-               )
-           ); ?>
+           <?php 
+           // echo $view->render('MauticSmsBundle:Sms:' . $smsType . '_graph.html.php',
+           //     array(
+           //         'stats' => $stats,
+           //         'sms'  => $sms
+           //     )
+           // ); 
+           ?>
 
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
