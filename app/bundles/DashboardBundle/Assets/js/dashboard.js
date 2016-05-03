@@ -64,8 +64,8 @@ Mautic.saveWidgetSorting = function () {
     var widgetsWrapper = mQuery('#dashboard-widgets');
     var widgets = widgetsWrapper.children();
     var ordering = [];
-    widgets.each(function(index, value) { 
-        ordering.push(mQuery(this).attr('data-widget-id')); 
+    widgets.each(function(index, value) {
+        ordering.push(mQuery(this).attr('data-widget-id'));
     });
 
     Mautic.ajaxActionRequest('dashboard:updateWidgetOrdering', {'ordering': ordering}, function(response) {
@@ -100,5 +100,15 @@ Mautic.initWidgetRemoveButtons = function (scope) {
             }
         });
     });
-    
+
+};
+
+Mautic.exportDashboardLayout = function(text, baseUrl) {
+    var name = prompt(text, "");
+
+    if (name) {
+        baseUrl = baseUrl + "?name=" + encodeURIComponent(name);
+    }
+
+    window.location = baseUrl;
 };

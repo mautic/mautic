@@ -21,19 +21,22 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.dashboard.
                 </div>
                 <div class="panel-body">
                     <div class="list-group">
-                        <?php foreach ($dashboards as $dashboard) : ?>
+                        <?php foreach ($dashboards as $dashboard => $config) : ?>
                             <div class="list-group-item mt-md <?php echo ($dashboard == $preview) ? 'active' : ''; ?>">
-                                <h4 class="list-group-item-heading"><?php echo $dashboard; ?></h4>
+                                <h4 class="list-group-item-heading"><?php echo $config['name']; ?></h4>
+                                <?php if (!empty($config['description'])):?>
+                                <p class="small"><?php echo $config['description']; ?></p>
+                                <?php endif; ?>
                                 <p class="list-group-item-text">
                                     <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'import', 'preview' => $dashboard)); ?>">
                                         <?php echo $view['translator']->trans('mautic.dashboard.preview'); ?>
                                     </a>&#183;
                                     <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'applyDashboardFile', 'file' => $dashboard)); ?>">
                                         <?php echo $view['translator']->trans('mautic.core.form.apply'); ?>
-                                    </a>&#183;
+                                    </a><?php if ($config['type'] == 'user'): ?>&#183;
                                     <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'deleteDashboardFile', 'file' => $dashboard)); ?>">
                                         <?php echo $view['translator']->trans('mautic.core.form.delete'); ?>
-                                    </a>
+                                    </a><?php endif; ?>
                                 </p>
                             </div>
                         <?php endforeach; ?>

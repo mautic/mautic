@@ -408,6 +408,19 @@ class MauticFactory
             if (substr($path, -1) === '/') {
                 $path = substr($path, 0, -1);
             }
+        } elseif ($name == 'dashboard') {
+            //these are absolute regardless as they are configurable
+            $path = $this->getParameter('dashboard_import_dir');
+            if (substr($path, -1) !== '/') {
+                $path .= '/';
+            }
+
+            $user  = $this->getUser();
+            $path .= $user->getId();
+
+            if (!file_exists($path)) {
+                mkdir($path, 0755);
+            }
         } elseif (isset($paths[$name])) {
             $path = $paths[$name];
         } elseif (strpos($name, '_root') !== false) {

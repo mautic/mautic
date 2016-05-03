@@ -25,7 +25,8 @@ $buttons[] = array(
 $buttons[] = array(
     'attr'      => array(
         'class'       => 'btn btn-default btn-nospin',
-        'href'        => $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'export')),
+        'href'        => 'javascript:void()',
+        'onclick'     => "Mautic.exportDashboardLayout('{$view['translator']->trans('mautic.dashboard.confirmation_layout_name')}', '{$view['router']->generate('mautic_dashboard_action', array('objectAction' => 'export'))}');",
         'data-toggle' => ''
     ),
     'iconClass' => 'fa fa-cloud-download',
