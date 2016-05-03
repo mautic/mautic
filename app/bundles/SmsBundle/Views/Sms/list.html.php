@@ -122,6 +122,8 @@ if (count($items)):
         'sessionVar'      => 'sms'
     )); ?>
 </div>
+<?php elseif (!$configured): ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', array('header' => 'mautic.sms.disabled', 'message' => 'mautic.sms.enable.in.configuration')); ?>
 <?php else: ?>
-    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php'); ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', array('message' => 'mautic.sms.create.in.campaign.builder')); ?>
 <?php endif; ?>
