@@ -38,12 +38,12 @@ class Trackable
     /**
      * @var int
      */
-    private $hits;
+    private $hits = 0;
 
     /**
      * @var int
      */
-    private $uniqueHits;
+    private $uniqueHits = 0;
 
     /**
      * @param ORM\ClassMetadata $metadata
@@ -53,7 +53,8 @@ class Trackable
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('channel_url_trackables')
-            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\TrackableRepository');
+            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\TrackableRepository')
+            ->addIndex(array('channel', 'channel_id'), 'channel_url_trackable_search');
 
         $builder->createManyToOne('redirect', 'Mautic\PageBundle\Entity\Redirect')
             ->addJoinColumn('redirect_id', 'id', true, false, 'CASCADE')

@@ -333,11 +333,12 @@ class PageModel extends FormModel
     }
 
     /**
-     * @param Page    $page
-     * @param Request $request
-     * @param string  $code
+     * @param        $page
+     * @param        $request
+     * @param string $code
      *
-     * @return void
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Exception
      */
     public function hitPage ($page, $request, $code = '200')
     {
@@ -346,7 +347,6 @@ class PageModel extends FormModel
             return;
         }
 
-        $hitRepo = $this->getHitRepository();
         $hit = new Hit();
         $hit->setDateHit(new \Datetime());
 
@@ -415,6 +415,7 @@ class PageModel extends FormModel
                                 $pageURL = urldecode($pageURL);
                             }
                         } elseif (isset($query['url'])) {
+                            // @deprecated
                             $pageURL = $query['url'];
                             if (!$decoded) {
                                 $pageURL = urldecode($pageURL);
@@ -427,6 +428,7 @@ class PageModel extends FormModel
                             }
                             $hit->setReferer($query['page_referrer']);
                         } elseif (isset($query['referrer'])) {
+                            // @deprecated
                             if (!$decoded) {
                                 $query['referrer'] = urldecode($query['referrer']);
                             }
@@ -439,6 +441,7 @@ class PageModel extends FormModel
                             }
                             $hit->setPageLanguage($query['page_language']);
                         } elseif (isset($query['language'])) {
+                            // @deprecated
                             if (!$decoded) {
                                 $query['language'] = urldecode($query['language']);
                             }
@@ -451,6 +454,7 @@ class PageModel extends FormModel
                             }
                             $hit->setUrlTitle($query['page_title']);
                         } elseif (isset($query['title'])) {
+                            // @deprecated
                             if (!$decoded) {
                                 $query['title'] = urldecode($query['title']);
                             }
@@ -597,18 +601,39 @@ class PageModel extends FormModel
                 try {
                     $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
                 } catch (\Exception $exception) {
-                    error_log($exception);
+                    $this->factory->getLogger()->addError(
+                        $exception->getMessage(),
+                        array('exception' => $exception)
+                    );
                 }
             } elseif ($page instanceof Redirect) {
                 $hit->setRedirect($page);
 
-                /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
-                $redirectModel = $this->factory->getModel('page.redirect');
-
                 try {
+
+                    /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
+                    $redirectModel = $this->factory->getModel('page.redirect');
                     $redirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
+
+                    // If this is a trackable, up the trackable counts as well
+                    if (!empty($clickthrough['channel'])) {
+                        /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
+                        $trackableModel = $this->factory->getModel('page.trackable');
+                        $channelId      = reset($clickthrough['channel']);
+                        $channel        = key($clickthrough['channel']);
+
+                        $trackableModel->getRepository()->upHitCount($page->getId(), $channel, $channelId, 1, $isUnique);
+                    }
                 } catch (\Exception $exception) {
-                    error_log($exception);
+                    if ($this->factory->getEnvironment() == 'dev') {
+
+                        throw $exception;
+                    } else {
+                        $this->factory->getLogger()->addError(
+                            $exception->getMessage(),
+                            array('exception' => $exception)
+                        );
+                    }
                 }
             }
         }
@@ -647,11 +672,15 @@ class PageModel extends FormModel
         try {
             $this->em->persist($hit);
             $this->em->flush($hit);
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             if ($this->factory->getEnvironment() == 'dev') {
-                throw $e;
+
+                throw $exception;
             } else {
-                error_log($e);
+                $this->factory->getLogger()->addError(
+                    $exception->getMessage(),
+                    array('exception' => $exception)
+                );
             }
         }
 

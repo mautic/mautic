@@ -49,6 +49,11 @@ class Redirect extends FormEntity
     private $uniqueHits = 0;
 
     /**
+     * @var ArrayCollection
+     */
+    private $trackables;
+
+    /**
      * Redirect constructor.
      */
     public function __construct()
@@ -64,7 +69,8 @@ class Redirect extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('page_redirects')
-            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\RedirectRepository');
+            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\RedirectRepository')
+            ->addIndex(array('url'), 'page_redirect_url_search');
 
         $builder->addId();
 
@@ -200,5 +206,25 @@ class Redirect extends FormEntity
     public function getUniqueHits()
     {
         return $this->uniqueHits;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getTrackableList()
+    {
+        return $this->trackables;
+    }
+
+    /**
+     * @param ArrayCollection $trackables
+     *
+     * @return Redirect
+     */
+    public function setTrackables($trackables)
+    {
+        $this->trackables = $trackables;
+
+        return $this;
     }
 }

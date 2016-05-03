@@ -41,21 +41,22 @@ class RedirectModel extends FormModel
     }
 
     /**
-     * Generate a redirect URL
+     * Generate a Mautic redirect/passthrough URL
      *
      * @param Redirect $redirect
      * @param array    $clickthrough
+     * @param bool     $shortenUrl
      *
      * @return string
-     *
      */
-    public function generateRedirectUrl(Redirect $redirect, $clickthrough = array())
+    public function generateRedirectUrl(Redirect $redirect, $clickthrough = array(), $shortenUrl = false)
     {
         return $this->buildUrl(
             'mautic_url_redirect',
             array('redirectId' => $redirect->getRedirectId()),
             true,
-            $clickthrough
+            $clickthrough,
+            $shortenUrl
         );
     }
 
@@ -257,13 +258,13 @@ class RedirectModel extends FormModel
      *
      * @return mixed
      *
-     * @deprecated To be removed in 2.0; use Mautic\PageBundle\Model\TrackableModel::getChannelTrackables() instead
+     * @deprecated To be removed in 2.0; use Mautic\PageBundle\Model\TrackableModel::getTrackableList() instead
      */
     public function getRedirectListBySource($source, $id)
     {
-        /** @var Trackable $model */
+        /** @var TrackableModel $model */
         $model = $this->factory->getModel('page.trackable');
 
-        return $model->getChannelTrackables($source, $id);
+        return $model->getTrackableList($source, $id);
     }
 }

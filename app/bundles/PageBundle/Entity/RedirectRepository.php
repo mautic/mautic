@@ -60,7 +60,6 @@ class RedirectRepository extends CommonRepository
             ->setParameter('urls', $urls);
 
         return $q->getQuery()->getResult();
-
     }
 
     /**
