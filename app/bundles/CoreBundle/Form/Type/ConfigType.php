@@ -406,6 +406,28 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'cached_data_timeout',
+            'text',
+            array(
+                'label'       => 'mautic.core.config.form.cached.data.timeout',
+                'label_attr'  => array('class' => 'control-label'),
+                'attr'        => array(
+                    'class'          => 'form-control',
+                    'tooltip'        => 'mautic.core.config.form.cached.data.timeout.tooltip',
+                    'postaddon'      => '',
+                    'postaddon_text' => $this->translator->trans('mautic.core.time.minutes')
+                ),
+                'constraints' => array(
+                    new NotBlank(
+                        array(
+                            'message' => 'mautic.core.value.required'
+                        )
+                    )
+                )
+            )
+        );
+
+        $builder->add(
             'date_format_full',
             'text',
             array(
@@ -659,6 +681,20 @@ class ConfigType extends AbstractType
                 'attr'  => array(
                     'tooltip' => 'mautic.core.config.form.cookie.httponly.tooltip'
                 )
+            )
+        );
+
+        $builder->add(
+            'link_shortener_url',
+            'text',
+            array(
+                'label'      => 'mautic.core.config.form.link.shortener',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.core.config.form.link.shortener.tooltip'
+                ),
+                'required'   => false
             )
         );
     }

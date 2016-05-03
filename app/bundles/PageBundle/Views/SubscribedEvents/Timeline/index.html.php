@@ -108,26 +108,50 @@ $counter = 3;
 						<?php endif; ?>
 					</dd>
 					<?php endif; ?>
-		            <?php if (!empty($query)): ?>
-		            <?php foreach ($query as $k => $v): ?>
-		            <?php if ($v === '' || $v === null || $v === array()) continue; ?>
-		            <?php $counter++; ?>
-		            <dt><?php echo $k; ?>:</dt>
-		            <dd class="ellipsis"><?php echo $v; ?></dd>
-					<?php
-		            if (empty($showMore) && $counter >= 5):
-	                    $showMore = true;
-		            ?>
-					<div style="display: none;">
-		            <?php endif; ?>
-		            <?php endforeach; ?>
-		            <?php if (!empty($showMore)): ?>
-		            </div>
-		            <a href="javascript:void(0);" class="text-center small center-block mt-xs" onclick="Mautic.toggleTimelineMoreVisiblity(mQuery(this).prev());">
-			            <?php echo $view['translator']->trans('mautic.core.more.show'); ?>
-		            </a>
-		            <?php endif; ?>
-		            <?php endif; ?>
+                    <?php
+                    if (! empty($query)) {
+                        foreach ($query as $k => $v) {
+                            if (in_array($v, array('', null, array()))) continue;
+                            if (in_array($k, array('ct', 'page_title', 'page_referrer', 'page_url'))) continue;
+                            if (is_array($v)) {
+                                foreach ($v as $k2 => $v2) {
+                                    $counter++;
+                                    $k2 = ucwords(str_replace('_', ' ', $k));
+
+                                    echo '<dt>' . $k2 . ':</dt>';
+                                    echo '<dd class="ellipsis">' . $v2 . '</dd>';
+
+                                    if (empty($showMore) && $counter > 5) {
+                                        $showMore = true;
+
+                                        echo '<div style="display:none">';
+                                    }
+                                }
+
+                                continue;
+                            }
+
+                            $counter++;
+                            $k = ucwords(str_replace('_', ' ', $k));
+
+                            echo '<dt>' . $k . ':</dt>';
+                            echo '<dd class="ellipsis">' . $v . '</dd>';
+
+                            if (empty($showMore) && $counter > 5) {
+                                $showMore = true;
+
+                                echo '<div style="display:none">';
+                            }
+                        }
+
+                        if (! empty($showMore)) {
+                            echo '</div>';
+                            echo '<a href="javascript:void(0);" class="text-center small center-block mt-xs" onclick="Mautic.toggleTimelineMoreVisiblity(mQuery(this).prev());">';
+                            echo $view['translator']->trans('mautic.core.more.show');
+                            echo '</a>';
+                        }
+                    }
+                    ?>
 				</dl>
 		        hola
 	        </div>

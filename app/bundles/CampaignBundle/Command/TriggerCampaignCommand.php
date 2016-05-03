@@ -92,7 +92,7 @@ class TriggerCampaignCommand extends ModeratedCommand
                 $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.triggering', array('%id%' => $id)).'</info>');
 
                 if (!$negativeOnly && !$scheduleOnly) {
-                    //trigger starting action events for newly added leads
+                    //trigger starting action events for newly added contacts
                     $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.starting').'</comment>');
                     $processed = $model->triggerStartingEvents($campaign, $totalProcessed, $batch, $max, $output);
                     $output->writeln(
@@ -136,7 +136,7 @@ class TriggerCampaignCommand extends ModeratedCommand
                 if ($c->isPublished()) {
                     $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.triggering', array('%id%' => $c->getId())).'</info>');
                     if (!$negativeOnly && !$scheduleOnly) {
-                        //trigger starting action events for newly added leads
+                        //trigger starting action events for newly added contacts
                         $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.starting').'</comment>');
                         $processed = $model->triggerStartingEvents($c, $totalProcessed, $batch, $max, $output);
                         $output->writeln(

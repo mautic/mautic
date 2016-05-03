@@ -63,6 +63,8 @@
         "aws/aws-sdk-php": "~2.7",
         "rackspace/php-opencloud": "1.12.*",
 
+        "twilio/sdk": "^4.10",
+
         "knplabs/knp-menu": "^2.0",
         "knplabs/knp-menu-bundle":"^2.0",
         "friendsofsymfony/oauth-server-bundle": "1.5.2",
@@ -79,7 +81,9 @@
         "mrclay/minify": "2.2.0",
         "jbroadway/urlify": "^1.0",
         "geoip2/geoip2": "~2.0",
-        "camspiers/json-pretty": "1.0.*"
+        "camspiers/json-pretty": "1.0.*",
+        "misd/phone-number-bundle": "^1.1",
+        "ip2location/ip2location-php": "^7.2"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "2.5.*",

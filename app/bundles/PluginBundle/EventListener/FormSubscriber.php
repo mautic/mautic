@@ -11,7 +11,6 @@ namespace Mautic\PluginBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event\FormBuilderEvent;
-use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 
 /**
@@ -44,29 +43,5 @@ class FormSubscriber extends CommonSubscriber
             'callback'    => array('\\Mautic\\PluginBundle\\Helper\\EventHelper', 'pushLead')
         );
         $event->addSubmitAction('plugin.leadpush', $action);
-
-        $action = array(
-            'label'    => 'mautic.plugin.actions.facebookLogin',
-            'formType' => 'sociallogin_facebook',
-            'template' => 'MauticSocialBundle:Integration\Facebook:login.html.php',
-        );
-
-        $event->addFormField('plugin.loginFacebook', $action);
-
-        $action = array(
-            'label'    => 'mautic.plugin.actions.googlePlusLogin',
-            'formType' => 'sociallogin_googleplus',
-            'template' => 'MauticSocialBundle:Integration\GooglePlus:login.html.php',
-        );
-
-        $event->addFormField('plugin.loginGooglePlus', $action);
-
-        $action = array(
-            'label'    => 'mautic.plugin.actions.linkedInLogin',
-            'formType' => 'sociallogin_linkedin',
-            'template' => 'MauticSocialBundle:Integration\LinkedIn:login.html.php',
-        );
-
-        $event->addFormField('plugin.loginLinkedIn', $action);
     }
 }

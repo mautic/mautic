@@ -155,68 +155,6 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * Fetch Lead stats for some period of time.
-     *
-     * @param integer $quantity of units
-     * @param string $unit of time php.net/manual/en/class.dateinterval.php#dateinterval.props
-     * @param array $options
-     *
-     * @return mixed
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    public function getLeadStats($quantity, $unit, $options = array())
-    {
-        $graphData = GraphHelper::prepareDatetimeLineGraphData($quantity, $unit, array('viewed'));
-
-        // Load points for selected period
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-
-        $q->select(
-            sprintf('count(*) as count, DATE(cl.date_added) as date_added')
-        )
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl');
-
-        $utc = new \DateTimeZone('UTC');
-        $graphData['fromDate']->setTimezone($utc);
-
-        $q->andwhere(
-            $q->expr()->andX(
-                $q->expr()->gte('cl.date_added', ':date'),
-                $q->expr()->eq('cl.manually_removed', ':false')
-            )
-        )
-            ->setParameter('date', $graphData['fromDate']->format('Y-m-d H:i:s'))
-            ->setParameter('false', false, 'boolean')
-            ->groupBy('DATE(cl.date_added)')
-            ->orderBy('date_added', 'ASC');
-
-        if (isset($options['campaign_id'])) {
-            $q->andwhere($q->expr()->gte('cl.campaign_id', (int) $options['campaign_id']));
-        }
-
-        $datesAdded = $q->execute()->fetchAll();
-
-        $format         = GraphHelper::getDateLabelFormat($unit);
-        $formattedDates = array();
-        $dt             = new DateTimeHelper();
-        foreach ($datesAdded as &$date) {
-            $dt->setDateTime($date['date_added'], 'Y-m-d', 'utc');
-            $key                  = $dt->getDateTime()->format($format);
-            $formattedDates[$key] = (int) $date['count'];
-        }
-
-        foreach ($graphData['labels'] as $key => $label) {
-            $graphData['datasets'][0]['data'][$key] = (isset($formattedDates[$label])) ? $formattedDates[$label] : 0;
-        }
-
-        unset($graphData['fromDate']);
-
-        return $graphData;
-    }
-
-
-    /**
      * Updates lead ID (e.g. after a lead merge)
      *
      * @param $fromLeadId
