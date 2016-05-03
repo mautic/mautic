@@ -22,7 +22,7 @@ if ($event['extra']['hit']['dateLeft']) {
 	}
 }
 
-$icon = (isset($icons['page'])) ? $icons['page'] : '';
+$icon = (isset($event['icon'])) ? $event['icon'] : '';
 
 // Check for UTM codes
 $query = $event['extra']['hit']['query'];
