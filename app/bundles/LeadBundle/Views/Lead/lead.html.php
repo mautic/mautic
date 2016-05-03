@@ -407,24 +407,24 @@ $view['slots']->set(
                     <div class="panel-heading text-center">
                         <h4 class="fw-sb">
                             <?php if ($doNotContact['unsubscribed']): ?>
-                                <span class="label label-<?php echo(!empty($doNotContact['manual']) ? 'warning'
-                                    : 'danger'); ?>" data-toggle="tooltip"
-                                      title="<?php echo $doNotContact['comments']; ?>">
-                                    <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
-                                    <?php if (!empty($doNotContact['manual'])): ?>
-                                        <i class="fa fa-times has-click-event"
-                                           onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact['id']; ?>);"></i>
-                                    <?php endif; ?>
+                            <span class="label label-danger" data-toggle="tooltip" title="<?php echo $doNotContact['comments']; ?>">
+                                <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
+                            </span>
+
+                            <?php elseif ($doNotContact['manual']): ?>
+                            <span class="label label-danger" data-toggle="tooltip" title="<?php echo $doNotContact['comments']; ?>">
+                                <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
+                                <span data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans('mautic.lead.remove_dnc_status'); ?>">
+                                    <i class="fa fa-times has-click-event" onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact['id']; ?>);"></i>
                                 </span>
+                            </span>
+
                             <?php elseif ($doNotContact['bounced']): ?>
-                                <span class="label label-warning" data-toggle="tooltip"
-                                      title="<?php echo $doNotContact['comments']; ?>">
+                            <span class="label label-warning" data-toggle="tooltip" title="<?php echo $doNotContact['comments']; ?>">
                                 <?php echo $view['translator']->trans('mautic.lead.do.not.contact_bounced'); ?>
-                                    <span data-toggle="tooltip" data-placement="bottom"
-                                          title="<?php echo $view['translator']->trans(
-                                              'mautic.lead.remove_bounce_status'
-                                          ); ?>"><i class="fa fa-times has-click-event"
-                                                    onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact['id']; ?>);"></i></span>
+                                <span data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans('mautic.lead.remove_dnc_status'); ?>">
+                                    <i class="fa fa-times has-click-event" onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact['id']; ?>);"></i>
+                                </span>
                             </span>
                             <?php endif; ?>
                         </h4>

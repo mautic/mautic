@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Entity\DoNotContact;
 
 /**
  * LeadListRepository
@@ -469,7 +470,7 @@ class LeadListRepository extends CommonRepository
         if (null === $leadTable) {
             $schema = $this->_em->getConnection()->getSchemaManager();
             /** @var \Doctrine\DBAL\Schema\Column[] $leadTable */
-            $leadTable = $schema->listTableColumns(MAUTIC_TABLE_PREFIX.'leads');
+            $leadTable = $schema->listTableColumns(MAUTIC_TABLE_PREFIX . 'leads');
         }
 
         $options   = $this->getFilterExpressionFunctions();
@@ -747,19 +748,26 @@ class LeadListRepository extends CommonRepository
 
                 case 'dnc_bounced':
                 case 'dnc_unsubscribed':
+                case 'dnc_bounced_sms':
+                case 'dnc_unsubscribed_sms':
                     // Special handling of do not email
-
-                    $column = str_replace('dnc_', '', $details['field']);
-
                     $func = (($func == 'eq' && $details['filter']) || ($func == 'neq' && !$details['filter'])) ? 'EXISTS' : 'NOT EXISTS';
+
+                    $parts = explode('_', $details['field']);
+                    $channel = 'email';
+
+                    if (count($parts) === 3) {
+                        $channel = $parts[2];
+                    }
 
                     $subqb = $this->_em->getConnection()->createQueryBuilder()
                         ->select('null')
-                        ->from(MAUTIC_TABLE_PREFIX.'email_donotemail', $alias)
+                        ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', $alias)
                         ->where(
                             $q->expr()->andX(
-                                $q->expr()->eq($alias.'.'.$column, $exprParameter),
-                                $q->expr()->eq($alias.'.lead_id', 'l.id')
+                                $q->expr()->eq($alias . '.reason', $exprParameter),
+                                $q->expr()->eq($alias . '.lead_id', 'l.id'),
+                                $q->expr()->eq($alias . '.channel', $channel)
                             )
                         );
 
@@ -776,6 +784,10 @@ class LeadListRepository extends CommonRepository
 
                     // Filter will always be true and differentiated via EXISTS/NOT EXISTS
                     $details['filter'] = true;
+
+                    $ignoreAutoFilter = true;
+
+                    $parameters[$parameter] = ($parts[1] === 'bounced') ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
 
                     break;
 

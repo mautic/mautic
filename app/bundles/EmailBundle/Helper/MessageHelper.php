@@ -29,6 +29,7 @@ namespace Mautic\EmailBundle\Helper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\MonitoredEmail\Message;
+use Mautic\LeadBundle\Entity\DoNotContact;
 
 /**
  * Class MessageHelper
@@ -144,7 +145,7 @@ class MessageHelper
         }
 
         // Search for the lead
-        $stat = $leadId = $emailId = null;
+        $stat = $leadId = $leadEmail = $emailId = null;
         if (!empty($hashId)) {
             $q = $this->db->createQueryBuilder();
 
@@ -235,7 +236,6 @@ class MessageHelper
 
         if (!$leadId) {
             // A lead still could not be found
-
             return false;
         }
 
@@ -282,12 +282,13 @@ class MessageHelper
 
             // Check for an existing DNC entry
             $q = $this->db->createQueryBuilder();
-            $q->select('d.id')
-                ->from(MAUTIC_TABLE_PREFIX.'email_donotemail', 'd')
+            $q->select('dnc.id')
+                ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', 'dnc')
+                ->where('dnc.channel = "email"')
                 ->where(
-                    $q->expr()->eq('LOWER(d.address)', ':email')
+                    $q->expr()->eq('dnc.lead_id', ':leadId')
                 )
-                ->setParameter('email', strtolower($leadEmail));
+                ->setParameter('leadId', $leadId);
 
             try {
                 $exists = $q->execute()->fetchColumn();
@@ -296,20 +297,19 @@ class MessageHelper
             }
 
             if (!empty($exists)) {
-                $this->logger->debug('A DNC entry already exists for '.$leadEmail);
+                $this->logger->debug('A DNC entry already exists for ' . $leadEmail);
             } else {
                 $this->logger->debug('Existing not found so creating a new one.');
                 // Create a DNC entry
                 try {
                     $this->db->insert(
-                        MAUTIC_TABLE_PREFIX.'email_donotemail',
+                        MAUTIC_TABLE_PREFIX . 'lead_donotcontact',
                         array(
-                            'email_id'     => $emailId,
                             'lead_id'      => $leadId,
-                            'address'      => $leadEmail,
+                            'channel'      => 'email',
+                            'channel_id'   => $emailId,
                             'date_added'   => $dtHelper->toUtcString(),
-                            'bounced'      => ($isUnsubscribe) ? 0 : 1,
-                            'unsubscribed' => ($isUnsubscribe) ? 1 : 0,
+                            'reason'       => ($isUnsubscribe) ? DoNotContact::UNSUBSCRIBED : DoNotContact::BOUNCED,
                             'comments'     => $this->factory->getTranslator()->trans('mautic.email.bounce.reason.'.$messageDetails['rule_cat'])
                         )
                     );
