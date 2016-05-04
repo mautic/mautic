@@ -12,7 +12,6 @@ namespace Mautic\LeadBundle\Helper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\UtmTag;
-use Mautic\PageBundle\Entity\Hit;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 
 /**

@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\UserEvents;
+use Mautic\LeadBundle\Event\LeadTimelineEvent;
 
 /**
  * Class LeadSubscriber
@@ -64,7 +65,7 @@ class LeadSubscriber extends CommonSubscriber
 
                 return;
             }
-
+           $this->factory->getLogger()->addDebug(print_r(serialize($details),true));
             $check = base64_encode($lead->getId() . serialize($details));
             if (!in_array($check, $preventLoop)) {
                 $preventLoop[] = $check;
@@ -116,6 +117,24 @@ class LeadSubscriber extends CommonSubscriber
                         $pointsEvent = new Events\PointsChangeEvent($lead, $details['points'][0], $details['points'][1]);
                         $this->dispatcher->dispatch(LeadEvents::LEAD_POINTS_CHANGE, $pointsEvent);
                     }
+                }
+
+                if (!$lead->imported && isset($details["utmtags"])) {
+
+                    $template        = 'MauticLeadBundle:SubscribedEvents\Timeline:utmadded.html.php';
+                    $timeLineEvent = new LeadTimelineEvent($lead);
+                    $timeLineEvent->addEvent(
+                        array(
+                            'event'           => 'lead.utmtagsadded',
+                            'eventLabel'      => 'mautic.lead.event.utmtagsadded',
+                            'timestamp'       => time(),
+                            'extra'           => array(
+                                'log' => $log
+                            ),
+                            'contentTemplate' => $template
+                        )
+                    );
+                    
                 }
             }
         }
@@ -190,7 +209,8 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypes = array(
             'lead.create'     => 'mautic.lead.event.create',
             'lead.identified' => 'mautic.lead.event.identified',
-            'lead.ipadded'    => 'mautic.lead.event.ipadded'
+            'lead.ipadded'    => 'mautic.lead.event.ipadded',
+            'lead.utmtagsadded' => 'mautic.lead.event.utmtagsadded'
         );
 
         foreach ($eventTypes as $type => $label) {
@@ -205,7 +225,7 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onUserDelete(UserEvent $event)
     {
-        //not needed as set onDelete="SET NULL" on the entity association
+        //not needed as set onDelete="SET NULL" on the entiaddEventty association
         //$this->factory->getModel('lead.lead')->disassociateOwner($event->getUser()->getId());
     }
 

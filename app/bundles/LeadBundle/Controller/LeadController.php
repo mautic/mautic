@@ -357,6 +357,8 @@ class LeadController extends FormController
 
         $eventsByDate = $event->getEvents(true);
         $eventTypes   = $event->getEventTypes();
+        
+
 
         // Get an engagement count
         $translator     = $this->factory->getTranslator();
@@ -368,6 +370,7 @@ class LeadController extends FormController
 
         $events = array();
         foreach ($eventsByDate as $eventDate => $dateEvents) {
+
             $datetime = \DateTime::createFromFormat('Y-m-d H:i', $eventDate);
             if ($datetime > $fromDate) {
                 $total++;
@@ -378,7 +381,7 @@ class LeadController extends FormController
             }
             $events = array_merge($events, array_reverse($dateEvents));
         }
-
+       
         $lineChart   = new LineChart(null, $fromDate, $toDate);
         $query       = $lineChart->getChartQuery($this->factory->getEntityManager()->getConnection());
         $engagements = $query->completeTimeData($engagements);

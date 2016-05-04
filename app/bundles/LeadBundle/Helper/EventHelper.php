@@ -11,6 +11,7 @@ namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\UtmTag;
 
 class EventHelper
 {
@@ -46,15 +47,20 @@ class EventHelper
         $leadModel  = $factory->getModel('lead');
         $lead       = $leadModel->getCurrentLead();
         $factory->getLogger()->addError(print_r($config,true));
+        $queryReferrer = array();
 
         if ($factory->getRequest()->server->get('QUERY_STRING')) {
             parse_str($factory->getRequest()->server->get('QUERY_STRING'), $query);
             $referrerURL = $factory->getRequest()->server->get('HTTP_REFERER');
             $pageURI = $factory->getRequest()->server->get('REQUEST_URI');
             $referrerParsedUrl = parse_url($referrerURL);
-            parse_str($referrerParsedUrl['query'],$queryReferrer);
+
+            if(isset($referrerParsedUrl['query'])){
+                parse_str($referrerParsedUrl['query'],$queryReferrer);
+            }
 
             $utmValues = new UtmTag();
+
             if(key_exists('utm_campaign',$queryReferrer)){
                 $utmValues->setUtmCampaign($queryReferrer['utm_campaign']);
             }

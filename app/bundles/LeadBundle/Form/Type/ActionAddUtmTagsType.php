@@ -21,7 +21,7 @@ use Doctrine\ORM\EntityRepository;
  *
  * @package Mautic\LeadBundle\Form\Type
  */
-class FormSubmitActionAddUtmTagsType extends AbstractType
+class ActionAddUtmTagsType extends AbstractType
 {
     private $factory;
 
@@ -39,7 +39,7 @@ class FormSubmitActionAddUtmTagsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        
+
 
     }
 

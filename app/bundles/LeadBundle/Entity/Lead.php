@@ -300,10 +300,14 @@ class Lead extends FormEntity
                 $this->changes['tags']['removed'][] = $val;
             }
         } elseif ($prop == 'utmtags') {
-            if ($val instanceof Tag) {
-                $this->changes['utmtags']['added'][] = $val->getTag();
-            } else {
-                $this->changes['utmtags']['removed'][] = $val;
+
+            if ($val instanceof UtmTag) {
+                if($val->getUtmContent()) $this->changes['utmtags'] = array('utm_content',$val->getUtmContent());
+                if($val->getUtmMedium()) $this->changes['utmtags'] = array('utm_medium',$val->getUtmMedium());
+                if($val->getUtmCampaign()) $this->changes['utmtags'] = array('utm_campaign',$val->getUtmCampaign());
+                if($val->getUtmTerm()) $this->changes['utmtags'] = array('utm_term',$val->getUtmTerm());
+                if($val->getUtmSource()) $this->changes['utmtags'] = array('utm_source',$val->getUtmSource());
+
             }
         } elseif ($this->$getter() != $val) {
             $this->changes[$prop] = array($this->$getter(), $val);
@@ -1041,6 +1045,7 @@ class Lead extends FormEntity
      */
     public function setUtmTags($utmTags)
     {
+        $this->isChanged('utmtags', $utmTags);
         $this->utmtags[] = $utmTags;
 
         return $this;

@@ -224,9 +224,9 @@ return array(
                 'alias'     => 'lead_submitaction_pointschange'
             ),
             'mautic.form.type.lead.submitaction.addutmtags' => array(
-                'class'     => 'Mautic\LeadBundle\Form\Type\FormSubmitActionAddUtmTagsType',
+                'class'     => 'Mautic\LeadBundle\Form\Type\ActionAddUtmTagsType',
                 'arguments' => 'mautic.factory',
-                'alias'     => 'lead_submitaction_addutmtags'
+                'alias'     => 'lead_action_addutmtags'
             ),
             'mautic.form.type.lead.submitaction.changelist'   => array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\EventListType',
