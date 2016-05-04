@@ -73,7 +73,6 @@ return array(
             'items'    => array(
                 'mautic.page.pages' => array(
                     'route' => 'mautic_page_index',
-                    'id'        => 'mautic_page_root',
                     'access'    => array('page:pages:viewown', 'page:pages:viewother'),
                     'parent'    => 'mautic.core.components',
                     'priority'  => 100
