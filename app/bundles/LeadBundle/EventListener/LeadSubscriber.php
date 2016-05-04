@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\UserEvents;
-use Mautic\LeadBundle\Event\LeadTimelineEvent;
+
 
 /**
  * Class LeadSubscriber
@@ -121,20 +121,8 @@ class LeadSubscriber extends CommonSubscriber
 
                 if (!$lead->imported && isset($details["utmtags"])) {
 
-                    $template        = 'MauticLeadBundle:SubscribedEvents\Timeline:utmadded.html.php';
-                    $timeLineEvent = new LeadTimelineEvent($lead);
-                    $timeLineEvent->addEvent(
-                        array(
-                            'event'           => 'lead.utmtagsadded',
-                            'eventLabel'      => 'mautic.lead.event.utmtagsadded',
-                            'timestamp'       => time(),
-                            'extra'           => array(
-                                'log' => $log
-                            ),
-                            'contentTemplate' => $template
-                        )
-                    );
-                    
+                    $utmTagsEvent = new Events\LeadUtmTagsEvent($lead, $details['utmtags']);
+                    $this->dispatcher->dispatch(LeadEvents::LEAD_UTMTAGS_ADD, $utmTagsEvent);
                 }
             }
         }
@@ -212,7 +200,7 @@ class LeadSubscriber extends CommonSubscriber
             'lead.ipadded'    => 'mautic.lead.event.ipadded',
             'lead.utmtagsadded' => 'mautic.lead.event.utmtagsadded'
         );
-
+        $this->factory->getLogger()->addDebug(print_r("generating events", true));
         foreach ($eventTypes as $type => $label) {
             $event->addEventType($type, $this->translator->trans($label));
         }

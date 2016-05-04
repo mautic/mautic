@@ -11,20 +11,19 @@ namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\UtmTag;
 
 /**
  * Class PointsChangeEvent
  *
  * @package Mautic\LeadBundle\Event
  */
-class UtmTagsEvent extends CommonEvent
+class LeadUtmTagsEvent extends CommonEvent
 {
     /**
      * @param Lead $lead
      * @param bool $isNew
      */
-    public function __construct(Lead &$lead, UtmTag $utmTag)
+    public function __construct(Lead &$lead, $utmTag)
     {
         $this->entity =& $lead;
         $this->utmtags = $utmTag;
