@@ -37,7 +37,7 @@ $template = $form['template']->vars['data'];
                     <?php echo $view['form']->row($form['title']); ?>
                 </div>
                 <div class="col-md-6">
-                    <?php if (!isset($form['variantSettings'])): ?>
+                    <?php if (!$isVariant): ?>
                     <?php echo $view['form']->row($form['alias']); ?>
                     <?php else: ?>
                     <?php echo $view['form']->row($form['template']); ?>
@@ -45,7 +45,7 @@ $template = $form['template']->vars['data'];
                 </div>
             </div>
 
-            <?php if (!isset($form['variantSettings'])): ?>
+            <?php if (!$isVariant): ?>
             <div class="row">
                 <div class="col-md-6">
                     <?php echo $view['form']->row($form['template']); ?>
@@ -73,7 +73,7 @@ $template = $form['template']->vars['data'];
     <div class="col-md-3 bg-white height-auto bdr-l">
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php
-            if (isset($form['variantSettings'])):
+            if ($isVariant):
             echo $view['form']->row($form['variantSettings']);
 
             else:
@@ -85,15 +85,20 @@ $template = $form['template']->vars['data'];
             echo $view['form']->row($form['isPublished']);
             echo $view['form']->row($form['publishUp']);
             echo $view['form']->row($form['publishDown']);
+
+            if (!$isVariant):
+            echo $view['form']->row($form['redirectType']);
+            echo $view['form']->row($form['redirectUrl']);
+            endif;
             ?>
 
-            <?php if (isset($form['metaDescription'])): ?>
             <div class="template-fields<?php echo (!$template) ? ' hide"' : ''; ?>">
                 <?php echo $view['form']->row($form['metaDescription']); ?>
             </div>
-            <?php endif; ?>
 
-            <?php echo $view['form']->rest($form); ?>
+            <div class="hide">
+                <?php echo $view['form']->rest($form); ?>
+            </div>
         </div>
     </div>
 </div>
