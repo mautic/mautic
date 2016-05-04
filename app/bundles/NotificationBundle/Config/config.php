@@ -114,9 +114,9 @@ return array(
             )
         )
     ),
-    'categories' => array(
-        'notification' => null
-    ),
+    //'categories' => array(
+    //    'notification' => null
+    //),
     'parameters' => array(
         'notification_enabled' => false,
         'notification_app_id' => null,
