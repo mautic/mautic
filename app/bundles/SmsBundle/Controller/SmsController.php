@@ -214,6 +214,7 @@ class SmsController extends FormController
                     'permissions' => $permissions,
                     'model'       => $model,
                     'security'    => $this->factory->getSecurity(),
+                    'configured'  => $this->factory->getParameter('sms_enabled')
                 ),
                 'contentTemplate' => 'MauticSmsBundle:Sms:list.html.php',
                 'passthroughVars' => array(
@@ -280,7 +281,7 @@ class SmsController extends FormController
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('sms', $sms->getId(), $sms->getDateAdded());
 
         // Get click through stats
-        $trackableLinks = $model->getSmsClickStats($sms->getId());
+        // $trackableLinks = $model->getSmsClickStats($sms->getId());
 
         return $this->delegateView(
             array(
@@ -294,7 +295,7 @@ class SmsController extends FormController
                 'viewParameters'  => array(
                     'sms'   => $sms,
                     'stats'          => $stats,
-                    'trackableLinks' => $trackableLinks,
+                    // 'trackableLinks' => $trackableLinks,
                     'logs'           => $logs,
                     'permissions'    => $security->isGranted(
                         array(
