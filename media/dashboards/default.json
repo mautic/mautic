@@ -4,7 +4,7 @@
     "widgets":
     [
         {
-            "name": "Leads created",
+            "name": "Contacts created",
             "width": 100,
             "height": 330,
             "ordering": 0,
@@ -14,7 +14,7 @@
             }
         },
         {
-            "name": "Lead map",
+            "name": "Contact map",
             "width": 75,
             "height": 445,
             "ordering": 1,

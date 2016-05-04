@@ -329,7 +329,7 @@ class DashboardController extends FormController
         $response->headers->set('Content-Length', strlen($response->getContent()));
         $response->headers->set('Content-Type', 'application/force-download');
         $response->headers->set('Content-Type', 'application/octet-stream');
-        $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'.json"');
+        $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
         $response->headers->set('Expires', 0);
         $response->headers->set('Cache-Control', 'must-revalidate');
         $response->headers->set('Pragma', 'public');
