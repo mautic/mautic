@@ -15,6 +15,7 @@ use Mautic\PointBundle\Entity\Action;
 use Mautic\PointBundle\Entity\LeadPointLog;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Event\PointBuilderEvent;
+use Mautic\PointBundle\Event\PointActionEvent;
 use Mautic\PointBundle\Event\PointEvent;
 use Mautic\PointBundle\PointEvents;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
