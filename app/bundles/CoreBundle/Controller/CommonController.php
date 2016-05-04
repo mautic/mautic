@@ -11,7 +11,7 @@ namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Model\CommonModel;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Debug\Exception\ClassNotFoundException;
 use Symfony\Component\Debug\Exception\FlattenException;
@@ -40,7 +40,7 @@ class CommonController extends Controller implements MauticController
     protected $request;
 
     /**
-     * @var CommonModel[]
+     * @var AbstractCommonModel[]
      */
     protected $modelInstances = [];
 
@@ -76,7 +76,7 @@ class CommonController extends Controller implements MauticController
      *
      * @param $modelNameKey
      *
-     * @return CommonModel
+     * @return AbstractCommonModel
      */
     protected function getModel($modelNameKey)
     {

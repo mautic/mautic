@@ -14,6 +14,7 @@ use Mautic\AssetBundle\Event\AssetEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\Download;
@@ -49,6 +50,11 @@ class AssetModel extends FormModel
     protected $request;
 
     /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
+
+    /**
      * @var int
      */
     protected $maxAssetSize;
@@ -59,12 +65,14 @@ class AssetModel extends FormModel
      * @param LeadModel $leadModel
      * @param CategoryModel $categoryModel
      * @param RequestStack $requestStack
+     * @param IpLookupHelper $ipLookupHelper
      */
-    public function __construct(LeadModel $leadModel, CategoryModel $categoryModel, RequestStack $requestStack)
+    public function __construct(LeadModel $leadModel, CategoryModel $categoryModel, RequestStack $requestStack, IpLookupHelper $ipLookupHelper)
     {
         $this->leadModel = $leadModel;
         $this->categoryModel = $categoryModel;
         $this->request = $requestStack->getCurrentRequest();
+        $this->ipLookupHelper = $ipLookupHelper;
     }
 
     /**
@@ -227,7 +235,7 @@ class AssetModel extends FormModel
         }
 
         //check for existing IP
-        $ipAddress = $this->factory->getIpAddress();
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         $download->setCode($code);
         $download->setIpAddress($ipAddress);

@@ -252,6 +252,16 @@ return array(
                         'security.context'
                     )
                 )
+            ),
+            'mautic.helper.ip_lookup' => array(
+                'class' => 'Mautic\CoreBundle\Helper\IpLookupHelper',
+                'arguments' => array(
+                    'request_stack',
+                    'doctrine.orm.entity_manager',
+                    'mautic.ip_lookup',
+                    '%mautic.do_not_track_ips%',
+                    '%mautic.do_not_track_internal_ips%'
+                )
             )
         ),
         'other'   => array(
