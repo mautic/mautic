@@ -60,8 +60,6 @@ SQL;
         $this->addSql($sql);
 
         $this->addSql("ALTER TABLE {$this->prefix}channel_url_trackables ADD CONSTRAINT {$this->redirectFk} FOREIGN KEY (redirect_id) REFERENCES {$this->prefix}page_redirects (id) ON DELETE CASCADE");
-
-        $this->addSql("CREATE INDEX {$this->prefix}page_redirect_url_search ON {$this->prefix}page_redirects (url)");
     }
 
     /**
@@ -83,8 +81,6 @@ SQL;
         $this->addSql("CREATE INDEX {$this->redirectIdx} ON {$this->prefix}channel_url_trackables (redirect_id)");
         $this->addSql("CREATE INDEX {$this->prefix} ON {$this->prefix}channel_url_trackables (channel, channel_id)");
         $this->addSql("ALTER TABLE {$this->prefix}channel_url_trackables ADD CONSTRAINT {$this->redirectFk} FOREIGN KEY (redirect_id) REFERENCES {$this->prefix}page_redirects (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE");
-
-        $this->addSql("CREATE INDEX {$this->prefix}page_redirect_url_search ON {$this->prefix}page_redirects (url)");
     }
 
     /**
