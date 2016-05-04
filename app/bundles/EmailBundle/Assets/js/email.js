@@ -370,3 +370,30 @@ Mautic.getTotalAttachmentSize = function() {
         mQuery('#attachment-size').text('0');
     }
 };
+
+Mautic.standardEmailUrl = function(options) {
+    if (!options) {
+        return;
+    }
+
+    var url = options.windowUrl;
+    if (url) {
+        var editEmailKey = '/emails/edit/emailId';
+        var previewEmailKey = '/email/preview/emailId';
+        if (url.indexOf(editEmailKey) > -1 ||
+            url.indexOf(previewEmailKey) > -1) {
+            options.windowUrl = url.replace('emailId', mQuery('#campaignevent_properties_email').val());
+        }
+    }
+
+    return options;
+};
+
+Mautic.disabledEmailAction = function() {
+    var email = mQuery('#campaignevent_properties_email').val();
+
+    var disabled = email === '' || email === null;
+
+    mQuery('#campaignevent_properties_editEmailButton').prop('disabled', disabled);
+    mQuery('#campaignevent_properties_previewEmailButton').prop('disabled', disabled);
+};

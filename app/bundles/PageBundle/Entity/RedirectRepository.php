@@ -33,6 +33,9 @@ class RedirectRepository extends CommonRepository
             case 'sms':
                 $column = 'r.sms_id';
                 break;
+            case 'notification':
+                $column = 'r.notification_id';
+                break;
             default:
                 $column = 'r.' . $source;
                 break;

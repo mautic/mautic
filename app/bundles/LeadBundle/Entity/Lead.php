@@ -17,6 +17,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\DoNotEmail;
 use Mautic\UserBundle\Entity\User;
+use Mautic\NotificationBundle\Entity\PushID;
 
 /**
  * Class Lead
@@ -61,6 +62,11 @@ class Lead extends FormEntity
      * @var ArrayCollection
      */
     private $ipAddresses;
+
+    /**
+     * @var ArrayCollection
+     */
+    private $pushIds;
 
     /**
      * @var \DateTime
@@ -186,6 +192,13 @@ class Lead extends FormEntity
             ->cascadeDetach()
             ->build();
 
+        $builder->createOneToMany('pushIds', 'Mautic\NotificationBundle\Entity\PushID')
+            ->orphanRemoval()
+            ->mappedBy('lead')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
+
         $builder->createField('lastActive', 'datetime')
             ->columnName('last_active')
             ->nullable()
@@ -298,6 +311,7 @@ class Lead extends FormEntity
     public function __construct()
     {
         $this->ipAddresses     = new ArrayCollection();
+        $this->pushIds         = new ArrayCollection();
         $this->doNotContact    = new ArrayCollection();
         $this->pointsChangeLog = new ArrayCollection();
         $this->tags            = new ArrayCollection();
@@ -668,6 +682,57 @@ class Lead extends FormEntity
     public function getPointsChangeLog ()
     {
         return $this->pointsChangeLog;
+    }
+
+    /**
+     * @param string $identifier
+     *
+     * @return $this
+     */
+    public function addPushIDEntry($identifier)
+    {
+        /** @var PushID $id */
+        foreach ($this->pushIds as $id) {
+            if ($id->getPushID() === $identifier) {
+                return $this;
+            }
+        }
+
+        $entity = new PushID();
+        $entity->setPushID($identifier);
+        $entity->setLead($this);
+
+        $this->addPushID($entity);
+
+        return $this;
+    }
+
+    /**
+     * @param PushID $pushID
+     *
+     * @return $this
+     */
+    public function addPushID(PushID $pushID)
+    {
+        $this->pushIds[] = $pushID;
+
+        return $this;
+    }
+
+    /**
+     * @param PushID $pushID
+     */
+    public function removePushID(PushID $pushID)
+    {
+        $this->pushIds->removeElement($pushID);
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getPushIDs()
+    {
+        return $this->pushIds;
     }
 
     /**

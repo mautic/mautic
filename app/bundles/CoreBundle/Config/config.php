@@ -110,7 +110,7 @@ return array(
             'mautic.core.configbundle.subscriber' => array(
                 'class' => 'Mautic\CoreBundle\EventListener\ConfigSubscriber'
             ),
-            'mautic.core.js.subscriber'           => array(
+            'mautic.webpush.js.subscriber'           => array(
                 'class' => 'Mautic\CoreBundle\EventListener\BuildJsSubscriber'
             ),
             'mautic.core.dashboard.subscriber'    => array(

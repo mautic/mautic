@@ -7,20 +7,20 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\SmsBundle\Controller;
+namespace Mautic\NotificationBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\SmsBundle\SmsEvents;
-use Mautic\SmsBundle\Event\SmsSendEvent;
-use Mautic\SmsBundle\Entity\Sms;
+use Mautic\NotificationBundle\NotificationEvents;
+use Mautic\NotificationBundle\Event\NotificationSendEvent;
+use Mautic\NotificationBundle\Entity\Notification;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Templating\TemplateNameParser;
 
-class SmsController extends FormController
+class NotificationController extends FormController
 {
 
     /**
@@ -30,26 +30,26 @@ class SmsController extends FormController
      */
     public function indexAction($page = 1)
     {
-        /** @var \Mautic\SmsBundle\Model\SmsModel $model */
-        $model = $this->factory->getModel('sms');
+        /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
+        $model = $this->factory->getModel('notification');
 
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(
             array(
-                'sms:smses:viewown',
-                'sms:smses:viewother',
-                'sms:smses:create',
-                'sms:smses:editown',
-                'sms:smses:editother',
-                'sms:smses:deleteown',
-                'sms:smses:deleteother',
-                'sms:smses:publishown',
-                'sms:smses:publishother'
+                'notification:notifications:viewown',
+                'notification:notifications:viewother',
+                'notification:notifications:create',
+                'notification:notifications:editown',
+                'notification:notifications:editother',
+                'notification:notifications:deleteown',
+                'notification:notifications:deleteother',
+                'notification:notifications:publishown',
+                'notification:notifications:publishother'
             ),
             "RETURN_ARRAY"
         );
 
-        if (!$permissions['sms:smses:viewown'] && !$permissions['sms:smses:viewother']) {
+        if (!$permissions['notification:notifications:viewown'] && !$permissions['notification:notifications:viewother']) {
             return $this->accessDenied();
         }
 
@@ -69,18 +69,18 @@ class SmsController extends FormController
         $listFilters['filters']['groups'] = array();
 
         //set limits
-        $limit = $session->get('mautic.sms.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.notification.limit', $this->factory->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
-        $search  = $this->request->get('search', $session->get('mautic.sms.filter', ''));
+        $search  = $this->request->get('search', $session->get('mautic.notification.filter', ''));
         $session->set('mautic.email.filter', $search);
 
         $filter = array('string' => $search);
 
-        if (!$permissions['sms:smses:viewother']) {
+        if (!$permissions['notification:notifications:viewother']) {
             $filter['force'][] =
                 array('column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
         }
@@ -103,7 +103,7 @@ class SmsController extends FormController
             'prefix'   => 'theme'
         );
 
-        $currentFilters = $session->get('mautic.sms.list_filters', array());
+        $currentFilters = $session->get('mautic.notification.list_filters', array());
         $updatedFilters = $this->request->get('filters', false);
 
         if ($updatedFilters) {
@@ -125,7 +125,7 @@ class SmsController extends FormController
                 $currentFilters = array();
             }
         }
-        $session->set('mautic.sms.list_filters', $currentFilters);
+        $session->set('mautic.notification.list_filters', $currentFilters);
 
         if (!empty($currentFilters)) {
             $listIds = $catIds = array();
@@ -162,10 +162,10 @@ class SmsController extends FormController
             }
         }
 
-        $orderBy    = $session->get('mautic.sms.orderby', 'e.name');
-        $orderByDir = $session->get('mautic.sms.orderbydir', 'DESC');
+        $orderBy    = $session->get('mautic.notification.orderby', 'e.name');
+        $orderByDir = $session->get('mautic.notification.orderbydir', 'DESC');
 
-        $smss = $model->getEntities(
+        $notifications = $model->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -175,7 +175,7 @@ class SmsController extends FormController
             )
         );
 
-        $count = count($smss);
+        $count = count($notifications);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
             if ($count === 1) {
@@ -184,29 +184,29 @@ class SmsController extends FormController
                 $lastPage = (floor($count / $limit)) ?: 1;
             }
 
-            $session->set('mautic.sms.page', $lastPage);
-            $returnUrl = $this->generateUrl('mautic_sms_index', array('page' => $lastPage));
+            $session->set('mautic.notification.page', $lastPage);
+            $returnUrl = $this->generateUrl('mautic_notification_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(
                 array(
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => array('page' => $lastPage),
-                    'contentTemplate' => 'MauticSmsBundle:Sms:index',
+                    'contentTemplate' => 'MauticNotificationBundle:Notification:index',
                     'passthroughVars' => array(
-                        'activeLink'    => '#mautic_sms_index',
-                        'mauticContent' => 'sms'
+                        'activeLink'    => '#mautic_notification_index',
+                        'mauticContent' => 'notification'
                     )
                 )
             );
         }
-        $session->set('mautic.sms.page', $page);
+        $session->set('mautic.notification.page', $page);
 
         return $this->delegateView(
             array(
                 'viewParameters'  =>  array(
                     'searchValue' => $search,
                     'filters'     => $listFilters,
-                    'items'       => $smss,
+                    'items'       => $notifications,
                     'totalItems'  => $count,
                     'page'        => $page,
                     'limit'       => $limit,
@@ -214,13 +214,12 @@ class SmsController extends FormController
                     'permissions' => $permissions,
                     'model'       => $model,
                     'security'    => $this->factory->getSecurity(),
-                    'configured'  => $this->factory->getParameter('sms_enabled')
                 ),
-                'contentTemplate' => 'MauticSmsBundle:Sms:list.html.php',
+                'contentTemplate' => 'MauticNotificationBundle:Notification:list.html.php',
                 'passthroughVars' => array(
-                    'activeLink'    => '#mautic_sms_index',
-                    'mauticContent' => 'sms',
-                    'route'         => $this->generateUrl('mautic_sms_index', array('page' => $page))
+                    'activeLink'    => '#mautic_notification_index',
+                    'mauticContent' => 'notification',
+                    'route'         => $this->generateUrl('mautic_notification_index', array('page' => $page))
                 )
             )
         );
@@ -235,88 +234,88 @@ class SmsController extends FormController
      */
     public function viewAction($objectId)
     {
-        /** @var \Mautic\SmsBundle\Model\SmsModel $model */
-        $model    = $this->factory->getModel('sms');
+        /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
+        $model    = $this->factory->getModel('notification');
         $security = $this->factory->getSecurity();
 
-        /** @var \Mautic\SmsBundle\Entity\Sms $sms */
-        $sms = $model->getEntity($objectId);
+        /** @var \Mautic\NotificationBundle\Entity\Notification $notification */
+        $notification = $model->getEntity($objectId);
         //set the page we came from
-        $page = $this->factory->getSession()->get('mautic.sms.page', 1);
+        $page = $this->factory->getSession()->get('mautic.notification.page', 1);
 
-        if ($sms === null) {
+        if ($notification === null) {
             //set the return URL
-            $returnUrl = $this->generateUrl('mautic_sms_index', array('page' => $page));
+            $returnUrl = $this->generateUrl('mautic_notification_index', array('page' => $page));
 
             return $this->postActionRedirect(
                 array(
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => array('page' => $page),
-                    'contentTemplate' => 'MauticSmsBundle:Sms:index',
+                    'contentTemplate' => 'MauticNotificationBundle:Notification:index',
                     'passthroughVars' => array(
-                        'activeLink'    => '#mautic_sms_index',
-                        'mauticContent' => 'sms'
+                        'activeLink'    => '#mautic_notification_index',
+                        'mauticContent' => 'notification'
                     ),
                     'flashes'         => array(
                         array(
                             'type'    => 'error',
-                            'msg'     => 'mautic.sms.error.notfound',
+                            'msg'     => 'mautic.notification.error.notfound',
                             'msgVars' => array('%id%' => $objectId)
                         )
                     )
                 )
             );
         } elseif (!$this->factory->getSecurity()->hasEntityAccess(
-            'sms:smses:viewown',
-            'sms:smses:viewother',
-            $sms->getCreatedBy()
+            'notification:notifications:viewown',
+            'notification:notifications:viewother',
+            $notification->getCreatedBy()
         )
         ) {
             return $this->accessDenied();
         }
 
-        $stats = $model->getSmsGeneralStats($sms);
+        $stats = $model->getNotificationGeneralStats($notification);
 
         // Audit Log
-        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('sms', $sms->getId(), $sms->getDateAdded());
+        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('notification', $notification->getId(), $notification->getDateAdded());
 
         // Get click through stats
-        // $trackableLinks = $model->getSmsClickStats($sms->getId());
+        $trackableLinks = $model->getNotificationClickStats($notification->getId());
 
         return $this->delegateView(
             array(
                 'returnUrl'       => $this->generateUrl(
-                    'mautic_sms_action',
+                    'mautic_notification_action',
                     array(
                         'objectAction' => 'view',
-                        'objectId'     => $sms->getId()
+                        'objectId'     => $notification->getId()
                     )
                 ),
                 'viewParameters'  => array(
-                    'sms'   => $sms,
+                    'notification'   => $notification,
                     'stats'          => $stats,
-                    // 'trackableLinks' => $trackableLinks,
+                    'trackableLinks' => $trackableLinks,
                     'logs'           => $logs,
                     'permissions'    => $security->isGranted(
                         array(
-                            'sms:smses:viewown',
-                            'sms:smses:viewother',
-                            'sms:smses:create',
-                            'sms:smses:editown',
-                            'sms:smses:editother',
-                            'sms:smses:deleteown',
-                            'sms:smses:deleteother',
-                            'sms:smses:publishown',
-                            'sms:smses:publishother'
+                            'notification:notifications:viewown',
+                            'notification:notifications:viewother',
+                            'notification:notifications:create',
+                            'notification:notifications:editown',
+                            'notification:notifications:editother',
+                            'notification:notifications:deleteown',
+                            'notification:notifications:deleteother',
+                            'notification:notifications:publishown',
+                            'notification:notifications:publishother'
                         ),
                         "RETURN_ARRAY"
                     ),
-                    'security'    => $security
+                    'security'       => $security
                 ),
-                'contentTemplate' => 'MauticSmsBundle:Sms:details.html.php',
+                'contentTemplate' => 'MauticNotificationBundle:Notification:details.html.php',
                 'passthroughVars' => array(
-                    'activeLink'    => '#mautic_sms_index',
-                    'mauticContent' => 'sms'
+                    'activeLink'    => '#mautic_notification_index',
+                    'mauticContent' => 'notification'
                 )
             )
         );
@@ -325,37 +324,37 @@ class SmsController extends FormController
     /**
      * Generates new form and processes post data
      *
-     * @param  Sms $entity
+     * @param  Notification $entity
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function newAction($entity = null)
     {
-        /** @var \Mautic\SmsBundle\Model\SmsModel $model */
-        $model = $this->factory->getModel('sms');
+        /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
+        $model = $this->factory->getModel('notification');
 
-        if (! $entity instanceof Sms) {
-            /** @var \Mautic\SmsBundle\Entity\Sms $entity */
+        if (! $entity instanceof Notification) {
+            /** @var \Mautic\NotificationBundle\Entity\Notification $entity */
             $entity  = $model->getEntity();
         }
 
         $method  = $this->request->getMethod();
         $session = $this->factory->getSession();
 
-        if (!$this->factory->getSecurity()->isGranted('sms:smses:create')) {
+        if (!$this->factory->getSecurity()->isGranted('notification:notifications:create')) {
             return $this->accessDenied();
         }
 
         //set the page we came from
-        $page   = $session->get('mautic.sms.page', 1);
-        $action = $this->generateUrl('mautic_sms_action', array('objectAction' => 'new'));
+        $page   = $session->get('mautic.notification.page', 1);
+        $action = $this->generateUrl('mautic_notification_action', array('objectAction' => 'new'));
 
         $updateSelect = ($method == 'POST')
-            ? $this->request->request->get('sms[updateSelect]', false, true)
+            ? $this->request->request->get('notification[updateSelect]', false, true)
             : $this->request->get('updateSelect', false);
 
         if ($updateSelect) {
-            $entity->setSmsType('template');
+            $entity->setNotificationType('template');
         }
 
         //create the form
@@ -373,9 +372,9 @@ class SmsController extends FormController
                         'mautic.core.notice.created',
                         array(
                             '%name%'      => $entity->getName(),
-                            '%menu_link%' => 'mautic_sms_index',
+                            '%menu_link%' => 'mautic_notification_index',
                             '%url%'       => $this->generateUrl(
-                                'mautic_sms_action',
+                                'mautic_notification_action',
                                 array(
                                     'objectAction' => 'edit',
                                     'objectId'     => $entity->getId()
@@ -389,8 +388,8 @@ class SmsController extends FormController
                             'objectAction' => 'view',
                             'objectId'     => $entity->getId()
                         );
-                        $returnUrl      = $this->generateUrl('mautic_sms_action', $viewParameters);
-                        $template       = 'MauticSmsBundle:Sms:view';
+                        $returnUrl      = $this->generateUrl('mautic_notification_action', $viewParameters);
+                        $template       = 'MauticNotificationBundle:Notification:view';
                     } else {
                         //return edit view so that all the session stuff is loaded
                         return $this->editAction($entity->getId(), true);
@@ -398,15 +397,15 @@ class SmsController extends FormController
                 }
             } else {
                 $viewParameters = array('page' => $page);
-                $returnUrl      = $this->generateUrl('mautic_sms_index', $viewParameters);
-                $template       = 'MauticSmsBundle:Sms:index';
+                $returnUrl      = $this->generateUrl('mautic_notification_index', $viewParameters);
+                $template       = 'MauticNotificationBundle:Notification:index';
                 //clear any modified content
-                $session->remove('mautic.sms.'.$entity->getSessionId().'.content');
+                $session->remove('mautic.notification.'.$entity->getSessionId().'.content');
             }
 
             $passthrough = array(
-                'activeLink'    => 'mautic_sms_index',
-                'mauticContent' => 'sms'
+                'activeLink'    => 'mautic_notification_index',
+                'mauticContent' => 'notification'
             );
 
             // Check to see if this is a popup
@@ -416,9 +415,9 @@ class SmsController extends FormController
                     $passthrough,
                     array(
                         'updateSelect' => $form['updateSelect']->getData(),
-                        'smsId'    => $entity->getId(),
-                        'smsName'  => $entity->getName(),
-                        'smsLang'  => $entity->getLanguage()
+                        'notificationId'    => $entity->getId(),
+                        'notificationName' => $entity->getName(),
+                        'notificationLang'  => $entity->getLanguage()
                     )
                 );
             }
@@ -438,16 +437,16 @@ class SmsController extends FormController
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
-                    'form'                => $this->setFormTheme($form, 'MauticSmsBundle:Sms:form.html.php', 'MauticSmsBundle:FormTheme\Sms'),
-                    'sms'        => $entity
+                    'form'                => $this->setFormTheme($form, 'MauticNotificationBundle:Notification:form.html.php', 'MauticNotificationBundle:FormTheme\Notification'),
+                    'notification'        => $entity
                 ),
-                'contentTemplate' => 'MauticSmsBundle:Sms:form.html.php',
+                'contentTemplate' => 'MauticNotificationBundle:Notification:form.html.php',
                 'passthroughVars' => array(
-                    'activeLink'    => '#mautic_sms_index',
-                    'mauticContent' => 'sms',
+                    'activeLink'    => '#mautic_notification_index',
+                    'mauticContent' => 'notification',
                     'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect')),
                     'route'         => $this->generateUrl(
-                        'mautic_sms_action',
+                        'mautic_notification_action',
                         array(
                             'objectAction' => 'new'
                         )
@@ -466,23 +465,23 @@ class SmsController extends FormController
      */
     public function editAction($objectId, $ignorePost = false, $forceTypeSelection = false)
     {
-        /** @var \Mautic\SmsBundle\Model\SmsModel $model */
-        $model = $this->factory->getModel('sms');
+        /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
+        $model = $this->factory->getModel('notification');
         $method  = $this->request->getMethod();
         $entity  = $model->getEntity($objectId);
         $session = $this->factory->getSession();
-        $page    = $this->factory->getSession()->get('mautic.sms.page', 1);
+        $page    = $this->factory->getSession()->get('mautic.notification.page', 1);
 
         //set the return URL
-        $returnUrl = $this->generateUrl('mautic_sms_index', array('page' => $page));
+        $returnUrl = $this->generateUrl('mautic_notification_index', array('page' => $page));
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
             'viewParameters'  => array('page' => $page),
-            'contentTemplate' => 'MauticSmsBundle:Sms:index',
+            'contentTemplate' => 'MauticNotificationBundle:Notification:index',
             'passthroughVars' => array(
-                'activeLink'    => 'mautic_sms_index',
-                'mauticContent' => 'sms'
+                'activeLink'    => 'mautic_notification_index',
+                'mauticContent' => 'notification'
             )
         );
 
@@ -495,7 +494,7 @@ class SmsController extends FormController
                         'flashes' => array(
                             array(
                                 'type'    => 'error',
-                                'msg'     => 'mautic.sms.error.notfound',
+                                'msg'     => 'mautic.notification.error.notfound',
                                 'msgVars' => array('%id%' => $objectId)
                             )
                         )
@@ -503,8 +502,8 @@ class SmsController extends FormController
                 )
             );
         } elseif (!$this->factory->getSecurity()->hasEntityAccess(
-            'sms:smses:viewown',
-            'sms:smses:viewother',
+            'notification:notifications:viewown',
+            'notification:notifications:viewother',
             $entity->getCreatedBy()
         )
         ) {
@@ -515,13 +514,13 @@ class SmsController extends FormController
         }
 
         //Create the form
-        $action = $this->generateUrl('mautic_sms_action', array('objectAction' => 'edit', 'objectId' => $objectId));
+        $action = $this->generateUrl('mautic_notification_action', array('objectAction' => 'edit', 'objectId' => $objectId));
 
         $updateSelect = ($method == 'POST')
-            ? $this->request->request->get('sms[updateSelect]', false, true)
+            ? $this->request->request->get('notification[updateSelect]', false, true)
             : $this->request->get('updateSelect', false);
 
-        $form = $model->createForm($entity, $this->get('form.factory'), $action, array('update_select' => $updateSelect));
+        $form   = $model->createForm($entity, $this->get('form.factory'), $action, array('update_select' => $updateSelect));
 
         ///Check for a submitted form and process it
         if (!$ignorePost && $method == 'POST') {
@@ -535,9 +534,9 @@ class SmsController extends FormController
                         'mautic.core.notice.updated',
                         array(
                             '%name%'      => $entity->getName(),
-                            '%menu_link%' => 'mautic_sms_index',
+                            '%menu_link%' => 'mautic_notification_index',
                             '%url%'       => $this->generateUrl(
-                                'mautic_sms_action',
+                                'mautic_notification_action',
                                 array(
                                     'objectAction' => 'edit',
                                     'objectId'     => $entity->getId()
@@ -549,17 +548,16 @@ class SmsController extends FormController
                 }
             } else {
                 //clear any modified content
-                $session->remove('mautic.sms.'.$objectId.'.content');
+                $session->remove('mautic.notification.'.$objectId.'.content');
                 //unlock the entity
                 $model->unlockEntity($entity);
             }
 
+            $template    = 'MauticNotificationBundle:Notification:view';
             $passthrough = array(
-                'activeLink'    => 'mautic_sms_index',
-                'mauticContent' => 'sms'
+                'activeLink'    => 'mautic_notification_index',
+                'mauticContent' => 'notification'
             );
-
-            $template = 'MauticSmsBundle:Sms:view';
 
             // Check to see if this is a popup
             if (isset($form['updateSelect'])) {
@@ -567,10 +565,10 @@ class SmsController extends FormController
                 $passthrough = array_merge(
                     $passthrough,
                     array(
-                        'updateSelect' => $form['updateSelect']->getData(),
-                        'smsId'    => $entity->getId(),
-                        'smsName' => $entity->getName(),
-                        'smsLang'  => $entity->getLanguage()
+                        'updateSelect'      => $form['updateSelect']->getData(),
+                        'notificationId'    => $entity->getId(),
+                        'notificationTitle' => $entity->getTitle(),
+                        'notificationLang'  => $entity->getLanguage()
                     )
                 );
             }
@@ -584,7 +582,7 @@ class SmsController extends FormController
                     array_merge(
                         $postActionVars,
                         array(
-                            'returnUrl'       => $this->generateUrl('mautic_sms_action', $viewParameters),
+                            'returnUrl'       => $this->generateUrl('mautic_notification_action', $viewParameters),
                             'viewParameters'  => $viewParameters,
                             'contentTemplate' => $template,
                             'passthroughVars' => $passthrough
@@ -600,17 +598,17 @@ class SmsController extends FormController
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
-                    'form'               => $this->setFormTheme($form, 'MauticSmsBundle:Sms:form.html.php', 'MauticSmsBundle:FormTheme\Sms'),
-                    'sms'       => $entity,
+                    'form'               => $this->setFormTheme($form, 'MauticNotificationBundle:Notification:form.html.php', 'MauticNotificationBundle:FormTheme\Notification'),
+                    'notification'       => $entity,
                     'forceTypeSelection' => $forceTypeSelection
                 ),
-                'contentTemplate' => 'MauticSmsBundle:Sms:form.html.php',
+                'contentTemplate' => 'MauticNotificationBundle:Notification:form.html.php',
                 'passthroughVars' => array(
-                    'activeLink'    => '#mautic_sms_index',
-                    'mauticContent' => 'sms',
+                    'activeLink'    => '#mautic_notification_index',
+                    'mauticContent' => 'notification',
                     'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect')),
                     'route'         => $this->generateUrl(
-                        'mautic_sms_action',
+                        'mautic_notification_action',
                         array(
                             'objectAction' => 'edit',
                             'objectId'     => $entity->getId()
@@ -630,14 +628,14 @@ class SmsController extends FormController
      */
     public function cloneAction($objectId)
     {
-        $model  = $this->factory->getModel('sms');
+        $model  = $this->factory->getModel('notification');
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
-            if (!$this->factory->getSecurity()->isGranted('sms:smses:create')
+            if (!$this->factory->getSecurity()->isGranted('notification:notifications:create')
                 || !$this->factory->getSecurity()->hasEntityAccess(
-                    'sms:smses:viewown',
-                    'sms:smses:viewother',
+                    'notification:notifications:viewown',
+                    'notification:notifications:viewother',
                     $entity->getCreatedBy()
                 )
             ) {
@@ -646,7 +644,7 @@ class SmsController extends FormController
 
             $entity      = clone $entity;
             $session     = $this->factory->getSession();
-            $contentName = 'mautic.sms.'.$entity->getSessionId().'.content';
+            $contentName = 'mautic.notification.'.$entity->getSessionId().'.content';
 
             $session->set($contentName, $entity->getContent());
         }
@@ -663,39 +661,39 @@ class SmsController extends FormController
      */
     public function deleteAction($objectId)
     {
-        $page      = $this->factory->getSession()->get('mautic.sms.page', 1);
-        $returnUrl = $this->generateUrl('mautic_sms_index', array('page' => $page));
+        $page      = $this->factory->getSession()->get('mautic.notification.page', 1);
+        $returnUrl = $this->generateUrl('mautic_notification_index', array('page' => $page));
         $flashes   = array();
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
             'viewParameters'  => array('page' => $page),
-            'contentTemplate' => 'MauticSmsBundle:Sms:index',
+            'contentTemplate' => 'MauticNotificationBundle:Notification:index',
             'passthroughVars' => array(
-                'activeLink'    => 'mautic_sms_index',
-                'mauticContent' => 'sms'
+                'activeLink'    => 'mautic_notification_index',
+                'mauticContent' => 'notification'
             )
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->factory->getModel('sms');
+            $model  = $this->factory->getModel('notification');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
                 $flashes[] = array(
                     'type'    => 'error',
-                    'msg'     => 'mautic.sms.error.notfound',
+                    'msg'     => 'mautic.notification.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
             } elseif (!$this->factory->getSecurity()->hasEntityAccess(
-                'sms:smses:deleteown',
-                'sms:smses:deleteother',
+                'notification:notifications:deleteown',
+                'notification:notifications:deleteother',
                 $entity->getCreatedBy()
             )
             ) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
-                return $this->isLocked($postActionVars, $entity, 'sms');
+                return $this->isLocked($postActionVars, $entity, 'notification');
             }
 
             $model->deleteEntity($entity);
@@ -704,7 +702,7 @@ class SmsController extends FormController
                 'type'    => 'notice',
                 'msg'     => 'mautic.core.notice.deleted',
                 'msgVars' => array(
-                    '%name%' => $entity->getTitle(),
+                    '%name%' => $entity->getName(),
                     '%id%'   => $objectId
                 )
             );
@@ -727,22 +725,22 @@ class SmsController extends FormController
      */
     public function batchDeleteAction()
     {
-        $page      = $this->factory->getSession()->get('mautic.sms.page', 1);
-        $returnUrl = $this->generateUrl('mautic_sms_index', array('page' => $page));
+        $page      = $this->factory->getSession()->get('mautic.notification.page', 1);
+        $returnUrl = $this->generateUrl('mautic_notification_index', array('page' => $page));
         $flashes   = array();
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
             'viewParameters'  => array('page' => $page),
-            'contentTemplate' => 'MauticSmsBundle:Sms:index',
+            'contentTemplate' => 'MauticNotificationBundle:Notification:index',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_sms_index',
-                'mauticContent' => 'sms'
+                'activeLink'    => '#mautic_notification_index',
+                'mauticContent' => 'notification'
             )
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model     = $this->factory->getModel('sms');
+            $model     = $this->factory->getModel('notification');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
 
             $deleteIds = array();
@@ -754,18 +752,18 @@ class SmsController extends FormController
                 if ($entity === null) {
                     $flashes[] = array(
                         'type'    => 'error',
-                        'msg'     => 'mautic.sms.error.notfound',
+                        'msg'     => 'mautic.notification.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     );
                 } elseif (!$this->factory->getSecurity()->hasEntityAccess(
-                    'sms:smses:viewown',
-                    'sms:smses:viewother',
+                    'notification:notifications:viewown',
+                    'notification:notifications:viewother',
                     $entity->getCreatedBy()
                 )
                 ) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
-                    $flashes[] = $this->isLocked($postActionVars, $entity, 'sms', true);
+                    $flashes[] = $this->isLocked($postActionVars, $entity, 'notification', true);
                 } else {
                     $deleteIds[] = $objectId;
                 }
@@ -777,7 +775,7 @@ class SmsController extends FormController
 
                 $flashes[] = array(
                     'type'    => 'notice',
-                    'msg'     => 'mautic.sms.notice.batch_deleted',
+                    'msg'     => 'mautic.notification.notice.batch_deleted',
                     'msgVars' => array(
                         '%count%' => count($entities)
                     )
@@ -802,14 +800,14 @@ class SmsController extends FormController
      */
     public function previewAction($objectId)
     {
-        /** @var \Mautic\SmsBundle\Model\SmsModel $model */
-        $model = $this->factory->getModel('sms');
-        $sms = $model->getEntity($objectId);
+        /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
+        $model = $this->factory->getModel('notification');
+        $notification = $model->getEntity($objectId);
 
-        if ($sms != null
+        if ($notification != null
             && $this->factory->getSecurity()->hasEntityAccess(
-                'sms:smses:editown',
-                'sms:smses:editother'
+                'notification:notifications:editown',
+                'notification:notifications:editother'
             )
         ) {
 
@@ -818,9 +816,9 @@ class SmsController extends FormController
         return $this->delegateView(
             array(
                 'viewParameters' => array(
-                    'sms' => $sms
+                    'notification' => $notification
                 ),
-                'contentTemplate' => 'MauticSmsBundle:Sms:preview.html.php'
+                'contentTemplate' => 'MauticNotificationBundle:Notification:preview.html.php'
             )
         );
     }

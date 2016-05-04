@@ -1,14 +1,14 @@
-/** SmsBundle **/
-Mautic.smsOnLoad = function (container, response) {
+/** NotificationBundle **/
+Mautic.notificationOnLoad = function (container, response) {
     if (response && response.updateSelect) {
-        //added sms through a popup
-        var newOption = mQuery('<option />').val(response.smsId);
-        newOption.html(response.smsName);
+        //added notification through a popup
+        var newOption = mQuery('<option />').val(response.notificationId);
+        newOption.html(response.notificationName);
 
         var opener = window.opener;
         if(opener) {
             var el = '#' + response.updateSelect;
-            var optgroup = el + " optgroup[label=" + response.smsLang + "]";
+            var optgroup = el + " optgroup[label=" + response.notificationLang + "]";
             if (opener.mQuery(optgroup).length) {
                 // update option when new option equal with option item in group.
                 var firstOptionGroups = opener.mQuery(el + ' optgroup');
@@ -16,8 +16,8 @@ Mautic.smsOnLoad = function (container, response) {
                 firstOptionGroups.each(function() {
                     var firstOptions = mQuery(this).children();
                     for (var i = 0; i < firstOptions.length; i++) {
-                        if (firstOptions[i].value === response.smsId.toString()) {
-                            firstOptions[i].text = response.smsName;
+                        if (firstOptions[i].value === response.notificationId.toString()) {
+                            firstOptions[i].text = response.notificationName;
                             isUpdateOption = true;
                             break;
                         }
@@ -30,7 +30,7 @@ Mautic.smsOnLoad = function (container, response) {
                 }
             } else {
                 //create the optgroup
-                var newOptgroup = mQuery('<optgroup label="' + response.smsLang + '" />');
+                var newOptgroup = mQuery('<optgroup label="' + response.notificationLang + '" />');
                 newOption.appendTo(newOptgroup);
                 opener.mQuery(newOptgroup).appendTo(opener.mQuery(el));
             }
@@ -80,35 +80,35 @@ Mautic.smsOnLoad = function (container, response) {
 
         window.close();
     } else if (mQuery(container + ' #list-search').length) {
-        Mautic.activateSearchAutocomplete('list-search', 'sms');
+        Mautic.activateSearchAutocomplete('list-search', 'notification');
     }
 };
 
-Mautic.selectSmsType = function(smsType) {
-    if (smsType == 'list') {
+Mautic.selectNotificationType = function(notificationType) {
+    if (notificationType == 'list') {
         mQuery('#leadList').removeClass('hide');
         mQuery('#publishStatus').addClass('hide');
-        mQuery('.page-header h3').text(mauticLang.newListSms);
+        mQuery('.page-header h3').text(mauticLang.newListNotification);
     } else {
         mQuery('#publishStatus').removeClass('hide');
         mQuery('#leadList').addClass('hide');
-        mQuery('.page-header h3').text(mauticLang.newTemplateSms);
+        mQuery('.page-header h3').text(mauticLang.newTemplateNotification);
     }
 
-    mQuery('#sms_smsType').val(smsType);
+    mQuery('#notification_notificationType').val(notificationType);
 
     mQuery('body').removeClass('noscroll');
 
-    mQuery('.sms-type-modal').remove();
-    mQuery('.sms-type-modal-backdrop').remove();
+    mQuery('.notification-type-modal').remove();
+    mQuery('.notification-type-modal-backdrop').remove();
 };
 
-Mautic.loadNewSmsWindow = function(options) {
+Mautic.loadNewNotificationWindow = function(options) {
     if (options.windowUrl) {
         Mautic.startModalLoadingBar();
 
         setTimeout(function() {
-            var generator = window.open(options.windowUrl, 'newsmswindow', 'height=600,width=530');
+            var generator = window.open(options.windowUrl, 'newnotificationwindow', 'height=600,width=530');
 
             if (!generator || generator.closed || typeof generator.closed == 'undefined') {
                 alert(response.popupBlockerMessage);
@@ -122,26 +122,29 @@ Mautic.loadNewSmsWindow = function(options) {
     }
 };
 
-Mautic.standardSmsUrl = function(options) {
+Mautic.standardNotificationUrl = function(options) {
     if (!options) {
         return;
     }
 
     var url = options.windowUrl;
     if (url) {
-        var editEmailKey = '/sms/edit/smsId';
-        if (url.indexOf(editEmailKey) > -1) {
-            options.windowUrl = url.replace('smsId', mQuery('#campaignevent_properties_sms').val());
+        var editEmailKey = '/notifications/edit/notificationId';
+        var previewEmailKey = '/notifications/preview/notificationId';
+        if (url.indexOf(editEmailKey) > -1 ||
+            url.indexOf(previewEmailKey) > -1) {
+            options.windowUrl = url.replace('notificationId', mQuery('#campaignevent_properties_notification').val());
         }
     }
 
     return options;
 };
 
-Mautic.disabledSmsAction = function() {
-    var sms = mQuery('#campaignevent_properties_sms').val();
+Mautic.disabledNotificationAction = function() {
+    var email = mQuery('#campaignevent_properties_notification').val();
 
-    var disabled = sms === '' || sms === null;
+    var disabled = email === '' || email === null;
 
-    mQuery('#campaignevent_properties_editSmsButton').prop('disabled', disabled);
+    mQuery('#campaignevent_properties_editNotificationButton').prop('disabled', disabled);
+    mQuery('#campaignevent_properties_previewNotificationButton').prop('disabled', disabled);
 };
