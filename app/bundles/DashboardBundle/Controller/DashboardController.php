@@ -33,7 +33,7 @@ class DashboardController extends FormController
 
         // Apply the default dashboard if no widget exists
         if (!count($widgets)) {
-            return $this->applyDashboardFileAction('default.json');
+            return $this->applyDashboardFileAction('global.default');
         }
 
         $humanFormat     = 'M j, Y';
@@ -281,7 +281,7 @@ class DashboardController extends FormController
         $widgetsPaginator = $model->getWidgets();
         $usersName        = $this->factory->getUser()->getName();
         $dateTime         = new \DateTime;
-        $dateStamp        = $dateTime->format('Y-m-dTH:i:s');
+        $dateStamp        = $dateTime->format('Y-m-d H:i:s');
         $name             = $this->request->get(
             'name',
             'dashboard-of-'.str_replace(' ', '-', $usersName).'-'. $dateStamp
@@ -314,7 +314,15 @@ class DashboardController extends FormController
         }
 
         // Make the filename safe
-        $filename = InputHelper::alphanum($name, false, '_');
+        $filename = InputHelper::alphanum($name, false, '_'). '.json';
+
+        if ($this->request->get('save', false)) {
+            // Save to the user's folder
+            $dir = $this->factory->getSystemPath('dashboard.user');
+            file_put_contents($dir . '/' . $filename, json_encode($dashboard));
+
+            return $this->redirect($this->get('router')->generate('mautic_dashboard_action', array('objectAction' => 'import')));
+        }
 
         $response = new JsonResponse($dashboard);
         $response->setEncodingOptions($response->getEncodingOptions() | JSON_PRETTY_PRINT);
@@ -337,14 +345,20 @@ class DashboardController extends FormController
     public function deleteDashboardFileAction()
     {
         $file = $this->request->get('file');
-        $dir  = $this->factory->getSystemPath('dashboard');
-        $path = $dir . '/' . $file;
+
+        $parts = explode('.', $file);
+        $type  = array_shift($parts);
+        $name  = implode('.', $parts);
+
+        $dir  = $this->factory->getSystemPath("dashboard.$type");
+        $path = $dir.'/'.$name.'.json';
+
 
         if (file_exists($path) && is_writable($path)) {
             unlink($path);
         }
 
-        return $this->importAction();
+        return $this->redirect($this->generateUrl('mautic_dashboard_action', array('objectAction' => 'import')));
     }
 
     /**
@@ -360,8 +374,12 @@ class DashboardController extends FormController
             $file = $this->request->get('file');
         }
 
-        $dir = $this->factory->getSystemPath('dashboard');
-        $path = $dir . '/' . $file;
+        $parts = explode('.', $file);
+        $type  = array_shift($parts);
+        $name  = implode('.', $parts);
+
+        $dir  = $this->factory->getSystemPath("dashboard.$type");
+        $path = $dir . '/' . $name . '.json';
 
         if (file_exists($path) && is_writable($path)) {
             $widgets = json_decode(file_get_contents($path), true);
@@ -387,11 +405,11 @@ class DashboardController extends FormController
                     $model->saveEntity($widget);
                 }
 
-                return $this->indexAction();
+                return $this->redirect($this->get('router')->generate('mautic_dashboard_index'));
             }
         }
 
-        return $this->importAction();
+        return $this->redirect($this->generateUrl('mautic_dashboard_action', array('objectAction' => 'import')));
     }
 
     /**
@@ -403,7 +421,11 @@ class DashboardController extends FormController
 
         /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
         $model = $this->factory->getModel('dashboard');
-        $dir   = $this->factory->getSystemPath('dashboard');
+
+        $directories = array(
+            'user'   => $this->factory->getSystemPath('dashboard.user'),
+            'global' => $this->factory->getSystemPath('dashboard.global')
+        );
 
         $action = $this->generateUrl('mautic_dashboard_action', array('objectAction' => 'import'));
         $form   = $this->get('form.factory')->create('dashboard_upload', array(), array('action' => $action));
@@ -413,13 +435,7 @@ class DashboardController extends FormController
                 if ($this->isFormValid($form)) {
                     $fileData = $form['file']->getData();
                     if (!empty($fileData)) {
-
-                        // @todo check is_writable
-                        if (!is_dir($dir) && !file_exists($dir)) {
-                            mkdir($dir);
-                        }
-
-                        $fileData->move($dir, $fileData->getClientOriginalName());
+                        $fileData->move($directories['user'], $fileData->getClientOriginalName());
                     } else {
                         $form->addError(
                             new FormError(
@@ -434,11 +450,6 @@ class DashboardController extends FormController
         $dashboardFiles = array();
         $dashboards     = array();
 
-        $directories = array(
-            'user'   => $dir,
-            'global' => $dir . '/../'
-        );
-
         // User specific layouts
         chdir($directories['user']);
         $dashboardFiles['user'] = glob('*.json');
@@ -450,7 +461,8 @@ class DashboardController extends FormController
         foreach ($dashboardFiles as $type => $dirDashboardFiles) {
             $tempDashboard = array();
             foreach ($dirDashboardFiles as $dashId => $dashboard) {
-                $config = json_decode(
+                $dashboard = str_replace('.json', '', $dashboard);
+                $config    = json_decode(
                     file_get_contents($directories[$type].'/'.$dirDashboardFiles[$dashId]),
                     true
                 );
