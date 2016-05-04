@@ -61,6 +61,11 @@ return array(
                 ),
                 'alias' => 'notification_api'
             )
+        ),
+        'models' => array(
+            'mautic.notification.model.notification' => array(
+                'class' => 'Mautic\NotificationBundle\Model\NotificationModel'
+            )
         )
     ),
     'routes' => array(

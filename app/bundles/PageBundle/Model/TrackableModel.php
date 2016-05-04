@@ -9,7 +9,7 @@
 
 namespace Mautic\PageBundle\Model;
 
-use Mautic\CoreBundle\Model\CommonModel;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Event\UntrackableUrlsEvent;
@@ -18,7 +18,7 @@ use Mautic\PageBundle\PageEvents;
 /**
  * Class TrackableModel
  */
-class TrackableModel extends CommonModel
+class TrackableModel extends AbstractCommonModel
 {
     /**
      * Array of URLs and/or tokens that should not be converted to trackables
@@ -49,6 +49,21 @@ class TrackableModel extends CommonModel
     protected $usingClickthrough = true;
 
     /**
+     * @var RedirectModel
+     */
+    protected $redirectModel;
+
+    /**
+     * TrackableModel constructor.
+     *
+     * @param RedirectModel $redirectModel
+     */
+    public function __construct(RedirectModel $redirectModel)
+    {
+        $this->redirectModel = $redirectModel;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return \Mautic\PageBundle\Entity\TrackableRepository
@@ -63,7 +78,7 @@ class TrackableModel extends CommonModel
      */
     protected function getRedirectModel()
     {
-        return $this->factory->getModel('page.redirect');
+        return $this->redirectModel;
     }
 
     /**

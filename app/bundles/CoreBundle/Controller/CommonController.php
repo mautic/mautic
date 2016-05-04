@@ -11,7 +11,9 @@ namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Model\CommonModel;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Debug\Exception\ClassNotFoundException;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,6 +40,11 @@ class CommonController extends Controller implements MauticController
     protected $request;
 
     /**
+     * @var CommonModel[]
+     */
+    protected $modelInstances = [];
+
+    /**
      * @param Request $request
      */
     public function setRequest(Request $request)
@@ -62,6 +69,37 @@ class CommonController extends Controller implements MauticController
      */
     public function initialize(FilterControllerEvent $event)
     {
+    }
+
+    /**
+     * Get a model instance from the service container
+     *
+     * @param $modelNameKey
+     *
+     * @return CommonModel
+     */
+    protected function getModel($modelNameKey)
+    {
+        // Shortcut for models with the same name as the bundle
+        if (strpos('.', $modelNameKey) === false) {
+            $modelNameKey = "$modelNameKey.$modelNameKey";
+        }
+
+        if (! array_key_exists($modelNameKey, $this->modelInstances)) {
+            $parts = explode('.', $modelNameKey);
+
+            if (count($parts) !== 2) {
+                throw new \InvalidArgumentException($modelNameKey . " is not a valid model key.");
+            }
+
+            list($bundle, $name) = $parts;
+
+            $containerKey = str_replace(array('%bundle%', '%name%'), array($bundle, $name), 'mautic.%bundle%.model.%name%');
+
+            $this->modelInstances[$modelNameKey] = $this->container->get($containerKey);
+        }
+
+        return $this->modelInstances[$modelNameKey];
     }
 
     /**

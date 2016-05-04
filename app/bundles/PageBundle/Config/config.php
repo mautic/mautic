@@ -184,6 +184,20 @@ return array(
                 'class' => 'Mautic\PageBundle\Form\Type\DashboardHitsInTimeWidgetType',
                 'alias' => 'page_dashboard_hits_in_time_widget'
             )
+        ),
+        'models' =>  array(
+            'mautic.page.model.page' => array(
+                'class' => 'Mautic\PageBundle\Model\PageModel'
+            ),
+            'mautic.page.model.redirect' => array(
+                'class' => 'Mautic\PageBundle\Model\RedirectModel'
+            ),
+            'mautic.page.model.trackable' => array(
+                'class' => 'Mautic\PageBundle\Model\TrackableModel',
+                'arguments' => array(
+                    'mautic.page.model.redirect'
+                )
+            )
         )
     ),
 

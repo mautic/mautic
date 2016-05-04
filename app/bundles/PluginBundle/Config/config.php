@@ -118,6 +118,11 @@ return array(
                 'class'     => 'Mautic\PluginBundle\Helper\IntegrationHelper',
                 'arguments' => 'mautic.factory'
             )
+        ),
+        'models' =>  array(
+            'mautic.plugin.model.plugin' => array(
+                'class' => 'Mautic\PluginBundle\Model\PluginModel'
+            )
         )
     )
 );

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -9,20 +9,24 @@
 
 namespace Mautic\CoreBundle\Model;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Mautic\UserBundle\Entity\User;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Intl\Intl;
 
 /**
- * Class CommonModel
+ * Class AbstractCommonModel
  *
  * @package Mautic\CoreBundle\Model
  */
-class CommonModel
+abstract class AbstractCommonModel
 {
-
     /**
      * @var \Doctrine\ORM\EntityManager
      */
@@ -39,25 +43,75 @@ class CommonModel
     protected $dispatcher;
 
     /**
+     * @var Router
+     */
+    protected $router;
+
+    /**
      * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
      */
     protected $translator;
+    
+    /**
+     * @var User
+     */
+    protected $user;
 
     /**
-     * @var MauticFactory
+     * @param EntityManager $em
      */
-    protected $factory;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
+    public function setEntityManager(EntityManager $em)
     {
-        $this->em         = $factory->getEntityManager();
-        $this->security   = $factory->getSecurity();
-        $this->dispatcher = $factory->getDispatcher();
-        $this->translator = $factory->getTranslator();
-        $this->factory    = $factory;
+        $this->em = $em;
+    }
+
+    /**
+     * @param CorePermissions $security
+     */
+    public function setSecurity(CorePermissions $security)
+    {
+        $this->security = $security;
+    }
+
+    /**
+     * @param ContainerAwareEventDispatcher $dispatcher
+     */
+    public function setDispatcher(ContainerAwareEventDispatcher $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * @param Router $router
+     */
+    public function setRouter(Router $router)
+    {
+        $this->router = $router;
+    }
+
+    /**
+     * @param Translator $translator
+     */
+    public function setTranslator(Translator $translator)
+    {
+        $this->translator = $translator;
+    }
+
+    /**
+     * Initialize the user parameter for use in locking procedures
+     *
+     * @param SecurityContext $context
+     */
+    public function initUser(SecurityContext $context)
+    {
+        $user = $context->getToken()->getUser();
+
+        if (! $user instanceof User) {
+            $user = new User();
+            $user->isGuest = true;
+        }
+
+        $this->user = $user;
     }
 
     /**
@@ -122,9 +176,7 @@ class CommonModel
 
         if ($repo instanceof CommonRepository) {
             $repo->setTranslator($this->translator);
-            $repo->setCurrentUser(
-                $this->factory->getUser()
-            );
+            $repo->setCurrentUser($this->user);
 
             return $repo->getEntities($args);
         }
@@ -182,21 +234,13 @@ class CommonModel
      * @param array $routeParams
      * @param bool  $absolute
      * @param array $clickthrough
-     * @param bool  $shortenUrl
      *
      * @return string
      */
-    public function buildUrl($route, $routeParams = array(), $absolute = true, $clickthrough = array(), $shortenUrl = false)
+    public function buildUrl($route, $routeParams = array(), $absolute = true, $clickthrough = array())
     {
-        $url  = $this->factory->getRouter()->generate($route, $routeParams, $absolute);
+        $url  = $this->router->generate($route, $routeParams, $absolute);
         $url .= (!empty($clickthrough)) ? '?ct=' . $this->encodeArrayForUrl($clickthrough) : '';
-
-        if ($shortenUrl) {
-            /** @var UrlHelper $urlHelper */
-            $urlHelper = $this->factory->getHelper('url');
-
-            return $urlHelper->buildShortUrl($url);
-        }
 
         return $url;
     }
@@ -283,5 +327,4 @@ class CommonModel
     {
 
     }
-
 }

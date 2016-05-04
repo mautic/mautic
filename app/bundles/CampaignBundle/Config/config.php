@@ -121,6 +121,14 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'campaign_leadsource'
             ),
+        ),
+        'models' =>  array(
+            'mautic.campaign.model.campaign' => array(
+                'class' => 'Mautic\CampaignBundle\Model\CampaignModel'
+            ),
+            'mautic.campaign.model.event' => array(
+                'class' => 'Mautic\CampaignBundle\Model\EventModel'
+            )
         )
     )
 );

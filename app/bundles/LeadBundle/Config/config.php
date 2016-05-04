@@ -218,11 +218,6 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'leadfield'
             ),
-            'mautic.form.type.leadlist'                       => array(
-                'class'     => 'Mautic\LeadBundle\Form\Type\ListType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'leadlist'
-            ),
             'mautic.form.type.lead.submitaction.pointschange' => array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\FormSubmitActionPointsChangeType',
                 'arguments' => 'mautic.factory',
@@ -334,6 +329,20 @@ return array(
                 'class'     => 'Mautic\LeadBundle\Templating\Helper\AvatarHelper',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'lead_avatar'
+            )
+        ),
+        'models' =>  array(
+            'mautic.lead.model.lead' => array(
+                'class' => 'Mautic\LeadBundle\Model\LeadModel'
+            ),
+            'mautic.lead.model.field' => array(
+                'class' => 'Mautic\LeadBundle\Model\FieldModel'
+            ),
+            'mautic.lead.model.list' => array(
+                'class' => 'Mautic\LeadBundle\Model\ListModel'
+            ),
+            'mautic.lead.model.note' => array(
+                'class' => 'Mautic\LeadBundle\Model\NoteModel'
             )
         )
     )

@@ -9,15 +9,31 @@
 
 namespace Mautic\ConfigBundle\Model;
 
-use Mautic\CoreBundle\Model\CommonModel;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 
 /**
  * Class SysinfoModel
  */
-class SysinfoModel extends CommonModel
+class SysinfoModel extends AbstractCommonModel
 {
     protected $phpInfo;
     protected $folders;
+
+    /**
+     * @var PathsHelper
+     */
+    protected $pathsHelper;
+
+    /**
+     * SysinfoModel constructor.
+     * 
+     * @param PathsHelper $pathsHelper
+     */
+    public function __construct(PathsHelper $pathsHelper)
+    {
+        $this->pathsHelper = $pathsHelper;
+    }
 
     /**
 	 * Method to get the PHP info
@@ -68,12 +84,12 @@ class SysinfoModel extends CommonModel
 		}
 
         $importantFolders = array(
-            $this->factory->getSystemPath('local_config'),
+            $this->pathsHelper->getSystemPath('local_config'),
             $this->factory->getParameter('cache_path'),
             $this->factory->getParameter('log_path'),
             $this->factory->getParameter('upload_dir'),
-            $this->factory->getSystemPath('images', true),
-            $this->factory->getSystemPath('translations', true),
+            $this->pathsHelper->getSystemPath('images', true),
+            $this->pathsHelper->getSystemPath('translations', true),
         );
 
         // Show the spool folder only if the email queue is configured

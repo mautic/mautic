@@ -76,12 +76,7 @@ class MauticFactory
         if (!array_key_exists($name, $models)) {
             $parts = explode('.', $name);
 
-            // @deprecated support for addon in 1.1.4; to be removed in 2.0
-            if ($parts[0] == 'addon' && $parts[1] != 'addon') {
-                // @deprecated 1.1.4; to be removed in 2.0; BC support for MauticAddon
-                $namespace = 'MauticAddon';
-                array_shift($parts);
-            } elseif ($parts[0] == 'plugin' && $parts[1] != 'plugin') {
+            if ($parts[0] == 'plugin' && $parts[1] != 'plugin') {
                 $namespace = 'MauticPlugin';
                 array_shift($parts);
             } else {

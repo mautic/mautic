@@ -60,6 +60,11 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'category_bundles_form'
             )
+        ),
+        'models' =>  array(
+            'mautic.category.model.category' => array(
+                'class' => 'Mautic\CategoryBundle\Model\CategoryModel'
+            )
         )
     )
 );

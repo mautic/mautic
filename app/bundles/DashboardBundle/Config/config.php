@@ -64,6 +64,11 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'dashboard_filter'
             )
+        ),
+        'models' =>  array(
+            'mautic.dashboard.model.dashboard' => array(
+                'class' => 'Mautic\DashboardBundle\Model\DashboardModel'
+            )
         )
     ),
     'parameters' => array(

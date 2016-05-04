@@ -234,6 +234,11 @@ return array(
                     'setPassword' => array('%mautic.mailer_password%')
                 )
             ),
+        ),
+        'models' =>  array(
+            'mautic.email.model.email' => array(
+                'class' => 'Mautic\EmailBundle\Model\EmailModel'
+            )
         )
     ),
     'parameters' => array(

@@ -236,6 +236,23 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'security'
             ),
+            'mautic.helper.paths' => array(
+                'class' => 'Mautic\CoreBundle\Helper\PathsHelper',
+                'arguments' => array(
+                    '%mautic.paths%',
+                    '%mautic.theme%',
+                    '%mautic.image_path%',
+                    '%mautic.dashboard_import_dir%',
+                    '%mautic.dashboard_user_import_dir%',
+                    '%kernel.cache_dir%',
+                    '%kernel.log_dir%'
+                ),
+                'methodCalls' => array(
+                    'initUser' => array(
+                        'security.context'
+                    )
+                )
+            )
         ),
         'other'   => array(
             // Error handler
@@ -426,7 +443,27 @@ return array(
                 ),
                 'tag' => 'twig.extension'
             ),
-
+        ),
+        'models' =>  array(
+            'mautic.core.model.auditlog' => array(
+                'class' => 'Mautic\CoreBundle\Model\AuditLogModel'
+            ),
+            'mautic.core.model.notification' => array(
+                'class' => 'Mautic\CoreBundle\Model\NotificationModel',
+                'arguments' => array(
+                    'session',
+                    'mautic.helper.paths',
+                    'mautic.helper.update'
+                ),
+                'methodCalls' => array(
+                    'setDisableUpdates' => array(
+                        '%mautic.security.disableUpdates'
+                    )
+                )
+            ),
+            'mautic.core.model.form' => array(
+                'class' => 'Mautic\CoreBundle\Model\FormModel'
+            )
         )
     ),
 

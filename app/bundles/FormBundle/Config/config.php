@@ -192,6 +192,20 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'form_submitaction_sendemail'
             )
+        ),
+        'models' =>  array(
+            'mautic.form.model.action' => array(
+                'class' => 'Mautic\FormBundle\Model\ActionModel'
+            ),
+            'mautic.form.model.field' => array(
+                'class' => 'Mautic\FormBundle\Model\FieldModel'
+            ),
+            'mautic.form.model.form' => array(
+                'class' => 'Mautic\FormBundle\Model\FormModel'
+            ),
+            'mautic.form.model.submission' => array(
+                'class' => 'Mautic\FormBundle\Model\SubmissionModel'
+            )
         )
     )
 );

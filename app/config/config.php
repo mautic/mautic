@@ -13,11 +13,6 @@ $buildBundles = function($namespace, $bundle) use ($container, $paths, $root, &$
         $isPlugin   = true;
         $bundleBase = $bundle;
         $relative   = $paths['plugins'].'/'.$bundleBase;
-    } elseif (strpos($namespace, 'MauticAddon\\') !== false) {
-        // @deprecated 1.1.4; to be removed in 2.0; BC support for MauticAddon
-        $isPlugin   = true;
-        $bundleBase = $bundle;
-        $relative   = 'addons/'.$bundleBase;
     } elseif (strpos($namespace, 'Mautic\\') !== false) {
         $isMautic   = true;
         $bundleBase = str_replace('Mautic', '', $bundle);
@@ -41,12 +36,6 @@ $buildBundles = function($namespace, $bundle) use ($container, $paths, $root, &$
             $finder = \Symfony\Component\Finder\Finder::create()->files('*.php')->in($directory.'/Entity')->notName('*Repository.php');
 
             foreach ($finder as $file) {
-                // @deprecated 1.1.4; to be removed in 2.0; BC support for Addon
-                if (strpos($baseNamespace, 'PluginBundle') !== false && $file->getFilename() == 'Addon.php') {
-                    // Do not include this class as it's used for BC support
-                    continue;
-                }
-
                 // Check to see if entities are organized by subfolder
                 $subFolder = $file->getRelativePath();
 

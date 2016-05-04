@@ -147,6 +147,21 @@ return array(
             ),
             // Override the DropzoneController
             'oneup_uploader.controller.dropzone.class' => 'Mautic\AssetBundle\Controller\UploadController'
+        ),
+        'models' =>  array(
+            'mautic.asset.model.asset' => array(
+                'class' => 'Mautic\AssetBundle\Model\AssetModel',
+                'arguments' => array(
+                    'mautic.lead.model.lead',
+                    'mautic.category.model.category',
+                    'request_stack'
+                ),
+                'methodCalls' => array(
+                    'setMaxAssetSize' => array(
+                        '%mautic.max_size%'
+                    )
+                )
+            )
         )
     ),
 

@@ -66,6 +66,11 @@ return array(
                 ),
                 'alias' => 'twilio_service'
             )
+        ),
+        'models' =>  array(
+            'mautic.sms.model.sms' => array(
+                'class' => 'Mautic\SmsBundle\Model\SmsModel'
+            )
         )
     ),
     'routes' => array(

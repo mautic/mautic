@@ -91,6 +91,11 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'report_filters'
             )
+        ),
+        'models' =>  array(
+            'mautic.report.model.report' => array(
+                'class' => 'Mautic\ReportBundle\Model\ReportModel'
+            )
         )
     )
 );
