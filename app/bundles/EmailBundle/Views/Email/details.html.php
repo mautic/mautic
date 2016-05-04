@@ -418,7 +418,7 @@ $view['slots']->set(
                                                                    )
                                                                ); ?>"
                                                                data-toggle="confirmation"
-                                                               data-mesasge="<?php echo $view->escape(
+                                                               data-message="<?php echo $view->escape(
                                                                    $view["translator"]->trans(
                                                                        "mautic.email.abtest.confirmmakewinner",
                                                                        array("%name%" => $variant->getName())
