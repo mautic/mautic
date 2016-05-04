@@ -23,7 +23,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.sms.smses'
         'templateButtons' => array(
             'delete' => $permissions['sms:smses:deleteown'] || $permissions['sms:smses:deleteother']
         ),
-        'filters'     => $filters
+        // 'filters'     => $filters // @todo
     )); ?>
 
     <div class="page-list">

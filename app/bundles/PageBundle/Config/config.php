@@ -28,6 +28,11 @@ return array(
                 'path'       => '/mtracking.gif',
                 'controller' => 'MauticPageBundle:Public:trackingImage'
             ),
+            'mautic_url_redirect' => array(
+                'path'       => '/r/{redirectId}',
+                'controller' => 'MauticPageBundle:Public:redirect'
+            ),
+            // @deprecated; to be removed in 2.0 use mautic_url_redirect instead
             'mautic_page_trackable' => array(
                 'path'       => '/r/{redirectId}',
                 'controller' => 'MauticPageBundle:Public:redirect'

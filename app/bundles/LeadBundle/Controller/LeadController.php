@@ -20,7 +20,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Form\Type\TagListType;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Symfony\Component\Form\FormError;
@@ -412,10 +411,6 @@ class LeadController extends FormController
             }
         }
 
-        $event = new IconEvent($this->factory->getSecurity());
-        $this->factory->getDispatcher()->dispatch(CoreEvents::FETCH_ICONS, $event);
-        $icons = $event->getIcons();
-
         // We need the EmailRepository to check if a lead is flagged as do not contact
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
         $emailRepo = $this->factory->getModel('email')->getRepository();
@@ -435,7 +430,6 @@ class LeadController extends FormController
                     'eventTypes'        => $eventTypes,
                     'eventFilters'      => $filters,
                     'upcomingEvents'    => $upcomingEvents,
-                    'icons'             => $icons,
                     'engagementData'    => $engagementChart,
                     'noteCount'         => $this->factory->getModel('lead.note')->getNoteCount($lead, true),
                     'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value']),
@@ -844,32 +838,35 @@ class LeadController extends FormController
         $session = $this->factory->getSession();
         $search  = $this->request->get('search', $session->get('mautic.lead.merge.filter', ''));
         $session->set('mautic.lead.merge.filter', $search);
+        $leads = array();
 
-        $filter = array(
-            'string' => $search,
-            'force'  => array(
-                array(
-                    'column' => 'l.date_identified',
-                    'expr'   => 'isNotNull',
-                    'value'  => $mainLead->getId()
-                ),
-                array(
-                    'column' => 'l.id',
-                    'expr'   => 'neq',
-                    'value'  => $mainLead->getId()
+        if (! empty($search)) {
+            $filter = array(
+                'string' => $search,
+                'force' => array(
+                    array(
+                        'column' => 'l.date_identified',
+                        'expr' => 'isNotNull',
+                        'value' => $mainLead->getId()
+                    ),
+                    array(
+                        'column' => 'l.id',
+                        'expr' => 'neq',
+                        'value' => $mainLead->getId()
+                    )
                 )
-            )
-        );
+            );
 
-        $leads = $model->getEntities(
-            array(
-                'limit'          => 25,
-                'filter'         => $filter,
-                'orderBy'        => 'l.firstname,l.lastname,l.company,l.email',
-                'orderByDir'     => 'ASC',
-                'withTotalCount' => false
-            )
-        );
+            $leads = $model->getEntities(
+                array(
+                    'limit' => 25,
+                    'filter' => $filter,
+                    'orderBy' => 'l.firstname,l.lastname,l.company,l.email',
+                    'orderByDir' => 'ASC',
+                    'withTotalCount' => false
+                )
+            );
+        }
 
         $leadChoices = array();
         foreach ($leads as $l) {
@@ -888,6 +885,7 @@ class LeadController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
+            $valid =  true;
             if (!$this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $data = $form->getData();
@@ -925,9 +923,12 @@ class LeadController extends FormController
                     //Both leads are good so now we merge them
                     $mainLead = $model->mergeLeads($mainLead, $secLead, false);
                 }
-            };
+            }
+
+
 
             if ($valid) {
+
                 $viewParameters = array(
                     'objectId'     => $mainLead->getId(),
                     'objectAction' => 'view',

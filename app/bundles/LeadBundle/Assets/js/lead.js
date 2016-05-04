@@ -424,22 +424,32 @@ Mautic.addLeadListFilter = function (elId) {
 };
 
 Mautic.leadfieldOnLoad = function (container) {
-
-    var fixHelper = function(e, ui) {
-        ui.children().each(function() {
-            mQuery(this).width(mQuery(this).width());
-        });
-        return ui;
-    };
-
     if (mQuery(container + ' .leadfield-list').length) {
+        var bodyOverflow = {};
         mQuery(container + ' .leadfield-list tbody').sortable({
             handle: '.fa-ellipsis-v',
-            helper: fixHelper,
+            helper: function(e, ui) {
+                ui.children().each(function() {
+                    mQuery(this).width(mQuery(this).width());
+                });
+
+                // Fix body overflow that messes sortable up
+                bodyOverflow.overflowX = mQuery('body').css('overflow-x');
+                bodyOverflow.overflowY = mQuery('body').css('overflow-y');
+                mQuery('body').css({
+                    overflowX: 'visible',
+                    overflowY: 'visible'
+                });
+
+                return ui;
+            },
             scroll: false,
             axis: 'y',
             containment: container + ' .leadfield-list',
-            stop: function(i) {
+            stop: function(e, ui) {
+                // Restore original overflow
+                mQuery('body').css(bodyOverflow);
+
                 // Get the page and limit
                 mQuery.ajax({
                     type: "POST",

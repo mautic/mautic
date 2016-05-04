@@ -365,12 +365,12 @@ class EmailController extends FormController
 
         // Prepare stats for bargraph
         $variant = ($parent && $parent === $email);
-        $stats   = ($email->getEmailType() == 'template') ? 
+        $stats   = ($email->getEmailType() == 'template') ?
             $model->getEmailGeneralStats(
-                $email, 
+                $email,
                 $variant,
                 null,
-                new \DateTime($dateRangeForm->get('date_from')->getData()), 
+                new \DateTime($dateRangeForm->get('date_from')->getData()),
                 new \DateTime($dateRangeForm->get('date_to')->getData())) :
             $model->getEmailListStats($email, $variant);
 
@@ -392,7 +392,7 @@ class EmailController extends FormController
                 'viewParameters'  => array(
                     'email'          => $email,
                     'stats'          => $stats,
-                    'trackableLinks' => $trackableLinks,
+                    'trackables    ' => $trackableLinks,
                     'pending'        => $model->getPendingLeads($email, null, true),
                     'logs'           => $logs,
                     'variants'       => array(
@@ -548,6 +548,7 @@ class EmailController extends FormController
 
             // Check to see if this is a popup
             if (isset($form['updateSelect'])) {
+                $template    = false;
                 $passthrough = array_merge(
                     $passthrough,
                     array(
@@ -727,12 +728,15 @@ class EmailController extends FormController
                 $model->unlockEntity($entity);
             }
 
+            $template    = 'MauticEmailBundle:Email:view';
             $passthrough = array(
                 'activeLink'    => 'mautic_email_index',
                 'mauticContent' => 'email'
             );
+
             // Check to see if this is a popup
             if (isset($form['updateSelect'])) {
+                $template    = false;
                 $passthrough = array_merge(
                     $passthrough,
                     array(
@@ -756,7 +760,7 @@ class EmailController extends FormController
                         array(
                             'returnUrl'       => $this->generateUrl('mautic_email_action', $viewParameters),
                             'viewParameters'  => $viewParameters,
-                            'contentTemplate' => 'MauticEmailBundle:Email:view',
+                            'contentTemplate' => $template,
                             'passthroughVars' => $passthrough
                         )
                     )
@@ -836,7 +840,7 @@ class EmailController extends FormController
             $entity      = clone $entity;
             $session     = $this->factory->getSession();
             $contentName = 'mautic.emailbuilder.'.$entity->getSessionId().'.content';
-            
+
             $session->set($contentName, $entity->getContent());
         }
 

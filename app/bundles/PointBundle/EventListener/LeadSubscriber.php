@@ -97,13 +97,14 @@ class LeadSubscriber extends CommonSubscriber
         // Add the logs to the event array
         foreach ($logs as $log) {
             $event->addEvent(array(
-                'event'     => $eventTypeKey,
-                'eventLabel' => $eventTypeName,
-                'timestamp' => $log['dateAdded'],
-                'extra'     => array(
-                    'log' => $log
+                'event'           => $eventTypeKey,
+                'eventLabel'      => $eventTypeName,
+                'timestamp'       => $log['dateAdded'],
+                'extra'           => array(
+                    'log'           => $log
                 ),
-                'contentTemplate' => 'MauticPointBundle:SubscribedEvents\Timeline:index.html.php'
+                'contentTemplate' => 'MauticPointBundle:SubscribedEvents\Timeline:index.html.php',
+                'icon'            => 'fa-calculator'
             ));
         }
     }

@@ -9,11 +9,77 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Joomla\Http\Http;
+use Monolog\Logger;
+
 /**
  * Class UrlHelper
  */
 class UrlHelper
 {
+    /**
+     * @var Http
+     */
+    protected $http;
+
+    /**
+     * @var string
+     */
+    protected $shortnerServiceUrl;
+
+    /**
+     * @var Logger
+     */
+    protected $logger;
+
+    /**
+     * UrlHelper constructor.
+     *
+     * @param Http|null   $http
+     * @param null        $shortnerServiceUrl
+     * @param Logger|null $logger
+     */
+    public function __construct(Http $http = null, $shortnerServiceUrl = null, Logger $logger = null)
+    {
+        $this->http               = $http;
+        $this->shortnerServiceUrl = $shortnerServiceUrl;
+    }
+
+    /**
+     * Shorten a URL
+     *
+     * @param $url
+     *
+     * @return mixed
+     */
+    public function buildShortUrl($url)
+    {
+        if (! $this->shortnerServiceUrl) {
+
+            return $url;
+        }
+
+        try {
+            $response = $this->http->get($this->shortnerServiceUrl.urlencode($url));
+
+            if ($response->code === 200) {
+
+                return rtrim($response->body);
+            } elseif ($this->logger) {
+                $this->logger->addWarning("Url shortner failed with code {$response->code}: {$response->body}");
+            }
+        } catch (\Exception $exception) {
+            if ($this->logger) {
+                $this->logger->addError(
+                    $exception->getMessage(),
+                    array('exception' => $exception)
+                );
+            }
+        }
+
+        return $url;
+    }
+
     /**
      * @param $rel
      *

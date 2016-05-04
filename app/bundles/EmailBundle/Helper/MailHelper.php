@@ -21,7 +21,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\CoreBundle\Helper\EmojiHelper;
-use Mautic\CoreBundle\Templating\TemplateNameParser;
 
 /**
  * Class MailHelper
@@ -105,7 +104,7 @@ class MailHelper
     protected $source = array();
 
     /**
-     * @var null
+     * @var Email|null
      */
     protected $email = null;
 
@@ -207,6 +206,13 @@ class MailHelper
     private $transportStartTime;
 
     /**
+     * Simply a md5 of the content so that event listeners can easily determine if the content has been changed
+     *
+     * @var string
+     */
+    private $contentHash;
+
+    /**
      * @param MauticFactory $factory
      * @param               $mailer
      * @param null          $from
@@ -245,6 +251,7 @@ class MailHelper
      *
      * @param bool $dispatchSendEvent
      * @param bool $isQueueFlush (a tokenized/batch send via API such as Mandrill)
+     * @param bool $useOwnerAsMailer
      *
      * @return bool
      */
@@ -523,7 +530,7 @@ class MailHelper
         unset($this->lead, $this->idHash, $this->eventTokens, $this->queuedRecipients, $this->errors);
 
         $this->eventTokens  = $this->queuedRecipients = $this->errors = array();
-        $this->lead         = $this->idHash = null;
+        $this->lead         = $this->idHash = $this->contentHash = null;
         $this->internalSend = $this->fatal = false;
 
         $this->logger->clear();
@@ -788,6 +795,9 @@ class MailHelper
     public function setPlainText($content)
     {
         $this->plainText = $content;
+
+        // Update the identifier for the content
+        $this->contentHash = md5($this->body['content'].$this->plainText);
     }
 
     /**
@@ -862,6 +872,9 @@ class MailHelper
             }
         }
 
+        // Update the identifier for the content
+        $this->contentHash = md5($content.$this->plainText);
+
         $this->body = array(
             'content'     => $content,
             'contentType' => $contentType,
@@ -877,6 +890,16 @@ class MailHelper
     public function getBody()
     {
         return $this->body['content'];
+    }
+
+    /**
+     * Return the content identifier
+     *
+     * @return string
+     */
+    public function getcontentHash()
+    {
+        return $this->contentHash;
     }
 
     /**
@@ -1429,6 +1452,8 @@ class MailHelper
         $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_SEND, $event);
 
         $this->eventTokens = array_merge($this->eventTokens, $event->getTokens());
+
+        unset($event);
     }
 
     /**
@@ -1567,12 +1592,20 @@ class MailHelper
         if (substr($url, 0, 4) !== 'http' && substr($url, 0, 3) !== 'ftp') {
             return null;
         }
+
+        if ($this->email) {
+            // Get a Trackable which is channel aware
+            /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
+            $trackableModel = $this->factory->getModel('page.trackable');
+            $trackable      = $trackableModel->getTrackableByUrl($url, 'email', $this->email->getId());
+
+            return $trackable->getRedirect();
+        }
+
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
         $redirectModel = $this->factory->getModel('page.redirect');
 
-        $link = $redirectModel->getRedirectByUrl($url, $this->email);
-
-        return $link;
+        return $redirectModel->getRedirectByUrl($url);
     }
 
     /**
