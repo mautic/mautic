@@ -262,6 +262,28 @@ class PageRepository extends CommonRepository
     }
 
     /**
+     * Resets variant_start_date and variant_hits
+     *
+     * @param $variantParentId
+     * @param $date
+     */
+    public function resetVariants($variantParentId, $date)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->update(MAUTIC_TABLE_PREFIX . 'pages')
+            ->set('variant_hits', 0)
+            ->set('variant_start_date', ':date')
+            ->setParameter('date', $date)
+            ->where(
+                $qb->expr()->orX(
+                    $qb->expr()->eq('id', (int) $variantParentId),
+                    $qb->expr()->eq('variant_parent_id', (int) $variantParentId)
+                )
+            )
+            ->execute();
+    }
+
+    /**
      * Null variant and translation parent
      *
      * @param $ids
@@ -272,7 +294,7 @@ class PageRepository extends CommonRepository
             $ids = array($ids);
         }
 
-        $qb = $this->_em->getConnection()->createQueryBuilder();
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->update(MAUTIC_TABLE_PREFIX . 'pages')
             ->set('variant_parent_id', ':null')
             ->setParameter('null', null)
@@ -281,7 +303,7 @@ class PageRepository extends CommonRepository
             )
             ->execute();
 
-        $qb = $this->_em->getConnection()->createQueryBuilder();
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->update(MAUTIC_TABLE_PREFIX . 'pages')
             ->set('translation_parent_id', ':null')
             ->setParameter('null', null)
@@ -301,7 +323,7 @@ class PageRepository extends CommonRepository
      */
     public function upHitCount($id, $increaseBy = 1, $unique = false, $variant = false)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'pages')
             ->set('hits', 'hits + ' . (int) $increaseBy)

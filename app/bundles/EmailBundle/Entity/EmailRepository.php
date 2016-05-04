@@ -29,7 +29,7 @@ class EmailRepository extends CommonRepository
      */
     public function getDoNotEmailList()
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('distinct(l.email)')
             ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', 'dnc')
             ->leftJoin('dnc', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = dnc.lead_id')
@@ -57,7 +57,7 @@ class EmailRepository extends CommonRepository
      */
     public function checkDoNotEmail($email)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('dnc.*')
             ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', 'dnc')
             ->leftJoin('dnc', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = dnc.lead_id')
@@ -94,7 +94,7 @@ class EmailRepository extends CommonRepository
         $leadModel = $this->factory->getModel('lead.lead');
 
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
-        $leadRepo = $this->_em->getRepository('MauticLeadBundle:Lead');
+        $leadRepo = $this->getEntityManager()->getRepository('MauticLeadBundle:Lead');
         $leadId = (array) $leadRepo->getLeadByEmail($email, true);
 
         /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
@@ -116,7 +116,7 @@ class EmailRepository extends CommonRepository
      */
     public function deleteDoNotEmailEntry($id)
     {
-        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'lead_donotcontact', array('id' => (int) $id));
+        $this->getEntityManager()->getConnection()->delete(MAUTIC_TABLE_PREFIX.'lead_donotcontact', array('id' => (int) $id));
     }
 
     /**
@@ -127,7 +127,7 @@ class EmailRepository extends CommonRepository
      */
     public function getEntities($args = array())
     {
-        $q = $this->_em
+        $q = $this->getEntityManager()
             ->createQueryBuilder()
             ->select('e')
             ->from('MauticEmailBundle:Email', 'e', 'e.id');
@@ -151,7 +151,7 @@ class EmailRepository extends CommonRepository
      */
     public function getSentReadCount()
     {
-        $q = $this->_em->createQueryBuilder();
+        $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count')
             ->from('MauticEmailBundle:Email', 'e');
         $results = $q->getQuery()->getSingleResult(Query::HYDRATE_ARRAY);
@@ -178,7 +178,7 @@ class EmailRepository extends CommonRepository
     public function getEmailPendingLeads($emailId, $variantIds = null, $listIds = null, $countOnly = false, $limit = null)
     {
         // Do not include leads in the do not contact table
-        $dncQb = $this->_em->getConnection()->createQueryBuilder();
+        $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $dncQb->select('null')
             ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', 'dnc')
             ->where(
@@ -187,7 +187,7 @@ class EmailRepository extends CommonRepository
             ->andWhere('dnc.channel = "email"');
 
         // Do not include leads that have already been emailed
-        $statQb    = $this->_em->getConnection()->createQueryBuilder()
+        $statQb    = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('null')
             ->from(MAUTIC_TABLE_PREFIX . 'email_stats', 'stat');
 
@@ -210,7 +210,7 @@ class EmailRepository extends CommonRepository
         // Only include those who belong to the associated lead lists
         if (null === $listIds) {
             // Get a list of lists associated with this email
-            $lists = $this->_em->getConnection()->createQueryBuilder()
+            $lists = $this->getEntityManager()->getConnection()->createQueryBuilder()
                 ->select('el.leadlist_id')
                 ->from(MAUTIC_TABLE_PREFIX . 'email_list_xref', 'el')
                 ->where('el.email_id = ' . (int) $emailId)
@@ -230,7 +230,7 @@ class EmailRepository extends CommonRepository
             $listIds = array($listIds);
         }
 
-        $listQb = $this->_em->getConnection()->createQueryBuilder();
+        $listQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $listQb->select('null')
             ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll')
             ->where(
@@ -242,7 +242,7 @@ class EmailRepository extends CommonRepository
             );
 
         // Main query
-        $q  = $this->_em->getConnection()->createQueryBuilder();
+        $q  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         if ($countOnly) {
             $q->select('count(l.id) as count');
         } else {
@@ -461,12 +461,35 @@ class EmailRepository extends CommonRepository
             $ids = array($ids);
         }
 
-        $qb = $this->_em->getConnection()->createQueryBuilder();
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->update(MAUTIC_TABLE_PREFIX . 'emails')
             ->set('variant_parent_id', ':null')
             ->setParameter('null', null)
             ->where(
                 $qb->expr()->in('variant_parent_id', $ids)
+            )
+            ->execute();
+    }
+
+    /**
+     * Resets variant_start_date, variant_read_count, variant_sent_count
+     *
+     * @param $variantParentId
+     * @param $date
+     */
+    public function resetVariants($variantParentId, $date)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->update(MAUTIC_TABLE_PREFIX . 'emails')
+            ->set('variant_read_count', 0)
+            ->set('variant_sent_count', 0)
+            ->set('variant_start_date', ':date')
+            ->setParameter('date', $date)
+            ->where(
+                $qb->expr()->orX(
+                    $qb->expr()->eq('id', (int) $variantParentId),
+                    $qb->expr()->eq('variant_parent_id', (int) $variantParentId)
+                )
             )
             ->execute();
     }
@@ -481,7 +504,7 @@ class EmailRepository extends CommonRepository
      */
     public function upCount($id, $type = 'sent', $increaseBy = 1, $variant = false)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'emails')
             ->set($type . '_count', $type . '_count + ' . (int) $increaseBy)
