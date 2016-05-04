@@ -40,22 +40,112 @@ Mautic.widgetOnLoad = function(container, response) {
 
 Mautic.initWidgetSorting = function () {
     var widgetsWrapper = mQuery('#dashboard-widgets');
+    var bodyOverflow = {};
+
     widgetsWrapper.sortable({
         handle: '.card-header h4',
         placeholder: 'sortable-placeholder',
         items: '.widget',
         opacity: 0.9,
-        scroll: false,
-        scrollSensitivity: 5,
-        scrollSpeed: 5,
+        scroll: true,
+        scrollSpeed: 10,
         tolerance: "pointer",
         cursor: 'move',
-        cursorAt: { left: 0, top: 0 },
-        forcePlaceholderSize: true,
-        appendTo: 'body',
-        helper: 'clone',
+        appendTo: '#dashboard-widgets',
+
+        helper: function(e, ui) {
+            // Ensure the draggable retains it's original size and that the margin doesn't cause things to bounce around
+            ui.children().each(function() {
+                mQuery(this).width(mQuery(this).width());
+                mQuery(this).height(mQuery(this).height());
+            });
+
+            // Fix body overflow that messes sortable up
+            bodyOverflow.overflowX = mQuery('body').css('overflow-x');
+            bodyOverflow.overflowY = mQuery('body').css('overflow-y');
+            mQuery('body').css({
+                overflowX: 'visible',
+                overflowY: 'visible'
+            });
+
+            mQuery("#dashboard-widgets .widget").each(function(i) {
+                var item = mQuery(this);
+                var item_clone = item.clone();
+
+                var canvas = item.find('canvas').first();
+                if (canvas.length) {
+                    // Copy the canvas
+                    var destCanvas = item_clone.find('canvas').first();
+                    var destCtx = destCanvas[0].getContext('2d');
+                    destCtx.drawImage(canvas[0], 0, 0);
+                }
+
+                item.data("clone", item_clone);
+                var position = item.position();
+                item_clone
+                    .css({
+                        left: position.left,
+                        top: position.top,
+                        width: item.width(),
+                        visibility: "visible",
+                        position: "absolute",
+                        zIndex: 1
+                    });
+
+                item.css('visibility', 'hidden');
+                mQuery("#cloned-widgets").append(item_clone);
+            });
+
+            return ui;
+        },
+        start: function(e, ui) {
+            ui.helper.css('visibility', 'visible');
+            ui.helper.data("clone").hide();
+        },
+        sort: function(e, ui) {
+            var card = ui.item.find('.card').first();
+            // Keep the placeholder width and height of the same as that of the inner card's width to prevent the jump effect
+            ui.placeholder.width(card.width());
+            ui.placeholder.height(card.height());
+            // Prevent margin from pushing the elements out of the way
+            ui.placeholder.css({
+                marginTop: "5px",
+                marginBottom: "5px",
+                marginLeft: 0,
+                marginRight: 0
+            });
+        },
         stop: function() {
+            // Restore original overflow
+            mQuery('body').css(bodyOverflow);
+
+            mQuery("#dashboard-widgets .widget.exclude-me").each(function() {
+                var item = mQuery(this);
+                var clone = item.data("clone");
+                var position = item.position();
+
+                clone.css("left", position.left);
+                clone.css("top", position.top);
+                clone.show();
+                item.removeClass("exclude-me");
+            });
+
+            mQuery("#dashboard-widgets .widget").css("visibility", "visible");
+            mQuery("#cloned-widgets .widget").remove();
+
             Mautic.saveWidgetSorting();
+        },
+        change: function(e, ui) {
+            mQuery("#dashboard-widgets .widget:not(.exclude-me)").each(function() {
+                var item = mQuery(this);
+                var clone = item.data("clone");
+                clone.stop(true, false);
+                var position = item.position();
+                clone.animate({
+                    left: position.left,
+                    top: position.top
+                }, 200);
+            });
         }
     }).disableSelection();
 }
@@ -103,12 +193,30 @@ Mautic.initWidgetRemoveButtons = function (scope) {
 
 };
 
-Mautic.exportDashboardLayout = function(text, baseUrl) {
+Mautic.exportDashboardLayout = function(text, baseUrl, save) {
     var name = prompt(text, "");
 
-    if (name) {
-        baseUrl = baseUrl + "?name=" + encodeURIComponent(name);
-    }
+    if (name !== null) {
+        if (name) {
+            baseUrl = baseUrl + "?name=" + encodeURIComponent(name) + (save ? '&save=1' : '');
+        } else if (save) {
+            baseUrl = baseUrl + "?save=1";
+        }
 
-    window.location = baseUrl;
+        window.location = baseUrl;
+    }
+};
+
+Mautic.confirmDeleteDashboard = function(text, baseUrl, save) {
+    var name = prompt(text, "");
+
+    if (name !== null) {
+        if (name) {
+            baseUrl = baseUrl + "?name=" + encodeURIComponent(name) + (save ? '&save=1' : '');
+        } else if (save) {
+            baseUrl = baseUrl + "?save=1";
+        }
+
+        window.location = baseUrl;
+    }
 };

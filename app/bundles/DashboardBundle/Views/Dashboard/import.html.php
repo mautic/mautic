@@ -31,10 +31,10 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.dashboard.
                                     <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'import', 'preview' => $dashboard)); ?>">
                                         <?php echo $view['translator']->trans('mautic.dashboard.preview'); ?>
                                     </a>&#183;
-                                    <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'applyDashboardFile', 'file' => $dashboard)); ?>">
+                                    <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'applyDashboardFile', 'file' => "{$config['type']}.{$dashboard}")); ?>">
                                         <?php echo $view['translator']->trans('mautic.core.form.apply'); ?>
                                     </a><?php if ($config['type'] == 'user'): ?>&#183;
-                                    <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'deleteDashboardFile', 'file' => $dashboard)); ?>">
+                                    <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'deleteDashboardFile', 'file' => "{$config['type']}.{$dashboard}")); ?>" data-toggle="confirmation" data-message="<?php echo $view['translator']->trans('mautic.dashboard.delete_layout'); ?>" data-confirm-text="<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete")); ?>" data-confirm-callback="executeAction" data-cancel-text="<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel")); ?>">
                                         <?php echo $view['translator']->trans('mautic.core.form.delete'); ?>
                                     </a><?php endif; ?>
                                 </p>
@@ -70,7 +70,7 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.dashboard.
     <div class="col-md-12">
         <h2><?php echo $view['translator']->trans('mautic.dashboard.widgets.preview'); ?></h2>
     </div>
-    <div id="dashboard-widgets" class="cards">
+    <div id="dashboard-widgets" class="dashboard-widgets cards">
         <?php if ($widgets): ?>
             <?php foreach ($widgets as $widget): ?>
                 <div class="card-flex widget" data-widget-id="<?php echo $widget->getId(); ?>" style="width: <?php echo !empty($widget->getWidth()) ? $widget->getWidth() . '' : '100' ?>%; height: <?php echo !empty($widget->getHeight()) ? $widget->getHeight() . 'px' : '300px' ?>">
