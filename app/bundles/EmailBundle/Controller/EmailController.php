@@ -442,11 +442,11 @@ class EmailController extends FormController
      */
     public function newAction($entity = null)
     {
-        $model   = $this->factory->getModel('email');
+        $model = $this->factory->getModel('email');
 
         if (!($entity instanceof Email)) {
             /** @var \Mautic\EmailBundle\Entity\Email $entity */
-            $entity  = $model->getEntity();
+            $entity = $model->getEntity();
         }
 
         $method  = $this->request->getMethod();
@@ -576,9 +576,10 @@ class EmailController extends FormController
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
-                    'form'                => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.php', 'MauticEmailBundle:FormTheme\Email'),
-                    'tokens'              => $model->getBuilderComponents($entity, 'tokenSections'),
-                    'email'               => $entity
+                    'form'      => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.php', 'MauticEmailBundle:FormTheme\Email'),
+                    'isVariant' => $entity->isVariant(true),
+                    'tokens'    => $model->getBuilderComponents($entity, 'tokenSections'),
+                    'email'     => $entity
                 ),
                 'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
                 'passthroughVars' => array(
@@ -668,7 +669,7 @@ class EmailController extends FormController
             $entity->setEmailType('template');
         }
 
-        $form   = $model->createForm($entity, $this->get('form.factory'), $action, array('update_select' => $updateSelect));
+        $form = $model->createForm($entity, $this->get('form.factory'), $action, array('update_select' => $updateSelect));
 
         ///Check for a submitted form and process it
         if (!$ignorePost && $method == 'POST') {
@@ -792,6 +793,7 @@ class EmailController extends FormController
             array(
                 'viewParameters'  => array(
                     'form'               => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.php', 'MauticEmailBundle:FormTheme\Email'),
+                    'isVariant'          => $entity->isVariant(true),
                     'tokens'             => (!empty($tokens)) ? $tokens['tokenSections'] : $model->getBuilderComponents($entity, 'tokenSections'),
                     'email'              => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
@@ -1009,6 +1011,9 @@ class EmailController extends FormController
                 return $this->accessDenied();
             }
 
+            // Note this since it's cleared on __clone()
+            $emailType = $entity->getEmailType();
+
             $clone = clone $entity;
 
             //reset
@@ -1018,13 +1023,11 @@ class EmailController extends FormController
             $clone->setVariantSentCount(0);
             $clone->setVariantStartDate(null);
             $clone->setIsPublished(false);
+            $clone->setEmailType($emailType);
             $clone->setVariantParent($entity);
-
-            $model->saveEntity($clone);
-            $objectId = $clone->getId();
         }
 
-        return $this->editAction($objectId, true);
+        return $this->newAction($clone);
     }
 
     /**

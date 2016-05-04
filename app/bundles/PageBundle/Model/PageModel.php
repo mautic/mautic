@@ -9,6 +9,7 @@
 
 namespace Mautic\PageBundle\Model;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\PageBundle\Entity\Hit;
@@ -101,67 +102,46 @@ class PageModel extends FormModel
             $entity->setAlias($alias);
         }
 
-        $now = new \DateTime();
+        $now = new DateTimeHelper();
 
         //set the author for new pages
-        if (!$entity->isNew()) {
+        $isNew = $entity->isNew();
+        if (!$isNew) {
             //increase the revision
             $revision = $entity->getRevision();
             $revision++;
             $entity->setRevision($revision);
+        }
 
-            //reset the variant hit and start date if there are any changes
-            $changes   = $entity->getChanges();
-            $isVariant = $entity->getVariantStartDate();
-            if ($isVariant !== null && !empty($changes) && empty($this->inConversion)) {
-                $entity->setVariantHits(0);
-                $entity->setVariantStartDate($now);
-            }
+        // Reset the variant hit and start date if there are any changes and if this is an A/B test
+        // Do it here in addition to the blanket resetVariants call so that it's available to the event listeners
+        $changes = $entity->getChanges();
+        $parent  = $entity->getVariantParent();
+
+        if ($parent !== null && !empty($changes) && empty($this->inConversion)) {
+            $entity->setVariantHits(0);
+            $entity->setVariantStartDate($now->getDateTime());
         }
 
         parent::saveEntity($entity, $unlock);
 
-        //also reset variants if applicable due to changes
-        if (!empty($changes) && empty($this->inConversion)) {
-            $parent   = $entity->getVariantParent();
-            $children = (!empty($parent)) ? $parent->getVariantChildren() : $entity->getVariantChildren();
+        // If parent, add this entity as a child of the parent so that it populates the list in the tab (due to Doctrine hanging on to entities in memory)
+        if ($parent) {
+            $parent->addVariantChild($entity);
+        }
+        if ($translationParent = $entity->getTranslationParent()) {
+            $translationParent->addTranslationChild($entity);
+        }
 
-            $variants = array();
-            if (!empty($parent)) {
-                $parent->setVariantHits(0);
-                $parent->setVariantStartDate($now);
-                $variants[] = $parent;
-            }
-
-            if (count($children)) {
-                foreach ($children as $child) {
-                    $child->setVariantHits(0);
-                    $child->setVariantStartDate($now);
-                    $variants[] = $child;
-                }
-            }
+        // Reset associated variants if applicable due to changes
+        if ($entity->isVariant() && !empty($changes) && empty($this->inConversion)) {
+            $dateString = $now->toUtcString();
+            $parentId = (!empty($parent)) ? $parent->getId() : $entity->getId();
+            $this->getRepository()->resetVariants($parentId, $dateString);
 
             //if the parent was changed, then that parent/children must also be reset
             if (isset($changes['variantParent'])) {
-                $parent = $this->getEntity($changes['variantParent'][0]);
-                if (!empty($parent)) {
-                    $parent->setVariantHits(0);
-                    $parent->setVariantStartDate($now);
-                    $variants[] = $parent;
-
-                    $children = $parent->getVariantChildren();
-                    if (count($children)) {
-                        foreach ($children as $child) {
-                            $child->setVariantHits(0);
-                            $child->setVariantStartDate($now);
-                            $variants[] = $child;
-                        }
-                    }
-                }
-            }
-
-            if (!empty($variants)) {
-                $this->saveEntities($variants, false);
+                $this->getRepository()->resetVariants($changes['variantParent'][0], $dateString);
             }
         }
     }

@@ -9,6 +9,7 @@
 
 namespace Mautic\EmailBundle\Model;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
@@ -79,7 +80,7 @@ class EmailModel extends FormModel
      */
     public function saveEntity ($entity, $unlock = true)
     {
-        $now = new \DateTime();
+        $now = new DateTimeHelper();
 
         $type = $entity->getEmailType();
         if (empty($type)) {
@@ -100,58 +101,35 @@ class EmailModel extends FormModel
             $revision = $entity->getRevision();
             $revision++;
             $entity->setRevision($revision);
+        }
 
-            //reset the variant hit and start date if there are any changes
-            $changes = $entity->getChanges();
-            if ($entity->isVariant() && !empty($changes) && empty($this->inConversion)) {
-                $entity->setVariantSentCount(0);
-                $entity->setVariantStartDate($now);
-            }
+        // Reset the variant hit and start date if there are any changes and if this is an A/B test
+        // Do it here in addition to the blanket resetVariants call so that it's available to the event listeners
+        $changes = $entity->getChanges();
+        $parent  = $entity->getVariantParent();
+
+        if ($parent !== null && !empty($changes) && empty($this->inConversion)) {
+            $entity->setVariantSentCount(0);
+            $entity->setVariantReadCount(0);
+            $entity->setVariantStartDate($now->getDateTime());
         }
 
         parent::saveEntity($entity, $unlock);
 
-        //also reset variants if applicable due to changes
-        if (!empty($changes) && empty($this->inConversion)) {
-            $parent   = $entity->getVariantParent();
-            $children = (!empty($parent)) ? $parent->getVariantChildren() : $entity->getVariantChildren();
+        // If parent, add this entity as a child of the parent so that it populates the list in the tab (due to Doctrine hanging on to entities in memory)
+        if ($parent) {
+            $parent->addVariantChild($entity);
+        }
 
-            $variants = array();
-            if (!empty($parent)) {
-                $parent->setVariantSentCount(0);
-                $parent->setVariantStartDate($now);
-                $variants[] = $parent;
-            }
-
-            if (count($children)) {
-                foreach ($children as $child) {
-                    $child->setVariantSentCount(0);
-                    $child->setVariantStartDate($now);
-                    $variants[] = $child;
-                }
-            }
+        // Reset associated variants if applicable due to changes
+        if ($entity->isVariant() && !empty($changes) && empty($this->inConversion)) {
+            $dateString = $now->toUtcString();
+            $parentId = (!empty($parent)) ? $parent->getId() : $entity->getId();
+            $this->getRepository()->resetVariants($parentId, $dateString);
 
             //if the parent was changed, then that parent/children must also be reset
             if (isset($changes['variantParent'])) {
-                $parent = $this->getEntity($changes['variantParent'][0]);
-                if (!empty($parent)) {
-                    $parent->setVariantSentCount(0);
-                    $parent->setVariantStartDate($now);
-                    $variants[] = $parent;
-
-                    $children = $parent->getVariantChildren();
-                    if (count($children)) {
-                        foreach ($children as $child) {
-                            $child->setVariantSentCount(0);
-                            $child->setVariantStartDate($now);
-                            $variants[] = $child;
-                        }
-                    }
-                }
-            }
-
-            if (!empty($variants)) {
-                $this->saveEntities($variants, false);
+                $this->getRepository()->resetVariants($changes['variantParent'][0], $dateString);
             }
         }
     }
