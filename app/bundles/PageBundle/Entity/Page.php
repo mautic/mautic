@@ -11,9 +11,9 @@ namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -273,7 +273,7 @@ class Page extends FormEntity
         )));
 
         $metadata->addConstraint(new Callback(array(
-            'callback' => function ($page, ExecutionContextInterface $context) {
+            'callback' => function (Page $page, ExecutionContextInterface $context) {
                 $translationParent = $page->getTranslationParent();
 
                 if ($translationParent !== null) {
@@ -300,6 +300,25 @@ class Page extends FormEntity
                         $string = (string) $violations;
                         $context->buildViolation($string)
                             ->atPath('redirectUrl')
+                            ->addViolation();
+                    }
+                }
+
+                if ($page->isVariant()) {
+                    // Get a summation of weights
+                    $parent = $page->getVariantParent();
+                    $children = $parent ? $parent->getVariantChildren() : $page->getVariantChildren();
+
+                    $total = 0;
+                    foreach ($children as $child) {
+                        $settings = $child->getVariantSettings();
+                        $total += (int) $settings['weight'];
+                    }
+
+                    if ($total > 100) {
+                        //die(var_dump($context));
+                        $context->buildViolation('mautic.core.variant_weights_invalid')
+                            ->atPath('variantSettings[weight]')
                             ->addViolation();
                     }
                 }
@@ -636,7 +655,7 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function setCategory (\Mautic\CategoryBundle\Entity\Category $category = null)
+    public function setCategory (Category $category = null)
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -732,7 +751,9 @@ class Page extends FormEntity
      */
     public function addTranslationChild (Page $translationChildren)
     {
-        $this->translationChildren[] = $translationChildren;
+        if (!$this->translationChildren->contains($translationChildren)) {
+            $this->translationChildren[] = $translationChildren;
+        }
 
         return $this;
     }
@@ -800,7 +821,9 @@ class Page extends FormEntity
      */
     public function addVariantChild (Page $variantChildren)
     {
-        $this->variantChildren[] = $variantChildren;
+        if (!$this->variantChildren->contains($variantChildren)) {
+            $this->variantChildren[] = $variantChildren;
+        }
 
         return $this;
     }
@@ -838,6 +861,20 @@ class Page extends FormEntity
         $this->variantParent = $variantParent;
 
         return $this;
+    }
+
+    /**
+     * @param bool $isChild True to return if the email is a variant of a parent
+     *
+     * @return bool
+     */
+    public function isVariant($isChild = false)
+    {
+        if ($isChild) {
+            return ($this->variantParent === null) ? false : true;
+        } else {
+            return (!empty($this->variantParent) || count($this->variantChildren)) ? true : false;
+        }
     }
 
     /**
