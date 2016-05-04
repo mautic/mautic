@@ -13,15 +13,13 @@ $data = $event['extra']['log']['metadata'];
 if (isset($data['failed'])) {
     return;
 }
-
-$notification = $data['notification'];
 ?>
 
 <li class="wrapper form-submitted">
     <div class="figure"><span class="fa <?php echo isset($icons['notification']) ? $icons['notification'] : '' ?>"></span></div>
     <div class="panel">
         <div class="panel-body">
-            <h3><?php echo $notification['name']; ?></h3>
+            <h3><?php echo $data['name']; ?></h3>
             <p class="mb-0"><?php echo $view['translator']->trans('mautic.core.timeline.event.time', array('%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel'])); ?></p>
         </div>
         <div class="panel-footer">
@@ -33,9 +31,9 @@ $notification = $data['notification'];
             </dl>
             <div class="small">
                 <hr />
-                <strong><?php echo $notification['heading']; ?></strong>
+                <strong><?php echo $data['heading']; ?></strong>
                 <br />
-                <?php echo $notification['content']; ?>
+                <?php echo $data['content']; ?>
             </div>
         </div>
     </div>

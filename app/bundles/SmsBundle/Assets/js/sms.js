@@ -121,3 +121,27 @@ Mautic.loadNewSmsWindow = function(options) {
         }, 100);
     }
 };
+
+Mautic.standardSmsUrl = function(options) {
+    if (!options) {
+        return;
+    }
+
+    var url = options.windowUrl;
+    if (url) {
+        var editEmailKey = '/sms/edit/smsId';
+        if (url.indexOf(editEmailKey) > -1) {
+            options.windowUrl = url.replace('smsId', mQuery('#campaignevent_properties_sms').val());
+        }
+    }
+
+    return options;
+};
+
+Mautic.disabledSmsAction = function() {
+    var sms = mQuery('#campaignevent_properties_sms').val();
+
+    var disabled = sms === '' || sms === null;
+
+    mQuery('#campaignevent_properties_editSmsButton').prop('disabled', disabled);
+};

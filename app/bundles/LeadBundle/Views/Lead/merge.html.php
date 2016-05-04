@@ -18,7 +18,6 @@
         'target'        => '.lead-merge-options',
         'tmpl'          => 'update'
     )); ?>
-
     <div class="lead-merge-options mt-sm">
 <?php endif; ?>
 
