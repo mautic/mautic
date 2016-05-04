@@ -567,7 +567,7 @@ class NotificationController extends FormController
                     array(
                         'updateSelect'      => $form['updateSelect']->getData(),
                         'notificationId'    => $entity->getId(),
-                        'notificationTitle' => $entity->getTitle(),
+                        'notificationTitle' => $entity->getName(),
                         'notificationLang'  => $entity->getLanguage()
                     )
                 );
