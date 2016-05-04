@@ -392,7 +392,7 @@ class EmailController extends FormController
                 'viewParameters'  => array(
                     'email'          => $email,
                     'stats'          => $stats,
-                    'trackables    ' => $trackableLinks,
+                    'trackables'     => $trackableLinks,
                     'pending'        => $model->getPendingLeads($email, null, true),
                     'logs'           => $logs,
                     'variants'       => array(
