@@ -22,7 +22,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.notificati
         'templateButtons' => array(
             'delete' => $permissions['notification:notifications:deleteown'] || $permissions['notification:notifications:deleteother']
         ),
-        'filters'     => $filters
+        //'filters'     => $filters //@todo
     )); ?>
 
     <div class="page-list">
