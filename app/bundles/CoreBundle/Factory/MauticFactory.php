@@ -408,19 +408,33 @@ class MauticFactory
             if (substr($path, -1) === '/') {
                 $path = substr($path, 0, -1);
             }
-        } elseif ($name == 'dashboard') {
+        } elseif ($name == 'dashboard.user' || $name == 'dashboard.global') {
             //these are absolute regardless as they are configurable
-            $path = $this->getParameter('dashboard_import_dir');
-            if (substr($path, -1) !== '/') {
-                $path .= '/';
+            $globalPath = $this->getParameter('dashboard_import_dir');
+            if (substr($globalPath, -1) === '/') {
+                $globalPath = substr($globalPath, 0, -1);
             }
 
-            $user  = $this->getUser();
-            $path .= $user->getId();
+            if ($name == 'dashboard.global') {
 
-            if (!file_exists($path)) {
-                mkdir($path, 0755);
+                return $globalPath;
             }
+
+            if (!$userPath = $this->getParameter('dashboard_import_user_dir')) {
+                $userPath = $globalPath;
+            } elseif (substr($userPath, -1) === '/') {
+                $userPath = substr($userPath, 0, -1);
+            }
+
+            $user      = $this->getUser();
+            $userPath .= '/'.$user->getId();
+
+            // @todo check is_writable
+            if (!is_dir($userPath) && !file_exists($userPath)) {
+                mkdir($userPath, 0755);
+            }
+
+            return $userPath;
         } elseif (isset($paths[$name])) {
             $path = $paths[$name];
         } elseif (strpos($name, '_root') !== false) {
