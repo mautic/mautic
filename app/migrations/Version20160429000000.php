@@ -15,12 +15,12 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\LeadBundle\Entity\DoNotContact;
 
 /**
- * Universal DNC Migration
+ * Trackables
  */
-class Version20160426000000 extends AbstractMauticMigration
+class Version20160429000000 extends AbstractMauticMigration
 {
-    private $leadIdIdx;
-    private $leadIdFk;
+    private $redirectIdx;
+    private $redirectFk;
 
     /**
      * @param Schema $schema
@@ -30,12 +30,13 @@ class Version20160426000000 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        if ($schema->hasTable($this->prefix.'lead_donotcontact')) {
+        if ($schema->hasTable($this->prefix.'channel_url_trackables')) {
+
             throw new SkipMigrationException('Schema includes this migration');
         }
 
-        $this->leadIdIdx = $this->generatePropertyName($this->prefix . 'lead_donotcontact', 'idx', array('lead_id'));
-        $this->leadIdFk  = $this->generatePropertyName($this->prefix . 'lead_donotcontact', 'fk', array('lead_id'));
+        $this->redirectIdx = $this->generatePropertyName($this->prefix . 'channel_url_trackables', 'idx', array('redirect_id'));
+        $this->redirectFk  = $this->generatePropertyName($this->prefix . 'channel_url_trackables', 'fk', array('redirect_id'));
     }
 
     /**
@@ -45,22 +46,22 @@ class Version20160426000000 extends AbstractMauticMigration
     {
 
         $sql = <<<SQL
-CREATE TABLE `{$this->prefix}lead_donotcontact` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `lead_id` int(11) DEFAULT NULL,
-  `channel` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `channel_id` int(11) DEFAULT NULL,
-  `date_added` datetime NOT NULL COMMENT '(DC2Type:datetime)',
-  `reason` smallint NOT NULL,
-  `comments` longtext COLLATE utf8_unicode_ci,
-  PRIMARY KEY (`id`),
-  KEY `{$this->leadIdIdx}` (`lead_id`),
-  KEY `{$this->prefix}dnc_reason_search` (`reason`),
-  CONSTRAINT `{$this->leadIdFk}` FOREIGN KEY (`lead_id`) REFERENCES `{$this->prefix}leads` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+CREATE TABLE {$this->prefix}channel_url_trackables (
+  redirect_id INT NOT NULL, 
+  channel_id INT NOT NULL, 
+  channel VARCHAR(255) NOT NULL, 
+  hits INT NOT NULL, 
+  unique_hits INT NOT NULL, 
+  INDEX {$this->redirectIdx} (redirect_id),
+  INDEX {$this->prefix}channel_url_trackable_search (channel, channel_id),
+  PRIMARY KEY(redirect_id, channel_id)
+) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB
 SQL;
-
         $this->addSql($sql);
+
+        $this->addSql("ALTER TABLE {$this->prefix}channel_url_trackables ADD CONSTRAINT {$this->redirectFk} FOREIGN KEY (redirect_id) REFERENCES {$this->prefix}page_redirects (id) ON DELETE CASCADE");
+
+        $this->addSql("CREATE INDEX {$this->prefix}page_redirect_url_search ON {$this->prefix}page_redirects (url)");
     }
 
     /**
@@ -68,31 +69,26 @@ SQL;
      */
     public function postgresqlUp(Schema $schema)
     {
-        $this->addSql("CREATE SEQUENCE {$this->prefix}lead_donotcontact_id_seq INCREMENT BY 1 MINVALUE 1 START 1");
-
         $sql = <<<SQL
-CREATE TABLE {$this->prefix}lead_donotcontact (
-  id INT NOT NULL, 
-  lead_id INT DEFAULT NULL, 
-  date_added TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, 
-  reason SMALLINT NOT NULL, 
+CREATE TABLE {$this->prefix}channel_url_trackables (
+  redirect_id INT NOT NULL, 
+  channel_id INT NOT NULL, 
   channel VARCHAR(255) NOT NULL, 
-  channel_id INT DEFAULT NULL, 
-  comments TEXT DEFAULT NULL, 
-  PRIMARY KEY(id)
-);
+  hits INT NOT NULL, 
+  unique_hits INT NOT NULL, PRIMARY KEY(redirect_id, channel_id)
+)
 SQL;
-
         $this->addSql($sql);
 
-        $this->addSql("CREATE INDEX {$this->leadIdIdx} ON {$this->prefix}lead_donotcontact (lead_id)");
-        $this->addSql("CREATE INDEX {$this->prefix}dnc_reason_search ON {$this->prefix}lead_donotcontact (reason)");
-        $this->addSql("COMMENT ON COLUMN {$this->prefix}lead_donotcontact.date_added IS '(DC2Type:datetime)'");
-        $this->addSql("ALTER TABLE {$this->prefix}lead_donotcontact ADD CONSTRAINT {$this->leadIdFk} FOREIGN KEY (lead_id) REFERENCES {$this->prefix}leads (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE");
+        $this->addSql("CREATE INDEX {$this->redirectIdx} ON {$this->prefix}channel_url_trackables (redirect_id)");
+        $this->addSql("CREATE INDEX {$this->prefix} ON {$this->prefix}channel_url_trackables (channel, channel_id)");
+        $this->addSql("ALTER TABLE {$this->prefix}channel_url_trackables ADD CONSTRAINT {$this->redirectFk} FOREIGN KEY (redirect_id) REFERENCES {$this->prefix}page_redirects (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE");
+
+        $this->addSql("CREATE INDEX {$this->prefix}page_redirect_url_search ON {$this->prefix}page_redirects (url)");
     }
 
     /**
-     * Migrate existing email_donotemail entries to the new lead_donotcontact format
+     * Migrate email redirects to the trackable table
      *
      * @param Schema $schema
      */
@@ -101,8 +97,11 @@ SQL;
         $logger = $this->factory->getLogger();
         $qb = $this->connection->createQueryBuilder();
 
-        $qb->select('dne.email_id, dne.lead_id, dne.date_added, dne.unsubscribed, dne.bounced, dne.manual, dne.comments')
-            ->from($this->prefix.'email_donotemail', 'dne')
+        $qb->select('r.id, r.email_id, r.hits, r.unique_hits')
+            ->from($this->prefix.'page_redirects', 'r')
+            ->where(
+                $qb->expr()->isNotNull('r.email_id')
+            )
             ->setMaxResults(500);
 
         $start = 0;
@@ -111,40 +110,15 @@ SQL;
             $this->connection->beginTransaction();
 
             foreach ($results as $row) {
-                // Build the new format
-                if (empty($row['lead_id'])) {
-                    continue;
-                }
-
                 $insert = array(
-                    'lead_id'    => $row['lead_id'],
-                    'channel'    => 'email',
-                    'channel_id' => $row['email_id'],
-                    'date_added' => $row['date_added'],
-                    'comments'   => $row['comments']
+                    'redirect_id' => $row['id'],
+                    'channel'     => 'email',
+                    'channel_id'  => $row['email_id'],
+                    'hits'        => $row['hits'],
+                    'unique_hits' => $row['unique_hits']
                 );
 
-                if ('postgresql' == $this->platform) {
-                    // Get ID from sequence
-                    $nextVal = (int)$this->connection->fetchColumn(
-                        $this->connection->getDatabasePlatform()->getSequenceNextValSQL("{$this->prefix}lead_donotcontact_id_seq")
-                    );
-                    $insert['id'] = $nextVal;
-                }
-
-                switch (true) {
-                    case (!empty($row['unsubscribed'])):
-                        $insert['reason'] = DoNotContact::UNSUBSCRIBED;
-                        break;
-                    case (!empty($row['bounced'])):
-                        $insert['reason'] = DoNotContact::BOUNCED;
-                        break;
-                    default:
-                        $insert['reason'] = DoNotContact::MANUAL;
-                        break;
-                }
-
-                $this->connection->insert($this->prefix.'lead_donotcontact', $insert);
+                $this->connection->insert($this->prefix.'channel_url_trackables', $insert);
 
                 unset($insert);
             }

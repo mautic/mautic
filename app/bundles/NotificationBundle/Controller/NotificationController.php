@@ -294,7 +294,7 @@ class NotificationController extends FormController
                 'viewParameters'  => array(
                     'notification'   => $notification,
                     'stats'          => $stats,
-                    'trackableLinks' => $trackableLinks,
+                    'trackables'     => $trackableLinks,
                     'logs'           => $logs,
                     'permissions'    => $security->isGranted(
                         array(

@@ -23,27 +23,9 @@ use Mautic\SmsBundle\SmsEvents;
 class SmsSubscriber extends CommonSubscriber
 {
     /**
-     * @var Http
-     */
-    protected $http;
-
-    /**
      * @var string
      */
     protected $urlRegEx = '/https?\:\/\/([a-zA-Z0-9\-\.]+\.[a-zA-Z]+(\.[a-zA-Z])?)(\/\S*)?/i';
-
-    /**
-     * SmsSubscriber constructor.
-     * 
-     * @param MauticFactory $factory
-     * @param Http $http
-     */
-    public function __construct(MauticFactory $factory, Http $http)
-    {
-        $this->http = $http;
-        
-        parent::__construct($factory);
-    }
 
     /**
      * {@inheritdoc}
@@ -69,13 +51,11 @@ class SmsSubscriber extends CommonSubscriber
             preg_match_all($this->urlRegEx, $content, $matches);
 
             foreach ($matches[0] as $url) {
-                $tokens[$url] = $this->buildShortLink(
-                    $smsApi->convertToTrackedUrl(
-                        $url,
-                        array(
-                            'sms' => $event->getSmsId(),
-                            'lead' => $event->getLead()->getId()
-                        )
+                $tokens[$url] = $smsApi->convertToTrackedUrl(
+                    $url,
+                    array(
+                        'sms'  => $event->getSmsId(),
+                        'lead' => $event->getLead()->getId()
                     )
                 );
             }
@@ -96,23 +76,5 @@ class SmsSubscriber extends CommonSubscriber
     protected function contentHasLinks($content)
     {
         return preg_match($this->urlRegEx, $content);
-    }
-
-    /**
-     * @param $url
-     *
-     * @return string
-     */
-    protected function buildShortLink($url)
-    {
-        $linkShortenerUrl = $this->factory->getParameter('link_shortener_url');
-        
-        if (! $linkShortenerUrl) {
-            return $url;
-        }
-
-        $response = $this->http->get($linkShortenerUrl . urlencode($url));
-
-        return ($response->code === 200) ? rtrim($response->body) : $url;
     }
 }

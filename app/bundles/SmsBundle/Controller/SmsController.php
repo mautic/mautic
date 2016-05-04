@@ -214,6 +214,7 @@ class SmsController extends FormController
                     'permissions' => $permissions,
                     'model'       => $model,
                     'security'    => $this->factory->getSecurity(),
+                    'configured'  => $this->factory->getParameter('sms_enabled')
                 ),
                 'contentTemplate' => 'MauticSmsBundle:Sms:list.html.php',
                 'passthroughVars' => array(
@@ -294,7 +295,7 @@ class SmsController extends FormController
                 'viewParameters'  => array(
                     'sms'         => $sms,
                     'stats'       => $stats,
-                    'trackableLinks' => $trackableLinks,
+                    'trackables'  => $trackableLinks,
                     'logs'        => $logs,
                     'permissions' => $security->isGranted(
                         array(

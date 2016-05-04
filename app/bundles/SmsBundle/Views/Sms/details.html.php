@@ -55,7 +55,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <ul class="nav nav-tabs pr-md pl-md">
                 <li class="active">
                     <a href="#clicks-container" role="tab" data-toggle="tab">
-                        <?php echo $view['translator']->trans('mautic.sms.click_tracks'); ?>
+                        <?php echo $view['translator']->trans('mautic.trackable.click_counts'); ?>
                     </a>
                 </li>
             </ul>
@@ -65,36 +65,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
             <div class="tab-pane active bdr-w-0" id="clicks-container">
-                <?php if (!empty($trackableLinks)): ?>
-                <div class="table-responsive">
-                    <table class="table table-hover table-striped table-bordered click-list">
-                        <thead>
-                            <tr>
-                                <td><?php echo $view['translator']->trans('mautic.page.url'); ?></td>
-                                <td><?php echo $view['translator']->trans('mautic.sms.click_count'); ?></td>
-                                <td><?php echo $view['translator']->trans('mautic.sms.click_unique_count'); ?></td>
-                                <td><?php echo $view['translator']->trans('mautic.sms.click_track_id'); ?></td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($trackableLinks as $link): ?>
-                            <tr>
-                                <td><a href="<?php echo $link['url']; ?>"><?php echo $link['url']; ?></a></td>
-                                <td class="text-center"><?php echo $link['hits']; ?></td>
-                                <td class="text-center"><?php echo $link['unique_hits']; ?></td>
-                                <td><?php echo $link['redirect_id']; ?></td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <?php else: ?>
-                    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', array(
-                        'header'  => 'mautic.sms.click_tracks.header_none',
-                        'message' => 'mautic.sms.click_tracks.none'
-                    )); ?>
-                    <div class="clearfix"></div>
-                <?php endif; ?>
+                <?php echo $view->render('MauticPageBundle:Trackable:click_counts.html.php', array('trackables' => $trackables )); ?>
             </div>
         </div>
     </div>

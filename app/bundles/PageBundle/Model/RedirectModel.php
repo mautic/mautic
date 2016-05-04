@@ -10,7 +10,9 @@
 namespace Mautic\PageBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Entity\Trackable;
 
 /**
  * Class RedirectModel
@@ -29,55 +31,163 @@ class RedirectModel extends FormModel
     }
 
     /**
-     * @param Redirect $redirect
-     * @param array    $clickthrough
+     * @param $identifier
      *
-     * @return string
+     * @return null|Redirect
      */
-    public function generateRedirectUrl(Redirect $redirect, $clickthrough = array())
+    public function getRedirectById($identifier)
     {
-        $url  = $this->buildUrl('mautic_page_trackable', array('redirectId' => $redirect->getRedirectId()), true, $clickthrough);
-
-        return $url;
+        return $this->getRepository()->findOneBy(array('redirectId' => $identifier));
     }
 
     /**
-     * @param      $url
-     * @param null $forEmail
-     * @param bool $createEntity
+     * Generate a Mautic redirect/passthrough URL
+     *
+     * @param Redirect $redirect
+     * @param array    $clickthrough
+     * @param bool     $shortenUrl
+     *
+     * @return string
+     */
+    public function generateRedirectUrl(Redirect $redirect, $clickthrough = array(), $shortenUrl = false)
+    {
+        return $this->buildUrl(
+            'mautic_url_redirect',
+            array('redirectId' => $redirect->getRedirectId()),
+            true,
+            $clickthrough,
+            $shortenUrl
+        );
+    }
+
+    /**
+     * Get a Redirect entity by URL
+     *
+     * Note that $forEmail and $createEntity is deprecated and support will be removed in 2.0
+     * Use Mautic\PageBundle\Model\TrackableModel::getTrackableByUrl() if associated with a channel
+     *
+     * @param  $url
      *
      * @return Redirect|null
      */
-    public function getRedirectByUrl($url, $forEmail = null, $createEntity = true)
+    public function getRedirectByUrl ($url)
     {
+        // @deprecated support for $forEmail to be removed in 2.0
+        if (func_num_args() > 1) {
+            $args = func_get_args();
+            $forEmail     = $args[1];
+            $createEntity = (!empty($args[2]));
+
+            return $this->getRedirectForEmail($url, $forEmail, $createEntity);
+        }
+
         // Ensure the URL saved to the database does not have encoded ampersands
         $url = str_replace('&amp;', '&', $url);
 
         $repo     = $this->getRepository();
-        $criteria = array('url' => $url);
+        $redirect = $repo->findOneBy(array('url' => $url));
 
-        $criteria['email'] = $forEmail;
-
-        $redirect = $repo->findOneBy($criteria);
-
-        if ($redirect == null && $createEntity) {
-            $redirect = new Redirect();
-            $redirect->setUrl($url);
-            $redirect->setEmail($forEmail);
-
-            $redirect->setRedirectId();
-            $this->setTimestamps($redirect, true);
+        if ($redirect == null) {
+            $redirect = $this->createRedirectEntity($url);
         }
 
         return $redirect;
     }
 
     /**
+     * Get Redirect entities by an array of URLs
+     *
+     * @param array $urls
+     *
+     * @return array
+     */
+    public function getRedirectsByUrls (array $urls)
+    {
+        $redirects   = $this->getRepository()->findByUrls(array_values($urls));
+        $newEntities = array();
+        $return      = array();
+        $byUrl       = array();
+
+        foreach ($redirects as $redirect) {
+            $byUrl[$redirect->getUrl()] = $redirect;
+        }
+
+        foreach ($urls as $key => $url) {
+            if (empty($url)) {
+
+                continue;
+            }
+
+            if (isset($byUrl[$url])) {
+                $return[$key] = $byUrl[$url];
+            } else {
+                $redirect = $this->createRedirectEntity($url);
+                $newEntities[] = $redirect;
+                $return[$key]  = $redirect;
+            }
+        }
+
+        // Save new entities
+        if (count($newEntities)) {
+            $this->getRepository()->saveEntities($newEntities);
+        }
+
+        unset($redirects, $newEntities, $byUrl);
+
+        return $return;
+    }
+
+    /**
+     * Create a Redirect entity for URL
+     *
+     * @param $url
+     *
+     * @return Redirect
+     */
+    public function createRedirectEntity($url)
+    {
+        $redirect = new Redirect();
+        $redirect->setUrl($url);
+        $redirect->setRedirectId();
+
+        $this->setTimestamps($redirect, true);
+
+        return $redirect;
+    }
+
+    /**
+     * Get a Redirect entity by URL for an email
+     *
+     * @param      $url
+     * @param null $forEmail
+     * @param bool $createEntity
+     *
+     * @return Redirect|null
+     *
+     * @deprecated To be removed in 2.0
+     */
+    private function getRedirectForEmail($url, $forEmail = null, $createEntity = true)
+    {
+        if ($forEmail) {
+            /** @var TrackableModel $model */
+            $model = $this->factory->getModel('page.trackable');
+
+            return $model->getTrackableByUrl($url, 'email', $forEmail->getId());
+        }
+
+        return $createEntity ? $this->createRedirectEntity($url) : null;
+    }
+
+    /**
+     * Get Redirect entities by an array of URLs
+     *
      * @param      $urls
      * @param null $forEmail
      * @param bool $createEntity
      *
      * @return array
+     *
+     * @deprecated To be removed in 2.0; use Mautic\PageBundle\Model\TrackableModel::getTrackablesByUrls() instead
      */
     public function getRedirectListByUrls($urls, $forEmail = null, $createEntity = true)
     {
@@ -99,13 +209,7 @@ class RedirectModel extends FormModel
             if (isset($byUrl[$url])) {
                 $return[$key] = $byUrl[$url];
             } elseif ($createEntity) {
-                $redirect = new Redirect();
-                $redirect->setUrl($url);
-                $redirect->setEmail($forEmail);
-                $redirect->setRedirectId();
-                $this->setTimestamps($redirect, true);
-
-                $return[$key] = $redirect;
+                $return[$key] = $this->createRedirectEntity($url, $forEmail);
             }
         }
 
@@ -115,10 +219,14 @@ class RedirectModel extends FormModel
     }
 
     /**
+     * Get array of Redirect entities by array of IDs
+     *
      * @param      $ids
      * @param null $forEmail
      *
      * @return array
+     *
+     * @deprecated To be removed in 2.0; no replacement
      */
     public function getRedirectListByIds($ids, $forEmail = null)
     {
@@ -143,24 +251,20 @@ class RedirectModel extends FormModel
     }
 
     /**
-     * @param $identifier
+     * Get Redirect URL for an email
      *
-     * @return null|Redirect
-     */
-    public function getRedirectById($identifier)
-    {
-        return $this->getRepository()->findOneBy(array('redirectId' => $identifier));
-    }
-
-    /**
      * @param $source
      * @param $id
      *
      * @return mixed
+     *
+     * @deprecated To be removed in 2.0; use Mautic\PageBundle\Model\TrackableModel::getTrackableList() instead
      */
     public function getRedirectListBySource($source, $id)
     {
-        return $this->getRepository()->findBySource($source, $id);
-    }
+        /** @var TrackableModel $model */
+        $model = $this->factory->getModel('page.trackable');
 
+        return $model->getTrackableList($source, $id);
+    }
 }
