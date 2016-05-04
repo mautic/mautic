@@ -251,6 +251,9 @@ class PointModel extends CommonFormModel
                         $delta,
                         $ipAddress
                     );
+                    
+                    $event = new PointActionEvent($action, $lead);
+                    $this->dispatcher->dispatch(PointEvents::POINT_ON_ACTION, $event);
 
                     $log = new LeadPointLog();
                     $log->setIpAddress($ipAddress);
