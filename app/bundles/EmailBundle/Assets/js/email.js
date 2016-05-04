@@ -76,6 +76,8 @@ Mautic.emailOnLoad = function (container, response) {
             newOption.prop('selected', true);
 
             opener.mQuery(el).trigger("chosen:updated");
+
+            Mautic.disabledEmailAction(opener);
         }
 
         window.close();
@@ -389,11 +391,14 @@ Mautic.standardEmailUrl = function(options) {
     return options;
 };
 
-Mautic.disabledEmailAction = function() {
-    var email = mQuery('#campaignevent_properties_email').val();
+Mautic.disabledEmailAction = function(opener) {
+    if (typeof opener == 'undefined') {
+        opener = window;
+    }
+    var email = opener.mQuery('#campaignevent_properties_email').val();
 
     var disabled = email === '' || email === null;
 
-    mQuery('#campaignevent_properties_editEmailButton').prop('disabled', disabled);
-    mQuery('#campaignevent_properties_previewEmailButton').prop('disabled', disabled);
+    opener.mQuery('#campaignevent_properties_editEmailButton').prop('disabled', disabled);
+    opener.mQuery('#campaignevent_properties_previewEmailButton').prop('disabled', disabled);
 };

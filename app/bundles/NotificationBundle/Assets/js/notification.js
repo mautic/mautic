@@ -76,6 +76,8 @@ Mautic.notificationOnLoad = function (container, response) {
             newOption.prop('selected', true);
 
             opener.mQuery(el).trigger("chosen:updated");
+
+            Mautic.disabledNotificationAction(opener);
         }
 
         window.close();
@@ -140,11 +142,14 @@ Mautic.standardNotificationUrl = function(options) {
     return options;
 };
 
-Mautic.disabledNotificationAction = function() {
-    var email = mQuery('#campaignevent_properties_notification').val();
+Mautic.disabledNotificationAction = function(opener) {
+    if (typeof opener == 'undefined') {
+        opener = window;
+    }
 
-    var disabled = email === '' || email === null;
+    var notification = opener.mQuery('#campaignevent_properties_notification').val();
 
-    mQuery('#campaignevent_properties_editNotificationButton').prop('disabled', disabled);
-    mQuery('#campaignevent_properties_previewNotificationButton').prop('disabled', disabled);
+    var disabled = notification === '' || notification === null;
+
+    opener.mQuery('#campaignevent_properties_editNotificationButton').prop('disabled', disabled);
 };

@@ -76,6 +76,8 @@ Mautic.smsOnLoad = function (container, response) {
             newOption.prop('selected', true);
 
             opener.mQuery(el).trigger("chosen:updated");
+
+            Mautic.disabledSmsAction(opener);
         }
 
         window.close();
@@ -138,10 +140,14 @@ Mautic.standardSmsUrl = function(options) {
     return options;
 };
 
-Mautic.disabledSmsAction = function() {
-    var sms = mQuery('#campaignevent_properties_sms').val();
+Mautic.disabledSmsAction = function(opener) {
+    if (typeof opener == 'undefined') {
+        opener = window;
+    }
+
+    var sms = opener.mQuery('#campaignevent_properties_sms').val();
 
     var disabled = sms === '' || sms === null;
 
-    mQuery('#campaignevent_properties_editSmsButton').prop('disabled', disabled);
+    opener.mQuery('#campaignevent_properties_editSmsButton').prop('disabled', disabled);
 };
