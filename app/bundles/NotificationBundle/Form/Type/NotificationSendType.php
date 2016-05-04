@@ -66,7 +66,7 @@ class NotificationSendType extends AbstractType
 
             $builder->add('newNotificationButton', 'button', array(
                 'attr'  => array(
-                    'class'   => 'btn btn-primary',
+                    'class'   => 'btn btn-primary btn-nospin',
                     'onclick' => 'Mautic.loadNewNotificationWindow({
                         "windowUrl": "' . $windowUrl . '"
                     })',
@@ -75,7 +75,7 @@ class NotificationSendType extends AbstractType
                 'label' => 'mautic.notification.send.new.notification'
             ));
 
-            $email = $options['data']['notification'];
+            $notification = $options['data']['notification'];
 
             // create button edit notification
             $windowUrlEdit = $this->router->generate('mautic_notification_action', array(
@@ -87,7 +87,7 @@ class NotificationSendType extends AbstractType
 
             $builder->add('editNotificationButton', 'button', array(
                 'attr'  => array(
-                    'class'     => 'btn btn-primary',
+                    'class'     => 'btn btn-primary btn-nospin',
                     'onclick'   => 'Mautic.loadNewNotificationWindow(Mautic.standardNotificationUrl({"windowUrl": "' . $windowUrlEdit . '"}))',
                     'disabled'  => !isset($notification),
                     'icon'      => 'fa fa-edit'
