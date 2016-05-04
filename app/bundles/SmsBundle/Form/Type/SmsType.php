@@ -116,13 +116,13 @@ class SmsType extends AbstractType
         );
 
         //add category
-        $builder->add(
-            'category',
-            'category',
-            array(
-                'bundle' => 'email'
-            )
-        );
+        // $builder->add(
+        //     'category',
+        //     'category',
+        //     array(
+        //         'bundle' => 'email'
+        //     )
+        // );
 
         //add lead lists
         $transformer = new IdToEntityModelTransformer($this->em, 'MauticLeadBundle:LeadList', 'id', true);

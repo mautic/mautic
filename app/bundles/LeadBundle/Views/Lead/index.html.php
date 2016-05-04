@@ -34,8 +34,9 @@ if ($permissions['lead:leads:create']) {
     );
 }
 
+// Only show toggle buttons for accessibility
 $extraHtml = <<<button
-<div class="btn-group ml-5">
+<div class="btn-group ml-5 sr-only ">
     <span data-toggle="tooltip" title="{$view['translator']->trans('mautic.lead.tooltip.list')}" data-placement="left"><a id="table-view" href="{$view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'list'))}" data-toggle="ajax" class="btn btn-default"><i class="fa fa-fw fa-table"></i></span></a>
     <span data-toggle="tooltip" title="{$view['translator']->trans('mautic.lead.tooltip.grid')}" data-placement="left"><a id="card-view" href="{$view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'grid'))}" data-toggle="ajax" class="btn btn-default"><i class="fa fa-fw fa-th-large"></i></span></a>
 </div>

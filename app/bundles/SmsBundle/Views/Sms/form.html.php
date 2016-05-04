@@ -55,7 +55,7 @@ if (!isset($attachmentSize)) {
             <div id="leadList"<?php echo ($smsType == 'template') ? ' class="hide"' : ''; ?>>
                 <?php echo $view['form']->row($form['lists']); ?>
             </div>
-            <?php echo $view['form']->row($form['category']); ?>
+            <?php //echo $view['form']->row($form['category']); ?>
             <?php echo $view['form']->row($form['language']); ?>
             <div class="hide">
                 <div id="publishStatus"<?php echo ($smsType == 'list') ? ' class="hide"' : ''; ?>>

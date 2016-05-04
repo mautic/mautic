@@ -20,7 +20,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Form\Type\TagListType;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Symfony\Component\Form\FormError;
@@ -74,8 +73,8 @@ class LeadController extends FormController
         $session->set('mautic.lead.filter', $search);
 
         //do some default filtering
-        $orderBy    = $this->factory->getSession()->get('mautic.lead.orderby', 'l.last_active');
-        $orderByDir = $this->factory->getSession()->get('mautic.lead.orderbydir', 'DESC');
+        $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
+        $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
 
         $filter      = array('string' => $search, 'force' => '');
         $translator  = $this->factory->getTranslator();
@@ -412,10 +411,6 @@ class LeadController extends FormController
             }
         }
 
-        $event = new IconEvent($this->factory->getSecurity());
-        $this->factory->getDispatcher()->dispatch(CoreEvents::FETCH_ICONS, $event);
-        $icons = $event->getIcons();
-
         // We need the EmailRepository to check if a lead is flagged as do not contact
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
         $emailRepo = $this->factory->getModel('email')->getRepository();
@@ -435,7 +430,6 @@ class LeadController extends FormController
                     'eventTypes'        => $eventTypes,
                     'eventFilters'      => $filters,
                     'upcomingEvents'    => $upcomingEvents,
-                    'icons'             => $icons,
                     'engagementData'    => $engagementChart,
                     'noteCount'         => $this->factory->getModel('lead.note')->getNoteCount($lead, true),
                     'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value']),
