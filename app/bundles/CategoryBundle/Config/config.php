@@ -63,7 +63,11 @@ return array(
         ),
         'models' =>  array(
             'mautic.category.model.category' => array(
-                'class' => 'Mautic\CategoryBundle\Model\CategoryModel'
+                'class' => 'Mautic\CategoryBundle\Model\CategoryModel',
+                'arguments' => array(
+                    'request_stack',
+                    'mautic.factory'
+                )
             )
         )
     )

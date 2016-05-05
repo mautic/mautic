@@ -124,12 +124,21 @@ return array(
         ),
         'models' =>  array(
             'mautic.campaign.model.campaign' => array(
-                'class' => 'Mautic\CampaignBundle\Model\CampaignModel'
+                'class' => 'Mautic\CampaignBundle\Model\CampaignModel',
+                'arguments' => array(
+                    'mautic.helper.core_parameters',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.list',
+                    'mautic.form.model.form'
+                )
             ),
             'mautic.campaign.model.event' => array(
                 'class' => 'Mautic\CampaignBundle\Model\EventModel',
                 'arguments' => array(
-                    'mautic.helper.ip_lookup'
+                    'mautic.helper.ip_lookup',
+                    'mautic.helper.core_parameters',
+                    'mautic.lead.model.lead',
+                    'mautic.campaign.model.campaign'
                 )
             )
         )

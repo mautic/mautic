@@ -13,6 +13,7 @@ use Doctrine\ORM\PersistentCollection;
 use Mautic\AssetBundle\Event\AssetEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
@@ -66,21 +67,15 @@ class AssetModel extends FormModel
      * @param CategoryModel $categoryModel
      * @param RequestStack $requestStack
      * @param IpLookupHelper $ipLookupHelper
+     * @param CoreParametersHelper $coreParametersHelper
      */
-    public function __construct(LeadModel $leadModel, CategoryModel $categoryModel, RequestStack $requestStack, IpLookupHelper $ipLookupHelper)
+    public function __construct(LeadModel $leadModel, CategoryModel $categoryModel, RequestStack $requestStack, IpLookupHelper $ipLookupHelper, CoreParametersHelper $coreParametersHelper)
     {
         $this->leadModel = $leadModel;
         $this->categoryModel = $categoryModel;
         $this->request = $requestStack->getCurrentRequest();
         $this->ipLookupHelper = $ipLookupHelper;
-    }
-
-    /**
-     * @param int $maxAssetSize
-     */
-    public function setMaxAssetSize($maxAssetSize)
-    {
-        $this->maxAssetSize = $maxAssetSize;
+        $this->maxAssetSize = $coreParametersHelper->getParameter('mautic.max_size');
     }
 
     /**

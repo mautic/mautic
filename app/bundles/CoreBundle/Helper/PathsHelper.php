@@ -49,7 +49,7 @@ class PathsHelper
     /**
      * @var string
      */
-    protected $kernelLogDir;
+    protected $kernelLogsDir;
 
     /**
      * @var User
@@ -58,34 +58,20 @@ class PathsHelper
 
     /**
      * PathsHelper constructor.
-     * @param array $paths
-     * @param string $theme
-     * @param string $imagePath
-     * @param string $dashboardImportDir
-     * @param string $dashboardImportUserDir
-     * @param string $kernelCacheDir
-     * @param string $kernelLogDir
+     * 
+     * @param CoreParametersHelper
      * @param UserHelper $userHelper
      */
-    public function __construct(
-        $paths, 
-        $theme,
-        $imagePath, 
-        $dashboardImportDir, 
-        $dashboardImportUserDir,
-        $kernelCacheDir,
-        $kernelLogDir,
-        UserHelper $userHelper
-    )
+    public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper)
     {
-        $this->paths = $paths;
-        $this->theme = $theme;
-        $this->imagePath = $imagePath;
-        $this->dashboardImportDir = $dashboardImportDir;
-        $this->dashboardUserImportDir = $dashboardImportUserDir;
-        $this->kernelCacheDir = $kernelCacheDir;
-        $this->kernelLogDir = $kernelLogDir;
         $this->user = $userHelper->getUser();
+        $this->paths = $coreParametersHelper->getParameter('mautic.paths');
+        $this->theme = $coreParametersHelper->getParameter('mautic.theme');
+        $this->imagePath = $coreParametersHelper->getParameter('mautic.image_path');
+        $this->dashboardImportDir = $coreParametersHelper->getParameter('mautic.dashboard_import_dir');
+        $this->dashboardImportUserDir = $coreParametersHelper->getParameter('mautic.dashboard_import_user_dir');
+        $this->kernelCacheDir = $coreParametersHelper->getParameter('kernel.cache_dir');
+        $this->kernelLogsDir = $coreParametersHelper->getParameter('kernel.logs_dir');
     }
 
     /**
@@ -102,9 +88,9 @@ class PathsHelper
     {
         if ($name == 'currentTheme' || $name == 'current_theme') {
             $path = $this->paths['themes']."/".$this->theme;
-        } elseif ($name == 'cache' || $name == 'log') {
+        } elseif ($name == 'cache' || $name == 'logs') {
             //these are absolute regardless as they are configurable
-            return ($name === 'cache') ? $this->kernelCacheDir : $this->kernelLogDir;
+            return ($name === 'cache') ? $this->kernelCacheDir : $this->kernelLogsDir;
         } elseif ($name == 'images') {
             $path = $this->imagePath;
             

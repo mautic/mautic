@@ -57,8 +57,8 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onPageHit(PageHitEvent $event)
     {
-        /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
-        $model  = $this->factory->getModel('campaign');
+        /** @var \Mautic\CampaignBundle\Model\EventModel $model */
+        $model  = $this->factory->getModel('campaign.event');
         $hit    = $event->getHit();
         $page   = $hit->getPage();
         $typeId = $page instanceof Page ? 'page.pagehit.' . $page->getId() : null;

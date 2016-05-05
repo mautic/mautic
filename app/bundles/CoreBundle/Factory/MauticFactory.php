@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Templating\Helper\ThemeHelper;
 use Mautic\UserBundle\Entity\User;
@@ -59,47 +60,40 @@ class MauticFactory
     }
 
     /**
-     * @param string $name
+     * Get a model instance from the service container
      *
-     * @return \Mautic\CoreBundle\Model\CommonModel
-     * @throws NotAcceptableHttpException
+     * @param $modelNameKey
+     *
+     * @return AbstractCommonModel
+     * 
+     * @throws \InvalidArgumentException
+     * 
+     * @deprecated
      */
-    public function getModel($name)
+    public function getModel($modelNameKey)
     {
-        static $models = array();
-
-        //shortcut for models with same name as bundle
-        if (strpos($name, '.') === false) {
-            $name = "$name.$name";
+        static $modelInstances;
+        
+        // Shortcut for models with the same name as the bundle
+        if (strpos('.', $modelNameKey) === false) {
+            $modelNameKey = "$modelNameKey.$modelNameKey";
         }
 
-        if (!array_key_exists($name, $models)) {
-            $parts = explode('.', $name);
-
-            if ($parts[0] == 'plugin' && $parts[1] != 'plugin') {
-                $namespace = 'MauticPlugin';
-                array_shift($parts);
-            } else {
-                $namespace = 'Mautic';
-            }
+        if (! array_key_exists($modelNameKey, $modelInstances)) {
+            $parts = explode('.', $modelNameKey);
 
             if (count($parts) !== 2) {
-                throw new NotAcceptableHttpException($name." is not an acceptable model name.");
+                throw new \InvalidArgumentException($modelNameKey . " is not a valid model key.");
             }
 
-            $modelClass = '\\'.$namespace.'\\'.ucfirst($parts[0]).'Bundle\\Model\\'.ucfirst($parts[1]).'Model';
-            if (!class_exists($modelClass)) {
-                throw new NotAcceptableHttpException($name." is not an acceptable model name.");
-            }
+            list($bundle, $name) = $parts;
 
-            $models[$name] = new $modelClass($this);
+            $containerKey = str_replace(array('%bundle%', '%name%'), array($bundle, $name), 'mautic.%bundle%.model.%name%');
 
-            if (method_exists($models[$name], 'initialize')) {
-                $models[$name]->initialize();
-            }
+            $modelInstances[$modelNameKey] = $this->container->get($containerKey);
         }
 
-        return $models[$name];
+        return $modelInstances[$modelNameKey];
     }
 
     /**

@@ -49,16 +49,15 @@ class IpLookupHelper
      * @param RequestStack $requestStack
      * @param EntityManager $em
      * @param AbstractLookup $ipLookup
-     * @param $doNotTrackIps
-     * @param $doNotTrackInternalIps
+     * @param CoreParametersHelper $coreParametersHelper
      */
-    public function __construct(RequestStack $requestStack, EntityManager $em, AbstractLookup $ipLookup, $doNotTrackIps, $doNotTrackInternalIps)
+    public function __construct(RequestStack $requestStack, EntityManager $em, AbstractLookup $ipLookup, CoreParametersHelper $coreParametersHelper)
     {
         $this->request = $requestStack->getCurrentRequest();
         $this->em = $em;
         $this->ipLookup = $ipLookup;
-        $this->doNotTrackIps = $doNotTrackIps;
-        $this->doNotTrackInternalIps = $doNotTrackInternalIps;
+        $this->doNotTrackIps = $coreParametersHelper->getParameter('mautic.do_not_track_ips');
+        $this->doNotTrackInternalIps = $coreParametersHelper->getParameter('mautic.do_not_track_internal_ips');
     }
 
     /**

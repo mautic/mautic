@@ -156,11 +156,6 @@ return array(
                     'mautic.category.model.category',
                     'request_stack',
                     'mautic.helper.ip_lookup'
-                ),
-                'methodCalls' => array(
-                    'setMaxAssetSize' => array(
-                        '%mautic.max_size%'
-                    )
                 )
             )
         )

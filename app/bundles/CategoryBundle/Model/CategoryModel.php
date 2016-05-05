@@ -10,10 +10,13 @@
 namespace Mautic\CategoryBundle\Model;
 
 use Mautic\CategoryBundle\Event\CategoryEvent;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\CategoryEvents;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class CategoryModel
@@ -23,6 +26,27 @@ use Symfony\Component\EventDispatcher\Event;
 
 class CategoryModel extends FormModel
 {
+    /**
+     * @var null|\Symfony\Component\HttpFoundation\Request
+     */
+    protected $request;
+
+    /**
+     * @var MauticFactory
+     */
+    protected $factory;
+
+    /**
+     * CategoryModel constructor.
+     *
+     * @param RequestStack $requestStack
+     */
+    public function __construct(RequestStack $requestStack, MauticFactory $factory)
+    {
+        $this->request = $requestStack->getCurrentRequest();
+        $this->factory = $factory;
+    }
+
     public function getRepository()
     {
         return $this->em->getRepository('MauticCategoryBundle:Category');
@@ -35,8 +59,8 @@ class CategoryModel extends FormModel
 
     public function getPermissionBase()
     {
-        $request = $this->factory->getRequest();
-        $bundle  = $request->get('bundle');
+        $bundle  = $this->request->get('bundle');
+
         return $bundle.':categories';
     }
 

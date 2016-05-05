@@ -239,14 +239,8 @@ return array(
             'mautic.helper.paths' => array(
                 'class' => 'Mautic\CoreBundle\Helper\PathsHelper',
                 'arguments' => array(
-                    '%mautic.paths%',
-                    '%mautic.theme%',
-                    '%mautic.image_path%',
-                    '%mautic.dashboard_import_dir%',
-                    '%mautic.dashboard_user_import_dir%',
-                    '%kernel.cache_dir%',
-                    '%kernel.log_dir%',
-                    'mautic.helper.user'
+                    'mautic.helper.user',
+                    'mautic.helper.core_parameters'
                 ),
                 'methodCalls' => array(
                     'initUser' => array(
@@ -260,14 +254,19 @@ return array(
                     'request_stack',
                     'doctrine.orm.entity_manager',
                     'mautic.ip_lookup',
-                    '%mautic.do_not_track_ips%',
-                    '%mautic.do_not_track_internal_ips%'
+                    'mautic.helper.core_parameters'
                 )
             ),
             'mautic.helper.user' => array(
                 'class' => 'Mautic\CoreBundle\Helper\UserHelper',
                 'arguments' => array(
                     'security.context'
+                )
+            ),
+            'mautic.helper.core_parameters' => array(
+                'class' => 'Mautic\CoreBundle\Helper\CoreParametersHelper',
+                'arguments' => array(
+                    '@kernel'
                 )
             )
         ),
@@ -571,7 +570,10 @@ return array(
         'cookie_secure'                  => null,
         'cookie_httponly'                => false,
         'do_not_track_ips'               => array(),
+        'do_not_track_internal_ips'      => array(),
         'link_shortener_url'             => null,
-        'cached_data_timeout'            => 10
+        'cached_data_timeout'            => 10,
+        'batch_sleep_time'               => 1,
+        'batch_campaign_sleep_time'      => false
     )
 );
