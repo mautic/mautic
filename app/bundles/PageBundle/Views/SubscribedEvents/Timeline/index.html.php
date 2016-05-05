@@ -153,6 +153,9 @@ $counter = 3;
                     }
                     ?>
 				</dl>
+		        <div class="small">
+			        <?php echo $event['extra']['hit']['userAgent']; ?>
+		        </div>
 	        </div>
 	    <?php endif; ?>
 	</div>
