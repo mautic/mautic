@@ -638,6 +638,9 @@ class AjaxController extends CommonController
         $cookieHelper = $this->factory->getHelper('cookie');
         $cookieHelper->deleteCookie('mautic_update');
 
+        // Set a redirect to force a page reload to get new menu items, assets, etc
+        $dataArray['redirect'] = $this->get('router')->generate('mautic_core_update');
+
         return $this->sendJsonResponse($dataArray);
     }
 
