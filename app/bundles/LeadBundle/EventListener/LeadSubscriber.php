@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\UserEvents;
-
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
  * Class LeadSubscriber
@@ -200,9 +200,36 @@ class LeadSubscriber extends CommonSubscriber
             'lead.ipadded'    => 'mautic.lead.event.ipadded',
             'lead.utmtagsadded' => 'mautic.lead.event.utmtagsadded'
         );
-        $this->factory->getLogger()->addDebug(print_r("generating events", true));
+       
         foreach ($eventTypes as $type => $label) {
             $event->addEventType($type, $this->translator->trans($label));
+        }
+
+        $lead    = $event->getLead();
+        $filters = $event->getEventFilters();
+
+        $utmTagsRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:UtmTag');
+
+        $utmTags = $utmTagsRepository->getUtmTagsByLead($lead, $filters);
+
+        $this->factory->getLogger()->addError(print_r($utmTags,true));
+        $eventTypeKey = 'lead.utmtagsadded';
+        $eventTypeName = $this->factory->getTranslator()->trans('mautic.lead.event.utmtagsadded');
+        $event->addEventType($eventTypeKey, $eventTypeName);
+
+        // Add the logs to the event array
+        foreach ($utmTags as $utmTag) {
+            $event->addEvent(
+                array(
+                    'event'           => $eventTypeKey,
+                    'eventLabel'      => $eventTypeName,
+                    'timestamp'       => $utmTag['dateAdded'],
+                    'extra'           => array(
+                        'utmtags' => $utmTag
+                    ),
+                    'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:utmadded.html.php'
+                )
+            );
         }
     }
 

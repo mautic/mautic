@@ -25,6 +25,11 @@ class UtmTag
     private $id;
 
     /**
+     * @var \DateTime
+     */
+    private $dateAdded;
+
+    /**
      * @var \Mautic\LeadBundle\Entity\Lead
      */
     private $lead;
@@ -91,6 +96,8 @@ class UtmTag
             ->addIndex(array('utmtag'), 'lead_utmtag_search');
         
         $builder->addId();
+
+        $builder->addDateAdded();
 
         $builder->addLead(false, 'CASCADE', false, 'utmTags');
 

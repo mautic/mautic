@@ -18,33 +18,34 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class UtmTagRepository extends CommonRepository
 {
     /**
-     * Get tag entities by name
+     * Get tag entities by lead
      *
      * @param $utmTags
      *
      * @return array
      */
-    public function getTagsByName($utmTags)
+    public function getUtmTagsByLead(Lead $lead, $options = array())
     {
-        if (empty($utmTags)) {
+        if (empty($lead)) {
 
             return array();
         }
 
-        array_walk($utmTags, create_function('&$val', 'if (strpos($val, "-") === 0) $val = substr($val, 1);'));
         $qb = $this->_em->createQueryBuilder()
             ->select('ut')
-            ->from('MauticLeadBundle:UtmTag', 'ut', 'ut.utmtag');
+            ->from('MauticLeadBundle:UtmTag', 'ut');
 
-        if ($utmTags) {
-            $qb->where(
-                $qb->expr()->in('ut.utmtag', ':utmtags')
-            )
-                ->setParameter('utmtags', $utmTags);
-        }
+        $qb->where(
+            'ut.lead = ' . $lead->getId()
+        );
 
-        $results = $qb->getQuery()->getResult();
+        if (isset($options['filters']['search']) && $options['filters']['search']) {
+        $qb->andWhere($qb->expr()->orX(
+            $qb->expr()->like('ut.eventName', $qb->expr()->literal('%' . $options['filters']['search'] . '%')),
+            $qb->expr()->like('ut.actionName', $qb->expr()->literal('%' . $options['filters']['search'] . '%'))
+        ));
+    }
 
-        return $results;
+        return $qb->getQuery()->getArrayResult();
     }
 }

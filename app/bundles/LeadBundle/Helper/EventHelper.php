@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\UtmTag;
 
+
 class EventHelper
 {
     /**
@@ -92,8 +93,10 @@ class EventHelper
             $em   = $factory->getEntityManager();
             $repo = $em->getRepository('MauticLeadBundle:UtmTag');
             $repo->saveEntity($utmValues);
+
         }
 
         $leadModel->setUtmTags($lead, $utmValues);
     }
+
 }
