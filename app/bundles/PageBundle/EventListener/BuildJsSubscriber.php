@@ -73,6 +73,8 @@ class BuildJsSubscriber extends CommonSubscriber
                         params.platform = component.value;
                     } else if (component.key === 'adblock') {
                         params.adblock = component.value;
+                    } else if (component.key === 'do_not_track') {
+                        params.do_not_track = component.value;
                     }
                 }
             }
