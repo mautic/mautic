@@ -16,18 +16,6 @@ Mautic.leadOnLoad = function (container) {
         mQuery('#card-view').click();
     });
 
-    Mousetrap.bind('n', function(e) {
-        mQuery('#new-lead').click();
-    });
-
-    Mousetrap.bind('mod+enter', function(e) {
-        if(mQuery('#leadnote_buttons_save').length) {
-            mQuery('#leadnote_buttons_save').click();
-        } else if (mQuery('#save-quick-add').length) {
-            mQuery('#save-quick-add').click();
-        }
-    });
-
     //Prevent single combo keys from initiating within lead note
     Mousetrap.stopCallback = function(e, element, combo) {
         if (element.id == 'leadnote_text' && combo != 'mod+enter') {
