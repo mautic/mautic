@@ -226,6 +226,16 @@ return array(
                     'setPassword' => array('%mautic.mailer_password%')
                 )
             ),
+            'mautic.transport.sparkpost'          => array(
+                'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport',
+                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
+                'methodCalls'  => array(
+                    // Should be able to set api key here.
+                    'setUsername'      => array('%mautic.mailer_user%'),
+                    'setPassword'      => array('%mautic.mailer_password%'),
+                    'setMauticFactory' => array('mautic.factory')
+                )
+            ),
             'mautic.transport.postmark'          => array(
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\PostmarkTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',

@@ -209,14 +209,15 @@ class ConfigType extends AbstractType
             'choice',
             array(
                 'choices'     => array(
-                    'mail'                      => 'mautic.email.config.mailer_transport.mail',
-                    'mautic.transport.mandrill' => 'mautic.email.config.mailer_transport.mandrill',
-                    'mautic.transport.sendgrid' => 'mautic.email.config.mailer_transport.sendgrid',
                     'mautic.transport.amazon'   => 'mautic.email.config.mailer_transport.amazon',
-                    'mautic.transport.postmark' => 'mautic.email.config.mailer_transport.postmark',
                     'gmail'                     => 'mautic.email.config.mailer_transport.gmail',
+                    'mautic.transport.mandrill' => 'mautic.email.config.mailer_transport.mandrill',
+                    'smtp'                      => 'mautic.email.config.mailer_transport.smtp',
+                    'mail'                      => 'mautic.email.config.mailer_transport.mail',
+                    'mautic.transport.postmark' => 'mautic.email.config.mailer_transport.postmark',
+                    'mautic.transport.sendgrid' => 'mautic.email.config.mailer_transport.sendgrid',
                     'sendmail'                  => 'mautic.email.config.mailer_transport.sendmail',
-                    'smtp'                      => 'mautic.email.config.mailer_transport.smtp'
+                    'sparkpost'                 => 'mautic.email.config.mailer_transport.sparkpost',
                 ),
                 'label'       => 'mautic.email.config.mailer.transport',
                 'required'    => false,
