@@ -154,7 +154,8 @@ return array(
                 'arguments' => array(
                     'mautic.lead.model.lead',
                     'mautic.category.model.category',
-                    'request_stack'
+                    'request_stack',
+                    'mautic.helper.ip_lookup'
                 ),
                 'methodCalls' => array(
                     'setMaxAssetSize' => array(

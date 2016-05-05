@@ -11,6 +11,7 @@ namespace Mautic\EmailBundle\Model;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\GraphHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Entity\DoNotEmail;
@@ -36,6 +37,21 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class EmailModel extends FormModel
 {
+    /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
+
+    /**
+     * EventModel constructor.
+     *
+     * @param IpLookupHelper $ipLookupHelper
+     */
+    public function __construct(IpLookupHelper $ipLookupHelper)
+    {
+        $this->ipLookupHelper = $ipLookupHelper;
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -358,7 +374,7 @@ class EmailModel extends FormModel
         ));
 
         //check for existing IP
-        $ipAddress = $this->factory->getIpAddress();
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
         $stat->setIpAddress($ipAddress);
 
         if ($email) {

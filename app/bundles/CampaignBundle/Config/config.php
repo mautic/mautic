@@ -127,7 +127,10 @@ return array(
                 'class' => 'Mautic\CampaignBundle\Model\CampaignModel'
             ),
             'mautic.campaign.model.event' => array(
-                'class' => 'Mautic\CampaignBundle\Model\EventModel'
+                'class' => 'Mautic\CampaignBundle\Model\EventModel',
+                'arguments' => array(
+                    'mautic.helper.ip_lookup'
+                )
             )
         )
     )

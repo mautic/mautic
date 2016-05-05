@@ -204,7 +204,10 @@ return array(
                 'class' => 'Mautic\FormBundle\Model\FormModel'
             ),
             'mautic.form.model.submission' => array(
-                'class' => 'Mautic\FormBundle\Model\SubmissionModel'
+                'class' => 'Mautic\FormBundle\Model\SubmissionModel',
+                'arguments' => array(
+                    'mautic.helper.ip_lookup'
+                )
             )
         )
     )

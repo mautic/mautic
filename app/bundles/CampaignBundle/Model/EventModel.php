@@ -18,6 +18,7 @@ use Mautic\CampaignBundle\Event\CampaignDecisionEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Event\CampaignScheduledEvent;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\LeadBundle\Entity\Lead;
@@ -40,6 +41,21 @@ class EventModel extends CommonFormModel
      * @var bool
      */
     private $triggeredResponses = false;
+
+    /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
+
+    /**
+     * EventModel constructor.
+     * 
+     * @param IpLookupHelper $ipLookupHelper
+     */
+    public function __construct(IpLookupHelper $ipLookupHelper)
+    {
+        $this->ipLookupHelper = $ipLookupHelper;
+    }
 
     /**
      * {@inheritdoc}
@@ -1770,7 +1786,7 @@ class EventModel extends CommonFormModel
 
         if ($ipAddress == null) {
             // Lead triggered from system IP
-            $ipAddress = $this->factory->getIpAddress();
+            $ipAddress = $this->ipLookupHelper->getIpAddress();
         }
         $log->setIpAddress($ipAddress);
 

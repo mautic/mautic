@@ -10,6 +10,7 @@
 namespace Mautic\FormBundle\Model;
 
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Result;
@@ -28,6 +29,20 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class SubmissionModel extends CommonFormModel
 {
+    /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
+
+    /**
+     * EventModel constructor.
+     *
+     * @param IpLookupHelper $ipLookupHelper
+     */
+    public function __construct(IpLookupHelper $ipLookupHelper)
+    {
+        $this->ipLookupHelper = $ipLookupHelper;
+    }
 
     /**
      * {@inheritdoc}
@@ -55,7 +70,7 @@ class SubmissionModel extends CommonFormModel
         $submission->setDateSubmitted(new \DateTime());
         $submission->setForm($form);
 
-        $ipAddress = $this->factory->getIpAddress();
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
         $submission->setIpAddress($ipAddress);
 
         if (!empty($post['return'])) {
@@ -475,7 +490,7 @@ class SubmissionModel extends CommonFormModel
         }
 
         //check for existing IP address
-        $ipAddress = $this->factory->getIpAddress();
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         //no lead was found by a mapped email field so create a new one
         if ($lead->isNewlyCreated()) {

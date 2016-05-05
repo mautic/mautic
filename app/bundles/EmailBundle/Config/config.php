@@ -237,7 +237,10 @@ return array(
         ),
         'models' =>  array(
             'mautic.email.model.email' => array(
-                'class' => 'Mautic\EmailBundle\Model\EmailModel'
+                'class' => 'Mautic\EmailBundle\Model\EmailModel',
+                'arguments' => array(
+                    'mautic.helper.ip_lookup'
+                )
             )
         )
     ),

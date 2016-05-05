@@ -40,6 +40,10 @@ class ModelPass implements CompilerPassInterface
             if ($reflected->hasMethod('setRouter')) {
                 $definition->addMethodCall('setRouter', array(new Reference('router')));
             }
+            
+            if ($reflected->hasMethod('setLogger')) {
+                $definition->addMethodCall('setLogger', array(new Reference('monolog.logger.mautic')));
+            }
         }
     }
 }

@@ -333,7 +333,17 @@ return array(
         ),
         'models' =>  array(
             'mautic.lead.model.lead' => array(
-                'class' => 'Mautic\LeadBundle\Model\LeadModel'
+                'class' => 'Mautic\LeadBundle\Model\LeadModel',
+                'arguments' => array(
+                    'request_stack',
+                    'mautic.helper.cookie',
+                    'mautic.helper.ip_lookup',
+                    'mautic.helper.paths',
+                    'mautic.helper.integration',
+                    'mautic.point.model.trigger',
+                    'mautic.lead.model.field',
+                    'mautic.lead.model.list'
+                )
             ),
             'mautic.lead.model.field' => array(
                 'class' => 'Mautic\LeadBundle\Model\FieldModel'

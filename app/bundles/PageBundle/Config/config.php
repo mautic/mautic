@@ -187,7 +187,20 @@ return array(
         ),
         'models' =>  array(
             'mautic.page.model.page' => array(
-                'class' => 'Mautic\PageBundle\Model\PageModel'
+                'class' => 'Mautic\PageBundle\Model\PageModel',
+                'arguments' => array(
+                    'mautic.helper.cookie',
+                    'mautic.helper.ip_lookup',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.field',
+                    'mautic.page.model.redirect',
+                    'mautic.page.model.trackable'
+                ),
+                'methodCalls' => array(
+                    'setCatInUrl' => array(
+                        '%mautic.cat_in_page_url%'
+                    )
+                )
             ),
             'mautic.page.model.redirect' => array(
                 'class' => 'Mautic\PageBundle\Model\RedirectModel'
