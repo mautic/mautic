@@ -23,7 +23,7 @@ class UntrackableUrlsEvent extends Event
     private $doNotTrack = array(
         '{webview_url}',
         '{unsubscribe_url}',
-        '{trackedlink=(.*?)}',
+        '{trackable=(.*?)}',
         // Ignore lead fields with URLs for tracking since each is unique
         '^{leadfield=(.*?)}',
         // @todo - remove in 2.0
@@ -31,6 +31,13 @@ class UntrackableUrlsEvent extends Event
     );
 
     /**
+     * @var string
+     */
+    private $content;
+
+    /**
+     * @deprecated to be removed in 2.0
+     *
      * @var Email
      */
     private $email;
@@ -38,11 +45,15 @@ class UntrackableUrlsEvent extends Event
     /**
      * TrackableEvent constructor.
      *
-     * @param Email $email
+     * @param $content
      */
-    public function __construct(Email $email = null)
+    public function __construct($content)
     {
-        $this->email = $email;
+        if ($content instanceof Email) {
+            $this->email = $content;
+        } else {
+            $this->content = $content;
+        }
     }
 
     /**
@@ -56,16 +67,6 @@ class UntrackableUrlsEvent extends Event
     }
 
     /**
-     * Get affected email
-     *
-     * @return Email
-     */
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    /**
      * Get array of non-trackables
      *
      * @return array
@@ -73,5 +74,25 @@ class UntrackableUrlsEvent extends Event
     public function getDoNotTrackList()
     {
         return $this->doNotTrack;
+    }
+
+    /**
+     * @return string
+     */
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+    /**
+     * Get Email
+     *
+     * @deprecated To be removed in 2.0
+     *
+     * @return Email
+     */
+    public function getEmail()
+    {
+        return $this->email;
     }
 }

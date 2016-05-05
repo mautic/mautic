@@ -215,6 +215,13 @@ class AssetGenerationHelper
 
         if (count($directories)) {
             foreach ($directories as $directory) {
+                $group = $directory->getBasename();
+
+                // Only auto load directories app or libraries
+                if (!in_array($group, array('app', 'libraries'))) {
+                    continue;
+                }
+
                 $files         = new Finder();
                 $thisDirectory = str_replace('\\', '/', $directory->getRealPath());
                 $files->files()->depth('0')->name('*.' . $ext)->in($thisDirectory);
@@ -223,8 +230,6 @@ class AssetGenerationHelper
                     return strnatcmp($a->getRealpath(), $b->getRealpath());
                 };
                 $files->sort($sort);
-
-                $group = $directory->getBasename();
 
                 foreach ($files as $file) {
                     $fullPath = $file->getPathname();

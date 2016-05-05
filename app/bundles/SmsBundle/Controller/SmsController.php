@@ -214,6 +214,7 @@ class SmsController extends FormController
                     'permissions' => $permissions,
                     'model'       => $model,
                     'security'    => $this->factory->getSecurity(),
+                    'configured'  => $this->factory->getParameter('sms_enabled')
                 ),
                 'contentTemplate' => 'MauticSmsBundle:Sms:list.html.php',
                 'passthroughVars' => array(
@@ -292,11 +293,11 @@ class SmsController extends FormController
                     )
                 ),
                 'viewParameters'  => array(
-                    'sms'   => $sms,
-                    'stats'          => $stats,
-                    'trackableLinks' => $trackableLinks,
-                    'logs'           => $logs,
-                    'permissions'    => $security->isGranted(
+                    'sms'         => $sms,
+                    'stats'       => $stats,
+                    'trackables'  => $trackableLinks,
+                    'logs'        => $logs,
+                    'permissions' => $security->isGranted(
                         array(
                             'sms:smses:viewown',
                             'sms:smses:viewother',
@@ -310,7 +311,7 @@ class SmsController extends FormController
                         ),
                         "RETURN_ARRAY"
                     ),
-                    'security'       => $security
+                    'security'    => $security
                 ),
                 'contentTemplate' => 'MauticSmsBundle:Sms:details.html.php',
                 'passthroughVars' => array(
@@ -410,6 +411,7 @@ class SmsController extends FormController
 
             // Check to see if this is a popup
             if (isset($form['updateSelect'])) {
+                $template    = false;
                 $passthrough = array_merge(
                     $passthrough,
                     array(
@@ -519,7 +521,7 @@ class SmsController extends FormController
             ? $this->request->request->get('sms[updateSelect]', false, true)
             : $this->request->get('updateSelect', false);
 
-        $form   = $model->createForm($entity, $this->get('form.factory'), $action, array('update_select' => $updateSelect));
+        $form = $model->createForm($entity, $this->get('form.factory'), $action, array('update_select' => $updateSelect));
 
         ///Check for a submitted form and process it
         if (!$ignorePost && $method == 'POST') {
@@ -556,8 +558,12 @@ class SmsController extends FormController
                 'activeLink'    => 'mautic_sms_index',
                 'mauticContent' => 'sms'
             );
+
+            $template = 'MauticSmsBundle:Sms:view';
+
             // Check to see if this is a popup
             if (isset($form['updateSelect'])) {
+                $template    = false;
                 $passthrough = array_merge(
                     $passthrough,
                     array(
@@ -580,7 +586,7 @@ class SmsController extends FormController
                         array(
                             'returnUrl'       => $this->generateUrl('mautic_sms_action', $viewParameters),
                             'viewParameters'  => $viewParameters,
-                            'contentTemplate' => 'MauticSmsBundle:Sms:view',
+                            'contentTemplate' => $template,
                             'passthroughVars' => $passthrough
                         )
                     )
@@ -641,7 +647,7 @@ class SmsController extends FormController
             $entity      = clone $entity;
             $session     = $this->factory->getSession();
             $contentName = 'mautic.sms.'.$entity->getSessionId().'.content';
-            
+
             $session->set($contentName, $entity->getContent());
         }
 

@@ -110,7 +110,7 @@ return array(
             'mautic.core.configbundle.subscriber' => array(
                 'class' => 'Mautic\CoreBundle\EventListener\ConfigSubscriber'
             ),
-            'mautic.core.js.subscriber'           => array(
+            'mautic.webpush.js.subscriber'           => array(
                 'class' => 'Mautic\CoreBundle\EventListener\BuildJsSubscriber'
             ),
             'mautic.core.dashboard.subscriber'    => array(
@@ -342,6 +342,14 @@ return array(
             'mautic.helper.language'             => array(
                 'class'     => 'Mautic\CoreBundle\Helper\LanguageHelper',
                 'arguments' => 'mautic.factory'
+            ),
+            'mautic.helper.url'           => array(
+                'class'     => 'Mautic\CoreBundle\Helper\UrlHelper',
+                'arguments' => array(
+                    'mautic.http.connector',
+                    '%mautic.link_shortener_url%',
+                    'monolog.logger.mautic',
+                )
             ),
             // Menu
             'mautic.menu_renderer'               => array(

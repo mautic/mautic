@@ -76,6 +76,8 @@ Mautic.emailOnLoad = function (container, response) {
             newOption.prop('selected', true);
 
             opener.mQuery(el).trigger("chosen:updated");
+
+            Mautic.disabledEmailAction(opener);
         }
 
         window.close();
@@ -369,4 +371,34 @@ Mautic.getTotalAttachmentSize = function() {
     } else {
         mQuery('#attachment-size').text('0');
     }
+};
+
+Mautic.standardEmailUrl = function(options) {
+    if (!options) {
+        return;
+    }
+
+    var url = options.windowUrl;
+    if (url) {
+        var editEmailKey = '/emails/edit/emailId';
+        var previewEmailKey = '/email/preview/emailId';
+        if (url.indexOf(editEmailKey) > -1 ||
+            url.indexOf(previewEmailKey) > -1) {
+            options.windowUrl = url.replace('emailId', mQuery('#campaignevent_properties_email').val());
+        }
+    }
+
+    return options;
+};
+
+Mautic.disabledEmailAction = function(opener) {
+    if (typeof opener == 'undefined') {
+        opener = window;
+    }
+    var email = opener.mQuery('#campaignevent_properties_email').val();
+
+    var disabled = email === '' || email === null;
+
+    opener.mQuery('#campaignevent_properties_editEmailButton').prop('disabled', disabled);
+    opener.mQuery('#campaignevent_properties_previewEmailButton').prop('disabled', disabled);
 };

@@ -13,8 +13,6 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
-use Mautic\FormBundle\Event\SubmissionEvent;
-use Mautic\FormBundle\FormEvents;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\PointEvents;

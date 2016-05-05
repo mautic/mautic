@@ -38,7 +38,8 @@ class MergeType extends AbstractType
                 'multiple'    => false,
                 'empty_value' => '',
                 'attr'        => array(
-                    'class' => 'form-control'
+                    'class' => 'form-control',
+                    'tooltip' => 'mautic.lead.merge.select.modal.tooltip'
                 ),
                 'constraints' => array(
                     new NotBlank(

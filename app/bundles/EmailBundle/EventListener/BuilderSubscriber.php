@@ -13,6 +13,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\PageBundle\Entity\Trackable;
 
 /**
  * Class BuilderSubscriber
@@ -28,8 +29,16 @@ class BuilderSubscriber extends CommonSubscriber
     {
         return array(
             EmailEvents::EMAIL_ON_BUILD   => array('onEmailBuild', 0),
-            EmailEvents::EMAIL_ON_SEND    => array('onEmailGenerate', 0),
-            EmailEvents::EMAIL_ON_DISPLAY => array('onEmailGenerate', 0)
+            EmailEvents::EMAIL_ON_SEND    => array(
+                array('onEmailGenerate', 0),
+                // Ensure this is done last in order to catch all tokenized URLs
+                array('convertUrlsToTokens', -9999)
+            ),
+            EmailEvents::EMAIL_ON_DISPLAY => array(
+                array('onEmailGenerate', 0),
+                // Ensure this is done last in order to catch all tokenized URLs
+                array('convertUrlsToTokens', -9999)
+            )
         );
     }
 
@@ -133,8 +142,86 @@ class BuilderSubscriber extends CommonSubscriber
                 $signatureText = $owner['signature'];
             }
         }
-        
+
         $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
         $event->addToken('{signature}', $signatureText);
+    }
+
+    /**
+     * @param EmailSendEvent $event
+     *
+     * @return array
+     */
+    public function convertUrlsToTokens(EmailSendEvent $event)
+    {
+        /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
+        $trackableModel = $this->factory->getModel('page.trackable');
+
+        $email   = $event->getEmail();
+        $emailId = ($email) ? $email->getId() : null;
+
+        $clickthrough = $event->generateClickthrough();
+        $trackables   = $this->parseContentForUrls($event, $emailId);
+
+        /**
+         * @var string $token
+         * @var Trackable $trackable
+         */
+        foreach ($trackables as $token => $trackable) {
+            $event->addToken(
+                $token,
+                $trackableModel->generateTrackableUrl($trackable, $clickthrough)
+            );
+        }
+    }
+
+    /**
+     * Parses content for URLs and tokens
+     *
+     * @param EmailSendEvent $event
+     * @param                $emailId
+     *
+     * @return mixed
+     */
+    protected function parseContentForUrls(EmailSendEvent $event, $emailId)
+    {
+        static $convertedContent = array();
+
+        // Prevent parsing the exact same content over and over
+        if (!isset($convertedContent[$event->getContentHash()])) {
+            $html  = $event->getContent();
+            $text  = $event->getPlainText();
+
+            /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
+            $trackableModel = $this->factory->getModel('page.trackable');
+            $contentTokens  = $event->getTokens();
+
+            list($content, $trackables) = $trackableModel->parseContentForTrackables(
+                array($html, $text),
+                $contentTokens,
+                ($emailId) ? 'email' : null,
+                $emailId
+            );
+
+            list($html, $text) = $content;
+            unset($content);
+
+            if ($html) {
+                $event->setContent($html);
+            }
+            if ($text) {
+                $event->setPlainText($text);
+            }
+
+            $convertedContent[$event->getContentHash()] = $trackables;
+
+            // Don't need to preserve Trackable or Redirect entities in memory
+            $this->factory->getEntityManager()->clear('Mautic\PageBundle\Entity\Redirect');
+            $this->factory->getEntityManager()->clear('Mautic\PageBundle\Entity\Trackable');
+
+            unset($html, $text, $trackables);
+        }
+
+        return $convertedContent[$event->getContentHash()];
     }
 }

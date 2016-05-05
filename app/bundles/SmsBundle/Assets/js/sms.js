@@ -76,6 +76,8 @@ Mautic.smsOnLoad = function (container, response) {
             newOption.prop('selected', true);
 
             opener.mQuery(el).trigger("chosen:updated");
+
+            Mautic.disabledSmsAction(opener);
         }
 
         window.close();
@@ -120,4 +122,32 @@ Mautic.loadNewSmsWindow = function(options) {
             }
         }, 100);
     }
+};
+
+Mautic.standardSmsUrl = function(options) {
+    if (!options) {
+        return;
+    }
+
+    var url = options.windowUrl;
+    if (url) {
+        var editEmailKey = '/sms/edit/smsId';
+        if (url.indexOf(editEmailKey) > -1) {
+            options.windowUrl = url.replace('smsId', mQuery('#campaignevent_properties_sms').val());
+        }
+    }
+
+    return options;
+};
+
+Mautic.disabledSmsAction = function(opener) {
+    if (typeof opener == 'undefined') {
+        opener = window;
+    }
+
+    var sms = opener.mQuery('#campaignevent_properties_sms').val();
+
+    var disabled = sms === '' || sms === null;
+
+    opener.mQuery('#campaignevent_properties_editSmsButton').prop('disabled', disabled);
 };

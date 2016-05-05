@@ -135,3 +135,6 @@ ul.tag-cloud li {
 .contact-cards .img {
     max-height: 115px;
 }
+#lead_merge_lead_to_merge_chosen .chosen-search {
+    display:none;
+}

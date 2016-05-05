@@ -307,16 +307,13 @@ $view['slots']->set(
                     array(
                         'eventTypes'   => $eventTypes,
                         'eventFilters' => $eventFilters,
-                        'lead'         => $lead,
-                     //   'icons'        => $icons
+                        'lead'         => $lead
                     )
                 ); ?>
                 <div id="timeline-container">
                     <?php echo $view->render(
                         'MauticLeadBundle:Lead:history.html.php',
-                        array('events' => $events,
-                             // 'icons' => $icons
-                        )
+                        array('events' => $events)
                     ); ?>
                 </div>
             </div>

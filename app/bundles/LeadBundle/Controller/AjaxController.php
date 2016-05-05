@@ -15,7 +15,6 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\CoreEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Mautic\LeadBundle\LeadEvents;
@@ -225,16 +224,12 @@ class AjaxController extends CommonAjaxController
                 $events     = $event->getEvents();
                 $eventTypes = $event->getEventTypes();
 
-                $event = new IconEvent($this->factory->getSecurity());
-                $this->factory->getDispatcher()->dispatch(CoreEvents::FETCH_ICONS, $event);
-                $icons = $event->getIcons();
-
                 $timeline = $this->renderView('MauticLeadBundle:Lead:history.html.php', array(
                         'events'       => $events,
                         'eventTypes'   => $eventTypes,
                         'eventFilters' => $filter,
-                        'icons'        => $icons,
-                        'lead'         => $lead)
+                        'lead'         => $lead
+                    )
                 );
 
                 $dataArray['success']      = 1;
