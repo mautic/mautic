@@ -20,8 +20,8 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Form\Type\TagListType;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -73,8 +73,8 @@ class LeadController extends FormController
         $session->set('mautic.lead.filter', $search);
 
         //do some default filtering
-        $orderBy    = $this->factory->getSession()->get('mautic.lead.orderby', 'l.last_active');
-        $orderByDir = $this->factory->getSession()->get('mautic.lead.orderbydir', 'DESC');
+        $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
+        $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
 
         $filter      = array('string' => $search, 'force' => '');
         $translator  = $this->factory->getTranslator();
@@ -204,7 +204,6 @@ class LeadController extends FormController
     /*
      * Quick form controller route and view
      */
-
     public function quickAddAction()
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
@@ -234,6 +233,10 @@ class LeadController extends FormController
         );
 
         $quickForm = $model->createForm($model->getEntity(), $this->get('form.factory'), $action, array('fields' => $fields, 'isShortForm' => true));
+
+        //set the default owner to the currently logged in user
+        $currentUser = $this->get('security.context')->getToken()->getUser();
+        $quickForm->get('owner')->setData($currentUser);
 
         return $this->delegateView(
             array(
@@ -324,6 +327,28 @@ class LeadController extends FormController
             )
         );
 
+        // Get Places from IP addresses
+        $places = array();
+        if ($lead->getIpAddresses()) {
+            foreach ($lead->getIpAddresses() as $ip) {
+                if ($details = $ip->getIpDetails()) {
+                    if (!empty($details['latitude']) && !empty($details['longitude'])) {
+                        $name = 'N/A';
+                        if (!empty($details['city'])) {
+                            $name = $details['city'];
+                        } elseif (!empty($details['region'])) {
+                            $name = $details['region'];
+                        }
+                        $place = array(
+                            'latLng' => array($details['latitude'], $details['longitude']),
+                            'name' => $name,
+                        );
+                        $places[] = $place;
+                    }
+                }
+            }
+        }
+
         // Trigger the TIMELINE_ON_GENERATE event to fetch the timeline events from subscribed bundles
         $dispatcher = $this->factory->getDispatcher();
         $event      = new LeadTimelineEvent($lead, $filters);
@@ -334,13 +359,10 @@ class LeadController extends FormController
 
         // Get an engagement count
         $translator     = $this->factory->getTranslator();
-        $graphData      = GraphHelper::prepareDatetimeLineGraphData(
-            6,
-            'M',
-            array($translator->trans('mautic.lead.graph.line.all_engagements'), $translator->trans('mautic.lead.graph.line.points'))
-        );
-        $fromDate       = $graphData['fromDate'];
-        $allEngagements = array();
+
+        $fromDate       = (new \DateTime('first day of this month 00:00:00'))->modify('-6 months');
+        $toDate         = new \DateTime;
+        $engagements = array();
         $total          = 0;
 
         $events = array();
@@ -348,20 +370,21 @@ class LeadController extends FormController
             $datetime = \DateTime::createFromFormat('Y-m-d H:i', $eventDate);
             if ($datetime > $fromDate) {
                 $total++;
-                $allEngagements[] = array(
-                    'date' => $datetime,
+                $engagements[] = array(
+                    'date' => $eventDate,
                     'data' => 1
                 );
             }
             $events = array_merge($events, array_reverse($dateEvents));
         }
 
-        $graphData = GraphHelper::mergeLineGraphData($graphData, $allEngagements, 'M', 0, 'date', 'data', false, false);
-
-        /** @var \Mautic\LeadBundle\Entity\PointChangeLogRepository $pointsLogRepository */
-        $pointsLogRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');
-        $pointStats          = $pointsLogRepository->getLeadPoints($fromDate, array('lead_id' => $lead->getId()));
-        $engagementGraphData = GraphHelper::mergeLineGraphData($graphData, $pointStats, 'M', 1, 'date', 'data', false, false);
+        $lineChart   = new LineChart(null, $fromDate, $toDate);
+        $query       = $lineChart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $engagements = $query->completeTimeData($engagements);
+        $pointStats  = $query->fetchTimeData('lead_points_change_log', 'date_added', array('lead_id' => $lead->getId()));
+        $lineChart->setDataset($translator->trans('mautic.lead.graph.line.all_engagements'), $engagements);
+        $lineChart->setDataset($translator->trans('mautic.lead.graph.line.points'), $pointStats);
+        $engagementChart = $lineChart->render();
 
         // Upcoming events from Campaign Bundle
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
@@ -374,9 +397,19 @@ class LeadController extends FormController
         $socialProfiles    = $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
 
-        $event = new IconEvent($this->factory->getSecurity());
-        $this->factory->getDispatcher()->dispatch(CoreEvents::FETCH_ICONS, $event);
-        $icons = $event->getIcons();
+        // Set the social profile templates
+        foreach ($socialProfiles as $integration => &$details) {
+            if ($integrationObject = $integrationHelper->getIntegrationObject($integration)) {
+                if ($template = $integrationObject->getSocialProfileTemplate()) {
+                    $details['social_profile_template'] = $template;
+                }
+            }
+
+            if (!isset($details['social_profile_template'])) {
+                // No profile template found
+                unset($socialProfiles[$integration]);
+            }
+        }
 
         // We need the EmailRepository to check if a lead is flagged as do not contact
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
@@ -390,14 +423,14 @@ class LeadController extends FormController
                     'fields'            => $fields,
                     'socialProfiles'    => $socialProfiles,
                     'socialProfileUrls' => $socialProfileUrls,
+                    'places'            => $places,
                     'security'          => $this->factory->getSecurity(),
                     'permissions'       => $permissions,
                     'events'            => $events,
                     'eventTypes'        => $eventTypes,
                     'eventFilters'      => $filters,
                     'upcomingEvents'    => $upcomingEvents,
-                    'icons'             => $icons,
-                    'engagementData'    => $engagementGraphData,
+                    'engagementData'    => $engagementChart,
                     'noteCount'         => $this->factory->getModel('lead.note')->getNoteCount($lead, true),
                     'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value']),
                     'leadNotes'         => $this->forward(
@@ -805,32 +838,35 @@ class LeadController extends FormController
         $session = $this->factory->getSession();
         $search  = $this->request->get('search', $session->get('mautic.lead.merge.filter', ''));
         $session->set('mautic.lead.merge.filter', $search);
+        $leads = array();
 
-        $filter = array(
-            'string' => $search,
-            'force'  => array(
-                array(
-                    'column' => 'l.date_identified',
-                    'expr'   => 'isNotNull',
-                    'value'  => $mainLead->getId()
-                ),
-                array(
-                    'column' => 'l.id',
-                    'expr'   => 'neq',
-                    'value'  => $mainLead->getId()
+        if (! empty($search)) {
+            $filter = array(
+                'string' => $search,
+                'force' => array(
+                    array(
+                        'column' => 'l.date_identified',
+                        'expr' => 'isNotNull',
+                        'value' => $mainLead->getId()
+                    ),
+                    array(
+                        'column' => 'l.id',
+                        'expr' => 'neq',
+                        'value' => $mainLead->getId()
+                    )
                 )
-            )
-        );
+            );
 
-        $leads = $model->getEntities(
-            array(
-                'limit'          => 25,
-                'filter'         => $filter,
-                'orderBy'        => 'l.firstname,l.lastname,l.company,l.email',
-                'orderByDir'     => 'ASC',
-                'withTotalCount' => false
-            )
-        );
+            $leads = $model->getEntities(
+                array(
+                    'limit' => 25,
+                    'filter' => $filter,
+                    'orderBy' => 'l.firstname,l.lastname,l.company,l.email',
+                    'orderByDir' => 'ASC',
+                    'withTotalCount' => false
+                )
+            );
+        }
 
         $leadChoices = array();
         foreach ($leads as $l) {
@@ -849,6 +885,7 @@ class LeadController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
+            $valid =  true;
             if (!$this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $data = $form->getData();
@@ -886,9 +923,12 @@ class LeadController extends FormController
                     //Both leads are good so now we merge them
                     $mainLead = $model->mergeLeads($mainLead, $secLead, false);
                 }
-            };
+            }
+
+
 
             if ($valid) {
+
                 $viewParameters = array(
                     'objectId'     => $mainLead->getId(),
                     'objectAction' => 'view',

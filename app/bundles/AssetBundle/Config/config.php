@@ -50,13 +50,12 @@ return array(
 
     'menu' => array(
         'main' => array(
-            'priority' => 35,
             'items'    => array(
                 'mautic.asset.assets' => array(
                     'route'     => 'mautic_asset_index',
-                    'id'        => 'mautic_asset_root',
-                    'iconClass' => 'fa-folder-open-o',
-                    'access'    => array('asset:assets:viewown', 'asset:assets:viewother')
+                    'access'    => array('asset:assets:viewown', 'asset:assets:viewother'),
+                    'parent'    => 'mautic.core.components',
+                    'priority'  => 300,
                 )
             )
         )
@@ -103,7 +102,10 @@ return array(
             ),
             'oneup_uploader.pre_upload' => array(
                 'class' => 'Mautic\AssetBundle\EventListener\UploadSubscriber'
-            )
+            ),
+            'mautic.asset.dashboard.subscriber' => array(
+                'class' => 'Mautic\AssetBundle\EventListener\DashboardSubscriber'
+            ),
         ),
         'forms' => array(
             'mautic.form.type.asset' => array(
@@ -132,6 +134,10 @@ return array(
                 'class' => 'Mautic\AssetBundle\Form\Type\ConfigType',
                 'arguments' => 'mautic.factory',
                 'alias' => 'assetconfig'
+            ),
+            'mautic.form.type.asset_dashboard_downloads_in_time_widget' => array(
+                'class'     => 'Mautic\AssetBundle\Form\Type\DashboardDownloadsInTimeWidgetType',
+                'alias'     => 'asset_dashboard_downloads_in_time_widget'
             )
         ),
         'others' => array(

@@ -14,6 +14,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -24,8 +25,12 @@ use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Intl\Intl;
 
 /**
  * Class LeadModel
@@ -241,20 +246,31 @@ class LeadModel extends FormModel
     /**
      * Populates custom field values for updating the lead. Also retrieves social media data
      *
-     * @param Lead  $lead
-     * @param array $data
-     * @param $overwriteWithBlank
+     * @param Lead       $lead
+     * @param array      $data
+     * @param bool|false $overwriteWithBlank
+     * @param bool|true  $fetchSocialProfiles
+     *
      * @return array
      */
-    public function setFieldValues(Lead &$lead, array $data, $overwriteWithBlank = false)
+    public function setFieldValues(Lead &$lead, array $data, $overwriteWithBlank = false, $fetchSocialProfiles = true)
     {
-        //@todo - add a catch to NOT do social gleaning if a lead is created via a form, etc as we do not want the user to experience the wait
-        //generate the social cache
-        list($socialCache, $socialFeatureSettings) = $this->factory->getHelper('integration')->getUserProfiles($lead, $data, true, null, false, true);
+        if ($fetchSocialProfiles) {
+            //@todo - add a catch to NOT do social gleaning if a lead is created via a form, etc as we do not want the user to experience the wait
+            //generate the social cache
+            list($socialCache, $socialFeatureSettings) = $this->factory->getHelper('integration')->getUserProfiles(
+                $lead,
+                $data,
+                true,
+                null,
+                false,
+                true
+            );
 
-        //set the social cache while we have it
-        if (!empty($socialCache)) {
-            $lead->setSocialCache($socialCache);
+            //set the social cache while we have it
+            if (!empty($socialCache)) {
+                $lead->setSocialCache($socialCache);
+            }
         }
 
         //save the field values
@@ -815,6 +831,171 @@ class LeadModel extends FormModel
     }
 
     /**
+     * @param Lead $lead
+     * @param string $channel
+     *
+     * @return int
+     *
+     * @see \Mautic\LeadBundle\Entity\DoNotContact This method can return boolean false, so be
+     *                                             sure to always compare the return value against
+     *                                             the class constants of DoNotContact
+     */
+    public function isContactable(Lead $lead, $channel)
+    {
+        /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
+        $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
+
+        /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
+        $dncEntries = $dncRepo->getEntriesByLeadAndChannel($lead, $channel);
+
+        // If the lead has no entries in the DNC table, we're good to go
+        if (empty($dncEntries)) {
+            return DoNotContact::IS_CONTACTABLE;
+        }
+
+        foreach ($dncEntries as $dnc) {
+            if ($dnc->getReason() !== DoNotContact::IS_CONTACTABLE) {
+                return $dnc->getReason();
+            }
+        }
+
+        return DoNotContact::IS_CONTACTABLE;
+    }
+
+    /**
+     * Remove a Lead's DNC entry based on channel.
+     *
+     * @param Lead $lead
+     * @param string $channel
+     *
+     * @return boolean
+     */
+    public function removeDncForLead(Lead $lead, $channel)
+    {
+        /** @var DoNotContact $dnc */
+        foreach ($lead->getDoNotContact() as $dnc) {
+            if ($dnc->getChannel() === $channel) {
+                $lead->removeDoNotContactEntry($dnc);
+
+                $this->getRepository()->saveEntity($lead);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Create a DNC entry for a lead
+     *
+     * @param Lead         $lead
+     * @param string|array $channel  If an array with an ID, use the structure ['email' => 123]
+     * @param string       $comments
+     * @param int          $reason
+     * @param bool         $flush
+     *
+     * @return boolean If a DNC entry is added or updated, returns true. If a DNC is already present
+     *                 and has the specified reason, nothing is done and this returns false.
+     */
+    public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $flush = true)
+    {
+        $isContactable = $this->isContactable($lead, $channel);
+        $reason = $this->determineReasonFromTag($reason);
+
+        // If they don't have a DNC entry yet
+        if ($isContactable === DoNotContact::IS_CONTACTABLE) {
+            $dnc = new DoNotContact();
+
+            if (is_array($channel)) {
+                $channelId = reset($channel);
+                $channel   = key($channel);
+
+                $dnc->setChannelId((int) $channelId);
+            }
+
+            $dnc->setChannel($channel);
+            $dnc->setReason($reason);
+            $dnc->setLead($lead);
+            $dnc->setDateAdded(new \DateTime);
+            $dnc->setComments($comments);
+
+            $lead->addDoNotContactEntry($dnc);
+
+            $this->getRepository()->saveEntity($lead);
+
+            if ($flush) {
+                $this->em->flush();
+            }
+
+            return true;
+        }
+        // Or if the given reason is different than the stated reason
+        elseif ($isContactable !== $reason) {
+            /** @var DoNotContact $dnc */
+            foreach ($lead->getDoNotContact() as $dnc) {
+                // Only update if the contact did not unsubscribe themselves
+                if ($dnc->getChannel() === $channel && $dnc->getReason() !== DoNotContact::UNSUBSCRIBED) {
+                    // Remove the outdated entry
+                    $lead->removeDoNotContactEntry($dnc);
+
+                    // Update the DNC entry
+                    $dnc->setChannel($channel);
+                    $dnc->setReason($reason);
+                    $dnc->setLead($lead);
+                    $dnc->setDateAdded(new \DateTime);
+                    $dnc->setComments($comments);
+
+                    // Re-add the entry to the lead
+                    $lead->addDoNotContactEntry($dnc);
+
+                    // Persist
+                    $this->getRepository()->saveEntity($lead);
+
+                    if ($flush) {
+                        $this->em->flush();
+                    }
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * This method will translate text reason tags into DNC reason codes.
+     *
+     * @param string|int $tag
+     *
+     * @return int
+     *
+     * @see \Mautic\LeadBundle\Entity\DoNotContact This method can return boolean false, so be
+     * sure to always compare the return value against the class constants of DoNotContact
+     *
+     * @deprecated - No replacement. Remove in 2.0
+     */
+    private function determineReasonFromTag($tag)
+    {
+        switch ($tag) {
+            case DoNotContact::UNSUBSCRIBED:
+            case 'unsubscribed':
+                return DoNotContact::UNSUBSCRIBED;
+
+            case DoNotContact::BOUNCED:
+            case 'bounced':
+                return DoNotContact::BOUNCED;
+
+            case DoNotContact::MANUAL:
+            case 'manual':
+                return DoNotContact::MANUAL;
+        }
+
+        return DoNotContact::IS_CONTACTABLE;
+    }
+
+    /**
      * Add a do not contact entry for the lead
      *
      * @param Lead       $lead
@@ -823,10 +1004,10 @@ class LeadModel extends FormModel
      * @param bool|true  $persist
      * @param bool|false $manual
      *
-     * @return DoNotEmail|bool
+     * @return DoNotContact|bool
      * @throws \Doctrine\DBAL\DBALException
      *
-     * @deprecated Use unsubscribeLead() instead. To be removed in 2.0.
+     * @deprecated Use addDncForLead() instead. To be removed in 2.0.
      */
     public function setDoNotContact(Lead $lead, $emailAddress = '', $reason = '', $persist = true, $manual = false)
     {
@@ -835,42 +1016,29 @@ class LeadModel extends FormModel
 
     /**
      * @param Lead       $lead
-     * @param string     $reason
+     * @param string     $comments
      * @param bool|true  $persist
      * @param bool|false $manual
      *
-     * @return bool|DoNotEmail
+     * @return bool|DoNotContact
+     *
+     * @deprecated Use addDncForLead() instead. To be removed in 2.0.
      */
-    public function unsubscribeLead(Lead $lead, $reason = null, $persist = true, $manual = false)
+    public function unsubscribeLead(Lead $lead, $comments = null, $persist = true, $manual = false)
     {
-        $emailAddress = $lead->getEmail();
+        $comments = $comments ?: $this->factory->getTranslator()->trans('mautic.email.dnc.unsubscribed');
 
-        if (empty($emailAddress)) {
+        $reason = $manual ? DoNotContact::MANUAL : DoNotContact::UNSUBSCRIBED;
 
-            return false;
-        }
+        $this->addDncForLead($lead, 'email', $comments, $reason);
 
-        if (null === $reason) {
-            $reason = $this->factory->getTranslator()->trans('mautic.email.dnc.unsubscribed');
-        }
-
-        $em   = $this->factory->getEntityManager();
-        $repo = $em->getRepository('MauticEmailBundle:Email');
-        if (!$repo->checkDoNotEmail($emailAddress)) {
-            $dnc = new DoNotEmail();
-            $dnc->setLead($lead);
-            $dnc->setEmailAddress($emailAddress);
-            $dnc->setDateAdded(new \DateTime());
-            $dnc->setUnsubscribed();
-            $dnc->setManual($manual);
-            $dnc->setComments($reason);
-
-            if ($persist) {
-                $repo->saveEntity($dnc);
-            } else {
-                $lead->addDoNotEmailEntry($dnc);
-
-                return $dnc;
+        // This is here to duplicate previous behavior for BC
+        if ($persist !== true) {
+            /** @var DoNotContact $dnc */
+            foreach ($lead->getDoNotContact() as $dnc) {
+                if ($dnc->getChannel() === 'email') {
+                    return $dnc;
+                }
             }
         }
 
@@ -984,6 +1152,8 @@ class LeadModel extends FormModel
                     "%user%" => $this->factory->getUser()->getUsername()
                 ));
 
+                // The email must be set for successful unsubscribtion
+                $lead->addUpdatedField('email', $data[$fields['email']]);
                 $this->unsubscribeLead($lead, $reason, false);
             }
         }
@@ -1090,7 +1260,7 @@ class LeadModel extends FormModel
             $tags = explode(',', $tags);
         }
 
-        $logger->debug('LEAD: Adding ' . implode(', ', $tags) . ' to lead ID# ' . $lead->getId());
+        $logger->debug('CONTACT: Adding ' . implode(', ', $tags) . ' to contact ID# ' . $lead->getId());
 
         array_walk($tags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
 
@@ -1123,7 +1293,7 @@ class LeadModel extends FormModel
 
         if (!empty($removeTags)) {
 
-            $logger->debug('LEAD: Removing '.implode(', ', $removeTags).' for lead ID# '.$lead->getId());
+            $logger->debug('CONTACT: Removing '.implode(', ', $removeTags).' for contact ID# '.$lead->getId());
 
             array_walk($removeTags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
 
@@ -1211,5 +1381,269 @@ class LeadModel extends FormModel
         );
 
         return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
+    }
+
+    /**
+     * Get bar chart data of hits
+     *
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $dateFormat
+     * @param array    $filter
+     * @param boolean  $canViewOthers
+     *
+     * @return array
+     */
+    public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
+    {
+        $flag = null;
+        $topLists  = null;
+        $allLeadsT = $this->factory->getTranslator()->trans('mautic.lead.all.leads');
+        $identifiedT = $this->factory->getTranslator()->trans('mautic.lead.identified');
+        $anonymousT = $this->factory->getTranslator()->trans('mautic.lead.lead.anonymous');
+
+        if (isset($filter['flag'])) {
+            $flag = $filter['flag'];
+            unset($filter['flag']);
+        }
+
+        if (!$canViewOthers) {
+            $filter['owner_id'] = $this->factory->getUser()->getId();
+        }
+
+        $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query     = $chart->getChartQuery($this->em->getConnection());
+        $anonymousFilter = $filter;
+        $anonymousFilter['date_identified'] = array(
+            'expression' => 'isNull'
+        );
+        $identifiedFilter = $filter;
+        $identifiedFilter['date_identified'] = array(
+            'expression' => 'isNotNull'
+        );
+
+        if ($flag == 'top') {
+            $topLists = $this->factory->getModel('lead.list')->getTopLists(6, $dateFrom, $dateTo);
+            if ($topLists) {
+                foreach ($topLists as $list) {
+                    $filter['leadlist_id'] = array(
+                        'value' => $list['id'],
+                        'list_column_name' => 't.id'
+                    );
+                    $all = $query->fetchTimeData('leads', 'date_added', $filter);
+                    $chart->setDataset($list['name'] . ': ' . $allLeadsT, $all);
+                }
+            }
+        } elseif ($flag == 'topIdentifiedVsAnonymous') {
+            $topLists = $this->factory->getModel('lead.list')->getTopLists(3, $dateFrom, $dateTo);
+            if ($topLists) {
+                foreach ($topLists as $list) {
+                    $anonymousFilter['leadlist_id'] = array(
+                        'value' => $list['id'],
+                        'list_column_name' => 't.id'
+                    );
+                    $identifiedFilter['leadlist_id'] = array(
+                        'value' => $list['id'],
+                        'list_column_name' => 't.id'
+                    );
+                    $identified = $query->fetchTimeData('leads', 'date_added', $identifiedFilter);
+                    $anonymous = $query->fetchTimeData('leads', 'date_added', $anonymousFilter);
+                    $chart->setDataset($list['name'] . ': ' . $identifiedT, $identified);
+                    $chart->setDataset($list['name'] . ': ' . $anonymousT, $anonymous);
+                }
+            }
+        } elseif ($flag == 'identified') {
+            $identified = $query->fetchTimeData('leads', 'date_added', $identifiedFilter);
+            $chart->setDataset($identifiedT, $identified);
+        } elseif ($flag == 'anonymous') {
+            $anonymous = $query->fetchTimeData('leads', 'date_added', $anonymousFilter);
+            $chart->setDataset($anonymousT, $anonymous);
+        } elseif ($flag == 'identifiedVsAnonymous') {
+            $identified = $query->fetchTimeData('leads', 'date_added', $identifiedFilter);
+            $anonymous = $query->fetchTimeData('leads', 'date_added', $anonymousFilter);
+            $chart->setDataset($identifiedT, $identified);
+            $chart->setDataset($anonymousT, $anonymous);
+        } else {
+            $all = $query->fetchTimeData('leads', 'date_added', $filter);
+            $chart->setDataset($allLeadsT, $all);
+        }
+
+        return $chart->render();
+    }
+
+    /**
+     * Get pie chart data of dwell times
+     *
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     * @param boolean $canViewOthers
+     *
+     * @return array
+     */
+    public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, $filters = array(), $canViewOthers = true)
+    {
+        $chart = new PieChart();
+        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+
+        if (!$canViewOthers) {
+            $filter['owner_id'] = $this->factory->getUser()->getId();
+        }
+
+        $identified = $query->count('leads', 'date_identified', 'date_added', $filters);
+        $all = $query->count('leads', 'id', 'date_added', $filters);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.lead.identified'), $identified);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.lead.lead.anonymous'), ($all - $identified));
+
+        return $chart->render();
+    }
+
+    /**
+     * Get leads count per country name.
+     * Can't use entity, because country is a custom field.
+     *
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     * @param boolean $canViewOthers
+     *
+     * @return array
+     */
+    public function getLeadMapData($dateFrom, $dateTo, $filters = array(), $canViewOthers = true)
+    {
+        if (!$canViewOthers) {
+            $filter['owner_id'] = $this->factory->getUser()->getId();
+        }
+
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(t.id) as quantity, t.country')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+            ->groupBy('t.country')
+            ->where($q->expr()->isNotNull('t.country'));
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_added');
+
+        $results = $q->execute()->fetchAll();
+
+        $countries = array_flip(Intl::getRegionBundle()->getCountryNames('en'));
+        $mapData = array();
+
+        // Convert country names to 2-char code
+        if ($results) {
+            foreach ($results as $leadCountry) {
+                if (isset($countries[$leadCountry['country']])) {
+                    $mapData[$countries[$leadCountry['country']]] = $leadCountry['quantity'];
+                }
+            }
+        }
+
+        return $mapData;
+    }
+
+    /**
+     * Get a list of top (by leads owned) users
+     *
+     * @param integer $limit
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     *
+     * @return array
+     */
+    public function getTopOwners($limit = 10, $dateFrom = null, $dateTo = null, $filters = array())
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(t.id) AS leads, t.owner_id, u.first_name, u.last_name')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+            ->join('t', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = t.owner_id')
+            ->where($q->expr()->isNotNull('t.owner_id'))
+            ->orderBy('leads', 'DESC')
+            ->groupBy('t.owner_id, u.first_name, u.last_name')
+            ->setMaxResults($limit);
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_added');
+
+        $results = $q->execute()->fetchAll();
+        return $results;
+    }
+
+    /**
+     * Get a list of top (by leads owned) users
+     *
+     * @param integer $limit
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     *
+     * @return array
+     */
+    public function getTopCreators($limit = 10, $dateFrom = null, $dateTo = null, $filters = array())
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(t.id) AS leads, t.created_by, t.created_by_user')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+            ->where($q->expr()->isNotNull('t.created_by'))
+            ->andWhere($q->expr()->isNotNull('t.created_by_user'))
+            ->orderBy('leads', 'DESC')
+            ->groupBy('t.created_by, t.created_by_user')
+            ->setMaxResults($limit);
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_added');
+
+        $results = $q->execute()->fetchAll();
+        return $results;
+    }
+
+    /**
+     * Get a list of leads in a date range
+     *
+     * @param integer  $limit
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param array    $filters
+     * @param array    $options
+     *
+     * @return array
+     */
+    public function getLeadList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array(), $options = array())
+    {
+        if (!empty($options['canViewOthers'])) {
+            $filter['owner_id'] = $this->factory->getUser()->getId();
+        }
+
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('t.id, t.firstname, t.lastname, t.email, t.date_added, t.date_modified')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+            ->setMaxResults($limit);
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_added');
+
+        $results = $q->execute()->fetchAll();
+
+        if ($results) {
+            foreach ($results as &$result) {
+                if ($result['firstname'] || $result['lastname']) {
+                    $result['name'] = trim($result['firstname'] . ' ' . $result['lastname']);
+                } elseif ($result['email']) {
+                    $result['name'] = $result['email'];
+                } else {
+                    $result['name'] = 'anonymous';
+                }
+                unset($result['firstname']);
+                unset($result['lastname']);
+                unset($result['email']);
+            }
+        }
+
+        return $results;
     }
 }

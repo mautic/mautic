@@ -33,6 +33,11 @@ class ConfigEvent extends CommonEvent
     private $post;
 
     /**
+     * @var array
+     */
+    private $errors = array();
+
+    /**
      * @param array        $config
      * @param ParameterBag $post
      */
@@ -107,5 +112,26 @@ class ConfigEvent extends CommonEvent
     public function getPreservedFields()
     {
         return $this->preserve;
+    }
+
+    /**
+     * Set error message
+     *
+     * @param  string $message (untranslated)
+     * @param  array  $messageVars for translation
+     */
+    public function setError($message, $messageVars = array())
+    {
+        $this->errors[$message] = $messageVars;
+    }
+
+    /**
+     * Get error messages
+     *
+     * @return  array
+     */
+    public function getErrors()
+    {
+        return $this->errors;
     }
 }

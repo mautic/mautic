@@ -73,7 +73,7 @@ class HitRepository extends CommonRepository
     public function getLeadHits($leadId, array $options = array())
     {
         $query = $this->createQueryBuilder('h');
-        $query->select('IDENTITY(h.page) AS page_id, h.dateHit, h.dateLeft, h.referer, h.source, h.sourceId, h.url, h.urlTitle, h.query')
+        $query->select('IDENTITY(h.page) AS page_id, h.userAgent, h.dateHit, h.dateLeft, h.referer, h.source, h.sourceId, h.url, h.urlTitle, h.query')
             ->where('h.lead = ' . (int) $leadId);
 
         if (!empty($options['ipIds'])) {
@@ -90,45 +90,6 @@ class HitRepository extends CommonRepository
         }
 
         return $query->getQuery()->getArrayResult();
-    }
-
-    /**
-     * Get hit per time period
-     *
-     * @param integer $amount Number of units
-     * @param char    $unit   {@link php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters}
-     * @param array   $args
-     *
-     * @return array
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    public function getHits($amount, $unit, $args = array())
-    {
-        $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('viewed'));
-
-        $query = $this->createQueryBuilder('h');
-
-        $query->select('IDENTITY(h.page), h.dateHit');
-
-        if (isset($args['page_id'])) {
-            $query->andWhere($query->expr()->eq('IDENTITY(h.page)', (int) $args['page_id']));
-        }
-
-        if (isset($args['source'])) {
-            $query->andWhere($query->expr()->eq('h.source', $query->expr()->literal($args['source'])));
-        }
-
-        if (isset($args['source_id'])) {
-            $query->andWhere($query->expr()->eq('h.sourceId', (int) $args['source_id']));
-        }
-
-        $query->andwhere($query->expr()->gte('h.dateHit', ':date'))
-            ->setParameter('date', $data['fromDate']);
-
-        $hits = $query->getQuery()->getArrayResult();
-
-        return GraphHelper::mergeLineGraphData($data, $hits, $unit, 0, 'dateHit');
     }
 
     /**

@@ -68,6 +68,9 @@ class TwitterIntegration extends SocialIntegration
         return 'https://api.twitter.com/oauth/access_token';
     }
 
+    /**
+     * @return string
+     */
     public function getAuthLoginUrl()
     {
         $url = 'https://api.twitter.com/oauth/authorize';
@@ -78,7 +81,7 @@ class TwitterIntegration extends SocialIntegration
         if (isset($requestToken['oauth_token'])) {
             $url .= '?oauth_token='.$requestToken['oauth_token'];
         }
-
+        $this->factory->getLogger()->addError(print_r($url,true));
         return $url;
     }
 
@@ -112,7 +115,7 @@ class TwitterIntegration extends SocialIntegration
         // Prevent SSL issues
         $settings['ssl_verifypeer'] = false;
 
-        if (empty($settings['authorize_session'])) {
+        if (empty($settings['authorize_session']) && $authType!='access_token') {
             // Twitter requires oauth_token_secret to be part of composite key
             $settings['token_secret'] = $this->keys['oauth_token_secret'];
 
@@ -140,23 +143,34 @@ class TwitterIntegration extends SocialIntegration
     {
         //tell getUserId to return a user array if it obtains it
         $this->preventDoubleCall = true;
+        $identifier = $this->keys;
+        if(!isset($identifier[$this->getName()])){
+            $identifier[$this->getName()] = "account/verify_credentials";
+        }
 
         if ($id = $this->getUserId($identifier, $socialCache)) {
             if (is_array($id)) {
-                //getUserId has alread obtained the data
+                //getUserId has already obtained the data
                 $data = $id;
             } else {
-                $data = $this->makeRequest($this->getApiUrl("users/lookup"), array(
-                    'user_id'          => $id,
-                    'include_entities' => 'false'
-                ));
+                $data = $this->makeRequest($this->getApiUrl("account/verify_credentials"), array(
+                    //'user_id'          => $id,
+                    'include_email'=>'true',
+                    'include_entities' => 'false',
+                    'oauth_token' => $identifier['oauth_token']
+                ),'GET',array('auth_type'=>'oauth1a'));
             }
 
             if (isset($data[0])) {
-                $info                  = $this->matchUpData($data[0]);
-                $info['profileHandle'] = $data[0]['screen_name'];
+                $data  = $data[0];
+            }
+
+            $this->factory->getLogger()->addError(print_r($data,true));
+            if (isset($data)) {
+                $info                  = $this->matchUpData($data);
+                $info['profileHandle'] = $data['screen_name'];
                 //remove the size variant
-                $image                = $data[0]['profile_image_url_https'];
+                $image                = $data['profile_image_url_https'];
                 $image                = str_replace(array('_normal', '_bigger', '_mini'), '', $image);
                 $info['profileImage'] = $image;
 
@@ -266,14 +280,14 @@ class TwitterIntegration extends SocialIntegration
         }
 
         // note twitter requires params to be passed as strings
-        $data = $this->makeRequest($this->getApiUrl("users/lookup"), array(
-            'screen_name'      => $identifier,
-            'include_entities' => 'false',
+        $data = $this->makeRequest($this->getApiUrl("account/verify_credentials"), array(
+            'include_email'=>'true',
+            'include_entities' => 'true',
+            'oauth_token' => $identifier['oauth_token'],
+        ),'GET',array('auth_type'=>'oauth1a'));
 
-        ));
-
-        if (isset($data[0])) {
-            $socialCache['id'] = $data[0]['id'];
+        if (isset($data['id'])) {
+            $socialCache['id'] = $data['id'];
 
             //return the entire data set if the function has been called from getUserData()
             return ($this->preventDoubleCall) ? $data : $socialCache['id'];

@@ -222,7 +222,7 @@ class LeadRepository extends CommonRepository
      * Get list of lead Ids by unique field data.
      *
      * @param $uniqueFieldsWithData is an array of columns & values to filter by
-     * @param $leadId is the current lead id. Added to query to skip and find other leads.
+     * @param int $leadId is the current lead id. Added to query to skip and find other leads.
      *
      * @return array
      */
@@ -250,11 +250,12 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param $email
+     * @param string $email
+     * @param boolean $all Set to true to return all matching lead id's
      *
-     * @return integer|null
+     * @return array|null
      */
-    public function getLeadByEmail($email)
+    public function getLeadByEmail($email, $all = false)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('l.id')
@@ -265,7 +266,7 @@ class LeadRepository extends CommonRepository
         $result = $q->execute()->fetchAll();
 
         if (count($result)) {
-            return $result[0];
+            return $all ? $result : $result[0];
         } else {
             return null;
         }
@@ -293,24 +294,6 @@ class LeadRepository extends CommonRepository
         foreach ($results as $lead) {
             $lead->setAvailableSocialFields($this->availableSocialFields);
         }
-
-        return $results;
-    }
-
-    /**
-     * Get leads count per country name.
-     * Can't use entity, because country is custom field.
-     *
-     * @return array
-     */
-    public function getLeadsCountPerCountries()
-    {
-        $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('COUNT(l.id) as quantity, l.country')
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->groupBy('l.country')
-            ->where($q->expr()->isNotNull('l.country'));
-        $results = $q->execute()->fetchAll();
 
         return $results;
     }

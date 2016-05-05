@@ -14,7 +14,6 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\CoreEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Mautic\LeadBundle\LeadEvents;
@@ -69,9 +68,14 @@ class AjaxController extends CommonAjaxController
                         "id"    => $r['id']
                     );
                 }
+            } 
+            elseif ($field == "hit_url") {
+                $dataArray[] = array(
+                    'value' => ''
+                );
             } else {
                 $results = $this->factory->getModel('lead.field')->getLookupResults($field, $filter);
-                foreach ($results as $r) {
+                foreach ($results as $r) { 
                     $dataArray[] = array('value' => $r[$field]);
                 }
             }
@@ -104,7 +108,7 @@ class AjaxController extends CommonAjaxController
                 $integrationHelper = $this->factory->getHelper('integration');
                 $socialProfiles    = $integrationHelper->getUserProfiles($lead, $fields, true, $network);
                 $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
-                $networks          = array();
+                $integrations      = array();
                 $socialCount       = count($socialProfiles);
                 if (empty($network) || empty($socialCount)) {
                     $dataArray['completeProfile'] = $this->renderView('MauticLeadBundle:Social:index.html.php', array(
@@ -115,14 +119,21 @@ class AjaxController extends CommonAjaxController
                     $dataArray['socialCount']     = $socialCount;
                 } else {
                     foreach ($socialProfiles as $name => $details) {
-                        $networks[$name]['newContent'] = $this->renderView('MauticLeadBundle:Social/' . $name . ':view.html.php', array(
-                            'lead'              => $lead,
-                            'details'           => $details,
-                            'network'           => $name,
-                            'socialProfileUrls' => $socialProfileUrls
-                        ));
+                        if ($integrationObject = $integrationHelper->getIntegrationObject($name)) {
+                            if ($template = $integrationObject->getSocialProfileTemplate()) {
+                                $integrations[$name]['newContent'] = $this->renderView(
+                                    $template,
+                                    array(
+                                        'lead'              => $lead,
+                                        'details'           => $details,
+                                        'integrationName'   => $name,
+                                        'socialProfileUrls' => $socialProfileUrls
+                                    )
+                                );
+                            }
+                        }
                     }
-                    $dataArray['profiles'] = $networks;
+                    $dataArray['profiles'] = $integrations;
                 }
 
                 $dataArray['success'] = 1;
@@ -212,16 +223,12 @@ class AjaxController extends CommonAjaxController
                 $events     = $event->getEvents();
                 $eventTypes = $event->getEventTypes();
 
-                $event = new IconEvent($this->factory->getSecurity());
-                $this->factory->getDispatcher()->dispatch(CoreEvents::FETCH_ICONS, $event);
-                $icons = $event->getIcons();
-
                 $timeline = $this->renderView('MauticLeadBundle:Lead:history.html.php', array(
                         'events'       => $events,
                         'eventTypes'   => $eventTypes,
                         'eventFilters' => $filter,
-                        'icons'        => $icons,
-                        'lead'         => $lead)
+                        'lead'         => $lead
+                    )
                 );
 
                 $dataArray['success']      = 1;

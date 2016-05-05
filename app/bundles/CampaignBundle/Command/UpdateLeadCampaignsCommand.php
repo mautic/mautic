@@ -27,13 +27,13 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
                     'mautic:campaigns:rebuild',
                 )
             )
-            ->setDescription('Rebuild campaigns based on lead lists.')
-            ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of leads to process per round. Defaults to 300.', 300)
+            ->setDescription('Rebuild campaigns based on contact segments.')
+            ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of contacts to process per round. Defaults to 300.', 300)
             ->addOption(
-                '--max-leads',
+                '--max-contacts',
                 '-m',
                 InputOption::VALUE_OPTIONAL,
-                'Set max number of leads to process per campaign for this script execution. Defaults to all.',
+                'Set max number of contacts to process per campaign for this script execution. Defaults to all.',
                 false
             )
             ->addOption('--campaign-id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to rebuild. Defaults to all.', false)
@@ -54,7 +54,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
 
         $id    = $input->getOption('campaign-id');
         $batch = $input->getOption('batch-limit');
-        $max   = $input->getOption('max-leads');
+        $max   = $input->getOption('max-contacts');
 
         if (!$this->checkRunStatus($input, $output, ($id) ? $id : 'all')) {
 

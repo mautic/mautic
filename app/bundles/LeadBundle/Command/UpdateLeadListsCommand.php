@@ -19,9 +19,18 @@ class UpdateLeadListsCommand extends ModeratedCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:leadlists:update')
+            ->setName('mautic:contactsegments:update')
             ->setAliases(
                 array(
+                    'mautic:segments:update',
+                    'mautic:update:contactsegments',
+                    'mautic:update:segments',
+                    'mautic:rebuild:contactsegments',
+                    'mautic:contactsegments:rebuild',
+                    'mautic:segments:rebuild',
+                    'mautic:rebuild:segments',
+
+                    // Following aliases: BC support; @deprecated 1.1.4; to be removed in 2.0
                     'mautic:lists:update',
                     'mautic:update:leadlists',
                     'mautic:update:lists',
@@ -29,15 +38,16 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     'mautic:leadlists:rebuild',
                     'mautic:lists:rebuild',
                     'mautic:rebuild:lists',
+                    'mautic:leadlists:update'
                 )
             )
-            ->setDescription('Update leads in smart lists based on new lead data.')
-            ->addOption('--batch-limit', '-b', InputOption::VALUE_OPTIONAL, 'Set batch size of leads to process per round. Defaults to 300.', 300)
+            ->setDescription('Update contacts in smart segments based on new contact data.')
+            ->addOption('--batch-limit', '-b', InputOption::VALUE_OPTIONAL, 'Set batch size of contacts to process per round. Defaults to 300.', 300)
             ->addOption(
-                '--max-leads',
+                '--max-contacts',
                 '-m',
                 InputOption::VALUE_OPTIONAL,
-                'Set max number of leads to process per list for this script execution. Defaults to all.',
+                'Set max number of contacts to process per segment for this script execution. Defaults to all.',
                 false
             )
             ->addOption('--list-id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to rebuild. Defaults to all.', false);
@@ -56,7 +66,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
 
         $id    = $input->getOption('list-id');
         $batch = $input->getOption('batch-limit');
-        $max   = $input->getOption('max-leads');
+        $max   = $input->getOption('max-contacts');
 
         if (!$this->checkRunStatus($input, $output, ($id) ? $id : 'all')) {
 

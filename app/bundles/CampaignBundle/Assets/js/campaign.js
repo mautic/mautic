@@ -50,10 +50,6 @@ Mautic.campaignOnLoad = function (container) {
                 mQuery(this).find('.btn-edit').first().click();
             });
     }
-
-    Mautic.renderCampaignViewsBarChart();
-    Mautic.renderCampaignEmailSentPie();
-    Mautic.renderCampaignLeadsBarChart();
 };
 
 /**
@@ -62,12 +58,6 @@ Mautic.campaignOnLoad = function (container) {
 Mautic.campaignOnUnload = function(container) {
     delete Mautic.campaignBuilderInstance;
     delete Mautic.campaignBuilderLabels;
-
-    if (container === '#app-content') {
-        delete Mautic.campaignViewsBarChart;
-        delete Mautic.campaignEmailSentPie;
-        delete Mautic.campaignLeadsBarChart;
-    }
 }
 
 /**
@@ -336,10 +326,10 @@ Mautic.launchCampaignEditor = function() {
             );
         });
 
-        var overlayOptions = [["Arrow", {width: 15, length: 15, location: 0.5}]];
+        var overlayOptions = [["Arrow", {width: 8, length: 8, location: 0.5}]];
         var endpoint = "Dot";
         var connector = ["Bezier", {curviness: 25}];
-        var connectorStyleLineWidth = 3;
+        var connectorStyleLineWidth = 1;
 
         Mautic.campaignBuilderTopAnchor = [0.5, 0, 0, -1, 0, 0];
         Mautic.campaignBuilderTopEndpoint = {
@@ -690,96 +680,4 @@ Mautic.submitCampaignSource = function(e) {
     mQuery('#campaign_leadsource_droppedY').val(mQuery('#droppedY').val());
 
     mQuery('form[name="campaign_leadsource"]').submit();
-};
-
-
-Mautic.renderCampaignViewsBarChart = function (container) {
-    if (!mQuery('#campaign-views-chart').length) {
-        return;
-    }
-    chartData = mQuery.parseJSON(mQuery('#campaign-views-chart-data').text());
-    if (typeof chartData.labels === "undefined") {
-        return;
-    }
-    var ctx = document.getElementById("campaign-views-chart").getContext("2d");
-    var options = {
-        scaleShowGridLines : false,
-        barShowStroke : false,
-        barValueSpacing : 1,
-        showScale: false,
-        tooltipFontSize: 10,
-        tooltipCaretSize: 0
-    };
-    if (typeof Mautic.campaignViewsBarChart === 'undefined') {
-        Mautic.campaignViewsBarChart = new Chart(ctx).Bar(chartData, options);
-    }
-};
-
-Mautic.renderCampaignLeadsBarChart = function (container) {
-    if (!mQuery('#campaign-leads-chart').length) {
-        return;
-    }
-    chartData = mQuery.parseJSON(mQuery('#campaign-leads-chart-data').text());
-    if (typeof chartData.labels === "undefined") {
-        return;
-    }
-    var ctx = document.getElementById("campaign-leads-chart").getContext("2d");
-    var options = {
-        scaleShowGridLines : false,
-        barShowStroke : false,
-        barValueSpacing : 1,
-        showScale: false,
-        tooltipFontSize: 10,
-        tooltipCaretSize: 0
-    };
-    if (typeof Mautic.campaignLeadsBarChart === 'undefined') {
-        Mautic.campaignLeadsBarChart = new Chart(ctx).Bar(chartData, options);
-    }
-};
-
-Mautic.renderCampaignEmailSentPie = function () {
-    // Initilize chart only for first time
-    if (typeof Mautic.campaignEmailSentPie === 'object') {
-        return;
-    }
-    var element = mQuery('#emails-sent-rate');
-    if (!element.length) {
-        return;
-    }
-
-    var options = {
-        responsive: false,
-        tooltipFontSize: 10,
-        tooltipTemplate: "<%if (label){%><%}%><%= value %>x <%=label%>"};
-    var timesOnSiteData = mQuery.parseJSON(mQuery('#emails-sent-data').text());
-    timesOnSiteData = Mautic.emulateNoDataForPieChart(timesOnSiteData);
-    var ctx = document.getElementById("emails-sent-rate").getContext("2d");
-    Mautic.campaignEmailSentPie = new Chart(ctx).Pie(timesOnSiteData, options);
-};
-
-Mautic.standardEmailUrl = function(options) {
-    if (!options) {
-        return;
-    }
-
-    var url = options.windowUrl;
-    if (url) {
-        var editEmailKey = '/emails/edit/emailId';
-        var previewEmailKey = '/email/preview/emailId';
-        if (url.indexOf(editEmailKey) > -1 ||
-            url.indexOf(previewEmailKey) > -1) {
-            options.windowUrl = url.replace('emailId', mQuery('#campaignevent_properties_email').val());
-        }
-    }
-
-    return options;
-};
-
-Mautic.disabledEmailAction = function() {
-    var email = mQuery('#campaignevent_properties_email').val();
-
-    var disabled = email === '' || email === null;
-
-    mQuery('#campaignevent_properties_editEmailButton').prop('disabled', disabled);
-    mQuery('#campaignevent_properties_previewEmailButton').prop('disabled', disabled);
 };

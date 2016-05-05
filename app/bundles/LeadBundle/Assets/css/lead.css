@@ -127,3 +127,14 @@ ul.tag-cloud li {
 .lead-merge-options {
     position: relative;
 }
+
+.contact-cards .panel-body {
+    max-height: 150px;
+}
+
+.contact-cards .img {
+    max-height: 115px;
+}
+#lead_merge_lead_to_merge_chosen .chosen-search {
+    display:none;
+}
