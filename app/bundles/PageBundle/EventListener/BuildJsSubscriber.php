@@ -34,33 +34,43 @@ class BuildJsSubscriber extends CommonSubscriber
     public function onBuildJs(BuildJsEvent $event)
     {
         $router = $this->factory->getRouter();
-        $trackingUrl = str_replace(
+        $pageTrackingUrl = str_replace(
             array('http://', 'https://'),
             '',
             $router->generate('mautic_page_tracker', [], UrlGeneratorInterface::ABSOLUTE_URL)
         );
 
         $js = <<<JS
-(function(m, l, n, d){
-    m.trackingPixelUrl = (l.protocol == 'https:' ? 'https:' : 'http:') + '//{$trackingUrl}';
-    
-    var params = {
-        page_title: d.title,
-        page_language: n.language,
-        page_referrer: (d.referrer) ? d.referrer.split('/')[2] : '',
-        page_url: l.href
-    };
-    
-    // Merge user defined tracking pixel parameters.
-    if (m.hasOwnProperty("trackingPixelParams")) {
-        for (var attr in m.trackingPixelParams) {
-            params[attr] = m.trackingPixelParams[attr];
+(function(m, l, n, d) {
+    m.pageTrackingUrl = (l.protocol == 'https:' ? 'https:' : 'http:') + '//{$pageTrackingUrl}';
+
+    m.sendPageview = function(pageview) {
+
+        var params = {
+            page_title: d.title,
+            page_language: n.language,
+            page_referrer: (d.referrer) ? d.referrer.split('/')[2] : '',
+            page_url: l.href
+        };
+        
+        // Merge user defined tracking pixel parameters.
+        if (typeof pageview[2] === 'object') {
+            for (var attr in pageview[2]) {
+                params[attr] = pageview[2][attr];
+            }
+        }
+
+        m.trackingPixel = (new Image()).src = m.pageTrackingUrl + '?' + m.serialize(params);
+    }
+
+    if (typeof m.getInput === 'function') {
+        var pageview = m.getInput('send', 'pageview');
+
+        if (pageview) {
+            m.sendPageview(pageview)
         }
     }
-    
-    m.trackingPixelUrl += '?' + m.serialize(params);
-    
-    m.trackingPixel = (new Image()).src = m.trackingPixelUrl;
+
 })(MauticJS, location, navigator, document);
 JS;
 

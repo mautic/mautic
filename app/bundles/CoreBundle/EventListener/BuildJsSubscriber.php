@@ -44,7 +44,7 @@ var MauticJS = MauticJS || {};
 
 MauticJS.serialize = function(obj) {
     var str = [];
-    for(var p in obj)
+    for (var p in obj)
         if (obj.hasOwnProperty(p)) {
             str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
         }
@@ -54,6 +54,24 @@ MauticJS.serialize = function(obj) {
 MauticJS.documentReady = function(f) {
     /in/.test(document.readyState) ? setTimeout('MauticJS.documentReady(' + f + ')', 9) : f();
 };
+
+if (typeof window[window.MauticTrackingObject] === 'undefined') {
+    console.log('Mautic tracking is not initiated correctly. Follow the documentation.');
+} else {
+    MauticJS.input = window[window.MauticTrackingObject];
+    MauticJS.inputQueue = MauticJS.input.q;
+
+    MauticJS.getInput = function(task, type) {
+        if (MauticJS.inputQueue.length) {
+            for (var i in MauticJS.inputQueue) {
+                if (MauticJS.inputQueue[i][0] === task && MauticJS.inputQueue[i][1] === type);
+                return MauticJS.inputQueue[i];
+            }
+        } else {
+            return false;
+        }
+    }
+}
 JS;
         $event->appendJs($js, 'Mautic Core');
     }
