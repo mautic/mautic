@@ -135,7 +135,7 @@ class DashboardModel extends FormModel
         if ($widget->getCacheTimeout() == null || $widget->getCacheTimeout() == -1) {
             $widget->setCacheTimeout($this->factory->getParameter('cached_data_timeout'));
         }
-
+        
         // Merge global filter with widget params
         $widgetParams = $widget->getParams();
         $resultParams = array_merge($widgetParams, $filter);
