@@ -45,6 +45,9 @@ mQuery( document ).ready(function() {
         mQuery("html").Core({
             console: false
         });
+
+        //register global keyboard shortcuts
+        Mautic.bindGlobalKeyboardShortcuts();
     }
 
     if (typeof IdleTimer != 'undefined') {
@@ -110,12 +113,12 @@ var Mautic = {
             mQuery('#mautic_dashboard_index').click();
         });
 
-        Mousetrap.bind('shift+l', function(e) {
-            mQuery('#menu_lead_parent_child > li:first > a').click();
+        Mousetrap.bind('shift+c', function(e) {
+            mQuery('#mautic_lead_index').click();
         });
 
         Mousetrap.bind('shift+right', function (e) {
-            mQuery('.navbar-right > button.navbar-toggle').click();
+            mQuery(".navbar-right a[data-toggle='sidebar']").click();
         });
 
         Mousetrap.bind('shift+n', function (e) {
