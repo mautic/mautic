@@ -92,7 +92,12 @@ return array(
                 'mautic.sms.smses' => array(
                     'route'     => 'mautic_sms_index',
                     'access'    => array('sms:smses:viewown', 'sms:smses:viewother'),
-                    'parent'    => 'mautic.core.channels'
+                    'parent'    => 'mautic.core.channels',
+                    'checks'    => array(
+                        'parameters' => array(
+                            'sms_enabled' => true
+                        )
+                    )
                 )
             )
         )
