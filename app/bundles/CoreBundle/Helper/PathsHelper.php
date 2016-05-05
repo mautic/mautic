@@ -65,6 +65,7 @@ class PathsHelper
      * @param string $dashboardImportUserDir
      * @param string $kernelCacheDir
      * @param string $kernelLogDir
+     * @param UserHelper $userHelper
      */
     public function __construct(
         $paths, 
@@ -73,7 +74,8 @@ class PathsHelper
         $dashboardImportDir, 
         $dashboardImportUserDir,
         $kernelCacheDir,
-        $kernelLogDir
+        $kernelLogDir,
+        UserHelper $userHelper
     )
     {
         $this->paths = $paths;
@@ -83,23 +85,7 @@ class PathsHelper
         $this->dashboardUserImportDir = $dashboardImportUserDir;
         $this->kernelCacheDir = $kernelCacheDir;
         $this->kernelLogDir = $kernelLogDir;
-    }
-
-    /**
-     * Initialize the user parameter
-     *
-     * @param SecurityContext $context
-     */
-    public function initUser(SecurityContext $context)
-    {
-        $user = $context->getToken()->getUser();
-
-        if (! $user instanceof User) {
-            $user = new User();
-            $user->isGuest = true;
-        }
-
-        $this->user = $user;
+        $this->user = $userHelper->getUser();
     }
 
     /**

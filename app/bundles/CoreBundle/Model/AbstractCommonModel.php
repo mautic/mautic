@@ -11,6 +11,7 @@ namespace Mautic\CoreBundle\Model;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -100,18 +101,11 @@ abstract class AbstractCommonModel
     /**
      * Initialize the user parameter for use in locking procedures
      *
-     * @param SecurityContext $context
+     * @param UserHelper $userHelper
      */
-    public function initUser(SecurityContext $context)
+    public function setUser(UserHelper $userHelper)
     {
-        $user = $context->getToken()->getUser();
-
-        if (! $user instanceof User) {
-            $user = new User();
-            $user->isGuest = true;
-        }
-
-        $this->user = $user;
+        $this->user = $userHelper->getUser();
     }
 
     /**

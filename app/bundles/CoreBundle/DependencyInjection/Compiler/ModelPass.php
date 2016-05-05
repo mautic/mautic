@@ -29,13 +29,10 @@ class ModelPass implements CompilerPassInterface
             $definition->addMethodCall('setSecurity', array(new Reference('mautic.security')));
             $definition->addMethodCall('setDispatcher', array(new Reference('event_dispatcher')));
             $definition->addMethodCall('setTranslator', array(new Reference('translator')));
+            $definition->addMethodCall('setUser', array(new Reference('mautic.helper.user')));
 
             $modelClass = $definition->getClass();
             $reflected = new \ReflectionClass($modelClass);
-
-            if ($reflected->hasMethod('initUser')) {
-                $definition->addMethodCall('initUser', array(new Reference('security.context')));
-            }
             
             if ($reflected->hasMethod('setRouter')) {
                 $definition->addMethodCall('setRouter', array(new Reference('router')));

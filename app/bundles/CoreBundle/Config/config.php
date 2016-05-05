@@ -245,7 +245,8 @@ return array(
                     '%mautic.dashboard_import_dir%',
                     '%mautic.dashboard_user_import_dir%',
                     '%kernel.cache_dir%',
-                    '%kernel.log_dir%'
+                    '%kernel.log_dir%',
+                    'mautic.helper.user'
                 ),
                 'methodCalls' => array(
                     'initUser' => array(
@@ -261,6 +262,12 @@ return array(
                     'mautic.ip_lookup',
                     '%mautic.do_not_track_ips%',
                     '%mautic.do_not_track_internal_ips%'
+                )
+            ),
+            'mautic.helper.user' => array(
+                'class' => 'Mautic\CoreBundle\Helper\UserHelper',
+                'arguments' => array(
+                    'security.context'
                 )
             )
         ),
