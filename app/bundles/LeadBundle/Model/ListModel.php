@@ -97,14 +97,13 @@ class ListModel extends FormModel
         //make sure alias is not already taken
         $repo      = $this->getRepository();
         $testAlias = $alias;
-        $user      = $this->factory->getUser();
-        $existing  = $repo->getLists($user, $testAlias, $entity->getId());
+        $existing  = $repo->getLists($this->user, $testAlias, $entity->getId());
         $count     = count($existing);
         $aliasTag  = $count;
 
         while ($count) {
             $testAlias = $alias . $aliasTag;
-            $existing  = $repo->getLists($user, $testAlias, $entity->getId());
+            $existing  = $repo->getLists($this->user, $testAlias, $entity->getId());
             $count     = count($existing);
             $aliasTag++;
         }
@@ -430,7 +429,7 @@ class ListModel extends FormModel
     public function getUserLists($alias = '')
     {
         $user  = (!$this->security->isGranted('lead:lists:viewother')) ?
-            $this->factory->getUser() : false;
+            $this->user : false;
         $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getLists($user, $alias);
 
         return $lists;
@@ -994,7 +993,7 @@ class ListModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('ll.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);

@@ -44,13 +44,19 @@ class ClientModel extends FormModel
     /**
      * ClientModel constructor.
      * 
-     * @param Session $session
      * @param RequestStack $requestStack
      */
-    public function __construct(Session $session, RequestStack $requestStack)
+    public function __construct(RequestStack $requestStack)
+    {
+        $this->request = $requestStack->getCurrentRequest();
+    }
+
+    /**
+     * @param Session $session
+     */
+    public function setSession(Session $session)
     {
         $this->session = $session;
-        $this->request = $requestStack->getCurrentRequest();
     }
 
     /**

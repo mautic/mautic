@@ -13,8 +13,8 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
-use Mautic\EmailBundle\Entity\DoNotEmail;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
@@ -27,6 +27,8 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -43,13 +45,34 @@ class EmailModel extends FormModel
     protected $ipLookupHelper;
 
     /**
-     * EventModel constructor.
-     *
-     * @param IpLookupHelper $ipLookupHelper
+     * @var Mailbox
      */
-    public function __construct(IpLookupHelper $ipLookupHelper)
+    protected $mailboxHelper;
+
+    /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * @var TrackableModel
+     */
+    protected $pageTrackableModel;
+
+    /**
+     * EmailModel constructor.
+     * 
+     * @param IpLookupHelper $ipLookupHelper
+     * @param Mailbox $mailboxHelper
+     * @param LeadModel $leadModel
+     * @param TrackableModel $pageTrackableModel
+     */
+    public function __construct(IpLookupHelper $ipLookupHelper, Mailbox $mailboxHelper, LeadModel $leadModel, TrackableModel $pageTrackableModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
+        $this->mailboxHelper = $mailboxHelper;
+        $this->leadModel = $leadModel;
+        $this->pageTrackableModel = $pageTrackableModel;
     }
 
     /**
@@ -67,7 +90,7 @@ class EmailModel extends FormModel
      */
     public function getStatRepository ()
     {
-        return $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat');
+        return $this->em->getRepository('MauticEmailBundle:Stat');
     }
 
     /**
@@ -75,7 +98,7 @@ class EmailModel extends FormModel
      */
     public function getCopyRepository ()
     {
-        return $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Copy');
+        return $this->em->getRepository('MauticEmailBundle:Copy');
     }
 
     /**
@@ -334,9 +357,6 @@ class EmailModel extends FormModel
 
         $lead = $stat->getLead();
         if ($lead !== null) {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-            $leadModel = $this->factory->getModel('lead');
-
             /*
             // @todo too many webmail clients mask IP address
             if (!$lead->getIpAddresses()->contains($ipAddress)) {
@@ -346,7 +366,7 @@ class EmailModel extends FormModel
             */
 
             // Set the lead as current lead
-            $leadModel->setCurrentLead($lead);
+            $this->leadModel->setCurrentLead($lead);
         }
 
         if (!$stat->getIsRead()) {
@@ -673,7 +693,7 @@ class EmailModel extends FormModel
      */
     public function getEmailClickStats($emailId)
     {
-        return $this->factory->getModel('page.trackable')->getTrackableList('email', $emailId);
+        return $this->pageTrackableModel->getTrackableList('email', $emailId);
     }
 
     /**
@@ -1172,8 +1192,7 @@ class EmailModel extends FormModel
 
             if (!isset($user['email'])) {
                 /** @var \Mautic\UserBundle\Model\UserModel $model */
-                $userModel         = $this->factory->getModel('user');
-                $userEntity        = $userModel->getEntity($id);
+                $userEntity        = $this->userModel->getEntity($id);
                 $user['email']     = $userEntity->getEmail();
                 $user['firstname'] = $userEntity->getFirstName();
                 $user['lastname']  = $userEntity->getLastName();
@@ -1210,12 +1229,9 @@ class EmailModel extends FormModel
         $lead = $stat->getLead();
 
         if ($lead instanceof Lead) {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-            $leadModel = $this->factory->getModel('lead.lead');
-
             $email   = $stat->getEmail();
             $channel = ($email) ? array('email' => $email->getId()) : 'email';
-            $leadModel->addDncForLead($lead, $channel, $comments, $reason, $flush);
+            $this->leadModel->addDncForLead($lead, $channel, $comments, $reason, $flush);
         }
     }
 
@@ -1228,9 +1244,6 @@ class EmailModel extends FormModel
      */
     public function setEmailDoNotContact($email, $reason = 'bounced', $comments = '', $flush = true, $leadId = null)
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead.lead');
-
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
         $leadRepo = $this->em->getRepository('MauticLeadBundle:Lead');
         $leadId = (array) $leadRepo->getLeadByEmail($email, true);
@@ -1243,7 +1256,7 @@ class EmailModel extends FormModel
         }
 
         foreach ($leads as $lead) {
-            $leadModel->addDncForLead($lead, 'email', $comments, $reason, $flush);
+            $this->leadModel->addDncForLead($lead, 'email', $comments, $reason, $flush);
         }
     }
 
@@ -1359,12 +1372,9 @@ class EmailModel extends FormModel
      */
     public function getMonitoredMailbox($bundleKey, $folderKey)
     {
-        /** @var \Mautic\EmailBundle\MonitoredEmail\Mailbox $mailboxHelper */
-        $mailboxHelper = $this->factory->getHelper('mailbox');
+        if ($this->mailboxHelper->isConfigured($bundleKey, $folderKey)) {
 
-        if ($mailboxHelper->isConfigured($bundleKey, $folderKey)) {
-
-            return $mailboxHelper->getMailboxSettings();
+            return $this->mailboxHelper->getMailboxSettings();
         }
 
         return false;
@@ -1373,25 +1383,24 @@ class EmailModel extends FormModel
     /**
      * Joins the email table and limits created_by to currently logged in user
      *
-     * @param QueryBuilder  $query
-     *
+     * @param QueryBuilder  $q
      */
     public function limitQueryToCreator(QueryBuilder &$q)
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = t.email_id')
             ->andWhere('e.created_by = :userId')
-            ->setParameter('userId', $this->factory->getUser()->getId());
+            ->setParameter('userId', $this->user->getId());
     }
 
     /**
      * Get line chart data of emails sent and read
      *
-     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     * @param string   $dateFormat
-     * @param array    $filter
-     * @param boolean  $canViewOthers
+     * @param char      $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param string    $dateFormat
+     * @param array     $filter
+     * @param boolean   $canViewOthers
      *
      * @return array
      */
@@ -1413,7 +1422,7 @@ class EmailModel extends FormModel
                 $this->limitQueryToCreator($q);
             }
             $data = $query->loadAndBuildTimeData($q);
-            $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.sent.emails'), $data);
+            $chart->setDataset($this->translator->trans('mautic.email.sent.emails'), $data);
         }
 
         if ($flag == 'sent_and_opened_and_failed' || $flag == 'sent_and_opened' || $flag == 'opened') {
@@ -1422,7 +1431,7 @@ class EmailModel extends FormModel
                 $this->limitQueryToCreator($q);
             }
             $data = $query->loadAndBuildTimeData($q);
-            $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.read.emails'), $data);
+            $chart->setDataset($this->translator->trans('mautic.email.read.emails'), $data);
         }
 
         if ($flag == 'sent_and_opened_and_failed' || $flag == 'failed') {
@@ -1433,7 +1442,7 @@ class EmailModel extends FormModel
             $q->andWhere($q->expr()->eq('t.is_failed', ':true'))
                 ->setParameter('true', true, 'boolean');
             $data = $query->loadAndBuildTimeData($q);
-            $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.failed.emails'), $data);
+            $chart->setDataset($this->translator->trans('mautic.email.failed.emails'), $data);
         }
 
         return $chart->render();
@@ -1473,9 +1482,9 @@ class EmailModel extends FormModel
         $read = $query->fetchCount($readQ);
         $failed = $query->fetchCount($failedQ);
 
-        $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.graph.pie.ignored.read.failed.ignored'), ($sent - $read));
-        $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.graph.pie.ignored.read.failed.read'), $read);
-        $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.graph.pie.ignored.read.failed.failed'), $failed);
+        $chart->setDataset($this->translator->trans('mautic.email.graph.pie.ignored.read.failed.ignored'), ($sent - $read));
+        $chart->setDataset($this->translator->trans('mautic.email.graph.pie.ignored.read.failed.read'), $read);
+        $chart->setDataset($this->translator->trans('mautic.email.graph.pie.ignored.read.failed.failed'), $failed);
 
         return $chart->render();
     }
@@ -1483,11 +1492,11 @@ class EmailModel extends FormModel
     /**
      * Get a list of emails in a date range, grouped by a stat date count
      *
-     * @param integer  $limit
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     * @param array    $filters
-     * @param array    $options
+     * @param integer   $limit
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param array     $filters
+     * @param array     $options
      *
      * @return array
      */
@@ -1503,7 +1512,7 @@ class EmailModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('e.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1525,11 +1534,11 @@ class EmailModel extends FormModel
     /**
      * Get a list of emails in a date range
      *
-     * @param integer  $limit
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     * @param array    $filters
-     * @param array    $options
+     * @param integer   $limit
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param array     $filters
+     * @param array     $options
      *
      * @return array
      */
@@ -1542,7 +1551,7 @@ class EmailModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('t.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1565,8 +1574,8 @@ class EmailModel extends FormModel
     public function getUpcomingEmails($limit = 10, $canViewOthers = true)
     {
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
-        $leadEventLogRepository = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
-        $leadEventLogRepository->setCurrentUser($this->factory->getUser());
+        $leadEventLogRepository = $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
+        $leadEventLogRepository->setCurrentUser($this->user);
         $upcomingEmails = $leadEventLogRepository->getUpcomingEvents(
             array(
                 'type' => 'email.send',

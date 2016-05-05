@@ -201,7 +201,11 @@ return array(
                 'class' => 'Mautic\FormBundle\Model\FieldModel'
             ),
             'mautic.form.model.form' => array(
-                'class' => 'Mautic\FormBundle\Model\FormModel'
+                'class' => 'Mautic\FormBundle\Model\FormModel',
+                'arguments' => array(
+                    'model.form.model.action',
+                    'model.form.model.field'
+                )
             ),
             'mautic.form.model.submission' => array(
                 'class' => 'Mautic\FormBundle\Model\SubmissionModel',

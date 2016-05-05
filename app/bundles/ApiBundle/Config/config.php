@@ -157,7 +157,6 @@ return array(
             'mautic.api.model.client' => array(
                 'class' => 'Mautic\ApiBundle\Model\ClientModel',
                 'arguments' => array(
-                    'session',
                     'request_stack'
                 )
             )

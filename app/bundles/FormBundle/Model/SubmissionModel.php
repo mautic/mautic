@@ -704,29 +704,29 @@ class SubmissionModel extends CommonFormModel
     /**
      * Get line chart data of submissions
      *
-     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     * @param string   $dateFormat
-     * @param array    $filter
-     * @param boolean  $canViewOthers
+     * @param char      $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param string    $dateFormat
+     * @param array     $filter
+     * @param boolean   $canViewOthers
      *
      * @return array
      */
     public function getSubmissionsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
     {
         $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $query     = $chart->getChartQuery($this->em->getConnection());
         $q = $query->prepareTimeDataQuery('form_submissions', 'date_submitted', $filter);
 
         if (!$canViewOthers) {
             $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
                 ->andWhere('f.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
         }
 
         $data = $query->loadAndBuildTimeData($q);
-        $chart->setDataset($this->factory->getTranslator()->trans('mautic.form.submission.count'), $data);
+        $chart->setDataset($this->translator->trans('mautic.form.submission.count'), $data);
         return $chart->render();
     }
 
@@ -753,7 +753,7 @@ class SubmissionModel extends CommonFormModel
         if (!$canViewOthers) {
             $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
                 ->andWhere('f.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -789,7 +789,7 @@ class SubmissionModel extends CommonFormModel
         if (!$canViewOthers) {
             $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
                 ->andWhere('f.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);

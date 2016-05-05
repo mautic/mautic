@@ -67,7 +67,11 @@ return array(
         ),
         'models' =>  array(
             'mautic.dashboard.model.dashboard' => array(
-                'class' => 'Mautic\DashboardBundle\Model\DashboardModel'
+                'class' => 'Mautic\DashboardBundle\Model\DashboardModel',
+                'arguments' => array(
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.paths'
+                )
             )
         )
     ),

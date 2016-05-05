@@ -26,6 +26,27 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class FormModel extends CommonFormModel
 {
+    /**
+     * @var ActionModel
+     */
+    protected $formActionModel;
+
+    /**
+     * @var FieldModel
+     */
+    protected $formFieldModel;
+
+    /**
+     * FormModel constructor.
+     * 
+     * @param ActionModel $formActionModel
+     * @param FieldModel $formFieldModel
+     */
+    public function __construct(ActionModel $formActionModel, FieldModel $formFieldModel)
+    {
+        $this->formActionModel = $formActionModel;
+        $this->formFieldModel = $formFieldModel;
+    }
 
     /**
      * {@inheritdoc}
@@ -161,9 +182,7 @@ class FormModel extends CommonFormModel
 
         // Persist if the entity is known
         if ($entity->getId()) {
-            /** @var \Mautic\FormBundle\Model\FieldModel $fieldModel */
-            $fieldModel = $this->factory->getModel('form.field');
-            $fieldModel->saveEntities($entity->getFields());
+            $this->formFieldModel->saveEntities($entity->getFields());
         }
     }
 
@@ -189,7 +208,7 @@ class FormModel extends CommonFormModel
 
         // Delete fields from db
         if (count($deleteFields)) {
-            $this->factory->getModel('form.field')->deleteEntities($deleteFields);
+            $this->formFieldModel->deleteEntities($deleteFields);
         }
     }
 
@@ -241,9 +260,7 @@ class FormModel extends CommonFormModel
 
         // Persist if form is being edited
         if ($entity->getId()) {
-            /** @var \Mautic\FormBundle\Model\ActionModel $actionModel */
-            $actionModel = $this->factory->getModel('form.action');
-            $actionModel->saveEntities($entity->getActions());
+            $this->formActionModel->saveEntities($entity->getActions());
         }
     }
 
@@ -623,11 +640,11 @@ class FormModel extends CommonFormModel
     /**
      * Get a list of assets in a date range
      *
-     * @param integer  $limit
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     * @param array    $filters
-     * @param array    $options
+     * @param integer   $limit
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param array     $filters
+     * @param array     $options
      *
      * @return array
      */
@@ -640,7 +657,7 @@ class FormModel extends CommonFormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('t.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);

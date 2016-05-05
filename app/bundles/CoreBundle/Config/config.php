@@ -467,13 +467,12 @@ return array(
             'mautic.core.model.notification' => array(
                 'class' => 'Mautic\CoreBundle\Model\NotificationModel',
                 'arguments' => array(
-                    'session',
                     'mautic.helper.paths',
                     'mautic.helper.update'
                 ),
                 'methodCalls' => array(
                     'setDisableUpdates' => array(
-                        '%mautic.security.disableUpdates'
+                        '%mautic.security.disableUpdates%'
                     )
                 )
             ),

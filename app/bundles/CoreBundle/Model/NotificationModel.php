@@ -43,15 +43,21 @@ class NotificationModel extends FormModel
     /**
      * NotificationModel constructor.
      * 
-     * @param Session $session
      * @param PathsHelper $pathsHelper
      * @param UpdateHelper $updateHelper
      */
-    public function __construct(Session $session, PathsHelper $pathsHelper, UpdateHelper $updateHelper)
+    public function __construct(PathsHelper $pathsHelper, UpdateHelper $updateHelper)
     {
-        $this->session = $session;
         $this->pathsHelper = $pathsHelper;
         $this->updateHelper = $updateHelper;
+    }
+
+    /**
+     * @param Session $session
+     */
+    public function setSession(Session $session)
+    {
+        $this->session = $session;
     }
 
     /**

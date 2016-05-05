@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -49,7 +49,7 @@ abstract class AbstractCommonModel
     protected $router;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var Translator
      */
     protected $translator;
     

@@ -239,7 +239,10 @@ return array(
             'mautic.email.model.email' => array(
                 'class' => 'Mautic\EmailBundle\Model\EmailModel',
                 'arguments' => array(
-                    'mautic.helper.ip_lookup'
+                    'mautic.helper.ip_lookup',
+                    'mautic.helper.mailbox',
+                    'mautic.lead.model.lead',
+                    'mautic.page.model.trackable'
                 )
             )
         )
