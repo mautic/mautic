@@ -52,7 +52,7 @@ class BuildJsSubscriber extends CommonSubscriber
             page_referrer: (d.referrer) ? d.referrer.split('/')[2] : '',
             page_url: l.href
         };
-        
+
         // Merge user defined tracking pixel parameters.
         if (typeof pageview[2] === 'object') {
             for (var attr in pageview[2]) {
@@ -60,7 +60,27 @@ class BuildJsSubscriber extends CommonSubscriber
             }
         }
 
-        m.trackingPixel = (new Image()).src = m.pageTrackingUrl + '?' + m.serialize(params);
+        new Fingerprint2().get(function(result, components) {
+            params.fingerprint = result;
+            for (var componentId in components) {
+                var component = components[componentId];
+                if (typeof component.key !== 'undefined') {
+                    if (component.key === 'resolution') {
+                        params.resolution = component.value[0] + 'x' + component.value[1];
+                    } else if (component.key === 'timezone_offset') {
+                        params.timezone_offset = component.value;
+                    } else if (component.key === 'navigator_platform') {
+                        params.platform = component.value;
+                    } else if (component.key === 'adblock') {
+                        params.adblock = component.value;
+                    }
+                }
+            }
+
+            m.trackingPixel = (new Image()).src = m.pageTrackingUrl + '?' + m.serialize(params);
+        });
+
+        
     }
 
     if (typeof m.getInput === 'function') {
