@@ -59,7 +59,7 @@ class PointActionEvent extends CommonEvent
     }
 
     /**
-     * Sets the Lead entity
+     * Returns the Lead entity
      *
      * @return Lead
      */
@@ -69,7 +69,7 @@ class PointActionEvent extends CommonEvent
     }
 
     /**
-     * Returns the Lead entity
+     * Sets the Lead entity
      *
      * @param $lead
      */
