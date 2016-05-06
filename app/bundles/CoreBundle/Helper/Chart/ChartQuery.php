@@ -161,21 +161,34 @@ class ChartQuery extends AbstractChart
     {
         if ($dateColumn) {
             $isTime = (in_array($this->unit, array('H', 'i', 's')));
-            // Apply the start date/time if set
-            if ($this->dateFrom) {
-                $dateFrom = clone $this->dateFrom;
-                if ($isTime) $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
-                $query->andWhere('t.' . $dateColumn . ' >= :dateFrom');
-                $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
-            }
 
-            // Apply the end date/time if set
-            if ($this->dateTo) {
+            if ($this->dateFrom && $this->dateTo) {
+                // Between is faster so if we know both dates...
+                $dateFrom = clone $this->dateFrom;
                 $dateTo = clone $this->dateTo;
+                if ($isTime) $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
                 if ($isTime) $dateTo->setTimeZone(new \DateTimeZone('UTC'));
-                $query->andWhere('t.' . $dateColumn . ' <= :dateTo');
+                $query->andWhere('t.' . $dateColumn . ' BETWEEN :dateFrom AND :dateTo');
+                $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
                 $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
+            } else {
+                // Apply the start date/time if set
+                if ($this->dateFrom) {
+                    $dateFrom = clone $this->dateFrom;
+                    if ($isTime) $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
+                    $query->andWhere('t.' . $dateColumn . ' >= :dateFrom');
+                    $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
+                }
+
+                // Apply the end date/time if set
+                if ($this->dateTo) {
+                    $dateTo = clone $this->dateTo;
+                    if ($isTime) $dateTo->setTimeZone(new \DateTimeZone('UTC'));
+                    $query->andWhere('t.' . $dateColumn . ' <= :dateTo');
+                    $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
+                }
             }
+            
         }
     }
 
@@ -247,9 +260,6 @@ class ChartQuery extends AbstractChart
 
         $query->from(MAUTIC_TABLE_PREFIX . $table, 't')
             ->orderBy($dateConstruct, 'ASC');
-
-        // Count only with dates which are not empty
-        $query->andWhere('t.' . $column . ' IS NOT NULL');
 
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $column);
