@@ -148,7 +148,7 @@ abstract class AbstractChart
             case 'W':
                 $unit = 'a';
                 $amount = ($this->dateTo->diff($this->dateFrom)->format('%' . $unit) + 1);
-                $amount = $this->unit == 'W' ? floor($amount / 7) : $amount;
+                $amount = $this->unit == 'W' ? ceil($amount / 7) : $amount;
                 break;
             case 'm':
                 $amount = $this->dateTo->diff($this->dateFrom)->format('%y') * 12 + $this->dateTo->diff($this->dateFrom)->format('%m');
