@@ -316,7 +316,7 @@ class ChartQuery extends AbstractChart
                  * PHP DateTime cannot parse the Y W (ex 2016 09)
                  * format, so we transform it into d-M-Y.
                  */
-                if ($this->unit === 'W') {
+                if ($this->unit === 'W' && $this->isMysql()) {
                     list($year, $week)  = explode(' ', $item['date']);
                     $newDate = new \DateTime();
                     $newDate->setISODate($year, $week);
