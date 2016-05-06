@@ -211,8 +211,7 @@ class LeadSubscriber extends CommonSubscriber
         $utmTagsRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:UtmTag');
 
         $utmTags = $utmTagsRepository->getUtmTagsByLead($lead, $filters);
-
-        $this->factory->getLogger()->addError(print_r($utmTags,true));
+        
         $eventTypeKey = 'lead.utmtagsadded';
         $eventTypeName = $this->factory->getTranslator()->trans('mautic.lead.event.utmtagsadded');
         $event->addEventType($eventTypeKey, $eventTypeName);
@@ -224,6 +223,7 @@ class LeadSubscriber extends CommonSubscriber
                     'event'           => $eventTypeKey,
                     'eventLabel'      => $eventTypeName,
                     'timestamp'       => $utmTag['dateAdded'],
+                    'icon'            => 'fa-tag',
                     'extra'           => array(
                         'utmtags' => $utmTag
                     ),

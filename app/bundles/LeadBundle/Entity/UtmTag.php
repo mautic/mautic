@@ -42,7 +42,7 @@ class UtmTag
     /**
      * @var string
      */
-    private $referrer;
+    private $referer;
 
     /**
      * @var string
@@ -103,7 +103,7 @@ class UtmTag
 
         $builder->addNullableField('query', 'array');
 
-        $builder->addField('referrer', 'string');
+        $builder->addField('referer', 'string');
 
         $builder->createField('remoteHost', 'string')
             ->columnName('remote_host')
@@ -149,7 +149,7 @@ class UtmTag
                     'id',
                     'lead',
                     'query',
-                    'referrer',
+                    'referer',
                     'remoteHost',
                     'url',
                     'userAgent',
@@ -171,6 +171,30 @@ class UtmTag
     public function getId ()
     {
         return $this->id;
+    }
+
+    /**
+     * Set dateHit
+     *
+     * @param \DateTime $dateHit
+     *
+     * @return Hit
+     */
+    public function setDateAdded($date)
+    {
+        $this->dateAdded = $date;
+
+        return $this;
+    }
+
+    /**
+     * Get dateHit
+     *
+     * @return \DateTime
+     */
+    public function getDateAdded()
+    {
+        return $this->dateAdded;
     }
 
     /**
@@ -214,27 +238,27 @@ class UtmTag
     }
 
     /**
-     * Set referrer
+     * Set referer
      *
-     * @param string $referrer
+     * @param string $referer
      *
      * @return Action
      */
-    public function setReferrer ($referrer)
+    public function setReferer ($referer)
     {
-        $this->referrer = $referrer;
+        $this->referer = $referer;
 
         return $this;
     }
 
     /**
-     * Get referrer
+     * Get referer
      *
      * @return string
      */
-    public function getReferrer ()
+    public function getReferer ()
     {
-        return $this->referrer;
+        return $this->referer;
     }
 
     /**
