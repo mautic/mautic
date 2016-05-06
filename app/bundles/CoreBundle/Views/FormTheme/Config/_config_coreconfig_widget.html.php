@@ -41,7 +41,7 @@ $template = '<div class="col-md-6">{content}</div>';
             <?php echo $view['form']->rowIfExists($fields, 'default_pagelimit', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'default_timezone', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'locale', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'cached_data_timeout', $template); ?>
+            <?php //echo $view['form']->rowIfExists($fields, 'cached_data_timeout', $template); ?>
         </div>
 
         <hr class="text-muted" />

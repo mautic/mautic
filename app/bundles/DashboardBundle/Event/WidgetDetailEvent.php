@@ -162,10 +162,10 @@ class WidgetDetailEvent extends CommonEvent
         $this->widget->setLoadTime(abs(microtime() - $this->startTime));
 
         // Store the template data to the cache
-        if (!$skipCache && $this->cacheDir && $this->widget->getCacheTimeout() > 0) {
-            $cache = new CacheStorageHelper($this->cacheDir);
-            $cache->set($this->getUniqueWidgetId(), $templateData);
-        }
+        // if (!$skipCache && $this->cacheDir && $this->widget->getCacheTimeout() > 0) {
+        //     $cache = new CacheStorageHelper($this->cacheDir);
+        //     $cache->set($this->getUniqueWidgetId(), $templateData);
+        // }
     }
 
     /**
@@ -231,18 +231,18 @@ class WidgetDetailEvent extends CommonEvent
      */
     public function isCached()
     {
-        if (!$this->cacheDir) {
-            return false;
-        }
+        // if (!$this->cacheDir) {
+        //     return false;
+        // }
 
-        $cache = new CacheStorageHelper($this->cacheDir);
-        $data  = $cache->get($this->getUniqueWidgetId(), $this->cacheTimeout);
+        // $cache = new CacheStorageHelper($this->cacheDir);
+        // $data  = $cache->get($this->getUniqueWidgetId(), $this->cacheTimeout);
 
-        if ($data) {
-            $this->widget->setCached(true);
-            $this->setTemplateData($data, true);
-            return true;
-        }
+        // if ($data) {
+        //     $this->widget->setCached(true);
+        //     $this->setTemplateData($data, true);
+        //     return true;
+        // }
 
         return false;
     }
