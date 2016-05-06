@@ -51,7 +51,7 @@ class RedirectRepository extends CommonRepository
             );
         } else {
             $expr->add(
-                $q->expr()->eq('r.email', ':email')
+                $q->expr()->eq('r.email ', ':email')
             );
             $q->setParameter('email', $email);
         }

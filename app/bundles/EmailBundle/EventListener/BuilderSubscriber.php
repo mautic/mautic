@@ -85,8 +85,8 @@ class BuilderSubscriber extends CommonSubscriber
 
         // these should not allow visual tokens
         $tokens = array(
-            '{unsubscribe_url}'  => $this->translator->trans('mautic.email.token.unsubscribe_url'),
-            '{webview_url}'      => $this->translator->trans('mautic.email.token.webview_url')
+            '{unsubscribe_url}' => $this->translator->trans('mautic.email.token.unsubscribe_url'),
+            '{webview_url}'     => $this->translator->trans('mautic.email.token.webview_url')
         );
         if ($event->tokensRequested(array_keys($tokens))) {
             $event->addTokens(
@@ -100,8 +100,8 @@ class BuilderSubscriber extends CommonSubscriber
      */
     public function onEmailGenerate(EmailSendEvent $event)
     {
-        $idHash  = $event->getIdHash();
-        $lead = $event->getLead();
+        $idHash = $event->getIdHash();
+        $lead   = $event->getLead();
 
         if ($idHash == null) {
             // Generate a bogus idHash to prevent errors for routes that may include it
@@ -133,12 +133,12 @@ class BuilderSubscriber extends CommonSubscriber
         }
 
         $signatureText = $this->factory->getParameter('default_signature_text');
-        $fromName = $this->factory->getParameter('mailer_from_name');
+        $fromName      = $this->factory->getParameter('mailer_from_name');
 
         if (!empty($lead['owner_id'])) {
             $owner = $this->factory->getModel('lead')->getRepository()->getLeadOwner($lead['owner_id']);
             if ($owner && !empty($owner['signature'])) {
-                $fromName = $owner['first_name'] . ' ' . $owner['last_name'];
+                $fromName      = $owner['first_name'].' '.$owner['last_name'];
                 $signatureText = $owner['signature'];
             }
         }
@@ -154,8 +154,16 @@ class BuilderSubscriber extends CommonSubscriber
      */
     public function convertUrlsToTokens(EmailSendEvent $event)
     {
+        if ($event->isInternalSend()) {
+            // Don't convert for previews, example emails, etc
+
+            return;
+        }
+
         /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
         $trackableModel = $this->factory->getModel('page.trackable');
+        /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
+        $redirectModel = $this->factory->getModel('page.redirect');
 
         $email   = $event->getEmail();
         $emailId = ($email) ? $email->getId() : null;
@@ -164,14 +172,17 @@ class BuilderSubscriber extends CommonSubscriber
         $trackables   = $this->parseContentForUrls($event, $emailId);
 
         /**
-         * @var string $token
+         * @var string    $token
          * @var Trackable $trackable
          */
         foreach ($trackables as $token => $trackable) {
-            $event->addToken(
-                $token,
+            $url = ($trackable instanceof Trackable)
+                ?
                 $trackableModel->generateTrackableUrl($trackable, $clickthrough)
-            );
+                :
+                $redirectModel->generateRedirectUrl($trackable, $clickthrough);
+
+            $event->addToken($token, $url);
         }
     }
 
@@ -189,8 +200,8 @@ class BuilderSubscriber extends CommonSubscriber
 
         // Prevent parsing the exact same content over and over
         if (!isset($convertedContent[$event->getContentHash()])) {
-            $html  = $event->getContent();
-            $text  = $event->getPlainText();
+            $html = $event->getContent();
+            $text = $event->getPlainText();
 
             /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
             $trackableModel = $this->factory->getModel('page.trackable');
