@@ -41,6 +41,9 @@ class DashboardController extends FormController
         $action          = $this->generateUrl('mautic_dashboard_index');
         $dateRangeFilter = $this->request->get('daterange', array());
 
+        // Load date range from session
+        $filter          = $model->getDefaultFilter();
+
         // Set new date range to the session
         if ($this->request->isMethod('POST')) {
             $session = $this->factory->getSession();
@@ -53,10 +56,12 @@ class DashboardController extends FormController
                 $to = new \DateTime($dateRangeFilter['date_to']);
                 $session->set('mautic.dashboard.date.to', $to->format($mysqlFormat));
             }
-        }
 
-        // Load date range from session
-        $filter          = $model->getDefaultFilter();
+            // Clear the cache if the date range filter has changed
+            if ($from != $filter['dateFrom'] || $to != $filter['dateTo']) {
+                $model->clearDashboardCache();
+            }
+        }
 
         // Set the final date range to the form
         $dateRangeFilter['date_from'] = $filter['dateFrom']->format($humanFormat);
@@ -390,6 +395,8 @@ class DashboardController extends FormController
             if ($widgets) {
                 /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
                 $model = $this->factory->getModel('dashboard');
+
+                $model->clearDashboardCache();
 
                 $currentWidgets = $model->getWidgets();
 

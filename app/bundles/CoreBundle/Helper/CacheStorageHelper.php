@@ -31,22 +31,25 @@ class CacheStorageHelper
     /**
      * @param string $cacheDir
      */
-    public function __construct($cacheDir)
+    public function __construct($cacheDir, $uniqueCacheDir = null)
     {
         $this->cacheDir = $cacheDir . '/data';
+
+        if ($uniqueCacheDir) {
+            $this->cacheDir .= '/' . $uniqueCacheDir;
+        }
+
         $this->fs = new Filesystem();
-        $this->touchDir($this->cacheDir);
+        $this->touchDir();
     }
 
     /**
-     * Creates the directory if doesn't exist
-     *
-     * @param string $dir
+     * Creates the cache directory if doesn't exist
      */
-    public function touchDir($dir)
+    public function touchDir()
     {
-        if (!$this->fs->exists($dir)) {
-            $this->fs->mkdir($dir);
+        if (!$this->fs->exists($this->cacheDir)) {
+            $this->fs->mkdir($this->cacheDir);
         }
     }
 
@@ -77,7 +80,6 @@ class CacheStorageHelper
     public function get($fileName, $maxAge = 0)
     {
         if ($maxAge == 0) {
-            
             return false;
         }
 
@@ -100,5 +102,15 @@ class CacheStorageHelper
         }
 
         return false;
+    }
+
+    /**
+     * Wipes out the cache directory
+     */
+    public function clear()
+    {
+        if ($this->fs->exists($this->cacheDir)) {
+            $this->fs->remove($this->cacheDir);
+        }
     }
 }
