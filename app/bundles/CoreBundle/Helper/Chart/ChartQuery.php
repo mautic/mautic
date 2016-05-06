@@ -261,9 +261,6 @@ class ChartQuery extends AbstractChart
         $query->from(MAUTIC_TABLE_PREFIX . $table, 't')
             ->orderBy($dateConstruct, 'ASC');
 
-        // Count only with dates which are not empty
-        $query->andWhere('t.' . $column . ' IS NOT NULL');
-
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $column);
 
