@@ -210,13 +210,17 @@ class WidgetDetailEvent extends CommonEvent
             return $this->uniqueId;
         }
 
+        $params = $this->getWidget()->getParams();
+        // Unset dateFrom and dateTo since they constantly change
+        unset($params['dateFrom'], $params['dateTo']);
+
         $uniqueSettings = array(
-            'params' => $this->getWidget()->getParams(),
-            'width' => $this->getWidget()->getWidth(),
+            'params' => $params,
+            'width'  => $this->getWidget()->getWidth(),
             'height' => $this->getWidget()->getHeight(),
         );
 
-        return $this->uniqueId = $this->getType() . '_' . substr(md5(json_encode($uniqueSettings)), 0, 16);
+        return $this->uniqueId = $this->getType().'_'.substr(md5(json_encode($uniqueSettings)), 0, 16);
     }
 
     /**
