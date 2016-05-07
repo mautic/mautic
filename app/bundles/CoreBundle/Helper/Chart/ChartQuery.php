@@ -302,21 +302,32 @@ class ChartQuery extends AbstractChart
         $oneUnit = $this->getUnitInterval();
         $limit   = $this->countAmountFromDateRange($this->unit);
         $previousDate = clone $this->dateFrom;
-        $previousDate->setTimezone(new \DateTimeZone("UTC"));
+        
+        if ($this->unit === 'H') {
+            $previousDate->setTimezone(new \DateTimeZone("UTC"));
+        }
 
         // Convert data from DB to the chart.js format
         for ($i = 0; $i < $limit; $i++) {
 
             $nextDate = clone $previousDate;
-            $nextDate->setTimezone(new \DateTimeZone("UTC"));
-            $nextDate->add($oneUnit);
+
+            if ($this->unit === 'H') {
+                $nextDate->setTimezone(new \DateTimeZone("UTC"));
+            }
+
+            if ($this->unit === 'm') {
+                $nextDate->modify('first day of next month');
+            } else {
+                $nextDate->add($oneUnit);
+            }
 
             foreach ($rawData as $key => $item) {
                 /**
                  * PHP DateTime cannot parse the Y W (ex 2016 09)
                  * format, so we transform it into d-M-Y.
                  */
-                if ($this->unit === 'W') {
+                if ($this->unit === 'W' && $this->isMysql()) {
                     list($year, $week)  = explode(' ', $item['date']);
                     $newDate = new \DateTime();
                     $newDate->setISODate($year, $week);
@@ -351,7 +362,7 @@ class ChartQuery extends AbstractChart
 
             $previousDate->add($oneUnit);
         }
-
+        
         return $data;
     }
 
