@@ -209,15 +209,15 @@ class ConfigType extends AbstractType
             'choice',
             array(
                 'choices'     => array(
-                    'mautic.transport.amazon'   => 'mautic.email.config.mailer_transport.amazon',
-                    'gmail'                     => 'mautic.email.config.mailer_transport.gmail',
-                    'mautic.transport.mandrill' => 'mautic.email.config.mailer_transport.mandrill',
-                    'smtp'                      => 'mautic.email.config.mailer_transport.smtp',
-                    'mail'                      => 'mautic.email.config.mailer_transport.mail',
-                    'mautic.transport.postmark' => 'mautic.email.config.mailer_transport.postmark',
-                    'mautic.transport.sendgrid' => 'mautic.email.config.mailer_transport.sendgrid',
-                    'sendmail'                  => 'mautic.email.config.mailer_transport.sendmail',
-                    'sparkpost'                 => 'mautic.email.config.mailer_transport.sparkpost',
+                    'mautic.transport.amazon'    => 'mautic.email.config.mailer_transport.amazon',
+                    'gmail'                      => 'mautic.email.config.mailer_transport.gmail',
+                    'mautic.transport.mandrill'  => 'mautic.email.config.mailer_transport.mandrill',
+                    'smtp'                       => 'mautic.email.config.mailer_transport.smtp',
+                    'mail'                       => 'mautic.email.config.mailer_transport.mail',
+                    'mautic.transport.postmark'  => 'mautic.email.config.mailer_transport.postmark',
+                    'mautic.transport.sendgrid'  => 'mautic.email.config.mailer_transport.sendgrid',
+                    'sendmail'                   => 'mautic.email.config.mailer_transport.sendmail',
+                    'mautic.transport.sparkpost' => 'mautic.email.config.mailer_transport.sparkpost'
                 ),
                 'label'       => 'mautic.email.config.mailer.transport',
                 'required'    => false,
@@ -261,7 +261,25 @@ class ConfigType extends AbstractType
             )
         );
 
-        $smtpServiceShowConditions = '{"config_emailconfig_mailer_transport":["smtp"]}';
+        $apiKeyShowConditions = '{"config_emailconfig_mailer_transport":["mautic.transport.sparkpost"]}';
+        $builder->add(
+            'mailer_api_key',
+            'text',
+            array(
+                'label'      => 'mautic.email.config.mailer.apikey',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'        => 'form-control',
+                    'data-show-on' => $apiKeyShowConditions,
+                    'tooltip'      => 'mautic.email.config.mailer.apikey.tooltop',
+                    'autocomplete' => 'off',
+                    'placeholder'  => 'Get this from your e-mail delivery service and enter it here.'
+                ),
+                'required' => true
+            )
+        );
+
+        $smtpServiceShowConditions  = '{"config_emailconfig_mailer_transport":["smtp"]}';
         $amazonRegionShowConditions = '{"config_emailconfig_mailer_transport":["mautic.transport.amazon"]}';
 
         $builder->add(
@@ -300,6 +318,7 @@ class ConfigType extends AbstractType
             )
         );
 
+
         $builder->add(
             'mailer_port',
             'text',
@@ -326,6 +345,14 @@ class ConfigType extends AbstractType
                 "mautic.transport.amazon",
                 "mautic.transport.postmark",
                 "gmail"
+            ]
+        }';
+
+        $mailerApiShowConditions = '{
+            "config_emailconfig_mailer_auth_mode":[
+                "api_key"
+            ], "config_emailconfig_mailer_transport":[
+                "mautic.transport.sparkpost"
             ]
         }';
 

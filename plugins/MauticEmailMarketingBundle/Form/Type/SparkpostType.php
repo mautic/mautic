@@ -73,8 +73,8 @@ class SparkpostType extends AbstractType
             'label'    => 'mautic.sparkpost.list',
             'required' => false,
             'attr'     => array(
-                'tooltip'  => 'mautic.sparkpost.list.tooltip',
-                'onchange' => 'Mautic.getIntegrationLeadFields(\'Sparkpost\', this, {"list": this.value});'
+                'tooltip'     => 'mautic.sparkpost.list.tooltip',
+                'onchange'    => 'Mautic.getIntegrationLeadFields(\'Sparkpost\', this, {"list": this.value});'
             )
         ));
 

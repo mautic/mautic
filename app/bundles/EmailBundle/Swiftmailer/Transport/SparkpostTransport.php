@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\Request;
 class SparkpostTransport extends AbstractTokenHttpTransport implements InterfaceCallbackTransport
 {
 
+    private $apiKey = null;
+    
     /**
      * {@inheritdoc}
      */
@@ -244,6 +246,25 @@ class SparkpostTransport extends AbstractTokenHttpTransport implements Interface
     protected function getApiEndpoint()
     {
         return 'https://api.sparkpost.com/api/v1/transmissions';
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $apiKey
+     *
+     */
+    protected function setApiKey($apiKey)
+    {
+        $this->apiKey = $apiKey;
+    }
+    
+    /**
+     * {@inheritdoc}
+     */    
+    protected function getApiKey()
+    {
+        return $this->apiKey;
     }
 
     /**

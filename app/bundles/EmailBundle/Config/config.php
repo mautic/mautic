@@ -231,8 +231,7 @@ return array(
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'methodCalls'  => array(
                     // Should be able to set api key here.
-                    'setUsername'      => array('%mautic.mailer_user%'),
-                    'setPassword'      => array('%mautic.mailer_password%'),
+                    'setApiKey'        => array('%mautic.mailer_api_key%'),
                     'setMauticFactory' => array('mautic.factory')
                 )
             ),
@@ -247,6 +246,7 @@ return array(
         )
     ),
     'parameters' => array(
+        'mailer_api_key'               => null, // Api key from mail delivery provider.
         'mailer_from_name'             => 'Mautic',
         'mailer_from_email'            => 'email@yoursite.com',
         'mailer_return_path'           => null,
