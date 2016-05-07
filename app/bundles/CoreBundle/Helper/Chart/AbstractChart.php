@@ -46,6 +46,13 @@ abstract class AbstractChart
     protected $dateTo;
 
     /**
+     * Timezone data is requested to be in
+     *
+     * @var
+     */
+    protected $timezone;
+
+    /**
      * Time unit
      *
      * @var string
@@ -117,7 +124,8 @@ abstract class AbstractChart
     public function setDateRange(\DateTime $dateFrom, \DateTime $dateTo)
     {
         $this->dateFrom = clone $dateFrom;
-        $this->dateTo = clone $dateTo;
+        $this->dateTo   = clone $dateTo;
+        $this->timezone = $dateFrom->getTimezone();
 
         // a diff of two identical dates returns 0, but we expect 24 hours
         if ($dateFrom == $dateTo) {
@@ -214,7 +222,7 @@ abstract class AbstractChart
         } else {
             $color = $colorHelper->buildRandomColor();
         }
-        
+
         return $color;
     }
 }

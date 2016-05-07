@@ -15,7 +15,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 
 /**
  * Class ChartQuery
- * 
+ *
  * Methods to get the chart data as native queries to get better performance and work with date/time native SQL queries.
  */
 class ChartQuery extends AbstractChart
@@ -89,7 +89,7 @@ class ChartQuery extends AbstractChart
     {
         $this->setDateRange($dateFrom, $dateTo);
         $this->connection = $connection;
-        $this->unit = $unit;
+        $this->unit       = $unit;
     }
 
     /**
@@ -298,13 +298,23 @@ class ChartQuery extends AbstractChart
      */
     public function completeTimeData($rawData)
     {
-        $data    = array();
-        $oneUnit = $this->getUnitInterval();
-        $limit   = $this->countAmountFromDateRange($this->unit);
+        $data         = array();
+        $oneUnit      = $this->getUnitInterval();
+        $limit        = $this->countAmountFromDateRange($this->unit);
         $previousDate = clone $this->dateFrom;
-        
-        if ($this->unit === 'H') {
-            $previousDate->setTimezone(new \DateTimeZone("UTC"));
+        $utcTz        = new \DateTimeZone("UTC");
+
+        if (!in_array($this->unit, array('H', 'i', 's'))) {
+            // Because the data is aggregated based on UTC timestamps, there's a risk that some of the data points within local and UTC timezones
+            // may be incorrectly placed; we can't really do anything easily about this so we're just going to have to assume UTC dateFrom/dateTo
+            $previousDate->setTimezone($utcTz);
+
+            // Hours do not matter so let's reset to 00:00:00 for date comparison
+            $previousDate->setTime(0,0,0);
+
+            if ($this->unit == 'm') {
+                $limit--;
+            }
         }
 
         // Convert data from DB to the chart.js format
@@ -312,33 +322,46 @@ class ChartQuery extends AbstractChart
 
             $nextDate = clone $previousDate;
 
-            if ($this->unit === 'H') {
-                $nextDate->setTimezone(new \DateTimeZone("UTC"));
-            }
-
             if ($this->unit === 'm') {
                 $nextDate->modify('first day of next month');
             } else {
                 $nextDate->add($oneUnit);
             }
 
-            foreach ($rawData as $key => $item) {
-                /**
-                 * PHP DateTime cannot parse the Y W (ex 2016 09)
-                 * format, so we transform it into d-M-Y.
-                 */
-                if ($this->unit === 'W' && $this->isMysql()) {
-                    list($year, $week)  = explode(' ', $item['date']);
-                    $newDate = new \DateTime();
-                    $newDate->setISODate($year, $week);
-                    $item['date'] = $newDate->format('d-M-Y');
-                }
+            foreach ($rawData as $key => &$item) {
+                if (!isset($item['date_comparison'])) {
+                    /**
+                     * PHP DateTime cannot parse the Y W (ex 2016 09)
+                     * format, so we transform it into d-M-Y.
+                     */
+                    if ($this->unit === 'W' && $this->isMysql()) {
+                        list($year, $week) = explode(' ', $item['date']);
+                        $newDate = new \DateTime();
+                        $newDate->setISODate($year, $week);
+                        $item['date'] = $newDate->format('d-M-Y');
+                        unset($newDate);
+                    }
 
-                $itemDate = new \DateTime($item['date'], new \DateTimeZone("UTC"));
+                    // Data from the database will always in UTC
+                    $itemDate = new \DateTime($item['date'], $utcTz);
+
+                    if (!in_array($this->unit, array('H', 'i', 's'))) {
+                        // Hours do not matter so let's reset to 00:00:00 for date comparison
+                        $itemDate->setTime(0, 0, 0);
+                    } else {
+                        // Convert to the timezone used for comparison
+                        $itemDate->setTimezone($this->timezone);
+                    }
+
+                    $item['date_comparison'] = $itemDate;
+                } else {
+                    $itemDate = $item['date_comparison'];
+                }
 
                 // Place the right suma is between the time unit and time unit +1
                 if (isset($item['count']) && $itemDate >= $previousDate && $itemDate < $nextDate) {
                     $data[$i] = $item['count'];
+
                     unset($rawData[$key]);
                     continue;
                 }
@@ -360,9 +383,9 @@ class ChartQuery extends AbstractChart
                 $data[$i] = 0;
             }
 
-            $previousDate->add($oneUnit);
+            $previousDate = $nextDate;
         }
-        
+
         return $data;
     }
 
