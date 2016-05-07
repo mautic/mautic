@@ -84,7 +84,7 @@ class BarChart extends AbstractChart implements ChartInterface
             'label' => $label,
             'data'  => $data,
         );
-        
+
         $this->datasets[] = array_merge($baseData, $this->generateColors($datasetId));
 
         return $this;
@@ -109,8 +109,6 @@ class BarChart extends AbstractChart implements ChartInterface
             $this->labels[] = $date->format($format);
             $date->add($oneUnit);
         }
-        
-        $this->labels = $this->labels;
     }
 
     /**
