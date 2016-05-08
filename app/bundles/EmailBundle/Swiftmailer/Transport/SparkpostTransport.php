@@ -5,6 +5,7 @@
  * @author      Mautic
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ * @see         https://github.com/SlowProg/SparkPostSwiftMailer/blob/master/SwiftMailer/SparkPostTransport.php for additional source reference
  */
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
@@ -13,450 +14,355 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Symfony\Component\HttpFoundation\Request;
 
+use SparkPost\SparkPost;
+use GuzzleHttp\Client;
+use Ivory\HttpAdapter\Guzzle6HttpAdapter;
+
+use \Swift_Events_EventDispatcher;
+use \Swift_Events_EventListener;
+use \Swift_Events_SendEvent;
+use \Swift_Mime_Message;
+use \Swift_Transport;
+use \Swift_Attachment;
+use \Swift_MimePart;
+
 /**
  * Class SparkpostTransport
+ * The referrence class for this was provided by
+ * 
  */
-class SparkpostTransport extends AbstractTokenHttpTransport implements InterfaceCallbackTransport
+class SparkpostTransport implements \Swift_Transport
 {
+    /** 
+     * @var \Swift_Events_SimpleEventDispatcher|null
+     */
+    protected $dispatcher;
 
-    private $apiKey = null;
+    /**
+     * @var string|null
+     */
+    protected $apiKey;
+
+    /** 
+     * @var array|null
+     */
+    protected $apiResponsePayload;
+
+    /** 
+      * @var array|null
+      */
+    protected $fromEmail;
+
+    /**
+     * @var MauticFactory
+     */
+    protected $factory;
+
+    /**
+     * @var         $this->factory->getLogger();
+     */
+    private $logger;
+
+    public function __construct($apiKey)
+    {
+        $this->setApiKey($apiKey);
+        $this->getDispatcher();
+    }
+
+    /**
+     * TODO: To DRY this up, this may need to be abstracted out to some kind of AbstractApiKeyHttpTransport
+     * @return \Swift_Events_SimpleEventDispatcher
+     */
+    protected function getDispatcher()
+    {
+        if ($this->dispatcher == null) {
+            $this->dispatcher = new \Swift_Events_SimpleEventDispatcher();
+        }
+        return $this->dispatcher;
+    }
+
+    /**
+     * TODO: To DRY this up, this may need to be abstracted out to some kind of AbstractApiKeyHttpTransport
+     * @param MauticFactory $factory
+     */
+    public function setMauticFactory(MauticFactory $factory)
+    {
+        $this->factory = $factory;
+        $this->setLogger();
+        $this->logger->error("Here is the apikey $this->apiKey");
+    }
     
-    /**
-     * {@inheritdoc}
-     */
-    protected function getPayload()
+    // TODO: Remove this when you're done building this transport!
+    public function setLogger()
     {
-        $metadata     = $this->getMetadata();
-        $mauticTokens = $sparkpostMergeVars = $sparkpostMergePlaceholders = array();
-
-        // Sparkpost uses *|PLACEHOLDER|* for tokens so Mautic's need to be replaced
-        if (!empty($metadata)) {
-            $metadataSet  = reset($metadata);
-            $tokens       = (!empty($metadataSet['tokens'])) ? $metadataSet['tokens'] : array();
-            $mauticTokens = array_keys($tokens);
-
-            $sparkpostMergeVars = $sparkpostMergePlaceholders = array();
-            foreach ($mauticTokens as $token) {
-                $sparkpostMergeVars[$token]         = strtoupper(preg_replace("/[^a-z0-9]+/i", "", $token));
-                $sparkpostMergePlaceholders[$token] = '*|'.$sparkpostMergeVars[$token].'|*';
-            }
-        }
-
-        $message = $this->messageToArray($mauticTokens, $sparkpostMergePlaceholders, true);
-
-        // Not used ATM
-        unset($message['headers']);
-
-        $message['from_email'] = $message['from']['email'];
-        $message['from_name']  = $message['from']['name'];
-        unset($message['from']);
-
-        if (!empty($metadata)) {
-            // Sparkpost will only send a single email to cc and bcc of the first set of tokens
-            // so we have to manually set them as to addresses
-
-            // Problem is that it's not easy to know what email is sent so will tack it at the top
-            $insertCcEmailHeader = true;
-
-            $message['html'] = '*|HTMLCCEMAILHEADER|*'.$message['html'];
-            if (!empty($message['text'])) {
-                $message['text'] = '*|TEXTCCEMAILHEADER|*'.$message['text'];
-            }
-
-            // Do not expose all the emails in the if using metadata
-            $message['preserve_recipients'] = false;
-
-            $bcc = $message['recipients']['bcc'];
-            $cc  = $message['recipients']['cc'];
-
-            // Unset the cc and bcc as they will need to be sent as To with each set of tokens
-            unset($message['recipients']['bcc'], $message['recipients']['cc']);
-        }
-
-        // Generate the recipients
-        $recipients = $rcptMergeVars = $rcptMetadata = array();
-
-        $translator = $this->factory->getTranslator();
-
-        foreach ($message['recipients'] as $type => $typeRecipients) {
-            foreach ($typeRecipients as $rcpt) {
-                $rcpt['type'] = $type;
-                $recipients[] = $rcpt;
-
-                if ($type == 'to' && isset($metadata[$rcpt['email']])) {
-                    if (!empty($metadata[$rcpt['email']]['tokens'])) {
-                        $mergeVars = array(
-                            'rcpt' => $rcpt['email'],
-                            'vars' => array()
-                        );
-
-                        // This must not be included for CC and BCCs
-                        $trackingPixelToken = array();
-
-                        foreach ($metadata[$rcpt['email']]['tokens'] as $token => $value) {
-                            if ($token == '{tracking_pixel}') {
-                                $trackingPixelToken = array(
-                                    array(
-                                        'name'    => $sparkpostMergeVars[$token],
-                                        'content' => $value
-                                    )
-                                );
-
-                                continue;
-                            }
-
-                            $mergeVars['vars'][] = array(
-                                'name'    => $sparkpostMergeVars[$token],
-                                'content' => $value
-                            );
-                        }
-
-                        if (!empty($insertCcEmailHeader)) {
-                            // Make a copy before inserted the blank tokens
-                            $ccMergeVars       = $mergeVars;
-                            $mergeVars['vars'] = array_merge(
-                                $mergeVars['vars'],
-                                $trackingPixelToken,
-                                array(
-                                    array(
-                                        'name'    => 'HTMLCCEMAILHEADER',
-                                        'content' => ''
-                                    ),
-                                    array(
-                                        'name'    => 'TEXTCCEMAILHEADER',
-                                        'content' => ''
-                                    )
-                                )
-                            );
-                        } else {
-                            // Just merge the tracking pixel tokens
-                            $mergeVars['vars'] = array_merge($mergeVars['vars'], $trackingPixelToken);
-                        }
-
-                        // Add the vars
-                        $rcptMergeVars[] = $mergeVars;
-
-                        // Special handling of CC and BCC with tokens
-                        if (!empty($cc) || !empty($bcc)) {
-                            $ccMergeVars['vars'] = array_merge(
-                                $ccMergeVars['vars'],
-                                array(
-                                    array(
-                                        'name'    => 'HTMLCCEMAILHEADER',
-                                        'content' => $translator->trans('mautic.core.email.cc.copy',
-                                            array(
-                                                '%email%' => $rcpt['email']
-                                            )
-                                        ) . "<br /><br />"
-                                    ),
-                                    array(
-                                        'name'    => 'TEXTCCEMAILHEADER',
-                                        'content' => $translator->trans('mautic.core.email.cc.copy',
-                                            array(
-                                                '%email%' => $rcpt['email']
-                                            )
-                                        ) . "\n\n"
-                                    ),
-                                    array(
-                                        'name'    => 'TRACKINGPIXEL',
-                                        'content' => MailHelper::getBlankPixel()
-                                    )
-                                )
-                            );
-
-                            // If CC and BCC, remove the ct from URLs to prevent false lead tracking
-                            foreach ($ccMergeVars['vars'] as &$var) {
-                                if (strpos($var['content'], 'http') !== false && $ctPos = strpos($var['content'], 'ct=') !== false) {
-                                    // URL so make sure a ct query is not part of it
-                                    $var['content'] = substr($var['content'], 0, $ctPos);
-                                }
-                            }
-
-                            // Send same tokens to each CC
-                            if (!empty($cc)) {
-                                foreach ($cc as $ccRcpt) {
-                                    $recipients[]        = $ccRcpt;
-                                    $ccMergeVars['rcpt'] = $ccRcpt['email'];
-                                    $rcptMergeVars[]     = $ccMergeVars;
-                                }
-                            }
-
-                            // And same to BCC
-                            if (!empty($bcc)) {
-                                foreach ($bcc as $ccRcpt) {
-                                    $recipients[]        = $ccRcpt;
-                                    $ccMergeVars['rcpt'] = $ccRcpt['email'];
-                                    $rcptMergeVars[]     = $ccMergeVars;
-                                }
-                            }
-                        }
-
-                        unset($ccMergeVars, $mergeVars, $metadata[$rcpt['email']]['tokens']);
-                    }
-
-                    if (!empty($metadata[$rcpt['email']])) {
-                        $rcptMetadata[] = array(
-                            'rcpt'   => $rcpt['email'],
-                            'values' => $metadata[$rcpt['email']]
-                        );
-                        unset($metadata[$rcpt['email']]);
-                    }
-                }
-            }
-        }
-
-        $message['to'] = $recipients;
-
-        unset($message['recipients']);
-
-        // Set the merge vars
-        $message['merge_vars'] = $rcptMergeVars;
-
-        // Set the rest of $metadata as recipient_metadata
-        $message['recipient_metadata'] = $rcptMetadata;
-
-        // Set the reply to
-        if (!empty($message['replyTo'])) {
-            $message['headers']['Reply-To'] = $message['replyTo']['email'];
-        }
-        unset($message['replyTo']);
-
-        // Package it up
-        $payload = json_encode(
-            array(
-                'key'     => $this->getPassword(),
-                'message' => $message
-            )
-        );
-
-        return $payload;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getHeaders()
-    {
-
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getApiEndpoint()
-    {
-        return 'https://api.sparkpost.com/api/v1/transmissions';
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param $apiKey
-     *
-     */
-    protected function setApiKey($apiKey)
-    {
-        $this->apiKey = $apiKey;
+        $this->logger = $this->factory->getLogger();
     }
     
     /**
-     * {@inheritdoc}
-     */    
-    protected function getApiKey()
+     * Not used
+     */
+    public function setUsername($username)
     {
-        return $this->apiKey;
+
     }
 
     /**
-     * Start this Transport mechanism.
+     * Not used
+     */
+    public function getUsername()
+    {
+
+    }
+
+    /**
+     * Not used
+     */
+    public function setPassword($password)
+    {
+
+    }
+
+    /**
+     * Not used
+     */
+    public function isStarted()
+    {
+        return false;
+    }
+
+    /**
+     * Not used
      */
     public function start()
     {
-        // Make an API call to the ping endpoint
-        $this->post(
-            array(
-                'url'     => 'https://sparkpostapp.com/api/1.0/users/ping.json',
-                'payload' => json_encode(
-                    array(
-                        'key' => $this->getPassword()
-                    )
-                )
-            )
-        );
-
-        $this->started = true;
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param $response
-     * @param $info
-     *
-     * @return array
+     * Not used
+     */
+    public function stop()
+    {
+    }
+
+    /**
+     * @param string $apiKey
+     * @return $this
+     */
+    public function setApiKey($apiKey)
+    {
+        $this->apiKey = $apiKey;
+        //return $this;
+    }
+    /**
+     * @return null|string
+     */
+    public function getApiKey()
+    {
+        return $this->apiKey;
+    }
+    /**
+     * @return SparkPost\SparkPost
      * @throws \Swift_TransportException
      */
-    protected function handlePostResponse($response, $info)
+    protected function createSparkPost()
     {
-        $parsedResponse = '';
-        $response       = json_decode($response, true);
-
-        if ($response === false) {
-            $parsedResponse = $response;
-        }
-
-        if (!$this->started) {
-            // Check the response for PONG!
-            if ('PONG!' !== $response) {
-                $this->throwException('Sparkpost failed to authenticate');
-            }
-
-            return true;
-        }
-
-        $return     = array();
-        $hasBounces = false;
-        $bounces    = array(
-            'bounced'      => array(
-                'emails' => array()
-            ),
-            'unsubscribed' => array(
-                'emails' => array()
-            )
+        if ($this->apiKey === null)
+            throw new \Swift_TransportException('Cannot create instance of \SparkPost\SparkPost while API key is NULL');
+        return new SparkPost(
+            new Guzzle6HttpAdapter(new Client()),
+            ['key' => $this->apiKey]
         );
-        $metadata   = $this->getMetadata();
-
-        if (is_array($response)) {
-            if (isset($response['status']) && $response['status'] == 'error') {
-                $parsedResponse = $response['message'];
-                $error          = true;
+    }
+    /**
+     * @param Swift_Mime_Message $message
+     * @param null $failedRecipients
+     * @return int Number of messages sent
+     */
+    public function send(Swift_Mime_Message $message, &$failedRecipients = null)
+    {
+        $this->apiResponsePayload = null;
+        if ($event = $this->dispatcher->createSendEvent($this, $message)) {
+            $this->dispatcher->dispatchEvent($event, 'beforeSendPerformed');
+            if ($event->bubbleCancelled()) {
+                return 0;
+            }
+        }
+        $sendCount                = 0;
+        $sparkPost                = $this->createSparkPost();
+        $sparkPostMessage         = $this->getSparkPostMessage($message);
+        $this->apiResponsePayload = $sparkPost->transmission->send($sparkPostMessage);
+        $sendCount                = $this->apiResponsePayload['results']['total_accepted_recipients'];
+        
+        if ($this->apiResponsePayload['results']['total_rejected_recipients'] > 0) {
+            $failedRecipients[] = $this->fromEmail;
+        }
+        if ($event) {
+            if ($sendCount > 0) {
+                $event->setResult(Swift_Events_SendEvent::RESULT_SUCCESS);
             } else {
-                foreach ($response as $stat) {
-                    if (in_array($stat['status'], array('rejected', 'invalid'))) {
-                        $return[]       = $stat['email'];
-                        $parsedResponse = "{$stat['email']} => {$stat['status']}\n";
-
-                        if ('invalid' == $stat['status']) {
-                            $stat['reject_reason'] = 'invalid';
-                        }
-
-                        // Extract lead ID from metadata if applicable
-                        $leadId = (!empty($metadata[$stat['email']]['leadId'])) ? $metadata[$stat['email']]['leadId'] : null;
-
-                        if (in_array($stat['reject_reason'], array('hard-bounce', 'soft-bounce', 'reject', 'spam', 'invalid', 'unsub'))) {
-                            $hasBounces = true;
-                            $type       = ('unsub' == $stat['reject_reason']) ? 'unsubscribed' : 'bounced';
-
-                            $bounces[$type]['emails'][$stat['email']] = array(
-                                'leadId' => $leadId,
-                                'reason' => ('unsubscribed' == $type) ? $type : str_replace('-', '_', $stat['reject_reason'])
-                            );
-                        }
-                    }
-                }
+                $event->setResult(Swift_Events_SendEvent::RESULT_FAILED);
             }
+            $this->dispatcher->dispatchEvent($event, 'sendPerformed');
         }
-
-        if ($evt = $this->getDispatcher()->createResponseEvent($this, $parsedResponse, ($info['http_code'] == 200))) {
-            $this->getDispatcher()->dispatchEvent($evt, 'responseReceived');
-        }
-
-        // Parse bounces if applicable
-        if ($hasBounces) {
-            /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
-            $emailModel = $this->factory->getModel('email');
-            $emailModel->processMailerCallback($bounces);
-        }
-
-        if ($response === false) {
-            $this->throwException('Unexpected response');
-        } elseif (!empty($error)) {
-            $this->throwException('Sparkpost error');
-        }
-
-        return $return;
+        return $sendCount;
     }
-
-
     /**
-     * Returns a "transport" string to match the URL path /mailer/{transport}/callback
-     *
-     * @return mixed
+     * @param Swift_Events_EventListener $plugin
      */
-    public function getCallbackPath()
+    public function registerPlugin(Swift_Events_EventListener $plugin)
     {
-        return 'sparkpost';
+        $this->dispatcher->bindEventListener($plugin);
     }
-
     /**
-     * @return int
+     * @return array
      */
-    public function getMaxBatchLimit()
+    protected function getSupportedContentTypes()
     {
-        // Not used by Sparkpost API
-        return 0;
-    }
-
-    /**
-     * @param \Swift_Message $message
-     * @param int            $toBeAdded
-     * @param string         $type
-     *
-     * @return int
-     */
-    public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
-    {
-        // Not used by Sparkpost API
-        return 0;
-    }
-
-    /**
-     * Handle response
-     *
-     * @param Request       $request
-     * @param MauticFactory $factory
-     *
-     * @return mixed
-     */
-    public function handleCallbackResponse(Request $request, MauticFactory $factory)
-    {
-        $sparkpostEvents = $request->request->get('sparkpost_events');
-        $sparkpostEvents = json_decode($sparkpostEvents, true);
-        $rows           = array(
-            'bounced' => array(
-                'hashIds' => array(),
-                'emails'  => array()
-            ),
-            'unsubscribed' => array(
-                'hashIds' => array(),
-                'emails'  => array()
-            )
+        return array(
+            'text/plain',
+            'text/html'
         );
-
-        if (is_array($sparkpostEvents)) {
-            foreach ($sparkpostEvents as $event) {
-                $isBounce      = in_array($event['event'], array('hard_bounce', 'soft_bounce', 'reject', 'spam', 'invalid'));
-                $isUnsubscribe = ('unsub' === $event['event']);
-                if ($isBounce || $isUnsubscribe) {
-                    $type = ($isBounce) ? 'bounced' : 'unsubscribed';
-
-                    if (!empty($event['msg']['diag'])) {
-                        $reason = $event['msg']['diag'];
-                    } elseif (!empty($event['msg']['bounce_description'])) {
-                        $reason = $event['msg']['bounce_description'];
-                    } else {
-                        $reason = ($isUnsubscribe) ? 'unsubscribed' : $event['event'];
-                    }
-
-                    if (isset($event['msg']['metadata']['hashId'])) {
-                        $rows[$type]['hashIds'][$event['msg']['metadata']['hashId']] = $reason;
-                    } else {
-                        $rows[$type]['emails'][$event['msg']['email']] = $reason;
-                    }
+    }
+    /**
+     * @param string $contentType
+     * @return bool
+     */
+    protected function supportsContentType($contentType)
+    {
+        return in_array($contentType, $this->getSupportedContentTypes());
+    }
+    /**
+     * @param Swift_Mime_Message $message
+     * @return string
+     */
+    protected function getMessagePrimaryContentType(Swift_Mime_Message $message)
+    {
+        $contentType = $message->getContentType();
+        if($this->supportsContentType($contentType)){
+            return $contentType;
+        }
+        // SwiftMailer hides the content type set in the constructor of Swift_Mime_Message as soon
+        // as you add another part to the message. We need to access the protected property
+        // _userContentType to get the original type.
+        $messageRef = new \ReflectionClass($message);
+        if($messageRef->hasProperty('_userContentType')){
+            $propRef = $messageRef->getProperty('_userContentType');
+            $propRef->setAccessible(true);
+            $contentType = $propRef->getValue($message);
+        }
+        return $contentType;
+    }
+    /**
+     * https://jsapi.apiary.io/apis/sparkpostapi/introduction/subaccounts-coming-to-an-api-near-you-in-april!.html
+     *
+     * @param Swift_Mime_Message $message
+     * @return array SparkPost Send Message
+     * @throws \Swift_SwiftException
+     */
+    public function getSparkPostMessage(Swift_Mime_Message $message)
+    {
+        $contentType = $this->getMessagePrimaryContentType($message);
+        $fromAddresses = $message->getFrom();
+        $fromEmails = array_keys($fromAddresses);
+        list($fromFirstEmail, $fromFirstName) = each($fromAddresses);
+        $this->fromEmail = $fromFirstEmail;
+        $from = $fromFirstName?$fromFirstName.' <'.$fromFirstEmail.'>':$fromFirstEmail;
+        $toAddresses = $message->getTo();
+        $ccAddresses = $message->getCc() ? $message->getCc() : [];
+        $bccAddresses = $message->getBcc() ? $message->getBcc() : [];
+        $replyToAddresses = $message->getReplyTo() ? $message->getReplyTo() : [];
+        $recipients = array();
+        $cc = array();
+        $bcc = array();
+        $attachments = array();
+        $headers = array();
+        $tags = array();
+        $inlineCss = null;
+        foreach ($toAddresses as $toEmail => $toName) {
+            $recipients[] = array(
+                'address' => array(
+                    'email' => $toEmail,
+                    'name'  => $toName,
+                )
+            );
+        }
+        foreach ($replyToAddresses as $replyToEmail => $replyToName) {
+            if ($replyToName){
+                $headers['Reply-To'] = sprintf('%s <%s>', $replyToEmail, $replyToName);
+            } else {
+                $headers['Reply-To'] = $replyToEmail;
+            }
+        }
+        foreach ($ccAddresses as $ccEmail => $ccName) {
+            $cc[] = array(
+                'email' => $ccEmail,
+                'name'  => $ccName,
+            );
+        }
+        foreach ($bccAddresses as $bccEmail => $bccName) {
+            $bcc[] = array(
+                'email' => $bccEmail,
+                'name'  => $bccName,
+            );
+        }
+        $bodyHtml = $bodyText = null;
+        if($contentType === 'text/plain'){
+            $bodyText = $message->getBody();
+        }
+        elseif($contentType === 'text/html'){
+            $bodyHtml = $message->getBody();
+        }
+        else{
+            $bodyHtml = $message->getBody();
+        }
+        foreach ($message->getChildren() as $child) {
+            if ($child instanceof Swift_Attachment) {
+                $attachments[] = array(
+                    'type'    => $child->getContentType(),
+                    'name'    => $child->getFilename(),
+                    'data' => base64_encode($child->getBody())
+                );
+            } elseif ($child instanceof Swift_MimePart && $this->supportsContentType($child->getContentType())) {
+                if ($child->getContentType() == "text/html") {
+                    $bodyHtml = $child->getBody();
+                } elseif ($child->getContentType() == "text/plain") {
+                    $bodyText = $child->getBody();
                 }
             }
         }
-
-        return $rows;
+        if ($message->getHeaders()->has('List-Unsubscribe')) {
+            $headers['List-Unsubscribe'] = $message->getHeaders()->get('List-Unsubscribe')->getValue();
+        }
+        if ($message->getHeaders()->has('X-MC-InlineCSS')) {
+            $inlineCss = $message->getHeaders()->get('X-MC-InlineCSS')->getValue();
+        }
+        if($message->getHeaders()->has('X-MC-Tags')){
+            /** @var \Swift_Mime_Headers_UnstructuredHeader $tagsHeader */
+            $tagsHeader = $message->getHeaders()->get('X-MC-Tags');
+            $tags = explode(',', $tagsHeader->getValue());
+        }
+        $sparkPostMessage = array(
+            'html'       => $bodyHtml,
+            'text'       => $bodyText,
+            'from'       => $from,
+            'subject'    => $message->getSubject(),
+            'recipients' => $recipients,
+            'cc'         => $cc,
+            'bcc'        => $bcc,
+            'headers'    => $headers,
+            'inline_css' => $inlineCss,
+            'tags'       => $tags
+        );
+        if (count($attachments) > 0) {
+            $sparkPostMessage['attachments'] = $attachments;
+        }
+        return $sparkPostMessage;
+    }
+    /**
+     * @return null|array
+     */
+    public function getResultApi()
+    {
+        return $this->apiResponsePayload;
     }
 }

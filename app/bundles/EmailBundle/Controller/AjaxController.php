@@ -18,6 +18,7 @@ use Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\MandrillTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\PostmarkTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport;
+use Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport;
 
 /**
  * Class AjaxController
@@ -329,6 +330,9 @@ class AjaxController extends CommonAjaxController
                 case 'mautic.transport.amazon':
                     $mailer = new AmazonTransport($settings['amazon_region']);
                     break;
+                case 'mautic.transport.sparkpost':
+                    $mailer = new SparkpostTransport($settings['api_key']);
+                    break;
                 default:
                     if ($this->container->has($transport)) {
                         $mailer = $this->container->get($transport);
@@ -375,7 +379,6 @@ class AjaxController extends CommonAjaxController
                 }
             }
         }
-
         return $this->sendJsonResponse($dataArray);
     }
 

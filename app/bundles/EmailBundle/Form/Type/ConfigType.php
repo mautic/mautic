@@ -273,7 +273,7 @@ class ConfigType extends AbstractType
                     'data-show-on' => $apiKeyShowConditions,
                     'tooltip'      => 'mautic.email.config.mailer.apikey.tooltop',
                     'autocomplete' => 'off',
-                    'placeholder'  => 'Get this from your e-mail delivery service and enter it here.'
+                    'placeholder'  => 'mautic.email.config.mailer.apikey.placeholder'
                 ),
                 'required' => true
             )
