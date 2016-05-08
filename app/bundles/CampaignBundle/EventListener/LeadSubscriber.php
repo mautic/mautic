@@ -191,6 +191,13 @@ class LeadSubscriber extends CommonSubscriber
             if (!is_array($log['metadata'])) {
                 $log['metadata'] = ($log['metadata'] !== null) ? unserialize($log['metadata']) : array();
             }
+
+            // Hide this from the time line all together
+            if (!empty($log['metadata']['failed'])) {
+
+                continue;
+            }
+
             $template        = (!empty($eventSettings['action'][$log['type']]['timelineTemplate']))
                 ? $eventSettings['action'][$log['type']]['timelineTemplate'] : 'MauticCampaignBundle:SubscribedEvents\Timeline:index.html.php';
 
@@ -202,7 +209,8 @@ class LeadSubscriber extends CommonSubscriber
                     'extra'           => array(
                         'log' => $log
                     ),
-                    'contentTemplate' => $template
+                    'contentTemplate' => $template,
+                    'icon'            => 'fa-clock-o'
                 )
             );
         }

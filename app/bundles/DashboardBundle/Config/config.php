@@ -67,6 +67,7 @@ return array(
         )
     ),
     'parameters' => array(
-        'dashboard_import_dir' => '%kernel.root_dir%/../media/dashboards'
+        'dashboard_import_dir'      => '%kernel.root_dir%/../media/dashboards',
+        'dashboard_import_user_dir' => null
     )
 );

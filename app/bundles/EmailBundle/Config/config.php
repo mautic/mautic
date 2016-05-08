@@ -28,14 +28,26 @@ return array(
                 'path'       => '/emails/{id}',
                 'controller' => 'MauticEmailBundle:Api\EmailApi:getEntity'
             ),
-            'mautic_api_sendleademail' => array(
-                'path'       => '/emails/{id}/send/lead/{leadId}',
-                'controller' => 'MauticEmailBundle:Api\EmailApi:sendLead',
-                'method'     => 'POST'
-            ),
             'mautic_api_sendemail'     => array(
                 'path'       => '/emails/{id}/send',
                 'controller' => 'MauticEmailBundle:Api\EmailApi:send',
+                'method'     => 'POST'
+            ),
+            'mautic_api_sendcontactemail' => array(
+                'path'       => '/emails/{id}/send/contact/{leadId}',
+                'controller' => 'MauticEmailBundle:Api\EmailApi:sendLead',
+                'method'     => 'POST'
+            ),
+
+            // @deprecated - to be removed in 2.0
+            'mautic_api_sendleademail' => array(
+                'path'       => '/emails/{id}/send/contact/{leadId}',
+                'controller' => 'MauticEmailBundle:Api\EmailApi:sendLead',
+                'method'     => 'POST'
+            ),
+            'mautic_api_sendleademail_bc' => array(
+                'path'       => '/emails/{id}/send/lead/{leadId}',
+                'controller' => 'MauticEmailBundle:Api\EmailApi:sendLead',
                 'method'     => 'POST'
             )
         ),

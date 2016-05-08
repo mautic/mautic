@@ -128,8 +128,13 @@ ul.tag-cloud li {
     position: relative;
 }
 
-/* Following can be removed when the chart-improvement PR will be merged (it'll be part of dashboard css) */
-.jvectormap-container {
-    height:100%;
-    width:100%;
+.contact-cards .panel-body {
+    max-height: 150px;
+}
+
+.contact-cards .img {
+    max-height: 115px;
+}
+#lead_merge_lead_to_merge_chosen .chosen-search {
+    display:none;
 }

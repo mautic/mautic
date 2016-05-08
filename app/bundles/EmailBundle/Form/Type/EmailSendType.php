@@ -62,7 +62,7 @@ class EmailSendType extends AbstractType
 
             $builder->add('newEmailButton', 'button', array(
                 'attr'  => array(
-                    'class'   => 'btn btn-primary',
+                    'class'   => 'btn btn-primary btn-nospin',
                     'onclick' => 'Mautic.loadNewEmailWindow({
                         "windowUrl": "' . $windowUrl . '"
                     })',
@@ -83,7 +83,7 @@ class EmailSendType extends AbstractType
 
             $builder->add('editEmailButton', 'button', array(
                 'attr'  => array(
-                    'class'     => 'btn btn-primary',
+                    'class'     => 'btn btn-primary btn-nospin',
                     'onclick'   => 'Mautic.loadNewEmailWindow(Mautic.standardEmailUrl({"windowUrl": "' . $windowUrlEdit . '"}))',
                     'disabled'  => !isset($email),
                     'icon'      => 'fa fa-edit'
@@ -96,7 +96,7 @@ class EmailSendType extends AbstractType
 
             $builder->add('previewEmailButton', 'button', array(
                 'attr'  => array(
-                    'class'     => 'btn btn-primary',
+                    'class'     => 'btn btn-primary btn-nospin',
                     'onclick'   => 'Mautic.loadNewEmailWindow(Mautic.standardEmailUrl({"windowUrl": "' . $windowUrlPreview . '"}))',
                     'disabled'  => !isset($email),
                     'icon'      => 'fa fa-external-link'

@@ -42,7 +42,7 @@ $view['slots']->set(
         'MauticCoreBundle:Helper:page_actions.html.php',
         array(
             'item'            => $activePage,
-            'customButtons'   => $customButtons,
+            'customButtons'   => (isset($customButtons))?$customButtons:array(),
             'templateButtons' => array(
                 'edit'   => $security->hasEntityAccess(
                     $permissions['page:pages:editown'],

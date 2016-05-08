@@ -1,10 +1,10 @@
 //LeadBundle
 Mautic.leadOnLoad = function (container) {
     Mousetrap.bind('a', function(e) {
-        if(mQuery('#lead-quick-add').length) {
-            mQuery('#lead-quick-add').modal();
-        } else if (mQuery('#addNoteButton').length) {
-            mQuery('#addNoteButton').click();
+        if(mQuery('a.quickadd').length) {
+            mQuery('a.quickadd').click();
+        } else if (mQuery('a.btn-leadnote-add').length) {
+            mQuery('a.btn-leadnote-add').click();
         }
     });
 
@@ -14,18 +14,6 @@ Mautic.leadOnLoad = function (container) {
 
     Mousetrap.bind('c', function(e) {
         mQuery('#card-view').click();
-    });
-
-    Mousetrap.bind('n', function(e) {
-        mQuery('#new-lead').click();
-    });
-
-    Mousetrap.bind('mod+enter', function(e) {
-        if(mQuery('#leadnote_buttons_save').length) {
-            mQuery('#leadnote_buttons_save').click();
-        } else if (mQuery('#save-quick-add').length) {
-            mQuery('#save-quick-add').click();
-        }
     });
 
     //Prevent single combo keys from initiating within lead note
@@ -117,7 +105,7 @@ Mautic.leadOnLoad = function (container) {
             mQuery('#anonymousLeadButton').removeClass('btn-primary');
         }
     }
-    
+
     mQuery(document).on('shown.bs.tab', 'a#load-lead-map', function (e) {
         Mautic.renderLeadMap();
     })
@@ -295,7 +283,7 @@ Mautic.addLeadListFilter = function (elId) {
 
     var prototype = mQuery('.available-filters').data('prototype');
     var fieldType = mQuery(filterId).data('field-type');
-    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'tags', 'boolean', 'select', 'country', 'timezone', 'region']) != -1);
+    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'boolean', 'select', 'country', 'timezone', 'region']) != -1);
 
     prototype = prototype.replace(/__name__/g, filterNum);
     prototype = prototype.replace(/__label__/g, label);
@@ -424,22 +412,32 @@ Mautic.addLeadListFilter = function (elId) {
 };
 
 Mautic.leadfieldOnLoad = function (container) {
-
-    var fixHelper = function(e, ui) {
-        ui.children().each(function() {
-            mQuery(this).width(mQuery(this).width());
-        });
-        return ui;
-    };
-
     if (mQuery(container + ' .leadfield-list').length) {
+        var bodyOverflow = {};
         mQuery(container + ' .leadfield-list tbody').sortable({
             handle: '.fa-ellipsis-v',
-            helper: fixHelper,
+            helper: function(e, ui) {
+                ui.children().each(function() {
+                    mQuery(this).width(mQuery(this).width());
+                });
+
+                // Fix body overflow that messes sortable up
+                bodyOverflow.overflowX = mQuery('body').css('overflow-x');
+                bodyOverflow.overflowY = mQuery('body').css('overflow-y');
+                mQuery('body').css({
+                    overflowX: 'visible',
+                    overflowY: 'visible'
+                });
+
+                return ui;
+            },
             scroll: false,
             axis: 'y',
             containment: container + ' .leadfield-list',
-            stop: function(i) {
+            stop: function(e, ui) {
+                // Restore original overflow
+                mQuery('body').css(bodyOverflow);
+
                 // Get the page and limit
                 mQuery.ajax({
                     type: "POST",

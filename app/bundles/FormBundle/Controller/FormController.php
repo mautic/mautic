@@ -217,12 +217,12 @@ class FormController extends CommonFormController
         // Only show actions and fields that still exist
         $customComponents  = $model->getCustomComponents();
         $activeFormActions = array();
-        foreach ($activeForm->getActions() as $action) {
-            if (!isset($customComponents['actions'][$action->getType()])) {
+        foreach ($activeForm->getActions() as $formAction) {
+            if (!isset($customComponents['actions'][$formAction->getType()])) {
                 continue;
             }
-            $type                          = explode('.', $action->getType());
-            $activeFormActions[$type[0]][] = $action;
+            $type                          = explode('.', $formAction->getType());
+            $activeFormActions[$type[0]][] = $formAction;
         }
 
         $activeFormFields = array();
@@ -681,6 +681,7 @@ class FormController extends CommonFormController
             $modifiedFields = array();
             $usedLeadFields = array();
             $existingFields = $entity->getFields()->toArray();
+
             foreach ($existingFields as $formField) {
                 // Check to see if the field still exists
                 if ($formField->getType() !== 'button' && !isset($availableFields[$formField->getType()])) {
@@ -690,7 +691,14 @@ class FormController extends CommonFormController
                 $id    = $formField->getId();
                 $field = $formField->convertToArray();
                 unset($field['form']);
+
+                if (isset($customComponents['fields'][$field['type']])) {
+                    // Set the custom parameters
+                    $field['customParameters'] = $customComponents['fields'][$field['type']];
+                }
+
                 $modifiedFields[$id] = $field;
+
 
                 if (!empty($field['leadField'])) {
                     $usedLeadFields[$id] = $field['leadField'];
@@ -724,6 +732,7 @@ class FormController extends CommonFormController
                 $id     = $formAction->getId();
                 $action = $formAction->convertToArray();
                 unset($action['form']);
+
                 $modifiedActions[$id] = $action;
             }
 

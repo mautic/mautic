@@ -19,7 +19,7 @@
         <ul class="events">
             <?php foreach ($events as $event) : ?>
                 <?php if (isset($event['contentTemplate'])) : ?>
-                    <?php echo $view->render($event['contentTemplate'], array('event' => $event, 'icons' => $icons)); ?>
+                    <?php echo $view->render($event['contentTemplate'], array('event' => $event)); ?>
                 <?php endif; ?>
             <?php endforeach; ?>
         </ul>

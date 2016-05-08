@@ -365,12 +365,12 @@ class EmailController extends FormController
 
         // Prepare stats for bargraph
         $variant = ($parent && $parent === $email);
-        $stats   = ($email->getEmailType() == 'template') ? 
+        $stats   = ($email->getEmailType() == 'template') ?
             $model->getEmailGeneralStats(
-                $email, 
+                $email,
                 $variant,
                 null,
-                new \DateTime($dateRangeForm->get('date_from')->getData()), 
+                new \DateTime($dateRangeForm->get('date_from')->getData()),
                 new \DateTime($dateRangeForm->get('date_to')->getData())) :
             $model->getEmailListStats($email, $variant);
 
@@ -392,7 +392,7 @@ class EmailController extends FormController
                 'viewParameters'  => array(
                     'email'          => $email,
                     'stats'          => $stats,
-                    'trackableLinks' => $trackableLinks,
+                    'trackables'     => $trackableLinks,
                     'pending'        => $model->getPendingLeads($email, null, true),
                     'logs'           => $logs,
                     'variants'       => array(
@@ -442,11 +442,11 @@ class EmailController extends FormController
      */
     public function newAction($entity = null)
     {
-        $model   = $this->factory->getModel('email');
+        $model = $this->factory->getModel('email');
 
         if (!($entity instanceof Email)) {
             /** @var \Mautic\EmailBundle\Entity\Email $entity */
-            $entity  = $model->getEntity();
+            $entity = $model->getEntity();
         }
 
         $method  = $this->request->getMethod();
@@ -548,6 +548,7 @@ class EmailController extends FormController
 
             // Check to see if this is a popup
             if (isset($form['updateSelect'])) {
+                $template    = false;
                 $passthrough = array_merge(
                     $passthrough,
                     array(
@@ -575,9 +576,10 @@ class EmailController extends FormController
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
-                    'form'                => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.php', 'MauticEmailBundle:FormTheme\Email'),
-                    'tokens'              => $model->getBuilderComponents($entity, 'tokenSections'),
-                    'email'               => $entity
+                    'form'      => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.php', 'MauticEmailBundle:FormTheme\Email'),
+                    'isVariant' => $entity->isVariant(true),
+                    'tokens'    => $model->getBuilderComponents($entity, 'tokenSections'),
+                    'email'     => $entity
                 ),
                 'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
                 'passthroughVars' => array(
@@ -667,7 +669,7 @@ class EmailController extends FormController
             $entity->setEmailType('template');
         }
 
-        $form   = $model->createForm($entity, $this->get('form.factory'), $action, array('update_select' => $updateSelect));
+        $form = $model->createForm($entity, $this->get('form.factory'), $action, array('update_select' => $updateSelect));
 
         ///Check for a submitted form and process it
         if (!$ignorePost && $method == 'POST') {
@@ -727,12 +729,15 @@ class EmailController extends FormController
                 $model->unlockEntity($entity);
             }
 
+            $template    = 'MauticEmailBundle:Email:view';
             $passthrough = array(
                 'activeLink'    => 'mautic_email_index',
                 'mauticContent' => 'email'
             );
+
             // Check to see if this is a popup
             if (isset($form['updateSelect'])) {
+                $template    = false;
                 $passthrough = array_merge(
                     $passthrough,
                     array(
@@ -756,7 +761,7 @@ class EmailController extends FormController
                         array(
                             'returnUrl'       => $this->generateUrl('mautic_email_action', $viewParameters),
                             'viewParameters'  => $viewParameters,
-                            'contentTemplate' => 'MauticEmailBundle:Email:view',
+                            'contentTemplate' => $template,
                             'passthroughVars' => $passthrough
                         )
                     )
@@ -788,6 +793,7 @@ class EmailController extends FormController
             array(
                 'viewParameters'  => array(
                     'form'               => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.php', 'MauticEmailBundle:FormTheme\Email'),
+                    'isVariant'          => $entity->isVariant(true),
                     'tokens'             => (!empty($tokens)) ? $tokens['tokenSections'] : $model->getBuilderComponents($entity, 'tokenSections'),
                     'email'              => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
@@ -836,7 +842,7 @@ class EmailController extends FormController
             $entity      = clone $entity;
             $session     = $this->factory->getSession();
             $contentName = 'mautic.emailbuilder.'.$entity->getSessionId().'.content';
-            
+
             $session->set($contentName, $entity->getContent());
         }
 
@@ -1005,6 +1011,9 @@ class EmailController extends FormController
                 return $this->accessDenied();
             }
 
+            // Note this since it's cleared on __clone()
+            $emailType = $entity->getEmailType();
+
             $clone = clone $entity;
 
             //reset
@@ -1014,13 +1023,11 @@ class EmailController extends FormController
             $clone->setVariantSentCount(0);
             $clone->setVariantStartDate(null);
             $clone->setIsPublished(false);
+            $clone->setEmailType($emailType);
             $clone->setVariantParent($entity);
-
-            $model->saveEntity($clone);
-            $objectId = $clone->getId();
         }
 
-        return $this->editAction($objectId, true);
+        return $this->newAction($clone);
     }
 
     /**

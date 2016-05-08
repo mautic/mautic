@@ -15,7 +15,7 @@ $buttons = $preButtons = array();
 if ($permissions['lead:leads:create']) {
     $preButtons[] = array(
         'attr'      => array(
-            'class'       => 'btn btn-default btn-nospin',
+            'class'       => 'btn btn-default btn-nospin quickadd',
             'data-toggle' => 'ajaxmodal',
             'data-target' => '#MauticSharedModal',
             'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'quickAdd')),
@@ -34,8 +34,9 @@ if ($permissions['lead:leads:create']) {
     );
 }
 
+// Only show toggle buttons for accessibility
 $extraHtml = <<<button
-<div class="btn-group ml-5">
+<div class="btn-group ml-5 sr-only ">
     <span data-toggle="tooltip" title="{$view['translator']->trans('mautic.lead.tooltip.list')}" data-placement="left"><a id="table-view" href="{$view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'list'))}" data-toggle="ajax" class="btn btn-default"><i class="fa fa-fw fa-table"></i></span></a>
     <span data-toggle="tooltip" title="{$view['translator']->trans('mautic.lead.tooltip.grid')}" data-placement="left"><a id="card-view" href="{$view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'grid'))}" data-toggle="ajax" class="btn btn-default"><i class="fa fa-fw fa-th-large"></i></span></a>
 </div>
@@ -94,7 +95,7 @@ if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) 
                     'data-header' => $view['translator']->trans('mautic.lead.batch.lists')
                 ),
                 'tooltip' => $view['translator']->trans('mautic.lead.batch.lists'),
-                'iconClass' => 'fa fa-list'
+                'iconClass' => 'fa fa-pie-chart'
             ),
             array(
                 'attr'      => array(
@@ -116,7 +117,7 @@ if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) 
                     'data-header' => $view['translator']->trans('mautic.lead.batch.dnc'),
                 ),
                 'tooltip' => $view['translator']->trans('mautic.lead.batch.dnc'),
-                'iconClass' => 'fa fa-send text-danger'
+                'iconClass' => 'fa fa-ban text-danger'
             )
         )
     );

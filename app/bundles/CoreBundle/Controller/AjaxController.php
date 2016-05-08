@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\UpgradeEvent;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -628,11 +629,17 @@ class AjaxController extends CommonController
             }
         }
 
+        // Execute the mautic.post_upgrade event
+        $this->factory->getDispatcher()->dispatch(CoreEvents::POST_UPGRADE, new UpgradeEvent($dataArray));
+
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
         /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
         $cookieHelper = $this->factory->getHelper('cookie');
         $cookieHelper->deleteCookie('mautic_update');
+
+        // Set a redirect to force a page reload to get new menu items, assets, etc
+        $dataArray['redirect'] = $this->get('router')->generate('mautic_core_update');
 
         return $this->sendJsonResponse($dataArray);
     }

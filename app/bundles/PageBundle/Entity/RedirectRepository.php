@@ -22,21 +22,13 @@ class RedirectRepository extends CommonRepository
      * @param $source
      * @param $id
      *
+     * @deprecated To be removed in 2.0; use TrackableRepository::findByChannel instead
+     *
      * @return mixed
      */
     public function findBySource($source, $id)
     {
-        $column = ($source == 'email') ? 'r.email_id' : 'r.source';
-
-        $q = $this->_em->getConnection()->createQueryBuilder();
-
-        return $q->select('r.redirect_id, r.url, r.hits, r.unique_hits')
-            ->from(MAUTIC_TABLE_PREFIX.'page_redirects', 'r')
-            ->where(
-                $q->expr()->eq($column, (int) $id)
-            )
-            ->orderBy('r.url')
-            ->execute()->fetchAll();
+        return $this->getEntityManager()->getRepository('MauticPageBundle:Trackable')->findByChannel($source, $id);
     }
 
     /**
@@ -68,7 +60,6 @@ class RedirectRepository extends CommonRepository
             ->setParameter('urls', $urls);
 
         return $q->getQuery()->getResult();
-
     }
 
     /**
@@ -111,7 +102,7 @@ class RedirectRepository extends CommonRepository
      */
     public function upHitCount($id, $increaseBy = 1, $unique = false)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'page_redirects')
             ->set('hits', 'hits + ' . (int) $increaseBy)

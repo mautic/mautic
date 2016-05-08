@@ -199,7 +199,7 @@ $view['slots']->set(
             <ul class="nav nav-tabs pr-md pl-md">
                 <li class="active">
                     <a href="#clicks-container" role="tab" data-toggle="tab">
-                        <?php echo $view['translator']->trans('mautic.email.click_tracks'); ?>
+                        <?php echo $view['translator']->trans('mautic.trackable.click_counts'); ?>
                     </a>
                 </li>
                 <?php if ($showVariants): ?>
@@ -216,39 +216,7 @@ $view['slots']->set(
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
             <div class="tab-pane active bdr-w-0" id="clicks-container">
-                <?php if (!empty($trackableLinks)): ?>
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped table-bordered click-list">
-                            <thead>
-                            <tr>
-                                <td><?php echo $view['translator']->trans('mautic.page.url'); ?></td>
-                                <td><?php echo $view['translator']->trans('mautic.email.click_count'); ?></td>
-                                <td><?php echo $view['translator']->trans('mautic.email.click_unique_count'); ?></td>
-                                <td><?php echo $view['translator']->trans('mautic.email.click_track_id'); ?></td>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <?php foreach ($trackableLinks as $link): ?>
-                                <tr>
-                                    <td><a href="<?php echo $link['url']; ?>"><?php echo $link['url']; ?></a></td>
-                                    <td class="text-center"><?php echo $link['hits']; ?></td>
-                                    <td class="text-center"><?php echo $link['unique_hits']; ?></td>
-                                    <td><?php echo $link['redirect_id']; ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                <?php else: ?>
-                    <?php echo $view->render(
-                        'MauticCoreBundle:Helper:noresults.html.php',
-                        array(
-                            'header'  => 'mautic.email.click_tracks.header_none',
-                            'message' => 'mautic.email.click_tracks.none'
-                        )
-                    ); ?>
-                    <div class="clearfix"></div>
-                <?php endif; ?>
+                <?php echo $view->render('MauticPageBundle:Trackable:click_counts.html.php', array('trackables' => $trackables )); ?>
             </div>
 
             <?php if ($showVariants): ?>
@@ -418,7 +386,7 @@ $view['slots']->set(
                                                                    )
                                                                ); ?>"
                                                                data-toggle="confirmation"
-                                                               data-mesasge="<?php echo $view->escape(
+                                                               data-message="<?php echo $view->escape(
                                                                    $view["translator"]->trans(
                                                                        "mautic.email.abtest.confirmmakewinner",
                                                                        array("%name%" => $variant->getName())

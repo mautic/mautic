@@ -26,6 +26,7 @@ $templates = array(
     'timezones' => 'timezone-template',
     'select'    => 'select-template',
     'lists'     => 'leadlist-template',
+    'emails'    => 'lead_email_received-template',
     'tags'      => 'tags-template'
 );
 
@@ -128,7 +129,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
             if (isset($form->vars[$dataKey])):
                 foreach ($form->vars[$dataKey] as $value => $label):
                     if (is_array($label)):
-                        echo "<optgroup label=\"$value\">$value</optgroup>\n";
+                        echo "<optgroup label=\"$value\">\n";
                         foreach ($label as $optionValue => $optionLabel):
                             echo "<option value=\"$optionValue\">$optionLabel</option>\n";
                         endforeach;

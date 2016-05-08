@@ -76,25 +76,29 @@ class CacheStorageHelper
      */
     public function get($fileName, $maxAge = 0)
     {
-        if ($maxAge == 0) return false;
-        
-        $filePath = $this->cacheDir . '/' . $fileName . '.php';
+        if ($maxAge == 0) {
+            
+            return false;
+        }
+
+        $filePath = $this->cacheDir.'/'.$fileName.'.php';
 
         if ($this->fs->exists($filePath)) {
 
             if ($maxAge) {
                 $modifiedAt = filemtime($filePath);
-                $now = time();
-                $fileAge = round(($now - $modifiedAt) / 60); // in minutes
+                $now        = time();
+                $fileAge    = round(($now - $modifiedAt) / 60); // in minutes
 
                 if ($fileAge >= $maxAge) {
+
                     return false;
                 }
             }
 
             return json_decode(file_get_contents($filePath), true);
         }
-        
+
         return false;
     }
 }

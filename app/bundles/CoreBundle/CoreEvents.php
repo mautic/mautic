@@ -1,7 +1,7 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -67,4 +67,31 @@ final class CoreEvents
      * @var string
      */
     const BUILD_CANVAS_CONTENT = 'mautic.build_canvas_content';
+
+    /**
+     * The mautic.pre_upgrade is dispatched before an upgrade.
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\UpgradeEvent instance.
+     *
+     * @var string
+     */
+    const PRE_UPGRADE = 'mautic.pre_upgrade';
+
+    /**
+     * The mautic.post_upgrade is dispatched after an upgrade.
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\UpgradeEvent instance.
+     *
+     * @var string
+     */
+    const POST_UPGRADE = 'mautic.post_upgrade';
+
+    /**
+     * The mautic.build_embeddable_js event is dispatched to allow plugins to extend the mautic tracking js
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\BuildJsEvent instance.
+     *
+     * @var string
+     */
+    const BUILD_MAUTIC_JS = 'mautic.build_embeddable_js';
 }
