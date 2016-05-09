@@ -324,7 +324,9 @@ class ChartQuery extends AbstractChart
 
             if ($this->unit === 'm') {
                 $nextDate->modify('first day of next month');
-            } else {
+            } elseif ($this->unit === 'W') {
+                $nextDate->modify('Sunday this week');
+            }  else {
                 $nextDate->add($oneUnit);
             }
 
@@ -361,7 +363,6 @@ class ChartQuery extends AbstractChart
                 // Place the right suma is between the time unit and time unit +1
                 if (isset($item['count']) && $itemDate >= $previousDate && $itemDate < $nextDate) {
                     $data[$i] = $item['count'];
-
                     unset($rawData[$key]);
                     continue;
                 }

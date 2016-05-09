@@ -157,8 +157,7 @@ abstract class AbstractChart
                 break;
             case 'W':
                 $dayAmount = $this->dateTo->diff($this->dateFrom)->format('%a');
-                $weekAmount = ceil($dayAmount / 7);
-                $amount = $weekAmount++;
+                $amount = (ceil($dayAmount / 7) + 1);
                 break;
             case 'm':
                 $amount = $this->dateTo->diff($this->dateFrom)->format('%y') * 12 + $this->dateTo->diff($this->dateFrom)->format('%m');
