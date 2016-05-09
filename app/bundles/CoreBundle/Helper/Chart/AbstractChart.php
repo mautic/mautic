@@ -161,7 +161,11 @@ abstract class AbstractChart
                 break;
             case 'm':
                 $amount = $this->dateTo->diff($this->dateFrom)->format('%y') * 12 + $this->dateTo->diff($this->dateFrom)->format('%m');
+
+                // Add 1 month if there are some days left
                 if ($this->dateTo->diff($this->dateFrom)->format('%d') > 0) $amount++;
+
+                // Add 1 month if count of days are greater or equal than in date to
                 if ($this->dateFrom->format('d') >= $this->dateTo->format('d')) $amount++;
                 break;
             case 'H':

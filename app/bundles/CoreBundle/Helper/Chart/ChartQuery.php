@@ -304,17 +304,10 @@ class ChartQuery extends AbstractChart
         $previousDate = clone $this->dateFrom;
         $utcTz        = new \DateTimeZone("UTC");
 
-        if (!in_array($this->unit, array('H', 'i', 's'))) {
-            // Because the data is aggregated based on UTC timestamps, there's a risk that some of the data points within local and UTC timezones
-            // may be incorrectly placed; we can't really do anything easily about this so we're just going to have to assume UTC dateFrom/dateTo
-            $previousDate->setTimezone($utcTz);
-
-            // Hours do not matter so let's reset to 00:00:00 for date comparison
-            $previousDate->setTime(0,0,0);
-
-            if ($this->unit == 'm') {
-                $limit--;
-            }
+        if ($this->unit == 'm') {
+            $previousDate->modify('first day of this month');
+        } elseif ($this->unit === 'W') {
+            $previousDate->modify('Monday this week');
         }
 
         // Convert data from DB to the chart.js format
@@ -325,7 +318,7 @@ class ChartQuery extends AbstractChart
             if ($this->unit === 'm') {
                 $nextDate->modify('first day of next month');
             } elseif ($this->unit === 'W') {
-                $nextDate->modify('Sunday this week');
+                $nextDate->modify('Monday next week');
             }  else {
                 $nextDate->add($oneUnit);
             }
