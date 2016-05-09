@@ -304,7 +304,9 @@ class ChartQuery extends AbstractChart
         $previousDate = clone $this->dateFrom;
         $utcTz        = new \DateTimeZone("UTC");
 
-        if ($this->unit == 'm') {
+        if ($this->unit === 'Y') {
+            $previousDate->modify('first day of January');
+        } elseif ($this->unit == 'm') {
             $previousDate->modify('first day of this month');
         } elseif ($this->unit === 'W') {
             $previousDate->modify('Monday this week');
