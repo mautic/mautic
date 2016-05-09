@@ -101,7 +101,9 @@ class TrackableModel extends CommonModel
         }
 
         // Ensure the URL saved to the database does not have encoded ampersands
-        $url = str_replace('&amp;', '&', $url);
+        while (strpos($url, '&amp;') !== false) {
+            $url = str_replace('&amp;', '&', $url);
+        }
 
         $trackable = $this->getRepository()->findByUrl($url, $channel, $channelId);
         if ($trackable == null) {
@@ -338,7 +340,7 @@ class TrackableModel extends CommonModel
             // For HTML, replace only the links; leaving the link text (if a URL) intact
             foreach ($this->contentReplacements['second_pass'] as $search => $replace) {
                 $content = preg_replace(
-                    '/<a(.*?) href=(["\'])'.preg_quote(str_replace('&', '&amp;', $search), '/').'(.*?)\\2(.*?)>/i',
+                    '/<a(.*?) href=(["\'])'.preg_quote($search, '/').'(.*?)\\2(.*?)>/i',
                     '<a$1 href=$2'.$replace.'$3$2$4>',
                     $content
                 );
@@ -358,7 +360,7 @@ class TrackableModel extends CommonModel
     /**
      * Find URLs in HTML and parse into trackables
      *
-     * @param  $html HTML content
+     * @param  string $html HTML content
      *
      * @return array
      */
@@ -398,7 +400,7 @@ class TrackableModel extends CommonModel
     /**
      * Find URLs in plain text and parse into trackables
      *
-     * @param  $text Plain text content
+     * @param  string $text Plain text content
      *
      * @return array
      */
@@ -452,7 +454,9 @@ class TrackableModel extends CommonModel
         $url = trim($url);
 
         // Ensure these are & for the sake of parsing
-        $url = str_replace('&amp;', '&', $url);
+        while (strpos($url, '&amp;') !== false) {
+            $url = str_replace('&amp;', '&', $url);
+        }
 
         // Default key and final URL to the given $url
         $trackableKey = $trackableUrl = $url;
