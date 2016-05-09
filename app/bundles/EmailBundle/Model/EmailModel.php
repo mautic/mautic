@@ -103,11 +103,22 @@ class EmailModel extends FormModel
             $entity->setRevision($revision);
         }
 
-        // Ensure links in HTML don't have double encoded ampersands
-        $htmlContent = $this->cleanUrlsInContent($entity->getCustomHtml());
-        $entity->setCustomHtml($htmlContent);
+        // Ensure links in template content don't have encoded ampersands
+        if ($entity->getTemplate()) {
+            $content = $entity->getContent();
 
-        // Ensure links in PLAIN TEXT don't have double encoded ampersands
+            foreach ($content as $key => $value) {
+                $content[$key] = $this->cleanUrlsInContent($value);
+            }
+
+            $entity->setContent($content);
+        } else {
+            // Ensure links in HTML don't have encoded ampersands
+            $htmlContent = $this->cleanUrlsInContent($entity->getCustomHtml());
+            $entity->setCustomHtml($htmlContent);
+        }
+
+        // Ensure links in PLAIN TEXT don't have encoded ampersands
         $plainContent = $this->cleanUrlsInContent($entity->getPlainText());
         $entity->setPlainText($plainContent);
 
