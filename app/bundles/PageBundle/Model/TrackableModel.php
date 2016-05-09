@@ -338,7 +338,7 @@ class TrackableModel extends CommonModel
             // For HTML, replace only the links; leaving the link text (if a URL) intact
             foreach ($this->contentReplacements['second_pass'] as $search => $replace) {
                 $content = preg_replace(
-                    '/<a(.*?) href=(["\'])'.preg_quote($search, '/').'(.*?)\\2(.*?)>/i',
+                    '/<a(.*?) href=(["\'])'.preg_quote(str_replace('&', '&amp;', $search), '/').'(.*?)\\2(.*?)>/i',
                     '<a$1 href=$2'.$replace.'$3$2$4>',
                     $content
                 );
