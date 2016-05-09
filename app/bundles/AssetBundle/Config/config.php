@@ -155,7 +155,8 @@ return array(
                     'mautic.lead.model.lead',
                     'mautic.category.model.category',
                     'request_stack',
-                    'mautic.helper.ip_lookup'
+                    'mautic.helper.ip_lookup',
+                    'mautic.helper.core_parameters'
                 )
             )
         )

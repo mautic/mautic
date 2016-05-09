@@ -340,7 +340,6 @@ return array(
                     'mautic.helper.ip_lookup',
                     'mautic.helper.paths',
                     'mautic.helper.integration',
-                    'mautic.point.model.trigger',
                     'mautic.lead.model.field',
                     'mautic.lead.model.list'
                 )

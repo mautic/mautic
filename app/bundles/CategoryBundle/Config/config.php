@@ -65,8 +65,7 @@ return array(
             'mautic.category.model.category' => array(
                 'class' => 'Mautic\CategoryBundle\Model\CategoryModel',
                 'arguments' => array(
-                    'request_stack',
-                    'mautic.factory'
+                    'request_stack'
                 )
             )
         )

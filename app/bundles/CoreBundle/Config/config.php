@@ -241,11 +241,6 @@ return array(
                 'arguments' => array(
                     'mautic.helper.user',
                     'mautic.helper.core_parameters'
-                ),
-                'methodCalls' => array(
-                    'initUser' => array(
-                        'security.context'
-                    )
                 )
             ),
             'mautic.helper.ip_lookup' => array(
@@ -266,7 +261,7 @@ return array(
             'mautic.helper.core_parameters' => array(
                 'class' => 'Mautic\CoreBundle\Helper\CoreParametersHelper',
                 'arguments' => array(
-                    '@kernel'
+                    'kernel'
                 )
             )
         ),

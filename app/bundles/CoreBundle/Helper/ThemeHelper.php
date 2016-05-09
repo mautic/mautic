@@ -13,20 +13,32 @@ namespace Mautic\CoreBundle\Helper;
 use Mautic\CoreBundle\Exception as MauticException;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Mautic\CoreBundle\Templating\TemplateNameParser;
 
 class ThemeHelper
 {
+    /**
+     * @var PathsHelper
+     */
+    private $pathsHelper;
 
-    private $factory;
-    private $themes;
+    /**
+     * @var array|mixed
+     */
+    private $themes = array();
 
-    public function __construct(MauticFactory $factory)
+    /**
+     * ThemeHelper constructor.
+     * 
+     * @param PathsHelper $pathsHelper
+     */
+    public function __construct(PathsHelper $pathsHelper, TemplatingHelper $templatingHelper)
     {
-        $this->factory = $factory;
-
-        $this->themes = $this->factory->getInstalledThemes();
-
+        $this->pathsHelper = $pathsHelper;
+        $this->templatingHelper = $templatingHelper;
+        
+        $this->themes = $this->getInstalledThemes();
     }
 
     private function getDirectoryName($newName)
@@ -43,8 +55,8 @@ class ThemeHelper
      */
     public function copy($theme, $newName)
     {
-        $root      = $this->factory->getSystemPath('themes_root') . '/';
-        $themes    = $this->factory->getInstalledThemes();
+        $root      = $this->pathsHelper->getSystemPath('themes_root') . '/';
+        $themes    = $this->getInstalledThemes();
 
         //check to make sure the theme exists
         if (!isset($themes[$theme])) {
@@ -73,8 +85,8 @@ class ThemeHelper
      */
     public function rename($theme, $newName)
     {
-        $root      = $this->factory->getSystemPath('themes_root') . '/';
-        $themes    = $this->factory->getInstalledThemes();
+        $root      = $this->pathsHelper->getSystemPath('themes_root') . '/';
+        $themes    = $this->getInstalledThemes();
 
         //check to make sure the theme exists
         if (!isset($themes[$theme])) {
@@ -101,8 +113,8 @@ class ThemeHelper
      */
     public function delete($theme)
     {
-        $root      = $this->factory->getSystemPath('themes_root') . '/';
-        $themes    = $this->factory->getInstalledThemes();
+        $root      = $this->pathsHelper->getSystemPath('themes_root') . '/';
+        $themes    = $this->getInstalledThemes();
 
         //check to make sure the theme exists
         if (!isset($themes[$theme])) {
@@ -124,10 +136,6 @@ class ThemeHelper
     {
         if (file_exists($themePath . '/config.json')) {
             $config = json_decode(file_get_contents($themePath . '/config.json'), true);
-        }
-        // @deprecated Remove support for theme config.php in 2.0
-        elseif (file_exists($themePath . '/config.php')) {
-            $config = include $themePath . '/config.php';
         }
 
         $config['name'] = $newName;
@@ -159,18 +167,50 @@ class ThemeHelper
      */
     public function checkForTwigTemplate($template)
     {
-        $kernel = $this->factory->getKernel();
-        $parser = new TemplateNameParser($kernel);
+        $parser = new TemplateNameParser($this->kernel);
 
         $template = $parser->parse($template);
 
         $twigTemplate = clone $template;
         $twigTemplate->set('engine', 'twig');
 
-        if ($this->factory->getTemplating()->exists($twigTemplate)) {
+        if ($this->templating->exists($twigTemplate)) {
             return $twigTemplate->getLogicalName();
         }
 
         return $template->getLogicalName();
+    }
+    
+    public function getInstalledThemes($specificFeature = 'all')
+    {
+        if (empty($this->themes[$specificFeature])) {
+            $dir = $this->pathsHelper->getSystemPath('themes', true);
+
+            $finder = new Finder();
+            $finder->directories()->depth('0')->ignoreDotFiles(true)->in($dir);
+
+            $themes[$specificFeature] = array();
+            foreach ($finder as $theme) {
+                if (file_exists($theme->getRealPath().'/config.json')) {
+                    $config = json_decode(file_get_contents($theme->getRealPath() . '/config.json'), true);
+                }
+                // @deprecated Remove support for theme config.php in 2.0
+                elseif (file_exists($theme->getRealPath() . '/config.php')) {
+                    $config = include $theme->getRealPath() . '/config.php';
+                } else {
+                    continue;
+                }
+
+                if ($specificFeature != 'all') {
+                    if (isset($config['features']) && in_array($specificFeature, $config['features'])) {
+                        $themes[$specificFeature][$theme->getBasename()] = $config['name'];
+                    }
+                } else {
+                    $themes[$specificFeature][$theme->getBasename()] = $config['name'];
+                }
+            }
+        }
+
+        return $themes[$specificFeature];
     }
 }

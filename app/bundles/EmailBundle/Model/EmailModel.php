@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Entity\Email;
@@ -50,6 +51,11 @@ class EmailModel extends FormModel
     protected $mailboxHelper;
 
     /**
+     * @var MailHelper
+     */
+    protected $mailHelper;
+
+    /**
      * @var LeadModel
      */
     protected $leadModel;
@@ -64,13 +70,15 @@ class EmailModel extends FormModel
      * 
      * @param IpLookupHelper $ipLookupHelper
      * @param Mailbox $mailboxHelper
+     * @param MailHelper $mailHelper
      * @param LeadModel $leadModel
      * @param TrackableModel $pageTrackableModel
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, Mailbox $mailboxHelper, LeadModel $leadModel, TrackableModel $pageTrackableModel)
+    public function __construct(IpLookupHelper $ipLookupHelper, Mailbox $mailboxHelper, MailHelper $mailHelper, LeadModel $leadModel, TrackableModel $pageTrackableModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
         $this->mailboxHelper = $mailboxHelper;
+        $this->mailHelper = $mailHelper;
         $this->leadModel = $leadModel;
         $this->pageTrackableModel = $pageTrackableModel;
     }
@@ -998,7 +1006,7 @@ class EmailModel extends FormModel
         $saveEntities    = array();
         $emailSentCounts = array();
 
-        $mailer = $this->factory->getMailer(!$sendBatchMail);
+        $mailer = $this->mailHelper->getMailer(!$sendBatchMail);
 
         $contentGenerated = false;
 
@@ -1172,7 +1180,7 @@ class EmailModel extends FormModel
             return false;
         }
 
-        $mailer = $this->factory->getMailer();
+        $mailer = $this->mailHelper->getMailer();
         $mailer->setLead($lead, true);
         $mailer->setTokens($tokens);
         $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments, (!$saveStat));

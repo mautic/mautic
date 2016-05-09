@@ -184,45 +184,6 @@ class CategoryModel extends FormModel
     }
 
     /**
-     * Delete an entity
-     *
-     * @param  $entity
-     * @return null|object
-     */
-    public function deleteEntity($entity)
-    {
-        $bundle = $entity->getBundle();
-
-        //if it doesn't have a dot, then assume the model will be $bundle.$bundle
-        $modelName = (strpos($bundle, '.') === false) ? $bundle.'.'.$bundle : $bundle;
-        $model     = $this->factory->getModel($modelName);
-
-        $repo       = $model->getRepository();
-        $tableAlias = $repo->getTableAlias();
-
-        $entities = $model->getEntities(array(
-            'filter' => array(
-                'force' => array(
-                    array(
-                        'column' => $tableAlias.'.category',
-                        'expr'   => 'eq',
-                        'value'  => $entity->getId()
-                    )
-                )
-            )
-        ));
-
-        if (!empty($entities)) {
-            foreach ($entities as $e) {
-                $e->setCategory(null);
-            }
-            $model->saveEntities($entities, false);
-        }
-
-        parent::deleteEntity($entity);
-    }
-
-    /**
      * Get list of entities for autopopulate fields
      *
      * @param $bundle

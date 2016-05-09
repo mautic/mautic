@@ -34,12 +34,22 @@ class CoreParametersHelper
 
     /**
      * @param string $name
+     * @param mixed  $default
      * 
      * @return mixed
      */
-    public function getParameter($name)
+    public function getParameter($name, $default = null)
     {
-        return $this->parameterBag->get($name);
+        if ($name === 'db_table_prefix' && defined('MAUTIC_TABLE_PREFIX')) {
+            //use the constant in case in the installer
+            return MAUTIC_TABLE_PREFIX;
+        }
+
+        if ($this->parameterBag->has('mautic.' . $name)) {
+            return $this->parameterBag->get('mautic.' . $name);
+        }
+        
+        return $default;
     }
 
     /**
@@ -49,6 +59,6 @@ class CoreParametersHelper
      */
     public function hasParameter($name)
     {
-        return $this->parameterBag->has($name);
+        return $this->parameterBag->has('mautic.' . $name);
     }
 }

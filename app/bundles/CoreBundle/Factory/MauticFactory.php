@@ -72,10 +72,10 @@ class MauticFactory
      */
     public function getModel($modelNameKey)
     {
-        static $modelInstances;
+        static $modelInstances = array();
         
         // Shortcut for models with the same name as the bundle
-        if (strpos('.', $modelNameKey) === false) {
+        if (strpos($modelNameKey, '.') === false) {
             $modelNameKey = "$modelNameKey.$modelNameKey";
         }
 
@@ -384,62 +384,7 @@ class MauticFactory
      */
     public function getSystemPath($name, $fullPath = false)
     {
-        $paths = $this->getParameter('paths');
-
-        if ($name == 'currentTheme' || $name == 'current_theme') {
-            $theme = $this->getParameter('theme');
-            $path  = $paths['themes']."/$theme";
-        } elseif ($name == 'cache' || $name == 'log') {
-            //these are absolute regardless as they are configurable
-            return $this->container->getParameter("kernel.{$name}_dir");
-        } elseif ($name == 'images') {
-            $path = $this->getParameter('image_path');
-            if (substr($path, -1) === '/') {
-                $path = substr($path, 0, -1);
-            }
-        } elseif ($name == 'dashboard.user' || $name == 'dashboard.global') {
-            //these are absolute regardless as they are configurable
-            $globalPath = $this->getParameter('dashboard_import_dir');
-            if (substr($globalPath, -1) === '/') {
-                $globalPath = substr($globalPath, 0, -1);
-            }
-
-            if ($name == 'dashboard.global') {
-
-                return $globalPath;
-            }
-
-            if (!$userPath = $this->getParameter('dashboard_import_user_dir')) {
-                $userPath = $globalPath;
-            } elseif (substr($userPath, -1) === '/') {
-                $userPath = substr($userPath, 0, -1);
-            }
-
-            $user      = $this->getUser();
-            $userPath .= '/'.$user->getId();
-
-            // @todo check is_writable
-            if (!is_dir($userPath) && !file_exists($userPath)) {
-                mkdir($userPath, 0755);
-            }
-
-            return $userPath;
-        } elseif (isset($paths[$name])) {
-            $path = $paths[$name];
-        } elseif (strpos($name, '_root') !== false) {
-            // Assume system root if one is not set specifically
-            $path = $paths['root'];
-        } else {
-            throw new \InvalidArgumentException("$name does not exist.");
-        }
-
-        if ($fullPath) {
-            $rootPath = (!empty($paths[$name . '_root'])) ? $paths[$name . '_root'] : $paths['root'];
-
-            return $rootPath . '/' . $path;
-        }
-
-        return $path;
+        return $this->container->get('mautic.helper.paths')->getSystemPath($name, $fullPath);
     }
 
     /**

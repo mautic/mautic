@@ -16,7 +16,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Intl\Intl;
@@ -39,7 +39,7 @@ abstract class AbstractCommonModel
     protected $security;
 
     /**
-     * @var \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
+     * @var EventDispatcherInterface
      */
     protected $dispatcher;
 
@@ -75,9 +75,9 @@ abstract class AbstractCommonModel
     }
 
     /**
-     * @param ContainerAwareEventDispatcher $dispatcher
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function setDispatcher(ContainerAwareEventDispatcher $dispatcher)
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }

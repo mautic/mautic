@@ -9,6 +9,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -32,6 +33,16 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class ListModel extends FormModel
 {
+    /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    public function __construct(CoreParametersHelper $coreParametersHelper)
+    {
+        $this->coreParametersHelper = $coreParametersHelper;
+    }
+
     /**
      * Used by addLead and removeLead functions
      *
@@ -952,9 +963,9 @@ class ListModel extends FormModel
      */
     protected function batchSleep()
     {
-        $leadSleepTime = $this->factory->getParameter('batch_lead_sleep_time', false);
+        $leadSleepTime = $this->coreParametersHelper->getParameter('batch_lead_sleep_time', false);
         if ($leadSleepTime === false) {
-            $leadSleepTime = $this->factory->getParameter('batch_sleep_time', 1);
+            $leadSleepTime = $this->coreParametersHelper->getParameter('batch_sleep_time', 1);
         }
 
         if (empty($leadSleepTime)) {

@@ -197,6 +197,13 @@ return array(
                 'class'     => 'Mautic\EmailBundle\Helper\MessageHelper',
                 'arguments' => 'mautic.factory'
             ),
+            'mautic.helper.mailer'             => array(
+                'class'     => 'Mautic\EmailBundle\Helper\MailHelper',
+                'arguments' => array(
+                    'mautic.factory',
+                    'mailer'
+                )
+            ),
             // Mailers
             'mautic.transport.amazon'            => array(
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport',
@@ -241,6 +248,7 @@ return array(
                 'arguments' => array(
                     'mautic.helper.ip_lookup',
                     'mautic.helper.mailbox',
+                    'mautic.helper.mailer',
                     'mautic.lead.model.lead',
                     'mautic.page.model.trackable'
                 )

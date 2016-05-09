@@ -73,11 +73,6 @@ class LeadModel extends FormModel
      * @var IntegrationHelper
      */
     protected $integrationHelper;
-    
-    /**
-     * @var TriggerModel
-     */
-    protected $pointTriggerModel;
 
     /**
      * @var FieldModel
@@ -102,7 +97,6 @@ class LeadModel extends FormModel
      * @param IpLookupHelper $ipLookupHelper
      * @param PathsHelper $pathsHelper
      * @param IntegrationHelper $integrationHelper
-     * @param TriggerModel $pointTriggerModel
      * @param FieldModel $leadFieldModel
      * @param ListModel $leadListModel
      */
@@ -111,8 +105,7 @@ class LeadModel extends FormModel
         CookieHelper $cookieHelper, 
         IpLookupHelper $ipLookupHelper, 
         PathsHelper $pathsHelper, 
-        IntegrationHelper $integrationHelper, 
-        TriggerModel $pointTriggerModel, 
+        IntegrationHelper $integrationHelper,
         FieldModel $leadFieldModel,
         ListModel $leadListModel
     )
@@ -122,7 +115,6 @@ class LeadModel extends FormModel
         $this->ipLookupHelper = $ipLookupHelper;
         $this->pathsHelper = $pathsHelper;
         $this->integrationHelper = $integrationHelper;
-        $this->pointTriggerModel = $pointTriggerModel;
         $this->leadFieldModel = $leadFieldModel;
         $this->leadListModel = $leadListModel;
     }
@@ -150,8 +142,6 @@ class LeadModel extends FormModel
             $repoSetup = true;
 
             //set the point trigger model in order to get the color code for the lead
-            $repo->setTriggerModel($this->pointTriggerModel);
-
             $fields = $this->leadFieldModel->getFieldList(true, false);
 
             $socialFields = (!empty($fields['social'])) ? array_keys($fields['social']) : array();
@@ -231,13 +221,7 @@ class LeadModel extends FormModel
             return new Lead();
         }
 
-        //set the point trigger model in order to get the color code for the lead
-        $repo = $this->getRepository();
-        $repo->setTriggerModel($this->pointTriggerModel);
-
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**

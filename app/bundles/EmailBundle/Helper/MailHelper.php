@@ -247,6 +247,19 @@ class MailHelper
     }
 
     /**
+     * Mirrors previous MauticFactory functionality
+     * 
+     * @param bool $cleanSlate
+     * @return $this
+     */
+    public function getMailer($cleanSlate = true)
+    {
+        $this->reset($cleanSlate);
+        
+        return $this;
+    }
+
+    /**
      * Send the message
      *
      * @param bool $dispatchSendEvent

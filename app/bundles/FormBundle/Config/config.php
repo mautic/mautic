@@ -203,8 +203,8 @@ return array(
             'mautic.form.model.form' => array(
                 'class' => 'Mautic\FormBundle\Model\FormModel',
                 'arguments' => array(
-                    'model.form.model.action',
-                    'model.form.model.field'
+                    'mautic.form.model.action',
+                    'mautic.form.model.field'
                 )
             ),
             'mautic.form.model.submission' => array(
