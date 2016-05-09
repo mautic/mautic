@@ -153,10 +153,12 @@ abstract class AbstractChart
     {
         switch ($this->unit) {
             case 'd':
+                $amount = ($this->dateTo->diff($this->dateFrom)->format('%a') + 1);
+                break;
             case 'W':
-                $unit = 'a';
-                $amount = ($this->dateTo->diff($this->dateFrom)->format('%' . $unit) + 1);
-                $amount = $this->unit == 'W' ? ceil($amount / 7) : $amount;
+                $dayAmount = $this->dateTo->diff($this->dateFrom)->format('%a');
+                $weekAmount = ceil($dayAmount / 7);
+                $amount = $weekAmount++;
                 break;
             case 'm':
                 $amount = $this->dateTo->diff($this->dateFrom)->format('%y') * 12 + $this->dateTo->diff($this->dateFrom)->format('%m');
