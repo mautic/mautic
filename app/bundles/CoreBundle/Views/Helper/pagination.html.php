@@ -73,10 +73,10 @@ endif;
     <div class="<?php echo $paginationWrapper; ?>">
         <ul class="pagination nm <?php echo $pageClass; ?>">
             <?php
-            $urlPage = "/" . ($page - $range);
-            $url     = (($page - $range) > 0) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
+            $urlPage = "/1";
+            $url     = ($page > 1) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
             $data    = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
-            $class   = (($page - $range) <= 0) ? ' class="disabled"' : '';
+            $class   = ($page <= 1) ? ' class="disabled"' : '';
             ?>
             <li<?php echo $class; ?>>
                 <?php  ?>
@@ -138,7 +138,7 @@ endif;
             $urlPage = "/" . $totalPages;
             $url     = ($page < $totalPages && $totalPages > $range) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
             $data    = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
-            $class   = (($page + $range) == $totalPages || $page === $totalPages) ? ' class="disabled"' : '';
+            $class   = ($page === $totalPages) ? ' class="disabled"' : '';
             ?>
             <li<?php echo $class; ?>>
                 <?php  ?>
