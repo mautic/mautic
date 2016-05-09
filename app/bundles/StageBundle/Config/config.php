@@ -21,7 +21,7 @@ return array(
         ),
         'api'  => array(
             'mautic_api_getstages'   => array(
-                'path'       => '/points',
+                'path'       => '/stages',
                 'controller' => 'MauticStageBundle:Api\StageApi:getEntities'
             ),
             'mautic_api_getstage'    => array(
@@ -36,7 +36,7 @@ return array(
             'mautic.stages.menu.root' => array(
                 'id'        => 'mautic_stages_root',
                 'iconClass' => 'fa-scale',
-                'access'    => array('point:stages:view'),
+                'access'    => array('stage:stages:view'),
                 'priority'  => 30,
                 'children'  => array(
                     'mautic.stage.menu.index'         => array(
@@ -61,34 +61,21 @@ return array(
                 'class' => 'Mautic\StageBundle\EventListener\LeadSubscriber'
             ),
             'mautic.stage.search.subscriber'     => array(
-                'class' => 'Mautic\PointBundle\EventListener\SearchSubscriber'
+                'class' => 'Mautic\StageBundle\EventListener\SearchSubscriber'
             ),
-            'mautic.point.dashboard.subscriber'  => array(
-                'class' => 'Mautic\PointBundle\EventListener\DashboardSubscriber'
+            'mautic.stage.dashboard.subscriber'  => array(
+                'class' => 'Mautic\StageBundle\EventListener\DashboardSubscriber'
             ),
         ),
         'forms'  => array(
-            'mautic.point.type.form'                  => array(
-                'class'     => 'Mautic\PointBundle\Form\Type\PointType',
+            'mautic.stage.type.form'                  => array(
+                'class'     => 'Mautic\StageBundle\Form\Type\StageType',
                 'arguments' => 'mautic.factory',
-                'alias'     => 'point'
+                'alias'     => 'stage'
             ),
-            'mautic.point.type.action'                => array(
-                'class' => 'Mautic\PointBundle\Form\Type\PointActionType',
-                'alias' => 'pointaction'
-            ),
-            'mautic.pointtrigger.type.form'           => array(
-                'class'     => 'Mautic\PointBundle\Form\Type\TriggerType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'pointtrigger'
-            ),
-            'mautic.pointtrigger.type.action'         => array(
-                'class' => 'Mautic\PointBundle\Form\Type\TriggerEventType',
-                'alias' => 'pointtriggerevent'
-            ),
-            'mautic.point.type.genericpoint_settings' => array(
-                'class' => 'Mautic\PointBundle\Form\Type\GenericPointSettingsType',
-                'alias' => 'genericpoint_settings'
+            'mautic.stage.type.action'                => array(
+                'class' => 'Mautic\StageBundle\Form\Type\StageActionType',
+                'alias' => 'stageaction'
             )
         )
     )
