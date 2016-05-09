@@ -135,9 +135,7 @@ endif;
             </li>
 
             <?php
-            $urlPage = "/" . ($page + $range);
-            if (($page + $range) > $totalPages)
-                $urlPage = "/" . $totalPages;
+            $urlPage = "/" . $totalPages;
             $url     = ($page < $totalPages && $totalPages > $range) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
             $data    = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax" data-target="' . $target . '"' . $menuLink;
             $class   = (($page + $range) == $totalPages || $page === $totalPages) ? ' class="disabled"' : '';
