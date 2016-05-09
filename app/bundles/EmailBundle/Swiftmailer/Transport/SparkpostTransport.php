@@ -58,11 +58,6 @@ class SparkpostTransport implements \Swift_Transport
      */
     protected $factory;
 
-    /**
-     * @var         $this->factory->getLogger();
-     */
-    private $logger;
-
     public function __construct($apiKey)
     {
         $this->setApiKey($apiKey);
@@ -88,38 +83,6 @@ class SparkpostTransport implements \Swift_Transport
     public function setMauticFactory(MauticFactory $factory)
     {
         $this->factory = $factory;
-        $this->setLogger();
-        $this->logger->error("Here is the apikey $this->apiKey");
-    }
-    
-    // TODO: Remove this when you're done building this transport!
-    public function setLogger()
-    {
-        $this->logger = $this->factory->getLogger();
-    }
-    
-    /**
-     * Not used
-     */
-    public function setUsername($username)
-    {
-
-    }
-
-    /**
-     * Not used
-     */
-    public function getUsername()
-    {
-
-    }
-
-    /**
-     * Not used
-     */
-    public function setPassword($password)
-    {
-
     }
 
     /**
@@ -166,12 +129,12 @@ class SparkpostTransport implements \Swift_Transport
      */
     protected function createSparkPost()
     {
-        if ($this->apiKey === null)
+        if ($this->apiKey === null){
             throw new \Swift_TransportException('Cannot create instance of \SparkPost\SparkPost while API key is NULL');
-        return new SparkPost(
-            new Guzzle6HttpAdapter(new Client()),
-            ['key' => $this->apiKey]
-        );
+        }
+        $httpAdapter = new Guzzle6HttpAdapter(new Client());
+        $sparky      = new SparkPost($httpAdapter, ['key' => $this->apiKey]);
+        return $sparky;
     }
     /**
      * @param Swift_Mime_Message $message
@@ -356,6 +319,7 @@ class SparkpostTransport implements \Swift_Transport
         if (count($attachments) > 0) {
             $sparkPostMessage['attachments'] = $attachments;
         }
+
         return $sparkPostMessage;
     }
     /**
