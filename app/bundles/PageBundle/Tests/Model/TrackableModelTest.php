@@ -228,6 +228,31 @@ class TrackableModelTest extends WebTestCase
 
         $this->assertEmpty($trackables, $content);
     }
+    
+    /**
+     * @testdox Test that tokens that are supposed to be ignored are
+     *
+     * @covers Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     */
+    public function testIgnoredTokensAreNotConverted()
+    {
+        $url   = 'https://{unsubscribe_url}';
+        $model = $this->getModel($url, null, array('{unsubscribe_url}'));
+
+        list($content, $trackables) = $model->parseContentForTrackables(
+            $this->generateContent($url, 'html'),
+            array(
+                '{unsubscribe_url}' => 'https://domain.com/email/unsubscribe/xxxxxxx'
+            ),
+            'email',
+            1
+        );
+
+        $this->assertEmpty($trackables, $content);
+        $this->assertFalse(strpos($url, $content), 'https:// should have been stripped from the token URL');
+    }
 
     /**
      * @testdox Test that a token used in place of a URL is not parsed
@@ -288,12 +313,12 @@ class TrackableModelTest extends WebTestCase
     }
 
     /**
-     * @param      $urls
-     * @param null $tokenUrls
-     *
+     * @param       $urls
+     * @param null  $tokenUrls
+     * @param array $doNotTrack
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getModel($urls, $tokenUrls = null)
+    protected function getModel($urls, $tokenUrls = null, $doNotTrack = array())
     {
         if (!is_array($urls)) {
             $urls = array($urls);
@@ -315,7 +340,7 @@ class TrackableModelTest extends WebTestCase
 
         $mockModel->expects($this->once())
             ->method('getDoNotTrackList')
-            ->willReturn(array());
+            ->willReturn($doNotTrack);
 
         $entities = array();
         foreach ($urls as $k => $url) {
