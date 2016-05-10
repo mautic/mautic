@@ -152,7 +152,7 @@ $view['slots']->set(
                                 </div>
                             </div>
                             <div class="text-center">
-                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $stats['newVsReturning'], 'chartType' => 'pie', 'chartHeight' => 93)); ?>
+                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $stats['newVsReturning'], 'chartType' => 'pie', 'chartHeight' => 93, 'disableLegend' => true)); ?>
                             </div>
                         </div>
                     </div>
@@ -169,7 +169,7 @@ $view['slots']->set(
                                 </div>
                             </div>
                             <div class="text-center">
-                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $stats['dwellTime'], 'chartType' => 'pie', 'chartHeight' => 93)); ?>
+                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $stats['dwellTime'], 'chartType' => 'pie', 'chartHeight' => 93, 'disableLegend' => true)); ?>
                             </div>
                         </div>
                     </div>

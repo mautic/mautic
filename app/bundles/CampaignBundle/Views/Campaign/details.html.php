@@ -94,7 +94,7 @@ $view['slots']->set(
                                 </div>
                             </div>
                             <div class="pt-0 pl-10 pb-0 pr-10">
-                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $leadStats, 'chartType' => 'simple-bar', 'chartHeight' => 93)); ?>
+                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $leadStats, 'chartType' => 'simple-bar', 'chartHeight' => 108)); ?>
                             </div>
                         </div>
                     </div>

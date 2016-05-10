@@ -3003,7 +3003,7 @@ var Mautic = {
                     } else if (canvas.hasClass('pie-chart')) {
                         Mautic.renderPieChart(canvas)
                     } else if (canvas.hasClass('simple-bar-chart')) {
-                        // Mautic.renderSimpleBarChart(canvas)
+                        Mautic.renderSimpleBarChart(canvas)
                     }
                 }
                 canvas.addClass('chart-rendered');
@@ -3034,14 +3034,21 @@ var Mautic = {
      */
     renderPieChart: function(canvas) {
         var data = mQuery.parseJSON(canvas.text());
+        var options = {};
+        var disableLegend = canvas.attr('data-disable-legend');
+        if (typeof disableLegend !== 'undefined' && disableLegend !== false) {
+            console.log('diabled');
+            options.legend = {
+                display: false
+            }
+        }
         // data = Mautic.emulateNoDataForPieChart(data);
-        console.log(data);
-        var pieChart = new Chart(canvas, {
+        var chart = new Chart(canvas, {
             type: 'pie',
-            data: data, 
-            // options: {segmentStrokeWidth : 1}
+            data: data,
+            options: options
         });
-        Mautic.chartObjects.push(pieChart);
+        Mautic.chartObjects.push(chart);
     },
 
     /**
@@ -3050,17 +3057,21 @@ var Mautic = {
      * @param mQuery element canvas
      */
     renderSimpleBarChart: function(canvas) {
-        var ctx = canvas[0].getContext("2d");
         var data = mQuery.parseJSON(canvas.text());
-        var options = {
-            scaleShowGridLines : false,
-            barShowStroke : false,
-            barValueSpacing : 1,
-            showScale: false,
-            tooltipFontSize: 10,
-            tooltipCaretSize: 0
-        };
-        Mautic.chartObjects.push(new Chart(ctx).Bar(data, options));
+        var chart = new Chart(canvas, {
+            type: 'bar',
+            data: data, 
+            options: {
+                scales: {
+                    xAxes: [{display: false,}],
+                    yAxes: [{display: false,}]
+                },
+                legend: {
+                    display: false
+                }
+            }
+        });
+        Mautic.chartObjects.push(chart);
     },
 
     /**
