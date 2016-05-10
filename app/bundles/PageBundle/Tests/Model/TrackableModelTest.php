@@ -228,7 +228,7 @@ class TrackableModelTest extends WebTestCase
 
         $this->assertEmpty($trackables, $content);
     }
-    
+
     /**
      * @testdox Test that tokens that are supposed to be ignored are
      *
@@ -252,6 +252,28 @@ class TrackableModelTest extends WebTestCase
 
         $this->assertEmpty($trackables, $content);
         $this->assertFalse(strpos($url, $content), 'https:// should have been stripped from the token URL');
+    }
+
+    /**
+     * @testdox Test that a URL injected into the do not track list is not converted
+     *
+     * @covers Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     */
+    public function testIgnoredUrlDoesNotCrash()
+    {
+        $url   = 'https://domain.com';
+        $model = $this->getModel($url, null, array($url));
+
+        list($content, $trackables) = $model->parseContentForTrackables(
+            $this->generateContent($url, 'html'),
+            array(),
+            'email',
+            1
+        );
+
+        $this->assertTrue((strpos($content, $url) !== false), $content);
     }
 
     /**
