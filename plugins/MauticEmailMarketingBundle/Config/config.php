@@ -29,11 +29,6 @@ return array(
                 'class'     => 'MauticPlugin\MauticEmailMarketingBundle\Form\Type\IcontactType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'emailmarketing_icontact'
-            ),
-            'mautic.form.type.emailmarketing.sparkpost' => array(
-                'class'     => 'MauticPlugin\MauticEmailMarketingBundle\Form\Type\SparkpostType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'emailmarketing_sparkpost'
             )
         )
     )
