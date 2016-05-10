@@ -84,7 +84,7 @@ class BarChart extends AbstractChart implements ChartInterface
             'label' => $label,
             'data'  => $data,
         );
-        
+
         $this->datasets[] = array_merge($baseData, $this->generateColors($datasetId));
 
         return $this;
@@ -107,10 +107,14 @@ class BarChart extends AbstractChart implements ChartInterface
 
         for ($i = 0; $i < $amount; $i++) {
             $this->labels[] = $date->format($format);
-            $date->add($oneUnit);
+
+            // Special case for months because PHP behaves weird with February
+            if ($this->unit === 'm') {
+                $date->modify('first day of next month');
+            } else {
+                $date->add($oneUnit);
+            }
         }
-        
-        $this->labels = $this->labels;
     }
 
     /**
