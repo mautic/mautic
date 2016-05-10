@@ -31,10 +31,10 @@ class LineChart extends BarChart implements ChartInterface
         $color = $this->configureColorHelper($datasetId);
 
         return array(
-            'fillColor'             => $color->toRgba(0.1),
-            'strokeColor'           => $color->toRgba(0.8),
-            'pointColor'            => $color->toRgba(0.75),
-            'pointHighlightStroke'  => $color->toRgba(1)
+            'backgroundColor'           => $color->toRgba(0.1),
+            'borderColor'               => $color->toRgba(0.8),
+            'pointHoverBackgroundColor' => $color->toRgba(0.75),
+            'pointHoverBorderColor'     => $color->toRgba(1)
         );
     }
 }

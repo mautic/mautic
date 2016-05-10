@@ -9,11 +9,8 @@
 ?>
 <div class="chart-wrapper">
     <div class="pt-sd pr-md pb-md pl-md">
-        <div class="chart-legend pull-right"></div>
-        <div class="clearfix"></div>
         <div style="height:<?php echo $chartHeight; ?>px">
             <canvas class="chart <?php echo $chartType; ?>-chart"><?php echo json_encode($chartData); ?></canvas>
         </div>
     </div>
-    <div class="legend"></div>
 </div>

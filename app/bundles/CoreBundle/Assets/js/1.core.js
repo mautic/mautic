@@ -82,7 +82,9 @@ if (typeof History != 'undefined') {
 //set global Chart defaults
 if (typeof Chart != 'undefined') {
     // configure global Chart options
-    Chart.defaults.global.responsive = true;
+    Chart.defaults.global.elements.line.borderWidth = 1;
+    Chart.defaults.global.elements.point.radius = 2;
+    Chart.defaults.global.legend.labels.boxWidth = 20;
     Chart.defaults.global.maintainAspectRatio = false;
 }
 
@@ -3001,7 +3003,7 @@ var Mautic = {
                     } else if (canvas.hasClass('pie-chart')) {
                         Mautic.renderPieChart(canvas)
                     } else if (canvas.hasClass('simple-bar-chart')) {
-                        Mautic.renderSimpleBarChart(canvas)
+                        // Mautic.renderSimpleBarChart(canvas)
                     }
                 }
                 canvas.addClass('chart-rendered');
@@ -3015,17 +3017,13 @@ var Mautic = {
      * @param mQuery element canvas
      */
     renderLineChart: function(canvas) {
-        var ctx = canvas[0].getContext("2d");
         var data = mQuery.parseJSON(canvas.text());
         if (!data.labels.length || !data.datasets.length) return;
-        var options = {
-            pointDotRadius : 2,
-            datasetStrokeWidth : 1,
-            bezierCurveTension : 0.2,
-            multiTooltipTemplate: "<%= datasetLabel %>: <%= value %>"
-        }
-        var chart = new Chart(ctx).Line(data, options);
-        canvas.closest('.chart-wrapper').find('.chart-legend').html(chart.generateLegend());
+        var chart = new Chart(canvas, {
+            type: 'line',
+            data: data, 
+            options: {lineTension : 0.2}
+        });
         Mautic.chartObjects.push(chart);
     },
 
@@ -3035,12 +3033,14 @@ var Mautic = {
      * @param mQuery element canvas
      */
     renderPieChart: function(canvas) {
-        var ctx = canvas[0].getContext("2d");
         var data = mQuery.parseJSON(canvas.text());
-        data = Mautic.emulateNoDataForPieChart(data);
-        var options = {segmentStrokeWidth : 1}
-        var pieChart = new Chart(ctx).Pie(data, options);
-        mQuery(canvas).closest('.chart-wrapper').find('.legend').html(pieChart.generateLegend());
+        // data = Mautic.emulateNoDataForPieChart(data);
+        console.log(data);
+        var pieChart = new Chart(canvas, {
+            type: 'pie',
+            data: data, 
+            // options: {segmentStrokeWidth : 1}
+        });
         Mautic.chartObjects.push(pieChart);
     },
 

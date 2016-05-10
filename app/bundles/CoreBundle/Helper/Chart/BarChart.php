@@ -125,10 +125,11 @@ class BarChart extends AbstractChart implements ChartInterface
         $color = $this->configureColorHelper($datasetId);
 
         return array(
-            'fillColor'         => $color->toRgba(0.1),
-            'strokeColor'       => $color->toRgba(0.8),
-            'highlightFill'     => $color->toRgba(0.75),
-            'highlightStroke'   => $color->toRgba(1)
+            'fill' => true,
+            'backgroundColor'           => $color->toRgba(0.1),
+            'borderColor'               => $color->toRgba(0.8),
+            'pointHoverBackgroundColor' => $color->toRgba(0.75),
+            'pointHoverBorderColor'     => $color->toRgba(1)
         );
     }
 }
