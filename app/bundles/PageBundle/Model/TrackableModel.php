@@ -116,7 +116,9 @@ class TrackableModel extends AbstractCommonModel
         }
 
         // Ensure the URL saved to the database does not have encoded ampersands
-        $url = str_replace('&amp;', '&', $url);
+        while (strpos($url, '&amp;') !== false) {
+            $url = str_replace('&amp;', '&', $url);
+        }
 
         $trackable = $this->getRepository()->findByUrl($url, $channel, $channelId);
         if ($trackable == null) {
@@ -373,7 +375,7 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Find URLs in HTML and parse into trackables
      *
-     * @param  $html HTML content
+     * @param  string $html HTML content
      *
      * @return array
      */
@@ -413,7 +415,7 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Find URLs in plain text and parse into trackables
      *
-     * @param  $text Plain text content
+     * @param  string $text Plain text content
      *
      * @return array
      */
@@ -467,7 +469,9 @@ class TrackableModel extends AbstractCommonModel
         $url = trim($url);
 
         // Ensure these are & for the sake of parsing
-        $url = str_replace('&amp;', '&', $url);
+        while (strpos($url, '&amp;') !== false) {
+            $url = str_replace('&amp;', '&', $url);
+        }
 
         // Default key and final URL to the given $url
         $trackableKey = $trackableUrl = $url;
