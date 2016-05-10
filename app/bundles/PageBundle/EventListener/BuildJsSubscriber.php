@@ -37,7 +37,7 @@ class BuildJsSubscriber extends CommonSubscriber
         $pageTrackingUrl = str_replace(
             array('http://', 'https://'),
             '',
-            $router->generate('mautic_page_tracker', [], UrlGeneratorInterface::ABSOLUTE_URL)
+            $router->generate('mautic_page_tracker', array(), UrlGeneratorInterface::ABSOLUTE_URL)
         );
 
         $js = <<<JS

@@ -14,6 +14,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Doctrine\Common\Collections\ArrayCollection;
+use Mautic\EmailBundle\Entity\Email;
 
 /**
  * Class Redirect
@@ -54,6 +55,13 @@ class Redirect extends FormEntity
     private $trackables;
 
     /**
+     * @deprecated to be removed in 2.0
+     *
+     * @var
+     */
+    private $email;
+
+    /**
      * Redirect constructor.
      */
     public function __construct()
@@ -90,6 +98,9 @@ class Redirect extends FormEntity
             ->mappedBy('redirect')
             ->fetchExtraLazy()
             ->build();
+
+        // @deprecated to be removed in 2.0
+        $builder->addNamedField('email', 'integer', 'email_id', true);
     }
 
     /**
@@ -223,6 +234,34 @@ class Redirect extends FormEntity
     public function setTrackables($trackables)
     {
         $this->trackables = $trackables;
+
+        return $this;
+    }
+
+    /**
+     * @deprecated to be removed in 2.0
+     *
+     * @return mixed
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @deprecated to be removed in 2.0
+     *
+     * @param mixed $email
+     *
+     * @return Redirect
+     */
+    public function setEmail($email)
+    {
+        if ($email instanceof Email) {
+            $email = $email->getId();
+        }
+        
+        $this->email = $email;
 
         return $this;
     }
