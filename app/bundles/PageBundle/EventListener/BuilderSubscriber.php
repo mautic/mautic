@@ -28,7 +28,6 @@ class BuilderSubscriber extends CommonSubscriber
     private $shareButtonsRegex = '{sharebuttons}';
     private $emailIsInternalSend = false;
     private $emailEntity = null;
-    private $emailTrackedLinkSettings = array();
 
     /**
      * {@inheritdoc}

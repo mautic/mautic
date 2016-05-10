@@ -1,20 +1,20 @@
 //LeadBundle
 Mautic.leadOnLoad = function (container) {
-    Mousetrap.bind('a', function(e) {
+    Mautic.addKeyboardShortcut('a', 'Quick add a New Contact', function(e) {
         if(mQuery('a.quickadd').length) {
             mQuery('a.quickadd').click();
         } else if (mQuery('a.btn-leadnote-add').length) {
             mQuery('a.btn-leadnote-add').click();
         }
-    });
+    }, 'contact pages');
 
-    Mousetrap.bind('t', function(e) {
+    Mautic.addKeyboardShortcut('t', 'Activate Table View', function(e) {
         mQuery('#table-view').click();
-    });
+    }, 'contact pages');
 
-    Mousetrap.bind('c', function(e) {
+    Mautic.addKeyboardShortcut('c', 'Activate Card View', function(e) {
         mQuery('#card-view').click();
-    });
+    }, 'contact pages');
 
     //Prevent single combo keys from initiating within lead note
     Mousetrap.stopCallback = function(e, element, combo) {

@@ -15,7 +15,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 
 /**
  * Class ChartQuery
- * 
+ *
  * Methods to get the chart data as native queries to get better performance and work with date/time native SQL queries.
  */
 class ChartQuery extends AbstractChart
@@ -89,7 +89,7 @@ class ChartQuery extends AbstractChart
     {
         $this->setDateRange($dateFrom, $dateTo);
         $this->connection = $connection;
-        $this->unit = $unit;
+        $this->unit       = $unit;
     }
 
     /**
@@ -161,21 +161,34 @@ class ChartQuery extends AbstractChart
     {
         if ($dateColumn) {
             $isTime = (in_array($this->unit, array('H', 'i', 's')));
-            // Apply the start date/time if set
-            if ($this->dateFrom) {
-                $dateFrom = clone $this->dateFrom;
-                if ($isTime) $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
-                $query->andWhere('t.' . $dateColumn . ' >= :dateFrom');
-                $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
-            }
 
-            // Apply the end date/time if set
-            if ($this->dateTo) {
+            if ($this->dateFrom && $this->dateTo) {
+                // Between is faster so if we know both dates...
+                $dateFrom = clone $this->dateFrom;
                 $dateTo = clone $this->dateTo;
+                if ($isTime) $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
                 if ($isTime) $dateTo->setTimeZone(new \DateTimeZone('UTC'));
-                $query->andWhere('t.' . $dateColumn . ' <= :dateTo');
+                $query->andWhere('t.' . $dateColumn . ' BETWEEN :dateFrom AND :dateTo');
+                $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
                 $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
+            } else {
+                // Apply the start date/time if set
+                if ($this->dateFrom) {
+                    $dateFrom = clone $this->dateFrom;
+                    if ($isTime) $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
+                    $query->andWhere('t.' . $dateColumn . ' >= :dateFrom');
+                    $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
+                }
+
+                // Apply the end date/time if set
+                if ($this->dateTo) {
+                    $dateTo = clone $this->dateTo;
+                    if ($isTime) $dateTo->setTimeZone(new \DateTimeZone('UTC'));
+                    $query->andWhere('t.' . $dateColumn . ' <= :dateTo');
+                    $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
+                }
             }
+            
         }
     }
 
@@ -248,9 +261,6 @@ class ChartQuery extends AbstractChart
         $query->from(MAUTIC_TABLE_PREFIX . $table, 't')
             ->orderBy($dateConstruct, 'ASC');
 
-        // Count only with dates which are not empty
-        $query->andWhere('t.' . $column . ' IS NOT NULL');
-
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $column);
 
@@ -298,32 +308,62 @@ class ChartQuery extends AbstractChart
      */
     public function completeTimeData($rawData)
     {
-        $data    = array();
-        $oneUnit = $this->getUnitInterval();
-        $limit   = $this->countAmountFromDateRange($this->unit);
+        $data         = array();
+        $oneUnit      = $this->getUnitInterval();
+        $limit        = $this->countAmountFromDateRange($this->unit);
         $previousDate = clone $this->dateFrom;
-        $previousDate->setTimezone(new \DateTimeZone("UTC"));
+        $utcTz        = new \DateTimeZone("UTC");
+
+        if ($this->unit === 'Y') {
+            $previousDate->modify('first day of January');
+        } elseif ($this->unit == 'm') {
+            $previousDate->modify('first day of this month');
+        } elseif ($this->unit === 'W') {
+            $previousDate->modify('Monday this week');
+        }
 
         // Convert data from DB to the chart.js format
         for ($i = 0; $i < $limit; $i++) {
 
             $nextDate = clone $previousDate;
-            $nextDate->setTimezone(new \DateTimeZone("UTC"));
-            $nextDate->add($oneUnit);
 
-            foreach ($rawData as $key => $item) {
-                /**
-                 * PHP DateTime cannot parse the Y W (ex 2016 09)
-                 * format, so we transform it into d-M-Y.
-                 */
-                if ($this->unit === 'W') {
-                    list($year, $week)  = explode(' ', $item['date']);
-                    $newDate = new \DateTime();
-                    $newDate->setISODate($year, $week);
-                    $item['date'] = $newDate->format('d-M-Y');
+            if ($this->unit === 'm') {
+                $nextDate->modify('first day of next month');
+            } elseif ($this->unit === 'W') {
+                $nextDate->modify('Monday next week');
+            }  else {
+                $nextDate->add($oneUnit);
+            }
+
+            foreach ($rawData as $key => &$item) {
+                if (!isset($item['date_comparison'])) {
+                    /**
+                     * PHP DateTime cannot parse the Y W (ex 2016 09)
+                     * format, so we transform it into d-M-Y.
+                     */
+                    if ($this->unit === 'W' && $this->isMysql()) {
+                        list($year, $week) = explode(' ', $item['date']);
+                        $newDate = new \DateTime();
+                        $newDate->setISODate($year, $week);
+                        $item['date'] = $newDate->format('d-M-Y');
+                        unset($newDate);
+                    }
+
+                    // Data from the database will always in UTC
+                    $itemDate = new \DateTime($item['date'], $utcTz);
+
+                    if (!in_array($this->unit, array('H', 'i', 's'))) {
+                        // Hours do not matter so let's reset to 00:00:00 for date comparison
+                        $itemDate->setTime(0, 0, 0);
+                    } else {
+                        // Convert to the timezone used for comparison
+                        $itemDate->setTimezone($this->timezone);
+                    }
+
+                    $item['date_comparison'] = $itemDate;
+                } else {
+                    $itemDate = $item['date_comparison'];
                 }
-
-                $itemDate = new \DateTime($item['date'], new \DateTimeZone("UTC"));
 
                 // Place the right suma is between the time unit and time unit +1
                 if (isset($item['count']) && $itemDate >= $previousDate && $itemDate < $nextDate) {
@@ -349,7 +389,7 @@ class ChartQuery extends AbstractChart
                 $data[$i] = 0;
             }
 
-            $previousDate->add($oneUnit);
+            $previousDate = $nextDate;
         }
 
         return $data;

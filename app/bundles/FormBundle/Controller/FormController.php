@@ -566,7 +566,7 @@ class FormController extends CommonFormController
                                 $alias = $model->cleanAlias($entity->getName(), '', 10);
                                 $entity->setAlias($alias);
                             }
-                            
+
                             if (!$entity->getId()) {
                                 // Set timestamps because this is a new clone
                                 $model->setTimestamps($entity, true, false);
@@ -690,6 +690,12 @@ class FormController extends CommonFormController
 
                 $id    = $formField->getId();
                 $field = $formField->convertToArray();
+
+                if (!$id) {
+                    // Cloned entity
+                    $id = $field['id'] = $field['sessionId'] = 'new' . hash('sha1', uniqid(mt_rand()));
+                }
+
                 unset($field['form']);
 
                 if (isset($customComponents['fields'][$field['type']])) {
@@ -731,6 +737,11 @@ class FormController extends CommonFormController
 
                 $id     = $formAction->getId();
                 $action = $formAction->convertToArray();
+
+                if (!$id) {
+                    // Cloned entity so use a random Id instead
+                    $action['id'] = $id = 'new' . hash('sha1', uniqid(mt_rand()));
+                }
                 unset($action['form']);
 
                 $modifiedActions[$id] = $action;

@@ -84,10 +84,10 @@
     width: 30px;
 }
 
-.dashboard-widgets .chart-wrapper {
+.chart-wrapper {
     position: relative;
 }
-.dashboard-widgets .legend {
+.chart-wrapper .legend {
     background: #000;
     opacity: 0;
     position: absolute;
@@ -99,19 +99,19 @@
     color: #fff;
     -webkit-transition: all 0.3s ease-in-out;
 }
-.dashboard-widgets .card:hover .legend {
+.chart-wrapper:hover .legend {
     opacity: 0.8;
 }
-.dashboard-widgets .legend ul {
+.chart-wrapper .legend ul {
     list-style: none;
     margin: 0;
     padding: 5px 0;
 }
-.dashboard-widgets .legend li {
+.chart-wrapper .legend li {
     margin: 0 10px;
     padding: 5px 0;
 }
-.dashboard-widgets .legend li span {
+.chart-wrapper .legend li span {
     display: inline-block;
     width: 14px;
     height: 8px;
