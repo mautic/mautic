@@ -130,7 +130,7 @@ $view['slots']->set(
                                         <?php echo $view['translator']->trans('mautic.page.pageviews'); ?>
                                     </h5>
                                 </div>
-                                <div class="col-xs-4 va-t text-right">$hasVariants
+                                <div class="col-xs-4 va-t text-right">
                                     <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
                                 </div>
                             </div>
