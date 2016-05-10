@@ -82,7 +82,9 @@ class RedirectModel extends FormModel
         }
 
         // Ensure the URL saved to the database does not have encoded ampersands
-        $url = str_replace('&amp;', '&', $url);
+        while (strpos($url, '&amp;') !== false) {
+            $url = str_replace('&amp;', '&', $url);
+        }
 
         $repo     = $this->getRepository();
         $redirect = $repo->findOneBy(array('url' => $url));
