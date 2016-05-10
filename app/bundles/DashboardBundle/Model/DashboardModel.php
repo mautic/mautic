@@ -17,6 +17,8 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\DashboardEvents;
+use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
 
 /**
  * Class DashboardModel
@@ -171,7 +173,7 @@ class DashboardModel extends FormModel
         if ($widget->getCacheTimeout() == null || $widget->getCacheTimeout() == -1) {
             $widget->setCacheTimeout($this->coreParametersHelper->getParameter('cached_data_timeout'));
         }
-
+        
         // Merge global filter with widget params
         $widgetParams = $widget->getParams();
         $resultParams = array_merge($widgetParams, $filter);
@@ -192,9 +194,20 @@ class DashboardModel extends FormModel
 
         $event = new WidgetDetailEvent($this->translator);
         $event->setWidget($widget);
-        $event->setCacheDir($cacheDir);
+
+        $event->setCacheDir($cacheDir, $this->user->getId());
         $event->setSecurity($this->security);
         $this->dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
+    }
+
+    /**
+     * Clears the temporary widget cache
+     */
+    public function clearDashboardCache()
+    {
+        $cacheDir = $this->coreParametersHelper->getParameter('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
+        $cacheStorage = new CacheStorageHelper($cacheDir, $this->user->getId());
+        $cacheStorage->clear();
     }
 
     /**

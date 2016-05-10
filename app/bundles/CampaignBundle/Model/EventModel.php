@@ -508,7 +508,7 @@ class EventModel extends CommonFormModel
             ) : 0;
         }
 
-        $start = $evaluatedEventCount = $executedEventCount = $rootEvaluatedCount = $rootExecutedCount = 0;
+        $evaluatedEventCount = $executedEventCount = $rootEvaluatedCount = $rootExecutedCount = 0;
 
         // Try to save some memory
         gc_enable();
@@ -530,8 +530,8 @@ class EventModel extends CommonFormModel
         while ($continue) {
             $this->logger->debug('CAMPAIGN: Batch #'.$batchDebugCounter);
 
-            // Get list of all campaign leads
-            $campaignLeads = ($leadId) ? array($leadId) : $campaignRepo->getCampaignLeadIds($campaignId, $start, $limit, true);
+            // Get list of all campaign leads; start is always zero in practice because of $pendingOnly
+            $campaignLeads = ($leadId) ? array($leadId) : $campaignRepo->getCampaignLeadIds($campaignId, 0, $limit, true);
 
             if (empty($campaignLeads)) {
                 // No leads found
@@ -685,8 +685,6 @@ class EventModel extends CommonFormModel
 
                 $leadDebugCounter++;
             }
-
-            $start += $limit;
 
             $this->em->clear('Mautic\LeadBundle\Entity\Lead');
             $this->em->clear('Mautic\UserBundle\Entity\User');

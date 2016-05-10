@@ -114,6 +114,11 @@ return array(
                 'mautic.notification.notifications' => array(
                     'route'     => 'mautic_notification_index',
                     'access'    => array('notification:notifications:viewown', 'notification:notifications:viewother'),
+                    'checks'    => array(
+                        'parameters' => array(
+                            'notification_enabled' => true
+                        )
+                    ),
                     'parent'    => 'mautic.core.channels'
                 )
             )

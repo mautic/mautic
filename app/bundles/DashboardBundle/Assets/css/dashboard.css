@@ -83,11 +83,7 @@
 .dashboard-widgets .card table td:last-child {
     width: 30px;
 }
-@media (max-width: 700px) {
-    .dashboard-widgets .card {
-        width: 100% !important;
-    }
-}
+
 .dashboard-widgets .chart-wrapper {
     position: relative;
 }
@@ -124,3 +120,10 @@
     -webkit-border-radius: 4px;
     border-radius: 4px;
 }
+
+@media (max-width: 700px) {
+    .dashboard-widgets .widget {
+        width: 100% !important;
+    }
+}
+
