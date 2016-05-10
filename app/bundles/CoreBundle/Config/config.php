@@ -359,9 +359,23 @@ return array(
                 'class'     => 'Mautic\CoreBundle\Helper\CacheHelper',
                 'arguments' => 'mautic.factory'
             ),
+            'mautic.helper.templating'           => array(
+                'class'     => 'Mautic\CoreBundle\Helper\TemplatingHelper',
+                'arguments' => array(
+                    'kernel'
+                )
+            ),
             'mautic.helper.theme'                => array(
                 'class'     => 'Mautic\CoreBundle\Helper\ThemeHelper',
-                'arguments' => 'mautic.factory'
+                'arguments' => array(
+                    'mautic.helper.paths',
+                    'mautic.helper.templating'
+                ),
+                'methodCalls' => array(
+                    'setDefaultTheme' => array(
+                        '%mautic.theme%'
+                    )
+                )
             ),
             'mautic.helper.encryption'           => array(
                 'class'     => 'Mautic\CoreBundle\Helper\EncryptionHelper',

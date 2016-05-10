@@ -348,7 +348,10 @@ return array(
                 'class' => 'Mautic\LeadBundle\Model\FieldModel'
             ),
             'mautic.lead.model.list' => array(
-                'class' => 'Mautic\LeadBundle\Model\ListModel'
+                'class' => 'Mautic\LeadBundle\Model\ListModel',
+                'arguments' => array(
+                    'mautic.helper.core_parameters'
+                )
             ),
             'mautic.lead.model.note' => array(
                 'class' => 'Mautic\LeadBundle\Model\NoteModel'

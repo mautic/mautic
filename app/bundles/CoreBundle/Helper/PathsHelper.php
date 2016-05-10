@@ -65,11 +65,11 @@ class PathsHelper
     public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper)
     {
         $this->user = $userHelper->getUser();
-        $this->paths = $coreParametersHelper->getParameter('mautic.paths');
-        $this->theme = $coreParametersHelper->getParameter('mautic.theme');
-        $this->imagePath = $coreParametersHelper->getParameter('mautic.image_path');
-        $this->dashboardImportDir = $coreParametersHelper->getParameter('mautic.dashboard_import_dir');
-        $this->dashboardImportUserDir = $coreParametersHelper->getParameter('mautic.dashboard_import_user_dir');
+        $this->paths = $coreParametersHelper->getParameter('paths');
+        $this->theme = $coreParametersHelper->getParameter('theme');
+        $this->imagePath = $coreParametersHelper->getParameter('image_path');
+        $this->dashboardImportDir = $coreParametersHelper->getParameter('dashboard_import_dir');
+        $this->dashboardImportUserDir = $coreParametersHelper->getParameter('dashboard_import_user_dir');
         $this->kernelCacheDir = $coreParametersHelper->getParameter('kernel.cache_dir');
         $this->kernelLogsDir = $coreParametersHelper->getParameter('kernel.logs_dir');
     }

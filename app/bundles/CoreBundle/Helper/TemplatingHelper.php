@@ -9,8 +9,10 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Mautic\CoreBundle\Templating\TemplateNameParser;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * Class TemplatingHelper
@@ -25,11 +27,11 @@ class TemplatingHelper
     /**
      * TemplatingHelper constructor.
      * 
-     * @param Container $container
+     * @param Kernel $kernel
      */
-    public function __construct(Container $container)
+    public function __construct(Kernel $kernel)
     {
-        $this->container = $container;
+        $this->container = $kernel->getContainer();
     }
 
     /**
@@ -46,5 +48,13 @@ class TemplatingHelper
         }
 
         return $this->container->get('templating');
+    }
+
+    /**
+     * @return TemplateNameParser
+     */
+    public function getTemplateNameParser()
+    {
+        return new TemplateNameParser($this->container->get('kernel'));
     }
 }

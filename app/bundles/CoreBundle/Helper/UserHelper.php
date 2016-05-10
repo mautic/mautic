@@ -31,11 +31,20 @@ class UserHelper
         $this->securityContext = $securityContext;
     }
 
-    public function getUser()
+    /**
+     * @param bool $nullIfGuest
+     * 
+     * @return User|null
+     */
+    public function getUser($nullIfGuest = false)
     {
         $user = $this->securityContext->getToken()->getUser();
 
         if (! $user instanceof User) {
+            if ($nullIfGuest) {
+                return null;
+            }
+            
             $user = new User();
             $user->isGuest = true;
         }

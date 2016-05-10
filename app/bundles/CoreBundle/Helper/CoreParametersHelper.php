@@ -48,6 +48,11 @@ class CoreParametersHelper
         if ($this->parameterBag->has('mautic.' . $name)) {
             return $this->parameterBag->get('mautic.' . $name);
         }
+
+        // Last ditch effort in case we're getting non-mautic params
+        if ($this->parameterBag->has($name)) {
+            return $this->parameterBag->get($name);
+        }
         
         return $default;
     }

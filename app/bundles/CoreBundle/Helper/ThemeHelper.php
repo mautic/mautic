@@ -11,10 +11,9 @@ namespace Mautic\CoreBundle\Helper;
 
 
 use Mautic\CoreBundle\Exception as MauticException;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
-use Mautic\CoreBundle\Templating\TemplateNameParser;
+use Mautic\CoreBundle\Templating\Helper\ThemeHelper as TemplatingThemeHelper;
 
 class ThemeHelper
 {
@@ -29,6 +28,21 @@ class ThemeHelper
     private $themes = array();
 
     /**
+     * @var array
+     */
+    private $steps = array();
+
+    /**
+     * @var string
+     */
+    private $defaultTheme;
+
+    /**
+     * @var TemplatingThemeHelper[]
+     */
+    private $themeHelpers = array();
+
+    /**
      * ThemeHelper constructor.
      * 
      * @param PathsHelper $pathsHelper
@@ -37,10 +51,37 @@ class ThemeHelper
     {
         $this->pathsHelper = $pathsHelper;
         $this->templatingHelper = $templatingHelper;
-        
-        $this->themes = $this->getInstalledThemes();
     }
 
+    /**
+     * @param string $defaultTheme
+     */
+    public function setDefaultTheme($defaultTheme)
+    {
+        $this->defaultTheme = $defaultTheme;
+    }
+
+    /**
+     * @param string $themeName
+     * 
+     * @return ThemeHelper
+     */
+    public function createThemeHelper($themeName)
+    {
+        if ($themeName === 'current') {
+            $themeName = $this->defaultTheme;
+        }
+
+        $themeHelper = new TemplatingThemeHelper($this->pathsHelper, $themeName);
+        
+        return $themeHelper;
+    }
+
+    /**
+     * @param $newName
+     * 
+     * @return string
+     */
     private function getDirectoryName($newName)
     {
         return InputHelper::alphanum($newName, true);
@@ -151,6 +192,7 @@ class ThemeHelper
     public function getOptionalSettings()
     {
         $minors = array();
+
         foreach ($this->steps as $step) {
             foreach ($step->checkOptionalSettings() as $minor) {
                 $minors[] = $minor;
@@ -167,20 +209,26 @@ class ThemeHelper
      */
     public function checkForTwigTemplate($template)
     {
-        $parser = new TemplateNameParser($this->kernel);
+        $parser = $this->templatingHelper->getTemplateNameParser();
+        $templating = $this->templatingHelper->getTemplating();
 
         $template = $parser->parse($template);
 
         $twigTemplate = clone $template;
         $twigTemplate->set('engine', 'twig');
 
-        if ($this->templating->exists($twigTemplate)) {
+        if ($templating->exists($twigTemplate)) {
             return $twigTemplate->getLogicalName();
         }
 
         return $template->getLogicalName();
     }
-    
+
+    /**
+     * @param string $specificFeature
+     * 
+     * @return mixed
+     */
     public function getInstalledThemes($specificFeature = 'all')
     {
         if (empty($this->themes[$specificFeature])) {
@@ -189,28 +237,71 @@ class ThemeHelper
             $finder = new Finder();
             $finder->directories()->depth('0')->ignoreDotFiles(true)->in($dir);
 
-            $themes[$specificFeature] = array();
+            $this->themes[$specificFeature] = array();
             foreach ($finder as $theme) {
                 if (file_exists($theme->getRealPath().'/config.json')) {
                     $config = json_decode(file_get_contents($theme->getRealPath() . '/config.json'), true);
-                }
-                // @deprecated Remove support for theme config.php in 2.0
-                elseif (file_exists($theme->getRealPath() . '/config.php')) {
-                    $config = include $theme->getRealPath() . '/config.php';
                 } else {
                     continue;
                 }
 
                 if ($specificFeature != 'all') {
                     if (isset($config['features']) && in_array($specificFeature, $config['features'])) {
-                        $themes[$specificFeature][$theme->getBasename()] = $config['name'];
+                        $this->themes[$specificFeature][$theme->getBasename()] = $config['name'];
                     }
                 } else {
-                    $themes[$specificFeature][$theme->getBasename()] = $config['name'];
+                    $this->themes[$specificFeature][$theme->getBasename()] = $config['name'];
                 }
             }
         }
 
-        return $themes[$specificFeature];
+        return $this->themes[$specificFeature];
+    }
+
+    /**
+     * @param string $theme
+     * @param bool $throwException
+     * 
+     * @return TemplatingThemeHelper
+     * 
+     * @throws MauticException\FileNotFoundException
+     * @throws MauticException\BadConfigurationException
+     */
+    public function getTheme($theme = 'current', $throwException = false)
+    {
+        if (empty($this->themeHelpers[$theme])) {
+            try {
+                $this->themeHelpers[$theme] = $this->createThemeHelper($theme);
+            } catch (MauticException\FileNotFoundException $e) {
+                if (! $throwException) {
+                    // theme wasn't found so just use the first available
+                    $themes = $this->getInstalledThemes();
+
+                    foreach ($themes as $installedTheme => $name) {
+                        try {
+                            if (isset($this->themeHelpers[$installedTheme])) {
+                                // theme found so return it
+                                return $this->themeHelpers[$installedTheme];
+                            } else {
+                                $this->themeHelpers[$installedTheme] = $this->createThemeHelper($installedTheme);
+                                // found so use this theme
+                                $theme = $installedTheme;
+                                $found = true;
+                                break;
+                            }
+                        } catch (MauticException\FileNotFoundException $e) {
+                            continue;
+                        }
+                    }
+                }
+
+                if (empty($found)) {
+                    // if we get to this point then no template was found so throw an exception regardless
+                    throw $e;
+                }
+            }
+        }
+
+        return $this->themeHelpers[$theme];
     }
 }

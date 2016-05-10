@@ -125,19 +125,7 @@ class MauticFactory
      */
     public function getUser($nullIfGuest = false)
     {
-        $token = $this->getSecurityContext()->getToken();
-        $user  = ($token !== null) ? $token->getUser() : null;
-
-        if (!$user instanceof User) {
-            if ($nullIfGuest) {
-                return null;
-            } else {
-                $user          = new User();
-                $user->isGuest = true;
-            }
-        }
-
-        return $user;
+        return $this->container->get('mautic.helper.user')->getUser($nullIfGuest);
     }
 
     /**
@@ -255,13 +243,7 @@ class MauticFactory
      */
     public function getTemplating()
     {
-        if (defined('IN_MAUTIC_CONSOLE')) {
-            //enter the request scope in order to be use the templating.helper.assets service
-            $this->container->enterScope('request');
-            $this->container->set('request', new Request(), 'request');
-        }
-
-        return $this->container->get('templating');
+        return $this->container->get('mautic.helper.templating')->getTemplating();
     }
 
     /**
@@ -323,12 +305,7 @@ class MauticFactory
      */
     public function getParameter($id, $default = false)
     {
-        if ($id == 'db_table_prefix' && defined('MAUTIC_TABLE_PREFIX')) {
-            //use the constant in case in the installer
-            return MAUTIC_TABLE_PREFIX;
-        }
-
-        return ($this->container->hasParameter('mautic.'.$id)) ? $this->container->getParameter('mautic.'.$id) : $default;
+        return $this->container->get('mautic.helper.core_parameters')->getParameter($id, $default);
     }
 
     /**
@@ -434,57 +411,7 @@ class MauticFactory
      */
     public function getTheme($theme = 'current', $throwException = false)
     {
-        static $themeHelpers = array();
-
-        if (empty($themeHelpers[$theme])) {
-            try {
-                $themeHelpers[$theme] = new ThemeHelper($this, $theme);
-            } catch (\Exception $e) {
-                if (!$throwException) {
-                    if ($e instanceof FileNotFoundException) {
-                        //theme wasn't found so just use the first available
-                        $themes = $this->getInstalledThemes();
-
-                        if ($theme !== 'current') {
-                            //first try the default theme
-                            $default = $this->getParameter('theme');
-                            if (isset($themes[$default])) {
-                                $themeHelpers[$default] = new ThemeHelper($this, $default);
-                                $found                  = true;
-                            }
-                        }
-
-                        if (empty($found)) {
-                            foreach ($themes as $installedTheme => $name) {
-                                try {
-                                    if (isset($themeHelpers[$installedTheme])) {
-                                        //theme found so return it
-                                        return $themeHelpers[$installedTheme];
-                                    } else {
-                                        $themeHelpers[$installedTheme] = new ThemeHelper($this, $installedTheme);
-                                        //found so use this theme
-                                        $theme = $installedTheme;
-                                        $found = true;
-                                        break;
-                                    }
-                                } catch (\Exception $e) {
-                                    continue;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (empty($found)) {
-                    //if we get to this point then no template was found so throw an exception regardless
-                    if ($throwException) {
-                        throw ($e);
-                    }
-                }
-            }
-        }
-
-        return $themeHelpers[$theme];
+        return $this->container->get('mautic.helper.theme')->getTheme($theme, $throwException);
     }
 
     /**
@@ -496,37 +423,7 @@ class MauticFactory
      */
     public function getInstalledThemes($specificFeature = 'all')
     {
-        static $themes = array();
-
-        if (empty($themes[$specificFeature])) {
-            $dir = $this->getSystemPath('themes', true);
-
-            $finder = new Finder();
-            $finder->directories()->depth('0')->ignoreDotFiles(true)->in($dir);
-
-            $themes[$specificFeature] = array();
-            foreach ($finder as $theme) {
-                if (file_exists($theme->getRealPath().'/config.json')) {
-                    $config = json_decode(file_get_contents($theme->getRealPath() . '/config.json'), true);
-                }
-                // @deprecated Remove support for theme config.php in 2.0
-                elseif (file_exists($theme->getRealPath() . '/config.php')) {
-                    $config = include $theme->getRealPath() . '/config.php';
-                } else {
-                    continue;
-                }
-
-                if ($specificFeature != 'all') {
-                    if (isset($config['features']) && in_array($specificFeature, $config['features'])) {
-                        $themes[$specificFeature][$theme->getBasename()] = $config['name'];
-                    }
-                } else {
-                    $themes[$specificFeature][$theme->getBasename()] = $config['name'];
-                }
-            }
-        }
-
-        return $themes[$specificFeature];
+        return $this->container->get('mautic.helper.theme')->getInstalledThemes($specificFeature);
     }
 
     /**
@@ -538,17 +435,7 @@ class MauticFactory
      */
     public function getMailer($cleanSlate = true)
     {
-        if ($this->mailHelper == null) {
-            $this->mailHelper = new MailHelper(
-                $this, $this->container->get('mailer'), array(
-                    $this->getParameter('mailer_from_email') => $this->getParameter('mailer_from_name')
-                )
-            );
-        } else {
-            $this->mailHelper->reset($cleanSlate);
-        }
-
-        return $this->mailHelper;
+        return $this->container->get('mautic.helper.mailer')->getMailer($cleanSlate);
     }
 
     /**
@@ -558,45 +445,7 @@ class MauticFactory
      */
     public function getIpAddressFromRequest()
     {
-        $request   = $this->getRequest();
-        $ipHolders = array(
-            'HTTP_CLIENT_IP',
-            'HTTP_X_FORWARDED_FOR',
-            'HTTP_X_FORWARDED',
-            'HTTP_X_CLUSTER_CLIENT_IP',
-            'HTTP_FORWARDED_FOR',
-            'HTTP_FORWARDED',
-            'REMOTE_ADDR'
-        );
-
-        foreach ($ipHolders as $key) {
-            if ($request->server->get($key)) {
-                $ip = $request->server->get($key);
-
-                if (strpos($ip, ',') !== false) {
-                    // Multiple IPs are present so use the last IP which should be the most reliable IP that last connected to the proxy
-                    $ips = explode(',', $ip);
-                    array_walk($ips, create_function('&$val', '$val = trim($val);'));
-
-                    if ($internalIps = $this->getParameter('do_not_track_internal_ips')) {
-                        $ips = array_diff($ips, $internalIps);
-                    }
-
-                    $ip = end($ips);
-                }
-
-                $ip = trim($ip);
-
-                // Validate IP
-                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-
-                    return $ip;
-                }
-            }
-        }
-
-        // if everything else fails
-        return '127.0.0.1';
+        return $this->container->get('mautic.helper.ip_lookup')->getIpAddressFromRequest();
     }
 
     /**
@@ -608,66 +457,7 @@ class MauticFactory
      */
     public function getIpAddress($ip = null)
     {
-        static $ipAddresses = array();
-
-        if ($ip === null) {
-            $ip = $this->getIpAddressFromRequest();
-        }
-
-        if (empty($ip)) {
-            //assume local as the ip is empty
-            $ip = '127.0.0.1';
-        }
-
-        if (empty($ipAddress[$ip])) {
-            $repo      = $this->getEntityManager()->getRepository('MauticCoreBundle:IpAddress');
-            $ipAddress = $repo->findOneByIpAddress($ip);
-            $saveIp    = ($ipAddress === null);
-
-            if ($ipAddress === null) {
-                $ipAddress = new IpAddress();
-                $ipAddress->setIpAddress($ip);
-            }
-
-            // Ensure the do not track list is inserted
-            $doNotTrack  = $this->getParameter('do_not_track_ips', array());
-            if (!is_array($doNotTrack)) {
-                $doNotTrack = array();
-            }
-            $internalIps = $this->getParameter('do_not_track_internal_ips', array());
-            if (!is_array($internalIps)) {
-                $internalIps = array();
-            }
-            $doNotTrack  = array_merge(array('127.0.0.1', '::1'), $doNotTrack, $internalIps);
-            $ipAddress->setDoNotTrackList($doNotTrack);
-
-            $details = $ipAddress->getIpDetails();
-            if ($ipAddress->isTrackable() && empty($details['city']))  {
-                // Get the IP lookup service
-
-                // Fetch the data
-                /** @var \Mautic\CoreBundle\IpLookup\AbstractLookup $ipLookup */
-                $ipLookup = $this->container->get('mautic.ip_lookup');
-
-                if ($ipLookup) {
-                    $details = $ipLookup->setIpAddress($ip)
-                        ->getDetails();
-
-                    $ipAddress->setIpDetails($details);
-
-                    // Save new details
-                    $saveIp = true;
-                }
-            }
-
-            if ($saveIp) {
-                $repo->saveEntity($ipAddress);
-            }
-
-            $ipAddresses[$ip] = $ipAddress;
-        }
-
-        return $ipAddresses[$ip];
+        return $this->container->get('mautic.helper.ip_lookup')->getIpAddress($ip);
     }
 
     /**
