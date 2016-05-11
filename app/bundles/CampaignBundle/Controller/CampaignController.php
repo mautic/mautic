@@ -261,6 +261,11 @@ class CampaignController extends FormController
             return $this->accessDenied();
         }
 
+        // Init the date range filter form
+        $dateRangeValues  = $this->request->get('daterange', array());
+        $action           = $this->generateUrl('mautic_campaign_action', array('objectAction' => 'view', 'objectId' => $objectId));
+        $dateRangeForm    = $this->get('form.factory')->create('daterange', $dateRangeValues, array('action' => $action));
+
         $campaignLeadRepo = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Lead');
         $eventLogRepo     = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
         $events           = $model->getEventRepository()->getCampaignEvents($entity->getId());
@@ -273,11 +278,19 @@ class CampaignController extends FormController
             $event['percent']  = ($leadCount) ? round($event['logCount'] / $leadCount * 100) : 0;
         }
 
+        $stats = $model->getCampaignMetricsLineChartData(
+            null,
+            new \DateTime($dateRangeForm->get('date_from')->getData()),
+            new \DateTime($dateRangeForm->get('date_to')->getData()),
+            null,
+            array('campaign_id' => $objectId)
+        );
+
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('campaign', $objectId, $entity->getDateAdded());
 
         // Hit count per day for last 30 days
-        $hits = $pageModel->getHitsBarChartData(null, new \DateTime('-30 days'), new \DateTime, null, array('source_id' => $objectId, 'source' => 'campaign'));
+        $hits = $pageModel->getHitsLineChartData(null, new \DateTime('-30 days'), new \DateTime, null, array('source_id' => $objectId, 'source' => 'campaign'));
 
         // Sent emails stats
         $emailsSent = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat')->getIgnoredReadFailed(
@@ -298,7 +311,9 @@ class CampaignController extends FormController
                     'hits'          => $hits,
                     'emailsSent'    => $emailsSent,
                     'leadStats'     => $leadStats,
+                    'stats'         => $stats,
                     'events'        => $events,
+                    'dateRangeForm' => $dateRangeForm->createView(),
                     'campaignLeads' => $this->forward(
                         'MauticCampaignBundle:Campaign:leads',
                         array(

@@ -84,7 +84,7 @@ if (typeof Chart != 'undefined') {
     // configure global Chart options
     Chart.defaults.global.elements.line.borderWidth = 1;
     Chart.defaults.global.elements.point.radius = 2;
-    Chart.defaults.global.legend.labels.boxWidth = 20;
+    Chart.defaults.global.legend.labels.boxWidth = 12;
     Chart.defaults.global.maintainAspectRatio = false;
 }
 
