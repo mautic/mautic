@@ -891,26 +891,6 @@ class PageModel extends FormModel
     }
 
     /**
-     * Get bar chart data of hits
-     *
-     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     * @param string   $dateFormat
-     * @param array    $filter
-     *
-     * @return array
-     */
-    public function getHitsBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
-    {
-        $chart     = new BarChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
-        $chartData = $query->fetchTimeData('page_hits', 'date_hit', $filter);
-        $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.field.hits'), $chartData);
-        return $chart->render();
-    }
-
-    /**
      * Get line chart data of hits
      *
      * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}

@@ -261,9 +261,6 @@ class PageController extends FormController
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('page', $activePage->getId(), $activePage->getDateAdded());
 
-        // Hit count per day for last 30 days
-        $last30 = $model->getHitsBarChartData('d', new \DateTime('-30 days'), new \DateTime, null, array('page_id' => $activePage->getId()));
-
         $pageviews = $model->getHitsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),
@@ -309,17 +306,14 @@ class PageController extends FormController
                     'hits'      => array(
                         'total'  => $activePage->getHits(),
                         'unique' => $activePage->getUniqueHits()
-                    ),
-                    'newVsReturning' => $model->getNewVsReturningPieChartData(new \DateTime('-30 days'), new \DateTime, array('page_id' => $objectId)),
-                    'dwellTime' => $model->getDwellTimesPieChartData(new \DateTime('-30 days'), new \DateTime, array('page_id' => $objectId))
+                    )
                 ),
                 'abTestResults' => $abTestResults,
                 'security'      => $security,
                 'pageUrl'       => $model->generateUrl($activePage, true),
                 'previewUrl'    => $this->generateUrl('mautic_page_preview', array('id' => $objectId), true),
                 'logs'          => $logs,
-                'dateRangeForm' => $dateRangeForm->createView(),
-                'last30'        => $last30
+                'dateRangeForm' => $dateRangeForm->createView()
             ),
             'contentTemplate' => 'MauticPageBundle:Page:details.html.php',
             'passthroughVars' => array(
