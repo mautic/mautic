@@ -8,7 +8,7 @@
  */
 ?>
 
-<div class="card" style="height: <?php echo !empty($widget->getHeight()) ? ($widget->getHeight() - 10) . 'px' : '300px' ?>">
+<div class="card" style="height: <?php echo ($widget->getHeight() ? ($widget->getHeight() - 10) . 'px' : '300px') ?>">
     <div class="card-header">
         <h4><?php echo $widget->getName(); ?></h4>
         <?php if ($widget->getId()) : ?>
@@ -18,9 +18,9 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-right">
                 <li>
-                    <a  href="<?php echo $this->container->get('router')->generate('mautic_dashboard_action', array('objectAction' => 'edit', 'objectId' => $widget->getId())); ?>" 
-                        data-toggle="ajaxmodal" 
-                        data-target="#MauticSharedModal" 
+                    <a  href="<?php echo $this->container->get('router')->generate('mautic_dashboard_action', array('objectAction' => 'edit', 'objectId' => $widget->getId())); ?>"
+                        data-toggle="ajaxmodal"
+                        data-target="#MauticSharedModal"
                         data-header="<?php echo $view['translator']->trans('mautic.dashboard.widget.header.edit'); ?>">
                         <i class="fa fa-pencil"></i> Edit
                     </a>
@@ -38,7 +38,7 @@
                 </li>
                 <li role="separator" class="divider"></li>
                 <li>
-                    <a  href="<?php echo $this->container->get('router')->generate('mautic_dashboard_action', array('objectAction' => 'delete', 'objectId' => $widget->getId())); ?>" 
+                    <a  href="<?php echo $this->container->get('router')->generate('mautic_dashboard_action', array('objectAction' => 'delete', 'objectId' => $widget->getId())); ?>"
                         data-header="<?php echo $view['translator']->trans('mautic.dashboard.widget.header.delete'); ?>"
                         class="remove-widget">
                         <i class="fa fa-remove"></i> Remove
