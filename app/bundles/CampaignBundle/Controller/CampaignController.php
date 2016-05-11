@@ -288,19 +288,7 @@ class CampaignController extends FormController
 
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('campaign', $objectId, $entity->getDateAdded());
-
-        // Hit count per day for last 30 days
-        $hits = $pageModel->getHitsLineChartData(null, new \DateTime('-30 days'), new \DateTime, null, array('source_id' => $objectId, 'source' => 'campaign'));
-
-        // Sent emails stats
-        $emailsSent = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat')->getIgnoredReadFailed(
-            null,
-            array('source_id' => $entity->getId(), 'source' => 'campaign')
-        );
-
-        // Lead count stats
-        $leadStats = $model->getLeadsAddedLineChartData(null, new \DateTime('-30 days'), new \DateTime, null, array('campaign_id' => $objectId));
-
+        
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
@@ -308,9 +296,6 @@ class CampaignController extends FormController
                     'permissions'   => $permissions,
                     'security'      => $security,
                     'logs'          => $logs,
-                    'hits'          => $hits,
-                    'emailsSent'    => $emailsSent,
-                    'leadStats'     => $leadStats,
                     'stats'         => $stats,
                     'events'        => $events,
                     'dateRangeForm' => $dateRangeForm->createView(),

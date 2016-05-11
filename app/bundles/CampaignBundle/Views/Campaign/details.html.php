@@ -103,66 +103,6 @@ $view['slots']->set(
             </div>
             <!--/ stats -->
 
-            <!-- stats -->
-            <!-- <div class="pa-md">
-                <div class="row stat-boxes">
-                    <div class="col-md-4">
-                        <div class="panel ovf-h bg-auto bg-light-xs campaign-stat-charts">
-                            <div class="panel-body box-layout">
-                                <div class="col-xs-8 va-m">
-                                    <h5 class="dark-md fw-sb mb-xs">
-                                        <?php echo $view['translator']->trans('mautic.campaign.campaign.leads'); ?>
-                                    </h5>
-                                </div>
-                                <div class="col-xs-4 va-t text-right">
-                                    <h3 class="text-white dark-sm"><span class="fa fa-user"></span></h3>
-                                </div>
-                            </div>
-                            <div class="pt-0 pl-10 pb-0 pr-10">
-                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $leadStats, 'chartType' => 'simple-bar', 'chartHeight' => 108)); ?>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="panel ovf-h bg-auto bg-light-xs">
-                            <div class="panel-body box-layout pb-0">
-                                <div class="col-xs-8 va-m">
-                                    <h5 class="dark-md fw-sb mb-xs">
-                                        <?php echo $view['translator']->trans(
-                                            'mautic.campaign.campaign.new.returning'
-                                        ); ?>
-                                    </h5>
-                                </div>
-                                <div class="col-xs-4 va-t text-right">
-                                    <h3 class="text-white dark-sm"><span class="fa fa-bookmark-o"></span></h3>
-                                </div>
-                            </div>
-                            <div class="text-center">
-                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $emailsSent, 'chartType' => 'pie', 'chartHeight' => 93)); ?>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="panel ovf-h bg-auto bg-light-xs campaign-stat-charts">
-                            <div class="panel-body box-layout">
-                                <div class="col-xs-8 va-m">
-                                    <h5 class="dark-md fw-sb mb-xs">
-                                        <?php echo $view['translator']->trans('mautic.campaign.campaign.pageviews'); ?>
-                                    </h5>
-                                </div>
-                                <div class="col-xs-4 va-t text-right">
-                                    <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
-                                </div>
-                            </div>
-                            <div class="pt-0 pl-10 pb-0 pr-10">
-                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $hits, 'chartType' => 'simple-bar', 'chartHeight' => 93)); ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
-            <!--/ stats -->
-
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
                 <li class="active">
