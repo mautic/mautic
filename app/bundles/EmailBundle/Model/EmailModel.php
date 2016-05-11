@@ -103,6 +103,25 @@ class EmailModel extends FormModel
             $entity->setRevision($revision);
         }
 
+        // Ensure links in template content don't have encoded ampersands
+        if ($entity->getTemplate()) {
+            $content = $entity->getContent();
+
+            foreach ($content as $key => $value) {
+                $content[$key] = $this->cleanUrlsInContent($value);
+            }
+
+            $entity->setContent($content);
+        } else {
+            // Ensure links in HTML don't have encoded ampersands
+            $htmlContent = $this->cleanUrlsInContent($entity->getCustomHtml());
+            $entity->setCustomHtml($htmlContent);
+        }
+
+        // Ensure links in PLAIN TEXT don't have encoded ampersands
+        $plainContent = $this->cleanUrlsInContent($entity->getPlainText());
+        $entity->setPlainText($plainContent);
+
         // Reset the variant hit and start date if there are any changes and if this is an A/B test
         // Do it here in addition to the blanket resetVariants call so that it's available to the event listeners
         $changes = $entity->getChanges();
@@ -1457,7 +1476,7 @@ class EmailModel extends FormModel
         $read = $query->fetchCount($readQ);
         $failed = $query->fetchCount($failedQ);
 
-        $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.graph.pie.ignored.read.failed.ignored'), ($sent - $read));
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.graph.pie.ignored.read.failed.ignored'), ($sent - $read - $failed));
         $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.graph.pie.ignored.read.failed.read'), $read);
         $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.graph.pie.ignored.read.failed.failed'), $failed);
 
@@ -1562,5 +1581,30 @@ class EmailModel extends FormModel
         );
 
         return $upcomingEmails;
+    }
+
+    /**
+     * Check all links in content and remove &amp;
+     * This even works with double encoded ampersands
+     *
+     * @param string $content
+     *
+     * @return string
+     */
+    private function cleanUrlsInContent($content)
+    {
+        if (preg_match_all('/((https?|ftps?):\/\/)([a-zA-Z0-9-\.{}]*[a-zA-Z0-9=}]*)(\??)([^\s\"\]]+)?/i', $content, $matches)) {
+            foreach ($matches[0] as $url) {
+                $newUrl = $url;
+
+                while (strpos($newUrl, '&amp;') !== false) {
+                    $newUrl = str_replace('&amp;', '&', $newUrl);
+                }
+
+                $content = str_replace($url, $newUrl, $content);
+            }
+        }
+
+        return $content;
     }
 }

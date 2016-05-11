@@ -15,6 +15,7 @@ use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
 
 /**
  * Class DashboardModel
@@ -156,9 +157,19 @@ class DashboardModel extends FormModel
 
         $event = new WidgetDetailEvent($this->translator);
         $event->setWidget($widget);
-        $event->setCacheDir($cacheDir);
+        $event->setCacheDir($cacheDir, $this->factory->getUser()->getId());
         $event->setSecurity($this->factory->getSecurity());
         $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
+    }
+
+    /**
+     * Clears the temporary widget cache
+     */
+    public function clearDashboardCache()
+    {
+        $cacheDir = $this->factory->getParameter('cached_data_dir', $this->factory->getSystemPath('cache', true));
+        $cacheStorage = new CacheStorageHelper($cacheDir, $this->factory->getUser()->getId());
+        $cacheStorage->clear();
     }
 
     /**
