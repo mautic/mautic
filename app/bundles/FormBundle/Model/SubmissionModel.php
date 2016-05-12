@@ -24,7 +24,7 @@ use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
-use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\PageModel;
 use Monolog\Logger;
@@ -74,7 +74,7 @@ class SubmissionModel extends CommonFormModel
     protected $campaignModel;
 
     /**
-     * @var FieldModel
+     * @var LeadFieldModel
      */
     protected $leadFieldModel;
 
@@ -92,7 +92,7 @@ class SubmissionModel extends CommonFormModel
      * @param PageModel $pageModel
      * @param LeadModel $leadModel
      * @param CampaignModel $campaignModel
-     * @param FieldModel $leadFieldModel
+     * @param LeadFieldModel $leadFieldModel
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -101,7 +101,7 @@ class SubmissionModel extends CommonFormModel
         PageModel $pageModel,
         LeadModel $leadModel,
         CampaignModel $campaignModel,
-        FieldModel $leadFieldModel
+        LeadFieldModel $leadFieldModel
     )
     {
         $this->ipLookupHelper = $ipLookupHelper;

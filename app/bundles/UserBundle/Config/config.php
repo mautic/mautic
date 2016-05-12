@@ -187,7 +187,10 @@ return array(
                 'class' => 'Mautic\UserBundle\Model\RoleModel'
             ),
             'mautic.user.model.user' => array(
-                'class' => 'Mautic\UserBundle\Model\UserModel'
+                'class' => 'Mautic\UserBundle\Model\UserModel',
+                'arguments' => array(
+                    'mautic.helper.mailer'
+                )
             )
         )
     )

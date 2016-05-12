@@ -21,6 +21,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Intl\Intl;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class AbstractCommonModel
@@ -62,7 +63,7 @@ abstract class AbstractCommonModel
     protected $router;
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     protected $translator;
     
@@ -104,9 +105,9 @@ abstract class AbstractCommonModel
     }
 
     /**
-     * @param Translator $translator
+     * @param TranslatorInterface $translator
      */
-    public function setTranslator(Translator $translator)
+    public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }

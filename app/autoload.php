@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/bootstrap.php.cache';
+
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Composer\Autoload\ClassLoader;
 
