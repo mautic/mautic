@@ -27,24 +27,25 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class CategoryModel extends FormModel
 {
     /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
-     */
-    protected $request;
-
-    /**
+     * @deprecated Remove in 2.0
+     *
      * @var MauticFactory
      */
     protected $factory;
+
+    /**
+     * @var null|\Symfony\Component\HttpFoundation\Request
+     */
+    protected $request;
 
     /**
      * CategoryModel constructor.
      *
      * @param RequestStack $requestStack
      */
-    public function __construct(RequestStack $requestStack, MauticFactory $factory)
+    public function __construct(RequestStack $requestStack)
     {
         $this->request = $requestStack->getCurrentRequest();
-        $this->factory = $factory;
     }
 
     public function getRepository()

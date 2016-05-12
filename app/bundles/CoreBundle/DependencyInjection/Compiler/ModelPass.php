@@ -45,6 +45,11 @@ class ModelPass implements CompilerPassInterface
             if ($reflected->hasMethod('setSession')) {
                 $definition->addMethodCall('setSession', array(new Reference('session')));
             }
+            
+            // Temporary, for development purposes
+            if ($reflected->hasProperty('factory')) {
+                $definition->addMethodCall('setFactory', array(new Reference('mautic.factory')));
+            }
         }
     }
 }

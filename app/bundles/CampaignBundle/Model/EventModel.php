@@ -39,6 +39,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 class EventModel extends CommonFormModel
 {
     /**
+     * @deprecated Remove in 2.0
+     * 
+     * @var MauticFactory
+     */
+    protected $factory;
+    
+    /**
      * @var mixed
      */
     protected $batchSleepTime;

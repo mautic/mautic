@@ -11,6 +11,7 @@ namespace Mautic\CoreBundle\Model;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -28,6 +29,18 @@ use Symfony\Component\Intl\Intl;
  */
 abstract class AbstractCommonModel
 {
+    /**
+     * Do not use Factory in Models. There's a couple places where we
+     * still need to in core, but we are working on refactoring. This
+     * is completely temporary.
+     * 
+     * @param MauticFactory $factory
+     */
+    public function setFactory(MauticFactory $factory)
+    {
+        $this->factory = $factory;
+    }
+    
     /**
      * @var \Doctrine\ORM\EntityManager
      */

@@ -37,6 +37,13 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class SubmissionModel extends CommonFormModel
 {
     /**
+     * @deprecated Remove in 2.0
+     *
+     * @var MauticFactory
+     */
+    protected $factory;
+
+    /**
      * @var IpLookupHelper
      */
     protected $ipLookupHelper;
