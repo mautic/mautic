@@ -296,7 +296,13 @@ class TrackableModel extends AbstractCommonModel
             // Replace URLs in content with tokens
             foreach ($content as &$text) {
                 $type = (preg_match('/<a(.*?) href/i', $text)) ? 'html' : 'text';
-                $text = $this->prepareContentWithTrackableTokens($text, $type, $trackableTokens);
+                $text = $this->prepareContentWithTrackableTokens($text, $type);
+            }
+        } elseif (!empty($this->contentReplacements['first_pass'])) {
+            // Replace URLs in content with tokens
+            foreach ($content as &$text) {
+                $type = (preg_match('/<a(.*?) href/i', $text)) ? 'html' : 'text';
+                $text = $this->prepareContentWithTrackableTokens($text, $type);
             }
         }
 
@@ -499,17 +505,17 @@ class TrackableModel extends AbstractCommonModel
         if (preg_match('/^(\{\S+?\})/', $tokenizedHost, $match)) {
             $token = $match[1];
 
-            // Validate that the token is something that can be trackable
-            if (!$this->validateTokenIsTrackable($token, $tokenizedHost)) {
-
-                return false;
-            }
-
             // Tokenized hosts shouldn't use a scheme since the token value should contain it
             if ($scheme = (!empty($urlParts['scheme'])) ? $urlParts['scheme'] : false) {
                 // Token has a schema so let's get rid of it before replacing tokens
                 $this->contentReplacements['first_pass'][$scheme.'://'.$tokenizedHost] = $tokenizedHost;
                 unset($urlParts['scheme']);
+            }
+
+            // Validate that the token is something that can be trackable
+            if (!$this->validateTokenIsTrackable($token, $tokenizedHost)) {
+
+                return false;
             }
 
             $trackableUrl = (!empty($urlParts['query'])) ? $this->contentTokens[$token].'?'.$urlParts['query'] : $this->contentTokens[$token];
@@ -555,7 +561,7 @@ class TrackableModel extends AbstractCommonModel
     {
         // Ensure it's not in the do not track list
         foreach ($this->doNotTrack as $notTrackable) {
-            if (preg_match('/'.$notTrackable.'/i', $url)) {
+            if (preg_match('/'.preg_quote($notTrackable, '/').'/', $url)) {
 
                 return true;
             }
