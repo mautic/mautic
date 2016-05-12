@@ -495,7 +495,7 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
 
     if (selectedVal === 'datetime' || selectedVal === 'date' || selectedVal === 'time') {
         Mautic.activateDateTimeInputs(defaultValueField, selectedVal);
-    } else {
+    } else if (defaultValueField.hasClass('calendar-activated')) {
         defaultValueField.datetimepicker('destroy').removeClass('calendar-activated');
     }
 };
