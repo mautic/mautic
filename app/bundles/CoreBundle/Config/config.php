@@ -470,7 +470,7 @@ return array(
             ),
             // Schema
             'mautic.schema.helper.factory' => array(
-                'class' => 'Maujtic\CoreBundle\Doctrine\Helper\SchemaHelperFactory',
+                'class' => 'Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory',
                 'arguments' => array(
                     'mautic.schema.helper.table',
                     'mautic.schema.helper.index',
