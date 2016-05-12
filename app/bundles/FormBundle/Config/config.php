@@ -203,6 +203,9 @@ return array(
             'mautic.form.model.form' => array(
                 'class' => 'Mautic\FormBundle\Model\FormModel',
                 'arguments' => array(
+                    'request_stack',
+                    'mautic.helper.templating',
+                    'mautic.schema.helper.factory',
                     'mautic.form.model.action',
                     'mautic.form.model.field'
                 )
@@ -210,7 +213,13 @@ return array(
             'mautic.form.model.submission' => array(
                 'class' => 'Mautic\FormBundle\Model\SubmissionModel',
                 'arguments' => array(
-                    'mautic.helper.ip_lookup'
+                    'mautic.helper.ip_lookup',
+                    'mautic.helper.templating',
+                    'mautic.form.model.form',
+                    'mautic.page.model.page',
+                    'mautic.lead.model.lead',
+                    'mautic.campaign.model.campaign',
+                    'mautic.lead.model.field'
                 )
             )
         )

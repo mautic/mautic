@@ -10,6 +10,7 @@
 namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -380,7 +381,7 @@ class ListModel extends FormModel
         );
 
         //get list of custom fields
-        $fields = $this->factory->getModel('lead.field')->getEntities(
+        $fields = $this->em->getRepository('MauticLeadBundle:LeadField')->getEntities(
             array(
                 'filter' => array(
                     'isListable'  => true,
@@ -473,7 +474,7 @@ class ListModel extends FormModel
 
         $id       = $entity->getId();
         $list     = array('id' => $id, 'filters' => $entity->getFilters());
-        $dtHelper = $this->factory->getDate();
+        $dtHelper = new DateTimeHelper;
 
         $batchLimiters = array(
             'dateTime' => $dtHelper->toUtcString()

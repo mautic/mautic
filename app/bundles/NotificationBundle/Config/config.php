@@ -64,7 +64,10 @@ return array(
         ),
         'models' => array(
             'mautic.notification.model.notification' => array(
-                'class' => 'Mautic\NotificationBundle\Model\NotificationModel'
+                'class' => 'Mautic\NotificationBundle\Model\NotificationModel',
+                'arguments' => array(
+                    'mautic.page.model.trackable'
+                )
             )
         )
     ),

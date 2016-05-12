@@ -468,6 +468,32 @@ return array(
                 ),
                 'tag' => 'twig.extension'
             ),
+            // Schema
+            'mautic.scheme.helper.factory' => array(
+                
+            ),
+            'mautic.schema.helper.column' => array(
+                'class' => 'Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper',
+                'arguments' => array(
+                    'database_connection',
+                    'mautic.db_table_prefix'
+                )
+            ),
+            'mautic.schema.helper.index' => array(
+                'class' => 'Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper',
+                'arguments' => array(
+                    'database_connection',
+                    'mautic.db_table_prefix'
+                )
+            ),
+            'mautic.schema.helper.table' => array(
+                'class' => 'Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper',
+                'arguments' => array(
+                    'database_connection',
+                    'mautic.db_table_prefix',
+                    'mautic.schema.helper.column'
+                )
+            ),
         ),
         'models' =>  array(
             'mautic.core.model.auditlog' => array(

@@ -69,7 +69,10 @@ return array(
         ),
         'models' =>  array(
             'mautic.sms.model.sms' => array(
-                'class' => 'Mautic\SmsBundle\Model\SmsModel'
+                'class' => 'Mautic\SmsBundle\Model\SmsModel',
+                'arguments' => array(
+                    'mautic.page.model.trackable'
+                )
             )
         )
     ),

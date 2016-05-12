@@ -184,25 +184,7 @@ class MauticFactory
      */
     public function getSchemaHelper($type, $name = null)
     {
-        static $schemaHelpers = array();
-
-        if (empty($schemaHelpers[$type])) {
-            $className = "\\Mautic\\CoreBundle\\Doctrine\\Helper\\".ucfirst($type).'SchemaHelper';
-            if ($type == "table") {
-                //get the column helper as well
-                $columnHelper         = $this->getSchemaHelper('column');
-                $schemaHelpers[$type] = new $className($this->getDatabase(), MAUTIC_TABLE_PREFIX, $columnHelper);
-            } else {
-                $schemaHelpers[$type] = new $className($this->getDatabase(), MAUTIC_TABLE_PREFIX);
-            }
-
-        }
-
-        if ($name !== null) {
-            $schemaHelpers[$type]->setName($name);
-        }
-
-        return $schemaHelpers[$type];
+        return $this->container->get('mautic.schema.helper.factory')->getSchemaHelper($type, $name);
     }
 
     /**
@@ -319,23 +301,6 @@ class MauticFactory
      */
     public function getDate($string = null, $format = null, $tz = 'local')
     {
-        static $dates;
-
-        if (!empty($string)) {
-            if ($string instanceof \DateTime) {
-                $key = $string->format('U').".$format.$tz";
-            } else {
-                $key = "$string.$format.$tz";
-            }
-
-            if (empty($dates[$key])) {
-                $dates[$key] = new DateTimeHelper($string, $format, $tz);
-            }
-
-            return $dates[$key];
-        }
-
-        //now so generate a new helper
         return new DateTimeHelper($string, $format, $tz);
     }
 

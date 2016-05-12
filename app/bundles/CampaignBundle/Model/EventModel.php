@@ -834,7 +834,6 @@ class EventModel extends CommonFormModel
                     'eventDetails'    => null,
                     'event'           => $event,
                     'lead'            => $lead,
-                    'factory'         => $this->factory, // WHAT??
                     'systemTriggered' => true,
                     'dateScheduled'   => $eventTriggerDate
                 );
@@ -1431,7 +1430,7 @@ class EventModel extends CommonFormModel
                                 : $campaignLeadDates[$lead->getId()];
 
                             // Convert to local DateTime
-                            $grandParentDate = $this->factory->getDate($utcDateString, 'Y-m-d H:i:s', 'UTC')->getLocalDateTime();
+                            $grandParentDate = (new DateTimeHelper($utcDateString))->getLocalDateTime();
 
                             // Non-decision has not taken place yet, so cycle over each associated action to see if timing is right
                             $eventTiming   = array();

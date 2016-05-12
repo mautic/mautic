@@ -121,7 +121,10 @@ return array(
         ),
         'models' =>  array(
             'mautic.plugin.model.plugin' => array(
-                'class' => 'Mautic\PluginBundle\Model\PluginModel'
+                'class' => 'Mautic\PluginBundle\Model\PluginModel',
+                'arguments' => array(
+                    'mautic.lead.model.field'
+                )
             )
         )
     )

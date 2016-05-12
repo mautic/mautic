@@ -9,6 +9,7 @@
 
 namespace Mautic\PointBundle\Model;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Entity\Lead;
@@ -118,12 +119,11 @@ class TriggerModel extends CommonFormModel
             $ipAddress = $this->ipLookupHelper->getIpAddress();
 
             foreach ($events as $event) {
-                $dateTime  = $this->factory->getDate($entity->getDateAdded());
                 $filter = array('force' => array(
                     array(
                         'column' => 'l.date_added',
                         'expr'   => 'lte',
-                        'value'  => $dateTime->toUtcString()
+                        'value'  => (new DateTimeHelper($entity->getDateAdded()))->toUtcString()
                     ),
                     array(
                         'column' => 'l.points',

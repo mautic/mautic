@@ -10,6 +10,7 @@
 namespace Mautic\UserBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Event\StatusChangeEvent;
 use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\UserEvents;
@@ -23,6 +24,16 @@ use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
  */
 class UserModel extends FormModel
 {
+    /**
+     * @var MailHelper
+     */
+    protected $mailHelper;
+    
+    public function __construct(MailHelper $mailHelper)
+    {
+        $this->mailHelper = $mailHelper;
+    }
+
     /**
      * Define statuses that are supported
      *
@@ -241,10 +252,10 @@ class UserModel extends FormModel
      */
     public function sendResetEmail(User $user)
     {
-        $mailer = $this->factory->getMailer();
+        $mailer = $this->mailHelper->getMailer();
 
         $resetToken = $this->getResetToken($user);
-        $resetLink = $this->factory->getKernel()->getContainer()->get('router')->generate('mautic_user_passwordresetconfirm', array('token' => $resetToken), true);
+        $resetLink = $this->router->generate('mautic_user_passwordresetconfirm', array('token' => $resetToken), true);
 
         $mailer->setTo(array($user->getEmail() => $user->getName()));
         $mailer->setSubject($this->translator->trans('mautic.user.user.passwordreset.subject'));
@@ -308,7 +319,7 @@ class UserModel extends FormModel
                 $this->getRepository()->saveEntity($this->user);
 
                 if ($this->dispatcher->hasListeners(UserEvents::STATUS_CHANGE)) {
-                    $event = new StatusChangeEvent($this->factory);
+                    $event = new StatusChangeEvent($this->user);
                     $this->dispatcher->dispatch(UserEvents::STATUS_CHANGE, $event);
                 }
             }

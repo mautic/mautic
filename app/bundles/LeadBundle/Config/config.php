@@ -574,7 +574,10 @@ return array(
                 )
             ),
             'mautic.lead.model.field' => array(
-                'class' => 'Mautic\LeadBundle\Model\FieldModel'
+                'class' => 'Mautic\LeadBundle\Model\FieldModel',
+                'arguments' => array(
+                    'mautic.schema.helper.factory'
+                )
             ),
             'mautic.lead.model.list' => array(
                 'class' => 'Mautic\LeadBundle\Model\ListModel',

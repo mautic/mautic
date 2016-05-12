@@ -11,6 +11,7 @@ namespace Mautic\CampaignBundle\Model;
 
 use Doctrine\ORM\PersistentCollection;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
@@ -869,7 +870,7 @@ class CampaignModel extends CommonFormModel
         $lists = $repo->getCampaignListIds($campaign->getId());
 
         $batchLimiters = array(
-            'dateTime' => $this->factory->getDate()->toUtcString()
+            'dateTime' => (new DateTimeHelper())->toUtcString()
         );
 
         if (count($lists)) {

@@ -12,6 +12,7 @@ namespace Mautic\EmailBundle\Model;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
@@ -30,6 +31,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -44,6 +46,11 @@ class EmailModel extends FormModel
      * @var IpLookupHelper
      */
     protected $ipLookupHelper;
+
+    /**
+     * @var ThemeHelper
+     */
+    protected $themeHelper;
 
     /**
      * @var Mailbox
@@ -66,21 +73,38 @@ class EmailModel extends FormModel
     protected $pageTrackableModel;
 
     /**
+     * @var UserModel
+     */
+    protected $userModel;
+
+    /**
      * EmailModel constructor.
      * 
      * @param IpLookupHelper $ipLookupHelper
+     * @param ThemeHelper $themeHelper
      * @param Mailbox $mailboxHelper
      * @param MailHelper $mailHelper
      * @param LeadModel $leadModel
      * @param TrackableModel $pageTrackableModel
+     * @param UserModel $userModel
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, Mailbox $mailboxHelper, MailHelper $mailHelper, LeadModel $leadModel, TrackableModel $pageTrackableModel)
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        ThemeHelper $themeHelper,
+        Mailbox $mailboxHelper,
+        MailHelper $mailHelper,
+        LeadModel $leadModel,
+        TrackableModel $pageTrackableModel,
+        UserModel $userModel
+    )
     {
         $this->ipLookupHelper = $ipLookupHelper;
+        $this->themeHelper = $themeHelper;
         $this->mailboxHelper = $mailboxHelper;
         $this->mailHelper = $mailHelper;
         $this->leadModel = $leadModel;
         $this->pageTrackableModel = $pageTrackableModel;
+        $this->userModel = $userModel;
     }
 
     /**
@@ -379,7 +403,7 @@ class EmailModel extends FormModel
             }
         }
 
-        $readDateTime = $this->factory->getDate();
+        $readDateTime = new DateTimeHelper;
         $stat->setLastOpened($readDateTime->getDateTime());
 
         $lead = $stat->getLead();
@@ -839,7 +863,7 @@ class EmailModel extends FormModel
             //used to house slots so they don't have to be fetched over and over for same template
             $slots = array();
             if ($template = $email->getTemplate()) {
-                $slots[$template] = $this->factory->getTheme($template)->getSlots('email');
+                $slots[$template] = $this->themeHelper->getTheme($template)->getSlots('email');
             }
 
             //store the settings of all the variants in order to properly disperse the emails
@@ -869,7 +893,7 @@ class EmailModel extends FormModel
                                 if (isset($slots[$template])) {
                                     $useSlots = $slots[$template];
                                 } else {
-                                    $slots[$template] = $this->factory->getTheme($template)->getSlots('email');
+                                    $slots[$template] = $this->themeHelper->getTheme($template)->getSlots('email');
                                     $useSlots         = $slots[$template];
                                 }
                             }
@@ -1218,7 +1242,6 @@ class EmailModel extends FormModel
             }
 
             if (!isset($user['email'])) {
-                /** @var \Mautic\UserBundle\Model\UserModel $model */
                 $userEntity        = $this->userModel->getEntity($id);
                 $user['email']     = $userEntity->getEmail();
                 $user['firstname'] = $userEntity->getFirstName();
@@ -1291,13 +1314,12 @@ class EmailModel extends FormModel
      * Remove email from DNC list
      *
      * @param $email
+     *
+     * @deprecated Use LeadModel::removeDncForEmail instead
      */
     public function removeDoNotContact($email)
     {
-        $repo = $this->getRepository();
-
-        $repo->setFactory($this->factory);
-        $repo->removeFromDoNotEmailList($email);
+        $this->leadModel->removeDncForEmail($email);
     }
 
     /**
