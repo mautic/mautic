@@ -268,13 +268,6 @@ class HitRepository extends CommonRepository
         return (int) $result['visitors'];
     }
 
-    private function log($message){
-        $fp = fopen('data.txt', 'a+');
-        fwrite($fp, $message." \n\r");
-        fclose($fp);
-    }
-    
-    
     /**
      * Get the latest hit
      *
@@ -301,8 +294,6 @@ class HitRepository extends CommonRepository
                     ->setParameter('url_'.$k, $u);
             }
         }
-
-        $this->log(" ".print_r($sq->getSQL(), true));
         
         $result = $sq->execute()->fetch();
 

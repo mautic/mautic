@@ -17,13 +17,6 @@ use Mautic\PageBundle\Entity\Page;
  */
 class PointActionHelper
 {
-    
-    
-    private static function log($message){
-        $fp = fopen('data.txt', 'a+');
-        fwrite($fp, $message." \n\r");
-        fclose($fp);
-    }
 
     /**
      * @param MauticFactory $factory
@@ -34,9 +27,6 @@ class PointActionHelper
      */
     public static function validatePageHit($factory, $eventDetails, $action)
     {
-        
-        self::log("validatePageHit :: ".print_r($action, true));
-        
         $pageHit = $eventDetails->getPage();
 
         if ($pageHit instanceof Page) {
@@ -68,8 +58,6 @@ class PointActionHelper
      */
     public static function validateUrlHit($factory, $eventDetails, $action)
     {
-        self::log("validateUrlHit :: ".var_dump($action));
-        
         $changePoints   = array();
         $url            = $eventDetails->getUrl();
         $limitToUrl     = html_entity_decode(trim($action['properties']['page_url']));
@@ -81,13 +69,9 @@ class PointActionHelper
 
         $hitRepository  = $factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
         $lead           = $eventDetails->getLead();
-        
-        self::log("action properties :: ".print_r($action['properties'], true));
 
         if (isset($action['properties']['first_time']) && $action['properties']['first_time'] === true) {
-            
-            self::log("validateUrlHit :: fisttime :: ".$action['id']);
-            
+
             $hitStats = $hitRepository->getDwellTimes(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
             if (isset($hitStats['count']) && $hitStats['count']) {
                 $changePoints['first_time'] = false;
@@ -97,9 +81,7 @@ class PointActionHelper
         }
 
         if ($action['properties']['accumulative_time']) {
-            
-            self::log("validateUrlHit :: accumulative_time :: ".$action['id']);
-            
+
             if (!isset($hitStats)) {
                 $hitStats = $hitRepository->getDwellTimes(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
             }
@@ -111,9 +93,7 @@ class PointActionHelper
         }
 
         if ($action['properties']['page_hits']) {
-            
-            self::log("validateUrlHit :: page_hits :: ".$action['id']);
-            
+
             if (!isset($hitStats)) {
                 $hitStats = $hitRepository->getDwellTimes(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
             }
@@ -125,9 +105,7 @@ class PointActionHelper
         }
 
         if ($action['properties']['returns_within']) {
-            
-            self::log("validateUrlHit :: returns_within :: ".$action['id']);
-            
+
             $latestHit = $hitRepository->getLatestHit(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
             $latestPlus = clone $latestHit;
             $latestPlus->add(new \DateInterval('PT' . $action['properties']['returns_within'] . 'S'));
@@ -140,35 +118,21 @@ class PointActionHelper
         }
 
         if ($action['properties']['returns_after']) {
-            
-            self::log("validateUrlHit :: returns_after :: ".$action['id']. " :: ".$action['properties']['returns_after']);
-            
+
             if (!isset($latestHit)) {
-                self::log("validateUrlHit :: return_after 1 :: initatilisation de latestHit");
                 $latestHit = $hitRepository->getLatestHit(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
             }
             $latestPlus = clone $latestHit; // time 
             $latestPlus->add(new \DateInterval('PT' . $action['properties']['returns_after'] . 'S'));
             $now = new \dateTime();
-            
-            self::log("validateUrlHit :: return_after latest :: ". date_format($latestHit, "c"));
-            self::log("validateUrlHit :: return_after latestPlus :: ".date_format($latestPlus, "c"));
-            self::log("validateUrlHit :: return_after now :: ".date_format($now, "c"));
-            
+
            // if ($latestPlus >= $now) { // DE BASE
             if ($latestPlus <= $now) { 
-                self::log("validateUrlHit :: return_after 2 :: latestHit >= now returning TRUE");
                 $changePoints['returns_after'] = true;
             } else {
-                self::log("validateUrlHit :: return_after 3 :: latestHit != now returning FALSE");
                 $changePoints['returns_after'] = false;
             }
         }
-
-        self::log("validateUrlHit :: changepoint :: ".var_dump($changePoints));
-        
-        self::log("validateUrlHit :: in array ".in_array(false, $changePoints));
-        
         // return true only if all configured options are true
         return !in_array(false, $changePoints);
     }

@@ -149,13 +149,9 @@ class PointModel extends CommonFormModel
      */
     public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null)
     {
-
-        $this->log('trigger action : '.$type." :: ".$typeId);
-    	
     	if($type != "api.call") {
         	//only trigger actions for anonymous users
     		if (!$this->security->isAnonymous()) {
-    		    $this->log("trigger action : is anonymous");
     			return;
     		}
     	}
@@ -165,7 +161,6 @@ class PointModel extends CommonFormModel
             $session = $this->factory->getSession();
             $triggeredEvents = $session->get('mautic.triggered.point.actions', array());
             if (in_array($typeId, $triggeredEvents)) {
-                $this->log("trigger action :: event already triggered");
                 return;
             }
             $triggeredEvents[] = $typeId;
@@ -184,7 +179,6 @@ class PointModel extends CommonFormModel
             $lead = $leadModel->getCurrentLead();
 
             if (null === $lead || !$lead->getId()) {
-                $this->log("trigger action no lead");
                 return;
             }
         }
@@ -198,25 +192,19 @@ class PointModel extends CommonFormModel
         $persist = array();
         foreach ($availablePoints as $action) {
             //if it's already been done, then skip it
-            
-            
-            $this->log("getProperties : ".print_r( $action->getProperties(), true));
-            
-            
+
             if (isset($completedActions[$action->getId()]) ){
                 
                if ($action->getType() !== 'url.hit' 
                    || (empty($action->getProperties()['accumulative_time']) 
                                     &&  empty($action->getProperties()['returns_within']) 
                                     && empty($action->getProperties()['returns_after']) ) ) {   
-                    $this->log("trigger action action already applied =>".$action->getId());
                     continue;
                 } 
             }
 
             //make sure the action still exists
             if (!isset($availableActions['actions'][$action->getType()])) {
-                $this->log("trigger action acrtion doesn't exists anymore  => ".$action->getId());
                 continue;
             }
             $settings = $availableActions['actions'][$action->getType()];
@@ -256,8 +244,6 @@ class PointModel extends CommonFormModel
                     }
                 }
                 $pointsChange = $reflection->invokeArgs($this, $pass);
-
-                $this->log("trigger action pointsChange => ".$pointsChange . " :: ".$action->getId());
                 
                 if ($pointsChange) {
                     $delta = $action->getDelta();
@@ -280,22 +266,18 @@ class PointModel extends CommonFormModel
                     $persist[] = $log;
                 }
             } else {
-                $this->log("trigger action action not is_callable => ".$callback);
             }
         }
 
         if (!empty($persist)) {
             $leadModel->saveEntity($lead);
             $this->getRepository()->saveEntities($persist);
-            
-            $this->log("trigger action save entity");
 
             // Detach logs to reserve memory
             $this->em->clear('Mautic\PointBundle\Entity\LeadPointLog');
         } else {
-            $this->log("trigger action nothing to save ");
+
         }
-        
-               $this->log('trigger action END : '.$type." :: ".$typeId);
+
     }
 }
