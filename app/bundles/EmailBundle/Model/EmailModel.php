@@ -1422,12 +1422,12 @@ class EmailModel extends FormModel
 
         if ($flag == 'all' || $flag == 'unsubscribed') {
             $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::UNSUBSCRIBED, $canViewOthers);
-            $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.unsubscribtions'), $data);
+            $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.unsubscribed'), $data);
         }
 
         if ($flag == 'all' || $flag == 'bounced') {
             $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::BOUNCED, $canViewOthers);
-            $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.bounces'), $data);
+            $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.bounced'), $data);
         }
 
         return $chart->render();
