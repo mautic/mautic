@@ -1420,6 +1420,31 @@ class EmailModel extends FormModel
             $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.failed.emails'), $data);
         }
 
+        if ($flag == 'all' || $flag == 'clicked') {
+            $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', array())
+                ->join('t', MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut', 't.redirect_id = cut.redirect_id')
+                ->andWhere('cut.channel = :channel')
+                ->setParameter('channel', 'email');
+
+            if (isset($filter['email_id'])) {
+                if (is_array($filter['email_id'])) {
+                    $q->andWhere('cut.channel_id IN(:channel_id)');
+                    $q->setParameter('channel_id', implode(',', $filter['email_id']));
+                } else {
+                    $q->andWhere('cut.channel_id = :channel_id');
+                    $q->setParameter('channel_id', $filter['email_id']);
+                }
+            }
+
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.clicked'), $data);
+        }
+
         if ($flag == 'all' || $flag == 'unsubscribed') {
             $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::UNSUBSCRIBED, $canViewOthers);
             $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.unsubscribed'), $data);
@@ -1451,9 +1476,7 @@ class EmailModel extends FormModel
             ->setParameter('reason', $reason);
 
         if (!$canViewOthers) {
-            $q->join('t', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = t.channel_id')
-                ->andWhere('e.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+            $this->limitQueryToCreator($q);
         }
 
         return $data = $query->loadAndBuildTimeData($q);
