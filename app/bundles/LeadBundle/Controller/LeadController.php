@@ -358,18 +358,15 @@ class LeadController extends FormController
         $eventTypes   = $event->getEventTypes();
 
         // Get an engagement count
-        $translator     = $this->factory->getTranslator();
-
-        $fromDate       = (new \DateTime('first day of this month 00:00:00'))->modify('-6 months');
-        $toDate         = new \DateTime;
+        $translator  = $this->factory->getTranslator();
+        $fromDate    = (new \DateTime('first day of this month 00:00:00'))->modify('-6 months');
+        $toDate      = new \DateTime;
         $engagements = array();
-        $total          = 0;
+        $events      = array();
 
-        $events = array();
         foreach ($eventsByDate as $eventDate => $dateEvents) {
-            $datetime = \DateTime::createFromFormat('Y-m-d H:i', $eventDate);
+            $datetime = new \DateTime($eventDate);
             if ($datetime > $fromDate) {
-                $total++;
                 $engagements[] = array(
                     'date' => $eventDate,
                     'data' => 1
