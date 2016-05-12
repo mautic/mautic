@@ -642,7 +642,7 @@ class EmailModel extends FormModel
 
         $filter = array(
             'email_id' => $emailIds,
-            'flag'     => 'sent_and_opened_and_failed'
+            'flag'     => 'all'
         );
 
         return $this->getEmailsLineChartData($unit, $dateFrom, $dateTo, null, $filter);
@@ -1391,7 +1391,7 @@ class EmailModel extends FormModel
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = $chart->getChartQuery($this->em->getConnection());
 
-        if ($flag == 'sent_and_opened_and_failed' || $flag == 'sent_and_opened' || !$flag) {
+        if ($flag == 'sent_and_opened_and_failed' || $flag == 'all' || $flag == 'sent_and_opened' || !$flag) {
             $q = $query->prepareTimeDataQuery('email_stats', 'date_sent', $filter);
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
@@ -1400,7 +1400,7 @@ class EmailModel extends FormModel
             $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.sent.emails'), $data);
         }
 
-        if ($flag == 'sent_and_opened_and_failed' || $flag == 'sent_and_opened' || $flag == 'opened') {
+        if ($flag == 'sent_and_opened_and_failed' || $flag == 'all' || $flag == 'sent_and_opened' || $flag == 'opened') {
             $q = $query->prepareTimeDataQuery('email_stats', 'date_read', $filter);
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
@@ -1409,7 +1409,7 @@ class EmailModel extends FormModel
             $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.read.emails'), $data);
         }
 
-        if ($flag == 'sent_and_opened_and_failed' || $flag == 'failed') {
+        if ($flag == 'sent_and_opened_and_failed' || $flag == 'all' || $flag == 'failed') {
             $q = $query->prepareTimeDataQuery('email_stats', 'date_sent', $filter);
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
@@ -1420,7 +1420,43 @@ class EmailModel extends FormModel
             $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.failed.emails'), $data);
         }
 
+        if ($flag == 'all' || $flag == 'unsubscribed') {
+            $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::UNSUBSCRIBED, $canViewOthers);
+            $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.unsubscribtions'), $data);
+        }
+
+        if ($flag == 'all' || $flag == 'bounced') {
+            $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::BOUNCED, $canViewOthers);
+            $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.bounces'), $data);
+        }
+
         return $chart->render();
+    }
+
+    /**
+     * Modifies the line chart query for the DNC
+     *
+     * @param ChartQuery $q
+     * @param array      $filter
+     * @param boolean    $reason
+     * @param boolean    $canViewOthers
+     */
+    public function getDncLineChartDataset(ChartQuery &$query, array $filter, $reason, $canViewOthers)
+    {
+        $dncFilter = isset($filter['email_id']) ? array('channel_id' => $filter['email_id']) : array();
+        $q = $query->prepareTimeDataQuery('lead_donotcontact', 'date_added', $dncFilter);
+        $q->andWhere('t.channel = :channel')
+            ->setParameter('channel', 'email')
+            ->andWhere($q->expr()->eq('t.reason', ':reason'))
+            ->setParameter('reason', $reason);
+
+        if (!$canViewOthers) {
+            $q->join('t', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = t.channel_id')
+                ->andWhere('e.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        return $data = $query->loadAndBuildTimeData($q);
     }
 
     /**
