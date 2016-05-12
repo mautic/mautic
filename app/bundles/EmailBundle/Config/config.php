@@ -259,10 +259,12 @@ return array(
                 'class' => 'Mautic\EmailBundle\Model\EmailModel',
                 'arguments' => array(
                     'mautic.helper.ip_lookup',
+                    'mautic.helper.theme',
                     'mautic.helper.mailbox',
                     'mautic.helper.mailer',
                     'mautic.lead.model.lead',
-                    'mautic.page.model.trackable'
+                    'mautic.page.model.trackable',
+                    'mautic.user.model.user'
                 )
             )
         )
