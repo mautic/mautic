@@ -463,7 +463,7 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
     if (mQuery('#field-templates .'+selectedVal).length) {
         mQuery('#leadfield_properties').html('');
         mQuery('#leadfield_properties').append(mQuery('#field-templates .'+selectedVal).clone(true));
-    } else {
+    } else if (!mQuery('#leadfield_properties .'+selectedVal).length) {
         mQuery('#leadfield_properties').html('');
     }
 
