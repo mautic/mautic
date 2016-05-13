@@ -89,7 +89,7 @@ class ChartQuery extends AbstractChart
     {
         $this->setDateRange($dateFrom, $dateTo);
         $this->connection = $connection;
-        $this->unit       = $unit;
+        $this->unit       = !$unit ? $this->getTimeUnitFromDateRange() : $unit;
     }
 
     /**
@@ -152,12 +152,11 @@ class ChartQuery extends AbstractChart
     /**
      * Apply date filters to the query
      *
-     * @param  QueryBuilder
-     * @param  string
-     * @param  DateTime
-     * @param  DateTime
+     * @param  QueryBuilder $query
+     * @param  string       $dateColumn
+     * @param  string       $tablePrefix
      */
-    public function applyDateFilters(&$query, $dateColumn)
+    public function applyDateFilters(&$query, $dateColumn, $tablePrefix = 't')
     {
         if ($dateColumn) {
             $isTime = (in_array($this->unit, array('H', 'i', 's')));
@@ -168,7 +167,7 @@ class ChartQuery extends AbstractChart
                 $dateTo = clone $this->dateTo;
                 if ($isTime) $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
                 if ($isTime) $dateTo->setTimeZone(new \DateTimeZone('UTC'));
-                $query->andWhere('t.' . $dateColumn . ' BETWEEN :dateFrom AND :dateTo');
+                $query->andWhere($tablePrefix . '.' . $dateColumn . ' BETWEEN :dateFrom AND :dateTo');
                 $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
                 $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
             } else {
@@ -176,7 +175,7 @@ class ChartQuery extends AbstractChart
                 if ($this->dateFrom) {
                     $dateFrom = clone $this->dateFrom;
                     if ($isTime) $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
-                    $query->andWhere('t.' . $dateColumn . ' >= :dateFrom');
+                    $query->andWhere($tablePrefix . '.' . $dateColumn . ' >= :dateFrom');
                     $query->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
                 }
 
@@ -184,7 +183,7 @@ class ChartQuery extends AbstractChart
                 if ($this->dateTo) {
                     $dateTo = clone $this->dateTo;
                     if ($isTime) $dateTo->setTimeZone(new \DateTimeZone('UTC'));
-                    $query->andWhere('t.' . $dateColumn . ' <= :dateTo');
+                    $query->andWhere($tablePrefix . '.' . $dateColumn . ' <= :dateTo');
                     $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
                 }
             }
@@ -230,43 +229,54 @@ class ChartQuery extends AbstractChart
     public function prepareTimeDataQuery($table, $column, $filters = array())
     {
         // Convert time unitst to the right form for current database platform
-        $dbUnit  = $this->translateTimeUnit($this->unit);
         $query   = $this->connection->createQueryBuilder();
+        $query->from(MAUTIC_TABLE_PREFIX . $table, 't');
+
+        $this->modifyTimeDataQuery($query, $column);
+        $this->applyFilters($query, $filters);
+        $this->applyDateFilters($query, $column);
+
+        return $query;
+    }
+
+    /**
+     * Modify database query for fetching the line time chart data
+     *
+     * @param  QueryBuilder $query
+     * @param  string       $column name
+     * @param  string       $tablePrefix
+     */
+    public function modifyTimeDataQuery(&$query, $column, $tablePrefix = 't')
+    {
+        // Convert time unitst to the right form for current database platform
+        $dbUnit  = $this->translateTimeUnit($this->unit);
         $limit   = $this->countAmountFromDateRange($this->unit);
         $groupBy = '';
 
         // Postgres and MySql are handeling date/time SQL funciton differently
         if ($this->isPostgres()) {
             if (isset($filters['groupBy'])) {
-                $count = 'COUNT(DISTINCT(t.' . $filters['groupBy'] . '))';
+                $count = 'COUNT(DISTINCT(' . $tablePrefix . '.' . $filters['groupBy'] . '))';
                 unset($filters['groupBy']);
             } else {
                 $count = 'COUNT(*)';
             }
-            $dateConstruct = 'DATE_TRUNC(\'' . $dbUnit . '\', t.' . $column . ')';
+            $dateConstruct = 'DATE_TRUNC(\'' . $dbUnit . '\', ' . $tablePrefix . '.' . $column . ')';
             $query->select($dateConstruct . ' AS date, ' . $count . ' AS count')
                 ->groupBy($dateConstruct);
         } elseif ($this->isMysql()) {
             if (isset($filters['groupBy'])) {
-                $groupBy = ', t.' . $filters['groupBy'];
+                $groupBy = ', ' . $tablePrefix . '.' . $filters['groupBy'];
                 unset($filters['groupBy']);
             }
-            $dateConstruct = 'DATE_FORMAT(t.' . $column . ', \'' . $dbUnit . '\')';
+            $dateConstruct = 'DATE_FORMAT(' . $tablePrefix . '.' . $column . ', \'' . $dbUnit . '\')';
             $query->select($dateConstruct . ' AS date, COUNT(*) AS count')
                 ->groupBy($dateConstruct . $groupBy);
         } else {
             throw new \UnexpectedValueException(__CLASS__ . '::' . __METHOD__ . ' supports only MySql a PosgreSQL database platforms.');
         }
 
-        $query->from(MAUTIC_TABLE_PREFIX . $table, 't')
-            ->orderBy($dateConstruct, 'ASC');
-
-        $this->applyFilters($query, $filters);
-        $this->applyDateFilters($query, $column);
-
-        $query->setMaxResults($limit);
-
-        return $query;
+        $query->orderBy($dateConstruct, 'ASC')->setMaxResults($limit);
     }
 
     /**
