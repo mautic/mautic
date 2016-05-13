@@ -560,17 +560,27 @@ class EmailModel extends FormModel
 
         $lists     = $email->getLists();
         $listCount = count($lists);
-        $combined  = array(0, 0, 0);
+        $combined  = array(0, 0, 0, 0, 0, 0);
 
         $chart = new BarChart(array(
             $this->translator->trans('mautic.email.sent'),
             $this->translator->trans('mautic.email.read'),
-            $this->translator->trans('mautic.email.failed')
+            $this->translator->trans('mautic.email.failed'),
+            $this->translator->trans('mautic.email.clicked'),
+            $this->translator->trans('mautic.email.unsubscribed'),
+            $this->translator->trans('mautic.email.bounced')
         ));
 
         if ($listCount) {
             /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
             $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
+
+            /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
+            $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
+
+            /** @var \Mautic\PageBundle\Entity\TrackableRepository $trackableRepo */
+            $trackableRepo = $this->em->getRepository('MauticPageBundle:Trackable');
+
             $key = ($listCount > 1) ? 1 : 0;
 
             foreach ($lists as $l) {
@@ -583,12 +593,24 @@ class EmailModel extends FormModel
                 $failedCount = $statRepo->getFailedCount($emailIds, $l->getId());
                 $combined[2] += $failedCount;
 
+                $clickCount = $trackableRepo->getCount('email', $emailIds, $l->getId());
+                $combined[3] += $clickCount;
+
+                $unsubscribedCount = $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, $l->getId());
+                $combined[4] += $unsubscribedCount;
+
+                $bouncedCount = $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, $l->getId());
+                $combined[5] += $bouncedCount;
+
                 $chart->setDataset(
                     $l->getName(),
                     array(
                         $sentCount,
                         $readCount,
-                        $failedCount
+                        $failedCount,
+                        $clickCount,
+                        $unsubscribedCount,
+                        $bouncedCount
                     ),
                     $key
                 );

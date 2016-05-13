@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Helper\Chart;
 
+use Mautic\CoreBundle\Helper\Chart\AbstactChart;
 use Mautic\CoreBundle\Helper\Chart\ChartInterface;
 
 /**
@@ -16,7 +17,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartInterface;
  *
  * Line chart requires the same data as Bar chart
  */
-class LineChart implements ChartInterface
+class LineChart extends AbstractChart implements ChartInterface
 {
         /**
      * Configurable date format

@@ -78,9 +78,9 @@ class BarChart extends AbstractChart implements ChartInterface
 
         return array(
             'fill' => true,
-            'backgroundColor'           => $color->toRgba(0.5),
+            'backgroundColor'           => $color->toRgba(0.7),
             'borderColor'               => $color->toRgba(0.8),
-            'pointHoverBackgroundColor' => $color->toRgba(0.75),
+            'pointHoverBackgroundColor' => $color->toRgba(0.9),
             'pointHoverBorderColor'     => $color->toRgba(1)
         );
     }
