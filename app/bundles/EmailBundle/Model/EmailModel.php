@@ -23,6 +23,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -560,53 +561,52 @@ class EmailModel extends FormModel
 
         $lists     = $email->getLists();
         $listCount = count($lists);
+        $combined  = array(0, 0, 0);
 
-        $combined = $this->translator->trans('mautic.email.lists.combined');
-        $datasets = array(
-            $combined => array(0, 0, 0)
-        );
-
-        $labels = array(
+        $chart = new BarChart(array(
             $this->translator->trans('mautic.email.sent'),
             $this->translator->trans('mautic.email.read'),
             $this->translator->trans('mautic.email.failed')
-        );
+        ));
 
         if ($listCount) {
             /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
             $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
+            $key = ($listCount > 1) ? 1 : 0;
 
             foreach ($lists as $l) {
-                $name = $l->getName();
-
                 $sentCount = $statRepo->getSentCount($emailIds, $l->getId());
-                $datasets[$combined][0] += $sentCount;
+                $combined[0] += $sentCount;
 
                 $readCount = $statRepo->getReadCount($emailIds, $l->getId());
-                $datasets[$combined][1] += $readCount;
+                $combined[1] += $readCount;
 
                 $failedCount = $statRepo->getFailedCount($emailIds, $l->getId());
-                $datasets[$combined][2] += $failedCount;
+                $combined[2] += $failedCount;
 
-                $datasets[$name] = array();
-
-                $datasets[$name] = array(
-                    $sentCount,
-                    $readCount,
-                    $failedCount
+                $chart->setDataset(
+                    $l->getName(),
+                    array(
+                        $sentCount,
+                        $readCount,
+                        $failedCount
+                    ),
+                    $key
                 );
 
-                $datasets[$name]['datasetKey'] = $l->getId();
+                $key++;
             }
         }
 
-        if ($listCount === 1) {
-            unset($datasets[$combined]);
+        if ($listCount > 1) {
+            $chart->setDataset(
+                $this->translator->trans('mautic.email.lists.combined'),
+                $combined,
+                0
+            );
         }
 
-        $data = GraphHelper::prepareBarGraphData($labels, $datasets);
-
-        return $data;
+        return $chart->render();
     }
 
     /**
