@@ -118,6 +118,9 @@ return array(
             'mautic.email.pointbundle.subscriber'    => array(
                 'class' => 'Mautic\EmailBundle\EventListener\PointSubscriber'
             ),
+            'mautic.email.stagebundle.subscriber'    => array(
+                'class' => 'Mautic\EmailBundle\EventListener\StageSubscriber'
+            ),
             'mautic.email.calendarbundle.subscriber' => array(
                 'class' => 'Mautic\EmailBundle\EventListener\CalendarSubscriber'
             ),

@@ -35,7 +35,7 @@ return array(
         'main' => array(
             'mautic.stages.menu.root' => array(
                 'id'        => 'mautic_stages_root',
-                'iconClass' => 'fa-scale',
+                'iconClass' => 'fa-tachometer',
                 'access'    => array('stage:stages:view'),
                 'priority'  => 30,
                 'children'  => array(

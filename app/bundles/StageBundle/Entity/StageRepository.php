@@ -52,7 +52,7 @@ class StageRepository extends CommonRepository
     public function getPublishedByType($type)
     {
         $q = $this->createQueryBuilder('p')
-            ->select('partial p.{id, type, name, delta, properties}')
+            ->select('partial p.{id, type, name, properties}')
             ->setParameter('type', $type);
 
         //make sure the published up and down dates are good

@@ -110,6 +110,9 @@ return array(
             'mautic.form.pointbundle.subscriber'    => array(
                 'class' => 'Mautic\FormBundle\EventListener\PointSubscriber'
             ),
+            'mautic.form.stagebundle.subscriber'    => array(
+                'class' => 'Mautic\FormBundle\EventListener\StageSubscriber'
+            ),
             'mautic.form.reportbundle.subscriber'   => array(
                 'class' => 'Mautic\FormBundle\EventListener\ReportSubscriber'
             ),

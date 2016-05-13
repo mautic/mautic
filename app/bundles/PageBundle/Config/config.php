@@ -99,6 +99,9 @@ return array(
             'mautic.page.pointbundle.subscriber'    => array(
                 'class' => 'Mautic\PageBundle\EventListener\PointSubscriber'
             ),
+            'mautic.page.stagebundle.subscriber'    => array(
+                'class' => 'Mautic\PageBundle\EventListener\StageSubscriber'
+            ),
             'mautic.page.reportbundle.subscriber'   => array(
                 'class' => 'Mautic\PageBundle\EventListener\ReportSubscriber'
             ),

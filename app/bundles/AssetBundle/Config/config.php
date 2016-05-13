@@ -73,6 +73,9 @@ return array(
             'mautic.asset.pointbundle.subscriber' => array(
                 'class' => 'Mautic\AssetBundle\EventListener\PointSubscriber'
             ),
+            'mautic.asset.stagebundle.subscriber' => array(
+                'class' => 'Mautic\AssetBundle\EventListener\StageSubscriber'
+            ),
             'mautic.asset.formbundle.subscriber' => array(
                 'class' => 'Mautic\AssetBundle\EventListener\FormSubscriber'
             ),

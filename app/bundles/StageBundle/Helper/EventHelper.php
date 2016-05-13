@@ -30,9 +30,9 @@ class EventHelper
 
         //only initiate once per lead per type
         if (empty($initiated[$lead->getId()][$action['type']])) {
-            if (!empty($action['properties']['delta'])) {
-                $stagesChange = $action['properties']['delta'];
-            }
+            //if (!empty($action['properties']['delta'])) {
+            //    $stagesChange = $action['properties']['delta'];
+            //}
         }
 
         return $stagesChange;

@@ -55,10 +55,6 @@ class Stage extends FormEntity
      */
     private $publishDown;
 
-    /**
-     * @var int
-     */
-    private $delta = 0;
 
     /**
      * @var array
@@ -109,8 +105,6 @@ class Stage extends FormEntity
 
         $builder->addPublishDates();
 
-        $builder->addField('delta', 'integer');
-
         $builder->addField('properties', 'array');
 
         $builder->createOneToMany('log', 'LeadStageLog')
@@ -158,7 +152,6 @@ class Stage extends FormEntity
                 array(
                     'publishUp',
                     'publishDown',
-                    'delta',
                     'properties'
                 )
             )
@@ -382,21 +375,5 @@ class Stage extends FormEntity
     public function setCategory ($category)
     {
         $this->category = $category;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDelta ()
-    {
-        return $this->delta;
-    }
-
-    /**
-     * @param mixed $delta
-     */
-    public function setDelta ($delta)
-    {
-        $this->delta = (int)$delta;
     }
 }

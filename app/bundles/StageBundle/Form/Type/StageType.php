@@ -74,17 +74,6 @@ class StageType extends AbstractType
             ),
         ));
 
-        $builder->add('delta', 'number', array(
-            'label'      => 'mautic.stage.action.delta',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       =>
-                array(
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.stage.action.delta.help'
-                ),
-            'precision'  => 0
-        ));
-
         $type = (!empty($options['actionType'])) ? $options['actionType'] : $options['data']->getType();
         if ($type) {
             $formType   =  (!empty($options['stageActions']['actions'][$type]['formType'])) ?

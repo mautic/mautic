@@ -210,7 +210,6 @@ class StageModel extends CommonFormModel
                     'type'       => $action->getType(),
                     'name'       => $action->getName(),
                     'properties' => $action->getProperties(),
-                    'stages'     => $action->getDelta()
                 ),
                 'lead'        => $lead,
                 'factory'     => $this->factory,
@@ -241,14 +240,13 @@ class StageModel extends CommonFormModel
                 $stagesChange = $reflection->invokeArgs($this, $pass);
 
                 if ($stagesChange) {
-                    $delta = $action->getDelta();
-                    $lead->addToStages($delta);
+                    //todo: this is where the lead should move from stage to stage
+                    //$lead->addToStages($delta);
                     $parsed = explode('.', $action->getType());
                     $lead->addStagesChangeLogEntry(
                         $parsed[0],
                         $action->getId() . ": " . $action->getName(),
                         $parsed[1],
-                        $delta,
                         $ipAddress
                     );
 
