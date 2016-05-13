@@ -18,13 +18,7 @@ Mautic.reportOnLoad = function (container) {
 		}
 	}
 
-	Mautic.initReportGraphs();
-};
-
-Mautic.reportOnUnload = function(id) {
-	if (id === '#app-content') {
-		delete Mautic.reportGraphs;
-	}
+    Mautic.initDateRangePicker();
 };
 
 /**
@@ -180,62 +174,3 @@ Mautic.checkReportCondition = function(selector) {
 		mQuery('#' + valueInput).prop('disabled', false);
 	}
 };
-
-Mautic.initReportGraphs = function () {
-	Mautic.reportGraphs = {};
-	var graphs = mQuery('canvas.graph');
-	mQuery.each(graphs, function(i, graph){
-		var mGraph = mQuery(graph);
-		if (mGraph.hasClass('graph-line')) {
-			var id = mGraph.attr('id');
-			if (typeof Mautic.reportGraphs[id] === 'undefined') {
-				var graphData = mQuery.parseJSON(mQuery('#' + id + '-data').text());
-				Mautic.reportGraphs[id] = Mautic.renderReportLineGraph(graph.getContext("2d"), graphData);
-			}
-		}
-		if (mGraph.hasClass('graph-pie')) {
-			var id = mGraph.attr('id');
-			if (typeof Mautic.reportGraphs[id] === 'undefined') {
-				var graphData = mQuery.parseJSON(mQuery('#' + id + '-data').text());
-				Mautic.reportGraphs[id] = Mautic.renderReportPieGraph(graph.getContext("2d"), graphData);
-			}
-		}
-	});
-}
-
-Mautic.updateReportGraph = function(element, amount, unit) {
-	var canvas   = mQuery(element).closest('.panel').find('canvas');
-	var id       = canvas.attr('id');
-	var reportId = Mautic.getEntityId();
-	var options  = {'graphName': id.replace(/\-/g, '.'), 'amount': amount, 'unit': unit};
-	var query    = 'reportId=' + reportId + '&' + mQuery.param(options);
-
-    var callback = function(response) {
-        Mautic.reportGraphs[id].destroy();
-        delete Mautic.reportGraphs[id];
-        if (typeof response.graph.datasets != 'undefined') {
-            Mautic.reportGraphs[id] = Mautic.renderReportLineGraph(canvas.get(0).getContext("2d"), response.graph);
-        }
-    };
-
-    Mautic.getChartData(element, 'report:updateGraph', query, callback);
-}
-
-Mautic.renderReportLineGraph = function (canvas, chartData) {
-    var options = {
-        pointDotRadius : 2,
-        datasetStrokeWidth : 1,
-        bezierCurveTension : 0.2,
-        multiTooltipTemplate: "<%= datasetLabel %>: <%= value %>"
-    }
-    return new Chart(canvas).Line(chartData, options);
-};
-
-Mautic.renderReportPieGraph = function (canvas, chartData) {
-    var options = {
-        responsive: false,
-        tooltipFontSize: 10,
-        tooltipTemplate: "<%if (label){%><%}%><%= value %>x <%=label%>",
-	    segmentStrokeWidth : 1};
-    Mautic.pageTimePie = new Chart(canvas).Pie(chartData, options);
-}

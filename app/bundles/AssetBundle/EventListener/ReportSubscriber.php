@@ -10,11 +10,11 @@
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 
 /**
  * Class ReportSubscriber
@@ -172,29 +172,16 @@ class ReportSubscriber extends CommonSubscriber
 
             switch ($g) {
                 case 'mautic.asset.graph.line.downloads':
-                    // Generate data for Downloads line graph
-                    $unit   = 'D';
-                    $amount = 30;
+                    $queryBuilder->select('ad.asset_id, ad.date_download as "count"');
+                    $chart     = new LineChart(null, $options['dateFrom'], $options['dateTo']);
+                    $chartQuery = $options['chartQuery'];
+                    $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_download', 'ad');
+                    $downloads = $chartQuery->loadAndBuildTimeData($queryBuilder);
+                    $chart->setDataset('test', $downloads);
+                    $data         = $chart->render();
+                    $data['name'] = 'mautic.asset.graph.line.downloads';
 
-                    if (isset($options['amount'])) {
-                        $amount = $options['amount'];
-                    }
-
-                    if (isset($options['unit'])) {
-                        $unit = $options['unit'];
-                    }
-
-                    $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('downloaded'));
-
-                    $queryBuilder->select('ad.asset_id as asset, ad.date_download as "dateDownload"');
-                    $queryBuilder->andwhere($queryBuilder->expr()->gte('ad.date_download', ':date'))
-                        ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
-                    $downloads = $queryBuilder->execute()->fetchAll();
-
-                    $timeStats         = GraphHelper::mergeLineGraphData($data, $downloads, $unit, 0, 'dateDownload');
-                    $timeStats['name'] = 'mautic.asset.graph.line.downloads';
-
-                    $event->setGraph($g, $timeStats);
+                    $event->setGraph($g, $data);
                     break;
                 case 'mautic.asset.table.most.downloaded':
                     $limit                  = 10;

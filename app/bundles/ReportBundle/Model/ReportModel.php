@@ -18,6 +18,7 @@ use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\ReportEvents;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -435,6 +436,11 @@ class ReportModel extends FormModel
             $query->andWhere($filterExpressions);
             $query->setParameters($filterParameters);
         }
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $options['dateFrom'], $options['dateTo']);
+        $chartQuery->applyDateFilters($query, 'date_download', 'ad');
+        $options['chartQuery'] = $chartQuery;
+
         $contentTemplate = $reportGenerator->getContentTemplate();
 
         //set what page currently on so that we can return here after form submission/cancellation
@@ -459,9 +465,9 @@ class ReportModel extends FormModel
                     if (isset($availableGraphs[$g])) {
                         $graphOptions = isset($availableGraphs[$g]['options']) ? $availableGraphs[$g]['options'] : array();
 
-                        if (!empty($options['graphName'])) {
+                        // if (!empty($options['graphName'])) {
                             $graphOptions = array_merge($graphOptions, $options);
-                        }
+                        // }
                         $eventGraphs[$g] = array(
                             'options' => $graphOptions,
                             'type'    => $availableGraphs[$g]['type']

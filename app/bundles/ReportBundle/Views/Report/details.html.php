@@ -112,6 +112,11 @@ if ($tmpl == 'index') {
                 <div class="box-layout">
                     <div class="col-xs-10 va-m">
                         <div class="text-white dark-sm mb-0"><?php echo $report->getDescription(); ?></div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', array('dateRangeForm' => $dateRangeForm)); ?>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
