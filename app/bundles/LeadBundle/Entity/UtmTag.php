@@ -92,14 +92,13 @@ class UtmTag
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_utmtags')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\UtmTagRepository')
-            ->addIndex(array('utmtag'), 'lead_utmtag_search');
+            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\UtmTagRepository');
         
         $builder->addId();
 
         $builder->addDateAdded();
 
-        $builder->addLead(false, 'CASCADE', false, 'utmTags');
+        $builder->addLead(false, 'CASCADE', false, 'utmtags');
 
         $builder->addNullableField('query', 'array');
 

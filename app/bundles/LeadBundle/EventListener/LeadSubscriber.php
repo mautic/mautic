@@ -218,6 +218,7 @@ class LeadSubscriber extends CommonSubscriber
 
         // Add the logs to the event array
         foreach ($utmTags as $utmTag) {
+            if(!empty($utmTag['query']))
             $event->addEvent(
                 array(
                     'event'           => $eventTypeKey,

@@ -27,7 +27,6 @@ class UtmTagRepository extends CommonRepository
     public function getUtmTagsByLead(Lead $lead, $options = array())
     {
         if (empty($lead)) {
-
             return array();
         }
 
@@ -36,7 +35,7 @@ class UtmTagRepository extends CommonRepository
             ->from('MauticLeadBundle:UtmTag', 'ut');
 
         $qb->where(
-            'ut.lead = ' . $lead->getId()
+            'ut.lead = ' . $lead->getId() . 'and (ut.utmCampaign is not null or ut.utmContent is not null or ut.utmMedium is not null or ut.utmSource is not null or ut.utmTerm is not null)'
         );
 
         if (isset($options['filters']['search']) && $options['filters']['search']) {
@@ -45,7 +44,7 @@ class UtmTagRepository extends CommonRepository
             $qb->expr()->like('ut.actionName', $qb->expr()->literal('%' . $options['filters']['search'] . '%'))
         ));
     }
-
+        
         return $qb->getQuery()->getArrayResult();
     }
 }

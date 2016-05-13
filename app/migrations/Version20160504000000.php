@@ -81,15 +81,15 @@ CREATE TABLE {$this->prefix}lead_utmtags (
   date_added TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, 
   lead_id INT DEFAULT NULL, 
   query TEXT DEFAULT NULL,
-  referer VARCHAR(255) NOT NULL, 
-  remote_host VARCHAR(255) NOT NULL, 
-  url VARCHAR(255) NOT NULL, 
+  referer VARCHAR(255) DEFAULT NULL, 
+  remote_host VARCHAR(255) DEFAULT NULL, 
+  url VARCHAR(255) DEFAULT NULL, 
   user_agent TEXT DEFAULT NULL, 
-  utm_campaign VARCHAR(255) NOT NULL,
-  utm_content VARCHAR(255) NOT NULL,
-  utm_medium VARCHAR(255) NOT NULL,
-  utm_source VARCHAR(255) NOT NULL,
-  utm_term VARCHAR(255) NOT NULL,
+  utm_campaign VARCHAR(255) DEFAULT NULL,
+  utm_content VARCHAR(255) DEFAULT NULL,
+  utm_medium VARCHAR(255) DEFAULT NULL,
+  utm_source VARCHAR(255) DEFAULT NULL,
+  utm_term VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY(id)
 );
 SQL;

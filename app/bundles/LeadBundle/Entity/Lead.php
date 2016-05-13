@@ -337,7 +337,6 @@ class Lead extends FormEntity
         $this->doNotContact    = new ArrayCollection();
         $this->pointsChangeLog = new ArrayCollection();
         $this->tags            = new ArrayCollection();
-        $this->utmtags         = new ArrayCollection();
     }
 
     /**
