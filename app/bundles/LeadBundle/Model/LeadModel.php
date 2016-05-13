@@ -21,6 +21,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\EmailBundle\Entity\DoNotEmail;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
@@ -84,6 +85,16 @@ class LeadModel extends FormModel
     public function getTagRepository()
     {
         return $this->em->getRepository('MauticLeadBundle:Tag');
+    }
+
+    /**
+     * Get the tags repository
+     *
+     * @return \Mautic\LeadBundle\Entity\UtmTagRepository
+     */
+    public function getUtmTagRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:UtmTag');
     }
 
     /**
@@ -1237,6 +1248,20 @@ class LeadModel extends FormModel
                 $this->getTagRepository()->deleteOrphans();
             }
         }
+    }
+
+    /**
+     * Update a leads tags
+     *
+     * @param Lead  $lead
+     * @param array $tags
+     * @param bool|false $removeOrphans
+     */
+    public function setUtmTags(Lead $lead, UtmTag $utmTags)
+    {
+        $lead->setUtmTags($utmTags);
+
+        $this->saveEntity($lead);
     }
 
     /**

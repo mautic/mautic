@@ -12,6 +12,7 @@ namespace Mautic\PageBundle\Model;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
@@ -330,6 +331,9 @@ class PageModel extends FormModel
         $hit = new Hit();
         $hit->setDateHit(new \Datetime());
 
+        $utmTags = new UtmTag();
+        $utmTags->setDateAdded(new \Datetime());
+
         //check for existing IP
         $ipAddress = $this->factory->getIpAddress();
         $hit->setIpAddress($ipAddress);
@@ -407,12 +411,14 @@ class PageModel extends FormModel
                                 $query['page_referrer'] = urldecode($query['page_referrer']);
                             }
                             $hit->setReferer($query['page_referrer']);
+                            $utmTags->setReferer($query['page_referrer']);
                         } elseif (isset($query['referrer'])) {
                             // @deprecated
                             if (!$decoded) {
                                 $query['referrer'] = urldecode($query['referrer']);
                             }
                             $hit->setReferer($query['referrer']);
+                            $utmTags->setReferer($query['referrer']);
                         }
 
                         if (isset($query['page_language'])) {
@@ -548,16 +554,19 @@ class PageModel extends FormModel
         }
 
         $hit->setUrl($pageURL);
+        $utmTags->setUrl($pageURL);
 
         // Store query array
         $query = $request->query->all();
         unset($query['d']);
         $hit->setQuery($query);
+        $utmTags->setQuery($query);
 
         list($trackingId, $trackingNewlyGenerated) = $leadModel->getTrackingCookie();
 
         $hit->setTrackingId($trackingId);
         $hit->setLead($lead);
+        $utmTags->setLead($lead);
 
         $isUnique = $trackingNewlyGenerated;
         if (!$trackingNewlyGenerated) {
@@ -632,8 +641,38 @@ class PageModel extends FormModel
             $hit->setReferer($request->server->get('HTTP_REFERER'));
         }
 
+        if (!$utmTags->getReferer()) {
+            $utmTags->setReferer($request->server->get('HTTP_REFERER'));
+        }
+
         $hit->setUserAgent($request->server->get('HTTP_USER_AGENT'));
+        $utmTags->setUserAgent($request->server->get('HTTP_USER_AGENT'));
+
         $hit->setRemoteHost($request->server->get('REMOTE_HOST'));
+        $utmTags->setRemoteHost($request->server->get('REMOTE_HOST'));
+
+        if (key_exists('utm_campaign',$query)){
+            $utmTags->setUtmCampaign($query['utm_campaign']);
+        }
+
+        if (key_exists('utm_term',$query)){
+            $utmTags->setUtmTerm($query['utm_term']);
+        }
+        if (key_exists('utm_content',$query)){
+            $utmTags->setUtmConent($query['utm_content']);
+        }
+        if (key_exists('utm_medium',$query)){
+            $utmTags->setUtmMedium($query['utm_medium']);
+        }
+        if (key_exists('utm_source',$query)){
+            $utmTags->setUtmSource($query['utm_source']);
+        }
+
+        $em   = $this->factory->getEntityManager();
+        $repo = $em->getRepository('MauticLeadBundle:UtmTag');
+        $repo->saveEntity($utmTags);
+
+        $leadModel->setUtmTags($lead, $utmTags);
 
         //get a list of the languages the user prefers
         $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');

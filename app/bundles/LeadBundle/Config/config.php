@@ -447,15 +447,15 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'leadfield'
             ),
-            'mautic.form.type.leadlist'                       => array(
-                'class'     => 'Mautic\LeadBundle\Form\Type\ListType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'leadlist'
-            ),
             'mautic.form.type.lead.submitaction.pointschange' => array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\FormSubmitActionPointsChangeType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'lead_submitaction_pointschange'
+            ),
+            'mautic.form.type.lead.submitaction.addutmtags' => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\ActionAddUtmTagsType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'lead_action_addutmtags'
             ),
             'mautic.form.type.lead.submitaction.changelist'   => array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\EventListType',

@@ -76,6 +76,15 @@ class CampaignSubscriber extends CommonSubscriber
         );
         $event->addAction('lead.changetags', $action);
 
+        $action = array(
+            'label'       => 'mautic.lead.lead.events.addutmtags',
+            'description' => 'mautic.lead.lead.events.addutmtags_descr',
+            'formType'    => 'lead_action_addutmtags',
+            'formTheme'   => 'MauticLeadBundle:FormTheme\\ActionAddUtmTags',
+            'callback'    => '\Mautic\LeadBundle\Helper\EventHelper::addUtmTags'
+        );
+        $event->addAction('lead.addutmtags', $action);
+
         $trigger = array(
             'label'       => 'mautic.lead.lead.events.field_value',
             'description' => 'mautic.lead.lead.events.field_value_descr',

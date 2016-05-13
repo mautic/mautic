@@ -48,6 +48,16 @@ final class LeadEvents
     const LEAD_POINTS_CHANGE = 'mautic.lead_points_change';
 
     /**
+     * The mautic.lead_points_change event is dispatched if a lead's points changes.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\PointsChangeEvent instance.
+     *
+     * @var string
+     */
+    const LEAD_UTMTAGS_ADD = 'mautic.lead_utmtags_add';
+
+    /**
      * The mautic.lead_list_change event is dispatched if a lead's lists changes.
      *
      * The event listener receives a

@@ -862,7 +862,7 @@ Mautic.updateLeadTags = function () {
     });
 };
 
-Mautic.createLeadTag = function (el) {
+Mautic.createLeadUtmTag = function (el) {
     var newFound = false;
     mQuery('#' + mQuery(el).attr('id') + ' :selected').each(function(i, selected) {
         if (!mQuery.isNumeric(mQuery(selected).val())) {
@@ -881,6 +881,32 @@ Mautic.createLeadTag = function (el) {
     Mautic.ajaxActionRequest('lead:addLeadTags', {tags: tags}, function(response) {
         if (response.tags) {
             mQuery('#' + mQuery(el).attr('id')).html(response.tags);
+            mQuery('#' + mQuery(el).attr('id')).trigger('chosen:updated');
+        }
+
+        Mautic.removeLabelLoadingIndicator();
+    });
+};
+
+Mautic.createLeadUtmTag = function (el) {
+    var newFound = false;
+    mQuery('#' + mQuery(el).attr('id') + ' :selected').each(function(i, selected) {
+        if (!mQuery.isNumeric(mQuery(selected).val())) {
+            newFound = true;
+        }
+    });
+
+    if (!newFound) {
+        return;
+    }
+
+    Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
+
+    var utmtags = JSON.stringify(mQuery(el).val());
+
+    Mautic.ajaxActionRequest('lead:addLeadUtmTags', {utmtags: utmtags}, function(response) {
+        if (response.tags) {
+            mQuery('#' + mQuery(el).attr('id')).html(response.utmtags);
             mQuery('#' + mQuery(el).attr('id')).trigger('chosen:updated');
         }
 
