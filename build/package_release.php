@@ -64,7 +64,7 @@ if (!isset($args['repackage'])) {
     }
 
     // Compile prod assets
-    system('php '.__DIR__.'/packaging/app/console mautic:assets:generate -e prod', $result);
+    system('cd '.__DIR__.'/packaging && php '.__DIR__.'/packaging/app/console mautic:assets:generate -e prod', $result);
     if ($result !== 0) {
         exit;
     }
