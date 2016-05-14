@@ -11,27 +11,36 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'email');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.email.emails'));
 
-$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
-    'templateButtons' => array(
-        'new'    => $permissions['email:emails:create']
-    ),
-    'routeBase' => 'email'
-)));
+$view['slots']->set(
+    'actions',
+    $view->render(
+        'MauticCoreBundle:Helper:page_actions.html.php',
+        array(
+            'templateButtons' => array(
+                'new' => $permissions['email:emails:create']
+            ),
+            'routeBase'       => 'email'
+        )
+    )
+);
 
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
-    <?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', array(
-        'searchValue' => $searchValue,
-        'searchHelp'  => 'mautic.email.help.searchcommands',
-        'searchId'    => 'email-search',
-        'action'      => $currentRoute,
-        'routeBase'   => 'email',
-        'templateButtons' => array(
-            'delete' => $permissions['email:emails:deleteown'] || $permissions['email:emails:deleteother']
-        ),
-        'filters'     => $filters
-    )); ?>
+    <?php echo $view->render(
+        'MauticCoreBundle:Helper:list_toolbar.html.php',
+        array(
+            'searchValue' => $searchValue,
+            'searchHelp'  => 'mautic.email.help.searchcommands',
+            'searchId'        => 'email-search',
+            'action'          => $currentRoute,
+            'routeBase'       => 'email',
+            'templateButtons' => array(
+                'delete' => $permissions['email:emails:deleteown'] || $permissions['email:emails:deleteother']
+            ),
+            'filters'         => $filters
+        )
+    ); ?>
 
     <div class="page-list">
         <?php $view['slots']->output('_content'); ?>

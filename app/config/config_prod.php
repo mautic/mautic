@@ -23,13 +23,15 @@ $container->loadFromExtension("doctrine", array(
 ));
 */
 
-$debugMode = $container->getParameter('kernel.debug');
+$debugMode = $container->hasParameter('mautic.debug') ? $container->getParameter('mautic.debug') : $container->getParameter('kernel.debug');
+
 $container->loadFromExtension("monolog", array(
     "channels" => array(
         "mautic",
     ),
     "handlers" => array(
         "main"    => array(
+            "formatter"    => $debugMode ? "mautic.monolog.fulltrace.formatter" : null,
             "type"         => "fingers_crossed",
             "buffer_size"  => "200",
             "action_level" => ($debugMode) ? "debug" : "error",
@@ -45,9 +47,10 @@ $container->loadFromExtension("monolog", array(
             "max_files" => 7
         ),
         "mautic"    => array(
-            "type"  => "rotating_file",
-            "path"  => "%kernel.logs_dir%/mautic_%kernel.environment%.php",
-            "level" => ($debugMode) ? "debug" : "notice",
+            "formatter" => $debugMode ? "mautic.monolog.fulltrace.formatter" : null,
+            "type"      => "rotating_file",
+            "path"      => "%kernel.logs_dir%/mautic_%kernel.environment%.php",
+            "level"     => ($debugMode) ? "debug" : "notice",
             'channels' => array(
                 'mautic',
             ),

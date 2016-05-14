@@ -84,13 +84,12 @@ return array(
 
     'menu'     => array(
         'main' => array(
-            'priority' => 20,
             'items'    => array(
                 'mautic.form.forms' => array(
                     'route'     => 'mautic_form_index',
-                    'id'        => 'mautic_form_root',
-                    'iconClass' => 'fa-pencil-square-o',
-                    'access'    => array('form:forms:viewown', 'form:forms:viewother')
+                    'access'    => array('form:forms:viewown', 'form:forms:viewother'),
+                    'parent'    => 'mautic.core.components',
+                    'priority'  => 200
                 )
             )
         )
@@ -129,9 +128,12 @@ return array(
             'mautic.form.search.subscriber'         => array(
                 'class' => 'Mautic\FormBundle\EventListener\SearchSubscriber'
             ),
-            'mautic.form.webhook.subscriber'                => array(
+            'mautic.form.webhook.subscriber'        => array(
                 'class' => 'Mautic\FormBundle\EventListener\WebhookSubscriber'
-            )
+            ),
+            'mautic.form.dashboard.subscriber'      => array(
+                'class' => 'Mautic\FormBundle\EventListener\DashboardSubscriber'
+            ),
         ),
         'forms'  => array(
             'mautic.form.type.form'                      => array(

@@ -108,9 +108,16 @@ if (isset($mauticParams['site_url'])) {
             }
         }
 
+        $scheme = (! empty($parts['scheme']) ? $parts['scheme'] : 'http');
+        $portContainerKey = ($scheme === 'http') ? 'request_listener.http_port' : 'request_listener.https_port';
+
         $container->setParameter('router.request_context.host', $parts['host']);
-        $container->setParameter('router.request_context.scheme', (!empty($parts['scheme']) ? $parts['scheme'] : 'http'));
+        $container->setParameter('router.request_context.scheme', $scheme);
         $container->setParameter('router.request_context.base_url', $path);
+
+        if (! empty($parts['port'])) {
+            $container->setParameter($portContainerKey, (!empty($parts['port']) ? $parts['port'] : null));
+        }
     }
 }
 

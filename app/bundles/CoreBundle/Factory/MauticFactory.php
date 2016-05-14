@@ -235,16 +235,18 @@ class MauticFactory
      */
     public function getTranslator()
     {
-        /** @var \Mautic\CoreBundle\Translation\Translator $translator */
-        $translator = $this->container->get('translator');
+        if (defined('IN_MAUTIC_CONSOLE')) {
+            /** @var \Mautic\CoreBundle\Translation\Translator $translator */
+            $translator = $this->container->get('translator');
 
-        if ($translator->getLocale() === null) {
             $translator->setLocale(
                 $this->getParameter('locale')
             );
+
+            return $translator;
         }
 
-        return $translator;
+        return $this->container->get('translator');
     }
 
     /**
@@ -406,6 +408,33 @@ class MauticFactory
             if (substr($path, -1) === '/') {
                 $path = substr($path, 0, -1);
             }
+        } elseif ($name == 'dashboard.user' || $name == 'dashboard.global') {
+            //these are absolute regardless as they are configurable
+            $globalPath = $this->getParameter('dashboard_import_dir');
+            if (substr($globalPath, -1) === '/') {
+                $globalPath = substr($globalPath, 0, -1);
+            }
+
+            if ($name == 'dashboard.global') {
+
+                return $globalPath;
+            }
+
+            if (!$userPath = $this->getParameter('dashboard_import_user_dir')) {
+                $userPath = $globalPath;
+            } elseif (substr($userPath, -1) === '/') {
+                $userPath = substr($userPath, 0, -1);
+            }
+
+            $user      = $this->getUser();
+            $userPath .= '/'.$user->getId();
+
+            // @todo check is_writable
+            if (!is_dir($userPath) && !file_exists($userPath)) {
+                mkdir($userPath, 0755);
+            }
+
+            return $userPath;
         } elseif (isset($paths[$name])) {
             $path = $paths[$name];
         } elseif (strpos($name, '_root') !== false) {
@@ -543,15 +572,22 @@ class MauticFactory
 
             $themes[$specificFeature] = array();
             foreach ($finder as $theme) {
-                if (file_exists($theme->getRealPath().'/config.php')) {
-                    $config = include $theme->getRealPath().'/config.php';
-                    if ($specificFeature != 'all') {
-                        if (isset($config['features']) && in_array($specificFeature, $config['features'])) {
-                            $themes[$specificFeature][$theme->getBasename()] = $config['name'];
-                        }
-                    } else {
+                if (file_exists($theme->getRealPath().'/config.json')) {
+                    $config = json_decode(file_get_contents($theme->getRealPath() . '/config.json'), true);
+                }
+                // @deprecated Remove support for theme config.php in 2.0
+                elseif (file_exists($theme->getRealPath() . '/config.php')) {
+                    $config = include $theme->getRealPath() . '/config.php';
+                } else {
+                    continue;
+                }
+
+                if ($specificFeature != 'all') {
+                    if (isset($config['features']) && in_array($specificFeature, $config['features'])) {
                         $themes[$specificFeature][$theme->getBasename()] = $config['name'];
                     }
+                } else {
+                    $themes[$specificFeature][$theme->getBasename()] = $config['name'];
                 }
             }
         }
@@ -615,7 +651,13 @@ class MauticFactory
                     $ip = end($ips);
                 }
 
-                return trim($ip);
+                $ip = trim($ip);
+
+                // Validate IP
+                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+
+                    return $ip;
+                }
             }
         }
 
@@ -655,44 +697,32 @@ class MauticFactory
 
             // Ensure the do not track list is inserted
             $doNotTrack  = $this->getParameter('do_not_track_ips', array());
+            if (!is_array($doNotTrack)) {
+                $doNotTrack = array();
+            }
             $internalIps = $this->getParameter('do_not_track_internal_ips', array());
+            if (!is_array($internalIps)) {
+                $internalIps = array();
+            }
             $doNotTrack  = array_merge(array('127.0.0.1', '::1'), $doNotTrack, $internalIps);
             $ipAddress->setDoNotTrackList($doNotTrack);
 
             $details = $ipAddress->getIpDetails();
             if ($ipAddress->isTrackable() && empty($details['city']))  {
                 // Get the IP lookup service
-                if ($ipService = $this->getParameter('ip_lookup_service')) {
-                    // Find the service class
-                    $bundles = $this->getMauticBundles(true);
 
-                    foreach ($bundles as $bundle) {
-                        if (!empty($bundle['config']['ip_lookup_services'][$ipService])) {
-                            $class = $bundle['config']['ip_lookup_services'][$ipService]['class'];
-                            if (substr($class, 0, 1) !== '\\') {
-                                $class = '\\' . $class;
-                            }
+                // Fetch the data
+                /** @var \Mautic\CoreBundle\IpLookup\AbstractLookup $ipLookup */
+                $ipLookup = $this->container->get('mautic.ip_lookup');
 
-                            /** @var \Mautic\CoreBundle\IpLookup\AbstractIpLookup $lookupClass */
-                            $lookupClass = new $class($ip, $this->getParameter('ip_lookup_auth'), $this->getLogger());
+                if ($ipLookup) {
+                    $details = $ipLookup->setIpAddress($ip)
+                        ->getDetails();
 
-                            // Fetch the data
-                            $lookupClass->getData();
+                    $ipAddress->setIpDetails($details);
 
-                            // Get and set the details
-                            $details = get_object_vars($lookupClass);
-                            $ipAddress->setIpDetails($details);
-
-                            // Save new details
-                            $saveIp = true;
-
-                            unset($lookupClass);
-
-                            break;
-                        }
-                    }
-
-                    unset($bundles);
+                    // Save new details
+                    $saveIp = true;
                 }
             }
 
@@ -748,6 +778,10 @@ class MauticFactory
                 return $this->container->get('templating.helper.slots');
             case 'template.form':
                 return $this->container->get('templating.helper.form');
+            case 'template.translator':
+                return $this->container->get('templating.helper.translator');
+            case 'template.router':
+                return $this->container->get('templating.helper.router');
             default:
                 return $this->container->get('mautic.helper.'.$helper);
         }

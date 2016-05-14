@@ -171,9 +171,9 @@ class CommonRepository extends EntityRepository
      */
     public function saveEntity($entity, $flush = true)
     {
-        $this->_em->persist($entity);
+        $this->getEntityManager()->persist($entity);
         if ($flush) {
-            $this->_em->flush();
+            $this->getEntityManager()->flush($entity);
         }
     }
 
@@ -192,10 +192,10 @@ class CommonRepository extends EntityRepository
             $this->saveEntity($entity, false);
 
             if ((($k + 1) % $batchSize) === 0) {
-                $this->_em->flush();
+                $this->getEntityManager()->flush();
             }
         }
-        $this->_em->flush();
+        $this->getEntityManager()->flush();
     }
 
     /**
@@ -215,7 +215,6 @@ class CommonRepository extends EntityRepository
             $this->_em->flush();
         }
     }
-
 
     /**
      * Delete an array of entities
@@ -947,6 +946,73 @@ class CommonRepository extends EntityRepository
         }
 
         return $q->execute()->fetchAll();
+    }
+
+    /**
+     * @param      $alias
+     * @param null $catAlias
+     * @param null $lang
+     *
+     * @return null
+     */
+    public function findOneBySlugs($alias, $catAlias = null, $lang = null)
+    {
+        try {
+            $q = $this->createQueryBuilder($this->getTableAlias())
+                ->setParameter(':alias', $alias);
+
+            $expr = $q->expr()->andX(
+                $q->expr()->eq($this->getTableAlias().'.alias', ':alias')
+            );
+
+            $metadata = $this->getClassMetadata();
+
+            if (null !== $catAlias) {
+                if (isset($metadata->associationMappings['category'])) {
+                    $q->leftJoin($this->getTableAlias().'.category', 'category')
+                        ->setParameter('catAlias', $catAlias);
+
+                    $expr->add(
+                        $q->expr()->eq('category.alias', ':catAlias')
+                    );
+                } else {
+                    // This entity does not have a category mapping so return null
+
+                    return null;
+                }
+            }
+
+            if (isset($metadata->fieldMappings['language'])) {
+                if ($lang) {
+                    // Find the landing page with the specific requested locale
+                    $q->setParameter('lang', $lang);
+
+                    $expr->add(
+                        $q->expr()->eq($this->getTableAlias().'.language', ':lang')
+                    );
+                } elseif (isset($metadata->associationMappings['translationParent'])) {
+                    // Find the parent translation
+                    $expr->add(
+                        $q->expr()->isNull($this->getTableAlias().'.translationParent')
+                    );
+                }
+            }
+
+            // Check for variants and return parent only
+            if (isset($metadata->associationMappings['variantParent'])) {
+                $expr->add(
+                    $q->expr()->isNull($this->getTableAlias().'.variantParent')
+                );
+            }
+
+            $q->where($expr);
+
+            $entity = $q->getQuery()->getSingleResult();
+        } catch (\Exception $exception) {
+            $entity = null;
+        }
+
+        return $entity;
     }
 }
 

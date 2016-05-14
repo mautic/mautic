@@ -13,8 +13,6 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
-use Mautic\FormBundle\Event\SubmissionEvent;
-use Mautic\FormBundle\FormEvents;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\PointEvents;
@@ -96,6 +94,12 @@ class PointSubscriber extends CommonSubscriber
      */
     public function onEmailSend(EmailSendEvent $event)
     {
-        $this->factory->getModel('point')->triggerAction('email.send', $event->getEmail());
+        if ($leadArray = $event->getLead()) {
+            $lead = $this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $leadArray['id']);
+        } else {
+
+            return;
+        }
+        $this->factory->getModel('point')->triggerAction('email.send', $event->getEmail(), null, $lead);
     }
 }

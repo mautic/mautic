@@ -281,6 +281,10 @@ Mautic.processUpdate = function (container, step, state) {
                     } else {
                         if (response.success) {
                             mQuery('div[id=' + container + ']').html('<div class="alert alert-mautic">' + response.message + '</div>');
+
+                            if (response.postmessage) {
+                                mQuery('<div>'+response.postmessage+'</div>').insertAfter('div[id=' + container + '] .alert');
+                            }
                         } else {
                             mQuery('td[id=update-step-finalization-status]').html('<span class="hidden-xs">' + response.stepStatus + '</span>');
                             mQuery('td[id=update-step-finalization-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-warning text-danger'));

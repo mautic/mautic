@@ -57,24 +57,6 @@ class AjaxController extends CommonAjaxController
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function updateSubmissionChartAction(Request $request)
-    {
-        $formId    = InputHelper::int($request->request->get('formId'));
-        $amount    = InputHelper::int($request->request->get('amount'));
-        $unit      = InputHelper::clean($request->request->get('unit'));
-        $dataArray = array('success' => 0);
-
-        // Download stats per time period
-        $dataArray['stats'] = $this->factory->getEntityManager()->getRepository('MauticFormBundle:Submission')->getSubmissionsSince($formId, $amount, $unit);
-        $dataArray['success']  = 1;
-
-        return $this->sendJsonResponse($dataArray);
-    }
-
-    /**
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
     protected function updateFormFieldsAction(Request $request)
     {
         $formId    = InputHelper::int($request->request->get('formId'));

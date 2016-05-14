@@ -29,8 +29,10 @@ class PageDisplayEvent extends Event
     private $page;
 
     /**
+     * PageDisplayEvent constructor.
+     *
+     * @param      $content
      * @param Page $page
-     * @param bool $isNew
      */
     public function __construct($content, Page $page)
     {

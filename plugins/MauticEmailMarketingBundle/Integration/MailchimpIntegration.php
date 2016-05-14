@@ -33,13 +33,12 @@ class MailchimpIntegration extends EmailAbstractIntegration
         return 'MailChimp';
     }
 
-
     /**
      * {@inheritdoc}
      */
     public function getAuthenticationType ()
     {
-        return 'oauth2';
+        return (empty($this->keys['client_id'])) ? 'basic' : 'oauth2';
     }
 
     /**
@@ -63,8 +62,26 @@ class MailchimpIntegration extends EmailAbstractIntegration
     }
 
     /**
+     * @return array
+     */
+    public function getRequiredKeyFields()
+    {
+        return (empty($this->keys['client_id'])) ?
+            array(
+                'username'      => 'mautic.integration.keyfield.username',
+                'password'      => 'mautic.integration.keyfield.api'
+            ) :
+            array(
+                'client_id'      => 'mautic.integration.keyfield.clientid',
+                'client_secret'  => 'mautic.integration.keyfield.clientsecret'
+            );
+    }
+
+    /**
      * @param array $settings
      * @param array $parameters
+     *
+     * @return bool|string
      */
     public function authCallback($settings = array(), $parameters = array())
     {
@@ -81,7 +98,9 @@ class MailchimpIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * @return array
+     * @param array $settings
+     *
+     * @return mixed
      */
     public function getAvailableLeadFields ($settings = array())
     {
@@ -118,7 +137,10 @@ class MailchimpIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * @param $lead
+     * @param       $lead
+     * @param array $config
+     *
+     * @return bool
      */
     public function pushLead($lead, $config = array())
     {
@@ -127,10 +149,13 @@ class MailchimpIntegration extends EmailAbstractIntegration
         $mappedData = $this->populateLeadData($lead, $config);
 
         if (empty($mappedData)) {
+
             return false;
         } elseif (empty($mappedData['EMAIL'])) {
+
             return false;
         } elseif (!isset($config['list_settings'])) {
+
             return false;
         }
 

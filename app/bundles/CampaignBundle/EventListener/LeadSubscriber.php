@@ -57,7 +57,7 @@ class LeadSubscriber extends CommonSubscriber
 
         //get campaigns for the list
         if (!isset($listCampaigns[$list->getId()])) {
-            $listCampaigns[$list->getId()] = $model->getRepository()->getPublishedCampaignsByLeadLists(array($list->getId()), true);
+            $listCampaigns[$list->getId()] = $model->getRepository()->getPublishedCampaignsByLeadLists($list->getId());
         }
 
         $leadLists = $em->getRepository('MauticLeadBundle:LeadList')->getLeadLists($leads, true, true);
@@ -115,7 +115,7 @@ class LeadSubscriber extends CommonSubscriber
         $em        = $this->factory->getEntityManager();
 
         //get campaigns for the list
-        $listCampaigns = $repo->getPublishedCampaignsByLeadLists(array($list->getId()), true);
+        $listCampaigns = $repo->getPublishedCampaignsByLeadLists($list->getId());
 
         $leadLists   = $leadModel->getLists($lead, true);
         $leadListIds = array_keys($leadLists);
@@ -191,6 +191,13 @@ class LeadSubscriber extends CommonSubscriber
             if (!is_array($log['metadata'])) {
                 $log['metadata'] = ($log['metadata'] !== null) ? unserialize($log['metadata']) : array();
             }
+
+            // Hide this from the time line all together
+            if (!empty($log['metadata']['failed'])) {
+
+                continue;
+            }
+
             $template        = (!empty($eventSettings['action'][$log['type']]['timelineTemplate']))
                 ? $eventSettings['action'][$log['type']]['timelineTemplate'] : 'MauticCampaignBundle:SubscribedEvents\Timeline:index.html.php';
 
@@ -202,7 +209,8 @@ class LeadSubscriber extends CommonSubscriber
                     'extra'           => array(
                         'log' => $log
                     ),
-                    'contentTemplate' => $template
+                    'contentTemplate' => $template,
+                    'icon'            => 'fa-clock-o'
                 )
             );
         }

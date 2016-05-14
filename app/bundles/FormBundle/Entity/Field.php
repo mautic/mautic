@@ -127,6 +127,15 @@ class Field
     private $sessionId;
 
     /**
+     * Reset properties on clone
+     */
+    public function __clone()
+    {
+        $this->id   = null;
+        $this->form = null;
+    }
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
