@@ -13,6 +13,7 @@ use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -230,12 +231,13 @@ class IntegrationHelper
      *
      * @param $name
      *
-     * @return mixed
+     * @return AbstractIntegration
      */
     public function getIntegrationObject($name)
     {
         $integrationObjects = $this->getIntegrationObjects($name);
-        return $integrationObjects[$name];
+
+        return (isset($integrationObjects[$name])) ? $integrationObjects[$name] : null;
     }
 
     /**

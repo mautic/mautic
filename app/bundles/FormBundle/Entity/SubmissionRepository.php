@@ -250,15 +250,6 @@ class SubmissionRepository extends CommonRepository
         return $query->execute()->fetchAll();
     }
 
-    public function getSubmissionsSince($formId, $amount = 30, $unit = 'D')
-    {
-        $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('submissions'));
-
-        $submissions = $this->getSubmissions(array('id' => $formId, 'fromDate' => $data['fromDate']));
-
-        return GraphHelper::mergeLineGraphData($data, $submissions, $unit, 0, 'dateSubmitted');
-    }
-
     /**
      * Get list of forms ordered by it's count
      *

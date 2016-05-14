@@ -42,6 +42,38 @@ $container->loadFromExtension('doctrine', array(
     )
 ));
 
+$container->loadFromExtension("monolog", array(
+    'channels' => array(
+        'mautic',
+    ),
+    "handlers" => array(
+        "main"    => array(
+            "formatter" => "mautic.monolog.fulltrace.formatter",
+            "type"      => "rotating_file",
+            "path"      => "%kernel.logs_dir%/%kernel.environment%.php",
+            "level"     => "debug",
+            "channels"  => array(
+                "!mautic"
+            ),
+            "max_files" => 7
+        ),
+        "console" => array(
+            "type"   => "console",
+            "bubble" => false
+        ),
+        "mautic"    => array(
+            "formatter" => "mautic.monolog.fulltrace.formatter",
+            "type"      => "rotating_file",
+            "path"      => "%kernel.logs_dir%/mautic_%kernel.environment%.php",
+            "level"     => "debug",
+            'channels'  => array(
+                'mautic',
+            ),
+            "max_files" => 7
+        )
+    )
+));
+
 $container->loadFromExtension('liip_functional_test', array(
     'cache_sqlite_db' => true
 ));

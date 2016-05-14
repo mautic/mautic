@@ -13,6 +13,8 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Entity\Plugin;
+use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
+use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -163,12 +165,17 @@ class PluginController extends FormController
                     $em          = $this->factory->getEntityManager();
                     $integration = $entity->getName();
 
-                    //merge keys
+                    // Merge keys
                     $keys = $form['apiKeys']->getData();
 
-                    //restore original keys then merge the new ones to keep the form from wiping out empty secrets
-                    $mergedKeys = $integrationObject->mergeApiKeys($keys, $currentKeys, true);
-                    $integrationObject->encryptAndSetApiKeys($mergedKeys, $entity);
+                    // Prevent merged keys
+                    $secretKeys = $integrationObject->getSecretKeys();
+                    foreach ($secretKeys as $secretKey) {
+                        if (empty($keys[$secretKey]) && !empty($currentKeys[$secretKey])) {
+                            $keys[$secretKey] = $currentKeys[$secretKey];
+                        }
+                    }
+                    $integrationObject->encryptAndSetApiKeys($keys, $entity);
 
                     if (!$authorize) {
                         $features = $entity->getSupportedFeatures();
@@ -196,7 +203,14 @@ class PluginController extends FormController
                     if ($authorize) {
                         //redirect to the oauth URL
                         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
-                        $oauthUrl = $integrationObject->getAuthLoginUrl();
+                        $event = $this->factory->getDispatcher()->dispatch(
+                            PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT,
+                            new PluginIntegrationAuthRedirectEvent(
+                                $integrationObject,
+                                $integrationObject->getAuthLoginUrl()
+                            )
+                        );
+                        $oauthUrl = $event->getAuthUrl();
 
                         return new JsonResponse(
                             array(

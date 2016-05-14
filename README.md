@@ -176,29 +176,28 @@ Everyone can test submitted features and bug fixes. No programming skills are re
 
 ### Requirements
 
-1. Mautic use Git as a version control system. Download and install git for your OS from https://git-scm.com/.
+1. Mautic uses Git as a version control system. Download and install git for your OS from https://git-scm.com/.
 2. Install a server, PHP and MySql/Posgres to be able to run Mautic locally. Easy option is [_AMP package for your OS](https://en.wikipedia.org/wiki/List_of_Apache%E2%80%93MySQL%E2%80%93PHP_packages).
 3. Install [Composer](https://getcomposer.org/), the dependency manager for PHP.
 
 ### Install the latest GitHub version
 
 1. Open a Terminal/Console window.
-2. Change directory (`cd`) to the server root.
-3. Clone the repository (`git@github.com:mautic/mautic.git`)
-4. The **mautic** directory should appear in the server root. Change directory to mautic directory.
+2. Change directory to the server root (i.e. `cd /var/www` if your local server root is at /var/www).
+3. Clone the repository (`git clone https://github.com/mautic/mautic.git`)
+4. The **mautic** directory should appear in the server root. Change directory to mautic directory (`cd mautic`).
 5. Install dependencies (`composer install`).
-6. Visit Mautic in a browser (probably in http//localhost/mautic) and follow installation steps.
+6. Visit Mautic in a browser (probably at http://localhost/mautic) and follow installation steps.
 
 ### Test a pull request (PR)
 
 1. [Select a PR](https://github.com/mautic/mautic/pulls) to test.
 2. Read the description and steps to test. If it's a bug fix, follow the steps if you'll be able to recreate the issue.
 3. Use development environment for testing. To do that, add `index_dev.php` after the Mautic URL. Eg. `http://localhost/mautic/index_dev.php/s/`
-3. Scroll down and click on 'command line instructions' link.
-4. Copy the 2 lines from Step 1 and execute them in the terminal window.
-5. Clear cache for development environment (`app/console cache:clear -e dev`).
-6. Follow the steps from the PR description again to see if the result is as described.
-7. Write a comment how the test went. If there is a problem, provide as many information as possible including error log messages.
+3. [Apply the PR](https://help.github.com/articles/checking-out-pull-requests-locally/#modifying-an-inactive-pull-request-locally)
+4. Clear cache for development environment (`app/console cache:clear -e dev`).
+5. Follow the steps from the PR description again to see if the result is as described.
+6. Write a comment how the test went. If there is a problem, provide as many information as possible including error log messages.
 
 <h2>FAQ and Contact Information</h2>
 <p>Marketing automation has historically been a difficult tool to implement in a business. The Mautic community is a rich environment for you to learn from others and share your knowledge as well. Open source means more than open code. Open source is providing equality for all and a chance to improve. If you have questions then the Mautic community can help provide the answers. </p>

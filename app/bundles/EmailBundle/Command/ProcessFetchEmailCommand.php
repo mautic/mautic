@@ -31,6 +31,7 @@ class ProcessFetchEmailCommand extends ContainerAwareCommand
         $this
             ->setName('mautic:fetch:email')
             ->setAliases(array(
+                'mautic:email:fetch',
                 'mautic:fetch:mail',
                 'mautic:check:email',
                 'mautic:check:mail'

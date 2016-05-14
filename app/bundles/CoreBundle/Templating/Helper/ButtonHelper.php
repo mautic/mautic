@@ -90,7 +90,8 @@ class ButtonHelper extends Helper
      *
      * @return string
      */
-    public function buildCustom ($c, $buttonCount) {
+    public function buildCustom($c, $buttonCount)
+    {
         $buttons = '';
 
         //Wrap links in a tag
@@ -100,7 +101,7 @@ class ButtonHelper extends Helper
         }
 
         if (isset($c['confirm'])) {
-            if(($this->groupType == 'group' || ($this->groupType == 'button-dropdown' && $buttonCount === 0))) {
+            if (($this->groupType == 'group' || ($this->groupType == 'button-dropdown' && $buttonCount === 0))) {
                 if (isset($c['confirm']['btnClass']) && !strstr($c['confirm']['btnClass'], 'btn-')) {
                     $c['confirm']['btnClass'] .= ' btn btn-default';
                 } elseif (!isset($c['confirm']['btnClass'])) {
@@ -110,11 +111,22 @@ class ButtonHelper extends Helper
                 if (!isset($c['confirm']['btnClass'])) {
                     $c['confirm']['btnClass'] = '';
                 } elseif ($this->groupType == 'button-dropdown') {
-                    $search                   = array('btn-default', 'btn-primary', 'btn-success', 'btn-info', 'btn-warning', 'btn-danger', 'btn');
+                    $search                   = array(
+                        'btn-default',
+                        'btn-primary',
+                        'btn-success',
+                        'btn-info',
+                        'btn-warning',
+                        'btn-danger',
+                        'btn'
+                    );
                     $c['confirm']['btnClass'] = str_replace($search, '', $c['attr']['class']);
                 }
             }
-            $buttons .= $this->wrapOpeningTag.$this->templating->render('MauticCoreBundle:Helper:confirm.html.php', $c['confirm'])."{$this->wrapClosingTag}\n";
+            $buttons .= $this->wrapOpeningTag.$this->templating->render(
+                    'MauticCoreBundle:Helper:confirm.html.php',
+                    $c['confirm']
+                )."{$this->wrapClosingTag}\n";
         } else {
             $attr = $this->menuLink;
 
@@ -126,15 +138,25 @@ class ButtonHelper extends Helper
                 $c['attr']['class'] = $c['btnClass'];
             }
 
-            if(($this->groupType == 'group' || ($this->groupType == 'button-dropdown' && $buttonCount === 0))) {
+            if (($this->groupType == 'group' || ($this->groupType == 'button-dropdown' && $buttonCount === 0))) {
                 if (!isset($c['attr']['class'])) {
                     $c['attr']['class'] = 'btn btn-default';
                 } elseif (!strstr($c['attr']['class'], 'btn-')) {
                     $c['attr']['class'] .= ' btn btn-default';
                 }
-            } elseif (($this->groupType == 'dropdown' || ($this->groupType == 'button-dropdown' && $buttonCount > 0)) && isset($c['attr']['class'])) {
+            } elseif (($this->groupType == 'dropdown' || ($this->groupType == 'button-dropdown' && $buttonCount > 0))
+                && isset($c['attr']['class'])
+            ) {
                 // Remove btn classes
-                $search = array('btn-default', 'btn-primary', 'btn-success', 'btn-info', 'btn-warning', 'btn-danger', 'btn');
+                $search             = array(
+                    'btn-default',
+                    'btn-primary',
+                    'btn-success',
+                    'btn-info',
+                    'btn-warning',
+                    'btn-danger',
+                    'btn'
+                );
                 $c['attr']['class'] = str_replace($search, '', $c['attr']['class']);
             }
 
@@ -150,33 +172,35 @@ class ButtonHelper extends Helper
                         if ($k == 'title') {
                             $v = $this->translator->trans($v);
                         }
-                        $tooltipAttr .= " $k=" . '"' . $v . '"';
+                        $tooltipAttr .= " $k=".'"'.$v.'"';
                     }
                 } else {
-                    $tooltipAttr .= ' title="' . $this->translator->trans($c['tooltip']) . '" data-placement="left"';
+                    $tooltipAttr .= ' title="'.$this->translator->trans($c['tooltip']).'" data-placement="left"';
                 }
             }
 
             foreach ($c['attr'] as $k => $v) {
-                $attr .= " $k=" . '"' . $v . '"';
+                $attr .= " $k=".'"'.$v.'"';
             }
 
-            $buttonContent  = (isset($c['iconClass'])) ? '<i class="' . $c['iconClass'] . '"></i> ' : '';
+            $buttonContent = (isset($c['iconClass'])) ? '<i class="'.$c['iconClass'].'"></i> ' : '';
             if (!empty($c['btnText'])) {
                 $buttonContent .= $this->translator->trans($c['btnText']);
             }
-            $buttons       .= "{$this->wrapOpeningTag}<a{$attr}><span{$tooltipAttr}>{$buttonContent}</span></a>{$this->wrapClosingTag}\n";
+            $buttons .= "{$this->wrapOpeningTag}<a{$attr}><span{$tooltipAttr}>{$buttonContent}</span></a>{$this->wrapClosingTag}\n";
         }
 
         return $buttons;
     }
 
-    public function renderPreCustomButtons(&$buttonCount, $dropdownHtml = '') {
+    public function renderPreCustomButtons(&$buttonCount, $dropdownHtml = '')
+    {
         $preCustomButtonContent = '';
-
         foreach ($this->preCustomButtons as $c) {
+
             if ($this->groupType == 'button-dropdown' && $buttonCount === 1) {
                 $preCustomButtonContent .= $dropdownHtml;
+
             }
             $preCustomButtonContent .= $this->buildCustom($c, $buttonCount);
             $buttonCount++;
@@ -185,7 +209,8 @@ class ButtonHelper extends Helper
         return $preCustomButtonContent;
     }
 
-    public function renderPostCustomButtons (&$buttonCount, $dropdownHtml = '') {
+    public function renderPostCustomButtons(&$buttonCount, $dropdownHtml = '')
+    {
         $postCustomButtonContent = '';
 
         if (!empty($this->postCustomButtons)) {

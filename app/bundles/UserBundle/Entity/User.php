@@ -127,6 +127,11 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
     private $preferences = array();
 
     /**
+     * @var string
+     */
+    private $signature;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -198,6 +203,11 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
         $builder->createField('preferences', 'array')
             ->nullable()
             ->build();
+
+        $builder->createField('signature', 'text')
+            ->nullable()
+            ->build();
+
     }
 
     /**
@@ -309,7 +319,8 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
                     'locale',
                     'lastLogin',
                     'lastActive',
-                    'onlineStatus'
+                    'onlineStatus',
+                    'signature'
                 )
             )
             ->build();
@@ -388,10 +399,17 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      */
     public function getRoles ()
     {
-        $roles = array(
-            "ROLE_API",
-            (($this->isAdmin()) ? "ROLE_ADMIN" : "ROLE_USER")
-        );
+        $roles = array();
+
+        if ($this->username) {
+            $roles = array(
+                (($this->isAdmin()) ? "ROLE_ADMIN" : "ROLE_USER")
+            );
+
+            if (defined('MAUTIC_API_REQUEST') && MAUTIC_API_REQUEST) {
+                $roles[] = "ROLE_API";
+            }
+        }
 
         return $roles;
     }
@@ -824,5 +842,30 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
     public function setPreferences (array $preferences)
     {
         $this->preferences = $preferences;
+    }
+
+    /**
+     * Set signature
+     *
+     * @param string $signature
+     *
+     * @return User
+     */
+    public function setSignature($signature)
+    {
+        $this->isChanged('signature', $signature);
+        $this->signature = $signature;
+
+        return $this;
+    }
+
+    /**
+     * Get signature
+     *
+     * @return string
+     */
+    public function getSignature()
+    {
+        return $this->signature;
     }
 }

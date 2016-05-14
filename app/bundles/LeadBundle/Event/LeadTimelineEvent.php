@@ -97,7 +97,7 @@ class LeadTimelineEvent extends Event
                 $e['timestamp'] = $dt->getDateTime();
                 unset($dt);
             }
-            $dateString = $e['timestamp']->format('Y-m-d H:i');
+            $dateString = $e['timestamp']->format('Y-m-d H:i:s');
             if (!isset($byDate[$dateString])) {
                 $byDate[$dateString] = array();
             }

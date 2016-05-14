@@ -4,6 +4,8 @@ Mautic.formOnLoad = function (container) {
         Mautic.activateSearchAutocomplete('list-search', 'form.form');
     }
 
+    Mautic.initDateRangePicker();
+
     if (mQuery('#mauticforms_fields')) {
         //make the fields sortable
         mQuery('#mauticforms_fields').sortable({
@@ -55,10 +57,6 @@ Mautic.formOnLoad = function (container) {
 
     if (mQuery('#mauticform_formType').length && mQuery('#mauticform_formType').val() == '') {
         mQuery('body').addClass('noscroll');
-    }
-
-    if (typeof Mautic.formSubmissionChart === 'undefined') {
-        Mautic.renderSubmissionChart();
     }
 };
 
@@ -122,12 +120,6 @@ Mautic.updateFormFieldValues = function (field) {
             .attr('autocomplete', valueFieldAttrs['autocomplete'])
             .attr('value', valueFieldAttrs['value']);
         valueField.replaceWith(newValueField);
-    }
-};
-
-Mautic.formOnUnload = function(id) {
-    if (id === '#app-content') {
-        delete Mautic.formSubmissionChart;
     }
 };
 
@@ -250,34 +242,6 @@ Mautic.onPostSubmitActionChange = function(value) {
     mQuery('#mauticform_postActionProperty').next().html('');
     mQuery('#mauticform_postActionProperty').parent().removeClass('has-error');
 };
-
-Mautic.renderSubmissionChart = function (chartData) {
-    if (!mQuery('#submission-chart').length) {
-        return;
-    }
-    if (!chartData) {
-        chartData = mQuery.parseJSON(mQuery('#submission-chart-data').text());
-    } else if (chartData.stats) {
-        chartData = chartData.stats;
-    }
-
-    var ctx = document.getElementById("submission-chart").getContext("2d");
-    var options = {};
-
-    if (typeof Mautic.formSubmissionChart === 'undefined') {
-        Mautic.formSubmissionChart = new Chart(ctx).Line(chartData, options);
-    } else {
-        Mautic.formSubmissionChart.destroy();
-        Mautic.formSubmissionChart = new Chart(ctx).Line(chartData, options);
-    }
-};
-
-Mautic.updateSubmissionChart = function(element, amount, unit) {
-    var formId = Mautic.getEntityId();
-    var query = "amount=" + amount + "&unit=" + unit + "&formId=" + formId;
-
-    Mautic.getChartData(element, 'form:updateSubmissionChart', query, 'renderSubmissionChart');
-}
 
 Mautic.selectFormType = function(formType) {
     if (formType == 'standalone') {

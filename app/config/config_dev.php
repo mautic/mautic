@@ -9,6 +9,7 @@ if (file_exists(__DIR__ . '/security_local.php')) {
 
 //Twig Configuration
 $container->loadFromExtension('twig', array(
+    'cache'                => false,
     'debug'                => '%kernel.debug%',
     'strict_variables'     => '%kernel.debug%'
 ));
@@ -34,10 +35,11 @@ $container->loadFromExtension("monolog", array(
     ),
     "handlers" => array(
         "main"    => array(
-            "type"  => "rotating_file",
-            "path"  => "%kernel.logs_dir%/%kernel.environment%.php",
-            "level" => "debug",
-            "channels" => array(
+            "formatter" => "mautic.monolog.fulltrace.formatter",
+            "type"      => "rotating_file",
+            "path"      => "%kernel.logs_dir%/%kernel.environment%.php",
+            "level"     => "debug",
+            "channels"  => array(
                 "!mautic"
             ),
             "max_files" => 7
@@ -47,54 +49,17 @@ $container->loadFromExtension("monolog", array(
             "bubble" => false
         ),
         "mautic"    => array(
-            "type"  => "rotating_file",
-            "path"  => "%kernel.logs_dir%/mautic_%kernel.environment%.php",
-            "level" => "debug",
-            'channels' => array(
+            "formatter" => "mautic.monolog.fulltrace.formatter",
+            "type"      => "rotating_file",
+            "path"      => "%kernel.logs_dir%/mautic_%kernel.environment%.php",
+            "level"     => "debug",
+            'channels'  => array(
                 'mautic',
             ),
             "max_files" => 7
         )
     )
 ));
-
-//Register command line logging
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-
-$container->setParameter(
-    'console_exception_listener.class',
-    'Mautic\CoreBundle\EventListener\ConsoleExceptionListener'
-);
-$definitionConsoleExceptionListener = new Definition(
-    '%console_exception_listener.class%',
-    array(new Reference('logger'))
-);
-$definitionConsoleExceptionListener->addTag(
-    'kernel.event_listener',
-    array('event' => 'console.exception')
-);
-$container->setDefinition(
-    'mautic.kernel.listener.command_exception',
-    $definitionConsoleExceptionListener
-);
-
-$container->setParameter(
-    'console_terminate_listener.class',
-    'Mautic\CoreBundle\EventListener\ConsoleTerminateListener'
-);
-$definitionConsoleExceptionListener = new Definition(
-    '%console_terminate_listener.class%',
-    array(new Reference('logger'))
-);
-$definitionConsoleExceptionListener->addTag(
-    'kernel.event_listener',
-    array('event' => 'console.terminate')
-);
-$container->setDefinition(
-    'mautic.kernel.listener.command_terminate',
-    $definitionConsoleExceptionListener
-);
 
 // Allow overriding config without a requiring a full bundle or hacks
 if (file_exists(__DIR__ . '/config_override.php')) {

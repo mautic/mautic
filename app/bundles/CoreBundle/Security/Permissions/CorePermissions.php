@@ -205,6 +205,9 @@ class CorePermissions
             $classes[$bundle]->analyzePermissions($bundlePermissions[$bundle], $bundlePermissions, true);
         }
 
+        //get a list of plugin bundles so we can tell later if a bundle is core or plugin
+        $pluginBundles = $this->getPluginBundles();
+        
         //create entities
         foreach ($bundlePermissions as $bundle => $permissions) {
             foreach ($permissions as $name => $perms) {
@@ -215,7 +218,7 @@ class CorePermissions
                 $entity->setName(strtolower($name));
 
                 $bit   = 0;
-                $class = $this->getPermissionObject($bundle);
+                $class = $this->getPermissionObject($bundle, true, array_key_exists(ucfirst($bundle) . "Bundle", $pluginBundles));
 
                 foreach ($perms as $perm) {
                     //get the bit for the perm
