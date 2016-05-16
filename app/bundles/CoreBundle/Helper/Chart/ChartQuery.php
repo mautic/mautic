@@ -316,13 +316,14 @@ class ChartQuery extends AbstractChart
      *
      * @return array
      */
-    public function completeTimeData($rawData)
+    public function completeTimeData($rawData, $countAverage = false)
     {
-        $data         = array();
-        $oneUnit      = $this->getUnitInterval();
-        $limit        = $this->countAmountFromDateRange($this->unit);
-        $previousDate = clone $this->dateFrom;
-        $utcTz        = new \DateTimeZone("UTC");
+        $data          = array();
+        $averageCounts = array();
+        $oneUnit       = $this->getUnitInterval();
+        $limit         = $this->countAmountFromDateRange($this->unit);
+        $previousDate  = clone $this->dateFrom;
+        $utcTz         = new \DateTimeZone("UTC");
 
         if ($this->unit === 'Y') {
             $previousDate->modify('first day of January');
@@ -386,8 +387,14 @@ class ChartQuery extends AbstractChart
                 if (isset($item['data']) && $itemDate >= $previousDate && $itemDate < $nextDate) {
                     if (isset($data[$i])) {
                         $data[$i] += $item['data'];
+                        if ($countAverage) {
+                            $averageCounts[$i]++;
+                        }
                     } else {
                         $data[$i] = $item['data'];
+                        if ($countAverage) {
+                            $averageCounts[$i] = 1;
+                        }
                     }
                     unset($rawData[$key]);
                     continue;
@@ -397,9 +404,20 @@ class ChartQuery extends AbstractChart
             // Chart.js requires the 0 for empty data, but the array slot has to exist
             if (!isset($data[$i])) {
                 $data[$i] = 0;
+                if ($countAverage) {
+                    $averageCounts[$i] = 0;
+                }
             }
 
             $previousDate = $nextDate;
+        }
+
+        if ($countAverage) {
+            foreach ($data as $key => $value) {
+                if (!empty($averageCounts[$key])) {
+                    $data[$key] = round($data[$key] / $averageCounts[$key], 2);
+                }
+            }
         }
 
         return $data;
