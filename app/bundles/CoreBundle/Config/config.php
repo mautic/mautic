@@ -263,6 +263,13 @@ return array(
                 'arguments' => array(
                     'kernel'
                 )
+            ),
+            'mautic.helper.bundle' => array(
+                'class' => 'Mautic\CoreBundle\Helper\BundleHelper',
+                'arguments' => array(
+                    'mautic.helper.core_parameters',
+                    'kernel'
+                )
             )
         ),
         'other'   => array(
