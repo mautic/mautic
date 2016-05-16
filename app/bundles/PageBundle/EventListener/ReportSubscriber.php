@@ -279,9 +279,9 @@ class ReportSubscriber extends CommonSubscriber
 
             switch ($g) {
                 case 'mautic.page.graph.line.hits':
-                    $chart      = new LineChart(null, $options['dateFrom'], $options['dateTo']);
+                    $chart        = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_hit', 'ph');
-                    $hits  = $chartQuery->loadAndBuildTimeData($queryBuilder);
+                    $hits         = $chartQuery->loadAndBuildTimeData($queryBuilder);
                     $chart->setDataset($options['translator']->trans('mautic.page.graph.line.hits'), $hits);
                     $data         = $chart->render();
                     $data['name'] = 'mautic.page.graph.line.hits';

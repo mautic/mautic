@@ -530,7 +530,7 @@ class ChartQuery extends AbstractChart
     {
         $query = $this->connection->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX . $table, $tablePrefix);
-        $this->modifyCountDateDiffQuery($query, $dateColumn1, $dateColumn2, $endSecond, $tablePrefix);
+        $this->modifyCountDateDiffQuery($query, $dateColumn1, $dateColumn2, $startSecond, $endSecond, $tablePrefix);
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $dateColumn1);
         return $query;

@@ -15,6 +15,7 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 
 /**
  * Class ReportSubscriber
@@ -207,60 +208,36 @@ class ReportSubscriber extends CommonSubscriber
         $pointLogRepo = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');
 
         foreach ($graphs as $g) {
-            $options      = $event->getOptions($g);
             $queryBuilder = clone $qb;
+            $options      = $event->getOptions($g);
+            $chartQuery   = clone $options['chartQuery'];
+            $chartQuery->applyDateFilters($queryBuilder, 'date_added', 'l');
 
             switch ($g) {
                 case 'mautic.lead.graph.line.leads':
-                    // Generate data for leads line graph
-                    $unit = 'D';
-                    $amount = 30;
+                    $chart        = new LineChart(null, $options['dateFrom'], $options['dateTo']);
+                    $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_added', 'l');
+                    $leads        = $chartQuery->loadAndBuildTimeData($queryBuilder);
+                    $chart->setDataset($options['translator']->trans('mautic.lead.all.leads'), $leads);
 
-                    if (isset($options['amount'])) {
-                        $amount = $options['amount'];
-                    }
+                    // @todo: the identified contact count is the same as the all contact caunt for some reason 
+                    // $queryBuilder->andwhere($qb->expr()->isNotNull('l.date_identified'));
+                    // $identified   = $chartQuery->loadAndBuildTimeData($queryBuilder);
+                    // $chart->setDataset($options['translator']->trans('mautic.lead.identified'), $leads);
 
-                    if (isset($options['unit'])) {
-                        $unit = $options['unit'];
-                    }
-
-                    $timeStats = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('leads', 'emails'));
-                    $queryBuilder->select('l.id as lead, l.date_added as "dateAdded", LENGTH(l.email) > 0 as email');
-                    $queryBuilder->andwhere($queryBuilder->expr()->gte('l.date_added', ':date'))
-                        ->setParameter('date', $timeStats['fromDate']->format('Y-m-d H:i:s'));
-                    $leads = $queryBuilder->execute()->fetchAll();
-
-                    $timeStats = GraphHelper::mergeLineGraphData($timeStats, $leads, $unit, 0, 'dateAdded');
-                    $timeStats = GraphHelper::mergeLineGraphData($timeStats, $leads, $unit, 1, 'dateAdded', 'email');
-                    $timeStats['name'] = 'mautic.lead.graph.line.leads';
-                    $event->setGraph($g, $timeStats);
+                    $data         = $chart->render();
+                    $data['name'] = 'mautic.lead.graph.line.leads';
+                    $event->setGraph($g, $data);
                     break;
 
                 case 'mautic.lead.graph.line.points':
-
-                    // Generate data for points line graph
-                    $unit   = 'D';
-                    $amount = 30;
-
-                    if (isset($options['amount'])) {
-                        $amount = $options['amount'];
-                    }
-
-                    if (isset($options['unit'])) {
-                        $unit = $options['unit'];
-                    }
-
-                    $timeStats = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('points'));
-
-                    $queryBuilder->select('lp.lead_id as lead, lp.date_added as dateAdded, lp.delta');
-                    $queryBuilder->andwhere($queryBuilder->expr()->gte('lp.date_added', ':date'))
-                        ->setParameter('date', $timeStats['fromDate']->format('Y-m-d H:i:s'));
-                    $points = $queryBuilder->execute()->fetchAll();
-
-                    $timeStats         = GraphHelper::mergeLineGraphData($timeStats, $points, $unit, 0, 'dateAdded', 'delta');
-                    $timeStats['name'] = 'mautic.lead.graph.line.points';
-
-                    $event->setGraph($g, $timeStats);
+                    $chart        = new LineChart(null, $options['dateFrom'], $options['dateTo']);
+                    $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_added', 'lp');
+                    $leads        = $chartQuery->loadAndBuildTimeData($queryBuilder);
+                    $chart->setDataset($options['translator']->trans('mautic.lead.graph.line.points'), $leads);
+                    $data         = $chart->render();
+                    $data['name'] = 'mautic.lead.graph.line.points';
+                    $event->setGraph($g, $data);
                     break;
 
                 case 'mautic.lead.table.most.points':
