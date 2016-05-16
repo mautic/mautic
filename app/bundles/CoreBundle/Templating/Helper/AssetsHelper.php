@@ -11,13 +11,12 @@ namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
-use Symfony\Component\Asset\Package;
-use Symfony\Component\Asset\Packages;
+use Symfony\Component\Templating\Helper\CoreAssetsHelper;
 
 /**
  * Class AssetsHelper
  */
-class AssetsHelper extends Package
+class AssetsHelper extends CoreAssetsHelper
 {
 
     /**
@@ -39,13 +38,6 @@ class AssetsHelper extends Package
      * @var
      */
     protected $version;
-
-    public function __construct(Packages $packages)
-    {
-        $defaultPackage = $packages->getPackage();
-        
-        parent::__construct($defaultPackage->getVersionStrategy(), $defaultPackage->getContext());
-    }
 
     /**
      * Gets asset prefix
@@ -610,10 +602,5 @@ class AssetsHelper extends Package
     public function getName()
     {
         return 'assets';
-    }
-
-    public function setCharset($charset)
-    {
-
     }
 }

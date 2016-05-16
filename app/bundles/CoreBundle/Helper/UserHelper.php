@@ -38,7 +38,12 @@ class UserHelper
      */
     public function getUser($nullIfGuest = false)
     {
-        $user = $this->securityContext->getToken()->getUser();
+        $user  = null;
+        $token = $this->securityContext->getToken();
+
+        if ($token !== null) {
+            $user = $token->getUser();
+        }
 
         if (! $user instanceof User) {
             if ($nullIfGuest) {

@@ -7,42 +7,43 @@
         "psr-4": {
             "Mautic\\AddonBundle\\Bundle\\":"app/bundles/PluginBundle/Bundle/BC",
             "Mautic\\": "app/bundles/",
-            "MauticPlugin\\": "plugins/"
+            "MauticPlugin\\": "plugins/",
+            "MauticAddon\\": "addons/"
         }
     },
     "require": {
         "php": ">=5.3.10",
 
-        "symfony/class-loader": "2.8.*",
-        "symfony/config": "2.8.*",
-        "symfony/console": "2.8.*",
-        "symfony/debug": "2.8.*",
-        "symfony/dependency-injection": "2.8.*",
-        "symfony/event-dispatcher": "2.8.*",
-        "symfony/finder": "2.8.*",
-        "symfony/form": "2.8.*",
-        "symfony/http-foundation": "2.8.*",
-        "symfony/http-kernel": "2.8.*",
-        "symfony/intl": "2.8.*",
-        "symfony/options-resolver": "2.8.*",
-        "symfony/process": "2.8.*",
-        "symfony/routing": "2.8.*",
-        "symfony/security": "2.8.*",
-        "symfony/templating": "2.8.*",
-        "symfony/translation": "2.8.*",
-        "symfony/validator": "2.8.*",
-        "symfony/yaml": "2.8.*",
-        "symfony/stopwatch": "2.8.*",
+        "symfony/class-loader": "2.6.*",
+        "symfony/config": "2.6.*",
+        "symfony/console": "2.6.*",
+        "symfony/debug": "2.6.*",
+        "symfony/dependency-injection": "2.6.*",
+        "symfony/event-dispatcher": "2.6.*",
+        "symfony/finder": "2.3.*",
+        "symfony/form": "2.6.*",
+        "symfony/http-foundation": "2.6.*",
+        "symfony/http-kernel": "2.6.*",
+        "symfony/intl": "2.6.*",
+        "symfony/options-resolver": "2.6.*",
+        "symfony/process": "2.6.*",
+        "symfony/routing": "2.6.*",
+        "symfony/security": "2.6.*",
+        "symfony/templating": "2.6.*",
+        "symfony/translation": "2.6.*",
+        "symfony/validator": "2.6.*",
+        "symfony/yaml": "2.6.*",
+        "symfony/stopwatch": "2.6.*",
 
-        "symfony/framework-bundle": "v2.8.5",
-        "symfony/monolog-bundle": "2.11.*",
-        "symfony/security-bundle": "2.8.*",
+        "symfony/framework-bundle": "2.5.*",
+        "symfony/monolog-bundle": "2.4.*",
+        "symfony/security-bundle": "2.6.*",
         "symfony/swiftmailer-bundle": "2.3.*",
 
-        "symfony/doctrine-bridge": "2.8.*",
-        "symfony/monolog-bridge": "2.8.*",
+        "symfony/doctrine-bridge": "2.6.*",
+        "symfony/monolog-bridge": "2.6.*",
 
-        "sensio/distribution-bundle": "~5.0",
+        "sensio/distribution-bundle": "2.3.*",
 
         "twig/twig": "1.*",
         "symfony/twig-bundle": "2.5.*",
@@ -100,7 +101,7 @@
         "post-update-cmd": [
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache"
-         ]
+        ]
     },
     "config": {
         "bin-dir": "bin"
