@@ -15,7 +15,6 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
-use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Form\Type\TagListType;
 use Mautic\LeadBundle\LeadEvents;
