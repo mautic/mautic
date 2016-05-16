@@ -16,6 +16,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
 
 /**
  * Class ReportSubscriber
@@ -313,30 +314,67 @@ class ReportSubscriber extends CommonSubscriber
                     break;
 
                 case 'mautic.page.graph.pie.time.on.site':
-                    $hitStats               = $hitRepo->getDwellTimes(array(), $queryBuilder);
-                    $graphData              = array();
-                    $graphData['data']      = $hitStats['timesOnSite'];
-                    $graphData['name']      = 'mautic.page.graph.pie.time.on.site';
-                    $graphData['iconClass'] = 'fa-clock-o';
-                    $event->setGraph($g, $graphData);
+                    $timesOnSite = $hitRepo->getDwellTimeLabels();
+                    $chart       = new PieChart();
+
+                    foreach ($timesOnSite as $time) {
+                        $q = clone $queryBuilder;
+                        $chartQuery->modifyCountDateDiffQuery($q, 'date_hit', 'date_left', $time['from'], $time['till'], 'ph');
+                        $data = $chartQuery->fetchCountDateDiff($q);
+                        $chart->setDataset($time['label'], $data);
+                    }
+
+                    $event->setGraph(
+                        $g,
+                        array(
+                            'data'      => $chart->render(),
+                            'name'      => 'mautic.page.graph.pie.time.on.site',
+                            'iconClass' => 'fa-clock-o'
+                        )
+                    );
                     break;
 
                 case 'mautic.page.graph.pie.new.vs.returning':
-                    $hitStats = $hitRepo->getDwellTimes(array(), $queryBuilder);
-                    $graphData              = array();
-                    $graphData['data']      = $hitStats['newVsReturning'];
-                    $graphData['name']      = 'mautic.page.graph.pie.new.vs.returning';
-                    $graphData['iconClass'] = 'fa-bookmark-o';
-                    $event->setGraph($g, $graphData);
+                    $chart     = new PieChart();
+                    $allQ      = clone $queryBuilder;
+                    $uniqueQ   = clone $queryBuilder;
+                    $chartQuery->modifyCountQuery($allQ, 'date_hit', array(), 'ph');
+                    $chartQuery->modifyCountQuery($uniqueQ, 'date_hit', array('getUnique' => true, 'selectAlso' => array('ph.page_id')), 'ph');
+                    $all       = $chartQuery->fetchCount($allQ);
+                    $unique    = $chartQuery->fetchCount($uniqueQ);
+                    $returning = $all - $unique;
+                    $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.unique'), $unique);
+                    $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.graph.pie.new.vs.returning.returning'), $returning);
+
+                    $event->setGraph(
+                        $g,
+                        array(
+                            'data'      => $chart->render(),
+                            'name'      => 'mautic.page.graph.pie.new.vs.returning',
+                            'iconClass' => 'fa-bookmark-o'
+                        )
+                    );
                     break;
 
                 case 'mautic.page.graph.pie.languages':
-                    $hitStats = $hitRepo->getDwellTimes(array(), $queryBuilder);
-                    $graphData              = array();
-                    $graphData['data']      = $hitStats['languages'];
-                    $graphData['name']      = 'mautic.page.graph.pie.languages';
-                    $graphData['iconClass'] = 'fa-globe';
-                    $event->setGraph($g, $graphData);
+                    $queryBuilder->select('ph.page_language, COUNT(distinct(ph.id))')
+                        ->groupBy('ph.page_language')
+                        ->andWhere($qb->expr()->isNotNull('ph.page_language'));
+                    $data  = $queryBuilder->execute()->fetchAll();
+                    $chart = new PieChart();
+                    
+                    foreach ($data as $lang) {
+                        $chart->setDataset($lang['page_language'], $lang['count']);
+                    }
+
+                    $event->setGraph(
+                        $g,
+                        array(
+                            'data'      => $chart->render(),
+                            'name'      => 'mautic.page.graph.pie.languages',
+                            'iconClass' => 'fa-globe'
+                        )
+                    );
                     break;
 
                 case 'mautic.page.table.referrers':

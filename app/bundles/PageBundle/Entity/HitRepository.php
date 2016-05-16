@@ -349,6 +349,38 @@ class HitRepository extends CommonRepository
     }
 
     /**
+     * Get array of dwell time labels with ranges
+     *
+     * @return array
+     */
+    public function getDwellTimeLabels()
+    {
+        return array(
+            array(
+                'label' => '< 1m',
+                'from' => 0,
+                'till' => 60
+            ),
+            array(
+                'label' => '1 - 5m',
+                'from' => 60,
+                'till' => 300
+            ),
+            array(
+                'label' => '5 - 10m',
+                'value' => 0,
+                'from' => 300,
+                'till' => 600
+            ),
+            array(
+                'label' => '> 10m',
+                'from' => 600,
+                'till' => 999999
+            )
+        );
+    }
+
+    /**
      * Get the number of bounces
      *
      * @param array                             $options

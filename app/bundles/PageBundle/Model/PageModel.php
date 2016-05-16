@@ -730,19 +730,6 @@ class PageModel extends FormModel
         return $this->getHitRepository()->getBounces($page->getId());
     }
 
-
-    /**
-     * Get number of page bounces
-     *
-     * @param Page $page
-     *
-     * @return int
-     */
-    public function getDwellTimeStats (Page $page)
-    {
-        return $this->getHitRepository()->getDwellTimes(array('pageIds' => $page->getId()));
-    }
-
     /**
      * Get the variant parent/children
      *
@@ -984,28 +971,9 @@ class PageModel extends FormModel
      */
     public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = array(), $canViewOthers = true)
     {
-        $timesOnSite = array(
-            array(
-                'label' => '< 1m',
-                'from' => 0,
-                'till' => 60),
-            array(
-                'label' => '1 - 5m',
-                'from' => 60,
-                'till' => 300),
-            array(
-                'label' => '5 - 10m',
-                'value' => 0,
-                'from' => 300,
-                'till' => 600),
-            array(
-                'label' => '> 10m',
-                'from' => 600,
-                'till' => 999999),
-        );
-
-        $chart = new PieChart();
-        $query = new ChartQuery($this->factory->getEntityManager()->getConnection(), $dateFrom, $dateTo);
+        $timesOnSite = $this->getHitRepository()->getDwellTimeLabels();
+        $chart       = new PieChart();
+        $query       = new ChartQuery($this->factory->getEntityManager()->getConnection(), $dateFrom, $dateTo);
 
         foreach ($timesOnSite as $time) {
             $q = $query->getCountDateDiffQuery('page_hits', 'date_hit', 'date_left', $time['from'], $time['till'], $filters);

@@ -434,15 +434,28 @@ class ChartQuery extends AbstractChart
      *
      * @return QueryBuilder $query
      */
-    public function getCountQuery($table, $uniqueColumn, $dateColumn = null, $filters = array(), $options = array())
+    public function getCountQuery($table, $uniqueColumn, $dateColumn = null, $filters = array(), $options = array(), $tablePrefix = 't')
     {
         $query = $this->connection->createQueryBuilder();
-
-        $query->select('COUNT(t.' . $uniqueColumn . ') AS count')
-            ->from(MAUTIC_TABLE_PREFIX . $table, 't');
-
+        $query->from(MAUTIC_TABLE_PREFIX . $table, $tablePrefix);
+        $this->modifyCountQuery($query, $uniqueColumn, $dateColumn, $tablePrefix);
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $dateColumn);
+
+        return $query;
+    }
+
+    /**
+     * Modify the query to count occurences of a value in a column
+     *
+     * @param  QueryBuilder $table without prefix
+     * @param  string       $uniqueColumn name
+     * @param  array        $options for special behavior
+     * @param  string       $tablePrefix
+     */
+    public function modifyCountQuery(QueryBuilder &$query, $uniqueColumn, $options = array(), $tablePrefix = 't')
+    {
+        $query->select('COUNT(' . $tablePrefix . '.' . $uniqueColumn . ') AS count');
 
         // Count only unique values
         if (!empty($options['getUnique'])) {
@@ -451,14 +464,14 @@ class ChartQuery extends AbstractChart
                 $selectAlso = ', ' . implode(', ', $options['selectAlso']);
             }
             // Modify the previous query
-            $query->select('t.' . $uniqueColumn . $selectAlso);
+            $query->select($tablePrefix . '.' . $uniqueColumn . $selectAlso);
             $query->having('COUNT(*) = 1')
-                ->groupBy('t.' . $uniqueColumn . $selectAlso);
+                ->groupBy($tablePrefix . '.' . $uniqueColumn . $selectAlso);
 
             // Create a new query with subquery of the previous query
             $uniqueQuery = $this->connection->createQueryBuilder();
-            $uniqueQuery->select('COUNT(t.' . $uniqueColumn . ') AS count')
-                ->from('(' . $query->getSql() . ')', 't');
+            $uniqueQuery->select('COUNT(' . $tablePrefix . '.' . $uniqueColumn . ') AS count')
+                ->from('(' . $query->getSql() . ')', $tablePrefix);
 
             // Apply params from the previous query to the new query
             $uniqueQuery->setParameters($query->getParameters());
@@ -509,33 +522,47 @@ class ChartQuery extends AbstractChart
      * @param  integer    $startSecond
      * @param  integer    $endSecond
      * @param  array      $filters will be added to where claues
+     * @param  string     $tablePrefix
      *
      * @return QueryBuilder $query
      */
-    public function getCountDateDiffQuery($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $filters = array())
+    public function getCountDateDiffQuery($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $filters = array(), $tablePrefix = 't')
     {
         $query = $this->connection->createQueryBuilder();
+        $query->from(MAUTIC_TABLE_PREFIX . $table, $tablePrefix);
+        $this->modifyCountDateDiffQuery($query, $dateColumn1, $dateColumn2, $endSecond, $tablePrefix);
+        $this->applyFilters($query, $filters);
+        $this->applyDateFilters($query, $dateColumn1);
+        return $query;
+    }
 
-        $query->select('COUNT(t.' . $dateColumn1 . ') AS count')
-            ->from(MAUTIC_TABLE_PREFIX . $table, 't');
+    /**
+     * Modify the query to count how many rows is between a range of date diff in seconds
+     *
+     * @param  QueryBuilder $query
+     * @param  string       $dateColumn1
+     * @param  string       $dateColumn2
+     * @param  integer      $startSecond
+     * @param  integer      $endSecond
+     * @param  array        $filters will be added to where claues
+     * @param  string       $tablePrefix
+     */
+    public function modifyCountDateDiffQuery(QueryBuilder &$query, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $tablePrefix = 't')
+    {
+        $query->select('COUNT(' . $tablePrefix . '.' . $dateColumn1 . ') AS count');
 
         if ($this->isPostgres()) {
-            $query->where('extract(epoch from(t.' . $dateColumn2 . '::timestamp - t.' . $dateColumn1 . '::timestamp)) >= :startSecond');
-            $query->andWhere('extract(epoch from(t.' . $dateColumn2 . '::timestamp - t.' . $dateColumn1 . '::timestamp)) < :endSecond');
+            $query->where('extract(epoch from(' . $tablePrefix . '.' . $dateColumn2 . '::timestamp - ' . $tablePrefix . '.' . $dateColumn1 . '::timestamp)) >= :startSecond');
+            $query->andWhere('extract(epoch from(' . $tablePrefix . '.' . $dateColumn2 . '::timestamp - ' . $tablePrefix . '.' . $dateColumn1 . '::timestamp)) < :endSecond');
         }
 
         if ($this->isMysql()) {
-            $query->where('TIMESTAMPDIFF(SECOND, t.' . $dateColumn2 . ', t.' . $dateColumn1 . ') >= :startSecond');
-            $query->andWhere('TIMESTAMPDIFF(SECOND, t.' . $dateColumn2 . ', t.' . $dateColumn1 . ') < :endSecond');
+            $query->where('TIMESTAMPDIFF(SECOND, ' . $tablePrefix . '.' . $dateColumn2 . ', ' . $tablePrefix . '.' . $dateColumn1 . ') >= :startSecond');
+            $query->andWhere('TIMESTAMPDIFF(SECOND, ' . $tablePrefix . '.' . $dateColumn2 . ', ' . $tablePrefix . '.' . $dateColumn1 . ') < :endSecond');
         }
 
         $query->setParameter('startSecond', $startSecond);
         $query->setParameter('endSecond', $endSecond);
-
-        $this->applyFilters($query, $filters);
-        $this->applyDateFilters($query, $dateColumn1);
-
-        return $query;
     }
 
     /**
