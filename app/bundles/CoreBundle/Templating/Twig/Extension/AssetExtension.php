@@ -25,7 +25,7 @@ class AssetExtension extends Twig_Extension
 
     /**
      * AssetExtension constructor.
-     * 
+     *
      * @param AssetsHelper $assetsHelper
      */
     public function __construct(AssetsHelper $assetsHelper)
@@ -50,7 +50,7 @@ class AssetExtension extends Twig_Extension
 
     public function getName()
     {
-        return 'asset';
+        return 'coreasset';
     }
 
     public function outputSystemStylesheets()

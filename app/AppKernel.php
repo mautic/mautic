@@ -478,7 +478,7 @@ class AppKernel extends Kernel
             }
         }
 
-        require_once $cache;
+        require_once $cache->getPath();
 
         $this->container = new $class();
         $this->container->set('kernel', $this);
