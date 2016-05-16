@@ -169,15 +169,15 @@ class ReportSubscriber extends CommonSubscriber
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
             $queryBuilder = clone $qb;
+            $chartQuery   = clone $options['chartQuery'];
+            $chartQuery->applyDateFilters($queryBuilder, 'date_download', 'ad');
 
             switch ($g) {
                 case 'mautic.asset.graph.line.downloads':
-                    $queryBuilder->select('ad.asset_id, ad.date_download as "count"');
-                    $chart     = new LineChart(null, $options['dateFrom'], $options['dateTo']);
-                    $chartQuery = $options['chartQuery'];
+                    $chart      = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_download', 'ad');
-                    $downloads = $chartQuery->loadAndBuildTimeData($queryBuilder);
-                    $chart->setDataset('test', $downloads);
+                    $downloads  = $chartQuery->loadAndBuildTimeData($queryBuilder);
+                    $chart->setDataset($options['translator']->trans('mautic.asset.graph.line.downloads'), $downloads);
                     $data         = $chart->render();
                     $data['name'] = 'mautic.asset.graph.line.downloads';
 

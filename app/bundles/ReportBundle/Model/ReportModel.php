@@ -438,8 +438,8 @@ class ReportModel extends FormModel
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $options['dateFrom'], $options['dateTo']);
-        $chartQuery->applyDateFilters($query, 'date_download', 'ad');
         $options['chartQuery'] = $chartQuery;
+        $options['translator'] = $this->factory->getTranslator();
 
         $contentTemplate = $reportGenerator->getContentTemplate();
 
