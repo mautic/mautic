@@ -471,7 +471,7 @@ return array(
             'templating.twig.extension.asset'    => array(
                 'class' => 'Mautic\CoreBundle\Templating\Twig\Extension\AssetExtension',
                 'arguments' => array(
-                    'mautic.factory'
+                    'templating.helper.assets'
                 ),
                 'tag' => 'twig.extension'
             ),
