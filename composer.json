@@ -8,8 +8,12 @@
             "Mautic\\AddonBundle\\Bundle\\":"app/bundles/PluginBundle/Bundle/BC",
             "Mautic\\": "app/bundles/",
             "MauticPlugin\\": "plugins/",
-            "MauticAddon\\": "addons/"
-        }
+            "Mautic\\Middleware\\": "app/middlewares/"
+        },
+        "classmap": [
+            "app/AppKernel.php",
+            "app/AppCache.php"
+        ]
     },
     "require": {
         "php": ">=5.3.10",
@@ -92,7 +96,10 @@
         "geoip2/geoip2": "~2.0",
         "camspiers/json-pretty": "1.0.*",
         "misd/phone-number-bundle": "^1.1",
-        "ip2location/ip2location-php": "^7.2"
+        "ip2location/ip2location-php": "^7.2",
+
+        "stack/run": "^1.0",
+        "stack/builder": "^1.0"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "2.5.*",

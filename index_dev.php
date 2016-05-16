@@ -27,7 +27,6 @@ if (version_compare(PHP_VERSION, MAUTIC_MAXIMUM_PHP, '>')) {
 // Fix for hosts that do not have date.timezone set, it will be reset based on users settings
 date_default_timezone_set ('UTC');
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Debug\Debug;
 
 // If you don't want to setup permissions the proper way, just uncomment the following PHP line
@@ -53,11 +52,8 @@ if (isset($_SERVER['HTTP_CLIENT_IP'])
 $loader = require_once __DIR__ . '/vendor/autoload.php';
 Debug::enable();
 
-require_once __DIR__.'/app/AppKernel.php';
-
-$kernel = new AppKernel('dev', true);
+$kernel = new AppKernel('dev', false);
 $kernel->loadClassCache();
-$request = Request::createFromGlobals();
-$response = $kernel->handle($request);
-$response->send();
-$kernel->terminate($request, $response);
+
+Stack\run((new Stack\Builder)
+    ->resolve($kernel));
