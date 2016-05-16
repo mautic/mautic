@@ -40,8 +40,8 @@
     position: absolute;
     padding: 10px 15px;
     z-index: 1010;
-    border-radius: 3px;
     background: #FFFFFF;
+    border-radius: 3px;
 }
 
 .list-campaign-event:hover, .list-campaign-source:hover {
@@ -76,22 +76,23 @@
 
 
 .list-campaign-decision,  a.list-campaign-decision {
-    /*background-color: #faebcc;*/
+    /*background-color: #e5ffff;*/
     border: solid 1px #00b49d;
 }
 
 .list-campaign-condition,  a.list-campaign-condition {
-    border: solid 1px #f86a52;
+    /*background-color: #ffe9d1;*/
+    border: solid 1px #ffb79f;
 }
 
 .list-campaign-action, a.list-campaign-action {
-    /*background-color: #47558f;*/
-    border: solid 1px #4e5e9e;
+    /*background-color: #cdddff;*/
+    border: solid 1px #9babeb;
     /*color: #fff;*/
 }
 
 .list-campaign-leadsource, a.list-campaign-leadsource {
-    /*background-color: #47558f;*/
+    /*background-color: #ffffe6;*/
     border: solid 1px #fdb933;
     /*color: #fff;*/
 }
@@ -127,4 +128,8 @@
 
 .campaign-event-buttons .btn-edit {
     background: #337ab7;
+}
+
+.stat-boxes .pie-legend li {
+    display: inline;
 }

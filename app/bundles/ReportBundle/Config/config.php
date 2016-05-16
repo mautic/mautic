@@ -50,16 +50,14 @@ return array(
 
     'menu'     => array(
         'main' => array(
-            'priority' => 40,
-            'items'    => array(
-                'mautic.report.reports' => array(
-                    'route'     => 'mautic_report_index',
-                    'iconClass' => 'fa-line-chart',
-                    'access'    => array(
-                        'report:reports:viewown',
-                        'report:reports:viewother'
-                    )
-                )
+            'mautic.report.reports' => array(
+                'route'     => 'mautic_report_index',
+                'iconClass' => 'fa-line-chart',
+                'access'    => array(
+                    'report:reports:viewown',
+                    'report:reports:viewother'
+                ),
+                'priority' => 20
             )
         )
     ),

@@ -11,15 +11,26 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'campaign');
 $view['slots']->set("headerTitle", $campaign->getName());
 
-$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
-    'item'      => $campaign,
-    'templateButtons' => array(
-        'edit'      => $permissions['campaign:campaigns:edit'],
-        'clone'     => $permissions['campaign:campaigns:create'],
-        'delete'    => $permissions['campaign:campaigns:delete'],
-    ),
-    'routeBase' => 'campaign'
-)));
+$view['slots']->set(
+    'actions',
+    $view->render(
+        'MauticCoreBundle:Helper:page_actions.html.php',
+        array(
+            'item'            => $campaign,
+            'templateButtons' => array(
+                'edit'   => $permissions['campaign:campaigns:edit'],
+                'clone'  => $permissions['campaign:campaigns:create'],
+                'delete' => $permissions['campaign:campaigns:delete'],
+                'close'  => $permissions['campaign:campaigns:view'],
+            ),
+            'routeBase'       => 'campaign'
+        )
+    )
+);
+$view['slots']->set(
+    'publishStatus',
+    $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $campaign))
+);
 ?>
 
 <!-- start: box layout -->
@@ -33,9 +44,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                     <div class="col-xs-6 va-m">
                         <div class="text-white dark-sm mb-0"><?php echo $campaign->getDescription(); ?></div>
                     </div>
-                    <div class="col-xs-6 va-m text-right">
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $campaign)); ?>
-                    </div>
+
                 </div>
             </div>
             <!--/ campaign detail header -->
@@ -46,7 +55,10 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                     <div class="panel shd-none mb-0">
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
-                                <?php echo $view->render('MauticCoreBundle:Helper:details.html.php', array('entity' => $campaign)); ?>
+                            <?php echo $view->render(
+                                'MauticCoreBundle:Helper:details.html.php',
+                                array('entity' => $campaign)
+                            ); ?>
                             </tbody>
                         </table>
                     </div>
@@ -59,7 +71,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <!-- campaign detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#campaign-details"><span class="caret"></span>  <?php echo $view['translator']->trans('mautic.core.details'); ?></a>
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse"
+                       data-target="#campaign-details"><span
+                            class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?></a>
                 </span>
             </div>
             <!--/ campaign detail collapseable toggler -->
@@ -80,11 +94,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                 </div>
                             </div>
                             <div class="pt-0 pl-10 pb-0 pr-10">
-                                <div>
-                                    <canvas id="campaign-leads-chart" height="93"></canvas>
-                                </div>
+                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $leadStats, 'chartType' => 'simple-bar', 'chartHeight' => 93)); ?>
                             </div>
-                            <div id="campaign-leads-chart-data" class="hide"><?php echo json_encode($leadStats); ?></div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -92,7 +103,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                             <div class="panel-body box-layout pb-0">
                                 <div class="col-xs-8 va-m">
                                     <h5 class="dark-md fw-sb mb-xs">
-                                        <?php echo $view['translator']->trans('mautic.campaign.campaign.new.returning'); ?>
+                                        <?php echo $view['translator']->trans(
+                                            'mautic.campaign.campaign.new.returning'
+                                        ); ?>
                                     </h5>
                                 </div>
                                 <div class="col-xs-4 va-t text-right">
@@ -100,10 +113,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                 </div>
                             </div>
                             <div class="text-center">
-                                <canvas id="emails-sent-rate" width="110" height="110"></canvas>
-                                <div id="emails-sent-data" class="hide">
-                                    <?php echo json_encode($emailsSent); ?>
-                                </div>
+                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $emailsSent, 'chartType' => 'pie', 'chartHeight' => 93)); ?>
                             </div>
                         </div>
                     </div>
@@ -120,11 +130,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                 </div>
                             </div>
                             <div class="pt-0 pl-10 pb-0 pr-10">
-                                <div>
-                                    <canvas id="campaign-views-chart" height="93"></canvas>
-                                </div>
+                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $hits, 'chartType' => 'simple-bar', 'chartHeight' => 93)); ?>
                             </div>
-                            <div id="campaign-views-chart-data" class="hide"><?php echo json_encode($hits); ?></div>
                         </div>
                     </div>
                 </div>
@@ -161,13 +168,22 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <div class="tab-content pa-md">
             <!-- #events-container -->
             <div class="tab-pane active fade in bdr-w-0" id="decisions-container">
-                <?php echo $view->render('MauticCampaignBundle:Campaign:events.html.php', array('events' => $events, 'eventType' => 'decision')); ?>
+                <?php echo $view->render(
+                    'MauticCampaignBundle:Campaign:events.html.php',
+                    array('events' => $events, 'eventType' => 'decision')
+                ); ?>
             </div>
             <div class="tab-pane fade in bdr-w-0" id="actions-container">
-                <?php echo $view->render('MauticCampaignBundle:Campaign:events.html.php', array('events' => $events, 'eventType' => 'action')); ?>
+                <?php echo $view->render(
+                    'MauticCampaignBundle:Campaign:events.html.php',
+                    array('events' => $events, 'eventType' => 'action')
+                ); ?>
             </div>
             <div class="tab-pane fade in bdr-w-0" id="conditions-container">
-                <?php echo $view->render('MauticCampaignBundle:Campaign:events.html.php', array('events' => $events, 'eventType' => 'condition')); ?>
+                <?php echo $view->render(
+                    'MauticCampaignBundle:Campaign:events.html.php',
+                    array('events' => $events, 'eventType' => 'condition')
+                ); ?>
             </div>
             <!--/ #events-container -->
 

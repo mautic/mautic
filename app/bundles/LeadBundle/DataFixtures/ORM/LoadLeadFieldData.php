@@ -64,6 +64,7 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
             'twitter',
             'facebook',
             'googleplus',
+            'linkedin',
             'skype',
             'instagram',
             'foursquare'
@@ -122,6 +123,7 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
                 'twitter',
                 'facebook',
                 'googleplus',
+                'linkedin',
                 'skype',
                 'foursquare',
                 'instagram',
@@ -134,7 +136,7 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
             $entity->setIsShortVisible($shortVisible);
 
 
-            $group = (in_array($name, array('twitter', 'facebook', 'googleplus', 'skype', 'instagram', 'foursquare'))) ? 'social' : 'core';
+            $group = (in_array($name, array('twitter', 'facebook', 'googleplus','linkedin', 'skype', 'instagram', 'foursquare'))) ? 'social' : 'core';
             $entity->setGroup($group);
 
             $manager->persist($entity);

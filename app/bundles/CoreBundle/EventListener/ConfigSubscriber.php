@@ -61,9 +61,18 @@ class ConfigSubscriber extends CommonSubscriber
             // If there is an error, fall back to 'en_US' as it is our system default
             if ($fetchLanguage['error']) {
                 $values['coreconfig']['locale'] = 'en_US';
+                $message = 'mautic.core.could.not.set.language';
+                $messageVars = array();
 
-                // TODO - Raise a flash message
-                $this->factory->getSession()->getFlashBag()->add('notice', 'mautic.core.could.not.set.language');
+                if (isset($fetchLanguage['message'])) {
+                    $message = $fetchLanguage['message'];
+                }
+
+                if (isset($fetchLanguage['vars'])) {
+                    $messageVars = $fetchLanguage['vars'];
+                }
+
+                $event->setError($message, $messageVars);
             }
         }
 

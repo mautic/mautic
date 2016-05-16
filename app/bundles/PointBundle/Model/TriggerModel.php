@@ -199,7 +199,7 @@ class TriggerModel extends CommonFormModel
      *
      * @return void
      */
-    public function setEvents(Trigger &$entity, $sessionEvents)
+    public function setEvents(Trigger $entity, $sessionEvents)
     {
         $order   = 1;
         $existingActions = $entity->getEvents();
@@ -216,11 +216,18 @@ class TriggerModel extends CommonFormModel
                 if (method_exists($event, $func)) {
                     $event->$func($v);
                 }
-                $event->setTrigger($entity);
             }
+            $event->setTrigger($entity);
             $event->setOrder($order);
             $order++;
             $entity->addTriggerEvent($properties['id'], $event);
+        }
+
+        // Persist if editing the trigger
+        if ($entity->getId()) {
+            /** @var \Mautic\PointBundle\Model\TriggerEventModel $eventModel */
+            $eventModel = $this->factory->getModel('point.triggerEvent');
+            $eventModel->saveEntities($entity->getEvents());
         }
     }
 
@@ -257,7 +264,6 @@ class TriggerModel extends CommonFormModel
         }
         return $groups;
     }
-
 
     /**
      * Triggers a specific event
@@ -368,6 +374,9 @@ class TriggerModel extends CommonFormModel
 
             if (!empty($persist)) {
                 $this->getEventRepository()->saveEntities($persist);
+
+                $this->em->clear('Mautic\PointBundle\Entity\LeadTriggerLog');
+                $this->em->clear('Mautic\PointBundle\Entity\TriggerEvent');
             }
         }
     }

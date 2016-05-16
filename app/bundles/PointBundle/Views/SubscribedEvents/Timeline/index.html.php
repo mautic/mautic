@@ -12,7 +12,7 @@ $item = $event['extra']['log'];
 ?>
 
 <li class="wrapper point-gained">
-	<div class="figure"><span class="fa <?php echo isset($icons['points']) ? $icons['points'] : '' ?>"></span></div>
+	<div class="figure"><span class="fa <?php echo isset($event['icon']) ? $event['icon'] : '' ?>"></span></div>
 	<div class="panel">
 	    <div class="panel-body">
 	    	<h3>

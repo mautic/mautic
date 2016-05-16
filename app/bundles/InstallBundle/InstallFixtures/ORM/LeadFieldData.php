@@ -63,6 +63,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
             'facebook',
             'googleplus',
             'skype',
+            'linkedin',
             'instagram',
             'foursquare'
         );
@@ -122,6 +123,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
                 'facebook',
                 'googleplus',
                 'skype',
+                'linkedin',
                 'foursquare',
                 'instagram',
                 'website'
@@ -131,7 +133,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
             $shortVisible = in_array($name, array('firstname', 'lastname', 'email')) ? true : false;
             $entity->setIsShortVisible($shortVisible);
 
-            $group = (in_array($name, array('twitter', 'facebook', 'googleplus', 'skype', 'instagram', 'foursquare'))) ? 'social' : 'core';
+            $group = (in_array($name, array('twitter', 'facebook', 'googleplus', 'skype', 'linkedin','instagram', 'foursquare'))) ? 'social' : 'core';
             $entity->setGroup($group);
 
             $manager->persist($entity);

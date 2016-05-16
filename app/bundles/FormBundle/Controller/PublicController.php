@@ -28,6 +28,7 @@ class PublicController extends CommonFormController
             return $this->accessDenied();
         }
 
+        $form          = null;
         $post          = $this->request->request->get('mauticform');
         $messengerMode = (!empty($post['messenger']));
         $server        = $this->request->server->all();
@@ -213,7 +214,15 @@ class PublicController extends CommonFormController
         $msg     = (!empty($message['message'])) ? $message['message'] : '';
         $msgType = (!empty($message['type'])) ? $message['type'] : 'notice';
 
-        return $this->render('MauticCoreBundle::message.html.php', array(
+        $analytics = $this->factory->getHelper('template.analytics')->getCode();
+
+        if (! empty($analytics)) {
+            $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
+        }
+
+        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $this->factory->getParameter('theme') . ':message.html.php');
+
+        return $this->render($logicalName, array(
             'message'  => $msg,
             'type'     => $msgType,
             'template' => $this->factory->getParameter('theme')
@@ -232,7 +241,7 @@ class PublicController extends CommonFormController
     public function previewAction($id = 0)
     {
         $objectId          = (empty($id)) ? InputHelper::int($this->request->get('id')) : $id;
-        $css               = InputHelper::raw($this->request->get('css'));
+        $css               = InputHelper::string($this->request->get('css'));
         $model             = $this->factory->getModel('form.form');
         $form              = $model->getEntity($objectId);
         $customStylesheets = (!empty($css)) ? explode(',', $css) : array();
@@ -268,6 +277,29 @@ class PublicController extends CommonFormController
         }
 
         $viewParams['template'] = $template;
+
+        if (! empty($template)) {
+            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':form.html.php');
+            $assetsHelper = $this->factory->getHelper('template.assets');
+            $slotsHelper = $this->factory->getHelper('template.slots');
+            $analyticsHelper = $this->factory->getHelper('template.analytics');
+
+            if (! empty($customStylesheets)) {
+                foreach ($customStylesheets as $css) {
+                    $assetsHelper->addStylesheet($css);
+                }
+            }
+
+            $slotsHelper->set('pageTitle', $form->getName());
+
+            $analytics = $analyticsHelper->getCode();
+
+            if (! empty($analytics)) {
+                $assetsHelper->addCustomDeclaration($analytics);
+            }
+
+            return $this->render($logicalName, $viewParams);
+        }
 
         return $this->render('MauticFormBundle::form.html.php', $viewParams);
     }

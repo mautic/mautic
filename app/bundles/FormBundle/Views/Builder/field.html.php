@@ -26,7 +26,16 @@ if (isset($properties['labelAttributes'])):
     unset($form['properties']['labelAttributes']);
 endif;
 
-$showProperties = (isset($form['properties']) && count($form['properties']));
+$showProperties = false;
+if (isset($form['properties']) && count($form['properties'])):
+    // Only show if there is at least one non-hidden field
+    foreach ($form['properties'] as $property):
+        if ('hidden' != $property->vars['block_prefixes'][1]):
+            $showProperties = true;
+            break;
+        endif;
+    endforeach;
+endif;
 
 // Check for validation errors to show on tabs
 $generalTabError    = (isset($form['label']) && ($view['form']->containsErrors($form['label'])));
@@ -132,10 +141,14 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
 
                         <?php foreach ($properties as $name => $property): ?>
                             <?php if ($form['properties'][$name]->isRendered() || $name == 'labelAttributes') continue; ?>
-                            <?php $col = ($name == 'text') ? 12 : 6; ?>
+
+                            <?php  if ($form['properties'][$name]->vars['block_prefixes'][1] == 'hidden') : echo $view['form']->row($form['properties'][$name]); ?>
+                            <?php else:
+                                $col = ($name == 'text') ? 12 : 6; ?>
                             <div class="col-md-<?php echo $col; ?>">
                                 <?php echo $view['form']->row($form['properties'][$name]); ?>
                             </div>
+                            <?php endif; ?>
                         <?php endforeach; ?>
 
                     <?php endif; ?>

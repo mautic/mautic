@@ -84,7 +84,8 @@ class LeadSubscriber extends CommonSubscriber
                     'form'  => $formModel->getEntity($row['form_id']),
                     'page'  => $pageModel->getEntity($row['page_id'])
                 ),
-                'contentTemplate' => 'MauticFormBundle:SubscribedEvents\Timeline:index.html.php'
+                'contentTemplate' => 'MauticFormBundle:SubscribedEvents\Timeline:index.html.php',
+                'icon'            => 'fa-pencil-square-o'
             ));
         }
     }

@@ -81,6 +81,8 @@ class FoursquareIntegration extends SocialIntegration
      * @param array  $parameters
      * @param string $method
      * @param array  $settings
+     *
+     * @return mixed|string
      */
     public function makeRequest($url, $parameters = array(), $method = 'GET', $settings = array())
     {

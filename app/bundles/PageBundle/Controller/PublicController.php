@@ -14,6 +14,8 @@ use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\LeadBundle\EventListener\EmailSubscriber;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
+use Mautic\PageBundle\Entity\Page;
+use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -37,7 +39,6 @@ class PublicController extends CommonFormController
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model      = $this->factory->getModel('page.page');
         $security   = $this->factory->getSecurity();
-        $translator = $this->get('translator');
         $entity     = $model->getEntityBySlugs($slug);
 
         if (!empty($entity)) {
@@ -234,13 +235,26 @@ class PublicController extends CommonFormController
                 }
             }
 
+            $analytics = $this->factory->getHelper('template.analytics')->getCode();
+
             $template = $entity->getTemplate();
             if (!empty($template)) {
                 //all the checks pass so display the content
-                $slots    = $this->factory->getTheme($template)->getSlots('page');
-                $response = $this->render('MauticPageBundle::public.html.php', array(
+                $slots = $this->factory->getTheme($template)->getSlots('page');
+                $content = $entity->getContent();
+
+                $this->processSlots($slots, $entity);
+
+                // Add the GA code to the template assets
+                if (! empty($analytics)) {
+                    $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
+                }
+
+                $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':page.html.php');
+
+                $response = $this->render($logicalName, array(
                     'slots'           => $slots,
-                    'content'         => $entity->getContent(),
+                    'content'         => $content,
                     'page'            => $entity,
                     'template'        => $template,
                     'public'          => true
@@ -249,9 +263,8 @@ class PublicController extends CommonFormController
                 $content = $response->getContent();
             } else {
                 $content = $entity->getCustomHtml();
-                $analytics = $this->factory->getParameter('google_analytics');
                 if (!empty($analytics)) {
-                    $content = str_replace('</head>', htmlspecialchars_decode($analytics) . "\n</head>", $content);
+                    $content = str_replace('</head>', $analytics . "\n</head>", $content);
                 }
             }
 
@@ -285,24 +298,37 @@ class PublicController extends CommonFormController
             $this->notFound();
         }
 
+        $analytics = $this->factory->getHelper('template.analytics')->getCode();
+
         $template = $entity->getTemplate();
         if (!empty($template)) {
             //all the checks pass so display the content
-            $slots    = $this->factory->getTheme($template)->getSlots('page');
-            $response = $this->render('MauticPageBundle::public.html.php', array(
+            $slots = $this->factory->getTheme($template)->getSlots('page');
+            $content = $entity->getContent();
+
+            $this->processSlots($slots, $entity);
+
+            // Add the GA code to the template assets
+            if (! empty($analytics)) {
+                $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
+            }
+
+            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':page.html.php');
+
+            $response = $this->render($logicalName, array(
                 'slots'           => $slots,
-                'content'         => $entity->getContent(),
+                'content'         => $content,
                 'page'            => $entity,
                 'template'        => $template,
-                'public'          => true
+                'public'          => true // @deprecated Remove in 2.0
             ));
 
             $content = $response->getContent();
         } else {
             $content = $entity->getCustomHtml();
-            $analytics = $this->factory->getParameter('google_analytics');
+
             if (!empty($analytics)) {
-                $content = str_replace('</head>', htmlspecialchars_decode($analytics) . "\n</head>", $content);
+                $content = str_replace('</head>', $analytics . "\n</head>", $content);
             }
         }
 
@@ -373,5 +399,86 @@ class PublicController extends CommonFormController
         $url       = EmailSubscriber::findLeadTokens($url, $leadArray, true);
 
         return $this->redirect($url);
+    }
+
+    /**
+     * PreProcess page slots for public view.
+     *
+     * @param array $slots
+     * @param Page $entity
+     */
+    private function processSlots($slots, $entity)
+    {
+        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
+        $assetsHelper = $this->factory->getHelper('template.assets');
+        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
+        $slotsHelper = $this->factory->getHelper('template.slots');
+
+        $content = $entity->getContent();
+
+        foreach ($slots as $slot => $slotConfig) {
+            // backward compatibility - if slotConfig array does not exist
+            if (is_numeric($slot)) {
+                $slot = $slotConfig;
+                $slotConfig = array();
+            }
+
+            if (isset($slotConfig['type']) && $slotConfig['type'] == 'slideshow') {
+                if (isset($content[$slot])) {
+                    $options = json_decode($content[$slot], true);
+                } else {
+                    $options = array(
+                        'width' => '100%',
+                        'height' => '250px',
+                        'background_color' => 'transparent',
+                        'arrow_navigation' => false,
+                        'dot_navigation' => true,
+                        'interval' => 5000,
+                        'pause' => 'hover',
+                        'wrap' => true,
+                        'keyboard' => true
+                    );
+                }
+
+                // Create sample slides for first time or if all slides were deleted
+                if (empty($options['slides'])) {
+                    $options['slides'] =  array (
+                        array (
+                            'order' => 0,
+                            'background-image' => $assetsHelper->getUrl('media/images/mautic_logo_lb200.png'),
+                            'captionheader' => 'Caption 1'
+                        ),
+                        array (
+                            'order' => 1,
+                            'background-image' => $assetsHelper->getUrl('media/images/mautic_logo_db200.png'),
+                            'captionheader' => 'Caption 2'
+                        )
+                    );
+                }
+
+                // Order slides
+                usort($options['slides'], function($a, $b)
+                {
+                    return strcmp($a['order'], $b['order']);
+                });
+
+                $options['slot'] = $slot;
+                $options['public'] = true;
+
+                $renderingEngine = $this->container->get('templating')->getEngine('MauticPageBundle:Page:Slots/slideshow.html.php');
+                $slotsHelper->set($slot, $renderingEngine->render('MauticPageBundle:Page:Slots/slideshow.html.php', $options));
+            } elseif (isset($slotConfig['type']) && $slotConfig['type'] == 'textarea') {
+                $value = isset($content[$slot]) ? nl2br($content[$slot]) : "";
+                $slotsHelper->set($slot, $value);
+            } else {
+                // Fallback for other types like html, text, textarea and all unknown
+                $value = isset($content[$slot]) ? $content[$slot] : "";
+                $slotsHelper->set($slot, $value);
+            }
+        }
+
+        $parentVariant = $entity->getVariantParent();
+        $title = (! empty($parentVariant)) ? $parentVariant->getTitle() : $entity->getTitle();
+        $slotsHelper->set('pageTitle', $title);
     }
 }

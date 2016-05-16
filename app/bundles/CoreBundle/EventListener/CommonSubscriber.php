@@ -109,27 +109,14 @@ class CommonSubscriber implements EventSubscriberInterface
 
             foreach ($bundles as $bundle) {
                 if (!empty($bundle['config']['menu'][$name])) {
-                    $menu        = $bundle['config']['menu'][$name];
-                    $menuItems[] = array(
-                        'priority' => !isset($menu['priority']) ? 9999 : $menu['priority'],
-                        'items'    => !isset($menu['items']) ? $menu : $menu['items']
+                    $menu = $bundle['config']['menu'][$name];
+                    $event->addMenuItems(
+                        array(
+                            'priority' => !isset($menu['priority']) ? 9999 : $menu['priority'],
+                            'items'    => !isset($menu['items']) ? $menu : $menu['items']
+                        )
                     );
                 }
-            }
-
-            usort($menuItems, function ($a, $b) {
-                $ap = $a['priority'];
-                $bp = $b['priority'];
-
-                if ($ap == $bp) {
-                    return 0;
-                }
-
-                return ($ap < $bp) ? -1 : 1;
-            });
-
-            foreach ($menuItems as $items) {
-                $event->addMenuItems($items['items']);
             }
 
             $allItems[$name] = $event->getMenuItems();

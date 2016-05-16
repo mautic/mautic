@@ -47,15 +47,18 @@ class RoleController extends FormController
         $filter     = $this->request->get('search', $this->factory->getSession()->get('mautic.role.filter', ''));
         $this->factory->getSession()->set('mautic.role.filter', $filter);
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $model = $this->factory->getModel('user.role');
 
-        $items = $this->factory->getModel('user.role')->getEntities(
+        $items = $model->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
                 'filter'     => $filter,
                 'orderBy'    => $orderBy,
                 'orderByDir' => $orderByDir
-            ));
+            )
+        );
+
 
         $count = count($items);
         if ($count && $count < ($start + 1)) {
@@ -78,6 +81,14 @@ class RoleController extends FormController
             ));
         }
 
+        $roleIds = array();
+
+        foreach ($items as $role) {
+            $roleIds[] = $role->getId();
+        }
+
+        $userCounts = (!empty($roleIds)) ? $model->getRepository()->getUserCount($roleIds) : array();
+
         //set what page currently on so that we can return here after form submission/cancellation
         $this->factory->getSession()->set('mautic.role.page', $page);
 
@@ -90,6 +101,7 @@ class RoleController extends FormController
 
         $parameters = array(
             'items'       => $items,
+            'userCounts'  => $userCounts,
             'searchValue' => $filter,
             'page'        => $page,
             'limit'       => $limit,

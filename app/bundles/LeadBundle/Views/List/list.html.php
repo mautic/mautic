@@ -23,10 +23,27 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                     'checkall' => 'true',
                     'target'   => '#leadListTable'
                 ));
+
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'sessionVar' => 'leadlist',
+                    'orderBy'    => 'l.name',
+                    'text'       => 'mautic.core.name',
+                    'class'      => 'col-leadlist-name'
+                ));
+
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'sessionVar' => 'leadlist',
+                    'text'       => 'mautic.lead.list.thead.leadcount',
+                    'class'      => 'visible-md visible-lg col-leadlist-leadcount'
+                ));
+
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'sessionVar' => 'leadlist',
+                    'orderBy'    => 'l.id',
+                    'text'       => 'mautic.core.id',
+                    'class'      => 'visible-md visible-lg col-leadlist-id'
+                ));
                 ?>
-                <th class="col-leadlist-name"><?php echo $view['translator']->trans('mautic.core.name'); ?></th>
-                <th class="visible-md visible-lg col-leadlist-leadcount"><?php echo $view['translator']->trans('mautic.lead.list.thead.leadcount'); ?></th>
-                <th class="visible-md visible-lg col-leadlist-id"><?php echo $view['translator']->trans('mautic.core.id'); ?></th>
             </tr>
             </thead>
             <tbody>
@@ -58,9 +75,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                     </td>
                     <td>
                         <div>
-                            <?php if ($item->isGlobal()): ?>
-                            <i class="fa fa-fw fa-globe"></i>
-                            <?php endif; ?>
+                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', array('item' => $item, 'model' => 'lead.list')); ?>
                             <?php if ($security->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy())) : ?>
                                 <a href="<?php echo $view['router']->generate('mautic_leadlist_action', array('objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajax">
                                     <?php echo $item->getName(); ?> (<?php echo $item->getAlias(); ?>)
@@ -71,6 +86,9 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                             <?php if (!$item->isGlobal() && $currentUser->getId() != $item->getCreatedBy()): ?>
                             <br />
                             <span class="small">(<?php echo $item->getCreatedByUser(); ?>)</span>
+                            <?php endif; ?>
+                            <?php if ($item->isGlobal()): ?>
+                                <i class="fa fa-fw fa-globe"></i>
                             <?php endif; ?>
                         </div>
                         <?php if ($description = $item->getDescription()): ?>

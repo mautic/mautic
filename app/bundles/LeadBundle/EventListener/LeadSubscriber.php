@@ -1,7 +1,7 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\ApiBundle\Event\RouteEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\UserBundle\Event\UserEvent;
@@ -54,8 +55,16 @@ class LeadSubscriber extends CommonSubscriber
         //needs to be prevented
         static $preventLoop = array();
 
-        $lead = $event->getLead();
+        $lead  = $event->getLead();
+
         if ($details = $event->getChanges()) {
+            // Unset dateLastActive to prevent un-necessary audit log entries
+            unset($details['dateLastActive']);
+            if (empty($details)) {
+
+                return;
+            }
+
             $check = base64_encode($lead->getId() . serialize($details));
             if (!in_array($check, $preventLoop)) {
                 $preventLoop[] = $check;
@@ -89,13 +98,13 @@ class LeadSubscriber extends CommonSubscriber
                 }
 
                 //add if an ip was added
-                if (isset($details['ipAddresses'])) {
+                if (isset($details['ipAddresses']) && !empty($details['ipAddresses'][1])) {
                     $log = array(
                         "bundle"    => "lead",
                         "object"    => "lead",
                         "objectId"  => $lead->getId(),
                         "action"    => "ipadded",
-                        "details"   => $details['ipAddresses'][1],
+                        "details"   => $details['ipAddresses'],
                         "ipAddress" => $this->request->server->get('REMOTE_ADDR')
                     );
                     $this->factory->getModel('core.auditLog')->writeToLog($log);
@@ -155,7 +164,7 @@ class LeadSubscriber extends CommonSubscriber
     /**
      * Add a field delete entry to the audit log
      *
-     * @param Events\LeadEvent $event
+     * @param Events\LeadFieldEvent $event
      */
     public function onFieldDelete(Events\LeadFieldEvent $event)
     {
@@ -241,7 +250,7 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param LeadChangeEvent $event
+     * @param Events\LeadMergeEvent $event
      */
     public function onLeadMerge(Events\LeadMergeEvent $event)
     {

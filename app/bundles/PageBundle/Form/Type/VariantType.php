@@ -98,19 +98,7 @@ class VariantType extends AbstractType
             });
         }
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setOptional(array('page_entity'));
-
-        $resolver->setDefaults(array(
-            'page_entity' => null
-        ));
-    }
-
+    
     /**
      * {@inheritdoc}
      */

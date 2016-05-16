@@ -194,14 +194,17 @@ class CommonController extends Controller implements MauticController
         }
 
         //Ajax call so respond with json
-        if ($forward) {
-            //the content is from another controller action so we must retrieve the response from it instead of
-            //directly parsing the template
-            $query              = array("ignoreAjax" => true, 'request' => $this->request, 'subrequest' => true);
-            $newContentResponse = $this->forward($contentTemplate, $parameters, $query);
-            $newContent         = $newContentResponse->getContent();
-        } else {
-            $newContent = $this->renderView($contentTemplate, $parameters);
+        $newContent = '';
+        if ($contentTemplate) {
+            if ($forward) {
+                //the content is from another controller action so we must retrieve the response from it instead of
+                //directly parsing the template
+                $query              = array("ignoreAjax" => true, 'request' => $this->request, 'subrequest' => true);
+                $newContentResponse = $this->forward($contentTemplate, $parameters, $query);
+                $newContent         = $newContentResponse->getContent();
+            } else {
+                $newContent = $this->renderView($contentTemplate, $parameters);
+            }
         }
 
         //there was a redirect within the controller leading to a double call of this function so just return the content
@@ -209,6 +212,7 @@ class CommonController extends Controller implements MauticController
         if ($this->request->get('ignoreAjax', false)) {
             $response = new Response();
             $response->setContent($newContent);
+            
             return $response;
         }
 

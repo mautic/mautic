@@ -118,23 +118,24 @@ class AssetsHelper extends CoreAssetsHelper
      *
      * @param string $script
      * @param string $location
+     * @param boolean $async
      *
      * @return void
      */
-    public function addScript($script, $location = 'head')
+    public function addScript($script, $location = 'head', $async = false)
     {
         $assets     =& $this->assets;
-        $addScripts = function ($s) use ($location, &$assets) {
+        $addScripts = function ($s) use ($location, &$assets, $async) {
             if ($location == 'head') {
                 //special place for these so that declarations and scripts can be mingled
-                $assets['headDeclarations'][] = array('script' => $s);
+                $assets['headDeclarations'][] = array('script' => array($s, $async));
             } else {
                 if (!isset($assets['scripts'][$location])) {
                     $assets['scripts'][$location] = array();
                 }
 
                 if (!in_array($s, $assets['scripts'][$location])) {
-                    $assets['scripts'][$location][] = $s;
+                    $assets['scripts'][$location][] = array($s, $async);
                 }
             }
         };
@@ -316,7 +317,8 @@ class AssetsHelper extends CoreAssetsHelper
     {
         if (isset($this->assets['scripts'][$location])) {
             foreach (array_reverse($this->assets['scripts'][$location]) as $s) {
-                echo '<script src="'.$this->getUrl($s).'"></script>'."\n";
+                list($script, $async) = $s;
+                echo '<script src="'.$this->getUrl($script).'"' . ($async ? ' async' : '') . '></script>'."\n";
             }
         }
 
@@ -356,7 +358,9 @@ class AssetsHelper extends CoreAssetsHelper
                             $headOutput .= "\n</script>";
                             $scriptOpen = false;
                         }
-                        $headOutput .= "\n".'<script src="' . $this->getUrl($output) . '"></script>';
+                        list($script, $async) = $output;
+
+                        $headOutput .= "\n".'<script src="' . $this->getUrl($script) . '"' . ($async ? ' async' : '') . '></script>';
                         break;
                     case 'custom':
                     case 'declaration':

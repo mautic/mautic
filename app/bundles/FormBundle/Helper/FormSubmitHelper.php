@@ -22,24 +22,32 @@ class FormSubmitHelper
      */
     public static function sendEmail($tokens, $config, MauticFactory $factory, Lead $lead)
     {
+        // replace line brakes with <br> for textarea values
+        if ($tokens) {
+            foreach ($tokens as $token => &$value) {
+                $value = nl2br(html_entity_decode($value));
+            }
+        }
+
         $mailer = $factory->getMailer();
-        $emails = (!empty($config['to'])) ? explode(',', $config['to']) : array();
+        $emails = (!empty($config['to'])) ? array_fill_keys(explode(',', $config['to']), null) : array();
 
         $mailer->setTo($emails);
 
         $leadEmail = $lead->getEmail();
+
         if (!empty($leadEmail)) {
             // Reply to lead for user convenience
             $mailer->setReplyTo($leadEmail);
         }
 
         if (!empty($config['cc'])) {
-            $emails = explode(',', $config['cc']);
+            $emails = array_fill_keys(explode(',', $config['cc']), null);
             $mailer->setCc($emails);
         }
 
         if (!empty($config['bcc'])) {
-            $emails = explode(',', $config['bcc']);
+            $emails = array_fill_keys(explode(',', $config['bcc']), null);
             $mailer->setBcc($emails);
         }
 

@@ -163,7 +163,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
                             );
 
                             // If CC and BCC, remove the ct from URLs to prevent false lead tracking
-                            foreach ($ccMergeVars as &$var) {
+                            foreach ($ccMergeVars['vars'] as &$var) {
                                 if (strpos($var['content'], 'http') !== false && $ctPos = strpos($var['content'], 'ct=') !== false) {
                                     // URL so make sure a ct query is not part of it
                                     $var['content'] = substr($var['content'], 0, $ctPos);
@@ -252,10 +252,16 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
     public function start()
     {
         // Make an API call to the ping endpoint
-        $this->post(array(
-            'url'     => 'https://mandrillapp.com/api/1.0/users/ping.json',
-            'payload' => json_encode(array('key' => $this->getPassword()))
-        ));
+        $this->post(
+            array(
+                'url'     => 'https://mandrillapp.com/api/1.0/users/ping.json',
+                'payload' => json_encode(
+                    array(
+                        'key' => $this->getPassword()
+                    )
+                )
+            )
+        );
 
         $this->started = true;
     }
@@ -278,7 +284,27 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
             $parsedResponse = $response;
         }
 
-        $return = array();
+        if (!$this->started) {
+            // Check the response for PONG!
+            if ('PONG!' !== $response) {
+                $this->throwException('Mandrill failed to authenticate');
+            }
+
+            return true;
+        }
+
+        $return     = array();
+        $hasBounces = false;
+        $bounces    = array(
+            'bounced'      => array(
+                'emails' => array()
+            ),
+            'unsubscribed' => array(
+                'emails' => array()
+            )
+        );
+        $metadata   = $this->getMetadata();
+
         if (is_array($response)) {
             if (isset($response['status']) && $response['status'] == 'error') {
                 $parsedResponse = $response['message'];
@@ -288,6 +314,23 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
                     if (in_array($stat['status'], array('rejected', 'invalid'))) {
                         $return[]       = $stat['email'];
                         $parsedResponse = "{$stat['email']} => {$stat['status']}\n";
+
+                        if ('invalid' == $stat['status']) {
+                            $stat['reject_reason'] = 'invalid';
+                        }
+
+                        // Extract lead ID from metadata if applicable
+                        $leadId = (!empty($metadata[$stat['email']]['leadId'])) ? $metadata[$stat['email']]['leadId'] : null;
+
+                        if (in_array($stat['reject_reason'], array('hard-bounce', 'soft-bounce', 'reject', 'spam', 'invalid', 'unsub'))) {
+                            $hasBounces = true;
+                            $type       = ('unsub' == $stat['reject_reason']) ? 'unsubscribed' : 'bounced';
+
+                            $bounces[$type]['emails'][$stat['email']] = array(
+                                'leadId' => $leadId,
+                                'reason' => ('unsubscribed' == $type) ? $type : str_replace('-', '_', $stat['reject_reason'])
+                            );
+                        }
                     }
                 }
             }
@@ -295,6 +338,13 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
 
         if ($evt = $this->getDispatcher()->createResponseEvent($this, $parsedResponse, ($info['http_code'] == 200))) {
             $this->getDispatcher()->dispatchEvent($evt, 'responseReceived');
+        }
+
+        // Parse bounces if applicable
+        if ($hasBounces) {
+            /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
+            $emailModel = $this->factory->getModel('email');
+            $emailModel->processMailerCallback($bounces);
         }
 
         if ($response === false) {
@@ -351,31 +401,41 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
     {
         $mandrillEvents = $request->request->get('mandrill_events');
         $mandrillEvents = json_decode($mandrillEvents, true);
-        $bounces        = array(
-            'hashIds' => array(),
-            'emails'  => array()
+        $rows           = array(
+            'bounced' => array(
+                'hashIds' => array(),
+                'emails'  => array()
+            ),
+            'unsubscribed' => array(
+                'hashIds' => array(),
+                'emails'  => array()
+            )
         );
 
         if (is_array($mandrillEvents)) {
             foreach ($mandrillEvents as $event) {
-                if (in_array($event['event'], array('hard_bounce', 'soft_bounce', 'reject'))) {
+                $isBounce      = in_array($event['event'], array('hard_bounce', 'soft_bounce', 'reject', 'spam', 'invalid'));
+                $isUnsubscribe = ('unsub' === $event['event']);
+                if ($isBounce || $isUnsubscribe) {
+                    $type = ($isBounce) ? 'bounced' : 'unsubscribed';
+
                     if (!empty($event['msg']['diag'])) {
                         $reason = $event['msg']['diag'];
                     } elseif (!empty($event['msg']['bounce_description'])) {
                         $reason = $event['msg']['bounce_description'];
                     } else {
-                        $reason = $event['event'];
+                        $reason = ($isUnsubscribe) ? 'unsubscribed' : $event['event'];
                     }
 
                     if (isset($event['msg']['metadata']['hashId'])) {
-                        $bounces['hashIds'][$event['msg']['metadata']['hashId']] = $reason;
+                        $rows[$type]['hashIds'][$event['msg']['metadata']['hashId']] = $reason;
                     } else {
-                        $bounces['emails'][$event['msg']['email']] = $reason;
+                        $rows[$type]['emails'][$event['msg']['email']] = $reason;
                     }
                 }
             }
         }
 
-        return array('bounces' => $bounces);
+        return $rows;
     }
 }
