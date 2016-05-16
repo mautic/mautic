@@ -9,6 +9,7 @@
 // Define Mautic's supported PHP versions
 define('MAUTIC_MINIMUM_PHP', '5.3.7');
 define('MAUTIC_MAXIMUM_PHP', '5.6.999');
+define('MAUTIC_ROOT_DIR', __DIR__);
 
 // Are we running the minimum version?
 if (version_compare(PHP_VERSION, MAUTIC_MINIMUM_PHP, '<')) {
