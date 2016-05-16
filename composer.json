@@ -5,7 +5,6 @@
     "description": "Mautic Open Source Distribution",
     "autoload": {
         "psr-4": {
-            "Mautic\\AddonBundle\\Bundle\\":"app/bundles/PluginBundle/Bundle/BC",
             "Mautic\\": "app/bundles/",
             "MauticPlugin\\": "plugins/",
             "Mautic\\Middleware\\": "app/middlewares/"
@@ -16,7 +15,7 @@
         ]
     },
     "require": {
-        "php": ">=5.3.10",
+        "php": "~5.4.9",
 
         "symfony/console": "~2.8",
         "symfony/debug": "~2.8",
