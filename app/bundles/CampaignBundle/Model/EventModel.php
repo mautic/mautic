@@ -727,7 +727,7 @@ class EventModel extends CommonFormModel
             return false;
         }
 
-        if ($event['eventType'] == 'condition') {
+        if ($event['eventType'] == 'condition' || $event['eventType'] == 'action') {
             $allowNegative = true;
         }
 
