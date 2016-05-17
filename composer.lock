@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "93ea990ffe0891415466af8d4fef977b",
-    "content-hash": "1f194860265fb0777112651a3e4181c4",
+    "hash": "49844d0f2bd058e3c1f83ddb73887a11",
+    "content-hash": "e52f5d3550299533b3cc565591c5e802",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -1800,16 +1800,16 @@
         },
         {
             "name": "jms/serializer",
-            "version": "1.0.0",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/serializer.git",
-                "reference": "a29d9a204efc3ca3f39a9d182a83fd34462fef3f"
+                "reference": "fe13a1f993ea3456e195b7820692f2eb2b6bbb48"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/a29d9a204efc3ca3f39a9d182a83fd34462fef3f",
-                "reference": "a29d9a204efc3ca3f39a9d182a83fd34462fef3f",
+                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/fe13a1f993ea3456e195b7820692f2eb2b6bbb48",
+                "reference": "fe13a1f993ea3456e195b7820692f2eb2b6bbb48",
                 "shasum": ""
             },
             "require": {
@@ -1819,6 +1819,9 @@
                 "jms/parser-lib": "1.*",
                 "php": ">=5.4.0",
                 "phpcollection/phpcollection": "~0.1"
+            },
+            "conflict": {
+                "twig/twig": "<1.12"
             },
             "require-dev": {
                 "doctrine/orm": "~2.1",
@@ -1831,7 +1834,7 @@
                 "symfony/translation": "~2.0",
                 "symfony/validator": "~2.0",
                 "symfony/yaml": "2.*",
-                "twig/twig": ">=1.8,<2.0-dev"
+                "twig/twig": "~1.12|~2.0"
             },
             "suggest": {
                 "symfony/yaml": "Required if you'd like to serialize data to YAML format."
@@ -1839,7 +1842,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.17-dev"
+                    "dev-master": "1.1-dev"
                 }
             },
             "autoload": {
@@ -1866,27 +1869,28 @@
                 "serialization",
                 "xml"
             ],
-            "time": "2015-06-16 11:50:24"
+            "time": "2015-10-27 09:24:41"
         },
         {
             "name": "jms/serializer-bundle",
-            "version": "1.0.0",
+            "version": "1.1.0",
             "target-dir": "JMS/SerializerBundle",
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/JMSSerializerBundle.git",
-                "reference": "0be35615b5bae1ce42567244a321aa1be3ed0280"
+                "reference": "3e396c980545350c2efb65a50041d2a9f9d6562e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/JMSSerializerBundle/zipball/0be35615b5bae1ce42567244a321aa1be3ed0280",
-                "reference": "0be35615b5bae1ce42567244a321aa1be3ed0280",
+                "url": "https://api.github.com/repos/schmittjoh/JMSSerializerBundle/zipball/3e396c980545350c2efb65a50041d2a9f9d6562e",
+                "reference": "3e396c980545350c2efb65a50041d2a9f9d6562e",
                 "shasum": ""
             },
             "require": {
                 "jms/serializer": "^1.0.0",
-                "php": ">=5.3.2",
-                "symfony/framework-bundle": "~2.1"
+                "php": ">=5.4.0",
+                "phpoption/phpoption": "^1.1.0",
+                "symfony/framework-bundle": "~2.3|~3.0"
             },
             "require-dev": {
                 "doctrine/doctrine-bundle": "*",
@@ -1908,7 +1912,7 @@
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.13-dev"
+                    "dev-master": "1.1-dev"
                 }
             },
             "autoload": {
@@ -1935,7 +1939,7 @@
                 "serialization",
                 "xml"
             ],
-            "time": "2015-06-23 19:27:08"
+            "time": "2015-11-10 12:26:42"
         },
         {
             "name": "joomla/filter",
@@ -5643,40 +5647,40 @@
         },
         {
             "name": "symfony/twig-bundle",
-            "version": "v2.8.6",
+            "version": "v3.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/twig-bundle.git",
-                "reference": "1b1e34ee367fddc0e0c6322b841f35064125e410"
+                "reference": "8eec3b236f28d8275b66f7f3b9983ab6b7a5e552"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/twig-bundle/zipball/1b1e34ee367fddc0e0c6322b841f35064125e410",
-                "reference": "1b1e34ee367fddc0e0c6322b841f35064125e410",
+                "url": "https://api.github.com/repos/symfony/twig-bundle/zipball/8eec3b236f28d8275b66f7f3b9983ab6b7a5e552",
+                "reference": "8eec3b236f28d8275b66f7f3b9983ab6b7a5e552",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.9",
-                "symfony/asset": "~2.7|~3.0.0",
-                "symfony/http-foundation": "~2.5|~3.0.0",
-                "symfony/http-kernel": "~2.7",
-                "symfony/twig-bridge": "~2.7|~3.0.0"
+                "php": ">=5.5.9",
+                "symfony/asset": "~2.8|~3.0",
+                "symfony/http-foundation": "~2.8|~3.0",
+                "symfony/http-kernel": "~2.8|~3.0",
+                "symfony/twig-bridge": "~2.8|~3.0"
             },
             "require-dev": {
-                "symfony/config": "~2.8|~3.0.0",
-                "symfony/dependency-injection": "~2.6,>=2.6.6|~3.0.0",
-                "symfony/expression-language": "~2.4|~3.0.0",
-                "symfony/finder": "~2.0,>=2.0.5",
-                "symfony/framework-bundle": "~2.7|~3.0.0",
-                "symfony/routing": "~2.1|~3.0.0",
-                "symfony/stopwatch": "~2.2|~3.0.0",
-                "symfony/templating": "~2.1|~3.0.0",
-                "symfony/yaml": "~2.3|~3.0.0"
+                "symfony/config": "~2.8|~3.0",
+                "symfony/dependency-injection": "~2.8|~3.0",
+                "symfony/expression-language": "~2.8|~3.0",
+                "symfony/finder": "~2.8|~3.0",
+                "symfony/framework-bundle": "~2.8|~3.0",
+                "symfony/routing": "~2.8|~3.0",
+                "symfony/stopwatch": "~2.8|~3.0",
+                "symfony/templating": "~2.8|~3.0",
+                "symfony/yaml": "~2.8|~3.0"
             },
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.8-dev"
+                    "dev-master": "3.0-dev"
                 }
             },
             "autoload": {
@@ -5703,7 +5707,7 @@
             ],
             "description": "Symfony TwigBundle",
             "homepage": "https://symfony.com",
-            "time": "2016-03-27 09:27:49"
+            "time": "2016-03-10 10:34:12"
         },
         {
             "name": "symfony/validator",
@@ -7161,51 +7165,32 @@
         },
         {
             "name": "webfactory/exceptions-bundle",
-            "version": "4.3.0",
+            "version": "3.0.1",
+            "target-dir": "Webfactory/Bundle/ExceptionsBundle",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webfactory/exceptions-bundle.git",
-                "reference": "21520dcb9eabe1359a888b7dce556b93e2e89cef"
+                "reference": "a85ed42116a9aa51a6e90c72e3b0ed0a33211dc2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webfactory/exceptions-bundle/zipball/21520dcb9eabe1359a888b7dce556b93e2e89cef",
-                "reference": "21520dcb9eabe1359a888b7dce556b93e2e89cef",
+                "url": "https://api.github.com/repos/webfactory/exceptions-bundle/zipball/a85ed42116a9aa51a6e90c72e3b0ed0a33211dc2",
+                "reference": "a85ed42116a9aa51a6e90c72e3b0ed0a33211dc2",
                 "shasum": ""
             },
-            "require": {
-                "symfony/twig-bundle": "~2.2"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~4.0",
-                "symfony/framework-bundle": "~2.2"
-            },
-            "type": "symfony-bundle",
+            "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-default": "3.1.x-dev"
+                    "dev-default": "3.0.x-dev"
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Webfactory\\Bundle\\ExceptionsBundle\\": ""
+                "psr-0": {
+                    "Webfactory\\Bundle\\ExceptionsBundle": ""
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "webfactory GmbH",
-                    "email": "info@webfactory.de",
-                    "homepage": "http://www.webfactory.de",
-                    "role": "Developer"
-                }
-            ],
-            "description": "A simple controller to display error pages during development plus some building blocks for more user-friendly error pages.",
-            "homepage": "http://inside.webfactory.de/de/blog/symfony2-exception-handling-and-custom-error-pages-explained.html",
-            "time": "2016-01-19 14:46:51"
+            "time": "2013-04-16 08:55:48"
         }
     ],
     "aliases": [],
@@ -7217,7 +7202,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "~5.6.19"
+        "php": "~7"
     },
     "platform-dev": []
 }
