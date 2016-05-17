@@ -56,5 +56,4 @@ Debug::enable();
 $kernel = new AppKernel('dev', false);
 $kernel->loadClassCache();
 
-Stack\run((new Stack\Builder)
-    ->resolve($kernel));
+Stack\run((new \Mautic\Middleware\MiddlewareBuilder)->resolve($kernel));

@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * @package     Mautic
+ * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.org
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace Mautic\Middleware;
 
 use Mautic\CoreBundle\Exception\DatabaseConnectionException;
@@ -7,8 +15,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class CatchExceptionMiddleware implements HttpKernelInterface
+class CatchExceptionMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
 {
+    const PRIORITY = 1;
+    
     /**
      * @var HttpKernelInterface
      */
@@ -47,5 +57,13 @@ class CatchExceptionMiddleware implements HttpKernelInterface
 
         include MAUTIC_ROOT_DIR . '/offline.php';
         exit;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPriority()
+    {
+        return self::PRIORITY; 
     }
 }

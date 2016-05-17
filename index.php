@@ -46,6 +46,4 @@ $apcLoader->register(true);
 $kernel = new AppKernel('prod', false);
 $kernel->loadClassCache();
 
-Stack\run((new Stack\Builder)
-    ->push('Mautic\Middleware\CatchExceptionMiddleware')
-    ->resolve($kernel));
+Stack\run((new \Mautic\Middleware\MiddlewareBuilder)->resolve($kernel));
