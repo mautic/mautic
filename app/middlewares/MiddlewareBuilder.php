@@ -17,7 +17,7 @@ class MiddlewareBuilder
 {
     protected $specs;
     
-    public function __construct($env = 'prod')
+    public function __construct($env = null)
     {
         $this->specs = new \SplPriorityQueue();
 
@@ -25,8 +25,12 @@ class MiddlewareBuilder
         
         $this->addMiddlewares($middlewares);
         
-        if ($envMiddlewares = glob(__DIR__ . '/' . ucfirst($env) . '/*Middleware.php')) {
-            $this->addMiddlewares($envMiddlewares, $env);
+        if (isset($env)) {
+            $envMiddlewares = glob(__DIR__ . '/' . ucfirst($env) . '/*Middleware.php');
+
+            if (! empty($envMiddlewares)) {
+                $this->addMiddlewares($envMiddlewares, $env);
+            }
         }
     }
     
