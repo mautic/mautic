@@ -913,8 +913,8 @@ class PageModel extends FormModel
         }
 
         if ($flag == 'unique' || $flag == 'total_and_unique') {
-            $filter['groupBy'] = 'lead_id';
             $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', $filter);
+            $q->groupBy('t.lead_id, t.date_hit');
 
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
@@ -922,7 +922,6 @@ class PageModel extends FormModel
 
             $data = $query->loadAndBuildTimeData($q);
             $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.show.unique.visits'), $data);
-            unset($filter['groupBy']);
         }
 
         return $chart->render();
