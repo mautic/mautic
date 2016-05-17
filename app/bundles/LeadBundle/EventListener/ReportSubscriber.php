@@ -218,12 +218,9 @@ class ReportSubscriber extends CommonSubscriber
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_added', 'l');
                     $leads        = $chartQuery->loadAndBuildTimeData($queryBuilder);
                     $chart->setDataset($options['translator']->trans('mautic.lead.all.leads'), $leads);
-
-                    // @todo: the identified contact count is the same as the all contact caunt for some reason 
-                    // $queryBuilder->andwhere($qb->expr()->isNotNull('l.date_identified'));
-                    // $identified   = $chartQuery->loadAndBuildTimeData($queryBuilder);
-                    // $chart->setDataset($options['translator']->trans('mautic.lead.identified'), $leads);
-
+                    $queryBuilder->andwhere($qb->expr()->isNotNull('l.date_identified'));
+                    $identified   = $chartQuery->loadAndBuildTimeData($queryBuilder);
+                    $chart->setDataset($options['translator']->trans('mautic.lead.identified'), $identified);
                     $data         = $chart->render();
                     $data['name'] = $g;
                     $event->setGraph($g, $data);
