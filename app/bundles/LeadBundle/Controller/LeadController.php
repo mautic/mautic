@@ -60,7 +60,7 @@ class LeadController extends FormController
         }
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model   = $this->factory->getModel('lead.lead');
+        $model   = $this->getModel('lead');
         $session = $this->factory->getSession();
         //set limits
         $limit = $session->get('mautic.lead.limit', $this->factory->getParameter('default_pagelimit'));

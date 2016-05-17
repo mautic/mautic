@@ -26,6 +26,8 @@ use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 
 /**
  * Mautic's Factory
+ * 
+ * @deprecated 2.0 to be removed in 3.0
  */
 class MauticFactory
 {
@@ -65,28 +67,26 @@ class MauticFactory
      */
     public function getModel($modelNameKey)
     {
-        static $modelInstances = array();
-        
         // Shortcut for models with the same name as the bundle
         if (strpos($modelNameKey, '.') === false) {
             $modelNameKey = "$modelNameKey.$modelNameKey";
         }
 
-        if (! array_key_exists($modelNameKey, $modelInstances)) {
-            $parts = explode('.', $modelNameKey);
+        $parts = explode('.', $modelNameKey);
 
-            if (count($parts) !== 2) {
-                throw new \InvalidArgumentException($modelNameKey . " is not a valid model key.");
-            }
-
-            list($bundle, $name) = $parts;
-
-            $containerKey = str_replace(array('%bundle%', '%name%'), array($bundle, $name), 'mautic.%bundle%.model.%name%');
-
-            $modelInstances[$modelNameKey] = $this->container->get($containerKey);
+        if (count($parts) !== 2) {
+            throw new \InvalidArgumentException($modelNameKey . " is not a valid model key.");
         }
 
-        return $modelInstances[$modelNameKey];
+        list($bundle, $name) = $parts;
+
+        $containerKey = str_replace(array('%bundle%', '%name%'), array($bundle, $name), 'mautic.%bundle%.model.%name%');
+
+        if ($this->container->has($containerKey)) {
+            return $this->container->get($containerKey);
+        }
+        
+        throw new \InvalidArgumentException($containerKey . ' is not a registered container key.');
     }
 
     /**
