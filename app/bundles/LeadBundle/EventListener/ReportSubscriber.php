@@ -225,7 +225,7 @@ class ReportSubscriber extends CommonSubscriber
                     // $chart->setDataset($options['translator']->trans('mautic.lead.identified'), $leads);
 
                     $data         = $chart->render();
-                    $data['name'] = 'mautic.lead.graph.line.leads';
+                    $data['name'] = $g;
                     $event->setGraph($g, $data);
                     break;
 
@@ -235,7 +235,7 @@ class ReportSubscriber extends CommonSubscriber
                     $leads        = $chartQuery->loadAndBuildTimeData($queryBuilder);
                     $chart->setDataset($options['translator']->trans('mautic.lead.graph.line.points'), $leads);
                     $data         = $chart->render();
-                    $data['name'] = 'mautic.lead.graph.line.points';
+                    $data['name'] = $g;
                     $event->setGraph($g, $data);
                     break;
 
@@ -248,7 +248,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $pointLogRepo->getMostPoints($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.lead.table.most.points';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-asterisk';
                     $graphData['link']      = 'mautic_lead_action';
                     $event->setGraph($g, $graphData);
@@ -264,7 +264,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $pointLogRepo->getMostLeads($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.lead.table.top.countries';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-globe';
                     $event->setGraph($g, $graphData);
                     break;
@@ -279,7 +279,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $pointLogRepo->getMostLeads($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.lead.table.top.cities';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-university';
                     $event->setGraph($g, $graphData);
                     break;
@@ -293,7 +293,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $pointLogRepo->getMostPoints($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.lead.table.top.events';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-calendar';
                     $event->setGraph($g, $graphData);
                     break;
@@ -307,7 +307,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $pointLogRepo->getMostPoints($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.lead.table.top.actions';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-bolt';
                     $event->setGraph($g, $graphData);
                     break;

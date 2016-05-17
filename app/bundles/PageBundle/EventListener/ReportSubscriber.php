@@ -282,9 +282,9 @@ class ReportSubscriber extends CommonSubscriber
                     $chart        = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_hit', 'ph');
                     $hits         = $chartQuery->loadAndBuildTimeData($queryBuilder);
-                    $chart->setDataset($options['translator']->trans('mautic.page.graph.line.hits'), $hits);
+                    $chart->setDataset($options['translator']->trans($g), $hits);
                     $data         = $chart->render();
-                    $data['name'] = 'mautic.page.graph.line.hits';
+                    $data['name'] = $g;
 
                     $event->setGraph($g, $data);
                     break;
@@ -305,9 +305,9 @@ class ReportSubscriber extends CommonSubscriber
                     }
 
                     $hits = $chartQuery->completeTimeData($hits, true);
-                    $chart->setDataset($options['translator']->trans('mautic.page.graph.line.time.on.site'), $hits);
+                    $chart->setDataset($options['translator']->trans($g), $hits);
                     $data         = $chart->render();
-                    $data['name'] = 'mautic.page.graph.line.time.on.site';
+                    $data['name'] = $g;
 
                     $event->setGraph($g, $data);
                     break;
@@ -327,7 +327,7 @@ class ReportSubscriber extends CommonSubscriber
                         $g,
                         array(
                             'data'      => $chart->render(),
-                            'name'      => 'mautic.page.graph.pie.time.on.site',
+                            'name'      => $g,
                             'iconClass' => 'fa-clock-o'
                         )
                     );
@@ -349,7 +349,7 @@ class ReportSubscriber extends CommonSubscriber
                         $g,
                         array(
                             'data'      => $chart->render(),
-                            'name'      => 'mautic.page.graph.pie.new.vs.returning',
+                            'name'      => $g,
                             'iconClass' => 'fa-bookmark-o'
                         )
                     );
@@ -370,7 +370,7 @@ class ReportSubscriber extends CommonSubscriber
                         $g,
                         array(
                             'data'      => $chart->render(),
-                            'name'      => 'mautic.page.graph.pie.languages',
+                            'name'      => $g,
                             'iconClass' => 'fa-globe'
                         )
                     );
@@ -382,7 +382,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $hitRepo->getReferers($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.page.table.referrers';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-sign-in';
                     $event->setGraph($g, $graphData);
                     break;
@@ -393,7 +393,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $hitRepo->getMostVisited($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.page.table.most.visited';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-eye';
                     $graphData['link']      = 'mautic_page_action';
                     $event->setGraph($g, $graphData);
@@ -405,7 +405,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $hitRepo->getMostVisited($queryBuilder, $limit, $offset, 'p.unique_hits', 'sessions');
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.page.table.most.visited.unique';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-eye';
                     $graphData['link']      = 'mautic_page_action';
                     $event->setGraph($g, $graphData);

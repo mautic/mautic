@@ -230,7 +230,7 @@ class ReportSubscriber extends CommonSubscriber
                     $timeStats         = GraphHelper::mergeLineGraphData($timeStats, $stats, $unit, 0, 'dateSent');
                     $timeStats         = GraphHelper::mergeLineGraphData($timeStats, $stats, $unit, 1, 'dateRead');
                     $timeStats         = GraphHelper::mergeLineGraphData($timeStats, $stats, $unit, 2, 'dateSent', 'is_failed');
-                    $timeStats['name'] = 'mautic.email.graph.line.stats';
+                    $timeStats['name'] = $g;
 
                     $event->setGraph($g, $timeStats);
                     break;
@@ -239,7 +239,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $statRepo->getIgnoredReadFailed($queryBuilder);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.email.graph.pie.ignored.read.failed';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-flag-checkered';
                     $event->setGraph($g, $graphData);
                     break;
@@ -253,7 +253,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.email.table.most.emails.sent';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-paper-plane-o';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
@@ -268,7 +268,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.email.table.most.emails.read';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-eye';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
@@ -284,7 +284,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.email.table.most.emails.failed';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-exclamation-triangle';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
@@ -299,7 +299,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.email.table.most.emails.read.percent';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-tachometer';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);

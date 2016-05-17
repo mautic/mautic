@@ -177,9 +177,9 @@ class ReportSubscriber extends CommonSubscriber
                     $chart      = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_download', 'ad');
                     $downloads  = $chartQuery->loadAndBuildTimeData($queryBuilder);
-                    $chart->setDataset($options['translator']->trans('mautic.asset.graph.line.downloads'), $downloads);
+                    $chart->setDataset($options['translator']->trans($g), $downloads);
                     $data         = $chart->render();
-                    $data['name'] = 'mautic.asset.graph.line.downloads';
+                    $data['name'] = $g;
 
                     $event->setGraph($g, $data);
                     break;
@@ -189,7 +189,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $downloadRepo->getMostDownloaded($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.asset.table.most.downloaded';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-download';
                     $graphData['link']      = 'mautic_asset_action';
                     $event->setGraph($g, $graphData);
@@ -200,7 +200,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $downloadRepo->getTopReferrers($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.asset.table.top.referrers';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-download';
                     $graphData['link']      = 'mautic_asset_action';
                     $event->setGraph($g, $graphData);
@@ -209,7 +209,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $downloadRepo->getHttpStatuses($queryBuilder);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.asset.graph.pie.statuses';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-globe';
                     $event->setGraph($g, $graphData);
                     break;

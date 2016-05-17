@@ -156,9 +156,9 @@ class ReportSubscriber extends CommonSubscriber
                     $chart      = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_submitted', 'fs');
                     $hits  = $chartQuery->loadAndBuildTimeData($queryBuilder);
-                    $chart->setDataset($options['translator']->trans('mautic.form.graph.line.submissions'), $hits);
+                    $chart->setDataset($options['translator']->trans($g), $hits);
                     $data         = $chart->render();
-                    $data['name'] = 'mautic.form.graph.line.submissions';
+                    $data['name'] = $g;
 
                     $event->setGraph($g, $data);
                     break;
@@ -170,7 +170,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $submissionRepo->getTopReferrers($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.form.table.top.referrers';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-sign-in';
                     $graphData['link']      = 'mautic_form_action';
                     $event->setGraph($g, $graphData);
@@ -182,7 +182,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $submissionRepo->getMostSubmitted($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.form.table.most.submitted';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-check-square-o';
                     $graphData['link']      = 'mautic_form_action';
                     $event->setGraph($g, $graphData);
