@@ -46,17 +46,20 @@ class CatchExceptionMiddleware implements HttpKernelInterface, PrioritizedMiddle
                 return $response;
             }
         } catch (DatabaseConnectionException $e) {
-            define('MAUTIC_OFFLINE', 1);
             $message = $e->getMessage();
         } catch (\Exception $e) {
             error_log($e);
-            define('MAUTIC_OFFLINE', 1);
             $message    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
             $submessage = 'System administrators, check server logs for errors.';
-        }
+        } finally {
+            define('MAUTIC_OFFLINE', 1);
 
-        include MAUTIC_ROOT_DIR . '/offline.php';
-        exit;
+            ob_start();
+            include MAUTIC_ROOT_DIR . '/offline.php';
+            $content = ob_get_clean();
+
+            return new Response($content, 500);
+        }
     }
 
     /**
