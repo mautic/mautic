@@ -51,7 +51,9 @@ class CatchExceptionMiddleware implements HttpKernelInterface, PrioritizedMiddle
             error_log($e);
             $message    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
             $submessage = 'System administrators, check server logs for errors.';
-        } finally {
+        }
+
+        if (isset($message)) {
             define('MAUTIC_OFFLINE', 1);
 
             ob_start();
