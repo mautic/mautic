@@ -65,7 +65,8 @@ return array(
             'mautic.config.model.sysinfo' => array(
                 'class' => 'Mautic\ConfigBundle\Model\SysinfoModel',
                 'arguments' => array(
-                    'mautic.helper.paths'
+                    'mautic.helper.paths',
+                    'mautic.helper.core_parameters'
                 )
             )
         )
