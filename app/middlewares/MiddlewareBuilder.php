@@ -17,14 +17,29 @@ class MiddlewareBuilder
 {
     protected $specs;
     
-    public function __construct()
+    public function __construct($env = 'prod')
     {
         $this->specs = new \SplPriorityQueue();
 
         $middlewares = glob(__DIR__ . '/*Middleware.php');
-
+        
+        $this->addMiddlewares($middlewares);
+        
+        if ($envMiddlewares = glob(__DIR__ . '/' . ucfirst($env) . '/*Middleware.php')) {
+            $this->addMiddlewares($envMiddlewares, $env);
+        }
+    }
+    
+    public function addMiddlewares(array $middlewares, $env = null)
+    {
+        $prefix = 'Mautic\\Middleware\\';
+        
+        if ($env) {
+            $prefix .= ucfirst($env) . '\\';
+        }
+        
         foreach ($middlewares as $middleware) {
-            $this->push('Mautic\\Middleware\\' . basename(substr($middleware, 0, -4)));
+            $this->push($prefix . basename(substr($middleware, 0, -4)));
         }
     }
     

@@ -8,14 +8,15 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\Middleware;
+namespace Mautic\Middleware\Prod;
 
+use Mautic\Middleware\PrioritizedMiddlewareInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class SetMauticHeaderMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
 {
-    const PRIORITY = 2;
+    const PRIORITY = 20;
 
     /**
      * @var HttpKernelInterface

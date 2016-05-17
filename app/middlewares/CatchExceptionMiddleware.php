@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class CatchExceptionMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
 {
-    const PRIORITY = 1;
+    const PRIORITY = 100;
     
     /**
      * @var HttpKernelInterface

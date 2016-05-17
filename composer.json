@@ -15,7 +15,7 @@
         ]
     },
     "require": {
-        "php": "~5.4.9",
+        "php": "~5.6.19",
 
         "symfony/console": "~2.8",
         "symfony/debug": "~2.8",
@@ -30,6 +30,7 @@
         "symfony/yaml": "~2.8",
         "symfony/property-access": "~2.8",
         "symfony/dom-crawler": "~2.8",
+        "symfony/browser-kit": "~2.8",
 
         "symfony/asset": "~2.7",
         "symfony/class-loader": "~2.1",
