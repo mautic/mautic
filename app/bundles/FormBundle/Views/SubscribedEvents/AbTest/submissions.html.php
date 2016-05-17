@@ -9,8 +9,8 @@
 
 $support = $results['support'];
 $label = $view['translator']->trans($variants['criteria'][$results['basedOn']]['label']);
-
-$barData = \Mautic\CoreBundle\Helper\GraphHelper::prepareBarGraphData($support['labels'], $support['data']);
+$chart = new \Mautic\CoreBundle\Helper\Chart\BarChart($support['labels']);
+$chart->setDataset($support['data']);
 
 ?>
 <div class="panel ovf-h bg-auto bg-light-xs abtest-bar-chart">
@@ -28,9 +28,6 @@ $barData = \Mautic\CoreBundle\Helper\GraphHelper::prepareBarGraphData($support['
         <div class="col-sm-7">
             <canvas id="abtest-bar-chart" height="300"></canvas>
         </div>
-        <div class="col-sm-5">
-            <div class="abtest-bar-legend legend-container"></div>
-        </div>
     </div>
 </div>
 
@@ -38,8 +35,8 @@ $barData = \Mautic\CoreBundle\Helper\GraphHelper::prepareBarGraphData($support['
     mQuery(document).ready(function() {
         mQuery('#abStatsModal').on('shown.bs.modal', function (event) {
             var canvas = document.getElementById("abtest-bar-chart");
-            var barData = mQuery.parseJSON('<?php echo json_encode($barData); ?>');
-            var barGraph = new Chart(canvas.getContext("2d")).Bar(barData, {
+            var barData = mQuery.parseJSON('<?php echo json_encode($chart->render()); ?>');
+            var barGraph = new Chart(canvas, {type: 'bar', data: barData, options: {
                 responsive: true,
                 animation: false,
                 tooltipTitleFontSize: 10,
@@ -48,12 +45,7 @@ $barData = \Mautic\CoreBundle\Helper\GraphHelper::prepareBarGraphData($support['
                 scaleSteps: 11,
                 scaleStepWidth: <?php echo $support['step_width'] ?>,
                 scaleStartValue: 0
-            });
-
-            var legendHolder = document.createElement('div');
-            legendHolder.innerHTML = barGraph.generateLegend();
-            mQuery('.abtest-bar-legend').html(legendHolder.firstChild);
-            barGraph.update();
+            }});
         });
     });
 </script>
