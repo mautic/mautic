@@ -192,7 +192,6 @@ class NoteController extends FormController
 
 
             $response = new JsonResponse($passthroughVars);
-            $response->headers->set('Content-Length', strlen($response->getContent()));
 
             return $response;
         } else {
@@ -274,7 +273,6 @@ class NoteController extends FormController
             $passthroughVars['mauticContent'] = 'leadNote';
 
             $response = new JsonResponse($passthroughVars);
-            $response->headers->set('Content-Length', strlen($response->getContent()));
 
             return $response;
         } else {
@@ -370,7 +368,6 @@ class NoteController extends FormController
             'mauticContent' => 'leadNote',
             'downNoteCount' => 1
         ));
-        $response->headers->set('Content-Length', strlen($response->getContent()));
 
         return $response;
     }

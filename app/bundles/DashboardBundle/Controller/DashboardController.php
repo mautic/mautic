@@ -136,7 +136,6 @@ class DashboardController extends FormController
             }
 
             $response = new JsonResponse($passthroughVars);
-            $response->headers->set('Content-Length', strlen($response->getContent()));
 
             return $response;
         } else {
@@ -203,7 +202,6 @@ class DashboardController extends FormController
 
 
             $response = new JsonResponse($passthroughVars);
-            $response->headers->set('Content-Length', strlen($response->getContent()));
 
             return $response;
         } else {
@@ -329,7 +327,6 @@ class DashboardController extends FormController
 
         $response = new JsonResponse($dashboard);
         $response->setEncodingOptions($response->getEncodingOptions() | JSON_PRETTY_PRINT);
-        $response->headers->set('Content-Length', strlen($response->getContent()));
         $response->headers->set('Content-Type', 'application/force-download');
         $response->headers->set('Content-Type', 'application/octet-stream');
         $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
