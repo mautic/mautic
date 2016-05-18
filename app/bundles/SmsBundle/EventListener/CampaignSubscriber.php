@@ -100,7 +100,7 @@ class CampaignSubscriber extends CommonSubscriber
         $lead = $event->getLead();
 
         if ($this->leadModel->isContactable($lead, 'sms') !== DoNotContact::IS_CONTACTABLE) {
-            $event->setResult(['failed' => 1]);
+            return $event->setResult(['failed' => 1]);
         }
 
         $leadPhoneNumber = $lead->getFieldValue('mobile');
@@ -110,14 +110,14 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         if (empty($leadPhoneNumber)) {
-            $event->setResult(['failed' => 1]);
+            return $event->setResult(['failed' => 1]);
         }
 
         $smsId = (int) $event->getConfig()['sms'];
         $sms   = $this->smsModel->getEntity($smsId);
 
         if ($sms->getId() !== $smsId) {
-            $event->setResult(['failed' => 1]);
+            return $event->setResult(['failed' => 1]);
         }
 
         $smsEvent = new SmsSendEvent($sms->getMessage(), $lead);
@@ -128,7 +128,7 @@ class CampaignSubscriber extends CommonSubscriber
 
         // If there was a problem sending at this point, it's an API problem and should be requeued
         if ($metadata === false) {
-            $event->setResult(false);
+            return $event->setResult(false);
         }
 
         $event->setResult([
