@@ -136,6 +136,17 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
+     * Set the result to failed
+     */
+    public function setFailed($reason = null)
+    {
+        $this->result = [
+            'failed' => 1,
+            'reason' => $reason
+        ];
+    }
+
+    /**
      * @return mixed
      */
     public function getEventSettings()

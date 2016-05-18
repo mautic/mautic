@@ -100,7 +100,7 @@ class CampaignSubscriber extends CommonSubscriber
         $lead = $event->getLead();
 
         if ($this->leadModel->isContactable($lead, 'sms') !== DoNotContact::IS_CONTACTABLE) {
-            return $event->setResult(['failed' => 1]);
+            return $event->setFailed('Lead is not contactable on the SMS channel.');
         }
 
         $leadPhoneNumber = $lead->getFieldValue('mobile');
@@ -110,14 +110,14 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         if (empty($leadPhoneNumber)) {
-            return $event->setResult(['failed' => 1]);
+            return $event->setFailed('Missing phone number for lead.');
         }
 
         $smsId = (int) $event->getConfig()['sms'];
         $sms   = $this->smsModel->getEntity($smsId);
 
         if ($sms->getId() !== $smsId) {
-            return $event->setResult(['failed' => 1]);
+            return $event->setFailed('The specified SMS entity does not exist.');
         }
 
         $smsEvent = new SmsSendEvent($sms->getMessage(), $lead);
