@@ -9,37 +9,49 @@
 
 namespace Mautic\SmsBundle\Helper;
 
+use Doctrine\ORM\EntityManager;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
+use Mautic\CoreBundle\Helper\PhoneNumberHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\SmsBundle\Event\SmsSendEvent;
-use Mautic\SmsBundle\SmsEvents;
+use Mautic\LeadBundle\Model\LeadModel;
 
 class SmsHelper
 {
     /**
-     * @var MauticFactory
+     * @var EntityManager
      */
-    protected $factory;
+    protected $em;
 
     /**
-     * @param MauticFactory $factory
+     * @var LeadModel
      */
-    public function __construct(MauticFactory $factory)
+    protected $leadModel;
+
+    /**
+     * @var PhoneNumberHelper
+     */
+    protected $phoneNumberHelper;
+
+    /**
+     * SmsHelper constructor.
+     * 
+     * @param EntityManager $em
+     * @param LeadModel $leadModel
+     */
+    public function __construct(EntityManager $em, LeadModel $leadModel, PhoneNumberHelper $phoneNumberHelper)
     {
-        $this->factory = $factory;
+        $this->em = $em;
+        $this->leadModel = $leadModel;
+        $this->phoneNumberHelper = $phoneNumberHelper;
     }
 
     public function unsubscribe($number)
     {
-        $phoneUtil = PhoneNumberUtil::getInstance();
-        $phoneNumber = $phoneUtil->parse($number, 'US');
-        $number = $phoneUtil->format($phoneNumber, PhoneNumberFormat::E164);
+        $number = $this->phoneNumberHelper->format($number, PhoneNumberFormat::E164);
 
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $repo */
-        $repo = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead');
+        $repo = $this->em->getRepository('MauticLeadBundle:Lead');
 
         $args = array(
             'filter' => array(
@@ -70,9 +82,6 @@ class SmsHelper
             }
         }
 
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead.lead');
-
-        return $leadModel->addDncForLead($lead, 'sms', null, DoNotContact::UNSUBSCRIBED);
+        return $this->leadModel->addDncForLead($lead, 'sms', null, DoNotContact::UNSUBSCRIBED);
     }
 }
