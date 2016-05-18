@@ -33,7 +33,6 @@ Mautic.launchBuilder = function (formName, actionName) {
 
     // Disable the close button until everything is loaded
     mQuery('.btn-close-builder').prop('disabled', true);
-
     if (Mautic.builderMode == 'template') {
         // Template
         var src = mQuery('#builder_url').val();
@@ -47,6 +46,7 @@ Mautic.launchBuilder = function (formName, actionName) {
             .appendTo('.builder-content')
             .load(function () {
                 var contents = mQuery(this).contents();
+                Mautic.initSlots(contents);
                 // here, catch the droppable div and create a droppable widget
                 contents.find('.mautic-editable').droppable({
                     iframeFix: true,
@@ -523,3 +523,24 @@ Mautic.insertBuilderFeedback = function () {
 Mautic.builderOnLoad = function (target) {
     Mautic.activateBuilderDragTokens(target);
 };
+
+
+Mautic.initSlots = function(contents) {
+    var slots = contents.find('[data-slot]');
+    contents.find('[data-slot-container]').sortable({
+        items: slots,
+        handle: 'div[data-slot-handle]',
+        placeholder: 'slot-placeholder'
+    }).disableSelection();
+    slots.each(function (index, value) { 
+        var slot = mQuery(this);
+        var type = slot.attr('data-slot');
+        var handle = mQuery('<div/>').attr('data-slot-handle', true);
+
+        slot.hover(function() {
+            slot.append(handle);
+        }, function() {
+            handle.remove('div[data-slot-handle]');
+        });
+    });
+}
