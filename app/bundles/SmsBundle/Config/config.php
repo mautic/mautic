@@ -11,7 +11,13 @@ return array(
     'services'    => array(
         'events'  => array(
             'mautic.sms.campaignbundle.subscriber' => array(
-                'class' => 'Mautic\SmsBundle\EventListener\CampaignSubscriber'
+                'class' => 'Mautic\SmsBundle\EventListener\CampaignSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.lead.model.lead',
+                    'mautic.sms.model.sms',
+                    'mautic.sms.api'
+                ]
             ),
             'mautic.sms.configbundle.subscriber' => array(
                 'class' => 'Mautic\SmsBundle\EventListener\ConfigSubscriber'
