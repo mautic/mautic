@@ -12,6 +12,7 @@ use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Event\AssetEvent;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
+use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 
 /**
@@ -28,8 +29,9 @@ class CampaignSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            CampaignEvents::CAMPAIGN_ON_BUILD => array('onCampaignBuild', 0),
-            AssetEvents::ASSET_ON_DOWNLOAD    => array('onAssetDownload', 0)
+            CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],
+            AssetEvents::ASSET_ON_DOWNLOAD    => ['onAssetDownload', 0],
+            AssetEvents::ON_CAMPAIGN_TRIGGER_DECISION  => ['onCampaignTrigger', 0]
         );
     }
 
@@ -41,7 +43,7 @@ class CampaignSubscriber extends CommonSubscriber
         $trigger = array(
             'label'       => 'mautic.asset.campaign.event.download',
             'description' => 'mautic.asset.campaign.event.download_descr',
-            'callback'    => array('\\Mautic\\AssetBundle\\Helper\\CampaignEventHelper', 'validateAssetDownloadTrigger'),
+            'eventName'   => AssetEvents::ON_CAMPAIGN_TRIGGER_DECISION,
             'formType'    => 'campaignevent_assetdownload'
         );
 
@@ -57,5 +59,27 @@ class CampaignSubscriber extends CommonSubscriber
     {
         $asset = $event->getAsset();
         $this->factory->getModel('campaign')->triggerEvent('asset.download', $asset, 'asset.download.'.$asset->getId());
+    }
+
+    /**
+     * @param CampaignExecutionEvent $event
+     */
+    public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
+    {
+        $eventDetails = $event->getEventDetails();
+
+        if ($eventDetails == null) {
+            return $event->setResult(true);
+        }
+
+        $assetId       = $eventDetails->getId();
+        $limitToAssets = $event->getConfig()['assets'];
+
+        if (!empty($limitToAssets) && !in_array($assetId, $limitToAssets)) {
+            //no points change
+            return $event->setResult(false);
+        }
+
+        $event->setResult(true);
     }
 }
