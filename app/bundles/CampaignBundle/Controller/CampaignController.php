@@ -380,7 +380,7 @@ class CampaignController extends FormController
                 $lastPage = (ceil($count / $limit)) ?: 1;
             }
             $this->factory->getSession()->set('mautic.campaign.lead.page', $lastPage);
-            $returnUrl = $this->generateUrl('mautic_campaign_leads', array('objectId' => $objectId, 'page' => $lastPage));
+            $returnUrl = $this->generateUrl('mautic_campaign_contacts', array('objectId' => $objectId, 'page' => $lastPage));
 
             return $this->postActionRedirect(
                 array(
@@ -407,7 +407,7 @@ class CampaignController extends FormController
                     'totalItems'    => $leads['count'],
                     'tmpl'          => 'campaignleads',
                     'indexMode'     => 'grid',
-                    'link'          => 'mautic_campaign_leads',
+                    'link'          => 'mautic_campaign_contacts',
                     'sessionVar'    => 'campaign.lead',
                     'limit'         => $limit,
                     'objectId'      => $objectId,

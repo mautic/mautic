@@ -39,13 +39,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 class EventModel extends CommonFormModel
 {
     /**
-     * @deprecated Remove in 2.0
-     * 
-     * @var MauticFactory
-     */
-    protected $factory;
-    
-    /**
      * @var mixed
      */
     protected $batchSleepTime;
@@ -1623,55 +1616,31 @@ class EventModel extends CommonFormModel
      */
     public function invokeEventCallback($event, $settings, $lead = null, $eventDetails = null, $systemTriggered = false, LeadEventLog $log = null)
     {
-        $args = array(
+        // Create a campaign event with a default successful result
+        $campaignEvent = new CampaignExecutionEvent([
             'eventSettings'   => $settings,
             'eventDetails'    => $eventDetails,
             'event'           => $event,
             'lead'            => $lead,
-            'factory'         => $this->factory, // WHAT??
             'systemTriggered' => $systemTriggered,
             'config'          => $event['properties']
-        );
-
-        if (is_callable($settings['callback'])) {
-            if (is_array($settings['callback'])) {
-                $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
-            } elseif (strpos($settings['callback'], '::') !== false) {
-                $parts      = explode('::', $settings['callback']);
-                $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-            } else {
-                $reflection = new \ReflectionMethod(null, $settings['callback']);
+        ], true, $log);
+        
+        $eventName = array_key_exists('eventName', $settings) ? $settings['eventName'] : null;
+        
+        if ($eventName && $this->dispatcher->hasListeners($eventName)) {
+            $this->dispatcher->dispatch($eventName, $campaignEvent);
+            
+            if ($event['eventType'] !== 'decision' && $this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_EXECUTION)) {
+                $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_EXECUTION, $campaignEvent);
             }
-
-            $pass = array();
-            foreach ($reflection->getParameters() as $param) {
-                if (isset($args[$param->getName()])) {
-                    $pass[] = $args[$param->getName()];
-                } else {
-                    $pass[] = null;
-                }
+            
+            if ($campaignEvent->wasLogUpdatedByListener()) {
+                $campaignEvent->setResult($campaignEvent->getLogEntry());
             }
-
-            $result = $reflection->invokeArgs($this, $pass);
-
-            if ('decision' != $event['eventType'] && $this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_EXECUTION)) {
-                $executionEvent = $this->dispatcher->dispatch(
-                    CampaignEvents::ON_EVENT_EXECUTION,
-                    new CampaignExecutionEvent($args, $result, $log)
-                );
-
-                if ($executionEvent->wasLogUpdatedByListener()) {
-                    $result = $executionEvent->getLogEntry();
-                }
-            }
-        } else {
-            $result = true;
         }
-
-        // Save some RAM for batch processing
-        unset($args, $pass, $reflection, $settings, $lead, $event, $eventDetails);
-
-        return $result;
+        
+        return $campaignEvent->getResult();
     }
 
     /**

@@ -128,6 +128,14 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
+     * @param $result
+     */
+    public function setResult($result)
+    {
+        $this->result = $result;
+    }
+
+    /**
      * @return mixed
      */
     public function getEventSettings()
