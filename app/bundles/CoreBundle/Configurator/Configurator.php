@@ -251,7 +251,7 @@ class Configurator
 
         $count = $counter = count($array);
         foreach ($array as $key => $value) {
-            if (is_string($key)) {
+            if (is_string($key) or is_numeric($key)) {
                 if ($counter === $count) {
                     $string .= str_repeat("\t", $level + 1);
                 }
