@@ -65,10 +65,10 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            CampaignEvents::CAMPAIGN_ON_BUILD => array('onCampaignBuild', 0),
+        return [
+            CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],
             SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0]
-        );
+        ];
     }
 
     /**
@@ -79,15 +79,15 @@ class CampaignSubscriber extends CommonSubscriber
         if ($this->factory->getParameter('sms_enabled')) {
             $event->addAction(
                 'sms.send_text_sms',
-                array(
+                [
                     'label'            => 'mautic.campaign.sms.send_text_sms',
                     'description'      => 'mautic.campaign.sms.send_text_sms.tooltip',
                     'eventName'        => SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                     'formType'         => 'smssend_list',
-                    'formTypeOptions'  => array('update_select' => 'campaignevent_properties_sms'),
+                    'formTypeOptions'  => ['update_select' => 'campaignevent_properties_sms'],
                     'formTheme'        => 'MauticSmsBundle:FormTheme\SmsSendList',
                     'timelineTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.php'
-                )
+                ]
             );
         }
     }
