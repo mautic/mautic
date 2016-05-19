@@ -56,7 +56,7 @@ class FieldController extends FormController
 
         $session->set('mautic.lead.emailtoken.filter', $search);
 
-        $fields = $this->factory->getModel('lead.field')->getEntities(array(
+        $fields = $this->getModel('lead.field')->getEntities(array(
             'start'          => $start,
             'limit'          => $limit,
             'filter'         => array('string' => $search),
@@ -123,7 +123,7 @@ class FieldController extends FormController
 
         //retrieve the entity
         $field     = new LeadField();
-        $model      = $this->factory->getModel('lead.field');
+        $model      = $this->getModel('lead.field');
         //set the return URL for post actions
         $returnUrl  = $this->generateUrl('mautic_leadfield_index');
         $action     = $this->generateUrl('mautic_leadfield_action', array('objectAction' => 'new'));
@@ -209,7 +209,7 @@ class FieldController extends FormController
             return $this->accessDenied();
         }
 
-        $model   = $this->factory->getModel('lead.field');
+        $model   = $this->getModel('lead.field');
         $field   = $model->getEntity($objectId);
 
         //set the return URL
@@ -315,7 +315,7 @@ class FieldController extends FormController
      */
     public function cloneAction ($objectId)
     {
-        $model   = $this->factory->getModel('lead.field');
+        $model   = $this->getModel('lead.field');
         $entity  = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -358,7 +358,7 @@ class FieldController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->factory->getModel('lead.field');
+            $model  = $this->getModel('lead.field');
             $field = $model->getEntity($objectId);
 
             if ($field === null) {
@@ -416,7 +416,7 @@ class FieldController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model     = $this->factory->getModel('lead.field');
+            $model     = $this->getModel('lead.field');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = array();
 

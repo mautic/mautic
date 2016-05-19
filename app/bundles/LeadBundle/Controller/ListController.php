@@ -29,7 +29,7 @@ class ListController extends FormController
     public function indexAction($page = 1)
     {
         /** @var ListModel $model */
-        $model   = $this->factory->getModel('lead.list');
+        $model   = $this->getModel('lead.list');
         $session = $this->factory->getSession();
 
         //set some permissions
@@ -155,7 +155,7 @@ class ListController extends FormController
         //retrieve the entity
         $list     = new LeadList();
         /** @var ListModel $model */
-        $model      =$this->factory->getModel('lead.list');
+        $model      =$this->getModel('lead.list');
         //set the page we came from
         $page       = $this->factory->getSession()->get('mautic.leadlist.page', 1);
         //set the return URL for post actions
@@ -222,7 +222,7 @@ class ListController extends FormController
     public function editAction ($objectId, $ignorePost = false)
     {
         /** @var ListModel $model */
-        $model   = $this->factory->getModel('lead.list');
+        $model   = $this->getModel('lead.list');
         $list    = $model->getEntity($objectId);
 
         //set the page we came from
@@ -333,7 +333,7 @@ class ListController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             /** @var ListModel $model */
-            $model  =$this->factory->getModel('lead.list');
+            $model  =$this->getModel('lead.list');
             $list = $model->getEntity($objectId);
 
             if ($list === null) {
@@ -392,7 +392,7 @@ class ListController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             /** @var ListModel $model */
-            $model     = $this->factory->getModel('lead.list');
+            $model     = $this->getModel('lead.list');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = array();
 
@@ -482,11 +482,11 @@ class ListController extends FormController
         $leadId = $this->request->get('leadId');
         if (!empty($leadId) && $this->request->getMethod() == 'POST') {
             /** @var ListModel $model */
-            $model  = $this->factory->getModel('lead.list');
+            $model  = $this->getModel('lead.list');
             /** @var LeadList $list */
             $list   = $model->getEntity($listId);
             /** @var LeadModel $leadModel */
-            $leadModel = $this->factory->getModel('lead');
+            $leadModel = $this->getModel('lead');
             $lead      = $leadModel->getEntity($leadId);
 
             if ($lead === null) {

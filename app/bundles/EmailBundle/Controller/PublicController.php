@@ -24,7 +24,7 @@ class PublicController extends CommonFormController
     public function indexAction($idHash)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model = $this->factory->getModel('email');
+        $model = $this->getModel('email');
         $stat  = $model->getEmailStatus($idHash);
 
         if (!empty($stat)) {
@@ -54,7 +54,7 @@ class PublicController extends CommonFormController
 
                     //the lead needs to have fields populated
                     $statLead = $stat->getLead();
-                    $lead     = $this->factory->getModel('lead')->getLead($statLead->getId());
+                    $lead     = $this->getModel('lead')->getLead($statLead->getId());
                     $template = $emailEntity->getTemplate();
                     if (!empty($template)) {
                         $slots = $this->factory->getTheme($template)->getSlots('email');
@@ -148,7 +148,7 @@ class PublicController extends CommonFormController
     public function trackingImageAction($idHash)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model = $this->factory->getModel('email');
+        $model = $this->getModel('email');
         $model->hitEmail($idHash, $this->request);
 
         return TrackingPixelHelper::getResponse($this->request);
@@ -165,7 +165,7 @@ class PublicController extends CommonFormController
     {
         // Find the email
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model      = $this->factory->getModel('email');
+        $model      = $this->getModel('email');
         $translator = $this->get('translator');
         $stat       = $model->getEmailStatus($idHash);
 
@@ -176,7 +176,7 @@ class PublicController extends CommonFormController
             if ($lead) {
                 // Set the lead as current lead
                 /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-                $leadModel = $this->factory->getModel('lead');
+                $leadModel = $this->getModel('lead');
                 $leadModel->setCurrentLead($lead);
             }
 
@@ -212,7 +212,7 @@ class PublicController extends CommonFormController
 
                 if ($unsubscribeForm != null && $unsubscribeForm->isPublished()) {
                     $formTemplate = $unsubscribeForm->getTemplate();
-                    $formModel    = $this->factory->getModel('form');
+                    $formModel    = $this->getModel('form');
                     $formContent  = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
                 }
             }
@@ -265,7 +265,7 @@ class PublicController extends CommonFormController
     public function resubscribeAction($idHash)
     {
         //find the email
-        $model = $this->factory->getModel('email');
+        $model = $this->getModel('email');
         $stat  = $model->getEmailStatus($idHash);
 
         if (!empty($stat)) {
@@ -275,7 +275,7 @@ class PublicController extends CommonFormController
             if ($lead) {
                 // Set the lead as current lead
                 /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-                $leadModel = $this->factory->getModel('lead');
+                $leadModel = $this->getModel('lead');
                 $leadModel->setCurrentLead($lead);
             }
 
@@ -360,7 +360,7 @@ class PublicController extends CommonFormController
 
             if (is_array($response)) {
                 /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-                $model = $this->factory->getModel('email');
+                $model = $this->getModel('email');
 
                 $model->processMailerCallback($response);
             }
@@ -381,7 +381,7 @@ class PublicController extends CommonFormController
     public function previewAction($objectId)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model       = $this->factory->getModel('email');
+        $model       = $this->getModel('email');
         $emailEntity = $model->getEntity($objectId);
 
         if (
@@ -437,7 +437,7 @@ class PublicController extends CommonFormController
 
         // Prepare a fake lead
         /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
-        $fieldModel = $this->factory->getModel('lead.field');
+        $fieldModel = $this->getModel('lead.field');
         $fields     = $fieldModel->getFieldList(false, false);
         array_walk(
             $fields,

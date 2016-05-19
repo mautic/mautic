@@ -40,11 +40,6 @@ class CommonController extends Controller implements MauticController
     protected $request;
 
     /**
-     * @var AbstractCommonModel[]
-     */
-    protected $modelInstances = [];
-
-    /**
      * @param Request $request
      */
     public function setRequest(Request $request)
@@ -81,7 +76,7 @@ class CommonController extends Controller implements MauticController
     protected function getModel($modelNameKey)
     {
         // Shortcut for models with the same name as the bundle
-        if (strpos('.', $modelNameKey) === false) {
+        if (strpos($modelNameKey, '.') === false) {
             $modelNameKey = "$modelNameKey.$modelNameKey";
         }
 
@@ -513,7 +508,7 @@ class CommonController extends Controller implements MauticController
         $afterId = $request->get('mauticLastNotificationId', null);
 
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model = $this->factory->getModel('core.notification');
+        $model = $this->getModel('core.notification');
 
         list($notifications, $showNewIndicator, $updateMessage) = $model->getNotificationContent($afterId);
 
@@ -541,7 +536,7 @@ class CommonController extends Controller implements MauticController
     public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null)
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
-        $notificationModel = $this->factory->getModel('core.notification');
+        $notificationModel = $this->getModel('core.notification');
         $notificationModel->addNotification($message, $type, $isRead, $header, $iconClass, $datetime );
     }
 

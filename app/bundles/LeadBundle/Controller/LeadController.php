@@ -146,7 +146,7 @@ class LeadController extends FormController
             $listArgs["filter"]["force"] = " $mine";
         }
 
-        $lists = $this->factory->getModel('lead.list')->getUserLists();
+        $lists = $this->getModel('lead.list')->getUserLists();
 
         //check to see if in a single list
         $inSingleList = (substr_count($search, "$listCommand:") === 1) ? true : false;
@@ -170,7 +170,7 @@ class LeadController extends FormController
 
         // We need the EmailRepository to check if a lead is flagged as do not contact
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
-        $emailRepo = $this->factory->getModel('email')->getRepository();
+        $emailRepo = $this->getModel('email')->getRepository();
 
         return $this->delegateView(
             array(
@@ -207,12 +207,12 @@ class LeadController extends FormController
     public function quickAddAction()
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model = $this->factory->getModel('lead.lead');
+        $model = $this->getModel('lead.lead');
 
         // Get the quick add form
         $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'new', 'qf' => 1));
 
-        $fields = $this->factory->getModel('lead.field')->getEntities(
+        $fields = $this->getModel('lead.field')->getEntities(
             array(
                 'filter'         => array(
                     'force' => array(
@@ -263,7 +263,7 @@ class LeadController extends FormController
     public function viewAction($objectId)
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model = $this->factory->getModel('lead.lead');
+        $model = $this->getModel('lead.lead');
 
         /** @var \Mautic\LeadBundle\Entity\Lead $lead */
         $lead = $model->getEntity($objectId);
@@ -413,7 +413,7 @@ class LeadController extends FormController
 
         // We need the EmailRepository to check if a lead is flagged as do not contact
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
-        $emailRepo = $this->factory->getModel('email')->getRepository();
+        $emailRepo = $this->getModel('email')->getRepository();
 
         return $this->delegateView(
             array(
@@ -431,7 +431,7 @@ class LeadController extends FormController
                     'eventFilters'      => $filters,
                     'upcomingEvents'    => $upcomingEvents,
                     'engagementData'    => $engagementChart,
-                    'noteCount'         => $this->factory->getModel('lead.note')->getNoteCount($lead, true),
+                    'noteCount'         => $this->getModel('lead.note')->getNoteCount($lead, true),
                     'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value']),
                     'leadNotes'         => $this->forward(
                         'MauticLeadBundle:Note:index',
@@ -464,7 +464,7 @@ class LeadController extends FormController
      */
     public function newAction()
     {
-        $model = $this->factory->getModel('lead.lead');
+        $model = $this->getModel('lead.lead');
         $lead  = $model->getEntity();
 
         if (!$this->factory->getSecurity()->isGranted('lead:leads:create')) {
@@ -475,7 +475,7 @@ class LeadController extends FormController
         $page = $this->factory->getSession()->get('mautic.lead.page', 1);
 
         $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'new'));
-        $fields = $this->factory->getModel('lead.field')->getEntities(
+        $fields = $this->getModel('lead.field')->getEntities(
             array(
                 'force'          => array(
                     array(
@@ -609,7 +609,7 @@ class LeadController extends FormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
-        $model = $this->factory->getModel('lead.lead');
+        $model = $this->getModel('lead.lead');
         $lead  = $model->getEntity($objectId);
 
         //set the page we came from
@@ -656,7 +656,7 @@ class LeadController extends FormController
         }
 
         $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'edit', 'objectId' => $objectId));
-        $fields = $this->factory->getModel('lead.field')->getEntities(
+        $fields = $this->getModel('lead.field')->getEntities(
             array(
                 'force'          => array(
                     array(
@@ -799,7 +799,7 @@ class LeadController extends FormController
     public function mergeAction ($objectId)
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model    = $this->factory->getModel('lead');
+        $model    = $this->getModel('lead');
         $mainLead = $model->getEntity($objectId);
         $page     = $this->factory->getSession()->get('mautic.lead.page', 1);
 
@@ -997,7 +997,7 @@ class LeadController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->factory->getModel('lead.lead');
+            $model  = $this->getModel('lead.lead');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
@@ -1062,7 +1062,7 @@ class LeadController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model     = $this->factory->getModel('lead');
+            $model     = $this->getModel('lead');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = array();
 
@@ -1124,7 +1124,7 @@ class LeadController extends FormController
     public function listAction($objectId)
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model = $this->factory->getModel('lead');
+        $model = $this->getModel('lead');
         $lead  = $model->getEntity($objectId);
 
         if ($lead != null
@@ -1135,7 +1135,7 @@ class LeadController extends FormController
             )
         ) {
             /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
-            $listModel = $this->factory->getModel('lead.list');
+            $listModel = $this->getModel('lead.list');
             $lists     = $listModel->getUserLists();
 
             // Get a list of lists for the lead
@@ -1166,7 +1166,7 @@ class LeadController extends FormController
      */
     public function campaignAction($objectId)
     {
-        $model = $this->factory->getModel('lead');
+        $model = $this->getModel('lead');
         $lead  = $model->getEntity($objectId);
 
         if ($lead != null
@@ -1177,7 +1177,7 @@ class LeadController extends FormController
             )
         ) {
             /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-            $campaignModel  = $this->factory->getModel('campaign');
+            $campaignModel  = $this->getModel('campaign');
             $campaigns      = $campaignModel->getPublishedCampaigns(true);
             $leadsCampaigns = $campaignModel->getLeadCampaigns($lead, true);
 
@@ -1211,7 +1211,7 @@ class LeadController extends FormController
         ini_set('auto_detect_line_endings', true);
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model   = $this->factory->getModel('lead');
+        $model   = $this->getModel('lead');
         $session = $this->factory->getSession();
 
         if (!$this->factory->getSecurity()->isGranted('lead:leads:create')) {
@@ -1251,7 +1251,7 @@ class LeadController extends FormController
                 // Match fields
 
                 /** @var \Mautic\LeadBundle\Model\FieldModel $pluginModel */
-                $fieldModel = $this->factory->getModel('lead.field');
+                $fieldModel = $this->getModel('lead.field');
 
                 $leadFields   = $fieldModel->getFieldList(false, false);
                 $importFields = $session->get('mautic.lead.import.importfields', array());
@@ -1573,7 +1573,7 @@ class LeadController extends FormController
         $valid = $cancelled = false;
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model = $this->factory->getModel('lead');
+        $model = $this->getModel('lead');
 
         /** @var \Mautic\LeadBundle\Entity\Lead $lead */
         $lead = $model->getEntity($objectId);
@@ -1598,7 +1598,7 @@ class LeadController extends FormController
 
         // Check if lead has a bounce status
         /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
-        $emailModel = $this->factory->getModel('email');
+        $emailModel = $this->getModel('email');
         $dnc        =  $emailModel->getRepository()->checkDoNotEmail($leadEmail);
 
         $inList = ($this->request->getMethod() == 'GET')
@@ -1744,7 +1744,7 @@ class LeadController extends FormController
     {
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-            $model = $this->factory->getModel('lead');
+            $model = $this->getModel('lead');
             $data  = $this->request->request->get('lead_batch', array(), true);
             $ids   = json_decode($data['ids'], true);
 
@@ -1797,7 +1797,7 @@ class LeadController extends FormController
         } else {
             // Get a list of lists
             /** @var \Mautic\LeadBundle\Model\ListModel $model */
-            $model = $this->factory->getModel('lead.list');
+            $model = $this->getModel('lead.list');
             $lists = $model->getUserLists();
             $items = array();
             foreach ($lists as $list) {
@@ -1844,11 +1844,11 @@ class LeadController extends FormController
     public function batchCampaignsAction($objectId = 0)
     {
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-        $campaignModel = $this->factory->getModel('campaign');
+        $campaignModel = $this->getModel('campaign');
 
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-            $model = $this->factory->getModel('lead');
+            $model = $this->getModel('lead');
             $data  = $this->request->request->get('lead_batch', array(), true);
             $ids   = json_decode($data['ids'], true);
 
@@ -1971,7 +1971,7 @@ class LeadController extends FormController
     {
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-            $model = $this->factory->getModel('lead');
+            $model = $this->getModel('lead');
             $data  = $this->request->request->get('lead_batch_dnc', array(), true);
             $ids   = json_decode($data['ids'], true);
 

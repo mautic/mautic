@@ -53,7 +53,7 @@ class NoteController extends FormController
         $orderBy    = $this->factory->getSession()->get('mautic.lead.'.$lead->getId().'.note.orderby', 'n.dateTime');
         $orderByDir = $this->factory->getSession()->get('mautic.lead.'.$lead->getId().'.note.orderbydir', 'DESC');
 
-        $model = $this->factory->getModel('lead.note');
+        $model = $this->getModel('lead.note');
 
         $force = array(
             array(
@@ -144,7 +144,7 @@ class NoteController extends FormController
         $note = new LeadNote();
         $note->setLead($lead);
 
-        $model  = $this->factory->getModel('lead.note');
+        $model  = $this->getModel('lead.note');
         $action = $this->generateUrl('mautic_leadnote_action', array(
                 'objectAction' => 'new',
                 'leadId'       => $leadId)
@@ -223,7 +223,7 @@ class NoteController extends FormController
             return $lead;
         }
 
-        $model      = $this->factory->getModel('lead.note');
+        $model      = $this->getModel('lead.note');
         $note       = $model->getEntity($objectId);
         $closeModal = false;
         $valid      = false;
@@ -301,7 +301,7 @@ class NoteController extends FormController
     protected function checkLeadAccess ($leadId, $action)
     {
         //make sure the user has view access to this lead
-        $leadModel = $this->factory->getModel('lead');
+        $leadModel = $this->getModel('lead');
         $lead      = $leadModel->getEntity($leadId);
 
         if ($lead === null) {
@@ -351,7 +351,7 @@ class NoteController extends FormController
             return $lead;
         }
 
-        $model = $this->factory->getModel('lead.note');
+        $model = $this->getModel('lead.note');
         $note  = $model->getEntity($objectId);
 
         if (

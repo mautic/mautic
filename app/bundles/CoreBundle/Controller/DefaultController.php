@@ -34,7 +34,7 @@ class DefaultController extends CommonController
             return $this->redirect($this->generateUrl('mautic_dashboard_index'));
         } else {
             /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
-            $pageModel = $this->factory->getModel('page');
+            $pageModel = $this->getModel('page');
             $page      = $pageModel->getEntity($root);
 
             if (empty($page)) {
@@ -80,7 +80,7 @@ class DefaultController extends CommonController
     public function notificationsAction()
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model = $this->factory->getModel('core.notification');
+        $model = $this->getModel('core.notification');
 
         list($notifications, $showNewIndicator, $updateMessage) = $model->getNotificationContent();
 

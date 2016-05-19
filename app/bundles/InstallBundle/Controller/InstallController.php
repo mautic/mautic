@@ -849,7 +849,7 @@ class InstallController extends CommonController
             $encoder = $this->container->get('security.encoder_factory')->getEncoder($user);
 
             /** @var \Mautic\UserBundle\Model\RoleModel $model */
-            $model = $this->factory->getModel('user.role');
+            $model = $this->getModel('user.role');
 
             $user->setFirstName($data->firstname);
             $user->setLastName($data->lastname);
