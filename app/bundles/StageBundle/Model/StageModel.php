@@ -141,7 +141,49 @@ class StageModel extends CommonFormModel
     }
 
     /**
-     * Triggers a specific stage change
+     * Get line chart data of stages
+     *
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $dateFormat
+     * @param array    $filter
+     * @param boolean  $canViewOthers
+     *
+     * @return array
+     */
+    public function getStageLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
+    {
+        $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $q         = $query->prepareTimeDataQuery('lead_stages_change_log', 'date_added', $filter);
+
+        if (!$canViewOthers) {
+            $q->join('t', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id')
+                ->andWhere('l.owner_id = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $data = $query->loadAndBuildTimeData($q);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.stage.changes'), $data);
+        return $chart->render();
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getUserStages()
+    {
+        $user  = (!$this->security->isGranted('stage:stages:viewother')) ?
+            $this->factory->getUser() : false;
+        $stages = $this->em->getRepository('MauticStageBundle:Stage')->getStages($user);
+
+        return $stages;
+    }
+
+    /**
+     * Triggers a specific point change
      *
      * @param $type
      * @param mixed $eventDetails passthrough from function triggering action to the callback function
@@ -168,8 +210,8 @@ class StageModel extends CommonFormModel
             $session->set('mautic.triggered.stage.actions', $triggeredEvents);
         }
 
-        //find all the actions for published stages
-        /** @var \Mautic\StageBundle\Entity\StageRepository $repo */
+        //find all the actions for published points
+        /** @var \Mautic\PointBundle\Entity\PointRepository $repo */
         $repo            = $this->getRepository();
         $availableStages = $repo->getPublishedByType($type);
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
@@ -202,63 +244,22 @@ class StageModel extends CommonFormModel
             if (!isset($availableActions['actions'][$action->getType()])) {
                 continue;
             }
-            $settings = $availableActions['actions'][$action->getType()];
-
-            $args = array(
-                'action'      => array(
-                    'id'         => $action->getId(),
-                    'type'       => $action->getType(),
-                    'name'       => $action->getName(),
-                    'properties' => $action->getProperties(),
-                ),
-                'lead'        => $lead,
-                'factory'     => $this->factory,
-                'eventDetails' => $eventDetails
+            
+            $lead->addToPoints($action);
+            $parsed = explode('.', $action->getType());
+            $lead->stageChangeLogEntry(
+                $parsed[0],
+                $action->getId() . ": " . $action->getName(),
+                $parsed[1]
             );
 
-            $callback = (isset($settings['callback'])) ? $settings['callback'] :
-                array('\\Mautic\\StageBundle\\Helper\\EventHelper', 'engageStageAction');
+            $log = new LeadStageLog();
+            $log->setStage($action);
+            $log->setLead($lead);
+            $log->setDateAdded(new \DateTime());
 
-            if (is_callable($callback)) {
-                if (is_array($callback)) {
-                    $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                } elseif (strpos($callback, '::') !== false) {
-                    $parts      = explode('::', $callback);
-                    $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-                } else {
-                    $reflection = new \ReflectionMethod(null, $callback);
-                }
+            $persist[] = $log;
 
-                $pass = array();
-                foreach ($reflection->getParameters() as $param) {
-                    if (isset($args[$param->getName()])) {
-                        $pass[] = $args[$param->getName()];
-                    } else {
-                        $pass[] = null;
-                    }
-                }
-                $stagesChange = $reflection->invokeArgs($this, $pass);
-
-                if ($stagesChange) {
-                    //todo: this is where the lead should move from stage to stage
-                    //$lead->addToStages($delta);
-                    $parsed = explode('.', $action->getType());
-                    $lead->addStagesChangeLogEntry(
-                        $parsed[0],
-                        $action->getId() . ": " . $action->getName(),
-                        $parsed[1],
-                        $ipAddress
-                    );
-
-                    $log = new LeadStageLog();
-                    $log->setIpAddress($ipAddress);
-                    $log->setStage($action);
-                    $log->setLead($lead);
-                    $log->setDateFired(new \DateTime());
-
-                    $persist[] = $log;
-                }
-            }
         }
 
         if (!empty($persist)) {
@@ -266,36 +267,8 @@ class StageModel extends CommonFormModel
             $this->getRepository()->saveEntities($persist);
 
             // Detach logs to reserve memory
-            $this->em->clear('Mautic\StageBundle\Entity\LeadStageLog');
+            $this->em->clear('Mautic\PointBundle\Entity\LeadStageLog');
         }
     }
 
-    /**
-     * Get line chart data of stages
-     *
-     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     * @param string   $dateFormat
-     * @param array    $filter
-     * @param boolean  $canViewOthers
-     *
-     * @return array
-     */
-    public function getStageLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
-    {
-        $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
-        $q         = $query->prepareTimeDataQuery('lead_stages_change_log', 'date_added', $filter);
-
-        if (!$canViewOthers) {
-            $q->join('t', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id')
-                ->andWhere('l.owner_id = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
-        }
-
-        $data = $query->loadAndBuildTimeData($q);
-        $chart->setDataset($this->factory->getTranslator()->trans('mautic.stage.changes'), $data);
-        return $chart->render();
-    }
 }

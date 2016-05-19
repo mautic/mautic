@@ -176,6 +176,10 @@ return array(
                 'class' => 'Mautic\FormBundle\Form\Type\PointActionFormSubmitType',
                 'alias' => 'pointaction_formsubmit'
             ),
+            'mautic.form.type.stageaction_formsubmit'    => array(
+                'class' => 'Mautic\FormBundle\Form\Type\StageActionFormSubmitType',
+                'alias' => 'stageaction_formsubmit'
+            ),
             'mautic.form.type.form_list'                 => array(
                 'class'     => 'Mautic\FormBundle\Form\Type\FormListType',
                 'arguments' => 'mautic.factory',

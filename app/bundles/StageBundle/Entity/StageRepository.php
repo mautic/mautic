@@ -123,4 +123,53 @@ class StageRepository extends CommonRepository
     {
         return $this->getStandardSearchCommands();
     }
+
+    /**
+     * Get a list of lists
+     *
+     * @param bool   $user
+     * @param string $alias
+     * @param string $id
+     *
+     * @return array
+     */
+    public function getStages($user = false, $id = '')
+    {
+        static $stages = array();
+
+        if (is_object($user)) {
+            $user = $user->getId();
+        }
+
+        $key = (int) $user.$id;
+        if (isset($stages[$key])) {
+            return $stages[$key];
+        }
+
+        $q = $this->_em->createQueryBuilder()
+            ->from('MauticStageBundle:Stage', 's', 's.id');
+
+        $q->select('partial s.{id, name}')
+            ->andWhere($q->expr()->eq('s.isPublished', ':true'))
+            ->setParameter('true', true, 'boolean');
+
+        if (!empty($user)) {
+            $q->orWhere('s.createdBy = :user');
+            $q->setParameter('user', $user);
+        }
+
+        if (!empty($id)) {
+            $q->andWhere(
+                $q->expr()->neq('s.id', $id)
+            );
+        }
+
+        $q->orderBy('s.name');
+
+        $results = $q->getQuery()->getArrayResult();
+
+        $stages[$key] = $results;
+
+        return $results;
+    }
 }

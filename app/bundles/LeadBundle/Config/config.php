@@ -470,6 +470,11 @@ return array(
                 'class' => 'Mautic\LeadBundle\Form\Type\PointActionType',
                 'alias' => 'leadpoints_action'
             ),
+            'mautic.form.type.leadstage_action'              => array(
+                'class' => 'Mautic\LeadBundle\Form\Type\StageActionType',
+                'arguments' => 'mautic.factory',
+                'alias' => 'leadstage_action'
+            ),
             'mautic.form.type.leadlist_trigger'               => array(
                 'class' => 'Mautic\LeadBundle\Form\Type\ListTriggerType',
                 'alias' => 'leadlist_trigger'

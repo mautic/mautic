@@ -99,4 +99,14 @@ class LeadSubscriber extends CommonSubscriber
             $event->getVictor()->getId()
         );
     }
+
+    /**
+     * Handle point triggers for new leads (including 0 point triggers)
+     *
+     * @param LeadEvent $event
+     */
+    public function onLeadSave(LeadEvent $event)
+    {
+        
+    }
 }
