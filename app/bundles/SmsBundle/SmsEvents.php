@@ -68,7 +68,7 @@ final class SmsEvents
     const SMS_POST_DELETE = 'mautic.sms_post_delete';
 
     /**
-     * The mautic.sms.on_campaign_trigger_action event is fired when the campagin action triggers.
+     * The mautic.sms.on_campaign_trigger_action event is fired when the campaign action triggers.
      *
      * The event listener receives a
      * Mautic\CampaignBundle\Event\CampaignExecutionEvent
