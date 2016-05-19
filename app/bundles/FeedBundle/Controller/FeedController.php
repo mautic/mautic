@@ -9,13 +9,13 @@
 
 namespace Mautic\FeedBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class FeedController
  */
-class FeedController extends Controller
+class FeedController extends FormController
 {
     /**
      * Generates the default view
@@ -24,6 +24,8 @@ class FeedController extends Controller
      */
     public function indexAction()
     {
-        return new Response('Hello World!');
+        return $this->delegateView(array(
+            'contentTemplate' => 'MauticFeedBundle:Feed:hello.html.php'
+        ));
     }
 }
