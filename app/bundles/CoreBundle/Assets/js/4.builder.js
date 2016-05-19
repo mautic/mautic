@@ -526,13 +526,15 @@ Mautic.builderOnLoad = function (target) {
 
 
 Mautic.initSlots = function(contents) {
-    var slots = contents.find('[data-slot]');
-    contents.find('[data-slot-container]').sortable({
-        items: slots,
+    var slotContainers = contents.find('[data-slot-container]');
+    slotContainers.sortable({
+        items: '[data-slot]',
         handle: 'div[data-slot-handle]',
-        placeholder: 'slot-placeholder'
+        placeholder: 'slot-placeholder',
+        connectWith: '[data-slot-container]'
     }).disableSelection();
-    slots.each(function (index, value) { 
+    
+    contents.find('[data-slot]').each(function (index, value) { 
         var slot = mQuery(this);
         var type = slot.attr('data-slot');
         var handle = mQuery('<div/>').attr('data-slot-handle', true);
@@ -543,4 +545,29 @@ Mautic.initSlots = function(contents) {
             handle.remove('div[data-slot-handle]');
         });
     });
+
+    mQuery('#slot-type-container .slot-type').draggable({
+        iframeFix: true,
+        iframeId: 'builder-template-content',
+        connectToSortable: slotContainers,
+        revert: 'invalid',
+        appendTo: '.builder',
+        helper: 'clone',
+        zIndex: 8000,
+        scroll: true,
+        scrollSensitivity: 100,
+        scrollSpeed: 100,
+        cursorAt: {top: 15, left: 15},
+        start: function( event, ui ) {
+            console.log('start', event, ui);
+            mQuery(ui.helper).css({
+                background: 'blue',
+                height: '100px',
+                width: '100px'
+            });
+        },
+        stop: function(event, ui) {
+            
+        }
+    }).disableSelection();
 }

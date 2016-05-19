@@ -93,6 +93,30 @@ class BuilderSubscriber extends CommonSubscriber
                 $event->filterTokens($tokens)
             );
         }
+
+        if ($event->slotTypesRequested()) {
+            $event->addSlotType(
+                'text',
+                'Text',
+                'font',
+                'form-placeholder',
+                1000
+            );
+            $event->addSlotType(
+                'image',
+                'Image',
+                'image',
+                'form-placeholder',
+                900
+            );
+            $event->addSlotType(
+                'button',
+                'Button',
+                'external-link',
+                'form-placeholder',
+                800
+            );
+        }
     }
 
     /**

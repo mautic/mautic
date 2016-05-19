@@ -20,6 +20,7 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class BuilderEvent extends Event
 {
+    protected $slotTypes = array();
     protected $tokens = array();
     protected $visualTokens = array();
     protected $tokenSections = array();
@@ -39,6 +40,41 @@ class BuilderEvent extends Event
         $this->tokenFilterTarget = (strpos($tokenFilter, '{@') === 0) ? 'label' : 'token';
         $this->tokenFilterText   = str_replace(array('{@', '{', '}'), '', $tokenFilter);
         $this->tokenFilter       = ($this->tokenFilterTarget == 'label') ? $this->tokenFilterText : str_replace('{@', '{', $tokenFilter);
+    }
+
+    /**
+     * @param $key
+     * @param $header
+     * @param $icon
+     * @param $form
+     * @param $priority
+     */
+    public function addSlotType($key, $header, $icon, $form, $priority = 0)
+    {
+        $this->slotTypes[$key] = array(
+            'header'   => $this->translator->trans($header),
+            'icon'     => $icon,
+            'form'     => $form,
+            'priority' => $priority
+        );
+    }
+
+    /**
+     * Get slot types
+     *
+     * @return array
+     */
+    public function getSlotTypes()
+    {
+        $sort = array('priority' => array(), 'header' => array());
+        foreach ($this->slotTypes as $k => $v) {
+            $sort['priority'][$k] = $v['priority'];
+            $sort['header'][$k]   = $v['header'];
+        }
+
+        array_multisort($sort['priority'], SORT_DESC, $sort['header'], SORT_ASC, $this->slotTypes);
+
+        return $this->slotTypes;
     }
 
     /**
@@ -372,6 +408,16 @@ class BuilderEvent extends Event
     public function abTestWinnerCriteriaRequested()
     {
         return $this->getRequested('abTestWinnerCriteria');
+    }
+
+    /**
+     * Check if AB Test Winner Criteria has been requested
+     *
+     * @return bool
+     */
+    public function slotTypesRequested()
+    {
+        return $this->getRequested('slotTypes');
     }
 
     /**

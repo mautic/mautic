@@ -187,6 +187,30 @@ if (!isset($attachmentSize)) {
             <?php echo $view->render('MauticCoreBundle:Helper:buildermodal_link.html.php'); ?>
         </div>
     </div>
+    <div class="builder-panel slot-panel">
+        <div class="panel-group builder-slots" id="emailSlotsPanel">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#slot-type-container" role="tab" data-toggle="tab">Content Slots</a></li>
+                <li class=""><a href="#customize-form-container" role="tab" data-toggle="tab">Customize</a></li>
+            </ul>
+            <div class="bg-auto tab-content pa-md">
+                <div class="tab-pane fade bdr-w-0 active in" id="slot-type-container">
+                    <?php if ($slots): ?>
+                        <?php foreach ($slots as $slotKey => $slot): ?>
+                            <div class="slot-type btn btn-default btn-lg btn-block">
+                                <i class="fa fa-<?php echo $slot['icon']; ?>" aria-hidden="true"></i>
+                                <?php echo $slot['header']; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                    <p class="text-muted pt-md text-center"><i>Drag the slot to the desired position.</i></p>
+                </div>
+                <div class="tab-pane fade bdr-w-0" id="customize-form-container">
+                    form
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <?php

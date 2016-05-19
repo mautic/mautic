@@ -15,14 +15,14 @@
     /* BUILDER CSS */
     div[data-slot-handle] {
         cursor: move!important;
-        bottom: -15px;
+        bottom: -5px;
         content: '';
         left: -15px;
         margin: 0;
         padding: 0;
         position: absolute;
         right: -15px;
-        top: -15px;
+        top: -5px;
         z-index: -1;
         border: 1px solid blue;
     }
@@ -35,6 +35,10 @@
     .slot-placeholder {
         border: 1px solid red;
         margin: 20px 0;
+    }
+
+    body {
+        overflow: auto;
     }
 
 
@@ -134,10 +138,6 @@
       vertical-align: top;
     }
 
-    .button {
-      padding: 30px 0 0;
-    }
-
     .info-block {
       padding: 0 20px;
       width: 260px;
@@ -189,7 +189,7 @@
     }
 
     .user-msg {
-      padding-top: 10px;
+      padding: 10px 0;
       font-size: 14px;
       text-align: center;
       font-style: italic;
@@ -340,9 +340,6 @@
                 <div data-slot="text">
                     You've received an invitation!
                 </div>
-                <div data-slot="text">
-                    You've received an invitation!2
-                </div>
             </td>
           </tr>
           <tr>
@@ -388,8 +385,10 @@
       <center>
         <table cellpadding="0" cellspacing="0" width="600" class="w320">
           <tr>
-            <td class="header-md" style="text-align:center;">
+            <td class="header-md" data-slot-container>
+            <div data-slot="text">
               Come check us out!
+              </div>
             </td>
           </tr>
           <tr>
@@ -399,19 +398,27 @@
                   <td class="mobile-block">
                     <table cellspacing="0" cellpadding="0" width="100%" style="border-collapse:separate !important;">
                       <tr>
-                        <td class="mini-img">
-                          <a href=""><img src="http://s3.amazonaws.com/swu-filepicker/u3EYVdcIQo6dZiKefuLu_bracelet.jpg" alt="product" /></a>
+                        <td class="mini-img" data-slot-container>
+                            <div data-slot="image">
+                              <a href=""><img src="http://s3.amazonaws.com/swu-filepicker/u3EYVdcIQo6dZiKefuLu_bracelet.jpg" alt="product" /></a>
+                            </div>
                         </td>
-                        <td class="mini-img">
-                          <a href=""><img src="http://s3.amazonaws.com/swu-filepicker/yyN7crRfTTW6l8fO0S0S_hat.jpg" alt="product" /></a>
+                        <td class="mini-img" data-slot-container>
+                            <div data-slot="image">
+                              <a href=""><img src="http://s3.amazonaws.com/swu-filepicker/yyN7crRfTTW6l8fO0S0S_hat.jpg" alt="product" /></a>
+                          </div>
                         </td>
                       </tr>
                       <tr>
-                        <td class="mini-img">
+                        <td class="mini-img" data-slot-container>
+                            <div data-slot="image">
                           <a href=""><img src="http://s3.amazonaws.com/swu-filepicker/DXWZ4PzwQUGI0wQoABDt_jacket.jpg" alt="product" /></a>
-                        </td>
-                        <td class="mini-img">
+                          </div>
+                          </td>
+                        <td class="mini-img" data-slot-container>
+                            <div data-slot="image">
                           <a href=""><img src="http://s3.amazonaws.com/swu-filepicker/RPezUIwPRv8pjatAAH1E_item_images_19.jpg" alt="product" /></a>
+                          </div>
                         </td>
                       </tr>
                     </table>
@@ -419,19 +426,27 @@
                   <td class="mobile-block">
                     <table cellspacing="0" cellpadding="0" width="100%" style="border-collapse:separate !important;">
                       <tr>
-                        <td class="mini-img">
+                        <td class="mini-img" data-slot-container>
+                            <div data-slot="image">
                           <a href=""><img src="http://s3.amazonaws.com/swu-filepicker/9wRy50HQTg2CTyZA5Ozi_item_images_16.jpg" alt="product" /></a>
-                        </td>
-                        <td class="mini-img">
+                          </div>
+                          </td>
+                        <td class="mini-img" data-slot-container>
+                            <div data-slot="image">
                           <a href=""><img src="http://s3.amazonaws.com/swu-filepicker/RPezUIwPRv8pjatAAH1E_item_images_19.jpg" alt="product" /></a>
+                          </div>
                         </td>
                       </tr>
                       <tr>
-                        <td class="mini-img">
+                        <td class="mini-img" data-slot-container>
+                            <div data-slot="image">
                           <a href=""><img src="http://s3.amazonaws.com/swu-filepicker/DXWZ4PzwQUGI0wQoABDt_jacket.jpg" alt="product" /></a>
-                        </td>
-                        <td class="mini-img">
+                          </div>
+                          </td>
+                        <td class="mini-img" data-slot-container>
+                            <div data-slot="image">
                           <a href=""><img src="http://s3.amazonaws.com/swu-filepicker/u3EYVdcIQo6dZiKefuLu_bracelet.jpg" alt="product" /></a>
+                          </div>
                         </td>
                       </tr>
                     </table>
@@ -449,10 +464,12 @@
       <center>
         <table cellspacing="0" cellpadding="0" width="600" class="w320">
           <tr>
-            <td style="padding: 25px 0 25px">
+            <td style="padding: 25px 0 25px" data-slot-container>
+            <div data-slot="text">
               <strong>Awesome Inc</strong><br />
               1234 Awesome St <br />
               Wonderland <br /><br />
+              </div>
             </td>
           </tr>
         </table>
