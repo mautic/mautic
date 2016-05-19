@@ -23,7 +23,7 @@ $loader = require_once __DIR__ . '/vendor/autoload.php';
 
 Debug::enable();
 
-$kernel = new AppKernel('dev', false);
+$kernel = new AppKernel('dev', true);
 $kernel->loadClassCache();
 
 Stack\run((new MiddlewareBuilder('dev'))->resolve($kernel));
