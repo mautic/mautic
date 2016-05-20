@@ -157,7 +157,7 @@ class TwitterIntegration extends SocialIntegration
             $data = $this->makeRequest(
                 $this->getApiUrl("users/lookup"),
                 array(
-                    'screen_name'      => $identifier,
+                    'screen_name'      => $this->cleanIdentifier($identifier),
                     'include_entities' => 'false'
                 )
             );
@@ -279,9 +279,11 @@ class TwitterIntegration extends SocialIntegration
      */
     public function cleanIdentifier ($identifier)
     {
-        if (strpos($identifier, 'http') !== false) {
+        if (preg_match('#https?://twitter.com/(.*?)(/.*?|$)#i', $identifier, $match)) {
             //extract the handle
-            $identifier = substr(strrchr(rtrim($identifier, '/'), '/'), 1);
+            $identifier = $match[1];
+        } elseif (substr($identifier, 0, 1) == '@') {
+            $identifier = substr($identifier, 1);
         }
 
         return urlencode($identifier);
