@@ -13,6 +13,7 @@ matrix:
 
 before_script:
   - composer install
+  - cd app
 
 script:
   - phpunit
