@@ -138,7 +138,7 @@ var Mautic = {
         Mautic.addKeyboardShortcut('shift+s', 'Global Search', function (e) {
             mQuery('#globalSearchContainer .search-button').click();
         });
-        
+
         Mousetrap.bind('?', function (e) {
             var modalWindow = mQuery('#MauticSharedModal');
 
@@ -1128,7 +1128,7 @@ var Mautic = {
                 var identifierClass = (new Date).getTime();
                 MauticVars.iconClasses[identifierClass] = mQuery(el).attr('class');
 
-                var specialClasses = ['fa-fw', 'fa-lg', 'fa-2x', 'fa-3x', 'fa-4x', 'fa-5x', 'fa-li'];
+                var specialClasses = ['fa-fw', 'fa-lg', 'fa-2x', 'fa-3x', 'fa-4x', 'fa-5x', 'fa-li', 'text-white', 'text-muted'];
                 var appendClasses = "";
 
                 //check for special classes to add to spinner

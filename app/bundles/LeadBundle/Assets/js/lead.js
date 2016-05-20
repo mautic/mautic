@@ -507,7 +507,6 @@ Mautic.updateLeadFieldBooleanLabels = function(el, label) {
 };
 
 Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
-    Mautic.startIconSpinOnEvent(event);
     var query = "action=lead:updateSocialProfile&network=" + network + "&lead=" + leadId;
     mQuery.ajax({
         showLoadingBar: true,
