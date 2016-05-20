@@ -46,6 +46,11 @@ class Stage extends FormEntity
     private $type;
 
     /**
+     * @var int
+     */
+    private $weight = 0;
+
+    /**
      * @var \DateTime
      */
     private $publishUp;
@@ -103,6 +108,8 @@ class Stage extends FormEntity
             ->length(50)
             ->build();
 
+        $builder->createField('weight', 'integer');
+
         $builder->addPublishDates();
 
         $builder->addField('properties', 'array');
@@ -145,6 +152,7 @@ class Stage extends FormEntity
                     'name',
                     'category',
                     'type',
+                    'weight',
                     'description'
                 )
             )
@@ -217,6 +225,30 @@ class Stage extends FormEntity
     public function getType ()
     {
         return $this->type;
+    }
+
+    /**
+     * Set weight
+     *
+     * @param integer $weight
+     *
+     * @return Action
+     */
+    public function setWeight ($type)
+    {
+        $this->weight = (int)$type;
+
+        return $this;
+    }
+
+    /**
+     * Get weight
+     *
+     * @return integer
+     */
+    public function getWeight ()
+    {
+        return $this->weight;
     }
 
     /**

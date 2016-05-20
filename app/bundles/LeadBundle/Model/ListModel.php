@@ -1005,4 +1005,40 @@ class ListModel extends FormModel
 
         return $results;
     }
+    /**
+     * Get a list of top (by leads added) lists
+     *
+     * @param integer $limit
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     *
+     * @return array
+     */
+    public function getLifeCycleLists($limit = 5, $dateFrom = null, $dateTo = null, $filters = array())
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name, COUNT(l.stage_id) as stages')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 't')
+            ->join('t', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = t.leadlist_id')
+            ->join('t', MAUTIC_TABLE_PREFIX.'lead', 'l', 'l.id = t.lead_id')
+            ->orderBy('leads', 'DESC')
+            ->where($q->expr()->eq('ll.is_published', ':published'))
+            ->setParameter('published', true)
+            ->groupBy('ll.id, l.stage_id')
+            ->setMaxResults($limit);
+
+        if (!empty($options['canViewOthers'])) {
+            $q->andWhere('ll.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_added');
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
 }
