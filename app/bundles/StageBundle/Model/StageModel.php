@@ -183,7 +183,7 @@ class StageModel extends CommonFormModel
     }
 
     /**
-     * Triggers a specific point change
+     * Triggers a specific stage change
      *
      * @param $type
      * @param mixed $eventDetails passthrough from function triggering action to the callback function
@@ -210,8 +210,8 @@ class StageModel extends CommonFormModel
             $session->set('mautic.triggered.stage.actions', $triggeredEvents);
         }
 
-        //find all the actions for published points
-        /** @var \Mautic\PointBundle\Entity\PointRepository $repo */
+        //find all the actions for published stages
+        /** @var \Mautic\StageBundle\Entity\StageRepository $repo */
         $repo            = $this->getRepository();
         $availableStages = $repo->getPublishedByType($type);
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
@@ -245,7 +245,7 @@ class StageModel extends CommonFormModel
                 continue;
             }
             
-            $lead->addToPoints($action);
+            $lead->setStage($action);
             $parsed = explode('.', $action->getType());
             $lead->stageChangeLogEntry(
                 $parsed[0],
@@ -256,7 +256,7 @@ class StageModel extends CommonFormModel
             $log = new LeadStageLog();
             $log->setStage($action);
             $log->setLead($lead);
-            $log->setDateAdded(new \DateTime());
+            $log->setDateFired(new \DateTime());
 
             $persist[] = $log;
 
@@ -267,7 +267,7 @@ class StageModel extends CommonFormModel
             $this->getRepository()->saveEntities($persist);
 
             // Detach logs to reserve memory
-            $this->em->clear('Mautic\PointBundle\Entity\LeadStageLog');
+            $this->em->clear('Mautic\StageBundle\Entity\LeadStageLog');
         }
     }
 

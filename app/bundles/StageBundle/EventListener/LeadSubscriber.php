@@ -43,8 +43,8 @@ class LeadSubscriber extends CommonSubscriber
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         // Set available event types
-        $eventTypeKey = 'stage.gained';
-        $eventTypeName = $this->translator->trans('mautic.stage.event.gained');
+        $eventTypeKey = 'stage.changed';
+        $eventTypeName = $this->translator->trans('mautic.stage.event.changed');
         $event->addEventType($eventTypeKey, $eventTypeName);
 
         $filters = $event->getEventFilters();
@@ -78,7 +78,7 @@ class LeadSubscriber extends CommonSubscriber
                     'log'           => $log
                 ),
                 'contentTemplate' => 'MauticStageBundle:SubscribedEvents\Timeline:index.html.php',
-                'icon'            => 'fa-calculator'
+                'icon'            => 'fa-tachometer'
             ));
         }
     }

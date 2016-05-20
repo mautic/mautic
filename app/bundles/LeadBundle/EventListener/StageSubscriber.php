@@ -1,0 +1,1 @@
+//todo: trigger an event on stage changes maybe?

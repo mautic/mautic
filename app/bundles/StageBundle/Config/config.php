@@ -33,17 +33,11 @@ return array(
 
     'menu'     => array(
         'main' => array(
-            'mautic.stages.menu.root' => array(
-                'id'        => 'mautic_stages_root',
+            'mautic.stages.menu.index' => array(
+                'route'  => 'mautic_stage_index',
                 'iconClass' => 'fa-tachometer',
                 'access'    => array('stage:stages:view'),
-                'priority'  => 30,
-                'children'  => array(
-                    'mautic.stage.menu.index'         => array(
-                        'route'  => 'mautic_stage_index',
-                        'access' => 'stage:stages:view'
-                    )
-                )
+                'priority'  => 25
             )
         )
     ),

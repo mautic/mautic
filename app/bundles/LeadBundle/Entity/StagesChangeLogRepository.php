@@ -30,14 +30,14 @@ class StagesChangeLogRepository extends CommonRepository
      */
     public function getLeadTimelineEvents($leadId, array $options = array())
     {
-        $query = $this->createQueryBuilder('lp')
-            ->select('lp.eventName, lp.actionName, lp.dateAdded, lp.type')
-            ->where('lp.lead = ' . $leadId);
+        $query = $this->createQueryBuilder('ls')
+            ->select('ls.eventName, ls.actionName, ls.dateAdded, ls.type')
+            ->where('ls.lead = ' . $leadId);
 
         if (isset($options['filters']['search']) && $options['filters']['search']) {
             $query->andWhere($query->expr()->orX(
-                $query->expr()->like('lp.eventName', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
-                $query->expr()->like('lp.actionName', $query->expr()->literal('%' . $options['filters']['search'] . '%'))
+                $query->expr()->like('ls.eventName', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
+                $query->expr()->like('ls.actionName', $query->expr()->literal('%' . $options['filters']['search'] . '%'))
             ));
         }
 

@@ -257,7 +257,7 @@ class Lead extends FormEntity
             ->addJoinColumn('stage_id', 'id', false)
             ->build();
         
-        $builder->createOneToMany('stageChangeLog', 'StageChangeLog')
+        $builder->createOneToMany('stageChangeLog', 'StagesChangeLog')
             ->orphanRemoval()
             ->setOrderBy(array('dateAdded' => 'DESC'))
             ->mappedBy('lead')
@@ -338,6 +338,7 @@ class Lead extends FormEntity
         $this->doNotContact    = new ArrayCollection();
         $this->pointsChangeLog = new ArrayCollection();
         $this->tags            = new ArrayCollection();
+        $this->stageChangeLog = new ArrayCollection();
     }
 
     /**
@@ -704,7 +705,7 @@ class Lead extends FormEntity
         $event->setActionName($action);
         $event->setDateAdded(new \DateTime());
         $event->setLead($this);
-        $this->addPointsChangeLog($event);
+        $this->stageChangeLog($event);
     }
 
     /**
@@ -714,7 +715,7 @@ class Lead extends FormEntity
      *
      * @return Lead
      */
-    public function stageChangeLog(StageChangeLog $stageChangeLog)
+    public function stageChangeLog(StagesChangeLog $stageChangeLog)
     {
         $this->stageChangeLog[] = $stageChangeLog;
 
@@ -1143,6 +1144,6 @@ class Lead extends FormEntity
      */
     public function getStage()
     {
-        return $this->stage;
+        return $this->stage->getName();
     }
 }
