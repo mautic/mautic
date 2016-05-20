@@ -240,6 +240,9 @@ abstract class AbstractIntegration
             $keys
         );
 
+        // Update keys
+        $this->keys = array_merge($this->keys, $keys);
+
         $encrypted = $this->encryptApiKeys($keys);
         $entity->setApiKeys($encrypted);
     }
