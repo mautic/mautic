@@ -12,42 +12,43 @@ namespace Mautic\PluginBundle\Event;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 
 /**
- * Class PluginIntegrationAuthRedirectEvent
+ * Class PluginIntegrationAuthCallbackUrlEvent
  */
-class PluginIntegrationAuthRedirectEvent extends AbstractPluginIntegrationEvent
+class PluginIntegrationAuthCallbackUrlEvent extends AbstractPluginIntegrationEvent
 {
     /**
      * @var string
      */
-    private $authUrl;
+    private $callbackUrl;
 
     /**
-     * PluginIntegrationAuthRedirectEvent constructor.
+     * PluginIntegrationAuthCallbackUrlEvent constructor.
      *
      * @param AbstractIntegration $integration
-     * @param                     $authUrl
+     * @param                     $callbackUrl
      */
-    public function __construct(AbstractIntegration $integration, $authUrl)
+    public function __construct(AbstractIntegration $integration, $callbackUrl)
     {
         $this->integration = $integration;
-        $this->authUrl     = $authUrl;
+        $this->callbackUrl = $callbackUrl;
     }
 
     /**
      * @return string
      */
-    public function getAuthUrl()
+    public function getCallbackUrl()
     {
-        return $this->authUrl;
+        return $this->callbackUrl;
     }
 
     /**
-     * @param string $authUrl
+     * @param string $callbackUrl
      */
-    public function setAuthUrl($authUrl)
+    public function setCallbackUrl($callbackUrl)
     {
-        $this->authUrl = $authUrl;
+        $this->callbackUrl = $callbackUrl;
 
         $this->stopPropagation();
     }
 }
+

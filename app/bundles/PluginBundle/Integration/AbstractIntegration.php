@@ -11,6 +11,8 @@ namespace Mautic\PluginBundle\Integration;
 
 use Joomla\Http\HttpFactory;
 use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Event\PluginIntegrationAuthCallbackUrlEvent;
+use Mautic\PluginBundle\Event\PluginIntegrationFormDisplayEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\Helper\oAuthHelper;
@@ -31,6 +33,11 @@ abstract class AbstractIntegration
     protected $factory;
 
     /**
+     * @var \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
+     */
+    protected $dispatcher;
+
+    /**
      * @var Integration
      */
     protected $settings;
@@ -45,7 +52,8 @@ abstract class AbstractIntegration
      */
     public function __construct(MauticFactory $factory)
     {
-        $this->factory = $factory;
+        $this->factory    = $factory;
+        $this->dispatcher = $factory->getDispatcher();
 
         $this->init();
     }
@@ -226,8 +234,7 @@ abstract class AbstractIntegration
      */
     public function encryptAndSetApiKeys(array $keys, Integration $entity)
     {
-        $this->keys = $keys;
-
+        /** @var PluginIntegrationKeyEvent $event */
         $keys = $this->dispatchIntegrationKeyEvent(
             PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT,
             $keys
@@ -513,7 +520,7 @@ abstract class AbstractIntegration
         list($parameters, $headers) = $this->prepareRequest($url, $parameters, $method, $settings, $authType);
 
         if (empty($settings['ignore_event_dispatch'])) {
-            $event = $this->factory->getDispatcher()->dispatch(
+            $event = $this->dispatcher->dispatch(
                 PluginEvents::PLUGIN_ON_INTEGRATION_REQUEST,
                 new PluginIntegrationRequestEvent($this, $url, $parameters, $headers, $method, $settings, $authType)
             );
@@ -627,7 +634,7 @@ abstract class AbstractIntegration
 
         if (empty($settings['ignore_event_dispatch'])) {
             $event->setResponse($result);
-            $this->factory->getDispatcher()->dispatch(
+            $this->dispatcher->dispatch(
                 PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE,
                 $event
             );
@@ -809,11 +816,19 @@ abstract class AbstractIntegration
      */
     public function getAuthCallbackUrl()
     {
-        return $this->factory->getRouter()->generate(
+        $defaultUrl = $this->factory->getRouter()->generate(
             'mautic_integration_auth_callback',
             array('integration' => $this->getName()),
             true //absolute
         );
+
+        /** @var PluginIntegrationAuthCallbackUrlEvent $event */
+        $event = $this->dispatcher->dispatch(
+            PluginEvents::PLUGIN_ON_INTEGRATION_GET_AUTH_CALLBACK_URL,
+            new PluginIntegrationAuthCallbackUrlEvent($this, $defaultUrl)
+        );
+
+        return $event->getCallbackUrl();
     }
 
     /**
@@ -1070,36 +1085,19 @@ abstract class AbstractIntegration
     }
 
     /**
-     * Cleans the identifier for api calls
-     *
-     * @param mixed $identifier
-     *
-     * @return string
-     */
-    protected function cleanIdentifier($identifier)
-    {
-        if (is_array($identifier)) {
-            foreach ($identifier as &$i) {
-                $i = urlencode($i);
-            }
-        } else {
-            $identifier = urlencode($identifier);
-        }
-
-        return $identifier;
-    }
-
-    /**ids=me
      * Gets the ID of the user for the integration
      *
      * @param       $identifier
      * @param array $socialCache
+     *
+     * @deprecated  To be removed 2.0
      *
      * @return mixed
      */
     public function getUserId($identifier, &$socialCache)
     {
         if (!empty($socialCache['id'])) {
+
             return $socialCache['id'];
         }
 
@@ -1241,10 +1239,11 @@ abstract class AbstractIntegration
     /**
      * Create or update existing Mautic lead from the integration's profile data
      *
-     * @param mixed       $data    Profile data from integration
-     * @param bool|true   $persist Set to false to not persist lead to the database in this method
-     * @param array|null  $socialCache
+     * @param mixed      $data    Profile data from integration
+     * @param bool|true  $persist Set to false to not persist lead to the database in this method
+     * @param array|null $socialCache
      * @param mixed||null $identifiers
+     *
      * @return Lead
      */
     public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null)
@@ -1278,7 +1277,7 @@ abstract class AbstractIntegration
         }
 
         // Default to new lead
-        $lead            = new Lead();
+        $lead = new Lead();
         $lead->setNewlyCreated(true);
 
         if (count($uniqueLeadFieldData)) {
@@ -1548,6 +1547,17 @@ abstract class AbstractIntegration
         );
     }
 
+    public function getFormDisplaySettings()
+    {
+        /** @var PluginIntegrationFormDisplayEvent $event */
+        $event = $this->dispatcher->dispatch(
+            PluginEvents::PLUGIN_ON_INTEGRATION_FORM_DISPLAY,
+            new PluginIntegrationFormDisplayEvent($this, $this->getFormSettings())
+        );
+
+        return $event->getSettings();
+    }
+
     /**
      * Get available fields for choices in the config UI
      *
@@ -1580,11 +1590,31 @@ abstract class AbstractIntegration
     protected function dispatchIntegrationKeyEvent($eventName, $keys = array())
     {
         /** @var PluginIntegrationKeyEvent $event */
-        $event = $this->factory->getDispatcher()->dispatch(
+        $event = $this->dispatcher->dispatch(
             $eventName,
             new PluginIntegrationKeyEvent($this, $keys)
         );
 
         return $event->getKeys();
+    }
+
+    /**
+     * Cleans the identifier for api calls
+     *
+     * @param mixed $identifier
+     *
+     * @return string
+     */
+    protected function cleanIdentifier($identifier)
+    {
+        if (is_array($identifier)) {
+            foreach ($identifier as &$i) {
+                $i = urlencode($i);
+            }
+        } else {
+            $identifier = urlencode($identifier);
+        }
+
+        return $identifier;
     }
 }

@@ -251,7 +251,8 @@ class PluginController extends FormController
             array(
                 'viewParameters'  => array(
                     'form'        => $this->setFormTheme($form, $template, $themes),
-                    'integration' => $integrationObject
+                    'integration' => $integrationObject,
+                    'formSettings' => $integrationObject->getFormDisplaySettings()
                 ),
                 'contentTemplate' => $template,
                 'passthroughVars' => array(

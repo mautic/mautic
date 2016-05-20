@@ -6,7 +6,7 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$formSettings  = $integration->getFormSettings();
+
 $hasFeatures   = (isset($form['supportedFeatures']) && count($form['supportedFeatures']));
 $hasFields     = (isset($form['featureSettings']) && count($form['featureSettings']['leadFields']));
 $fieldHtml     = (isset($form['featureSettings']) && !empty($form['featureSettings']['leadFields'])) ? $view['form']->row($form['featureSettings']['leadFields'], array('integration' => $integration)) : '';
@@ -50,7 +50,7 @@ $description   = $integration->getDescription();
         </div>
         <?php endif; ?>
         <div class="row">
-            <div class="col-xs-12 text-right">
+            <div class="col-xs-12 text-center">
                 <?php echo $view['form']->widget($form['authButton']); ?>
             </div>
         </div>
