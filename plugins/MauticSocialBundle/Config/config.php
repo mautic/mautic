@@ -100,7 +100,7 @@ return array(
         'main' => array(
             'mautic.social.monitoring' => array(
                 'route'     => 'mautic_social_index',
-                'parent'    => 'mautic.core.components',
+                'parent'    => 'mautic.core.channels',
                 'access'    => 'plugin:mauticSocial:monitoring:view',
             )
         )
