@@ -197,9 +197,12 @@ if (!isset($attachmentSize)) {
                 <div class="tab-pane fade bdr-w-0 active in" id="slot-type-container">
                     <?php if ($slots): ?>
                         <?php foreach ($slots as $slotKey => $slot): ?>
-                            <div class="slot-type btn btn-default btn-lg btn-block">
+                            <div class="slot-type-handle btn btn-default btn-lg btn-block" data-slot-type="<?php echo $slotKey; ?>">
                                 <i class="fa fa-<?php echo $slot['icon']; ?>" aria-hidden="true"></i>
                                 <?php echo $slot['header']; ?>
+                                <script type="text/html">
+                                    <?php echo $view->render($slot['content']); ?>
+                                </script>
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>

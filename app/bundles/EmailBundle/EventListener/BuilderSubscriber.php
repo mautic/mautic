@@ -99,6 +99,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'text',
                 'Text',
                 'font',
+                'MauticCoreBundle:Slots:text.html.twig',
                 'form-placeholder',
                 1000
             );
@@ -106,6 +107,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'image',
                 'Image',
                 'image',
+                'MauticCoreBundle:Slots:image.html.twig',
                 'form-placeholder',
                 900
             );
@@ -113,6 +115,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'button',
                 'Button',
                 'external-link',
+                'MauticCoreBundle:Slots:button.html.twig',
                 'form-placeholder',
                 800
             );

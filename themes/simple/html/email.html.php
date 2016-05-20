@@ -37,9 +37,8 @@
         margin: 20px 0;
     }
 
-    body {
-        overflow: auto;
-    }
+
+
 
 
     /* Take care of image borders and formatting, client hacks */

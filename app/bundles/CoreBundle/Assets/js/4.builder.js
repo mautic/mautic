@@ -531,22 +531,22 @@ Mautic.initSlots = function(contents) {
         items: '[data-slot]',
         handle: 'div[data-slot-handle]',
         placeholder: 'slot-placeholder',
-        connectWith: '[data-slot-container]'
+        connectWith: '[data-slot-container]',
+        stop: function(event, ui) {
+            if (ui.item.hasClass('slot-type-handle')) {
+                var slotTypeContent = ui.item.find('script').html();
+                var newSlot = mQuery('<div/>').attr('data-slot', ui.item.attr('data-slot-type')).append(slotTypeContent);
+                Mautic.initSlot(newSlot);
+                ui.item.replaceWith(newSlot);
+            }
+        }
     }).disableSelection();
     
-    contents.find('[data-slot]').each(function (index, value) { 
-        var slot = mQuery(this);
-        var type = slot.attr('data-slot');
-        var handle = mQuery('<div/>').attr('data-slot-handle', true);
-
-        slot.hover(function() {
-            slot.append(handle);
-        }, function() {
-            handle.remove('div[data-slot-handle]');
-        });
+    contents.find('[data-slot]').each(function() { 
+        Mautic.initSlot(mQuery(this));
     });
 
-    mQuery('#slot-type-container .slot-type').draggable({
+    mQuery('#slot-type-container .slot-type-handle').draggable({
         iframeFix: true,
         iframeId: 'builder-template-content',
         connectToSortable: slotContainers,
@@ -559,7 +559,6 @@ Mautic.initSlots = function(contents) {
         scrollSpeed: 100,
         cursorAt: {top: 15, left: 15},
         start: function( event, ui ) {
-            console.log('start', event, ui);
             mQuery(ui.helper).css({
                 background: 'blue',
                 height: '100px',
@@ -567,7 +566,16 @@ Mautic.initSlots = function(contents) {
             });
         },
         stop: function(event, ui) {
-            
+            ui.helper = mQuery(event.target).closest('[data-slot-type]');
         }
     }).disableSelection();
+}
+
+Mautic.initSlot = function(slot) {
+    var handle = mQuery('<div/>').attr('data-slot-handle', true);
+    slot.hover(function() {
+        slot.append(handle);
+    }, function() {
+        handle.remove('div[data-slot-handle]');
+    });
 }

@@ -46,14 +46,16 @@ class BuilderEvent extends Event
      * @param $key
      * @param $header
      * @param $icon
+     * @param $content
      * @param $form
      * @param $priority
      */
-    public function addSlotType($key, $header, $icon, $form, $priority = 0)
+    public function addSlotType($key, $header, $icon, $content, $form, $priority = 0)
     {
         $this->slotTypes[$key] = array(
             'header'   => $this->translator->trans($header),
             'icon'     => $icon,
+            'content'  => $content,
             'form'     => $form,
             'priority' => $priority
         );
