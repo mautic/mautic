@@ -78,12 +78,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                     if (!empty($properties['list'])) {
                         // Lookup/Select options
                         $fieldValues = explode('|', $properties['list']);
-                        $completeArray = array();
-                        for($i=0;$i<count($fieldValues);$i++){
-                            $newArray = array($fieldValues[$i] => $fieldValues[$i]);
-                            $completeArray = array_merge($completeArray + $newArray);                  
-                        }
-                       $fieldValues = $completeArray;
+                        $fieldValues = array_combine($fieldValues, $fieldValues);
                     } elseif (!empty($properties) && $fieldType == 'boolean') {
                         // Boolean options
                         $fieldValues = array(

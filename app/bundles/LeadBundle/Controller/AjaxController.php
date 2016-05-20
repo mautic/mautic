@@ -604,6 +604,7 @@ class AjaxController extends CommonAjaxController
             if (!empty($properties['list'])) {
                 // Lookup/Select options
                 $options = explode('|', $properties['list']);
+                $options = array_combine($options, $options);
             } elseif (!empty($properties) && $fieldType == 'boolean') {
                 // Boolean options
                 $options = array(
