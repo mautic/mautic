@@ -78,6 +78,12 @@ class CampaignEventLeadFieldValueType extends AbstractType
                     if (!empty($properties['list'])) {
                         // Lookup/Select options
                         $fieldValues = explode('|', $properties['list']);
+                        $completeArray = array();
+                        for($i=0;$i<count($fieldValues);$i++){
+                            $newArray = array($fieldValues[$i] => $fieldValues[$i]);
+                            $completeArray = array_merge($completeArray + $newArray);                  
+                        }
+                       $fieldValues = $completeArray;
                     } elseif (!empty($properties) && $fieldType == 'boolean') {
                         // Boolean options
                         $fieldValues = array(
@@ -90,6 +96,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                     }
                 }
             }
+
 
             // Display selectbox for a field with choices, textbox for others
             if (!empty($fieldValues) && in_array($fieldType, $choiceTypes)) {
