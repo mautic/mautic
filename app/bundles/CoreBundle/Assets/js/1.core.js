@@ -927,6 +927,23 @@ var Mautic = {
             Mousetrap.reset();
 
             contentSpecific = mauticContent;
+            
+            // trash created chart objects to save some memory
+            if (typeof Mautic.chartObjects !== 'undefined') {
+                mQuery.each(Mautic.chartObjects, function (i, chart) {
+                    chart.destroy();
+                });
+                Mautic.chartObjects = [];
+            }
+
+            // trash created map objects to save some memory
+            if (typeof Mautic.mapObjects !== 'undefined') {
+                mQuery.each(Mautic.mapObjects, function (i, map) {
+                    map.removeAllMarkers();
+                    map.remove();
+                });
+                Mautic.mapObjects = [];
+            }
         } else if (response && response.mauticContent) {
             contentSpecific = response.mauticContent;
         }
@@ -939,16 +956,6 @@ var Mautic = {
             if (typeof (Mautic.loadedContent[contentSpecific])) {
                 delete Mautic.loadedContent[contentSpecific];
             }
-        }
-
-        // trash created chart objects to save some memory
-        if (typeof Mautic.chartObjects !== 'undefined') {
-            delete Mautic.chartObjects;
-        }
-
-        // trash created map objects to save some memory
-        if (typeof Mautic.mapObjects !== 'undefined') {
-            delete Mautic.mapObjects;
         }
     },
 
