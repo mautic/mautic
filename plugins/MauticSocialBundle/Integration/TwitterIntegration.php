@@ -18,13 +18,6 @@ class TwitterIntegration extends SocialIntegration
 {
 
     /**
-     * Used in getUserData to prevent a double user search call with getUserId
-     *
-     * @var bool
-     */
-    private $preventDoubleCall = false;
-
-    /**
      * {@inheritdoc}
      */
     public function getName ()
@@ -56,7 +49,8 @@ class TwitterIntegration extends SocialIntegration
         return array(
             'public_profile',
             'public_activity',
-            'share_button'
+            'share_button',
+            'login_button'
         );
     }
 
@@ -81,7 +75,7 @@ class TwitterIntegration extends SocialIntegration
         if (isset($requestToken['oauth_token'])) {
             $url .= '?oauth_token='.$requestToken['oauth_token'];
         }
-        $this->factory->getLogger()->addError(print_r($url,true));
+
         return $url;
     }
 
@@ -141,42 +135,49 @@ class TwitterIntegration extends SocialIntegration
      */
     public function getUserData ($identifier, &$socialCache)
     {
-        //tell getUserId to return a user array if it obtains it
-        $this->preventDoubleCall = true;
-        $identifier = $this->keys;
-        if(!isset($identifier[$this->getName()])){
-            $identifier[$this->getName()] = "account/verify_credentials";
+        $accessToken = $this->getContactAccessToken($socialCache);
+
+        // Contact SSO
+        if (isset($accessToken['oauth_token'])) {
+            // note twitter requires params to be passed as strings
+            $data = $this->makeRequest(
+                $this->getApiUrl("account/verify_credentials"),
+                array(
+                    'include_email'    => 'true',
+                    'include_entities' => 'false',
+                    'oauth_token'      => $accessToken['oauth_token'],
+                ),
+                'GET',
+                array('auth_type' => 'oauth1a')
+            );
         }
 
-        if ($id = $this->getUserId($identifier, $socialCache)) {
-            if (is_array($id)) {
-                //getUserId has already obtained the data
-                $data = $id;
-            } else {
-                $data = $this->makeRequest($this->getApiUrl("account/verify_credentials"), array(
-                    //'user_id'          => $id,
-                    'include_email'=>'true',
-                    'include_entities' => 'false',
-                    'oauth_token' => $identifier['oauth_token']
-                ),'GET',array('auth_type'=>'oauth1a'));
-            }
+        if (empty($data)) {
+            // Try via user lookup
+            $data = $this->makeRequest(
+                $this->getApiUrl("users/lookup"),
+                array(
+                    'screen_name'      => $identifier,
+                    'include_entities' => 'false'
+                )
+            );
 
             if (isset($data[0])) {
-                $data  = $data[0];
+                $data = $data[0];
             }
+        }
 
-            $this->factory->getLogger()->addError(print_r($data,true));
-            if (isset($data)) {
-                $info                  = $this->matchUpData($data);
-                $info['profileHandle'] = $data['screen_name'];
-                //remove the size variant
-                $image                = $data['profile_image_url_https'];
-                $image                = str_replace(array('_normal', '_bigger', '_mini'), '', $image);
-                $info['profileImage'] = $image;
+        if (isset($data['id'])) {
+            $socialCache['id'] = $data['id'];
 
-                $socialCache['profile'] = $info;
-            }
-            $this->preventDoubleCall = false;
+            $info                  = $this->matchUpData($data);
+            $info['profileHandle'] = $data['screen_name'];
+            //remove the size variant
+            $image                = $data['profile_image_url_https'];
+            $image                = str_replace(array('_normal', '_bigger', '_mini'), '', $image);
+            $info['profileImage'] = $image;
+
+            $socialCache['profile'] = $info;
         }
     }
 
@@ -185,61 +186,70 @@ class TwitterIntegration extends SocialIntegration
      */
     public function getPublicActivity ($identifier, &$socialCache)
     {
-        if ($id = $this->getUserId($identifier, $socialCache)) {
-            //due to the way Twitter filters, get more than 10 tweets
-            $data = $this->makeRequest($this->getApiUrl("/statuses/user_timeline"), array(
-                'user_id'         => $id,
-                'exclude_replies' => 'true',
-                'count'           => 25,
-                'trim_user'       => 'true'
-            ));
+        if (!isset($socialCache['id'])) {
+            $this->getUserData($identifier, $socialCache);
 
-            if (!empty($data) && count($data)) {
-                $socialCache['has']['activity'] = true;
-                $socialCache['activity']        = array(
-                    'tweets' => array(),
-                    'photos' => array(),
-                    'tags'   => array()
+            if (!isset($socialCache['id'])) {
+
+                return;
+            }
+        }
+
+        $id = $socialCache['id'];
+
+        //due to the way Twitter filters, get more than 10 tweets
+        $data = $this->makeRequest($this->getApiUrl("/statuses/user_timeline"), array(
+            'user_id'         => $id,
+            'exclude_replies' => 'true',
+            'count'           => 25,
+            'trim_user'       => 'true'
+        ));
+
+        if (!empty($data) && count($data)) {
+            $socialCache['has']['activity'] = true;
+            $socialCache['activity']        = array(
+                'tweets' => array(),
+                'photos' => array(),
+                'tags'   => array()
+            );
+
+            foreach ($data as $k => $d) {
+                if ($k == 10) {
+                    break;
+                }
+
+                $tweet = array(
+                    'tweet'       => EmojiHelper::toHtml($d['text']),
+                    'url'         => "https://twitter.com/{$id}/status/{$d['id']}",
+                    'coordinates' => $d['coordinates'],
+                    'published'   => $d['created_at'],
                 );
 
-                foreach ($data as $k => $d) {
-                    if ($k == 10) {
-                        break;
-                    }
+                $socialCache['activity']['tweets'][] = $tweet;
 
-                    $tweet = array(
-                        'tweet'       => EmojiHelper::toHtml($d['text']),
-                        'url'         => "https://twitter.com/{$id}/status/{$d['id']}",
-                        'coordinates' => $d['coordinates'],
-                        'published'   => $d['created_at'],
-                    );
+                //images
+                if (isset($d['entities']['media'])) {
+                    foreach ($d['entities']['media'] as $m) {
+                        if ($m['type'] == 'photo') {
+                            $photo = array(
+                                'url' => (isset($m['media_url_https']) ? $m['media_url_https'] : $m['media_url'])
+                            );
 
-                    $socialCache['activity']['tweets'][] = $tweet;
-
-                    //images
-                    if (isset($d['entities']['media'])) {
-                        foreach ($d['entities']['media'] as $m) {
-                            if ($m['type'] == 'photo') {
-                                $photo = array(
-                                    'url' => (isset($m['media_url_https']) ? $m['media_url_https'] : $m['media_url'])
-                                );
-
-                                $socialCache['activity']['photos'][] = $photo;
-                            }
+                            $socialCache['activity']['photos'][] = $photo;
                         }
                     }
+                }
 
-                    //hastags
-                    if (isset($d['entities']['hashtags'])) {
-                        foreach ($d['entities']['hashtags'] as $h) {
-                            if (isset($socialCache['activity']['tags'][$h['text']])) {
-                                $socialCache['activity']['tags'][$h['text']]['count']++;
-                            } else {
-                                $socialCache['activity']['tags'][$h['text']] = array(
-                                    'count' => 1,
-                                    'url'   => 'https://twitter.com/search?q=%23' . $h['text']
-                                );
-                            }
+                //hastags
+                if (isset($d['entities']['hashtags'])) {
+                    foreach ($d['entities']['hashtags'] as $h) {
+                        if (isset($socialCache['activity']['tags'][$h['text']])) {
+                            $socialCache['activity']['tags'][$h['text']]['count']++;
+                        } else {
+                            $socialCache['activity']['tags'][$h['text']] = array(
+                                'count' => 1,
+                                'url'   => 'https://twitter.com/search?q=%23' . $h['text']
+                            );
                         }
                     }
                 }
@@ -259,41 +269,9 @@ class TwitterIntegration extends SocialIntegration
             "description"   => array("type" => "string"),
             "url"           => array("type" => "string"),
             "time_zone"     => array("type" => "string"),
-            "lang"          => array("type" => "string")
+            "lang"          => array("type" => "string"),
+            "email"         => array("type" => "string"),
         );
-    }
-
-    /**
-     * Gets the ID of the user for the network
-     *
-     * @param $identifier
-     * @param $socialCache
-     *
-     * @return mixed|null
-     */
-    public function getUserId ($identifier, &$socialCache)
-    {
-        if (!empty($socialCache['id'])) {
-            return $socialCache['id'];
-        } elseif (empty($identifier)) {
-            return false;
-        }
-
-        // note twitter requires params to be passed as strings
-        $data = $this->makeRequest($this->getApiUrl("account/verify_credentials"), array(
-            'include_email'=>'true',
-            'include_entities' => 'true',
-            'oauth_token' => $identifier['oauth_token'],
-        ),'GET',array('auth_type'=>'oauth1a'));
-
-        if (isset($data['id'])) {
-            $socialCache['id'] = $data['id'];
-
-            //return the entire data set if the function has been called from getUserData()
-            return ($this->preventDoubleCall) ? $data : $socialCache['id'];
-        }
-
-        return false;
     }
 
     /**

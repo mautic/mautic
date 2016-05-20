@@ -15,6 +15,7 @@ use Symfony\Component\Form\Form;
 
 abstract class SocialIntegration extends AbstractIntegration
 {
+    protected $persistNewLead = false;
 
     /**
      * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
@@ -198,19 +199,22 @@ abstract class SocialIntegration extends AbstractIntegration
      *
      * @param $socialCache
      *
-     * @return array|null
+     * @return array|mixed|null
      */
-    protected function getAccessToken($socialCache)
+    protected function getContactAccessToken(&$socialCache)
     {
         $accessToken = $this->factory->getSession()->get($this->getName().'_tokenResponse', array());
-        if (!isset($accessToken['access_token'])) {
+        if (!isset($accessToken[$this->getAuthTokenKey()])) {
             if (isset($socialCache['accessToken'])) {
                 $accessToken = $this->decryptApiKeys($socialCache['accessToken']);
             } else {
+
                 return null;
             }
         } else {
-            $accessToken['persist_lead'] = true;
+            $socialCache['accessToken'] = $this->encryptApiKeys($accessToken);
+
+            $this->persistNewLead = true;
         }
 
         return $accessToken;
