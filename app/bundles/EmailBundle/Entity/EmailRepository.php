@@ -246,7 +246,8 @@ class EmailRepository extends CommonRepository
         } else {
             $q->select('l.*');
 
-            // join a derived table of leads belonging to the lead lists
+            // use a derived table in order to retrieve distinct leads in case they belong to multiple
+            // lead lists associated with this email
             $listQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
             $listQb->select('distinct(ll.lead_id) lead_id')
                 ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll')
