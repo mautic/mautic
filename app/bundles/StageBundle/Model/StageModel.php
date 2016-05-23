@@ -235,31 +235,31 @@ class StageModel extends CommonFormModel
 
         $persist = array();
         foreach ($availableStages as $action) {
+
+            $this->factory->getLogger()->addError(print_r($action->getId(),true));
             //if it's already been done, then skip it
             if (isset($completedActions[$action->getId()])) {
-                continue;
+               //continue;
             }
 
             //make sure the action still exists
             if (!isset($availableActions['actions'][$action->getType()])) {
-                continue;
+              //  continue;
             }
             
-            $lead->setStage($action);
             $parsed = explode('.', $action->getType());
             $lead->stageChangeLogEntry(
                 $parsed[0],
                 $action->getId() . ": " . $action->getName(),
                 $parsed[1]
             );
-
+            $lead->setStage($action);
             $log = new LeadStageLog();
             $log->setStage($action);
             $log->setLead($lead);
             $log->setDateFired(new \DateTime());
 
             $persist[] = $log;
-
         }
 
         if (!empty($persist)) {

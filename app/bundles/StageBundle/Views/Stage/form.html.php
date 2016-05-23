@@ -33,6 +33,7 @@ echo $view['form']->start($form);
                 </div>
                 <div class="col-md-6">
                     <div class="pa-md">
+                        <?php echo $view['form']->row($form['weight']); ?>
                         <?php echo $view['form']->row($form['type']); ?>
                         <div id="stageActionProperties">
                             <?php

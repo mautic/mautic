@@ -63,6 +63,16 @@ class StageType extends AbstractType
             'required'   => false
         ));
 
+        $builder->add('weight', 'number', array(
+            'label'      => 'mautic.stage.action.weight',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       =>
+                array(
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.stage.action.weight.help'
+                ),
+            'precision'  => 0
+        ));
         $builder->add('type', 'choice', array(
             'choices' => $options['stageActions']['choices'],
             'empty_value' => '',

@@ -93,15 +93,10 @@ class LeadSubscriber extends CommonSubscriber
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
-
-        $em->getRepository('MauticStageBundle:LeadTriggerLog')->updateLead(
-            $event->getLoser()->getId(),
-            $event->getVictor()->getId()
-        );
     }
 
     /**
-     * Handle point triggers for new leads (including 0 point triggers)
+     * Handle for new leads 
      *
      * @param LeadEvent $event
      */

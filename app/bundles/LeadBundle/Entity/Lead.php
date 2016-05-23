@@ -1144,6 +1144,6 @@ class Lead extends FormEntity
      */
     public function getStage()
     {
-        return $this->stage->getName();
+        return $this->stage;
     }
 }

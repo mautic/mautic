@@ -394,7 +394,7 @@ $view['slots']->set(
                 ?>
                 <?php if ($lead->getStage()): ?>
                     <h1 <?php echo $style; ?>>
-                        <?php echo $view['translator']->trans('mautic.lead.stage',array('%stage%' => $lead->getStage())); ?>
+                        <?php echo $view['translator']->trans('mautic.lead.stage',array('%stage%' => $lead->getStage()->getName())); ?>
                     </h1>
                     <hr>
                 <?php endif; ?>
