@@ -107,27 +107,27 @@ Mautic.launchBuilder = function (formName, actionName) {
             }
         });
 
-        builder.ckeditor(function() {
-                CKEDITOR.instances['builder-custom-content'].resize('100%', mQuery('.builder-content').height());
+        // builder.ckeditor(function() {
+        //         CKEDITOR.instances['builder-custom-content'].resize('100%', mQuery('.builder-content').height());
 
-                var data = CKEDITOR.instances[formName + '_customHtml'].getData();
-                CKEDITOR.instances['builder-custom-content'].setData(data);
+        //         var data = CKEDITOR.instances[formName + '_customHtml'].getData();
+        //         CKEDITOR.instances['builder-custom-content'].setData(data);
 
-                mQuery('.btn-close-builder').prop('disabled', false);
+        //         mQuery('.btn-close-builder').prop('disabled', false);
 
-                // Activate draggables
-                Mautic.activateBuilderDragTokens();
+        //         // Activate draggables
+        //         Mautic.activateBuilderDragTokens();
 
-                mQuery('#builder-overlay').addClass('hide');
-            },
-            {
-                toolbar: 'fullpage',
-                fullPage: true,
-                extraPlugins: 'sourcedialog,docprops,tokens',
-                width: '100%',
-                allowedContent: true // Do not strip classes and the like
-            }
-        );
+        //         mQuery('#builder-overlay').addClass('hide');
+        //     },
+        //     {
+        //         toolbar: 'fullpage',
+        //         fullPage: true,
+        //         extraPlugins: 'sourcedialog,docprops,tokens',
+        //         width: '100%',
+        //         allowedContent: true // Do not strip classes and the like
+        //     }
+        // );
     }
 };
 
@@ -572,6 +572,15 @@ Mautic.initSlots = function(contents) {
 }
 
 Mautic.initSlot = function(slot) {
+    var type = slot.attr('data-slot');
+
+    // Todo: Fire JS event so other slots could catch it and do their thing
+    // Temporarily for text slot:
+    if (type === 'text') {
+        // slot.froalaEditor();
+    }
+
+
     var handle = mQuery('<div/>').attr('data-slot-handle', true);
     slot.hover(function() {
         slot.append(handle);

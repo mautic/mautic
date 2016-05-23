@@ -90,18 +90,18 @@ Mautic.emailOnLoad = function (container, response) {
         // Now empty it so that ckeditor doesn't load it as html
         mQuery('#emailform_plainText').val('');
 
-        var events = Mautic.getGlobalEditorEvents();
-        events.instanceReady = function( event ) {
-            event.editor.insertText(plainText);
-        };
+        // var events = Mautic.getGlobalEditorEvents();
+        // events.instanceReady = function( event ) {
+        //     event.editor.insertText(plainText);
+        // };
 
-        mQuery('#emailform_plainText').ckeditor({
-            removePlugins: 'elementspath,toolbar',
-            extraPlugins: 'tokens',
-            autoParagraph: false,
-            height: "235px",
-            on: events
-        });
+        // mQuery('#emailform_plainText').ckeditor({
+        //     removePlugins: 'elementspath,toolbar',
+        //     extraPlugins: 'tokens',
+        //     autoParagraph: false,
+        //     height: "235px",
+        //     on: events
+        // });
 
         if (mQuery('#emailform_emailType').val() == '') {
             mQuery('body').addClass('noscroll');
@@ -156,7 +156,7 @@ Mautic.emailOnUnload = function(id) {
 
     if (mQuery('#emailform_plainText').length) {
         // Activate the plain text editor to support token inserts
-        CKEDITOR.instances['emailform_plainText'].destroy(true);
+        // CKEDITOR.instances['emailform_plainText'].destroy(true);
     }
 };
 
@@ -334,7 +334,7 @@ Mautic.autoGeneratePlaintext = function() {
         'email:generatePlaintText',
         data,
         function (response) {
-            CKEDITOR.instances['emailform_plainText'].insertText(response.text);
+            // CKEDITOR.instances['emailform_plainText'].insertText(response.text);
             mQuery('.plaintext-spinner').addClass('hide');
         }
     );

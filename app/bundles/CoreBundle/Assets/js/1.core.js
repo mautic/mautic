@@ -513,40 +513,41 @@ var Mautic = {
         mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage', 'editor-basic-fullpage'], function (index, editorClass) {
             if (mQuery(container + ' textarea.' + editorClass).length) {
                 mQuery(container + ' textarea.' + editorClass).each(function () {
-                    var settings = {};
+                    // var settings = {};
 
-                    if (editorClass != 'editor') {
-                        // Set the custom editor toolbar
-                        var toolbar = editorClass.replace('editor-', '').replace('-', '_');
-                        settings.toolbar = toolbar;
-                    }
+                    // if (editorClass != 'editor') {
+                    //     // Set the custom editor toolbar
+                    //     var toolbar = editorClass.replace('editor-', '').replace('-', '_');
+                    //     settings.toolbar = toolbar;
+                    // }
 
-                    if (editorClass != 'editor' && editorClass != 'editor-basic') {
-                        // Do not strip classes and the like
-                        settings.allowedContent = true;
-                    }
+                    // if (editorClass != 'editor' && editorClass != 'editor-basic') {
+                    //     // Do not strip classes and the like
+                    //     settings.allowedContent = true;
+                    // }
 
-                    if (editorClass == 'editor-fullpage' || editorClass == 'editor-basic-fullpage') {
-                        // Allow full page editing and add tools to update html document
-                        settings.fullPage     = true;
-                        settings.extraPlugins = "sourcedialog,docprops,filemanager";
-                    }
+                    // if (editorClass == 'editor-fullpage' || editorClass == 'editor-basic-fullpage') {
+                    //     // Allow full page editing and add tools to update html document
+                    //     settings.fullPage     = true;
+                    //     settings.extraPlugins = "sourcedialog,docprops,filemanager";
+                    // }
 
-                    if (editorClass == 'editor') {
-                        settings.removePlugins = 'resize';
-                    }
+                    // if (editorClass == 'editor') {
+                    //     settings.removePlugins = 'resize';
+                    // }
 
-                    if (mQuery(this).hasClass('editor-builder-tokens')) {
-                        if (settings.extraPlugins) {
-                            settings.extraPlugins = settings.extraPlugins + ',tokens';
-                        } else {
-                            settings.extraPlugins = 'tokens';
-                        }
-                    }
+                    // if (mQuery(this).hasClass('editor-builder-tokens')) {
+                    //     if (settings.extraPlugins) {
+                    //         settings.extraPlugins = settings.extraPlugins + ',tokens';
+                    //     } else {
+                    //         settings.extraPlugins = 'tokens';
+                    //     }
+                    // }
 
-                    settings.on = Mautic.getGlobalEditorEvents();
+                    // settings.on = Mautic.getGlobalEditorEvents();
 
-                    mQuery(this).ckeditor(settings);
+                    // mQuery(this).ckeditor(settings);
+                    mQuery(this).froalaEditor();
                 });
             }
         });
@@ -843,46 +844,46 @@ var Mautic = {
      *
      * @returns {{contentDom: Function}}
      */
-    getGlobalEditorEvents: function() {
+    // getGlobalEditorEvents: function() {
 
-        return {
-            contentDom: function (event) {
-                var editable = event.editor.editable();
+    //     return {
+    //         contentDom: function (event) {
+    //             var editable = event.editor.editable();
 
-                var doc = (editable.isInline()) ? '#' + event.editor.name : mQuery(event.editor.window.getFrame().$).contents();
-                var tokens = mQuery(doc).find('*[data-token]');
+    //             var doc = (editable.isInline()) ? '#' + event.editor.name : mQuery(event.editor.window.getFrame().$).contents();
+    //             var tokens = mQuery(doc).find('*[data-token]');
 
-                tokens.each(function (i) {
-                    mQuery(this).off('dblclick').on('dblclick', function (e) {
-                        var selEl = new CKEDITOR.dom.element(e.target);
-                        var rangeObjForSelection = new CKEDITOR.dom.range(event.editor.document);
-                        rangeObjForSelection.selectNodeContents(selEl);
-                        event.editor.getSelection().selectRanges([rangeObjForSelection]);
+    //             tokens.each(function (i) {
+    //                 mQuery(this).off('dblclick').on('dblclick', function (e) {
+    //                     var selEl = new CKEDITOR.dom.element(e.target);
+    //                     var rangeObjForSelection = new CKEDITOR.dom.range(event.editor.document);
+    //                     rangeObjForSelection.selectNodeContents(selEl);
+    //                     event.editor.getSelection().selectRanges([rangeObjForSelection]);
 
-                        // Remove contenteditable=false to make it deletable
-                        mQuery(e.target).prop('contenteditable', true);
-                    });
-                });
+    //                     // Remove contenteditable=false to make it deletable
+    //                     mQuery(e.target).prop('contenteditable', true);
+    //                 });
+    //             });
 
-                CKEDITOR.instances[event.editor.name].on('key', function (e) {
-                    var key = e.data.keyCode;
-                    if (key !== 8) {
-                        var tokens = mQuery(doc).find('*[data-token][contenteditable=\'true\']');
-                        tokens.each(function (i) {
-                            mQuery(this).prop('contenteditable', false);
-                        });
-                    }
-                });
+    //             CKEDITOR.instances[event.editor.name].on('key', function (e) {
+    //                 var key = e.data.keyCode;
+    //                 if (key !== 8) {
+    //                     var tokens = mQuery(doc).find('*[data-token][contenteditable=\'true\']');
+    //                     tokens.each(function (i) {
+    //                         mQuery(this).prop('contenteditable', false);
+    //                     });
+    //                 }
+    //             });
 
-                editable.attachListener(editable, 'click', function (e) {
-                    var tokens = mQuery(doc).find('*[data-token][contenteditable=\'true\']');
-                    tokens.each(function (i) {
-                        mQuery(this).prop('contenteditable', false);
-                    });
-                });
-            }
-        }
-    },
+    //             editable.attachListener(editable, 'click', function (e) {
+    //                 var tokens = mQuery(doc).find('*[data-token][contenteditable=\'true\']');
+    //                 tokens.each(function (i) {
+    //                     mQuery(this).prop('contenteditable', false);
+    //                 });
+    //             });
+    //         }
+    //     }
+    // },
 
     /**
      * Functions to be ran on ajax page unload
@@ -897,16 +898,16 @@ var Mautic = {
                 MauticVars.modalsReset = {};
             }
 
-            mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage'], function (index, editorClass) {
-                mQuery(container + ' textarea.' + editorClass).each(function () {
-                    for (var name in CKEDITOR.instances) {
-                        var instance = CKEDITOR.instances[name];
-                        if (this && this == instance.element.$) {
-                            instance.destroy(true);
-                        }
-                    }
-                });
-            });
+            // mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage'], function (index, editorClass) {
+            //     mQuery(container + ' textarea.' + editorClass).each(function () {
+            //         for (var name in CKEDITOR.instances) {
+            //             var instance = CKEDITOR.instances[name];
+            //             if (this && this == instance.element.$) {
+            //                 instance.destroy(true);
+            //             }
+            //         }
+            //     });
+            // });
 
             //turn off shuffle events
             mQuery('html')

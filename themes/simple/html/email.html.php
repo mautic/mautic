@@ -327,6 +327,7 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="<?php echo $view['assets']->getUrl('media/css/froala_style.min.css'); ?>" type="text/css" />
 </head>
 <body>
 <table align="center" cellpadding="0" cellspacing="0" class="container-for-gmail-android" width="100%">

@@ -52,7 +52,7 @@ class AssetExtension extends Twig_Extension
     {
         ob_start();
 
-        $this->helper->outputSystemStylesheets();
+        $this->helper->outputSystemStylesheets(true);
 
         return ob_get_clean();
     }
