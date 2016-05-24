@@ -16,6 +16,13 @@ define('MAUTIC_ROOT',              dirname(__DIR__));
 define('MAUTIC_UPGRADE_ROOT',      __DIR__);
 define('MAUTIC_UPGRADE_ERROR_LOG', MAUTIC_ROOT . '/upgrade_errors.txt');
 
+ini_set('display_errors', 'Off');
+date_default_timezone_set('UTC');
+
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\BufferedOutput;
+
 // Get the local config file location
 /** @var $paths */
 $root = MAUTIC_ROOT . '/app';
@@ -67,7 +74,11 @@ function clear_mautic_cache(array $status)
         process_error_log(array('Could not remove the application cache.  You will need to manually delete ' . MAUTIC_CACHE_DIR . '.'));
     }
 
-    //Remove the cached update
+    // Build the cache for migrations
+    build_cache();
+
+    // Apply critical migrations
+    apply_critical_migrations();
 
     $status['complete']                     = true;
     $status['stepStatus']                   = 'Success';
@@ -76,6 +87,57 @@ function clear_mautic_cache(array $status)
     $status['updateState']['cacheComplete'] = true;
 
     return $status;
+}
+
+/**
+ * @param       $command
+ * @param array $args
+ *
+ * @return array
+ * @throws Exception
+ */
+function run_symfony_command($command, array $args)
+{
+    static $application;
+
+    require_once dirname(__DIR__) . '/app/bootstrap.php.cache';
+    require_once dirname(__DIR__) . '/app/AppKernel.php';
+
+    $args = array_merge(
+        array('console', $command),
+        $args
+    );
+
+    if (null == $application) {
+        $kernel      = new AppKernel('prod', true);
+        $application = new Application($kernel);
+        $application->setAutoExit(false);
+    }
+
+    $input  = new ArgvInput($args);
+    $output = new BufferedOutput();
+    $exitCode   = $application->run($input, $output);
+    $bufferOutput = $output->fetch();
+
+    unset($input, $output);
+
+    return array($exitCode, $bufferOutput);
+}
+
+function build_cache()
+{
+    run_symfony_command('cache:clear',  array('--no-interaction', '--env=prod', '--no-debug'));
+}
+
+function apply_critical_migrations()
+{
+    $criticalMigrations = array(
+        '20160225000000'
+    );
+
+    foreach ($criticalMigrations as $version) {
+        run_symfony_command('doctrine:migrations:migrate',  array('--no-interaction', '--env=prod', '--no-debug', $version));
+    }
 }
 
 /**

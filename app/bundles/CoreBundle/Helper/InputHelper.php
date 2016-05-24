@@ -18,15 +18,25 @@ use Joomla\Filter\InputFilter;
 class InputHelper
 {
     /**
+     * String filter
+     *
      * @var InputFilter
      */
-    private static $filter;
+    private static $stringFilter;
 
-    private static function getFilter()
+    /**
+     * HTML filter
+     *
+     * @var InputFilter
+     */
+    private static $htmlFilter;
+
+    private static function getFilter($html = false)
     {
-        if (empty(self::$filter)) {
-            self::$filter = new InputFilter(array(), array(), 1, 1);
-            self::$filter->tagBlacklist = array(
+        if (empty(self::$htmlFilter)) {
+            // Most of Mautic's HTML uses include full HTML documents so use blacklist method
+            self::$htmlFilter = new InputFilter(array(), array(), 1, 1);
+            self::$htmlFilter->tagBlacklist = array(
                 'applet',
                 'bgsound',
                 'base',
@@ -34,21 +44,23 @@ class InputHelper
                 'embed',
                 'frame',
                 'frameset',
-                //'iframe',
                 'ilayer',
                 'layer',
                 'object',
                 'xml'
             );
 
-            self::$filter->attrBlacklist = array(
+            self::$htmlFilter->attrBlacklist = array(
                 'codebase',
                 'dynsrc',
                 'lowsrc'
             );
+
+            // Standard behavior if HTML is not specifically used
+            self::$stringFilter = new InputFilter();
         }
 
-        return self::$filter;
+        return ($html) ? self::$htmlFilter : self::$stringFilter;
     }
 
     /**
@@ -61,6 +73,7 @@ class InputHelper
      */
     public static function __callStatic($name, $arguments)
     {
+
         return self::getFilter()->clean($arguments[0], $name);
     }
 
@@ -203,42 +216,6 @@ class InputHelper
     }
 
     /**
-     * Returns float value
-     *
-     * @param mixed $value
-     *
-     * @return float
-     */
-    public static function float($value)
-    {
-        return (float) filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_THOUSAND);
-    }
-
-    /**
-     * Returns int value
-     *
-     * @param mixed $value
-     *
-     * @return int
-     */
-    public static function int($value)
-    {
-        return (int) filter_var($value, FILTER_SANITIZE_NUMBER_INT);
-    }
-
-    /**
-     * Returns boolean value
-     *
-     * @param mixed $value
-     *
-     * @return bool
-     */
-    public static function boolean($value)
-    {
-        return filter_var($value, FILTER_VALIDATE_BOOLEAN);
-    }
-
-    /**
      * Removes all characters except those allowed in URLs
      *
      * @param            $value
@@ -369,7 +346,7 @@ class InputHelper
             // Special handling for HTML comments
             $value = str_replace(array('<!--', '-->'), array('<mcomment>', '</mcomment>'), $value, $commentCount);
 
-            $value = self::getFilter()->clean($value, 'html');
+            $value = self::getFilter(true)->clean($value, 'html');
 
             // Was a doctype found?
             if ($doctypeFound) {

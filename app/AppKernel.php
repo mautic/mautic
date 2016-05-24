@@ -33,14 +33,14 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const MINOR_VERSION = 2;
+    const MINOR_VERSION = 4;
 
     /**
      * Patch version number
      *
      * @const integer
      */
-    const PATCH_VERSION = 3;
+    const PATCH_VERSION = 0;
 
     /**
      * Extra version identifier
@@ -50,7 +50,7 @@ class AppKernel extends Kernel
      *
      * @const string
      */
-    const EXTRA_VERSION = '-dev';
+    const EXTRA_VERSION = '';
 
     /**
      * @var array
@@ -132,6 +132,7 @@ class AppKernel extends Kernel
             new FOS\RestBundle\FOSRestBundle(),
             new JMS\SerializerBundle\JMSSerializerBundle(),
             new Oneup\UploaderBundle\OneupUploaderBundle(),
+            new Symfony\Bundle\TwigBundle\TwigBundle(),
         );
 
         //dynamically register Mautic Bundles
@@ -206,7 +207,6 @@ class AppKernel extends Kernel
         }
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
-            $bundles[] = new Symfony\Bundle\TwigBundle\TwigBundle();
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
             $bundles[] = new Sensio\Bundle\DistributionBundle\SensioDistributionBundle();
             $bundles[] = new Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle();
@@ -482,13 +482,16 @@ class AppKernel extends Kernel
         $class = $this->getContainerClass();
 
         $cache = new \Symfony\Component\Config\ConfigCache($this->getContainerFile(true), $this->debug);
-        $fresh = true;
+
+        $fresh = file_exists($this->getCacheDir().'/classes.php');
         if (!$cache->isFresh()) {
             $container = $this->buildContainer();
             $container->compile();
             $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
 
-            $fresh = false;
+            if ($this->debug) {
+                $fresh = false;
+            }
         }
 
         require_once $cache;
@@ -496,6 +499,7 @@ class AppKernel extends Kernel
         $this->container = new $class();
         $this->container->set('kernel', $this);
 
+        // Warm up the cache if classes.php is missing or in dev mode
         if (!$fresh && $this->container->has('cache_warmer')) {
             $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
         }
@@ -504,7 +508,7 @@ class AppKernel extends Kernel
     /**
      * Builds the service container.
      *
-     * @return ContainerBuilder The compiled service container
+     * @return \Symfony\Component\DependencyInjection\ContainerBuilder The compiled service container
      *
      * @throws \RuntimeException
      */
@@ -529,7 +533,7 @@ class AppKernel extends Kernel
         }
 
         // Only rebuild the classes if it doesn't exist or if the kernel is booted through the console meaning likely cache:clear is used
-        if (defined('IN_MAUTIC_CONSOLE') || !file_exists($this->getCacheDir().'/classes.map')) {
+        if (defined('IN_MAUTIC_CONSOLE') || !file_exists($this->getCacheDir().'/classes.php')) {
             $container->addCompilerPass(new DependencyInjection\AddClassesToCachePass($this));
         }
 

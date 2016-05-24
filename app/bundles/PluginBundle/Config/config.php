@@ -11,37 +11,54 @@ return array(
     'routes'   => array(
         'main' => array(
             // @deprecated 1.1.4 to be removed in 2.0
+            'mautic_integration_auth_callback_bc_secure' => array(
+                'path'       => '/addon/integrations/authcallback/{integration}',
+                'controller' => 'MauticPluginBundle:Auth:authCallback'
+            ),
+            'mautic_integration_auth_callback_secure'    => array(
+                'path'       => '/plugins/integrations/authcallback/{integration}',
+                'controller' => 'MauticPluginBundle:Auth:authCallback'
+            ),
+            'mautic_integration_auth_postauth_secure'    => array(
+                'path'       => '/plugins/integrations/authstatus/{integration}',
+                'controller' => 'MauticPluginBundle:Auth:authStatus'
+            ),
+            'mautic_plugin_index'                 => array(
+                'path'       => '/plugins',
+                'controller' => 'MauticPluginBundle:Plugin:index'
+            ),
+            'mautic_plugin_config'                => array(
+                'path'       => '/plugins/config/{name}',
+                'controller' => 'MauticPluginBundle:Plugin:config'
+            ),
+            'mautic_plugin_info'                  => array(
+                'path'       => '/plugins/info/{name}',
+                'controller' => 'MauticPluginBundle:Plugin:info'
+            ),
+            'mautic_plugin_reload'                => array(
+                'path'       => '/plugins/reload',
+                'controller' => 'MauticPluginBundle:Plugin:reload'
+            )
+        ),
+        'public' => array(
+            'mautic_integration_auth_user'        => array(
+                'path'       => '/plugins/integrations/authuser/{integration}',
+                'controller' => 'MauticPluginBundle:Auth:authUser'
+            ),
             'mautic_integration_auth_callback_bc' => array(
                 'path'       => '/addon/integrations/authcallback/{integration}',
                 'controller' => 'MauticPluginBundle:Auth:authCallback'
             ),
-            'mautic_integration_auth_callback' => array(
+            'mautic_integration_auth_callback'    => array(
                 'path'       => '/plugins/integrations/authcallback/{integration}',
                 'controller' => 'MauticPluginBundle:Auth:authCallback'
             ),
-            'mautic_integration_auth_postauth' => array(
-                'path'       => '/plugins/integrations/authstatus',
+            'mautic_integration_auth_postauth'    => array(
+                'path'       => '/plugins/integrations/authstatus/{integration}',
                 'controller' => 'MauticPluginBundle:Auth:authStatus'
             ),
-            'mautic_plugin_index'   => array(
-                'path'       => '/plugins',
-                'controller' => 'MauticPluginBundle:Plugin:index'
-            ),
-            'mautic_plugin_config'    => array(
-                'path'       => '/plugins/config/{name}',
-                'controller' => 'MauticPluginBundle:Plugin:config'
-            ),
-            'mautic_plugin_info'      => array(
-                'path'       => '/plugins/info/{name}',
-                'controller' => 'MauticPluginBundle:Plugin:info'
-            ),
-            'mautic_plugin_reload'    => array(
-                'path'       => '/plugins/reload',
-                'controller' => 'MauticPluginBundle:Plugin:reload'
-            )
         )
     ),
-
     'menu'     => array(
         'admin' => array(
             'priority' => 50,

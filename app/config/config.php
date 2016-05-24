@@ -1,10 +1,12 @@
 <?php
 include __DIR__ . '/paths_helper.php';
 
-$ormMappings = $serializerMappings = array();
+$ormMappings =
+$serializerMappings =
+$ipLookupServices = array();
 
 //Note Mautic specific bundles so they can be applied as needed without having to specify them individually
-$buildBundles = function($namespace, $bundle) use ($container, $paths, $root, &$ormMappings, &$serializerMappings) {
+$buildBundles = function($namespace, $bundle) use ($container, $paths, $root, &$ormMappings, &$serializerMappings, &$ipLookupServices) {
     $isPlugin = $isMautic = false;
 
     if (strpos($namespace, 'MauticPlugin\\') !== false) {
@@ -28,6 +30,11 @@ $buildBundles = function($namespace, $bundle) use ($container, $paths, $root, &$
 
         // Check for a single config file
         $config = (file_exists($directory.'/Config/config.php')) ? include $directory.'/Config/config.php' : array();
+
+        // Register IP lookup services
+        if (isset($config['ip_lookup_services'])) {
+            $ipLookupServices = array_merge($ipLookupServices, $config['ip_lookup_services']);
+        }
 
         // Check for staticphp mapping
         if (file_exists($directory.'/Entity')) {
@@ -110,12 +117,15 @@ $container->setParameter('mautic.bundles', $setBundles);
 $container->setParameter('mautic.plugin.bundles', $setPluginBundles);
 unset($setBundles, $setPluginBundles);
 
+// Set IP lookup services
+$container->setParameter('mautic.ip_lookup_services', $ipLookupServices);
+
 // Load parameters
 $loader->import('parameters.php');
 $container->loadFromExtension('mautic_core');
 
 // Set template engines
-$engines = ($container->getParameter('kernel.environment') == 'dev') ? array('php', 'twig') : array('php');
+$engines = array('php', 'twig');
 
 // Generate session name
 if (isset($_COOKIE['mautic_session_name'])) {
@@ -176,6 +186,12 @@ $dbalSettings = array(
     'types'    => array(
         'array'    => 'Mautic\CoreBundle\Doctrine\Type\ArrayType',
         'datetime' => 'Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType'
+    ),
+    // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
+    'mapping_types' => array(
+        'enum'  => 'string',
+        'point' => 'string',
+        'bit'   => 'string',
     )
 );
 
@@ -297,4 +313,46 @@ $container->loadFromExtension('jms_serializer', array(
 $container->setParameter(
     'jms_serializer.camel_case_naming_strategy.class',
     'JMS\Serializer\Naming\IdenticalPropertyNamingStrategy'
+);
+
+// Monolog formatter
+$container->register('mautic.monolog.fulltrace.formatter', 'Monolog\Formatter\LineFormatter')
+    ->addMethodCall('includeStacktraces', array(true));
+
+//Register command line logging
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
+
+$container->setParameter(
+    'console_exception_listener.class',
+    'Mautic\CoreBundle\EventListener\ConsoleExceptionListener'
+);
+$definitionConsoleExceptionListener = new Definition(
+    '%console_exception_listener.class%',
+    array(new Reference('monolog.logger.mautic'))
+);
+$definitionConsoleExceptionListener->addTag(
+    'kernel.event_listener',
+    array('event' => 'console.exception')
+);
+$container->setDefinition(
+    'mautic.kernel.listener.command_exception',
+    $definitionConsoleExceptionListener
+);
+
+$container->setParameter(
+    'console_terminate_listener.class',
+    'Mautic\CoreBundle\EventListener\ConsoleTerminateListener'
+);
+$definitionConsoleExceptionListener = new Definition(
+    '%console_terminate_listener.class%',
+    array(new Reference('monolog.logger.mautic'))
+);
+$definitionConsoleExceptionListener->addTag(
+    'kernel.event_listener',
+    array('event' => 'console.terminate')
+);
+$container->setDefinition(
+    'mautic.kernel.listener.command_terminate',
+    $definitionConsoleExceptionListener
 );

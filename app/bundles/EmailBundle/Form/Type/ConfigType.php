@@ -124,6 +124,28 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'default_signature_text',
+            'textarea',
+            array(
+                'label'      => 'mautic.email.config.default_signature_text',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.default_signature_text.tooltip'
+                ),
+                'required'   => false,
+                'data'       => (!empty($options['data']['default_signature_text']))
+                    ? $options['data']['default_signature_text']
+                    : $this->factory->getTranslator()->trans(
+                        'mautic.email.default.signature',
+                        array(
+                            '%from_name%' => '|FROM_NAME|'
+                        )
+                    )
+            )
+        );
+
+        $builder->add(
             'mailer_from_name',
             'text',
             array(
@@ -206,7 +228,41 @@ class ConfigType extends AbstractType
             )
         );
 
+        $builder->add(
+            'mailer_convert_embed_images',
+            'yesno_button_group',
+            array(
+                'label'      => 'mautic.email.config.mailer.convert.embed.images',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'      => 'form-control',
+                    'tooltip'    => 'mautic.email.config.mailer.convert.embed.images.tooltip',
+
+                ),
+                'data'       => empty($options['data']['mailer_convert_embed_images']) ? false : true,
+                'required'   => false
+            )
+        );
+
+        $builder->add(
+            'mailer_append_tracking_pixel',
+            'yesno_button_group',
+            array(
+                'label'      => 'mautic.email.config.mailer.append.tracking.pixel',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'      => 'form-control',
+                    'tooltip'    => 'mautic.email.config.mailer.append.tracking.pixel.tooltip',
+
+                ),
+                'data'       => empty($options['data']['mailer_append_tracking_pixel']) ? false : true,
+                'required'   => false
+            )
+        );
+
         $smtpServiceShowConditions = '{"config_emailconfig_mailer_transport":["smtp"]}';
+        $amazonRegionShowConditions = '{"config_emailconfig_mailer_transport":["mautic.transport.amazon"]}';
+
         $builder->add(
             'mailer_host',
             'text',
@@ -219,6 +275,27 @@ class ConfigType extends AbstractType
                     'tooltip'      => 'mautic.email.config.mailer.host.tooltip'
                 ),
                 'required'   => false
+            )
+        );
+
+
+        $builder->add(
+            'mailer_amazon_region',
+            'choice',
+            array(
+                'choices'     => array(
+                    'email-smtp.eu-west-1.amazonaws.com' => 'mautic.email.config.mailer.amazon_host.eu_west_1',
+                    'email-smtp.us-east-1.amazonaws.com' => 'mautic.email.config.mailer.amazon_host.us_east_1',
+                    'email-smtp.us-west-2.amazonaws.com' => 'mautic.email.config.mailer.amazon_host.eu_west_2'
+                ),
+                'label'       => 'mautic.email.config.mailer.amazon_host',
+                'required'    => false,
+                'attr'        => array(
+                    'class'   => 'form-control',
+                    'data-show-on' => $amazonRegionShowConditions,
+                    'tooltip' => 'mautic.email.config.mailer.amazon_host.tooltip'
+                ),
+                'empty_value' => false
             )
         );
 
@@ -463,6 +540,21 @@ class ConfigType extends AbstractType
                 'label'    => false,
                 'data'     => (array_key_exists('monitored_email', $options['data'])) ? $options['data']['monitored_email'] : array(),
                 'required' => false
+            )
+        );
+
+        $builder->add(
+            'mailer_is_owner',
+            'yesno_button_group',
+            array(
+                'label'      => 'mautic.email.config.mailer.is.owner',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'      => 'form-control',
+                    'tooltip'    => 'mautic.email.config.mailer.is.owner.tooltip',
+                ),
+                'data'       => empty($options['data']['mailer_is_owner']) ? false : true,
+                'required'   => false
             )
         );
     }

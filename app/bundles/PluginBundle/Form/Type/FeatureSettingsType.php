@@ -66,11 +66,29 @@ class FeatureSettingsType extends AbstractType
 
             list ($specialInstructions, $alertType) = $integration_object->getFormNotes('leadfield_match');
 
+            /**
+             * Auto Match Integration Fields with Mautic Fields.
+             */
+            $flattenLeadFields = array();
+            foreach (array_values($leadFields) as $fieldsWithoutGroups) {
+                $flattenLeadFields = array_merge($flattenLeadFields, $fieldsWithoutGroups);
+            }
+
+            $integrationFields  = array_keys($fields);
+            $flattenLeadFields  = array_keys($flattenLeadFields);
+            $fieldsIntersection = array_uintersect($integrationFields, $flattenLeadFields, "strcasecmp");
+
+
+            $autoMatchedFields = array();
+            foreach ($fieldsIntersection as $field) {
+                $autoMatchedFields[$field] = strtolower($field);
+            }
+
             $form->add('leadFields', 'integration_fields', array(
                 'label'                => 'mautic.integration.leadfield_matches',
                 'required'             => true,
                 'lead_fields'          => $leadFields,
-                'data'                 => isset($data['leadFields']) ? $data['leadFields'] : array(),
+                'data'                 => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : $autoMatchedFields,
                 'integration_fields'   => $fields,
                 'special_instructions' => $specialInstructions,
                 'alert_type'           => $alertType

@@ -40,14 +40,13 @@ class LeadSubscriber extends CommonSubscriber
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         // Set available event types
-        $eventTypeKeySent = 'email.sent';
+        $eventTypeKeySent  = 'email.sent';
         $eventTypeNameSent = $this->translator->trans('mautic.email.sent');
         $event->addEventType($eventTypeKeySent, $eventTypeNameSent);
 
-        $eventTypeKeyRead = 'email.read';
+        $eventTypeKeyRead  = 'email.read';
         $eventTypeNameRead = $this->translator->trans('mautic.email.read');
         $event->addEventType($eventTypeKeyRead, $eventTypeNameRead);
-
 
         // Decide if those events are filtered
         $filters = $event->getEventFilters();
@@ -70,30 +69,36 @@ class LeadSubscriber extends CommonSubscriber
         // Add the events to the event array
         foreach ($stats as $stat) {
             if ($stat['dateRead'] && $event->isApplicable($eventTypeKeyRead, true)) {
-                $event->addEvent(array(
-                    'event'     => $eventTypeKeyRead,
-                    'eventLabel' => $eventTypeNameRead,
-                    'timestamp' => $stat['dateRead'],
-                    'extra'     => array(
-                        'stats' => $stat,
-                        'type'  => 'read'
-                    ),
-                    'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php'
-                ));
+                $event->addEvent(
+                    array(
+                        'event'           => $eventTypeKeyRead,
+                        'eventLabel'      => $eventTypeNameRead,
+                        'timestamp'       => $stat['dateRead'],
+                        'extra'           => array(
+                            'stat' => $stat,
+                            'type' => 'read'
+                        ),
+                        'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php',
+                        'icon'            => 'fa-envelope-o'
+                    )
+                );
             }
 
             // Email read
             if ($stat['dateSent'] && $event->isApplicable($eventTypeKeySent)) {
-                $event->addEvent(array(
-                    'event'           => $eventTypeKeySent,
-                    'eventLabel'      => $eventTypeNameSent,
-                    'timestamp'       => $stat['dateSent'],
-                    'extra'           => array(
-                        'stats' => $stat,
-                        'type'  => 'sent'
-                    ),
-                    'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php'
-                ));
+                $event->addEvent(
+                    array(
+                        'event'           => $eventTypeKeySent,
+                        'eventLabel'      => $eventTypeNameSent,
+                        'timestamp'       => $stat['dateSent'],
+                        'extra'           => array(
+                            'stat' => $stat,
+                            'type' => 'sent'
+                        ),
+                        'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php',
+                        'icon'            => 'fa-envelope'
+                    )
+                );
             }
         }
     }

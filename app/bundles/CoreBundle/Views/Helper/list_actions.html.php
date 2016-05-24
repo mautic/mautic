@@ -28,7 +28,7 @@ if (!isset($route)) {
         <input type="checkbox" data-target="tbody" data-toggle="selectrow" class="list-checkbox" name="cb<?php echo $id; ?>" value="<?php echo $id; ?>" />
     </span>
 
-    <div class="btn-group">
+    <div class="input-group-btn">
         <button type="button" class="btn btn-default btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
             <i class="fa fa-angle-down "></i>
         </button>

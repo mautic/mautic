@@ -7,17 +7,26 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$item = $event['extra']['stats'];
+$item    = $event['extra']['stat'];
+$subject = $view['translator']->trans('mautic.email.timeline.event.custom_email');
 
+if (!empty($item['storedSubject'])) {
+	$subject .= ': '.$item['storedSubject'];
+} elseif (!empty($item['subject'])) {
+	/**
+	 * @deprecated 1.2.3 - to be removed in 2.0
+	 */
+	$subject = ': '.$item['subject'];
+}
 ?>
 
 <li class="wrapper email-read">
-	<div class="figure"><span class="fa <?php echo isset($icons['email']) ? $icons['email'] : '' ?>"></span></div>
+	<div class="figure"><span class="fa <?php echo isset($event['icon']) ? $event['icon'] : '' ?>"></span></div>
 	<div class="panel">
 	    <div class="panel-body">
 	    	<h3>
 	    		<a target="_new" href="<?php echo $view['router']->generate('mautic_email_webview', array("idHash" => $item['idHash'])); ?>">
-				    <?php echo (!empty($item['name'])) ? $item['name'] : $view['translator']->trans('mautic.email.timeline.event.custom_email'); ?>
+				    <?php echo $subject; ?>
 				</a>
 			</h3>
             <p class="mb-0"><?php echo $view['translator']->trans('mautic.core.timeline.event.time', array('%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel'])); ?></p>

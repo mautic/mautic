@@ -115,7 +115,48 @@ class RoleRepository extends CommonRepository
             $expr,
             ($returnParameter) ? array("$unique" => $string) : array()
         );
+    }
 
+    /**
+     * Get a count of users that belong to the role
+     *
+     * @param $roleIds
+     *
+     * @return array
+     */
+    public function getUserCount($roleIds)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('count(u.id) as thecount, u.role_id')
+            ->from(MAUTIC_TABLE_PREFIX.'users', 'u');
+
+        $returnArray = (is_array($roleIds));
+
+        if (!$returnArray) {
+            $roleIds = array($roleIds);
+        }
+
+        $q->where(
+            $q->expr()->in('u.role_id', $roleIds)
+        )
+            ->groupBy('u.role_id');
+
+        $result = $q->execute()->fetchAll();
+
+        $return = array();
+        foreach ($result as $r) {
+            $return[$r['role_id']] = $r['thecount'];
+        }
+
+        // Ensure lists without leads have a value
+        foreach ($roleIds as $r) {
+            if (!isset($return[$r])) {
+                $return[$r] = 0;
+            }
+        }
+
+        return ($returnArray) ? $return : $return[$roleIds[0]];
     }
 
     /**

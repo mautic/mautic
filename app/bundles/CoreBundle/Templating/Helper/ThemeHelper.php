@@ -68,11 +68,15 @@ class ThemeHelper
         }
 
         //get the config
-        if (!file_exists($this->themePath . '/config.php')) {
+        if (file_exists($this->themePath . '/config.json')) {
+            $this->config = json_decode(file_get_contents($this->themePath . '/config.json'), true);
+        }
+        // @deprecated Remove support for theme config.php in 2.0
+        elseif (file_exists($this->themePath . '/config.php')) {
+            $this->config = include $this->themePath . '/config.php';
+        } else {
             throw new BadConfigurationException($this->theme . ' is missing a required config file');
         }
-
-        $this->config = include $this->themePath . '/config.php';
 
         if (!isset($this->config['name'])) {
             throw new BadConfigurationException($this->theme . ' does not have a valid config file');

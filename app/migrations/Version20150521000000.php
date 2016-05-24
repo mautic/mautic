@@ -148,7 +148,7 @@ class Version20150521000000 extends AbstractMauticMigration
 
         if (!empty($actionEntities)) {
             $this->factory->getModel('point')->getRepository()->saveEntities($actionEntities);
-            $em->clear('MauticFormBundle:Action');
+            $em->clear('Mautic\FormBundle\Entity\Action');
         }
 
         foreach ($formFieldMatches as $leadFieldId => $formFieldIds) {
@@ -207,7 +207,7 @@ class Version20150521000000 extends AbstractMauticMigration
             }
 
             $formRepo->saveEntities($forms);
-            $em->clear('MauticFormBundle:Form');
+            $em->clear('Mautic\FormBundle\Entity\Form');
         }
 
         // Clear template for custom mode
@@ -256,7 +256,7 @@ class Version20150521000000 extends AbstractMauticMigration
 
         if (!empty($redirectEntities)) {
             $this->factory->getModel('page.redirect')->getRepository()->saveEntities($redirectEntities);
-            $em->clear('MauticPageBundle:Redirect');
+            $em->clear('Mautic\PageBundle\Entity\Redirect');
         }
 
         // Copy subjects as names
