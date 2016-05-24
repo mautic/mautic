@@ -68,7 +68,7 @@ class Periodicity
 
         $builder->addId();
 
-        $builder->createField('nextShoot', 'date')
+        $builder->createField('nextShoot', 'datetime')
             ->columnName('next_shoot')
             ->build();
 
@@ -102,9 +102,18 @@ class Periodicity
             ->columnName('target_id')
             ->build();
     }
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getid()
+    {
+        return $this->id;
+    }
 
     /**
-     * Set userId
+     * Set nextShoot
      *
      * @param date $nextShoot
      *
