@@ -536,18 +536,44 @@ var Mautic = {
                     //     settings.removePlugins = 'resize';
                     // }
 
-                    // if (mQuery(this).hasClass('editor-builder-tokens')) {
-                    //     if (settings.extraPlugins) {
-                    //         settings.extraPlugins = settings.extraPlugins + ',tokens';
-                    //     } else {
-                    //         settings.extraPlugins = 'tokens';
-                    //     }
-                    // }
+                    var textarea = mQuery(this);
 
-                    // settings.on = Mautic.getGlobalEditorEvents();
+                    if (mQuery(this).hasClass('editor-builder-tokens')) {
 
-                    // mQuery(this).ckeditor(settings);
-                    mQuery(this).froalaEditor();
+                        textarea.on('froalaEditor.initialized', function (e, editor) {
+                            mQuery.ajax({
+                                url: mauticAjaxUrl,
+                                data: 'action=' + textarea.attr('data-token-callback'),
+                                success: function (response) {
+                                    if (typeof response.tokens === 'object') {
+                                    console.log('success', response.tokens, typeof response.tokens === 'object');
+                                        editor.$el.atwho({
+                                            at: textarea.attr('data-token-activator'),
+                                            displayTpl: '<li>${name} <small>${id}</small></li>',
+                                            insertTpl: "{${id}}",
+                                            editableAtwhoQueryAttrs: {"data-fr-verified": true},
+                                            data: mQuery.map(response.tokens, function(value, i) {
+                                                console.log({'id':i, 'name':value});
+                                                return {'id':i, 'name':value};
+                                            })
+                                        });
+                                    }
+
+                                },
+                                error: function (request, textStatus, errorThrown) {
+                                    Mautic.processAjaxError(request, textStatus, errorThrown);
+                                }
+                            });
+                            
+                        });
+                    }
+
+                    textarea.froalaEditor();
+
+                    mQuery('body').on('mouseup', '.atwho-view-ul li', function (e) {
+                        e.stopPropagation();
+                    });
+
                 });
             }
         });

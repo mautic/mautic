@@ -706,33 +706,14 @@ class AjaxController extends CommonController
      */
     protected function getBuilderTokensAction(Request $request)
     {
-        $dataArray = array();
+        $tokens = array();
 
         if (method_exists($this, 'getBuilderTokens')) {
             $query  = $request->get('query');
-            $visual = $request->get('visual');
-
-            if ($query && $query !== '{' && $query !== '{@') {
-                $tokenList = $this->getBuilderTokens($query);
-
-                $tokens       = (isset($tokenList['tokens'])) ? $tokenList['tokens'] : array();
-                $visualTokens = ($visual !== 'false' && isset($tokenList['visualTokens'])) ? $tokenList['visualTokens'] : array();
-
-                if (!empty($tokens)) {
-                    asort($tokens);
-
-                    $dataArray['html'] = $this->render(
-                        'MauticCoreBundle:Helper:buildertoken_list.html.php',
-                        array(
-                            'tokens'       => $tokens,
-                            'visualTokens' => $visualTokens
-                        )
-                    )->getContent();
-                }
-            }
+            $tokens = $this->getBuilderTokens($query);
         }
 
-        return $this->sendJsonResponse($dataArray);
+        return $this->sendJsonResponse($tokens);
     }
 
     /**

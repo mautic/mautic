@@ -195,7 +195,7 @@ class AjaxController extends CommonAjaxController
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $this->factory->getModel('email');
 
-        return $model->getBuilderComponents(null, array('tokens', 'visualTokens'), $query);
+        return $model->getBuilderComponents(null, array('tokens'), $query);
     }
 
     /**
