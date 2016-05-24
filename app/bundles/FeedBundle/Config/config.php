@@ -26,5 +26,22 @@ return array(
                 )
             )
         )
+    ),
+    'services' => array(
+        'other' => array(
+            'mautic.helper.feed' => array(
+                'class' => 'Mautic\FeedBundle\Helper\FeedHelper',
+//                 'argument' => array(
+//                     'debril.http.curl',
+//                     'debril.parser.factory',
+//                     'debril.parser.xml'
+//                 )
+                'methodCalls' => array(
+                    'setFactory' => array('debril.parser.factory'),
+                    'setXmlParser' => array('debril.parser.xml'),
+                    'setReader' => array('debril.reader')
+                )
+            )
+        )
     )
 );

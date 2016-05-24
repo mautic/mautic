@@ -11,6 +11,7 @@ namespace Mautic\FeedBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\FeedBundle\Helper\FeedHelper;
 
 /**
  * Class FeedController
@@ -25,26 +26,13 @@ class FeedController extends FormController
      */
     public function indexAction()
     {
-        /** @var \Debril\RssAtomBundle\Protocol\Parser\Factory $factory */
-        $factory = $this->container->get('debril.parser.factory');
-
-        /** @var \Debril\RssAtomBundle\Protocol\Parser\XmlParser $xmlParser */
-        $xmlParser = $this->container->get('debril.parser.xml');
-
-        /** @var \Debril\RssAtomBundle\Protocol\FeedReader $reader */
-        $reader = $this->container->get('debril.reader');
-
         // Write the contents of the XML file into a string
-        $xmlContents = file_get_contents('feed.xml');
+        $xmlString = file_get_contents('feed.xml');
 
-        // Parses the contents into a SimpleXMLElement
-        $xmlBody = $xmlParser->parseString($xmlContents);
+        /** @var FeedHelper $feedHelper  */
+        $feedHelper = $this->get('mautic.helper.feed');
 
-        // Finds the appropriate parser for the given feed
-        $parser = $reader->getAccurateParser($xmlBody);
-
-        // Parses the feed with the correct parser
-        $feedContent = $parser->parse($xmlBody, $factory->newFeed());
+        $feedContent = $feedHelper->getFeedContentFromString($xmlString);
 
         return new Response(var_dump($feedContent));
 
