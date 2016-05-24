@@ -41,6 +41,7 @@ $template = '<div class="col-md-6">{content}</div>';
             <?php echo $view['form']->rowIfExists($fields, 'default_pagelimit', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'default_timezone', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'locale', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'cached_data_timeout', $template); ?>
         </div>
 
         <hr class="text-muted" />
@@ -104,20 +105,37 @@ $template = '<div class="col-md-6">{content}</div>';
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_service', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_auth', $template); ?>
+            <div id="ip_lookup_config_container">
+            <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_config', '<div class="col-md-12">{content}</div>'); ?>
+            </div>
         </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="small text-center" id="ip_lookup_attribution"><?php echo $ipLookupAttribution; ?></div>
+            </div>
+        </div>
+
+        <?php if (isset($fields['do_not_track_ips'])): ?>
+        <hr class="text-muted" />
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'do_not_track_ips', $template); ?>
+        </div>
+        <?php endif; ?>
 
         <?php if (isset($fields['transifex_username'])): ?>
         <hr class="text-muted" />
-
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'transifex_username', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'transifex_password', $template); ?>
         </div>
         <?php endif; ?>
-
+        
+        <?php if (isset($fields['link_shortener_url'])): ?>
+        <hr class="text-muted" />
         <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'do_not_track_ips', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'link_shortener_url', $template); ?>
         </div>
+        <?php endif; ?>
     </div>
 </div>
 <?php endif; ?>

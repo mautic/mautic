@@ -19,7 +19,7 @@ if ($page->getId()) {
 ?>
 
 <li class="wrapper form-submitted">
-	<div class="figure"><span class="fa <?php echo isset($icons['form']) ? $icons['form'] : '' ?>"></span></div>
+	<div class="figure"><span class="fa <?php echo isset($event['icon']) ? $event['icon'] : '' ?>"></span></div>
 	<div class="panel">
 	    <div class="panel-body">
 	    	<h3>

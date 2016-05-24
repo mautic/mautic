@@ -29,6 +29,13 @@ class MenuHelper extends Helper
     private $factory;
 
     /**
+     * Stores items that are assigned to another parent outside it's bundle
+     *
+     * @var array
+     */
+    private $orphans = array();
+
+    /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
@@ -61,7 +68,9 @@ class MenuHelper extends Helper
     }
 
     /**
-     * @param      $name
+     * @param $name
+     *
+     * @return bool|mixed
      */
     protected function getParameter($name)
     {
@@ -151,9 +160,11 @@ class MenuHelper extends Helper
     /**
      * Converts menu config into something KNP menus expects
      *
-     * @param $items
+     * @param     $items
+     * @param int $depth
+     * @param int $defaultPriority
      */
-    public function createMenuStructure(&$items, $depth = 0)
+    public function createMenuStructure(&$items, $depth = 0, $defaultPriority = 9999)
     {
         foreach ($items as $k => &$i) {
             if (!is_array($i) || empty($i)) {
@@ -219,10 +230,7 @@ class MenuHelper extends Helper
             );
 
             $i['extras'] = array();
-
-
             $i['extras']['depth'] = $depth;
-
 
             //Set the icon class for the menu item
             if (!empty($i['iconClass'])) {
@@ -236,8 +244,107 @@ class MenuHelper extends Helper
 
             //Repeat for sub items
             if (isset($i['children'])) {
-                $this->createMenuStructure($i['children'], $depth + 1);
+                $this->createMenuStructure($i['children'], $depth + 1, $defaultPriority);
+            }
+
+            // Determine if this item needs to be listed in a bundle outside it's own
+            if (isset($i['parent'])) {
+                if (!isset($this->orphans[$i['parent']])) {
+                    $this->orphans[$i['parent']] = array();
+                }
+
+                $this->orphans[$i['parent']][$k] = $i;
+
+                unset($items[$k]);
+
+                // Don't set a default priority here as it'll assume that of it's parent
+            } elseif (!isset($i['priority'])) {
+                // Ensure a priority for non-orphans
+                $i['priority'] = $defaultPriority;
             }
         }
+    }
+
+    /**
+     * Get orphaned menu items
+     *
+     * @return array
+     */
+    public function getOrphans()
+    {
+        $orphans = $this->orphans;
+        $this->orphans = array();
+
+        return $orphans;
+    }
+
+    /**
+     * Give orphaned menu items a home
+     *
+     * @param array $menuItems
+     * @param bool  $appendOrphans
+     * @param int   $depth
+     */
+    public function placeOrphans(array &$menuItems, $appendOrphans = false, $depth = 1)
+    {
+        foreach ($menuItems as $key => &$items) {
+            if (isset($this->orphans[$key])) {
+                $priority = (isset($items['priority'])) ? $items['priority'] : 9999;
+                foreach ($this->orphans[$key] as &$orphan) {
+                    if (!isset($orphan['extras'])) {
+                        $orphan['extras'] = array();
+                    }
+                    $orphan['extras']['depth'] = $depth;
+                    if (!isset($orphan['priority'])) {
+                        $orphan['priority']  = $priority;
+                    }
+                }
+
+                $items['children'] = (!isset($items['children'])) ?
+                    $this->orphans[$key] :
+                    $items['children'] = array_merge($items['children'], $this->orphans[$key]);
+                unset($this->orphans[$key]);
+            } elseif (isset($items['children'])) {
+                foreach ($items['children'] as $subKey => $subItems) {
+                    $this->placeOrphans($subItems, false, $depth + 1);
+                }
+            }
+        }
+
+        // Append orphans that couldn't find a home
+        if ($appendOrphans && count($this->orphans)) {
+            $menuItems = array_merge($menuItems, $this->orphans);
+            $this->orphans = array();
+        }
+    }
+
+    /**
+     * Sort menu items by priority
+     *
+     * @param $menuItems
+     * @param $defaultPriority
+     */
+    public function sortByPriority(&$menuItems, $defaultPriority = 9999)
+    {
+        foreach ($menuItems as &$items) {
+            $parentPriority = (isset($items['priority'])) ? $items['priority'] : $defaultPriority;
+            if (isset($items['children'])) {
+                $this->sortByPriority($items['children'], $parentPriority);
+            }
+        }
+
+        uasort(
+            $menuItems,
+            function ($a, $b) use ($defaultPriority) {
+                $ap = (isset($a['priority']) ? (int) $a['priority'] : $defaultPriority);
+                $bp = (isset($b['priority']) ? (int) $b['priority'] : $defaultPriority);
+
+                if ($ap == $bp) {
+                    return 0;
+                }
+
+                return ($ap > $bp) ? -1 : 1;
+            }
+        );
     }
 }

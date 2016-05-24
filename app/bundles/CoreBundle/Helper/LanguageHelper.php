@@ -154,7 +154,7 @@ class LanguageHelper
 
         // Get the language data
         try {
-            $data      = $this->connector->post('https://updates.mautic.org/index.php?option=com_mauticdownload&task=fetchLanguages', array(), null, 10);
+            $data      = $this->connector->post('https://updates.mautic.org/index.php?option=com_mauticdownload&task=fetchLanguages', array(), array(), 10);
             $languages = json_decode($data->body, true);
             $languages = $languages['languages'];
         } catch (\Exception $exception) {
@@ -217,27 +217,46 @@ class LanguageHelper
         if (!isset($cacheData['languages'][$languageCode])) {
             return array(
                 'error'   => true,
-                'message' => 'mautic.core.language.helper.invalid.language'
+                'message' => 'mautic.core.language.helper.invalid.language',
+                'vars'    => array(
+                    '%language%' => $languageCode
+                )
             );
         }
 
+        $langUrl = 'https://updates.mautic.org/index.php?option=com_mauticdownload&task=downloadLanguagePackage&langCode=' . $languageCode;
+
         // GET the update data
         try {
-            $data = $this->connector->get('https://updates.mautic.org/index.php?option=com_mauticdownload&task=downloadLanguagePackage&langCode=' . $languageCode);
+            $data = $this->connector->get($langUrl);
         } catch (\Exception $exception) {
             $logger = $this->factory->getLogger();
             $logger->addError('An error occurred while attempting to fetch the package: ' . $exception->getMessage());
 
             return array(
                 'error'   => true,
-                'message' => 'mautic.core.language.helper.error.fetching.package'
+                'message' => 'mautic.core.language.helper.error.fetching.package.exception',
+                'vars'    => array(
+                    '%exception%' => $exception->getMessage()
+                )
             );
         }
 
-        if ($data->code != 200) {
+        if ($data->code >= 300 && $data->code < 400) {
             return array(
                 'error'   => true,
-                'message' => 'mautic.core.language.helper.error.fetching.package'
+                'message' => 'mautic.core.language.helper.error.follow.redirects',
+                'vars'    => array(
+                    '%url%' => $langUrl
+                )
+            );
+        } elseif ($data->code != 200) {
+            return array(
+                'error'   => true,
+                'message' => 'mautic.core.language.helper.error.on.language.server.side',
+                'vars'    => array(
+                    '%code%' => $data->code
+                )
             );
         }
 

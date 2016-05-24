@@ -17,6 +17,11 @@ use Symfony\Component\Templating\Helper\SlotsHelper as BaseSlotsHelper;
 class SlotsHelper extends BaseSlotsHelper
 {
     /**
+     * @var bool
+     */
+    protected $inBuilder = false;
+
+    /**
      * Appends a slot value if already set
      *
      * @param $name
@@ -42,7 +47,13 @@ class SlotsHelper extends BaseSlotsHelper
      */
     public function hasContent($names)
     {
-        if (!$this->slots['public']) {
+        // @deprecated Kept for BC in PHP templates. Remove in 2.0
+        if (isset($this->slots['public'])) {
+            return true;
+        }
+
+        // If we're in the builder, return true so all slots show.
+        if ($this->inBuilder) {
             return true;
         }
 
@@ -62,5 +73,13 @@ class SlotsHelper extends BaseSlotsHelper
         }
 
         return false;
+    }
+
+    /**
+     * @param bool $bool
+     */
+    public function inBuilder($bool)
+    {
+        $this->inBuilder = (bool) $bool;
     }
 }

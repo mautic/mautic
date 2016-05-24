@@ -17,6 +17,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\FormEvents;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -65,7 +66,9 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
+     * @param null $id
+     *
+     * @return Form
      */
     public function getEntity($id = null)
     {
@@ -155,6 +158,13 @@ class FormModel extends CommonFormModel
             $order++;
             $entity->addField($properties['id'], $field);
         }
+
+        // Persist if the entity is known
+        if ($entity->getId()) {
+            /** @var \Mautic\FormBundle\Model\FieldModel $fieldModel */
+            $fieldModel = $this->factory->getModel('form.field');
+            $fieldModel->saveEntities($entity->getFields());
+        }
     }
 
     /**
@@ -164,13 +174,22 @@ class FormModel extends CommonFormModel
     public function deleteFields(Form $entity, $sessionFields)
     {
         if (empty($sessionFields)) {
+
             return;
         }
+
         $existingFields = $entity->getFields();
+        $deleteFields   = array();
         foreach ($sessionFields as $fieldId) {
             if (isset($existingFields[$fieldId])) {
                 $entity->removeField($fieldId, $existingFields[$fieldId]);
+                $deleteFields[] = $fieldId;
             }
+        }
+
+        // Delete fields from db
+        if (count($deleteFields)) {
+            $this->factory->getModel('form.field')->deleteEntities($deleteFields);
         }
     }
 
@@ -219,6 +238,13 @@ class FormModel extends CommonFormModel
             $order++;
             $entity->addAction($properties['id'], $action);
         }
+
+        // Persist if form is being edited
+        if ($entity->getId()) {
+            /** @var \Mautic\FormBundle\Model\ActionModel $actionModel */
+            $actionModel = $this->factory->getModel('form.action');
+            $actionModel->saveEntities($entity->getActions());
+        }
     }
 
     /**
@@ -228,7 +254,7 @@ class FormModel extends CommonFormModel
     {
         $isNew = ($entity->getId()) ? false : true;
 
-        if ($isNew) {
+        if ($isNew && !$entity->getAlias()) {
             $alias = $this->cleanAlias($entity->getName(), '', 10);
             $entity->setAlias($alias);
         }
@@ -490,6 +516,8 @@ class FormModel extends CommonFormModel
 
                 switch ($f->getType()) {
                     case 'text':
+                    case 'email':
+                    case 'hidden':
                         if (preg_match('/<input(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)value="(.*?)"(.*?)\/>/i', $formHtml, $match)) {
                             $replace  = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'value="'.urldecode($value).'"'.$match[4].'/>';
                             $formHtml = str_replace($match[0], $replace, $formHtml);
@@ -590,5 +618,37 @@ class FormModel extends CommonFormModel
         );
 
         return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
+    }
+
+    /**
+     * Get a list of assets in a date range
+     *
+     * @param integer  $limit
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param array    $filters
+     * @param array    $options
+     *
+     * @return array
+     */
+    public function getFormList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array(), $options = array())
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('t.id, t.name, t.date_added, t.date_modified')
+            ->from(MAUTIC_TABLE_PREFIX.'forms', 't')
+            ->setMaxResults($limit);
+
+        if (!empty($options['canViewOthers'])) {
+            $q->andWhere('t.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_added');
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
     }
 }

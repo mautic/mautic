@@ -370,7 +370,12 @@ class FormModel extends CommonModel
 
         // Some labels are quite long if a question so cut this short
         $alias = strtolower(InputHelper::alphanum($alias, false, $spaceCharacter));
-
+        
+        // Ensure we have something
+        if (empty($alias)) {
+            $alias = substr(str_shuffle("abcdefghijklmnopqrstuvwxyz"), 0, 5);
+        }
+        
         // Trim if applicable
         if ($maxLength) {
             $alias = substr($alias, 0, $maxLength);
@@ -379,7 +384,7 @@ class FormModel extends CommonModel
         if (substr($alias, -1) == '_') {
             $alias = substr($alias, 0, -1);
         }
-
+        
         // Check that alias is SQL safe since it will be used for the column name
         $databasePlatform = $this->em->getConnection()->getDatabasePlatform();
         $reservedWords = $databasePlatform->getReservedKeywordsList();

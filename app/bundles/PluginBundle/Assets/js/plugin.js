@@ -8,8 +8,7 @@ Mautic.initiateIntegrationAuthorization = function() {
 
 Mautic.loadIntegrationAuthWindow = function(response) {
     if (response.newContent) {
-        response.target = '#IntegrationEditModal .modal-body-content';
-        Mautic.processPageContent(response);
+        Mautic.processModalContent(response, '#IntegrationEditModal');
     } else {
         Mautic.stopPageLoadingBar();
         Mautic.stopIconSpinPostEvent();

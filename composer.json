@@ -1,5 +1,5 @@
 {
-    "name": "mautic/open-source-edition",
+    "name": "mautic/core",
     "license": "GPL-3.0",
     "type": "project",
     "description": "Mautic Open Source Distribution",
@@ -12,7 +12,7 @@
         }
     },
     "require": {
-        "php": ">=5.3.7",
+        "php": ">=5.3.10",
 
         "symfony/class-loader": "2.6.*",
         "symfony/config": "2.6.*",
@@ -33,54 +33,65 @@
         "symfony/translation": "2.6.*",
         "symfony/validator": "2.6.*",
         "symfony/yaml": "2.6.*",
+        "symfony/stopwatch": "2.6.*",
 
         "symfony/framework-bundle": "2.5.*",
-        "symfony/monolog-bundle": "~2.4",
+        "symfony/monolog-bundle": "2.4.*",
         "symfony/security-bundle": "2.6.*",
-        "symfony/swiftmailer-bundle": "~2.3",
+        "symfony/swiftmailer-bundle": "2.3.*",
 
-        "symfony/doctrine-bridge": "2.5.*",
-        "symfony/monolog-bridge": "2.5.*",
+        "symfony/doctrine-bridge": "2.6.*",
+        "symfony/monolog-bridge": "2.6.*",
 
-        "sensio/distribution-bundle": "~2.3",
+        "sensio/distribution-bundle": "2.3.*",
+
+        "twig/twig": "1.*",
+        "symfony/twig-bundle": "2.5.*",
 
         "doctrine/annotations": "1.2.*,>=1.2.7",
         "doctrine/cache": "1.4.*,>=1.4.2",
         "doctrine/common": "2.4.*,>=2.4.3",
         "doctrine/dbal": "2.4.*",
-        "doctrine/migrations": "dev-master",
+        "doctrine/migrations": "1.0.0-alpha3",
         "doctrine/orm": "2.4.*,>=2.4.8",
         "doctrine/doctrine-bundle": "~1.2",
         "doctrine/doctrine-cache-bundle": "~1.0",
-        "doctrine/doctrine-fixtures-bundle": "2.2.*@dev",
+        "doctrine/doctrine-fixtures-bundle": "^2.2",
         "doctrine/doctrine-migrations-bundle": "~1.0",
 
-        "knplabs/gaufrette": "dev-master",
+        "knplabs/gaufrette": "0.2",
         "aws/aws-sdk-php": "~2.7",
-        "rackspace/php-opencloud": "~1.12",
+        "rackspace/php-opencloud": "1.12.*",
 
-        "knplabs/knp-menu": "2.0.*@dev",
-        "knplabs/knp-menu-bundle":"dev-master",
-        "friendsofsymfony/oauth-server-bundle": "dev-master",
+        "twilio/sdk": "^4.10",
+
+        "knplabs/knp-menu": "^2.0",
+        "knplabs/knp-menu-bundle":"^2.0",
+        "friendsofsymfony/oauth-server-bundle": "1.5.2",
         "willdurand/oauth-server-bundle": "dev-master",
-        "jms/serializer-bundle": "@dev",
+        "jms/serializer-bundle": "1.0.*",
+        "jms/serializer": "1.0.*",
         "friendsofsymfony/rest-bundle": "1.3.*",
         "oneup/uploader-bundle": "~1.3",
 
         "ircmaxell/password-compat": "~1.0",
         "phpoffice/phpexcel": "1.8.0",
-        "joomla/http": "~1.1",
-        "joomla/filter": "~1.1",
+        "joomla/http": "1.2.*",
+        "joomla/filter": "1.2.*",
         "mrclay/minify": "2.2.0",
-        "jbroadway/urlify": "^1.0"
+        "jbroadway/urlify": "^1.0",
+        "geoip2/geoip2": "~2.0",
+        "camspiers/json-pretty": "1.0.*",
+        "misd/phone-number-bundle": "^1.1",
+        "ip2location/ip2location-php": "^7.2"
     },
     "require-dev": {
-        "symfony/twig-bundle": "2.5.*",
         "symfony/web-profiler-bundle": "2.5.*",
-        "liip/functional-test-bundle": "dev-master",
+        "liip/functional-test-bundle": "^1.3.4",
         "sensio/generator-bundle": "~2.3",
         "babdev/transifex": "~1.0",
-        "webfactory/exceptions-bundle": "@stable"
+        "webfactory/exceptions-bundle": "@stable",
+        "phpunit/phpunit": "4.5"
     },
     "scripts": {
         "post-install-cmd": [

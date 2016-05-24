@@ -31,6 +31,10 @@ return array(
             )
         ),
         'public' => array(
+            'mautic_js'                    => array(
+                'path'       => '/mtc.js',
+                'controller' => 'MauticCoreBundle:Js:index'
+            ),
             'mautic_base_index'            => array(
                 'path'       => '/',
                 'controller' => 'MauticCoreBundle:Default:index'
@@ -76,10 +80,15 @@ return array(
     ),
     'menu'       => array(
         'main'  => array(
-            'priority' => -1000,
-            'items'    => array(
-                'name'     => 'root',
-                'children' => array()
+            'mautic.core.components' => array(
+                'id'        => 'mautic_components_root',
+                'iconClass' => 'fa-puzzle-piece',
+                'priority'  => 60
+            ),
+            'mautic.core.channels' => array(
+                'id'        => 'mautic_channels_root',
+                'iconClass' => 'fa-rss',
+                'priority'  => 40
             )
         ),
         'admin' => array(
@@ -100,6 +109,12 @@ return array(
             ),
             'mautic.core.configbundle.subscriber' => array(
                 'class' => 'Mautic\CoreBundle\EventListener\ConfigSubscriber'
+            ),
+            'mautic.webpush.js.subscriber'           => array(
+                'class' => 'Mautic\CoreBundle\EventListener\BuildJsSubscriber'
+            ),
+            'mautic.core.dashboard.subscriber'    => array(
+                'class' => 'Mautic\CoreBundle\EventListener\DashboardSubscriber'
             )
         ),
         'forms'   => array(
@@ -142,13 +157,33 @@ return array(
             ),
             'mautic.form.type.coreconfig'         => array(
                 'class'     => 'Mautic\CoreBundle\Form\Type\ConfigType',
-                'arguments' => 'mautic.factory',
+                'arguments' => array(
+                    'translator',
+                    'mautic.helper.language',
+                    'mautic.ip_lookup.factory',
+                    '%mautic.supported_languages%',
+                    '%mautic.ip_lookup_services%',
+                    'mautic.ip_lookup'
+                ),
                 'alias'     => 'coreconfig'
+            ),
+            'mautic.form.type.coreconfig.iplookup_download_data_store_button' => array(
+                'class'     => 'Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType',
+                'alias'     => 'iplookup_download_data_store_button',
+                'arguments' => array(
+                    'mautic.helper.template.date',
+                    'translator'
+                )
             ),
             'mautic.form.type.theme_list'         => array(
                 'class'     => 'Mautic\CoreBundle\Form\Type\ThemeListType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'theme_list'
+            ),
+            'mautic.form.type.daterange'          => array(
+                'class'     => 'Mautic\CoreBundle\Form\Type\DateRangeType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'daterange'
             )
         ),
         'helpers' => array(
@@ -211,6 +246,14 @@ return array(
                     'monolog.logger.mautic'
                 ),
                 'tag' => 'kernel.event_subscriber'
+            ),
+
+            // Configurator (used in installer and managing global config)
+            'mautic.configurator' => array(
+                'class'     => 'Mautic\InstallBundle\Configurator\Configurator', // In 2.0 change this to reference the CoreBundle
+                'arguments' => array(
+                    'mautic.factory'
+                )
             ),
 
             // Template helper overrides
@@ -300,6 +343,14 @@ return array(
                 'class'     => 'Mautic\CoreBundle\Helper\LanguageHelper',
                 'arguments' => 'mautic.factory'
             ),
+            'mautic.helper.url'           => array(
+                'class'     => 'Mautic\CoreBundle\Helper\UrlHelper',
+                'arguments' => array(
+                    'mautic.http.connector',
+                    '%mautic.link_shortener_url%',
+                    'monolog.logger.mautic',
+                )
+            ),
             // Menu
             'mautic.menu_renderer'               => array(
                 'class'     => 'Mautic\CoreBundle\Menu\MenuRenderer',
@@ -320,56 +371,109 @@ return array(
                 )
             ),
             'mautic.menu.main'                   => array(
-                'class'          => 'Knp\Menu\MenuItem',
-                'factoryService' => 'mautic.menu.builder',
-                'factoryMethod'  => 'mainMenu',
-                'tag'            => 'knp_menu.menu',
-                'alias'          => 'main'
+                'class'   => 'Knp\Menu\MenuItem',
+                'factory' => array('@mautic.menu.builder', 'mainMenu'),
+                'tag'     => 'knp_menu.menu',
+                'alias'   => 'main',
             ),
             'mautic.menu.admin'                  => array(
-                'class'          => 'Knp\Menu\MenuItem',
-                'factoryService' => 'mautic.menu.builder',
-                'factoryMethod'  => 'adminMenu',
-                'tag'            => 'knp_menu.menu',
-                'alias'          => 'admin'
+                'class'   => 'Knp\Menu\MenuItem',
+                'factory' => array('@mautic.menu.builder', 'adminMenu'),
+                'tag'     => 'knp_menu.menu',
+                'alias'   => 'admin',
             ),
+            // IP Lookup
+            'mautic.ip_lookup.factory' => array(
+                'class'     => 'Mautic\CoreBundle\Factory\IpLookupFactory',
+                'arguments' => array(
+                    '%mautic.ip_lookup_services%',
+                    'monolog.logger.mautic',
+                    'mautic.http.connector',
+                    '%kernel.cache_dir%'
+                )
+            ),
+            'mautic.ip_lookup' => array(
+                'class'     => 'Mautic\CoreBundle\IpLookup\AbstractLookup', // bogus just to make cache compilation happy
+                'factory'   => array('@mautic.ip_lookup.factory', 'getService'),
+                'arguments' => array(
+                    '%mautic.ip_lookup_service%',
+                    '%mautic.ip_lookup_auth%',
+                    '%mautic.ip_lookup_config%',
+                    'mautic.http.connector'
+                )
+            ),
+            // Other
+            'mautic.http.connector' => array(
+                'class'   => 'Joomla\Http\Http',
+                'factory' => array('Joomla\Http\HttpFactory', 'getHttp')
+            ),
+
             'twig.controller.exception.class'    => 'Mautic\CoreBundle\Controller\ExceptionController',
             'monolog.handler.stream.class'       => 'Mautic\CoreBundle\Monolog\Handler\PhpHandler',
+
+            // Twig
+            'templating.twig.extension.slot'    => array(
+                'class' => 'Mautic\CoreBundle\Templating\Twig\Extension\SlotExtension',
+                'arguments' => array(
+                    'mautic.factory'
+                ),
+                'tag' => 'twig.extension'
+            ),
+            'templating.twig.extension.asset'    => array(
+                'class' => 'Mautic\CoreBundle\Templating\Twig\Extension\AssetExtension',
+                'arguments' => array(
+                    'mautic.factory'
+                ),
+                'tag' => 'twig.extension'
+            ),
+
         )
     ),
 
     'ip_lookup_services' => array(
         'freegeoip' => array(
-            'display_name' => 'freegeoip.net',
-            'class'        => 'Mautic\CoreBundle\IpLookup\FreegeoipIpLookup'
+            'display_name' => 'Freegeoip.net',
+            'class'        => 'Mautic\CoreBundle\IpLookup\FreegeoipLookup'
         ),
         'geobytes' => array(
             'display_name' => 'Geobytes',
-            'class'        => 'Mautic\CoreBundle\IpLookup\GeobytesIpLookup'
+            'class'        => 'Mautic\CoreBundle\IpLookup\GeobytesLookup'
         ),
         'geoips' => array(
             'display_name' => 'GeoIPs',
-            'class'        => 'Mautic\CoreBundle\IpLookup\GeoipsIpLookup'
+            'class'        => 'Mautic\CoreBundle\IpLookup\GeoipsLookup'
         ),
         'ipinfodb' => array(
             'display_name' => 'IPInfoDB',
-            'class'        => 'Mautic\CoreBundle\IpLookup\IpinfodbIpLookup'
+            'class'        => 'Mautic\CoreBundle\IpLookup\IpinfodbLookup'
         ),
         'maxmind_country' => array(
             'display_name' => 'MaxMind - Country Geolocation',
-            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindCountryIpLookup'
+            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindCountryLookup'
         ),
         'maxmind_omni' => array(
             'display_name' => 'MaxMind - Insights (formerly Omni)',
-            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindOmniIpLookup'
+            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindOmniLookup'
         ),
         'maxmind_precision' => array(
             'display_name' => 'MaxMind - GeoIP2 Precision',
-            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindPrecisionIpLookup'
+            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindPrecisionLookup'
+        ),
+        'maxmind_download' => array(
+            'display_name' => 'MaxMind - GeoLite2 City Download',
+            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindDownloadLookup'
         ),
         'telize' => array(
             'display_name' => 'Telize',
-            'class'        => 'Mautic\CoreBundle\IpLookup\TelizeIpLookup'
+            'class'        => 'Mautic\CoreBundle\IpLookup\TelizeLookup'
+        ),
+		'ip2loctionlocal'=>array(
+		    'display_name' => 'IP2Location Local Bin File',
+            'class'        => 'Mautic\CoreBundle\IpLookup\IP2LocationBinLookup'
+        ),
+		'ip2loctionapi'=>array(
+		    'display_name' => 'IP2Location Web Service',
+            'class'        => 'Mautic\CoreBundle\IpLookup\IP2LocationAPILookup'
         )
     ),
 
@@ -402,8 +506,9 @@ return array(
         'date_format_short'              => 'D, M d',
         'date_format_dateonly'           => 'F j, Y',
         'date_format_timeonly'           => 'g:i a',
-        'ip_lookup_service'              => 'telize',
+        'ip_lookup_service'              => 'maxmind_download',
         'ip_lookup_auth'                 => '',
+        'ip_lookup_config'               => array(),
         'transifex_username'             => '',
         'transifex_password'             => '',
         'update_stability'               => 'stable',
@@ -411,6 +516,8 @@ return array(
         'cookie_domain'                  => '',
         'cookie_secure'                  => null,
         'cookie_httponly'                => false,
-        'do_not_track_ips'               => null,
+        'do_not_track_ips'               => array(),
+        'link_shortener_url'             => null,
+        'cached_data_timeout'            => 10
     )
 );

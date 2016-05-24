@@ -253,9 +253,10 @@ class StatRepository extends CommonRepository
     {
         $query = $this->createQueryBuilder('s');
 
-        $query->select('IDENTITY(s.email) AS email_id, s.id, s.dateRead, s.dateSent, e.name, e.subject, s.isRead, s.isFailed, s.viewedInBrowser, s.retryCount, IDENTITY(s.list) AS list_id, l.name as list_name, s.trackingHash as idHash, s.openDetails')
+        $query->select('IDENTITY(s.email) AS email_id, s.id, s.dateRead, s.dateSent, e.name, e.subject, s.isRead, s.isFailed, s.viewedInBrowser, s.retryCount, IDENTITY(s.list) AS list_id, l.name as list_name, s.trackingHash as idHash, s.openDetails, ec.subject as storedSubject')
             ->leftJoin('MauticEmailBundle:Email', 'e', 'WITH', 'e.id = s.email')
             ->leftJoin('MauticLeadBundle:LeadList', 'l', 'WITH', 'l.id = s.list')
+            ->leftJoin('MauticEmailBundle:Copy', 'ec', 'WITH', 'ec.id = s.storedCopy')
             ->where(
                 $query->expr()->andX(
                     $query->expr()->eq('IDENTITY(s.lead)', $leadId),
@@ -405,53 +406,6 @@ class StatRepository extends CommonRepository
     public function deleteStat($id)
     {
         $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats', array('id' => (int) $id));
-    }
-
-    /**
-     * Fetch stats for some period of time.
-     *
-     * @param $emailIds
-     * @param $fromDate
-     * @param $state
-     *
-     * @return mixed
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    public function getEmailStats($emailIds, $fromDate, $state)
-    {
-        if (!is_array($emailIds)) {
-            $emailIds = array((int) $emailIds);
-        }
-
-        // Load points for selected period
-        $q = $this->createQueryBuilder('s');
-
-        $dateColumn = ($state == 'sent') ? 'dateSent' : 'dateRead';
-
-        $q->select('s.id, 1 as data, s.'.$dateColumn.' as date');
-
-        $q->where(
-            $q->expr()->in('IDENTITY(s.email)', ':emails')
-        )
-            ->setParameter('emails', $emailIds);
-
-        if ($state != 'sent') {
-            $q->andWhere(
-                $q->expr()->eq('s.is'.ucfirst($state), ':true')
-            )
-                ->setParameter('true', true, 'boolean');
-        }
-
-        $q->andwhere(
-            $q->expr()->gte('s.'.$dateColumn, ':date')
-        )
-            ->setParameter('date', $fromDate)
-            ->orderBy('s.'.$dateColumn, 'ASC');
-
-        $stats = $q->getQuery()->getArrayResult();
-
-        return $stats;
     }
 
     /**

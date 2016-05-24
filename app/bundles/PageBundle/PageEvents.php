@@ -79,4 +79,14 @@ final class PageEvents
      * @var string
      */
     const PAGE_POST_DELETE = 'mautic.page_post_delete';
+
+    /**
+     * The mautic.redirect_do_not_track event is thrown when converting email links to trackables/redirectables in order to compile of list of tokens/URLs
+     * to ignore.
+     *
+     * The event listener receives a Mautic\PageBundle\Event\UntrackableUrlsEvent instance.
+     *
+     * @var string
+     */
+    const REDIRECT_DO_NOT_TRACK = 'mautic.redirect_do_not_track';
 }

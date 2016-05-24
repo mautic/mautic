@@ -57,7 +57,7 @@ class AssetRepository extends CommonRepository
         }
 
         if (!$viewOther) {
-            $q->andWhere($q->expr()->eq('IDENTITY(a.createdBy)', ':id'))
+            $q->andWhere($q->expr()->eq('a.createdBy', ':id'))
                 ->setParameter('id', $this->currentUser->getId());
         }
 
@@ -175,26 +175,6 @@ class AssetRepository extends CommonRepository
             'mautic.core.searchcommand.category',
             'mautic.asset.asset.searchcommand.lang'
         );
-    }
-
-    /**
-     * Get a list of popular (by downloads) assets
-     *
-     * @param integer $limit
-     * @return array
-     */
-    public function getPopularAssets($limit = 10)
-    {
-        $q  = $this->createQueryBuilder('a');
-        $q->select("partial a.{id, title, downloadCount}")
-            ->orderBy('a.downloadCount', 'DESC')
-            ->where('a.downloadCount > 0')
-            ->setMaxResults($limit);
-
-        $expr = $this->getPublishedByDateExpression($q, 'a');
-        $q->andWhere($expr);
-
-        return $q->getQuery()->getResult();
     }
 
     /**

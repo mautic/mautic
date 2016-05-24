@@ -75,7 +75,15 @@ class FormSubmitHelper
             '%url%' => $url
         ));
 
-        $content = $factory->getTemplating()->renderResponse('MauticCoreBundle::message.html.php', array(
+        $analytics = $factory->getHelper('template.analytics')->getCode();
+
+        if (! empty($analytics)) {
+            $factory->getHelper('template.assets')->addCustomDeclaration($analytics);
+        }
+
+        $logicalName = $factory->getHelper('theme')->checkForTwigTemplate(':' . $factory->getParameter('theme') . ':message.html.php');
+
+        $content = $factory->getTemplating()->renderResponse($logicalName, array(
             'message'  => $msg,
             'type'     => 'notice',
             'template' => $factory->getParameter('theme')

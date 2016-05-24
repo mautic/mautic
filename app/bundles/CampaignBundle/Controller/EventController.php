@@ -230,6 +230,7 @@ class EventController extends CommonFormController
                             $event['name'] = $this->get('translator')->trans($event['settings']['label']);
                         }
                         $modifiedEvents[$objectId] = $event;
+
                         $session->set('mautic.campaign.' . $campaignId . '.events.modified', $modifiedEvents);
                     } else {
                         $success = 0;

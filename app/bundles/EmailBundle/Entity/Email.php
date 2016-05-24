@@ -191,7 +191,15 @@ class Email extends FormEntity
 
     public function __clone()
     {
-        $this->id = null;
+        $this->id               = null;
+        $this->stats            = new ArrayCollection();
+        $this->sentCount        = 0;
+        $this->readCount        = 0;
+        $this->revision         = 0;
+        $this->variantSentCount = 0;
+        $this->variantStartDate = null;
+        $this->emailType        = null;
+        $this->sessionId        = 'new_' . hash('sha1', uniqid(mt_rand()));
 
         parent::__clone();
     }
@@ -396,7 +404,7 @@ class Email extends FormEntity
         );
 
         $metadata->addConstraint(new Callback(array(
-            'callback' => function ($email, ExecutionContextInterface $context) {
+            'callback' => function (Email $email, ExecutionContextInterface $context) {
                 $type = $email->getEmailType();
                 if ($type == 'list') {
                     $validator  = $context->getValidator();
@@ -420,6 +428,25 @@ class Email extends FormEntity
                         $string = (string) $violations;
                         $context->buildViolation($string)
                             ->atPath('lists')
+                            ->addViolation();
+                    }
+                }
+
+                if ($email->isVariant()) {
+                    // Get a summation of weights
+                    $parent = $email->getVariantParent();
+                    $children = $parent ? $parent->getVariantChildren() : $email->getVariantChildren();
+
+                    $total = 0;
+                    foreach ($children as $child) {
+                        $settings = $child->getVariantSettings();
+                        $total += (int) $settings['weight'];
+                    }
+
+                    if ($total > 100) {
+                        //die(var_dump($context));
+                        $context->buildViolation('mautic.core.variant_weights_invalid')
+                            ->atPath('variantSettings[weight]')
                             ->addViolation();
                     }
                 }
@@ -811,9 +838,11 @@ class Email extends FormEntity
      *
      * @return Email
      */
-    public function addVariantChild (\Mautic\EmailBundle\Entity\Email $variantChildren)
+    public function addVariantChild (Email $variantChildren)
     {
-        $this->variantChildren[] = $variantChildren;
+        if (!$this->variantChildren->contains($variantChildren)) {
+            $this->variantChildren[] = $variantChildren;
+        }
 
         return $this;
     }
@@ -823,7 +852,7 @@ class Email extends FormEntity
      *
      * @param \Mautic\EmailBundle\Entity\Email $variantChildren
      */
-    public function removeVariantChild (\Mautic\EmailBundle\Entity\Email $variantChildren)
+    public function removeVariantChild (Email $variantChildren)
     {
         $this->variantChildren->removeElement($variantChildren);
     }
@@ -845,7 +874,7 @@ class Email extends FormEntity
      *
      * @return Email
      */
-    public function setVariantParent (\Mautic\EmailBundle\Entity\Email $variantParent = null)
+    public function setVariantParent (Email $variantParent = null)
     {
         $this->isChanged('variantParent', $variantParent);
         $this->variantParent = $variantParent;
