@@ -28,6 +28,10 @@ return array(
                 'defaults'   => array(
                     'objectModel' => ''
                 )
+            ),
+            'mautic_core_file_action' => array(
+                'path'       => '/file/{objectAction}/{objectId}',
+                'controller' => 'MauticCoreBundle:File:execute'
             )
         ),
         'public' => array(
