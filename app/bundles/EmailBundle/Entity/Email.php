@@ -31,6 +31,7 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Mautic\FeedBundle\Entity\Feed;
 
 /**
  * Class Email.
@@ -172,6 +173,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var
      */
     private $sessionId;
+
+    /**
+     * @var Feed
+     */
+    private $feed;
 
     public function __clone()
     {
@@ -319,6 +325,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->addInverseJoinColumn('asset_id', 'id', false, false, 'CASCADE')
             ->addJoinColumn('email_id', 'id', false, false, 'CASCADE')
             ->fetchExtraLazy()
+            ->build();
+
+        $builder->createOneToOne('feed', 'Mautic\FeedBundle\Entity\Feed')
+            ->mappedBy('email')
             ->build();
     }
 
@@ -1048,4 +1058,16 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             }
         }
     }
+
+    public function getFeed()
+    {
+        return $this->feed;
+    }
+
+    public function setFeed(Feed $feed)
+    {
+        $this->feed = $feed;
+        return $this;
+    }
+
 }
