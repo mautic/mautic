@@ -41,6 +41,9 @@ mQuery( document ).ajaxStop(function(event) {
 });
 
 mQuery( document ).ready(function() {
+    // Set the Froala license key
+    mQuery.FroalaEditor.DEFAULTS.key = 'MCHCPd1XQVZFSHSd1C==';
+
     if (typeof mauticContent !== 'undefined') {
         mQuery("html").Core({
             console: false
@@ -538,41 +541,19 @@ var Mautic = {
 
                     var textarea = mQuery(this);
 
-                    if (mQuery(this).hasClass('editor-builder-tokens')) {
-
+                    if (textarea.hasClass('editor-builder-tokens')) {
                         textarea.on('froalaEditor.initialized', function (e, editor) {
-                            mQuery.ajax({
-                                url: mauticAjaxUrl,
-                                data: 'action=' + textarea.attr('data-token-callback'),
-                                success: function (response) {
-                                    if (typeof response.tokens === 'object') {
-                                    console.log('success', response.tokens, typeof response.tokens === 'object');
-                                        editor.$el.atwho({
-                                            at: textarea.attr('data-token-activator'),
-                                            displayTpl: '<li>${name} <small>${id}</small></li>',
-                                            insertTpl: "{${id}}",
-                                            editableAtwhoQueryAttrs: {"data-fr-verified": true},
-                                            data: mQuery.map(response.tokens, function(value, i) {
-                                                console.log({'id':i, 'name':value});
-                                                return {'id':i, 'name':value};
-                                            })
-                                        });
-                                    }
-
-                                },
-                                error: function (request, textStatus, errorThrown) {
-                                    Mautic.processAjaxError(request, textStatus, errorThrown);
-                                }
-                            });
-                            
+                            Mautic.initAtWho(editor, textarea.attr('data-token-callback'));
                         });
                     }
 
-                    textarea.froalaEditor();
-
-                    mQuery('body').on('mouseup', '.atwho-view-ul li', function (e) {
-                        e.stopPropagation();
+                    textarea.froalaEditor({
+                        enter: mQuery.FroalaEditor.ENTER_BR
                     });
+
+                    // mQuery('body').on('mouseup', '.atwho-view-ul li', function (e) {
+                    //     e.stopPropagation();
+                    // });
 
                 });
             }
@@ -685,6 +666,36 @@ var Mautic = {
         if ((response && typeof response.stopPageLoading != 'undefined' && response.stopPageLoading) || container == '#app-content' || container == '.page-list') {
             Mautic.stopPageLoadingBar();
         }
+    },
+
+    /**
+     * Initialize AtWho dropdown in a Froala editor.
+     *
+     * @param Froala editor object
+     * @param ajax callback to get the tokens
+     */
+    initAtWho: function(editor, callback) {
+        mQuery.ajax({
+            url: mauticAjaxUrl,
+            data: 'action=' + callback,
+            success: function (response) {
+                if (typeof response.tokens === 'object') {
+                    editor.$el.atwho({
+                        at: '{',
+                        displayTpl: '<li>${name} <small>${id}</small></li>',
+                        insertTpl: "${id}",
+                        editableAtwhoQueryAttrs: {"data-fr-verified": true},
+                        data: mQuery.map(response.tokens, function(value, i) {
+                            return {'id':i, 'name':value};
+                        })
+                    });
+                }
+
+            },
+            error: function (request, textStatus, errorThrown) {
+                Mautic.processAjaxError(request, textStatus, errorThrown);
+            }
+        });
     },
 
     /**
