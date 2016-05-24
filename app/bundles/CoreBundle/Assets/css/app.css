@@ -352,7 +352,7 @@ body > #app-wrapper {
 }
 .app-sidebar {
   position: fixed;
-  z-index: 990;
+  z-index: 0;
   top: 0;
   bottom: 0;
 }
