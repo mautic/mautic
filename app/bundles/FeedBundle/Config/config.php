@@ -9,6 +9,11 @@
 
 return array(
     'services' => array(
+        'events' => array(
+            'mautic.feed.emailbundle.subscriber' => array(
+                'class' => 'Mautic\FeedBundle\EventListener\EmailSubscriber'
+            )
+        ),
         'other' => array(
             'mautic.helper.feed' => array(
                 'class' => 'Mautic\FeedBundle\Helper\FeedHelper',
