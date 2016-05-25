@@ -30,18 +30,25 @@ class AjaxController extends CommonController
 {
 
     /**
-     * @param array $dataArray
+     * @param array   $dataArray
+     * @param integer $statusCoce
+     * @param boolean $addIgnoreWdt
      *
      * @return JsonResponse
      * @throws \Exception
      */
-    protected function sendJsonResponse($dataArray, $addIgnoreWdt = true)
+    protected function sendJsonResponse($dataArray, $statusCode = null, $addIgnoreWdt = true)
     {
         $response = new JsonResponse();
 
         if ($this->factory->getEnvironment() == 'dev' && $addIgnoreWdt) {
             $dataArray['ignore_wdt'] = 1;
         }
+
+        if ($statusCode !== null) {
+            $response->setStatusCode($statusCode);
+        }
+
         $response->setData($dataArray);
 
         return $response;

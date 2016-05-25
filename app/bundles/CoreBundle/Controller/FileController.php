@@ -10,12 +10,27 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Helper\InputHelper;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class FileController
  */
 class FileController extends AjaxController
 {
+    protected $imageMimes = array(
+        'image/gif',
+        'image/jpeg',
+        'image/pjpeg',
+        'image/jpeg',
+        'image/pjpeg',
+        'image/png',
+        'image/x-png'
+    );
+
+    protected $response = array();
+
+    protected $statusCode = Response::HTTP_OK;
+
     /**
      * Uploads a file
      *
@@ -24,18 +39,19 @@ class FileController extends AjaxController
     public function uploadAction()
     {
         $mediaDir = $this->getMediaAbsolutePath();
-
-        foreach ($this->request->files as $file) {
-            // @todo check file extension
-            $fileName = md5(uniqid()).'.'.$file->guessExtension();
-            $file->move($mediaDir, $fileName);
+        if (!isset($this->response['error'])) {
+            foreach ($this->request->files as $file) {
+                if (in_array($file->getMimeType(), $this->imageMimes)) {
+                    $fileName = md5(uniqid()).'.'.$file->guessExtension();
+                    $file->move($mediaDir, $fileName);
+                    $this->response['link'] = $this->getMediaUrl().'/'.$fileName;
+                } else {
+                    $this->response['error'] = 'The uploaded image does not have an allowed mime type';
+                }
+            }
         }
 
-        return $this->sendJsonResponse(
-            array(
-                'link' => $this->getMediaUrl().'/'.$fileName
-            )
-        );
+        return $this->sendJsonResponse($this->response, $this->statusCode);
     }
 
     /**
@@ -45,24 +61,14 @@ class FileController extends AjaxController
      */
     public function listAction()
     {
-        $fnames   = scandir($this->getMediaAbsolutePath());
-        $response = array();
-        $mimes    = array(
-            'image/gif',
-            'image/jpeg',
-            'image/pjpeg',
-            'image/jpeg',
-            'image/pjpeg',
-            'image/png',
-            'image/x-png'
-        );
+        $fnames = scandir($this->getMediaAbsolutePath());
 
         if ($fnames) {
             foreach ($fnames as $name) {
                 $imagePath = $this->getMediaAbsolutePath().'/'.$name;
-                $imageUrl = $this->getMediaUrl().'/'.$name;
-                if (!is_dir($name) && in_array(mime_content_type($imagePath), $mimes)) {
-                    $response[] = array(
+                $imageUrl  = $this->getMediaUrl().'/'.$name;
+                if (!is_dir($name) && in_array(mime_content_type($imagePath), $this->imageMimes)) {
+                    $this->response[] = array(
                         'url'   => $imageUrl,
                         'thumb' => $imageUrl,
                         'name'  => $name
@@ -70,10 +76,10 @@ class FileController extends AjaxController
                 }
             }
         } else {
-            $response['error'] = 'Images folder does not exist!';
+            $this->response['error'] = 'Images folder does not exist!';
         }
 
-        return $this->sendJsonResponse($response, false);
+        return $this->sendJsonResponse($this->response, $this->statusCode, false);
     }
 
     /**
@@ -88,15 +94,17 @@ class FileController extends AjaxController
         $imagePath = $this->getMediaAbsolutePath().'/'.basename($src);
 
         if (!file_exists($imagePath)) {
-            $response['error'] = 'File does not exist';
+            $this->response['error'] = 'File does not exist';
+            $this->statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
         } elseif (!is_writable($imagePath)) {
-            $response['error'] = 'File is not writable';
+            $this->response['error'] = 'File is not writable';
+            $this->statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
         } else {
             unlink($imagePath);
-            $response['deleted'] = true;
+            $this->response['deleted'] = true;
         }
 
-        return $this->sendJsonResponse($response);
+        return $this->sendJsonResponse($this->response, $this->statusCode);
     }
 
 
@@ -111,7 +119,13 @@ class FileController extends AjaxController
         $mediaDir = realpath($mediaDirRaw);
 
         if ($mediaDir === false) {
-            // @todo media dir does not exist
+            $this->response['error'] = 'Media dir does not exist';
+            $this->statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
+        }
+
+        if (is_writable($mediaDir) === false) {
+            $this->response['error'] = 'Media dir is not writable';
+            $this->statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
         }
 
         return $mediaDir;
