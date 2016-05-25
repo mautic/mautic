@@ -35,11 +35,11 @@ class AjaxController extends CommonController
      * @return JsonResponse
      * @throws \Exception
      */
-    protected function sendJsonResponse($dataArray)
+    protected function sendJsonResponse($dataArray, $addIgnoreWdt = true)
     {
         $response = new JsonResponse();
 
-        if ($this->factory->getEnvironment() == 'dev') {
+        if ($this->factory->getEnvironment() == 'dev' && $addIgnoreWdt) {
             $dataArray['ignore_wdt'] = 1;
         }
         $response->setData($dataArray);

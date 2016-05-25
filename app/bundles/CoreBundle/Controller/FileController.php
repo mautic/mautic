@@ -21,12 +21,7 @@ class FileController extends AjaxController
      */
     public function uploadAction()
     {
-        $mediaDirRaw = $this->container->getParameter('kernel.root_dir').'/../'.$this->factory->getParameter('image_path');
-        $mediaDir = realpath($mediaDirRaw);
-
-        if ($mediaDir === false) {
-            // @todo media dir does not exist
-        }
+        $mediaDir = $this->getMediaAbsolutePath();
 
         foreach ($this->request->files as $file) {
             // @todo check file extension
@@ -36,8 +31,77 @@ class FileController extends AjaxController
 
         return $this->sendJsonResponse(
             array(
-                'link' => $this->request->getScheme() . '://' . $this->request->getHttpHost() . $this->request->getBasePath().'/'.$this->factory->getParameter('image_path').'/'.$fileName
+                'link' => $this->getMediaUrl().'/'.$fileName
             )
         );
+    }
+
+    /**
+     * List the files in /media directory
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function listAction()
+    {
+        $fnames   = scandir($this->getMediaAbsolutePath());
+        $response = array();
+        $mimes    = array(
+            'image/gif',
+            'image/jpeg',
+            'image/pjpeg',
+            'image/jpeg',
+            'image/pjpeg',
+            'image/png',
+            'image/x-png'
+        );
+
+        if ($fnames) {
+            foreach ($fnames as $name) {
+                $imagePath = $this->getMediaAbsolutePath().'/'.$name;
+                $imageUrl = $this->getMediaUrl().'/'.$name;
+                if (!is_dir($name) && in_array(mime_content_type($imagePath), $mimes)) {
+                    $response[] = array(
+                        'url'   => $imageUrl,
+                        'thumb' => $imageUrl,
+                        'name'  => $name
+                    );
+                }
+            }
+        } else {
+            $response['error'] = 'Images folder does not exist!';
+        }
+
+        return $this->sendJsonResponse($response, false);
+    }
+
+
+    /**
+     * Get the Media directory full file system path
+     *
+     * @return string
+     */
+    public function getMediaAbsolutePath()
+    {
+        $mediaDirRaw = $this->container->getParameter('kernel.root_dir').'/../'.$this->factory->getParameter('image_path');
+        $mediaDir = realpath($mediaDirRaw);
+
+        if ($mediaDir === false) {
+            // @todo media dir does not exist
+        }
+
+        return $mediaDir;
+    }
+
+    /**
+     * Get the Media directory full file system path
+     *
+     * @return string
+     */
+    public function getMediaUrl()
+    {
+        return $this->request->getScheme().'://'
+            .$this->request->getHttpHost()
+            .$this->request->getBasePath().'/'
+            .$this->factory->getParameter('image_path');
     }
 }

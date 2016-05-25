@@ -550,6 +550,7 @@ var Mautic = {
                     textarea.froalaEditor({
                         enter: mQuery.FroalaEditor.ENTER_BR,
                         imageUploadURL: mauticBaseUrl + 's/file/upload',
+                        imageManagerLoadURL: mauticBaseUrl + 's/file/list'
                     });
 
                     // mQuery('body').on('mouseup', '.atwho-view-ul li', function (e) {
