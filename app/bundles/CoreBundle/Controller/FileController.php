@@ -9,6 +9,8 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CoreBundle\Helper\InputHelper;
+
 /**
  * Class FileController
  */
@@ -72,6 +74,29 @@ class FileController extends AjaxController
         }
 
         return $this->sendJsonResponse($response, false);
+    }
+
+    /**
+     * Delete a file from /media directory
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function deleteAction()
+    {
+        $src       = InputHelper::clean($this->request->request->get('src'));
+        $response  = array('deleted' => false);
+        $imagePath = $this->getMediaAbsolutePath().'/'.basename($src);
+
+        if (!file_exists($imagePath)) {
+            $response['error'] = 'File does not exist';
+        } elseif (!is_writable($imagePath)) {
+            $response['error'] = 'File is not writable';
+        } else {
+            unlink($imagePath);
+            $response['deleted'] = true;
+        }
+
+        return $this->sendJsonResponse($response);
     }
 
 
