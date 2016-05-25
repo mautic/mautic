@@ -448,7 +448,7 @@ class AssetsHelper extends CoreAssetsHelper
             $plugins . 'code_beautifier.js?v' . $this->version,
             $plugins . 'code_view.js?v' . $this->version,
             $plugins . 'colors.js?v' . $this->version,
-            $plugins . 'file.js?v' . $this->version,
+            // $plugins . 'file.js?v' . $this->version,  // @todo
             $plugins . 'font_family.js?v' . $this->version,
             $plugins . 'font_size.js?v' . $this->version,
             $plugins . 'fullscreen.js?v' . $this->version,
@@ -482,7 +482,7 @@ class AssetsHelper extends CoreAssetsHelper
             $base . 'froala_style.css?v' . $this->version,
             $plugins . 'code_view.css?v' . $this->version,
             $plugins . 'colors.css?v' . $this->version,
-            $plugins . 'file.css?v' . $this->version,
+            // $plugins . 'file.css?v' . $this->version,
             $plugins . 'fullscreen.css?v' . $this->version,
             $plugins . 'image.css?v' . $this->version,
             $plugins . 'image_manager.css?v' . $this->version,
