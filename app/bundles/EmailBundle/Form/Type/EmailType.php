@@ -74,6 +74,55 @@ class EmailType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('email.email', $options));
 
+        //For feed
+        $builder->add(
+            'feed_url',
+            'text',
+            array(
+                'label'      => 'Feed URL',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control feed_url'),
+                'mapped' => false,
+                'required' => false
+            )
+        );
+        $builder->add(
+            'feed_item_count',
+            'number',
+            array(
+                'label'      => 'Number of items per mail',
+                'label_attr' => array('class' => 'control-label feed_conditional_appear'),
+                'attr'       => array('class' => 'form-control feed_conditional_appear'),
+                'mapped' => false,
+                'required' => false
+            )
+        );
+        $builder->add(
+            'periodicity_next_shoot',
+            'datetime',
+            array(
+                'widget' => 'single_text',
+                'label'      => 'First send date & time',
+                'label_attr' => array('class' => 'control-label feed_conditional_appear'),
+                'attr'       => array('class' => 'form-control feed_conditional_appear'),
+                'mapped' => false,
+                'required' => false,
+                'format' => 'dd/MM/yyyy hh:mm',
+                'data' => new \DateTime('now')
+            )
+        );
+        $builder->add(
+            'periodicity_interval',
+            'number',
+            array(
+                'label'      => 'Periodicity (number of day)',
+                'label_attr' => array('class' => 'control-label feed_conditional_appear'),
+                'attr'       => array('class' => 'form-control feed_conditional_appear'),
+                'mapped' => false,
+                'required' => false
+            )
+        );
+
         $builder->add(
             'name',
             'text',
