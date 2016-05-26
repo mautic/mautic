@@ -17,11 +17,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
+use Mautic\CoreBundle\Command\ModeratedCommand;
 
 /**
  * CLI command to generate Segment Email
  */
-class EmailGenerateCommand extends ContainerAwareCommand
+class EmailGenerateCommand extends ModeratedCommand
 {
 
     /**
@@ -33,7 +34,8 @@ class EmailGenerateCommand extends ContainerAwareCommand
     {
         $this->setName('mautic:email:generate')
             ->setDescription('generate Segment Email')
-            ->addOption('--id', null, InputOption::VALUE_REQUIRED, 'Email ID');
+            ->addOption('--id', null, InputOption::VALUE_REQUIRED, 'Email ID')
+            ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
         // ->addOption('--time-limit', null, InputOption::VALUE_OPTIONAL, 'Limit the number of seconds per batch. Defaults to value set in config.')
         // ->addOption('--do-not-clear', null, InputOption::VALUE_NONE, 'By default, failed messages older than the --recover-timeout setting will be attempted one more time then deleted if it fails again. If this is set, sending of failed messages will continue to be attempted.')
         // ->addOption('--recover-timeout', null, InputOption::VALUE_OPTIONAL, 'Sets the amount of time in seconds before attempting to resend failed messages. Defaults to value set in config.')
@@ -55,6 +57,8 @@ class EmailGenerateCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
 
+
+
         $options = $input->getOptions();
         $objectId=$options['id'];
         $factory = $this->getContainer()->get('mautic.factory');
@@ -68,80 +72,32 @@ class EmailGenerateCommand extends ContainerAwareCommand
             return 0;
         }
 
+        if (!$this->checkRunStatus($input, $output, ($objectId) ? $objectId : 'all')) {
+            return 0;
+        }
         // make sure email and category are published
         $category = $entity->getCategory();
         $catPublished = (!empty($category)) ? $category->isPublished() : true;
         $published = $entity->isPublished();
 
-        if (!$catPublished || !$published) {
+
+        if (!$catPublished || !$published ) {
+            return 0;
+        }
+        if (!is_null($entity->getFeed()) && $entity->getFeed()->getSnapshots()->last()->isExpired()===true){
             return 0;
         }
 
-//         die('');
-        $action = $model->generateUrl('mautic_email_action', array(
-            'objectAction' => 'send',
-            'objectId' => $objectId
-        ));
         $pending = $model->getPendingLeads($entity, null, true);
+        $output->writeln('<info>There is '.$pending.' mails to generate</info>');
+        $sendStat=$model->sendEmailToLists($entity);
+        $output->writeln('<info>'.$sendStat[0].' mails sent</info>');
+        $output->writeln('<info>'.$pending[0].' mails failed</info>');
 
-        $form = $this->get('form.factory')->create('batch_send', array(), array(
-            'action' => $action
-        ));
-        $complete = $this->request->request->get('complete', false);
+        $this->completeRun();
+
+        return 0;
 
 
-        die('');
-        if ($this->request->getMethod() == 'POST' && ($complete || $this->isFormValid($form))) {
-            if (!$complete) {
-                $progress = array(
-                    0,
-                    (int) $pending
-                );
-                $session->set('mautic.email.send.progress', $progress);
-
-                $stats = array(
-                    'sent' => 0,
-                    'failed' => 0,
-                    'failedRecipients' => array()
-                );
-                $session->set('mautic.email.send.stats', $stats);
-
-                $status = 'inprogress';
-                $batchlimit = $form['batchlimit']->getData();
-
-                $session->set('mautic.email.send.active', false);
-            } else {
-                $stats = $session->get('mautic.email.send.stats');
-                $progress = $session->get('mautic.email.send.progress');
-                $batchlimit = 100;
-                $status = (!empty($stats['failed'])) ? 'with_errors' : 'success';
-            }
-
-            $contentTemplate = 'MauticEmailBundle:Send:progress.html.php';
-            $viewParameters = array(
-                'progress' => $progress,
-                'stats' => $stats,
-                'status' => $status,
-                'email' => $entity,
-                'batchlimit' => $batchlimit
-            );
-        } else {
-            // process and send
-            $contentTemplate = 'MauticEmailBundle:Send:form.html.php';
-            $viewParameters = array(
-                'form' => $form->createView(),
-                'email' => $entity,
-                'pending' => $pending
-            );
-        }
-
-        return $this->delegateView(array(
-            'viewParameters' => $viewParameters,
-            'contentTemplate' => $contentTemplate,
-            'passthroughVars' => array(
-                'mauticContent' => 'emailSend',
-                'route' => $action
-            )
-        ));
     }
 }

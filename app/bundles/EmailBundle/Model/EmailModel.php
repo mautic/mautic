@@ -853,7 +853,8 @@ class EmailModel extends FormModel
     public function getPendingLeads(Email $email, $listId = null, $countOnly = false, $limit = null, $includeVariants = true)
     {
         $variantIds = ($includeVariants) ? $email->getRelatedEntityIds() : null;
-        $total      = $this->getRepository()->getEmailPendingLeads($email->getId(), $variantIds, $listId, $countOnly, $limit);
+        $snapshotId = is_null($email->getFeed()) ? null : $email->getFeed()->getSnapshots()->last()->getId();
+        $total = $this->getRepository()->getEmailPendingLeads($email->getId(), $snapshotId, $variantIds, $listId, $countOnly, $limit);
 
         return $total;
     }
