@@ -36,6 +36,11 @@ class Snapshot
     private $feed;
 
     /**
+     * @var bool
+     */
+    private $isExpired = false;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -56,6 +61,10 @@ class Snapshot
 
         $builder->createManyToOne('feed', 'Feed')
             ->addJoinColumn('feed_id', 'id', false)
+            ->build();
+
+        $builder->createField('isExpired', 'boolean')
+            ->columnName('is_expired')
             ->build();
 
     }
@@ -102,6 +111,22 @@ class Snapshot
     {
         $this->feed = $feed;
         return $this;
+    }
+
+    public function getIsExpired()
+    {
+        return $this->isExpired;
+    }
+
+    public function setIsExpired($isExpired)
+    {
+        $this->isExpired = $isExpired;
+        return $this;
+    }
+
+    public function isExpired()
+    {
+        return $this->getIsExpired();
     }
 
 }
