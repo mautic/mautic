@@ -12,6 +12,7 @@ namespace Mautic\FeedBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class Feed
 {
@@ -37,6 +38,16 @@ class Feed
     private $email;
 
     /**
+     * @var ArrayCollection
+     */
+    private $snapshots;
+
+    public function __construct()
+    {
+        $this->snapshots = new ArrayCollection();
+    }
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -58,6 +69,10 @@ class Feed
 
         $builder->createField('itemCount', 'integer')
             ->columnName('item_count')
+            ->build();
+
+        $builder->createOneToMany('snapshots', 'Snapshot')
+            ->mappedBy('feed')
             ->build();
     }
 
@@ -105,5 +120,9 @@ class Feed
         return $this;
     }
 
+    public function getSnapshots()
+    {
+        return $this->snapshots;
+    }
 
 }

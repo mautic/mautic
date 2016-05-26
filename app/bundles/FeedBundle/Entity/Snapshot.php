@@ -10,7 +10,6 @@
 namespace Mautic\FeedBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\EmailBundle\Entity\Email;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class Snapshot
@@ -39,26 +38,70 @@ class Snapshot
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('feed_snapshots');
 
-//         $builder->addId();
+        $builder->addId();
 
-//         $builder->createOneToOne('email', 'Mautic\EmailBundle\Entity\Email')
-//             ->inversedBy('feed')
-//             ->addJoinColumn('email_id', 'id', false)
-//             ->build();
+        $builder->createField('date', 'datetime')
+            ->columnName('date')
+            ->build();
 
-//         $builder->createField('feedUrl', 'string')
-//             ->columnName('feed_url')
-//             ->build();
+        $builder->createField('xmlString', 'text')
+            ->columnName('xml_string')
+            ->build();
 
-//         $builder->createField('itemCount', 'integer')
-//             ->columnName('item_count')
-//             ->build();
+        $builder->createManyToOne('feed', 'Feed')
+            ->addJoinColumn('feed_id', 'id', false)
+            ->build();
+
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    public function getDate()
+    {
+        return $this->date;
+    }
+
+    public function setDate(\DateTime $date)
+    {
+        $this->date = $date;
+        return $this;
+    }
+
+    public function getXmlString()
+    {
+        return $this->xmlString;
+    }
+
+    public function setXmlString($xmlString)
+    {
+        $this->xmlString = $xmlString;
+        return $this;
+    }
+
+    public function getFeed()
+    {
+        return $this->feed;
+    }
+
+    public function setFeed(Feed $feed)
+    {
+        $this->feed = $feed;
+        return $this;
     }
 
 }
