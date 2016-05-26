@@ -23,7 +23,6 @@ use Mautic\EmailBundle\Entity\Email;
  */
 class Redirect extends FormEntity
 {
-
     /**
      * @var int
      */
@@ -53,13 +52,6 @@ class Redirect extends FormEntity
      * @var ArrayCollection
      */
     private $trackables;
-
-    /**
-     * @deprecated to be removed in 2.0
-     *
-     * @var
-     */
-    private $email;
 
     /**
      * Redirect constructor.
@@ -98,9 +90,6 @@ class Redirect extends FormEntity
             ->mappedBy('redirect')
             ->fetchExtraLazy()
             ->build();
-
-        // @deprecated to be removed in 2.0
-        $builder->addNamedField('email', 'integer', 'email_id', true);
     }
 
     /**
@@ -234,34 +223,6 @@ class Redirect extends FormEntity
     public function setTrackables($trackables)
     {
         $this->trackables = $trackables;
-
-        return $this;
-    }
-
-    /**
-     * @deprecated to be removed in 2.0
-     *
-     * @return mixed
-     */
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    /**
-     * @deprecated to be removed in 2.0
-     *
-     * @param mixed $email
-     *
-     * @return Redirect
-     */
-    public function setEmail($email)
-    {
-        if ($email instanceof Email) {
-            $email = $email->getId();
-        }
-        
-        $this->email = $email;
 
         return $this;
     }

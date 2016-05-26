@@ -977,7 +977,7 @@ class LeadModel extends FormModel
      * @param Lead         $lead
      * @param string|array $channel  If an array with an ID, use the structure ['email' => 123]
      * @param string       $comments
-     * @param int          $reason
+     * @param int          $reason   Must be a class constant from the DoNotContact class.
      * @param bool         $flush
      *
      * @return boolean If a DNC entry is added or updated, returns true. If a DNC is already present
@@ -986,7 +986,6 @@ class LeadModel extends FormModel
     public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $flush = true)
     {
         $isContactable = $this->isContactable($lead, $channel);
-        $reason = $this->determineReasonFromTag($reason);
 
         // If they don't have a DNC entry yet
         if ($isContactable === DoNotContact::IS_CONTACTABLE) {
@@ -1042,87 +1041,6 @@ class LeadModel extends FormModel
                     }
 
                     return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * This method will translate text reason tags into DNC reason codes.
-     *
-     * @param string|int $tag
-     *
-     * @return int
-     *
-     * @see \Mautic\LeadBundle\Entity\DoNotContact This method can return boolean false, so be
-     * sure to always compare the return value against the class constants of DoNotContact
-     *
-     * @deprecated - No replacement. Remove in 2.0
-     */
-    private function determineReasonFromTag($tag)
-    {
-        switch ($tag) {
-            case DoNotContact::UNSUBSCRIBED:
-            case 'unsubscribed':
-                return DoNotContact::UNSUBSCRIBED;
-
-            case DoNotContact::BOUNCED:
-            case 'bounced':
-                return DoNotContact::BOUNCED;
-
-            case DoNotContact::MANUAL:
-            case 'manual':
-                return DoNotContact::MANUAL;
-        }
-
-        return DoNotContact::IS_CONTACTABLE;
-    }
-
-    /**
-     * Add a do not contact entry for the lead
-     *
-     * @param Lead       $lead
-     * @param string     $emailAddress
-     * @param string     $reason
-     * @param bool|true  $persist
-     * @param bool|false $manual
-     *
-     * @return DoNotContact|bool
-     * @throws \Doctrine\DBAL\DBALException
-     *
-     * @deprecated Use addDncForLead() instead. To be removed in 2.0.
-     */
-    public function setDoNotContact(Lead $lead, $emailAddress = '', $reason = '', $persist = true, $manual = false)
-    {
-        return $this->unsubscribeLead($lead, $reason, $persist, $manual);
-    }
-
-    /**
-     * @param Lead       $lead
-     * @param string     $comments
-     * @param bool|true  $persist
-     * @param bool|false $manual
-     *
-     * @return bool|DoNotContact
-     *
-     * @deprecated Use addDncForLead() instead. To be removed in 2.0.
-     */
-    public function unsubscribeLead(Lead $lead, $comments = null, $persist = true, $manual = false)
-    {
-        $comments = $comments ?: $this->translator->trans('mautic.email.dnc.unsubscribed');
-
-        $reason = $manual ? DoNotContact::MANUAL : DoNotContact::UNSUBSCRIBED;
-
-        $this->addDncForLead($lead, 'email', $comments, $reason);
-
-        // This is here to duplicate previous behavior for BC
-        if ($persist !== true) {
-            /** @var DoNotContact $dnc */
-            foreach ($lead->getDoNotContact() as $dnc) {
-                if ($dnc->getChannel() === 'email') {
-                    return $dnc;
                 }
             }
         }
@@ -1239,7 +1157,7 @@ class LeadModel extends FormModel
 
                 // The email must be set for successful unsubscribtion
                 $lead->addUpdatedField('email', $data[$fields['email']]);
-                $this->unsubscribeLead($lead, $reason, false);
+                $this->addDncForLead($lead, 'email', $reason, DoNotContact::MANUAL);
             }
         }
         unset($fields['doNotEmail']);

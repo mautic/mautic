@@ -82,8 +82,8 @@ if ($tmpl == 'index')
         "totalItems"      => $totalItems,
         "page"            => $page,
         "limit"           => $limit,
-        "menuLinkId"      => 'mautic_lead_index',
-        "baseUrl"         => $view['router']->generate('mautic_lead_index'),
+        "menuLinkId"      => 'mautic_contact_index',
+        "baseUrl"         => $view['router']->generate('mautic_contact_index'),
         "tmpl"            => $indexMode,
         'sessionVar'      => 'lead'
     )); ?>

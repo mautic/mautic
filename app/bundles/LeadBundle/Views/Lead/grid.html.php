@@ -28,7 +28,7 @@ if ($tmpl == 'index')
 <?php if (count($items)): ?>
     <div class="panel-footer">
         <?php
-        $link = (isset($link))? $link : 'mautic_lead_index';
+        $link = (isset($link))? $link : 'mautic_contact_index';
         echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
             "totalItems"      => $totalItems,
             "page"            => $page,

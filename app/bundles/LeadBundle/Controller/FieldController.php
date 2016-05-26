@@ -73,14 +73,14 @@ class FieldController extends FormController
                 $lastPage = (ceil($count / $limit)) ?: 1;
             }
             $session->set('mautic.leadfield.page', $lastPage);
-            $returnUrl = $this->generateUrl('mautic_leadfield_index', array('page' => $lastPage));
+            $returnUrl = $this->generateUrl('mautic_contactfield_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => array('page' => $lastPage),
                 'contentTemplate' => 'MauticLeadBundle:Field:index',
                 'passthroughVars' => array(
-                    'activeLink'    => '#mautic_leadfield_index',
+                    'activeLink'    => '#mautic_contactfield_index',
                     'mauticContent' => 'leadfield'
                 )
             ));
@@ -103,8 +103,8 @@ class FieldController extends FormController
             ),
             'contentTemplate' => 'MauticLeadBundle:Field:list.html.php',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_leadfield_index',
-                'route'         => $this->generateUrl('mautic_leadfield_index', array('page' => $page)),
+                'activeLink'    => '#mautic_contactfield_index',
+                'route'         => $this->generateUrl('mautic_contactfield_index', array('page' => $page)),
                 'mauticContent' => 'leadfield'
             )
         ));
@@ -125,8 +125,8 @@ class FieldController extends FormController
         $field     = new LeadField();
         $model      = $this->getModel('lead.field');
         //set the return URL for post actions
-        $returnUrl  = $this->generateUrl('mautic_leadfield_index');
-        $action     = $this->generateUrl('mautic_leadfield_action', array('objectAction' => 'new'));
+        $returnUrl  = $this->generateUrl('mautic_contactfield_index');
+        $action     = $this->generateUrl('mautic_contactfield_action', array('objectAction' => 'new'));
         //get the user form factory
         $form       = $model->createForm($field, $this->get('form.factory'), $action);
 
@@ -154,8 +154,8 @@ class FieldController extends FormController
 
                             $this->addFlash('mautic.core.notice.created', array(
                                 '%name%'      => $field->getLabel(),
-                                '%menu_link%' => 'mautic_leadfield_index',
-                                '%url%'       => $this->generateUrl('mautic_leadfield_action', array(
+                                '%menu_link%' => 'mautic_contactfield_index',
+                                '%url%'       => $this->generateUrl('mautic_contactfield_action', array(
                                     'objectAction' => 'edit',
                                     'objectId'     => $field->getId()
                                 ))
@@ -173,7 +173,7 @@ class FieldController extends FormController
                     'returnUrl'       => $returnUrl,
                     'contentTemplate' => 'MauticLeadBundle:Field:index',
                     'passthroughVars' => array(
-                        'activeLink'    => '#mautic_leadfield_index',
+                        'activeLink'    => '#mautic_contactfield_index',
                         'mauticContent' => 'leadfield'
                     )
                 ));
@@ -188,8 +188,8 @@ class FieldController extends FormController
             ),
             'contentTemplate' => 'MauticLeadBundle:Field:form.html.php',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_leadfield_index',
-                'route'         => $this->generateUrl('mautic_leadfield_action', array('objectAction' => 'new')),
+                'activeLink'    => '#mautic_contactfield_index',
+                'route'         => $this->generateUrl('mautic_contactfield_action', array('objectAction' => 'new')),
                 'mauticContent' => 'leadfield'
             )
         ));
@@ -213,13 +213,13 @@ class FieldController extends FormController
         $field   = $model->getEntity($objectId);
 
         //set the return URL
-        $returnUrl  = $this->generateUrl('mautic_leadfield_index');
+        $returnUrl  = $this->generateUrl('mautic_contactfield_index');
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
             'contentTemplate' => 'MauticLeadBundle:Field:index',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_leadfield_index',
+                'activeLink'    => '#mautic_contactfield_index',
                 'mauticContent' => 'leadfield'
             )
         );
@@ -241,7 +241,7 @@ class FieldController extends FormController
             return $this->isLocked($postActionVars, $field, 'lead.field');
         }
 
-        $action = $this->generateUrl('mautic_leadfield_action', array('objectAction' => 'edit', 'objectId' => $objectId));
+        $action = $this->generateUrl('mautic_contactfield_action', array('objectAction' => 'edit', 'objectId' => $objectId));
         $form   = $model->createForm($field, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
@@ -267,8 +267,8 @@ class FieldController extends FormController
 
                         $this->addFlash('mautic.core.notice.updated',  array(
                             '%name%'      => $field->getLabel(),
-                            '%menu_link%' => 'mautic_leadfield_index',
-                            '%url%'       => $this->generateUrl('mautic_leadfield_action', array(
+                            '%menu_link%' => 'mautic_contactfield_index',
+                            '%url%'       => $this->generateUrl('mautic_contactfield_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $field->getId()
                             ))
@@ -300,7 +300,7 @@ class FieldController extends FormController
             ),
             'contentTemplate' => 'MauticLeadBundle:Field:form.html.php',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_leadfield_index',
+                'activeLink'    => '#mautic_contactfield_index',
                 'route'         => $action,
                 'mauticContent' => 'leadfield'
             )
@@ -345,14 +345,14 @@ class FieldController extends FormController
             return $this->accessDenied();
         }
 
-        $returnUrl = $this->generateUrl('mautic_leadfield_index');
+        $returnUrl = $this->generateUrl('mautic_contactfield_index');
         $flashes   = array();
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
             'contentTemplate' => 'MauticLeadBundle:Field:index',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_leadfield_index',
+                'activeLink'    => '#mautic_contactfield_index',
                 'mauticContent' => 'lead'
             )
         );
@@ -403,14 +403,14 @@ class FieldController extends FormController
             return $this->accessDenied();
         }
 
-        $returnUrl = $this->generateUrl('mautic_leadfield_index');
+        $returnUrl = $this->generateUrl('mautic_contactfield_index');
         $flashes     = array();
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
             'contentTemplate' => 'MauticLeadBundle:Field:index',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_leadfield_index',
+                'activeLink'    => '#mautic_contactfield_index',
                 'mauticContent' => 'lead'
             )
         );

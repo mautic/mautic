@@ -54,100 +54,6 @@ return [
             'mautic_contact_action'           => [
                 'path'       => '/contacts/{objectAction}/{objectId}',
                 'controller' => 'MauticLeadBundle:Lead:execute'
-            ],
-
-            // @todo remove in 2.0 - left here till core references are all updated
-            'mautic_lead_emailtoken_index' => [
-                'path'       => '/contacts/emailtokens/{page}',
-                'controller' => 'MauticLeadBundle:SubscribedEvents\BuilderToken:index'
-            ],
-            'mautic_leadlist_index'        => [
-                'path'       => '/segments/{page}',
-                'controller' => 'MauticLeadBundle:List:index'
-            ],
-            'mautic_leadlist_action'       => [
-                'path'       => '/segments/{objectAction}/{objectId}',
-                'controller' => 'MauticLeadBundle:List:execute'
-            ],
-            'mautic_leadfield_index'       => [
-                'path'       => '/contacts/fields/{page}',
-                'controller' => 'MauticLeadBundle:Field:index'
-            ],
-            'mautic_leadfield_action'      => [
-                'path'       => '/contacts/fields/{objectAction}/{objectId}',
-                'controller' => 'MauticLeadBundle:Field:execute'
-            ],
-            'mautic_lead_index'            => [
-                'path'       => '/contacts/{page}',
-                'controller' => 'MauticLeadBundle:Lead:index'
-            ],
-            'mautic_leadnote_index'        => [
-                'path'         => '/contacts/notes/{leadId}/{page}',
-                'controller'   => 'MauticLeadBundle:Note:index',
-                'defaults'     => [
-                    'leadId' => 0
-                ],
-                'requirements' => [
-                    'leadId' => '\d+'
-                ]
-            ],
-            'mautic_leadnote_action'       => [
-                'path'         => '/contacts/notes/{leadId}/{objectAction}/{objectId}',
-                'controller'   => 'MauticLeadBundle:Note:executeNote',
-                'requirements' => [
-                    'leadId' => '\d+'
-                ]
-            ],
-            'mautic_lead_action'           => [
-                'path'       => '/contacts/{objectAction}/{objectId}',
-                'controller' => 'MauticLeadBundle:Lead:execute'
-            ],
-
-            // @deprecated to be removed in 2.0; left here just in case a URL is hardcoded
-            'mautic_lead_emailtoken_index_bc' => [
-                'path'       => '/leads/emailtokens/{page}',
-                'controller' => 'MauticLeadBundle:SubscribedEvents\BuilderToken:index'
-            ],
-            'mautic_leadlist_index_bc'        => [
-                'path'       => '/leads/lists/{page}',
-                'controller' => 'MauticLeadBundle:List:index'
-            ],
-            'mautic_leadlist_action_bc'       => [
-                'path'       => '/leads/lists/{objectAction}/{objectId}',
-                'controller' => 'MauticLeadBundle:List:execute'
-            ],
-            'mautic_leadfield_index_bc'       => [
-                'path'       => '/leads/fields/{page}',
-                'controller' => 'MauticLeadBundle:Field:index'
-            ],
-            'mautic_leadfield_action_bc'      => [
-                'path'       => '/leads/fields/{objectAction}/{objectId}',
-                'controller' => 'MauticLeadBundle:Field:execute'
-            ],
-            'mautic_lead_index_bc'            => [
-                'path'       => '/leads/{page}',
-                'controller' => 'MauticLeadBundle:Lead:index'
-            ],
-            'mautic_leadnote_index_bc'        => [
-                'path'         => '/leads/notes/{leadId}/{page}',
-                'controller'   => 'MauticLeadBundle:Note:index',
-                'defaults'     => [
-                    'leadId' => 0
-                ],
-                'requirements' => [
-                    'leadId' => '\d+'
-                ]
-            ],
-            'mautic_leadnote_action_bc'       => [
-                'path'         => '/leads/notes/{leadId}/{objectAction}/{objectId}',
-                'controller'   => 'MauticLeadBundle:Note:executeNote',
-                'requirements' => [
-                    'leadId' => '\d+'
-                ]
-            ],
-            'mautic_lead_action_bc'           => [
-                'path'       => '/leads/{objectAction}/{objectId}',
-                'controller' => 'MauticLeadBundle:Lead:execute'
             ]
         ],
         'api'  => [
@@ -187,7 +93,7 @@ return [
                 'path'       => '/contacts/{id}/campaigns',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getCampaigns'
             ],
-            'mautic_api_getsegments'     => [
+            'mautic_api_getcontactssegments'     => [
                 'path'       => '/segments/{id}',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getLists'
             ],
@@ -216,142 +122,6 @@ return [
                 'path'       => '/segments/{id}/contact/remove/{leadId}',
                 'controller' => 'MauticLeadBundle:Api\ListApi:removeLead',
                 'method'     => 'POST'
-            ],
-
-            // @deprecated to be removed in 2.0; left here till routes have been renamed
-            'mautic_api_getleads'          => [
-                'path'       => '/contacts',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getEntities'
-            ],
-            'mautic_api_newlead'           => [
-                'path'       => '/contacts/new',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:newEntity',
-                'method'     => 'POST'
-            ],
-            'mautic_api_getlead'           => [
-                'path'       => '/contacts/{id}',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getEntity'
-            ],
-            'mautic_api_editputlead'       => [
-                'path'       => '/contacts/{id}/edit',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:editEntity',
-                'method'     => 'PUT'
-            ],
-            'mautic_api_editpatchlead'     => [
-                'path'       => '/contacts/{id}/edit',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:editEntity',
-                'method'     => 'PATCH'
-            ],
-            'mautic_api_deletelead'        => [
-                'path'       => '/contacts/{id}/delete',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:deleteEntity',
-                'method'     => 'DELETE'
-            ],
-            'mautic_api_getleadsnotes'     => [
-                'path'       => '/contacts/{id}/notes',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getNotes'
-            ],
-            'mautic_api_getleadscampaigns' => [
-                'path'       => '/contacts/{id}/campaigns',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getCampaigns'
-            ],
-            'mautic_api_getleadslists'     => [
-                'path'       => '/segments/{id}',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getLists'
-            ],
-            'mautic_api_getleadowners'     => [
-                'path'       => '/contacts/list/owners',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getOwners'
-            ],
-            'mautic_api_getleadfields'     => [
-                'path'       => '/contacts/list/fields',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getFields'
-            ],
-            'mautic_api_getleadlists'      => [
-                'path'       => '/contacts/list/segments',
-                'controller' => 'MauticLeadBundle:Api\ListApi:getLists'
-            ],
-            'mautic_api_getlists'          => [
-                'path'       => '/segments',
-                'controller' => 'MauticLeadBundle:Api\ListApi:getLists'
-            ],
-            'mautic_api_listaddlead'       => [
-                'path'       => '/segments/{id}/contact/add/{leadId}',
-                'controller' => 'MauticLeadBundle:Api\ListApi:addLead',
-                'method'     => 'POST'
-            ],
-            'mautic_api_listremovelead'    => [
-                'path'       => '/segments/{id}/contact/remove/{leadId}',
-                'controller' => 'MauticLeadBundle:Api\ListApi:removeLead',
-                'method'     => 'POST'
-            ],
-
-            // @deprecated to be removed in 2.0; left here for hard coded URLs/API libraries
-            'mautic_api_getleads_bc'          => [
-                'path'       => '/leads',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getEntities'
-            ],
-            'mautic_api_newlead_bc'           => [
-                'path'       => '/leads/new',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:newEntity',
-                'method'     => 'POST'
-            ],
-            'mautic_api_getlead_bc'           => [
-                'path'       => '/leads/{id}',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getEntity'
-            ],
-            'mautic_api_editputlead_bc'       => [
-                'path'       => '/leads/{id}/edit',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:editEntity',
-                'method'     => 'PUT'
-            ],
-            'mautic_api_editpatchlead_bc'     => [
-                'path'       => '/leads/{id}/edit',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:editEntity',
-                'method'     => 'PATCH'
-            ],
-            'mautic_api_deletelead_bc'        => [
-                'path'       => '/leads/{id}/delete',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:deleteEntity',
-                'method'     => 'DELETE'
-            ],
-            'mautic_api_getleadsnotes_bc'     => [
-                'path'       => '/leads/{id}/notes',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getNotes'
-            ],
-            'mautic_api_getleadscampaigns_bc' => [
-                'path'       => '/leads/{id}/campaigns',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getCampaigns'
-            ],
-            'mautic_api_getleadslists_bc'     => [
-                'path'       => '/leads/{id}/lists',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getLists'
-            ],
-            'mautic_api_getleadowners_bc'     => [
-                'path'       => '/leads/list/owners',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getOwners'
-            ],
-            'mautic_api_getleadfields_bc'     => [
-                'path'       => '/leads/list/fields',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getFields'
-            ],
-            'mautic_api_getleadlists_bc'      => [
-                'path'       => '/leads/list/lists',
-                'controller' => 'MauticLeadBundle:Api\ListApi:getLists'
-            ],
-            'mautic_api_getlists_bc'          => [
-                'path'       => '/lists',
-                'controller' => 'MauticLeadBundle:Api\ListApi:getLists'
-            ],
-            'mautic_api_listaddlead_bc'       => [
-                'path'       => '/lists/{id}/lead/add/{leadId}',
-                'controller' => 'MauticLeadBundle:Api\ListApi:addLead',
-                'method'     => 'POST'
-            ],
-            'mautic_api_listremovelead_bc'    => [
-                'path'       => '/lists/{id}/lead/remove/{leadId}',
-                'controller' => 'MauticLeadBundle:Api\ListApi:removeLead',
-                'method'     => 'POST'
             ]
         ]
     ],
@@ -361,13 +131,13 @@ return [
                 'mautic.lead.leads' => [
                     'iconClass' => 'fa-user',
                     'access'    => ['lead:leads:viewown', 'lead:leads:viewother'],
-                    'route' => 'mautic_lead_index',
+                    'route' => 'mautic_contact_index',
                     'priority' => 80
                 ],
                 'mautic.lead.list.menu.index'  => [
                     'iconClass' => 'fa-pie-chart',
                     'access'    => ['lead:leads:viewown', 'lead:leads:viewother'],
-                    'route' => 'mautic_leadlist_index',
+                    'route' => 'mautic_segment_index',
                     'priority' => 70
                 ]
             ]
@@ -378,7 +148,7 @@ return [
                 'mautic.lead.field.menu.index' => [
                     'id'        => 'mautic_lead_field',
                     'iconClass' => 'fa-list',
-                    'route'  => 'mautic_leadfield_index',
+                    'route'  => 'mautic_contactfield_index',
                     'access' => 'lead:fields:full'
                 ]
             ]

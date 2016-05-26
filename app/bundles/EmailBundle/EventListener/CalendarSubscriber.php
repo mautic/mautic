@@ -80,7 +80,7 @@ class CalendarSubscriber extends CommonSubscriber
                     $contactName = $this->translator->trans('mautic.lead.lead.anonymous');
                 }
                 $details                = $this->translator->trans('mautic.email.event.sent.direct', array('%contact%' => $contactName));
-                $object['url']          = $router->generate('mautic_lead_action', array('objectAction' => 'view', 'objectId' => $object['lead_id']), true);
+                $object['url']          = $router->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $object['lead_id']), true);
                 $object['attr']         = 'data-toggle="ajax"';
                 $object['title']        = $details;
                 $object['description']  = $details;

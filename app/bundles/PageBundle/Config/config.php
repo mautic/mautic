@@ -32,11 +32,6 @@ return [
                 'path'       => '/r/{redirectId}',
                 'controller' => 'MauticPageBundle:Public:redirect'
             ],
-            // @deprecated; to be removed in 2.0 use mautic_url_redirect instead
-            'mautic_page_trackable' => [
-                'path'       => '/r/{redirectId}',
-                'controller' => 'MauticPageBundle:Public:redirect'
-            ],
             'mautic_page_redirect' => [
                 'path'       => '/redirect/{redirectId}',
                 'controller' => 'MauticPageBundle:Public:redirect'

@@ -54,7 +54,7 @@ class InstallController extends CommonController
             return $this->redirect($this->generateUrl('mautic_dashboard_index'));
         }
 
-        /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
+        /** @var \Mautic\CoreBundle\Configurator\Configurator $configurator */
         $configurator = $this->container->get('mautic.configurator');
         $params       = $configurator->getParameters();
         $step         = $configurator->getStep($index);
@@ -380,7 +380,7 @@ class InstallController extends CommonController
         $application->setAutoExit(false);
         $application->run($input, $output);
 
-        /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
+        /** @var \Mautic\CoreBundle\Configurator\Configurator $configurator */
         $configurator = $this->container->get('mautic.configurator');
 
         $welcomeUrl = $this->generateUrl('mautic_dashboard_index');
@@ -418,7 +418,7 @@ class InstallController extends CommonController
             return false;
         }
 
-        /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
+        /** @var \Mautic\CoreBundle\Configurator\Configurator $configurator */
         $configurator = $this->container->get('mautic.configurator');
         $params       = $configurator->getParameters();
 

@@ -96,7 +96,7 @@ class ListController extends FormController
                 $lastPage = (ceil($count / $limit)) ?: 1;
             }
             $session->set('mautic.leadlist.page', $lastPage);
-            $returnUrl = $this->generateUrl('mautic_leadlist_index', array('page' => $lastPage));
+            $returnUrl = $this->generateUrl('mautic_segment_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
@@ -106,7 +106,7 @@ class ListController extends FormController
                 ),
                 'contentTemplate' => 'MauticLeadBundle:List:index',
                 'passthroughVars' => array(
-                    'activeLink'    => '#mautic_leadlist_index',
+                    'activeLink'    => '#mautic_segment_index',
                     'mauticContent' => 'leadlist'
                 )
             ));
@@ -134,8 +134,8 @@ class ListController extends FormController
             'viewParameters'  => $parameters,
             'contentTemplate' => 'MauticLeadBundle:List:list.html.php',
             'passthroughVars' => array(
-                'activeLink'     => '#mautic_leadlist_index',
-                'route'          => $this->generateUrl('mautic_leadlist_index', array('page' => $page)),
+                'activeLink'     => '#mautic_segment_index',
+                'route'          => $this->generateUrl('mautic_segment_index', array('page' => $page)),
                 'mauticContent'  => 'leadlist'
             )
         ));
@@ -159,8 +159,8 @@ class ListController extends FormController
         //set the page we came from
         $page       = $this->factory->getSession()->get('mautic.leadlist.page', 1);
         //set the return URL for post actions
-        $returnUrl  = $this->generateUrl('mautic_leadlist_index', array('page' => $page));
-        $action     = $this->generateUrl('mautic_leadlist_action', array('objectAction' => 'new'));
+        $returnUrl  = $this->generateUrl('mautic_segment_index', array('page' => $page));
+        $action     = $this->generateUrl('mautic_segment_action', array('objectAction' => 'new'));
         //get the user form factory
         $form       = $model->createForm($list, $this->get('form.factory'),  $action);
 
@@ -174,8 +174,8 @@ class ListController extends FormController
 
                     $this->addFlash('mautic.core.notice.created',  array(
                         '%name%'      => $list->getName() . " (" . $list->getAlias() . ")",
-                        '%menu_link%' => 'mautic_leadlist_index',
-                        '%url%'       => $this->generateUrl('mautic_leadlist_action', array(
+                        '%menu_link%' => 'mautic_segment_index',
+                        '%url%'       => $this->generateUrl('mautic_segment_action', array(
                             'objectAction' => 'edit',
                             'objectId'     => $list->getId()
                         ))
@@ -189,7 +189,7 @@ class ListController extends FormController
                     'viewParameters'  => array('page' => $page),
                     'contentTemplate' => 'MauticLeadBundle:List:index',
                     'passthroughVars' => array(
-                        'activeLink'    => '#mautic_leadlist_index',
+                        'activeLink'    => '#mautic_segment_index',
                         'mauticContent' => 'leadlist'
                     )
                 ));
@@ -204,8 +204,8 @@ class ListController extends FormController
             ),
             'contentTemplate' => 'MauticLeadBundle:List:form.html.php',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_leadlist_index',
-                'route'         => $this->generateUrl('mautic_leadlist_action', array('objectAction' => 'new')),
+                'activeLink'    => '#mautic_segment_index',
+                'route'         => $this->generateUrl('mautic_segment_action', array('objectAction' => 'new')),
                 'mauticContent' => 'leadlist'
             )
         ));
@@ -229,14 +229,14 @@ class ListController extends FormController
         $page    = $this->factory->getSession()->get('mautic.leadlist.page', 1);
 
         //set the return URL
-        $returnUrl  = $this->generateUrl('mautic_leadlist_index', array('page' => $page));
+        $returnUrl  = $this->generateUrl('mautic_segment_index', array('page' => $page));
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
             'viewParameters'  => array('page' => $page),
             'contentTemplate' => 'MauticLeadBundle:List:index',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_leadlist_index',
+                'activeLink'    => '#mautic_segment_index',
                 'mauticContent' => 'leadlist'
             )
         );
@@ -262,7 +262,7 @@ class ListController extends FormController
             return $this->isLocked($postActionVars, $list, 'lead.list');
         }
 
-        $action = $this->generateUrl('mautic_leadlist_action', array('objectAction' => 'edit', 'objectId' => $objectId));
+        $action = $this->generateUrl('mautic_segment_action', array('objectAction' => 'edit', 'objectId' => $objectId));
         $form   = $model->createForm($list, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
@@ -275,8 +275,8 @@ class ListController extends FormController
 
                     $this->addFlash('mautic.core.notice.updated',  array(
                         '%name%'      => $list->getName() . " (" . $list->getAlias() . ")",
-                        '%menu_link%' => 'mautic_leadlist_index',
-                        '%url%'       => $this->generateUrl('mautic_leadlist_action', array(
+                        '%menu_link%' => 'mautic_segment_index',
+                        '%url%'       => $this->generateUrl('mautic_segment_action', array(
                             'objectAction' => 'edit',
                             'objectId'     => $list->getId()
                         ))
@@ -302,7 +302,7 @@ class ListController extends FormController
             ),
             'contentTemplate' => 'MauticLeadBundle:List:form.html.php',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_leadlist_index',
+                'activeLink'    => '#mautic_segment_index',
                 'route'         => $action,
                 'mauticContent' => 'leadlist'
             )
@@ -318,7 +318,7 @@ class ListController extends FormController
     public function deleteAction($objectId)
     {
         $page      = $this->factory->getSession()->get('mautic.leadlist.page', 1);
-        $returnUrl = $this->generateUrl('mautic_leadlist_index', array('page' => $page));
+        $returnUrl = $this->generateUrl('mautic_segment_index', array('page' => $page));
         $flashes   = array();
 
         $postActionVars = array(
@@ -326,7 +326,7 @@ class ListController extends FormController
             'viewParameters'  => array('page' => $page),
             'contentTemplate' => 'MauticLeadBundle:List:index',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_leadlist_index',
+                'activeLink'    => '#mautic_segment_index',
                 'mauticContent' => 'lead'
             )
         );
@@ -377,7 +377,7 @@ class ListController extends FormController
      */
     public function batchDeleteAction() {
         $page        = $this->factory->getSession()->get('mautic.leadlist.page', 1);
-        $returnUrl   = $this->generateUrl('mautic_leadlist_index', array('page' => $page));
+        $returnUrl   = $this->generateUrl('mautic_segment_index', array('page' => $page));
         $flashes     = array();
 
         $postActionVars = array(
@@ -385,7 +385,7 @@ class ListController extends FormController
             'viewParameters'  => array('page' => $page),
             'contentTemplate' => 'MauticLeadBundle:List:index',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_leadlist_index',
+                'activeLink'    => '#mautic_segment_index',
                 'mauticContent' => 'lead'
             )
         );
@@ -466,7 +466,7 @@ class ListController extends FormController
      */
     protected function changeList($listId, $action) {
         $page        = $this->factory->getSession()->get('mautic.lead.page', 1);
-        $returnUrl   = $this->generateUrl('mautic_lead_index', array('page' => $page));
+        $returnUrl   = $this->generateUrl('mautic_contact_index', array('page' => $page));
         $flashes     = array();
 
         $postActionVars = array(
@@ -474,7 +474,7 @@ class ListController extends FormController
             'viewParameters'  => array('page' => $page),
             'contentTemplate' => 'MauticLeadBundle:Lead:index',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_lead_index',
+                'activeLink'    => '#mautic_contact_index',
                 'mauticContent' => 'lead'
             )
         );
@@ -524,7 +524,7 @@ class ListController extends FormController
                         '%name%' => $identifier,
                         '%id%'   => $leadId,
                         '%list%' => $list->getName(),
-                        '%url%'  => $this->generateUrl('mautic_lead_action', array(
+                        '%url%'  => $this->generateUrl('mautic_contact_action', array(
                             'objectAction' => 'edit',
                             'objectId'     => $leadId
                         ))

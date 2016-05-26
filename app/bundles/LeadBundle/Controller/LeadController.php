@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\GraphHelper;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Form\Type\TagListType;
 use Mautic\LeadBundle\LeadEvents;
@@ -121,7 +122,7 @@ class LeadController extends FormController
                 $lastPage = (ceil($count / $limit)) ?: 1;
             }
             $session->set('mautic.lead.page', $lastPage);
-            $returnUrl = $this->generateUrl('mautic_lead_index', array('page' => $lastPage));
+            $returnUrl = $this->generateUrl('mautic_contact_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(
                 array(
@@ -129,7 +130,7 @@ class LeadController extends FormController
                     'viewParameters'  => array('page' => $lastPage),
                     'contentTemplate' => 'MauticLeadBundle:Lead:index',
                     'passthroughVars' => array(
-                        'activeLink'    => '#mautic_lead_index',
+                        'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'lead'
                     )
                 )
@@ -193,9 +194,9 @@ class LeadController extends FormController
                 ),
                 'contentTemplate' => "MauticLeadBundle:Lead:{$indexMode}.html.php",
                 'passthroughVars' => array(
-                    'activeLink'    => '#mautic_lead_index',
+                    'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'lead',
-                    'route'         => $this->generateUrl('mautic_lead_index', array('page' => $page))
+                    'route'         => $this->generateUrl('mautic_contact_index', array('page' => $page))
                 )
             )
         );
@@ -210,7 +211,7 @@ class LeadController extends FormController
         $model = $this->getModel('lead.lead');
 
         // Get the quick add form
-        $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'new', 'qf' => 1));
+        $action = $this->generateUrl('mautic_contact_action', array('objectAction' => 'new', 'qf' => 1));
 
         $fields = $this->getModel('lead.field')->getEntities(
             array(
@@ -245,7 +246,7 @@ class LeadController extends FormController
                 ),
                 'contentTemplate' => "MauticLeadBundle:Lead:quickadd.html.php",
                 'passthroughVars' => array(
-                    'activeLink'    => '#mautic_lead_index',
+                    'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'lead',
                     'route'         => false
                 )
@@ -287,7 +288,7 @@ class LeadController extends FormController
 
         if ($lead === null) {
             //set the return URL
-            $returnUrl = $this->generateUrl('mautic_lead_index', array('page' => $page));
+            $returnUrl = $this->generateUrl('mautic_contact_index', array('page' => $page));
 
             return $this->postActionRedirect(
                 array(
@@ -295,7 +296,7 @@ class LeadController extends FormController
                     'viewParameters'  => array('page' => $page),
                     'contentTemplate' => 'MauticLeadBundle:Lead:index',
                     'passthroughVars' => array(
-                        'activeLink'    => '#mautic_lead_index',
+                        'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'lead'
                     ),
                     'flashes'         => array(
@@ -443,10 +444,10 @@ class LeadController extends FormController
                 ),
                 'contentTemplate' => 'MauticLeadBundle:Lead:lead.html.php',
                 'passthroughVars' => array(
-                    'activeLink'    => '#mautic_lead_index',
+                    'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'lead',
                     'route'         => $this->generateUrl(
-                        'mautic_lead_action',
+                        'mautic_contact_action',
                         array(
                             'objectAction' => 'view',
                             'objectId'     => $lead->getId()
@@ -474,7 +475,7 @@ class LeadController extends FormController
         //set the page we came from
         $page = $this->factory->getSession()->get('mautic.lead.page', 1);
 
-        $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'new'));
+        $action = $this->generateUrl('mautic_contact_action', array('objectAction' => 'new'));
         $fields = $this->getModel('lead.field')->getEntities(
             array(
                 'force'          => array(
@@ -523,9 +524,9 @@ class LeadController extends FormController
                         'mautic.core.notice.created',
                         array(
                             '%name%'      => $identifier,
-                            '%menu_link%' => 'mautic_lead_index',
+                            '%menu_link%' => 'mautic_contact_index',
                             '%url%'       => $this->generateUrl(
-                                'mautic_lead_action',
+                                'mautic_contact_action',
                                 array(
                                     'objectAction' => 'edit',
                                     'objectId'     => $lead->getId()
@@ -538,14 +539,14 @@ class LeadController extends FormController
 
                     if ($inQuickForm) {
                         $viewParameters = array('page' => $page);
-                        $returnUrl      = $this->generateUrl('mautic_lead_index', $viewParameters);
+                        $returnUrl      = $this->generateUrl('mautic_contact_index', $viewParameters);
                         $template       = 'MauticLeadBundle:Lead:index';
                     } elseif ($form->get('buttons')->get('save')->isClicked()) {
                         $viewParameters = array(
                             'objectAction' => 'view',
                             'objectId'     => $lead->getId()
                         );
-                        $returnUrl      = $this->generateUrl('mautic_lead_action', $viewParameters);
+                        $returnUrl      = $this->generateUrl('mautic_contact_action', $viewParameters);
                         $template       = 'MauticLeadBundle:Lead:view';
                     } else {
                         return $this->editAction($lead->getId(), true);
@@ -553,7 +554,7 @@ class LeadController extends FormController
                 }
             } else {
                 $viewParameters = array('page' => $page);
-                $returnUrl      = $this->generateUrl('mautic_lead_index', $viewParameters);
+                $returnUrl      = $this->generateUrl('mautic_contact_index', $viewParameters);
                 $template       = 'MauticLeadBundle:Lead:index';
             }
 
@@ -564,7 +565,7 @@ class LeadController extends FormController
                         'viewParameters'  => $viewParameters,
                         'contentTemplate' => $template,
                         'passthroughVars' => array(
-                            'activeLink'    => '#mautic_lead_index',
+                            'activeLink'    => '#mautic_contact_index',
                             'mauticContent' => 'lead',
                             'closeModal'    => 1, //just in case in quick form
                         )
@@ -586,10 +587,10 @@ class LeadController extends FormController
                 ),
                 'contentTemplate' => 'MauticLeadBundle:Lead:form.html.php',
                 'passthroughVars' => array(
-                    'activeLink'    => '#mautic_lead_index',
+                    'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'lead',
                     'route'         => $this->generateUrl(
-                        'mautic_lead_action',
+                        'mautic_contact_action',
                         array(
                             'objectAction' => 'new'
                         )
@@ -616,14 +617,14 @@ class LeadController extends FormController
         $page = $this->factory->getSession()->get('mautic.lead.page', 1);
 
         //set the return URL
-        $returnUrl = $this->generateUrl('mautic_lead_index', array('page' => $page));
+        $returnUrl = $this->generateUrl('mautic_contact_index', array('page' => $page));
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
             'viewParameters'  => array('page' => $page),
             'contentTemplate' => 'MauticLeadBundle:Lead:index',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_lead_index',
+                'activeLink'    => '#mautic_contact_index',
                 'mauticContent' => 'lead'
             )
         );
@@ -655,7 +656,7 @@ class LeadController extends FormController
             return $this->isLocked($postActionVars, $lead, 'lead.lead');
         }
 
-        $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'edit', 'objectId' => $objectId));
+        $action = $this->generateUrl('mautic_contact_action', array('objectAction' => 'edit', 'objectId' => $objectId));
         $fields = $this->getModel('lead.field')->getEntities(
             array(
                 'force'          => array(
@@ -708,9 +709,9 @@ class LeadController extends FormController
                         'mautic.core.notice.updated',
                         array(
                             '%name%'      => $identifier,
-                            '%menu_link%' => 'mautic_lead_index',
+                            '%menu_link%' => 'mautic_contact_index',
                             '%url%'       => $this->generateUrl(
-                                'mautic_lead_action',
+                                'mautic_contact_action',
                                 array(
                                     'objectAction' => 'edit',
                                     'objectId'     => $lead->getId()
@@ -734,7 +735,7 @@ class LeadController extends FormController
                     array_merge(
                         $postActionVars,
                         array(
-                            'returnUrl'       => $this->generateUrl('mautic_lead_action', $viewParameters),
+                            'returnUrl'       => $this->generateUrl('mautic_contact_action', $viewParameters),
                             'viewParameters'  => $viewParameters,
                             'contentTemplate' => 'MauticLeadBundle:Lead:view'
                         )
@@ -755,10 +756,10 @@ class LeadController extends FormController
                 ),
                 'contentTemplate' => 'MauticLeadBundle:Lead:form.html.php',
                 'passthroughVars' => array(
-                    'activeLink'    => '#mautic_lead_index',
+                    'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'lead',
                     'route'         => $this->generateUrl(
-                        'mautic_lead_action',
+                        'mautic_contact_action',
                         array(
                             'objectAction' => 'edit',
                             'objectId'     => $lead->getId()
@@ -804,14 +805,14 @@ class LeadController extends FormController
         $page     = $this->factory->getSession()->get('mautic.lead.page', 1);
 
         //set the return URL
-        $returnUrl = $this->generateUrl('mautic_lead_index', array('page' => $page));
+        $returnUrl = $this->generateUrl('mautic_contact_index', array('page' => $page));
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
             'viewParameters'  => array('page' => $page),
             'contentTemplate' => 'MauticLeadBundle:Lead:index',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_lead_index',
+                'activeLink'    => '#mautic_contact_index',
                 'mauticContent' => 'lead'
             )
         );
@@ -873,7 +874,7 @@ class LeadController extends FormController
             $leadChoices[$l->getId()] = $l->getPrimaryIdentifier();
         }
 
-        $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'merge', 'objectId' => $mainLead->getId()));
+        $action = $this->generateUrl('mautic_contact_action', array('objectAction' => 'merge', 'objectId' => $mainLead->getId()));
 
         $form = $this->get('form.factory')->create(
             'lead_merge',
@@ -936,7 +937,7 @@ class LeadController extends FormController
 
                 return $this->postActionRedirect(
                     array(
-                        'returnUrl'       => $this->generateUrl('mautic_lead_action', $viewParameters),
+                        'returnUrl'       => $this->generateUrl('mautic_contact_action', $viewParameters),
                         'viewParameters'  => $viewParameters,
                         'contentTemplate' => 'MauticLeadBundle:Lead:view',
                         'passthroughVars' => array(
@@ -957,7 +958,7 @@ class LeadController extends FormController
                     'action'       => $action,
                     'form'         => $form->createView(),
                     'currentRoute' => $this->generateUrl(
-                        'mautic_lead_action',
+                        'mautic_contact_action',
                         array(
                             'objectAction' => 'merge',
                             'objectId'     => $mainLead->getId()
@@ -983,7 +984,7 @@ class LeadController extends FormController
     public function deleteAction($objectId)
     {
         $page      = $this->factory->getSession()->get('mautic.lead.page', 1);
-        $returnUrl = $this->generateUrl('mautic_lead_index', array('page' => $page));
+        $returnUrl = $this->generateUrl('mautic_contact_index', array('page' => $page));
         $flashes   = array();
 
         $postActionVars = array(
@@ -991,7 +992,7 @@ class LeadController extends FormController
             'viewParameters'  => array('page' => $page),
             'contentTemplate' => 'MauticLeadBundle:Lead:index',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_lead_index',
+                'activeLink'    => '#mautic_contact_index',
                 'mauticContent' => 'lead'
             )
         );
@@ -1048,7 +1049,7 @@ class LeadController extends FormController
     public function batchDeleteAction()
     {
         $page      = $this->factory->getSession()->get('mautic.lead.page', 1);
-        $returnUrl = $this->generateUrl('mautic_lead_index', array('page' => $page));
+        $returnUrl = $this->generateUrl('mautic_contact_index', array('page' => $page));
         $flashes   = array();
 
         $postActionVars = array(
@@ -1056,7 +1057,7 @@ class LeadController extends FormController
             'viewParameters'  => array('page' => $page),
             'contentTemplate' => 'MauticLeadBundle:Lead:index',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_lead_index',
+                'activeLink'    => '#mautic_contact_index',
                 'mauticContent' => 'lead'
             )
         );
@@ -1234,7 +1235,7 @@ class LeadController extends FormController
 
         $progress = $session->get('mautic.lead.import.progress', array(0, 0));
         $stats    = $session->get('mautic.lead.import.stats', array('merged' => 0, 'created' => 0, 'ignored' => 0, 'failures' => array()));
-        $action   = $this->generateUrl('mautic_lead_action', array('objectAction' => 'import'));
+        $action   = $this->generateUrl('mautic_contact_action', array('objectAction' => 'import'));
 
         switch ($step) {
             case 1:
@@ -1528,10 +1529,10 @@ class LeadController extends FormController
                     'viewParameters'  => $viewParameters,
                     'contentTemplate' => $contentTemplate,
                     'passthroughVars' => array(
-                        'activeLink'    => '#mautic_lead_index',
+                        'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'leadImport',
                         'route'         => $this->generateUrl(
-                            'mautic_lead_action',
+                            'mautic_contact_action',
                             array(
                                 'objectAction' => 'import'
                             )
@@ -1609,7 +1610,7 @@ class LeadController extends FormController
                 true
             );
         $email  = array('list' => $inList);
-        $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'email', 'objectId' => $objectId));
+        $action = $this->generateUrl('mautic_contact_action', array('objectAction' => 'email', 'objectId' => $objectId));
         $form   = $this->get('form.factory')->create('lead_quickemail', $email, array('action' => $action));
 
         if ($this->request->getMethod() == 'POST') {
@@ -1691,13 +1692,13 @@ class LeadController extends FormController
 
         if (empty($leadEmail) || $valid || $cancelled) {
             if ($inList) {
-                $route          = 'mautic_lead_index';
+                $route          = 'mautic_contact_index';
                 $viewParameters = array(
                     'page' => $this->factory->getSession()->get('mautic.lead.page', 1)
                 );
                 $func           = 'index';
             } else {
-                $route          = 'mautic_lead_action';
+                $route          = 'mautic_contact_action';
                 $viewParameters = array(
                     'objectAction' => 'view',
                     'objectId'     => $objectId
@@ -1805,7 +1806,7 @@ class LeadController extends FormController
             }
 
             $route = $this->generateUrl(
-                'mautic_lead_action',
+                'mautic_contact_action',
                 array(
                     'objectAction' => 'batchLists'
                 )
@@ -1825,7 +1826,7 @@ class LeadController extends FormController
                     ),
                     'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
                     'passthroughVars' => array(
-                        'activeLink'    => '#mautic_lead_index',
+                        'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
                         'route'         => $route
                     )
@@ -1931,7 +1932,7 @@ class LeadController extends FormController
             }
 
             $route = $this->generateUrl(
-                'mautic_lead_action',
+                'mautic_contact_action',
                 array(
                     'objectAction' => 'batchCampaigns'
                 )
@@ -1951,7 +1952,7 @@ class LeadController extends FormController
                     ),
                     'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
                     'passthroughVars' => array(
-                        'activeLink'    => '#mautic_lead_index',
+                        'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
                         'route'         => $route
                     )
@@ -1998,7 +1999,7 @@ class LeadController extends FormController
                 foreach ($entities as $lead) {
                     if ($this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getCreatedBy())) {
 
-                        if ($model->unsubscribeLead($lead, $data['reason'], false, true)) {
+                        if ($model->addDncForLead($lead, 'email', $data['reason'], DoNotContact::MANUAL)) {
                             $persistEntities[] = $lead;
                         }
                     }
@@ -2023,7 +2024,7 @@ class LeadController extends FormController
             );
         } else {
             $route = $this->generateUrl(
-                'mautic_lead_action',
+                'mautic_contact_action',
                 array(
                     'objectAction' => 'batchDnc'
                 )
@@ -2042,7 +2043,7 @@ class LeadController extends FormController
                     ),
                     'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
                     'passthroughVars' => array(
-                        'activeLink'    => '#mautic_lead_index',
+                        'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
                         'route'         => $route
                     )

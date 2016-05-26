@@ -475,12 +475,6 @@ class PageModel extends FormModel
                             if (!$decoded) {
                                 $pageURL = urldecode($pageURL);
                             }
-                        } elseif (isset($query['url'])) {
-                            // @deprecated
-                            $pageURL = $query['url'];
-                            if (!$decoded) {
-                                $pageURL = urldecode($pageURL);
-                            }
                         }
 
                         if (isset($query['page_referrer'])) {
@@ -488,12 +482,6 @@ class PageModel extends FormModel
                                 $query['page_referrer'] = urldecode($query['page_referrer']);
                             }
                             $hit->setReferer($query['page_referrer']);
-                        } elseif (isset($query['referrer'])) {
-                            // @deprecated
-                            if (!$decoded) {
-                                $query['referrer'] = urldecode($query['referrer']);
-                            }
-                            $hit->setReferer($query['referrer']);
                         }
 
                         if (isset($query['page_language'])) {
@@ -501,12 +489,6 @@ class PageModel extends FormModel
                                 $query['page_language'] = urldecode($query['page_language']);
                             }
                             $hit->setPageLanguage($query['page_language']);
-                        } elseif (isset($query['language'])) {
-                            // @deprecated
-                            if (!$decoded) {
-                                $query['language'] = urldecode($query['language']);
-                            }
-                            $hit->setPageLanguage($query['language']);
                         }
 
                         if (isset($query['page_title'])) {
@@ -514,12 +496,6 @@ class PageModel extends FormModel
                                 $query['page_title'] = urldecode($query['page_title']);
                             }
                             $hit->setUrlTitle($query['page_title']);
-                        } elseif (isset($query['title'])) {
-                            // @deprecated
-                            if (!$decoded) {
-                                $query['title'] = urldecode($query['title']);
-                            }
-                            $hit->setUrlTitle($query['title']);
                         }
 
                         // Update lead fields if some data were sent in the URL query

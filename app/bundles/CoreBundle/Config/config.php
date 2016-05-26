@@ -267,7 +267,7 @@ return [
 
             // Configurator (used in installer and managing global config]
             'mautic.configurator' => [
-                'class'     => 'Mautic\InstallBundle\Configurator\Configurator', // In 2.0 change this to reference the CoreBundle
+                'class'     => 'Mautic\CoreBundle\Configurator\Configurator', // In 2.0 change this to reference the CoreBundle
                 'arguments' => [
                     'mautic.factory'
                 ]

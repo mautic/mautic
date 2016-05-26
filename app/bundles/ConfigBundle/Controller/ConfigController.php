@@ -55,7 +55,7 @@ class ConfigController extends FormController
             'doNotChangeDisplayMode' => $doNotChangeDisplayMode
         ));
 
-        /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
+        /** @var \Mautic\CoreBundle\Configurator\Configurator $configurator */
         $configurator = $this->get('mautic.configurator');
         $isWritabale  = $configurator->isFileWritable();
 

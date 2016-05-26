@@ -10,11 +10,6 @@
 return [
     'routes'   => [
         'main' => [
-            // @deprecated 1.1.4 to be removed in 2.0
-            'mautic_integration_auth_callback_bc_secure' => [
-                'path'       => '/addon/integrations/authcallback/{integration}',
-                'controller' => 'MauticPluginBundle:Auth:authCallback'
-            ],
             'mautic_integration_auth_callback_secure'    => [
                 'path'       => '/plugins/integrations/authcallback/{integration}',
                 'controller' => 'MauticPluginBundle:Auth:authCallback'

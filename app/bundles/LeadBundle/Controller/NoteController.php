@@ -145,7 +145,7 @@ class NoteController extends FormController
         $note->setLead($lead);
 
         $model  = $this->getModel('lead.note');
-        $action = $this->generateUrl('mautic_leadnote_action', array(
+        $action = $this->generateUrl('mautic_contactnote_action', array(
                 'objectAction' => 'new',
                 'leadId'       => $leadId)
         );
@@ -232,7 +232,7 @@ class NoteController extends FormController
             return $this->accessDenied();
         }
 
-        $action = $this->generateUrl('mautic_leadnote_action', array(
+        $action = $this->generateUrl('mautic_contactnote_action', array(
             'objectAction' => 'edit',
             'objectId'     => $objectId,
             'leadId'       => $leadId
@@ -307,14 +307,14 @@ class NoteController extends FormController
         if ($lead === null) {
             //set the return URL
             $page      = $this->factory->getSession()->get('mautic.lead.page', 1);
-            $returnUrl = $this->generateUrl('mautic_lead_index', array('page' => $page));
+            $returnUrl = $this->generateUrl('mautic_contact_index', array('page' => $page));
 
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => array('page' => $page),
                 'contentTemplate' => 'MauticLeadBundle:Lead:index',
                 'passthroughVars' => array(
-                    'activeLink'    => '#mautic_lead_index',
+                    'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'leadNote'
                 ),
                 'flashes'         => array(

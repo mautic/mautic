@@ -62,7 +62,6 @@ class RedirectModel extends FormModel
     /**
      * Get a Redirect entity by URL
      *
-     * Note that $forEmail and $createEntity is deprecated and support will be removed in 2.0
      * Use Mautic\PageBundle\Model\TrackableModel::getTrackableByUrl() if associated with a channel
      *
      * @param  $url
@@ -71,15 +70,6 @@ class RedirectModel extends FormModel
      */
     public function getRedirectByUrl ($url)
     {
-        // @deprecated support for $forEmail to be removed in 2.0
-        if (func_num_args() > 1) {
-            $args = func_get_args();
-            $forEmail     = $args[1];
-            $createEntity = (!empty($args[2]));
-
-            return $this->getRedirectForEmail($url, $forEmail, $createEntity);
-        }
-
         // Ensure the URL saved to the database does not have encoded ampersands
         while (strpos($url, '&amp;') !== false) {
             $url = str_replace('&amp;', '&', $url);
