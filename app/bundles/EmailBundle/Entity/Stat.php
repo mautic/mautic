@@ -33,6 +33,10 @@ class Stat
     private $email;
 
     /**
+     * @var \Mautic\FeedBundle\Entity\Snapshot
+     */
+    private $snapshot;
+    /**
      * @var \Mautic\LeadBundle\Entity\Lead
      */
     private $lead;
@@ -155,6 +159,10 @@ class Stat
 
         $builder->createManyToOne('list', 'Mautic\LeadBundle\Entity\LeadList')
             ->addJoinColumn('list_id', 'id', true, false, 'SET NULL')
+            ->build();
+
+        $builder->createManyToOne('snapshot', 'Mautic\FeedBundle\Entity\Snapshot')
+            ->addJoinColumn('snapshot_id', 'id', true, false, 'SET NULL')
             ->build();
 
         $builder->addIpAddress(true);
@@ -616,4 +624,16 @@ class Stat
 
         return $this;
     }
+
+    public function getSnapshot()
+    {
+        return $this->snapshot;
+    }
+
+    public function setSnapshot($snapshot)
+    {
+        $this->snapshot = $snapshot;
+        return $this;
+    }
+
 }
