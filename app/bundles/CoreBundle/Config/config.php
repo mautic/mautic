@@ -54,27 +54,6 @@ return [
                 'requirements' => [
                     'url' => '.*/$'
                 ]
-            ],
-            'mautic_public_bc_redirect'    => [
-                'path'         => '/p/{url}',
-                'controller'   => 'MauticCoreBundle:Default:publicBcRedirect',
-                'requirements' => [
-                    'url' => '.+'
-                ]
-            ],
-            'mautic_ajax_bc_redirect'      => [
-                'path'         => '/ajax{url}',
-                'controller'   => 'MauticCoreBundle:Default:ajaxBcRedirect',
-                'requirements' => [
-                    'url' => '.+'
-                ],
-                'defaults'     => [
-                    'url' => ''
-                ]
-            ],
-            'mautic_update_bc_redirect'    => [
-                'path'       => '/update',
-                'controller' => 'MauticCoreBundle:Default:updateBcRedirect'
             ]
         ]
     ],

@@ -1311,18 +1311,6 @@ class EmailModel extends FormModel
     }
 
     /**
-     * Remove email from DNC list
-     *
-     * @param $email
-     *
-     * @deprecated Use LeadModel::removeDncForEmail instead
-     */
-    public function removeDoNotContact($email)
-    {
-        $this->leadModel->removeDncForEmail($email);
-    }
-
-    /**
      * Processes the callback response from a mailer for bounces and unsubscribes
      *
      * @param array $response

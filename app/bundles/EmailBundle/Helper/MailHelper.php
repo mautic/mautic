@@ -1378,18 +1378,6 @@ class MailHelper
     }
 
     /**
-     * Set custom tokens
-     *
-     * @param array $tokens
-     *
-     * @deprecated Since 1.1.  Use setTokens() instead. To be removed in 2.0
-     */
-    public function setCustomTokens(array $tokens)
-    {
-        $this->setTokens($tokens);
-    }
-
-    /**
      * Get tokens
      *
      * @return array
@@ -1619,14 +1607,6 @@ class MailHelper
         $redirectModel = $this->factory->getModel('page.redirect');
 
         return $redirectModel->getRedirectByUrl($url);
-    }
-
-    /**
-     * @deprecated 1.2.3 - to be removed in 2.0.  Use createEmailStat() instead
-     */
-    public function createLeadEmailStat()
-    {
-        $this->createEmailStat();
     }
 
     /**

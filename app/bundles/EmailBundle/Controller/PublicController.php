@@ -40,68 +40,9 @@ class PublicController extends CommonFormController
                 $tokens['{tracking_pixel}'] = MailHelper::getBlankPixel();
             }
 
-            // Check for stored copy
-            $copy = $stat->getStoredCopy();
-            if (null === $copy) {
-                /**
-                 * @deprecated - to be removed in 2.0
-                 */
-                $subject = '';
-                $content = $stat->getCopy();
-
-                if (empty($content) && null !== $emailEntity) {
-                    // Old way where stats didn't store content
-
-                    //the lead needs to have fields populated
-                    $statLead = $stat->getLead();
-                    $lead     = $this->getModel('lead')->getLead($statLead->getId());
-                    $template = $emailEntity->getTemplate();
-                    if (!empty($template)) {
-                        $slots = $this->factory->getTheme($template)->getSlots('email');
-
-                        $assetsHelper = $this->factory->getHelper('template.assets');
-
-                        $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
-
-                        $this->processSlots($slots, $emailEntity);
-
-                        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':email.html.php');
-
-                        $response = $this->render(
-                            $logicalName,
-                            array(
-                                'inBrowser' => true,
-                                'slots'     => $slots,
-                                'content'   => $emailEntity->getContent(),
-                                'email'     => $emailEntity,
-                                'lead'      => $lead,
-                                'template'  => $template
-                            )
-                        );
-
-                        $content = $response->getContent();
-                    } else {
-                        $content = $emailEntity->getCustomHtml();
-                    }
-
-                    $event = new EmailSendEvent(
-                        null,
-                        array(
-                            'content' => $content,
-                            'lead'    => $lead,
-                            'email'   => $emailEntity,
-                            'idHash'  => $idHash,
-                            'tokens'  => $tokens
-                        )
-                    );
-                    $this->factory->getDispatcher()->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
-
-                    $content = $event->getContent();
-                }
-            } else {
-                $subject = $copy->getSubject();
-                $content = $copy->getBody();
-            }
+            $copy    = $stat->getStoredCopy();
+            $subject = $copy->getSubject();
+            $content = $copy->getBody();
 
             // Convert emoji
             $content = EmojiHelper::toEmoji($content, 'short');

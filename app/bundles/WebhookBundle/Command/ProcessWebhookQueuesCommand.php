@@ -33,11 +33,6 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('mautic:webhooks:process')
-            ->setAliases(
-                array(
-                    'mautic:process:webhooks'
-                )
-            )
             ->setDescription('Process queued webhook payloads')
             ->addOption(
                 '--webhook-id',

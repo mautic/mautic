@@ -10,7 +10,7 @@
 namespace Mautic\CoreBundle\Configurator;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\InstallBundle\Configurator\Step\StepInterface;
+use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**

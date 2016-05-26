@@ -51,6 +51,8 @@ class MauticFactory
      */
     public function __construct(ContainerInterface $container)
     {
+        @trigger_error('MauticFactory is deprecated since 2.0 and will be removed in 3.0', E_USER_DEPRECATED);
+
         $this->container = $container;
     }
 
@@ -62,8 +64,6 @@ class MauticFactory
      * @return AbstractCommonModel
      * 
      * @throws \InvalidArgumentException
-     * 
-     * @deprecated
      */
     public function getModel($modelNameKey)
     {

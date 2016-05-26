@@ -10,7 +10,6 @@
 namespace Mautic\CategoryBundle\Model;
 
 use Mautic\CategoryBundle\Event\CategoryEvent;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\CategoryEvents;
@@ -26,13 +25,6 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class CategoryModel extends FormModel
 {
-    /**
-     * @deprecated Remove in 2.0
-     *
-     * @var MauticFactory
-     */
-    protected $factory;
-
     /**
      * @var null|\Symfony\Component\HttpFoundation\Request
      */

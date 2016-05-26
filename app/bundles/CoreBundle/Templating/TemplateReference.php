@@ -71,9 +71,6 @@ class TemplateReference extends BaseTemplateReference
             $bundleRoot = $this->factory->getSystemPath('bundles', true);
             $pluginRoot = $this->factory->getSystemPath('plugins', true);
 
-            // @deprecated 1.1.4; to be removed in 2.0; BC support for MauticAddon
-            $addonRoot = $this->factory->getSystemPath('root') . '/addons';
-
             // Check for a system-wide override
             $themePath      = $this->factory->getSystemPath('themes', true);
             $systemTemplate = $themePath.'/system/'.$this->parameters['bundle'].'/'.$path;
@@ -90,8 +87,7 @@ class TemplateReference extends BaseTemplateReference
 
                     if (
                         (!empty($match[1]) && file_exists($bundleRoot.'/'.$match[1].'Bundle/Views/'.$path)) ||
-                        file_exists($pluginRoot.'/'.$this->parameters['bundle'].'/Views/'.$path) ||
-                        file_exists($addonRoot.'/'.$this->parameters['bundle'].'/Views/'.$path)
+                        file_exists($pluginRoot.'/'.$this->parameters['bundle'].'/Views/'.$path)
                     ) {
                         // Mautic core template
                         $template = '@'.$this->get('bundle').'/Views/'.$path;

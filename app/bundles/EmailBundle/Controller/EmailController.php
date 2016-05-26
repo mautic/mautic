@@ -1359,22 +1359,6 @@ class EmailController extends FormController
     }
 
     /**
-     * Preview email
-     *
-     * @param $objectId
-     *
-     * @deprecated since 1.1.3
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function previewAction($objectId)
-    {
-        return $this->redirect(
-            $this->generateUrl('mautic_email_preview', array('objectId' => $objectId))
-        );
-    }
-
-    /**
      * PreProcess page slots for public view.
      *
      * @param array $slots
