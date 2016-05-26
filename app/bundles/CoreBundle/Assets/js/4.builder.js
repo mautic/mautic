@@ -253,11 +253,11 @@ Mautic.closeBuilder = function(model) {
             mQuery(".ui-draggable[data-token]").draggable('destroy');
 
             // Get the contents of the editor
-            var data = CKEDITOR.instances['builder-custom-content'].getData();
-            CKEDITOR.instances[Mautic.builderFormName + '_customHtml'].setData(data);
+            // var data = CKEDITOR.instances['builder-custom-content'].getData();
+            // CKEDITOR.instances[Mautic.builderFormName + '_customHtml'].setData(data);
 
-            // Destroy the editor
-            CKEDITOR.instances['builder-custom-content'].destroy(true);
+            // // Destroy the editor
+            // CKEDITOR.instances['builder-custom-content'].destroy(true);
         } catch (err) {
             console.log(err);
         }
@@ -363,15 +363,15 @@ Mautic.saveBuilderContent = function (model, entityId, content, callback) {
  * @returns {*}
  */
 Mautic.getBuilderEditorInstance = function (id) {
-    var editors = (Mautic.builderMode == 'template') ?
-        document.getElementById('builder-template-content').contentWindow.CKEDITOR.instances :
-        CKEDITOR.instances;
+    // var editors = (Mautic.builderMode == 'template') ?
+    //     document.getElementById('builder-template-content').contentWindow.CKEDITOR.instances :
+    //     CKEDITOR.instances;
 
-    if (id) {
-        return editors[id];
-    } else {
-        return editors;
-    }
+    // if (id) {
+    //     return editors[id];
+    // } else {
+    //     return editors;
+    // }
 };
 
 /**
@@ -540,7 +540,7 @@ Mautic.initSlots = function(contents) {
                 ui.item.replaceWith(newSlot);
             }
         }
-    }).disableSelection();
+    });
     
     contents.find('[data-slot]').each(function() { 
         Mautic.initSlot(mQuery(this));
@@ -574,10 +574,14 @@ Mautic.initSlots = function(contents) {
 Mautic.initSlot = function(slot) {
     var type = slot.attr('data-slot');
 
-    // Todo: Fire JS event so other slots could catch it and do their thing
+    // Todo: Fire a JS event so other slots could catch it and do their thing
     // Temporarily for text slot:
     if (type === 'text') {
-        // slot.froalaEditor();
+        console.log('froala text');
+        slot.froalaEditor({toolbarInline: true, zIndex: 2501});
+    } else if (type === 'image') {
+        console.log('froala image', slot.find('img'));
+        slot.find('img').froalaEditor({toolbarInline: true});
     }
 
 

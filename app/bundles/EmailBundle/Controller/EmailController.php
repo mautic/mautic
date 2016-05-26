@@ -1420,9 +1420,10 @@ class EmailController extends FormController
         $assetsHelper->addScriptDeclaration("var mauticBasePath    = '" . $this->request->getBasePath() . "';");
         $assetsHelper->addScriptDeclaration("var mauticAjaxUrl     = '" . $routerHelper->generate("mautic_core_ajax") . "';");
         $assetsHelper->addScriptDeclaration("var mauticAssetPrefix = '" . $assetsHelper->getAssetPrefix(true) . "';");
-        $assetsHelper->addCustomDeclaration($assetsHelper->getSystemScripts(true, true));
-        $assetsHelper->addScript('app/bundles/EmailBundle/Assets/builder/builder.js');
-        $assetsHelper->addStylesheet('app/bundles/EmailBundle/Assets/builder/builder.css');
+        // $assetsHelper->addCustomDeclaration($assetsHelper->getSystemScripts(true, true));
+        // $assetsHelper->addStylesheet('app/bundles/EmailBundle/Assets/builder/builder.css');
+        $assetsHelper->addStylesheet('app/bundles/CoreBundle/Assets/css/libraries/froala/froala_editor.css');
+        $assetsHelper->addStylesheet('app/bundles/CoreBundle/Assets/css/libraries/froala/froala_style.css');
     }
 
 }
