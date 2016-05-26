@@ -43,7 +43,7 @@ class Feed
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('feed');
+        $builder->setTable('feeds');
 
         $builder->addId();
 
