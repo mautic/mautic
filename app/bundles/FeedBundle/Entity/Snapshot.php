@@ -74,12 +74,6 @@ class Snapshot
         return $this->id;
     }
 
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
     public function getDate()
     {
         return $this->date;
