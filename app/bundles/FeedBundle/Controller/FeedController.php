@@ -12,6 +12,8 @@ namespace Mautic\FeedBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\FeedBundle\Helper\FeedHelper;
+use Mautic\FeedBundle\Entity\Feed;
+use Mautic\FeedBundle\Entity\Snapshot;
 
 /**
  * Class FeedController
@@ -20,24 +22,29 @@ class FeedController extends FormController
 {
 
     /**
-     * Generates the default view
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function testAction($id)
     {
-        // Write the contents of the XML file into a string
-        $xmlString = file_get_contents('feed.xml');
+        $em = $this->factory->getEntityManager();
 
         /** @var FeedHelper $feedHelper  */
         $feedHelper = $this->get('mautic.helper.feed');
 
+        /** @var Feed $feed */
+        $feed = $em->find('MauticFeedBundle:Feed', $id);
+
+        /** @var Snapshot $snapshot */
+        $snapshot = $feed->getSnapshots()->last();
+
+        // Write the contents of the XML file into a string
+        $xmlString = $snapshot->getXmlString();
+
+
         $feedContent = $feedHelper->getFeedContentFromString($xmlString);
 
-        return new Response(var_dump($feedContent));
-
-//         return $this->delegateView(array(
-//             'contentTemplate' => 'MauticFeedBundle:Feed:hello.html.php'
-//         ));
+        return new Response(var_dump($feedContent), Response::HTTP_OK, array(
+            'content-type' => 'text/plain'
+        ));
     }
 }

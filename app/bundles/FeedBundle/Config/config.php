@@ -8,6 +8,14 @@
  */
 
 return array(
+    'routes' => array(
+        'main' => array(
+            'mautic_feed_test' => array(
+                'path' => '/feeds/parse/{id}',
+                'controller' => 'MauticFeedBundle:Feed:test'
+            )
+        )
+    ),
     'services' => array(
         'events' => array(
             'mautic.feed.emailbundle.subscriber' => array(
