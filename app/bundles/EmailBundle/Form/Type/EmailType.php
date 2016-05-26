@@ -26,6 +26,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Mautic\FeedBundle\Form\Type\FeedType;
 
 /**
  * Class EmailType.
@@ -76,49 +77,10 @@ class EmailType extends AbstractType
 
         //For feed
         $builder->add(
-            'feed_url',
-            'text',
+            'feed',
+            new FeedType(),
             array(
-                'label'      => 'Feed URL',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control feed_url'),
-                'mapped' => false,
-                'required' => false
-            )
-        );
-        $builder->add(
-            'feed_item_count',
-            'number',
-            array(
-                'label'      => 'Number of items per mail',
-                'label_attr' => array('class' => 'control-label feed_conditional_appear'),
-                'attr'       => array('class' => 'form-control feed_conditional_appear'),
-                'mapped' => false,
-                'required' => false
-            )
-        );
-        $builder->add(
-            'periodicity_next_shoot',
-            'datetime',
-            array(
-                'widget' => 'single_text',
-                'label'      => 'First send date & time',
-                'label_attr' => array('class' => 'control-label feed_conditional_appear'),
-                'attr'       => array('class' => 'form-control feed_conditional_appear'),
-                'mapped' => false,
-                'required' => false,
-                'format' => 'dd/MM/yyyy hh:mm',
-                'data' => new \DateTime('now')
-            )
-        );
-        $builder->add(
-            'periodicity_interval',
-            'number',
-            array(
-                'label'      => 'Periodicity (number of day)',
-                'label_attr' => array('class' => 'control-label feed_conditional_appear'),
-                'attr'       => array('class' => 'form-control feed_conditional_appear'),
-                'mapped' => false,
+                'label'      => 'For RSS Mail only',
                 'required' => false
             )
         );

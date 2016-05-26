@@ -1064,7 +1064,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->feed;
     }
 
-    public function setFeed(Feed $feed)
+    public function setFeed(Feed $feed = NULL)
     {
         $this->feed = $feed;
         return $this;

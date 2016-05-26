@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\FeedBundle\Entity\Feed;
 
 class EmailController extends FormController
 {
@@ -511,6 +512,20 @@ class EmailController extends FormController
                     BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($content);
 
                     $entity->setCustomHtml($content);
+
+                    //If the URL field isn't empty, we set a linked feed and periodicity
+                    if($entity->getFeed()->getFeedUrl() != ''){
+                        //We set the email link in the feed
+                        $entity->getFeed()->setEmail($entity);
+                        //We persist the feed entity
+                        $this->factory->getEntityManager()->persist($entity->getFeed());
+
+                        //Idem for the Periodicity
+                    }
+                    else{
+                        //We destroy the feed, so symfony won't be angry about an unsaved entity
+                        $entity->setFeed(NULL);
+                    }
 
                     //form is valid so process the data
                     $model->saveEntity($entity);

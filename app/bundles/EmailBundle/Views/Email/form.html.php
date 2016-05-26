@@ -204,11 +204,7 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
 
             <!-- For feed -->
             <hr/>
-            <h3>For RSS Mail only</h3>
-            <?php echo $view['form']->row($form['feed_url']); ?>
-            <?php echo $view['form']->row($form['feed_item_count']); ?>
-            <?php echo $view['form']->row($form['periodicity_interval']); ?>
-            <?php echo $view['form']->row($form['periodicity_next_shoot']); ?>
+            <?php echo $view['form']->row($form['feed']); ?>
         </div>
         <div class="hide">
             <?php echo $view['form']->rest($form); ?>
