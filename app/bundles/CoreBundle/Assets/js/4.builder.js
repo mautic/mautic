@@ -46,6 +46,7 @@ Mautic.launchBuilder = function (formName, actionName) {
             .appendTo('.builder-content')
             .load(function () {
                 var contents = mQuery(this).contents();
+                Mautic.initSlotListeners(contents);
                 Mautic.initSlots(contents);
                 // here, catch the droppable div and create a droppable widget
                 contents.find('.mautic-editable').droppable({
@@ -542,9 +543,10 @@ Mautic.initSlots = function(contents) {
         }
     });
     
-    contents.find('[data-slot]').each(function() { 
-        Mautic.initSlot(mQuery(this));
+    contents.find('[data-slot]').each(function() {
+        contents.trigger('slot:init', this);
     });
+
 
     mQuery('#slot-type-container .slot-type-handle').draggable({
         iframeFix: true,
@@ -571,36 +573,23 @@ Mautic.initSlots = function(contents) {
     }).disableSelection();
 }
 
-Mautic.initSlot = function(slot) {
-    var type = slot.attr('data-slot');
-    var slotIntEvent = mQuery.Event('slot.init', {
-        type: type,
-        slot: slot
+Mautic.initSlotListeners = function(contents) {
+    contents.on('slot:init', function(event, slot) {
+        slot = mQuery(slot);
+        var type = slot.attr('data-slot');
+
+        // initialize the drag handle
+        var handle = mQuery('<div/>').attr('data-slot-handle', true);
+        slot.hover(function() {
+            slot.append(handle);
+        }, function() {
+            handle.remove('div[data-slot-handle]');
+        });
+
+        if (type === 'text') {
+            slot.froalaEditor({toolbarInline: true, zIndex: 2501});
+        } else if (type === 'image') {
+            slot.find('img').froalaEditor({toolbarInline: true});
+        }
     });
-    console.log('event triggered', slotIntEvent);
-    mQuery('body').trigger(slotIntEvent);
-
-
-    // Todo: Fire a JS event so other slots could catch it and do their thing
-    // Temporarily for text slot:
-    if (type === 'text') {
-        slot.froalaEditor({toolbarInline: true, zIndex: 2501});
-    } else if (type === 'image') {
-        slot.find('img').froalaEditor({toolbarInline: true});
-    }
-
-    var handle = mQuery('<div/>').attr('data-slot-handle', true);
-    slot.hover(function() {
-        slot.append(handle);
-    }, function() {
-        handle.remove('div[data-slot-handle]');
-    });
-}
-
-// Handle slot triggers
-mQuery(function() {
-    console.log('slot.init listeners loaded');
-    mQuery('body').on('slot.init', function() {
-        console.log('slot.init', this);
-    });
-});
+};
