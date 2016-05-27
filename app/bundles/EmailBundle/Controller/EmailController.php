@@ -1422,7 +1422,7 @@ class EmailController extends FormController
         $assetsHelper->addScriptDeclaration("var mauticAssetPrefix = '" . $assetsHelper->getAssetPrefix(true) . "';");
         // $assetsHelper->addCustomDeclaration($assetsHelper->getSystemScripts(true, true));
         // $assetsHelper->addStylesheet('app/bundles/EmailBundle/Assets/builder/builder.css');
-        $assetsHelper->addStylesheet('app/bundles/CoreBundle/Assets/css/libraries/froala/froala_editor.css');
+        // $assetsHelper->addStylesheet('app/bundles/CoreBundle/Assets/css/libraries/froala/froala_editor.css');
         $assetsHelper->addStylesheet('app/bundles/CoreBundle/Assets/css/libraries/froala/froala_style.css');
     }
 

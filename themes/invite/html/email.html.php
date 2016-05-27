@@ -327,7 +327,6 @@
       }
     }
   </style>
-  <link rel="stylesheet" href="<?php echo $view['assets']->getUrl('media/css/froala_style.min.css'); ?>" type="text/css" />
 </head>
 <body>
 <table align="center" cellpadding="0" cellspacing="0" class="container-for-gmail-android" width="100%">
@@ -400,12 +399,12 @@
                       <tr>
                         <td class="mini-img" data-slot-container>
                             <div data-slot="image">
-                              <img src="http://s3.amazonaws.com/swu-filepicker/u3EYVdcIQo6dZiKefuLu_bracelet.jpg" alt="product" class="fr-fil fr-dib" />
+                              <img src="http://s3.amazonaws.com/swu-filepicker/u3EYVdcIQo6dZiKefuLu_bracelet.jpg" alt="product" />
                             </div>
                         </td>
                         <td class="mini-img" data-slot-container>
                             <div data-slot="image">
-                              <a href=""><img src="http://s3.amazonaws.com/swu-filepicker/yyN7crRfTTW6l8fO0S0S_hat.jpg" alt="product" class="fr-fil fr-dib" /></a>
+                              <a href=""><img src="http://s3.amazonaws.com/swu-filepicker/yyN7crRfTTW6l8fO0S0S_hat.jpg" alt="product" /></a>
                           </div>
                         </td>
                       </tr>
