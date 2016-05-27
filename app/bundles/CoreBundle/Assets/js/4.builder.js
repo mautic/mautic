@@ -573,17 +573,21 @@ Mautic.initSlots = function(contents) {
 
 Mautic.initSlot = function(slot) {
     var type = slot.attr('data-slot');
+    var slotIntEvent = mQuery.Event('slot.init', {
+        type: type,
+        slot: slot
+    });
+    console.log('event triggered', slotIntEvent);
+    mQuery('body').trigger(slotIntEvent);
+
 
     // Todo: Fire a JS event so other slots could catch it and do their thing
     // Temporarily for text slot:
     if (type === 'text') {
-        console.log('froala text');
         slot.froalaEditor({toolbarInline: true, zIndex: 2501});
     } else if (type === 'image') {
-        console.log('froala image', slot.find('img'));
         slot.find('img').froalaEditor({toolbarInline: true});
     }
-
 
     var handle = mQuery('<div/>').attr('data-slot-handle', true);
     slot.hover(function() {
@@ -592,3 +596,11 @@ Mautic.initSlot = function(slot) {
         handle.remove('div[data-slot-handle]');
     });
 }
+
+// Handle slot triggers
+mQuery(function() {
+    console.log('slot.init listeners loaded');
+    mQuery('body').on('slot.init', function() {
+        console.log('slot.init', this);
+    });
+});

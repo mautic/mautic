@@ -12,7 +12,7 @@
     <head>
         <?php $view['assets']->outputHeadDeclarations(); ?>
         <style type="text/css">
-        /* BUILDER CSS 
+        /* BUILDER CSS */
         div[data-slot-handle] {
             cursor: move!important;
             bottom: -5px;
@@ -35,7 +35,7 @@
         .slot-placeholder {
             border: 1px solid red;
             margin: 20px 0;
-        }*/
+        }
         </style>
     </head>
     <body>
