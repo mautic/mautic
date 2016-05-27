@@ -154,8 +154,8 @@ return array(
                 'alias'     => 'campaign_leadsource'
             ),
         )
-    ), 
+    ),
     'parameters' => array(
-        'campaing_time_wait_on_event_false' => 'PT1H'
+        'campaign_time_wait_on_event_false' => 'PT1H'
     )
 );
