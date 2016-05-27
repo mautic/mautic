@@ -36,10 +36,13 @@ class FeedController extends FormController
 
         /** @var Snapshot $snapshot */
         $snapshot = $feed->getSnapshots()->last();
+        $snapshot->setIsExpired(!$snapshot->isExpired());
+
+        $em->persist($snapshot);
+        $em->flush();
 
         // Write the contents of the XML file into a string
         $xmlString = $snapshot->getXmlString();
-
 
         $feedContent = $feedHelper->getFeedContentFromString($xmlString);
 
