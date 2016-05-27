@@ -1019,14 +1019,12 @@ class ListModel extends FormModel
     public function getLifeCycleSegments($limit = null, $dateFrom = null, $dateTo = null, $filters = array(), $segments)
     {
         if(!empty($segments)){
-            $segments = implode(",", $segments);
-            $this->factory->getLogger()->addError(print_r($segments,true));
+            $segmentlist = "'".implode("','", $segments)."'";
         }
         $q = $this->em->getConnection()->createQueryBuilder();
-        $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name')
+        $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name,ll.alias as alias')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 't')
             ->join('t', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = t.leadlist_id')
-
             ->orderBy('leads', 'DESC')
             ->where($q->expr()->eq('ll.is_published', ':published'))
             ->setParameter('published', true)
@@ -1036,8 +1034,7 @@ class ListModel extends FormModel
             $q->setMaxResults($limit);
         }
         if(!empty($segments)){
-            $q->andWhere("ll.id IN (:lists)")
-                ->setParameter('lists', $segments);
+            $q->andWhere("ll.id IN (".$segmentlist.")");
         }
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('ll.created_by = :userId')
@@ -1046,6 +1043,24 @@ class ListModel extends FormModel
 
         $results = $q->execute()->fetchAll();
 
+        if(in_array(0,$segments))
+        {
+            $qAll = $this->em->getConnection()->createQueryBuilder();
+            $qAll->select('COUNT(t.date_added) AS leads, 0 as id, "All Contacts" as name, "" as alias')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 't')
+                ->join('t', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = t.leadlist_id')
+                ->orderBy('leads', 'DESC')
+                ->where($qAll->expr()->eq('ll.is_published', ':published'))
+                ->setParameter('published', true);
+
+            if (!empty($options['canViewOthers'])) {
+                $qAll->andWhere('ll.created_by = :userId')
+                    ->setParameter('userId', $this->factory->getUser()->getId());
+            }
+
+            $resultsAll = $qAll->execute()->fetchAll();
+            $results = array_merge($results,$resultsAll);
+        }
         return $results;
     }
 
@@ -1067,13 +1082,15 @@ class ListModel extends FormModel
         $identified = $query->fetchCount($lists);
         
         $chart->setDataset($listName, $identified);
-        $chart->setDataset($this->factory->getTranslator()->trans('mautic.lead.lifecycle.graph.pie.all.lists'), $all);
+
+        if(isset($filter['leadlist_id']['value'])) {
+            $chart->setDataset(
+                $this->factory->getTranslator()->trans('mautic.lead.lifecycle.graph.pie.all.lists'),
+                $all
+            );
+        }
 
         return $chart->render();
-    }
-    
-    public function getLifeCycleStagesPerSegment($limit = 5, $dateFrom = null, $dateTo = null, $filters = array()){
-        
     }
     
     /**
@@ -1091,6 +1108,9 @@ class ListModel extends FormModel
     {
         $chart     = new BarChart($unit, $dateFrom, $dateTo, $dateFormat);
 
+        $data['values'] = array();
+        $data['labels'] = array();
+
         $q = $this->em->getConnection()->createQueryBuilder();
         
         $q->select('count(l.id) as leads, s.name as stage')
@@ -1099,10 +1119,18 @@ class ListModel extends FormModel
             ->join('t', MAUTIC_TABLE_PREFIX.'stages','s', 's.id=l.stage_id')
             ->orderBy('leads', 'DESC')
             ->where($q->expr()->eq('s.is_published', ':published'))
-            ->andWhere($q->expr()->eq('t.leadlist_id', ':leadlistid'))
-            ->setParameter('published', true)
-            ->setParameter('leadlistid', $filter['leadlist_id']['value'])
-            ->groupBy('s.name');
+
+            ->andWhere($q->expr()->gte('t.date_added', ':date_from'))
+            ->setParameter('date_from', $dateFrom->format('Y-m-d'))
+            ->andWhere($q->expr()->lte('t.date_added', ':date_to'))
+            ->setParameter('date_to', $dateTo->format('Y-m-d'))
+            ->setParameter('published', true);
+
+        if(isset($filter['leadlist_id']['value'])){
+           $q->andWhere($q->expr()->eq('t.leadlist_id', ':leadlistid'))->setParameter('leadlistid', $filter['leadlist_id']['value']);
+        }
+
+            $q->groupBy('s.name');
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('s.created_by = :userId')
@@ -1117,7 +1145,7 @@ class ListModel extends FormModel
         }
         $data['xAxes'][] =array('display' => true);
         $data['yAxes'][] =array('display' => true);
-        
+
         $baseData = array(
             'label' => $this->factory->getTranslator()->trans('mautic.lead.leads'),
             'data'  => $data['values'],
@@ -1132,7 +1160,6 @@ class ListModel extends FormModel
                 'xAxes' => $data['xAxes'],
                 'yAxes' => $data['yAxes']
             ));
-
 
         return $chartData;
     }

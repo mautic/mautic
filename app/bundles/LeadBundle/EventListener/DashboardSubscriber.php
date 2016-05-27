@@ -180,74 +180,81 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'lead.lifetime') {
 
-            if (!$event->isCached()) {
-                $model  = $this->factory->getModel('lead.list');
-                $params = $event->getWidget()->getParams();
+            $model  = $this->factory->getModel('lead.list');
+            $params = $event->getWidget()->getParams();
 
-                if (empty($params['limit'])) {
-                    // Count the list limit from the widget height
-                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
-                } else {
-                    $limit = $params['limit'];
-                }
+            if (empty($params['limit'])) {
+                // Count the list limit from the widget height
+                $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
+            } else {
+                $limit = $params['limit'];
+            }
 
-                $maxSegmentsToshow = 4;
-                $params['filter']['flag'] = array();
+            $maxSegmentsToshow = 4;
+            $params['filter']['flag'] = array();
 
-                if (isset($params['flag'])) {
-                    $params['filter']['flag'] = $params['flag'];
-                    $this->factory->getLogger()->addError(print_r($params['filter']['flag'],true));
-                    $maxSegmentsToshow = count($params['filter']['flag']);
-                }
+            if (isset($params['flag'])) {
+                $params['filter']['flag'] = $params['flag'];
+                $maxSegmentsToshow = count($params['filter']['flag']);
+            }
+            $this->factory->getLogger()->addError(print_r($params['filter']['flag'],true));
+            $lists = $model->getLifeCycleSegments($maxSegmentsToshow, $params['dateFrom'], $params['dateTo'], $canViewOthers, $params['filter']['flag']);
+            $items = array();
 
-                $lists = $model->getLifeCycleSegments($maxSegmentsToshow, $params['dateFrom'], $params['dateTo'], $canViewOthers, $params['filter']['flag']);
-                $items = array();
-
-                // Build table rows with links
-                if ($lists) {
-                    $this->factory->getLogger()->addError(print_r($lists,true));
-                    foreach ($lists as &$list) {
-                        $listUrl = $this->factory->getRouter()->generate('mautic_leadlist_action', array('objectAction' => 'edit', 'objectId' => $list['id']));
+            // Build table rows with links
+            if ($lists) {
+                foreach ($lists as &$list) {
+                    if($list['alias'] != ''){
+                        $listUrl = $this->factory->getRouter()->generate('mautic_contact_index', array('search' => 'segment:'.$list['alias']));
+                    }
+                    else{
+                        $listUrl = $this->factory->getRouter()->generate('mautic_contact_index', array());
+                    }
+                    if($list['id']){
                         $params['filter']['leadlist_id']=array(
                             'value' => $list['id'],
                             'list_column_name' => 't.lead_id'
                         );
-
-                        $column = $model->getLifeCycleSegmentChartData(
-                            $params['timeUnit'],
-                            $params['dateFrom'],
-                            $params['dateTo'],
-                            $params['dateFormat'],
-                            $params['filter'],
-                            $canViewOthers,
-                            $list['name']
-                        );
-                        $items['columnName'][] = $list['name'];
-                        $items['link'][] = $listUrl;
-                        $items['chartItems'][] = $column;
-                        
-                        $stages[] = $model->getStagesBarChartData($params['timeUnit'],
-                            $params['dateFrom'],
-                            $params['dateTo'],
-                            $params['dateFormat'],
-                            $params['filter'],
-                            $canViewOthers);
                     }
-                    $with = 100/count($lists);
-                   
-                    $event->setTemplateData(array(
-                        'columnName' => $items['columnName'],
-                        'width' => $with,
-                        'link' => $items['link'],
-                        'chartType'   => 'pie',
-                        'chartHeight' => $event->getWidget()->getHeight() - 180,
-                        'chartItems'   => $items['chartItems'],
-                        'stages' => $stages
-                    ));
-                    $event->setTemplate('MauticCoreBundle:Helper:lifecycle.html.php');
-                    $event->stopPropagation();
+                    else{
+                        unset($params['filter']['leadlist_id']);
+                    }
+
+                    $column = $model->getLifeCycleSegmentChartData(
+                        $params['timeUnit'],
+                        $params['dateFrom'],
+                        $params['dateTo'],
+                        $params['dateFormat'],
+                        $params['filter'],
+                        $canViewOthers,
+                        $list['name']
+                    );
+                    $items['columnName'][] = $list['name'];
+                    $items['link'][] = $listUrl;
+                    $items['chartItems'][] = $column;
+
+                    $stages[] = $model->getStagesBarChartData($params['timeUnit'],
+                        $params['dateFrom'],
+                        $params['dateTo'],
+                        $params['dateFormat'],
+                        $params['filter'],
+                        $canViewOthers);
                 }
+                $with = 100/count($lists);
+
+                $event->setTemplateData(array(
+                    'columnName' => $items['columnName'],
+                    'width' => $with,
+                    'link' => $items['link'],
+                    'chartType'   => 'pie',
+                    'chartHeight' => $event->getWidget()->getHeight() - 180,
+                    'chartItems'   => $items['chartItems'],
+                    'stages' => $stages
+                ));
+                $event->setTemplate('MauticCoreBundle:Helper:lifecycle.html.php');
+                $event->stopPropagation();
             }
+
 
             return;
         }

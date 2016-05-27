@@ -40,7 +40,7 @@ class DashboardLeadsLifetimeWidgetType extends AbstractType
 
         $lists = $model->getUserLists();
         $segments = array();
-
+        $segments[0]= $this->factory->getTranslator()->trans('mautic.lead.all.leads');
         foreach ($lists as $list) {
             $segments[$list['id']] = $list['name'];
         }
