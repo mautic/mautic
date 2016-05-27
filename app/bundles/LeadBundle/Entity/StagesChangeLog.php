@@ -63,7 +63,7 @@ class StagesChangeLog
 
         $builder->addId();
 
-        $builder->addLead(false, 'CASCADE', false, 'stagesChangeLog');
+        $builder->addLead(false, 'CASCADE', false, 'stageChangeLog');
         
         $builder->createField('type', 'text')
             ->length(50)

@@ -547,6 +547,11 @@ return array(
             'mautic.form.type.lead_dashboard_leads_in_time_widget'  => array(
                 'class'     => 'Mautic\LeadBundle\Form\Type\DashboardLeadsInTimeWidgetType',
                 'alias'     => 'lead_dashboard_leads_in_time_widget'
+            ),
+            'mautic.form.type.lead_dashboard_leads_lifetime_widget'  => array(
+                'class'     => 'Mautic\LeadBundle\Form\Type\DashboardLeadsLifetimeWidgetType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'lead_dashboard_leads_lifetime_widget'
             )
         ),
         'other'   => array(

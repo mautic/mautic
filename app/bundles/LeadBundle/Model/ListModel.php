@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Event\LeadListEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -1015,30 +1016,124 @@ class ListModel extends FormModel
      *
      * @return array
      */
-    public function getLifeCycleLists($limit = 5, $dateFrom = null, $dateTo = null, $filters = array())
+    public function getLifeCycleSegments($limit = null, $dateFrom = null, $dateTo = null, $filters = array(), $segments)
     {
+        if(!empty($segments)){
+            $segments = implode(",", $segments);
+            $this->factory->getLogger()->addError(print_r($segments,true));
+        }
         $q = $this->em->getConnection()->createQueryBuilder();
-        $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name, COUNT(l.stage_id) as stages')
+        $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 't')
             ->join('t', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = t.leadlist_id')
-            ->join('t', MAUTIC_TABLE_PREFIX.'lead', 'l', 'l.id = t.lead_id')
+
             ->orderBy('leads', 'DESC')
             ->where($q->expr()->eq('ll.is_published', ':published'))
             ->setParameter('published', true)
-            ->groupBy('ll.id, l.stage_id')
-            ->setMaxResults($limit);
+            ->groupBy('ll.id');
 
+        if($limit){
+            $q->setMaxResults($limit);
+        }
+        if(!empty($segments)){
+            $q->andWhere("ll.id IN (:lists)")
+                ->setParameter('lists', $segments);
+        }
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('ll.created_by = :userId')
                 ->setParameter('userId', $this->factory->getUser()->getId());
         }
 
-        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-        $chartQuery->applyFilters($q, $filters);
-        $chartQuery->applyDateFilters($q, 'date_added');
-
         $results = $q->execute()->fetchAll();
 
         return $results;
+    }
+
+    public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true, $listName){
+
+        $chart = new PieChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+
+        if (!$canViewOthers) {
+            $filter['owner_id'] = $this->factory->getUser()->getId();
+        }
+
+        if(isset($filter['flag'])){
+            unset($filter['flag']);
+        }
+        $allLists=$query->getCountQuery('lead_lists_leads', 'lead_id', 'date_added', null);
+        $lists = $query->getCountQuery('lead_lists_leads', 'lead_id', 'date_added', $filter);
+        $all = $query->fetchCount($allLists);
+        $identified = $query->fetchCount($lists);
+        
+        $chart->setDataset($listName, $identified);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.lead.lifecycle.graph.pie.all.lists'), $all);
+
+        return $chart->render();
+    }
+    
+    public function getLifeCycleStagesPerSegment($limit = 5, $dateFrom = null, $dateTo = null, $filters = array()){
+        
+    }
+    
+    /**
+     * Get bar chart data of hits
+     *
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $dateFormat
+     * @param array    $filter
+     *
+     * @return array
+     */
+    public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
+    {
+        $chart     = new BarChart($unit, $dateFrom, $dateTo, $dateFormat);
+
+        $q = $this->em->getConnection()->createQueryBuilder();
+        
+        $q->select('count(l.id) as leads, s.name as stage')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 't')
+            ->join('t', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id')
+            ->join('t', MAUTIC_TABLE_PREFIX.'stages','s', 's.id=l.stage_id')
+            ->orderBy('leads', 'DESC')
+            ->where($q->expr()->eq('s.is_published', ':published'))
+            ->andWhere($q->expr()->eq('t.leadlist_id', ':leadlistid'))
+            ->setParameter('published', true)
+            ->setParameter('leadlistid', $filter['leadlist_id']['value'])
+            ->groupBy('s.name');
+
+        if (!empty($options['canViewOthers'])) {
+            $q->andWhere('s.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $results = $q->execute()->fetchAll();
+        foreach($results as $result){
+            $data['labels'][]=$result['stage'];
+            $data['values'][]=$result['leads'];
+
+        }
+        $data['xAxes'][] =array('display' => true);
+        $data['yAxes'][] =array('display' => true);
+        
+        $baseData = array(
+            'label' => $this->factory->getTranslator()->trans('mautic.lead.leads'),
+            'data'  => $data['values'],
+        );
+        $datasetId = count($data['values']);
+        $datasets[] = array_merge($baseData, $chart->generateColors($datasetId));
+
+        $chartData = array(
+            'labels' => $data['labels'],
+            'datasets' => $datasets,
+            'options' => array(
+                'xAxes' => $data['xAxes'],
+                'yAxes' => $data['yAxes']
+            ));
+
+
+        return $chartData;
     }
 }

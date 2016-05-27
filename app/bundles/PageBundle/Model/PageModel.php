@@ -906,6 +906,7 @@ class PageModel extends FormModel
         $chart     = new BarChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
         $chartData = $query->fetchTimeData('page_hits', 'date_hit', $filter);
+        
         $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.field.hits'), $chartData);
         return $chart->render();
     }
