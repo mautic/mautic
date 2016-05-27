@@ -1652,6 +1652,11 @@ class MailHelper
         $stat->setDateSent(new \DateTime());
         $stat->setEmail($this->email);
 
+        //check if current email use feed
+        $currentFeedSnapshot=$this->email->getFeed()->getSnapshots()->last();
+        if (!is_null($currentFeedSnapshot)){
+            $stat->setSnapshot($currentFeedSnapshot);
+        }
         // Note if a lead
         if (null !== $this->lead) {
             $stat->setLead($this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $this->lead['id']));
