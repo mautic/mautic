@@ -32,7 +32,7 @@ class DashboardController extends FormController
         $widgets         = $model->getWidgets();
 
         // Apply the default dashboard if no widget exists
-        if (!count($widgets)) {
+        if (!count($widgets) && $this->factory->getUser()->getId()) {
             return $this->applyDashboardFileAction('global.default');
         }
 
