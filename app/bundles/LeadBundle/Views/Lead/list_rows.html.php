@@ -56,7 +56,7 @@
                             'edit'      => $hasEditAccess,
                             'delete'    => $security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $item->getOwner()),
                         ),
-                        'routeBase' => 'lead',
+                        'routeBase' => 'contact',
                         'langVar'   => 'lead.lead',
                         'customButtons' => $custom
                     ));

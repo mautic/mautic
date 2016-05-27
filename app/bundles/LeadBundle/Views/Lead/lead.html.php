@@ -135,7 +135,7 @@ $view['slots']->set(
         'MauticCoreBundle:Helper:page_actions.html.php',
         array(
             'item'            => $lead,
-            'routeBase'       => 'lead',
+            'routeBase'       => 'contact',
             'langVar'         => 'lead.lead',
             'customButtons'   => $buttons,
             'templateButtons' => array(

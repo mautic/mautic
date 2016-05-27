@@ -297,7 +297,7 @@ class LeadController extends FormController
                     'contentTemplate' => 'MauticLeadBundle:Lead:index',
                     'passthroughVars' => array(
                         'activeLink'    => '#mautic_contact_index',
-                        'mauticContent' => 'lead'
+                        'mauticContent' => 'contact'
                     ),
                     'flashes'         => array(
                         array(
@@ -395,7 +395,7 @@ class LeadController extends FormController
 
         $fields            = $lead->getFields();
         $integrationHelper = $this->factory->getHelper('integration');
-        $socialProfiles    = $integrationHelper->getUserProfiles($lead, $fields);
+        $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
 
         // Set the social profile templates

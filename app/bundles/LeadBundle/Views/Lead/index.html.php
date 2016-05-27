@@ -46,7 +46,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'templateButtons' => array(
         'new' => $permissions['lead:leads:create']
     ),
-    'routeBase' => 'lead',
+    'routeBase' => 'contact',
     'langVar'   => 'lead.lead',
     'preCustomButtons' => $preButtons,
     'customButtons'    => $buttons,
@@ -130,7 +130,7 @@ if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) 
         'searchHelp'  => 'mautic.lead.lead.help.searchcommands',
         'action'      => $currentRoute,
         'langVar'     => 'lead.lead',
-        'routeBase'   => 'lead',
+        'routeBase'   => 'contact',
         'preCustomButtons' => $customButtons,
         'templateButtons' => array(
             'delete' => $permissions['lead:leads:deleteown'] || $permissions['lead:leads:deleteother']
