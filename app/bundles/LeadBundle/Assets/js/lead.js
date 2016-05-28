@@ -463,7 +463,7 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
     if (mQuery('#field-templates .'+selectedVal).length) {
         mQuery('#leadfield_properties').html('');
         mQuery('#leadfield_properties').append(mQuery('#field-templates .'+selectedVal).clone(true));
-    } else {
+    } else if (!mQuery('#leadfield_properties .'+selectedVal).length) {
         mQuery('#leadfield_properties').html('');
     }
 
@@ -495,7 +495,7 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
 
     if (selectedVal === 'datetime' || selectedVal === 'date' || selectedVal === 'time') {
         Mautic.activateDateTimeInputs(defaultValueField, selectedVal);
-    } else {
+    } else if (defaultValueField.hasClass('calendar-activated')) {
         defaultValueField.datetimepicker('destroy').removeClass('calendar-activated');
     }
 };
