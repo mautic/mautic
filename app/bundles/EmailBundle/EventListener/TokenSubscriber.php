@@ -38,7 +38,7 @@ class TokenSubscriber extends CommonSubscriber
     {
         // Find and replace encoded tokens for trackable URL conversion
         $content = $event->getContent();
-        $content = preg_replace('/(%7B)(.*?)(%7D)/i', '{$2}', $content);
+        $content = preg_replace('/(%7B)(.*?)(%7D)/i', '{$2}', $content, -1, $count);
         $event->setContent($content);
 
         if ($plainText = $event->getPlainText()) {

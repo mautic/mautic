@@ -10,9 +10,9 @@
 namespace Mautic\CoreBundle\Model;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\UrlHelper;
 use Symfony\Component\Intl\Intl;
 
 /**
@@ -182,13 +182,21 @@ class CommonModel
      * @param array $routeParams
      * @param bool  $absolute
      * @param array $clickthrough
+     * @param bool  $shortenUrl
      *
      * @return string
      */
-    public function buildUrl($route, $routeParams = array(), $absolute = true, $clickthrough = array())
+    public function buildUrl($route, $routeParams = array(), $absolute = true, $clickthrough = array(), $shortenUrl = false)
     {
         $url  = $this->factory->getRouter()->generate($route, $routeParams, $absolute);
         $url .= (!empty($clickthrough)) ? '?ct=' . $this->encodeArrayForUrl($clickthrough) : '';
+
+        if ($shortenUrl) {
+            /** @var UrlHelper $urlHelper */
+            $urlHelper = $this->factory->getHelper('url');
+
+            return $urlHelper->buildShortUrl($url);
+        }
 
         return $url;
     }

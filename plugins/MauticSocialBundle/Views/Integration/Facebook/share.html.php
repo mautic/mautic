@@ -8,6 +8,7 @@
  */
 
 $locale    = $app->getRequest()->getLocale();
+$settings  = (!empty($field['properties'])) ? $field['properties'] : array();
 $layout    = (!empty($settings['layout'])) ? $settings['layout'] : 'standard';
 $action    = (!empty($settings['action'])) ? $settings['action'] : 'like';
 $showFaces = (!empty($settings['showFaces'])) ? 'true' : 'false';
@@ -27,6 +28,7 @@ JS;
 ?>
 
 <?php //add FB's required OG tag ?>
+<?php echo $js; ?>
 <meta property="og:type" content="website" />
 <div class="fb-<?php echo ($action == 'share') ? 'share-button' : 'like'; ?> share-button facebook-share-button layout-<?php echo $layout; ?> action-<?php echo $action; ?>"
      data-<?php echo ($action == 'share') ? 'type' : 'layout'; ?>="<?php echo $layout; ?>"

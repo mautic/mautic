@@ -22,14 +22,24 @@ return array(
                 'path'       => '/campaigns/{page}',
                 'controller' => 'MauticCampaignBundle:Campaign:index'
             ),
-            'mautic_campaign_leads'       => array(
-                'path'       => '/campaigns/view/{objectId}/leads/{page}',
-                'controller' => 'MauticCampaignBundle:Campaign:leads',
-            ),
             'mautic_campaign_action'      => array(
                 'path'       => '/campaigns/{objectAction}/{objectId}',
                 'controller' => 'MauticCampaignBundle:Campaign:execute'
-            )
+            ),
+            'mautic_campaign_contacts'       => array(
+                'path'       => '/campaigns/view/{objectId}/contact/{page}',
+                'controller' => 'MauticCampaignBundle:Campaign:leads',
+            ),
+
+            //@deprecated to be removed in 2.0
+            'mautic_campaign_leads'       => array(
+                'path'       => '/campaigns/view/{objectId}/contacts/{page}',
+                'controller' => 'MauticCampaignBundle:Campaign:leads',
+            ),
+            'mautic_campaign_leads_bc'       => array(
+                'path'       => '/campaigns/view/{objectId}/leads/{page}',
+                'controller' => 'MauticCampaignBundle:Campaign:leads',
+            ),
         ),
         'api'  => array(
             'mautic_api_getcampaigns' => array(
@@ -40,12 +50,34 @@ return array(
                 'path'       => '/campaigns/{id}',
                 'controller' => 'MauticCampaignBundle:Api\CampaignApi:getEntity'
             ),
+            'mautic_api_campaignaddcontact' => array(
+                'path'       => '/campaigns/{id}/contact/add/{leadId}',
+                'controller' => 'MauticCampaignBundle:Api\CampaignApi:addLead',
+                'method'     => 'POST'
+            ),
+            'mautic_api_campaignremovecontact' => array(
+                'path'       => '/campaigns/{id}/contact/remove/{leadId}',
+                'controller' => 'MauticCampaignBundle:Api\CampaignApi:removeLead',
+                'method'     => 'POST'
+            ),
+
+            // @deprecated - to be removed in 2.0
             'mautic_api_campaignaddlead' => array(
-                'path'       => '/campaigns/{id}/lead/add/{leadId}',
+                'path'       => '/campaigns/{id}/contact/add/{leadId}',
                 'controller' => 'MauticCampaignBundle:Api\CampaignApi:addLead',
                 'method'     => 'POST'
             ),
             'mautic_api_campaignremovelead' => array(
+                'path'       => '/campaigns/{id}/contact/remove/{leadId}',
+                'controller' => 'MauticCampaignBundle:Api\CampaignApi:removeLead',
+                'method'     => 'POST'
+            ),
+            'mautic_api_campaignaddlead_bc' => array(
+                'path'       => '/campaigns/{id}/lead/add/{leadId}',
+                'controller' => 'MauticCampaignBundle:Api\CampaignApi:addLead',
+                'method'     => 'POST'
+            ),
+            'mautic_api_campaignremovelead_bc' => array(
                 'path'       => '/campaigns/{id}/lead/remove/{leadId}',
                 'controller' => 'MauticCampaignBundle:Api\CampaignApi:removeLead',
                 'method'     => 'POST'
@@ -55,14 +87,11 @@ return array(
 
     'menu'     => array(
         'main' => array(
-            'priority' => 10,
-            'items'    => array(
-                'mautic.campaign.campaigns' => array(
-                    'route'     => 'mautic_campaign_index',
-                    'id'        => 'mautic_campaigns_root',
-                    'iconClass' => 'fa-clock-o',
-                    'access'    => 'campaign:campaigns:view'
-                )
+            'mautic.campaign.menu.index' => array(
+                'iconClass' => 'fa-clock-o',
+                'route'     => 'mautic_campaign_index',
+                'access'    => 'campaign:campaigns:view',
+                'priority'  => 50
             )
         )
     ),
@@ -87,7 +116,10 @@ return array(
             ),
             'mautic.campaign.search.subscriber'         => array(
                 'class' => 'Mautic\CampaignBundle\EventListener\SearchSubscriber'
-            )
+            ),
+            'mautic.campaign.dashboard.subscriber'           => array(
+                'class' => 'Mautic\CampaignBundle\EventListener\DashboardSubscriber'
+            ),
         ),
         'forms'  => array(
             'mautic.campaign.type.form'                 => array(

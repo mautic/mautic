@@ -25,14 +25,14 @@ class FormSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            FormEvents::FORM_ON_BUILD => array('onFormBuild', 0)
+            FormEvents::FORM_ON_BUILD  => array('onFormBuild', 0)
         );
     }
 
     /**
      * @param FormBuilderEvent $event
      */
-    public function onFormBuild (FormBuilderEvent $event)
+    public function onFormBuild(FormBuilderEvent $event)
     {
         $action = array(
             'group'       => 'mautic.plugin.actions',
@@ -42,7 +42,6 @@ class FormSubscriber extends CommonSubscriber
             'formTheme'   => 'MauticPluginBundle:FormTheme\Integration',
             'callback'    => array('\\Mautic\\PluginBundle\\Helper\\EventHelper', 'pushLead')
         );
-
         $event->addSubmitAction('plugin.leadpush', $action);
     }
 }

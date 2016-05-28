@@ -408,6 +408,33 @@ class MauticFactory
             if (substr($path, -1) === '/') {
                 $path = substr($path, 0, -1);
             }
+        } elseif ($name == 'dashboard.user' || $name == 'dashboard.global') {
+            //these are absolute regardless as they are configurable
+            $globalPath = $this->getParameter('dashboard_import_dir');
+            if (substr($globalPath, -1) === '/') {
+                $globalPath = substr($globalPath, 0, -1);
+            }
+
+            if ($name == 'dashboard.global') {
+
+                return $globalPath;
+            }
+
+            if (!$userPath = $this->getParameter('dashboard_import_user_dir')) {
+                $userPath = $globalPath;
+            } elseif (substr($userPath, -1) === '/') {
+                $userPath = substr($userPath, 0, -1);
+            }
+
+            $user      = $this->getUser();
+            $userPath .= '/'.$user->getId();
+
+            // @todo check is_writable
+            if (!is_dir($userPath) && !file_exists($userPath)) {
+                mkdir($userPath, 0755);
+            }
+
+            return $userPath;
         } elseif (isset($paths[$name])) {
             $path = $paths[$name];
         } elseif (strpos($name, '_root') !== false) {
@@ -545,15 +572,22 @@ class MauticFactory
 
             $themes[$specificFeature] = array();
             foreach ($finder as $theme) {
-                if (file_exists($theme->getRealPath().'/config.php')) {
-                    $config = include $theme->getRealPath().'/config.php';
-                    if ($specificFeature != 'all') {
-                        if (isset($config['features']) && in_array($specificFeature, $config['features'])) {
-                            $themes[$specificFeature][$theme->getBasename()] = $config['name'];
-                        }
-                    } else {
+                if (file_exists($theme->getRealPath().'/config.json')) {
+                    $config = json_decode(file_get_contents($theme->getRealPath() . '/config.json'), true);
+                }
+                // @deprecated Remove support for theme config.php in 2.0
+                elseif (file_exists($theme->getRealPath() . '/config.php')) {
+                    $config = include $theme->getRealPath() . '/config.php';
+                } else {
+                    continue;
+                }
+
+                if ($specificFeature != 'all') {
+                    if (isset($config['features']) && in_array($specificFeature, $config['features'])) {
                         $themes[$specificFeature][$theme->getBasename()] = $config['name'];
                     }
+                } else {
+                    $themes[$specificFeature][$theme->getBasename()] = $config['name'];
                 }
             }
         }
@@ -744,6 +778,10 @@ class MauticFactory
                 return $this->container->get('templating.helper.slots');
             case 'template.form':
                 return $this->container->get('templating.helper.form');
+            case 'template.translator':
+                return $this->container->get('templating.helper.translator');
+            case 'template.router':
+                return $this->container->get('templating.helper.router');
             default:
                 return $this->container->get('mautic.helper.'.$helper);
         }

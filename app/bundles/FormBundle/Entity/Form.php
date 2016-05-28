@@ -762,12 +762,13 @@ class Form extends FormEntity
      */
     public function generateFormName()
     {
-        return strtolower(
+        $name = strtolower(
             InputHelper::alphanum(
                 InputHelper::transliterate(
                     $this->name
                 )
             )
         );
+        return (empty($name)) ? 'form-' . $this->id : $name;
     }
 }

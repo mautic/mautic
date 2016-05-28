@@ -19,6 +19,9 @@ use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -430,5 +433,139 @@ class AssetModel extends FormModel
         }
 
         return $size;
+    }
+
+    /**
+     * Get line chart data of downloads
+     *
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $dateFormat
+     * @param array    $filter
+     * @param boolean  $canViewOthers
+     *
+     * @return array
+     */
+    public function getDownloadsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
+    {
+        $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $q         = $query->prepareTimeDataQuery('asset_downloads', 'date_download', $filter);
+
+        if (!$canViewOthers) {
+            $q->join('t', MAUTIC_TABLE_PREFIX.'assets', 'a', 'a.id = t.asset_id')
+                ->andWhere('a.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $data = $query->loadAndBuildTimeData($q);
+
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.asset.downloadcount'), $data);
+        return $chart->render();
+    }
+    
+    /**
+     * Get pie chart data of unique vs repetitive downloads.
+     * Repetitive in this case mean if a lead downloaded any of the assets more than once
+     *
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     * @param boolean $canViewOthers
+     *
+     * @return array
+     */
+    public function getUniqueVsRepetitivePieChartData($dateFrom, $dateTo, $filters = array(), $canViewOthers = true)
+    {
+        $chart      = new PieChart();
+        $query      = new ChartQuery($this->factory->getEntityManager()->getConnection(), $dateFrom, $dateTo);
+        $allQ       = $query->getCountQuery('asset_downloads', 'id', 'date_download', $filters);
+        $uniqueQ    = $query->getCountQuery('asset_downloads', 'lead_id', 'date_download', $filters, array('getUnique' => true));
+
+        if (!$canViewOthers) {
+            $allQ->join('t', MAUTIC_TABLE_PREFIX.'assets', 'a', 'a.id = t.asset_id')
+                ->andWhere('a.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+            $uniqueQ->join('t', MAUTIC_TABLE_PREFIX.'assets', 'a', 'a.id = t.asset_id')
+                ->andWhere('a.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $all = $query->fetchCount($allQ);
+        $unique = $query->fetchCount($uniqueQ);
+
+        $repetitive = $all - $unique;
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.asset.unique'), $unique);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.asset.repetitive'), $repetitive);
+
+        return $chart->render();
+    }
+
+    /**
+     * Get a list of popular (by downloads) assets
+     *
+     * @param integer $limit
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     * @param boolean $canViewOthers
+     *
+     * @return array
+     */
+    public function getPopularAssets($limit = 10, $dateFrom = null, $dateTo = null, $filters = array(), $canViewOthers = true)
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(DISTINCT t.id) AS download_count, a.id, a.title')
+            ->from(MAUTIC_TABLE_PREFIX.'asset_downloads', 't')
+            ->join('t', MAUTIC_TABLE_PREFIX.'assets', 'a', 'a.id = t.asset_id')
+            ->orderBy('download_count', 'DESC')
+            ->groupBy('a.id')
+            ->setMaxResults($limit);
+
+        if (!$canViewOthers) {
+            $q->andWhere('a.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_download');
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
+     * Get a list of assets in a date range
+     *
+     * @param integer  $limit
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param array    $filters
+     * @param array    $options
+     *
+     * @return array
+     */
+    public function getAssetList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array(), $options = array())
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('t.id, t.title as name, t.date_added, t.date_modified')
+            ->from(MAUTIC_TABLE_PREFIX.'assets', 't')
+            ->setMaxResults($limit);
+
+        if (!empty($options['canViewOthers'])) {
+            $q->andWhere('t.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_added');
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
     }
 }

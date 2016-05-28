@@ -78,7 +78,8 @@ class LeadSubscriber extends CommonSubscriber
                             'stat' => $stat,
                             'type' => 'read'
                         ),
-                        'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php'
+                        'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php',
+                        'icon'            => 'fa-envelope-o'
                     )
                 );
             }
@@ -94,7 +95,8 @@ class LeadSubscriber extends CommonSubscriber
                             'stat' => $stat,
                             'type' => 'sent'
                         ),
-                        'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php'
+                        'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php',
+                        'icon'            => 'fa-envelope'
                     )
                 );
             }

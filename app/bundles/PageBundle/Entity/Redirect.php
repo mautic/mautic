@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\EmailBundle\Entity\Email;
 
 /**
@@ -49,9 +50,24 @@ class Redirect extends FormEntity
     private $uniqueHits = 0;
 
     /**
-     * @var Email
+     * @var ArrayCollection
+     */
+    private $trackables;
+
+    /**
+     * @deprecated to be removed in 2.0
+     *
+     * @var
      */
     private $email;
+
+    /**
+     * Redirect constructor.
+     */
+    public function __construct()
+    {
+        $this->trackables = new ArrayCollection();
+    }
 
     /**
      * @param ORM\ClassMetadata $metadata
@@ -78,9 +94,13 @@ class Redirect extends FormEntity
             ->columnName('unique_hits')
             ->build();
 
-        $builder->createManyToOne('email', 'Mautic\EmailBundle\Entity\Email')
-            ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
+        $builder->createOneToMany('trackables', 'Trackable')
+            ->mappedBy('redirect')
+            ->fetchExtraLazy()
             ->build();
+
+        // @deprecated to be removed in 2.0
+        $builder->addNamedField('email', 'integer', 'email_id', true);
     }
 
     /**
@@ -199,6 +219,28 @@ class Redirect extends FormEntity
     }
 
     /**
+     * @return ArrayCollection
+     */
+    public function getTrackableList()
+    {
+        return $this->trackables;
+    }
+
+    /**
+     * @param ArrayCollection $trackables
+     *
+     * @return Redirect
+     */
+    public function setTrackables($trackables)
+    {
+        $this->trackables = $trackables;
+
+        return $this;
+    }
+
+    /**
+     * @deprecated to be removed in 2.0
+     *
      * @return mixed
      */
     public function getEmail()
@@ -207,12 +249,18 @@ class Redirect extends FormEntity
     }
 
     /**
-     * @param Email $email
+     * @deprecated to be removed in 2.0
+     *
+     * @param mixed $email
      *
      * @return Redirect
      */
-    public function setEmail(Email $email = null)
+    public function setEmail($email)
     {
+        if ($email instanceof Email) {
+            $email = $email->getId();
+        }
+        
         $this->email = $email;
 
         return $this;

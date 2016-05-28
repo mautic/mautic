@@ -15,11 +15,8 @@ README.md
 upgrade.php
 vendor/babdev/*
 vendor/liip/*
-vendor/twig/*
 vendor/webfactory/*
 vendor/sensio/generator-bundle/*
 vendor/symfony/browser-kit/*
 vendor/symfony/dom-crawler/*
-vendor/symfony/twig-bridge/*
-vendor/symfony/twig-bundle/*
 vendor/symfony/web-profiler-bundle/*

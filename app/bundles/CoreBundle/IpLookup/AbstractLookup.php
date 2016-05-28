@@ -104,6 +104,13 @@ abstract class AbstractLookup
      */
     public function getDetails()
     {
-        return call_user_func('get_object_vars', $this);
+        $reflect = new \ReflectionClass($this);
+        $props   = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC);
+
+        $details = array();
+        foreach ($props as $prop) {
+            $details[$prop->getName()] = $prop->getValue($this);
+        }
+        return $details;
     }
 }

@@ -21,7 +21,7 @@ if (!empty($item['storedSubject'])) {
 ?>
 
 <li class="wrapper email-read">
-	<div class="figure"><span class="fa <?php echo isset($icons['email']) ? $icons['email'] : '' ?>"></span></div>
+	<div class="figure"><span class="fa <?php echo isset($event['icon']) ? $event['icon'] : '' ?>"></span></div>
 	<div class="panel">
 	    <div class="panel-body">
 	    	<h3>

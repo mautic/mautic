@@ -33,7 +33,17 @@ class MenuEvent extends Event
     protected $type;
 
     /**
-     * @param CorePermissions $security
+     * Menu helper
+     *
+     * @var MenuHelper
+     */
+    protected $helper;
+
+    /**
+     * MenuEvent constructor.
+     *
+     * @param MenuHelper $menuHelper
+     * @param string     $type
      */
     public function __construct(MenuHelper $menuHelper, $type = 'main')
     {
@@ -52,18 +62,22 @@ class MenuEvent extends Event
     /**
      * Add items to the menu
      *
-     * @param array $items
+     * @param array $menuItems
      *
      * @return void
      */
-    public function addMenuItems(array $items)
+    public function addMenuItems(array $menuItems)
     {
+        $defaultPriority = isset($menuItems['priority']) ? $menuItems['priority'] : 9999;
+        $items           = isset($menuItems['items']) ? $menuItems['items'] : $menuItems;
+
         $isRoot = isset($items['name']) && ($items['name'] == 'root' || $items['name'] == 'admin');
         if (!$isRoot) {
-            $this->helper->createMenuStructure($items);
-        }
+            $this->helper->createMenuStructure($items, 0, $defaultPriority);
 
-        if ($isRoot) {
+            $this->menuItems['children'] = array_merge_recursive($this->menuItems['children'], $items);
+        } else {
+
             //make sure the root does not override the children
             if (isset($this->menuItems['children'])) {
                 if (isset($items['children'])) {
@@ -73,8 +87,6 @@ class MenuEvent extends Event
                 }
             }
             $this->menuItems = $items;
-        } else {
-            $this->menuItems['children'] = array_merge_recursive($this->menuItems['children'], $items);
         }
     }
 
@@ -85,6 +97,9 @@ class MenuEvent extends Event
      */
     public function getMenuItems()
     {
+        $this->helper->placeOrphans($this->menuItems['children'], true);
+        $this->helper->sortByPriority($this->menuItems['children']);
+        
         return $this->menuItems;
     }
 
