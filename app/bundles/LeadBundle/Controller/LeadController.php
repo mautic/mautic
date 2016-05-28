@@ -364,7 +364,6 @@ class LeadController extends FormController
         $fromDate->modify('-6 months');
         $toDate      = new \DateTime;
         $engagements = array();
-        $total       = 0;
 
         $events = array();
         foreach ($eventsByDate as $eventDate => $dateEvents) {
@@ -398,16 +397,18 @@ class LeadController extends FormController
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
 
         // Set the social profile templates
-        foreach ($socialProfiles as $integration => &$details) {
-            if ($integrationObject = $integrationHelper->getIntegrationObject($integration)) {
-                if ($template = $integrationObject->getSocialProfileTemplate()) {
-                    $details['social_profile_template'] = $template;
+        if ($socialProfiles) {
+            foreach ($socialProfiles as $integration => &$details) {
+                if ($integrationObject = $integrationHelper->getIntegrationObject($integration)) {
+                    if ($template = $integrationObject->getSocialProfileTemplate()) {
+                        $details['social_profile_template'] = $template;
+                    }
                 }
-            }
 
-            if (!isset($details['social_profile_template'])) {
-                // No profile template found
-                unset($socialProfiles[$integration]);
+                if (!isset($details['social_profile_template'])) {
+                    // No profile template found
+                    unset($socialProfiles[$integration]);
+                }
             }
         }
 
