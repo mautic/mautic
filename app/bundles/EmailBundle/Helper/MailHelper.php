@@ -897,7 +897,7 @@ class MailHelper
      *
      * @return string
      */
-    public function getcontentHash()
+    public function getContentHash()
     {
         return $this->contentHash;
     }

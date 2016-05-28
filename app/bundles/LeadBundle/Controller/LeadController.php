@@ -339,9 +339,9 @@ class LeadController extends FormController
                         } elseif (!empty($details['region'])) {
                             $name = $details['region'];
                         }
-                        $place = array(
+                        $place    = array(
                             'latLng' => array($details['latitude'], $details['longitude']),
-                            'name' => $name,
+                            'name'   => $name,
                         );
                         $places[] = $place;
                     }
@@ -358,12 +358,13 @@ class LeadController extends FormController
         $eventTypes   = $event->getEventTypes();
 
         // Get an engagement count
-        $translator     = $this->factory->getTranslator();
+        $translator = $this->factory->getTranslator();
 
-        $fromDate       = (new \DateTime('first day of this month 00:00:00'))->modify('-6 months');
-        $toDate         = new \DateTime;
+        $fromDate = new \DateTime('first day of this month 00:00:00');
+        $fromDate->modify('-6 months');
+        $toDate      = new \DateTime;
         $engagements = array();
-        $total          = 0;
+        $total       = 0;
 
         $events = array();
         foreach ($eventsByDate as $eventDate => $dateEvents) {
