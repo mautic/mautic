@@ -31,32 +31,13 @@ class MenuHelper extends Helper
     protected $helper;
 
     /**
-     * @var CorePermissions
+     * MenuHelper constructor.
+     *
+     * @param KnpHelper $helper
      */
-    protected $security;
-
-    /**
-     * @var null|Request
-     */
-    protected $request;
-
-    /**
-     * @var User
-     */
-    protected $user;
-
-    /**
-     * @var array
-     */
-    protected $mauticParameters;
-
-    public function __construct(KnpHelper $helper, CorePermissions $security, TokenStorageInterface $tokenStorage, RequestStack $requestStack, array $mauticParameters)
+    public function __construct(KnpHelper $helper)
     {
-        $this->helper           = $helper;
-        $this->security         = $security;
-        $this->user             = $tokenStorage->getToken()->getUser();
-        $this->mauticParameters = $mauticParameters;
-        $this->request          = $requestStack->getCurrentRequest();
+        $this->helper = $helper;
     }
 
     /**
@@ -138,125 +119,6 @@ class MenuHelper extends Helper
     }
 
     /**
-     * Converts menu config into something KNP menus expects
-     *
-     * @param      $items
-     * @param int  $depth
-     * @param bool $isRoot
-     */
-    public function createMenuStructure(&$items, $depth = 0, $isRoot = false)
-    {
-        if ($isRoot) {
-            if (!empty($items['children'])) {
-                $this->createMenuStructure($items['children'], $depth + 1);
-            }
-        } else {
-            foreach ($items as $k => &$i) {
-                if (!is_array($i) || empty($i)) {
-                    continue;
-                }
-
-                if (isset($i['bundle'])) {
-                    // Category shortcut
-                    $bundleName = $i['bundle'];
-                    $i          = array(
-                        'access'          => $bundleName.':categories:view',
-                        'route'           => 'mautic_category_index',
-                        'id'              => 'mautic_'.$bundleName.'category_index',
-                        'routeParameters' => array('bundle' => $bundleName),
-                    );
-                }
-
-                // Check to see if menu is restricted
-                if (isset($i['access'])) {
-                    if ($i['access'] == 'admin') {
-                        if (!$this->user->isAdmin()) {
-                            unset($items[$k]);
-                            continue;
-                        }
-                    } elseif (!$this->security->isGranted($i['access'], 'MATCH_ONE')) {
-                        unset($items[$k]);
-                        continue;
-                    }
-                }
-
-                if (isset($i['checks'])) {
-                    $passChecks = true;
-                    foreach ($i['checks'] as $checkGroup => $checks) {
-                        foreach ($checks as $name => $value) {
-                            if ($checkGroup == 'parameters') {
-                                if ($this->getParameter($name) != $value) {
-                                    $passChecks = false;
-                                    break;
-                                }
-                            } elseif ($checkGroup == 'request') {
-                                if ($this->request->get($name) != $value) {
-                                    $passChecks = false;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    if (!$passChecks) {
-                        unset($items[$k]);
-                        continue;
-                    }
-                }
-
-                //Set ID to route name
-                if (!isset($i['id'])) {
-                    if (!empty($i['route'])) {
-                        $i['id'] = $i['route'];
-                    } else {
-                        $i['id'] = 'menu-item-'.uniqid();
-                    }
-                }
-
-                //Set link attributes
-                if (!isset($i['linkAttributes'])) {
-                    $i['linkAttributes'] = array(
-                        'data-menu-link' => $i['id'],
-                        'id'             => $i['id']
-                    );
-                } elseif (!isset($i['linkAttributes']['id'])) {
-                    $i['linkAttributes']['id']             = $i['id'];
-                    $i['linkAttributes']['data-menu-link'] = $i['id'];
-                } elseif (!isset($i['linkAttributes']['data-menu-link'])) {
-                    $i['linkAttributes']['data-menu-link'] = $i['id'];
-                }
-
-                $i['extras']          = array();
-                $i['extras']['depth'] = $depth;
-
-                // Note a divider
-                if (!empty($i['divider'])) {
-                    $i['extras']['divider'] = true;
-                }
-
-                // Note a header
-                if (!empty($i['header'])) {
-                    $i['extras']['header'] = $i['header'];
-                }
-
-                //Set the icon class for the menu item
-                if (!empty($i['iconClass'])) {
-                    $i['extras']['iconClass'] = $i['iconClass'];
-                }
-
-                //Set the actual route name so that it's available to the menu template
-                if (isset($i['route'])) {
-                    $i['extras']['routeName'] = $i['route'];
-                }
-
-                //Repeat for sub items
-                if (isset($i['children'])) {
-                    $this->createMenuStructure($i['children'], $depth + 1);
-                }
-            }
-        }
-    }
-
-    /**
      * Retrieves an item following a path in the tree.
      *
      * @param \Knp\Menu\ItemInterface|string $menu
@@ -287,15 +149,5 @@ class MenuHelper extends Helper
         $options['menu'] = $menu;
 
         return $this->helper->render($menu, $options, $renderer);
-    }
-
-    /**
-     * @param $name
-     *
-     * @return bool
-     */
-    protected function getParameter($name)
-    {
-        return isset($this->mauticParameters[$name]) ? $this->mauticParameters[$name] : false;
     }
 }

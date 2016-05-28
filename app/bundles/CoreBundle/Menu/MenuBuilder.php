@@ -16,8 +16,6 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 /**
  * Class MenuBuilder
@@ -50,12 +48,12 @@ class MenuBuilder
      * @param MatcherInterface $matcher
      * @param MauticFactory    $factory
      */
-    public function __construct(FactoryInterface $knpFactory, MatcherInterface $matcher, MauticFactory $factory)
+    public function __construct(FactoryInterface $knpFactory, MatcherInterface $matcher, EventDispatcherInterface $dispatcher, MenuHelper $menuHelper)
     {
         $this->factory    = $knpFactory;
         $this->matcher    = $matcher;
-        $this->dispatcher = $factory->getDispatcher();
-        $this->menuHelper = $factory->getHelper('template.menu');
+        $this->dispatcher = $dispatcher;
+        $this->menuHelper = $menuHelper;
     }
 
     /**

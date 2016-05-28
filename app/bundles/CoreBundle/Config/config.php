@@ -203,13 +203,7 @@ return array(
         'helpers' => array(
             'mautic.helper.template.menu'               => array(
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\MenuHelper',
-                'arguments' => array(
-                    'knp_menu.helper',
-                    'mautic.security',
-                    'security.token_storage',
-                    'request_stack',
-                    '%mautic.parameters%'
-                ),
+                'arguments' => array('knp_menu.helper'),
                 'alias'     => 'menu'
             ),
             'mautic.helper.template.date'      => array(
@@ -395,10 +389,16 @@ return array(
                 )
             ),
             // Menu
-            'mautic.helper.update'               => array(
-                'class'     => 'Mautic\CoreBundle\Helper\UpdateHelper',
-                'arguments' => 'mautic.factory'
+            'mautic.helper.menu' => array(
+                'class'     => 'Mautic\CoreBundle\Menu\MenuHelper',
+                'arguments' => array(
+                    'mautic.security',
+                    'security.token_storage',
+                    'request_stack',
+                    '%mautic.parameters%'
+                )
             ),
+
             'mautic.menu_renderer'               => array(
                 'class'     => 'Mautic\CoreBundle\Menu\MenuRenderer',
                 'arguments' => array(
@@ -414,7 +414,8 @@ return array(
                 'arguments' => array(
                     'knp_menu.factory',
                     'knp_menu.matcher',
-                    'mautic.factory'
+                    'event_dispatcher',
+                    'mautic.helper.menu'
                 )
             ),
             // IP Lookup
