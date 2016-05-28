@@ -41,6 +41,7 @@ $template = '<div class="col-md-6">{content}</div>';
             <?php echo $view['form']->rowIfExists($fields, 'default_pagelimit', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'default_timezone', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'locale', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'cached_data_timeout', $template); ?>
         </div>
 
         <hr class="text-muted" />
@@ -126,6 +127,13 @@ $template = '<div class="col-md-6">{content}</div>';
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'transifex_username', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'transifex_password', $template); ?>
+        </div>
+        <?php endif; ?>
+        
+        <?php if (isset($fields['link_shortener_url'])): ?>
+        <hr class="text-muted" />
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'link_shortener_url', $template); ?>
         </div>
         <?php endif; ?>
     </div>

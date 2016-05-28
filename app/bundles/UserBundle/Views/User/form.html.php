@@ -55,6 +55,17 @@ $view['slots']->set("headerTitle", $header);
 			</div>
 			<hr class="mnr-md mnl-md">
 
+            <div class="form-group mb-0">
+                <div class="row">
+                    <div class="col-sm-6<?php echo (count($form['signature']->vars['errors'])) ? ' has-error' : ''; ?>">
+                        <label class="control-label mb-xs"><?php echo $view['form']->label($form['signature']); ?></label>
+                        <?php echo $view['form']->widget($form['signature'], array('attr' => array('placeholder' => $form['signature']->vars['label']))); ?>
+                        <?php echo $view['form']->errors($form['signature']); ?>
+                    </div>
+                </div>
+            </div>
+            <hr class="mnr-md mnl-md">
+
 			<div class="panel panel-default form-group mb-0">
 				<div class="panel-body">
 				    <div class="row">

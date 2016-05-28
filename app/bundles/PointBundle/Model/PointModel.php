@@ -17,6 +17,9 @@ use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\PointEvent;
 use Mautic\PointBundle\PointEvents;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -167,11 +170,12 @@ class PointModel extends CommonFormModel
 
         //find all the actions for published points
         /** @var \Mautic\PointBundle\Entity\PointRepository $repo */
-        $repo         = $this->getRepository();
+        $repo            = $this->getRepository();
         $availablePoints = $repo->getPublishedByType($type);
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel    = $this->factory->getModel('lead');
         $ipAddress    = $this->factory->getIpAddress();
+
         if (null === $lead) {
             $lead = $leadModel->getCurrentLead();
 
@@ -187,9 +191,7 @@ class PointModel extends CommonFormModel
         //get a list of actions that has already been performed on this lead
         $completedActions = $repo->getCompletedLeadActions($type, $lead->getId());
 
-        $persist     = array();
-        $persistLead = false;
-
+        $persist = array();
         foreach ($availablePoints as $action) {
             //if it's already been done, then skip it
             if (isset($completedActions[$action->getId()])) {
@@ -256,21 +258,46 @@ class PointModel extends CommonFormModel
                     $log->setLead($lead);
                     $log->setDateFired(new \DateTime());
 
-                    $action->addLog($log);
-                    $persist[] = $action;
-                    $persistLead = true;
+                    $persist[] = $log;
                 }
             }
         }
 
-        //save the lead
-        if ($persistLead) {
+        if (!empty($persist)) {
             $leadModel->saveEntity($lead);
+            $this->getRepository()->saveEntities($persist);
+
+            // Detach logs to reserve memory
+            $this->em->clear('Mautic\PointBundle\Entity\LeadPointLog');
+        }
+    }
+
+    /**
+     * Get line chart data of points
+     *
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $dateFormat
+     * @param array    $filter
+     * @param boolean  $canViewOthers
+     *
+     * @return array
+     */
+    public function getPointLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
+    {
+        $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $q         = $query->prepareTimeDataQuery('lead_points_change_log', 'date_added', $filter);
+
+        if (!$canViewOthers) {
+            $q->join('t', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id')
+                ->andWhere('l.owner_id = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
         }
 
-        //persist the action xref
-        if (!empty($persist)) {
-            $this->getRepository()->saveEntities($persist);
-        }
+        $data = $query->loadAndBuildTimeData($q);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.point.changes'), $data);
+        return $chart->render();
     }
 }

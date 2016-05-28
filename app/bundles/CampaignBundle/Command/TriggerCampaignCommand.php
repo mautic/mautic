@@ -43,7 +43,7 @@ class TriggerCampaignCommand extends ModeratedCommand
             )
             ->addOption('--scheduled-only', null, InputOption::VALUE_NONE, 'Trigger only scheduled events')
             ->addOption('--negative-only', null, InputOption::VALUE_NONE, 'Trigger only negative events, i.e. with a "no" decision path.')
-            ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of leads to process per round. Defaults to 100.', 100)
+            ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of contacts to process per round. Defaults to 100.', 100)
             ->addOption(
                 '--max-events',
                 '-m',
@@ -92,7 +92,7 @@ class TriggerCampaignCommand extends ModeratedCommand
                 $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.triggering', array('%id%' => $id)).'</info>');
 
                 if (!$negativeOnly && !$scheduleOnly) {
-                    //trigger starting action events for newly added leads
+                    //trigger starting action events for newly added contacts
                     $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.starting').'</comment>');
                     $processed = $model->triggerStartingEvents($campaign, $totalProcessed, $batch, $max, $output);
                     $output->writeln(
@@ -136,7 +136,7 @@ class TriggerCampaignCommand extends ModeratedCommand
                 if ($c->isPublished()) {
                     $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.triggering', array('%id%' => $c->getId())).'</info>');
                     if (!$negativeOnly && !$scheduleOnly) {
-                        //trigger starting action events for newly added leads
+                        //trigger starting action events for newly added contacts
                         $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.starting').'</comment>');
                         $processed = $model->triggerStartingEvents($c, $totalProcessed, $batch, $max, $output);
                         $output->writeln(

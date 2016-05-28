@@ -33,6 +33,7 @@ class Message
     public $textHtml;
     public $dsnReport;
     public $dsnMessage;
+    public $xHeaders = array();
 
     /** @var Attachment[] */
     protected $attachments = array();

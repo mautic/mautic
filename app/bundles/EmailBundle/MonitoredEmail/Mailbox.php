@@ -15,6 +15,7 @@
 namespace Mautic\EmailBundle\MonitoredEmail;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\Exception\MailboxException;
 use stdClass;
 
 class Mailbox
@@ -74,14 +75,14 @@ class Mailbox
      * @param null $folderKey
      *
      * @return bool
-     * @throws \Exception
+     * @throws MailboxException
      */
     public function isConfigured($bundleKey = null, $folderKey = null) {
         if ($bundleKey !== null) {
             try {
                 $this->switchMailbox($bundleKey, $folderKey);
-            } catch (\Exception $e) {
-                
+            } catch (MailboxException $e) {
+
                 return false;
             }
         }
@@ -100,7 +101,7 @@ class Mailbox
      * @param        $bundle
      * @param string $mailbox
      *
-     * @throws \Exception
+     * @throws MailboxException
      */
     public function switchMailbox($bundle, $mailbox = '')
     {
@@ -111,7 +112,7 @@ class Mailbox
             $this->imapFolder = $this->mailboxes[$key]['folder'];
             $this->setImapPath();
         } else {
-            throw new \Exception($key . ' not found');
+            throw new MailboxException($key . ' not found');
         }
     }
 
@@ -185,7 +186,7 @@ class Mailbox
      * @param string $mailbox
      *
      * @return mixed
-     * @throws \Exception
+     * @throws MailboxException
      */
     public function getMailboxSettings($bundle = null, $mailbox = '')
     {
@@ -205,7 +206,7 @@ class Mailbox
             $imapPath              = $this->getImapPath($settings);
             $settings['imap_path'] = $imapPath['full'];
         } else {
-            throw new \Exception($key . ' not found');
+            throw new MailboxException($key . ' not found');
         }
 
         return $settings;
@@ -258,7 +259,7 @@ class Mailbox
 
     /**
      * @return resource
-     * @throws \Exception
+     * @throws MailboxException
      */
     protected function initImapStream()
     {
@@ -272,7 +273,7 @@ class Mailbox
             $this->imapParams
         );
         if (!$imapStream) {
-            throw new \Exception('Connection error: '.imap_last_error());
+            throw new MailboxException();
         }
 
         return $imapStream;
@@ -712,18 +713,19 @@ class Mailbox
      */
     public function getMail($mailId, $markAsSeen = true)
     {
-        $head = imap_rfc822_parse_headers(imap_fetchheader($this->getImapStream(), $mailId, FT_UID));
+        $header     = imap_fetchheader($this->getImapStream(), $mailId, FT_UID);
+        $headObject = imap_rfc822_parse_headers($header);
 
         $mail              = new Message();
         $mail->id          = $mailId;
-        $mail->date        = date('Y-m-d H:i:s', isset($head->date) ? strtotime(preg_replace('/\(.*?\)/', '', $head->date)) : time());
-        $mail->subject     = isset($head->subject) ? $this->decodeMimeStr($head->subject, $this->serverEncoding) : null;
-        $mail->fromName    = isset($head->from[0]->personal) ? $this->decodeMimeStr($head->from[0]->personal, $this->serverEncoding) : null;
-        $mail->fromAddress = strtolower($head->from[0]->mailbox.'@'.$head->from[0]->host);
+        $mail->date        = date('Y-m-d H:i:s', isset($headObject->date) ? strtotime(preg_replace('/\(.*?\)/', '', $headObject->date)) : time());
+        $mail->subject     = isset($headObject->subject) ? $this->decodeMimeStr($headObject->subject, $this->serverEncoding) : null;
+        $mail->fromName    = isset($headObject->from[0]->personal) ? $this->decodeMimeStr($headObject->from[0]->personal, $this->serverEncoding) : null;
+        $mail->fromAddress = strtolower($headObject->from[0]->mailbox.'@'.$headObject->from[0]->host);
 
-        if (isset($head->to)) {
+        if (isset($headObject->to)) {
             $toStrings = array();
-            foreach ($head->to as $to) {
+            foreach ($headObject->to as $to) {
                 if (!empty($to->mailbox) && !empty($to->host)) {
                     $toEmail            = strtolower($to->mailbox.'@'.$to->host);
                     $toName             = isset($to->personal) ? $this->decodeMimeStr($to->personal, $this->serverEncoding) : null;
@@ -734,15 +736,15 @@ class Mailbox
             $mail->toString = implode(', ', $toStrings);
         }
 
-        if (isset($head->cc)) {
-            foreach ($head->cc as $cc) {
+        if (isset($headObject->cc)) {
+            foreach ($headObject->cc as $cc) {
                 $mail->cc[strtolower($cc->mailbox.'@'.$cc->host)] = isset($cc->personal) ? $this->decodeMimeStr($cc->personal, $this->serverEncoding)
                     : null;
             }
         }
 
-        if (isset($head->reply_to)) {
-            foreach ($head->reply_to as $replyTo) {
+        if (isset($headObject->reply_to)) {
+            foreach ($headObject->reply_to as $replyTo) {
                 $mail->replyTo[strtolower($replyTo->mailbox.'@'.$replyTo->host)] = isset($replyTo->personal) ? $this->decodeMimeStr(
                     $replyTo->personal,
                     $this->serverEncoding
@@ -758,6 +760,18 @@ class Mailbox
             foreach ($mailStructure->parts as $partNum => $partStructure) {
                 $this->initMailPart($mail, $partStructure, $partNum + 1, $markAsSeen);
             }
+        }
+
+        // Parse X headers
+        $tempArray = explode("\n", $header);
+        if (is_array($tempArray) && count($tempArray)) {
+            $headers = array();
+            foreach($tempArray as $line) {
+                if (preg_match("/^X-(.*?): (.*?)$/is", trim($line), $matches)) {
+                    $headers['x-'.strtolower($matches[1])] = $matches[2];
+                }
+            }
+            $mail->xHeaders = $headers;
         }
 
         return $mail;
@@ -839,11 +853,11 @@ class Mailbox
                 } else {
                     $mail->textHtml .= $data;
                 }
-            } elseif ($partStructure->type == 1 && $partStructure->ifsubtype && $partStructure->subtype == 'REPORT' && isset($params['REPORT-TYPE']) && $params['REPORT-TYPE'] == 'delivery-status') {
+            } elseif ($partStructure->type == 1 && $partStructure->ifsubtype && (strtolower($partStructure->subtype) == 'report' && isset($params['REPORT-TYPE']) && strtolower($params['REPORT-TYPE']) == 'delivery-status')) {
                     $mail->dsnMessage = trim($data);
                     $isDsn = true;
             } elseif ($partStructure->type == 2 && $data) {
-                if ($isDsn) {
+                if ($isDsn || (strtolower($partStructure->subtype) == 'delivery-status')) {
                     $mail->dsnReport = $data;
                 } else {
                     $mail->textPlain .= trim($data);
@@ -968,6 +982,10 @@ class Mailbox
     protected function disconnect()
     {
         if ($this->isConnected()) {
+            // Prevent these from throwing notices such as "SECURITY PROBLEM: insecure server advertised"
+            imap_errors();
+            imap_alerts();
+
             @imap_close($this->imapStream, CL_EXPUNGE);
         }
     }

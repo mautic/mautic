@@ -9,6 +9,7 @@
 
 namespace Mautic\PageBundle\Model;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\PageBundle\Entity\Hit;
@@ -18,9 +19,14 @@ use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
+use Mautic\CoreBundle\Helper\Chart\BarChart;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Doctrine\DBAL\Query\QueryBuilder;
 
 /**
  * Class PageModel
@@ -96,67 +102,46 @@ class PageModel extends FormModel
             $entity->setAlias($alias);
         }
 
-        $now = new \DateTime();
+        $now = new DateTimeHelper();
 
         //set the author for new pages
-        if (!$entity->isNew()) {
+        $isNew = $entity->isNew();
+        if (!$isNew) {
             //increase the revision
             $revision = $entity->getRevision();
             $revision++;
             $entity->setRevision($revision);
+        }
 
-            //reset the variant hit and start date if there are any changes
-            $changes   = $entity->getChanges();
-            $isVariant = $entity->getVariantStartDate();
-            if ($isVariant !== null && !empty($changes) && empty($this->inConversion)) {
-                $entity->setVariantHits(0);
-                $entity->setVariantStartDate($now);
-            }
+        // Reset the variant hit and start date if there are any changes and if this is an A/B test
+        // Do it here in addition to the blanket resetVariants call so that it's available to the event listeners
+        $changes = $entity->getChanges();
+        $parent  = $entity->getVariantParent();
+
+        if ($parent !== null && !empty($changes) && empty($this->inConversion)) {
+            $entity->setVariantHits(0);
+            $entity->setVariantStartDate($now->getDateTime());
         }
 
         parent::saveEntity($entity, $unlock);
 
-        //also reset variants if applicable due to changes
-        if (!empty($changes) && empty($this->inConversion)) {
-            $parent   = $entity->getVariantParent();
-            $children = (!empty($parent)) ? $parent->getVariantChildren() : $entity->getVariantChildren();
+        // If parent, add this entity as a child of the parent so that it populates the list in the tab (due to Doctrine hanging on to entities in memory)
+        if ($parent) {
+            $parent->addVariantChild($entity);
+        }
+        if ($translationParent = $entity->getTranslationParent()) {
+            $translationParent->addTranslationChild($entity);
+        }
 
-            $variants = array();
-            if (!empty($parent)) {
-                $parent->setVariantHits(0);
-                $parent->setVariantStartDate($now);
-                $variants[] = $parent;
-            }
-
-            if (count($children)) {
-                foreach ($children as $child) {
-                    $child->setVariantHits(0);
-                    $child->setVariantStartDate($now);
-                    $variants[] = $child;
-                }
-            }
+        // Reset associated variants if applicable due to changes
+        if ($entity->isVariant() && !empty($changes) && empty($this->inConversion)) {
+            $dateString = $now->toUtcString();
+            $parentId = (!empty($parent)) ? $parent->getId() : $entity->getId();
+            $this->getRepository()->resetVariants($parentId, $dateString);
 
             //if the parent was changed, then that parent/children must also be reset
             if (isset($changes['variantParent'])) {
-                $parent = $this->getEntity($changes['variantParent'][0]);
-                if (!empty($parent)) {
-                    $parent->setVariantHits(0);
-                    $parent->setVariantStartDate($now);
-                    $variants[] = $parent;
-
-                    $children = $parent->getVariantChildren();
-                    if (count($children)) {
-                        foreach ($children as $child) {
-                            $child->setVariantHits(0);
-                            $child->setVariantStartDate($now);
-                            $variants[] = $child;
-                        }
-                    }
-                }
-            }
-
-            if (!empty($variants)) {
-                $this->saveEntities($variants, false);
+                $this->getRepository()->resetVariants($changes['variantParent'][0], $dateString);
             }
         }
     }
@@ -328,11 +313,12 @@ class PageModel extends FormModel
     }
 
     /**
-     * @param Page    $page
-     * @param Request $request
-     * @param string  $code
+     * @param        $page
+     * @param        $request
+     * @param string $code
      *
-     * @return void
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Exception
      */
     public function hitPage ($page, $request, $code = '200')
     {
@@ -341,7 +327,6 @@ class PageModel extends FormModel
             return;
         }
 
-        $hitRepo = $this->getHitRepository();
         $hit = new Hit();
         $hit->setDateHit(new \Datetime());
 
@@ -410,6 +395,7 @@ class PageModel extends FormModel
                                 $pageURL = urldecode($pageURL);
                             }
                         } elseif (isset($query['url'])) {
+                            // @deprecated
                             $pageURL = $query['url'];
                             if (!$decoded) {
                                 $pageURL = urldecode($pageURL);
@@ -422,6 +408,7 @@ class PageModel extends FormModel
                             }
                             $hit->setReferer($query['page_referrer']);
                         } elseif (isset($query['referrer'])) {
+                            // @deprecated
                             if (!$decoded) {
                                 $query['referrer'] = urldecode($query['referrer']);
                             }
@@ -434,6 +421,7 @@ class PageModel extends FormModel
                             }
                             $hit->setPageLanguage($query['page_language']);
                         } elseif (isset($query['language'])) {
+                            // @deprecated
                             if (!$decoded) {
                                 $query['language'] = urldecode($query['language']);
                             }
@@ -446,6 +434,7 @@ class PageModel extends FormModel
                             }
                             $hit->setUrlTitle($query['page_title']);
                         } elseif (isset($query['title'])) {
+                            // @deprecated
                             if (!$decoded) {
                                 $query['title'] = urldecode($query['title']);
                             }
@@ -592,18 +581,39 @@ class PageModel extends FormModel
                 try {
                     $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
                 } catch (\Exception $exception) {
-                    error_log($exception);
+                    $this->factory->getLogger()->addError(
+                        $exception->getMessage(),
+                        array('exception' => $exception)
+                    );
                 }
             } elseif ($page instanceof Redirect) {
                 $hit->setRedirect($page);
 
-                /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
-                $redirectModel = $this->factory->getModel('page.redirect');
-
                 try {
+
+                    /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
+                    $redirectModel = $this->factory->getModel('page.redirect');
                     $redirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
+
+                    // If this is a trackable, up the trackable counts as well
+                    if (!empty($clickthrough['channel'])) {
+                        /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
+                        $trackableModel = $this->factory->getModel('page.trackable');
+                        $channelId      = reset($clickthrough['channel']);
+                        $channel        = key($clickthrough['channel']);
+
+                        $trackableModel->getRepository()->upHitCount($page->getId(), $channel, $channelId, 1, $isUnique);
+                    }
                 } catch (\Exception $exception) {
-                    error_log($exception);
+                    if ($this->factory->getEnvironment() == 'dev') {
+
+                        throw $exception;
+                    } else {
+                        $this->factory->getLogger()->addError(
+                            $exception->getMessage(),
+                            array('exception' => $exception)
+                        );
+                    }
                 }
             }
         }
@@ -642,11 +652,15 @@ class PageModel extends FormModel
         try {
             $this->em->persist($hit);
             $this->em->flush($hit);
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             if ($this->factory->getEnvironment() == 'dev') {
-                throw $e;
+
+                throw $exception;
             } else {
-                error_log($e);
+                $this->factory->getLogger()->addError(
+                    $exception->getMessage(),
+                    array('exception' => $exception)
+                );
             }
         }
 
@@ -861,5 +875,236 @@ class PageModel extends FormModel
         $this->getRepository()->nullParents($ids);
 
         return parent::deleteEntities($ids);
+    }
+
+    /**
+     * Joins the page table and limits created_by to currently logged in user
+     *
+     * @param QueryBuilder  $query
+     *
+     */
+    public function limitQueryToCreator(QueryBuilder &$q)
+    {
+        $q->join('t', MAUTIC_TABLE_PREFIX.'pages', 'p', 'p.id = t.page_id')
+            ->andWhere('p.created_by = :userId')
+            ->setParameter('userId', $this->factory->getUser()->getId());
+    }
+
+    /**
+     * Get bar chart data of hits
+     *
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $dateFormat
+     * @param array    $filter
+     *
+     * @return array
+     */
+    public function getHitsBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
+    {
+        $chart     = new BarChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $chartData = $query->fetchTimeData('page_hits', 'date_hit', $filter);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.field.hits'), $chartData);
+        return $chart->render();
+    }
+
+    /**
+     * Get line chart data of hits
+     *
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $dateFormat
+     * @param array    $filter
+     * @param boolean $canViewOthers
+     *
+     * @return array
+     */
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
+    {
+        $flag = null;
+
+        if (isset($filter['flag'])) {
+            $flag = $filter['flag'];
+            unset($filter['flag']);
+        }
+
+        $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
+
+        if (!$flag || $flag == 'total_and_unique') {
+            $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', $filter);
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.show.total.visits'), $data);
+        }
+
+        if ($flag == 'unique' || $flag == 'total_and_unique') {
+            $filter['groupBy'] = 'lead_id';
+            $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', $filter);
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.show.unique.visits'), $data);
+            unset($filter['groupBy']);
+        }
+
+        return $chart->render();
+    }
+
+    /**
+     * Get data for pie chart showing new vs returning leads.
+     * Returning leads are even leads who visits 2 different page once.
+     *
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param array    $filters
+     * @param boolean  $canViewOthers
+     *
+     * @return array
+     */
+    public function getNewVsReturningPieChartData($dateFrom, $dateTo, $filters = array(), $canViewOthers = true)
+    {
+        $chart     = new PieChart();
+        $query     = new ChartQuery($this->factory->getEntityManager()->getConnection(), $dateFrom, $dateTo);
+        $allQ      = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
+        $uniqueQ   = $query->getCountQuery('page_hits', 'lead_id', 'date_hit', $filters, array('getUnique' => true, 'selectAlso' => array('t.page_id')));
+
+        if (!$canViewOthers) {
+            $this->limitQueryToCreator($allQ);
+            $this->limitQueryToCreator($uniqueQ);
+        }
+
+        $all       = $query->fetchCount($allQ);
+        $unique    = $query->fetchCount($uniqueQ);
+        $returning = $all - $unique;
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.unique'), $unique);
+        $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.graph.pie.new.vs.returning.returning'), $returning);
+        return $chart->render();
+    }
+
+    /**
+     * Get pie chart data of dwell times
+     *
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param array    $filters
+     * @param boolean  $canViewOthers
+     *
+     * @return array
+     */
+    public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = array(), $canViewOthers = true)
+    {
+        $timesOnSite = array(
+            array(
+                'label' => '< 1m',
+                'from' => 0,
+                'till' => 60),
+            array(
+                'label' => '1 - 5m',
+                'from' => 60,
+                'till' => 300),
+            array(
+                'label' => '5 - 10m',
+                'value' => 0,
+                'from' => 300,
+                'till' => 600),
+            array(
+                'label' => '> 10m',
+                'from' => 600,
+                'till' => 999999),
+        );
+
+        $chart = new PieChart();
+        $query = new ChartQuery($this->factory->getEntityManager()->getConnection(), $dateFrom, $dateTo);
+
+        foreach ($timesOnSite as $time) {
+            $q = $query->getCountDateDiffQuery('page_hits', 'date_hit', 'date_left', $time['from'], $time['till'], $filters);
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+
+            $data = $query->fetchCountDateDiff($q);
+            $chart->setDataset($time['label'], $data);
+        }
+
+        return $chart->render();
+    }
+
+    /**
+     * Get a list of popular (by hits) pages
+     *
+     * @param integer  $limit
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param array    $filters
+     * @param boolean  $canViewOthers
+     *
+     * @return array
+     */
+    public function getPopularPages($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array(), $canViewOthers = true)
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(DISTINCT t.id) AS hits, p.id, p.title, p.alias')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 't')
+            ->join('t', MAUTIC_TABLE_PREFIX.'pages', 'p', 'p.id = t.page_id')
+            ->orderBy('hits', 'DESC')
+            ->groupBy('p.id')
+            ->setMaxResults($limit);
+
+        if (!$canViewOthers) {
+            $q->andWhere('p.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_hit');
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
+     * Get a list of pages created in a date range
+     *
+     * @param integer  $limit
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param array    $filters
+     * @param boolean  $canViewOthers
+     *
+     * @return array
+     */
+    public function getPageList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = array(), $canViewOthers = true)
+    {
+        $q = $this->em->getConnection()->createQueryBuilder();
+        $q->select('t.id, t.title AS name, t.date_added, t.date_modified')
+            ->from(MAUTIC_TABLE_PREFIX.'pages', 't')
+            ->setMaxResults($limit);
+
+        if (!$canViewOthers) {
+            $q->andWhere('t.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $chartQuery->applyFilters($q, $filters);
+        $chartQuery->applyDateFilters($q, 'date_added');
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
     }
 }

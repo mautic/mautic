@@ -104,7 +104,7 @@ class MailHelper
     protected $source = array();
 
     /**
-     * @var null
+     * @var Email|null
      */
     protected $email = null;
 
@@ -180,9 +180,37 @@ class MailHelper
     );
 
     /**
+     * Cache for lead owners
+     *
+     * @var array
+     */
+    protected static $leadOwners = array();
+
+    /**
      * @var bool
      */
     protected $fatal = false;
+
+    /**
+     * Large batch mail sends may result on timeouts with SMTP servers. This will will keep track of the number of sends and restart the connection once met.
+     *
+     * @var int
+     */
+    private $messageSentCount = 0;
+
+    /**
+     * Large batch mail sends may result on timeouts with SMTP servers. This will will keep track of when a transport was last started and force a restart after set number of minutes.
+     *
+     * @var int
+     */
+    private $transportStartTime;
+
+    /**
+     * Simply a md5 of the content so that event listeners can easily determine if the content has been changed
+     *
+     * @var string
+     */
+    private $contentHash;
 
     /**
      * @param MauticFactory $factory
@@ -194,6 +222,7 @@ class MailHelper
         $this->factory   = $factory;
         $this->mailer    = $mailer;
         $this->transport = $mailer->getTransport();
+
         try {
             $this->logger = new \Swift_Plugins_Loggers_ArrayLogger();
             $this->mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($this->logger));
@@ -221,20 +250,39 @@ class MailHelper
      * Send the message
      *
      * @param bool $dispatchSendEvent
-     * @param bool $isQueueFlush
+     * @param bool $isQueueFlush (a tokenized/batch send via API such as Mandrill)
+     * @param bool $useOwnerAsMailer
      *
      * @return bool
      */
-    public function send($dispatchSendEvent = false, $isQueueFlush = false)
+    public function send($dispatchSendEvent = false, $isQueueFlush = false, $useOwnerAsMailer = true)
     {
         // Set from email
-        $from = $this->message->getFrom();
-        if (empty($from)) {
+        if (!$isQueueFlush && $useOwnerAsMailer && $this->factory->getParameter('mailer_is_owner') && isset($this->lead['id'])) {
+            if (!isset($this->lead['owner_id'])) {
+                $this->lead['owner_id'] = 0;
+            } elseif (isset($this->lead['owner_id'])) {
+                if (!isset(self::$leadOwners[$this->lead['owner_id']])) {
+                    $owner = $this->factory->getModel('lead')->getRepository()->getLeadOwner($this->lead['owner_id']);
+                    if ($owner) {
+                        self::$leadOwners[$owner['id']] = $owner;
+                    }
+                } else {
+                    $owner = self::$leadOwners[$this->lead['owner_id']];
+                }
+            }
+
+            if (!empty($owner)) {
+                $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name']);
+            } else {
+                $this->setFrom($this->from);
+            }
+        } elseif (!$from = $this->message->getFrom()) {
             $this->setFrom($this->from);
         }
 
         // Set system return path if applicable
-        if (!$isQueueFlush && $bounceEmail = $this->generateBounceEmail($this->idHash)) {
+        if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail($this->idHash))) {
             $this->message->setReturnPath($bounceEmail);
         } elseif (!empty($this->returnPath)) {
             $this->message->setReturnPath($this->returnPath);
@@ -317,6 +365,11 @@ class MailHelper
 
             try {
                 $failures = array();
+
+                if (!$this->transport->isStarted()) {
+                    $this->transportStartTime = time();
+                }
+
                 $this->mailer->send($this->message, $failures);
 
                 if (!empty($failures)) {
@@ -338,6 +391,9 @@ class MailHelper
                 );
             }
         }
+
+        $this->messageSentCount++;
+        $this->checkIfTransportNeedsRestart();
 
         $error = empty($this->errors);
 
@@ -474,7 +530,7 @@ class MailHelper
         unset($this->lead, $this->idHash, $this->eventTokens, $this->queuedRecipients, $this->errors);
 
         $this->eventTokens  = $this->queuedRecipients = $this->errors = array();
-        $this->lead         = $this->idHash = null;
+        $this->lead         = $this->idHash = $this->contentHash = null;
         $this->internalSend = $this->fatal = false;
 
         $this->logger->clear();
@@ -692,7 +748,7 @@ class MailHelper
      * @param bool   $returnContent
      * @param null   $charset
      *
-     * @return void
+     * @return void|string
      */
     public function setTemplate($template, $vars = array(), $returnContent = false, $charset = null)
     {
@@ -739,6 +795,9 @@ class MailHelper
     public function setPlainText($content)
     {
         $this->plainText = $content;
+
+        // Update the identifier for the content
+        $this->contentHash = md5($this->body['content'].$this->plainText);
     }
 
     /**
@@ -786,18 +845,35 @@ class MailHelper
      * @param string $contentType
      * @param null   $charset
      * @param bool   $ignoreTrackingPixel
+     * @param bool   $ignoreEmbedImageConversion
      */
-    public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false)
+    public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false, $ignoreEmbedImageConversion = false)
     {
-        if (!$ignoreTrackingPixel) {
+        if (!$ignoreEmbedImageConversion && $this->factory->getParameter('mailer_convert_embed_images')) {
+            $matches = array();
+            if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
+                $replaces = array();
+                foreach($matches[1] AS $match) {
+                    if (strpos($match, 'cid:') === false) {
+                        $replaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
+                    }
+                }
+                $content = strtr($content, $replaces);
+            }
+        }
+
+        if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
             // Append tracking pixel
-            $trackingImg = '<img style="display: none;" height="1" width="1" src="{tracking_pixel}" />';
+            $trackingImg = '<img style="display: none;" height="1" width="1" src="{tracking_pixel}" alt="Mautic is open source marketing automation" />';
             if (strpos($content, '</body>') !== false) {
                 $content = str_replace('</body>', $trackingImg.'</body>', $content);
             } else {
                 $content .= $trackingImg;
             }
         }
+
+        // Update the identifier for the content
+        $this->contentHash = md5($content.$this->plainText);
 
         $this->body = array(
             'content'     => $content,
@@ -814,6 +890,16 @@ class MailHelper
     public function getBody()
     {
         return $this->body['content'];
+    }
+
+    /**
+     * Return the content identifier
+     *
+     * @return string
+     */
+    public function getContentHash()
+    {
+        return $this->contentHash;
     }
 
     /**
@@ -1185,7 +1271,11 @@ class MailHelper
                 $slots = $slots[$template];
             }
 
-            $customHtml = $this->setTemplate('MauticEmailBundle::public.html.php', array(
+            $this->processSlots($slots, $email);
+
+            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':email.html.php');
+
+            $customHtml = $this->setTemplate($logicalName, array(
                 'slots'    => $slots,
                 'content'  => $email->getContent(),
                 'email'    => $email,
@@ -1362,6 +1452,8 @@ class MailHelper
         $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_SEND, $event);
 
         $this->eventTokens = array_merge($this->eventTokens, $event->getTokens());
+
+        unset($event);
     }
 
     /**
@@ -1500,12 +1592,20 @@ class MailHelper
         if (substr($url, 0, 4) !== 'http' && substr($url, 0, 3) !== 'ftp') {
             return null;
         }
+
+        if ($this->email) {
+            // Get a Trackable which is channel aware
+            /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
+            $trackableModel = $this->factory->getModel('page.trackable');
+            $trackable      = $trackableModel->getTrackableByUrl($url, 'email', $this->email->getId());
+
+            return $trackable->getRedirect();
+        }
+
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
         $redirectModel = $this->factory->getModel('page.redirect');
 
-        $link = $redirectModel->getRedirectByUrl($url, $this->email);
-
-        return $link;
+        return $redirectModel->getRedirectByUrl($url);
     }
 
     /**
@@ -1666,5 +1766,52 @@ class MailHelper
         }
 
         return $monitoredEmail;
+    }
+
+    /**
+     * A large number of mail sends may result on timeouts with SMTP servers. This checks for the number of email sends and restarts the transport if necessary
+     *
+     * @param bool $force
+     */
+    public function checkIfTransportNeedsRestart($force = false)
+    {
+        // Check if we should restart the SMTP transport
+        if ($this->transport instanceof \Swift_SmtpTransport) {
+            $maxNumberOfMessages = (method_exists($this->transport, 'getNumberOfMessagesTillRestart'))
+                ? $this->transport->getNumberOfMessagesTillRestart() : 50;
+
+            $maxNumberOfMinutes = (method_exists($this->transport, 'getNumberOfMinutesTillRestart'))
+                ? $this->transport->getNumberOfMinutesTillRestart() : 2;
+
+            $numberMinutesRunning = floor(time() - $this->transportStartTime) / 60;
+
+            if ($force || $this->messageSentCount >= $maxNumberOfMessages || $numberMinutesRunning >= $maxNumberOfMinutes) {
+                // Stop the transport
+                $this->transport->stop();
+                $this->messageSentCount = 0;
+            }
+        }
+    }
+
+    /**
+     * @param $slots
+     * @param Email $entity
+     */
+    public function processSlots($slots, $entity)
+    {
+        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
+        $slotsHelper = $this->factory->getHelper('template.slots');
+
+        $content = $entity->getContent();
+
+        foreach ($slots as $slot => $slotConfig) {
+            if (is_numeric($slot)) {
+                $slot = $slotConfig;
+                $slotConfig = array();
+            }
+
+            $value = isset($content[$slot]) ? $content[$slot] : "";
+            $slotsHelper->set($slot, $value);
+        }
     }
 }

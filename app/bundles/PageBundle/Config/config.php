@@ -28,6 +28,11 @@ return array(
                 'path'       => '/mtracking.gif',
                 'controller' => 'MauticPageBundle:Public:trackingImage'
             ),
+            'mautic_url_redirect' => array(
+                'path'       => '/r/{redirectId}',
+                'controller' => 'MauticPageBundle:Public:redirect'
+            ),
+            // @deprecated; to be removed in 2.0 use mautic_url_redirect instead
             'mautic_page_trackable' => array(
                 'path'       => '/r/{redirectId}',
                 'controller' => 'MauticPageBundle:Public:redirect'
@@ -63,15 +68,14 @@ return array(
         )
     ),
 
-    'menu'       => array(
+    'menu' => array(
         'main' => array(
-            'priority' => 30,
             'items'    => array(
                 'mautic.page.pages' => array(
                     'route' => 'mautic_page_index',
-                    'id'        => 'mautic_page_root',
-                    'iconClass' => 'fa-file-text-o',
-                    'access'    => array('page:pages:viewown', 'page:pages:viewother')
+                    'access'    => array('page:pages:viewown', 'page:pages:viewother'),
+                    'parent'    => 'mautic.core.components',
+                    'priority'  => 100
                 )
             )
         )
@@ -113,8 +117,14 @@ return array(
             'mautic.page.search.subscriber'         => array(
                 'class' => 'Mautic\PageBundle\EventListener\SearchSubscriber'
             ),
-            'mautic.page.webhook.subscriber'                => array(
+            'mautic.page.webhook.subscriber'        => array(
                 'class' => 'Mautic\PageBundle\EventListener\WebhookSubscriber'
+            ),
+            'mautic.page.dashboard.subscriber'      => array(
+                'class' => 'Mautic\PageBundle\EventListener\DashboardSubscriber'
+            ),
+            'mautic.page.js.subscriber'           => array(
+                'class' => 'Mautic\PageBundle\EventListener\BuildJsSubscriber'
             )
         ),
         'forms'  => array(
@@ -169,6 +179,10 @@ return array(
                 'class' => 'Mautic\PageBundle\Form\Type\RedirectListType',
                 'arguments' => 'mautic.factory',
                 'alias' => 'redirect_list'
+            ),
+            'mautic.form.type.page_dashboard_hits_in_time_widget' => array(
+                'class' => 'Mautic\PageBundle\Form\Type\DashboardHitsInTimeWidgetType',
+                'alias' => 'page_dashboard_hits_in_time_widget'
             )
         )
     ),

@@ -29,9 +29,9 @@ class ApiSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return array(
-            KernelEvents::REQUEST                 => array('onKernelRequest', 0),
-            ApiEvents::CLIENT_POST_SAVE           => array('onClientPostSave', 0),
-            ApiEvents::CLIENT_POST_DELETE         => array('onClientDelete', 0)
+            KernelEvents::REQUEST         => array('onKernelRequest', 255),
+            ApiEvents::CLIENT_POST_SAVE   => array('onClientPostSave', 0),
+            ApiEvents::CLIENT_POST_DELETE => array('onClientDelete', 0)
         );
     }
 
@@ -52,6 +52,7 @@ class ApiSubscriber extends CommonSubscriber
 
         // Check if /oauth or /api
         $isApiRequest = (strpos($requestUrl, '/oauth') !== false || strpos($requestUrl, '/api') !== false);
+        defined('MAUTIC_API_REQUEST') or define('MAUTIC_API_REQUEST', $isApiRequest);
 
         if ($isApiRequest && !$apiEnabled) {
 

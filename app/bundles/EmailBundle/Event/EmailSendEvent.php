@@ -176,7 +176,7 @@ class EmailSendEvent extends CommonEvent
     public function setContent($content)
     {
         if ($this->helper !== null) {
-            $this->helper->setBody($content, 'text/html', null, true);
+            $this->helper->setBody($content, 'text/html', null, true, true);
         } else {
             $this->content = $content;
         }
@@ -328,5 +328,45 @@ class EmailSendEvent extends CommonEvent
     public function shouldAppendClickthrough()
     {
         return (!$this->isInternalSend() && null === $this->getEmail());
+    }
+
+    /**
+     * Generate a clickthrough array for URLs
+     *
+     * @return array
+     */
+    public function generateClickthrough()
+    {
+        $source       = $this->getSource();
+        $email        = $this->getEmail();
+        $clickthrough = array(
+            //what entity is sending the email?
+            'source' => $source,
+            //the email being sent to be logged in page hit if applicable
+            'email'  => ($email != null) ? $email->getId() : null,
+            'stat'   => $this->getIdHash()
+        );
+        $lead         = $this->getLead();
+        if ($lead !== null) {
+            $clickthrough['lead'] = $lead['id'];
+        }
+
+        return $clickthrough;
+    }
+
+    /**
+     * Get the content hash to note if the content has been changed
+     *
+     * @return string
+     */
+    public function getContentHash()
+    {
+        if (null !== $this->helper) {
+
+            return $this->helper->getContentHash();
+        } else {
+
+            return md5($this->getContent().$this->getPlainText());
+        }
     }
 }

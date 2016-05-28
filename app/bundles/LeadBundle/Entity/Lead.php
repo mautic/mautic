@@ -17,6 +17,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\DoNotEmail;
 use Mautic\UserBundle\Entity\User;
+use Mautic\NotificationBundle\Entity\PushID;
 
 /**
  * Class Lead
@@ -55,12 +56,17 @@ class Lead extends FormEntity
     /**
      * @var ArrayCollection
      */
-    private $doNotEmail;
+    private $doNotContact;
 
     /**
      * @var ArrayCollection
      */
     private $ipAddresses;
+
+    /**
+     * @var ArrayCollection
+     */
+    private $pushIds;
 
     /**
      * @var \DateTime
@@ -169,7 +175,7 @@ class Lead extends FormEntity
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createOneToMany('doNotEmail', 'Mautic\EmailBundle\Entity\DoNotEmail')
+        $builder->createOneToMany('doNotContact', 'Mautic\LeadBundle\Entity\DoNotContact')
             ->orphanRemoval()
             ->mappedBy('lead')
             ->cascadePersist()
@@ -184,6 +190,13 @@ class Lead extends FormEntity
             ->cascadeMerge()
             ->cascadePersist()
             ->cascadeDetach()
+            ->build();
+
+        $builder->createOneToMany('pushIds', 'Mautic\NotificationBundle\Entity\PushID')
+            ->orphanRemoval()
+            ->mappedBy('lead')
+            ->cascadeAll()
+            ->fetchExtraLazy()
             ->build();
 
         $builder->createField('lastActive', 'datetime')
@@ -298,7 +311,8 @@ class Lead extends FormEntity
     public function __construct()
     {
         $this->ipAddresses     = new ArrayCollection();
-        $this->doNotEmail      = new ArrayCollection();
+        $this->pushIds         = new ArrayCollection();
+        $this->doNotContact    = new ArrayCollection();
         $this->pointsChangeLog = new ArrayCollection();
         $this->tags            = new ArrayCollection();
     }
@@ -671,47 +685,110 @@ class Lead extends FormEntity
     }
 
     /**
-     * @param DoNotEmail $doNotEmail
+     * @param string $identifier
      *
      * @return $this
      */
-    public function addDoNotEmailEntry(DoNotEmail $doNotEmail)
+    public function addPushIDEntry($identifier)
     {
-        if ($doNotEmail->getBounced()) {
-            $type = $doNotEmail->isManual() ? 'manual' : 'bounced';
-        } elseif ($doNotEmail->getUnsubscribed()) {
-            $type = 'unsubscribed';
+        /** @var PushID $id */
+        foreach ($this->pushIds as $id) {
+            if ($id->getPushID() === $identifier) {
+                return $this;
+            }
         }
 
-        $this->changes['dnc_status'] = array($type, $doNotEmail->getComments());
+        $entity = new PushID();
+        $entity->setPushID($identifier);
+        $entity->setLead($this);
 
-        $this->doNotEmail[] = $doNotEmail;
+        $this->addPushID($entity);
 
         return $this;
     }
 
     /**
-     * @param DoNotEmail $doNotEmail
+     * @param PushID $pushID
+     *
+     * @return $this
      */
-    public function removeDoNotEmailEntry(DoNotEmail $doNotEmail)
+    public function addPushID(PushID $pushID)
     {
-        if ($doNotEmail->getBounced()) {
-            $type = $doNotEmail->isManual() ? 'manual' : 'bounced';
-        } elseif ($doNotEmail->getUnsubscribed()) {
-            $type = 'unsubscribed';
-        }
+        $this->pushIds[] = $pushID;
 
-        $this->changes['dnc_status'] = array('removed', $type);
+        return $this;
+    }
 
-        $this->doNotEmail->removeElement($doNotEmail);
+    /**
+     * @param PushID $pushID
+     */
+    public function removePushID(PushID $pushID)
+    {
+        $this->pushIds->removeElement($pushID);
     }
 
     /**
      * @return ArrayCollection
      */
-    public function getDoNotEmail()
+    public function getPushIDs()
     {
-        return $this->doNotEmail;
+        return $this->pushIds;
+    }
+
+    /**
+     * @param DoNotContact $doNotContact
+     *
+     * @return $this
+     */
+    public function addDoNotContactEntry(DoNotContact $doNotContact)
+    {
+        $this->changes['dnc_channel_status'][$doNotContact->getChannel()] = array(
+            'reason'   => $doNotContact->getReason(),
+            'comments' => $doNotContact->getComments()
+        );
+
+        // @deprecated - to be removed in 2.0
+        switch ($doNotContact->getReason()) {
+            case DoNotContact::BOUNCED:
+                $type = 'bounced';
+                break;
+            case DoNotContact::MANUAL:
+                $type = 'manual';
+                break;
+            case DoNotContact::UNSUBSCRIBED:
+                $type = 'unsubscribed';
+                break;
+        }
+        $this->changes['dnc_status'] = array($type, $doNotContact->getComments());
+
+        $this->doNotContact[] = $doNotContact;
+
+        return $this;
+    }
+
+    /**
+     * @param DoNotContact $doNotContact
+     */
+    public function removeDoNotContactEntry(DoNotContact $doNotContact)
+    {
+        $this->changes['dnc_channel_status'][$doNotContact->getChannel()] = array(
+            'reason'     => DoNotContact::IS_CONTACTABLE,
+            'old_reason' => $doNotContact->getReason(),
+            'comments'   => $doNotContact->getComments()
+        );
+
+        // @deprecated to be removed in 2.0
+        $this->changes['dnc_status'] = array('removed', $doNotContact->getComments());
+
+        $this->doNotContact->removeElement($doNotContact);
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getDoNotContact()
+    {
+        return $this->doNotContact;
     }
 
     /**
