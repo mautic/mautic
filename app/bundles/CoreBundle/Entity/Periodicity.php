@@ -58,6 +58,11 @@ class Periodicity
      */
     private $triggerIntervalUnit;
 
+    /**
+     * @var integer
+     */
+    private $daysOfWeekMask;
+
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -100,6 +105,12 @@ class Periodicity
 
         $builder->createField('targetId', 'integer')
             ->columnName('target_id')
+            ->build();
+
+        $builder->createField('daysOfWeekMask', 'integer')
+            ->columnName('days_of_week_mask')
+            ->length(1)
+            ->nullable()
             ->build();
     }
     /**
@@ -265,4 +276,45 @@ class Periodicity
         $this->isChanged('triggerIntervalUnit', $triggerIntervalUnit);
         $this->triggerIntervalUnit = $triggerIntervalUnit;
     }
+
+    public static function getDaysOfWeek(){
+        return ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    }
+
+    /**
+     *
+     * @return array
+     */
+    public function getDaysOfWeekMask()
+    {
+        $tmp = $this->daysOfWeekMask;
+        $return = array();
+        for($i = 6; $i >= 0; $i--){
+            if($tmp >= 2**$i){
+                $tmp = $tmp - 2**$i;
+                $return[$this->getDaysOfWeek()[6-$i]] = true;
+            }
+            else{
+                $return[$this->getDaysOfWeek()[6-$i]] = false;
+            }
+        }
+        return $return;
+    }
+
+    /**
+     *
+     * @param array $daysOfWeekMask
+     */
+    public function setDaysOfWeekMask($daysOfWeekMask)
+    {
+        $tmp = 0;
+        for($i = 6; $i >= 0; $i--){
+            if($daysOfWeekMask[$this->getDaysOfWeek()[6-$i]] == true){
+                $tmp += 2**$i;
+            }
+        }
+        $this->daysOfWeekMask = $tmp;
+        return $this;
+    }
+
 }
