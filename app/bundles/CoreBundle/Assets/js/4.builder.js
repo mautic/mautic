@@ -537,7 +537,7 @@ Mautic.initSlots = function(contents) {
             if (ui.item.hasClass('slot-type-handle')) {
                 var slotTypeContent = ui.item.find('script').html();
                 var newSlot = mQuery('<div/>').attr('data-slot', ui.item.attr('data-slot-type')).append(slotTypeContent);
-                Mautic.initSlot(newSlot);
+                contents.trigger('slot:init', newSlot);
                 ui.item.replaceWith(newSlot);
             }
         }
