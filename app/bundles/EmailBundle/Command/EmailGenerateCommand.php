@@ -46,7 +46,6 @@ class EmailGenerateCommand extends ModeratedCommand
         // <info>php %command.full_name%</info>
         // EOT
         // )
-
     }
 
     /**
@@ -56,11 +55,8 @@ class EmailGenerateCommand extends ModeratedCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
-
-
         $options = $input->getOptions();
-        $objectId=$options['id'];
+        $objectId = $options['id'];
         $factory = $this->getContainer()->get('mautic.factory');
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
@@ -80,24 +76,25 @@ class EmailGenerateCommand extends ModeratedCommand
         $catPublished = (!empty($category)) ? $category->isPublished() : true;
         $published = $entity->isPublished();
 
-
-        if (!$catPublished || !$published ) {
+        if (!$catPublished || !$published) {
             return 0;
         }
-        if (!is_null($entity->getFeed()) && $entity->getFeed()->getSnapshots()->last()->isExpired()===true){
+        if (!is_null($entity->getFeed()) && $entity->getFeed()
+            ->getSnapshots()
+            ->last()
+            ->isExpired() === true) {
             return 0;
         }
 
         $pending = $model->getPendingLeads($entity, null, true);
-        $output->writeln('<info>There is '.$pending.' mails to generate</info>');
-        $sendStat=$model->sendEmailToLists($entity);
-        $output->writeln('<info>'.$sendStat[0].' mails sent</info>');
-        $output->writeln('<info>'.$pending[0].' mails failed</info>');
-
+        $output->writeln('<info>There is ' . $pending . ' mails to generate</info>');
+        $sendStat = $model->sendEmailToLists($entity);
+        if ($pending > 0) {
+            $output->writeln('<info>' . $sendStat[0] . ' mails sent</info>');
+            $output->writeln('<info>' . $sendStat[0] . ' mails failed</info>');
+        }
         $this->completeRun();
 
         return 0;
-
-
     }
 }

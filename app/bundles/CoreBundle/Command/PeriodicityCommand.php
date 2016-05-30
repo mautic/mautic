@@ -13,35 +13,37 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Output\NullOutput;
 
 class PeriodicityCommand extends ModeratedCommand
 {
 
     protected function configure()
     {
+
         $this->setName('mautic:periodicity:update')
             ->setDescription('Run all periodicity event')
-            ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of leads to process per round. Defaults to 300.', 300)
-            ->
-        // ->addOption(
-        // '--max-leads',
-        // '-m',
-        // InputOption::VALUE_OPTIONAL,
-        // 'Send feeds',
-        // false
-        // )
-        addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
-
+            ->addOption('--id', '-id', InputOption::VALUE_OPTIONAL, 'Id of periodicity', false)
+            ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
+            // ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of leads to process per round. Defaults to 300.', 300)
         parent::configure();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $options = $input->getOptions();
+        $objectId = $options['id'];
+        if (!$this->checkRunStatus($input, $output, ($objectId) ? $objectId : 'all')) {
+            return 0;
+        }
+
         $container = $this->getContainer();
         $factory = $container->get('mautic.factory');
         $translator = $factory->getTranslator();
         $em = $factory->getEntityManager();
-        $output->writeln('<info>Execute periodicity event </info>');
+//         $output->writeln('<info>Execute periodicity event </info>');
         $periodicityModel = $factory->getModel('core.periodicity');
         $periodicitys = $periodicityModel->getRepository()->getEntities();
 
@@ -51,12 +53,25 @@ class PeriodicityCommand extends ModeratedCommand
             if ($p->getNextShoot() > new \DateTime()) {
                 continue;
             }
+            $output->writeln('<info>' . $translator->trans('mautic.core.command.perodicity.update', array('%id%' => $p->getid())) . '</info>');
 
+            $env = $container->get('kernel')->getEnvironment();
 
+            $args = array(
+                '--env' => $env,
+                '--id' => $p->getTargetId()
+            );
 
+            if ($env == 'prod') {
+                $args[] = '--no-debug';
+            }
+
+            $input       = new ArgvInput($args);
+            $application = $this->getApplication()->find('mautic:'.$p->getType());
+            $returnCode = $application->run($input, $output);
         }
         $this->completeRun();
 
-        return 0;
+        return $returnCode;
     }
 }
