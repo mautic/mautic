@@ -50,7 +50,9 @@ class PeriodicityCommand extends ModeratedCommand
         /**@var \Mautic\CoreBundle\Entity\Periodicity $p */
 
         foreach ($periodicitys as $p) {
-            if ($p->getNextShoot() > new \DateTime()) {
+            var_dump($p->nextShoot()->format('H:i:s d/m/Y'));
+            if ($p->nextShoot() < new \DateTime()) {
+
                 continue;
             }
             $output->writeln('<info>' . $translator->trans('mautic.core.command.perodicity.update', array('%id%' => $p->getid())) . '</info>');

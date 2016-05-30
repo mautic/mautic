@@ -11,6 +11,8 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Symfony\Component\Validator\Constraints\Date;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 class Periodicity
 {
@@ -24,7 +26,7 @@ class Periodicity
      *
      * @var date
      */
-    private $nextShoot;
+    private $lastShoot;
 
     /**
      *
@@ -38,21 +40,25 @@ class Periodicity
     private $targetId;
 
     /**
+     *
      * @var null|\DateTime
      */
     private $triggerDate;
 
     /**
+     *
      * @var int
      */
     private $triggerInterval = 0;
 
     /**
+     *
      * @var string
      */
     private $triggerIntervalUnit;
 
     /**
+     *
      * @var integer
      */
     private $daysOfWeekMask;
@@ -67,8 +73,8 @@ class Periodicity
 
         $builder->addId();
 
-        $builder->createField('nextShoot', 'datetime')
-            ->columnName('next_shoot')
+        $builder->createField('lastShoot', 'datetime')
+            ->columnName('last_shoot')
             ->build();
 
         $builder->createField('triggerDate', 'datetime')
@@ -160,6 +166,20 @@ class Periodicity
     }
 
     /**
+     * Set name
+     *
+     * @param string $name
+     *
+     * @return Event
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
      * Get nextShoot
      *
      * @return date
@@ -167,6 +187,16 @@ class Periodicity
     public function getNextShoot()
     {
         return $this->nextShoot;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
@@ -275,8 +305,17 @@ class Periodicity
         $this->triggerIntervalUnit = $triggerIntervalUnit;
     }
 
-    public static function getDaysOfWeek(){
-        return ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    public static function getDaysOfWeek()
+    {
+        return array(
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday"
+        );
     }
 
     /**
@@ -287,13 +326,12 @@ class Periodicity
     {
         $tmp = $this->daysOfWeekMask;
         $return = array();
-        for($i = 6; $i >= 0; $i--){
-            if($tmp >= 2**$i){
-                $tmp = $tmp - 2**$i;
-                $return[$this->getDaysOfWeek()[6-$i]] = true;
-            }
-            else{
-                $return[$this->getDaysOfWeek()[6-$i]] = false;
+        for ($i = 6; $i >= 0; $i --) {
+            if ($tmp >= pow(2, $i)) {
+                $tmp = $tmp - pow(2, $i);
+                $return[$this->getDaysOfWeek()[6 - $i]] = true;
+            } else {
+                $return[$this->getDaysOfWeek()[6 - $i]] = false;
             }
         }
         return $return;
@@ -306,13 +344,59 @@ class Periodicity
     public function setDaysOfWeekMask($daysOfWeekMask)
     {
         $tmp = 0;
-        for($i = 6; $i >= 0; $i--){
-            if($daysOfWeekMask[$this->getDaysOfWeek()[6-$i]] == true){
-                $tmp += 2**$i;
+        for ($i = 6; $i >= 0; $i --) {
+            if ($daysOfWeekMask[$this->getDaysOfWeek()[6 - $i]] == true) {
+                $tmp += pow(2, $i);
             }
         }
         $this->daysOfWeekMask = $tmp;
         return $this;
     }
 
+    public function getLastShoot()
+    {
+        return $this->lastShoot;
+    }
+
+    public function setLastShoot($lastShoot)
+    {
+        $this->lastShoot = $lastShoot;
+        return $this;
+    }
+
+    /**
+     * nextShoot
+     *
+     * @return date
+     */
+    public function nextShoot()
+    {
+        // define date of next execution
+        switch ($this->getTriggerIntervalUnit()) {
+            case 'd':
+                $dates = array();
+                foreach ($this->getDaysOfWeek() as $day => $activated) {
+                    if ($activated === true) {
+
+                        $dates[] = $this->getLastShoot()->setTime(0, 0)->modify('next ' . $day);
+                    }
+                }
+                /** @var \DateTime $nextShoot */
+                $nextShoot = min($dates);
+
+                break;
+            case 'w':
+                /** @var \DateTime $nextShoot */
+                $nextShoot = $this->getLastShoot()->setTime(0, 0)->modify('+'.$this->getTriggerInterval(). 'week');
+
+                break;
+            case 'm':
+                /** @var \DateTime $nextShoot */
+                $nextShoot = $this->getLastShoot()->setTime(0, 0)->modify('+' .$this->getTriggerInterval(). 'month');
+                break;
+        }
+
+        $nextShoot->setTime($this->getTriggerDate()->format('H'), $this->getTriggerDate()->format('i'));
+        return $nextShoot;
+    }
 }

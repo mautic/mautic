@@ -33,7 +33,7 @@ class EmailGenerateCommand extends ModeratedCommand
     protected function configure()
     {
         $this->setName('mautic:email:generate')
-            ->setDescription('generate Segment Email')
+            ->setDescription('Generate Segment Email')
             ->addOption('--id', null, InputOption::VALUE_REQUIRED, 'Email ID')
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
         // ->addOption('--time-limit', null, InputOption::VALUE_OPTIONAL, 'Limit the number of seconds per batch. Defaults to value set in config.')
@@ -93,6 +93,7 @@ class EmailGenerateCommand extends ModeratedCommand
             $output->writeln('<info>' . $sendStat[0] . ' mails sent</info>');
             $output->writeln('<info>' . $sendStat[0] . ' mails failed</info>');
         }
+
         $this->completeRun();
 
         return 0;
