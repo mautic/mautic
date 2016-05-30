@@ -133,6 +133,11 @@ Mautic.launchBuilder = function (formName, actionName) {
 };
 
 /**
+ * Holds currently focussed slot jQuery object
+ */
+Mautic.builderSlotFocus = null;
+
+/**
  * Set builder token draggables
  *
  * @param target
@@ -586,6 +591,13 @@ Mautic.initSlotListeners = function(contents) {
             handle.remove('div[data-slot-handle]');
         });
 
+        slot.on('click', function() {
+            Mautic.builderSlotFocus = mQuery(this);
+            var focusType = Mautic.builderSlotFocus.attr('data-slot');
+            var focusForm = mQuery('script[data-slot-type-form="'+focusType+'"]').html();
+            mQuery('#slot-form-container').html(focusForm);
+        });
+
         if (type === 'text') {
             slot.froalaEditor({toolbarInline: true, zIndex: 2501});
         } else if (type === 'image') {
@@ -593,3 +605,5 @@ Mautic.initSlotListeners = function(contents) {
         }
     });
 };
+
+
