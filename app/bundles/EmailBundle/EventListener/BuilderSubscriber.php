@@ -100,7 +100,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'Text',
                 'font',
                 'MauticCoreBundle:Slots:text.html.twig',
-                'form-placeholder',
+                'slot',
                 1000
             );
             $event->addSlotType(
@@ -108,7 +108,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'Image',
                 'image',
                 'MauticCoreBundle:Slots:image.html.twig',
-                'form-placeholder',
+                'slot',
                 900
             );
             $event->addSlotType(
@@ -116,7 +116,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'Button',
                 'external-link',
                 'MauticCoreBundle:Slots:button.html.twig',
-                'form-placeholder',
+                'slot',
                 800
             );
         }

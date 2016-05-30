@@ -789,13 +789,22 @@ class EmailController extends FormController
         $assets         = $form['assetAttachments']->getData();
         $attachmentSize = $this->factory->getModel('asset')->getTotalFilesize($assets);
 
+        $slotTypes = $model->getBuilderComponents($entity, 'slotTypes');
+
+        foreach ($slotTypes as &$slotType) {
+            if (isset($slotType['form'])) {
+                $slotForm = $this->get('form.factory')->create($slotType['form']);
+                $slotType['form'] = $slotForm->createView();
+            }
+        }
+
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
                     'form'               => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.php', 'MauticEmailBundle:FormTheme\Email'),
                     'isVariant'          => $entity->isVariant(true),
                     'tokens'             => (!empty($tokens)) ? $tokens['tokenSections'] : $model->getBuilderComponents($entity, 'tokenSections'),
-                    'slots'              => $model->getBuilderComponents($entity, 'slotTypes'),
+                    'slots'              => $slotTypes,
                     'email'              => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
                     'attachmentSize'     => $attachmentSize

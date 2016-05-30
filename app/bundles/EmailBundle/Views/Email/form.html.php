@@ -193,7 +193,8 @@ if (!isset($attachmentSize)) {
                     <p class="text-muted pt-md text-center"><i>Drag the slot to the desired position.</i></p>
                 </div>
                 <div class="tab-pane fade bdr-w-0" id="customize-form-container">
-                    form
+                    <?php echo $view['form']->start($slot['form']); ?>
+                    <?php echo $view['form']->end($slot['form']); ?>
                 </div>
             </div>
         </div>
