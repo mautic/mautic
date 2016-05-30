@@ -172,23 +172,7 @@ if (!isset($attachmentSize)) {
             </div>
         </div>
         <div class="panel-group builder-tokens" id="emailTokensPanel">
-            <?php foreach ($tokens as $k => $t): ?>
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h4 class="panel-title"><?php echo $t['header']; ?></h4>
-                    </div>
-                    <div class="panel-body">
-                        <?php echo $t['content']; ?>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-
-            <?php echo $view->render('MauticCoreBundle:Helper:buildermodal_feedback.html.php'); ?>
-            <?php echo $view->render('MauticCoreBundle:Helper:buildermodal_link.html.php'); ?>
-        </div>
-    </div>
-    <div class="builder-panel slot-panel">
-        <div class="panel-group builder-slots" id="emailSlotsPanel">
+            <div class="panel-group builder-slots" id="emailSlotsPanel">
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#slot-type-container" role="tab" data-toggle="tab">Content Slots</a></li>
                 <li class=""><a href="#customize-form-container" role="tab" data-toggle="tab">Customize</a></li>
@@ -212,6 +196,20 @@ if (!isset($attachmentSize)) {
                     form
                 </div>
             </div>
+        </div>
+            <?php foreach ($tokens as $k => $t): ?>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title"><?php echo $t['header']; ?></h4>
+                    </div>
+                    <div class="panel-body">
+                        <?php echo $t['content']; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+
+            <?php echo $view->render('MauticCoreBundle:Helper:buildermodal_feedback.html.php'); ?>
+            <?php echo $view->render('MauticCoreBundle:Helper:buildermodal_link.html.php'); ?>
         </div>
     </div>
 </div>
