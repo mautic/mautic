@@ -244,7 +244,8 @@ class PublicController extends CommonFormController
         $css               = InputHelper::string($this->request->get('css'));
         $model             = $this->getModel('form.form');
         $form              = $model->getEntity($objectId);
-        $customStylesheets = (!empty($css)) ? explode(',', $css) : array();
+        $customStylesheets = (!empty($css)) ? explode(',', $css) : [];
+        $template          = null;
 
         if ($form === null || !$form->isPublished()) {
 
@@ -279,10 +280,9 @@ class PublicController extends CommonFormController
         $viewParams['template'] = $template;
 
         if (! empty($template)) {
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':form.html.php');
+            $logicalName  = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':form.html.php');
             $assetsHelper = $this->factory->getHelper('template.assets');
-            $slotsHelper = $this->factory->getHelper('template.slots');
-            $analyticsHelper = $this->factory->getHelper('template.analytics');
+            $analytics    = $this->factory->getHelper('template.analytics')->getCode();
 
             if (! empty($customStylesheets)) {
                 foreach ($customStylesheets as $css) {
@@ -290,9 +290,8 @@ class PublicController extends CommonFormController
                 }
             }
 
-            $slotsHelper->set('pageTitle', $form->getName());
+            $this->factory->getHelper('template.slots')->set('pageTitle', $form->getName());
 
-            $analytics = $analyticsHelper->getCode();
 
             if (! empty($analytics)) {
                 $assetsHelper->addCustomDeclaration($analytics);
