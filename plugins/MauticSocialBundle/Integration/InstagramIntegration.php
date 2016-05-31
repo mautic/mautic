@@ -72,7 +72,7 @@ class InstagramIntegration extends SocialIntegration
      */
     public function getUserData($identifier, &$socialCache)
     {
-        if ($id = $this->getUserId($identifier, $socialCache)) {
+        if ($id = $this->getContactUserId($identifier, $socialCache)) {
             $url  = $this->getApiUrl('users/'.$id);
             $data = $this->makeRequest($url);
 
@@ -92,7 +92,7 @@ class InstagramIntegration extends SocialIntegration
     public function getPublicActivity($identifier, &$socialCache)
     {
         $socialCache['has']['activity'] = false;
-        if ($id = $this->getUserId($identifier, $socialCache)) {
+        if ($id = $this->getContactUserId($identifier, $socialCache)) {
             //get more than 10 so we can weed out videos
             $data = $this->makeRequest($this->getApiUrl("users/$id/media/recent"), array('count' => 20));
 
@@ -137,7 +137,19 @@ class InstagramIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getUserId($identifier, &$socialCache)
+    public function getAvailableLeadFields($settings = array())
+    {
+        return array(
+            "full_name" => array("type" => "string"),
+            "bio"       => array("type" => "string"),
+            "website"   => array("type" => "string")
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    private function getContactUserId(&$identifier, &$socialCache)
     {
         if (!empty($socialCache['id'])) {
             return $socialCache['id'];
@@ -161,17 +173,5 @@ class InstagramIntegration extends SocialIntegration
         }
 
         return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAvailableLeadFields($settings = array())
-    {
-        return array(
-            "full_name" => array("type" => "string"),
-            "bio"       => array("type" => "string"),
-            "website"   => array("type" => "string")
-        );
     }
 }
