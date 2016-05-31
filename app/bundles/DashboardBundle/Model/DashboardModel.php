@@ -173,7 +173,7 @@ class DashboardModel extends FormModel
         if ($widget->getCacheTimeout() == null || $widget->getCacheTimeout() == -1) {
             $widget->setCacheTimeout($this->coreParametersHelper->getParameter('cached_data_timeout'));
         }
-        
+
         // Merge global filter with widget params
         $widgetParams = $widget->getParams();
         $resultParams = array_merge($widgetParams, $filter);
@@ -257,8 +257,10 @@ class DashboardModel extends FormModel
      */
     public function getDefaultFilter()
     {
+        $lastMonth = new \DateTime();
+        $lastMonth->sub(new \DateInterval('P30D'));
+
         $today       = new \DateTime();
-        $lastMonth   = (new \DateTime())->sub(new \DateInterval('P30D'));
         $mysqlFormat = 'Y-m-d H:i:s';
         $dateFrom    = new \DateTime($this->session->get('mautic.dashboard.date.from', $lastMonth->format($mysqlFormat)));
         $dateTo      = new \DateTime($this->session->get('mautic.dashboard.date.to', $today->format($mysqlFormat)));

@@ -340,9 +340,9 @@ class LeadController extends FormController
                         } elseif (!empty($details['region'])) {
                             $name = $details['region'];
                         }
-                        $place = array(
+                        $place    = array(
                             'latLng' => array($details['latitude'], $details['longitude']),
-                            'name' => $name,
+                            'name'   => $name,
                         );
                         $places[] = $place;
                     }
@@ -359,18 +359,17 @@ class LeadController extends FormController
         $eventTypes   = $event->getEventTypes();
 
         // Get an engagement count
-        $translator     = $this->factory->getTranslator();
+        $translator = $this->factory->getTranslator();
 
-        $fromDate       = (new \DateTime('first day of this month 00:00:00'))->modify('-6 months');
-        $toDate         = new \DateTime;
+        $fromDate = new \DateTime('first day of this month 00:00:00');
+        $fromDate->modify('-6 months');
+        $toDate      = new \DateTime;
         $engagements = array();
-        $total          = 0;
 
         $events = array();
         foreach ($eventsByDate as $eventDate => $dateEvents) {
-            $datetime = \DateTime::createFromFormat('Y-m-d H:i', $eventDate);
+            $datetime = new \DateTime($eventDate);
             if ($datetime > $fromDate) {
-                $total++;
                 $engagements[] = array(
                     'date' => $eventDate,
                     'data' => 1
@@ -399,16 +398,18 @@ class LeadController extends FormController
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
 
         // Set the social profile templates
-        foreach ($socialProfiles as $integration => &$details) {
-            if ($integrationObject = $integrationHelper->getIntegrationObject($integration)) {
-                if ($template = $integrationObject->getSocialProfileTemplate()) {
-                    $details['social_profile_template'] = $template;
+        if ($socialProfiles) {
+            foreach ($socialProfiles as $integration => &$details) {
+                if ($integrationObject = $integrationHelper->getIntegrationObject($integration)) {
+                    if ($template = $integrationObject->getSocialProfileTemplate()) {
+                        $details['social_profile_template'] = $template;
+                    }
                 }
-            }
 
-            if (!isset($details['social_profile_template'])) {
-                // No profile template found
-                unset($socialProfiles[$integration]);
+                if (!isset($details['social_profile_template'])) {
+                    // No profile template found
+                    unset($socialProfiles[$integration]);
+                }
             }
         }
 
