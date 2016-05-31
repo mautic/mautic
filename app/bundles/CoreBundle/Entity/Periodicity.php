@@ -30,12 +30,6 @@ class Periodicity
      *
      * @var string
      */
-    private $name;
-
-    /**
-     *
-     * @var string
-     */
     private $type;
     /**
      *
@@ -93,11 +87,6 @@ class Periodicity
             ->nullable()
             ->build();
 
-        $builder->createField('name', 'string')
-            ->columnName('name')
-            ->length(50)
-            ->build();
-
         $builder->createField('type', 'string')
             ->columnName('type')
             ->length(50)
@@ -113,6 +102,39 @@ class Periodicity
             ->nullable()
             ->build();
     }
+
+    //Statics functions for the possibles types
+    public static function getTypeEmail(){  return "email:genarate";}
+    public static function getTypeSms(){  	return "sms:genarate";}
+
+    /**
+     * @var array
+     */
+    protected $changes;
+
+    /**
+     * @param $prop
+     * @param $val
+     *
+     * @return void
+     */
+    protected function isChanged ($prop, $val)
+    {
+        $getter  = "get" . ucfirst($prop);
+        $current = $this->$getter();
+        if ($current != $val) {
+            $this->changes[$prop] = array($current, $val);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getChanges ()
+    {
+        return $this->changes;
+    }
+
     /**
      * Get id
      *
@@ -145,30 +167,6 @@ class Periodicity
     public function getNextShoot()
     {
         return $this->nextShoot;
-    }
-
-    /**
-     * Set name
-     *
-     * @param string $name
-     *
-     * @return Event
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * Get name
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
     }
 
     /**

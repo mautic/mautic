@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\CoreBundle\Entity\Periodicity;
 use Mautic\FeedBundle\Entity\Feed;
 
 class EmailController extends FormController
@@ -514,13 +515,15 @@ class EmailController extends FormController
                     $entity->setCustomHtml($content);
 
                     //If the URL field isn't empty, we set a linked feed and periodicity
-                    if($entity->getFeed()->getFeedUrl() != ''){
+                    if($entity->getFeed() != null && $entity->getFeed()->getFeedUrl() != ''){
                         //We set the email link in the feed
                         $entity->getFeed()->setEmail($entity);
                         //We persist the feed entity
                         $this->factory->getEntityManager()->persist($entity->getFeed());
 
                         //Idem for the Periodicity
+                        //Except that Periodicity isn't in Email, so we have to do it manually
+                        //And in order to have the Email id, we need to do it after saving the Email
                     }
                     else{
                         //We destroy the feed, so symfony won't be angry about an unsaved entity
@@ -529,6 +532,34 @@ class EmailController extends FormController
 
                     //form is valid so process the data
                     $model->saveEntity($entity);
+
+                    //Here we save the Periodicity, if needed
+                    if($entity->getFeed() != null && $entity->getFeed()->getFeedUrl() != ''){
+                        $periodicityEntity = new Periodicity();
+                        $periodicityEntity->setNextShoot(new \DateTime($_POST['emailform']['nextShoot']));
+                        $periodicityEntity->setType(Periodicity::getTypeEmail());
+                        $periodicityEntity->setTargetId($entity->getId());
+                        if($_POST['recurency'] == 'interval'){
+                            $periodicityEntity->setTriggerInterval($_POST['emailform']['interval']);
+                            $periodicityEntity->setTriggerIntervalUnit($_POST['emailform']['intervalUnit']);
+                        } else {
+                            $daysOfWeekMask = array();
+                            for($i = 0; $i < 7; $i++){
+                                if(array_key_exists($i, $_POST['emailform']['DaysOfWeek'])){
+                                    $daysOfWeekMask[Periodicity::getDaysOfWeek()[$i]] = true;
+                                } else {
+                                    $daysOfWeekMask[Periodicity::getDaysOfWeek()[$i]] = false;
+                                }
+                            }
+                            $periodicityEntity->setDaysOfWeekMask($daysOfWeekMask);
+                        }
+                        //We persist the Periodicity
+                        $this->factory->getEntityManager()->persist($periodicityEntity);
+                        $this->factory->getEntityManager()->flush();
+                    }
+
+                    //clear the session
+                    $session->remove($contentName);
 
                     $this->addFlash(
                         'mautic.core.notice.created',

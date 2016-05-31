@@ -27,6 +27,8 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Mautic\FeedBundle\Form\Type\FeedType;
+use Mautic\CoreBundle\Entity\Periodicity;
+use Mautic\CoreBundle\Form\Type\PeriodicityType;
 
 /**
  * Class EmailType.
@@ -84,6 +86,10 @@ class EmailType extends AbstractType
                 'required' => false
             )
         );
+
+        //For periodicity
+        $periodicity = new PeriodicityType();
+        $periodicity->buildForm($builder, $options);
 
         $builder->add(
             'name',

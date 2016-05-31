@@ -1070,4 +1070,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
+    /**
+     * @return boolean
+     */
+    public function hasFeed(){
+        if($this->getFeed() === null){  return false;
+        } else {                        return true;}
+    }
+
 }

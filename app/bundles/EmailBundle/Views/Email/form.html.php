@@ -205,6 +205,32 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
             <!-- For feed -->
             <hr/>
             <?php echo $view['form']->row($form['feed']); ?>
+
+            <?php echo $view['form']->row($form['nextShoot']); ?>
+
+            <style>
+                #recurency_days_of_week:checked + label + br + div.row,
+                #recurency_days_of_week:checked + label + br + div.row + div.row{
+                    display: none;
+                }
+                #recurency_days_of_week:not(:checked) + label + br + div.row + div.row + div.row{
+                    display: none;
+                }
+                #recurency_days_of_week + label + br + div.row{          width: 50%;}
+                #recurency_days_of_week + label + br + div.row + div.row{width: 50%;}
+                #recurency_days_of_week + label + br + div.row,
+                #recurency_days_of_week + label + br + div.row + div.row{
+                    float: left;
+                }
+            </style>
+            <label>Recurency :</label>
+            <br/><input type="radio" value="interval" name="recurency" id="recurency_interval" checked="checked"/>
+            <label for="recurency_interval">Interval</label>
+            <br/><input type="radio" value="days_of_week" name="recurency" id="recurency_days_of_week"/>
+            <label for="recurency_days_of_week">Days of week</label>
+            <br/><?php echo $view['form']->row($form['interval']); ?>
+            <?php echo $view['form']->row($form['intervalUnit']); ?>
+            <?php echo $view['form']->row($form['DaysOfWeek']); ?>
         </div>
         <div class="hide">
             <?php echo $view['form']->rest($form); ?>
