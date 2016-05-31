@@ -40,15 +40,23 @@ class SlotType extends AbstractType
         $builder->add('padding-top', 'number', array(
             'label'      => 'mautic.core.padding.top',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
             'required'   => false,
+            'attr'       => array(
+                'class'           => 'form-control',
+                'data-slot-param' => 'padding-top',
+                'postaddon_text'  => 'px',
+            ),
         ));
 
         $builder->add('padding-bottom', 'number', array(
             'label'      => 'mautic.core.padding.bottom',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
             'required'   => false,
+            'attr'       => array(
+                'class'           => 'form-control',
+                'data-slot-param' => 'padding-bottom',
+                'postaddon_text'  => 'px',
+            ),
         ));
     }
 

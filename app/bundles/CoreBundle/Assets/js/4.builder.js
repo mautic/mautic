@@ -594,7 +594,10 @@ Mautic.initSlotListeners = function(contents) {
         slot.on('click', function() {
             Mautic.builderSlotFocus = mQuery(this);
             var focusType = Mautic.builderSlotFocus.attr('data-slot');
-            var focusForm = mQuery('script[data-slot-type-form="'+focusType+'"]').html();
+            var focusForm = mQuery(mQuery('script[data-slot-type-form="'+focusType+'"]').html());
+            focusForm.on('keyup', function(e) {
+                contents.trigger('slot:change', {slot: slot, field: mQuery(e.target)});
+            });
             mQuery('#slot-form-container').html(focusForm);
         });
 
@@ -602,6 +605,13 @@ Mautic.initSlotListeners = function(contents) {
             slot.froalaEditor({toolbarInline: true, zIndex: 2501});
         } else if (type === 'image') {
             slot.find('img').froalaEditor({toolbarInline: true});
+        }
+    });
+
+    contents.on('slot:change', function(event, params) {
+        var fieldParam = params.field.attr('data-slot-param');
+        if (fieldParam === 'padding-top' || fieldParam === 'padding-bottom') {
+            params.slot.css(fieldParam, params.field.val() + 'px');
         }
     });
 };
