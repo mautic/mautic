@@ -16,6 +16,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Output\NullOutput;
+use Mautic\CoreBundle\Model\PeriodicityModel;
+use Mautic\CoreBundle\Templating\Helper\DateHelper;
 
 class PeriodicityCommand extends ModeratedCommand
 {
@@ -42,17 +44,17 @@ class PeriodicityCommand extends ModeratedCommand
         $container = $this->getContainer();
         $factory = $container->get('mautic.factory');
         $translator = $factory->getTranslator();
-        $em = $factory->getEntityManager();
-//         $output->writeln('<info>Execute periodicity event </info>');
+//         $em = $factory->getEntityManager();
+        /**@var PeriodicityModel $periodicityModel */
         $periodicityModel = $factory->getModel('core.periodicity');
         $periodicitys = $periodicityModel->getRepository()->getEntities();
 
         /**@var \Mautic\CoreBundle\Entity\Periodicity $p */
 
         foreach ($periodicitys as $p) {
-            var_dump($p->nextShoot()->format('H:i:s d/m/Y'));
-            if ($p->nextShoot() < new \DateTime()) {
 
+            if ($p->nextShoot() > new \DateTime()) {
+                $output->writeln('<info>' . $translator->trans('mautic.core.command.perodicity.next_exec', array('%id%' => $p->getid(), '%nextShoot%' => $p->nextShoot()->format($factory->getParameter('date_format_full')))) . '</info>');
                 continue;
             }
             $output->writeln('<info>' . $translator->trans('mautic.core.command.perodicity.update', array('%id%' => $p->getid())) . '</info>');
@@ -71,9 +73,15 @@ class PeriodicityCommand extends ModeratedCommand
             $input       = new ArgvInput($args);
             $application = $this->getApplication()->find('mautic:'.$p->getType());
             $returnCode = $application->run($input, $output);
+
+            if ($returnCode===0){
+                $p->setLastShoot(new \DateTime());
+                $periodicityModel->getRepository()->saveEntity($p,true);;
+            }
+
         }
         $this->completeRun();
 
-        return $returnCode;
+
     }
 }

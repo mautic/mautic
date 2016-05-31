@@ -319,7 +319,7 @@ class Periodicity
     }
 
     /**
-     *
+     * convert bitmask to array
      * @return array
      */
     public function getDaysOfWeekMask()
@@ -338,7 +338,7 @@ class Periodicity
     }
 
     /**
-     *
+     * convert array to bitmask
      * @param array $daysOfWeekMask
      */
     public function setDaysOfWeekMask($daysOfWeekMask)
@@ -375,10 +375,12 @@ class Periodicity
         switch ($this->getTriggerIntervalUnit()) {
             case 'd':
                 $dates = array();
-                foreach ($this->getDaysOfWeek() as $day => $activated) {
+                foreach ($this->getDaysOfWeekMask() as $day => $activated) {
                     if ($activated === true) {
 
-                        $dates[] = $this->getLastShoot()->setTime(0, 0)->modify('next ' . $day);
+                        $dates[] = clone $this->getLastShoot()
+                            ->setTime(0, 0)
+                            ->modify('next ' . $day);
                     }
                 }
                 /** @var \DateTime $nextShoot */
@@ -387,16 +389,23 @@ class Periodicity
                 break;
             case 'w':
                 /** @var \DateTime $nextShoot */
-                $nextShoot = $this->getLastShoot()->setTime(0, 0)->modify('+'.$this->getTriggerInterval(). 'week');
+                $nextShoot = $this->getLastShoot()
+                    ->setTime(0, 0)
+                    ->modify('+' . $this->getTriggerInterval() . 'week');
 
                 break;
             case 'm':
                 /** @var \DateTime $nextShoot */
-                $nextShoot = $this->getLastShoot()->setTime(0, 0)->modify('+' .$this->getTriggerInterval(). 'month');
+                $nextShoot = $this->getLastShoot()
+                    ->setTime(0, 0)
+                    ->modify('+' . $this->getTriggerInterval() . 'month');
                 break;
         }
 
-        $nextShoot->setTime($this->getTriggerDate()->format('H'), $this->getTriggerDate()->format('i'));
+        // Modifiy execution time according to triggerdate time
+        $nextShoot->setTime($this->getTriggerDate()
+            ->format('H'), $this->getTriggerDate()
+            ->format('i'));
         return $nextShoot;
     }
 }
