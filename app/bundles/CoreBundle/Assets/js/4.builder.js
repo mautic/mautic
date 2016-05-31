@@ -206,19 +206,19 @@ Mautic.closeBuilder = function(model) {
         });
 
         // Get the content of each editor
-        mQuery.each(editors, function (slot, editor) {
-            slot = slot.replace("slot-", "");
-            content[slot] = editor.getData();
-        });
+        // mQuery.each(editors, function (slot, editor) {
+        //     slot = slot.replace("slot-", "");
+        //     content[slot] = editor.getData();
+        // });
 
-        // Get the content of each field
-        mQuery.each(fields, function (key, field) {
-            field = mQuery(field);
-            slot = field.attr('id').replace("slot-", "");
-            content[slot] = field.val();
-        });
+        // // Get the content of each field
+        // mQuery.each(fields, function (key, field) {
+        //     field = mQuery(field);
+        //     slot = field.attr('id').replace("slot-", "");
+        //     content[slot] = field.val();
+        // });
 
-        Mautic.saveBuilderContent(model, builderContents.find('#builder_entity_id').val(), content, function (response) {
+        Mautic.saveBuilderContentLocally(model, builderContents.find('#builder_entity_id').val(), content, function (response) {
             if (response.success) {
                 try {
                     // Kill droppables
@@ -239,7 +239,7 @@ Mautic.closeBuilder = function(model) {
 
                 mQuery('body').css('overflow-y', '');
 
-                // mQuery('.builder').addClass('hide');
+                mQuery('.builder').addClass('hide');
                 Mautic.stopIconSpinPostEvent();
             }
         });
@@ -334,7 +334,7 @@ Mautic.toggleBuilderButton = function (hide) {
 };
 
 /**
- * Save the builder content
+ * Save the builder content to the session by a AJAX call
  *
  * @param model
  * @param entityId

@@ -26,53 +26,6 @@ use Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport;
  */
 class AjaxController extends CommonAjaxController
 {
-
-    /**
-     * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function setBuilderContentAction(Request $request)
-    {
-        $dataArray = array('success' => 0);
-        $entityId  = InputHelper::clean($request->request->get('entity'));
-        $session   = $this->factory->getSession();
-
-        if (!empty($entityId)) {
-            $sessionVar = 'mautic.emailbuilder.'.$entityId.'.content';
-
-            // Check for an array of slots
-            $slots   = InputHelper::_($request->request->get('slots', array(), true), 'html');
-            $content = $session->get($sessionVar, array());
-
-            if (!is_array($content)) {
-                $content = array();
-            }
-
-            if (!empty($slots)) {
-                // Builder was closed so save each content
-                foreach ($slots as $slot => $newContent) {
-                    $content[$slot] = $newContent;
-                }
-
-                $session->set($sessionVar, $content);
-                $dataArray['success'] = 1;
-            } else {
-                // Check for a single slot
-                $newContent = InputHelper::html($request->request->get('content'));
-                $slot       = InputHelper::clean($request->request->get('slot'));
-
-                if (!empty($slot)) {
-                    $content[$slot] = $newContent;
-                    $session->set($sessionVar, $content);
-                    $dataArray['success'] = 1;
-                }
-            }
-        }
-
-        return $this->sendJsonResponse($dataArray);
-    }
-
     /**
      * @param Request $request
      *
