@@ -43,10 +43,7 @@ class GooglePlusIntegration extends SocialIntegration
      */
     public function getIdentifierFields()
     {
-        return array(
-            'googleplus',
-            'email'
-        );
+        return 'googleplus';
     }
 
     /**
@@ -69,38 +66,15 @@ class GooglePlusIntegration extends SocialIntegration
      */
     public function getUserData($identifier, &$socialCache)
     {
-        // Only persist if fetching the data after a form login
-        $persistLead = false;
+        $this->persistNewLead = false;
 
-        if ('oauth2' == $this->getAuthenticationType()) {
-            $accessToken = $this->getAccessToken($socialCache);
-
-            if (!isset($accessToken['access_token'])) {
-                // Try searching for the contact using Mautic's plugin authentication
-                $userId = $this->getUserId($identifier, $socialCache);
-            } else {
-                // Use the contact's access token for fetching profile data
-                $identifier['access_token'] = $accessToken['access_token'];
-
-                if (isset($accessToken['persist_lead'])) {
-                    $persistLead = $accessToken['persist_lead'];
-                    unset($accessToken['persist_lead']);
-                }
-
-                $userId = 'me';
-            }
-        } else {
-            // Try searching for the lead using Mautic's plugin authentication
-            $userId = $this->getUserId($identifier, $socialCache);
-        }
-
-        if ($userId) {
+        if ($userId = $this->getContactUserId($identifier, $socialCache)) {
             $url  = $this->getApiUrl("people/{$userId}");
-            if (isset($identifier['access_token'])) {
+            if ($userId == 'me') {
                 // Request using contact's access token
                 $data = $this->makeRequest(
                     $url,
-                    array('access_token' => $identifier['access_token']),
+                    array('access_token' => $identifier),
                     'GET',
                     array('auth_type' => 'access_token')
                 );
@@ -130,9 +104,8 @@ class GooglePlusIntegration extends SocialIntegration
                 if (!empty($info)) {
                     $socialCache['profile']     = $info;
                     $socialCache['lastRefresh'] = new \DateTime();
-                    $socialCache['accessToken'] = $this->encryptApiKeys($accessToken);
 
-                    $this->getMauticLead($info, $persistLead, $socialCache, $identifier);
+                    $this->getMauticLead($info, $this->persistNewLead, $socialCache, $identifier);
                 }
 
                 return $data;
@@ -147,7 +120,7 @@ class GooglePlusIntegration extends SocialIntegration
      */
     public function getPublicActivity($identifier, &$socialCache)
     {
-        if ($id = $this->getUserId($identifier, $socialCache)) {
+        if ($id = $this->getContactUserId($identifier, $socialCache)) {
             $data = $this->makeRequest($this->getApiUrl("people/$id/activities/public"), array('maxResults' => 10));
 
             if (!empty($data) && isset($data->items) && count($data->items)) {
@@ -350,10 +323,25 @@ class GooglePlusIntegration extends SocialIntegration
     }
 
     /**
-     * {@inheritdoc}
+     * @param $identifier
+     * @param $socialCache
+     *
+     * @return bool|mixed|string
      */
-    public function getUserId($identifier, &$socialCache)
+    private function getContactUserId(&$identifier, &$socialCache)
     {
+        if (false && 'oauth2' == $this->getAuthenticationType()) {
+            $accessToken = $this->getContactAccessToken($socialCache);
+
+            if (isset($accessToken['access_token'])) {
+                // Use the contact's access token for fetching profile data
+                $identifier = $accessToken['access_token'];
+
+                // Contact SSO login
+                return 'me';
+            }
+        }
+
         if (!empty($socialCache['id'])) {
 
             return $socialCache['id'];
@@ -362,30 +350,21 @@ class GooglePlusIntegration extends SocialIntegration
             return false;
         }
 
-        if (!is_array($identifier)) {
-            $identifier = array($identifier);
+
+        if (is_numeric($identifier)) {
+            //this is a google user ID
+            $socialCache['id'] = $identifier;
+
+            return $identifier;
         }
 
-        foreach ($identifier as $type => $id) {
-            if (empty($id)) {
-                continue;
-            }
+        // Get user ID using the Mautic users access token/key
+        $data = $this->makeRequest($this->getApiUrl('people'), array('query' => $identifier));
 
-            if ($type == 'googleplus' && is_numeric($id)) {
-                //this is a google user ID
-                $socialCache['id'] = $id;
+        if (!empty($data->items) && count($data->items) === 1) {
+            $socialCache['id'] = $data->items[0]->id;
 
-                return $id;
-            }
-
-            // Get user ID using the Mautic users access token/key
-            $data = $this->makeRequest($this->getApiUrl('people'), array('query' => $id));
-
-            if (!empty($data) && isset($data->id) && count($data->id)) {
-                $socialCache['id'] = $data->id;
-
-                return $socialCache['id'];
-            }
+            return $socialCache['id'];
         }
 
         return false;
