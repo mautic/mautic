@@ -253,7 +253,7 @@ class EmailController extends FormController
         /** @var \Mautic\EmailBundle\Entity\Email $email */
         $email = $model->getEntity($objectId);
         //set the page we came from
-        $page = $this->factory->getSession()->get('mautic.email.page', 1);
+        $page  = $this->factory->getSession()->get('mautic.email.page', 1);
 
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', array());
@@ -963,6 +963,8 @@ class EmailController extends FormController
 
         if (is_array($newContent)) {
             $content = array_merge($content, $newContent);
+            // Update the content for processSlots
+            $entity->setContent($content);
         }
 
         // Replace short codes to emoji

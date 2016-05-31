@@ -807,6 +807,8 @@ class PageController extends FormController
 
         if (is_array($newContent)) {
             $content = array_merge($content, $newContent);
+            // Update the content for processSlots
+            $entity->setContent($content);
         }
 
         $this->addAssetsForBuilder();
