@@ -101,7 +101,12 @@ return [
                 'class' => 'Mautic\AssetBundle\EventListener\SearchSubscriber'
             ],
             'oneup_uploader.pre_upload' => [
-                'class' => 'Mautic\AssetBundle\EventListener\UploadSubscriber'
+                'class' => 'Mautic\AssetBundle\EventListener\UploadSubscriber',
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.core_parameters',
+                    'mautic.asset.model.asset'
+                ]
             ],
             'mautic.asset.dashboard.subscriber' => [
                 'class' => 'Mautic\AssetBundle\EventListener\DashboardSubscriber'
@@ -110,7 +115,11 @@ return [
         'forms' => [
             'mautic.form.type.asset' => [
                 'class' => 'Mautic\AssetBundle\Form\Type\AssetType',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.theme',
+                    'mautic.asset.model.asset'
+                ],
                 'alias' => 'asset'
             ],
             'mautic.form.type.pointaction_assetdownload' => [

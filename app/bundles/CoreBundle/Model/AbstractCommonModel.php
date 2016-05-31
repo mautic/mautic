@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -129,7 +128,7 @@ abstract class AbstractCommonModel
      */
     public function getSupportedSearchCommands()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -141,7 +140,7 @@ abstract class AbstractCommonModel
     {
         $repo = $this->getRepository();
 
-        return ($repo instanceof CommonRepository) ? $repo->getSearchCommands() : array();
+        return ($repo instanceof CommonRepository) ? $repo->getSearchCommands() : [];
     }
 
     /**
@@ -177,7 +176,7 @@ abstract class AbstractCommonModel
      *
      * @return \Doctrine\ORM\Tools\Pagination\Paginator|array
      */
-    public function getEntities(array $args = array())
+    public function getEntities(array $args = [])
     {
         //set the translator
         $repo = $this->getRepository();
@@ -189,7 +188,7 @@ abstract class AbstractCommonModel
             return $repo->getEntities($args);
         }
 
-        return array();
+        return [];
     }
 
     /**
@@ -245,7 +244,7 @@ abstract class AbstractCommonModel
      *
      * @return string
      */
-    public function buildUrl($route, $routeParams = array(), $absolute = true, $clickthrough = array())
+    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [])
     {
         $url  = $this->router->generate($route, $routeParams, $absolute);
         $url .= (!empty($clickthrough)) ? '?ct=' . $this->encodeArrayForUrl($clickthrough) : '';
