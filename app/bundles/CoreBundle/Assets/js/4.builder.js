@@ -133,11 +133,6 @@ Mautic.launchBuilder = function (formName, actionName) {
 };
 
 /**
- * Holds currently focussed slot jQuery object
- */
-Mautic.builderSlotFocus = null;
-
-/**
  * Set builder token draggables
  *
  * @param target
@@ -592,15 +587,39 @@ Mautic.initSlotListeners = function(contents) {
         });
 
         slot.on('click', function() {
-            Mautic.builderSlotFocus = mQuery(this);
-            var focusType = Mautic.builderSlotFocus.attr('data-slot');
+            // Switch to the form tab
+            mQuery('a[href="#customize-form-container"]').tab('show');
+
+            // Update form in the Customize tab to the form of the focused slot type
+            var focusType = mQuery(this).attr('data-slot');
             var focusForm = mQuery(mQuery('script[data-slot-type-form="'+focusType+'"]').html());
-            focusForm.on('keyup', function(e) {
-                contents.trigger('slot:change', {slot: slot, field: mQuery(e.target)});
-            });
             mQuery('#slot-form-container').html(focusForm);
+
+            // Prefill the form field values with the values from slot attributes if any
+            mQuery.each(slot.get(0).attributes, function(i, attr) {
+                var attrPrefix = 'data-param-';
+                var regex = /data-param-(.*)/;
+                var match = regex.exec(attr.name);
+
+                if (match !== null) {
+                    focusForm.find('[data-slot-param="'+match[1]+'"]').val(attr.value);
+                }
+                console.log(match);
+                console.log(attr.name, attr.value);
+            });
+
+            focusForm.on('keyup', function(e) {
+                var field = mQuery(e.target);
+
+                // Store the slot settings as attributes
+                slot.attr('data-param-'+field.attr('data-slot-param'), field.val());
+
+                // Trigger the slot:change event
+                contents.trigger('slot:change', {slot: slot, field: field});
+            });
         });
 
+        // Initialize different slot types
         if (type === 'text') {
             slot.froalaEditor({toolbarInline: true, zIndex: 2501});
         } else if (type === 'image') {
@@ -609,6 +628,7 @@ Mautic.initSlotListeners = function(contents) {
     });
 
     contents.on('slot:change', function(event, params) {
+        // Change some slot styles when the values are changed in the slot edit form
         var fieldParam = params.field.attr('data-slot-param');
         if (fieldParam === 'padding-top' || fieldParam === 'padding-bottom') {
             params.slot.css(fieldParam, params.field.val() + 'px');
