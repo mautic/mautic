@@ -32,11 +32,19 @@ class FeedController extends FormController
         $feedHelper = $this->get('mautic.helper.feed');
 
         /** @var Feed $feed */
-        $feed = $em->find('MauticFeedBundle:Feed', $id);
+        $feed = $em->find('MauticFeedBundle:Feed', 1);
+
+
+        /** @var \Mautic\FeedBundle\Entity\FeedRepository $feedRepository */
+        $feedRepository = $em->getRepository('MauticFeedBundle:Feed');
+        $feedRepository->setFactory($this->factory); //TODO trouver une maniere "propre" d'injecter la factory
 
         /** @var Snapshot $snapshot */
-        $snapshot = $feed->getSnapshots()->last();
-        $snapshot->setIsExpired(!$snapshot->isExpired());
+        $snapshot=$feedRepository->latestSnapshot($feed);
+
+        var_dump($snapshot->getXmlString());
+        die('L46');
+//         $snapshot->setIsExpired(!$snapshot->isExpired());
 
         $em->persist($snapshot);
         $em->flush();
@@ -50,4 +58,5 @@ class FeedController extends FormController
             'content-type' => 'text/plain'
         ));
     }
+
 }

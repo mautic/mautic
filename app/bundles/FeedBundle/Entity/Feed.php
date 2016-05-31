@@ -54,7 +54,8 @@ class Feed
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('feeds');
+        $builder->setTable('feeds')
+        ->setCustomRepositoryClass('Mautic\FeedBundle\Entity\FeedRepository');
 
         $builder->addId();
 
@@ -73,8 +74,17 @@ class Feed
 
         $builder->createOneToMany('snapshots', 'Snapshot')
             ->mappedBy('feed')
+            ->cascadePersist()
+            ->fetchExtraLazy()
             ->build();
     }
+
+    /**
+     * return last valid snapshot, return null if none
+     *
+     * @return null|Snapshot
+     */
+
 
     public function getId()
     {
@@ -118,5 +128,11 @@ class Feed
     {
         return $this->snapshots;
     }
+
+    public function addSnapshot(Snapshot $snapshot){
+        $this->snapshots->add($snapshot);
+        return true;
+    }
+
 
 }

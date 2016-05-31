@@ -60,7 +60,8 @@ class Snapshot
             ->build();
 
         $builder->createManyToOne('feed', 'Feed')
-            ->addJoinColumn('feed_id', 'id', false)
+            ->inversedBy('snapshots')
+            ->addJoinColumn('feed_id', 'id', false, false, 'CASCADE')
             ->build();
 
         $builder->createField('isExpired', 'boolean')
