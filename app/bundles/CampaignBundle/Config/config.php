@@ -120,6 +120,9 @@ return array(
             'mautic.campaign.dashboard.subscriber'           => array(
                 'class' => 'Mautic\CampaignBundle\EventListener\DashboardSubscriber'
             ),
+            'mautic.campaignconfigbundle.subscriber'   => array(
+                'class' => 'Mautic\CampaignBundle\EventListener\ConfigSubscriber'
+            ),
         ),
         'forms'  => array(
             'mautic.campaign.type.form'                 => array(
@@ -152,6 +155,11 @@ return array(
                 'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignLeadSourceType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'campaign_leadsource'
+            ),
+            'mautic.form.type.campaignconfig'                    => array(
+                'class'     => 'Mautic\CampaignBundle\Form\Type\ConfigType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'campaignconfig'
             ),
         )
     ),

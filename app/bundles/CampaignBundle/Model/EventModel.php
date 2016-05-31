@@ -697,7 +697,7 @@ class EventModel extends CommonFormModel
         &$executedEventCount = 0,
         &$totalEventCount = 0
     ) {
-        
+
         $eventWaitTimeOnResponseFalse =  $this->factory->getParameter('campaing_time_wait_on_event_false');
 
         $evaluatedEventCount++;
@@ -846,10 +846,10 @@ class EventModel extends CommonFormModel
 
                 // Something failed
                 if ($wasScheduled) {
-                    
+
                     $date = new \DateTime();
-                    
-                    if ($eventWaitTimeOnResponseFalse != '') {
+
+                    if ($eventWaitTimeOnResponseFalse != '' && $eventWaitTimeOnResponseFalse != null) {
                         $date->add(new \DateInterval($eventWaitTimeOnResponseFalse));
                     }
 
@@ -866,7 +866,7 @@ class EventModel extends CommonFormModel
 
                 $logger->debug(
                     'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId().' failed with a response of '
-                    .var_export($response, true) . " placed on hold ".$eventWaitTimeOnResponseFalse );           
+                    .var_export($response, true) . " placed on hold ".$eventWaitTimeOnResponseFalse );
             } else {
                 $executedEventCount++;
 
