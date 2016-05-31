@@ -39,30 +39,50 @@ class DateRangeType extends AbstractType
     {
         $humanFormat = 'M j, Y';
 
-        $thirtyDays = new \DateTime('-30 days');
-        $dateFrom   = new \DateTime($options['data']['date_from']);
-        $builder->add('date_from', 'text', array(
-            'label'      => 'mautic.core.date.from',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
-            'required'   => false,
-            'data'       => empty($options['data']['date_from']) ? $thirtyDays->format($humanFormat) : $dateFrom->format($humanFormat),
-        ));
+        $dateFrom = (empty($options['data']['date_from']))
+            ?
+            new \DateTime('-30 days')
+            :
+            new \DateTime($options['data']['date_from']);
 
-        $now    = new \DateTime();
-        $dateTo = new \DateTime($options['data']['date_to']);
-        $builder->add('date_to', 'text', array(
-            'label'      => 'mautic.core.date.to',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
-            'required'   => false,
-            'data'       => empty($options['data']['date_to']) ? $now->format($humanFormat) : $dateTo->format($humanFormat)
-        ));
+        $builder->add(
+            'date_from',
+            'text',
+            array(
+                'label'      => 'mautic.core.date.from',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control'),
+                'required'   => false,
+                'data'       => $dateFrom->format($humanFormat),
+            )
+        );
 
-        $builder->add('apply', 'submit', array(
-            'label'      => 'mautic.core.form.apply',
-            'attr'       => array('class' => 'btn btn-default')
-        ));
+        $dateTo = (empty($options['data']['date_to']))
+            ?
+            new \DateTime()
+            :
+            new \DateTime($options['data']['date_to']);
+
+        $builder->add(
+            'date_to',
+            'text',
+            array(
+                'label'      => 'mautic.core.date.to',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control'),
+                'required'   => false,
+                'data'       => $dateTo->format($humanFormat)
+            )
+        );
+
+        $builder->add(
+            'apply',
+            'submit',
+            array(
+                'label' => 'mautic.core.form.apply',
+                'attr'  => array('class' => 'btn btn-default')
+            )
+        );
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
