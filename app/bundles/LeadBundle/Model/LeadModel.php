@@ -224,6 +224,27 @@ class LeadModel extends FormModel
     }
 
     /**
+     * Get a specific entity history
+     *
+     * @param $id
+     *
+     * @return null|object
+     */
+    public function getEntityHistory($id = null)
+    {
+        if (null !== $id) {
+            $repo = $this->getRepository();
+            if (method_exists($repo, 'getEntityHistory')) {
+                return $repo->getEntityHistory($id);
+            }
+
+            return $repo->find($id);
+        }
+
+        return null;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param $action
