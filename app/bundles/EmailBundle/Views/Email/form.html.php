@@ -26,6 +26,8 @@ $view['slots']->set("headerTitle", $header.$subheader);
 $template  = $form['template']->vars['data'];
 $emailType = $form['emailType']->vars['data'];
 
+$view['assets']->addScriptDeclaration('var mauticEntityId = '.$email->getSessionId().';');
+
 if (!isset($attachmentSize)) {
     $attachmentSize = 0;
 }
