@@ -255,7 +255,7 @@ class HitRepository extends CommonRepository
                     ->setParameter('url_'.$k, $u);
             }
         }
-
+        
         $result = $sq->execute()->fetch();
 
         return new \DateTime($result['latest_hit']);

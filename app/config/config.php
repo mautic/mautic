@@ -183,6 +183,7 @@ $dbalSettings = array(
     'user'     => '%mautic.db_user%',
     'password' => '%mautic.db_password%',
     'charset'  => 'UTF8',
+    'logging' => true,
     'types'    => array(
         'array'    => 'Mautic\CoreBundle\Doctrine\Type\ArrayType',
         'datetime' => 'Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType'

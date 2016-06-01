@@ -139,7 +139,7 @@ class PointModel extends CommonFormModel
 
         return $actions;
     }
-
+    
     /**
      * Triggers a specific point change
      *
@@ -152,12 +152,14 @@ class PointModel extends CommonFormModel
      */
     public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null)
     {
-        //only trigger actions for anonymous users
-        if (!$this->security->isAnonymous()) {
-            return;
-        }
-
-        if ($typeId !== null && $this->factory->getEnvironment() == 'prod') {
+    	if($type != "api.call") {
+        	//only trigger actions for anonymous users
+    		if (!$this->security->isAnonymous()) {
+    			return;
+    		}
+    	}
+    	
+        if ($typeId !== null && $this->factory->getEnvironment() == 'prod') { 	
             //let's prevent some unnecessary DB calls
             $session = $this->factory->getSession();
             $triggeredEvents = $session->get('mautic.triggered.point.actions', array());
@@ -180,7 +182,6 @@ class PointModel extends CommonFormModel
             $lead = $leadModel->getCurrentLead();
 
             if (null === $lead || !$lead->getId()) {
-
                 return;
             }
         }
@@ -194,8 +195,15 @@ class PointModel extends CommonFormModel
         $persist = array();
         foreach ($availablePoints as $action) {
             //if it's already been done, then skip it
-            if (isset($completedActions[$action->getId()])) {
-                continue;
+
+            if (isset($completedActions[$action->getId()]) ){
+                
+               if ($action->getType() !== 'url.hit' 
+                   || (empty($action->getProperties()['accumulative_time']) 
+                                    &&  empty($action->getProperties()['returns_within']) 
+                                    && empty($action->getProperties()['returns_after']) ) ) {   
+                    continue;
+                } 
             }
 
             //make sure the action still exists
@@ -239,7 +247,7 @@ class PointModel extends CommonFormModel
                     }
                 }
                 $pointsChange = $reflection->invokeArgs($this, $pass);
-
+                
                 if ($pointsChange) {
                     $delta = $action->getDelta();
                     $lead->addToPoints($delta);
@@ -260,6 +268,7 @@ class PointModel extends CommonFormModel
 
                     $persist[] = $log;
                 }
+            } else {
             }
         }
 
@@ -269,7 +278,10 @@ class PointModel extends CommonFormModel
 
             // Detach logs to reserve memory
             $this->em->clear('Mautic\PointBundle\Entity\LeadPointLog');
+        } else {
+
         }
+
     }
 
     /**

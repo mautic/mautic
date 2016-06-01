@@ -70,7 +70,8 @@ class PointActionHelper
         $hitRepository  = $factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
         $lead           = $eventDetails->getLead();
 
-        if ($action['properties']['first_time'] === true) {
+        if (isset($action['properties']['first_time']) && $action['properties']['first_time'] === true) {
+
             $hitStats = $hitRepository->getDwellTimes(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
             if (isset($hitStats['count']) && $hitStats['count']) {
                 $changePoints['first_time'] = false;
@@ -80,6 +81,7 @@ class PointActionHelper
         }
 
         if ($action['properties']['accumulative_time']) {
+
             if (!isset($hitStats)) {
                 $hitStats = $hitRepository->getDwellTimes(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
             }
@@ -91,6 +93,7 @@ class PointActionHelper
         }
 
         if ($action['properties']['page_hits']) {
+
             if (!isset($hitStats)) {
                 $hitStats = $hitRepository->getDwellTimes(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
             }
@@ -102,6 +105,7 @@ class PointActionHelper
         }
 
         if ($action['properties']['returns_within']) {
+
             $latestHit = $hitRepository->getLatestHit(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
             $latestPlus = clone $latestHit;
             $latestPlus->add(new \DateInterval('PT' . $action['properties']['returns_within'] . 'S'));
@@ -114,19 +118,21 @@ class PointActionHelper
         }
 
         if ($action['properties']['returns_after']) {
+
             if (!isset($latestHit)) {
                 $latestHit = $hitRepository->getLatestHit(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
             }
-            $latestPlus = clone $latestHit;
+            $latestPlus = clone $latestHit; // time 
             $latestPlus->add(new \DateInterval('PT' . $action['properties']['returns_after'] . 'S'));
             $now = new \dateTime();
-            if ($latestPlus >= $now) {
+
+           // if ($latestPlus >= $now) { // DE BASE
+            if ($latestPlus <= $now) { 
                 $changePoints['returns_after'] = true;
             } else {
                 $changePoints['returns_after'] = false;
             }
         }
-
         // return true only if all configured options are true
         return !in_array(false, $changePoints);
     }
