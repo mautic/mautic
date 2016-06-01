@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
@@ -7,30 +6,29 @@
  * @link        http://webmecanik.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\FeedBundle\Helper;
 
+use Debril\RssAtomBundle\Protocol\FeedInterface;
+use Debril\RssAtomBundle\Protocol\FeedReader;
 use Debril\RssAtomBundle\Protocol\Parser\Factory;
 use Debril\RssAtomBundle\Protocol\Parser\XmlParser;
-use Debril\RssAtomBundle\Protocol\FeedReader;
 use Mautic\FeedBundle\Entity\Feed;
 
 class FeedHelper
 {
 
     /**
-     *
      * @var Factory
      */
     protected $factory;
 
     /**
-     *
      * @var XmlParser
      */
     protected $xmlParser;
 
     /**
-     *
      * @var FeedReader
      */
     protected $reader;
@@ -40,7 +38,7 @@ class FeedHelper
      *
      * @param string $xmlString
      *
-     * @return FeedInInterface|FeedContent
+     * @return FeedInterface
      */
     public function getFeedContentFromString($xmlString)
     {
@@ -57,7 +55,6 @@ class FeedHelper
     }
 
     /**
-     *
      * @param string $feedUrl
      *
      * @return null|string
@@ -70,6 +67,22 @@ class FeedHelper
         } else {
             return null;
         }
+    }
+
+    /**
+     * @param FeedInterface $feed
+     *
+     * @return array
+     */
+    public function getFeedFields(FeedInterface $feed)
+    {
+        return array(
+            'title' => $feed->getTitle(),
+            'description' => $feed->getDescription(),
+            'link' => $feed->getLink(),
+            'date' => $feed->getLastModified()->format('Y-m-d H:i:s'),
+            'id' => $feed->getPublicId()
+        );
     }
 
     public function setFactory(Factory $factory)

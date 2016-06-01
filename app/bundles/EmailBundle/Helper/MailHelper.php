@@ -85,6 +85,11 @@ class MailHelper
     protected $lead = null;
 
     /**
+     * @var null
+     */
+    protected $feed = null;
+
+    /**
      * @var bool
      */
     protected $internalSend = false;
@@ -1207,7 +1212,23 @@ class MailHelper
     }
 
     /**
-     * Check if this is not being send directly to the lead.
+     * @return null
+     */
+    public function getFeed()
+    {
+        return $this->lead;
+    }
+
+    /**
+     * @param null $feed
+     */
+    public function setFeed($feed)
+    {
+        $this->feed = $feed;
+    }
+
+    /**
+     * Check if this is not being send directly to the lead
      *
      * @return bool
      */

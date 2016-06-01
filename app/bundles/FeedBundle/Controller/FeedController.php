@@ -53,9 +53,12 @@ class FeedController extends FormController
 
         $feedContent = $feedHelper->getFeedContentFromString($xmlString);
 
-        return new Response(var_dump($feedContent), Response::HTTP_OK, array(
-            'content-type' => 'text/plain'
-        ));
+        $feedFields = $feedHelper->getFeedFields($feedContent);
+
+        return new Response(print_r($feedFields, true),
+            Response::HTTP_OK, array(
+                'content-type' => 'text/plain'
+            ));
     }
 
 }

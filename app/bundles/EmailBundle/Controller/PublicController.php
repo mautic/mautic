@@ -21,6 +21,8 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceCallbackTransport;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\FeedBundle\Entity\Snapshot;
+use Mautic\FeedBundle\Helper\FeedHelper;
 
 class PublicController extends CommonFormController
 {
@@ -336,6 +338,15 @@ class PublicController extends CommonFormController
         if ($emailEntity === null) {
             return $this->notFound();
         }
+        /** @var FeedHelper $feedHelper  */
+        $feedHelper = $this->get('mautic.helper.feed');
+
+        $feed = $emailEntity->getFeed();
+        /** @var Snapshot $snapshot */
+        $snapshot = $feed->getSnapshots()->last();
+        $xmlString = $snapshot->getXmlString();
+        $feedContent = $feedHelper->getFeedContentFromString($xmlString);
+        $feedFields = $feedHelper->getFeedFields($feedContent);
 
         if (
             ($this->get('mautic.security')->isAnonymous() && !$emailEntity->isPublished())
@@ -389,16 +400,16 @@ class PublicController extends CommonFormController
         $tokens = ['{tracking_pixel}' => ''];
 
         // Prepare a fake lead
-        /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
-        $fieldModel = $this->getModel('lead.field');
-        $fields     = $fieldModel->getFieldList(false, false);
+        /** @var \Mautic\LeadBundle\Model\FieldModel $leadFieldModel */
+        $leadFieldModel = $this->factory->getModel('lead.field');
+        $leadFields     = $leadFieldModel->getFieldList(false, false);
         array_walk(
-            $fields,
+            $leadFields,
             function (&$field) {
                 $field = "[$field]";
             }
         );
-        $fields['id'] = 0;
+        $leadFields['id'] = 0;
 
         // Generate and replace tokens
         $event = new EmailSendEvent(
@@ -409,7 +420,8 @@ class PublicController extends CommonFormController
                 'idHash'       => $idHash,
                 'tokens'       => $tokens,
                 'internalSend' => true,
-                'lead'         => $fields,
+                'lead'         => $leadFields,
+                'feed'         => $feedFields
             ]
         );
         $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
