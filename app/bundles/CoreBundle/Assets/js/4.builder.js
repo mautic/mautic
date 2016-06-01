@@ -40,10 +40,13 @@ Mautic.launchBuilder = function (formName, actionName) {
             id: "builder-template-content"
         }).appendTo('.builder-content');
 
-        if (Mautic.storageAvailable('sessionStorage')) {
+        // Display alert if not
+        Mautic.storageAvailable('sessionStorage');
+
+        var storageToken = 'builder.'+actionName+'.'+mauticEntityId;
+        contents = mQuery(localStorage.getItem(storageToken));
+        if (contents.length) {
             // Open the email from localstorage
-            var storageToken = 'builder.'+actionName+'.'+mauticEntityId;
-            contents = mQuery(localStorage.getItem(storageToken));
             setTimeout( function() {
                 var doc = builder[0].contentWindow.document;
                 var body = mQuery('body', doc);
@@ -568,6 +571,10 @@ Mautic.initSlotListeners = function(contents) {
                 if (match !== null) {
                     focusForm.find('[data-slot-param="'+match[1]+'"]').val(attr.value);
                 }
+            });
+
+            focusForm.find('.delete-slot').click(function(e) {
+                slot.remove();
             });
 
             focusForm.on('keyup', function(e) {

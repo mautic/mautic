@@ -37,6 +37,12 @@ class SlotType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add('delete', 'button', array(
+            'attr'       => array(
+                'class'           => 'btn btn-primary btn-xs pull-right btn-danger delete-slot',
+            ),
+        ));
+
         $builder->add('padding-top', 'number', array(
             'label'      => 'mautic.core.padding.top',
             'label_attr' => array('class' => 'control-label'),
