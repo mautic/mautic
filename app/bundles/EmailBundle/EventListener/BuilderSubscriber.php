@@ -116,7 +116,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'Button',
                 'external-link',
                 'MauticCoreBundle:Slots:button.html.twig',
-                'slot',
+                'slot_button',
                 800
             );
         }

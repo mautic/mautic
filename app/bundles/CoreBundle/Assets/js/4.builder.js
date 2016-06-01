@@ -211,9 +211,10 @@ Mautic.closeBuilder = function(model) {
 
     if (Mautic.builderMode == 'template') {
         if (Mautic.storageAvailable('sessionStorage')) {
-            var content = mQuery('#builder-template-content').contents();
+            var content = mQuery('#builder-template-content').contents().find('html').html();
             var storageToken = 'builder.'+model+'.'+mauticEntityId;
-            localStorage.setItem(storageToken, content.find('html').html());
+            localStorage.setItem(storageToken, content);
+            mQuery('.builder-html').val(content);
             try {
                 // Kill droppables
                 // builderContents.find('.mautic-editable').droppable('destroy');
@@ -585,6 +586,10 @@ Mautic.initSlotListeners = function(contents) {
             slot.froalaEditor({toolbarInline: true, zIndex: 2501});
         } else if (type === 'image') {
             slot.find('img').froalaEditor({toolbarInline: true});
+        } else if (type === 'button') {
+            slot.find('a').click(function(e) {
+                e.preventDefault();
+            });
         }
     });
 
@@ -593,6 +598,8 @@ Mautic.initSlotListeners = function(contents) {
         var fieldParam = params.field.attr('data-slot-param');
         if (fieldParam === 'padding-top' || fieldParam === 'padding-bottom') {
             params.slot.css(fieldParam, params.field.val() + 'px');
+        } else if (fieldParam === 'href') {
+            params.slot.find('a').attr('href', params.field.val());
         }
     });
 };

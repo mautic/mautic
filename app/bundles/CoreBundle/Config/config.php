@@ -193,6 +193,11 @@ return array(
                 'class'     => 'Mautic\CoreBundle\Form\Type\SlotType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'slot'
+            ),
+            'mautic.form.type.slot.button'               => array(
+                'class'     => 'Mautic\CoreBundle\Form\Type\SlotButtonType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'slot_button'
             )
         ),
         'helpers' => array(
