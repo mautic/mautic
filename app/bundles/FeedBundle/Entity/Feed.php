@@ -61,7 +61,7 @@ class Feed
 
         $builder->createOneToOne('email', 'Mautic\EmailBundle\Entity\Email')
             ->inversedBy('feed')
-            ->addJoinColumn('email_id', 'id', false)
+            ->addJoinColumn('email_id', 'id', false, false, 'CASCADE')
             ->build();
 
         $builder->createField('feedUrl', 'string')
