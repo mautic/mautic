@@ -3223,5 +3223,44 @@ var Mautic = {
             },
             timepicker: false
         });
+    },
+
+    initCodeEditors: function() {
+        var codeEditors = mQuery('textarea.code-editor').not('[data-code-editor=loaded]');
+        Mautic.codeEditors = [];
+        if (codeEditors.length) {
+            codeEditors.each(function() {
+                var textarea = mQuery(this);
+                var editor = CodeMirror.fromTextArea(this, {
+                    // lineNumbers: true,
+                    // matchBrackets: true,
+                    mode: 'htmlmixed'
+                });
+
+                // Mark the textarea that the editor was loaded
+                textarea.attr('data-code-editor', 'loaded');
+
+                // Set editor content from the textarea on init
+                editor.setValue(textarea.val());
+                editor.refresh();
+
+                // Update the textarea content on editor blur
+                editor.on('blur', function() {
+                    textarea.val(editor.getValue());
+                });
+
+                // Save the textarea with the editor to a global array so it can be used elsewhere
+                Mautic.codeEditors.push({editor: editor, textarea: textarea});
+            });
+        }
+    },
+
+    refreshCodeEditors: function() {
+        if (typeof Mautic.codeEditors !== 'undefined' && Mautic.codeEditors.length) {
+            mQuery.each(Mautic.codeEditors, function (i, value) {
+                value.editor.setValue(value.textarea.val());
+                value.editor.refresh();
+            });
+        }
     }
 };

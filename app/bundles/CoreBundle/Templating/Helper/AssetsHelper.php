@@ -489,7 +489,8 @@ class AssetsHelper extends CoreAssetsHelper
             $plugins . 'line_breaker.css?v' . $this->version,
             $plugins . 'quick_insert.css?v' . $this->version,
             $plugins . 'table.css?v' . $this->version,
-            $plugins . 'video.css?v' . $this->version
+            $plugins . 'video.css?v' . $this->version,
+           'app/bundles/CoreBundle/Assets/css/libraries/other/codemirror.css?v' . $this->version
         );
     }
 

@@ -1,3 +1,5 @@
+
+
 /**
  * Launch builder
  *
@@ -6,6 +8,9 @@
 Mautic.launchBuilder = function (formName, actionName) {
     Mautic.builderMode     = (mQuery('#' + formName + '_template').val() == '') ? 'custom' : 'template';
     Mautic.builderFormName = formName;
+
+    // Holds HTML of the builder contents
+    Mautic.builderContents = [];
 
     mQuery('body').css('overflow-y', 'hidden');
 
@@ -34,25 +39,20 @@ Mautic.launchBuilder = function (formName, actionName) {
     // Disable the close button until everything is loaded
     mQuery('.btn-close-builder').prop('disabled', true);
     if (Mautic.builderMode == 'template') {
-        var contents;
         var builder = mQuery("<iframe />", {
             css: builderCss,
             id: "builder-template-content"
         }).appendTo('.builder-content');
 
-        // Display alert if not
-        Mautic.storageAvailable('sessionStorage');
-
-        var storageToken = 'builder.'+actionName+'.'+mauticEntityId;
-        contents = mQuery(localStorage.getItem(storageToken));
-        if (contents.length) {
-            // Open the email from localstorage
+        Mautic.builderContents = mQuery(mQuery('textarea.builder-html').val());
+        if (Mautic.builderContents.length) {
+            // Open the email from the HTML textarea
             setTimeout( function() {
                 var doc = builder[0].contentWindow.document;
                 var body = mQuery('body', doc);
-                body.html(contents);
-                Mautic.initSlotListeners(contents);
-                Mautic.initSlots(contents);
+                body.html(Mautic.builderContents);
+                Mautic.initSlotListeners();
+                Mautic.initSlots();
                 mQuery('#builder-overlay').addClass('hide');
                 mQuery('.btn-close-builder').prop('disabled', false);
             }, 1 );
@@ -63,11 +63,11 @@ Mautic.launchBuilder = function (formName, actionName) {
 
             builder.attr('src', src);
             builder.load(function () {
-                contents = mQuery(this).contents();
-                Mautic.initSlotListeners(contents);
-                Mautic.initSlots(contents);
+                Mautic.builderContents = mQuery(this).contents();
+                Mautic.initSlotListeners();
+                Mautic.initSlots();
                 // here, catch the droppable div and create a droppable widget
-                contents.find('.mautic-editable').droppable({
+                Mautic.builderContents.find('.mautic-editable').droppable({
                     iframeFix: true,
                     drop: function (event, ui) {
                         var editorId = mQuery(this).attr("id");
@@ -213,33 +213,30 @@ Mautic.closeBuilder = function(model) {
     mQuery('.btn-close-builder').prop('disabled', true);
 
     if (Mautic.builderMode == 'template') {
-        if (Mautic.storageAvailable('sessionStorage')) {
-            var content = mQuery('#builder-template-content').contents().find('html').html();
-            var storageToken = 'builder.'+model+'.'+mauticEntityId;
-            localStorage.setItem(storageToken, content);
-            mQuery('.builder-html').val(content);
-            try {
-                // Kill droppables
-                // builderContents.find('.mautic-editable').droppable('destroy');
+        console.log(Mautic.builderSlots);
+        // Trigger destroy slots event
+        if (typeof Mautic.builderSlots !== 'undefined' && Mautic.builderSlots.length) {
+            mQuery.each(Mautic.builderSlots, function(i, slotParams) {
+                Mautic.builderContents.trigger('slot:destroy', slotParams);
+                delete Mautic.builderSlots[i];
+            });
+        }
 
-                // Kill draggables
-                // mQuery(".ui-draggable[data-token]").draggable('destroy');
-            } catch (err) {
-                // console.log(err);
-            }
+        // Store the HTML content to the HTML textarea
+        mQuery('.builder-html').val(Mautic.builderContents.find('html').html());
+        Mautic.refreshCodeEditors();
 
-            // Kill the overlay
-            mQuery('#builder-overlay').remove();
+        // Kill the overlay
+        mQuery('#builder-overlay').remove();
 
-            // Hide builder
-            mQuery('.builder').removeClass('builder-active').addClass('hide');
-            mQuery('.btn-close-builder').prop('disabled', false);
+        // Hide builder
+        mQuery('.builder').removeClass('builder-active').addClass('hide');
+        mQuery('.btn-close-builder').prop('disabled', false);
 
-            mQuery('body').css('overflow-y', '');
+        mQuery('body').css('overflow-y', '');
 
-            mQuery('.builder').addClass('hide');
-            Mautic.stopIconSpinPostEvent();
-        };
+        mQuery('.builder').addClass('hide');
+        Mautic.stopIconSpinPostEvent();
 
         mQuery('#builder-template-content').remove();
     } else {
@@ -276,6 +273,7 @@ Mautic.closeBuilder = function(model) {
 
     delete Mautic.builderMode;
     delete Mautic.builderFormName;
+    delete Mautic.builderContents;
 };
 
 /**
@@ -284,22 +282,22 @@ Mautic.closeBuilder = function(model) {
  * @param el
  */
 Mautic.onBuilderModeSwitch = function(el) {
-    var builderMode = (mQuery(el).val() == '') ? false : true;
+    // var builderMode = (mQuery(el).val() == '') ? false : true;
 
-    if (builderMode) {
-        mQuery('.custom-html-mask').removeClass('hide');
-        mQuery('.template-dnd-help').removeClass('hide');
-        mQuery('.custom-dnd-help').addClass('hide');
-        mQuery('.template-fields').removeClass('hide');
-        Mautic.toggleBuilderButton(false);
+    // if (builderMode) {
+    //     mQuery('.custom-html-mask').removeClass('hide');
+    //     mQuery('.template-dnd-help').removeClass('hide');
+    //     mQuery('.custom-dnd-help').addClass('hide');
+    //     mQuery('.template-fields').removeClass('hide');
+    //     Mautic.toggleBuilderButton(false);
 
-    } else {
-        mQuery('.custom-html-mask').addClass('hide');
-        mQuery('.template-dnd-help').addClass('hide');
-        mQuery('.custom-dnd-help').removeClass('hide');
-        mQuery('.template-fields').addClass('hide');
-        Mautic.toggleBuilderButton(true);
-    }
+    // } else {
+    //     mQuery('.custom-html-mask').addClass('hide');
+    //     mQuery('.template-dnd-help').addClass('hide');
+    //     mQuery('.custom-dnd-help').removeClass('hide');
+    //     mQuery('.template-fields').addClass('hide');
+    //     Mautic.toggleBuilderButton(true);
+    // }
 };
 
 /**
@@ -493,8 +491,8 @@ Mautic.builderOnLoad = function (target) {
 };
 
 
-Mautic.initSlots = function(contents) {
-    var slotContainers = contents.find('[data-slot-container]');
+Mautic.initSlots = function() {
+    var slotContainers = Mautic.builderContents.find('[data-slot-container]');
     slotContainers.sortable({
         items: '[data-slot]',
         handle: 'div[data-slot-handle]',
@@ -504,14 +502,14 @@ Mautic.initSlots = function(contents) {
             if (ui.item.hasClass('slot-type-handle')) {
                 var slotTypeContent = ui.item.find('script').html();
                 var newSlot = mQuery('<div/>').attr('data-slot', ui.item.attr('data-slot-type')).append(slotTypeContent);
-                contents.trigger('slot:init', newSlot);
+                Mautic.builderContents.trigger('slot:init', newSlot);
                 ui.item.replaceWith(newSlot);
             }
         }
     });
     
-    contents.find('[data-slot]').each(function() {
-        contents.trigger('slot:init', this);
+    Mautic.builderContents.find('[data-slot]').each(function() {
+        Mautic.builderContents.trigger('slot:init', this);
     });
 
 
@@ -540,8 +538,9 @@ Mautic.initSlots = function(contents) {
     }).disableSelection();
 }
 
-Mautic.initSlotListeners = function(contents) {
-    contents.on('slot:init', function(event, slot) {
+Mautic.initSlotListeners = function() {
+    Mautic.builderSlots = [];
+    Mautic.builderContents.on('slot:init', function(event, slot) {
         slot = mQuery(slot);
         var type = slot.attr('data-slot');
 
@@ -584,7 +583,7 @@ Mautic.initSlotListeners = function(contents) {
                 slot.attr('data-param-'+field.attr('data-slot-param'), field.val());
 
                 // Trigger the slot:change event
-                contents.trigger('slot:change', {slot: slot, field: field});
+                Mautic.builderContents.trigger('slot:change', {slot: slot, field: field});
             });
         });
 
@@ -598,9 +597,12 @@ Mautic.initSlotListeners = function(contents) {
                 e.preventDefault();
             });
         }
+
+        // Store the slot to a global var
+        Mautic.builderSlots.push({slot: slot, type: type});
     });
 
-    contents.on('slot:change', function(event, params) {
+    Mautic.builderContents.on('slot:change', function(event, params) {
         // Change some slot styles when the values are changed in the slot edit form
         var fieldParam = params.field.attr('data-slot-param');
         if (fieldParam === 'padding-top' || fieldParam === 'padding-bottom') {
@@ -609,18 +611,18 @@ Mautic.initSlotListeners = function(contents) {
             params.slot.find('a').attr('href', params.field.val());
         }
     });
-};
 
-Mautic.storageAvailable = function(type) {
-    try {
-        var storage = window[type],
-            x = '__storage_test__';
-        storage.setItem(x, x);
-        storage.removeItem(x);
-        return true;
-    }
-    catch(e) {
-        alert('Your browser does not support local/session storage. Please, use a modern browser.');
-        return false;
-    }
-}
+    Mautic.builderContents.on('slot:destroy', function(event, params) {
+        console.log('slot:destroy', params);
+        if (params.type === 'text') {
+            params.slot.froalaEditor('destroy');
+        } else if (params.type === 'image') {
+            params.slot.find('img').froalaEditor('destroy');
+        }
+
+        // Remove Symfony toolbar
+        Mautic.builderContents.find('.sf-toolbar').remove();
+        // delete params.slot;
+        // delete params.type;
+    });
+};

@@ -147,6 +147,11 @@ Mautic.emailOnLoad = function (container, response) {
     }
 
     Mautic.initDateRangePicker();
+
+    mQuery(document).on('shown.bs.tab', 'a[href="#source-container"]', function (e) {
+        Mautic.refreshCodeEditors();
+        Mautic.initCodeEditors();
+    });
 };
 
 Mautic.emailOnUnload = function(id) {
