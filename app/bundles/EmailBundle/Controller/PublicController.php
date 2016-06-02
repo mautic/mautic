@@ -341,12 +341,16 @@ class PublicController extends CommonFormController
         /** @var FeedHelper $feedHelper  */
         $feedHelper = $this->get('mautic.helper.feed');
 
-        $feed = $emailEntity->getFeed();
-        /** @var Snapshot $snapshot */
-        $snapshot = $feed->getSnapshots()->last();
-        $xmlString = $snapshot->getXmlString();
-        $feedContent = $feedHelper->getFeedContentFromString($xmlString);
-        $feedFields = $feedHelper->getFeedFields($feedContent);
+        $feedFields = null;
+
+        if ($emailEntity->hasFeed()) {
+            $feed = $emailEntity->getFeed();
+            /** @var Snapshot $snapshot */
+            $snapshot = $feed->getSnapshots()->last();
+            $xmlString = $snapshot->getXmlString();
+            $feedContent = $feedHelper->getFeedContentFromString($xmlString);
+            $feedFields = $feedHelper->getFeedFields($feedContent);
+        }
 
         if (
             ($this->get('mautic.security')->isAnonymous() && !$emailEntity->isPublished())

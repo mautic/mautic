@@ -98,21 +98,25 @@ class EmailSubscriber extends CommonSubscriber
 
         $feed = $event->getFeed();
 
-        $event->setContent($this->feedHelper->unfoldFeedItems($feed, $event->getContent()));
+        if ($feed !== null) {
 
-        $content = $event->getContent();
+            $event->setContent($this->feedHelper->unfoldFeedItems($feed, $event->getContent()));
 
-        $fieldTokenList = $this->tokenHelper->findTokens(self::$feedFieldPrefix, $content, $feed);
+            $content = $event->getContent();
 
-        $items = $this->feedHelper->flattenItems($feed['items']);
+            $fieldTokenList = $this->tokenHelper->findTokens(self::$feedFieldPrefix, $content, $feed);
 
-        $itemTokenList = $this->tokenHelper->findTokens(self::$itemFieldPrefix, $content, $items);
+            $items = $this->feedHelper->flattenItems($feed['items']);
 
-        $tokenList = array_merge($fieldTokenList, $itemTokenList);
+            $itemTokenList = $this->tokenHelper->findTokens(self::$itemFieldPrefix, $content, $items);
 
-        if (count($tokenList)) {
-            $event->addTokens($tokenList);
-            unset($tokenList);
+            $tokenList = array_merge($fieldTokenList, $itemTokenList);
+
+            if (count($tokenList)) {
+                $event->addTokens($tokenList);
+                unset($tokenList);
+            }
+
         }
 
     }
