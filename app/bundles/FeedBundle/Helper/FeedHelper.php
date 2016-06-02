@@ -88,6 +88,8 @@ class FeedHelper
 
     /**
      * @param ItemOutInterface[] $items
+     *
+     * @return array
      */
     public function getItemFields($items) {
         $itemFields = array();
@@ -104,6 +106,10 @@ class FeedHelper
         return $itemFields;
     }
 
+    /**
+     * @param array  $feed
+     * @param string $content
+     */
     public function unfoldFeedItems($feed, $content) {
         // Get the string to replicate
         $matches = array();

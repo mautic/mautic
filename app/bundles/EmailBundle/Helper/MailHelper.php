@@ -22,6 +22,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
+use Mautic\FeedBundle\Entity\FeedRepository;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
@@ -1216,7 +1217,7 @@ class MailHelper
      */
     public function getFeed()
     {
-        return $this->lead;
+        return $this->feed;
     }
 
     /**
@@ -1674,9 +1675,16 @@ class MailHelper
         $stat->setEmail($this->email);
 
         //check if current email use feed
-        $currentFeedSnapshot=$this->email->getFeed()->getSnapshots()->last();
-        if (!is_null($currentFeedSnapshot)){
-            $stat->setSnapshot($currentFeedSnapshot);
+        if ($this->getEmail()->hasFeed()) {
+
+            $feed = $this->getEmail()->getFeed();
+
+            /** @var FeedRepository $feedRepository */
+            $feedRepository = $this->factory->getEntityManager()->getRepository('Feed');
+            $currentFeedSnapshot = $feedRepository->latestSnapshot($this->factory, $feed);
+            if (!is_null($currentFeedSnapshot)){
+                $stat->setSnapshot($currentFeedSnapshot);
+            }
         }
         // Note if a lead
         if (null !== $this->lead) {

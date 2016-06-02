@@ -23,7 +23,6 @@ class FeedRepository extends CommonRepository
 {
     public function latestSnapshot(MauticFactory $factory, Feed $feed)
     {
-
         for ($i = sizeof($feed->getSnapshots())-1; $i > 0; $i --) { //TODO faire une requette DQL pour eviter de charger tous les snapshot en memoire
             /** @var \Mautic\FeedBundle\Entity\Snapshot $s */
             $s = $feed->getSnapshots()->get($i);
