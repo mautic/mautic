@@ -846,6 +846,10 @@ class LeadModel extends FormModel
         $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
 
         /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
+        if (is_array($channel)) {
+            $channel = key($channel);
+        }
+
         $dncEntries = $dncRepo->getEntriesByLeadAndChannel($lead, $channel);
 
         // If the lead has no entries in the DNC table, we're good to go
