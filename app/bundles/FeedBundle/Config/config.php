@@ -21,6 +21,7 @@ return array(
             'mautic.feed.emailbundle.subscriber' => array(
                 'class' => 'Mautic\FeedBundle\EventListener\EmailSubscriber',
                 'methodCalls' => array(
+                    'setTokenHelper' => array('mautic.helper.token'),
                     'setFeedHelper' => array('mautic.helper.feed')
                 )
             )

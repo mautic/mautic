@@ -321,6 +321,11 @@ return [
                 ],
                 'alias' => 'security',
             ],
+            'mautic.helper.token' => [
+                'class'     => 'Mautic\CoreBundle\Token\TokenHelper',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'token_helper'
+            ],
             'mautic.helper.paths' => [
                 'class'     => 'Mautic\CoreBundle\Helper\PathsHelper',
                 'arguments' => [

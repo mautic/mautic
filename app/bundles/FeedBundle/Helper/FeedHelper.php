@@ -82,7 +82,6 @@ class FeedHelper
             'description' => $feed->getDescription(),
             'link' => $feed->getLink(),
             'date' => $feed->getLastModified()->format('Y-m-d H:i:s'),
-            'id' => $feed->getPublicId(),
             'items' => $this->getItemFields($feed->getItems())
         );
     }
@@ -95,7 +94,11 @@ class FeedHelper
         foreach ($items as $item) {
             $itemFields[] = array(
                 'title' => $item->getTitle(),
-                'description' => $item->getDescription()
+                'description' => $item->getDescription(),
+                'author' => $item->getAuthor(),
+                'summary' => $item->getSummary(),
+                'link' => $item->getLink(),
+                'date' => $item->getUpdated()->format('Y-m-d H:i:s')
             );
         }
         return $itemFields;
@@ -104,18 +107,31 @@ class FeedHelper
     public function unfoldFeedItems($feed, $content) {
         // Get the string to replicate
         $matches = array();
-        preg_match_all('/\{feeditems#start\}(.*)\{feeditems#end\}/s', $content, $matches);
-        $inner = $matches[1][0];
-
-        // Create the replicas
-        $count = count($feed['items']);
         $unfoldedContent = '';
-        for ($i = 0; $i < $count; ++$i) {
-            $unfoldedContent .= preg_replace('/\{itemfield=(\w+)\}/s', '{itemfield=$1#'.$i.'}', $inner);
+        $hasMatched = preg_match_all('/\{feeditems#start\}(.*)\{feeditems#end\}/s', $content, $matches);
+
+        if ($hasMatched) {
+            $inner = $matches[1][0];
+
+            // Create the replicas
+            $count = count($feed['items']);
+            for ($i = 0; $i < $count; ++$i) {
+                $unfoldedContent .= preg_replace('/\{itemfield=(\w+)\}/s', '{itemfield=$1#'.$i.'}', $inner);
+            }
         }
 
         // Replace with the final tags
         return str_replace($matches[0], $unfoldedContent, $content);
+    }
+
+    public function flattenItems($items) {
+        $flatItems = array();
+        foreach ($items as $index => $item) {
+            foreach ($item as $field => $content) {
+                $flatItems["$field#$index"] = $content;
+            }
+        }
+        return $flatItems;
     }
 
     public function setFactory(Factory $factory)

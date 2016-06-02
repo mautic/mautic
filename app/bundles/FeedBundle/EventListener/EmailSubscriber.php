@@ -10,11 +10,11 @@
 namespace Mautic\FeedBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Token\TokenHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\FeedBundle\Entity\Feed;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\FeedBundle\Helper\FeedHelper;
 
 /**
@@ -26,13 +26,20 @@ class EmailSubscriber extends CommonSubscriber
 {
 
     /**
+     * @var TokenHelper
+     */
+    protected $tokenHelper;
+
+    /**
      * @var FeedHelper
      */
-    private $feedHelper;
+    protected $feedHelper;
 
-    private static $feedFieldRegex = '{feedfield=(.*?)}';
-    private static $feeditemsRegex = '{feeditems#(start|end)}';
-    private static $itemFieldRegex = '{itemfield=(.*?)}';
+    private static $feedFieldPrefix = 'feedfield';
+    private static $itemFieldPrefix = 'itemfield';
+    private static $feedFieldRegex  = '{feedfield=(.*?)}';
+    private static $feeditemsRegex  = '{feeditems#(start|end)}';
+    private static $itemFieldRegex  = '{itemfield=(.*?)}';
 
     /**
      * @return array
@@ -56,8 +63,7 @@ class EmailSubscriber extends CommonSubscriber
                 '{feedfield=title}' => 'Feed Title',
                 '{feedfield=description}' => 'Feed Description',
                 '{feedfield=link}' => 'Feed Link',
-                '{feedfield=date}' => 'Feed Date',
-                '{feedfield=id}' => 'Feed Public ID'
+                '{feedfield=date}' => 'Feed Date'
             ));
         }
         if ($event->tokensRequested(self::$feeditemsRegex)) {
@@ -70,6 +76,10 @@ class EmailSubscriber extends CommonSubscriber
             $event->addTokens(array(
                 '{itemfield=title}' => 'Item Title',
                 '{itemfield=description}' => 'Item Description',
+                '{itemfield=author}' => 'Item Author',
+                '{itemfield=summary}' => 'Item Summary',
+                '{itemfield=link}' => 'Item Link',
+                '{itemfield=date}' => 'Item Date'
             ));
         }
     }
@@ -85,75 +95,26 @@ class EmailSubscriber extends CommonSubscriber
      * @param EmailSendEvent $event
      */
     public function onEmailGenerate(EmailSendEvent $event) {
-        $content = $event->getSubject()
-                 . $event->getContent()
-                 . $event->getPlainText();
 
         $feed = $event->getFeed();
 
-        $event->setContent($this->feedHelper->unfoldFeedItems($feed, $content));
+        $event->setContent($this->feedHelper->unfoldFeedItems($feed, $event->getContent()));
 
-        $tokenList = self::findFeedTokens($content, $feed);
+        $content = $event->getContent();
+
+        $fieldTokenList = $this->tokenHelper->findTokens(self::$feedFieldPrefix, $content, $feed);
+
+        $items = $this->feedHelper->flattenItems($feed['items']);
+
+        $itemTokenList = $this->tokenHelper->findTokens(self::$itemFieldPrefix, $content, $items);
+
+        $tokenList = array_merge($fieldTokenList, $itemTokenList);
+
         if (count($tokenList)) {
             $event->addTokens($tokenList);
             unset($tokenList);
         }
 
-    }
-
-    /**
-     * @param string $content
-     * @param Feed   $feed
-     * @param bool   $replace If true, search/replace will be executed on $content and the modified $content returned
-     *                        rather than an array of found matches
-     * @param MauticFactory $factory
-     *
-     * @return array|string
-     */
-    static function findFeedTokens($content, $feed, $replace = false)
-    {
-        // Search for bracket or bracket encoded
-        $regex     = '/({|%7B)feedfield=(.*?)(}|%7D)/';
-        $tokenList = array();
-        $matches = array();
-
-        $foundMatches = preg_match_all($regex, $content, $matches);
-        if ($foundMatches) {
-            foreach ($matches[2] as $key => $match) {
-                $token = $matches[0][$key];
-
-                if (isset($tokenList[$token])) {
-                    continue;
-                }
-
-                $fallbackCheck = explode('|', $match);
-                $urlencode     = false;
-                $fallback      = '';
-
-                if (isset($fallbackCheck[1])) {
-                    // There is a fallback or to be urlencoded
-                    $alias = $fallbackCheck[0];
-
-                    if ($fallbackCheck[1] === 'true') {
-                        $urlencode = true;
-                        $fallback  = '';
-                    } else {
-                        $fallback = $fallbackCheck[1];
-                    }
-                } else {
-                    $alias = $match;
-                }
-
-                $value             = (!empty($feed[$alias])) ? $feed[$alias] : $fallback;
-                $tokenList[$token] = ($urlencode) ? urlencode($value) : $value;
-            }
-
-            if ($replace) {
-                $content = str_replace(array_keys($tokenList), $tokenList, $content);
-            }
-        }
-
-        return $replace ? $content : $tokenList;
     }
 
     /**
@@ -164,6 +125,16 @@ class EmailSubscriber extends CommonSubscriber
         $this->feedHelper = $feedHelper;
         return $this;
     }
+
+    /**
+     * @param TokenHelper $tokenHelper
+     */
+    public function setTokenHelper(TokenHelper $tokenHelper)
+    {
+        $this->tokenHelper = $tokenHelper;
+        return $this;
+    }
+
 
 
 }
