@@ -536,7 +536,7 @@ class EmailController extends FormController
                     //Here we save the Periodicity, if needed
                     if($entity->getFeed() != null && $entity->getFeed()->getFeedUrl() != ''){
                         $periodicityEntity = new Periodicity();
-                        $periodicityEntity->setNextShoot(new \DateTime($_POST['emailform']['nextShoot']));
+                        $periodicityEntity->setTriggerDate(new \DateTime($_POST['emailform']['nextShoot']));
                         $periodicityEntity->setType(Periodicity::getTypeEmail());
                         $periodicityEntity->setTargetId($entity->getId());
                         if($_POST['recurency'] == 'interval'){

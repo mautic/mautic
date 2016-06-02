@@ -75,6 +75,7 @@ class Periodicity
 
         $builder->createField('lastShoot', 'datetime')
             ->columnName('last_shoot')
+            ->nullable()
             ->build();
 
         $builder->createField('triggerDate', 'datetime')
