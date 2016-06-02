@@ -535,13 +535,16 @@ class EmailController extends FormController
 
                     //Here we save the Periodicity, if needed
                     if($entity->getFeed() != null && $entity->getFeed()->getFeedUrl() != ''){
+                        //We need a new Periodicity
                         $periodicityEntity = new Periodicity();
+
                         $periodicityEntity->setTriggerDate(new \DateTime($_POST['emailform']['nextShoot']));
                         $periodicityEntity->setType(Periodicity::getTypeEmail());
                         $periodicityEntity->setTargetId($entity->getId());
                         if($_POST['recurency'] == 'interval'){
                             $periodicityEntity->setTriggerInterval($_POST['emailform']['interval']);
                             $periodicityEntity->setTriggerIntervalUnit($_POST['emailform']['intervalUnit']);
+                            $periodicityEntity->setDaysOfWeekMask(null);
                         } else {
                             $daysOfWeekMask = array();
                             for($i = 0; $i < 7; $i++){
@@ -552,6 +555,8 @@ class EmailController extends FormController
                                 }
                             }
                             $periodicityEntity->setDaysOfWeekMask($daysOfWeekMask);
+                            $periodicityEntity->setTriggerInterval(null);
+                            $periodicityEntity->setTriggerIntervalUnit(null);
                         }
                         //We persist the Periodicity
                         $this->factory->getEntityManager()->persist($periodicityEntity);
@@ -743,8 +748,57 @@ class EmailController extends FormController
 
                     $entity->setCustomHtml($content);
 
+                    if($entity->getFeed() != null){
+                        //We persist the feed entity
+                        $this->factory->getEntityManager()->persist($entity->getFeed());
+                        $this->factory->getEntityManager()->flush();
+                    }
+
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+
+                    //Save the Periodicity too (if exist)
+                    if($entity->getFeed() != null){
+                        //We find the Periodicity
+
+                        $periodicityEntity = $this->factory
+                            ->getEntityManager()
+                            ->getRepository("MauticCoreBundle:Periodicity")
+                            ->findBy(
+                                array(
+                                    'targetId' => $entity->getId(),
+                                    'type' => Periodicity::getTypeEmail()
+                                ),
+                                null,
+                                1,
+                                null
+                                )[0];
+
+                        $periodicityEntity->setTriggerDate(new \DateTime($_POST['emailform']['nextShoot']));
+                        if($_POST['recurency'] == 'interval'){
+                            $periodicityEntity->setTriggerInterval($_POST['emailform']['interval']);
+                            $periodicityEntity->setTriggerIntervalUnit($_POST['emailform']['intervalUnit']);
+                            $periodicityEntity->setDaysOfWeekMask(null);
+                        } else {
+                            $daysOfWeekMask = array();
+                            for($i = 0; $i < 7; $i++){
+                                if(array_key_exists($i, $_POST['emailform']['DaysOfWeek'])){
+                                    $daysOfWeekMask[Periodicity::getDaysOfWeek()[$i]] = true;
+                                } else {
+                                    $daysOfWeekMask[Periodicity::getDaysOfWeek()[$i]] = false;
+                                }
+                            }
+                            $periodicityEntity->setDaysOfWeekMask($daysOfWeekMask);
+                            $periodicityEntity->setTriggerInterval(null);
+                            $periodicityEntity->setTriggerIntervalUnit(null);
+                        }
+                        //We persist the Periodicity
+                        $this->factory->getEntityManager()->persist($periodicityEntity);
+                        $this->factory->getEntityManager()->flush();
+                    }
+
+                    //clear the session
+                    $session->remove($contentName);
 
                     $this->addFlash(
                         'mautic.core.notice.updated',
