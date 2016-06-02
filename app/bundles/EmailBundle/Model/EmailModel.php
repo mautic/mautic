@@ -854,7 +854,16 @@ class EmailModel extends FormModel
     {
         $variantIds = ($includeVariants) ? $email->getRelatedEntityIds() : null;
         $snapshotId = is_null($email->getFeed()) ? null : $email->getFeed()->getSnapshots()->last()->getId();
-        $total = $this->getRepository()->getEmailPendingLeads($email->getId(), $snapshotId, $variantIds, $listId, $countOnly, $limit);
+
+        if ($email->hasFeed()) {
+            $feedRepository = $this->em->getRepository('MauticFeedBundle:Feed');
+            $feedRepository->setFactory($this->factory); //TODO trouver une maniere "propre" d'injecter la factory
+            $snapshotsId = $feedRepository->latestSnapshot($email->getFeed())->getId();
+        } else {
+            $snapshotsId = null;
+        }
+
+        $total = $this->getRepository()->getEmailPendingLeads($email->getId(), $snapshotsId, $variantIds, $listId, $countOnly, $limit);
 
         return $total;
     }
