@@ -47,6 +47,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Mautic\FeedBundle\Entity\Feed;
 
 /**
  * Class EmailModel
@@ -1350,6 +1351,21 @@ class EmailModel extends FormModel
 
                 $mailer->setSource($source);
                 $mailer->setEmail($emailEntity, true, $useSettings['slots'], $assetAttachments);
+                $mailer->setLead($lead);
+
+                /** @var Feed $feed */
+                if ($email->hasFeed()){
+                    $feedHelper = $this->factory->getHelper('feed');
+                    /** @var Snapshot $snapshot */
+                    $snapshot = $email->getFeed()->getSnapshots()->last();
+                    $xmlString = $snapshot->getXmlString();
+                    $feedContent = $feedHelper->getFeedContentFromString($xmlString);
+                    $feedFields = $feedHelper->getFeedFields($feedContent);
+                    $this->factory->getLogger()->debug(print_r($feedFields, true));
+                    $mailer->setFeed($feedFields);
+                }
+
+                $mailer->setIdHash($idHash);
 
                 if (!empty($customHeaders)) {
                     $mailer->setCustomHeaders($customHeaders);

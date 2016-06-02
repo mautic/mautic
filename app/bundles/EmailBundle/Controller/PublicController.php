@@ -344,6 +344,7 @@ class PublicController extends CommonFormController
         $feedFields = null;
 
         if ($emailEntity->hasFeed()) {
+            //TODO A refactoriser pour
             $feed = $emailEntity->getFeed();
             /** @var Snapshot $snapshot */
             $snapshot = $feed->getSnapshots()->last();

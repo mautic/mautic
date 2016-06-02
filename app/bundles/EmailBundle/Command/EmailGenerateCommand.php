@@ -34,7 +34,7 @@ class EmailGenerateCommand extends ModeratedCommand
     {
         $this->setName('mautic:email:generate')
             ->setDescription('Generate Segment Email')
-            ->addOption('--id', null, InputOption::VALUE_REQUIRED, 'Email ID')
+            ->addOption('--id', null, InputOption::VALUE_OPTIONAL, 'Email ID')
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
         // ->addOption('--time-limit', null, InputOption::VALUE_OPTIONAL, 'Limit the number of seconds per batch. Defaults to value set in config.')
         // ->addOption('--do-not-clear', null, InputOption::VALUE_NONE, 'By default, failed messages older than the --recover-timeout setting will be attempted one more time then deleted if it fails again. If this is set, sending of failed messages will continue to be attempted.')
@@ -63,7 +63,7 @@ class EmailGenerateCommand extends ModeratedCommand
         $model = $factory->getModel('email');
         $entity = $model->getEntity($objectId);
 
-        if ($entity->getEmailType() == 'template') {
+        if (is_null($entity) || $entity->getEmailType() == 'template') {
             // return $this->accessDenied();
             return 0;
         }

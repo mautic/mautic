@@ -9,15 +9,13 @@
  */
 namespace Mautic\CoreBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\Console\Output\NullOutput;
 use Mautic\CoreBundle\Model\PeriodicityModel;
-use Mautic\CoreBundle\Templating\Helper\DateHelper;
+
 
 class PeriodicityCommand extends ModeratedCommand
 {
@@ -75,8 +73,12 @@ class PeriodicityCommand extends ModeratedCommand
             $returnCode = $application->run($input, $output);
 
             if ($returnCode===0){
+                // command done and success
                 $p->setLastShoot(new \DateTime());
                 $periodicityModel->getRepository()->saveEntity($p,true);;
+            }
+            else{
+                // command not finished normaly
             }
 
         }

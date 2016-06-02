@@ -1223,9 +1223,9 @@ class MailHelper
     /**
      * @param null $feed
      */
-    public function setFeed($feed)
+    public function setFeed($feedFields)
     {
-        $this->feed = $feed;
+        $this->feed = $feedFields;
     }
 
     /**

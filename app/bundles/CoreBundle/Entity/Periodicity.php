@@ -12,7 +12,6 @@ namespace Mautic\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Constraints\Date;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 class Periodicity
 {
@@ -110,34 +109,49 @@ class Periodicity
             ->build();
     }
 
-    //Statics functions for the possibles types
-    public static function getTypeEmail(){  return "email:genarate";}
-    public static function getTypeSms(){  	return "sms:genarate";}
+    // Statics functions for the possibles types
+    public static function getTypeEmail()
+    {
+        return "email:generate";
+    }
+
+    public static function getTypeSms()
+    {
+        return "sms:generate";
+    }
 
     /**
+     *
      * @var array
      */
     protected $changes;
 
     /**
-     * @param $prop
-     * @param $val
+     *
+     * @param
+     *            $prop
+     * @param
+     *            $val
      *
      * @return void
      */
-    protected function isChanged ($prop, $val)
+    protected function isChanged($prop, $val)
     {
-        $getter  = "get" . ucfirst($prop);
+        $getter = "get" . ucfirst($prop);
         $current = $this->$getter();
         if ($current != $val) {
-            $this->changes[$prop] = array($current, $val);
+            $this->changes[$prop] = array(
+                $current,
+                $val
+            );
         }
     }
 
     /**
+     *
      * @return array
      */
-    public function getChanges ()
+    public function getChanges()
     {
         return $this->changes;
     }
@@ -321,6 +335,7 @@ class Periodicity
 
     /**
      * convert bitmask to array
+     *
      * @return array
      */
     public function getDaysOfWeekMask()
@@ -340,6 +355,7 @@ class Periodicity
 
     /**
      * convert array to bitmask
+     *
      * @param array $daysOfWeekMask
      */
     public function setDaysOfWeekMask($daysOfWeekMask)
@@ -373,33 +389,46 @@ class Periodicity
     public function nextShoot()
     {
         // define date of next execution
+
+        if (is_null($this->getLastShoot())){
+            // last shoot was never set... mean it's the first execution of this periodicity
+            return $this->getTriggerDate();
+        }
+
         switch ($this->getTriggerIntervalUnit()) {
             case 'd':
-                $dates = array();
-                foreach ($this->getDaysOfWeekMask() as $day => $activated) {
-                    if ($activated === true) {
-
-                        $dates[] = clone $this->getLastShoot()
-                            ->setTime(0, 0)
-                            ->modify('next ' . $day);
-                    }
-                }
                 /** @var \DateTime $nextShoot */
-                $nextShoot = min($dates);
-
+                $nextShoot = clone $this->getLastShoot()
+                ->setTime(0, 0)
+                ->modify('+' . $this->getTriggerInterval() . 'day');
                 break;
             case 'w':
                 /** @var \DateTime $nextShoot */
-                $nextShoot = $this->getLastShoot()
+                $nextShoot = clone $this->getLastShoot()
                     ->setTime(0, 0)
                     ->modify('+' . $this->getTriggerInterval() . 'week');
 
                 break;
             case 'm':
                 /** @var \DateTime $nextShoot */
-                $nextShoot = $this->getLastShoot()
+                $nextShoot = clone $this->getLastShoot()
                     ->setTime(0, 0)
                     ->modify('+' . $this->getTriggerInterval() . 'month');
+                break;
+
+                // if  TriggerIntervalUnit is null, that mean we are on days of week pattern
+            case null:
+                $dates = array();
+                foreach ($this->getDaysOfWeekMask() as $day => $activated) {
+                    if ($activated === true) {
+
+                        $dates[] = clone $this->getLastShoot()
+                        ->setTime(0, 0)
+                        ->modify('next ' . $day);
+                    }
+                }
+                /** @var \DateTime $nextShoot */
+                $nextShoot = min($dates);
                 break;
         }
 

@@ -118,7 +118,6 @@ class FeedHelper
 
         if ($hasMatched) {
             $inner = $matches[1][0];
-
             // Create the replicas
             $count = count($feed['items']);
             for ($i = 0; $i < $count; ++$i) {
