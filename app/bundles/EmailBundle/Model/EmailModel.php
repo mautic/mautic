@@ -857,8 +857,7 @@ class EmailModel extends FormModel
 
         if ($email->hasFeed()) {
             $feedRepository = $this->em->getRepository('MauticFeedBundle:Feed');
-            $feedRepository->setFactory($this->factory); //TODO trouver une maniere "propre" d'injecter la factory
-            $snapshotsId = $feedRepository->latestSnapshot($email->getFeed())->getId();
+            $snapshotsId = $feedRepository->latestSnapshot($this->factory, $email->getFeed())->getId();
         } else {
             $snapshotsId = null;
         }
