@@ -11,6 +11,7 @@ namespace Mautic\FeedBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\FeedBundle\Helper\FeedHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
 
 
 /**
@@ -20,10 +21,9 @@ use Mautic\FeedBundle\Helper\FeedHelper;
  */
 class FeedRepository extends CommonRepository
 {
-    public function latestSnapshot(Feed $feed)
+    public function latestSnapshot(MauticFactory $factory, Feed $feed)
     {
-        /** @var FeedHelper $fh */
-        $fh= $this->factory->getHelper('feed');
+
         for ($i = sizeof($feed->getSnapshots())-1; $i > 0; $i --) { //TODO faire une requette DQL pour eviter de charger tous les snapshot en memoire
             /** @var \Mautic\FeedBundle\Entity\Snapshot $s */
             $s = $feed->getSnapshots()->get($i);
@@ -34,7 +34,10 @@ class FeedRepository extends CommonRepository
         unset($s);
         // there is no valid feed... need to pase a new one
 
-        if (!is_null($xmlString=$fh->getStringFromFeed($feed->getFeedUrl()))){
+        /** @var FeedHelper $feedHelper */
+        $feedHelper= $factory->getHelper('feed');
+
+        if (!is_null($xmlString=$feedHelper->getStringFromFeed($feed->getFeedUrl()))){
             $ns= new Snapshot();
             $ns->setDate(new \DateTime());
             $ns->setXmlString($xmlString);

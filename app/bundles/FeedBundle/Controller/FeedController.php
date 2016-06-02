@@ -37,10 +37,9 @@ class FeedController extends FormController
 
         /** @var \Mautic\FeedBundle\Entity\FeedRepository $feedRepository */
         $feedRepository = $em->getRepository('MauticFeedBundle:Feed');
-        $feedRepository->setFactory($this->factory); //TODO trouver une maniere "propre" d'injecter la factory
 
         /** @var Snapshot $snapshot */
-        $snapshot=$feedRepository->latestSnapshot($feed);
+        $snapshot=$feedRepository->latestSnapshot($this->factory, $feed);
 
         var_dump($snapshot->getXmlString());
         die('L46');
