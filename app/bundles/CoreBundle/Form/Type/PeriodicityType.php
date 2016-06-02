@@ -105,27 +105,6 @@ class PeriodicityType extends AbstractType
                 'required' => false
             )
         );
-//         $builder->add(
-//             'periodicity_next_shoot',
-//             'datetime',
-//             array(
-//                 'widget' => 'single_text',
-//                 'label'      => 'First send date & time',
-//                 'label_attr' => array('class' => 'control-label'),
-//                 'attr'       => array('class' => 'form-control'),
-//                 'format' => 'dd/MM/yyyy hh:mm',
-//                 'data' => new \DateTime('now')
-//             )
-//         );
-//         $builder->add(
-//             'periodicity_interval',
-//             'number',
-//             array(
-//                 'label'      => 'Periodicity (number of day)',
-//                 'label_attr' => array('class' => 'control-label'),
-//                 'attr'       => array('class' => 'form-control')
-//             )
-//         );
     }
 
     /**
