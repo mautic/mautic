@@ -14,6 +14,7 @@ use Debril\RssAtomBundle\Protocol\FeedReader;
 use Debril\RssAtomBundle\Protocol\Parser\Factory;
 use Debril\RssAtomBundle\Protocol\Parser\XmlParser;
 use Mautic\FeedBundle\Entity\Feed;
+use Debril\RssAtomBundle\Protocol\ItemOutInterface;
 
 class FeedHelper
 {
@@ -81,8 +82,40 @@ class FeedHelper
             'description' => $feed->getDescription(),
             'link' => $feed->getLink(),
             'date' => $feed->getLastModified()->format('Y-m-d H:i:s'),
-            'id' => $feed->getPublicId()
+            'id' => $feed->getPublicId(),
+            'items' => $this->getItemFields($feed->getItems())
         );
+    }
+
+    /**
+     * @param ItemOutInterface[] $items
+     */
+    public function getItemFields($items) {
+        $itemFields = array();
+        foreach ($items as $item) {
+            $itemFields[] = array(
+                'title' => $item->getTitle(),
+                'description' => $item->getDescription()
+            );
+        }
+        return $itemFields;
+    }
+
+    public function unfoldFeedItems($feed, $content) {
+        // Get the string to replicate
+        $matches = array();
+        preg_match_all('/\{feeditems#start\}(.*)\{feeditems#end\}/s', $content, $matches);
+        $inner = $matches[1][0];
+
+        // Create the replicas
+        $count = count($feed['items']);
+        $unfoldedContent = '';
+        for ($i = 0; $i < $count; ++$i) {
+            $unfoldedContent .= preg_replace('/\{itemfield=(\w+)\}/s', '{itemfield=$1#'.$i.'}', $inner);
+        }
+
+        // Replace with the final tags
+        return str_replace($matches[0], $unfoldedContent, $content);
     }
 
     public function setFactory(Factory $factory)

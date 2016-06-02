@@ -15,6 +15,7 @@ use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\FeedBundle\Entity\Feed;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\FeedBundle\Helper\FeedHelper;
 
 /**
  * Class EmailSubscriber
@@ -24,8 +25,14 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 class EmailSubscriber extends CommonSubscriber
 {
 
-    private static $leadFieldRegex = '{feedfield=(.*?)}';
+    /**
+     * @var FeedHelper
+     */
+    private $feedHelper;
 
+    private static $feedFieldRegex = '{feedfield=(.*?)}';
+    private static $feeditemsRegex = '{feeditems#(start|end)}';
+    private static $itemFieldRegex = '{itemfield=(.*?)}';
 
     /**
      * @return array
@@ -44,13 +51,25 @@ class EmailSubscriber extends CommonSubscriber
      */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
-        if ($event->tokensRequested(self::$leadFieldRegex)) {
+        if ($event->tokensRequested(self::$feedFieldRegex)) {
             $event->addTokens(array(
                 '{feedfield=title}' => 'Feed Title',
                 '{feedfield=description}' => 'Feed Description',
                 '{feedfield=link}' => 'Feed Link',
                 '{feedfield=date}' => 'Feed Date',
                 '{feedfield=id}' => 'Feed Public ID'
+            ));
+        }
+        if ($event->tokensRequested(self::$feeditemsRegex)) {
+            $event->addTokens(array(
+                '{feeditems#start}' => 'Start looping through the items',
+                '{feeditems#end}' => 'Stop looping through the items'
+            ));
+        }
+        if ($event->tokensRequested(self::$itemFieldRegex)) {
+            $event->addTokens(array(
+                '{itemfield=title}' => 'Item Title',
+                '{itemfield=description}' => 'Item Description',
             ));
         }
     }
@@ -71,6 +90,8 @@ class EmailSubscriber extends CommonSubscriber
                  . $event->getPlainText();
 
         $feed = $event->getFeed();
+
+        $event->setContent($this->feedHelper->unfoldFeedItems($feed, $content));
 
         $tokenList = self::findFeedTokens($content, $feed);
         if (count($tokenList)) {
@@ -94,6 +115,7 @@ class EmailSubscriber extends CommonSubscriber
         // Search for bracket or bracket encoded
         $regex     = '/({|%7B)feedfield=(.*?)(}|%7D)/';
         $tokenList = array();
+        $matches = array();
 
         $foundMatches = preg_match_all($regex, $content, $matches);
         if ($foundMatches) {
@@ -133,5 +155,15 @@ class EmailSubscriber extends CommonSubscriber
 
         return $replace ? $content : $tokenList;
     }
+
+    /**
+     * @param FeedHelper $feedHelper
+     */
+    public function setFeedHelper(FeedHelper $feedHelper)
+    {
+        $this->feedHelper = $feedHelper;
+        return $this;
+    }
+
 
 }

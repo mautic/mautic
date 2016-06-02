@@ -19,7 +19,10 @@ return array(
     'services' => array(
         'events' => array(
             'mautic.feed.emailbundle.subscriber' => array(
-                'class' => 'Mautic\FeedBundle\EventListener\EmailSubscriber'
+                'class' => 'Mautic\FeedBundle\EventListener\EmailSubscriber',
+                'methodCalls' => array(
+                    'setFeedHelper' => array('mautic.helper.feed')
+                )
             )
         ),
         'other' => array(
