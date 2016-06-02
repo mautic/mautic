@@ -842,14 +842,14 @@ class LeadModel extends FormModel
      */
     public function isContactable(Lead $lead, $channel)
     {
-        /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
-        $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
-
-        /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
         if (is_array($channel)) {
             $channel = key($channel);
         }
 
+        /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
+        $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
+
+        /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
         $dncEntries = $dncRepo->getEntriesByLeadAndChannel($lead, $channel);
 
         // If the lead has no entries in the DNC table, we're good to go
