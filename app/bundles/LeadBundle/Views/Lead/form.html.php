@@ -139,7 +139,7 @@ $img = $view['lead_avatar']->getAvatar($lead);
                                 </div>
                             </div>
                             <?php endif; ?>
-                            <?php if (isset($form['address1'])): ?>
+                            <?php if (isset($form['address2'])): ?>
                             <div class="row mb-xs">
                                 <div class="col-sm-8">
                                     <?php echo $view['form']->widget($form['address2'], array('attr' => array('placeholder' => $form['address2']->vars['label']))); ?>
