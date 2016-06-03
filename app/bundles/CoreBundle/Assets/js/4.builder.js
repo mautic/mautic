@@ -10,7 +10,7 @@ Mautic.launchBuilder = function (formName, actionName) {
     Mautic.builderFormName = formName;
 
     // Holds HTML of the builder contents
-    Mautic.builderContents = [];
+    Mautic.builderContents;
 
     mQuery('body').css('overflow-y', 'hidden');
 
@@ -47,15 +47,13 @@ Mautic.launchBuilder = function (formName, actionName) {
         Mautic.builderContents = mQuery(mQuery('textarea.builder-html').val());
         if (Mautic.builderContents.length) {
             // Open the email from the HTML textarea
-            setTimeout( function() {
-                var doc = builder[0].contentWindow.document;
-                var body = mQuery('body', doc);
-                body.html(Mautic.builderContents);
-                Mautic.initSlotListeners();
-                Mautic.initSlots();
-                mQuery('#builder-overlay').addClass('hide');
-                mQuery('.btn-close-builder').prop('disabled', false);
-            }, 1 );
+            var doc = builder[0].contentWindow.document;
+            var body = mQuery('body', doc);
+            body.html(Mautic.builderContents);
+            Mautic.initSlotListeners();
+            Mautic.initSlots();
+            mQuery('#builder-overlay').addClass('hide');
+            mQuery('.btn-close-builder').prop('disabled', false);
         } else {
             // Load the template for the new email
             var src = mQuery('#builder_url').val();
@@ -213,11 +211,10 @@ Mautic.closeBuilder = function(model) {
     mQuery('.btn-close-builder').prop('disabled', true);
 
     if (Mautic.builderMode == 'template') {
-        console.log(Mautic.builderSlots);
         // Trigger destroy slots event
         if (typeof Mautic.builderSlots !== 'undefined' && Mautic.builderSlots.length) {
             mQuery.each(Mautic.builderSlots, function(i, slotParams) {
-                Mautic.builderContents.trigger('slot:destroy', slotParams);
+                mQuery(slotParams.slot).trigger('slot:destroy', slotParams);
                 delete Mautic.builderSlots[i];
             });
         }
@@ -493,6 +490,8 @@ Mautic.builderOnLoad = function (target) {
 
 Mautic.initSlots = function() {
     var slotContainers = Mautic.builderContents.find('[data-slot-container]');
+
+    // Make slots sortable
     slotContainers.sortable({
         items: '[data-slot]',
         handle: 'div[data-slot-handle]',
@@ -507,12 +506,8 @@ Mautic.initSlots = function() {
             }
         }
     });
-    
-    Mautic.builderContents.find('[data-slot]').each(function() {
-        Mautic.builderContents.trigger('slot:init', this);
-    });
 
-
+    // Allow to drag&drop new slots from the slot type menu
     mQuery('#slot-type-container .slot-type-handle').draggable({
         iframeFix: true,
         iframeId: 'builder-template-content',
@@ -536,6 +531,11 @@ Mautic.initSlots = function() {
             ui.helper = mQuery(event.target).closest('[data-slot-type]');
         }
     }).disableSelection();
+
+    // Initialize the slots
+    Mautic.builderContents.find('[data-slot]').each(function() {
+        mQuery(this).trigger('slot:init', this);
+    });
 }
 
 Mautic.initSlotListeners = function() {
@@ -613,7 +613,6 @@ Mautic.initSlotListeners = function() {
     });
 
     Mautic.builderContents.on('slot:destroy', function(event, params) {
-        console.log('slot:destroy', params);
         if (params.type === 'text') {
             params.slot.froalaEditor('destroy');
         } else if (params.type === 'image') {
@@ -622,7 +621,5 @@ Mautic.initSlotListeners = function() {
 
         // Remove Symfony toolbar
         Mautic.builderContents.find('.sf-toolbar').remove();
-        // delete params.slot;
-        // delete params.type;
     });
 };
