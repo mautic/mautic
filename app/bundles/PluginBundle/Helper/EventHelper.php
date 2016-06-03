@@ -49,4 +49,35 @@ class EventHelper
 
         return $success;
     }
+
+    /**
+     * @param               $lead
+     * @param MauticFactory $factory
+     */
+    static public function getLeads($config, $lead, MauticFactory $factory)
+    {
+        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
+        $integrationHelper = $factory->getHelper('integration');
+
+        $integration = (!empty($config['integration'])) ? $config['integration'] : null;
+        $feature     = (empty($integration)) ? 'get_leads' : null;
+
+        $services = $integrationHelper->getIntegrationObjects($integration, $feature);
+        $success  = false;
+
+        foreach ($services as $name => $s) {
+            $settings = $s->getIntegrationSettings();
+            if (!$settings->isPublished()) {
+                continue;
+            }
+
+            if (method_exists($s, 'getLeads')) {
+                if ($s->getLeads($config)) {
+                    $success = true;
+                }
+            }
+        }
+
+        return $success;
+    }
 }
