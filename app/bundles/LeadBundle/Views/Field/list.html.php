@@ -49,10 +49,12 @@ if ($tmpl == 'index')
                     ?>
                 </td>
                 <td>
+
                     <span class="ellipsis">
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'lead.field')); ?>
+                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'lead.field', 'disableToggle' => ($item->getAlias() == 'email'))); ?>
                         <a href="<?php echo $view['router']->generate('mautic_leadfield_action', array('objectAction' => 'edit', 'objectId' => $item->getId())); ?>"><?php echo $item->getLabel(); ?></a>
                     </span>
+
                 </td>
                 <td class="visible-md visible-lg"><?php echo $item->getAlias(); ?></td>
                 <td class="visible-md visible-lg"><?php echo $view['translator']->trans('mautic.lead.field.group.'.$item->getGroup()); ?></td>
