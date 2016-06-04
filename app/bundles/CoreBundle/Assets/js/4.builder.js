@@ -43,17 +43,21 @@ Mautic.launchBuilder = function (formName, actionName) {
             css: builderCss,
             id: "builder-template-content"
         }).appendTo('.builder-content');
-
         Mautic.builderContents = mQuery(mQuery('textarea.builder-html').val());
+
         if (Mautic.builderContents.length) {
-            // Open the email from the HTML textarea
-            var doc = builder[0].contentWindow.document;
-            var body = mQuery('body', doc);
-            body.html(Mautic.builderContents);
-            Mautic.initSlotListeners();
-            Mautic.initSlots();
-            mQuery('#builder-overlay').addClass('hide');
-            mQuery('.btn-close-builder').prop('disabled', false);
+            var iframe = document.getElementById('builder-template-content');
+            var doc = iframe.contentDocument || iframe.contentWindow.document;
+            doc.open();
+            doc.write(mQuery('textarea.builder-html').val());
+            doc.close();
+            builder.load(function() {
+                Mautic.builderContents = builder.contents();
+                Mautic.initSlotListeners();
+                Mautic.initSlots();
+                mQuery('#builder-overlay').addClass('hide');
+                mQuery('.btn-close-builder').prop('disabled', false);
+            });
         } else {
             // Load the template for the new email
             var src = mQuery('#builder_url').val();
@@ -220,8 +224,7 @@ Mautic.closeBuilder = function(model) {
         }
 
         // Store the HTML content to the HTML textarea
-        mQuery('.builder-html').val(Mautic.builderContents.find('html').html());
-        Mautic.refreshCodeEditors();
+        mQuery('.builder-html').val(mQuery('iframe#builder-template-content').contents().find('html').get(0).outerHTML);
 
         // Kill the overlay
         mQuery('#builder-overlay').remove();
@@ -229,12 +232,9 @@ Mautic.closeBuilder = function(model) {
         // Hide builder
         mQuery('.builder').removeClass('builder-active').addClass('hide');
         mQuery('.btn-close-builder').prop('disabled', false);
-
         mQuery('body').css('overflow-y', '');
-
         mQuery('.builder').addClass('hide');
         Mautic.stopIconSpinPostEvent();
-
         mQuery('#builder-template-content').remove();
     } else {
         try {
@@ -270,7 +270,6 @@ Mautic.closeBuilder = function(model) {
 
     delete Mautic.builderMode;
     delete Mautic.builderFormName;
-    delete Mautic.builderContents;
 };
 
 /**
