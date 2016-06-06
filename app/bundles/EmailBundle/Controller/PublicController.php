@@ -23,6 +23,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\FeedBundle\Entity\Snapshot;
 use Mautic\FeedBundle\Helper\FeedHelper;
+use Mautic\FeedBundle\Entity\FeedRepository;
 
 class PublicController extends CommonFormController
 {
@@ -338,6 +339,10 @@ class PublicController extends CommonFormController
         if ($emailEntity === null) {
             return $this->notFound();
         }
+
+        /** @var FeedRepository $feedRepository */
+        $feedRepository = $this->factory->getEntityManager()->getRepository('MauticFeedBundle:Feed');
+
         /** @var FeedHelper $feedHelper  */
         $feedHelper = $this->get('mautic.helper.feed');
 
@@ -347,7 +352,7 @@ class PublicController extends CommonFormController
             //TODO A refactoriser pour
             $feed = $emailEntity->getFeed();
             /** @var Snapshot $snapshot */
-            $snapshot = $feed->getSnapshots()->last();
+            $snapshot = $feedRepository->latestSnapshot($this->factory, $feed);
             $xmlString = $snapshot->getXmlString();
             $feedContent = $feedHelper->getFeedContentFromString($xmlString);
             $feedFields = $feedHelper->getFeedFields($feedContent);

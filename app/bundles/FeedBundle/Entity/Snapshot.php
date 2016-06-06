@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
@@ -6,7 +7,6 @@
  * @link        http://webmecanik.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\FeedBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -16,31 +16,37 @@ class Snapshot
 {
 
     /**
+     *
      * @var int
      */
     private $id;
 
     /**
+     *
      * @var \DateTime
      */
     private $date;
 
     /**
+     *
      * @var string
      */
     private $xmlString;
 
     /**
+     *
      * @var Feed
      */
     private $feed;
 
     /**
-     * @var bool
+     *
+     * @var \DateTime
      */
-    private $isExpired = false;
+    private $dateExpired;
 
     /**
+     *
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -64,10 +70,19 @@ class Snapshot
             ->addJoinColumn('feed_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->createField('isExpired', 'boolean')
-            ->columnName('is_expired')
+        $builder->createField('dateExpired', 'datetime')
+            ->columnName('date_expired')
+            ->nullable()
             ->build();
+    }
 
+    /**
+     * check if snapshot still valid
+     * @return boolean
+     */
+    public function isExpired()
+    {
+        return new \DateTime() > $this->getDateExpired();
     }
 
     public function getId()
@@ -108,20 +123,22 @@ class Snapshot
         return $this;
     }
 
-    public function getIsExpired()
+    /**
+     *
+     * @return DateTime
+     */
+    public function getDateExpired()
     {
-        return $this->isExpired;
+        return $this->dateExpired;
     }
 
-    public function setIsExpired($isExpired)
+    /**
+     *
+     * @param \DateTime $dateExpired
+     */
+    public function setDateExpired(\DateTime $dateExpired)
     {
-        $this->isExpired = $isExpired;
+        $this->dateExpired = $dateExpired;
         return $this;
     }
-
-    public function isExpired()
-    {
-        return $this->getIsExpired();
-    }
-
 }

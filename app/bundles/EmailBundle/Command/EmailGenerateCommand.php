@@ -35,17 +35,14 @@ class EmailGenerateCommand extends ModeratedCommand
         $this->setName('mautic:email:generate')
             ->setDescription('Generate Segment Email')
             ->addOption('--id', null, InputOption::VALUE_OPTIONAL, 'Email ID')
-            ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
-        // ->addOption('--time-limit', null, InputOption::VALUE_OPTIONAL, 'Limit the number of seconds per batch. Defaults to value set in config.')
-        // ->addOption('--do-not-clear', null, InputOption::VALUE_NONE, 'By default, failed messages older than the --recover-timeout setting will be attempted one more time then deleted if it fails again. If this is set, sending of failed messages will continue to be attempted.')
-        // ->addOption('--recover-timeout', null, InputOption::VALUE_OPTIONAL, 'Sets the amount of time in seconds before attempting to resend failed messages. Defaults to value set in config.')
-        // ->addOption('--clear-timeout', null, InputOption::VALUE_OPTIONAL, 'Sets the amount of time in seconds before deleting failed messages. Defaults to value set in config.')
-        // ->setHelp(<<<EOT
+            ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.')
+
         // The <info>%command.name%</info> command is used to process the application's e-mail queue
 
         // <info>php %command.full_name%</info>
         // EOT
         // )
+        ;
     }
 
     /**
@@ -79,19 +76,13 @@ class EmailGenerateCommand extends ModeratedCommand
         if (!$catPublished || !$published) {
             return 0;
         }
-        if ($email->hasFeed() && $email->getFeed()->hasSnapshot() &&
-            $email->getSnapshots()
-            ->last()
-            ->isExpired() === true) {
-            return 0;
-        }
 
         $pending = $model->getPendingLeads($email, null, true);
         $output->writeln('<info>There is ' . $pending . ' mails to generate</info>');
         $sendStat = $model->sendEmailToLists($email);
         if ($pending > 0) {
             $output->writeln('<info>' . $sendStat[0] . ' mails sent</info>');
-            $output->writeln('<info>' . $sendStat[0] . ' mails failed</info>');
+            $output->writeln('<info>' . $sendStat[1] . ' mails failed</info>');
         }
 
         $this->completeRun();

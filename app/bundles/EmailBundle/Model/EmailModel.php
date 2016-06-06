@@ -48,6 +48,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Mautic\FeedBundle\Entity\Feed;
+use Mautic\FeedBundle\Entity\Snapshot;
 
 /**
  * Class EmailModel
@@ -1156,6 +1157,7 @@ class EmailModel extends FormModel
         $emailPriority    = (isset($options['email_priority'])) ? $options['email_priority'] : MessageQueue::PRIORITY_NORMAL;
         $messageQueue     = (isset($options['resend_message_queue'])) ? $options['resend_message_queue'] : false;
 
+
         if (!$email->getId()) {
             return false;
         }
@@ -1355,13 +1357,16 @@ class EmailModel extends FormModel
 
                 /** @var Feed $feed */
                 if ($email->hasFeed()){
+                    /** @var FeedHelper $feedHelper */
                     $feedHelper = $this->factory->getHelper('feed');
+                    /** @var FeedRepository $feedRepository */
+                    $feedRepository = $this->factory->getEntityManager()->getRepository('MauticFeedBundle:Feed');
                     /** @var Snapshot $snapshot */
-                    $snapshot = $email->getFeed()->getSnapshots()->last();
+                    $snapshot = $feedRepository->latestSnapshot($this->factory,$email->getFeed());
+
                     $xmlString = $snapshot->getXmlString();
                     $feedContent = $feedHelper->getFeedContentFromString($xmlString);
                     $feedFields = $feedHelper->getFeedFields($feedContent);
-                    $this->factory->getLogger()->debug(print_r($feedFields, true));
                     $mailer->setFeed($feedFields);
                 }
 
@@ -1474,6 +1479,12 @@ class EmailModel extends FormModel
 
         unset($saveEntities, $badEmails, $emailSentCounts, $emailSettings, $options, $tokens, $useEmail, $sendTo);
 
+        if ($email->hasFeed()){
+            //set usedfeedSnapShot expired
+            /** @var Snapshot $snapshot */
+            $snapshot->setDateExpired(new \DateTime());
+
+        }
         return $singleEmail ? (empty($errors)) : $errors;
     }
 

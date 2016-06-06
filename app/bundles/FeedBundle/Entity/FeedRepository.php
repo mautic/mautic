@@ -21,12 +21,21 @@ use Mautic\CoreBundle\Factory\MauticFactory;
  */
 class FeedRepository extends CommonRepository
 {
-    public function latestSnapshot(MauticFactory $factory, Feed $feed)
+    /**
+     *
+     * @param MauticFactory $factory
+     * @param Feed $feed
+     * @param null | \DateTime $maxDate max date of validity expected
+     *
+     * @return Snapshot
+     */
+    public function latestSnapshot(MauticFactory $factory, Feed $feed, $maxDate=null)
     {
+
         for ($i = sizeof($feed->getSnapshots())-1; $i > 0; $i --) { //TODO faire une requette DQL pour eviter de charger tous les snapshot en memoire
             /** @var \Mautic\FeedBundle\Entity\Snapshot $s */
             $s = $feed->getSnapshots()->get($i);
-            if ($s->isExpired()===false){
+            if ($s->isExpired()===false && (is_null($maxDate) || $s->getDate()>$maxDate)){
                 return $s;
             }
         }
