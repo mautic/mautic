@@ -542,8 +542,9 @@ var Mautic = {
                     var textarea = mQuery(this);
 
                     if (textarea.hasClass('editor-builder-tokens')) {
+                        // init AtWho in a froala editor
                         textarea.on('froalaEditor.initialized', function (e, editor) {
-                            Mautic.initAtWho(editor, textarea.attr('data-token-callback'));
+                            Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'));
                         });
                     }
 
@@ -553,11 +554,6 @@ var Mautic = {
                         imageManagerLoadURL: mauticBaseUrl + 's/file/list',
                         imageManagerDeleteURL: mauticBaseUrl + 's/file/delete'
                     });
-
-                    // mQuery('body').on('mouseup', '.atwho-view-ul li', function (e) {
-                    //     e.stopPropagation();
-                    // });
-
                 });
             }
         });
@@ -674,26 +670,58 @@ var Mautic = {
     /**
      * Initialize AtWho dropdown in a Froala editor.
      *
-     * @param Froala editor object
-     * @param ajax callback to get the tokens
+     * @param jQuery element
+     * @param method to get the tokens from
+     * @param Froala Editor
      */
-    initAtWho: function(editor, callback) {
+    initAtWho: function(element, method, froala) {
+        Mautic.getTokens(method, function(tokens) {
+            element.atwho({
+                at: '{',
+                displayTpl: '<li>${name} <small>${id}</small></li>',
+                insertTpl: "${id}",
+                editableAtwhoQueryAttrs: {"data-fr-verified": true},
+                data: mQuery.map(tokens, function(value, i) {
+                    return {'id':i, 'name':value};
+                })
+            });
+
+            if (froala) {
+                froala.events.on('keydown', function (e) {
+                    if ((e.which == mQuery.FroalaEditor.KEYCODE.TAB || 
+                        e.which == mQuery.FroalaEditor.KEYCODE.ENTER) && 
+                        froala.$el.atwho('isSelecting')) {
+                        return false;
+                    }
+                }, true);
+            }
+        });
+    },
+
+    /**
+     * Download the tokens
+     *
+     * @param method to fetch the tokens from
+     * @param callback(tokens) to call when finished
+     */
+    getTokens: function(method, callback) {
+        var lastUpdate = parseInt(sessionStorage.getItem('mautic.tokens.loaded'));
+        if ((lastUpdate + 600000) > Date.now()) {
+            return callback(JSON.parse(sessionStorage.getItem('mautic.tokens')));
+        }
+
         mQuery.ajax({
             url: mauticAjaxUrl,
-            data: 'action=' + callback,
+            data: 'action=' + method,
             success: function (response) {
                 if (typeof response.tokens === 'object') {
-                    editor.$el.atwho({
-                        at: '{',
-                        displayTpl: '<li>${name} <small>${id}</small></li>',
-                        insertTpl: "${id}",
-                        editableAtwhoQueryAttrs: {"data-fr-verified": true},
-                        data: mQuery.map(response.tokens, function(value, i) {
-                            return {'id':i, 'name':value};
-                        })
-                    });
-                }
+                    // store the tokens to the session storage
+                    sessionStorage.setItem('mautic.tokens', JSON.stringify(response.tokens));
+                    sessionStorage.setItem('mautic.tokens.loaded', Date.now());
 
+                    // return the callback with tokens
+                    callback(response.tokens);
+                }
             },
             error: function (request, textStatus, errorThrown) {
                 Mautic.processAjaxError(request, textStatus, errorThrown);
@@ -3234,6 +3262,7 @@ var Mautic = {
                 var editor = CodeMirror.fromTextArea(this, {
                     // lineNumbers: true,
                     // matchBrackets: true,
+                    indentUnit: 4,
                     mode: 'htmlmixed'
                 });
 
@@ -3248,6 +3277,10 @@ var Mautic = {
                 editor.on('blur', function() {
                     textarea.val(editor.getValue());
                 });
+
+                // Init the atWho dropdown
+                // Mautic.initAtWho(mQuery('.CodeMirror-code'), textarea.attr('data-token-callback'));
+                // CodeMirror doesn't use contentEditable ;(
 
                 // Save the textarea with the editor to a global array so it can be used elsewhere
                 Mautic.codeEditors.push({editor: editor, textarea: textarea});

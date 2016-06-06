@@ -588,6 +588,16 @@ Mautic.initSlotListeners = function() {
 
         // Initialize different slot types
         if (type === 'text') {
+            // init AtWho in a froala editor
+            var method = 'page:getBuilderTokens';
+            if (mQuery('.builder').hasClass('email-builder')) {
+                method = 'email:getBuilderTokens';
+            }
+            slot.on('froalaEditor.initialized', function (e, editor) {
+                Mautic.initAtWho(editor.$el, method, editor);
+            });
+
+            // Init Froala editor
             slot.froalaEditor({toolbarInline: true, zIndex: 2501});
         } else if (type === 'image') {
             slot.find('img').froalaEditor({toolbarInline: true});
