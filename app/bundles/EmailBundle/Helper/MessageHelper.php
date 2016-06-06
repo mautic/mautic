@@ -102,7 +102,6 @@ class MessageHelper
                 $isUnsubscribe = false;
                 $toEmail = $message['mail']['source'];
                 $amazonEmail = $message['bounce']['bouncedRecipients'][0]['emailAddress'];    
-                r_print($amazonEmail);
             }
             elseif ($message['notificationType']=='Complaint') {
                 $isBounce      = false;
