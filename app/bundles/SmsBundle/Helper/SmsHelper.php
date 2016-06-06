@@ -118,7 +118,12 @@ class SmsHelper
         $event = new SmsSendEvent($sms->getMessage(), $lead);
         $event->setSmsId($smsId);
 
-        $dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $event);
+        try {
+            $dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $event);
+        } catch (\Exception $exception) {
+            // A listener has prevented this from being sent
+            return array('failed' => 1);
+        }
 
         $metadata = $smsApi->sendSms($leadPhoneNumber, $event->getContent());
 

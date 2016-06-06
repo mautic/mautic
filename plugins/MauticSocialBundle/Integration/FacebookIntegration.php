@@ -102,15 +102,12 @@ class FacebookIntegration extends SocialIntegration
      */
     public function getUserData($identifier, &$socialCache)
     {
-        $persistLead = false;
-        $accessToken = $this->getAccessToken($socialCache);
+        $this->persistNewLead = false;
+        $accessToken          = $this->getContactAccessToken($socialCache);
 
         if (!isset($accessToken['access_token'])) {
 
             return;
-        } elseif (isset($accessToken['persist_lead'])) {
-            $persistLead = $accessToken['persist_lead'];
-            unset($accessToken['persist_lead']);
         }
 
         $url    = $this->getApiUrl("v2.5/me");
@@ -118,7 +115,7 @@ class FacebookIntegration extends SocialIntegration
 
         $parameters = array(
             'access_token' => $accessToken['access_token'],
-            'fields'       => implode(",",$fields)
+            'fields'       => implode(",", $fields)
         );
 
         $data = $this->makeRequest($url, $parameters, 'GET', array('auth_type' => 'rest'));
@@ -142,7 +139,7 @@ class FacebookIntegration extends SocialIntegration
             $socialCache['lastRefresh'] = new \DateTime();
             $socialCache['accessToken'] = $this->encryptApiKeys($accessToken);
 
-            $this->getMauticLead($info, $persistLead, $socialCache, $identifier);
+            $this->getMauticLead($info, $this->persistNewLead, $socialCache, $identifier);
 
             return $data;
         }
