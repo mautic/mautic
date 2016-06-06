@@ -227,8 +227,8 @@ return [
                 'arguments' => [
                     'request_stack',
                     'doctrine.orm.entity_manager',
-                    'mautic.ip_lookup',
-                    'mautic.helper.core_parameters'
+                    'mautic.helper.core_parameters',
+                    'mautic.ip_lookup'
                 ]
             ],
             'mautic.helper.user' => [
