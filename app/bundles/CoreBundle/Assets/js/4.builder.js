@@ -598,7 +598,14 @@ Mautic.initSlotListeners = function() {
             });
 
             // Init Froala editor
-            slot.froalaEditor({toolbarInline: true, zIndex: 2501});
+            slot.froalaEditor({
+                toolbarInline: true,
+                toolbarVisibleWithoutSelection: true,
+                // scrollableContainer: Mautic.builderContents.find('body'), // This is cause editor to lose CSS
+                scrollableContainer: slot,
+                toolbarButtons: ['bold', 'italic', 'insertImage', 'insertLink', 'undo', 'redo', '-', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'indent', 'outdent'],
+                zIndex: 2501
+            });
         } else if (type === 'image') {
             slot.find('img').froalaEditor({toolbarInline: true});
         } else if (type === 'button') {
