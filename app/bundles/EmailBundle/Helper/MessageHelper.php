@@ -95,6 +95,25 @@ class MessageHelper
 
         $this->logger->debug("Analyzing message to {$message->toString}");
 
+		if ($message->fromAddress=='no-reply@sns.amazonaws.com'){		
+				$message = json_decode(strtok($message->textPlain, "\n"), true);		
+				if ($message['notificationType']=='Bounce')
+				{
+					$isBounce = true;
+					$isUnsubscribe = false;
+					$toEmail = $message['mail']['source'];
+					$amazonEmail = $message['bounce']['bouncedRecipients'][0]['emailAddress'];	
+					r_print($amazonEmail);
+				}
+				elseif ($message['notificationType']=='Complaint') 
+				{
+					$isBounce      = false;
+					$isUnsubscribe = true;
+					$toEmail       = $message['mail']['source'];
+					$amazonEmail = $message['complaint']['complainedRecipients'][0]['emailAddress'];	
+				}
+		}		
+
         // Parse the to email if applicable
         if (preg_match('#^(.*?)\+(.*?)@(.*?)$#', $toEmail, $parts)) {
             if (strstr($parts[2], '_')) {
@@ -106,6 +125,15 @@ class MessageHelper
         $messageDetails = array();
 
         if ($allowBounce) {
+            if (isset($amazonEmail)){
+			$messageDetails['email']=$amazonEmail;
+			$messageDetails['rule_cat'] = 'unknown';
+			$messageDetails['rule_no'] = '0013';
+			$messageDetails['bounce_type'] = 'hard';
+			$messageDetails['remove'] = 1; 
+			} 
+			else
+			{
             if (!empty($message->dsnReport)) {
                 // Parse the bounce
                 $dsnMessage = ($message->dsnMessage) ? $message->dsnMessage : $message->textPlain;
@@ -137,6 +165,7 @@ class MessageHelper
                 $isBounce      = true;
                 $isUnsubscribe = false;
             }
+			}
         }
 
         if (!$isBounce && !$isUnsubscribe) {
