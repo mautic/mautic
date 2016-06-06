@@ -3067,7 +3067,7 @@ var Mautic = {
         var chart = new Chart(canvas, {
             type: 'line',
             data: data, 
-            options: {lineTension : 0.2}
+            options: {lineTension : 0.2, borderWidth: 1}
         });
         Mautic.chartObjects.push(chart);
     },
@@ -3079,10 +3079,9 @@ var Mautic = {
      */
     renderPieChart: function(canvas) {
         var data = mQuery.parseJSON(canvas.text());
-        var options = {};
+        var options = {borderWidth: 1};
         var disableLegend = canvas.attr('data-disable-legend');
         if (typeof disableLegend !== 'undefined' && disableLegend !== false) {
-            console.log('diabled');
             options.legend = {
                 display: false
             }
