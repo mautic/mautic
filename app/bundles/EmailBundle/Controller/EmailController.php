@@ -548,7 +548,7 @@ class EmailController extends FormController
                         } else {
                             $daysOfWeekMask = array();
                             for($i = 0; $i < 7; $i++){
-                                if(array_key_exists($i, $_POST['emailform']['DaysOfWeek'])){
+                                if(array_search(strval($i), $_POST['emailform']['DaysOfWeek']) !== false){
                                     $daysOfWeekMask[Periodicity::getDaysOfWeek()[$i]] = true;
                                 } else {
                                     $daysOfWeekMask[Periodicity::getDaysOfWeek()[$i]] = false;
@@ -760,7 +760,6 @@ class EmailController extends FormController
                     //Save the Periodicity too (if exist)
                     if($entity->getFeed() != null){
                         //We find the Periodicity
-
                         $periodicityEntity = $this->factory
                             ->getEntityManager()
                             ->getRepository("MauticCoreBundle:Periodicity")
@@ -782,7 +781,7 @@ class EmailController extends FormController
                         } else {
                             $daysOfWeekMask = array();
                             for($i = 0; $i < 7; $i++){
-                                if(array_key_exists($i, $_POST['emailform']['DaysOfWeek'])){
+                                if(array_search(strval($i), $_POST['emailform']['DaysOfWeek']) !== false){
                                     $daysOfWeekMask[Periodicity::getDaysOfWeek()[$i]] = true;
                                 } else {
                                     $daysOfWeekMask[Periodicity::getDaysOfWeek()[$i]] = false;
@@ -878,6 +877,30 @@ class EmailController extends FormController
                 $content = $entity->getCustomHtml();
                 $form['customHtml']->setData($content);
             }
+
+            //Set the periodicity for the edit form
+            /** @var $periodicityEntity Periodicity */
+            $periodicityEntity = $this->factory
+                ->getEntityManager()
+                ->getRepository("MauticCoreBundle:Periodicity")
+                ->findBy(
+                    array(
+                        'targetId' => $entity->getId(),
+                        'type' => Periodicity::getTypeEmail()
+                    ),
+                    null,
+                    1,
+                    null
+                    )[0];
+            $form->get('interval')->setData($periodicityEntity->getTriggerInterval());
+            $form->get('intervalUnit')->setData($periodicityEntity->getTriggerIntervalUnit());
+
+            $tmp = $periodicityEntity->getDaysOfWeekMask();
+            $formDaysOfWeek = array();
+            for($i = 0; $i < count($tmp); $i++){
+                if(array_values($tmp)[$i] === true){    array_push($formDaysOfWeek, $i);}
+            }
+            $form->get('DaysOfWeek')->setData($formDaysOfWeek);
         }
 
         $assets         = $form['assetAttachments']->getData();

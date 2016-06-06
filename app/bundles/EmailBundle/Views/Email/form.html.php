@@ -224,9 +224,9 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
                 }
             </style>
             <label>Recurency :</label>
-            <br/><input type="radio" value="interval" name="recurency" id="recurency_interval" checked="checked"/>
+            <br/><input type="radio" value="interval" name="recurency" id="recurency_interval"<?php if(!empty($form['interval']->vars['value'])){?> checked="checked"<?php } ?>/>
             <label for="recurency_interval">Interval</label>
-            <br/><input type="radio" value="days_of_week" name="recurency" id="recurency_days_of_week"/>
+            <br/><input type="radio" value="days_of_week" name="recurency" id="recurency_days_of_week"<?php if(empty($form['interval']->vars['value'])){?> checked="checked"<?php } ?>/>
             <label for="recurency_days_of_week">Days of week</label>
             <br/><?php echo $view['form']->row($form['interval']); ?>
             <?php echo $view['form']->row($form['intervalUnit']); ?>

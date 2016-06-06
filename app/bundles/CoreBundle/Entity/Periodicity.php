@@ -362,7 +362,7 @@ class Periodicity
     {
         $tmp = 0;
         for ($i = 6; $i >= 0; $i --) {
-            if ($daysOfWeekMask[$this->getDaysOfWeek()[6 - $i]] == true) {
+            if ($daysOfWeekMask[$this->getDaysOfWeek()[6 - $i]] === true) {
                 $tmp += pow(2, $i);
             }
         }
