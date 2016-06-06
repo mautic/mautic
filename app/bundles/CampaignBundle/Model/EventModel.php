@@ -698,7 +698,7 @@ class EventModel extends CommonFormModel
         &$totalEventCount = 0
     ) {
 
-        $eventWaitTimeOnResponseFalse =  $this->factory->getParameter('campaing_time_wait_on_event_false');
+        $eventWaitTimeOnResponseFalse =  $this->factory->getParameter('campaign_time_wait_on_event_false');
 
         $evaluatedEventCount++;
         $totalEventCount++;
