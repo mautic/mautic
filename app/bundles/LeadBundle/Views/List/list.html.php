@@ -56,7 +56,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                             'templateButtons' => array(
                                 'delete'    => $security->hasEntityAccess(true, $permissions['lead:lists:deleteother'], $item->getCreatedBy()),
                             ),
-                            'routeBase' => 'leadlist',
+                            'routeBase' => 'segment',
                             'langVar'   => 'lead.list',
                             'custom'    => array(
                                 array(

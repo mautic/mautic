@@ -14,7 +14,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'templateButtons' => array(
         'new' => true // this is intentional. Each user can segment leads
     ),
-    'routeBase' => 'leadlist',
+    'routeBase' => 'segment',
     'langVar'   => 'lead.list'
 )));
 ?>
@@ -25,7 +25,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         'searchHelp'  => 'mautic.lead.list.help.searchcommands',
         'action'      => $currentRoute,
         'langVar'     => 'lead.list',
-        'routeBase'   => 'leadlist',
+        'routeBase'   => 'segment',
         'templateButtons' => array(
             'delete' => $permissions['lead:lists:deleteother']
         )

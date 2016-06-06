@@ -51,7 +51,7 @@ class IpLookupHelper
      * @param AbstractLookup $ipLookup
      * @param CoreParametersHelper $coreParametersHelper
      */
-    public function __construct(RequestStack $requestStack, EntityManager $em, AbstractLookup $ipLookup, CoreParametersHelper $coreParametersHelper)
+    public function __construct(RequestStack $requestStack, EntityManager $em, AbstractLookup $ipLookup = null, CoreParametersHelper $coreParametersHelper)
     {
         $this->request = $requestStack->getCurrentRequest();
         $this->em = $em;
