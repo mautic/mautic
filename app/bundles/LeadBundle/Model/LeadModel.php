@@ -897,12 +897,12 @@ class LeadModel extends FormModel
      * @param string|array $channel  If an array with an ID, use the structure ['email' => 123]
      * @param string       $comments
      * @param int          $reason
-     * @param bool         $flush
+     * @param bool         $persist
      *
      * @return boolean If a DNC entry is added or updated, returns true. If a DNC is already present
      *                 and has the specified reason, nothing is done and this returns false.
      */
-    public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $flush = true)
+    public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $persist = true)
     {
         $isContactable = $this->isContactable($lead, $channel);
         $reason = $this->determineReasonFromTag($reason);
@@ -926,10 +926,9 @@ class LeadModel extends FormModel
 
             $lead->addDoNotContactEntry($dnc);
 
-            $this->getRepository()->saveEntity($lead);
-
-            if ($flush) {
-                $this->em->flush();
+            if ($persist) {
+                // Use model saveEntity to trigger events for DNC change
+                $this->saveEntity($lead);
             }
 
             return true;
@@ -953,11 +952,9 @@ class LeadModel extends FormModel
                     // Re-add the entry to the lead
                     $lead->addDoNotContactEntry($dnc);
 
-                    // Persist
-                    $this->getRepository()->saveEntity($lead);
-
-                    if ($flush) {
-                        $this->em->flush();
+                    if ($persist) {
+                        // Use model saveEntity to trigger events for DNC change
+                        $this->saveEntity($lead);
                     }
 
                     return true;
