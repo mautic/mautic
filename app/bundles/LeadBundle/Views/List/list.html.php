@@ -25,20 +25,20 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'leadlist',
+                    'sessionVar' => 'segment',
                     'orderBy'    => 'l.name',
                     'text'       => 'mautic.core.name',
                     'class'      => 'col-leadlist-name'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'leadlist',
+                    'sessionVar' => 'segment',
                     'text'       => 'mautic.lead.list.thead.leadcount',
                     'class'      => 'visible-md visible-lg col-leadlist-leadcount'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'leadlist',
+                    'sessionVar' => 'segment',
                     'orderBy'    => 'l.id',
                     'text'       => 'mautic.core.id',
                     'class'      => 'visible-md visible-lg col-leadlist-id'
@@ -56,7 +56,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                             'templateButtons' => array(
                                 'delete'    => $security->hasEntityAccess(true, $permissions['lead:lists:deleteother'], $item->getCreatedBy()),
                             ),
-                            'routeBase' => 'leadlist',
+                            'routeBase' => 'segment',
                             'langVar'   => 'lead.list',
                             'custom'    => array(
                                 array(
@@ -111,7 +111,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                 "page"       => $page,
                 "limit"      => $limit,
                 "baseUrl"    =>  $view['router']->generate('mautic_segment_index'),
-                'sessionVar' => 'leadlist'
+                'sessionVar' => 'segment'
             )); ?>
         </div>
     </div>
