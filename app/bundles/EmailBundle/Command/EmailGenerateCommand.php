@@ -61,9 +61,9 @@ class EmailGenerateCommand extends ModeratedCommand
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $factory->getModel('email');
-        $entity = $model->getEntity($objectId);
+        $email = $model->getEntity($objectId);
 
-        if (is_null($entity) || $entity->getEmailType() == 'template') {
+        if (is_null($email) || $email->getEmailType() == 'template') {
             // return $this->accessDenied();
             return 0;
         }
@@ -72,23 +72,23 @@ class EmailGenerateCommand extends ModeratedCommand
             return 0;
         }
         // make sure email and category are published
-        $category = $entity->getCategory();
+        $category = $email->getCategory();
         $catPublished = (!empty($category)) ? $category->isPublished() : true;
-        $published = $entity->isPublished();
+        $published = $email->isPublished();
 
         if (!$catPublished || !$published) {
             return 0;
         }
-        if (!is_null($entity->getFeed()) && $entity->getFeed()
-            ->getSnapshots()
+        if ($email->hasFeed() && $email->getFeed()->hasSnapshot() &&
+            $email->getSnapshots()
             ->last()
             ->isExpired() === true) {
             return 0;
         }
 
-        $pending = $model->getPendingLeads($entity, null, true);
+        $pending = $model->getPendingLeads($email, null, true);
         $output->writeln('<info>There is ' . $pending . ' mails to generate</info>');
-        $sendStat = $model->sendEmailToLists($entity);
+        $sendStat = $model->sendEmailToLists($email);
         if ($pending > 0) {
             $output->writeln('<info>' . $sendStat[0] . ' mails sent</info>');
             $output->writeln('<info>' . $sendStat[0] . ' mails failed</info>');

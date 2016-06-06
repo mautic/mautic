@@ -50,7 +50,6 @@ class PeriodicityCommand extends ModeratedCommand
         /**@var \Mautic\CoreBundle\Entity\Periodicity $p */
 
         foreach ($periodicitys as $p) {
-
             if ($p->nextShoot() > new \DateTime()) {
                 $output->writeln('<info>' . $translator->trans('mautic.core.command.perodicity.next_exec', array('%id%' => $p->getid(), '%nextShoot%' => $p->nextShoot()->format($factory->getParameter('date_format_full')))) . '</info>');
                 continue;

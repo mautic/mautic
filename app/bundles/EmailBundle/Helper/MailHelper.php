@@ -1680,12 +1680,13 @@ class MailHelper
             $feed = $this->getEmail()->getFeed();
 
             /** @var FeedRepository $feedRepository */
-            $feedRepository = $this->factory->getEntityManager()->getRepository('Feed');
+            $feedRepository = $this->factory->getEntityManager()->getRepository('MauticFeedBundle:Feed');
             $currentFeedSnapshot = $feedRepository->latestSnapshot($this->factory, $feed);
             if (!is_null($currentFeedSnapshot)){
                 $stat->setSnapshot($currentFeedSnapshot);
             }
         }
+
         // Note if a lead
         if (null !== $this->lead) {
             $stat->setLead($this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $this->lead['id']));

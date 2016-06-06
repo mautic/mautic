@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
@@ -6,7 +7,6 @@
  * @link        http://webmecanik.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\FeedBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -18,26 +18,31 @@ class Feed
 {
 
     /**
+     *
      * @var int
      */
     private $id;
 
     /**
+     *
      * @var string
      */
     private $feedUrl;
 
     /**
+     *
      * @var int
      */
     private $itemCount;
 
     /**
+     *
      * @var Email
      */
     private $email;
 
     /**
+     *
      * @var ArrayCollection
      */
     private $snapshots;
@@ -48,14 +53,14 @@ class Feed
     }
 
     /**
+     *
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('feeds')
-        ->setCustomRepositoryClass('Mautic\FeedBundle\Entity\FeedRepository');
+        $builder->setTable('feeds')->setCustomRepositoryClass('Mautic\FeedBundle\Entity\FeedRepository');
 
         $builder->addId();
 
@@ -84,8 +89,6 @@ class Feed
      *
      * @return null|Snapshot
      */
-
-
     public function getId()
     {
         return $this->id;
@@ -129,9 +132,17 @@ class Feed
         return $this->snapshots;
     }
 
-    public function addSnapshot(Snapshot $snapshot){
+    public function addSnapshot(Snapshot $snapshot)
+    {
         $this->snapshots->add($snapshot);
         return true;
+    }
+    /**
+     *
+     * @return boolean
+     */
+    public function hasSnapshot(){
+        return sizeof($this->getSnapshots())>0;
     }
 
 
