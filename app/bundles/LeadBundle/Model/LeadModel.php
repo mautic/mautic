@@ -871,17 +871,20 @@ class LeadModel extends FormModel
      *
      * @param Lead $lead
      * @param string $channel
+     * @param bool|true $persist
      *
      * @return boolean
      */
-    public function removeDncForLead(Lead $lead, $channel)
+    public function removeDncForLead(Lead $lead, $channel, $persist = true)
     {
         /** @var DoNotContact $dnc */
         foreach ($lead->getDoNotContact() as $dnc) {
             if ($dnc->getChannel() === $channel) {
                 $lead->removeDoNotContactEntry($dnc);
 
-                $this->getRepository()->saveEntity($lead);
+                if ($persist) {
+                    $this->saveEntity($lead);
+                }
 
                 return true;
             }
