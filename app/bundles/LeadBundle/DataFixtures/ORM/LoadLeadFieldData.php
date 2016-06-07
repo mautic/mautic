@@ -67,7 +67,8 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
             'linkedin',
             'skype',
             'instagram',
-            'foursquare'
+            'foursquare',
+            'attribution'
         );
 
         $leadsSchema = $this->container->get('mautic.factory')->getSchemaHelper('column', 'leads');
@@ -93,63 +94,93 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
             }
 
             if ($name == 'title') {
-                $entity->setProperties(array("list" =>"|Mr|Mrs|Miss"));
+                $entity->setProperties(array("list" => "|Mr|Mrs|Miss"));
             }
             $entity->setType($type);
-            $fixed = in_array($name, array(
-                'title',
-                'firstname',
-                'lastname',
-                'position',
-                'company',
-                'email',
-                'phone',
-                'mobile',
-                'address1',
-                'address2',
-                'country',
-                'city',
-                'state',
-                'zipcode'
-            )) ? true : false;
+            $fixed = in_array(
+                $name,
+                array(
+                    'attribution',
+                    'title',
+                    'firstname',
+                    'lastname',
+                    'position',
+                    'company',
+                    'email',
+                    'phone',
+                    'mobile',
+                    'address1',
+                    'address2',
+                    'country',
+                    'city',
+                    'state',
+                    'zipcode'
+                )
+            ) ? true : false;
             $entity->setIsFixed($fixed);
-            $entity->setOrder(($key+1));
+            $entity->setOrder(($key + 1));
             $entity->setAlias($name);
-            $listable    = in_array($name, array(
-                'address1',
-                'address2',
-                'fax',
-                'phone',
-                'twitter',
-                'facebook',
-                'googleplus',
-                'linkedin',
-                'skype',
-                'foursquare',
-                'instagram',
-                'mobile',
-                'website'
-            )) ? false : true;
+            $listable = in_array(
+                $name,
+                array(
+                    'attribution',
+                    'address1',
+                    'address2',
+                    'fax',
+                    'phone',
+                    'twitter',
+                    'facebook',
+                    'googleplus',
+                    'linkedin',
+                    'skype',
+                    'foursquare',
+                    'instagram',
+                    'mobile',
+                    'website',
+                )
+            ) ? false : true;
             $entity->setIsListable($listable);
 
-            $shortVisible = in_array($name, array('firstname', 'lastname', 'email')) ? true : false;
+            $shortVisible = in_array(
+                $name,
+                array(
+                    'firstname',
+                    'lastname',
+                    'email'
+                )
+            ) ? true : false;
             $entity->setIsShortVisible($shortVisible);
 
 
-            $group = (in_array($name, array('twitter', 'facebook', 'googleplus','linkedin', 'skype', 'instagram', 'foursquare'))) ? 'social' : 'core';
+            $group = (
+                in_array(
+                    $name,
+                    array(
+                        'twitter',
+                        'facebook',
+                        'googleplus',
+                        'linkedin',
+                        'skype',
+                        'instagram',
+                        'foursquare'
+                    )
+                )
+            ) ? 'social' : 'core';
             $entity->setGroup($group);
 
             $manager->persist($entity);
             $manager->flush();
 
             //add the column to the leads table
-            $leadsSchema->addColumn(array(
-                'name' => $name,
-                'type' => 'text',
-                'options' => array(
-                    'notnull' => false
+            $leadsSchema->addColumn(
+                array(
+                    'name'    => $name,
+                    'type'    => 'text',
+                    'options' => array(
+                        'notnull' => false
+                    )
                 )
-            ));
+            );
 
             $this->addReference('leadfield-'.$name, $entity);
         }
