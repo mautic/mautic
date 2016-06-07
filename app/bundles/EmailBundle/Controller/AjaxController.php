@@ -158,8 +158,6 @@ class AjaxController extends CommonAjaxController
      */
     protected function generatePlaintTextAction(Request $request)
     {
-        $dataArray = array();
-        $mode      = $request->request->get('mode');
         $custom    = $request->request->get('custom');
         $id        = $request->request->get('id');
 
@@ -169,28 +167,12 @@ class AjaxController extends CommonAjaxController
             )
         );
 
-        if ($mode == 'custom') {
-            // Convert placeholders into raw tokens
-            BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($custom);
+        // Convert placeholders into raw tokens
+        BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($custom);
 
-            $dataArray['text'] = $parser->setHtml($custom)->getText();
-        } else {
-            $session     = $this->factory->getSession();
-            $contentName = 'mautic.emailbuilder.'.$id.'.content';
-
-            $content = $session->get($contentName, array());
-            if (strpos($id, 'new') === false) {
-                $entity          = $this->factory->getModel('email')->getEntity($id);
-                $existingContent = $entity->getContent();
-                $content         = array_merge($existingContent, $content);
-            }
-
-            // Convert placeholders into raw tokens
-            BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($content);
-
-            $content           = implode("<br /><br />", $content);
-            $dataArray['text'] = $parser->setHtml($content)->getText();
-        }
+        $dataArray = array(
+            'text' => $parser->setHtml($custom)->getText()
+        );
 
         return $this->sendJsonResponse($dataArray);
     }

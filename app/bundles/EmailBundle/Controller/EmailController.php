@@ -690,16 +690,15 @@ class EmailController extends FormController
                     //     $viewContent = $entity->getCustomHtml();
                     // }
 
-                    // // Copy model content then parse from visual to tokens
-                    // $modelContent = $viewContent;
-                    // BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($modelContent);
+                    $content = $entity->getCustomHtml();
+                    BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($content);
 
                     // if (!empty($template)) {
                     //     $entity->setContent($modelContent);
                     // } else {
-                        $entity->setCustomHtml($entity->getCustomHtml());
+                        $entity->setCustomHtml($content);
                     // }
-
+                        
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 

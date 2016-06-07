@@ -325,21 +325,14 @@ Mautic.sendEmailBatch = function () {
 Mautic.autoGeneratePlaintext = function() {
     mQuery('.plaintext-spinner').removeClass('hide');
 
-    var mode = (mQuery('#emailform_template').val() == '') ? 'custom' : 'template';
-    var custom = mQuery('#emailform_customHtml').val();
-    var id = mQuery('#emailform_sessionId').val();
-
-    var data = {
-        mode: mode,
-        id: id,
-        custom: custom
-    };
-
     Mautic.ajaxActionRequest(
         'email:generatePlaintText',
-        data,
+        {
+            id: mQuery('#emailform_sessionId').val(),
+            custom: mQuery('#emailform_customHtml').val()
+        },
         function (response) {
-            // CKEDITOR.instances['emailform_plainText'].insertText(response.text);
+            mQuery('#emailform_plainText').val(response.text);
             mQuery('.plaintext-spinner').addClass('hide');
         }
     );
