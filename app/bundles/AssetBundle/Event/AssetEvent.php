@@ -23,10 +23,10 @@ class AssetEvent extends CommonEvent
      * @param Asset $asset
      * @param bool  $isNew
      */
-    public function __construct(Asset &$asset, $isNew = false)
+    public function __construct(Asset $asset, $isNew = false)
     {
-        $this->entity  =& $asset;
-        $this->isNew = $isNew;
+        $this->entity = $asset;
+        $this->isNew  = $isNew;
     }
 
     /**

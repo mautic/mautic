@@ -11,8 +11,7 @@ namespace Mautic\AssetBundle\Model;
 
 use Doctrine\ORM\PersistentCollection;
 use Mautic\AssetBundle\Event\AssetEvent;
-use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\AssetBundle\Event\AssetLoadEvent;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\Download;
@@ -190,6 +189,12 @@ class AssetModel extends FormModel
         $download->setCode($code);
         $download->setIpAddress($ipAddress);
         $download->setReferer($request->server->get('HTTP_REFERER'));
+
+        // Dispatch event
+        if ($this->dispatcher->hasListeners(AssetEvents::ASSET_ON_LOAD)) {
+            $event = new AssetLoadEvent($download);
+            $this->dispatcher->dispatch(AssetEvents::ASSET_ON_LOAD, $event);
+        }
 
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
@@ -464,7 +469,7 @@ class AssetModel extends FormModel
         $chart->setDataset($this->factory->getTranslator()->trans('mautic.asset.downloadcount'), $data);
         return $chart->render();
     }
-    
+
     /**
      * Get pie chart data of unique vs repetitive downloads.
      * Repetitive in this case mean if a lead downloaded any of the assets more than once
