@@ -82,32 +82,7 @@ Mautic.emailOnLoad = function (container, response) {
 
         window.close();
     } else if (mQuery('#emailform_plainText').length) {
-        // Activate the plain text editor to support token inserts
-
-        // Get the plain text first
-        var plainText = mQuery('#emailform_plainText').val();
-
-        // Now empty it so that ckeditor doesn't load it as html
-        mQuery('#emailform_plainText').val('');
-
-        // var events = Mautic.getGlobalEditorEvents();
-        // events.instanceReady = function( event ) {
-        //     event.editor.insertText(plainText);
-        // };
-
-        // mQuery('#emailform_plainText').ckeditor({
-        //     removePlugins: 'elementspath,toolbar',
-        //     extraPlugins: 'tokens',
-        //     autoParagraph: false,
-        //     height: "235px",
-        //     on: events
-        // });
-
-        if (mQuery('#emailform_emailType').val() == '') {
-            mQuery('body').addClass('noscroll');
-        }
-
-        Mautic.toggleBuilderButton(mQuery('#emailform_template').val() == '');
+        // @todo initiate the token dropdown
     } else if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'email');
     } else {
