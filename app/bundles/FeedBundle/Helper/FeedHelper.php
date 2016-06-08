@@ -71,6 +71,8 @@ class FeedHelper
     }
 
     /**
+     * Populates an array with the feed's content
+     *
      * @param FeedInterface $feed
      *
      * @return array
@@ -78,15 +80,17 @@ class FeedHelper
     public function getFeedFields(FeedInterface $feed)
     {
         return array(
-            'title' => $feed->getTitle(),
-            'description' => $feed->getDescription(),
-            'link' => $feed->getLink(),
-            'date' => $feed->getLastModified()->format('Y-m-d H:i:s'),
-            'items' => $this->getItemFields($feed->getItems())
+            'feedtitle' => $feed->getTitle(),
+            'feeddescription' => $feed->getDescription(),
+            'feedlink' => $feed->getLink(),
+            'feeddate' => $feed->getLastModified()->format('Y-m-d H:i:s'),
+            '*items' => $this->getItemFields($feed->getItems())
         );
     }
 
     /**
+     * Populates an array with the items' contents
+     *
      * @param ItemOutInterface[] $items
      *
      * @return array
@@ -95,18 +99,20 @@ class FeedHelper
         $itemFields = array();
         foreach ($items as $item) {
             $itemFields[] = array(
-                'title' => $item->getTitle(),
-                'description' => $item->getDescription(),
-                'author' => $item->getAuthor(),
-                'summary' => $item->getSummary(),
-                'link' => $item->getLink(),
-                'date' => $item->getUpdated()->format('Y-m-d H:i:s')
+                'itemtitle' => $item->getTitle(),
+                'itemdescription' => $item->getDescription(),
+                'itemauthor' => $item->getAuthor(),
+                'itemsummary' => $item->getSummary(),
+                'itemlink' => $item->getLink(),
+                'itemdate' => $item->getUpdated()->format('Y-m-d H:i:s')
             );
         }
         return $itemFields;
     }
 
     /**
+     * Unfolds the feed loop
+     *
      * @param array  $feed
      * @param string $content
      */
@@ -114,14 +120,14 @@ class FeedHelper
         // Get the string to replicate
         $matches = array();
         $unfoldedContent = '';
-        $hasMatched = preg_match_all('/\{feeditems#start\}(.*)\{feeditems#end\}/s', $content, $matches);
+        $hasMatched = preg_match_all('/\{feed=loopstart\}(.*)\{feed=loopend\}/s', $content, $matches);
 
         if ($hasMatched) {
             $inner = $matches[1][0];
             // Create the replicas
-            $count = count($feed['items']);
+            $count = count($feed['*items']);
             for ($i = 0; $i < $count; ++$i) {
-                $unfoldedContent .= preg_replace('/\{itemfield=(\w+)\}/s', '{itemfield=$1#'.$i.'}', $inner);
+                $unfoldedContent .= preg_replace('/\{feedfield=item(\w+)\}/s', '{feedfield=item$1#'.$i.'}', $inner);
             }
         }
 
@@ -129,6 +135,13 @@ class FeedHelper
         return str_replace($matches[0], $unfoldedContent, $content);
     }
 
+    /**
+     * Turns the bidimentional array of item fields into a numbered
+     * unidimentional array
+     *
+     * @param array $items
+     * @return array
+     */
     public function flattenItems($items) {
         $flatItems = array();
         foreach ($items as $index => $item) {
@@ -137,6 +150,19 @@ class FeedHelper
             }
         }
         return $flatItems;
+    }
+
+    /**
+     * Extracts the inner items array's contents into the same array as the
+     * feed fields
+     *
+     * @param array $feed
+     * @return array
+     */
+    public function flattenFeed($feed) {
+        $flatFeed = array_merge($feed, $this->flattenItems($feed['*items']));
+        unset($flatFeed['*items']);
+        return $flatFeed;
     }
 
     public function setFactory(Factory $factory)

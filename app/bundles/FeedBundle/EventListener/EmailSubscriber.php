@@ -36,10 +36,8 @@ class EmailSubscriber extends CommonSubscriber
     protected $feedHelper;
 
     private static $feedFieldPrefix = 'feedfield';
-    private static $itemFieldPrefix = 'itemfield';
-    private static $feedFieldRegex  = '{feedfield=(.*?)}';
-    private static $feeditemsRegex  = '{feeditems#(start|end)}';
-    private static $itemFieldRegex  = '{itemfield=(.*?)}';
+    private static $feedFieldRegex = '{feedfield=(.*?)}';
+    private static $feeditemsRegex = '{feed=(loopstart|loopend)}';
 
     /**
      * @return array
@@ -47,7 +45,7 @@ class EmailSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            EmailEvents::EMAIL_ON_BUILD => array('onEmailBuild', 0),
+            EmailEvents::EMAIL_ON_BUILD   => array('onEmailBuild', 0),
             EmailEvents::EMAIL_ON_SEND    => array('onEmailGenerate', 0),
             EmailEvents::EMAIL_ON_DISPLAY => array('onEmailDisplay', 0)
         );
@@ -60,26 +58,22 @@ class EmailSubscriber extends CommonSubscriber
     {
         if ($event->tokensRequested(self::$feedFieldRegex)) {
             $event->addTokens(array(
-                '{feedfield=title}' => 'Feed Title',
-                '{feedfield=description}' => 'Feed Description',
-                '{feedfield=link}' => 'Feed Link',
-                '{feedfield=date}' => 'Feed Date'
+                '{feedfield=feedtitle}' => 'Feed Title',
+                '{feedfield=feeddescription}' => 'Feed Description',
+                '{feedfield=feedlink}' => 'Feed Link',
+                '{feedfield=feeddate}' => 'Feed Date',
+                '{feedfield=itemtitle}' => 'Item Title',
+                '{feedfield=itemdescription}' => 'Item Description',
+                '{feedfield=itemauthor}' => 'Item Author',
+                '{feedfield=itemsummary}' => 'Item Summary',
+                '{feedfield=itemlink}' => 'Item Link',
+                '{feedfield=itemdate}' => 'Item Date'
             ));
         }
         if ($event->tokensRequested(self::$feeditemsRegex)) {
             $event->addTokens(array(
-                '{feeditems#start}' => 'Start looping through the items',
-                '{feeditems#end}' => 'Stop looping through the items'
-            ));
-        }
-        if ($event->tokensRequested(self::$itemFieldRegex)) {
-            $event->addTokens(array(
-                '{itemfield=title}' => 'Item Title',
-                '{itemfield=description}' => 'Item Description',
-                '{itemfield=author}' => 'Item Author',
-                '{itemfield=summary}' => 'Item Summary',
-                '{itemfield=link}' => 'Item Link',
-                '{itemfield=date}' => 'Item Date'
+                '{feed=loopstart}' => 'Start looping through the items',
+                '{feed=loopend}' => 'Stop looping through the items'
             ));
         }
     }
@@ -104,13 +98,9 @@ class EmailSubscriber extends CommonSubscriber
 
             $content = $event->getContent();
 
-            $fieldTokenList = $this->tokenHelper->findTokens(self::$feedFieldPrefix, $content, $feed);
+            $flatFeed = $this->feedHelper->flattenFeed($feed);
 
-            $items = $this->feedHelper->flattenItems($feed['items']);
-
-            $itemTokenList = $this->tokenHelper->findTokens(self::$itemFieldPrefix, $content, $items);
-
-            $tokenList = array_merge($fieldTokenList, $itemTokenList);
+            $tokenList = $this->tokenHelper->findTokens(self::$feedFieldPrefix, $content, $flatFeed);
 
             if (count($tokenList)) {
                 $event->addTokens($tokenList);
@@ -138,7 +128,5 @@ class EmailSubscriber extends CommonSubscriber
         $this->tokenHelper = $tokenHelper;
         return $this;
     }
-
-
 
 }
