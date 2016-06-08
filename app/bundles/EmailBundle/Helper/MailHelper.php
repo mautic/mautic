@@ -1675,7 +1675,7 @@ class MailHelper
         $stat->setEmail($this->email);
 
         //check if current email use feed
-        if ($this->getEmail()->hasFeed()) {
+        if (!is_null($this->getEmail()) && $this->getEmail()->hasFeed()) {
 
             $feed = $this->getEmail()->getFeed();
 

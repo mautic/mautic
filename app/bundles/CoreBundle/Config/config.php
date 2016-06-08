@@ -322,7 +322,7 @@ return [
                 'alias' => 'security',
             ],
             'mautic.helper.token' => [
-                'class'     => 'Mautic\CoreBundle\Token\TokenHelper',
+                'class'     => 'Mautic\CoreBundle\Token\DeprecatedTokenHelper',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'token_helper'
             ],

@@ -12,9 +12,9 @@ namespace Mautic\CoreBundle\Token;
 use Mautic\CoreBundle\Factory\MauticFactory;
 
 /**
- * Class TokenHelper
+ * Class DeprecatedTokenHelper
  */
-class TokenHelper
+class DeprecatedTokenHelper
 {
 
     /**

@@ -10,7 +10,7 @@
 namespace Mautic\FeedBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Token\TokenHelper;
+use Mautic\CoreBundle\Token\DeprecatedTokenHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -26,7 +26,7 @@ class EmailSubscriber extends CommonSubscriber
 {
 
     /**
-     * @var TokenHelper
+     * @var DeprecatedTokenHelper
      */
     protected $tokenHelper;
 
@@ -121,9 +121,9 @@ class EmailSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param TokenHelper $tokenHelper
+     * @param DeprecatedTokenHelper $tokenHelper
      */
-    public function setTokenHelper(TokenHelper $tokenHelper)
+    public function setTokenHelper(DeprecatedTokenHelper $tokenHelper)
     {
         $this->tokenHelper = $tokenHelper;
         return $this;
