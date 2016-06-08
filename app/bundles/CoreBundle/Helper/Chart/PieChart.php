@@ -27,7 +27,7 @@ class PieChart extends AbstractChart implements ChartInterface
     /**
      * Render chart data
      */
-    public function render($withoutCounts = false)
+    public function render($withCounts = true)
     {
         $data = array('data' => array(), 'backgroundColor' => array(), 'hoverBackgroundColor' => array());
 
@@ -36,7 +36,7 @@ class PieChart extends AbstractChart implements ChartInterface
             $data['data'][] = $value;
             $data['backgroundColor'][] = $color->toRgba(0.8);
             $data['hoverBackgroundColor'][] = $color->toRgba(0.9);
-            if (!$withoutCounts) {
+            if ($withCounts) {
                 $this->labels[$datasetId] = $this->buildFullLabel($this->labels[$datasetId], $value);
             }
         }
