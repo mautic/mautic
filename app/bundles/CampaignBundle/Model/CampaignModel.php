@@ -1134,10 +1134,10 @@ class CampaignModel extends CommonFormModel
     {
         $events = array();
         $chart  = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query  = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $query  = $chart->getChartQuery($this->em->getConnection());
         
         $contacts = $query->fetchTimeData('campaign_leads', 'date_added', $filter);
-        $chart->setDataset($this->factory->getTranslator()->trans('mautic.campaign.campaign.leads'), $contacts);
+        $chart->setDataset($this->translator->trans('mautic.campaign.campaign.leads'), $contacts);
 
         if (isset($filter['campaign_id'])) {
             $rawEvents = $this->getEventRepository()->getCampaignEvents($filter['campaign_id']);
@@ -1160,7 +1160,7 @@ class CampaignModel extends CommonFormModel
                     $rawData = $q->execute()->fetchAll();
                     if (!empty($rawData)) {
                         $triggers = $query->completeTimeData($rawData);
-                        $chart->setDataset($this->factory->getTranslator()->trans('mautic.campaign.'.$type), $triggers);
+                        $chart->setDataset($this->translator->trans('mautic.campaign.'.$type), $triggers);
                     }
                 }
                 unset($filter['event_id']);

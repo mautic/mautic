@@ -1022,7 +1022,7 @@ class PageModel extends FormModel
     {
         $timesOnSite = $this->getHitRepository()->getDwellTimeLabels();
         $chart       = new PieChart();
-        $query       = new ChartQuery($this->factory->getEntityManager()->getConnection(), $dateFrom, $dateTo);
+        $query       = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         foreach ($timesOnSite as $time) {
             $q = $query->getCountDateDiffQuery('page_hits', 'date_hit', 'date_left', $time['from'], $time['till'], $filters);

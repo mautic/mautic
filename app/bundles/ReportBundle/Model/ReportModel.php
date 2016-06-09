@@ -489,7 +489,7 @@ class ReportModel extends FormModel
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $options['dateFrom'], $options['dateTo']);
         $options['chartQuery'] = $chartQuery;
-        $options['translator'] = $this->factory->getTranslator();
+        $options['translator'] = $this->translator;
 
         $contentTemplate = $reportGenerator->getContentTemplate();
 
