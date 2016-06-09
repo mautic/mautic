@@ -94,7 +94,7 @@ class MessageHelper
         }
 
         $this->logger->debug("Analyzing message to {$message->toString}");
-
+        // If message from Amazon SNS collect bounces and complaints
         if ($message->fromAddress=='no-reply@sns.amazonaws.com') {        
             $message = json_decode(strtok($message->textPlain, "\n"), true);        
             if ($message['notificationType']=='Bounce') {
@@ -122,6 +122,7 @@ class MessageHelper
         
 
         if ($allowBounce) {
+            // If message from Amazon SNS fill details and don't process further
             if (isset($amazonEmail)){
             $messageDetails['email']=$amazonEmail;
             $messageDetails['rule_cat'] = 'unknown';
@@ -161,14 +162,6 @@ class MessageHelper
                     $isUnsubscribe = false;
                 }
             }    
-        }
-
-            if (!$isBounce && !empty($messageDetails['email'])) {
-                // Bounce was found in message content
-                $isBounce      = true;
-                $isUnsubscribe = false;
-            }
-			}
         }
 
         if (!$isBounce && !$isUnsubscribe) {
