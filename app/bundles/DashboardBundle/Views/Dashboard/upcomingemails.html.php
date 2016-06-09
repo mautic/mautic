@@ -25,7 +25,7 @@
                         <span class="text-white dark-sm"><?php echo $email['event_name']; ?></span>
                     </div>
                     <div class="col-md-4 va-m text-right">
-                        <a class="btn btn-sm btn-success"  href="<?php echo $view['router']->generate('mautic_lead_action', array('objectAction' => 'view', 'objectId' => $email['lead_id'])); ?>" data-toggle="ajax">
+                        <a class="btn btn-sm btn-success"  href="<?php echo $view['router']->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $email['lead_id'])); ?>" data-toggle="ajax">
                             <span class="fa <?php echo isset($icons['lead']) ? $icons['lead'] : ''; ?>"></span>
                             <?php echo $email['lead_name']; ?>
                         </a>

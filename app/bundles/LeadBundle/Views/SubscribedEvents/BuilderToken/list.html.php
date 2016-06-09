@@ -29,7 +29,7 @@ if ($tmpl == 'index') {
         "page"              => $page,
         "limit"             => $limit,
         "fixedLimit"        => true,
-        "baseUrl"           => $view['router']->generate('mautic_lead_emailtoken_index'),
+        "baseUrl"           => $view['router']->generate('mautic_contact_emailtoken_index'),
         "paginationWrapper" => 'text-center',
         "paginationClass"   => "sm",
         'sessionVar'        => 'lead.emailtoken',

@@ -45,7 +45,7 @@ class ConfigController extends FormController
         $this->mergeParamsWithLocal($formConfigs, $doNotChange);
 
         /* @type \Mautic\ConfigBundle\Model\ConfigModel $model */
-        $model = $this->factory->getModel('config');
+        $model = $this->getModel('config');
 
         // Create the form
         $action = $this->generateUrl('mautic_config_action', array('objectAction' => 'edit'));
@@ -55,7 +55,7 @@ class ConfigController extends FormController
             'doNotChangeDisplayMode' => $doNotChangeDisplayMode
         ));
 
-        /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
+        /** @var \Mautic\CoreBundle\Configurator\Configurator $configurator */
         $configurator = $this->get('mautic.configurator');
         $isWritabale  = $configurator->isFileWritable();
 

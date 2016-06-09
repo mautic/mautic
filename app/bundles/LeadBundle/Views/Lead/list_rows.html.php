@@ -24,7 +24,7 @@
                         //this lead was manually added to a list so give an option to remove them
                         $custom[] = array(
                             'attr' => array(
-                                'href' => $view['router']->generate('mautic_leadlist_action', array(
+                                'href' => $view['router']->generate('mautic_segment_action', array(
                                     "objectAction" => "removeLead",
                                     "objectId" => $currentList['id'],
                                     "leadId"   => $item->getId()
@@ -43,7 +43,7 @@
                                 'data-toggle' => 'ajaxmodal',
                                 'data-target' => '#MauticSharedModal',
                                 'data-header' => $view['translator']->trans('mautic.lead.email.send_email.header', array('%email%' => $fields['core']['email']['value'])),
-                                'href'        => $view['router']->generate('mautic_lead_action', array('objectId' => $item->getId(), 'objectAction' => 'email', 'list' => 1))
+                                'href'        => $view['router']->generate('mautic_contact_action', array('objectId' => $item->getId(), 'objectAction' => 'email', 'list' => 1))
                             ),
                             'btnText'   => 'mautic.lead.email.send_email',
                             'iconClass'    => 'fa fa-send'
@@ -56,14 +56,14 @@
                             'edit'      => $hasEditAccess,
                             'delete'    => $security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $item->getOwner()),
                         ),
-                        'routeBase' => 'lead',
+                        'routeBase' => 'contact',
                         'langVar'   => 'lead.lead',
                         'customButtons' => $custom
                     ));
                     ?>
                 </td>
                 <td>
-                    <a href="<?php echo $view['router']->generate('mautic_lead_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
+                    <a href="<?php echo $view['router']->generate('mautic_contact_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
                         <?php if (in_array($item->getId(), $noContactList)) : ?>
                             <div class="pull-right label label-danger"><i class="fa fa-ban"> </i></div>
                         <?php endif; ?>

@@ -11,12 +11,13 @@ namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
-use Symfony\Component\Templating\Helper\CoreAssetsHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Symfony\Component\Asset\Packages;
 
 /**
  * Class AssetsHelper
  */
-class AssetsHelper extends CoreAssetsHelper
+class AssetsHelper
 {
 
     /**
@@ -38,6 +39,28 @@ class AssetsHelper extends CoreAssetsHelper
      * @var
      */
     protected $version;
+
+    protected $packages;
+
+    protected $coreParametersHelper;
+
+    public function __construct(Packages $packages)
+    {
+        $this->packages = $packages;
+    }
+
+    public function setCharset()
+    {
+
+    }
+
+    /**
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function setParamsHelper(CoreParametersHelper $coreParametersHelper)
+    {
+        $this->coreParametersHelper = $coreParametersHelper;
+    }
 
     /**
      * Gets asset prefix
@@ -94,7 +117,7 @@ class AssetsHelper extends CoreAssetsHelper
             $path        = $assetPrefix.$path;
         }
 
-        $url = parent::getUrl($path, $packageName, $version);
+        $url = $this->packages->getUrl($path, $packageName, $version);
 
         if ($absolute) {
             $url = $this->getBaseUrl() . $url;

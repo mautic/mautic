@@ -9,8 +9,11 @@
 
 namespace Mautic\PointBundle\Model;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\LeadTriggerLog;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
@@ -24,6 +27,41 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class TriggerModel extends CommonFormModel
 {
+    /**
+     * @deprecated Remove in 2.0
+     *
+     * @var MauticFactory
+     */
+    protected $factory;
+
+    /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
+
+    /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * @var TriggerEventModel
+     */
+    protected $pointTriggerEventModel;
+
+    /**
+     * EventModel constructor.
+     *
+     * @param IpLookupHelper $ipLookupHelper
+     * @param LeadModel $leadModel
+     * @param TriggerEventModel $pointTriggerEventModel
+     */
+    public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, TriggerEventModel $pointTriggerEventModel)
+    {
+        $this->ipLookupHelper = $ipLookupHelper;
+        $this->leadModel = $leadModel;
+        $this->pointTriggerEventModel = $pointTriggerEventModel;
+    }
 
     /**
      * {@inheritdoc}
@@ -84,15 +122,14 @@ class TriggerModel extends CommonFormModel
             $events    = $entity->getEvents();
             $repo      = $this->getEventRepository();
             $persist   = array();
-            $ipAddress = $this->factory->getIpAddress();
+            $ipAddress = $this->ipLookupHelper->getIpAddress();
 
             foreach ($events as $event) {
-                $dateTime  = $this->factory->getDate($entity->getDateAdded());
                 $filter = array('force' => array(
                     array(
                         'column' => 'l.date_added',
                         'expr'   => 'lte',
-                        'value'  => $dateTime->toUtcString()
+                        'value'  => (new DateTimeHelper($entity->getDateAdded()))->toUtcString()
                     ),
                     array(
                         'column' => 'l.points',
@@ -114,9 +151,7 @@ class TriggerModel extends CommonFormModel
                 }
 
                 //get a list of leads that are before the trigger's date_added and trigger if not already done so
-                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-                $leadModel = $this->factory->getModel('lead');
-                $leads     = $leadModel->getEntities(array(
+                $leads     = $this->leadModel->getEntities(array(
                     'filter' => $filter
                 ));
 
@@ -225,9 +260,7 @@ class TriggerModel extends CommonFormModel
 
         // Persist if editing the trigger
         if ($entity->getId()) {
-            /** @var \Mautic\PointBundle\Model\TriggerEventModel $eventModel */
-            $eventModel = $this->factory->getModel('point.triggerEvent');
-            $eventModel->saveEntities($entity->getEvents());
+            $this->pointTriggerEventModel->saveEntities($entity->getEvents());
         }
     }
 
@@ -282,8 +315,7 @@ class TriggerModel extends CommonFormModel
         }
 
         if ($lead == null) {
-            $leadModel = $this->factory->getModel('lead');
-            $lead      = $leadModel->getCurrentLead();
+            $lead      = $this->leadModel->getCurrentLead();
         }
 
         if (!$force) {
@@ -308,7 +340,7 @@ class TriggerModel extends CommonFormModel
         $args     = array(
             'event'    => $event,
             'lead'     => $lead,
-            'factory'  => $this->factory,
+            'factory'  => $this->factory, // WHAT??
             'config'   => $event['properties']
         );
 
@@ -354,7 +386,7 @@ class TriggerModel extends CommonFormModel
         if (!empty($events)) {
             //get a list of actions that has already been applied to this lead
             $appliedEvents = $repo->getLeadTriggeredEvents($lead->getId());
-            $ipAddress     = $this->factory->getIpAddress();
+            $ipAddress     = $this->ipLookupHelper->getIpAddress();
             $persist       = array();
             foreach ($events as $event) {
                 if (isset($appliedEvents[$event['id']])) {
