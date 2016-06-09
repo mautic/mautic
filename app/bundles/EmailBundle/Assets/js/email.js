@@ -158,16 +158,24 @@ Mautic.autoGeneratePlaintext = function() {
 };
 
 Mautic.selectEmailType = function(emailType) {
-    if (emailType == 'list') {
+    if (emailType === 'list') {
         mQuery('#leadList').removeClass('hide');
         mQuery('#segmentTranslationParent').removeClass('hide');
         mQuery('#templateTranslationParent').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newListEmail);
-    } else {
+        mQuery('#feedInputs').addClass('hide');
+    } else if (emailType === 'template') {
         mQuery('#segmentTranslationParent').addClass('hide');
         mQuery('#templateTranslationParent').removeClass('hide');
+        mQuery('#publishStatus').removeClass('hide');
         mQuery('#leadList').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newTemplateEmail);
+        mQuery('#feedInputs').addClass('hide');
+    } else if (emailType === 'feed') {
+        mQuery('#segmentTranslationParent').removeClass('hide');
+        mQuery('#templateTranslationParent').addClass('hide');
+        mQuery('#leadList').removeClass('hide');
+        mQuery('.page-header h3').text(mauticLang.newRssEmail);
     }
 
     mQuery('#emailform_emailType').val(emailType);

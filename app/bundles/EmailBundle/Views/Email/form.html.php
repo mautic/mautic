@@ -181,7 +181,7 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
                 <?php echo $view['form']->row($form['publishUp']); ?>
                 <?php echo $view['form']->row($form['publishDown']); ?>
             <?php else: ?>
-            <div id="leadList"<?php echo ($emailType == 'template') ? ' class="hide"' : ''; ?>>
+            <div id="leadList"<?php echo ($emailType === 'list' || $emailType === 'feed' || is_null($emailType)) ? '' : ' class="hide"'; ?>>
                 <?php echo $view['form']->row($form['lists']); ?>
             </div>
             <?php echo $view['form']->row($form['category']); ?>
@@ -195,6 +195,7 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
             <?php endif; ?>
 
             <?php if (!$isVariant): ?>
+            <div id="publishStatus"<?php echo ($emailType === 'template' || $emailType === 'feed' || is_null($emailType)) ? '' : ' class="hide"'; ?>>
                 <?php echo $view['form']->row($form['isPublished']); ?>
                 <?php echo $view['form']->row($form['publishUp']); ?>
                 <?php echo $view['form']->row($form['publishDown']); ?>
@@ -203,34 +204,35 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
             <?php echo $view['form']->row($form['unsubscribeForm']); ?>
 
             <!-- For feed -->
-            <hr/>
-            <?php echo $view['form']->row($form['feed']); ?>
+            <div id="feedInputs"<?php echo ($emailType === 'feed' || is_null($emailType)) ? '' : ' class="hide"'; ?>>
+                <hr/>
+                <?php echo $view['form']->row($form['feed']); ?>
+                <?php echo $view['form']->row($form['nextShoot']); ?>
 
-            <?php echo $view['form']->row($form['nextShoot']); ?>
-
-            <style>
-                #recurency_days_of_week:checked + label + br + div.row,
-                #recurency_days_of_week:checked + label + br + div.row + div.row{
-                    display: none;
-                }
-                #recurency_days_of_week:not(:checked) + label + br + div.row + div.row + div.row{
-                    display: none;
-                }
-                #recurency_days_of_week + label + br + div.row{          width: 50%;}
-                #recurency_days_of_week + label + br + div.row + div.row{width: 50%;}
-                #recurency_days_of_week + label + br + div.row,
-                #recurency_days_of_week + label + br + div.row + div.row{
-                    float: left;
-                }
-            </style>
-            <label>Recurency :</label>
-            <br/><input type="radio" value="interval" name="recurency" id="recurency_interval"<?php if(!empty($form['interval']->vars['value'])){?> checked="checked"<?php } ?>/>
-            <label for="recurency_interval">Interval</label>
-            <br/><input type="radio" value="days_of_week" name="recurency" id="recurency_days_of_week"<?php if(empty($form['interval']->vars['value'])){?> checked="checked"<?php } ?>/>
-            <label for="recurency_days_of_week">Days of week</label>
-            <br/><?php echo $view['form']->row($form['interval']); ?>
-            <?php echo $view['form']->row($form['intervalUnit']); ?>
-            <?php echo $view['form']->row($form['DaysOfWeek']); ?>
+                <style>
+                    #recurency_days_of_week:checked + label + br + div.row,
+                    #recurency_days_of_week:checked + label + br + div.row + div.row{
+                        display: none;
+                    }
+                    #recurency_days_of_week:not(:checked) + label + br + div.row + div.row + div.row{
+                        display: none;
+                    }
+                    #recurency_days_of_week + label + br + div.row{          width: 50%;}
+                    #recurency_days_of_week + label + br + div.row + div.row{width: 50%;}
+                    #recurency_days_of_week + label + br + div.row,
+                    #recurency_days_of_week + label + br + div.row + div.row{
+                        float: left;
+                    }
+                </style>
+                <label>Recurency :</label>
+                <br/><input type="radio" value="interval" name="recurency" id="recurency_interval"<?php if(!empty($form['interval']->vars['value'])){?> checked="checked"<?php } ?>/>
+                <label for="recurency_interval">Interval</label>
+                <br/><input type="radio" value="days_of_week" name="recurency" id="recurency_days_of_week"<?php if(empty($form['interval']->vars['value'])){?> checked="checked"<?php } ?>/>
+                <label for="recurency_days_of_week">Days of week</label>
+                <br/><?php echo $view['form']->row($form['interval']); ?>
+                <?php echo $view['form']->row($form['intervalUnit']); ?>
+                <?php echo $view['form']->row($form['DaysOfWeek']); ?>
+            </div>
         </div>
         <div class="hide">
             <?php echo $view['form']->rest($form); ?>
@@ -288,16 +290,20 @@ if (empty($type) || !empty($forceTypeSelection)):
                 'newListEmail'     => 'mautic.email.type.list.header',
                 'newTemplateEmail' => 'mautic.email.type.template.header',
             ],
-            'typePrefix'         => 'email',
-            'cancelUrl'          => 'mautic_email_index',
-            'header'             => 'mautic.email.type.header',
-            'typeOneHeader'      => 'mautic.email.type.template.header',
-            'typeOneIconClass'   => 'fa-cube',
-            'typeOneDescription' => 'mautic.email.type.template.description',
-            'typeOneOnClick'     => "Mautic.selectEmailType('template');",
-            'typeTwoHeader'      => 'mautic.email.type.list.header',
-            'typeTwoIconClass'   => 'fa-pie-chart',
-            'typeTwoDescription' => 'mautic.email.type.list.description',
-            'typeTwoOnClick'     => "Mautic.selectEmailType('list');",
+            'typePrefix'           => 'email',
+            'cancelUrl'            => 'mautic_email_index',
+            'header'               => 'mautic.email.type.header',
+            'typeOneHeader'        => 'mautic.email.type.template.header',
+            'typeOneIconClass'     => 'fa-cube',
+            'typeOneDescription'   => 'mautic.email.type.template.description',
+            'typeOneOnClick'       => "Mautic.selectEmailType('template');",
+            'typeTwoHeader'        => 'mautic.email.type.list.header',
+            'typeTwoIconClass'     => 'fa-pie-chart',
+            'typeTwoDescription'   => 'mautic.email.type.list.description',
+            'typeTwoOnClick'       => "Mautic.selectEmailType('list');",
+            'typeThreeHeader'      => 'mautic.email.type.feed.header',
+            'typeThreeIconClass'   => 'fa-rss-square',
+            'typeThreeDescription' => 'mautic.email.type.feed.description',
+            'typeThreeOnClick'     => "Mautic.selectEmailType('feed');",
         ]);
 endif;
