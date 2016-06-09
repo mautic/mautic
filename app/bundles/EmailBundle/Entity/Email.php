@@ -378,7 +378,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                 $type = $email->getEmailType();
                 $translationParent = $email->getTranslationParent();
 
-                if ($type == 'list' && null == $translationParent) {
+                if ($type == 'list' || $type === 'feed' && null == $translationParent) {
                     $validator = $context->getValidator();
                     $violations = $validator->validate(
                         $email->getLists(),
@@ -397,6 +397,27 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                                 ->atPath('lists')
                                 ->addViolation();
                         }
+                    }
+                }
+
+                if ($type === 'feed') {
+                    $validator  = $context->getValidator();
+                    $violations = $validator->validate(
+                        $email->getFeed()->getFeedUrl(),
+                        array(
+                            new NotBlank(
+                                array(
+                                    'message' => 'mautic.feed.feed_url.required'
+                                )
+                            )
+                        )
+                    );
+
+                    if (count($violations) > 0) {
+                        $string = (string) $violations;
+                        $context->buildViolation($string)
+                            ->atPath('feed.feed_url')
+                            ->addViolation();
                     }
                 }
 
@@ -1059,11 +1080,17 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         }
     }
 
+    /**
+     * @return Feed
+     */
     public function getFeed()
     {
         return $this->feed;
     }
 
+    /**
+     * @param Feed $feed
+     */
     public function setFeed(Feed $feed = NULL)
     {
         $this->feed = $feed;

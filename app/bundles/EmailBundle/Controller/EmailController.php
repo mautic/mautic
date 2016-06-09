@@ -534,7 +534,7 @@ class EmailController extends FormController
                     $model->saveEntity($entity);
 
                     //Here we save the Periodicity, if needed
-                    if($entity->getFeed() != null && $entity->getFeed()->getFeedUrl() != ''){
+                    if ($entity->hasFeed()) {
                         //We need a new Periodicity
                         $periodicityEntity = new Periodicity();
 
@@ -748,7 +748,7 @@ class EmailController extends FormController
 
                     $entity->setCustomHtml($content);
 
-                    if($entity->getFeed() != null){
+                    if ($entity->hasFeed()) {
                         //We persist the feed entity
                         $this->factory->getEntityManager()->persist($entity->getFeed());
                         $this->factory->getEntityManager()->flush();
@@ -758,20 +758,15 @@ class EmailController extends FormController
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
                     //Save the Periodicity too (if exist)
-                    if($entity->getFeed() != null){
+                    if ($entity->hasFeed()) {
                         //We find the Periodicity
                         $periodicityEntity = $this->factory
                             ->getEntityManager()
                             ->getRepository("MauticCoreBundle:Periodicity")
-                            ->findBy(
-                                array(
+                            ->findBy(array(
                                     'targetId' => $entity->getId(),
                                     'type' => Periodicity::getTypeEmail()
-                                ),
-                                null,
-                                1,
-                                null
-                                )[0];
+                                ), null, 1, null )[0];
 
                         $periodicityEntity->setTriggerDate(new \DateTime($_POST['emailform']['nextShoot']));
                         if($_POST['recurency'] == 'interval'){
@@ -878,29 +873,29 @@ class EmailController extends FormController
                 $form['customHtml']->setData($content);
             }
 
-            //Set the periodicity for the edit form
-            /** @var $periodicityEntity Periodicity */
-            $periodicityEntity = $this->factory
-                ->getEntityManager()
-                ->getRepository("MauticCoreBundle:Periodicity")
-                ->findBy(
-                    array(
-                        'targetId' => $entity->getId(),
-                        'type' => Periodicity::getTypeEmail()
-                    ),
-                    null,
-                    1,
-                    null
-                    )[0];
-            $form->get('interval')->setData($periodicityEntity->getTriggerInterval());
-            $form->get('intervalUnit')->setData($periodicityEntity->getTriggerIntervalUnit());
+            if ($entity->hasFeed()) {
+                //Set the periodicity for the edit form
+                /** @var $periodicityEntity Periodicity */
+                $periodicityEntity = $this->factory
+                    ->getEntityManager()
+                    ->getRepository("MauticCoreBundle:Periodicity")
+                    ->findBy(
+                        array(
+                            'targetId' => $entity->getId(),
+                            'type' => Periodicity::getTypeEmail()
+                        ), null, 1, null )[0];
+                $form->get('interval')->setData($periodicityEntity->getTriggerInterval());
+                $form->get('intervalUnit')->setData($periodicityEntity->getTriggerIntervalUnit());
 
-            $tmp = $periodicityEntity->getDaysOfWeekMask();
-            $formDaysOfWeek = array();
-            for($i = 0; $i < count($tmp); $i++){
-                if(array_values($tmp)[$i] === true){    array_push($formDaysOfWeek, $i);}
+                $tmp = $periodicityEntity->getDaysOfWeekMask();
+                $formDaysOfWeek = array();
+                for ($i = 0; $i < count($tmp); $i++) {
+                    if (array_values($tmp)[$i] === true) {
+                        array_push($formDaysOfWeek, $i);
+                    }
+                }
+                $form->get('DaysOfWeek')->setData($formDaysOfWeek);
             }
-            $form->get('DaysOfWeek')->setData($formDaysOfWeek);
         }
 
         $assets         = $form['assetAttachments']->getData();

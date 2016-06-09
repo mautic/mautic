@@ -181,7 +181,7 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
                 <?php echo $view['form']->row($form['publishUp']); ?>
                 <?php echo $view['form']->row($form['publishDown']); ?>
             <?php else: ?>
-            <div id="leadList"<?php echo ($emailType === 'list' || $emailType === 'feed' || is_null($emailType)) ? '' : ' class="hide"'; ?>>
+            <div id="leadList"<?php echo ($emailType === 'list' || $emailType === 'feed') ? '' : ' class="hide"'; ?>>
                 <?php echo $view['form']->row($form['lists']); ?>
             </div>
             <?php echo $view['form']->row($form['category']); ?>
@@ -204,7 +204,7 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
             <?php echo $view['form']->row($form['unsubscribeForm']); ?>
 
             <!-- For feed -->
-            <div id="feedInputs"<?php echo ($emailType === 'feed' || is_null($emailType)) ? '' : ' class="hide"'; ?>>
+            <div id="feedInputs"<?php echo ($emailType === 'feed') ? '' : ' class="hide"'; ?>>
                 <hr/>
                 <?php echo $view['form']->row($form['feed']); ?>
                 <?php echo $view['form']->row($form['nextShoot']); ?>

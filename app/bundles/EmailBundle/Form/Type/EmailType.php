@@ -77,20 +77,6 @@ class EmailType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('email.email', $options));
 
-        //For feed
-        $builder->add(
-            'feed',
-            new FeedType(),
-            array(
-                'label'      => 'For RSS Mail only',
-                'required' => false
-            )
-        );
-
-        //For periodicity
-        $periodicity = new PeriodicityType();
-        $periodicity->buildForm($builder, $options);
-
         $builder->add(
             'name',
             'text',
@@ -277,6 +263,20 @@ class EmailType extends AbstractType
             )
                 ->addModelTransformer($transformer)
         );
+
+        //For feed
+        $builder->add(
+            'feed',
+            new FeedType(),
+            array(
+                'label'    => false,
+                'required' => true
+            )
+        );
+
+        //For periodicity
+        $periodicity = new PeriodicityType();
+        $periodicity->buildForm($builder, $options);
 
         $transformer = new IdToEntityModelTransformer($this->em, 'MauticEmailBundle:Email');
         $builder->add(

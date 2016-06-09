@@ -105,6 +105,9 @@ if (count($items)):
                             <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.email.icon_tooltip.list_email'); ?>">
                                 <i class="fa fa-fw fa-pie-chart"></i>
                             </span>
+                            <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.email.icon_tooltip.list_email'); ?>"><i class="fa fa-fw fa-pie-chart"></i></span>
+                            <?php elseif ($type == 'feed'): ?>
+                            <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.email.icon_tooltip.feed_email'); ?>"><i class="fa fa-fw fa-rss-square"></i></span>
                             <?php endif; ?>
                         </a>
                     </div>

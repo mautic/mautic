@@ -176,6 +176,7 @@ Mautic.selectEmailType = function(emailType) {
         mQuery('#templateTranslationParent').addClass('hide');
         mQuery('#leadList').removeClass('hide');
         mQuery('.page-header h3').text(mauticLang.newRssEmail);
+        mQuery('#feedInputs').removeClass('hide');
     }
 
     mQuery('#emailform_emailType').val(emailType);

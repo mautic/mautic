@@ -45,16 +45,16 @@ class FeedType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('Feed.Feed', $options));
 
         $builder->add(
-            'FeedUrl',
+            'feed_url',
             'text',
             array(
-                'label'      => 'URL',
+                'label'      => 'Feed URL',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control')
             )
         );
         $builder->add(
-            'ItemCount',
+            'item_count',
             'number',
             array(
                 'label'      => 'Number of items per mail',
@@ -62,27 +62,6 @@ class FeedType extends AbstractType
                 'attr'       => array('class' => 'form-control')
             )
         );
-//         $builder->add(
-//             'periodicity_next_shoot',
-//             'datetime',
-//             array(
-//                 'widget' => 'single_text',
-//                 'label'      => 'First send date & time',
-//                 'label_attr' => array('class' => 'control-label'),
-//                 'attr'       => array('class' => 'form-control'),
-//                 'format' => 'dd/MM/yyyy hh:mm',
-//                 'data' => new \DateTime('now')
-//             )
-//         );
-//         $builder->add(
-//             'periodicity_interval',
-//             'number',
-//             array(
-//                 'label'      => 'Periodicity (number of day)',
-//                 'label_attr' => array('class' => 'control-label'),
-//                 'attr'       => array('class' => 'form-control')
-//             )
-//         );
     }
 
     /**
