@@ -14,7 +14,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'templateButtons' => array(
         'new' => true
     ),
-    'routeBase' => 'leadfield',
+    'routeBase' => 'contactfield',
     'langVar'   => 'lead.field'
 )));
 ?>
@@ -24,7 +24,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         'searchValue' => $searchValue,
         'action'      => $currentRoute,
         'langVar'     => 'lead.field',
-        'routeBase'   => 'leadfield',
+        'routeBase'   => 'contactfield',
         'templateButtons' => array(
             'delete' => $permissions['lead:fields:full']
         )
