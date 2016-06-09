@@ -24,7 +24,7 @@ class PointApiController extends CommonApiController
     public function initialize (FilterControllerEvent $event)
     {
         parent::initialize($event);
-        $this->model            = $this->factory->getModel('point');
+        $this->model            = $this->getModel('point');
         $this->entityClass      = 'Mautic\PointBundle\Entity\Point';
         $this->entityNameOne    = 'point';
         $this->entityNameMulti  = 'points';

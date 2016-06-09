@@ -30,14 +30,7 @@ class ProcessEmailQueueCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:send:emails')
-            ->setAliases(array(
-                'mautic:process:email',
-                'mautic:process:emails',
-                'mautic:email:process',
-                'mautic:emails:process',
-                'mautic:send:email',
-            ))
+            ->setName('mautic:emails:send')
             ->setDescription('Processes SwiftMail\'s mail queue')
             ->addOption('--message-limit', null, InputOption::VALUE_OPTIONAL, 'Limit number of messages sent at a time. Defaults to value set in config.')
             ->addOption('--time-limit', null, InputOption::VALUE_OPTIONAL, 'Limit the number of seconds per batch. Defaults to value set in config.')

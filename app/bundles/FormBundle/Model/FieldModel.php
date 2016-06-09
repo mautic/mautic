@@ -12,12 +12,25 @@ namespace Mautic\FormBundle\Model;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Field;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Class FieldModel
  */
 class FieldModel extends CommonFormModel
 {
+    /**
+     * @var Session
+     */
+    protected $session;
+
+    /**
+     * @param Session $session
+     */
+    public function setSession(Session $session)
+    {
+        $this->session = $session;
+    }
 
     /**
      * {@inheritdoc}
@@ -58,9 +71,8 @@ class FieldModel extends CommonFormModel
      */
     public function getSessionFields($formId)
     {
-        $session = $this->factory->getSession();
-        $fields = $session->get('mautic.form.'.$formId.'.fields.modified', array());
-        $remove = $session->get('mautic.form.'.$formId.'.fields.deleted', array());
+        $fields = $this->session->get('mautic.form.'.$formId.'.fields.modified', array());
+        $remove = $this->session->get('mautic.form.'.$formId.'.fields.deleted', array());
         return array_diff_key($fields, array_flip($remove));
     }
 

@@ -27,7 +27,7 @@ class LeadApiController extends CommonApiController
     public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
-        $this->model            = $this->factory->getModel('lead.lead');
+        $this->model            = $this->getModel('lead.lead');
         $this->entityClass      = 'Mautic\LeadBundle\Entity\Lead';
         $this->entityNameOne    = 'lead';
         $this->entityNameMulti  = 'leads';
@@ -43,7 +43,7 @@ class LeadApiController extends CommonApiController
         // Check for an email to see if the lead already exists
         $parameters = $this->request->request->all();
 
-        $uniqueLeadFields    = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
+        $uniqueLeadFields    = $this->getModel('lead.field')->getUniqueIdentiferFields();
         $uniqueLeadFieldData = array();
 
         foreach ($parameters as $k => $v) {
@@ -76,7 +76,7 @@ class LeadApiController extends CommonApiController
      */
     protected function createEntityForm($entity)
     {
-        $fields = $this->factory->getModel('lead.field')->getEntities(
+        $fields = $this->getModel('lead.field')->getEntities(
             array(
                 'force'          => array(
                     array(
@@ -129,7 +129,7 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $fields = $this->factory->getModel('lead.field')->getEntities(
+        $fields = $this->getModel('lead.field')->getEntities(
             array(
                 'filter' => array(
                     'force' => array(
@@ -166,7 +166,7 @@ class LeadApiController extends CommonApiController
                 return $this->accessDenied();
             }
 
-            $results = $this->factory->getModel('lead.note')->getEntities(
+            $results = $this->getModel('lead.note')->getEntities(
                 array(
                     'start'      => $this->request->query->get('start', 0),
                     'limit'      => $this->request->query->get('limit', $this->factory->getParameter('default_pagelimit')),
@@ -260,7 +260,7 @@ class LeadApiController extends CommonApiController
             }
 
             /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-            $campaignModel = $this->factory->getModel('campaign');
+            $campaignModel = $this->getModel('campaign');
             $campaigns = $campaignModel->getLeadCampaigns($entity, true);
 
             foreach ($campaigns as &$c) {

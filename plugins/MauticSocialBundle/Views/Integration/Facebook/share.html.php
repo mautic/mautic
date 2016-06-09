@@ -8,9 +8,7 @@
  */
 
 $locale    = $app->getRequest()->getLocale();
-
-$settings = $field['properties'];
-
+$settings  = (!empty($field['properties'])) ? $field['properties'] : array();
 $layout    = (!empty($settings['layout'])) ? $settings['layout'] : 'standard';
 $action    = (!empty($settings['action'])) ? $settings['action'] : 'like';
 $showFaces = (!empty($settings['showFaces'])) ? 'true' : 'false';

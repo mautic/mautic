@@ -29,17 +29,7 @@ return array(
             'mautic_campaign_contacts'       => array(
                 'path'       => '/campaigns/view/{objectId}/contact/{page}',
                 'controller' => 'MauticCampaignBundle:Campaign:leads',
-            ),
-
-            //@deprecated to be removed in 2.0
-            'mautic_campaign_leads'       => array(
-                'path'       => '/campaigns/view/{objectId}/contacts/{page}',
-                'controller' => 'MauticCampaignBundle:Campaign:leads',
-            ),
-            'mautic_campaign_leads_bc'       => array(
-                'path'       => '/campaigns/view/{objectId}/leads/{page}',
-                'controller' => 'MauticCampaignBundle:Campaign:leads',
-            ),
+            )
         ),
         'api'  => array(
             'mautic_api_getcampaigns' => array(
@@ -57,28 +47,6 @@ return array(
             ),
             'mautic_api_campaignremovecontact' => array(
                 'path'       => '/campaigns/{id}/contact/remove/{leadId}',
-                'controller' => 'MauticCampaignBundle:Api\CampaignApi:removeLead',
-                'method'     => 'POST'
-            ),
-
-            // @deprecated - to be removed in 2.0
-            'mautic_api_campaignaddlead' => array(
-                'path'       => '/campaigns/{id}/contact/add/{leadId}',
-                'controller' => 'MauticCampaignBundle:Api\CampaignApi:addLead',
-                'method'     => 'POST'
-            ),
-            'mautic_api_campaignremovelead' => array(
-                'path'       => '/campaigns/{id}/contact/remove/{leadId}',
-                'controller' => 'MauticCampaignBundle:Api\CampaignApi:removeLead',
-                'method'     => 'POST'
-            ),
-            'mautic_api_campaignaddlead_bc' => array(
-                'path'       => '/campaigns/{id}/lead/add/{leadId}',
-                'controller' => 'MauticCampaignBundle:Api\CampaignApi:addLead',
-                'method'     => 'POST'
-            ),
-            'mautic_api_campaignremovelead_bc' => array(
-                'path'       => '/campaigns/{id}/lead/remove/{leadId}',
                 'controller' => 'MauticCampaignBundle:Api\CampaignApi:removeLead',
                 'method'     => 'POST'
             )
@@ -153,6 +121,26 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'campaign_leadsource'
             ),
+        ),
+        'models' =>  array(
+            'mautic.campaign.model.campaign' => array(
+                'class' => 'Mautic\CampaignBundle\Model\CampaignModel',
+                'arguments' => array(
+                    'mautic.helper.core_parameters',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.list',
+                    'mautic.form.model.form'
+                )
+            ),
+            'mautic.campaign.model.event' => array(
+                'class' => 'Mautic\CampaignBundle\Model\EventModel',
+                'arguments' => array(
+                    'mautic.helper.ip_lookup',
+                    'mautic.helper.core_parameters',
+                    'mautic.lead.model.lead',
+                    'mautic.campaign.model.campaign'
+                )
+            )
         )
     )
 );

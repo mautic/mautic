@@ -36,14 +36,14 @@ class ColorHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testThatColorHexAreSetCorrectly()
     {
-        $colors = [
-            '#ccc'      => [204, 204, 204],
-            '#fff'      => [255, 255, 255],
-            '#000'      => [0, 0, 0],
-            '#333333'   => [51, 51, 51],
-            '#369'      => [51, 102, 153],
-            '#f8Ac30'   => [248, 172, 48]
-        ];
+        $colors = array(
+            '#ccc'      => array(204, 204, 204),
+            '#fff'      => array(255, 255, 255),
+            '#000'      => array(0, 0, 0),
+            '#333333'   => array(51, 51, 51),
+            '#369'      => array(51, 102, 153),
+            '#f8Ac30'   => array(248, 172, 48)
+        );
 
         foreach ($colors as $hex => $rgb) {
             $helper = new ColorHelper($hex);
@@ -61,14 +61,14 @@ class ColorHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testThatColorHexAreConvertedBackToHexCorrectly()
     {
-        $colors = [
+        $colors = array(
             '#ccc'      => '#cccccc',
             '#fff'      => '#ffffff',
             '#000'      => '#000000',
             '#333333'   => '#333333',
             '#369'      => '#336699',
             '#f8Ac30'   => '#f8ac30'
-        ];
+        );
 
         foreach ($colors as $hex1 => $hex2) {
             $helper = new ColorHelper;
@@ -84,14 +84,14 @@ class ColorHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testThatColorHexAreConvertedToRgbCorrectly()
     {
-        $colors = [
+        $colors = array(
             '#ccc'      => 'rgb(204,204,204)',
             '#fff'      => 'rgb(255,255,255)',
             '#000'      => 'rgb(0,0,0)',
             '#333333'   => 'rgb(51,51,51)',
             '#369'      => 'rgb(51,102,153)',
             '#f8Ac30'   => 'rgb(248,172,48)'
-        ];
+        );
 
         foreach ($colors as $hex => $rgb) {
             $helper = new ColorHelper($hex);
@@ -106,14 +106,14 @@ class ColorHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testThatColorHexAreConvertedToRgbaCorrectly()
     {
-        $colors = [
+        $colors = array(
             '#ccc'      => 'rgba(204,204,204,%g)',
             '#fff'      => 'rgba(255,255,255,%g)',
             '#000'      => 'rgba(0,0,0,%g)',
             '#333333'   => 'rgba(51,51,51,%g)',
             '#369'      => 'rgba(51,102,153,%g)',
             '#f8Ac30'   => 'rgba(248,172,48,%g)'
-        ];
+        );
 
         foreach ($colors as $hex => $rgba) {
             $helper = new ColorHelper($hex);
