@@ -18,7 +18,6 @@ use Symfony\Component\Form\FormError;
  */
 class SysinfoController extends FormController
 {
-
     /**
      * @param int $page
      *
@@ -31,7 +30,7 @@ class SysinfoController extends FormController
         }
 
         /** @var \Mautic\ConfigBundle\Model\SysinfoModel $model */
-        $model   = $this->factory->getModel('config.sysinfo');
+        $model   = $this->getModel('config.sysinfo');
         $phpInfo = $model->getPhpInfo();
         $folders = $model->getFolders();
         $log     = $model->getLogTail();

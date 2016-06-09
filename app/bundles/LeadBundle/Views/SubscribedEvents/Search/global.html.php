@@ -8,7 +8,7 @@
  */
 ?>
 <?php if (!empty($showMore)): ?>
-    <a href="<?php echo $this->container->get('router')->generate('mautic_lead_index', array('search' => $searchString)); ?>" data-toggle="ajax">
+    <a href="<?php echo $this->container->get('router')->generate('mautic_contact_index', array('search' => $searchString)); ?>" data-toggle="ajax">
         <span><?php echo $view['translator']->trans('mautic.core.search.more', array("%count%" => $remaining)); ?></span>
     </a>
 <?php else: ?>
@@ -16,7 +16,7 @@
     <span class="pull-left pr-xs pt-xs" style="width:36px">
         <span class="img-wrapper img-rounded"><img src="<?php echo $view['gravatar']->getImage($fields['core']['email']['value'], '100');; ?>" /></span>
     </span>
-    <a href="<?php echo $this->container->get('router')->generate('mautic_lead_action', array('objectAction' => 'view', 'objectId' => $lead->getId())); ?>" data-toggle="ajax">
+    <a href="<?php echo $this->container->get('router')->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $lead->getId())); ?>" data-toggle="ajax">
         <span><?php echo $lead->getPrimaryIdentifier(true); ?></span>
         <?php
         $color = $lead->getColor();

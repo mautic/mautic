@@ -15,7 +15,7 @@ use Mautic\UserBundle\Entity\User;
 /**
  * Class AuditLogModel
  */
-class AuditLogModel extends CommonModel
+class AuditLogModel extends AbstractCommonModel
 {
 
     /**
@@ -51,7 +51,7 @@ class AuditLogModel extends CommonModel
         $log->setIpAddress($ipAddress);
         $log->setDateAdded(new \DateTime());
 
-        $user     = (!defined('MAUTIC_IGNORE_AUDITLOG_USER')) ? $this->factory->getUser() : null;
+        $user     = (!defined('MAUTIC_IGNORE_AUDITLOG_USER')) ? $this->user : null;
         $userId   = 0;
         $userName = '';
         if (!$user instanceof User) {

@@ -29,7 +29,7 @@ class AjaxController extends CommonAjaxController
     public function getSourceDataAction(Request $request)
     {
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
-        $model   = $this->factory->getModel('report');
+        $model   = $this->getModel('report');
         $context = $request->get('context');
 
         list($list, $types) = $model->getColumnList($context, true);
@@ -49,7 +49,7 @@ class AjaxController extends CommonAjaxController
         $dataArray = array('success' => 0);
 
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
-        $model    = $this->factory->getModel('report');
+        $model    = $this->getModel('report');
         $report   = $model->getEntity($reportId);
 
         $options['ignoreTableData'] = true;

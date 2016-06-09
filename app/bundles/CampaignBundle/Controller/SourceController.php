@@ -56,7 +56,7 @@ class SourceController extends CommonFormController
             return $this->modalAccessDenied();
         }
 
-        $sourceList = $this->factory->getModel('campaign')->getSourceLists($sourceType);
+        $sourceList = $this->getModel('campaign')->getSourceLists($sourceType);
         $form       = $this->get('form.factory')->create(
             'campaign_leadsource',
             $source,
@@ -162,7 +162,7 @@ class SourceController extends CommonFormController
             return $this->modalAccessDenied();
         }
 
-        $sourceList = $this->factory->getModel('campaign')->getSourceLists($sourceType);
+        $sourceList = $this->getModel('campaign')->getSourceLists($sourceType);
         $form       = $this->get('form.factory')->create(
             'campaign_leadsource',
             $source,

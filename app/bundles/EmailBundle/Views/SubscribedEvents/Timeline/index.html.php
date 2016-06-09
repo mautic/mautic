@@ -12,11 +12,6 @@ $subject = $view['translator']->trans('mautic.email.timeline.event.custom_email'
 
 if (!empty($item['storedSubject'])) {
 	$subject .= ': '.$item['storedSubject'];
-} elseif (!empty($item['subject'])) {
-	/**
-	 * @deprecated 1.2.3 - to be removed in 2.0
-	 */
-	$subject = ': '.$item['subject'];
 }
 ?>
 

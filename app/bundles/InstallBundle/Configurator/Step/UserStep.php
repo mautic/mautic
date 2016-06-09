@@ -12,6 +12,7 @@ namespace Mautic\InstallBundle\Configurator\Step;
 use Mautic\InstallBundle\Configurator\Form\UserStepType;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Validator\Constraints as Assert;
+use Mautic\CoreBundle\Configurator\Step\StepInterface;
 
 /**
  * User Step.
