@@ -26,21 +26,21 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const MAJOR_VERSION = 1;
+    const MAJOR_VERSION = 2;
 
     /**
      * Minor version number
      *
      * @const integer
      */
-    const MINOR_VERSION = 4;
+    const MINOR_VERSION = 0;
 
     /**
      * Patch version number
      *
      * @const integer
      */
-    const PATCH_VERSION = 2;
+    const PATCH_VERSION = 0;
 
     /**
      * Extra version identifier
@@ -56,6 +56,21 @@ class AppKernel extends Kernel
      * @var array
      */
     private $pluginBundles  = array();
+
+    /**
+     * Constructor.
+     *
+     * @param string $environment The environment
+     * @param bool   $debug       Whether to enable debugging or not
+     *
+     * @api
+     */
+    public function __construct($environment, $debug)
+    {
+        defined('MAUTIC_ENV') or define('MAUTIC_ENV', $environment);
+
+        parent::__construct($environment, $debug);
+    }
 
     /**
      * {@inheritdoc}
@@ -78,19 +93,12 @@ class AppKernel extends Kernel
         $router->setContext($requestContext);
 
         if (strpos($request->getRequestUri(), 'installer') === false && !$this->isInstalled()) {
-            //the context is not populated at this point so have to do it manually
-            $router = $this->getContainer()->get('router');
-            $requestContext = new \Symfony\Component\Routing\RequestContext();
-            $requestContext->fromRequest($request);
-            $router->setContext($requestContext);
-
             $base  = $requestContext->getBaseUrl();
             //check to see if the .htaccess file exists or if not running under apache
             if ((strpos(strtolower($_SERVER["SERVER_SOFTWARE"]), 'apache') === false || !file_exists(__DIR__ .'../.htaccess') && strpos($base, 'index') === false)) {
                 $base .= '/index.php';
             }
 
-            //return new RedirectResponse();
             return new RedirectResponse($base . '/installer');
         }
 
@@ -118,6 +126,7 @@ class AppKernel extends Kernel
     public function registerBundles()
     {
         $bundles = array(
+            // Symfony/Core Bundles
             new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
             new Symfony\Bundle\SecurityBundle\SecurityBundle(),
             new Symfony\Bundle\MonologBundle\MonologBundle(),
@@ -133,28 +142,28 @@ class AppKernel extends Kernel
             new JMS\SerializerBundle\JMSSerializerBundle(),
             new Oneup\UploaderBundle\OneupUploaderBundle(),
             new Symfony\Bundle\TwigBundle\TwigBundle(),
+            // Mautic Bundles
+            new Mautic\ApiBundle\MauticApiBundle(),
+            new Mautic\AssetBundle\MauticAssetBundle(),
+            new Mautic\CalendarBundle\MauticCalendarBundle(),
+            new Mautic\CampaignBundle\MauticCampaignBundle(),
+            new Mautic\CategoryBundle\MauticCategoryBundle(),
+            new Mautic\ConfigBundle\MauticConfigBundle(),
+            new Mautic\CoreBundle\MauticCoreBundle(),
+            new Mautic\DashboardBundle\MauticDashboardBundle(),
+            new Mautic\EmailBundle\MauticEmailBundle(),
+            new Mautic\FormBundle\MauticFormBundle(),
+            new Mautic\InstallBundle\MauticInstallBundle(),
+            new Mautic\LeadBundle\MauticLeadBundle(),
+            new Mautic\NotificationBundle\MauticNotificationBundle(),
+            new Mautic\PageBundle\MauticPageBundle(),
+            new Mautic\PluginBundle\MauticPluginBundle(),
+            new Mautic\PointBundle\MauticPointBundle(),
+            new Mautic\ReportBundle\MauticReportBundle(),
+            new Mautic\SmsBundle\MauticSmsBundle(),
+            new Mautic\UserBundle\MauticUserBundle(),
+            new Mautic\WebhookBundle\MauticWebhookBundle()
         );
-
-        //dynamically register Mautic Bundles
-        $searchPath = __DIR__ . '/bundles';
-        $finder     = new \Symfony\Component\Finder\Finder();
-        $finder->files()
-            ->followLinks()
-            ->in($searchPath)
-            ->depth('1')
-            ->name('*Bundle.php');
-
-        foreach ($finder as $file) {
-            $dirname  = basename($file->getRelativePath());
-            $filename = substr($file->getFilename(), 0, -4);
-            $class    = '\\Mautic' . '\\' . $dirname . '\\' . $filename;
-            if (class_exists($class)) {
-                $bundleInstance = new $class();
-                $bundles[]      = $bundleInstance;
-
-                unset($bundleInstance);
-            }
-        }
 
         //dynamically register Mautic Plugin Bundles
         $searchPath = dirname(__DIR__) . '/plugins';
@@ -178,31 +187,6 @@ class AppKernel extends Kernel
                 }
 
                 unset($plugin);
-            }
-        }
-
-        // @deprecated 1.1.4; bc support for MauticAddon namespace; to be removed in 2.0
-        $searchPath = dirname(__DIR__) . '/addons';
-        $finder     = new \Symfony\Component\Finder\Finder();
-        $finder->files()
-            ->followLinks()
-            ->depth('1')
-            ->in($searchPath)
-            ->name('*Bundle.php');
-
-        foreach ($finder as $file) {
-            $dirname  = basename($file->getRelativePath());
-            $filename = substr($file->getFilename(), 0, -4);
-
-            $class = '\\MauticAddon' . '\\' . $dirname . '\\' . $filename;
-            if (class_exists($class)) {
-                $addon = new $class();
-
-                if ($addon instanceof \Symfony\Component\HttpKernel\Bundle\Bundle) {
-                    $bundles[] = $addon;
-                }
-
-                unset($addon);
             }
         }
 
@@ -494,7 +478,7 @@ class AppKernel extends Kernel
             }
         }
 
-        require_once $cache;
+        require_once $cache->getPath();
 
         $this->container = new $class();
         $this->container->set('kernel', $this);

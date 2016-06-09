@@ -63,6 +63,10 @@ class TwilioApi extends AbstractSmsApi
      */
     public function sendSms($number, $content)
     {
+        if ($number === null) {
+            return false;
+        }
+
         try
         {
             $this->client->account->messages->sendMessage(

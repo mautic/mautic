@@ -131,7 +131,7 @@ class CommonRepository extends EntityRepository
             return $query->iterate(null, $hydrationMode);
         } elseif (empty($args['ignore_paginator'])) {
             // Paginator
-            return new Paginator($query);
+            return new Paginator($query, false);
         } else {
             // All results
             return $query->getResult($hydrationMode);

@@ -34,13 +34,18 @@ class TemplateNameParser extends BaseTemplateNameParser
     protected $factory;
 
     /**
+     * @var \Symfony\Component\DependencyInjection\ContainerInterface
+     */
+    protected $container;
+
+    /**
      * {@inheritdoc}
      */
     public function __construct(KernelInterface $kernel)
     {
         parent::__construct($kernel);
 
-        $this->factory = $kernel->getContainer()->get('mautic.factory');
+        $this->container = $kernel->getContainer();
     }
 
     /**
@@ -82,7 +87,8 @@ class TemplateNameParser extends BaseTemplateNameParser
             $template->setThemeOverride($themeOverride);
         }
 
-        $template->setFactory($this->factory);
+        $template->setThemeHelper($this->container->get('mautic.helper.theme'));
+        $template->setPathsHelper($this->container->get('mautic.helper.paths'));
 
         if ($template->get('bundle')) {
             try {

@@ -47,7 +47,7 @@ class RoleController extends FormController
         $filter     = $this->request->get('search', $this->factory->getSession()->get('mautic.role.filter', ''));
         $this->factory->getSession()->set('mautic.role.filter', $filter);
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
-        $model = $this->factory->getModel('user.role');
+        $model = $this->getModel('user.role');
 
         $items = $model->getEntities(
             array(
@@ -132,7 +132,7 @@ class RoleController extends FormController
 
         //retrieve the entity
         $entity = new Entity\Role();
-        $model  = $this->factory->getModel('user.role');
+        $model  = $this->getModel('user.role');
 
         //set the return URL for post actions
         $returnUrl = $this->generateUrl('mautic_role_index');
@@ -213,7 +213,7 @@ class RoleController extends FormController
         }
 
         /** @var \Mautic\UserBundle\Model\RoleModel $model */
-        $model  = $this->factory->getModel('user.role');
+        $model  = $this->getModel('user.role');
         $entity = $model->getEntity($objectId);
 
         //set the page we came from
@@ -393,7 +393,7 @@ class RoleController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             try {
-                $model  = $this->factory->getModel('user.role');
+                $model  = $this->getModel('user.role');
                 $entity = $model->getEntity($objectId);
 
                 if ($entity === null) {
@@ -453,7 +453,7 @@ class RoleController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model     = $this->factory->getModel('user.role');
+            $model     = $this->getModel('user.role');
             $ids       = json_decode($this->request->query->get('ids', ''));
             $deleteIds = array();
             $currentUser    = $this->factory->getUser();

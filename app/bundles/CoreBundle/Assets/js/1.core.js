@@ -126,7 +126,7 @@ var Mautic = {
         });
 
         Mautic.addKeyboardShortcut('shift+c', 'Load Contacts',  function(e) {
-            mQuery('#mautic_lead_index').click();
+            mQuery('#mautic_contact_index').click();
         });
 
         Mautic.addKeyboardShortcut('shift+right', 'Activate Right Menu', function (e) {
