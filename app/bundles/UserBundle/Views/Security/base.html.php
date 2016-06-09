@@ -18,7 +18,7 @@
     <link rel="icon" type="image/x-icon" href="<?php echo $view['assets']->getUrl('media/images/favicon.ico') ?>" />
     <link rel="apple-touch-icon" href="<?php echo $view['assets']->getUrl('media/images/apple-touch-icon.png') ?>" />
 
-    <?php $view['assets']->outputSystemStylesheets(true); ?>
+    <?php $view['assets']->outputSystemStylesheets(); ?>
 </head>
 <body>
 <section id="main" role="main">
