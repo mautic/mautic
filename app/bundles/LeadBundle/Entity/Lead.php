@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\EmailBundle\Entity\DoNotEmail;
 use Mautic\UserBundle\Entity\User;
 use Mautic\NotificationBundle\Entity\PushID;
 
@@ -142,6 +141,16 @@ class Lead extends FormEntity
      * @var ArrayCollection
      */
     private $tags;
+
+    /**
+     * @param $name
+     *
+     * @return bool
+     */
+    public function __get($name)
+    {
+        return $this->getFieldValue(strtolower($name));
+    }
 
     /**
      * @param ORM\ClassMetadata $metadata

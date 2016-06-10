@@ -9,7 +9,9 @@
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\LeadBundle\Event\LeadChangeEvent;
+use Mautic\FormBundle\Event\SubmissionEvent;
+use Mautic\FormBundle\FormEvents;
+use Mautic\LeadBundle\Entity\Attribution;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -27,10 +29,12 @@ class LeadSubscriber extends CommonSubscriber
      */
     static public function getSubscribedEvents()
     {
-        return array(
-            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
-            LeadEvents::LEAD_POST_MERGE      => array('onLeadMerge', 0)
-        );
+        return [
+            LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
+            LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
+            // Execute this event after potential campaign decision triggers
+            FormEvents::FORM_ON_SUBMIT       => ['logContactAttribution', -10],
+        ];
     }
 
     /**
@@ -41,7 +45,7 @@ class LeadSubscriber extends CommonSubscriber
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         // Set available event types
-        $eventTypeKey = 'form.submitted';
+        $eventTypeKey  = 'form.submitted';
         $eventTypeName = $this->translator->trans('mautic.form.event.submitted');
         $event->addEventType($eventTypeKey, $eventTypeName);
 
@@ -52,7 +56,7 @@ class LeadSubscriber extends CommonSubscriber
         }
 
         $lead    = $event->getLead();
-        $options = array('ipIds' => array(), 'leadId' => $lead->getId(), 'filters' => $filters);
+        $options = ['ipIds' => [], 'leadId' => $lead->getId(), 'filters' => $filters];
 
         /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
         /*
@@ -75,18 +79,20 @@ class LeadSubscriber extends CommonSubscriber
             $dtHelper = $this->factory->getDate($row['dateSubmitted'], 'Y-m-d H:i:s', 'UTC');
 
             $submission = $submissionRepository->getEntity($row['id']);
-            $event->addEvent(array(
-                'event'     => $eventTypeKey,
-                'eventLabel'=> $eventTypeName,
-                'timestamp' => $dtHelper->getLocalDateTime(),
-                'extra'     => array(
-                    'submission' => $submission,
-                    'form'  => $formModel->getEntity($row['form_id']),
-                    'page'  => $pageModel->getEntity($row['page_id'])
-                ),
-                'contentTemplate' => 'MauticFormBundle:SubscribedEvents\Timeline:index.html.php',
-                'icon'            => 'fa-pencil-square-o'
-            ));
+            $event->addEvent(
+                [
+                    'event'           => $eventTypeKey,
+                    'eventLabel'      => $eventTypeName,
+                    'timestamp'       => $dtHelper->getLocalDateTime(),
+                    'extra'           => [
+                        'submission' => $submission,
+                        'form'       => $formModel->getEntity($row['form_id']),
+                        'page'       => $pageModel->getEntity($row['page_id'])
+                    ],
+                    'contentTemplate' => 'MauticFormBundle:SubscribedEvents\Timeline:index.html.php',
+                    'icon'            => 'fa-pencil-square-o'
+                ]
+            );
         }
     }
 
@@ -96,5 +102,23 @@ class LeadSubscriber extends CommonSubscriber
     public function onLeadMerge(LeadMergeEvent $event)
     {
         $this->factory->getModel('form.submission')->getRepository()->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
+    }
+
+    /**
+     * @param SubmissionEvent $event
+     */
+    public function logContactAttribution(SubmissionEvent $event)
+    {
+        $lead = $event->getLead();
+        if (null != $lead->getAttribution()) {
+            $form = $event->getForm();
+
+            $attribution = (new Attribution())
+                ->setChannel('form')
+                ->setChannelId($form->getId())
+                ->setAction('submission');
+
+            $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Attribution')->saveEntity($attribution);
+        }
     }
 }

@@ -45,16 +45,19 @@ Mautic.addReportRow = function(elId) {
 
 	var newColumnId = '#' + elId + '_' + index + '_column';
 
-	// Update the column options if applicable
-	if (typeof Mautic.reportPrototypeColumnOptions != 'undefined') {
-		mQuery(newColumnId).html(Mautic.reportPrototypeColumnOptions);
-	}
-
 	if (elId == 'report_filters') {
+		if (typeof Mautic.reportPrototypeFilterOptions != 'undefined') {
+			// Update the column options if applicable
+			mQuery(newColumnId).html(Mautic.reportPrototypeFilterOptions);
+		}
+
 		mQuery(newColumnId).on('change', function() {
 			Mautic.updateReportFilterValueInput(this);
 		});
 		Mautic.updateReportFilterValueInput(newColumnId);
+	} else if (typeof Mautic.reportPrototypeColumnOptions != 'undefined') {
+		// Update the column options if applicable
+		mQuery(newColumnId).html(Mautic.reportPrototypeColumnOptions);
 	}
 
 	Mautic.activateChosenSelect(mQuery('#'+elId+'_'+index+'_column'));
@@ -63,7 +66,9 @@ Mautic.addReportRow = function(elId) {
 };
 
 Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
-	var types      = (typeof Mautic.reportPrototypeColumnTypes != 'undefined') ? Mautic.reportPrototypeColumnTypes : mQuery('#report_filters').data('column-types');
+	var types           = (typeof Mautic.reportPrototypeFilterTypes != 'undefined') ? Mautic.reportPrototypeFilterTypes : mQuery('#report_filters').data('filter-types');
+    var operators  = (typeof Mautic.reportPrototypeFilterOperators != 'undefined') ? Mautic.reportPrototypeFilterOperators : mQuery('#report_filters').data('filter-operators');
+
 	var newValue   = mQuery(filterColumn).val();
 	var filterId   = mQuery(filterColumn).attr('id');
 	var filterType = types[newValue];
@@ -72,12 +77,16 @@ Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
 	var valueEl = mQuery(filterColumn).parent().parent().find('.filter-value');
 	var valueVal = valueEl.val();
 
-	var idParts = filterId.split("_");
+	var idParts    = filterId.split("_");
+	var valueId    = 'report_filters_' + idParts[2] + '_value';
+	var valueName  = 'report[filters][' + idParts[2] + '][value]';
 
-	var valueId   = 'report_filters_' + idParts[2] + '_value';
-	var valueName = 'report[filters][' + idParts[2] + '][value]';
+    // Replace the condition list with operators
+    mQuery('#report_filters_' + idParts[2] + '_condition').html(operators[newValue]);
+    console.log(operators, newValue, operators[newValue]);
 
-	if (filterType == 'bool') {
+    // Replace the value field appropriately
+    if (filterType == 'bool') {
 		if (mQuery(valueEl).attr('type') != 'radio') {
 			var template = mQuery('#filterValueYesNoTemplate .btn-group').clone(true);
 			mQuery(template).find('input[type="radio"]').each(function () {
@@ -131,8 +140,8 @@ Mautic.updateReportSourceData = function (context) {
 			// Reset index
 			mQuery('#report_filters').data('index', 0);
 
-			// Update types
-			Mautic.reportPrototypeColumnTypes = response.types;
+			// Update columns
+            Mautic.reportPrototypeColumnOptions = mQuery(response.columns);
 
 			// Remove order
 			mQuery('#report_tableOrder').find('div').remove().end();
@@ -140,8 +149,10 @@ Mautic.updateReportSourceData = function (context) {
 			// Reset index
 			mQuery('#report_tableOrder').data('index', 0);
 
-			// Store options to update prototype
-			Mautic.reportPrototypeColumnOptions = mQuery(response.columns);
+            // Update filter list
+            Mautic.reportPrototypeFilterTypes     = response.filterTypes;
+			Mautic.reportPrototypeFilterOptions   = mQuery(response.filters);
+            Mautic.reportPrototypeFilterOperators = response.filterOperators;
 
 			mQuery('#report_graphs').html(response.graphs);
 			mQuery('#report_graphs').multiSelect('refresh');

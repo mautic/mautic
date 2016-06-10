@@ -25,7 +25,9 @@ class ReportFiltersType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addModelTransformer(new ReportFilterDataTransformer($options['columns']));
+        $builder->addModelTransformer(
+            new ReportFilterDataTransformer($options['filters'])
+        );
     }
 
     /**
@@ -49,9 +51,11 @@ class ReportFiltersType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
-            'columns' => array(),
-            'report'  => null
-        ));
+        $resolver->setDefaults(
+            [
+                'filters' => [],
+                'report'  => null
+            ]
+        );
     }
 }

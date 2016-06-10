@@ -9,6 +9,7 @@
 
 namespace Mautic\ReportBundle\Form\Type;
 
+use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -21,62 +22,56 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class FilterSelectorType extends AbstractType
 {
     /**
-     * Array of filter conditions
-     *
-     * @var array
-     */
-    private $conditionArray = array(
-        'eq'       => '=',
-        'gt'       => '>',
-        'gte'      => '>=',
-        'lt'       => '<',
-        'lte'      => '<=',
-        'neq'      => '!=',
-        'like'     => 'LIKE',
-        'notLike'  => 'NOT LIKE',
-        'empty'    => 'EMPTY',
-        'notEmpty' => 'NOT EMPTY'
-    );
-
-    /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Build a list of columns
-        $builder->add('column', 'choice', array(
-            'choices'     => $options['columnList'],
-            'expanded'    => false,
-            'multiple'    => false,
-            'label'       => 'mautic.report.report.label.filtercolumn',
-            'label_attr'  => array('class' => 'control-label filter-column'),
-            'empty_value' => false,
-            'required'    => false,
-            'attr'        => array(
-                'class' => 'form-control filter-columns'
-            )
-        ));
+        $builder->add(
+            'column',
+            'choice',
+            [
+                'choices'     => $options['columnList'],
+                'expanded'    => false,
+                'multiple'    => false,
+                'label'       => 'mautic.report.report.label.filtercolumn',
+                'label_attr'  => ['class' => 'control-label filter-column'],
+                'empty_value' => false,
+                'required'    => false,
+                'attr'        => [
+                    'class' => 'form-control filter-columns'
+                ]
+            ]
+        );
 
         // Build a list of condition values
-        $builder->add('condition', 'choice', array(
-            'choices'     => $this->conditionArray,
-            'expanded'    => false,
-            'multiple'    => false,
-            'label'       => 'mautic.report.report.label.filtercondition',
-            'label_attr'  => array('class' => 'control-label filter-condition'),
-            'empty_value' => false,
-            'required'    => false,
-            'attr'        => array(
-                'class' => 'form-control not-chosen'
-            )
-        ));
+        $builder->add(
+            'condition',
+            'choice',
+            [
+                'choices' => MauticReportBuilder::OPERATORS[$options['operatorGroup']],
+                'expanded'    => false,
+                'multiple'    => false,
+                'label'       => 'mautic.report.report.label.filtercondition',
+                'label_attr'  => ['class' => 'control-label filter-condition'],
+                'empty_value' => false,
+                'required'    => false,
+                'attr'        => [
+                    'class' => 'form-control not-chosen'
+                ]
+            ]
+        );
 
-        $builder->add('value', 'text', array(
-            'label'      => 'mautic.report.report.label.filtervalue',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control filter-value'),
-            'required'   => false
-        ));
+        $builder->add(
+            'value',
+            'text',
+            [
+                'label'      => 'mautic.report.report.label.filtervalue',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control filter-value'],
+                'required'   => false
+            ]
+        );
     }
 
     /**
@@ -84,9 +79,12 @@ class FilterSelectorType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars = array_replace($view->vars, array(
-            'columnList' => $options['columnList']
-        ));
+        $view->vars = array_replace(
+            $view->vars,
+            [
+                'columnList' => $options['columnList']
+            ]
+        );
     }
 
     /**
@@ -102,8 +100,11 @@ class FilterSelectorType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
-            'columnList' => array()
-        ));
+        $resolver->setDefaults(
+            [
+                'columnList'    => [],
+                'operatorGroup' => 'default'
+            ]
+        );
     }
 }

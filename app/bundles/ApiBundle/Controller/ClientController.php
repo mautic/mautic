@@ -45,7 +45,7 @@ class ClientController extends FormController
         $this->factory->getSession()->set('mautic.client.filter', $filter);
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
-        $clients = $this->factory->getModel('api.client')->getEntities(
+        $clients = $this->getModel('api.client')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -125,7 +125,7 @@ class ClientController extends FormController
     public function authorizedClientsAction()
     {
         $me      = $this->get('security.context')->getToken()->getUser();
-        $clients = $this->factory->getModel('api.client')->getUserClients($me);
+        $clients = $this->getModel('api.client')->getUserClients($me);
 
         return $this->render('MauticApiBundle:Client:authorized.html.php', array('clients' => $clients));
     }
@@ -142,7 +142,7 @@ class ClientController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\ApiBundle\Model\ClientModel $model */
-            $model = $this->factory->getModel('api.client');
+            $model = $this->getModel('api.client');
 
             $client = $model->getEntity($clientId);
 
@@ -194,7 +194,7 @@ class ClientController extends FormController
         $this->factory->getSession()->set('mautic.client.filter.api_mode', $api_mode);
 
         /** @var \Mautic\ApiBundle\Model\ClientModel $model */
-        $model = $this->factory->getModel('api.client');
+        $model = $this->getModel('api.client');
 
         //retrieve the entity
         $client = $model->getEntity();
@@ -284,7 +284,7 @@ class ClientController extends FormController
             return $this->accessDenied();
         }
         /** @var \Mautic\ApiBundle\Model\ClientModel $model */
-        $model     = $this->factory->getModel('api.client');
+        $model     = $this->getModel('api.client');
         $client    = $model->getEntity($objectId);
         $returnUrl = $this->generateUrl('mautic_client_index');
 
@@ -405,7 +405,7 @@ class ClientController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\ApiBundle\Model\ClientModel $model */
-            $model  = $this->factory->getModel('api.client');
+            $model  = $this->getModel('api.client');
             $entity = $model->getEntity($objectId);
             if ($entity === null) {
                 $flashes[] = array(

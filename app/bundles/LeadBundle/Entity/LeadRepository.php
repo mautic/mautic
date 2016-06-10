@@ -672,22 +672,7 @@ class LeadRepository extends CommonRepository
         switch ($command) {
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous'):
                 $expr = $q->expr()->$xFunc(
-                    $q->expr()->$xSubFunc(
-                        $q->expr()->$eqFunc("l.firstname", $q->expr()->literal('')),
-                        $q->expr()->$nullFunc("l.firstname")
-                    ),
-                    $q->expr()->$xSubFunc(
-                        $q->expr()->$eqFunc("l.lastname", $q->expr()->literal('')),
-                        $q->expr()->$nullFunc("l.lastname")
-                    ),
-                    $q->expr()->$xSubFunc(
-                        $q->expr()->$eqFunc("l.company", $q->expr()->literal('')),
-                        $q->expr()->$nullFunc("l.company")
-                    ),
-                    $q->expr()->$xSubFunc(
-                        $q->expr()->$eqFunc("l.email", $q->expr()->literal('')),
-                        $q->expr()->$nullFunc("l.email")
-                    )
+                    $q->expr()->$nullFunc('l.date_identified')
                 );
 
                 if (!empty($this->availableSocialFields)) {

@@ -70,4 +70,12 @@ class SubmissionEvent extends Event
     {
         return $this->server;
     }
+
+    /**
+     * @return \Mautic\FormBundle\Entity\Form
+     */
+    public function getForm()
+    {
+        return $this->entity->getForm();
+    }
 }

@@ -21,6 +21,48 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 final class MauticReportBuilder implements ReportBuilderInterface
 {
     /**
+     * @var array
+     */
+    const OPERATORS = [
+        'default'     => [
+            'eq'       => 'mautic.lead.list.form.operator.equals',
+            'gt'       => 'mautic.lead.list.form.operator.greaterthan',
+            'gte'      => 'mautic.lead.list.form.operator.greaterthanequals',
+            'lt'       => 'mautic.lead.list.form.operator.lessthan',
+            'lte'      => 'mautic.lead.list.form.operator.lessthanequals',
+            'neq'      => 'mautic.lead.list.form.operator.notequals',
+            'like'     => 'mautic.lead.list.form.operator.islike',
+            'notLike'  => 'mautic.lead.list.form.operator.isnotlike',
+            'empty'    => 'mautic.lead.list.form.operator.isempty',
+            'notEmpty' => 'mautic.lead.list.form.operator.isnotempty',
+        ],
+        'bool'        => [
+            'eq'  => 'mautic.lead.list.form.operator.equals',
+            'neq' => 'mautic.lead.list.form.operator.notequals',
+        ],
+        'multiselect' => [
+            'in'  => 'mautic.lead.list.form.operator.in',
+            '!in' => 'mautic.lead.list.form.operator.notin'
+        ],
+        'select'      => [
+            'eq'       => 'mautic.lead.list.form.operator.equals',
+            'neq'      => 'mautic.lead.list.form.operator.notequals',
+            'empty'    => 'mautic.lead.list.form.operator.isempty',
+            'notEmpty' => 'mautic.lead.list.form.operator.isnotempty',
+            'in'       => 'mautic.lead.list.form.operator.in',
+            '!in'      => 'mautic.lead.list.form.operator.notin',
+        ],
+        'text'        => [
+            'eq'       => 'mautic.lead.list.form.operator.equals',
+            'neq'      => 'mautic.lead.list.form.operator.notequals',
+            'empty'    => 'mautic.lead.list.form.operator.isempty',
+            'notEmpty' => 'mautic.lead.list.form.operator.isnotempty',
+            'like'     => 'mautic.lead.list.form.operator.islike',
+            'notLike'  => 'mautic.lead.list.form.operator.isnotlike',
+        ],
+    ];
+
+    /**
      * @var \Symfony\Component\Security\Core\SecurityContextInterface
      */
     private $securityContext;
@@ -84,9 +126,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
      */
     protected function configureBuilder(array $options)
     {
-        $source   = $this->entity->getSource();
-        $fields   = $this->entity->getColumns();
-        $order    = $this->entity->getTableOrder();
+        $source = $this->entity->getSource();
+        $fields = $this->entity->getColumns();
+        $order  = $this->entity->getTableOrder();
 
         // Trigger the REPORT_ON_GENERATE event to initialize the QueryBuilder
         /** @type \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher $dispatcher */
@@ -96,7 +138,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $dispatcher->dispatch(ReportEvents::REPORT_ON_GENERATE, $event);
         $queryBuilder = $event->getQueryBuilder();
 
-        $selectColumns = array();
+        $selectColumns = [];
         foreach ($fields as $field) {
             if (isset($options['columns'][$field])) {
                 $selectColumns[] = "$field as \"{$options['columns'][$field]['label']}\"";

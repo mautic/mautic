@@ -30,17 +30,8 @@ class JsController extends CommonController
             'gcm_user_visible_only' => true
         );
 
-        // @deprecated: Drop when pushing minimum php version to 5.4
-        if (version_compare(PHP_VERSION, '5.4', '<')) {
-            $jsonPretty = new JsonPretty;
-
-            $data = $jsonPretty->prettify($data);
-        } else {
-            $data = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-        }
-
         return new Response(
-            $data,
+            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
             200,
             array(
                 'Content-Type' => 'application/json'

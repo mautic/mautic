@@ -10,6 +10,7 @@
 namespace Mautic\SmsBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Event\SmsEvent;
@@ -26,6 +27,21 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class SmsModel extends FormModel
 {
     /**
+     * @var TrackableModel
+     */
+    protected $pageTrackableModel;
+
+    /**
+     * SmsModel constructor.
+     * 
+     * @param TrackableModel $pageTrackableModel
+     */
+    public function __construct(TrackableModel $pageTrackableModel)
+    {
+        $this->pageTrackableModel = $pageTrackableModel;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return \Mautic\SmsBundle\Entity\SmsRepository
@@ -40,7 +56,7 @@ class SmsModel extends FormModel
      */
     public function getStatRepository()
     {
-        return $this->factory->getEntityManager()->getRepository('MauticSmsBundle:Stat');
+        return $this->em->getRepository('MauticSmsBundle:Stat');
     }
 
     /**
@@ -213,6 +229,6 @@ class SmsModel extends FormModel
      */
     public function getSmsClickStats($smsId)
     {
-        return $this->factory->getModel('page.trackable')->getTrackableList('sms', $smsId);
+        return $this->pageTrackableModel->getTrackableList('sms', $smsId);
     }
 }

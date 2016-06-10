@@ -356,14 +356,14 @@ class ReportSubscriber extends CommonSubscriber
                     break;
 
                 case 'mautic.page.graph.pie.languages':
-                    $queryBuilder->select('ph.page_language, COUNT(distinct(ph.id))')
+                    $queryBuilder->select('ph.page_language, COUNT(distinct(ph.id)) as the_count')
                         ->groupBy('ph.page_language')
                         ->andWhere($qb->expr()->isNotNull('ph.page_language'));
                     $data  = $queryBuilder->execute()->fetchAll();
                     $chart = new PieChart();
-                    
+
                     foreach ($data as $lang) {
-                        $chart->setDataset($lang['page_language'], $lang['count']);
+                        $chart->setDataset($lang['page_language'], $lang['the_count']);
                     }
 
                     $event->setGraph(

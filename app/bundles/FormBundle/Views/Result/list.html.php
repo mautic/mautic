@@ -85,7 +85,7 @@ $formId = $form->getId();
                 <td><?php echo $item['id']; ?></td>
                 <td>
                     <?php if (!empty($item['lead']['id'])): ?>
-                    <a href="<?php echo $view['router']->generate('mautic_lead_action', array('objectAction' => 'view', 'objectId' => $item['lead']['id'])); ?>" data-toggle="ajax">
+                    <a href="<?php echo $view['router']->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $item['lead']['id'])); ?>" data-toggle="ajax">
                         <?php echo $view['date']->toFull($item['dateSubmitted']); ?>
                     </a>
                     <?php else: ?>

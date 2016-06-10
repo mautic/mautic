@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Event;
 
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -76,5 +77,18 @@ class CommonEvent extends Event
         }
 
         return $this->changes;
+    }
+
+    /**
+     * @return Lead
+     */
+    public function getLead()
+    {
+        if (method_exists($this->entity, 'getLead')) {
+
+            return $this->entity->getLead();
+        }
+
+        return null;
     }
 }

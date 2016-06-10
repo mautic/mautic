@@ -98,4 +98,14 @@ final class AssetEvents
      * @var string
      */
     const ASSET_POST_DELETE = 'mautic.asset_post_delete';
+
+    /**
+     * The mautic.asset.on_campaign_trigger_decision event is fired when the campaign action triggers.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.asset.on_campaign_trigger_decision';
 }

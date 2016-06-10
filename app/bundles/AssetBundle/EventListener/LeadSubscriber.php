@@ -8,6 +8,8 @@
  */
 namespace Mautic\AssetBundle\EventListener;
 
+use Mautic\AssetBundle\AssetEvents;
+use Mautic\AssetBundle\Event\AssetLoadEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
@@ -27,11 +29,13 @@ class LeadSubscriber extends CommonSubscriber
      */
     static public function getSubscribedEvents()
     {
-        return array(
-            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
-            LeadEvents::CURRENT_LEAD_CHANGED => array('onLeadChange', 0),
-            LeadEvents::LEAD_POST_MERGE      => array('onLeadMerge', 0)
-        );
+        return [
+            LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
+            LeadEvents::CURRENT_LEAD_CHANGED => ['onLeadChange', 0],
+            LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
+            // Execute this event after potential campaign decision triggers
+            AssetEvents::ASSET_ON_LOAD       => ['logContactAttribution', -10],
+        ];
     }
 
     /**
@@ -42,7 +46,7 @@ class LeadSubscriber extends CommonSubscriber
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         // Set available event types
-        $eventTypeKey = 'asset.download';
+        $eventTypeKey  = 'asset.download';
         $eventTypeName = $this->translator->trans('mautic.asset.event.download');
         $event->addEventType($eventTypeKey, $eventTypeName);
 
@@ -54,7 +58,7 @@ class LeadSubscriber extends CommonSubscriber
         }
 
         $lead    = $event->getLead();
-        $options = array('ipIds' => array(), 'filters' => $filters);
+        $options = ['ipIds' => [], 'filters' => $filters];
 
 
         /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
@@ -73,16 +77,18 @@ class LeadSubscriber extends CommonSubscriber
 
         // Add the downloads to the event array
         foreach ($downloads as $download) {
-            $event->addEvent(array(
-                'event'     => $eventTypeKey,
-                'eventLabel' => $eventTypeName,
-                'timestamp' => $download['dateDownload'],
-                'extra'     => array(
-                    'asset' => $model->getEntity($download['asset_id'])
-                ),
-                'contentTemplate' => 'MauticAssetBundle:SubscribedEvents\Timeline:index.html.php',
-                'icon'      => 'fa-download'
-            ));
+            $event->addEvent(
+                [
+                    'event'           => $eventTypeKey,
+                    'eventLabel'      => $eventTypeName,
+                    'timestamp'       => $download['dateDownload'],
+                    'extra'           => [
+                        'asset' => $model->getEntity($download['asset_id'])
+                    ],
+                    'contentTemplate' => 'MauticAssetBundle:SubscribedEvents\Timeline:index.html.php',
+                    'icon'            => 'fa-download'
+                ]
+            );
         }
     }
 
@@ -91,7 +97,11 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadChange(LeadChangeEvent $event)
     {
-        $this->factory->getModel('asset')->getDownloadRepository()->updateLeadByTrackingId($event->getNewLead()->getId(), $event->getNewTrackingId(), $event->getOldTrackingId());
+        $this->factory->getModel('asset')->getDownloadRepository()->updateLeadByTrackingId(
+            $event->getNewLead()->getId(),
+            $event->getNewTrackingId(),
+            $event->getOldTrackingId()
+        );
     }
 
     /**
@@ -100,5 +110,31 @@ class LeadSubscriber extends CommonSubscriber
     public function onLeadMerge(LeadMergeEvent $event)
     {
         $this->factory->getModel('asset')->getDownloadRepository()->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
+    }
+
+    /**
+     * @param $event
+     */
+    public function logContactAttribution(AssetLoadEvent $event)
+    {
+        $lead = $event->getLead();
+
+        if (null != $lead->getAttribution()) {
+            $asset  = $event->getAsset();
+            $record = $event->getRecord();
+
+            $campaign = null;
+            if ($record->getSource() == 'campaign') {
+                $campaign = $this->factory->getEntityManager()->getReference('MauticCampaignBundle:Campaign', $record->getSourceId());
+            }
+
+            $attribution = (new Attribution())
+                ->setChannel('asset')
+                ->setChannelId($asset->getId())
+                ->setAction('download')
+                ->setCampaign($campaign);
+
+            $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Attribution')->saveEntity($attribution);
+        }
     }
 }

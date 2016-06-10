@@ -29,31 +29,42 @@ class AjaxController extends CommonAjaxController
     public function getSourceDataAction(Request $request)
     {
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
-        $model   = $this->factory->getModel('report');
+        $model   = $this->getModel('report');
         $context = $request->get('context');
 
-        list($list, $types) = $model->getColumnList($context, true);
-        $graphs             = $model->getGraphList($context, true);
+        $graphs = $model->getGraphList($context, true);
+        list($columns, $columnTypes) = $model->getColumnList($context, true);
+        list($filters, $filterTypes, $filterOperators) = $model->getFilterList($context, true);
 
-        return $this->sendJsonResponse(array('columns' => $list, 'types' => $types, 'graphs' => $graphs));
+        return $this->sendJsonResponse(
+            [
+                'columns'         => $columns,
+                'types'           => $columnTypes,
+                'filters'         => $filters,
+                'filterTypes'     => $filterTypes,
+                'filterOperators' => $filterOperators,
+                'graphs'          => $graphs,
+            ]
+        );
     }
 
     /**
      * @param Request $request
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function updateGraphAction(Request $request)
     {
         $reportId  = InputHelper::int($request->request->get('reportId'));
         $options   = InputHelper::clean($request->request->all());
-        $dataArray = array('success' => 0);
+        $dataArray = ['success' => 0];
 
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
-        $model    = $this->factory->getModel('report');
+        $model    = $this->getModel('report');
         $report   = $model->getEntity($reportId);
 
         $options['ignoreTableData'] = true;
-        $reportData = $model->getReportData($report, $this->container->get('form.factory'), $options);
+        $reportData                 = $model->getReportData($report, $this->container->get('form.factory'), $options);
 
         $dataArray['graph']   = $reportData['graphs'][$options['graphName']]['data'];
         $dataArray['success'] = 1;

@@ -32,8 +32,16 @@ class AssetLoadEvent extends CommonEvent
      *
      * @return Download
      */
-    public function getDownload()
+    public function getRecord()
     {
         return $this->entity;
+    }
+
+    /**
+     * @return \Mautic\AssetBundle\Entity\Asset
+     */
+    public function getAsset()
+    {
+        return $this->entity->getAsset();
     }
 }

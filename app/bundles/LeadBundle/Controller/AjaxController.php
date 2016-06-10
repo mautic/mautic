@@ -35,7 +35,7 @@ class AjaxController extends CommonAjaxController
     protected function userListAction (Request $request)
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
-        $results   = $this->factory->getModel('lead.lead')->getLookupResults('user', $filter);
+        $results   = $this->getModel('lead.lead')->getLookupResults('user', $filter);
         $dataArray = array();
         foreach ($results as $r) {
             $name        = $r['firstName'] . ' ' . $r['lastName'];
@@ -60,7 +60,7 @@ class AjaxController extends CommonAjaxController
         $field     = InputHelper::clean($request->query->get('field'));
         if (!empty($field)) {
             if ($field == "owner_id") {
-                $results = $this->factory->getModel('lead.lead')->getLookupResults('user', $filter);
+                $results = $this->getModel('lead.lead')->getLookupResults('user', $filter);
                 foreach ($results as $r) {
                     $name        = $r['firstName'] . ' ' . $r['lastName'];
                     $dataArray[] = array(
@@ -74,7 +74,7 @@ class AjaxController extends CommonAjaxController
                     'value' => ''
                 );
             } else {
-                $results = $this->factory->getModel('lead.field')->getLookupResults($field, $filter);
+                $results = $this->getModel('lead.field')->getLookupResults($field, $filter);
                 foreach ($results as $r) { 
                     $dataArray[] = array('value' => $r[$field]);
                 }
@@ -99,7 +99,7 @@ class AjaxController extends CommonAjaxController
 
         if (!empty($leadId)) {
             //find the lead
-            $model = $this->factory->getModel('lead.lead');
+            $model = $this->getModel('lead.lead');
             $lead  = $model->getEntity($leadId);
 
             if ($lead !== null && $this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getOwner())) {
@@ -158,7 +158,7 @@ class AjaxController extends CommonAjaxController
 
         if (!empty($leadId)) {
             //find the lead
-            $model = $this->factory->getModel('lead.lead');
+            $model = $this->getModel('lead.lead');
             $lead  = $model->getEntity($leadId);
 
             if ($lead !== null && $this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getOwner())) {
@@ -200,7 +200,7 @@ class AjaxController extends CommonAjaxController
 
         if (!empty($leadId)) {
             //find the lead
-            $model = $this->factory->getModel('lead.lead');
+            $model = $this->getModel('lead.lead');
             $lead  = $model->getEntity($leadId);
 
             if ($lead !== null) {
@@ -253,8 +253,8 @@ class AjaxController extends CommonAjaxController
         $action    = InputHelper::clean($request->request->get('listAction'));
 
         if (!empty($leadId) && !empty($listId) && in_array($action, array('remove', 'add'))) {
-            $leadModel = $this->factory->getModel('lead');
-            $listModel = $this->factory->getModel('lead.list');
+            $leadModel = $this->getModel('lead');
+            $listModel = $this->getModel('lead.list');
 
             $lead = $leadModel->getEntity($leadId);
             $list = $listModel->getEntity($listId);
@@ -282,8 +282,8 @@ class AjaxController extends CommonAjaxController
         $action     = InputHelper::clean($request->request->get('campaignAction'));
 
         if (!empty($leadId) && !empty($campaignId) && in_array($action, array('remove', 'add'))) {
-            $leadModel     = $this->factory->getModel('lead');
-            $campaignModel = $this->factory->getModel('campaign');
+            $leadModel     = $this->getModel('lead');
+            $campaignModel = $this->getModel('campaign');
 
             $lead     = $leadModel->getEntity($leadId);
             $campaign = $campaignModel->getEntity($campaignId);
@@ -338,9 +338,9 @@ class AjaxController extends CommonAjaxController
             if ($lead) {
                 // Use lead model to trigger listeners
                 $lead->removeDoNotEmailEntry($dnc);
-                $this->factory->getModel('lead')->saveEntity($lead);
+                $this->getModel('lead')->saveEntity($lead);
             } else {
-                $this->factory->getModel('email')->getRepository()->deleteDoNotEmailEntry($dncId);
+                $this->getModel('email')->getRepository()->deleteDoNotEmailEntry($dncId);
             }
 
             $dataArray['success'] = 1;
@@ -378,7 +378,7 @@ class AjaxController extends CommonAjaxController
             }
 
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-            $model   = $this->factory->getModel('lead.lead');
+            $model   = $this->getModel('lead.lead');
             $session = $this->factory->getSession();
 
             $search = $session->get('mautic.lead.filter', '');
@@ -421,7 +421,7 @@ class AjaxController extends CommonAjaxController
 
                 // We need the EmailRepository to check if a lead is flagged as do not contact
                 /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
-                $emailRepo = $this->factory->getModel('email')->getRepository();
+                $emailRepo = $this->getModel('email')->getRepository();
                 $indexMode = $this->request->get('view', $session->get('mautic.lead.indexmode', 'list'));
                 $template  = ($indexMode == 'list') ? 'list_rows' : 'grid_cards';
                 $dataArray['leads'] = $this->factory->getTemplating()->render("MauticLeadBundle:Lead:{$template}.html.php", array(
@@ -451,7 +451,7 @@ class AjaxController extends CommonAjaxController
         $emailId = $request->get('template');
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model    = $this->factory->getModel('email');
+        $model    = $this->getModel('email');
 
         /** @var \Mautic\EmailBundle\Entity\Email $email */
         $email    = $model->getEntity($emailId);
@@ -486,7 +486,7 @@ class AjaxController extends CommonAjaxController
     protected function updateLeadTagsAction(Request $request)
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel   = $this->factory->getModel('lead');
+        $leadModel   = $this->getModel('lead');
         $post        = $request->request->get('lead_tags', array(), true);
         $lead        = $leadModel->getEntity((int) $post['id']);
         $updatedTags = (!empty($post['tags']) && is_array($post['tags'])) ? $post['tags'] : array();
@@ -537,7 +537,7 @@ class AjaxController extends CommonAjaxController
                 }
             }
 
-            $leadModel = $this->factory->getModel('lead');
+            $leadModel = $this->getModel('lead');
 
             if (!empty($newTags)) {
                 $leadModel->getTagRepository()->saveEntities($newTags);
@@ -577,7 +577,7 @@ class AjaxController extends CommonAjaxController
 
         if (!empty($order)) {
             /** @var \Mautic\LeadBundle\Model\FieldModel $model */
-            $model = $this->factory->getModel('lead.field');
+            $model = $this->getModel('lead.field');
 
             $startAt = ($page > 1) ? ($page * $limit) + 1 : 1;
             $model->reorderFieldsByList($order, $startAt);
@@ -595,7 +595,7 @@ class AjaxController extends CommonAjaxController
     {
         $alias       = InputHelper::clean($request->request->get('alias'));
         $dataArray   = array('success' => 0, 'options' => null);
-        $leadField   = $this->factory->getModel('lead.field')->getRepository()->findOneBy(array('alias' => $alias));
+        $leadField   = $this->getModel('lead.field')->getRepository()->findOneBy(array('alias' => $alias));
         $choiceTypes = array('boolean', 'country', 'region', 'lookup', 'timezone', 'select', 'radio');
 
         if ($leadField && in_array($leadField->getType(), $choiceTypes)) {

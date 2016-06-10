@@ -9,6 +9,9 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Event\EmailOpenEvent;
+use Mautic\LeadBundle\Entity\Attribution;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -26,10 +29,12 @@ class LeadSubscriber extends CommonSubscriber
      */
     static public function getSubscribedEvents()
     {
-        return array(
-            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
-            LeadEvents::LEAD_POST_MERGE      => array('onLeadMerge', 0)
-        );
+        return [
+            LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
+            LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
+            // Execute this event after potential campaign decision triggers
+            EmailEvents::EMAIL_ON_OPEN       => ['logContactAttribution', -10],
+        ];
     }
 
     /**
@@ -52,7 +57,7 @@ class LeadSubscriber extends CommonSubscriber
         $filters = $event->getEventFilters();
 
         $lead    = $event->getLead();
-        $options = array('ipIds' => array(), 'filters' => $filters);
+        $options = ['ipIds' => [], 'filters' => $filters];
 
         /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
         /*
@@ -70,34 +75,34 @@ class LeadSubscriber extends CommonSubscriber
         foreach ($stats as $stat) {
             if ($stat['dateRead'] && $event->isApplicable($eventTypeKeyRead, true)) {
                 $event->addEvent(
-                    array(
+                    [
                         'event'           => $eventTypeKeyRead,
                         'eventLabel'      => $eventTypeNameRead,
                         'timestamp'       => $stat['dateRead'],
-                        'extra'           => array(
+                        'extra'           => [
                             'stat' => $stat,
                             'type' => 'read'
-                        ),
+                        ],
                         'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php',
                         'icon'            => 'fa-envelope-o'
-                    )
+                    ]
                 );
             }
 
             // Email read
             if ($stat['dateSent'] && $event->isApplicable($eventTypeKeySent)) {
                 $event->addEvent(
-                    array(
+                    [
                         'event'           => $eventTypeKeySent,
                         'eventLabel'      => $eventTypeNameSent,
                         'timestamp'       => $stat['dateSent'],
-                        'extra'           => array(
+                        'extra'           => [
                             'stat' => $stat,
                             'type' => 'sent'
-                        ),
+                        ],
                         'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php',
                         'icon'            => 'fa-envelope'
-                    )
+                    ]
                 );
             }
         }
@@ -112,5 +117,32 @@ class LeadSubscriber extends CommonSubscriber
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
+    }
+
+    /**
+     * @param EmailOpenEvent $event
+     */
+    public function logContactAttribution(EmailOpenEvent $event)
+    {
+        if ($stat = $event->getStat()) {
+            $lead = $event->getLead();
+
+            if (null != $lead->getAttribution()) {
+                $email = $event->getEmail();
+
+                $campaign = null;
+                if ($stat->getSource() == 'campaign') {
+                    $campaign = $this->factory->getEntityManager()->getReference('MauticCampaignBundle:Campaign', $stat->getSourceId());
+                }
+
+                $attribution = (new Attribution())
+                    ->setChannel('email')
+                    ->setChannelId($email ? $email->getId() : null)
+                    ->setAction('open')
+                    ->setCampaign($campaign);
+
+                $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Attribution')->saveEntity($attribution);
+            }
+        }
     }
 }

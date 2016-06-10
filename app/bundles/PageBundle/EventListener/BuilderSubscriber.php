@@ -23,7 +23,6 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 class BuilderSubscriber extends CommonSubscriber
 {
     private $pageTokenRegex = '{pagelink=(.*?)}';
-    private $externalTokenRegex = '{externallink=(.*?)}';
     private $langBarRegex = '{langbar}';
     private $shareButtonsRegex = '{sharebuttons}';
     private $emailIsInternalSend = false;
@@ -123,10 +122,9 @@ class BuilderSubscriber extends CommonSubscriber
             $content = str_ireplace($this->shareButtonsRegex, $buttons, $content);
         }
 
-        $clickThrough   = array('source' => array('page', $page->getId()));
-        $pageTokens     = $this->generatePageTokens($content, $clickThrough);
-        $externalTokens = $this->generateExternalLinkTokens($content, $clickThrough);
-        $tokens         = array_merge($pageTokens, $externalTokens);
+        $clickThrough = array('source' => array('page', $page->getId()));
+        $tokens       = $this->generatePageTokens($content, $clickThrough);
+
         if (count($tokens)) {
             $content = str_ireplace(array_keys($tokens), $tokens, $content);
         }
@@ -275,10 +273,8 @@ class BuilderSubscriber extends CommonSubscriber
         $this->emailIsInternalSend = $event->isInternalSend();
         $this->emailEntity         = $event->getEmail();
 
-        $tokens = array_merge(
-            $this->generatePageTokens($content.$plainText, $clickthrough),
-            $this->generateExternalLinkTokens($content.$plainText, $clickthrough)
-        );
+        $tokens = $this->generatePageTokens($content.$plainText, $clickthrough);
+
         $event->addTokens($tokens);
     }
 
@@ -315,58 +311,6 @@ class BuilderSubscriber extends CommonSubscriber
             }
 
             unset($matches);
-        }
-
-        return $tokens;
-    }
-
-    /**
-     * @deprecated Since version 1.1; to be removed in 2.0
-     *
-     * @param $content
-     * @param $clickthrough
-     *
-     * @return array
-     */
-    protected function generateExternalLinkTokens($content, $clickthrough = array())
-    {
-        /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
-        $redirectModel = $this->factory->getModel('page.redirect');
-
-        $tokens = array();
-
-        preg_match_all('/'.$this->externalTokenRegex.'/', $content, $matches);
-
-        if (!empty($matches[1])) {
-            $foundTokens = array();
-            foreach ($matches[1] as $key => $match) {
-                $token = $matches[0][$key];
-                if (!empty($tokens[$token])) {
-                    continue;
-                }
-
-                $foundTokens[$token] = $match;
-            }
-
-            if ($this->emailIsInternalSend) {
-                // Just replace tokens with its own URL
-                $tokens = array_merge($tokens, $foundTokens);
-            } else {
-                $links = $redirectModel->getRedirectListByUrls($foundTokens, $this->emailEntity);
-                foreach ($links as $token => $link) {
-                    $tokens[$token] = $redirectModel->generateRedirectUrl($link, $clickthrough);;
-
-                    if (!$link->getId() && !isset($persistEntities[$token])) {
-                        $persistEntities[$token] = $link;
-                    }
-                }
-
-                if (!empty($persistEntities)) {
-                    $redirectModel->saveEntities($persistEntities);
-                }
-            }
-
-            unset($foundTokens, $links, $persistEntities);
         }
 
         return $tokens;
