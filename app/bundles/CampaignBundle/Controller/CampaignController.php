@@ -884,7 +884,8 @@ class CampaignController extends FormController
         $campaign = $model->getEntity($objectId);
 
         // Generate temporary ID
-        $tempId = sha1(uniqid(mt_rand(), true));
+        $tempId = 'mautic_'.sha1(uniqid(mt_rand(), true));
+
 
         // load sources to session
         $currentSources = $model->getLeadSources($objectId);
