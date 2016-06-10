@@ -1,5 +1,3 @@
-
-
 /**
  * Launch builder
  *
@@ -52,9 +50,6 @@ Mautic.launchBuilder = function (formName, actionName) {
             doc.write(mQuery('textarea.builder-html').val());
             doc.close();
             builder.load(function() {
-                Mautic.builderContents = builder.contents();
-                Mautic.initSlotListeners();
-                Mautic.initSlots();
                 mQuery('#builder-overlay').addClass('hide');
                 mQuery('.btn-close-builder').prop('disabled', false);
             });
@@ -65,9 +60,6 @@ Mautic.launchBuilder = function (formName, actionName) {
 
             builder.attr('src', src);
             builder.load(function () {
-                Mautic.builderContents = mQuery(this).contents();
-                Mautic.initSlotListeners();
-                Mautic.initSlots();
                 // here, catch the droppable div and create a droppable widget
                 Mautic.builderContents.find('.mautic-editable').droppable({
                     iframeFix: true,
@@ -486,10 +478,9 @@ Mautic.builderOnLoad = function (target) {
     Mautic.activateBuilderDragTokens(target);
 };
 
-
 Mautic.initSlots = function() {
     var slotContainers = Mautic.builderContents.find('[data-slot-container]');
-
+console.log(Mautic.builderContents, slotContainers);
     // Make slots sortable
     slotContainers.sortable({
         items: '[data-slot]',
@@ -597,16 +588,16 @@ Mautic.initSlotListeners = function() {
                 Mautic.initAtWho(editor.$el, method, editor);
             });
 
-            // Init Froala editor
-            slot.froalaEditor({
+            var inlineFroalaOptions = {
                 toolbarInline: true,
                 toolbarVisibleWithoutSelection: true,
-                // scrollableContainer: Mautic.builderContents.find('body'), // This is cause editor to lose CSS
-                scrollableContainer: slot,
                 toolbarButtons: ['bold', 'italic', 'insertImage', 'insertLink', 'undo', 'redo', '-', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'indent', 'outdent'],
-                zIndex: 2501
-            });
+                zIndex: 2501,
+            };
+
+            slot.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, inlineFroalaOptions));
         } else if (type === 'image') {
+            // Init Froala editor
             slot.find('img').froalaEditor({toolbarInline: true});
         } else if (type === 'button') {
             slot.find('a').click(function(e) {
@@ -639,3 +630,9 @@ Mautic.initSlotListeners = function() {
         Mautic.builderContents.find('.sf-toolbar').remove();
     });
 };
+
+mQuery(function() {
+Mautic.builderContents = mQuery('body');
+    Mautic.initSlotListeners();
+    Mautic.initSlots();
+});

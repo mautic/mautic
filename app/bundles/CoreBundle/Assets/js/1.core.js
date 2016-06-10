@@ -41,6 +41,13 @@ mQuery( document ).ajaxStop(function(event) {
 });
 
 mQuery( document ).ready(function() {
+    Mautic.basicFroalaOptions = {
+        enter: mQuery.FroalaEditor.ENTER_BR,
+        imageUploadURL: mauticBaseUrl + 's/file/upload',
+        imageManagerLoadURL: mauticBaseUrl + 's/file/list',
+        imageManagerDeleteURL: mauticBaseUrl + 's/file/delete'
+    };
+
     // Set the Froala license key
     mQuery.FroalaEditor.DEFAULTS.key = 'MCHCPd1XQVZFSHSd1C==';
 
@@ -548,12 +555,7 @@ var Mautic = {
                         });
                     }
 
-                    textarea.froalaEditor({
-                        enter: mQuery.FroalaEditor.ENTER_BR,
-                        imageUploadURL: mauticBaseUrl + 's/file/upload',
-                        imageManagerLoadURL: mauticBaseUrl + 's/file/list',
-                        imageManagerDeleteURL: mauticBaseUrl + 's/file/delete'
-                    });
+                    textarea.froalaEditor(Mautic.basicFroalaOptions);
                 });
             }
         });
