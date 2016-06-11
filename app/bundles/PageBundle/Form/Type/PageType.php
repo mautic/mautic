@@ -114,7 +114,6 @@ class PageType extends AbstractType
                 'attr'    => array(
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.page.form.template.help',
-                    'onchange' => 'Mautic.onBuilderModeSwitch(this);'
                 ),
                 'empty_value' => 'mautic.core.none'
             )

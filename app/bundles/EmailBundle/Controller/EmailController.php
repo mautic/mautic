@@ -1413,7 +1413,7 @@ class EmailController extends FormController
 
         $assetsHelper->addScriptDeclaration("var mauticBasePath    = '" . $this->request->getBasePath() . "';");
         $assetsHelper->addScriptDeclaration("var mauticAjaxUrl     = '" . $routerHelper->generate("mautic_core_ajax") . "';");
-        $assetsHelper->addScriptDeclaration("var mauticBaseUrl     = '" . $routerHelper->generate("mautic_core_ajax") . "';");// remove this
+        $assetsHelper->addScriptDeclaration("var mauticBaseUrl     = '" . $routerHelper->generate("mautic_base_index") . "';");
         $assetsHelper->addScriptDeclaration("var mauticAssetPrefix = '" . $assetsHelper->getAssetPrefix(true) . "';");
         $assetsHelper->addCustomDeclaration($assetsHelper->getSystemScripts(true, true));
         // $assetsHelper->addStylesheet('app/bundles/EmailBundle/Assets/builder/builder.css');
