@@ -21,90 +21,6 @@ use Mautic\LeadBundle\Event\ListChangeEvent;
 class CampaignEventHelper
 {
     /**
-     * @param $event
-     * @param $factory
-     * @param $lead
-     *
-     * @return bool
-     */
-    public static function changeLists ($event, $factory, $lead)
-    {
-        $properties = $event['properties'];
-
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel  = $factory->getModel('lead');
-        $addTo      = $properties['addToLists'];
-        $removeFrom = $properties['removeFromLists'];
-
-        $somethingHappened = false;
-
-        if (!empty($addTo)) {
-            $leadModel->addToLists($lead, $addTo);
-            $somethingHappened = true;
-        }
-
-        if (!empty($removeFrom)) {
-            $leadModel->removeFromLists($lead, $removeFrom);
-            $somethingHappened = true;
-        }
-
-        return $somethingHappened;
-    }
-
-    /**
-     * @param               $event
-     * @param               $lead
-     * @param MauticFactory $factory
-     *
-     * @return bool
-     */
-    public static function changePoints ($event, $lead, MauticFactory $factory)
-    {
-        $points = $event['properties']['points'];
-
-        $somethingHappened = false;
-
-        if ($lead != null && !empty($points)) {
-            $lead->addToPoints($points);
-
-            //add a lead point change log
-            $log = new PointsChangeLog();
-            $log->setDelta($points);
-            $log->setLead($lead);
-            $log->setType('campaign');
-            $log->setEventName("{$event['campaign']['id']}: {$event['campaign']['name']}");
-            $log->setActionName("{$event['id']}: {$event['name']}");
-            $log->setIpAddress($factory->getIpAddress());
-            $log->setDateAdded(new \DateTime());
-            $lead->addPointsChangeLog($log);
-
-            $factory->getModel('lead')->saveEntity($lead);
-            $somethingHappened = true;
-        }
-
-        return $somethingHappened;
-    }
-
-    /**
-     * @param $event
-     * @param $factory
-     * @param $lead
-     *
-     * @return bool
-     */
-    public static function updateLead ($event, $factory, $lead)
-    {
-        $properties = $event['properties'];
-
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel  = $factory->getModel('lead');
-        $leadModel->setFieldValues($lead, $properties, false);
-        $leadModel->saveEntity($lead);
-
-        return true;
-    }
-
-    /**
      * @param      $event
      * @param Lead $lead
      *
@@ -146,29 +62,5 @@ class CampaignEventHelper
         }
 
         return true;
-    }
-
-    /**
-     * Determine if this campaign applies
-     *
-     * @param $eventDetails
-     * @param $event
-     *
-     * @return bool
-     */
-    public static function validateFormValue(MauticFactory $factory, $event, Lead $lead)
-    {
-        if (!$lead || !$lead->getId()) {
-            return false;
-        }
-
-        $operators = $factory->getModel('lead')->getFilterExpressionFunctions();
-
-        return $factory->getModel('lead.field')->getRepository()->compareValue(
-            $lead->getId(),
-            $event['properties']['field'],
-            $event['properties']['value'],
-            $operators[$event['properties']['operator']]['expr']
-        );
     }
 }

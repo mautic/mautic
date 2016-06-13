@@ -54,6 +54,9 @@ class MauticCoreExtension extends Extension
                         case 'menus':
                             $defaultTag = 'knp_menu.menu';
                             break;
+                        case 'models':
+                            $defaultTag = 'mautic.model';
+                            break;
                         default:
                             $defaultTag = false;
                             break;

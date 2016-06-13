@@ -30,7 +30,7 @@ class AjaxController extends CommonAjaxController
     protected function categoryListAction(Request $request)
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
-        $results   = $this->factory->getModel('asset.asset')->getLookupResults('category', $filter, 10);
+        $results   = $this->getModel('asset')->getLookupResults('category', $filter, 10);
         $dataArray = array();
         foreach ($results as $r) {
             $dataArray[] = array(
