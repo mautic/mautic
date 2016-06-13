@@ -212,16 +212,23 @@ if ($activeForm->getFormType() === null || !empty($forceTypeSelection)):
             'typePrefix'         => 'form',
             'cancelUrl'          => 'mautic_form_index',
             'header'             => 'mautic.form.type.header',
-            'typeOneHeader'      => 'mautic.form.type.campaign.header',
-            'typeOneIconClass'   => 'fa-cubes',
-            'typeOneDescription' => 'mautic.form.type.campaign.description',
-            'typeOneOnClick'     => "Mautic.selectFormType('campaign');",
-            'typeTwoHeader'      => 'mautic.form.type.standalone.header',
-            'typeTwoIconClass'   => 'fa-list',
-            'typeTwoDescription' => 'mautic.form.type.standalone.description',
-            'typeTwoOnClick'     => "Mautic.selectFormType('standalone');",
-        ]
-    );
+            'types'                => [
+                [
+                    'header'        => 'mautic.form.type.campaign.header',
+                    'iconClass'     => 'fa-cubes',
+                    'description'   => 'mautic.form.type.campaign.description',
+                    'onClick'       => "Mautic.selectFormType('campaign');",
+                    'color'         => 'success'
+                ],
+                [
+                    'header'        => 'mautic.form.type.standalone.header',
+                    'iconClass'     => 'fa-list',
+                    'description'   => 'mautic.form.type.standalone.description',
+                    'onClick'       => "Mautic.selectFormType('standalone');",
+                    'color'         => 'primary'
+                ]
+            ]
+        ]);
 endif;
 
 $view['slots']->append(

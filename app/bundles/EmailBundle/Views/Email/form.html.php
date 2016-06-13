@@ -293,17 +293,28 @@ if (empty($type) || !empty($forceTypeSelection)):
             'typePrefix'           => 'email',
             'cancelUrl'            => 'mautic_email_index',
             'header'               => 'mautic.email.type.header',
-            'typeOneHeader'        => 'mautic.email.type.template.header',
-            'typeOneIconClass'     => 'fa-cube',
-            'typeOneDescription'   => 'mautic.email.type.template.description',
-            'typeOneOnClick'       => "Mautic.selectEmailType('template');",
-            'typeTwoHeader'        => 'mautic.email.type.list.header',
-            'typeTwoIconClass'     => 'fa-pie-chart',
-            'typeTwoDescription'   => 'mautic.email.type.list.description',
-            'typeTwoOnClick'       => "Mautic.selectEmailType('list');",
-            'typeThreeHeader'      => 'mautic.email.type.feed.header',
-            'typeThreeIconClass'   => 'fa-rss-square',
-            'typeThreeDescription' => 'mautic.email.type.feed.description',
-            'typeThreeOnClick'     => "Mautic.selectEmailType('feed');",
+            'types'                => [
+                [
+                    'header'       => 'mautic.email.type.template.header',
+                    'iconClass'    => 'fa-cube',
+                    'description'  => 'mautic.email.type.template.description',
+                    'onClick'      => "Mautic.selectEmailType('template');",
+                    'color'        => 'success'
+                ],
+                [
+                    'header'       => 'mautic.email.type.list.header',
+                    'iconClass'    => 'fa-pie-chart',
+                    'description'  => 'mautic.email.type.list.description',
+                    'onClick'      => "Mautic.selectEmailType('list');",
+                    'color'        => 'primary'
+                ],
+                [
+                    'header'       => 'mautic.email.type.feed.header',
+                    'iconClass'    => 'fa-rss-square',
+                    'description'  => 'mautic.email.type.feed.description',
+                    'onClick'      => "Mautic.selectEmailType('feed');",
+                    'color'        => 'warning'
+                ]
+            ]
         ]);
 endif;
