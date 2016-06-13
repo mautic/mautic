@@ -1283,21 +1283,21 @@
         },
         {
             "name": "geoip2/geoip2",
-            "version": "v2.4.0",
+            "version": "v2.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/maxmind/GeoIP2-php.git",
-                "reference": "2edce6957126399039124459174d5dce24edfdae"
+                "reference": "241e4442e0469d70043805ef699290616d53ce41"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/maxmind/GeoIP2-php/zipball/2edce6957126399039124459174d5dce24edfdae",
-                "reference": "2edce6957126399039124459174d5dce24edfdae",
+                "url": "https://api.github.com/repos/maxmind/GeoIP2-php/zipball/241e4442e0469d70043805ef699290616d53ce41",
+                "reference": "241e4442e0469d70043805ef699290616d53ce41",
                 "shasum": ""
             },
             "require": {
                 "maxmind-db/reader": "~1.0",
-                "maxmind/web-service-common": "~0.0.3",
+                "maxmind/web-service-common": "~0.2",
                 "php": ">=5.3.1"
             },
             "require-dev": {
@@ -1330,7 +1330,7 @@
                 "geolocation",
                 "maxmind"
             ],
-            "time": "2016-04-15 19:49:51"
+            "time": "2016-06-10 22:32:01"
         },
         {
             "name": "giggsey/libphonenumber-for-php",
@@ -1492,16 +1492,16 @@
         },
         {
             "name": "ip2location/ip2location-php",
-            "version": "7.2.4",
+            "version": "7.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/chrislim2888/IP2Location-PHP-Module.git",
-                "reference": "623787bc81e10aa50f510d5aefad9cd725695bf6"
+                "reference": "5f637f2e95e51861b9d969aa98f4e5868074f922"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/chrislim2888/IP2Location-PHP-Module/zipball/623787bc81e10aa50f510d5aefad9cd725695bf6",
-                "reference": "623787bc81e10aa50f510d5aefad9cd725695bf6",
+                "url": "https://api.github.com/repos/chrislim2888/IP2Location-PHP-Module/zipball/5f637f2e95e51861b9d969aa98f4e5868074f922",
+                "reference": "5f637f2e95e51861b9d969aa98f4e5868074f922",
                 "shasum": ""
             },
             "type": "library",
@@ -1528,7 +1528,7 @@
                 "ip2location",
                 "ip2locationlite"
             ],
-            "time": "2016-01-07 01:12:07"
+            "time": "2016-06-10 07:21:52"
         },
         {
             "name": "ircmaxell/password-compat",
@@ -2368,16 +2368,16 @@
         },
         {
             "name": "maxmind/web-service-common",
-            "version": "v0.0.4",
+            "version": "v0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/maxmind/web-service-common-php.git",
-                "reference": "f26fce5281290973beeeca3e33847887177dd138"
+                "reference": "620a1a0ac7e9b6c20ea65bfd7c93367af6433d77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/maxmind/web-service-common-php/zipball/f26fce5281290973beeeca3e33847887177dd138",
-                "reference": "f26fce5281290973beeeca3e33847887177dd138",
+                "url": "https://api.github.com/repos/maxmind/web-service-common-php/zipball/620a1a0ac7e9b6c20ea65bfd7c93367af6433d77",
+                "reference": "620a1a0ac7e9b6c20ea65bfd7c93367af6433d77",
                 "shasum": ""
             },
             "require": {
@@ -2386,7 +2386,8 @@
                 "php": ">=5.3"
             },
             "require-dev": {
-                "phpunit/phpunit": "4.6.*"
+                "phpunit/phpunit": "4.*",
+                "squizlabs/php_codesniffer": "2.*"
             },
             "type": "library",
             "autoload": {
@@ -2406,7 +2407,7 @@
             ],
             "description": "Internal MaxMind Web Service API",
             "homepage": "https://github.com/maxmind/mm-web-service-api-php",
-            "time": "2015-07-21 20:07:31"
+            "time": "2016-06-10 22:22:39"
         },
         {
             "name": "misd/phone-number-bundle",
@@ -6051,25 +6052,25 @@
     "packages-dev": [
         {
             "name": "babdev/transifex",
-            "version": "1.2.0",
+            "version": "1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BabDev/Transifex-API.git",
-                "reference": "9d0d82a91bef2f60d4479e6d618be19fd1f7ba41"
+                "reference": "01177cbc67d56d56f3eda5c93c8863f39c080a42"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BabDev/Transifex-API/zipball/9d0d82a91bef2f60d4479e6d618be19fd1f7ba41",
-                "reference": "9d0d82a91bef2f60d4479e6d618be19fd1f7ba41",
+                "url": "https://api.github.com/repos/BabDev/Transifex-API/zipball/01177cbc67d56d56f3eda5c93c8863f39c080a42",
+                "reference": "01177cbc67d56d56f3eda5c93c8863f39c080a42",
                 "shasum": ""
             },
             "require": {
                 "joomla/http": "~1.1",
-                "php": ">=5.3.10"
+                "php": "^5.3.10|~7.0"
             },
             "require-dev": {
                 "joomla/test": "~1.0",
-                "phpunit/phpunit": "~4.5",
+                "phpunit/phpunit": "~4.8|>=5.0 <5.4",
                 "squizlabs/php_codesniffer": "~1.5"
             },
             "type": "library",
@@ -6099,7 +6100,7 @@
                 "php",
                 "transifex"
             ],
-            "time": "2015-07-13 02:53:14"
+            "time": "2016-06-10 02:57:54"
         },
         {
             "name": "liip/functional-test-bundle",
