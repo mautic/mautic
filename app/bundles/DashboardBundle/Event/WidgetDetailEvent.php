@@ -12,8 +12,8 @@ namespace Mautic\DashboardBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class WidgetDetailEvent
@@ -40,7 +40,7 @@ class WidgetDetailEvent extends CommonEvent
      */
     protected $security = null;
 
-    public function __construct(Translator $translator)
+    public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
         $this->startTime = microtime();

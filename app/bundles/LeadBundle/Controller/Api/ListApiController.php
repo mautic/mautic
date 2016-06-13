@@ -25,7 +25,7 @@ class ListApiController extends CommonApiController
     public function initialize (FilterControllerEvent $event)
     {
         parent::initialize($event);
-        $this->model            = $this->factory->getModel('lead.list');
+        $this->model            = $this->getModel('lead.list');
         $this->entityClass      = 'Mautic\LeadBundle\Entity\LeadList';
         $this->entityNameOne    = 'list';
         $this->entityNameMulti  = 'lists';
@@ -40,7 +40,7 @@ class ListApiController extends CommonApiController
      */
     public function getListsAction ()
     {
-        $lists   = $this->factory->getModel('lead.list')->getUserLists();
+        $lists   = $this->getModel('lead.list')->getUserLists();
         $view    = $this->view($lists, Codes::HTTP_OK);
         $context = SerializationContext::create()->setGroups(array('leadListList'));
         $view->setSerializationContext($context);
@@ -62,7 +62,7 @@ class ListApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
-            $leadModel = $this->factory->getModel('lead');
+            $leadModel = $this->getModel('lead');
             $lead      = $leadModel->getEntity($leadId);
 
             // Does the lead exist and the user has permission to edit
@@ -101,7 +101,7 @@ class ListApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
-            $leadModel = $this->factory->getModel('lead');
+            $leadModel = $this->getModel('lead');
             $lead      = $leadModel->getEntity($leadId);
 
             // Does the lead exist and the user has permission to edit

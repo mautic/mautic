@@ -57,6 +57,18 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias' => 'config'
             )
+        ),
+        'models' =>  array(
+            'mautic.config.model.config' => array(
+                'class' => 'Mautic\ConfigBundle\Model\ConfigModel'
+            ),
+            'mautic.config.model.sysinfo' => array(
+                'class' => 'Mautic\ConfigBundle\Model\SysinfoModel',
+                'arguments' => array(
+                    'mautic.helper.paths',
+                    'mautic.helper.core_parameters'
+                )
+            )
         )
     )
 );

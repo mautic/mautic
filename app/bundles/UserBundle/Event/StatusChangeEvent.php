@@ -11,6 +11,8 @@ namespace Mautic\UserBundle\Event;
 
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\UserBundle\Entity\User;
 
 /**
  * Class StatusChangeEvent
@@ -20,30 +22,20 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 class StatusChangeEvent extends Event
 {
     /**
-     * @var MauticFactory
-     */
-    private $factory;
-
-    /**
-     * @var \Mautic\UserBundle\Entity\User|null
+     * @var \Mautic\UserBundle\Entity\User
      */
     private $user;
 
     /**
-     * @param MauticFactory $factory
+     * StatusChangeEvent constructor.
+     * 
+     * @param User $user
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(User $user)
     {
-        $this->factory = $factory;
-        $this->user    = $factory->getUser();
-    }
-
-    /**
-     * @return MauticFactory
-     */
-    public function getFactory()
-    {
-        return $this->factory;
+        $this->user = $user;
+        
+        parent::__construct();
     }
 
     /**
