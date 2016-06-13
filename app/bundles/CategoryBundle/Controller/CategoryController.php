@@ -101,7 +101,7 @@ class CategoryController extends FormController
         $orderBy    = $this->factory->getSession()->get('mautic.category.orderby', 'c.title');
         $orderByDir = $this->factory->getSession()->get('mautic.category.orderbydir', 'DESC');
 
-        $entities = $this->factory->getModel('category.category')->getEntities(
+        $entities = $this->getModel('category')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -177,7 +177,7 @@ class CategoryController extends FormController
     public function newAction ($bundle)
     {
         $session   = $this->factory->getSession();
-        $model     = $this->factory->getModel('category');
+        $model     = $this->getModel('category');
         $entity    = $model->getEntity();
         $success   = $closeModal = 0;
         $cancelled = $valid = false;
@@ -273,7 +273,7 @@ class CategoryController extends FormController
     public function editAction ($bundle, $objectId, $ignorePost = false)
     {
         $session   = $this->factory->getSession();
-        $model     = $this->factory->getModel('category');
+        $model     = $this->getModel('category');
         $entity    = $model->getEntity($objectId);
         $success   = $closeModal = 0;
         $cancelled = $valid = false;
@@ -377,7 +377,7 @@ class CategoryController extends FormController
      */
     public function cloneAction ($bundle, $objectId)
     {
-        $model  = $this->factory->getModel('category.category');
+        $model  = $this->getModel('category');
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -423,7 +423,7 @@ class CategoryController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->factory->getModel('category.category');
+            $model  = $this->getModel('category');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
@@ -486,7 +486,7 @@ class CategoryController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model     = $this->factory->getModel('category');
+            $model     = $this->getModel('category');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = array();
 

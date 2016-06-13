@@ -77,7 +77,7 @@ class AjaxController extends CommonAjaxController
     protected function updateWidgetOrderingAction(Request $request)
     {
         $data = $request->request->get('ordering');
-        $repo = $this->factory->getModel('dashboard')->getRepository();
+        $repo = $this->getModel('dashboard')->getRepository();
         $repo->updateOrdering(array_flip($data), $this->factory->getUser()->getId());
         $dataArray = array('success' => 1);
 
@@ -102,7 +102,7 @@ class AjaxController extends CommonAjaxController
         // }
 
         /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
-        $model  = $this->factory->getModel('dashboard');
+        $model  = $this->getModel('dashboard');
         $entity = $model->getEntity($objectId);
         if ($entity) {
             $model->deleteEntity($entity);

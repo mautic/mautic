@@ -21,7 +21,7 @@ class PublicController extends FormController
     public function passwordResetAction ()
     {
         /** @var \Mautic\UserBundle\Model\UserModel $model */
-        $model = $this->factory->getModel('user');
+        $model = $this->getModel('user');
 
         $data   = array('identifier' => '');
         $action = $this->generateUrl('mautic_user_passwordreset');
@@ -60,7 +60,7 @@ class PublicController extends FormController
     public function passwordResetConfirmAction()
     {
         /** @var \Mautic\UserBundle\Model\UserModel $model */
-        $model = $this->factory->getModel('user');
+        $model = $this->getModel('user');
 
         $data   = array('identifier' => '', 'password' => '', 'password_confirm' => '');
         $action = $this->generateUrl('mautic_user_passwordresetconfirm');

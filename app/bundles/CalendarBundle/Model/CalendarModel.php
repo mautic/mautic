@@ -39,7 +39,6 @@ class CalendarModel extends FormModel
      * Collects data for the calendar display
      *
      * @param string    $bundle
-     * @param date      $date
      * @param integer   $id
      *
      * @return array

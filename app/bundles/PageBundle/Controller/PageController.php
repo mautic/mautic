@@ -29,7 +29,7 @@ class PageController extends FormController
      */
     public function indexAction($page = 1)
     {
-        $model = $this->factory->getModel('page.page');
+        $model = $this->getModel('page.page');
 
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(array(
@@ -114,7 +114,7 @@ class PageController extends FormController
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         //retrieve a list of categories
-        $categories = $this->factory->getModel('page.page')->getLookupResults('category', '', 0);
+        $categories = $this->getModel('page.page')->getLookupResults('category', '', 0);
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
@@ -147,7 +147,7 @@ class PageController extends FormController
     public function viewAction($objectId)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model      = $this->factory->getModel('page.page');
+        $model      = $this->getModel('page.page');
         $security   = $this->factory->getSecurity();
         $activePage = $model->getEntity($objectId);
         //set the page we came from
@@ -254,7 +254,7 @@ class PageController extends FormController
         }
 
         // Audit Log
-        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('page', $activePage->getId(), $activePage->getDateAdded());
+        $logs = $this->getModel('core.auditLog')->getLogForObject('page', $activePage->getId(), $activePage->getDateAdded());
 
         // Hit count per day for last 30 days
         $last30 = $model->getHitsBarChartData('d', new \DateTime('-30 days'), new \DateTime, null, array('page_id' => $activePage->getId()));
@@ -324,7 +324,7 @@ class PageController extends FormController
     public function newAction($entity = null)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model   = $this->factory->getModel('page.page');
+        $model   = $this->getModel('page.page');
 
         if (!($entity instanceof Page)) {
             /** @var \Mautic\PageBundle\Entity\Page $entity */
@@ -447,7 +447,7 @@ class PageController extends FormController
     public function editAction($objectId, $ignorePost = false)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model   = $this->factory->getModel('page.page');
+        $model   = $this->getModel('page.page');
         $entity  = $model->getEntity($objectId);
         $session = $this->factory->getSession();
         $page    = $this->factory->getSession()->get('mautic.page.page', 1);
@@ -609,7 +609,7 @@ class PageController extends FormController
     public function cloneAction($objectId)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model   = $this->factory->getModel('page.page');
+        $model   = $this->getModel('page.page');
         $entity  = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -658,7 +658,7 @@ class PageController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\PageBundle\Model\PageModel $model */
-            $model  = $this->factory->getModel('page.page');
+            $model  = $this->getModel('page.page');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
@@ -719,7 +719,7 @@ class PageController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\PageBundle\Model\PageModel $model */
-            $model     = $this->factory->getModel('page');
+            $model     = $this->getModel('page');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = array();
 
@@ -775,7 +775,7 @@ class PageController extends FormController
     public function builderAction($objectId)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model = $this->factory->getModel('page.page');
+        $model = $this->getModel('page.page');
 
         //permission check
         if (strpos($objectId, 'new') !== false) {
@@ -835,7 +835,7 @@ class PageController extends FormController
     public function abtestAction($objectId)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model   = $this->factory->getModel('page.page');
+        $model   = $this->getModel('page.page');
         $entity  = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -890,7 +890,7 @@ class PageController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\PageBundle\Model\PageModel $model */
-            $model  = $this->factory->getModel('page.page');
+            $model  = $this->getModel('page.page');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {

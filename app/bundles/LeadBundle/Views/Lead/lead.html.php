@@ -53,7 +53,7 @@ if (!empty($fields['core']['email']['value'])) {
                 array('%email%' => $fields['core']['email']['value'])
             ),
             'href'        => $view['router']->generate(
-                'mautic_lead_action',
+                'mautic_contact_action',
                 array('objectId' => $lead->getId(), 'objectAction' => 'email')
             )
         ),
@@ -72,7 +72,7 @@ $buttons[] = array(
         ),
         'data-footer' => 'false',
         'href'        => $view['router']->generate(
-            'mautic_lead_action',
+            'mautic_contact_action',
             array("objectId" => $lead->getId(), "objectAction" => "list")
         ),
     ),
@@ -92,7 +92,7 @@ if ($security->isGranted('campaign:campaigns:edit')) {
             ),
             'data-footer' => 'false',
             'href'        => $view['router']->generate(
-                'mautic_lead_action',
+                'mautic_contact_action',
                 array("objectId" => $lead->getId(), "objectAction" => "campaign")
             )
         ),
@@ -119,7 +119,7 @@ if (($security->hasEntityAccess(
                 array('%name%' => $lead->getPrimaryIdentifier())
             ),
             'href'        => $view['router']->generate(
-                'mautic_lead_action',
+                'mautic_contact_action',
                 array("objectId" => $lead->getId(), "objectAction" => "merge")
             )
         ),
@@ -135,7 +135,7 @@ $view['slots']->set(
         'MauticCoreBundle:Helper:page_actions.html.php',
         array(
             'item'            => $lead,
-            'routeBase'       => 'lead',
+            'routeBase'       => 'contact',
             'langVar'         => 'lead.lead',
             'customButtons'   => $buttons,
             'templateButtons' => array(

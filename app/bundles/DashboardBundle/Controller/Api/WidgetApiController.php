@@ -29,7 +29,7 @@ class WidgetApiController extends CommonApiController
     public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
-        $this->model            = $this->factory->getModel('dashboard');
+        $this->model            = $this->getModel('dashboard');
         $this->entityClass      = 'Mautic\DashboardBundle\Entity\Widget';
         $this->entityNameOne    = 'widget';
         $this->entityNameMulti  = 'widgets';

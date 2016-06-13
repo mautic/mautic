@@ -26,13 +26,6 @@ class TriggerCampaignCommand extends ModeratedCommand
     {
         $this
             ->setName('mautic:campaigns:trigger')
-            ->setAliases(
-                array(
-                    'mautic:campaign:trigger',
-                    'mautic:trigger:campaigns',
-                    'mautic:trigger:campaign'
-                )
-            )
             ->setDescription('Trigger timed events for published campaigns.')
             ->addOption(
                 '--campaign-id',

@@ -269,8 +269,7 @@ class CorePermissions
 
             $parts = explode(':', $permission);
 
-            // addon @deprecated 1.1.4; will be removed in 2.0
-            if (($parts[0] == 'addon' ||$parts[0] == 'plugin') && count($parts) == 4) {
+            if ($parts[0] == 'plugin' && count($parts) == 4) {
                 $isPlugin = true;
                 array_shift($parts);
             } else {
@@ -349,8 +348,8 @@ class CorePermissions
             }
 
             $parts = explode(':', $p);
-            // addon @deprecated 1.1.4; will be removed in 2.0
-            if (($parts[0] == 'addon' || $parts[0] == 'plugin') && count($parts) == 4) {
+
+            if ($parts[0] == 'plugin' && count($parts) == 4) {
                 $isPlugin = true;
                 array_shift($parts);
             } else {

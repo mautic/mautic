@@ -9,9 +9,9 @@
 
 namespace Mautic\PointBundle\Event;
 
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class TriggerBuilderEvent
@@ -27,14 +27,14 @@ class TriggerBuilderEvent extends Event
     private $events = array();
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
     /**
-     * @param Translator $translator
+     * @param TranslatorInterface $translator
      */
-    public function __construct(Translator $translator)
+    public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
