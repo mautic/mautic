@@ -10,12 +10,27 @@
 namespace Mautic\PluginBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Model\FieldModel;
 
 /**
  * Class PluginModel
  */
 class PluginModel extends FormModel
 {
+    /**
+     * @var FieldModel
+     */
+    protected $leadFieldModel;
+
+    /**
+     * PluginModel constructor.
+     *
+     * @param FieldModel $leadFieldModel
+     */
+    public function __construct(FieldModel $leadFieldModel)
+    {
+        $this->leadFieldModel = $leadFieldModel;
+    }
 
     /**
      * {@inheritdoc}
@@ -35,12 +50,11 @@ class PluginModel extends FormModel
         return 'plugin:plugins';
     }
 
-
     /**
      * Get lead fields used in selects/matching
      */
     public function getLeadFields()
     {
-        return $this->factory->getModel('lead.field')->getFieldList();
+        return $this->leadFieldModel->getFieldList();
     }
 }

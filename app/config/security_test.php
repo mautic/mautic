@@ -85,4 +85,6 @@ $container->loadFromExtension('security', array(
     )
 ));
 
+$container->setParameter('mautic.security.disableUpdates', false);
+
 $this->import('security_api.php');

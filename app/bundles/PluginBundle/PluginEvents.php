@@ -72,6 +72,16 @@ final class PluginEvents
     const PLUGIN_ON_INTEGRATION_AUTH_REDIRECT = 'mautic.plugin_on_integration_auth_redirect';
 
     /**
+     * The mautic.plugin.on_campaign_trigger_action event is fired when the campaign action triggers.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.plugin.on_campaign_trigger_action';
+
+    /**
      * The mautic.plugin_on_integration_get_auth_callback_url event is dispatched when generating the redirect/callback URL
      *
      * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationAuthCallbackUrlEvent instance.

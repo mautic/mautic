@@ -12,6 +12,7 @@ namespace Mautic\InstallBundle\Configurator\Step;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\InstallBundle\Configurator\Form\CheckStepType;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Mautic\CoreBundle\Configurator\Step\StepInterface;
 
 /**
  * Check Step.
@@ -157,24 +158,18 @@ class CheckStep implements StepInterface
         }
 
         if (function_exists('apc_store') && ini_get('apc.enabled')) {
-            $minimumAPCversion = version_compare(PHP_VERSION, '5.4.0', '>=') ? '3.1.13' : '3.0.17';
-
-            if (!version_compare(phpversion('apc'), $minimumAPCversion, '>=')) {
+            if (!version_compare(phpversion('apc'), '3.1.13', '>=')) {
                 $messages[] = 'mautic.install.apc.version';
             }
         }
 
-        $unicodeIni = version_compare(PHP_VERSION, '5.4.0', '>=') ? 'zend.detect_unicode' : 'detect_unicode';
-
         // Commented for now, no idea what this check was actually supposed to be doing in the distro bundle
-        /*if (ini_get($unicodeIni)) {
+        /*if (ini_get('zend.detect_unicode')) {
             $messages[] = 'mautic.install.detect.unicode';
         }*/
 
         if (extension_loaded('suhosin')) {
-            $cfgValue = ini_get('suhosin.executor.include.whitelist');
-
-            if (!call_user_func(create_function('$cfgValue', 'return false !== stripos($cfgValue, "phar");'), $cfgValue)) {
+            if (stripos(ini_get('suhosin.executor.include.whitelist'), 'phar')) {
                 $messages[] = 'mautic.install.suhosin.whitelist';
             }
         }

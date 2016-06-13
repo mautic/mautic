@@ -124,7 +124,7 @@ var Mautic = {
         });
 
         Mautic.addKeyboardShortcut('shift+c', 'Load Contacts',  function(e) {
-            mQuery('#mautic_lead_index').click();
+            mQuery('#mautic_contact_index').click();
         });
 
         Mautic.addKeyboardShortcut('shift+right', 'Activate Right Menu', function (e) {
@@ -3119,11 +3119,40 @@ var Mautic = {
         if (maps.length) {
             maps.each(function(index, element) {
                 var wrapper = mQuery(element);
-                var data = mQuery.parseJSON(wrapper.text());
+                try {
+                    var data = mQuery.parseJSON(wrapper.text());
+                } catch (error) {
+
+                    return;
+                }
+
+                // Markers have numerical indexes
+                var firstKey = Object.keys(data)[0];
+
+                // Check type of data
+                if (firstKey == "0") {
+                    // Markers
+                    var markersData = data,
+                        regionsData = {};
+                } else {
+                    // Regions
+                    var markersData = {},
+                        regionsData = data;
+                }
+
                 wrapper.text('');
                 wrapper.vectorMap({
                     backgroundColor: 'transparent',
                     zoomOnScroll: false,
+                    markers: markersData,
+                    markerStyle: {
+                        initial: {
+                            fill: '#40C7B5'
+                        },
+                        selected: {
+                            fill: '#40C7B5'
+                        }
+                    },
                     regionStyle: {
                         initial: {
                             "fill": '#dce0e5',
@@ -3140,7 +3169,7 @@ var Mautic = {
                     map: 'world_mill_en',
                     series: {
                         regions: [{
-                            values: data,
+                            values: regionsData,
                             scale: ['#dce0e5', '#40C7B5'],
                             normalizeFunction: 'polynomial'
                         }]
