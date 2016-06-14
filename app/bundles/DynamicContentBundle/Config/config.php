@@ -46,11 +46,6 @@ return [
             ]
         ],
         'forms' => [
-            'mautic.form.type.dwc_filter'               => [
-                'class'     => 'Mautic\DynamicContentBundle\Form\Type\FilterType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'dwc_filter'
-            ],
             'mautic.form.type.dwc'                       => [
                 'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentType',
                 'arguments' => 'mautic.factory',

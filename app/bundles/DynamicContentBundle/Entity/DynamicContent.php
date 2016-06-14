@@ -52,14 +52,14 @@ class DynamicContent extends FormEntity
     /**
      * @var ArrayCollection
      */
-    private $items;
+    private $variants;
 
     /**
      * DynamicContent constructor.
      */
     public function __construct()
     {
-        $this->items = new ArrayCollection();
+        $this->variants = new ArrayCollection;
     }
 
     /**
@@ -88,9 +88,9 @@ class DynamicContent extends FormEntity
         
         $builder->addPublishDates();
 
-        $builder->createOneToMany('items', 'DynamicContentItem')
+        $builder->createOneToMany('variants', 'DynamicContent')
             ->setIndexBy('id')
-            ->mappedBy('dwc')
+            ->mappedBy('parent_id')
             ->fetchExtraLazy()
             ->build();
     }
@@ -116,7 +116,6 @@ class DynamicContent extends FormEntity
                 'category'
             ])
             ->addProperties([
-                'filters',
                 'publishUp',
                 'publishDown'
             ])
@@ -167,26 +166,6 @@ class DynamicContent extends FormEntity
     public function setDescription($description)
     {
         $this->description = $description;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLanguage()
-    {
-        return $this->language;
-    }
-
-    /**
-     * @param string $language
-     *
-     * @return $this
-     */
-    public function setLanguage($language)
-    {
-        $this->language = $language;
 
         return $this;
     }
@@ -251,6 +230,38 @@ class DynamicContent extends FormEntity
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
 
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getVariants()
+    {
+        return $this->variants;
+    }
+
+    /**
+     * @param ArrayCollection $variants
+     *
+     * @return $this
+     */
+    public function setVariants(ArrayCollection $variants)
+    {
+        $this->variants = $variants;
+
+        return $this;
+    }
+
+    /**
+     * @param DynamicContent $variant
+     *
+     * @return $this
+     */
+    public function addVariant(DynamicContent $variant)
+    {
+        $this->variants->add($variant);
+        
         return $this;
     }
 }

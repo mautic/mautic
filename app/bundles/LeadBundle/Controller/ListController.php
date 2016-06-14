@@ -51,18 +51,18 @@ class ListController extends FormController
         }
 
         //set limits
-        $limit = $session->get('mautic.leadlist.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.segment.limit', $this->factory->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
-        $search = $this->request->get('search', $session->get('mautic.leadlist.filter', ''));
-        $session->set('mautic.leadlist.filter', $search);
+        $search = $this->request->get('search', $session->get('mautic.segment.filter', ''));
+        $session->set('mautic.segment.filter', $search);
 
         //do some default filtering
-        $orderBy    = $session->get('mautic.leadlist.orderby', 'l.name');
-        $orderByDir = $session->get('mautic.leadlist.orderbydir', 'ASC');
+        $orderBy    = $session->get('mautic.segment.orderby', 'l.name');
+        $orderByDir = $session->get('mautic.segment.orderbydir', 'ASC');
 
         $filter     = array(
             'string' => $search
@@ -95,7 +95,7 @@ class ListController extends FormController
             } else {
                 $lastPage = (ceil($count / $limit)) ?: 1;
             }
-            $session->set('mautic.leadlist.page', $lastPage);
+            $session->set('mautic.segment.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_segment_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(array(
@@ -113,7 +113,7 @@ class ListController extends FormController
         }
 
         //set what page currently on so that we can return here after form submission/cancellation
-        $session->set('mautic.leadlist.page', $page);
+        $session->set('mautic.segment.page', $page);
 
         $listIds    = array_keys($items->getIterator()->getArrayCopy());
         $leadCounts = (!empty($listIds)) ? $model->getRepository()->getLeadCount($listIds) : array();
@@ -157,7 +157,7 @@ class ListController extends FormController
         /** @var ListModel $model */
         $model      =$this->getModel('lead.list');
         //set the page we came from
-        $page       = $this->factory->getSession()->get('mautic.leadlist.page', 1);
+        $page       = $this->factory->getSession()->get('mautic.segment.page', 1);
         //set the return URL for post actions
         $returnUrl  = $this->generateUrl('mautic_segment_index', array('page' => $page));
         $action     = $this->generateUrl('mautic_segment_action', array('objectAction' => 'new'));
@@ -226,7 +226,7 @@ class ListController extends FormController
         $list    = $model->getEntity($objectId);
 
         //set the page we came from
-        $page    = $this->factory->getSession()->get('mautic.leadlist.page', 1);
+        $page    = $this->factory->getSession()->get('mautic.segment.page', 1);
 
         //set the return URL
         $returnUrl  = $this->generateUrl('mautic_segment_index', array('page' => $page));
@@ -317,7 +317,7 @@ class ListController extends FormController
      */
     public function deleteAction($objectId)
     {
-        $page      = $this->factory->getSession()->get('mautic.leadlist.page', 1);
+        $page      = $this->factory->getSession()->get('mautic.segment.page', 1);
         $returnUrl = $this->generateUrl('mautic_segment_index', array('page' => $page));
         $flashes   = array();
 
@@ -376,7 +376,7 @@ class ListController extends FormController
      * @return JsonResponse | RedirectResponse
      */
     public function batchDeleteAction() {
-        $page        = $this->factory->getSession()->get('mautic.leadlist.page', 1);
+        $page        = $this->factory->getSession()->get('mautic.segment.page', 1);
         $returnUrl   = $this->generateUrl('mautic_segment_index', array('page' => $page));
         $flashes     = array();
 
