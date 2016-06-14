@@ -1,0 +1,8 @@
+{
+  "name": "Invite",
+  "features": [
+    "page",
+    "email",
+    "form"
+  ]
+}

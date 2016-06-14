@@ -12,7 +12,7 @@ namespace Mautic\CoreBundle\Templating\Helper;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Symfony\Component\Finder\Finder;
+use Mautic\CoreBundle\Helper\PathsHelper;
 
 /**
  * Class ThemeHelper
@@ -46,39 +46,31 @@ class ThemeHelper
     private $config;
 
     /**
-     * @param MauticFactory $factory
-     * @param string        $theme
+     * @param PathsHelper $pathsHelper
+     * @param string      $theme
      *
      * @throws BadConfigurationException
      * @throws FileNotFoundException
      */
-    public function __construct(MauticFactory $factory, $theme = 'current')
+    public function __construct(PathsHelper $pathsHelper, $theme)
     {
-        $this->factory   = $factory;
-        $this->theme     = ($theme == 'current') ? $factory->getParameter('theme') : $theme;
-        if ($this->theme == null) {
-            $this->theme = 'Mauve';
-        }
-        $this->themeDir  = $factory->getSystemPath('themes') . '/' . $this->theme;
-        $this->themePath = $factory->getSystemPath('themes_root') . '/' . $this->themeDir;
+        $this->theme = $theme;
+        $this->themeDir  = $pathsHelper->getSystemPath('themes') . '/' . $this->theme;
+        $this->themePath = $pathsHelper->getSystemPath('themes_root') . '/' . $this->themeDir;
 
-        //check to make sure the theme exists
-        if (!file_exists($this->themePath)) {
+        // check to make sure the theme exists
+        if (! file_exists($this->themePath)) {
             throw new FileNotFoundException($this->theme . ' not found!');
         }
 
-        //get the config
+        // get the config
         if (file_exists($this->themePath . '/config.json')) {
             $this->config = json_decode(file_get_contents($this->themePath . '/config.json'), true);
-        }
-        // @deprecated Remove support for theme config.php in 2.0
-        elseif (file_exists($this->themePath . '/config.php')) {
-            $this->config = include $this->themePath . '/config.php';
         } else {
             throw new BadConfigurationException($this->theme . ' is missing a required config file');
         }
 
-        if (!isset($this->config['name'])) {
+        if (! isset($this->config['name'])) {
             throw new BadConfigurationException($this->theme . ' does not have a valid config file');
         }
     }

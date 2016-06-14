@@ -75,7 +75,7 @@ class FormController extends CommonFormController
         $orderBy    = $session->get('mautic.form.orderby', 'f.name');
         $orderByDir = $session->get('mautic.form.orderbydir', 'ASC');
 
-        $forms = $this->factory->getModel('form.form')->getEntities(
+        $forms = $this->getModel('form.form')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -144,7 +144,7 @@ class FormController extends CommonFormController
     public function viewAction($objectId)
     {
         /** @var \Mautic\FormBundle\Model\FormModel $model */
-        $model      = $this->factory->getModel('form');
+        $model      = $this->getModel('form');
         $activeForm = $model->getEntity($objectId);
 
         //set the page we came from
@@ -198,7 +198,7 @@ class FormController extends CommonFormController
         );
 
         // Audit Log
-        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('form', $objectId, $activeForm->getDateAdded());
+        $logs = $this->getModel('core.auditLog')->getLogForObject('form', $objectId, $activeForm->getDateAdded());
 
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', array());
@@ -206,7 +206,7 @@ class FormController extends CommonFormController
         $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, array('action' => $action));
 
         // Submission stats per time period
-        $timeStats = $this->factory->getModel('form.submission')->getSubmissionsLineChartData(
+        $timeStats = $this->getModel('form.submission')->getSubmissionsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),
             new \DateTime($dateRangeForm->get('date_to')->getData()),
@@ -272,7 +272,7 @@ class FormController extends CommonFormController
     public function newAction()
     {
         /** @var \Mautic\FormBundle\Model\FormModel $model */
-        $model   = $this->factory->getModel('form');
+        $model   = $this->getModel('form');
         $entity  = $model->getEntity();
         $session = $this->factory->getSession();
 
@@ -467,7 +467,7 @@ class FormController extends CommonFormController
     public function editAction($objectId, $ignorePost = false, $forceTypeSelection = false)
     {
         /** @var \Mautic\FormBundle\Model\FormModel $model */
-        $model     = $this->factory->getModel('form');
+        $model     = $this->getModel('form');
         $formData  = $this->request->request->get('mauticform');
         $sessionId = isset($formData['sessionId']) ? $formData['sessionId'] : null;
 
@@ -583,7 +583,7 @@ class FormController extends CommonFormController
 
                             // Delete deleted actions
                             if (count($deletedActions)) {
-                                $this->factory->getModel('form.action')->deleteEntities($deletedActions);
+                                $this->getModel('form.action')->deleteEntities($deletedActions);
                             }
                         } else {
                             // Clear the actions
@@ -591,7 +591,7 @@ class FormController extends CommonFormController
 
                             // Delete all actions
                             if (count($modifiedActions)) {
-                                $this->factory->getModel('form.action')->deleteEntities(array_keys($modifiedActions));
+                                $this->getModel('form.action')->deleteEntities(array_keys($modifiedActions));
                             }
                         }
 
@@ -799,7 +799,7 @@ class FormController extends CommonFormController
      */
     public function cloneAction($objectId)
     {
-        $model = $this->factory->getModel('form.form');
+        $model = $this->getModel('form.form');
 
         /** @var \Mautic\FormBundle\Entity\Form $entity */
         $entity = $model->getEntity($objectId);
@@ -850,7 +850,7 @@ class FormController extends CommonFormController
      */
     public function previewAction($objectId)
     {
-        $model = $this->factory->getModel('form.form');
+        $model = $this->getModel('form.form');
         $form  = $model->getEntity($objectId);
 
         if ($form === null) {
@@ -942,7 +942,7 @@ class FormController extends CommonFormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->factory->getModel('form.form');
+            $model  = $this->getModel('form.form');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
@@ -1007,7 +1007,7 @@ class FormController extends CommonFormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model     = $this->factory->getModel('form');
+            $model     = $this->getModel('form');
             $ids       = json_decode($this->request->query->get('ids', ''));
             $deleteIds = array();
 
@@ -1094,7 +1094,7 @@ class FormController extends CommonFormController
 
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\FormBundle\Model\FormModel $model */
-            $model = $this->factory->getModel('form');
+            $model = $this->getModel('form');
             $ids   = json_decode($this->request->query->get('ids', ''));
             $count = 0;
             // Loop over the IDs to perform access checks pre-delete

@@ -41,6 +41,16 @@ mQuery( document ).ajaxStop(function(event) {
 });
 
 mQuery( document ).ready(function() {
+    Mautic.basicFroalaOptions = {
+        enter: mQuery.FroalaEditor.ENTER_BR,
+        imageUploadURL: mauticBaseUrl + 's/file/upload',
+        imageManagerLoadURL: mauticBaseUrl + 's/file/list',
+        imageManagerDeleteURL: mauticBaseUrl + 's/file/delete'
+    };
+
+    // Set the Froala license key
+    mQuery.FroalaEditor.DEFAULTS.key = 'MCHCPd1XQVZFSHSd1C==';
+
     if (typeof mauticContent !== 'undefined') {
         mQuery("html").Core({
             console: false
@@ -124,7 +134,7 @@ var Mautic = {
         });
 
         Mautic.addKeyboardShortcut('shift+c', 'Load Contacts',  function(e) {
-            mQuery('#mautic_lead_index').click();
+            mQuery('#mautic_contact_index').click();
         });
 
         Mautic.addKeyboardShortcut('shift+right', 'Activate Right Menu', function (e) {
@@ -513,40 +523,39 @@ var Mautic = {
         mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage', 'editor-basic-fullpage'], function (index, editorClass) {
             if (mQuery(container + ' textarea.' + editorClass).length) {
                 mQuery(container + ' textarea.' + editorClass).each(function () {
-                    var settings = {};
+                    // var settings = {};
 
-                    if (editorClass != 'editor') {
-                        // Set the custom editor toolbar
-                        var toolbar = editorClass.replace('editor-', '').replace('-', '_');
-                        settings.toolbar = toolbar;
+                    // if (editorClass != 'editor') {
+                    //     // Set the custom editor toolbar
+                    //     var toolbar = editorClass.replace('editor-', '').replace('-', '_');
+                    //     settings.toolbar = toolbar;
+                    // }
+
+                    // if (editorClass != 'editor' && editorClass != 'editor-basic') {
+                    //     // Do not strip classes and the like
+                    //     settings.allowedContent = true;
+                    // }
+
+                    // if (editorClass == 'editor-fullpage' || editorClass == 'editor-basic-fullpage') {
+                    //     // Allow full page editing and add tools to update html document
+                    //     settings.fullPage     = true;
+                    //     settings.extraPlugins = "sourcedialog,docprops,filemanager";
+                    // }
+
+                    // if (editorClass == 'editor') {
+                    //     settings.removePlugins = 'resize';
+                    // }
+
+                    var textarea = mQuery(this);
+
+                    if (textarea.hasClass('editor-builder-tokens')) {
+                        // init AtWho in a froala editor
+                        textarea.on('froalaEditor.initialized', function (e, editor) {
+                            Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'));
+                        });
                     }
 
-                    if (editorClass != 'editor' && editorClass != 'editor-basic') {
-                        // Do not strip classes and the like
-                        settings.allowedContent = true;
-                    }
-
-                    if (editorClass == 'editor-fullpage' || editorClass == 'editor-basic-fullpage') {
-                        // Allow full page editing and add tools to update html document
-                        settings.fullPage     = true;
-                        settings.extraPlugins = "sourcedialog,docprops,filemanager";
-                    }
-
-                    if (editorClass == 'editor') {
-                        settings.removePlugins = 'resize';
-                    }
-
-                    if (mQuery(this).hasClass('editor-builder-tokens')) {
-                        if (settings.extraPlugins) {
-                            settings.extraPlugins = settings.extraPlugins + ',tokens';
-                        } else {
-                            settings.extraPlugins = 'tokens';
-                        }
-                    }
-
-                    settings.on = Mautic.getGlobalEditorEvents();
-
-                    mQuery(this).ckeditor(settings);
+                    textarea.froalaEditor(Mautic.basicFroalaOptions);
                 });
             }
         });
@@ -658,6 +667,68 @@ var Mautic = {
         if ((response && typeof response.stopPageLoading != 'undefined' && response.stopPageLoading) || container == '#app-content' || container == '.page-list') {
             Mautic.stopPageLoadingBar();
         }
+    },
+
+    /**
+     * Initialize AtWho dropdown in a Froala editor.
+     *
+     * @param jQuery element
+     * @param method to get the tokens from
+     * @param Froala Editor
+     */
+    initAtWho: function(element, method, froala) {
+        Mautic.getTokens(method, function(tokens) {
+            element.atwho({
+                at: '{',
+                displayTpl: '<li>${name} <small>${id}</small></li>',
+                insertTpl: "${id}",
+                editableAtwhoQueryAttrs: {"data-fr-verified": true},
+                data: mQuery.map(tokens, function(value, i) {
+                    return {'id':i, 'name':value};
+                })
+            });
+
+            if (froala) {
+                froala.events.on('keydown', function (e) {
+                    if ((e.which == mQuery.FroalaEditor.KEYCODE.TAB || 
+                        e.which == mQuery.FroalaEditor.KEYCODE.ENTER) && 
+                        froala.$el.atwho('isSelecting')) {
+                        return false;
+                    }
+                }, true);
+            }
+        });
+    },
+
+    /**
+     * Download the tokens
+     *
+     * @param method to fetch the tokens from
+     * @param callback(tokens) to call when finished
+     */
+    getTokens: function(method, callback) {
+        var lastUpdate = parseInt(sessionStorage.getItem('mautic.tokens.loaded'));
+        if ((lastUpdate + 600000) > Date.now()) {
+            return callback(JSON.parse(sessionStorage.getItem('mautic.tokens')));
+        }
+
+        mQuery.ajax({
+            url: mauticAjaxUrl,
+            data: 'action=' + method,
+            success: function (response) {
+                if (typeof response.tokens === 'object') {
+                    // store the tokens to the session storage
+                    sessionStorage.setItem('mautic.tokens', JSON.stringify(response.tokens));
+                    sessionStorage.setItem('mautic.tokens.loaded', Date.now());
+
+                    // return the callback with tokens
+                    callback(response.tokens);
+                }
+            },
+            error: function (request, textStatus, errorThrown) {
+                Mautic.processAjaxError(request, textStatus, errorThrown);
+            }
+        });
     },
 
     /**
@@ -843,46 +914,46 @@ var Mautic = {
      *
      * @returns {{contentDom: Function}}
      */
-    getGlobalEditorEvents: function() {
+    // getGlobalEditorEvents: function() {
 
-        return {
-            contentDom: function (event) {
-                var editable = event.editor.editable();
+    //     return {
+    //         contentDom: function (event) {
+    //             var editable = event.editor.editable();
 
-                var doc = (editable.isInline()) ? '#' + event.editor.name : mQuery(event.editor.window.getFrame().$).contents();
-                var tokens = mQuery(doc).find('*[data-token]');
+    //             var doc = (editable.isInline()) ? '#' + event.editor.name : mQuery(event.editor.window.getFrame().$).contents();
+    //             var tokens = mQuery(doc).find('*[data-token]');
 
-                tokens.each(function (i) {
-                    mQuery(this).off('dblclick').on('dblclick', function (e) {
-                        var selEl = new CKEDITOR.dom.element(e.target);
-                        var rangeObjForSelection = new CKEDITOR.dom.range(event.editor.document);
-                        rangeObjForSelection.selectNodeContents(selEl);
-                        event.editor.getSelection().selectRanges([rangeObjForSelection]);
+    //             tokens.each(function (i) {
+    //                 mQuery(this).off('dblclick').on('dblclick', function (e) {
+    //                     var selEl = new CKEDITOR.dom.element(e.target);
+    //                     var rangeObjForSelection = new CKEDITOR.dom.range(event.editor.document);
+    //                     rangeObjForSelection.selectNodeContents(selEl);
+    //                     event.editor.getSelection().selectRanges([rangeObjForSelection]);
 
-                        // Remove contenteditable=false to make it deletable
-                        mQuery(e.target).prop('contenteditable', true);
-                    });
-                });
+    //                     // Remove contenteditable=false to make it deletable
+    //                     mQuery(e.target).prop('contenteditable', true);
+    //                 });
+    //             });
 
-                CKEDITOR.instances[event.editor.name].on('key', function (e) {
-                    var key = e.data.keyCode;
-                    if (key !== 8) {
-                        var tokens = mQuery(doc).find('*[data-token][contenteditable=\'true\']');
-                        tokens.each(function (i) {
-                            mQuery(this).prop('contenteditable', false);
-                        });
-                    }
-                });
+    //             CKEDITOR.instances[event.editor.name].on('key', function (e) {
+    //                 var key = e.data.keyCode;
+    //                 if (key !== 8) {
+    //                     var tokens = mQuery(doc).find('*[data-token][contenteditable=\'true\']');
+    //                     tokens.each(function (i) {
+    //                         mQuery(this).prop('contenteditable', false);
+    //                     });
+    //                 }
+    //             });
 
-                editable.attachListener(editable, 'click', function (e) {
-                    var tokens = mQuery(doc).find('*[data-token][contenteditable=\'true\']');
-                    tokens.each(function (i) {
-                        mQuery(this).prop('contenteditable', false);
-                    });
-                });
-            }
-        }
-    },
+    //             editable.attachListener(editable, 'click', function (e) {
+    //                 var tokens = mQuery(doc).find('*[data-token][contenteditable=\'true\']');
+    //                 tokens.each(function (i) {
+    //                     mQuery(this).prop('contenteditable', false);
+    //                 });
+    //             });
+    //         }
+    //     }
+    // },
 
     /**
      * Functions to be ran on ajax page unload
@@ -897,16 +968,16 @@ var Mautic = {
                 MauticVars.modalsReset = {};
             }
 
-            mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage'], function (index, editorClass) {
-                mQuery(container + ' textarea.' + editorClass).each(function () {
-                    for (var name in CKEDITOR.instances) {
-                        var instance = CKEDITOR.instances[name];
-                        if (this && this == instance.element.$) {
-                            instance.destroy(true);
-                        }
-                    }
-                });
-            });
+            // mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage'], function (index, editorClass) {
+            //     mQuery(container + ' textarea.' + editorClass).each(function () {
+            //         for (var name in CKEDITOR.instances) {
+            //             var instance = CKEDITOR.instances[name];
+            //             if (this && this == instance.element.$) {
+            //                 instance.destroy(true);
+            //             }
+            //         }
+            //     });
+            // });
 
             //turn off shuffle events
             mQuery('html')
@@ -3211,5 +3282,49 @@ var Mautic = {
             },
             timepicker: false
         });
+    },
+
+    initCodeEditors: function() {
+        var codeEditors = mQuery('textarea.code-editor').not('[data-code-editor=loaded]');
+        Mautic.codeEditors = [];
+        if (codeEditors.length) {
+            codeEditors.each(function() {
+                var textarea = mQuery(this);
+                var editor = CodeMirror.fromTextArea(this, {
+                    // lineNumbers: true,
+                    // matchBrackets: true,
+                    indentUnit: 4,
+                    mode: 'htmlmixed'
+                });
+
+                // Mark the textarea that the editor was loaded
+                textarea.attr('data-code-editor', 'loaded');
+
+                // Set editor content from the textarea on init
+                editor.setValue(textarea.val());
+                editor.refresh();
+
+                // Update the textarea content on editor blur
+                editor.on('blur', function() {
+                    textarea.val(editor.getValue());
+                });
+
+                // Init the atWho dropdown
+                // Mautic.initAtWho(mQuery('.CodeMirror-code'), textarea.attr('data-token-callback'));
+                // CodeMirror doesn't use contentEditable ;(
+
+                // Save the textarea with the editor to a global array so it can be used elsewhere
+                Mautic.codeEditors.push({editor: editor, textarea: textarea});
+            });
+        }
+    },
+
+    refreshCodeEditors: function() {
+        if (typeof Mautic.codeEditors !== 'undefined' && Mautic.codeEditors.length) {
+            mQuery.each(Mautic.codeEditors, function (i, value) {
+                value.editor.setValue(value.textarea.val());
+                value.editor.refresh();
+            });
+        }
     }
 };

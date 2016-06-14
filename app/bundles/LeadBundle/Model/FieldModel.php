@@ -9,6 +9,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -25,6 +26,20 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class FieldModel extends FormModel
 {
+    /**
+     * @var SchemaHelperFactory
+     */
+    protected $schemaHelperFactory;
+    
+    /**
+     * FieldModel constructor.
+     * 
+     * @param SchemaHelperFactory $schemaHelperFactory
+     */
+    public function __construct(SchemaHelperFactory $schemaHelperFactory)
+    {
+        $this->schemaHelperFactory = $schemaHelperFactory;
+    }
 
     /**
      * @return \Doctrine\ORM\EntityRepository
@@ -139,7 +154,7 @@ class FieldModel extends FormModel
 
         if ($entity->getId()) {
             //create the field as its own column in the leads table
-            $leadsSchema = $this->factory->getSchemaHelper('column', 'leads');
+            $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', 'leads');
             if ($isNew || (!$isNew && !$leadsSchema->checkColumnExists($alias))) {
                 $leadsSchema->addColumn(
                     array(
@@ -167,7 +182,7 @@ class FieldModel extends FormModel
                     try {
                         // Update the unique_identifier_search index
                         /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
-                        $modifySchema = $this->factory->getSchemaHelper('index', 'leads');
+                        $modifySchema = $this->schemaHelperFactory->getSchemaHelper('index', 'leads');
                         $modifySchema->allowColumn($alias);
                         $modifySchema->addIndex($indexColumns, 'unique_identifier_search');
                         $modifySchema->addIndex(array($alias), 'lead_field'.$alias.'_search');
@@ -193,7 +208,7 @@ class FieldModel extends FormModel
         parent::deleteEntity($entity);
 
         //remove the column from the leads table
-        $leadsSchema = $this->factory->getSchemaHelper('column', 'leads');
+        $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', 'leads');
         $leadsSchema->dropColumn($entity->getAlias());
         $leadsSchema->executeChanges();
     }
@@ -210,7 +225,7 @@ class FieldModel extends FormModel
         $entities = parent::deleteEntities($ids);
 
         //remove the column from the leads table
-        $leadsSchema = $this->factory->getSchemaHelper('column', 'leads');
+        $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', 'leads');
         foreach ($entities as $e) {
             $leadsSchema->dropColumn($e->getAlias());
         }

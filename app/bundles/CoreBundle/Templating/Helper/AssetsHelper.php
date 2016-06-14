@@ -11,12 +11,13 @@ namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
-use Symfony\Component\Templating\Helper\CoreAssetsHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Symfony\Component\Asset\Packages;
 
 /**
  * Class AssetsHelper
  */
-class AssetsHelper extends CoreAssetsHelper
+class AssetsHelper
 {
 
     /**
@@ -38,6 +39,28 @@ class AssetsHelper extends CoreAssetsHelper
      * @var
      */
     protected $version;
+
+    protected $packages;
+
+    protected $coreParametersHelper;
+
+    public function __construct(Packages $packages)
+    {
+        $this->packages = $packages;
+    }
+
+    public function setCharset()
+    {
+
+    }
+
+    /**
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function setParamsHelper(CoreParametersHelper $coreParametersHelper)
+    {
+        $this->coreParametersHelper = $coreParametersHelper;
+    }
 
     /**
      * Gets asset prefix
@@ -94,7 +117,7 @@ class AssetsHelper extends CoreAssetsHelper
             $path        = $assetPrefix.$path;
         }
 
-        $url = parent::getUrl($path, $packageName, $version);
+        $url = $this->packages->getUrl($path, $packageName, $version);
 
         if ($absolute) {
             $url = $this->getBaseUrl() . $url;
@@ -199,24 +222,6 @@ class AssetsHelper extends CoreAssetsHelper
             }
         } else {
             $addSheet($stylesheet);
-        }
-    }
-
-    /**
-     * Load ckeditor source files
-     *
-     * @return void
-     */
-    public function loadEditor()
-    {
-        static $editorLoaded;
-
-        if (empty($editorLoaded)) {
-            $editorLoaded = true;
-            $this->addScript(array(
-                'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js?v' . $this->version,
-                'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js?v' . $this->version
-            ));
         }
     }
 
@@ -409,8 +414,7 @@ class AssetsHelper extends CoreAssetsHelper
         $assets = $this->assetHelper->getAssets();
 
         if ($includeEditor) {
-            $assets['js'][] = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js?v' . $this->version;
-            $assets['js'][] = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js?v' . $this->version;
+            $assets['js'] = array_merge($assets['js'], $this->getFroalaScripts());
         }
 
         if (isset($assets['js'])) {
@@ -433,8 +437,7 @@ class AssetsHelper extends CoreAssetsHelper
         $assets = $this->assetHelper->getAssets();
 
         if ($includeEditor) {
-            $assets['js'][] = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js?v' . $this->version;
-            $assets['js'][] = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js?v' . $this->version;
+            $assets['js'] = array_merge($assets['js'], $this->getFroalaScripts());
         }
 
         if ($render) {
@@ -448,6 +451,41 @@ class AssetsHelper extends CoreAssetsHelper
         }
 
         return $assets['js'];
+    }
+
+    /**
+     * Load Froala JS source files
+     *
+     * @return array
+     */
+    public function getFroalaScripts()
+    {
+        $base = 'app/bundles/CoreBundle/Assets/js/libraries/froala/';
+        $plugins = $base . 'plugins/';
+        return array(
+            $base . 'froala_editor.js?v' . $this->version,
+            $plugins . 'align.js?v' . $this->version,
+            $plugins . 'code_beautifier.js?v' . $this->version,
+            $plugins . 'code_view.js?v' . $this->version,
+            $plugins . 'colors.js?v' . $this->version,
+            // $plugins . 'file.js?v' . $this->version,  // @todo
+            $plugins . 'font_family.js?v' . $this->version,
+            $plugins . 'font_size.js?v' . $this->version,
+            $plugins . 'fullscreen.js?v' . $this->version,
+            $plugins . 'image.js?v' . $this->version,
+            $plugins . 'image_manager.js?v' . $this->version,
+            $plugins . 'inline_style.js?v' . $this->version,
+            $plugins . 'line_breaker.js?v' . $this->version,
+            $plugins . 'link.js?v' . $this->version,
+            $plugins . 'lists.js?v' . $this->version,
+            $plugins . 'paragraph_format.js?v' . $this->version,
+            $plugins . 'paragraph_style.js?v' . $this->version,
+            $plugins . 'quick_insert.js?v' . $this->version,
+            $plugins . 'quote.js?v' . $this->version,
+            $plugins . 'table.js?v' . $this->version,
+            $plugins . 'url.js?v' . $this->version,
+            $plugins . 'video.js?v' . $this->version
+        );
     }
 
     /**

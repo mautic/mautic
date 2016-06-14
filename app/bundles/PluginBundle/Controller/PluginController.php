@@ -33,7 +33,7 @@ class PluginController extends FormController
         }
 
         /** @var \Mautic\PluginBundle\Model\PluginModel $pluginModel */
-        $pluginModel = $this->factory->getModel('plugin');
+        $pluginModel = $this->getModel('plugin');
 
         // List of plugins for filter and to show as a single integration
         $plugins = $pluginModel->getEntities(
@@ -139,7 +139,7 @@ class PluginController extends FormController
             throw $this->createNotFoundException($this->get('translator')->trans('mautic.core.url.error.404'));
         }
 
-        $leadFields = $this->factory->getModel('plugin')->getLeadFields();
+        $leadFields = $this->getModel('plugin')->getLeadFields();
 
         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
         $entity = $integrationObject->getIntegrationSettings();
@@ -275,7 +275,7 @@ class PluginController extends FormController
         }
 
         /** @var \Mautic\PluginBundle\Model\PluginModel $pluginModel */
-        $pluginModel = $this->factory->getModel('plugin');
+        $pluginModel = $this->getModel('plugin');
 
         $bundle = $pluginModel->getRepository()->findOneBy(
             array(
@@ -318,7 +318,7 @@ class PluginController extends FormController
         }
 
         /** @var \Mautic\PluginBundle\Model\PluginModel $model */
-        $model   = $this->factory->getModel('plugin');
+        $model   = $this->getModel('plugin');
         $plugins = $this->factory->getParameter('plugin.bundles');
         $added   = $disabled = $updated = 0;
 

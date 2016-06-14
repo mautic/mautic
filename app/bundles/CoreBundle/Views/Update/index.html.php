@@ -53,3 +53,4 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.core.updat
             </div>
         </div>
     </div>
+</div>

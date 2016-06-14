@@ -27,15 +27,7 @@ class UpdateIpDataStoreCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('mautic:iplookup:download')
-            ->setAliases(
-                array(
-                    'mautic:fetch:ipdata',
-                    'mautic:ipdata:fetch',
-                    'mautic:ipdata:update',
-                    'mautic:update:ipdata'
-                )
-            )
-            ->setDescription('Fetch remote datastores for IP lookup services that leveral local lookups')
+            ->setDescription('Fetch remote datastores for IP lookup services that leverage local lookups')
             ->setHelp(
                 <<<EOT
                 The <info>%command.name%</info> command is used to update local IP lookup data if applicable.

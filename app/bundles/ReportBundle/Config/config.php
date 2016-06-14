@@ -91,6 +91,17 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'report_filters'
             )
+        ),
+        'models' =>  array(
+            'mautic.report.model.report' => array(
+                'class' => 'Mautic\ReportBundle\Model\ReportModel',
+                'arguments' => array(
+                    'security.context',
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.template.formatter',
+                    'mautic.helper.templating',
+                )
+            )
         )
     )
 );

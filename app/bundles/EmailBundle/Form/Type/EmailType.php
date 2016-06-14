@@ -146,7 +146,6 @@ class EmailType extends AbstractType
                 'attr'        => array(
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.email.form.template.help',
-                    'onchange' => 'Mautic.onBuilderModeSwitch(this);'
                 ),
                 'empty_value' => 'mautic.core.none'
             )
@@ -213,7 +212,7 @@ class EmailType extends AbstractType
                     'label_attr' => array('class' => 'control-label'),
                     'required'   => false,
                     'attr'       => array(
-                        'class'                => 'form-control editor-fullpage editor-builder-tokens',
+                        'class'                => 'form-control code-editor editor-builder-tokens builder-html',
                         'data-token-callback'  => 'email:getBuilderTokens',
                         'data-token-activator' => '{'
                     )

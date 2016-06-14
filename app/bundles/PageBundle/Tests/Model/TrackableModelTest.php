@@ -26,13 +26,13 @@ class TrackableModelTest extends WebTestCase
      */
     public function testHtmlIsDetectedInContent()
     {
-        $mockFactory = $this->getMockBuilder('Mautic\CoreBundle\Factory\MauticFactory')
+        $mockRedirectModel = $this->getMockBuilder('Mautic\PageBundle\Model\RedirectModel')
             ->disableOriginalConstructor()
             ->getMock();
 
         $mockModel = $this->getMockBuilder('Mautic\PageBundle\Model\TrackableModel')
-            ->setConstructorArgs(array($mockFactory))
-            ->setMethods(array('getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromHtml'))
+            ->setConstructorArgs([$mockRedirectModel])
+            ->setMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromHtml'])
             ->getMock();
 
         $mockModel->expects($this->once())
@@ -71,13 +71,13 @@ class TrackableModelTest extends WebTestCase
      */
     public function testPlainTextIsDetectedInContent()
     {
-        $mockFactory = $this->getMockBuilder('Mautic\CoreBundle\Factory\MauticFactory')
+        $mockRedirectModel = $this->getMockBuilder('Mautic\PageBundle\Model\RedirectModel')
             ->disableOriginalConstructor()
             ->getMock();
 
         $mockModel = $this->getMockBuilder('Mautic\PageBundle\Model\TrackableModel')
-            ->setConstructorArgs(array($mockFactory))
-            ->setMethods(array('getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromText'))
+            ->setConstructorArgs([$mockRedirectModel])
+            ->setMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromText'])
             ->getMock();
 
         $mockModel->expects($this->once())
@@ -351,13 +351,13 @@ class TrackableModelTest extends WebTestCase
             $tokenUrls = array($tokenUrls);
         }
 
-        $mockFactory = $this->getMockBuilder('Mautic\CoreBundle\Factory\MauticFactory')
+        $mockRedirectModel = $this->getMockBuilder('Mautic\PageBundle\Model\RedirectModel')
             ->disableOriginalConstructor()
             ->getMock();
 
         $mockModel = $this->getMockBuilder('Mautic\PageBundle\Model\TrackableModel')
-            ->setConstructorArgs(array($mockFactory))
-            ->setMethods(array('getDoNotTrackList', 'getEntitiesFromUrls'))
+            ->setConstructorArgs([$mockRedirectModel])
+            ->setMethods(['getDoNotTrackList', 'getEntitiesFromUrls'])
             ->getMock();
 
         $mockModel->expects($this->once())

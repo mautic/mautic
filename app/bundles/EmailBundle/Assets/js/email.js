@@ -82,32 +82,7 @@ Mautic.emailOnLoad = function (container, response) {
 
         window.close();
     } else if (mQuery('#emailform_plainText').length) {
-        // Activate the plain text editor to support token inserts
-
-        // Get the plain text first
-        var plainText = mQuery('#emailform_plainText').val();
-
-        // Now empty it so that ckeditor doesn't load it as html
-        mQuery('#emailform_plainText').val('');
-
-        var events = Mautic.getGlobalEditorEvents();
-        events.instanceReady = function( event ) {
-            event.editor.insertText(plainText);
-        };
-
-        mQuery('#emailform_plainText').ckeditor({
-            removePlugins: 'elementspath,toolbar',
-            extraPlugins: 'tokens',
-            autoParagraph: false,
-            height: "235px",
-            on: events
-        });
-
-        if (mQuery('#emailform_emailType').val() == '') {
-            mQuery('body').addClass('noscroll');
-        }
-
-        Mautic.toggleBuilderButton(mQuery('#emailform_template').val() == '');
+        // @todo initiate the token dropdown
     } else if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'email');
     } else {
@@ -147,6 +122,11 @@ Mautic.emailOnLoad = function (container, response) {
     }
 
     Mautic.initDateRangePicker();
+
+    mQuery(document).on('shown.bs.tab', 'a[href="#source-container"]', function (e) {
+        Mautic.refreshCodeEditors();
+        Mautic.initCodeEditors();
+    });
 };
 
 Mautic.emailOnUnload = function(id) {
@@ -156,7 +136,7 @@ Mautic.emailOnUnload = function(id) {
 
     if (mQuery('#emailform_plainText').length) {
         // Activate the plain text editor to support token inserts
-        CKEDITOR.instances['emailform_plainText'].destroy(true);
+        // CKEDITOR.instances['emailform_plainText'].destroy(true);
     }
 };
 
@@ -320,21 +300,14 @@ Mautic.sendEmailBatch = function () {
 Mautic.autoGeneratePlaintext = function() {
     mQuery('.plaintext-spinner').removeClass('hide');
 
-    var mode = (mQuery('#emailform_template').val() == '') ? 'custom' : 'template';
-    var custom = mQuery('#emailform_customHtml').val();
-    var id = mQuery('#emailform_sessionId').val();
-
-    var data = {
-        mode: mode,
-        id: id,
-        custom: custom
-    };
-
     Mautic.ajaxActionRequest(
         'email:generatePlaintText',
-        data,
+        {
+            id: mQuery('#emailform_sessionId').val(),
+            custom: mQuery('#emailform_customHtml').val()
+        },
         function (response) {
-            CKEDITOR.instances['emailform_plainText'].insertText(response.text);
+            mQuery('#emailform_plainText').val(response.text);
             mQuery('.plaintext-spinner').addClass('hide');
         }
     );
