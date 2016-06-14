@@ -806,7 +806,8 @@ class EmailController extends FormController
                     'slots'              => $slotTypes,
                     'email'              => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
-                    'attachmentSize'     => $attachmentSize
+                    'attachmentSize'     => $attachmentSize,
+                    'builderAssets'      => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())) // strip new lines
                 ),
                 'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
                 'passthroughVars' => array(
@@ -979,7 +980,6 @@ class EmailController extends FormController
         // Replace short codes to emoji
         $content = EmojiHelper::toEmoji($content, 'short');
 
-        $this->addAssetsForBuilder();
         $this->processSlots($slots, $entity);
 
         $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':email.html.php');
@@ -1404,7 +1404,7 @@ class EmailController extends FormController
         $slotsHelper->stop();
     }
 
-    private function addAssetsForBuilder()
+    private function getAssetsForBuilder()
     {
         /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
         $assetsHelper = $this->factory->getHelper('template.assets');
@@ -1419,6 +1419,8 @@ class EmailController extends FormController
         // $assetsHelper->addStylesheet('app/bundles/EmailBundle/Assets/builder/builder.css');
         $assetsHelper->addStylesheet('app/bundles/CoreBundle/Assets/css/libraries/builder.css');
         // $assetsHelper->addStylesheet('app/bundles/CoreBundle/Assets/css/libraries/froala/froala_style.css');
+        $builderAssets = $assetsHelper->getHeadDeclarations();
+        $assetsHelper->clear();
+        return $builderAssets;
     }
-
 }

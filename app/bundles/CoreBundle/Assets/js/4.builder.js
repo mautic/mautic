@@ -7,9 +7,6 @@ Mautic.launchBuilder = function (formName, actionName) {
     Mautic.builderMode     = (mQuery('#' + formName + '_template').val() == '') ? 'custom' : 'template';
     Mautic.builderFormName = formName;
 
-    // Holds HTML of the builder contents
-    Mautic.builderContents;
-
     mQuery('body').css('overflow-y', 'hidden');
 
     // Activate the builder
@@ -36,33 +33,54 @@ Mautic.launchBuilder = function (formName, actionName) {
 
     // Disable the close button until everything is loaded
     mQuery('.btn-close-builder').prop('disabled', true);
+
+    // Load the theme from the custom HTML textarea
+    var themeHtml = mQuery('textarea.builder-html').val();
+
+    if (themeHtml.length) {
+        Mautic.buildBuilderIframe(themeHtml, builderCss);
+    } else {
+        // Load the theme from a theme HTML if the textarea is empty
+        var src = mQuery('#builder_url').val();
+            src += '?template=' + mQuery('#' + formName + '_template').val();
+
+        mQuery.get(src, function(themeHtml) {
+            Mautic.buildBuilderIframe(themeHtml, builderCss);
+        });
+    }
+};
+
+Mautic.buildBuilderIframe = function(themeHtml, builderCss) {
+
     var builder = mQuery("<iframe />", {
         css: builderCss,
         id: "builder-template-content"
     }).appendTo('.builder-content');
-    Mautic.builderContents = mQuery(mQuery('textarea.builder-html').val());
 
-    if (Mautic.builderContents.length) {
-        var iframe = document.getElementById('builder-template-content');
-        var doc = iframe.contentDocument || iframe.contentWindow.document;
-        doc.open();
-        doc.write(mQuery('textarea.builder-html').val());
-        doc.close();
-        builder.load(function() {
-            mQuery('#builder-overlay').addClass('hide');
-            mQuery('.btn-close-builder').prop('disabled', false);
-        });
-    } else {
-        // Load the template for the new email
-        var src = mQuery('#builder_url').val();
-        src += '?template=' + mQuery('#' + formName + '_template').val();
+    // Insert the Mautic assets to the header
+    var assets = Mautic.htmlspecialchars_decode(mQuery('[data-builder-assets]').html());
+    var assetsText = '';
+    themeHtml = themeHtml.replace('</head>', assets+'</head>');
 
-        builder.attr('src', src);
-        builder.load(function () {
-            mQuery('#builder-overlay').addClass('hide');
-            mQuery('.btn-close-builder').prop('disabled', false);
-        });
-    }
+    // Build the iframe with the theme HTML in it
+    var iframe = document.getElementById('builder-template-content');
+    var doc = iframe.contentDocument || iframe.contentWindow.document;
+    doc.open();
+    doc.write(themeHtml);
+    doc.close();
+    builder.load(function() {
+        mQuery('#builder-overlay').addClass('hide');
+        mQuery('.btn-close-builder').prop('disabled', false);
+    });
+}
+
+Mautic.htmlspecialchars_decode = function(encodedHtml) {
+    encodedHtml = encodedHtml.replace(/&quot;/g, '"');
+    encodedHtml = encodedHtml.replace(/&#039;/g, "'");
+    encodedHtml = encodedHtml.replace(/&amp;/g, '&');
+    encodedHtml = encodedHtml.replace(/&lt;/g, '<');
+    encodedHtml = encodedHtml.replace(/&gt;/g, '>');
+    return encodedHtml;
 };
 
 /**
@@ -82,12 +100,17 @@ Mautic.closeBuilder = function(model) {
     mQuery('#builder-overlay').removeClass('hide');
     mQuery('.btn-close-builder').prop('disabled', true);
 
-    var iframeWindow = document.getElementById('builder-template-content').contentWindow;
-    iframeWindow.Mautic.destroySlots();
-    
+    // Trigger slot:destroy event
+    document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
+
+    var themeHtml = mQuery('iframe#builder-template-content').contents();
+
+    // Remove Mautic's assets
+    themeHtml.find('[data-source="mautic"]').remove();
+    themeHtml.find('.atwho-container').remove();
 
     // Store the HTML content to the HTML textarea
-    mQuery('.builder-html').val(mQuery('iframe#builder-template-content').contents().find('html').get(0).outerHTML);
+    mQuery('.builder-html').val(themeHtml.find('html').get(0).outerHTML);
 
     // Kill the overlay
     mQuery('#builder-overlay').remove();

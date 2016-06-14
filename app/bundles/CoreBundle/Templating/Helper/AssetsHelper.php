@@ -234,7 +234,7 @@ class AssetsHelper
      */
     public function includeScript($assetFilePath, $onLoadCallback = '', $alreadyLoadedCallback = '')
     {
-        return  '<script async="async" type="text/javascript">Mautic.loadScript(\''.$this->getUrl($assetFilePath)."', '$onLoadCallback', '$alreadyLoadedCallback');</script>";
+        return  '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadScript(\''.$this->getUrl($assetFilePath)."', '$onLoadCallback', '$alreadyLoadedCallback');</script>";
     }
 
     /*
@@ -244,7 +244,7 @@ class AssetsHelper
      */
     public function includeStylesheet($assetFilePath)
     {
-        return  '<script async="async" type="text/javascript">Mautic.loadStylesheet(\'' . $this->getUrl($assetFilePath) . '\');</script>';
+        return  '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadStylesheet(\'' . $this->getUrl($assetFilePath) . '\');</script>';
     }
 
     /**
@@ -295,20 +295,33 @@ class AssetsHelper
      */
     public function outputStyles()
     {
-        if (isset($this->assets['stylesheets'])) {
+        echo $this->getStyles();
+    }
 
+    /**
+     * Outputs the stylesheets and style declarations
+     *
+     * @return void
+     */
+    public function getStyles()
+    {
+        $styles = '';
+
+        if (isset($this->assets['stylesheets'])) {
             foreach (array_reverse($this->assets['stylesheets']) as $s) {
-                echo '<link rel="stylesheet" href="' . $this->getUrl($s) . '" />' . "\n";
+                $styles .= '<link rel="stylesheet" href="' . $this->getUrl($s) . '" data-source="mautic" />' . "\n";
             }
         }
 
         if (isset($this->assets['styleDeclarations'])) {
-            echo "<style>\n";
+            $styles .=  "<style data-source=\"mautic\">\n";
             foreach (array_reverse($this->assets['styleDeclarations']) as $d) {
-                echo "$d\n";
+                $styles .=  "$d\n";
             }
-            echo "</style>\n";
+            $styles .=  "</style>\n";
         }
+
+        return $styles;
     }
 
     /**
@@ -323,12 +336,12 @@ class AssetsHelper
         if (isset($this->assets['scripts'][$location])) {
             foreach (array_reverse($this->assets['scripts'][$location]) as $s) {
                 list($script, $async) = $s;
-                echo '<script src="'.$this->getUrl($script).'"' . ($async ? ' async' : '') . '></script>'."\n";
+                echo '<script src="'.$this->getUrl($script).'"' . ($async ? ' async' : '') . ' data-source="mautic"></script>'."\n";
             }
         }
 
         if (isset($this->assets['scriptDeclarations'][$location])) {
-            echo "<script>\n";
+            echo "<script data-source=\"mautic\">\n";
             foreach (array_reverse($this->assets['scriptDeclarations'][$location]) as $d) {
                 echo "$d\n";
             }
@@ -349,8 +362,17 @@ class AssetsHelper
      */
     public function outputHeadDeclarations()
     {
-        $this->outputStyles();
-        $headOutput = '';
+        echo $this->getHeadDeclarations();
+    }
+
+    /**
+     * Returns head scripts, stylesheets, and custom declarations
+     *
+     * @return void
+     */
+    public function getHeadDeclarations()
+    {
+        $headOutput = $this->getStyles();
         if (!empty($this->assets['headDeclarations'])) {
             $scriptOpen = false;
             foreach ($this->assets['headDeclarations'] as $declaration) {
@@ -365,7 +387,7 @@ class AssetsHelper
                         }
                         list($script, $async) = $output;
 
-                        $headOutput .= "\n".'<script src="' . $this->getUrl($script) . '"' . ($async ? ' async' : '') . '></script>';
+                        $headOutput .= "\n".'<script src="' . $this->getUrl($script) . '"' . ($async ? ' async' : '') . ' data-source="mautic"></script>';
                         break;
                     case 'custom':
                     case 'declaration':
@@ -373,7 +395,7 @@ class AssetsHelper
                             $headOutput .= "\n</script>";
                             $scriptOpen = false;
                         } elseif ($type == 'declaration' && !$scriptOpen) {
-                            $headOutput .= "\n<script>";
+                            $headOutput .= "\n<script data-source=\"mautic\">";
                             $scriptOpen = true;
                         }
                         $headOutput .= "\n$output";
@@ -385,7 +407,7 @@ class AssetsHelper
                 $headOutput .= "\n</script>\n\n";
             }
         }
-        echo $headOutput;
+        return $headOutput;
     }
 
     /**
@@ -399,7 +421,7 @@ class AssetsHelper
 
         if (isset($assets['css'])) {
             foreach ($assets['css'] as $url) {
-                echo '<link rel="stylesheet" href="' . $this->getUrl($url) . '" />' . "\n";
+                echo '<link rel="stylesheet" href="' . $this->getUrl($url) . '" data-source="mautic" />' . "\n";
             }
         }
     }
@@ -419,7 +441,7 @@ class AssetsHelper
 
         if (isset($assets['js'])) {
             foreach ($assets['js'] as $url) {
-                echo '<script src="' . $this->getUrl($url) . '"></script>' . "\n";
+                echo '<script src="' . $this->getUrl($url) . '" data-source="mautic"></script>' . "\n";
             }
         }
     }
@@ -444,7 +466,7 @@ class AssetsHelper
             $js = '';
             if (isset($assets['js'])) {
                 foreach ($assets['js'] as $url) {
-                    $js .= '<script src="' . $this->getUrl($url) . '"></script>' . "\n";
+                    $js .= '<script src="' . $this->getUrl($url) . '" data-source="mautic"></script>' . "\n";
                 }
             }
             return $js;
@@ -631,7 +653,14 @@ class AssetsHelper
         } else {
             return '<img src="' . $flagImg . '" class="'.$class.'" />';
         }
+    }
 
+    /**
+     * Clear all the assets
+     */
+    public function clear()
+    {
+        $this->assets = [];
     }
 
     /**
