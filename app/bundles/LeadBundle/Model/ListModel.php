@@ -9,6 +9,8 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -33,6 +35,16 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class ListModel extends FormModel
 {
+    /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    public function __construct(CoreParametersHelper $coreParametersHelper)
+    {
+        $this->coreParametersHelper = $coreParametersHelper;
+    }
+
     /**
      * Used by addLead and removeLead functions
      *
@@ -98,14 +110,13 @@ class ListModel extends FormModel
         //make sure alias is not already taken
         $repo      = $this->getRepository();
         $testAlias = $alias;
-        $user      = $this->factory->getUser();
-        $existing  = $repo->getLists($user, $testAlias, $entity->getId());
+        $existing  = $repo->getLists($this->user, $testAlias, $entity->getId());
         $count     = count($existing);
         $aliasTag  = $count;
 
         while ($count) {
             $testAlias = $alias . $aliasTag;
-            $existing  = $repo->getLists($user, $testAlias, $entity->getId());
+            $existing  = $repo->getLists($this->user, $testAlias, $entity->getId());
             $count     = count($existing);
             $aliasTag++;
         }
@@ -371,7 +382,7 @@ class ListModel extends FormModel
         );
 
         //get list of custom fields
-        $fields = $this->factory->getModel('lead.field')->getEntities(
+        $fields = $this->em->getRepository('MauticLeadBundle:LeadField')->getEntities(
             array(
                 'filter' => array(
                     'isListable'  => true,
@@ -431,7 +442,7 @@ class ListModel extends FormModel
     public function getUserLists($alias = '')
     {
         $user  = (!$this->security->isGranted('lead:lists:viewother')) ?
-            $this->factory->getUser() : false;
+            $this->user : false;
         $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getLists($user, $alias);
 
         return $lists;
@@ -464,7 +475,7 @@ class ListModel extends FormModel
 
         $id       = $entity->getId();
         $list     = array('id' => $id, 'filters' => $entity->getFilters());
-        $dtHelper = $this->factory->getDate();
+        $dtHelper = new DateTimeHelper;
 
         $batchLimiters = array(
             'dateTime' => $dtHelper->toUtcString()
@@ -954,9 +965,9 @@ class ListModel extends FormModel
      */
     protected function batchSleep()
     {
-        $leadSleepTime = $this->factory->getParameter('batch_lead_sleep_time', false);
+        $leadSleepTime = $this->coreParametersHelper->getParameter('batch_lead_sleep_time', false);
         if ($leadSleepTime === false) {
-            $leadSleepTime = $this->factory->getParameter('batch_sleep_time', 1);
+            $leadSleepTime = $this->coreParametersHelper->getParameter('batch_sleep_time', 1);
         }
 
         if (empty($leadSleepTime)) {
@@ -995,7 +1006,7 @@ class ListModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('ll.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);

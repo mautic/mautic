@@ -25,9 +25,7 @@ class UntrackableUrlsEvent extends Event
         '{unsubscribe_url}',
         '{trackable=(.*?)}',
         // Ignore lead fields with URLs for tracking since each is unique
-        '^{leadfield=(.*?)}',
-        // @todo - remove in 2.0
-        '{externallink=(.*?)}'
+        '^{leadfield=(.*?)}'
     );
 
     /**
@@ -36,24 +34,13 @@ class UntrackableUrlsEvent extends Event
     private $content;
 
     /**
-     * @deprecated to be removed in 2.0
-     *
-     * @var Email
-     */
-    private $email;
-
-    /**
      * TrackableEvent constructor.
      *
      * @param $content
      */
     public function __construct($content)
     {
-        if ($content instanceof Email) {
-            $this->email = $content;
-        } else {
-            $this->content = $content;
-        }
+        $this->content = $content;
     }
 
     /**
@@ -82,17 +69,5 @@ class UntrackableUrlsEvent extends Event
     public function getContent()
     {
         return $this->content;
-    }
-
-    /**
-     * Get Email
-     *
-     * @deprecated To be removed in 2.0
-     *
-     * @return Email
-     */
-    public function getEmail()
-    {
-        return $this->email;
     }
 }

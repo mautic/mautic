@@ -9,11 +9,16 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
+use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
+use Mautic\LeadBundle\Model\LeadModel;
 
 /**
  * Class CampaignSubscriber
@@ -22,6 +27,30 @@ use Mautic\EmailBundle\Event\EmailOpenEvent;
  */
 class CampaignSubscriber extends CommonSubscriber
 {
+    /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * @var EmailModel
+     */
+    protected $emailModel;
+
+    /**
+     * CampaignSubscriber constructor.
+     * 
+     * @param MauticFactory $factory
+     * @param LeadModel $leadModel
+     * @param EmailModel $emailModel
+     */
+    public function __construct(MauticFactory $factory, LeadModel $leadModel, EmailModel $emailModel)
+    {
+        $this->leadModel = $leadModel;
+        $this->emailModel = $emailModel;
+
+        parent::__construct($factory);
+    }
 
     /**
      * @return array
@@ -30,7 +59,9 @@ class CampaignSubscriber extends CommonSubscriber
     {
         return array(
             CampaignEvents::CAMPAIGN_ON_BUILD => array('onCampaignBuild', 0),
-            EmailEvents::EMAIL_ON_OPEN        => array('onEmailOpen', 0)
+            EmailEvents::EMAIL_ON_OPEN        => array('onEmailOpen', 0),
+            EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0],
+            EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0]
         );
     }
 
@@ -42,14 +73,14 @@ class CampaignSubscriber extends CommonSubscriber
         $trigger = array(
             'label'           => 'mautic.email.campaign.event.open',
             'description'     => 'mautic.email.campaign.event.open_descr',
-            'callback'        => array('\\Mautic\\EmailBundle\\Helper\\CampaignEventHelper', 'validateEmailTrigger')
+            'eventName'       => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION
         );
         $event->addLeadDecision('email.open', $trigger);
 
         $action = array(
             'label'           => 'mautic.email.campaign.event.send',
             'description'     => 'mautic.email.campaign.event.send_descr',
-            'callback'        => array('\\Mautic\\EmailBundle\\Helper\\CampaignEventHelper', 'sendEmailAction'),
+            'eventName'       => EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION,
             'formType'        => 'emailsend_list',
             'formTypeOptions' => array('update_select' => 'campaignevent_properties_email'),
             'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList'
@@ -66,5 +97,56 @@ class CampaignSubscriber extends CommonSubscriber
     {
         $email = $event->getEmail();
         $this->factory->getModel('campaign')->triggerEvent('email.open', $email, 'email.open' . $email->getId());
+    }
+
+    /**
+     * @param CampaignExecutionEvent $event
+     */
+    public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
+    {
+        $eventDetails = $event->getEventDetails();
+        $eventParent  = $event->getEvent()['parent'];
+        
+        if ($eventDetails == null) {
+            return $event->setResult(false);
+        }
+
+        //check to see if the parent event is a "send email" event and that it matches the current email opened
+        if (!empty($eventParent) && $eventParent['type'] === 'email.send') {
+            return $event->setResult($eventDetails->getId() === (int) $eventParent['properties']['email']);
+        }
+
+        return $event->setResult(false);
+    }
+
+    /**
+     * @param CampaignExecutionEvent $event
+     */
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    {
+        $emailSent = false;
+        $lead = $event->getLead();
+
+        if ($lead instanceof Lead) {
+            $fields = $lead->getFields();
+
+            $leadCredentials       = $this->leadModel->flattenFields($fields);
+            $leadCredentials['id'] = $lead->getId();
+        } else {
+            $leadCredentials = $lead;
+        }
+
+        if (!empty($leadCredentials['email'])) {
+            $emailId = (int) $event->getConfig()['email'];
+
+            $email = $this->emailModel->getEntity($emailId);
+
+            if ($email != null && $email->isPublished()) {
+                $options   = ['source' => ['campaign', $event['campaign']['id']]];
+                $emailSent = $this->emailModel->sendEmail($email, $leadCredentials, $options);
+            }
+        }
+
+        return $event->setResult($emailSent);
     }
 }

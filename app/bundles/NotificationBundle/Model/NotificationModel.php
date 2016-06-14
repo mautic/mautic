@@ -16,6 +16,7 @@ use Mautic\NotificationBundle\Entity\Stat;
 use Mautic\NotificationBundle\Event\NotificationEvent;
 use Mautic\NotificationBundle\Event\NotificationClickEvent;
 use Mautic\NotificationBundle\NotificationEvents;
+use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -26,6 +27,21 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class NotificationModel extends FormModel
 {
+    /**
+     * @var TrackableModel
+     */
+    protected $pageTrackableModel;
+    
+    /**
+     * NotificationModel constructor.
+     * 
+     * @param TrackableModel $pageTrackableModel
+     */
+    public function __construct(TrackableModel $pageTrackableModel)
+    {
+        $this->pageTrackableModel = $pageTrackableModel;
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -41,7 +57,7 @@ class NotificationModel extends FormModel
      */
     public function getStatRepository()
     {
-        return $this->factory->getEntityManager()->getRepository('MauticNotificationBundle:Stat');
+        return $this->em->getRepository('MauticNotificationBundle:Stat');
     }
 
     /**
@@ -312,6 +328,6 @@ class NotificationModel extends FormModel
      */
     public function getNotificationClickStats($notificationId)
     {
-        return $this->factory->getModel('page.trackable')->getTrackableList('notification', $notificationId);
+        return $this->pageTrackableModel->getTrackableList('notification', $notificationId);
     }
 }

@@ -27,7 +27,7 @@ class ReportController extends FormController
     public function indexAction ($page = 1)
     {
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
-        $model = $this->factory->getModel('report');
+        $model = $this->getModel('report');
 
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(array(
@@ -133,7 +133,7 @@ class ReportController extends FormController
     public function cloneAction ($objectId)
     {
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
-        $model  = $this->factory->getModel('report');
+        $model  = $this->getModel('report');
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -177,7 +177,7 @@ class ReportController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             /* @type \Mautic\ReportBundle\Model\ReportModel $model */
-            $model  = $this->factory->getModel('report');
+            $model  = $this->getModel('report');
             $entity = $model->getEntity($objectId);
 
             $check = $this->checkEntityAccess($postActionVars, $entity, $objectId, array('report:reports:deleteown', 'report:reports:deleteother'), $model, 'report');
@@ -227,7 +227,7 @@ class ReportController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model     = $this->factory->getModel('report');
+            $model     = $this->getModel('report');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = array();
 
@@ -285,7 +285,7 @@ class ReportController extends FormController
     public function editAction ($objectId, $ignorePost = false)
     {
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
-        $model   = $this->factory->getModel('report');
+        $model   = $this->getModel('report');
         $entity  = $model->getEntity($objectId);
         $session = $this->factory->getSession();
         $page    = $session->get('mautic.report.page', 1);
@@ -409,7 +409,7 @@ class ReportController extends FormController
         }
 
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
-        $model   = $this->factory->getModel('report');
+        $model   = $this->getModel('report');
 
         if (!($entity instanceof Report)) {
             /** @var \Mautic\ReportBundle\Entity\Report $entity */
@@ -496,7 +496,7 @@ class ReportController extends FormController
     public function viewAction ($objectId, $reportPage = 1)
     {
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
-        $model    = $this->factory->getModel('report');
+        $model    = $this->getModel('report');
         $entity   = $model->getEntity($objectId);
         $security = $this->factory->getSecurity();
 
@@ -609,7 +609,7 @@ class ReportController extends FormController
     public function exportAction ($objectId, $format = 'csv')
     {
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
-        $model    = $this->factory->getModel('report');
+        $model    = $this->getModel('report');
         $entity   = $model->getEntity($objectId);
         $security = $this->factory->getSecurity();
 

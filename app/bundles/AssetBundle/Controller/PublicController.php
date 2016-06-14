@@ -31,7 +31,7 @@ class PublicController extends CommonFormController
         $security   = $this->factory->getSecurity();
 
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-        $model      = $this->factory->getModel('asset.asset');
+        $model      = $this->getModel('asset');
 
         /** @var \Mautic\AssetBundle\Entity\Asset $entity */
         $entity     = $model->getEntityBySlugs($slug);

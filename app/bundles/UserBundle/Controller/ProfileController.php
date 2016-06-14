@@ -26,7 +26,7 @@ class ProfileController extends FormController
     {
         //get current user
         $me    = $this->get('security.context')->getToken()->getUser();
-        $model = $this->factory->getModel('user.user');
+        $model = $this->getModel('user.user');
 
         //set some permissions
         $permissions = array(

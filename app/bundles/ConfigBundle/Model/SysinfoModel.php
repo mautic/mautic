@@ -9,15 +9,39 @@
 
 namespace Mautic\ConfigBundle\Model;
 
-use Mautic\CoreBundle\Model\CommonModel;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 
 /**
  * Class SysinfoModel
  */
-class SysinfoModel extends CommonModel
+class SysinfoModel extends AbstractCommonModel
 {
     protected $phpInfo;
     protected $folders;
+
+    /**
+     * @var PathsHelper
+     */
+    protected $pathsHelper;
+
+    /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
+     * SysinfoModel constructor.
+     * 
+     * @param PathsHelper $pathsHelper
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function __construct(PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
+    {
+        $this->pathsHelper = $pathsHelper;
+        $this->coreParametersHelper = $coreParametersHelper;
+    }
 
     /**
 	 * Method to get the PHP info
@@ -47,9 +71,9 @@ class SysinfoModel extends CommonModel
     		$output = str_replace('</div>', '', $output);
     		$this->phpInfo = $output;
         } elseif (function_exists('phpversion')) {
-             $this->phpInfo = $this->factory->getTranslator()->trans('mautic.sysinfo.phpinfo.phpversion', array('%phpversion%' => phpversion()));
+             $this->phpInfo = $this->translator->trans('mautic.sysinfo.phpinfo.phpversion', array('%phpversion%' => phpversion()));
         } else {
-             $this->phpInfo = $this->factory->getTranslator()->trans('mautic.sysinfo.phpinfo.missing');
+             $this->phpInfo = $this->translator->trans('mautic.sysinfo.phpinfo.missing');
         }
 
 		return $this->phpInfo;
@@ -68,17 +92,17 @@ class SysinfoModel extends CommonModel
 		}
 
         $importantFolders = array(
-            $this->factory->getSystemPath('local_config'),
-            $this->factory->getParameter('cache_path'),
-            $this->factory->getParameter('log_path'),
-            $this->factory->getParameter('upload_dir'),
-            $this->factory->getSystemPath('images', true),
-            $this->factory->getSystemPath('translations', true),
+            $this->pathsHelper->getSystemPath('local_config'),
+            $this->coreParametersHelper->getParameter('cache_path'),
+            $this->coreParametersHelper->getParameter('log_path'),
+            $this->coreParametersHelper->getParameter('upload_dir'),
+            $this->pathsHelper->getSystemPath('images', true),
+            $this->pathsHelper->getSystemPath('translations', true),
         );
 
         // Show the spool folder only if the email queue is configured
-        if ($this->factory->getParameter('mailer_spool_type') == 'file') {
-            $importantFolders[] = $this->factory->getParameter('mailer_spool_path');
+        if ($this->coreParametersHelper->getParameter('mailer_spool_type') == 'file') {
+            $importantFolders[] = $this->coreParametersHelper->getParameter('mailer_spool_path');
         }
 
         foreach ($importantFolders as $folder) {
@@ -101,7 +125,7 @@ class SysinfoModel extends CommonModel
      */
     public function getLogTail($lines = 10)
     {
-        $log = $this->factory->getParameter('log_path') . '/mautic_' . $this->factory->getEnvironment() . '-' . date('Y-m-d') . '.php';
+        $log = $this->coreParametersHelper->getParameter('log_path') . '/mautic_' . MAUTIC_ENV . '-' . date('Y-m-d') . '.php';
 
         if (!file_exists($log)) {
             return null;

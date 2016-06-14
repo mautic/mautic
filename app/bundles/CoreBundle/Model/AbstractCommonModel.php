@@ -1,7 +1,7 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -9,20 +9,38 @@
 
 namespace Mautic\CoreBundle\Model;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\UserBundle\Entity\User;
+use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Intl\Intl;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class CommonModel
+ * Class AbstractCommonModel
  *
  * @package Mautic\CoreBundle\Model
  */
-class CommonModel
+abstract class AbstractCommonModel
 {
-
+    /**
+     * Do not use Factory in Models. There's a couple places where we
+     * still need to in core, but we are working on refactoring. This
+     * is completely temporary.
+     * 
+     * @param MauticFactory $factory
+     */
+    public function setFactory(MauticFactory $factory)
+    {
+        $this->factory = $factory;
+    }
+    
     /**
      * @var \Doctrine\ORM\EntityManager
      */
@@ -34,30 +52,73 @@ class CommonModel
     protected $security;
 
     /**
-     * @var \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
+     * @var EventDispatcherInterface
      */
     protected $dispatcher;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var Router
+     */
+    protected $router;
+
+    /**
+     * @var TranslatorInterface
      */
     protected $translator;
+    
+    /**
+     * @var User
+     */
+    protected $user;
 
     /**
-     * @var MauticFactory
+     * @param EntityManager $em
      */
-    protected $factory;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
+    public function setEntityManager(EntityManager $em)
     {
-        $this->em         = $factory->getEntityManager();
-        $this->security   = $factory->getSecurity();
-        $this->dispatcher = $factory->getDispatcher();
-        $this->translator = $factory->getTranslator();
-        $this->factory    = $factory;
+        $this->em = $em;
+    }
+
+    /**
+     * @param CorePermissions $security
+     */
+    public function setSecurity(CorePermissions $security)
+    {
+        $this->security = $security;
+    }
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * @param Router $router
+     */
+    public function setRouter(Router $router)
+    {
+        $this->router = $router;
+    }
+
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function setTranslator(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
+    /**
+     * Initialize the user parameter for use in locking procedures
+     *
+     * @param UserHelper $userHelper
+     */
+    public function setUser(UserHelper $userHelper)
+    {
+        $this->user = $userHelper->getUser();
     }
 
     /**
@@ -67,7 +128,7 @@ class CommonModel
      */
     public function getSupportedSearchCommands()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -79,7 +140,7 @@ class CommonModel
     {
         $repo = $this->getRepository();
 
-        return ($repo instanceof CommonRepository) ? $repo->getSearchCommands() : array();
+        return ($repo instanceof CommonRepository) ? $repo->getSearchCommands() : [];
     }
 
     /**
@@ -115,21 +176,19 @@ class CommonModel
      *
      * @return \Doctrine\ORM\Tools\Pagination\Paginator|array
      */
-    public function getEntities(array $args = array())
+    public function getEntities(array $args = [])
     {
         //set the translator
         $repo = $this->getRepository();
 
         if ($repo instanceof CommonRepository) {
             $repo->setTranslator($this->translator);
-            $repo->setCurrentUser(
-                $this->factory->getUser()
-            );
+            $repo->setCurrentUser($this->user);
 
             return $repo->getEntities($args);
         }
 
-        return array();
+        return [];
     }
 
     /**
@@ -182,21 +241,13 @@ class CommonModel
      * @param array $routeParams
      * @param bool  $absolute
      * @param array $clickthrough
-     * @param bool  $shortenUrl
      *
      * @return string
      */
-    public function buildUrl($route, $routeParams = array(), $absolute = true, $clickthrough = array(), $shortenUrl = false)
+    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [])
     {
-        $url  = $this->factory->getRouter()->generate($route, $routeParams, $absolute);
+        $url  = $this->router->generate($route, $routeParams, $absolute);
         $url .= (!empty($clickthrough)) ? '?ct=' . $this->encodeArrayForUrl($clickthrough) : '';
-
-        if ($shortenUrl) {
-            /** @var UrlHelper $urlHelper */
-            $urlHelper = $this->factory->getHelper('url');
-
-            return $urlHelper->buildShortUrl($url);
-        }
 
         return $url;
     }
@@ -283,5 +334,4 @@ class CommonModel
     {
 
     }
-
 }
