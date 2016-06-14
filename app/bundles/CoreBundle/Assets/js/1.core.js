@@ -523,6 +523,7 @@ var Mautic = {
         mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage', 'editor-basic-fullpage'], function (index, editorClass) {
             if (mQuery(container + ' textarea.' + editorClass).length) {
                 mQuery(container + ' textarea.' + editorClass).each(function () {
+                    var textarea = mQuery(this);
                     // var settings = {};
 
                     // if (editorClass != 'editor') {
@@ -542,11 +543,20 @@ var Mautic = {
                     //     settings.extraPlugins = "sourcedialog,docprops,filemanager";
                     // }
 
-                    // if (editorClass == 'editor') {
-                    //     settings.removePlugins = 'resize';
-                    // }
 
-                    var textarea = mQuery(this);
+                    if (editorClass == 'editor') {
+                        //     settings.removePlugins = 'resize';
+
+                        textarea.froalaEditor({
+                            // Set custom buttons with separator between them.
+                            toolbarButtons: ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink','insertTable', 'html'],
+                            toolbarButtonsMD: ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertTable', 'html'],
+                            toolbarButtonsSM: ['undo', 'redo' , '-', 'bold', 'italic', 'underline'],
+                            toolbarButtonsXS: ['undo', 'redo' , '-', 'bold', 'italic', 'underline']
+                        });
+
+                    }
+
 
                     if (textarea.hasClass('editor-builder-tokens')) {
                         // init AtWho in a froala editor
