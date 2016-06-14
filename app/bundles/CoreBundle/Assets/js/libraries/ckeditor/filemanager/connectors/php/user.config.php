@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 // Boot Symfony
+require_once __DIR__ . '/../../../../../../../../../autoload.php';
 require_once __DIR__ . '/../../../../../../../../../bootstrap.php.cache';
 require_once __DIR__ . '/../../../../../../../../../AppKernel.php';
 $kernel = new AppKernel('prod', false);
