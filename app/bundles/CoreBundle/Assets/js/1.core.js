@@ -524,6 +524,14 @@ var Mautic = {
             if (mQuery(container + ' textarea.' + editorClass).length) {
                 mQuery(container + ' textarea.' + editorClass).each(function () {
                     var textarea = mQuery(this);
+
+                    // init AtWho in a froala editor
+                    if (textarea.hasClass('editor-builder-tokens')) {
+                        textarea.on('froalaEditor.initialized', function (e, editor) {
+                            Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'));
+                        });
+                    }
+
                     // var settings = {};
 
                     // if (editorClass != 'editor') {
@@ -547,25 +555,18 @@ var Mautic = {
                     if (editorClass == 'editor') {
                         //     settings.removePlugins = 'resize';
 
-                        textarea.froalaEditor({
+                        textarea.froalaEditor(mQuery.extend({
                             // Set custom buttons with separator between them.
-                            toolbarButtons: ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink','insertTable', 'html'],
-                            toolbarButtonsMD: ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertTable', 'html'],
+                            toolbarButtons: ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertImage','insertTable', 'html'],
+                            toolbarButtonsMD: ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertImage', 'insertTable', 'html'],
                             toolbarButtonsSM: ['undo', 'redo' , '-', 'bold', 'italic', 'underline'],
-                            toolbarButtonsXS: ['undo', 'redo' , '-', 'bold', 'italic', 'underline']
-                        });
+                            toolbarButtonsXS: ['undo', 'redo' , '-', 'bold', 'italic', 'underline'],
+                            heightMin: 100
+                        }, Mautic.basicFroalaOptions));
 
+                    } else {
+                        textarea.froalaEditor(Mautic.basicFroalaOptions);
                     }
-
-
-                    if (textarea.hasClass('editor-builder-tokens')) {
-                        // init AtWho in a froala editor
-                        textarea.on('froalaEditor.initialized', function (e, editor) {
-                            Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'));
-                        });
-                    }
-
-                    textarea.froalaEditor(Mautic.basicFroalaOptions);
                 });
             }
         });

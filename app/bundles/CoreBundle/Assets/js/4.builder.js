@@ -297,10 +297,10 @@ Mautic.initSlotListeners = function() {
                 toolbarInline: true,
                 toolbarVisibleWithoutSelection: true,
                 toolbarButtons: ['bold', 'italic', 'insertImage', 'insertLink', 'undo', 'redo', '-', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'indent', 'outdent'],
-                zIndex: 2501,
+                zIndex: 2501
             };
 
-            slot.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, inlineFroalaOptions));
+            slot.froalaEditor(mQuery.extend(inlineFroalaOptions, Mautic.basicFroalaOptions));
         } else if (type === 'image') {
             // Init Froala editor
             slot.find('img').froalaEditor({toolbarInline: true});
