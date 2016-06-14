@@ -15,8 +15,7 @@
 
     <testsuites>
         <testsuite name="Project Test Suite">
-            <directory>../src/*/*Bundle/Tests</directory>
-            <directory>../src/*/Bundle/*Bundle/Tests</directory>
+            <directory>bundles/*Bundle/Tests</directory>
         </testsuite>
     </testsuites>
 
