@@ -55,7 +55,7 @@ $template = $form['template']->vars['data'];
 
             <div class="row">
                 <div class="col-md-12" id="customHtmlContainer" style="min-height: 325px;">
-                    <div class="custom-html-mask<?php if (!$template) echo ' hide'; ?>">
+                    <div class="custom-html-mask">
                         <div class="well text-center" style="position: absolute; top: 110px; width: 50%; left:0; right:0; margin-left:auto; margin-right:auto; z-index: 1010;">
                             <h3 style="padding: 30px;">
                                 <a href="javascript: void(0);" onclick="Mautic.launchBuilder('page');">

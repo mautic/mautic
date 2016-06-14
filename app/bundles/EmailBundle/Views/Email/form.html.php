@@ -54,7 +54,7 @@ if (!isset($attachmentSize)) {
                             </div>
                         </div>
                         <div class="row">
-                            <div class="custom-html-mask<?php if (!$template) echo ' hide'; ?>">
+                            <div class="custom-html-mask">
                                 <div class="well text-center col-md-6 col-md-offset-3">
                                     <h3 style="padding: 30px;">
                                         <a href="javascript: void(0);" onclick="Mautic.launchBuilder('emailform', 'email');">

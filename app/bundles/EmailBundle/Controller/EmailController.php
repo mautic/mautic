@@ -479,32 +479,16 @@ class EmailController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $session     = $this->factory->getSession();
-                    $contentName = 'mautic.emailbuilder.'.$entity->getSessionId().'.content';
-
-                    $template = $entity->getTemplate();
-                    if (!empty($template)) {
-                        $content = $session->get($contentName, array());
-                        $entity->setCustomHtml(null);
-                    } else {
-                        $content = $entity->getCustomHtml();
-                        $entity->setContent(array());
-                    }
+                    $content = $entity->getCustomHtml();
 
                     // Parse visual placeholders into tokens
                     BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($content);
 
-                    if (!empty($template)) {
-                        $entity->setContent($content);
-                    } else {
-                        $entity->setCustomHtml($content);
-                    }
+                    $entity->setCustomHtml($content);
 
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
-                    //clear the session
-                    $session->remove($contentName);
 
                     $this->addFlash(
                         'mautic.core.notice.created',
@@ -573,13 +557,24 @@ class EmailController extends FormController
             }
         }
 
+        $slotTypes = $model->getBuilderComponents($entity, 'slotTypes');
+
+        foreach ($slotTypes as &$slotType) {
+            if (isset($slotType['form'])) {
+                $slotForm = $this->get('form.factory')->create($slotType['form']);
+                $slotType['form'] = $slotForm->createView();
+            }
+        }
+
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
-                    'form'      => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.php', 'MauticEmailBundle:FormTheme\Email'),
-                    'isVariant' => $entity->isVariant(true),
-                    'tokens'    => $model->getBuilderComponents($entity, 'tokenSections'),
-                    'email'     => $entity
+                    'form'          => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.php', 'MauticEmailBundle:FormTheme\Email'),
+                    'isVariant'     => $entity->isVariant(true),
+                    'tokens'        => $model->getBuilderComponents($entity, 'tokenSections'),
+                    'email'         => $entity,
+                    'slots'         => $slotTypes,
+                    'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())) // strip new lines
                 ),
                 'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
                 'passthroughVars' => array(
