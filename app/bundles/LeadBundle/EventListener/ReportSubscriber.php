@@ -274,7 +274,7 @@ class ReportSubscriber extends CommonSubscriber
                     $graphData['data']      = $items;
                     $graphData['name']      = 'mautic.lead.table.most.points';
                     $graphData['iconClass'] = 'fa-asterisk';
-                    $graphData['link']      = 'mautic_lead_action';
+                    $graphData['link']      = 'mautic_contact_action';
                     $event->setGraph($g, $graphData);
                     break;
 

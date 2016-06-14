@@ -267,4 +267,24 @@ final class LeadEvents
      * @var string
      */
     const FILTER_CHOICE_FIELDS = 'mautic.filter_choice_fields';
+
+    /**
+     * The mautic.lead.on_campaign_trigger_action event is fired when the campaign action triggers.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.lead.on_campaign_trigger_action';
+
+    /**
+     * The mautic.lead.on_campaign_trigger_condition event is fired when the campaign condition triggers.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_CONDITION = 'mautic.lead.on_campaign_trigger_condition';
 }

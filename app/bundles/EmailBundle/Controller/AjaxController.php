@@ -90,7 +90,7 @@ class AjaxController extends CommonAjaxController
         if (!empty($type)) {
             //get the HTML for the form
             /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-            $model = $this->factory->getModel('email');
+            $model = $this->getModel('email');
 
             $email = $model->getEntity($emailId);
 
@@ -146,7 +146,7 @@ class AjaxController extends CommonAjaxController
         $dataArray = array('success' => 0);
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model    = $this->factory->getModel('email');
+        $model    = $this->getModel('email');
         $objectId = $request->request->get('id', 0);
         $pending  = $request->request->get('pending', 0);
         $limit    = $request->request->get('batchlimit', 100);
@@ -193,7 +193,7 @@ class AjaxController extends CommonAjaxController
     protected function getBuilderTokens($query)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model = $this->factory->getModel('email');
+        $model = $this->getModel('email');
 
         return $model->getBuilderComponents(null, array('tokens', 'visualTokens'), $query);
     }
@@ -227,7 +227,7 @@ class AjaxController extends CommonAjaxController
 
             $content = $session->get($contentName, array());
             if (strpos($id, 'new') === false) {
-                $entity          = $this->factory->getModel('email')->getEntity($id);
+                $entity          = $this->getModel('email')->getEntity($id);
                 $existingContent = $entity->getContent();
                 $content         = array_merge($existingContent, $content);
             }
@@ -253,7 +253,7 @@ class AjaxController extends CommonAjaxController
         $size   = 0;
         if ($assets) {
             /** @var \Mautic\AssetBundle\Model\AssetModel $assetModel */
-            $assetModel = $this->factory->getModel('asset');
+            $assetModel = $this->getModel('asset');
             $size       = $assetModel->getTotalFilesize($assets);
         }
 
