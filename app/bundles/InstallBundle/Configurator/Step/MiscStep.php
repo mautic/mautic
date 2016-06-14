@@ -11,6 +11,7 @@ namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\InstallBundle\Configurator\Form\MiscStepType;
 use Symfony\Component\Validator\Constraints as Assert;
+use Mautic\CoreBundle\Configurator\Step\StepInterface;
 
 /**
  * Misc Step.

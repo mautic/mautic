@@ -78,22 +78,13 @@ class IpLookupFactory
                 $className = '\\'.$className;
             }
 
-            // @todo - remove in 2.0; BC support < 1.2.3
-            if (is_subclass_of($className, 'Mautic\CoreBundle\IpLookup\AbstractIpLookup')) {
-                $services[$service] = new $className(
-                    null,
-                    $auth,
-                    $this->logger
-                );
-            } else {
-                $services[$service] = new $className(
-                    $auth,
-                    $ipLookupConfig,
-                    $this->cacheDir,
-                    $this->logger,
-                    $this->httpConnector
-                );
-            }
+            $services[$service] = new $className(
+                $auth,
+                $ipLookupConfig,
+                $this->cacheDir,
+                $this->logger,
+                $this->httpConnector
+            );
         }
 
         return $services[$service];

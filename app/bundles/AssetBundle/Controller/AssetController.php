@@ -28,7 +28,7 @@ class AssetController extends FormController
     public function indexAction ($page = 1)
     {
 
-        $model = $this->factory->getModel('asset.asset');
+        $model = $this->getModel('asset');
 
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(array(
@@ -108,7 +108,7 @@ class AssetController extends FormController
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         //retrieve a list of categories
-        $categories = $this->factory->getModel('asset')->getLookupResults('category', '', 0);
+        $categories = $this->getModel('asset')->getLookupResults('category', '', 0);
 
         return $this->delegateView(array(
             'viewParameters'  => array(
@@ -140,7 +140,7 @@ class AssetController extends FormController
      */
     public function viewAction ($objectId)
     {
-        $model       = $this->factory->getModel('asset.asset');
+        $model       = $this->getModel('asset');
         $security    = $this->factory->getSecurity();
         $activeAsset = $model->getEntity($objectId);
         $request     = $this->request;
@@ -180,7 +180,7 @@ class AssetController extends FormController
         }
 
         // Audit Log
-        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
+        $logs = $this->getModel('core.auditLog')->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
 
         return $this->delegateView(array(
             'returnUrl'       => $action,
@@ -234,7 +234,7 @@ class AssetController extends FormController
     public function previewAction ($objectId)
     {
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-        $model       = $this->factory->getModel('asset.asset');
+        $model       = $this->getModel('asset');
         $activeAsset = $model->getEntity($objectId);
 
         if ($activeAsset === null || !$this->factory->getSecurity()->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy())) {
@@ -261,7 +261,7 @@ class AssetController extends FormController
     public function newAction ()
     {
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-        $model = $this->factory->getModel('asset.asset');
+        $model = $this->getModel('asset');
 
         /** @var \Mautic\AssetBundle\Entity\Asset $entity */
         $entity  = $model->getEntity();
@@ -397,7 +397,7 @@ class AssetController extends FormController
     public function editAction ($objectId, $ignorePost = false)
     {
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-        $model = $this->factory->getModel('asset.asset');
+        $model = $this->getModel('asset');
 
         /** @var \Mautic\AssetBundle\Entity\Asset $entity */
         $entity     = $model->getEntity($objectId);
@@ -562,7 +562,7 @@ class AssetController extends FormController
     public function cloneAction ($objectId)
     {
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-        $model  = $this->factory->getModel('asset.asset');
+        $model  = $this->getModel('asset');
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -611,7 +611,7 @@ class AssetController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-            $model  = $this->factory->getModel('asset.asset');
+            $model  = $this->getModel('asset');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
@@ -674,7 +674,7 @@ class AssetController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-            $model     = $this->factory->getModel('asset');
+            $model     = $this->getModel('asset');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = array();
 

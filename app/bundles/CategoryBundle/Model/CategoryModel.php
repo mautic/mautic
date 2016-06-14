@@ -14,6 +14,8 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\CategoryEvents;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class CategoryModel
@@ -23,6 +25,21 @@ use Symfony\Component\EventDispatcher\Event;
 
 class CategoryModel extends FormModel
 {
+    /**
+     * @var null|\Symfony\Component\HttpFoundation\Request
+     */
+    protected $request;
+
+    /**
+     * CategoryModel constructor.
+     *
+     * @param RequestStack $requestStack
+     */
+    public function __construct(RequestStack $requestStack)
+    {
+        $this->request = $requestStack->getCurrentRequest();
+    }
+
     public function getRepository()
     {
         return $this->em->getRepository('MauticCategoryBundle:Category');
@@ -35,8 +52,8 @@ class CategoryModel extends FormModel
 
     public function getPermissionBase()
     {
-        $request = $this->factory->getRequest();
-        $bundle  = $request->get('bundle');
+        $bundle  = $this->request->get('bundle');
+
         return $bundle.':categories';
     }
 
@@ -157,45 +174,6 @@ class CategoryModel extends FormModel
         } else {
             return null;
         }
-    }
-
-    /**
-     * Delete an entity
-     *
-     * @param  $entity
-     * @return null|object
-     */
-    public function deleteEntity($entity)
-    {
-        $bundle = $entity->getBundle();
-
-        //if it doesn't have a dot, then assume the model will be $bundle.$bundle
-        $modelName = (strpos($bundle, '.') === false) ? $bundle.'.'.$bundle : $bundle;
-        $model     = $this->factory->getModel($modelName);
-
-        $repo       = $model->getRepository();
-        $tableAlias = $repo->getTableAlias();
-
-        $entities = $model->getEntities(array(
-            'filter' => array(
-                'force' => array(
-                    array(
-                        'column' => $tableAlias.'.category',
-                        'expr'   => 'eq',
-                        'value'  => $entity->getId()
-                    )
-                )
-            )
-        ));
-
-        if (!empty($entities)) {
-            foreach ($entities as $e) {
-                $e->setCategory(null);
-            }
-            $model->saveEntities($entities, false);
-        }
-
-        parent::deleteEntity($entity);
     }
 
     /**

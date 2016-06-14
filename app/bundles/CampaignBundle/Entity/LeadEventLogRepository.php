@@ -104,6 +104,7 @@ class LeadEventLogRepository extends EntityRepository
         $leadIps = array();
 
         $query = $this->_em->getConnection()->createQueryBuilder();
+        $today = new DateTimeHelper();
         $query->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
             ->select('ll.event_id,
                     ll.campaign_id,
@@ -118,7 +119,7 @@ class LeadEventLogRepository extends EntityRepository
             ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = e.campaign_id')
             ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = ll.lead_id')
             ->where($query->expr()->gte('ll.trigger_date', ':today'))
-            ->setParameter('today', (new DateTimeHelper)->toUtcString());
+            ->setParameter('today', $today->toUtcString());
 
         if (isset($options['lead'])) {
             /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */

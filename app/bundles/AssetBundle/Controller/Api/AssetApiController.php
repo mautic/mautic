@@ -23,7 +23,7 @@ class AssetApiController extends CommonApiController
     public function initialize (FilterControllerEvent $event)
     {
         parent::initialize($event);
-        $this->model            = $this->factory->getModel('asset');
+        $this->model            = $this->getModel('asset');
         $this->entityClass      = 'Mautic\AssetBundle\Entity\Asset';
         $this->entityNameOne    = 'asset';
         $this->entityNameMulti  = 'assets';

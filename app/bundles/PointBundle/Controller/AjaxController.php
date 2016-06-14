@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\UtmBundle\Controller;
+namespace Mautic\PointBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -19,7 +19,29 @@ use Symfony\Component\HttpFoundation\Request;
 class AjaxController extends CommonAjaxController
 {
 
-     /**
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function reorderTriggerEventsAction(Request $request)
+    {
+        $dataArray   = array('success' => 0);
+        $session     = $this->factory->getSession();
+        $triggerId   = InputHelper::clean($request->request->get('triggerId'));
+        $sessionName = 'mautic.point.'.$triggerId.'.triggerevents.modified';
+        $order       = InputHelper::clean($request->request->get('triggerEvent'));
+        $components  = $session->get($sessionName);
+        if (!empty($order) && !empty($components)) {
+            $components = array_replace(array_flip($order), $components);
+            $session->set($sessionName, $components);
+            $dataArray['success'] = 1;
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
      * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
@@ -34,25 +56,25 @@ class AjaxController extends CommonAjaxController
 
         if (!empty($type)) {
             //get the HTML for the form
-            /** @var \Mautic\UtmBundle\Model\UtmModel $model */
-            $model   = $this->factory->getModel('utm');
-            $actions = $model->getUtmActions();
+            /** @var \Mautic\PointBundle\Model\PointModel $model */
+            $model   = $this->getModel('point');
+            $actions = $model->getPointActions();
 
             if (isset($actions['actions'][$type])) {
-                $themes = array('MauticUtmBundle:FormTheme\Action');
+                $themes = array('MauticPointBundle:FormTheme\Action');
                 if (!empty($actions['actions'][$type]['formTheme'])) {
                     $themes[] = $actions['actions'][$type]['formTheme'];
                 }
 
-                $formType        = (!empty($actions['actions'][$type]['formType'])) ? $actions['actions'][$type]['formType'] : 'genericutm_settings';
+                $formType        = (!empty($actions['actions'][$type]['formType'])) ? $actions['actions'][$type]['formType'] : 'genericpoint_settings';
                 $formTypeOptions = (!empty($actions['actions'][$type]['formTypeOptions'])) ? $actions['actions'][$type]['formTypeOptions'] : array();
-                $form            = $this->get('form.factory')->create('utmaction', array(), array('formType' => $formType, 'formTypeOptions' => $formTypeOptions));
-                $html            = $this->renderView('MauticUtmBundle:Utm:actionform.html.php', array(
-                    'form' => $this->setFormTheme($form, 'MauticUtmBundle:Utm:actionform.html.php', $themes)
+                $form            = $this->get('form.factory')->create('pointaction', array(), array('formType' => $formType, 'formTypeOptions' => $formTypeOptions));
+                $html            = $this->renderView('MauticPointBundle:Point:actionform.html.php', array(
+                    'form' => $this->setFormTheme($form, 'MauticPointBundle:Point:actionform.html.php', $themes)
                 ));
 
-                //replace utmaction with utm
-                $html                 = str_replace('utmaction', 'utm', $html);
+                //replace pointaction with point
+                $html                 = str_replace('pointaction', 'point', $html);
                 $dataArray['html']    = $html;
                 $dataArray['success'] = 1;
             }

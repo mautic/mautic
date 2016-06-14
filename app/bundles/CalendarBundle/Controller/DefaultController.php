@@ -47,7 +47,7 @@ class DefaultController extends FormController
         $entityId   = $this->request->query->get('objectId');
 
         /* @type \Mautic\CalendarBundle\Model\CalendarModel $model */
-        $calendarModel  = $this->factory->getModel('calendar');
+        $calendarModel  = $this->getModel('calendar');
         $event          = $calendarModel->editCalendarEvent($source, $entityId);
 
         $model   = $event->getModel();

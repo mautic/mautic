@@ -9,8 +9,10 @@
 
 namespace Mautic\PointBundle\Model;
 
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Action;
 use Mautic\PointBundle\Entity\LeadPointLog;
 use Mautic\PointBundle\Entity\Point;
@@ -21,6 +23,7 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -28,6 +31,41 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class PointModel extends CommonFormModel
 {
+    /**
+     * @deprecated Remove in 2.0
+     *
+     * @var MauticFactory
+     */
+    protected $factory;
+
+    /**
+     * @var Session
+     */
+    protected $session;
+    
+    /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
+
+    /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * PointModel constructor.
+     * 
+     * @param Session $session
+     * @param IpLookupHelper $ipLookupHelper
+     * @param LeadModel $leadModel
+     */
+    public function __construct(Session $session, IpLookupHelper $ipLookupHelper, LeadModel $leadModel)
+    {
+        $this->session = $session;
+        $this->ipLookupHelper = $ipLookupHelper;
+        $this->leadModel = $leadModel;
+    }
 
     /**
      * {@inheritdoc}
@@ -157,27 +195,24 @@ class PointModel extends CommonFormModel
             return;
         }
 
-        if ($typeId !== null && $this->factory->getEnvironment() == 'prod') {
+        if ($typeId !== null && MAUTIC_ENV === 'prod') {
             //let's prevent some unnecessary DB calls
-            $session = $this->factory->getSession();
-            $triggeredEvents = $session->get('mautic.triggered.point.actions', array());
+            $triggeredEvents = $this->session->get('mautic.triggered.point.actions', array());
             if (in_array($typeId, $triggeredEvents)) {
                 return;
             }
             $triggeredEvents[] = $typeId;
-            $session->set('mautic.triggered.point.actions', $triggeredEvents);
+            $this->session->set('mautic.triggered.point.actions', $triggeredEvents);
         }
 
         //find all the actions for published points
         /** @var \Mautic\PointBundle\Entity\PointRepository $repo */
         $repo            = $this->getRepository();
         $availablePoints = $repo->getPublishedByType($type);
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel    = $this->factory->getModel('lead');
-        $ipAddress    = $this->factory->getIpAddress();
+        $ipAddress       = $this->ipLookupHelper->getIpAddress();
 
         if (null === $lead) {
-            $lead = $leadModel->getCurrentLead();
+            $lead = $this->leadModel->getCurrentLead();
 
             if (null === $lead || !$lead->getId()) {
 
@@ -213,7 +248,7 @@ class PointModel extends CommonFormModel
                     'points'     => $action->getDelta()
                 ),
                 'lead'        => $lead,
-                'factory'     => $this->factory,
+                'factory'     => $this->factory, // WHAT?
                 'eventDetails' => $eventDetails
             );
 
@@ -264,7 +299,7 @@ class PointModel extends CommonFormModel
         }
 
         if (!empty($persist)) {
-            $leadModel->saveEntity($lead);
+            $this->leadModel->saveEntity($lead);
             $this->getRepository()->saveEntities($persist);
 
             // Detach logs to reserve memory
@@ -275,29 +310,30 @@ class PointModel extends CommonFormModel
     /**
      * Get line chart data of points
      *
-     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     * @param string   $dateFormat
-     * @param array    $filter
-     * @param boolean  $canViewOthers
+     * @param char      $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param string    $dateFormat
+     * @param array     $filter
+     * @param boolean   $canViewOthers
      *
      * @return array
      */
     public function getPointLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
     {
         $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $query     = $chart->getChartQuery($this->em->getConnection());
         $q         = $query->prepareTimeDataQuery('lead_points_change_log', 'date_added', $filter);
 
         if (!$canViewOthers) {
             $q->join('t', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id')
                 ->andWhere('l.owner_id = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
         }
 
         $data = $query->loadAndBuildTimeData($q);
-        $chart->setDataset($this->factory->getTranslator()->trans('mautic.point.changes'), $data);
+        $chart->setDataset($this->translator->trans('mautic.point.changes'), $data);
+
         return $chart->render();
     }
 }

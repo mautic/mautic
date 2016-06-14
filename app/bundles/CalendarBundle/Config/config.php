@@ -20,7 +20,13 @@ return array(
             )
         )
     ),
-
+    'services' => array(
+        'models' =>  array(
+            'mautic.calendar.model.calendar' => array(
+                'class' => 'Mautic\CalendarBundle\Model\CalendarModel'
+            )
+        )
+    ),
     'menu'   => array(
         'main' => array(
             'priority' => 90,
