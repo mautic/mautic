@@ -64,6 +64,26 @@ if (!isset($attachmentSize)) {
                                 </div>
                             </div>
                         </div>
+                        <?php if ($themes) : ?>
+                        <div class="row">
+                            <?php foreach ($themes as $themeKey => $themeInfo) : ?>
+                                <div class="col-md-2">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title"><?php echo $themeInfo['name']; ?></h3>
+                                        </div>
+                                        <div class="panel-body text-center" style="height: 250px">
+                                            <?php if (file_exists($themeInfo['dir'].'/thumbnail.png')) : ?>
+                                                <div style="background-image: url(<?php echo $view['assets']->getUrl('themes/'.$themeKey.'/thumbnail.png') ?>);background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 100%"></div>
+                                            <?php else : ?>
+                                                <i class="fa fa-file-image-o fa-5x text-muted" aria-hidden="true" style="padding-top: 75px; color: #E4E4E4"></i>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <?php endif; ?>
                     </div>
 
                     <div class="tab-pane fade bdr-w-0" id="advanced-container">

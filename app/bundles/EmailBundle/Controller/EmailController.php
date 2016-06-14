@@ -671,34 +671,14 @@ class EmailController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    // $contentName = 'mautic.emailbuilder.'.$entity->getSessionId().'.content';
-                    // $template    = $entity->getTemplate();
-                    // if (!empty($template)) {
-                    //     $existingContent = $entity->getContent();
-                    //     $newContent      = $session->get($contentName, array());
-                    //     $viewContent     = array_merge($existingContent, $newContent);
-
-                    //     $entity->setCustomHtml(null);
-                    // } else {
-                    //     $entity->setContent(array());
-
-                    //     $viewContent = $entity->getCustomHtml();
-                    // }
 
                     $content = $entity->getCustomHtml();
                     BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($content);
 
-                    // if (!empty($template)) {
-                    //     $entity->setContent($modelContent);
-                    // } else {
-                        $entity->setCustomHtml($content);
-                    // }
-                        
+                    $entity->setCustomHtml($content);
+
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
-
-                    //clear the session
-                    // $session->remove($contentName);
 
                     $this->addFlash(
                         'mautic.core.notice.updated',
@@ -799,6 +779,7 @@ class EmailController extends FormController
                     'isVariant'          => $entity->isVariant(true),
                     'tokens'             => (!empty($tokens)) ? $tokens['tokenSections'] : $model->getBuilderComponents($entity, 'tokenSections'),
                     'slots'              => $slotTypes,
+                    'themes'             => $this->factory->getInstalledThemes('email', true),
                     'email'              => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
                     'attachmentSize'     => $attachmentSize,
