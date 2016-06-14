@@ -181,7 +181,8 @@ $dbalSettings = array(
         'enum'  => 'string',
         'point' => 'string',
         'bit'   => 'string',
-    )
+    ),
+    'server_version' => 5.5
 );
 
 // If using pdo_sqlite as the database driver, add the path to config file
