@@ -49,10 +49,6 @@ if (!isset($attachmentSize)) {
                 <div class="tab-content pa-md">
                     <div class="tab-pane fade in active bdr-w-0" id="email-container">
                         <div class="row">
-                            <div class="col-md-8">
-                                <?php echo $view['form']->row($form['subject']); ?>
-                            </div>
-
                             <div class="col-md-4">
                                 <?php echo $view['form']->row($form['template']); ?>
                             </div>
@@ -132,6 +128,7 @@ if (!isset($attachmentSize)) {
     <div class="col-md-3 bg-white height-auto bdr-l">
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php echo $view['form']->row($form['name']); ?>
+            <?php echo $view['form']->row($form['subject']); ?>
             <?php if ($isVariant): ?>
                 <?php echo $view['form']->row($form['variantSettings']); ?>
                 <?php echo $view['form']->row($form['isPublished']); ?>
