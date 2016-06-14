@@ -98,7 +98,7 @@ class StageController extends FormController
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         //get the list of actions
-        $actions = $this->factory->getModel('stage')->getStageActions();
+        $actions = $this->getModel('stage')->getStageActions();
 
         return $this->delegateView(
             array(
@@ -130,7 +130,7 @@ class StageController extends FormController
      */
     public function newAction($entity = null)
     {
-        $model = $this->factory->getModel('stage');
+        $model = $this->getModel('stage');
 
         if (!($entity instanceof Stage)) {
             /** @var \Mautic\StageBundle\Entity\Stage $entity */
@@ -250,7 +250,7 @@ class StageController extends FormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
-        $model  = $this->factory->getModel('stage');
+        $model  = $this->getModel('stage');
         $entity = $model->getEntity($objectId);
 
         //set the page we came from
@@ -400,7 +400,7 @@ class StageController extends FormController
      */
     public function cloneAction($objectId)
     {
-        $model  = $this->factory->getModel('stage');
+        $model  = $this->getModel('stage');
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -439,7 +439,7 @@ class StageController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->factory->getModel('stage');
+            $model  = $this->getModel('stage');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
@@ -499,7 +499,7 @@ class StageController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model     = $this->factory->getModel('stage');
+            $model     = $this->getModel('stage');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = array();
 

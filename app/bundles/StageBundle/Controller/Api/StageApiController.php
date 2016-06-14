@@ -24,7 +24,7 @@ class StageApiController extends CommonApiController
     public function initialize (FilterControllerEvent $event)
     {
         parent::initialize($event);
-        $this->model            = $this->factory->getModel('stage');
+        $this->model            = $this->getModel('stage');
         $this->entityClass      = 'Mautic\StageBundle\Entity\Stage';
         $this->entityNameOne    = 'stage';
         $this->entityNameMulti  = 'stages';

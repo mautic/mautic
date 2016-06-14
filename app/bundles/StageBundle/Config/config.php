@@ -7,70 +7,79 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-return array(
-    'routes'   => array(
-        'main' => array(
-            'mautic_stage_index'              => array(
+return [
+    'routes'   => [
+        'main' => [
+            'mautic_stage_index'              => [
                 'path'       => '/stages/{page}',
                 'controller' => 'MauticStageBundle:Stage:index'
-            ),
-            'mautic_stage_action'             => array(
+            ],
+            'mautic_stage_action'             => [
                 'path'       => '/stages/{objectAction}/{objectId}',
                 'controller' => 'MauticStageBundle:Stage:execute'
-            )
-        ),
-        'api'  => array(
-            'mautic_api_getstages'   => array(
+            ]
+        ],
+        'api'  => [
+            'mautic_api_getstages'   => [
                 'path'       => '/stages',
                 'controller' => 'MauticStageBundle:Api\StageApi:getEntities'
-            ),
-            'mautic_api_getstage'    => array(
+            ],
+            'mautic_api_getstage'    => [
                 'path'       => '/stages/{id}',
                 'controller' => 'MauticStageBundle:Api\StageApi:getEntity'
-            )
-        )
-    ),
+            ]
+        ]
+    ],
 
-    'menu'     => array(
-        'main' => array(
-            'mautic.stages.menu.index' => array(
+    'menu'     => [
+        'main' => [
+            'mautic.stages.menu.index' => [
                 'route'  => 'mautic_stage_index',
                 'iconClass' => 'fa-tachometer',
-                'access'    => array('stage:stages:view'),
+                'access'    => ['stage:stages:view'],
                 'priority'  => 25
-            )
-        )
-    ),
+            ]
+        ]
+    ],
 
-    'categories' => array(
+    'categories' => [
         'stage' => null
-    ),
+    ],
 
-    'services' => array(
-        'events' => array(
-            'mautic.stage.subscriber'            => array(
+    'services' => [
+        'events' => [
+            'mautic.stage.subscriber'            => [
                 'class' => 'Mautic\StageBundle\EventListener\StageSubscriber'
-            ),
-            'mautic.stage.leadbundle.subscriber' => array(
+            ],
+            'mautic.stage.leadbundle.subscriber' => [
                 'class' => 'Mautic\StageBundle\EventListener\LeadSubscriber'
-            ),
-            'mautic.stage.search.subscriber'     => array(
+            ],
+            'mautic.stage.search.subscriber'     => [
                 'class' => 'Mautic\StageBundle\EventListener\SearchSubscriber'
-            ),
-            'mautic.stage.dashboard.subscriber'  => array(
+            ],
+            'mautic.stage.dashboard.subscriber'  => [
                 'class' => 'Mautic\StageBundle\EventListener\DashboardSubscriber'
-            ),
-        ),
-        'forms'  => array(
-            'mautic.stage.type.form'                  => array(
+            ],
+        ],
+        'forms'  => [
+            'mautic.stage.type.form'                  => [
                 'class'     => 'Mautic\StageBundle\Form\Type\StageType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'stage'
-            ),
-            'mautic.stage.type.action'                => array(
+            ],
+            'mautic.stage.type.action'                => [
                 'class' => 'Mautic\StageBundle\Form\Type\StageActionType',
                 'alias' => 'stageaction'
-            )
-        )
-    )
-);
+            ]
+        ],
+        'models' =>  [
+            'mautic.asset.model.asset' => [
+                'class' => 'Mautic\StageBundle\Model\StageModel',
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'session'
+        ]
+    ]
+]
+    ]
+];

@@ -28,7 +28,32 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class StageModel extends CommonFormModel
 {
+    /**
+     * @deprecated Remove in 2.0
+     *
+     * @var MauticFactory
+     */
+    protected $factory;
+    /**
+     * @var Session
+     */
+    protected $session;
 
+    /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+    /**
+     * PointModel constructor.
+     *
+     * @param Session $session
+     * @param LeadModel $leadModel
+     */
+    public function __construct(Session $session,  LeadModel $leadModel)
+    {
+        $this->session = $session;
+        $this->leadModel = $leadModel;
+    }
     /**
      * {@inheritdoc}
      *
@@ -199,27 +224,22 @@ class StageModel extends CommonFormModel
             return;
         }
 
-        if ($typeId !== null && $this->factory->getEnvironment() == 'prod') {
-            //let's prevent some unnecessary DB calls
-            $session = $this->factory->getSession();
-            $triggeredEvents = $session->get('mautic.triggered.stage.actions', array());
+        if ($typeId !== null && MAUTIC_ENV === 'prod') {
+            $triggeredEvents = $this->session->get('mautic.triggered.stage.actions', array());
             if (in_array($typeId, $triggeredEvents)) {
                 return;
             }
             $triggeredEvents[] = $typeId;
-            $session->set('mautic.triggered.stage.actions', $triggeredEvents);
+            $this->session->set('mautic.triggered.stage.actions', $triggeredEvents);
         }
 
         //find all the actions for published stages
         /** @var \Mautic\StageBundle\Entity\StageRepository $repo */
         $repo            = $this->getRepository();
         $availableStages = $repo->getPublishedByType($type);
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel    = $this->factory->getModel('lead');
-        $ipAddress    = $this->factory->getIpAddress();
 
         if (null === $lead) {
-            $lead = $leadModel->getCurrentLead();
+            $lead = $this->leadModel->getCurrentLead();
 
             if (null === $lead || !$lead->getId()) {
 
@@ -236,15 +256,14 @@ class StageModel extends CommonFormModel
         $persist = array();
         foreach ($availableStages as $action) {
 
-            $this->factory->getLogger()->addError(print_r($action->getId(),true));
             //if it's already been done, then skip it
             if (isset($completedActions[$action->getId()])) {
-               //continue;
+                continue;
             }
 
             //make sure the action still exists
             if (!isset($availableActions['actions'][$action->getType()])) {
-              //  continue;
+                continue;
             }
             
             $parsed = explode('.', $action->getType());
@@ -263,7 +282,7 @@ class StageModel extends CommonFormModel
         }
 
         if (!empty($persist)) {
-            $leadModel->saveEntity($lead);
+            $this->leadModel->saveEntity($lead);
             $this->getRepository()->saveEntities($persist);
 
             // Detach logs to reserve memory
