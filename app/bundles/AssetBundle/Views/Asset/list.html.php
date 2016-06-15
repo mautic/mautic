@@ -70,7 +70,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                                     'attr' => array(
                                         'data-toggle' => 'ajaxmodal',
                                         'data-target' => '#AssetPreviewModal',
-                                        'href' => $view['router']->generate('mautic_asset_action', array('objectAction' => 'preview', 'objectId' => $item->getId()))
+                                        'href' => $view['router']->path('mautic_asset_action', array('objectAction' => 'preview', 'objectId' => $item->getId()))
                                     ),
                                     'btnText'   => $view['translator']->trans('mautic.asset.asset.preview'),
                                     'iconClass' => 'fa fa-image'
@@ -85,7 +85,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                                 'item'       => $item,
                                 'model'      => 'asset.asset'
                             )); ?>
-                            <a href="<?php echo $view['router']->generate('mautic_asset_action',
+                            <a href="<?php echo $view['router']->path('mautic_asset_action',
                                 array("objectAction" => "view", "objectId" => $item->getId())); ?>"
                                data-toggle="ajax">
                                 <?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)
@@ -116,7 +116,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
             "page"            => $page,
             "limit"           => $limit,
             "menuLinkId"      => 'mautic_asset_index',
-            "baseUrl"         => $view['router']->generate('mautic_asset_index'),
+            "baseUrl"         => $view['router']->path('mautic_asset_index'),
             'sessionVar'      => 'asset'
         )); ?>
     </div>

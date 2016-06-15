@@ -20,7 +20,7 @@ if (!empty($item['storedSubject'])) {
 	<div class="panel">
 	    <div class="panel-body">
 	    	<h3>
-	    		<a target="_new" href="<?php echo $view['router']->generate('mautic_email_webview', array("idHash" => $item['idHash'])); ?>">
+	    		<a target="_new" href="<?php echo $view['router']->path('mautic_email_webview', array("idHash" => $item['idHash'])); ?>">
 				    <?php echo $subject; ?>
 				</a>
 			</h3>

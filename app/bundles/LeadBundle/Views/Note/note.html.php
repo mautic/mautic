@@ -52,7 +52,7 @@ switch ($type) {
                      <?php if ($permissions['delete']): ?>
                          <a class="btn btn-default btn-xs"
                             data-toggle="confirmation"
-                            href="<?php echo $view['router']->generate('mautic_contactnote_action', array('objectAction' => 'delete', 'objectId' => $id, 'leadId' => $lead->getId())); ?>"
+                            href="<?php echo $view['router']->path('mautic_contactnote_action', array('objectAction' => 'delete', 'objectId' => $id, 'leadId' => $lead->getId())); ?>"
                             data-message="<?php echo $view->escape($view["translator"]->trans('mautic.lead.note.confirmdelete')); ?>"
                             data-confirm-text="<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete")); ?>"
                             data-confirm-callback="executeAction"
