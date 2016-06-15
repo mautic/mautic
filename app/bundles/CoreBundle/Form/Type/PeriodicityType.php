@@ -48,7 +48,7 @@ class PeriodicityType extends AbstractType
             'nextShoot',
             'text',
             array(
-                'label'      => 'Beginning Date',
+                'label'      => 'mautic.core.periodicity.form.next_shoot',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
                 'mapped' => false,
@@ -60,7 +60,7 @@ class PeriodicityType extends AbstractType
             'interval',
             'number',
             array(
-                'label'      => 'Periodicity',
+                'label'      => 'mautic.core.periodicity.form.interval',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
                 'mapped' => false,
@@ -71,7 +71,7 @@ class PeriodicityType extends AbstractType
             'intervalUnit',
             'choice',
             array(
-                'label'      => 'Unit',
+                'label'      => 'mautic.core.periodicity.form.interval_unit',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
                 'mapped' => false,
@@ -93,13 +93,13 @@ class PeriodicityType extends AbstractType
                 'attr'       => array('class' => 'form-control'),
                 'mapped' => false,
                 'choices'  => array(
-                    0 => 'Monday',
-                    1 => 'Tuesday',
-                    2 => 'Wednesday',
-                    3 => 'Thursday',
-                    4 => 'Friday',
-                    5 => 'Saturday',
-                    6 => 'Sunday'
+                    0 => 'mautic.core.periodicity.form.days_of_week.monday',
+                    1 => 'mautic.core.periodicity.form.days_of_week.tuesday',
+                    2 => 'mautic.core.periodicity.form.days_of_week.wednesday',
+                    3 => 'mautic.core.periodicity.form.days_of_week.thursday',
+                    4 => 'mautic.core.periodicity.form.days_of_week.friday',
+                    5 => 'mautic.core.periodicity.form.days_of_week.saturday',
+                    6 => 'mautic.core.periodicity.form.days_of_week.sunday'
                 ),
                 'multiple' => true,
                 'required' => false

@@ -48,7 +48,7 @@ class FeedType extends AbstractType
             'feed_url',
             'text',
             array(
-                'label'      => 'Feed URL',
+                'label'      => 'mautic.feed.form.feed_url',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control')
             )
@@ -57,7 +57,7 @@ class FeedType extends AbstractType
             'item_count',
             'number',
             array(
-                'label'      => 'Number of items per mail',
+                'label'      => 'mautic.feed.form.item_count',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control')
             )

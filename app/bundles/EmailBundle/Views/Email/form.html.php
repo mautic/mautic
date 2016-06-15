@@ -223,12 +223,12 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
                     #recurency_days_of_week + label + br + div.row + div.row{
                         float: left;
                     }
-                </style>
-                <label>Recurency :</label>
+    			</style>
+                <label><?php echo $view['translator']->trans('mautic.core.periodicity.form.recurrence') ?> :</label>
                 <br/><input type="radio" value="interval" name="recurency" id="recurency_interval"<?php if(!empty($form['interval']->vars['value'])){?> checked="checked"<?php } ?>/>
-                <label for="recurency_interval">Interval</label>
+                <label for="recurency_interval"><?php echo $view['translator']->trans('mautic.core.periodicity.form.interval') ?></label>
                 <br/><input type="radio" value="days_of_week" name="recurency" id="recurency_days_of_week"<?php if(empty($form['interval']->vars['value'])){?> checked="checked"<?php } ?>/>
-                <label for="recurency_days_of_week">Days of week</label>
+                <label for="recurency_days_of_week"><?php echo $view['translator']->trans('mautic.core.periodicity.form.days_of_week') ?></label>
                 <br/><?php echo $view['form']->row($form['interval']); ?>
                 <?php echo $view['form']->row($form['intervalUnit']); ?>
                 <?php echo $view['form']->row($form['DaysOfWeek']); ?>
@@ -285,10 +285,11 @@ $type = $email->getEmailType();
 if (empty($type) || !empty($forceTypeSelection)):
     echo $view->render('MauticCoreBundle:Helper:form_selecttype.html.php',
         [
-            'item'       => $email,
-            'mauticLang' => [
-                'newListEmail'     => 'mautic.email.type.list.header',
-                'newTemplateEmail' => 'mautic.email.type.template.header',
+            'item'               => $email,
+            'mauticLang'         => [
+                'newListEmail'      => 'mautic.email.type.list.header',
+                'newTemplateEmail'  => 'mautic.email.type.template.header',
+                'newRssEmail'       => 'mautic.email.type.feed.header'
             ],
             'typePrefix'           => 'email',
             'cancelUrl'            => 'mautic_email_index',
