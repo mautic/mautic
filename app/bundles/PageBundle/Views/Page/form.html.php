@@ -110,7 +110,7 @@ $template = $form['template']->vars['data'];
 
 <div class="hide builder page-builder">
     <div class="builder-content">
-        <input type="hidden" id="builder_url" value="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'builder', 'objectId' => $activePage->getSessionId())); ?>" />
+        <input type="hidden" id="builder_url" value="<?php echo $view['router']->path('mautic_page_action', array('objectAction' => 'builder', 'objectId' => $activePage->getSessionId())); ?>" />
     </div>
     <div class="builder-panel">
         <div class="builder-panel-top">

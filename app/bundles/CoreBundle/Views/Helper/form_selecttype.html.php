@@ -19,7 +19,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <a href="javascript: void(0);" onclick="Mautic.closeModalAndRedirect('.<?php echo $typePrefix; ?>-type-modal', '<?php echo $view['router']->generate($cancelUrl); ?>');" class="close" ><span aria-hidden="true">&times;</span></a>
+                <a href="javascript: void(0);" onclick="Mautic.closeModalAndRedirect('.<?php echo $typePrefix; ?>-type-modal', '<?php echo $view['router']->path($cancelUrl); ?>');" class="close" ><span aria-hidden="true">&times;</span></a>
                 <h4 class="modal-title">
                     <?php echo $view['translator']->trans($header); ?>
                 </h4>
