@@ -378,6 +378,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                 $type = $email->getEmailType();
                 $translationParent = $email->getTranslationParent();
 
+                $listViolations          = null;
+                $feedUrlViolations       = null;
+                $feedItemCountViolations = null;
+
                 if ($type == 'list' || $type === 'feed' && null == $translationParent) {
                     $validator = $context->getValidator();
                     $violations = $validator->validate(
@@ -401,8 +405,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                 }
 
                 if ($type === 'feed') {
-                    $validator  = $context->getValidator();
-                    $violations = $validator->validate(
+                    $feedUrlViolations = $validator->validate(
                         $email->getFeed()->getFeedUrl(),
                         array(
                             new NotBlank(
@@ -413,11 +416,30 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                         )
                     );
 
+                    $feedItemCountViolations = $validator->validate(
+                        $email->getFeed()->getItemCount(),
+                        array(
+                            new NotBlank(
+                                array(
+                                    'message' => 'mautic.feed.item_count.required'
+                                )
+                            )
+                        )
+                    );
+                }
+
+                $violationPaths = array(
+                    array($listViolations,          'lists'),
+                    array($feedUrlViolations,       'feed.feed_url'),
+                    array($feedItemCountViolations, 'feed.item_count')
+                );
+
+                foreach ($violationPaths as list($violations, $path)) {
                     if (count($violations) > 0) {
-                        $string = (string) $violations;
-                        $context->buildViolation($string)
-                            ->atPath('feed.feed_url')
-                            ->addViolation();
+                        $message = (string) $violations;
+                        $context->buildViolation($message)
+                                ->atPath($path)
+                                ->addViolation();
                     }
                 }
 
