@@ -10,6 +10,8 @@
 namespace MauticPlugin\MauticSocialBundle\Helper;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -85,8 +87,14 @@ class CampaignEventHelper
             'source' => ['campaign', $event['campaign']['id']]
         ];
 
+        $leadArray = $lead->getProfileFields();
+        if (empty($leadArray['twitter'])) {
+
+            return false;
+        }
+
         $tweetText = $event['properties']['tweet_text'];
-        $tweetText = $this->parseTweetText($tweetText, $lead);
+        $tweetText = $this->parseTweetText($tweetText, $leadArray);
         $tweetUrl  = $twitterIntegration->getApiUrl('statuses/update');
         $status    = ['status' => $tweetText];
 
@@ -98,7 +106,7 @@ class CampaignEventHelper
             $tweetSent = true;
         }
 
-        return ($tweetSent) ? ['text' => $tweetText, 'response' => $sendTweet] : false;
+        return ($tweetSent) ? ['timeline' => $tweetText, 'response' => $sendTweet] : ['failed' => 1, 'response' => $sendTweet];
     }
 
     /**
@@ -111,14 +119,14 @@ class CampaignEventHelper
      */
     protected function parseTweetText($tweet, $lead)
     {
-        /* @var \Mautic\LeadBundle\Entity\Lead $lead */
-        $tweetHandle = $lead->getFieldValue('twitter');
+        $tweetHandle = $lead['twitter'];
         $tokens      = [
             '{twitter_handle}' => (strpos($tweetHandle, '@') !== false) ? $tweetHandle : "@$tweetHandle"
         ];
 
         $tokens = array_merge(
             $tokens,
+            TokenHelper::findLeadTokens($tweet, $lead),
             $this->pageTokenHelper->findPageTokens($tweet, $this->clickthrough),
             $this->assetTokenHelper->findAssetTokens($tweet, $this->clickthrough)
         );
