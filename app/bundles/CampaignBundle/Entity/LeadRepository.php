@@ -64,18 +64,17 @@ class LeadRepository extends CommonRepository
     {
         //DBAL
         $dq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $dq->select('count(*) as count')
+        $dq->select('count(id) as count')
             ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
 
         //Fix arguments if necessary
         $args = $this->convertOrmProperties('Mautic\\LeadBundle\\Entity\\Lead', $args);
 
         $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $sq->select('null')
+        $sq->select('DISTINCT(cl.lead_id)')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl');
 
         $expr = $sq->expr()->andX(
-            $sq->expr()->eq('cl.lead_id', 'l.id'),
             $sq->expr()->eq('cl.manually_removed', ':false')
         );
         $dq->setParameter('false', false, 'boolean');
@@ -88,7 +87,7 @@ class LeadRepository extends CommonRepository
         $sq->where($expr);
 
         $dq->andWhere(
-            sprintf('EXISTS (%s)', $sq->getSQL())
+            sprintf('l.id IN (%s)', $sq->getSQL())
         );
 
         //get a total count
