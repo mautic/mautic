@@ -42,7 +42,7 @@ if ($tmpl == 'index')
                             'clone'     => true,
                             'delete'    => $item->isFixed() ? false : true,
                         ),
-                        'routeBase' => 'leadfield',
+                        'routeBase' => 'contactfield',
                         'langVar'   => 'lead.field',
                         'pull'      => 'left'
                     ));

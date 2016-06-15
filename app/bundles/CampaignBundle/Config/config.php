@@ -141,7 +141,8 @@ return array(
                     'mautic.helper.ip_lookup',
                     'mautic.helper.core_parameters',
                     'mautic.lead.model.lead',
-                    'mautic.campaign.model.campaign'
+                    'mautic.campaign.model.campaign',
+                    'mautic.factory'
                 )
             )
         )
