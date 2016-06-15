@@ -79,7 +79,8 @@ class LeadEventLog
 
         $builder->setTable('campaign_lead_event_log')
             ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\LeadEventLogRepository')
-            ->addIndex(array('is_scheduled'), 'event_upcoming_search');
+            ->addIndex(['is_scheduled'], 'event_upcoming_search')
+            ->addIndex(['date_triggered'], 'campaign_date_triggered');
 
         $builder->createManyToOne('event', 'Event')
             ->isPrimaryKey()
