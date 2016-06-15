@@ -349,32 +349,15 @@ class PageController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $session     = $this->factory->getSession();
-                    $contentName = 'mautic.pagebuilder.'.$entity->getSessionId().'.content';
-
-                    $template = $entity->getTemplate();
-                    if (!empty($template)) {
-                        $content = $session->get($contentName, array());
-                        $entity->setCustomHtml(null);
-                    } else {
-                        $content = $entity->getCustomHtml();
-                        $entity->setContent(array());
-                    }
+                    $content = $entity->getCustomHtml();
 
                     // Parse visual placeholders into tokens
                     BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($content);
 
-                    if (!empty($template)) {
-                        $entity->setContent($content);
-                    } else {
-                        $entity->setCustomHtml($content);
-                    }
+                    $entity->setCustomHtml($content);
 
                     //form is valid so process the data
                     $model->saveEntity($entity);
-
-                    //clear the session
-                    $session->remove($contentName);
 
                     $this->addFlash('mautic.core.notice.created', array(
                         '%name%'      => $entity->getTitle(),
@@ -501,36 +484,14 @@ class PageController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $contentName     = 'mautic.pagebuilder.'.$entity->getSessionId().'.content';
+                    $content = $entity->getCustomHtml();
 
-                    $template = $entity->getTemplate();
-                    if (!empty($template)) {
-                        $existingContent = $entity->getContent();
-                        $newContent      = $session->get($contentName, array());
-                        $viewContent     = array_merge($existingContent, $newContent);
+                    BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($content);
 
-                        $entity->setCustomHtml(null);
-                    } else {
-                        $entity->setContent(array());
-
-                        $viewContent = $entity->getCustomHtml();
-                    }
-
-                    // Copy model content then parse from visual to tokens
-                    $modelContent = $viewContent;
-                    BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($modelContent);
-
-                    if (!empty($template)) {
-                        $entity->setContent($modelContent);
-                    } else {
-                        $entity->setCustomHtml($modelContent);
-                    }
+                    $entity->setCustomHtml($content);
 
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
-
-                    //clear the session
-                    $session->remove($contentName);
 
                     $this->addFlash('mautic.core.notice.updated', array(
                         '%name%'      => $entity->getTitle(),
