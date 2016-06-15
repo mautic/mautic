@@ -181,6 +181,17 @@ return array(
                 'class'     => 'Mautic\UserBundle\Security\Authentication\LogoutHandler',
                 'arguments' => 'mautic.factory'
             )
+        ),
+        'models' =>  array(
+            'mautic.user.model.role' => array(
+                'class' => 'Mautic\UserBundle\Model\RoleModel'
+            ),
+            'mautic.user.model.user' => array(
+                'class' => 'Mautic\UserBundle\Model\UserModel',
+                'arguments' => array(
+                    'mautic.helper.mailer'
+                )
+            )
         )
     )
 );

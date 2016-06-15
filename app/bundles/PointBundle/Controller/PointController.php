@@ -57,7 +57,7 @@ class PointController extends FormController
         $orderBy    = $this->factory->getSession()->get('mautic.point.orderby', 'p.name');
         $orderByDir = $this->factory->getSession()->get('mautic.point.orderbydir', 'ASC');
 
-        $points = $this->factory->getModel('point')->getEntities(array(
+        $points = $this->getModel('point')->getEntities(array(
             'start'      => $start,
             'limit'      => $limit,
             'filter'     => $filter,
@@ -88,7 +88,7 @@ class PointController extends FormController
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         //get the list of actions
-        $actions = $this->factory->getModel('point')->getPointActions();
+        $actions = $this->getModel('point')->getPointActions();
 
         return $this->delegateView(array(
             'viewParameters'  => array(
@@ -118,7 +118,7 @@ class PointController extends FormController
      */
     public function newAction($entity = null)
     {
-        $model   = $this->factory->getModel('point');
+        $model   = $this->getModel('point');
 
         if (!($entity instanceof Point)) {
             /** @var \Mautic\PointBundle\Entity\Point $entity */
@@ -220,7 +220,7 @@ class PointController extends FormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
-        $model  = $this->factory->getModel('point');
+        $model  = $this->getModel('point');
         $entity = $model->getEntity($objectId);
 
         //set the page we came from
@@ -347,7 +347,7 @@ class PointController extends FormController
      */
     public function cloneAction($objectId)
     {
-        $model   = $this->factory->getModel('point');
+        $model   = $this->getModel('point');
         $entity  = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -386,7 +386,7 @@ class PointController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->factory->getModel('point');
+            $model  = $this->getModel('point');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
@@ -443,7 +443,7 @@ class PointController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model     = $this->factory->getModel('point');
+            $model     = $this->getModel('point');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = array();
 

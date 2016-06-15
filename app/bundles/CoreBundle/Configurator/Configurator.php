@@ -10,7 +10,7 @@
 namespace Mautic\CoreBundle\Configurator;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\InstallBundle\Configurator\Step\StepInterface;
+use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
@@ -251,7 +251,7 @@ class Configurator
 
         $count = $counter = count($array);
         foreach ($array as $key => $value) {
-            if (is_string($key)) {
+            if (is_string($key) or is_numeric($key)) {
                 if ($counter === $count) {
                     $string .= str_repeat("\t", $level + 1);
                 }

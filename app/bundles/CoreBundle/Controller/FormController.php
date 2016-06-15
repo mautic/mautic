@@ -89,7 +89,7 @@ class FormController extends CommonController
             urlencode($this->generateUrl('mautic_dashboard_index'));
         $override  = '';
 
-        $modelClass   = $this->factory->getModel($model);
+        $modelClass   = $this->getModel($model);
         $nameFunction = $modelClass->getNameGetter();
 
         if ($this->factory->getUser()->isAdmin()) {
@@ -156,7 +156,7 @@ class FormController extends CommonController
     public function unlockAction($id, $modelName)
     {
         if ($this->factory->getUser()->isAdmin()) {
-            $model = $this->factory->getModel($modelName);
+            $model = $this->getModel($modelName);
 
             $entity = $model->getEntity($id);
             if ($entity !== null && $entity->getCheckedOutBy() !== null) {
@@ -264,7 +264,7 @@ class FormController extends CommonController
 
         $filter = array('string' => $search, 'force' => array());
 
-        $model = $this->factory->getModel($this->modelName);
+        $model = $this->getModel($this->modelName);
         $repo  = $model->getRepository();
 
         if (!$permissions[$this->permissionBase.':viewother']) {
@@ -350,7 +350,7 @@ class FormController extends CommonController
      */
     protected function viewStandard($objectId, $logObject= null, $logBundle =  null, $listPage = null)
     {
-        $model    = $this->factory->getModel($this->modelName);
+        $model    = $this->getModel($this->modelName);
         $entity   = $model->getEntity($objectId);
         $security = $this->factory->getSecurity();
 
@@ -385,7 +385,7 @@ class FormController extends CommonController
         }
 
         // Audit log entries
-        $logs = ($logObject) ? $this->factory->getModel('core.auditLog')->getLogForObject($logObject, $objectId, $entity->getDateAdded(), 10, $logBundle) : array();
+        $logs = ($logObject) ? $this->getModel('core.auditLog')->getLogForObject($logObject, $objectId, $entity->getDateAdded(), 10, $logBundle) : array();
 
         // Generate route
         $routeVars = array(
@@ -449,7 +449,7 @@ class FormController extends CommonController
      */
     protected function newStandard()
     {
-        $model  = $this->factory->getModel($this->modelName);
+        $model  = $this->getModel($this->modelName);
         $entity = $model->getEntity();
 
         if (!$this->factory->getSecurity()->isGranted($this->permissionBase.':create')) {
@@ -552,7 +552,7 @@ class FormController extends CommonController
      */
     protected function editStandard($objectId, $ignorePost = false)
     {
-        $model  = $this->factory->getModel($this->modelName);
+        $model  = $this->getModel($this->modelName);
         $entity = $model->getEntity($objectId);
 
         //set the page we came from
@@ -706,7 +706,7 @@ class FormController extends CommonController
      */
     protected function cloneStandard($objectId)
     {
-        $model  = $this->factory->getModel($this->modelName);
+        $model  = $this->getModel($this->modelName);
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -761,7 +761,7 @@ class FormController extends CommonController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->factory->getModel($this->modelName);
+            $model  = $this->getModel($this->modelName);
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
@@ -826,7 +826,7 @@ class FormController extends CommonController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model     = $this->factory->getModel($this->modelName);
+            $model     = $this->getModel($this->modelName);
             $ids       = json_decode($this->request->query->get('ids', ''));
             $deleteIds = array();
 

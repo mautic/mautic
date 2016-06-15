@@ -9,9 +9,12 @@
 
 namespace Mautic\ReportBundle\Model;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportEvent;
@@ -20,14 +23,61 @@ use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Security\Core\SecurityContext;
 
 /**
  * Class ReportModel
  */
 class ReportModel extends FormModel
 {
+    /**
+     * @var mixed
+     */
+    protected $defaultPageLimit;
+
+    /**
+     * @var SecurityContext
+     */
+    protected $securityContext;
+
+    /**
+     * @var FormatterHelper
+     */
+    protected $formatterHelper;
+
+    /**
+     * @var TemplatingHelper
+     */
+    protected $templatingHelper;
+
+    /**
+     * @var Session
+     */
+    protected $session;
+
+    public function __construct(
+        SecurityContext $securityContext,
+        CoreParametersHelper $coreParametersHelper,
+        FormatterHelper $formatterHelper,
+        TemplatingHelper $templatingHelper
+    )
+    {
+        $this->securityContext = $securityContext;
+        $this->defaultPageLimit = $coreParametersHelper->getParameter('default_pagelimit');
+        $this->formatterHelper = $formatterHelper;
+        $this->templatingHelper = $templatingHelper;
+    }
+
+    /**
+     * @param Session $session
+     */
+    public function setSession(Session $session)
+    {
+        $this->session = $session;
+    }
 
     /**
      * {@inheritdoc}
@@ -65,7 +115,7 @@ class ReportModel extends FormModel
 
         $params['table_list'] = $this->getTableData();
 
-        $reportGenerator = new ReportGenerator($this->factory->getSecurityContext(), $formFactory, $entity);
+        $reportGenerator = new ReportGenerator($this->securityContext, $formFactory, $entity);
 
         return $reportGenerator->getForm($entity, $params);
     }
@@ -145,7 +195,7 @@ class ReportModel extends FormModel
             } else {
                 //build them
                 $eventContext = ($context == 'all') ? '' : $context;
-                $event        = new ReportBuilderEvent($this->factory->getTranslator(), $eventContext);
+                $event        = new ReportBuilderEvent($this->translator, $eventContext);
                 $this->dispatcher->dispatch(ReportEvents::REPORT_ON_BUILD, $event);
 
                 $tables = $event->getTables();
@@ -274,8 +324,8 @@ class ReportModel extends FormModel
      */
     public function exportResults ($format, $report, $reportData)
     {
-        $formatter = $this->factory->getHelper('template.formatter');
-        $date      = $this->factory->getDate()->toLocalString();
+        $formatter = $this->formatterHelper;
+        $date      = (new DateTimeHelper)->toLocalString();
         $name      = str_replace(' ', '_', $date) . '_' . InputHelper::alphanum($report->getName(), false, '-');
 
         switch ($format) {
@@ -320,7 +370,7 @@ class ReportModel extends FormModel
 
                 return $response;
             case 'html':
-                $content = $this->factory->getTemplating()->renderResponse(
+                $content = $this->templatingHelper->getTemplating()->renderResponse(
                     'MauticReportBundle:Report:export.html.php',
                     array(
                         'data'      => $reportData['data'],
@@ -399,7 +449,7 @@ class ReportModel extends FormModel
         $paginate   = !empty($options['paginate']);
         $reportPage = (isset($options['reportPage'])) ? $options['reportPage'] : 1;
         $data       = $graphs = array();;
-        $reportGenerator = new ReportGenerator($this->factory->getSecurityContext(), $formFactory, $entity);
+        $reportGenerator = new ReportGenerator($this->securityContext, $formFactory, $entity);
 
         $selectedColumns = $entity->getColumns();
         $totalResults    = $limit = 0;
@@ -407,20 +457,20 @@ class ReportModel extends FormModel
         // Prepare the query builder
         $columns = $this->getTableData($entity->getSource());
 
-        $orderBy    = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.orderby', '');
-        $orderByDir = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.orderbydir', 'ASC');
+        $orderBy    = $this->session->get('mautic.report.' . $entity->getId() . '.orderby', '');
+        $orderByDir = $this->session->get('mautic.report.' . $entity->getId() . '.orderbydir', 'ASC');
 
         $dataOptions = array(
             //'start'      => $start,
             //'limit'      => $limit,
             'order'       => (!empty($orderBy)) ? array($orderBy, $orderByDir) : false,
-            'dispatcher'  => $this->factory->getDispatcher(),
+            'dispatcher'  => $this->dispatcher,
             'columns'     => $columns['columns']
         );
 
         /** @var \Doctrine\DBAL\Query\QueryBuilder $query */
         $query   = $reportGenerator->getQuery($dataOptions);
-        $filters = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.filters', array());
+        $filters = $this->session->get('mautic.report.' . $entity->getId() . '.filters', array());
         if (!empty($filters)) {
             $filterParameters  = array();
             $filterExpressions = $query->expr()->andX();
@@ -438,7 +488,7 @@ class ReportModel extends FormModel
         $contentTemplate = $reportGenerator->getContentTemplate();
 
         //set what page currently on so that we can return here after form submission/cancellation
-        $this->factory->getSession()->set('mautic.report.' . $entity->getId() . '.page', $reportPage);
+        $this->session->set('mautic.report.' . $entity->getId() . '.page', $reportPage);
 
         // Reset the orderBy as it causes errors in graphs and the count query in table data
         $parts  = $query->getQueryParts();
@@ -470,7 +520,7 @@ class ReportModel extends FormModel
                 }
 
                 $event = new ReportGraphEvent($entity, $eventGraphs, $query);
-                $this->factory->getDispatcher()->dispatch(ReportEvents::REPORT_ON_GRAPH_GENERATE, $event);
+                $this->dispatcher->dispatch(ReportEvents::REPORT_ON_GRAPH_GENERATE, $event);
                 $graphs = $event->getGraphs();
             }
         }
@@ -478,7 +528,7 @@ class ReportModel extends FormModel
         if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
             if ($paginate) {
                 // Build the options array to pass into the query
-                $limit = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.limit', $this->factory->getParameter('default_pagelimit'));
+                $limit = $this->session->get('mautic.report.' . $entity->getId() . '.limit', $this->defaultPageLimit);
                 $start = ($reportPage === 1) ? 0 : (($reportPage - 1) * $limit);
                 if ($start < 0) {
                     $start = 0;

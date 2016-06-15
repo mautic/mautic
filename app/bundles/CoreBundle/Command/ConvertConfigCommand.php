@@ -95,14 +95,7 @@ EOT
             return 1;
         }
 
-        // @deprecated: Drop when pushing minimum php version to 5.4
-        if (version_compare(PHP_VERSION, '5.4', '<')) {
-            $jsonPretty = new JsonPretty;
-
-            $jsonConfig = $jsonPretty->prettify($config);
-        } else {
-            $jsonConfig = json_encode($config, JSON_PRETTY_PRINT);
-        }
+        $jsonConfig = json_encode($config, JSON_PRETTY_PRINT);
 
         if (! file_put_contents($jsonConfigPath, $jsonConfig)) {
             $output->writeln("\n\n<error>Error writing json config file for the specified theme ($theme).</error>");

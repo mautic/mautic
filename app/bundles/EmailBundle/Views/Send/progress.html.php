@@ -35,7 +35,7 @@ $id       = ($status != 'inprogress') ? 'emailSendProgressComplete' : 'emailSend
             <ul class="list-group">
                 <?php foreach ($stats['failedRecipients'] as $leadId => $failedEmail): ?>
                 <li class="list-group-item">
-                    <a target="_new" class="text-danger" href="<?php echo $view['router']->generate('mautic_lead_action', array('objectAction' => 'view', 'objectId' => $leadId)); ?>">
+                    <a target="_new" class="text-danger" href="<?php echo $view['router']->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $leadId)); ?>">
                         <?php echo $failedEmail; ?>
                     </a>
                 </li>
