@@ -96,14 +96,6 @@ class CampaignSubscriber extends CommonSubscriber
         $event->addAction('lead.changepoints', $action);
 
         $action = array(
-            'label'       => 'mautic.lead.lead.events.changestage',
-            'description' => 'mautic.lead.lead.events.changestage_descr',
-            'formType'    => 'leadstage_action',
-            'callback'    => '\Mautic\LeadBundle\Helper\CampaignEventHelper::changeStage'
-        );
-        $event->addAction('lead.changestage', $action);
-
-        $action = array(
             'label'        => 'mautic.lead.lead.events.changelist',
             'description'  => 'mautic.lead.lead.events.changelist_descr',
             'formType'     => 'leadlist_action',
