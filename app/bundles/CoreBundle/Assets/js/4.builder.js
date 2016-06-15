@@ -286,7 +286,7 @@ Mautic.initSlotListeners = function() {
         if (type === 'text') {
             // init AtWho in a froala editor
             var method = 'page:getBuilderTokens';
-            if (mQuery('.builder').hasClass('email-builder')) {
+            if (parent.mQuery('.builder').hasClass('email-builder')) {
                 method = 'email:getBuilderTokens';
             }
             slot.on('froalaEditor.initialized', function (e, editor) {

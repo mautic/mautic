@@ -158,7 +158,7 @@ Mautic.intiSelectTheme = function() {
         currentLink.closest('.panel').find('.select-theme-selected').removeClass('hide');
         currentLink.addClass('hide');
     });
-}
+};
 
 Mautic.renderListCompareChart = function (chartData) {
     if (!mQuery("#list-compare-chart").length) {

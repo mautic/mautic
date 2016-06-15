@@ -114,6 +114,10 @@ var Mautic = {
 
     keyboardShortcutHtml: {},
 
+    builderTokens: {},
+
+    builderTokensRequestInProgress: false,
+
     addKeyboardShortcut: function (sequence, description, func, section) {
         Mousetrap.bind(sequence, func);
         var sectionName = section || 'global';
@@ -688,6 +692,28 @@ var Mautic = {
      * @param Froala Editor
      */
     initAtWho: function(element, method, froala) {
+        // Avoid to request the tokens if not necessary
+        if (Mautic.builderTokensRequestInProgress) {
+            // Wait till previous request finish
+            var intervalID = setInterval(function(){
+                if (!Mautic.builderTokensRequestInProgress) {
+                    clearInterval(intervalID);
+                    Mautic.configureAtWho(element, method, froala);
+                }
+            }, 500);
+        } else {
+            Mautic.configureAtWho(element, method, froala);
+        }
+    },
+
+    /**
+     * Initialize AtWho dropdown in a Froala editor.
+     *
+     * @param jQuery element
+     * @param method to get the tokens from
+     * @param Froala Editor
+     */
+    configureAtWho: function(element, method, froala) {
         Mautic.getTokens(method, function(tokens) {
             element.atwho({
                 at: '{',
@@ -718,10 +744,11 @@ var Mautic = {
      * @param callback(tokens) to call when finished
      */
     getTokens: function(method, callback) {
-        var lastUpdate = parseInt(sessionStorage.getItem('mautic.tokens.loaded'));
-        if ((lastUpdate + 600000) > Date.now()) {
-            return callback(JSON.parse(sessionStorage.getItem('mautic.tokens')));
+        if (!mQuery.isEmptyObject(Mautic.builderTokens)) {
+            return callback(Mautic.builderTokens);
         }
+
+        Mautic.builderTokensRequestInProgress = true;
 
         mQuery.ajax({
             url: mauticAjaxUrl,
@@ -729,8 +756,7 @@ var Mautic = {
             success: function (response) {
                 if (typeof response.tokens === 'object') {
                     // store the tokens to the session storage
-                    sessionStorage.setItem('mautic.tokens', JSON.stringify(response.tokens));
-                    sessionStorage.setItem('mautic.tokens.loaded', Date.now());
+                    Mautic.builderTokens = response.tokens;
 
                     // return the callback with tokens
                     callback(response.tokens);
@@ -738,6 +764,9 @@ var Mautic = {
             },
             error: function (request, textStatus, errorThrown) {
                 Mautic.processAjaxError(request, textStatus, errorThrown);
+            },
+            complete: function() {
+                Mautic.builderTokensRequestInProgress = false;
             }
         });
     },
@@ -1029,6 +1058,11 @@ var Mautic = {
         // trash created map objects to save some memory
         if (typeof Mautic.mapObjects !== 'undefined') {
             delete Mautic.mapObjects;
+        }
+
+        // trash tokens to save some memory
+        if (typeof Mautic.builderTokens !== 'undefined') {
+            Mautic.builderTokens = {};
         }
     },
 
