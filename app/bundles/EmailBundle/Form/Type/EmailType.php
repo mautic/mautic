@@ -147,7 +147,7 @@ class EmailType extends AbstractType
                     'class'    => 'form-control not-chosen hidden',
                     'tooltip'  => 'mautic.email.form.template.help',
                 ),
-                'empty_value' => 'mautic.core.none'
+                'data' => $options['data']->getTemplate() ? $options['data']->getTemplate() : 'blank'
             )
         );
 
