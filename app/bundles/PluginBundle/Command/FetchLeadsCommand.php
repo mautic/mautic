@@ -47,6 +47,12 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 'Set end date for updated values.'
             )
+            ->addOption(
+                '--sf-object',
+                '-sf',
+                InputOption::VALUE_OPTIONAL,
+                'Send the object name Lead - will import leads to mautic contacts, Contact will import contacts to mautic contacts.'
+            )
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
 
         parent::configure();
@@ -67,6 +73,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
         $integration   = $input->getOption('integration');
         $startDate     = $input->getOption('start-date');
         $endDate       = $input->getOption('end-date');
+        $object       = $input->getOption('sf-object');
 
         if ($integration && $startDate && $endDate) {
             /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
@@ -80,6 +87,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
 
                 $params['start']=$startDate;
                 $params['end']=$endDate;
+                $params['object']=$object;
                 if(strtotime($startDate) > strtotime('-30 days')) {
                     $processed = $integrationObject->getLeads($params);
 
