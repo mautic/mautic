@@ -1,25 +1,37 @@
 <html>
     <head>
-        {{ outputHeadDeclarations() }}
     </head>
-    <body style="background: #f2f2f2;">
-        <table style="border-collapse: collapse; background: #FFFFFF; width: 600px; min-height: 760px; color: #555; display: block; font-family: Helvetica Neue, Helvetica, Arial, sans-serif; border: 1px solid #d5d4d4; box-shadow: 1px 1px 1px #d5d4d4; margin: 50px auto;">
+    <body style="background: #f2f2f2; font-family: Helvetica Neue, Helvetica, Arial, sans-serif;">
+        <table style="border-collapse: collapse; background: #FFFFFF; width: 600px; color: #555; border: 1px solid #d5d4d4; margin: 30px auto 0px auto;">
             <tr>
-                <td style="vertical-align: top;color: #ffffff; background-color: #4e5d9d; padding: 30px 50px; font-size: 20px; line-height: 1.5em;">
-                    {{ slot('header') }}
+                <td style="vertical-align: top;color: #ffffff; background-color: #4e5d9d; padding: 30px 50px;" data-slot-container>
+                    <div data-slot="text">
+                        <h2 style="text-align: center;">Hello there!</h2>
+                    </div>
                 </td>
             </tr>
             <tr>
-                <td style="vertical-align: top; padding: 30px 50px; font-size: 17px; line-height: 1.7em;">
-                    {{ slot('body') }}
-                </td>
-            </tr>
-            <tr>
-                <td style="vertical-align: top; padding: 30px 50px; font-size: 12px; line-height: 1.5em;">
-                    {{ slot('footer') }}
+                <td style="vertical-align: top; padding: 30px 50px;display:block; box-sizing:border-box; clear:both" data-slot-container>
+                    <div data-slot="text">
+                        We haven't heard from you for a while...
+                        <br>
+                        <br>
+                        <br>
+                        <br>
+                        <br>
+                        <br>
+                    </div>
                 </td>
             </tr>
         </table>
-        {{ slot('builder') }}
+        <table style="border-collapse: collapse; width: 600px; color: #555; margin: 10px auto 0px auto;">
+            <tr>
+                <td style="vertical-align: top; padding: 0px 10px; font-size: 12px;" data-slot-container>
+                    <div data-slot="text">
+                        <div style="text-align: center;">{unsubscribe_text}‍ | {webview_text}‍</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
     </body>
 </html>
