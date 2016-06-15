@@ -38,18 +38,23 @@ class ConsoleExceptionListener
      */
     public function onConsoleException(ConsoleExceptionEvent $event)
     {
-        $command = $event->getCommand();
+        $command   = $event->getCommand();
         $exception = $event->getException();
 
+        // Log error with trace
+        $trace = (MAUTIC_ENV == 'dev') ? "\n[stack trace]\n" . $exception->getTraceAsString() : '';
+
         $message = sprintf(
-            '%s: %s (uncaught exception) at %s line %s while running console command `%s`',
+            '%s: %s (uncaught exception) at %s line %s while running console command `%s`%s',
             get_class($exception),
             $exception->getMessage(),
             $exception->getFile(),
             $exception->getLine(),
-            $command->getName()
+            $command->getName(),
+            $trace
         );
 
-        $this->logger->error($message);
+        // Use notice so it makes it to the log all "perttified" (using error spits it out to console and not the log)
+        $this->logger->notice($message);
     }
 }
