@@ -1033,7 +1033,7 @@ class ListModel extends FormModel
             $segmentlist = "'".implode("','", $segments)."'";
         }
         $q = $this->em->getConnection()->createQueryBuilder();
-        $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name,ll.alias as alias')
+        $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name as name,ll.alias as alias')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 't')
             ->join('t', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = t.leadlist_id')
             ->orderBy('leads', 'DESC')
@@ -1096,7 +1096,7 @@ class ListModel extends FormModel
 
         if(isset($filter['leadlist_id']['value'])) {
             $chart->setDataset(
-                $this->factory->getTranslator()->trans('mautic.lead.lifecycle.graph.pie.all.lists'),
+                $this->translator->trans('mautic.lead.lifecycle.graph.pie.all.lists'),
                 $all
             );
         }
@@ -1158,7 +1158,7 @@ class ListModel extends FormModel
         $data['yAxes'][] =array('display' => true);
 
         $baseData = array(
-            'label' => $this->factory->getTranslator()->trans('mautic.lead.leads'),
+            'label' => $this->translator->trans('mautic.lead.leads'),
             'data'  => $data['values'],
         );
         $datasetId = count($data['values']);

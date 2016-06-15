@@ -28,7 +28,6 @@ class LeadSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            LeadEvents::LEAD_POINTS_CHANGE   => array('onLeadStagesChange', 0),
             LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
             LeadEvents::LEAD_POST_MERGE      => array('onLeadMerge', 0),
             LeadEvents::LEAD_POST_SAVE       => array('onLeadSave', -1)
@@ -55,13 +54,6 @@ class LeadSubscriber extends CommonSubscriber
 
         $lead    = $event->getLead();
         $options = array('ipIds' => array(), 'filters' => $filters);
-
-        /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
-        /*
-        foreach ($lead->getIpAddresses() as $ip) {
-            $options['ipIds'][] = $ip->getId();
-        }
-        */
 
         /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
         $logRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:StagesChangeLog');

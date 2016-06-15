@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 /**
  * Universal DNC Migration
  */
-class Version20160426000000 extends AbstractMauticMigration
+class Version20160523000000 extends AbstractMauticMigration
 {
     private $leadIdIdx;
     private $leadIdFk;

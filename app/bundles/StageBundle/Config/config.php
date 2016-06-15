@@ -48,6 +48,14 @@ return [
 
     'services' => [
         'events' => [
+            'mautic.stage.campaignbundle.subscriber' => [
+                'class' => 'Mautic\StageBundle\EventListener\CampaignSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.lead.model.lead',
+                    'mautic.stage.model.stage'
+                ]
+            ],
             'mautic.stage.subscriber'            => [
                 'class' => 'Mautic\StageBundle\EventListener\StageSubscriber'
             ],
@@ -73,7 +81,7 @@ return [
             ]
         ],
         'models' =>  [
-            'mautic.asset.model.asset' => [
+            'mautic.stage.model.stage' => [
                 'class' => 'Mautic\StageBundle\Model\StageModel',
                 'arguments' => [
                     'mautic.lead.model.lead',

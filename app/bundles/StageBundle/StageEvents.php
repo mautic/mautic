@@ -69,58 +69,13 @@ final class StageEvents
      * @var string
      */
     const STAGE_ON_ACTION = 'mautic.stage_on_action';
-
     /**
-     * The mautic.stage_pre_save event is thrown right before a form is persisted.
+     * The mautic.stage.on_campaign_trigger_action event is fired when the campaign action triggers.
      *
-     * The event listener receives a Mautic\StageBundle\Event\TriggerEvent instance.
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
      *
      * @var string
      */
-    const TRIGGER_PRE_SAVE = 'mautic.trigger_pre_save';
-
-    /**
-     * The mautic.trigger_post_save event is thrown right after a form is persisted.
-     *
-     * The event listener receives a Mautic\StageBundle\Event\TriggerEvent instance.
-     *
-     * @var string
-     */
-    const TRIGGER_POST_SAVE = 'mautic.trigger_post_save';
-
-    /**
-     * The mautic.trigger_pre_delete event is thrown before a form is deleted.
-     *
-     * The event listener receives a Mautic\StageBundle\Event\TriggerEvent instance.
-     *
-     * @var string
-     */
-    const TRIGGER_PRE_DELETE = 'mautic.trigger_pre_delete';
-
-    /**
-     * The mautic.trigger_post_delete event is thrown after a form is deleted.
-     *
-     * The event listener receives a Mautic\StageBundle\Event\TriggerEvent instance.
-     *
-     * @var string
-     */
-    const TRIGGER_POST_DELETE = 'mautic.trigger_post_delete';
-
-    /**
-     * The mautic.trigger_on_build event is thrown before displaying the trigger builder form to allow adding of custom actions
-     *
-     * The event listener receives a Mautic\StageBundle\Event\TriggerBuilderEvent instance.
-     *
-     * @var string
-     */
-    const TRIGGER_ON_BUILD = 'mautic.trigger_on_build';
-
-    /**
-     * The mautic.trigger_on_event_execute event is thrown to execute a trigger event
-     *
-     * The event listener receives a Mautic\StageBundle\Event\TriggerEvent instance.
-     *
-     * @var string
-     */
-    const TRIGGER_ON_EVENT_EXECUTE = 'mautic.trigger_on_event_execute';
+    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.stage.on_campaign_trigger_action';
 }

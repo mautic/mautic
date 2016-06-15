@@ -17,6 +17,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\UserBundle\Entity\User;
 use Mautic\NotificationBundle\Entity\PushID;
+use Mautic\StageBundle\Entity\Stage;
 
 /**
  * Class Lead
