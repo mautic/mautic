@@ -8,9 +8,11 @@
  */
 
 namespace Mautic\CoreBundle\Helper;
+
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -19,7 +21,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class IpLookupHelper
 {
     /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
+     * @var null|Request
      */
     protected $request;
 
@@ -46,13 +48,17 @@ class IpLookupHelper
     /**
      * IpLookupHelper constructor.
      *
-     * @param RequestStack $requestStack
-     * @param EntityManager $em
+     * @param RequestStack         $requestStack
+     * @param EntityManager        $em
      * @param CoreParametersHelper $coreParametersHelper
-     * @param AbstractLookup $ipLookup
+     * @param AbstractLookup       $ipLookup
      */
-    public function __construct(RequestStack $requestStack, EntityManager $em, CoreParametersHelper $coreParametersHelper, AbstractLookup $ipLookup = null)
-    {
+    public function __construct(
+        RequestStack $requestStack,
+        EntityManager $em,
+        CoreParametersHelper $coreParametersHelper,
+        AbstractLookup $ipLookup = null
+    ) {
         $this->request               = $requestStack->getCurrentRequest();
         $this->em                    = $em;
         $this->ipLookup              = $ipLookup;
@@ -67,40 +73,30 @@ class IpLookupHelper
      */
     public function getIpAddressFromRequest()
     {
-        $ipHolders = array(
-            'HTTP_CLIENT_IP',
-            'HTTP_X_FORWARDED_FOR',
-            'HTTP_X_FORWARDED',
-            'HTTP_X_CLUSTER_CLIENT_IP',
-            'HTTP_FORWARDED_FOR',
-            'HTTP_FORWARDED',
-            'REMOTE_ADDR'
-        );
+        if (null !== $this->request) {
+            $ipHolders = [
+                'HTTP_CLIENT_IP',
+                'HTTP_X_FORWARDED_FOR',
+                'HTTP_X_FORWARDED',
+                'HTTP_X_CLUSTER_CLIENT_IP',
+                'HTTP_FORWARDED_FOR',
+                'HTTP_FORWARDED',
+                'REMOTE_ADDR'
+            ];
 
-        foreach ($ipHolders as $key) {
-            if ($this->request->server->get($key)) {
-                $ip = $this->request->server->get($key);
+            foreach ($ipHolders as $key) {
+                if ($this->request->server->get($key)) {
+                    $ip = trim($this->request->server->get($key));
 
-                if (strpos($ip, ',') !== false) {
-                    // Multiple IPs are present so use the last IP which should be the most reliable IP that last connected to the proxy
-                    $ips = explode(',', $ip);
-                    array_walk($ips, function(&$val) {
-                        $val = trim($val);
-                    });
-
-                    if ($this->doNotTrackInternalIps) {
-                        $ips = array_diff($ips, $this->doNotTrackInternalIps);
+                    if (strpos($ip, ',') !== false) {
+                        $ip = $this->getClientIpFromProxyList($ip);
                     }
 
-                    $ip = end($ips);
-                }
+                    // Validate IP
+                    if (null !== $ip && $this->ipIsValid($ip)) {
 
-                $ip = trim($ip);
-
-                // Validate IP
-                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-
-                    return $ip;
+                        return $ip;
+                    }
                 }
             }
         }
@@ -118,7 +114,7 @@ class IpLookupHelper
      */
     public function getIpAddress($ip = null)
     {
-        static $ipAddresses = array();
+        static $ipAddresses = [];
 
         if ($ip === null) {
             $ip = $this->getIpAddressFromRequest();
@@ -141,18 +137,18 @@ class IpLookupHelper
 
             // Ensure the do not track list is inserted
             if (!is_array($this->doNotTrackIps)) {
-                $this->doNotTrackIps = array();
+                $this->doNotTrackIps = [];
             }
 
             if (!is_array($this->doNotTrackInternalIps)) {
-                $this->doNotTrackInternalIps = array();
+                $this->doNotTrackInternalIps = [];
             }
 
-            $doNotTrack  = array_merge(array('127.0.0.1', '::1'), $this->doNotTrackIps, $this->doNotTrackInternalIps);
+            $doNotTrack = array_merge(['127.0.0.1', '::1'], $this->doNotTrackIps, $this->doNotTrackInternalIps);
             $ipAddress->setDoNotTrackList($doNotTrack);
 
             $details = $ipAddress->getIpDetails();
-            if ($ipAddress->isTrackable() && empty($details['city']))  {
+            if ($ipAddress->isTrackable() && empty($details['city'])) {
                 // Get the IP lookup service
 
                 // Fetch the data
@@ -175,5 +171,53 @@ class IpLookupHelper
         }
 
         return $ipAddresses[$ip];
+    }
+
+    /**
+     * Validates if an IP address if valid
+     *
+     * @param $ip
+     *
+     * @return mixed
+     */
+    public function ipIsValid($ip)
+    {
+        return filter_var(
+            $ip,
+            FILTER_VALIDATE_IP,
+            FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+        );
+    }
+
+    /**
+     * @param $ip
+     *
+     * @return null
+     */
+    protected function getClientIpFromProxyList($ip)
+    {
+        // Proxies are included
+        $ips = explode(',', $ip);
+        array_walk(
+            $ips,
+            function (&$val) {
+                $val = trim($val);
+            }
+        );
+
+        if ($this->doNotTrackInternalIps) {
+            $ips = array_diff($ips, $this->doNotTrackInternalIps);
+        }
+
+        // https://en.wikipedia.org/wiki/X-Forwarded-For
+        // X-Forwarded-For: client, proxy1, proxy2
+        foreach ($ips as $ip) {
+            if ($this->ipIsValid($ip)) {
+
+                return $ip;
+            }
+        }
+
+        return null;
     }
 }
