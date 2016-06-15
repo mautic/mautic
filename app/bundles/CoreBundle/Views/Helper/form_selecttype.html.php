@@ -53,7 +53,7 @@ if ($count === 2 || $count === 4) {
                                     <?php echo $view['translator']->trans($type['description']); ?>
                                 </div>
                                 <div class="hidden-xs panel-footer text-center">
-                                    <button class="btn btn-lg btn-default btn-nospin text-success" onclick="<?php echo $type['onClick']; ?>"><?php echo $view['translator']->trans('mautic.core.select'); ?></button>
+                                    <button class="btn btn-lg btn-default btn-nospin text-<?php echo $type['color'] ?>" onclick="<?php echo $type['onClick']; ?>"><?php echo $view['translator']->trans('mautic.core.select'); ?></button>
                                 </div>
                             </div>
                         </div>
