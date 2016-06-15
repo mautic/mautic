@@ -1273,8 +1273,10 @@ class MailHelper
             $this->setPlainText($plainText);
         }
 
-        $template = $email->getTemplate();
-        if (!empty($template)) {
+        $BCcontent = $email->getContent();
+        // Process emails created by Mautic v1
+        if (!empty($BCcontent)) {
+            $template = $email->getTemplate();
             if (empty($slots)) {
                 $template = $email->getTemplate();
                 $slots    = $this->factory->getTheme($template)->getSlots('email');
