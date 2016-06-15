@@ -104,7 +104,15 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         if ($stageChange){
-                $this->factory->getModel('stage')->triggerAction('campaign.action', $event['campaign']['id'],null,$lead);
+            $parsed = explode('.', $stageToChangeTo->getType());
+            $lead->stageChangeLogEntry(
+                $parsed[0],
+                $stageToChangeTo->getId() . ": " . $stageToChangeTo->getName(),
+                $parsed[1]
+            );
+            $lead->setStage($stageToChangeTo);
+
+            $this->leadModel->saveEntity($lead);
         }
 
         return $event->setResult($stageChange);
