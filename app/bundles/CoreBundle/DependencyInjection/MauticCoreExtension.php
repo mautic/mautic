@@ -49,6 +49,9 @@ class MauticCoreExtension extends Extension
                         case 'helpers':
                             $defaultTag = 'templating.helper';
                             break;
+                        case 'models':
+                            $defaultTag = 'mautic.model';
+                            break;
                         default:
                             $defaultTag = false;
                             break;

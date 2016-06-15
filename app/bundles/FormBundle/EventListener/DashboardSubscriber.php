@@ -150,7 +150,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 if ($submitters) {
                     foreach ($submitters as &$submitter) {
                         $name = $submitter['lead_id'];
-                        $leadUrl = $this->factory->getRouter()->generate('mautic_lead_action', array('objectAction' => 'view', 'objectId' => $submitter['lead_id']));
+                        $leadUrl = $this->factory->getRouter()->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $submitter['lead_id']));
                         if ($submitter['firstname'] || $submitter['lastname']) {
                             $name = trim($submitter['firstname'] . ' ' . $submitter['lastname']);
                         } elseif ($submitter['email']) {

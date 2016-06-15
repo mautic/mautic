@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\LeadBundle\Event\LeadNoteEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -24,6 +25,18 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class NoteModel extends FormModel
 {
+    /**
+     * @var Session
+     */
+    protected $session;
+
+    /**
+     * @param Session $session
+     */
+    public function setSession(Session $session)
+    {
+        $this->session = $session;
+    }
 
     /**
      * {@inheritdoc}
@@ -57,9 +70,7 @@ class NoteModel extends FormModel
             return new LeadNote();
         }
 
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
@@ -134,9 +145,8 @@ class NoteModel extends FormModel
      */
     public function getNoteCount(Lead $lead, $useFilters = false)
     {
-        $session = $this->factory->getSession();
-        $filter   = ($useFilters) ? $session->get('mautic.lead.'.$lead->getId().'.note.filter', '') : null;
-        $noteType = ($useFilters) ? $session->get('mautic.lead.'.$lead->getId().'.notetype.filter', array()) : null;
+        $filter   = ($useFilters) ? $this->session->get('mautic.lead.'.$lead->getId().'.note.filter', '') : null;
+        $noteType = ($useFilters) ? $this->session->get('mautic.lead.'.$lead->getId().'.notetype.filter', array()) : null;
 
         return $this->getRepository()->getNoteCount($lead->getId(), $filter, $noteType);
     }

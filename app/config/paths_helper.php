@@ -13,7 +13,7 @@ $root = $container->getParameter('kernel.root_dir');
 // Include local paths
 include 'paths.php';
 
-// Closure to replace %kernel_root_dir% placeholders
+// Closure to replace %kernel.root_dir% placeholders
 $replaceRootPlaceholder = function(&$value) use ($root, &$replaceRootPlaceholder) {
     if (is_array($value)) {
         foreach ($value as &$v) {

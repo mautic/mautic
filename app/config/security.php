@@ -152,3 +152,4 @@ $container->setParameter('mautic.security.restrictedConfigFields', $restrictedCo
  * mautic.security.disableUpdates = disables remote checks for updates
  * mautic.security.restrictedConfigFields.displayMode = accepts either remove or mask; mask will disable the input with a "Set by system" message
  */
+$container->setParameter('mautic.security.disableUpdates', false);

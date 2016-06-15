@@ -24,11 +24,10 @@ class TranslationsPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $translator = $container->findDefinition('translator.default');
-        $factory    = $container->get('mautic.factory');
 
         if ($translator !== null) {
             // Disable cache for dev environment
-            if ($factory->getEnvironment() == 'dev') {
+            if (MAUTIC_ENV === 'dev') {
                 $translatorOptions = $translator->getArgument(3);
                 $translatorOptions['cache_dir'] = null;
                 $translator->replaceArgument(3, $translatorOptions);
