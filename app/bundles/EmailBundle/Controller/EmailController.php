@@ -574,6 +574,7 @@ class EmailController extends FormController
                     'tokens'        => $model->getBuilderComponents($entity, 'tokenSections'),
                     'email'         => $entity,
                     'slots'         => $slotTypes,
+                    'themes'        => $this->factory->getInstalledThemes('email', true),
                     'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())) // strip new lines
                 ),
                 'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',

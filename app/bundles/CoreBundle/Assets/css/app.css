@@ -4514,3 +4514,8 @@ body.noscroll {
 .input-group .input-group-btn button {
   height: 32px;
 }
+.theme-selected {
+  border: 1px solid #A7A7A7;
+  -webkit-box-shadow: 0px 0px 40px #f3f3f3;
+  box-shadow: 0px 0px 40px #f3f3f3;
+}

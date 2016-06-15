@@ -145,7 +145,18 @@ Mautic.emailOnUnload = function(id) {
 Mautic.intiSelectTheme = function() {
     mQuery('[data-theme]').click(function(e) {
         e.preventDefault();
-        mQuery('#emailform_template').val(mQuery(this).attr('data-theme'));
+        var currentLink = mQuery(this);
+
+        // Set the theme field value
+        mQuery('#emailform_template').val(currentLink.attr('data-theme'));
+
+        // Manipulate classes to achieve the theme selection ilustion
+        mQuery('.theme-list .panel').removeClass('theme-selected');
+        currentLink.closest('.panel').addClass('theme-selected');
+        mQuery('.theme-list .select-theme-selected').addClass('hide');
+        mQuery('.theme-list .select-theme-link').removeClass('hide');
+        currentLink.closest('.panel').find('.select-theme-selected').removeClass('hide');
+        currentLink.addClass('hide');
     });
 }
 
