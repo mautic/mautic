@@ -32,6 +32,8 @@ Mautic.pageOnLoad = function (container) {
         Mautic.refreshCodeEditors();
         Mautic.initCodeEditors();
     });
+
+    Mautic.intiSelectTheme(mQuery('#page_template'));
 };
 
 Mautic.getPageAbTestWinnerForm = function(abKey) {

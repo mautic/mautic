@@ -423,7 +423,8 @@ class PageController extends FormController
                 'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
                 'isVariant'   => $entity->isVariant(true),
                 'tokens'      => $model->getBuilderComponents($entity, 'tokenSections'),
-                'activePage'  => $entity
+                'activePage'  => $entity,
+                'themes'      => $this->factory->getInstalledThemes('page', true),
             ),
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
             'passthroughVars' => array(
@@ -585,7 +586,8 @@ class PageController extends FormController
                 'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
                 'isVariant'   => $entity->isVariant(true),
                 'tokens'      => (!empty($tokens)) ? $tokens['tokenSections'] : $model->getBuilderComponents($entity, 'tokenSections'),
-                'activePage'  => $entity
+                'activePage'  => $entity,
+                'themes'      => $this->factory->getInstalledThemes('page', true),
             ),
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
             'passthroughVars' => array(

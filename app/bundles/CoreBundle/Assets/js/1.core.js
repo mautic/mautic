@@ -3371,5 +3371,24 @@ var Mautic = {
                 value.editor.refresh();
             });
         }
+    },
+
+
+    intiSelectTheme: function(themeField) {
+        mQuery('[data-theme]').click(function(e) {
+            e.preventDefault();
+            var currentLink = mQuery(this);
+
+            // Set the theme field value
+            themeField.val(currentLink.attr('data-theme'));
+
+            // Manipulate classes to achieve the theme selection ilustion
+            mQuery('.theme-list .panel').removeClass('theme-selected');
+            currentLink.closest('.panel').addClass('theme-selected');
+            mQuery('.theme-list .select-theme-selected').addClass('hide');
+            mQuery('.theme-list .select-theme-link').removeClass('hide');
+            currentLink.closest('.panel').find('.select-theme-selected').removeClass('hide');
+            currentLink.addClass('hide');
+        });
     }
 };

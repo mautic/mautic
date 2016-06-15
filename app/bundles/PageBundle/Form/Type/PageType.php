@@ -112,10 +112,11 @@ class PageType extends AbstractType
                 'feature' => 'page',
                 'data'    => $template,
                 'attr'    => array(
-                    'class'   => 'form-control',
+                    'class'   => 'form-control not-chosen hidden',
                     'tooltip' => 'mautic.page.form.template.help',
                 ),
-                'empty_value' => 'mautic.core.none'
+                'empty_value' => 'mautic.core.none',
+                'data' => $options['data']->getTemplate() ? $options['data']->getTemplate() : 'blank'
             )
         );
 
