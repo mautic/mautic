@@ -11,7 +11,7 @@ return [
     'menu' => [
         'main' => [
             'items' => [
-                'mautic.dwc.list' => [
+                'mautic.dynamicContent.dynamicContent' => [
                     'route' => 'mautic_dwc_index',
                     'access' => ['dynamicContent:dynamicContents:viewown', 'dynamicContent:dynamicContents:viewother'],
                     'parent' => 'mautic.core.components',
@@ -48,8 +48,24 @@ return [
         'forms' => [
             'mautic.form.type.dwc'                       => [
                 'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentType',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'translator',
+                    'mautic.security',
+                    'mautic.dynamicContent.model.dynamicContent',
+                    'request_stack',
+                    'doctrine.orm.entity_manager'
+                ],
                 'alias'     => 'dwc'
+            ],
+            'mautic.form.type.dwcsend_list' => [
+                'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentSendType',
+                'arguments' => 'router',
+                'alias'     => 'dwcsend_list'
+            ],
+            'mautic.form.type.dwc_list'     => [
+                'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentListType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'dwc_list'
             ],
         ],
         'models' => [

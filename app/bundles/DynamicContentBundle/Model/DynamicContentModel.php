@@ -31,6 +31,18 @@ class DynamicContentModel extends FormModel
     }
 
     /**
+     * Here just so PHPStorm calms down about type hinting
+     * 
+     * @param null $id
+     *
+     * @return null|DynamicContent
+     */
+    public function getEntity($id = null)
+    {
+        return parent::getEntity($id);
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param      $entity
@@ -51,5 +63,30 @@ class DynamicContentModel extends FormModel
         $params = (! empty($action)) ? ['action' => $action] : [];
 
         return $formFactory->create('dwc', $entity, $params);
+    }
+
+    /**
+     * Get the variant parent/children
+     *
+     * @param DynamicContent $entity
+     *
+     * @return array
+     */
+    public function getVariants(DynamicContent $entity)
+    {
+        $parent = $entity->getVariantParent();
+
+        if (!empty($parent)) {
+            $children = $parent->getVariantChildren();
+        } else {
+            $parent   = $entity;
+            $children = $entity->getVariantChildren();
+        }
+
+        if (empty($children)) {
+            $children = [];
+        }
+
+        return [$parent, $children];
     }
 }

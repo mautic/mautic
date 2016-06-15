@@ -12,6 +12,7 @@ namespace Mautic\DynamicContentBundle\Controller;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class DynamicContentController extends FormController
 {
@@ -20,7 +21,7 @@ class DynamicContentController extends FormController
      */
     protected function getPermissions()
     {
-        return (array) $this->factory->getSecurity()->isGranted([
+        return (array) $this->get('mautic.security')->isGranted([
             'dynamicContent:dynamicContents:viewown',
             'dynamicContent:dynamicContents:viewother',
             'dynamicContent:dynamicContents:create',
@@ -33,6 +34,9 @@ class DynamicContentController extends FormController
         ], "RETURN_ARRAY");
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function indexAction($page = 1)
     {
         $model = $this->getModel('dynamicContent');
@@ -57,10 +61,23 @@ class DynamicContentController extends FormController
         // fetch
 
         $search = $this->request->get('search', $this->factory->getSession()->get('mautic.dynamicContent.filter', ''));
-        $this->factory->getSession()->set('mautic.dynamicContent.filter', $search);
+        $this->get('session')->set('mautic.dynamicContent.filter', $search);
+        //do not list variants in the main list
+        $filter['force'][] = ['column' => 'e.variantParent', 'expr' => 'isNull'];
+
+        $orderBy    = $this->factory->getSession()->get('mautic.dynamicContent.orderby', 'e.name');
+        $orderByDir = $this->factory->getSession()->get('mautic.dynamicContent.orderbydir', 'DESC');
+
+        $entities = $model->getEntities([
+            'start'      => $start,
+            'limit'      => $limit,
+            'filter'     => $filter,
+            'orderBy'    => $orderBy,
+            'orderByDir' => $orderByDir
+        ]);
 
         //set what page currently on so that we can return here after form submission/cancellation
-        $this->factory->getSession()->set('mautic.dynamicContent.page', $page);
+        $this->get('session')->set('mautic.dynamicContent.page', $page);
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
@@ -68,7 +85,7 @@ class DynamicContentController extends FormController
         $categories = $this->getModel('page')->getLookupResults('category', '', 0);
 
         return $this->delegateView([
-            'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:index.html.php',
+            'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:list.html.php',
             'passthroughVars' => [
                 'activeLink'     => '#mautic_dwc_index',
                 'mauticContent'  => 'dwc',
@@ -76,7 +93,7 @@ class DynamicContentController extends FormController
             ],
             'viewParameters'  => [
                 'searchValue' => $search,
-                'items'       => [],
+                'items'       => $entities,
                 'categories'  => $categories,
                 'page'        => $page,
                 'limit'       => $limit,
@@ -88,13 +105,19 @@ class DynamicContentController extends FormController
         ]);
     }
 
-    public function newAction()
+    /**
+     * {@inheritdoc}
+     */
+    public function newAction($entity = null)
     {
         if (! $this->accessGranted('dynamicContent:dynamicContents:viewown')) {
             return $this->accessDenied();
         }
 
-        $entity = new DynamicContent;
+        if (! $entity instanceof DynamicContent) {
+            $entity = new DynamicContent;
+        }
+
         /** @var \Mautic\DynamicContentBundle\Model\DynamicContentModel $model */
         $model  = $this->getModel('dynamicContent');
         $page   = $this->factory->getSession()->get('mautic.dynamicContent.page', 1);
@@ -137,7 +160,7 @@ class DynamicContentController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'form' => $this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.php', 'MauticLeadBundle:FormTheme\Filter')
+                'form' => $this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.php')
             ],
             'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:form.html.php',
             'passthroughVars' => [
@@ -207,7 +230,7 @@ class DynamicContentController extends FormController
 
                     $this->addFlash('mautic.core.notice.updated', [
                         '%name%'      => $entity->getName(),
-                        '%menu_link%' => 'mautic_segment_index',
+                        '%menu_link%' => 'mautic_dwc_index',
                         '%url%'       => $this->generateUrl('mautic_dwc_action', [
                             'objectAction' => 'edit',
                             'objectId'     => $entity->getId()
@@ -229,15 +252,124 @@ class DynamicContentController extends FormController
 
         return $this->delegateView([
             'viewParameters'  => [
-                'form'            => $this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.php', 'MauticLeadBundle:FormTheme\Filter'),
+                'form'            => $this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.php'),
                 'currentListId'   => $objectId,
             ],
-            'contentTemplate' => 'MauticLeadBundle:List:form.html.php',
+            'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:form.html.php',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_dwc_index',
                 'route'         => $action,
                 'mauticContent' => 'dwc'
             ]
         ]);
+    }
+
+    /**
+     * Loads a specific form into the detailed panel
+     *
+     * @param int $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function viewAction($objectId)
+    {
+        /** @var \Mautic\DynamicContentBundle\Model\DynamicContentModel $model */
+        $model    = $this->getModel('dynamicContent');
+        $security = $this->get('mautic.security');
+        $entity   = $model->getEntity($objectId);
+        
+        //set the page we came from
+        $page = $this->get('session')->get('mautic.dynamicContent.page', 1);
+
+        if ($entity === null) {
+            //set the return URL
+            $returnUrl = $this->generateUrl('mautic_dwc_index', ['page' => $page]);
+
+            return $this->postActionRedirect([
+                'returnUrl'       => $returnUrl,
+                'viewParameters'  => ['page' => $page],
+                'contentTemplate' => 'MauticPageBundle:Page:index',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_dwc_index',
+                    'mauticContent' => 'dwc'
+                ],
+                'flashes'         => [
+                    [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.dynamicContent.error.notfound',
+                        'msgVars' => ['%id%' => $objectId]
+                    ]
+                ]
+            ]);
+        } elseif (!$security->hasEntityAccess('dynamicContent:dynamicContents:viewown', 'dynamicContent:dynamicContents:viewother', $entity->getCreatedBy())) {
+            return $this->accessDenied();
+        }
+
+        /** @var DynamicContent $parent */
+        /** @var DynamicContent[] $children */
+        list($parent, $children) = $model->getVariants($entity);
+
+        // Audit Log
+        $logs = $this->getModel('core.auditLog')->getLogForObject('dynamicContent', $entity->getId(), $entity->getDateAdded());
+
+        return $this->delegateView([
+            'returnUrl'       => $this->generateUrl('mautic_page_action', [
+                    'objectAction' => 'view',
+                    'objectId'     => $entity->getId()
+                ]),
+            'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:details.html.php',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_dwc_index',
+                'mauticContent' => 'dwc'
+            ],
+            'viewParameters'  => [
+                'entity'      => $entity,
+                'permissions' => $this->getPermissions(),
+                'security'    => $security,
+                'logs'        => $logs,
+                'variants'    => [
+                    'parent'   => $parent,
+                    'children' => $children
+                ]
+            ]
+        ]);
+    }
+
+    /**
+     * @param int $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function addvariantAction($objectId)
+    {
+        /** @var \Mautic\DynamicContentBundle\Model\DynamicContentModel $model */
+        $model  = $this->getModel('dynamicContent');
+        $entity = $model->getEntity($objectId);
+
+        if ($entity !== null) {
+            $parent = $entity->getVariantParent();
+
+            if ($parent || !$this->get('mautic.security')->isGranted('dynamicContent:dynamicContents:create') ||
+                !$this->factory->getSecurity()->hasEntityAccess(
+                    'dynamicContent:dynamicContents:viewown', 'dynamicContent:dynamicContents:viewother', $entity->getCreatedBy()
+                )
+            ) {
+                return $this->accessDenied();
+            }
+
+            /** @var DynamicContent $clone */
+            $clone = clone $entity;
+
+            $variantCount = count($entity->getVariantChildren());
+
+            //reset
+            // Auto update the name
+            $name = $clone->getName();
+            $clone->setName('Variant ' . ($variantCount + 1) . ': ' . $name);
+
+            $clone->setVariantParent($entity);
+        }
+
+        return $this->newAction($clone);
     }
 }

@@ -50,16 +50,36 @@ class DynamicContent extends FormEntity
     private $publishDown;
 
     /**
-     * @var ArrayCollection
+     * @var string
      */
-    private $variants;
+    private $language = 'en';
+
+    /**
+     * @var string
+     */
+    private $content;
+
+    /**
+     * @var int
+     */
+    private $sentCount = 0;
+
+    /**
+     * @var DynamicContent
+     **/
+    private $variantParent = null;
+
+    /**
+     * @var ArrayCollection
+     **/
+    private $variantChildren;
 
     /**
      * DynamicContent constructor.
      */
     public function __construct()
     {
-        $this->variants = new ArrayCollection;
+        $this->variantChildren = new ArrayCollection;
     }
 
     /**
@@ -68,6 +88,8 @@ class DynamicContent extends FormEntity
     public function __clone()
     {
         $this->id = null;
+        $this->sentCount = 0;
+        $this->variantChildren = new ArrayCollection;
         
         parent::__clone();
     }
@@ -88,10 +110,28 @@ class DynamicContent extends FormEntity
         
         $builder->addPublishDates();
 
-        $builder->createOneToMany('variants', 'DynamicContent')
+        $builder->createField('sentCount', 'integer')
+            ->columnName('sent_count')
+            ->build();
+
+        $builder->createManyToOne('variantParent', 'DynamicContent')
+            ->inversedBy('variantChildren')
+            ->addJoinColumn('variant_parent_id', 'id')
+            ->build();
+
+        $builder->createOneToMany('variantChildren', 'DynamicContent')
             ->setIndexBy('id')
-            ->mappedBy('parent_id')
-            ->fetchExtraLazy()
+            ->mappedBy('variantParent')
+            ->fetchLazy()
+            ->build();
+
+        $builder->createField('content', 'text')
+            ->columnName('content')
+            ->nullable()
+            ->build();
+
+        $builder->createField('language', 'string')
+            ->columnName('lang')
             ->build();
     }
 
@@ -112,14 +152,36 @@ class DynamicContent extends FormEntity
             ->addListProperties([
                 'id',
                 'name',
-                'language',
                 'category'
             ])
             ->addProperties([
                 'publishUp',
-                'publishDown'
+                'publishDown',
+                'sentCount',
+                'variantParent',
+                'variantChildren'
             ])
             ->build();
+    }
+
+    /**
+     * @param $prop
+     * @param $val
+     */
+    protected function isChanged($prop, $val)
+    {
+        $getter  = "get" . ucfirst($prop);
+        $current = $this->$getter();
+
+        if ($prop == 'variantParent' || $prop == 'category') {
+            $currentId = ($current) ? $current->getId() : '';
+            $newId     = ($val) ? $val->getId() : null;
+            if ($currentId != $newId) {
+                $this->changes[$prop] = array($currentId, $newId);
+            }
+        } else {
+            parent::isChanged($prop, $val);
+        }
     }
 
     /**
@@ -234,34 +296,163 @@ class DynamicContent extends FormEntity
     }
 
     /**
-     * @return ArrayCollection
+     * @return string
      */
-    public function getVariants()
+    public function getContent()
     {
-        return $this->variants;
+        return $this->content;
     }
 
     /**
-     * @param ArrayCollection $variants
+     * @param string $content
      *
      * @return $this
      */
-    public function setVariants(ArrayCollection $variants)
+    public function setContent($content)
     {
-        $this->variants = $variants;
+        $this->content = $content;
 
         return $this;
     }
 
     /**
-     * @param DynamicContent $variant
+     * @param bool $includeVariants
+     *
+     * @return mixed
+     */
+    public function getSentCount($includeVariants = false)
+    {
+        $count = $this->sentCount;
+
+        if ($includeVariants && $this->isVariant()) {
+            $parent = $this->getVariantParent();
+
+            if ($parent) {
+                $count   += $parent->getSentCount();
+                $children = $parent->getVariantChildren();
+            } else {
+                $children = $this->getVariantChildren();
+            }
+
+            foreach ($children as $child) {
+                if ($child->getId() !== $this->id) {
+                    $count += $child->getSentCount();
+                }
+            }
+        }
+
+        return $count;
+    }
+
+    /**
+     * @param $sentCount
      *
      * @return $this
      */
-    public function addVariant(DynamicContent $variant)
+    public function setSentCount($sentCount)
     {
-        $this->variants->add($variant);
-        
+        $this->sentCount = $sentCount;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $isChild True to return if the entity is a variant of a parent
+     *
+     * @return bool
+     */
+    public function isVariant($isChild = false)
+    {
+        if ($isChild) {
+            return $this->variantParent instanceof DynamicContent;
+        } else {
+            return (!empty($this->variantParent) || count($this->variantChildren));
+        }
+    }
+
+    /**
+     * Add a variant child
+     *
+     * @param DynamicContent $variantChildren
+     *
+     * @return $this
+     */
+    public function addVariantChild(DynamicContent $variantChildren)
+    {
+        if (!$this->variantChildren->contains($variantChildren)) {
+            $this->variantChildren[] = $variantChildren;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove a variant child
+     *
+     * @param DynamicContent $variantChildren
+     *
+     * @return $this
+     */
+    public function removeVariantChild(DynamicContent $variantChildren)
+    {
+        $this->variantChildren->removeElement($variantChildren);
+
+        return $this;
+    }
+
+    /**
+     * Get variantChildren
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getVariantChildren()
+    {
+        return $this->variantChildren;
+    }
+
+    /**
+     * Set variantParent
+     *
+     * @param DynamicContent $variantParent
+     *
+     * @return $this
+     */
+    public function setVariantParent(DynamicContent $variantParent = null)
+    {
+        $this->isChanged('variantParent', $variantParent);
+        $this->variantParent = $variantParent;
+
+        return $this;
+    }
+
+    /**
+     * Get variantParent
+     *
+     * @return DynamicContent
+     */
+    public function getVariantParent()
+    {
+        return $this->variantParent;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLanguage()
+    {
+        return $this->language;
+    }
+
+    /**
+     * @param $language
+     *
+     * @return $this
+     */
+    public function setLanguage($language)
+    {
+        $this->isChanged('language', $language);
+        $this->language = $language;
+
         return $this;
     }
 }
