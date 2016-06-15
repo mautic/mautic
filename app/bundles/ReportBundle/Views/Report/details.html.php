@@ -25,7 +25,7 @@ if ($tmpl == 'index') {
                 'target'      => '_new',
                 'data-toggle' => '',
                 'class'       => 'btn btn-default btn-nospin',
-                'href'        => $view['router']->generate(
+                'href'        => $view['router']->path(
                     'mautic_report_export',
                     array('objectId' => $report->getId(), 'format' => 'html')
                 )
@@ -39,7 +39,7 @@ if ($tmpl == 'index') {
                 'attr'      => array(
                     'data-toggle' => 'download',
                     'class'       => 'btn btn-default btn-nospin',
-                    'href'        => $view['router']->generate(
+                    'href'        => $view['router']->path(
                         'mautic_report_export',
                         array('objectId' => $report->getId(), 'format' => 'csv')
                     )
@@ -53,7 +53,7 @@ if ($tmpl == 'index') {
                     'attr'      => array(
                         'data-toggle' => 'download',
                         'class'       => 'btn btn-default btn-nospin',
-                        'href'        => $view['router']->generate(
+                        'href'        => $view['router']->path(
                             'mautic_report_export',
                             array('objectId' => $report->getId(), 'format' => 'xlsx')
                         )

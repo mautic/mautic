@@ -61,14 +61,14 @@ $container->loadFromExtension('security', array(
             'pattern'    => "^/",
             'http_basic' => array(),
             'form_login' => array(
-                'csrf_provider' => 'form.csrf_provider'
+                'csrf_token_generator' => 'security.csrf.token_manager'
             ),
             'context'    => 'mautic_test',
         ),
         'main' => array(
             'pattern' => "^/",
             'form_login' => array(
-                'csrf_provider' => 'form.csrf_provider'
+                'csrf_token_generator' => 'security.csrf.token_manager'
             ),
             'logout' => array(),
             'remember_me' => array(

@@ -15,7 +15,7 @@ $item = $event['extra']['log'];
     <div class="panel">
         <div class="panel-body">
             <h3>
-                <a href="<?php echo $view['router']->generate('mautic_campaign_action',
+                <a href="<?php echo $view['router']->path('mautic_campaign_action',
                     array("objectAction" => "view", "objectId" => $item['campaign_id'])); ?>"
                    data-toggle="ajax">
                     <?php echo $item['campaign_name']; ?>

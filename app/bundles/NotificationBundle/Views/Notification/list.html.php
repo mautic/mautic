@@ -67,7 +67,7 @@ if (count($items)):
                                 'data-target' => '#MauticSharedModal',
                                 'data-header' => $view['translator']->trans('mautic.notification.notification.header.preview'),
                                 'data-footer' => 'false',
-                                'href' => $view['router']->generate('mautic_notification_action', array("objectId" => $item->getId(), "objectAction" => "preview")),
+                                'href' => $view['router']->path('mautic_notification_action', array("objectId" => $item->getId(), "objectAction" => "preview")),
                             ),
                             'btnText'   => $view['translator']->trans('mautic.notification.preview'),
                             'iconClass' => 'fa fa-share'
@@ -90,7 +90,7 @@ if (count($items)):
                         <?php else: ?>
                         <i class="fa fa-fw fa-lg fa-toggle-on text-muted disabled"></i>
                         <?php endif; ?>
-                        <a href="<?php echo $view['router']->generate('mautic_notification_action', array("objectAction" => "preview", "objectId" => $item->getId())); ?>" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-footer="false" data-header="<?php echo $view['translator']->trans('mautic.notification.notification.header.preview')?>">
+                        <a href="<?php echo $view['router']->path('mautic_notification_action', array("objectAction" => "preview", "objectId" => $item->getId())); ?>" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-footer="false" data-header="<?php echo $view['translator']->trans('mautic.notification.notification.header.preview')?>">
                             <?php echo $item->getName(); ?>
                             <?php if ($type == 'list'): ?>
                             <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.notification.icon_tooltip.list_notification'); ?>"><i class="fa fa-fw fa-list"></i></span>
@@ -118,7 +118,7 @@ if (count($items)):
         'totalItems'      => $totalItems,
         'page'            => $page,
         'limit'           => $limit,
-        'baseUrl'         => $view['router']->generate('mautic_notification_index'),
+        'baseUrl'         => $view['router']->path('mautic_notification_index'),
         'sessionVar'      => 'notification'
     )); ?>
 </div>

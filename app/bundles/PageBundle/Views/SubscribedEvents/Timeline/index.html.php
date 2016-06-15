@@ -71,7 +71,7 @@ $counter = 3;
                 <?php if (!empty($title)): ?>
                     <?php echo $title; ?>
                 <?php elseif ($event['extra']['hit']['page_id']) : ?>
-                    <a href="<?php echo $view['router']->generate('mautic_page_action',
+                    <a href="<?php echo $view['router']->path('mautic_page_action',
                         array("objectAction" => "view", "objectId" => $item->getId())); ?>"
                        data-toggle="ajax">
                         <?php echo $item->getTitle(); ?>

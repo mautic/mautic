@@ -16,7 +16,7 @@ $buttons = array(
             'class'       => 'btn btn-default btn-nospin',
             'data-toggle' => 'ajaxmodal',
             'data-target' => '#MauticSharedModal',
-            'href'        => $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'new')),
+            'href'        => $view['router']->path('mautic_dashboard_action', array('objectAction' => 'new')),
             'data-header' => $view['translator']->trans('mautic.dashboard.widget.add'),
         ),
         'iconClass' => 'fa fa-plus',
@@ -26,7 +26,7 @@ $buttons = array(
         'attr'      => array(
             'class'       => 'btn btn-default btn-nospin',
             'href'        => 'javascript:void()',
-            'onclick'     => "Mautic.exportDashboardLayout('{$view['translator']->trans('mautic.dashboard.confirmation_layout_name')}', '{$view['router']->generate('mautic_dashboard_action', array('objectAction' => 'export'))}', true);",
+            'onclick'     => "Mautic.exportDashboardLayout('{$view['translator']->trans('mautic.dashboard.confirmation_layout_name')}', '{$view['router']->path('mautic_dashboard_action', array('objectAction' => 'export'))}', true);",
             'data-toggle' => ''
         ),
         'iconClass' => 'fa fa-save',
@@ -36,7 +36,7 @@ $buttons = array(
         'attr'      => array(
             'class'       => 'btn btn-default btn-nospin',
             'href'        => 'javascript:void()',
-            'onclick'     => "Mautic.exportDashboardLayout('{$view['translator']->trans('mautic.dashboard.confirmation_layout_name')}', '{$view['router']->generate('mautic_dashboard_action', array('objectAction' => 'export'))}', false);",
+            'onclick'     => "Mautic.exportDashboardLayout('{$view['translator']->trans('mautic.dashboard.confirmation_layout_name')}', '{$view['router']->path('mautic_dashboard_action', array('objectAction' => 'export'))}', false);",
             'data-toggle' => ''
         ),
         'iconClass' => 'fa fa-cloud-download',
@@ -45,7 +45,7 @@ $buttons = array(
     array(
         'attr'      => array(
             'class'       => 'btn btn-default',
-            'href'        => $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'import')),
+            'href'        => $view['router']->path('mautic_dashboard_action', array('objectAction' => 'import')),
             'data-header' => $view['translator']->trans('mautic.dashboard.widget.import'),
         ),
         'iconClass' => 'fa fa-cloud-upload',
@@ -83,7 +83,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <div class="col-xs-9">
                 <h4><i class="fa fa-quote-left"></i> <?php echo $view['translator']->trans('mautic.dashboard.nowidgets.tip.header'); ?> <i class="fa fa-quote-right"></i></h4>
                 <p class="mt-md"><?php echo $view['translator']->trans('mautic.dashboard.nowidgets.tip'); ?></p>
-                <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'applyDashboardFile', 'file' => 'default.json')); ?>" class="btn btn-success">
+                <a href="<?php echo $view['router']->path('mautic_dashboard_action', array('objectAction' => 'applyDashboardFile', 'file' => 'default.json')); ?>" class="btn btn-success">
                     Apply the default dashboard
                 </a>
             </div>
