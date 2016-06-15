@@ -9,34 +9,40 @@
 
 namespace Mautic\UserBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class RoleListType
  */
 class RoleListType extends AbstractType
 {
-
-    private $choices = array();
+    /**
+     * @var array
+     */
+    private $choices = [];
 
     /**
-     * @param MauticFactory $factory
+     * RoleListType constructor.
+     *
+     * @param RoleModel $model
      */
-    public function __construct(MauticFactory $factory) {
-        $choices = $factory->getModel('user.role')->getRepository()->getEntities(array(
-            'filter' => array(
-                'force' => array(
-                    array(
-                        'column' => 'r.isPublished',
-                        'expr'   => 'eq',
-                        'value'  => true
-                    )
-                )
-            )
-        ));
+    public function __construct(RoleModel $model)
+    {
+        $choices = $model->getRepository()->getEntities(
+            [
+                'filter' => [
+                    'force' => [
+                        [
+                            'column' => 'r.isPublished',
+                            'expr'   => 'eq',
+                            'value'  => true
+                        ]
+                    ]
+                ]
+            ]
+        );
 
         foreach ($choices as $choice) {
             $this->choices[$choice->getId()] = $choice->getName(true);
@@ -51,22 +57,28 @@ class RoleListType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
-            'choices'       => $this->choices,
-            'expanded'      => false,
-            'multiple'      => false,
-            'required'      => false,
-            'empty_value'   => 'mautic.core.form.chooseone'
-        ));
+        $resolver->setDefaults(
+            [
+                'choices'     => $this->choices,
+                'expanded'    => false,
+                'multiple'    => false,
+                'required'    => false,
+                'empty_value' => 'mautic.core.form.chooseone'
+            ]
+        );
     }
 
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return "role_list";
     }
 
+    /**
+     * @return string
+     */
     public function getParent()
     {
         return 'choice';

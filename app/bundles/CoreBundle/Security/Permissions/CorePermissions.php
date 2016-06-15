@@ -14,6 +14,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\Permission;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CorePermissions
@@ -60,7 +61,7 @@ class CorePermissions
      * @param                       $bundles
      * @param                       $pluginBundles
      */
-    public function __construct(Translator $translator, EntityManager $em, TokenStorageInterface $tokenStorage, array $parameters, $bundles, $pluginBundles)
+    public function __construct(TranslatorInterface $translator, EntityManager $em, TokenStorageInterface $tokenStorage, array $parameters, $bundles, $pluginBundles)
     {
         $this->translator    = $translator;
         $this->em            = $em;
@@ -195,7 +196,7 @@ class CorePermissions
 
         //get a list of plugin bundles so we can tell later if a bundle is core or plugin
         $pluginBundles = $this->getPluginBundles();
-        
+
         //create entities
         foreach ($bundlePermissions as $bundle => $permissions) {
             foreach ($permissions as $name => $perms) {

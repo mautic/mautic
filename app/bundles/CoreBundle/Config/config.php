@@ -357,7 +357,7 @@ return [
                     'request_stack'
                 ]
             ],
-            'mautic.helper.update'               => array(
+            'mautic.helper.update'               => [
                 'class'     => 'Mautic\CoreBundle\Helper\UpdateHelper',
                 'arguments' => 'mautic.factory'
             ],

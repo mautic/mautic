@@ -120,7 +120,13 @@ return array(
         'forms'  => array(
             'mautic.form.type.user'           => array(
                 'class'     => 'Mautic\UserBundle\Form\Type\UserType',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'translator',
+                    'doctrine.orm.entity_manager',
+                    'mautic.user.model.user',
+                    'mautic.helper.language',
+                    'mautic.helper.core_parameters',
+                ],
                 'alias'     => 'user'
             ),
             'mautic.form.type.role'           => array(
@@ -145,12 +151,12 @@ return array(
             ),
             'mautic.form.type.user_list'      => array(
                 'class'     => 'Mautic\UserBundle\Form\Type\UserListType',
-                'arguments' => 'mautic.factory',
+                'arguments' => 'mautic.user.model.user',
                 'alias'     => 'user_list'
             ),
             'mautic.form.type.role_list'      => array(
                 'class'     => 'Mautic\UserBundle\Form\Type\RoleListType',
-                'arguments' => 'mautic.factory',
+                'arguments' => 'mautic.user.model.role',
                 'alias'     => 'role_list'
             )
         ),
@@ -227,7 +233,11 @@ return array(
             ),
             'mautic.security.logout_handler'         => array(
                 'class'     => 'Mautic\UserBundle\Security\Authentication\LogoutHandler',
-                'arguments' => 'mautic.factory'
+                'arguments' => [
+                    'mautic.user.model.user',
+                    'event_dispatcher',
+                    'mautic.helper.user'
+                ]
             )
         ),
         'models' =>  array(
