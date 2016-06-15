@@ -559,13 +559,6 @@ class EmailController extends FormController
 
         $slotTypes = $model->getBuilderComponents($entity, 'slotTypes');
 
-        foreach ($slotTypes as &$slotType) {
-            if (isset($slotType['form'])) {
-                $slotForm = $this->get('form.factory')->create($slotType['form']);
-                $slotType['form'] = $slotForm->createView();
-            }
-        }
-
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
@@ -573,7 +566,7 @@ class EmailController extends FormController
                     'isVariant'     => $entity->isVariant(true),
                     'tokens'        => $model->getBuilderComponents($entity, 'tokenSections'),
                     'email'         => $entity,
-                    'slots'         => $slotTypes,
+                    'slots'         => $this->buildSlotForms($slotTypes),
                     'themes'        => $this->factory->getInstalledThemes('email', true),
                     'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())) // strip new lines
                 ),
@@ -766,20 +759,13 @@ class EmailController extends FormController
 
         $slotTypes = $model->getBuilderComponents($entity, 'slotTypes');
 
-        foreach ($slotTypes as &$slotType) {
-            if (isset($slotType['form'])) {
-                $slotForm = $this->get('form.factory')->create($slotType['form']);
-                $slotType['form'] = $slotForm->createView();
-            }
-        }
-
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
                     'form'               => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.php', 'MauticEmailBundle:FormTheme\Email'),
                     'isVariant'          => $entity->isVariant(true),
                     'tokens'             => (!empty($tokens)) ? $tokens['tokenSections'] : $model->getBuilderComponents($entity, 'tokenSections'),
-                    'slots'              => $slotTypes,
+                    'slots'              => $this->buildSlotForms($slotTypes),
                     'themes'             => $this->factory->getInstalledThemes('email', true),
                     'email'              => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
@@ -1397,5 +1383,17 @@ class EmailController extends FormController
         $builderAssets = $assetsHelper->getHeadDeclarations();
         $assetsHelper->clear();
         return $builderAssets;
+    }
+
+    private function buildSlotForms($slotTypes)
+    {
+        foreach ($slotTypes as &$slotType) {
+            if (isset($slotType['form'])) {
+                $slotForm = $this->get('form.factory')->create($slotType['form']);
+                $slotType['form'] = $slotForm->createView();
+            }
+        }
+
+        return $slotTypes;
     }
 }

@@ -102,6 +102,33 @@ class BuilderSubscriber extends CommonSubscriber
                 )
             );
         }
+
+        if ($event->slotTypesRequested()) {
+            $event->addSlotType(
+                'text',
+                'Text',
+                'font',
+                'MauticCoreBundle:Slots:text.html.twig',
+                'slot',
+                1000
+            );
+            $event->addSlotType(
+                'image',
+                'Image',
+                'image',
+                'MauticCoreBundle:Slots:image.html.twig',
+                'slot',
+                900
+            );
+            $event->addSlotType(
+                'button',
+                'Button',
+                'external-link',
+                'MauticCoreBundle:Slots:button.html.twig',
+                'slot_button',
+                800
+            );
+        }
     }
 
     /**

@@ -758,10 +758,14 @@ class PageModel extends FormModel
                 case 'abTestWinnerCriteria':
                     $components[$requested] = $event->getAbTestWinnerCriteria();
                     break;
+                case 'slotTypes':
+                    $components[$requested] = $event->getSlotTypes();
+                    break;
                 default:
                     $components['tokens']               = $event->getTokens();
                     $components['tokenSections']        = $event->getTokenSections();
                     $components['abTestWinnerCriteria'] = $event->getAbTestWinnerCriteria();
+                    $components['slotTypes']            = $event->getSlotTypes();
                     break;
             }
         }

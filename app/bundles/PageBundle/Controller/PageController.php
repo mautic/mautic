@@ -418,6 +418,8 @@ class PageController extends FormController
             }
         }
 
+        $slotTypes = $model->getBuilderComponents($entity, 'slotTypes');
+
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
@@ -425,6 +427,8 @@ class PageController extends FormController
                 'tokens'      => $model->getBuilderComponents($entity, 'tokenSections'),
                 'activePage'  => $entity,
                 'themes'      => $this->factory->getInstalledThemes('page', true),
+                'slots'       => $this->buildSlotForms($slotTypes),
+                'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())) // strip new lines
             ),
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
             'passthroughVars' => array(
@@ -581,6 +585,8 @@ class PageController extends FormController
             }
         }
 
+        $slotTypes = $model->getBuilderComponents($entity, 'slotTypes');
+        
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
@@ -588,6 +594,8 @@ class PageController extends FormController
                 'tokens'      => (!empty($tokens)) ? $tokens['tokenSections'] : $model->getBuilderComponents($entity, 'tokenSections'),
                 'activePage'  => $entity,
                 'themes'      => $this->factory->getInstalledThemes('page', true),
+                'slots'       => $this->buildSlotForms($slotTypes),
+                'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())) // strip new lines
             ),
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
             'passthroughVars' => array(
@@ -813,7 +821,6 @@ class PageController extends FormController
             $entity->setContent($content);
         }
 
-        $this->addAssetsForBuilder();
         $this->processSlots($slots, $entity);
 
         $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':page.html.php');
@@ -1063,7 +1070,7 @@ class PageController extends FormController
         $slotsHelper->stop();
     }
 
-    private function addAssetsForBuilder()
+    private function getAssetsForBuilder()
     {
         /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
         $assetsHelper = $this->factory->getHelper('template.assets');
@@ -1072,10 +1079,24 @@ class PageController extends FormController
 
         $assetsHelper->addScriptDeclaration("var mauticBasePath    = '" . $this->request->getBasePath() . "';");
         $assetsHelper->addScriptDeclaration("var mauticAjaxUrl     = '" . $routerHelper->generate("mautic_core_ajax") . "';");
+        $assetsHelper->addScriptDeclaration("var mauticBaseUrl     = '" . $routerHelper->generate("mautic_base_index") . "';");
         $assetsHelper->addScriptDeclaration("var mauticAssetPrefix = '" . $assetsHelper->getAssetPrefix(true) . "';");
         $assetsHelper->addCustomDeclaration($assetsHelper->getSystemScripts(true, true));
-        $assetsHelper->addScript('app/bundles/PageBundle/Assets/builder/builder.js');
-        $assetsHelper->addStylesheet('app/bundles/PageBundle/Assets/builder/pick-a-color.css');
-        $assetsHelper->addStylesheet('app/bundles/PageBundle/Assets/builder/builder.css');
+        $assetsHelper->addStylesheet('app/bundles/CoreBundle/Assets/css/libraries/builder.css');
+        $builderAssets = $assetsHelper->getHeadDeclarations();
+        $assetsHelper->clear();
+        return $builderAssets;
+    }
+
+    private function buildSlotForms($slotTypes)
+    {
+        foreach ($slotTypes as &$slotType) {
+            if (isset($slotType['form'])) {
+                $slotForm = $this->get('form.factory')->create($slotType['form']);
+                $slotType['form'] = $slotForm->createView();
+            }
+        }
+
+        return $slotTypes;
     }
 }
