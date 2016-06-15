@@ -11,6 +11,7 @@ namespace MauticPlugin\MauticSocialBundle\Command;
 
 use MauticPlugin\MauticSocialBundle\Event\SocialMonitorEvent;
 use MauticPlugin\MauticSocialBundle\Exception\ExitMonitorException;
+use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -39,6 +40,11 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
 
     protected $manipulatedLeads = array();
 
+    /**
+     * @var MonitoringModel
+     */
+    protected $monitoringModel;
+
     /*
      * Command configuration. Set the name, description, and options here.
      */
@@ -65,6 +71,7 @@ EOT
         $this->output     = $output;
         $this->maxRuns    = $this->input->getOption('max-runs');
         $this->queryCount = $this->input->getOption('query-count');
+        $this->monitoringModel = $this->getContainer()->get('mautic.social.model.monitoring');
 
         $translator = $this->getContainer()->get('translator');
         $translator->setLocale($this->getContainer()->getParameter('mautic.locale'));
@@ -157,13 +164,8 @@ EOT
      */
     protected function getMonitor($mid)
     {
-        /** @var \MauticPlugin\MauticSocialBundle\Model\MonitoringModel $model */
-        $model = $this->getContainer()
-            ->get('mautic.factory')
-            ->getModel('plugin.mauticSocial.monitoring');
-
         // get the entity record
-        $entity = $model->getEntity($mid);
+        $entity = $this->monitoringModel->getEntity($mid);
 
         return $entity;
     }
@@ -176,13 +178,11 @@ EOT
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->getContainer()
-            ->get('mautic.factory')
-            ->getModel('lead');
+            ->get('mautic.lead.model.lead');
 
         /** @var \Mautic\LeadBundle\Model\FieldModel $leadFieldModel */
         $leadFieldModel = $this->getContainer()
-            ->get('mautic.factory')
-            ->getModel('lead.field');
+            ->get('mautic.lead.model.field');
 
         // handle field
         $handleField = $this->getContainer()->getParameter('mautic.twitter_handle_field', $this->getNetworkName());
@@ -361,8 +361,7 @@ EOT
         $monitorLead->setDateAdded(new \DateTime());
 
         /* @var \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitorRepository */
-        $monitorRepository = $this->getContainer()->get('mautic.factory')
-            ->getEntityManager()->getRepository('MauticSocialBundle:lead');
+        $monitorRepository = $this->getContainer()->get('doctrine.orm.entity_manager')->getRepository('MauticSocialBundle:lead');
 
         // save it
         $monitorRepository->saveEntity($monitorLead);
@@ -375,8 +374,7 @@ EOT
     {
         /** @var \MauticPlugin\MauticSocialBundle\Model\PostCountModel $postCount */
         $postCount = $this->getContainer()
-            ->get('mautic.factory')
-            ->getModel('plugin.mauticSocial.PostCount');
+            ->get('mautic.social.model.postcount');
 
         $date = new \DateTime($tweet['created_at']);
 
@@ -391,7 +389,7 @@ EOT
     protected function getTwitterIntegration()
     {
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->getContainer()->get('mautic.factory')->getHelper('integration');
+        $integrationHelper = $this->getContainer()->get('mautic.helper.integration');
 
         /** @var \MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration $twitterIntegration */
         $twitterIntegration = $integrationHelper->getIntegrationObject('Twitter');
@@ -404,14 +402,9 @@ EOT
      */
     protected function setMonitorStats($monitor, $searchMeta)
     {
-        /** @var \MauticPlugin\MauticSocialBundle\Model\MonitoringModel $model */
-        $model = $this->getContainer()
-            ->get('mautic.factory')
-            ->getModel('plugin.mauticSocial.monitoring');
-
         $monitor->setStats($searchMeta);
 
-        $model->saveEntity($monitor);
+        $this->monitoringModel->saveEntity($monitor);
     }
 
     /*

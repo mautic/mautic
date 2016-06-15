@@ -74,8 +74,7 @@ EOT
 
         /** @var \MauticPlugin\MauticSocialBundle\Model\MonitoringModel $model */
         $model = $this->getContainer()
-            ->get('mautic.factory')
-            ->getModel('plugin.mauticSocial.monitoring');
+            ->get('mautic.social.model.monitoring');
 
         // set the repository
         $this->monitorRepo = $model->getRepository();

@@ -65,4 +65,15 @@ final class SocialEvents
      * @var string
      */
     const MONITOR_POST_PROCESS = 'mautic.monitor_post_process';
+
+    /**
+     * The mautic.social.on_campaign_trigger_action event is fired when the campaign action triggers.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.social.on_campaign_trigger_action';
+
 }

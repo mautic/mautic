@@ -9,7 +9,11 @@
 
 namespace MauticPlugin\MauticSocialBundle\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
+use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
+use Mautic\PageBundle\Model\TrackableModel;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticSocialBundle\Model\SocialEventLogModel;
 
 /**
@@ -19,7 +23,48 @@ use MauticPlugin\MauticSocialBundle\Model\SocialEventLogModel;
  */
 class CampaignEventHelper
 {
-    static $factory;
+    /**
+     * @var IntegrationHelper
+     */
+    protected $integrationHelper;
+
+    /**
+     * @var TrackableModel
+     */
+    protected $trackableModel;
+
+    /**
+     * @var PageTokenHelper
+     */
+    protected $pageTokenHelper;
+
+    /**
+     * @var AssetTokenHelper
+     */
+    protected $assetTokenHelper;
+
+    /**
+     * @var array
+     */
+    protected $clickthrough = [];
+
+    /**
+     * CampaignEventHelper constructor.
+     *
+     * @param IntegrationHelper $integrationHelper
+     * @param TrackableModel    $trackableModel
+     */
+    public function __construct(
+        IntegrationHelper $integrationHelper,
+        TrackableModel $trackableModel,
+        PageTokenHelper $pageTokenHelper,
+        AssetTokenHelper $assetTokenHelper
+    ) {
+        $this->integrationHelper = $integrationHelper;
+        $this->trackableModel    = $trackableModel;
+        $this->pageTokenHelper   = $pageTokenHelper;
+        $this->assetTokenHelper  = $assetTokenHelper;
+    }
 
     /**
      * @param MauticFactory $factory
@@ -28,182 +73,71 @@ class CampaignEventHelper
      *
      * @return bool
      */
-    public static function sendTweetAction (MauticFactory $factory, $lead, $event)
+    public function sendTweetAction($lead, $event)
     {
-        static::$factory = $factory;
-
         $tweetSent = false;
 
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $factory->getHelper('integration');
-
         /** @var \MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration $twitterIntegration */
-        $twitterIntegration = $integrationHelper->getIntegrationObject('Twitter');
+        $twitterIntegration = $this->integrationHelper->getIntegrationObject('Twitter');
+
+        // Setup clickthrough for URLs in tweet
+        $this->clickthrough = [
+            'source' => ['campaign', $event['campaign']['id']]
+        ];
 
         $tweetText = $event['properties']['tweet_text'];
-
-        $tweetText = CampaignEventHelper::parseTweetText($tweetText, $lead);
-
-        $tweetUrl = $twitterIntegration->getApiUrl('statuses/update');
-
-        $status = array('status' => $tweetText);
+        $tweetText = $this->parseTweetText($tweetText, $lead);
+        $tweetUrl  = $twitterIntegration->getApiUrl('statuses/update');
+        $status    = ['status' => $tweetText];
 
         // fire the tweet
-        $sendTweet = $twitterIntegration->makeRequest($tweetUrl, $status, 'POST', array('append_callback' => false));
-
-        $tweetId = '';
+        $sendTweet = $twitterIntegration->makeRequest($tweetUrl, $status, 'POST', ['append_callback' => false]);
 
         // verify the tweet was sent by checking for a tweet id
-        if (is_array($sendTweet) && array_key_exists('id_str', $sendTweet))
-        {
+        if (is_array($sendTweet) && array_key_exists('id_str', $sendTweet)) {
             $tweetSent = true;
-            $tweetId = $sendTweet['id_str'];
         }
 
-        //CampaignEventHelper::updateSocialLog($event, $lead, $tweetId, $tweetText, $tweetSent);
-
-        return $tweetSent;
+        return ($tweetSent) ? ['text' => $tweetText, 'response' => $sendTweet] : false;
     }
 
-    /*
+    /**
      * PreParse the twitter message and replace placeholders with values.
      *
-     * @param $tweet the tweet messsage
-     * @param $lead the lead entity
+     * @param $tweet
+     * @param $lead
+     *
+     * @return mixed
      */
-    protected static function parseTweetText($tweet, $lead)
+    protected function parseTweetText($tweet, $lead)
     {
         /* @var \Mautic\LeadBundle\Entity\Lead $lead */
-        $leadFields = $lead->getFields();
+        $tweetHandle = $lead->getFieldValue('twitter');
+        $tokens      = [
+            '{twitter_handle}' => (strpos($tweetHandle, '@') !== false) ? $tweetHandle : "@$tweetHandle"
+        ];
 
-        // check for twitter handle on the lead
-        if (isset($leadFields['social']['twitter']['value'])) {
-            $tweetHandle = $leadFields['social']['twitter']['value'];
+        $tokens = array_merge(
+            $tokens,
+            $this->pageTokenHelper->findPageTokens($tweet, $this->clickthrough),
+            $this->assetTokenHelper->findAssetTokens($tweet, $this->clickthrough)
+        );
+
+        list($tweet, $trackables) = $this->trackableModel->parseContentForTrackables(
+            $tweet,
+            $tokens,
+            'social_twitter',
+            -1 // No specific id associated with this so just send something
+        );
+
+        /**
+         * @var string $token
+         * @var Trackable $trackable
+         */
+        foreach ($trackables as $token => $trackable) {
+            $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $this->clickthrough);
         }
 
-        // replace tweet text with the handle and pre-pend with at symbol
-        if ((strpos($tweet, '{twitter_handle}') !== false) && isset($tweetHandle)) {
-            $tweet = str_ireplace('{twitter_handle}', '@' . $tweetHandle , $tweet);
-        }
-
-        $clickthrough['campaign'] = $lead->getId();
-
-        // replace the asset link
-        $tweet = self::replaceAssets($tweet, $clickthrough);
-
-        // replace the page url
-        $tweet = self::replacePage($tweet, $clickthrough);
-
-        return $tweet;
-    }
-
-    /**
-     * @param $tweet
-     * @param $clickthrough
-     *
-     * @return mixed
-     */
-    protected static function replaceAssets($tweet, $clickthrough)
-    {
-        $factory = static::$factory;
-
-        // replace asset links
-        $assetRegex = '/{assetlink=(.*?)}/';
-
-        // check to see if asset links are in the tweet
-        preg_match_all($assetRegex, $tweet, $matches);
-        if (!empty($matches[1])) {
-
-            /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-            $assetModel = $factory->getModel('asset');
-
-            foreach ($matches[1] as $match) {
-                if (empty($assets[$match])) {
-                    $assets[$match] = $assetModel->getEntity($match);
-                }
-
-                $url  = ($assets[$match] !== null) ? $assetModel->generateUrl($assets[$match], true, $clickthrough) : '';
-
-                // encode the url for tweeting
-                urlencode($url);
-
-                $tweet = str_ireplace('{assetlink=' . $match . '}', $url, $tweet);
-            }
-        }
-
-        return $tweet;
-    }
-
-    /**
-     * @param $tweet
-     * @param $clickthrough
-     *
-     * @return mixed
-     */
-    protected static function replacePage($tweet, $clickthrough)
-    {
-        $factory = static::$factory;
-
-        $pagelinkRegex = '/{pagelink=(.*?)}/';
-
-        preg_match_all($pagelinkRegex, $tweet, $matches);
-        if (!empty($matches[1])) {
-
-            /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
-            $pageModel = $factory->getModel('page');
-
-            foreach ($matches[1] as $match) {
-                if (empty($pages[$match])) {
-                    $pages[$match] = $pageModel->getEntity($match);
-                }
-
-                $url     = ($pages[$match] !== null) ? $pageModel->generateUrl($pages[$match], true, $clickthrough) : '';
-
-                // encode the url for tweeting
-                urlencode($url);
-
-                $tweet = str_ireplace('{pagelink=' . $match . '}', $url, $tweet);
-            }
-        }
-
-        return $tweet;
-    }
-
-    /*
-     * takes an array of query params for twitter and gives a list back.
-     *
-     * URL Encoding done in makeRequest()
-     */
-    protected static function buildTwitterSearchQuery(Array $query)
-    {
-        $queryString = implode(' ', $query);
-
-        return $queryString;
-    }
-
-    /*
-     *
-     */
-    protected static function updateSocialLog($event, $lead, $networkMessageId, $message, $sent)
-    {
-        /* @var \MauticPlugin\MauticSocialBundle\Model\SocialEventLogModel $logModel */
-        $logModel = new SocialEventLogModel(static::$factory);
-
-        /* @var \MauticPlugin\MauticSocialBundle\Entity\SocialEventLog $logEntity */
-        $logEntity = $logModel->getEntity();
-
-
-        $now = new \DateTime();
-
-        $logEntity->setLead($lead);
-        $logEntity->setDateTriggered($now);
-        $logEntity->setMessageSent($message);
-        $logEntity->setEventId($event['id']);
-        $logEntity->setEventType($event['type']);
-        $logEntity->setNetworkType('twitter');
-        $logEntity->setNetworkId($networkMessageId);
-        $logEntity->setNetworkResponse($sent);
-
-        $logModel->saveEntity($logEntity);
+        return str_replace(array_keys($tokens), array_values($tokens), $tweet);
     }
 }

@@ -34,14 +34,14 @@ class MonitoringModel extends FormModel
      * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm ($entity, $formFactory, $action = null, $params = array())
+    public function createForm($entity, $formFactory, $action = null, $params = [])
     {
         if (!$entity instanceof Monitoring) {
-            throw new MethodNotAllowedHttpException (array('Monitoring'));
+            throw new MethodNotAllowedHttpException (['Monitoring']);
         }
 
         if (!empty($action)) {
-            $params['action']  = $action;
+            $params['action'] = $action;
         }
 
         return $formFactory->create('monitoring', $entity, $params);
@@ -51,6 +51,7 @@ class MonitoringModel extends FormModel
      * Get a specific entity or generate a new one if id is empty
      *
      * @param $id
+     *
      * @return null|object
      */
     public function getEntity($id = null)
@@ -74,10 +75,10 @@ class MonitoringModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent ($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Monitoring) {
-            throw new MethodNotAllowedHttpException(array('Monitoring'));
+            throw new MethodNotAllowedHttpException(['Monitoring']);
         }
 
         switch ($action) {
@@ -113,9 +114,9 @@ class MonitoringModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     *  @var \MauticPlugin\MauticSocialBundle\Entity\Monitoring $monitoringEntity
+     * @var \MauticPlugin\MauticSocialBundle\Entity\Monitoring $monitoringEntity
      */
-    public function saveEntity ($monitoringEntity, $unlock = true)
+    public function saveEntity($monitoringEntity, $unlock = true)
     {
         // we're editing an existing record
         if (!$monitoringEntity->isNew()) {
@@ -123,8 +124,7 @@ class MonitoringModel extends FormModel
             $revision = $monitoringEntity->getRevision();
             $revision++;
             $monitoringEntity->setRevision($revision);
-        }
-        // is new
+        } // is new
         else {
             $now = new \DateTime();
             $monitoringEntity->setDateAdded($now);
@@ -154,10 +154,10 @@ class MonitoringModel extends FormModel
      */
     public function getNetworkTypes()
     {
-        $types = array(
+        $types = [
             'twitter_handle'  => 'mautic.social.monitoring.type.list.twitter.handle',
             'twitter_hashtag' => 'mautic.social.monitoring.type.list.twitter.hashtag'
-        );
+        ];
 
         return $types;
     }

@@ -9,21 +9,22 @@
 
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class ConfigType extends AbstractType
 {
-    protected $factory;
+    protected $fieldModel;
 
     /**
-     * @param MauticFactory $factory
+     * ConfigType constructor.
+     *
+     * @param FieldModel $fieldModel
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(FieldModel $fieldModel)
     {
-        $this->factory = $factory;
+        $this->fieldModel = $fieldModel;
     }
 
     /**
@@ -32,10 +33,7 @@ class ConfigType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
-        $fieldModel = $this->factory->getModel('lead.field');
-
-        $leadFields = $fieldModel->getFieldList(false, false);
+        $leadFields = $this->fieldModel->getFieldList(false, false);
 
         $builder->add(
             'twitter_handle_field',
