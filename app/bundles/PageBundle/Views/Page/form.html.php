@@ -31,47 +31,51 @@ $template = $form['template']->vars['data'];
 <div class="box-layout">
     <!-- container -->
     <div class="col-md-9 bg-auto height-auto">
-        <div class="pa-md">
-            <div class="row">
-                <div class="col-md-6">
-                    <?php echo $view['form']->row($form['title']); ?>
-                </div>
-                <div class="col-md-6">
-                    <?php if (!$isVariant): ?>
-                    <?php echo $view['form']->row($form['alias']); ?>
-                    <?php else: ?>
-                    <?php echo $view['form']->row($form['template']); ?>
-                    <?php endif; ?>
-                </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <!-- tabs controls -->
+                <ul class="bg-auto nav nav-tabs pr-md pl-md">
+                    <li class="active"><a href="#theme-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.theme'); ?></a></li>
+                    <li class=""><a href="#source-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.source'); ?></a></li>
+                </ul>
             </div>
+        </div>
 
-            <?php if (!$isVariant): ?>
-            <div class="row">
-                <div class="col-md-6">
-                    <?php echo $view['form']->row($form['template']); ?>
-                </div>
-            </div>
-            <?php endif; ?>
-
-            <div class="row">
-                <div class="col-md-12" id="customHtmlContainer" style="min-height: 325px;">
+        <!--/ tabs controls -->
+        <div class="tab-content pa-md">
+            <div class="tab-pane fade in active bdr-w-0" id="theme-container">
+                <div class="row">
                     <div class="custom-html-mask">
-                        <div class="well text-center" style="position: absolute; top: 110px; width: 50%; left:0; right:0; margin-left:auto; margin-right:auto; z-index: 1010;">
+                        <div class="well text-center" style="top: 110px; width: 50%; margin-left:auto; margin-right:auto;">
                             <h3 style="padding: 30px;">
                                 <a href="javascript: void(0);" onclick="Mautic.launchBuilder('page');">
                                     <?php echo $view['translator']->trans('mautic.core.builder.launch'); ?> <i class="fa fa-angle-right"></i>
                                 </a>
                             </h3>
                         </div>
-                        <div style="height: 100%; width: 100%; position: absolute; top: 0; left: 0; bottom: 0; right: 0; opacity: 0.8; background-color: #fff; z-index: 1000"></div>
                     </div>
-                    <?php echo $view['form']->row($form['customHtml']); ?>
+
+                    <?php echo $view['form']->row($form['template']); ?>
+                </div>
+            </div>
+
+            <div class="tab-pane fade bdr-w-0" id="source-container">
+                <div class="row">
+                    <div class="col-md-12" id="customHtmlContainer" style="min-height: 325px;">
+                        <?php echo $view['form']->row($form['customHtml']); ?>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-md-3 bg-white height-auto bdr-l">
         <div class="pr-lg pl-lg pt-md pb-md">
+            <?php echo $view['form']->row($form['title']); ?>
+            <?php if (!$isVariant): ?>
+            <?php echo $view['form']->row($form['alias']); ?>
+            <?php else: ?>
+            <?php echo $view['form']->row($form['template']); ?>
+            <?php endif; ?>
             <?php
             if ($isVariant):
             echo $view['form']->row($form['variantSettings']);
@@ -132,9 +136,6 @@ $template = $form['template']->vars['data'];
                     </div>
                 </div>
             <?php endforeach; ?>
-
-            <?php echo $view->render('MauticCoreBundle:Helper:buildermodal_feedback.html.php'); ?>
-            <?php echo $view->render('MauticCoreBundle:Helper:buildermodal_link.html.php'); ?>
         </div>
     </div>
 </div>
