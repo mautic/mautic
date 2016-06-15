@@ -1,169 +1,151 @@
-{% extends ":Mauve:base.html.twig" %}
+{% extends ":oxygen:base.html.twig" %}
 
 {% block content %}
-
-    {{ slot('slideshow') }}
-    <!-- Page Content -->
-    <div class="container">
-        {% if slotHasContent(['page_title', 'top1_title', 'top1', 'top2_title', 'top2', 'top3_title', 'top3']) %}
-        <!-- Marketing Icons Section -->
-        <div class="row">
-            {% if slotHasContent('page_title') %}
-            <div class="col-lg-12">
-                <h1 class="page-header">
-                    {{ slot('page_title') }}
-                </h1>
-            </div>
-            {% endif %}
-            {% if slotHasContent(['top1_title', 'top1']) %}
-            <div class="col-md-4">
-                <div class="panel panel-default">
-                    {% if slotHasContent('top1_title') %}
-                    <div class="panel-heading">
-                        <h4>{{ slot('top1_title') }}</h4>
-                    </div>
-                    {% endif %}
-                    {% if slotHasContent('top1') %}
-                    <div class="panel-body">
-                        {{ slot('top1') }}
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-            {% endif %}
-            {% if slotHasContent(['top2_title', 'top2']) %}
-            <div class="col-md-4">
-                <div class="panel panel-default">
-                    {% if slotHasContent('top2_title') %}
-                    <div class="panel-heading">
-                        <h4>{{ slot('top2_title') }}</h4>
-                    </div>
-                    {% endif %}
-                    {% if slotHasContent('top2') %}
-                    <div class="panel-body">
-                        {{ slot('top2') }}
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-            {% endif %}
-            {% if slotHasContent(['top3_title', 'top3']) %}
-            <div class="col-md-4">
-                <div class="panel panel-default">
-                    {% if slotHasContent('top3_title') %}
-                    <div class="panel-heading">
-                        <h4>{{ slot('top3_title') }}</h4>
-                    </div>
-                    {% endif %}
-                    {% if slotHasContent('top3') %}
-                    <div class="panel-body">
-                        {{ slot('top3') }}
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-            {% endif %}
-        </div>
-        <!-- /.row -->
-        {% endif %}
-
-        {% if slotHasContent(['section1_title', 'portfolio1', 'portfolio2', 'portfolio3', 'portfolio4', 'portfolio5', 'portfolio6']) %}
-        <!-- Portfolio Section -->
-        <div class="row">
-            {% if slotHasContent('section1_title') %}
-            <div class="col-lg-12">
-                <h2 class="page-header">{{ slot('section1_title') }}</h2>
-            </div>
-            {% endif %}
-            {% if slotHasContent('portfolio1') %}
-            <div class="col-md-4 col-sm-6">
-                {{ slot('portfolio1') }}
-            </div>
-            {% endif %}
-            {% if slotHasContent('portfolio2') %}
-            <div class="col-md-4 col-sm-6">
-                {{ slot('portfolio2') }}
-            </div>
-            {% endif %}
-            {% if slotHasContent('portfolio3') %}
-            <div class="col-md-4 col-sm-6">
-                {{ slot('portfolio3') }}
-            </div>
-            {% endif %}
-            {% if slotHasContent('portfolio4') %}
-            <div class="col-md-4 col-sm-6">
-                {{ slot('portfolio4') }}
-            </div>
-            {% endif %}
-            {% if slotHasContent('portfolio5') %}
-            <div class="col-md-4 col-sm-6">
-                {{ slot('portfolio5') }}
-            </div>
-            {% endif %}
-            {% if slotHasContent('portfolio6') %}
-            <div class="col-md-4 col-sm-6">
-                {{ slot('portfolio6') }}
-            </div>
-            {% endif %}
-        </div>
-        <!-- /.row -->
-        {% endif %}
-
-        {% if slotHasContent(['section2_title', 'section2', 'section2_graphic']) %}
-        <!-- Features Section -->
-        <div class="row">
-            {% if slotHasContent('section2_title') %}
-            <div class="col-lg-12">
-                <h2 class="page-header">{{ slot('section2_title') }}</h2>
-            </div>
-            {% endif %}
-            {% if slotHasContent('section2') %}
-            <div class="col-md-6">
-                {{ slot('section2') }}
-            </div>
-            {% endif %}
-            {% if slotHasContent('section2_graphic') %}
-            <div class="col-md-6">
-                {{ slot('section2_graphic') }}
-            </div>
-            {% endif %}
-        </div>
-        <!-- /.row -->
-        {% endif %}
-
-        {% if slotHasContent(['cta', 'cta_button']) %}
-        <hr>
-
-        <!-- Call to Action Section -->
-        <div class="well">
-            <div class="row">
-                {% if slotHasContent('cta') %}
-                <div class="col-md-8">
-                    {{ slot('cta') }}
-                </div>
-                {% endif %}
-                {% if slotHasContent('cta_button') %}
-                <div class="col-md-4">
-                    {{ slot('cta_button') }}
-                </div>
-                {% endif %}
-            </div>
-        </div>
-
-        <hr>
-        {% endif %}
-
-        {% if slotHasContent('footer') %}
-        <!-- Footer -->
-        <footer>
-            <div class="row">
-                <div class="col-lg-12">
-                    {{ slot('footer') }}
-                </div>
-            </div>
-        </footer>
-        {% endif %}
-    </div>
-    <!-- /.container -->
-    {{ slot('builder') }}
+<table align="center" cellpadding="0" cellspacing="0" class="container-for-gmail-android" width="100%">
+    <tr>
+        <td align="center" valign="top" width="100%" style="background-color: #f7f7f7;" class="content-padding">
+            <center>
+                <table cellspacing="0" cellpadding="0" width="600" class="w320">
+                    <tr>
+                        <td class="header-lg" data-slot-container>
+                            <div data-slot="text">
+                                You've received an invitation!
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="free-text" data-slot-container>
+                            <div data-slot="text">
+                                <span><a href="">@JaneDoe</a></span> has invited you to join Awesome inc!
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="mini-block-container">
+                            <table cellspacing="0" cellpadding="0" width="100%"  style="border-collapse:separate !important;">
+                                <tr>
+                                    <td class="mini-block" data-slot-container>
+                                        <div class="user-img" data-slot="text">
+                                            <a href=""><img class="user-img" src="http://s3.amazonaws.com/swu-filepicker/Ei7o4zRgT561k4rLfzTz_profile_pic.jpg" alt="user img" /></a>
+                                            <br /><a href="">@JaneDoe</a>
+                                        </div>
+                                        <div class="user-msg" data-slot="text">
+                                            "Hey Bob,
+                                            here's your invite! Come check out my profile page when you have a chance. You'll love it!"
+                                        </div>
+                                        <div class="button" data-slot="button">
+                                            <!--[if mso]>
+                                                <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="http://" style="height:45px;v-text-anchor:middle;width:155px;" arcsize="15%" strokecolor="#ffffff" fillcolor="#ff6f6f">
+                                                    <w:anchorlock/>
+                                                    <center style="color:#ffffff;font-family:Helvetica, Arial, sans-serif;font-size:14px;font-weight:regular;">Sign Up</center>
+                                                </v:roundrect>
+                                            <![endif]-->
+                                            <a href="http://" style="background-color:#ff6f6f;border-radius:5px;color:#ffffff;display:inline-block;font-family:'Cabin', Helvetica, Arial, sans-serif;font-size:14px;font-weight:regular;line-height:45px;text-align:center;text-decoration:none;width:155px;-webkit-text-size-adjust:none;mso-hide:all;">Sign Up</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </center>
+        </td>
+    </tr>
+    <tr>
+        <td align="center" valign="top" width="100%" style="background-color: #ffffff;  border-top: 1px solid #e5e5e5; border-bottom: 1px solid #e5e5e5;">
+            <center>
+                <table cellpadding="0" cellspacing="0" width="600" class="w320">
+                    <tr>
+                        <td class="header-md" data-slot-container>
+                            <div data-slot="text">
+                                Come check us out!
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="mini-imgs">
+                            <table cellpadding="0" cellspacing="0" width="0"  style="border-collapse:separate !important;">
+                                <tr>
+                                    <td class="mobile-block">
+                                        <table cellspacing="0" cellpadding="0" width="100%" style="border-collapse:separate !important;">
+                                            <tr>
+                                                <td class="mini-img" data-slot-container>
+                                                    <div data-slot="image">
+                                                      <img src="http://s3.amazonaws.com/swu-filepicker/u3EYVdcIQo6dZiKefuLu_bracelet.jpg" alt="product" />
+                                                    </div>
+                                                </td>
+                                                <td class="mini-img" data-slot-container>
+                                                    <div data-slot="image">
+                                                        <img src="http://s3.amazonaws.com/swu-filepicker/yyN7crRfTTW6l8fO0S0S_hat.jpg" alt="product" />
+                                                  </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="mini-img" data-slot-container>
+                                                    <div data-slot="image">
+                                                        <img src="http://s3.amazonaws.com/swu-filepicker/DXWZ4PzwQUGI0wQoABDt_jacket.jpg" alt="product" />
+                                                    </div>
+                                                </td>
+                                                <td class="mini-img" data-slot-container>
+                                                    <div data-slot="image">
+                                                        <img src="http://s3.amazonaws.com/swu-filepicker/RPezUIwPRv8pjatAAH1E_item_images_19.jpg" alt="product" />
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td class="mobile-block">
+                                        <table cellspacing="0" cellpadding="0" width="100%" style="border-collapse:separate !important;">
+                                            <tr>
+                                                <td class="mini-img" data-slot-container>
+                                                    <div data-slot="image">
+                                                        <img src="http://s3.amazonaws.com/swu-filepicker/9wRy50HQTg2CTyZA5Ozi_item_images_16.jpg" alt="product" />
+                                                    </div>
+                                                </td>
+                                                <td class="mini-img" data-slot-container>
+                                                    <div data-slot="image">
+                                                        <img src="http://s3.amazonaws.com/swu-filepicker/RPezUIwPRv8pjatAAH1E_item_images_19.jpg" alt="product" />
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="mini-img" data-slot-container>
+                                                    <div data-slot="image">
+                                                        <img src="http://s3.amazonaws.com/swu-filepicker/DXWZ4PzwQUGI0wQoABDt_jacket.jpg" alt="product" />
+                                                    </div>
+                                                </td>
+                                                <td class="mini-img" data-slot-container>
+                                                    <div data-slot="image">
+                                                        <img src="http://s3.amazonaws.com/swu-filepicker/u3EYVdcIQo6dZiKefuLu_bracelet.jpg" alt="product" />
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </center>
+        </td>
+    </tr>
+    <tr>
+        <td align="center" valign="top" width="100%" style="background-color: #f7f7f7; height: 100px;">
+            <center>
+                <table cellspacing="0" cellpadding="0" width="600" class="w320">
+                    <tr>
+                        <td style="padding: 25px 0 25px" data-slot-container>
+                            <div data-slot="text">
+                                <strong>Awesome Inc</strong><br />
+                                1234 Awesome St <br />
+                                Wonderland <br /><br />
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </center>
+        </td>
+    </tr>
+</table>
 {% endblock %}
