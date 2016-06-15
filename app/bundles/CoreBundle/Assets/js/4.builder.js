@@ -303,7 +303,7 @@ Mautic.initSlotListeners = function() {
             slot.froalaEditor(mQuery.extend(inlineFroalaOptions, Mautic.basicFroalaOptions));
         } else if (type === 'image') {
             // Init Froala editor
-            slot.find('img').froalaEditor({toolbarInline: true});
+            slot.find('img').froalaEditor(Mautic.basicFroalaOptions);
         } else if (type === 'button') {
             slot.find('a').click(function(e) {
                 e.preventDefault();
