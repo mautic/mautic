@@ -71,8 +71,8 @@ class CampaignSubscriber extends CommonSubscriber
             'label'           => 'mautic.stage.campaign.event.change',
             'description'     => 'mautic.stage.campaign.event.change_descr',
             'eventName'       => StageEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-            'formType'        => 'stageaction_list',
-            'formTheme'       => 'MauticStageBundle:FormTheme\StageActionList'
+            'formType'        => 'stageaction_change',
+            'formTheme'       => 'MauticStageBundle:FormTheme\StageActionChange'
         );
         $event->addAction('stage.change', $action);
     }
