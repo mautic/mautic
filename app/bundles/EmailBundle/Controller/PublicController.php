@@ -340,8 +340,9 @@ class PublicController extends CommonFormController
         //bogus ID
         $idHash = 'xxxxxxxxxxxxxx';
 
-        $template = $emailEntity->getTemplate();
-        if (!empty($template)) {
+        $BCcontent = $emailEntity->getContent();
+        if (!empty($BCcontent)) {
+            $template = $emailEntity->getTemplate();
             $slots = $this->factory->getTheme($template)->getSlots('email');
 
             $assetsHelper = $this->factory->getHelper('template.assets');
