@@ -10,7 +10,6 @@
 namespace Mautic\EmailBundle\Model;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\FormModel;
@@ -26,6 +25,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -647,53 +647,74 @@ class EmailModel extends FormModel
 
         $lists     = $email->getLists();
         $listCount = count($lists);
+        $combined  = array(0, 0, 0, 0, 0, 0);
 
-        $combined = $this->translator->trans('mautic.email.lists.combined');
-        $datasets = array(
-            $combined => array(0, 0, 0)
-        );
-
-        $labels = array(
+        $chart = new BarChart(array(
             $this->translator->trans('mautic.email.sent'),
             $this->translator->trans('mautic.email.read'),
-            $this->translator->trans('mautic.email.failed')
-        );
+            $this->translator->trans('mautic.email.failed'),
+            $this->translator->trans('mautic.email.clicked'),
+            $this->translator->trans('mautic.email.unsubscribed'),
+            $this->translator->trans('mautic.email.bounced')
+        ));
 
         if ($listCount) {
             /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
             $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
 
-            foreach ($lists as $l) {
-                $name = $l->getName();
+            /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
+            $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
 
+            /** @var \Mautic\PageBundle\Entity\TrackableRepository $trackableRepo */
+            $trackableRepo = $this->em->getRepository('MauticPageBundle:Trackable');
+
+            $key = ($listCount > 1) ? 1 : 0;
+
+            foreach ($lists as $l) {
                 $sentCount = $statRepo->getSentCount($emailIds, $l->getId());
-                $datasets[$combined][0] += $sentCount;
+                $combined[0] += $sentCount;
 
                 $readCount = $statRepo->getReadCount($emailIds, $l->getId());
-                $datasets[$combined][1] += $readCount;
+                $combined[1] += $readCount;
 
                 $failedCount = $statRepo->getFailedCount($emailIds, $l->getId());
-                $datasets[$combined][2] += $failedCount;
+                $combined[2] += $failedCount;
 
-                $datasets[$name] = array();
+                $clickCount = $trackableRepo->getCount('email', $emailIds, $l->getId());
+                $combined[3] += $clickCount;
 
-                $datasets[$name] = array(
-                    $sentCount,
-                    $readCount,
-                    $failedCount
+                $unsubscribedCount = $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, $l->getId());
+                $combined[4] += $unsubscribedCount;
+
+                $bouncedCount = $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, $l->getId());
+                $combined[5] += $bouncedCount;
+
+                $chart->setDataset(
+                    $l->getName(),
+                    array(
+                        $sentCount,
+                        $readCount,
+                        $failedCount,
+                        $clickCount,
+                        $unsubscribedCount,
+                        $bouncedCount
+                    ),
+                    $key
                 );
 
-                $datasets[$name]['datasetKey'] = $l->getId();
+                $key++;
             }
         }
 
-        if ($listCount === 1) {
-            unset($datasets[$combined]);
+        if ($listCount > 1) {
+            $chart->setDataset(
+                $this->translator->trans('mautic.email.lists.combined'),
+                $combined,
+                0
+            );
         }
 
-        $data = GraphHelper::prepareBarGraphData($labels, $datasets);
-
-        return $data;
+        return $chart->render();
     }
 
     /**
@@ -729,7 +750,7 @@ class EmailModel extends FormModel
 
         $filter = array(
             'email_id' => $emailIds,
-            'flag'     => 'sent_and_opened_and_failed'
+            'flag'     => 'all'
         );
 
         return $this->getEmailsLineChartData($unit, $dateFrom, $dateTo, null, $filter);
@@ -1453,7 +1474,7 @@ class EmailModel extends FormModel
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = $chart->getChartQuery($this->em->getConnection());
 
-        if ($flag == 'sent_and_opened_and_failed' || $flag == 'sent_and_opened' || !$flag) {
+        if ($flag == 'sent_and_opened_and_failed' || $flag == 'all' || $flag == 'sent_and_opened' || !$flag) {
             $q = $query->prepareTimeDataQuery('email_stats', 'date_sent', $filter);
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
@@ -1462,7 +1483,7 @@ class EmailModel extends FormModel
             $chart->setDataset($this->translator->trans('mautic.email.sent.emails'), $data);
         }
 
-        if ($flag == 'sent_and_opened_and_failed' || $flag == 'sent_and_opened' || $flag == 'opened') {
+        if ($flag == 'sent_and_opened_and_failed' || $flag == 'all' || $flag == 'sent_and_opened' || $flag == 'opened') {
             $q = $query->prepareTimeDataQuery('email_stats', 'date_read', $filter);
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
@@ -1471,7 +1492,7 @@ class EmailModel extends FormModel
             $chart->setDataset($this->translator->trans('mautic.email.read.emails'), $data);
         }
 
-        if ($flag == 'sent_and_opened_and_failed' || $flag == 'failed') {
+        if ($flag == 'sent_and_opened_and_failed' || $flag == 'all' || $flag == 'failed') {
             $q = $query->prepareTimeDataQuery('email_stats', 'date_sent', $filter);
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
@@ -1482,7 +1503,66 @@ class EmailModel extends FormModel
             $chart->setDataset($this->translator->trans('mautic.email.failed.emails'), $data);
         }
 
+        if ($flag == 'all' || $flag == 'clicked') {
+            $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', array())
+                ->join('t', MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut', 't.redirect_id = cut.redirect_id')
+                ->andWhere('cut.channel = :channel')
+                ->setParameter('channel', 'email');
+
+            if (isset($filter['email_id'])) {
+                if (is_array($filter['email_id'])) {
+                    $q->andWhere('cut.channel_id IN(:channel_id)');
+                    $q->setParameter('channel_id', implode(',', $filter['email_id']));
+                } else {
+                    $q->andWhere('cut.channel_id = :channel_id');
+                    $q->setParameter('channel_id', $filter['email_id']);
+                }
+            }
+
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.clicked'), $data);
+        }
+
+        if ($flag == 'all' || $flag == 'unsubscribed') {
+            $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::UNSUBSCRIBED, $canViewOthers);
+            $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.unsubscribed'), $data);
+        }
+
+        if ($flag == 'all' || $flag == 'bounced') {
+            $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::BOUNCED, $canViewOthers);
+            $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.bounced'), $data);
+        }
+
         return $chart->render();
+    }
+
+    /**
+     * Modifies the line chart query for the DNC
+     *
+     * @param ChartQuery $q
+     * @param array      $filter
+     * @param boolean    $reason
+     * @param boolean    $canViewOthers
+     */
+    public function getDncLineChartDataset(ChartQuery &$query, array $filter, $reason, $canViewOthers)
+    {
+        $dncFilter = isset($filter['email_id']) ? array('channel_id' => $filter['email_id']) : array();
+        $q = $query->prepareTimeDataQuery('lead_donotcontact', 'date_added', $dncFilter);
+        $q->andWhere('t.channel = :channel')
+            ->setParameter('channel', 'email')
+            ->andWhere($q->expr()->eq('t.reason', ':reason'))
+            ->setParameter('reason', $reason);
+
+        if (!$canViewOthers) {
+            $this->limitQueryToCreator($q);
+        }
+
+        return $data = $query->loadAndBuildTimeData($q);
     }
 
     /**

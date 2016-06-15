@@ -18,7 +18,7 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
 <?php if (!empty($columnOrder)): ?>
 <!-- table section -->
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
-    <div class="page-list"">
+    <div class="page-list">
         <div class="table-responsive table-responsive-force">
             <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
                 <thead>
@@ -70,7 +70,7 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
                 'totalItems'      => $totalResults,
                 'page'            => $reportPage,
                 'limit'           => $limit,
-                'baseUrl'         => $view['router']->generate('mautic_report_view', array(
+                'baseUrl'         => $view['router']->path('mautic_report_view', array(
                     'objectId' => $report->getId()
                 )),
                 'sessionVar'      => 'report.' . $report->getId(),

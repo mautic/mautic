@@ -781,19 +781,6 @@ class PageModel extends FormModel
         return $this->getHitRepository()->getBounces($page->getId());
     }
 
-
-    /**
-     * Get number of page bounces
-     *
-     * @param Page $page
-     *
-     * @return int
-     */
-    public function getDwellTimeStats (Page $page)
-    {
-        return $this->getHitRepository()->getDwellTimes(array('pageIds' => $page->getId()));
-    }
-
     /**
      * Get the variant parent/children
      *
@@ -941,26 +928,6 @@ class PageModel extends FormModel
     }
 
     /**
-     * Get bar chart data of hits
-     *
-     * @param char      $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     *
-     * @return array
-     */
-    public function getHitsBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
-    {
-        $chart     = new BarChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = $chart->getChartQuery($this->em->getConnection());
-        $chartData = $query->fetchTimeData('page_hits', 'date_hit', $filter);
-        $chart->setDataset($this->translator->trans('mautic.page.field.hits'), $chartData);
-        return $chart->render();
-    }
-
-    /**
      * Get line chart data of hits
      *
      * @param char      $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
@@ -996,8 +963,8 @@ class PageModel extends FormModel
         }
 
         if ($flag == 'unique' || $flag == 'total_and_unique') {
-            $filter['groupBy'] = 'lead_id';
             $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', $filter);
+            $q->groupBy('t.lead_id, t.date_hit');
 
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
@@ -1005,7 +972,6 @@ class PageModel extends FormModel
 
             $data = $query->loadAndBuildTimeData($q);
             $chart->setDataset($this->translator->trans('mautic.page.show.unique.visits'), $data);
-            unset($filter['groupBy']);
         }
 
         return $chart->render();
@@ -1054,28 +1020,9 @@ class PageModel extends FormModel
      */
     public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = array(), $canViewOthers = true)
     {
-        $timesOnSite = array(
-            array(
-                'label' => '< 1m',
-                'from' => 0,
-                'till' => 60),
-            array(
-                'label' => '1 - 5m',
-                'from' => 60,
-                'till' => 300),
-            array(
-                'label' => '5 - 10m',
-                'value' => 0,
-                'from' => 300,
-                'till' => 600),
-            array(
-                'label' => '> 10m',
-                'from' => 600,
-                'till' => 999999),
-        );
-
-        $chart = new PieChart();
-        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $timesOnSite = $this->getHitRepository()->getDwellTimeLabels();
+        $chart       = new PieChart();
+        $query       = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         foreach ($timesOnSite as $time) {
             $q = $query->getCountDateDiffQuery('page_hits', 'date_hit', 'date_left', $time['from'], $time['till'], $filters);

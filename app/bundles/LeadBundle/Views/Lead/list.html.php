@@ -88,7 +88,7 @@ if ($tmpl == 'index')
         "page"            => $page,
         "limit"           => $limit,
         "menuLinkId"      => 'mautic_contact_index',
-        "baseUrl"         => $view['router']->generate('mautic_contact_index'),
+        "baseUrl"         => $view['router']->path('mautic_contact_index'),
         "tmpl"            => $indexMode,
         'sessionVar'      => 'lead'
     )); ?>

@@ -15,7 +15,6 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
-use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Form\Type\TagListType;
@@ -369,7 +368,8 @@ class LeadController extends FormController
         $events = array();
         foreach ($eventsByDate as $eventDate => $dateEvents) {
             $datetime = new \DateTime($eventDate);
-            if ($datetime > $fromDate) {
+            if ($datetime >= $fromDate) {
+                $total++;
                 $engagements[] = array(
                     'date' => $eventDate,
                     'data' => 1

@@ -79,7 +79,9 @@ if (typeof History != 'undefined') {
 //set global Chart defaults
 if (typeof Chart != 'undefined') {
     // configure global Chart options
-    Chart.defaults.global.responsive = true;
+    Chart.defaults.global.elements.line.borderWidth = 1;
+    Chart.defaults.global.elements.point.radius = 2;
+    Chart.defaults.global.legend.labels.boxWidth = 12;
     Chart.defaults.global.maintainAspectRatio = false;
 }
 
@@ -925,6 +927,23 @@ var Mautic = {
             Mousetrap.reset();
 
             contentSpecific = mauticContent;
+            
+            // trash created chart objects to save some memory
+            if (typeof Mautic.chartObjects !== 'undefined') {
+                mQuery.each(Mautic.chartObjects, function (i, chart) {
+                    chart.destroy();
+                });
+                Mautic.chartObjects = [];
+            }
+
+            // trash created map objects to save some memory
+            if (typeof Mautic.mapObjects !== 'undefined') {
+                mQuery.each(Mautic.mapObjects, function (i, map) {
+                    map.removeAllMarkers();
+                    map.remove();
+                });
+                Mautic.mapObjects = [];
+            }
         } else if (response && response.mauticContent) {
             contentSpecific = response.mauticContent;
         }
@@ -937,16 +956,6 @@ var Mautic = {
             if (typeof (Mautic.loadedContent[contentSpecific])) {
                 delete Mautic.loadedContent[contentSpecific];
             }
-        }
-
-        // trash created chart objects to save some memory
-        if (typeof Mautic.chartObjects !== 'undefined') {
-            delete Mautic.chartObjects;
-        }
-
-        // trash created map objects to save some memory
-        if (typeof Mautic.mapObjects !== 'undefined') {
-            delete Mautic.mapObjects;
         }
     },
 
@@ -3036,6 +3045,8 @@ var Mautic = {
                         Mautic.renderLineChart(canvas)
                     } else if (canvas.hasClass('pie-chart')) {
                         Mautic.renderPieChart(canvas)
+                    } else if (canvas.hasClass('bar-chart')) {
+                        Mautic.renderBarChart(canvas)
                     } else if (canvas.hasClass('simple-bar-chart')) {
                         Mautic.renderSimpleBarChart(canvas)
                     }
@@ -3051,17 +3062,13 @@ var Mautic = {
      * @param mQuery element canvas
      */
     renderLineChart: function(canvas) {
-        var ctx = canvas[0].getContext("2d");
         var data = mQuery.parseJSON(canvas.text());
         if (!data.labels.length || !data.datasets.length) return;
-        var options = {
-            pointDotRadius : 2,
-            datasetStrokeWidth : 1,
-            bezierCurveTension : 0.2,
-            multiTooltipTemplate: "<%= datasetLabel %>: <%= value %>"
-        }
-        var chart = new Chart(ctx).Line(data, options);
-        canvas.closest('.chart-wrapper').find('.chart-legend').html(chart.generateLegend());
+        var chart = new Chart(canvas, {
+            type: 'line',
+            data: data, 
+            options: {lineTension : 0.2, borderWidth: 1}
+        });
         Mautic.chartObjects.push(chart);
     },
 
@@ -3071,13 +3078,36 @@ var Mautic = {
      * @param mQuery element canvas
      */
     renderPieChart: function(canvas) {
-        var ctx = canvas[0].getContext("2d");
         var data = mQuery.parseJSON(canvas.text());
-        data = Mautic.emulateNoDataForPieChart(data);
-        var options = {segmentStrokeWidth : 1}
-        var pieChart = new Chart(ctx).Pie(data, options);
-        mQuery(canvas).closest('.chart-wrapper').find('.legend').html(pieChart.generateLegend());
-        Mautic.chartObjects.push(pieChart);
+        var options = {borderWidth: 1};
+        var disableLegend = canvas.attr('data-disable-legend');
+        if (typeof disableLegend !== 'undefined' && disableLegend !== false) {
+            options.legend = {
+                display: false
+            }
+        }
+        // data = Mautic.emulateNoDataForPieChart(data);
+        var chart = new Chart(canvas, {
+            type: 'pie',
+            data: data,
+            options: options
+        });
+        Mautic.chartObjects.push(chart);
+    },
+
+    /**
+     * Render the chart.js bar chart
+     *
+     * @param mQuery element canvas
+     */
+    renderBarChart: function(canvas) {
+        var data = mQuery.parseJSON(canvas.text());
+        var chart = new Chart(canvas, {
+            type: 'bar',
+            data: data, 
+            options: {}
+        });
+        Mautic.chartObjects.push(chart);
     },
 
     /**
@@ -3086,17 +3116,21 @@ var Mautic = {
      * @param mQuery element canvas
      */
     renderSimpleBarChart: function(canvas) {
-        var ctx = canvas[0].getContext("2d");
         var data = mQuery.parseJSON(canvas.text());
-        var options = {
-            scaleShowGridLines : false,
-            barShowStroke : false,
-            barValueSpacing : 1,
-            showScale: false,
-            tooltipFontSize: 10,
-            tooltipCaretSize: 0
-        };
-        Mautic.chartObjects.push(new Chart(ctx).Bar(data, options));
+        var chart = new Chart(canvas, {
+            type: 'bar',
+            data: data, 
+            options: {
+                scales: {
+                    xAxes: [{display: false,}],
+                    yAxes: [{display: false,}]
+                },
+                legend: {
+                    display: false
+                }
+            }
+        });
+        Mautic.chartObjects.push(chart);
     },
 
     /**

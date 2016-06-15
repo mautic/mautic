@@ -1118,4 +1118,55 @@ class CampaignModel extends CommonFormModel
 
         return $chart->render();
     }
+
+    /**
+     * Get line chart data of hits
+     *
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $dateFormat
+     * @param array    $filter
+     *
+     * @return array
+     */
+    public function getCampaignMetricsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
+    {
+        $events = array();
+        $chart  = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query  = $chart->getChartQuery($this->em->getConnection());
+        
+        $contacts = $query->fetchTimeData('campaign_leads', 'date_added', $filter);
+        $chart->setDataset($this->translator->trans('mautic.campaign.campaign.leads'), $contacts);
+
+        if (isset($filter['campaign_id'])) {
+            $rawEvents = $this->getEventRepository()->getCampaignEvents($filter['campaign_id']);
+
+            // Group events by type
+            if ($rawEvents) {
+                foreach ($rawEvents as $event) {
+                    if (isset($events[$event['type']])) {
+                        $events[$event['type']][] = $event['id'];
+                    } else {
+                        $events[$event['type']] = array($event['id']);
+                    }
+                }
+            }
+
+            if ($events) {
+                foreach ($events as $type => $eventIds) {
+                    $filter['event_id'] = $eventIds;
+                    $q = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
+                    $rawData = $q->execute()->fetchAll();
+                    if (!empty($rawData)) {
+                        $triggers = $query->completeTimeData($rawData);
+                        $chart->setDataset($this->translator->trans('mautic.campaign.'.$type), $triggers);
+                    }
+                }
+                unset($filter['event_id']);
+            }
+        }
+
+        return $chart->render();
+    }
 }

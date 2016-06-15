@@ -69,9 +69,10 @@ class PointActionHelper
 
         $hitRepository  = $factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
         $lead           = $eventDetails->getLead();
+        $urlWithSqlWC   = str_replace('*', '%', $url);
 
         if ($action['properties']['first_time'] === true) {
-            $hitStats = $hitRepository->getDwellTimes(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
+            $hitStats = $hitRepository->getDwellTimesForUrls(array($urlWithSqlWC), array('leadId' => $lead->getId()));
             if (isset($hitStats['count']) && $hitStats['count']) {
                 $changePoints['first_time'] = false;
             } else {
@@ -81,7 +82,7 @@ class PointActionHelper
 
         if ($action['properties']['accumulative_time']) {
             if (!isset($hitStats)) {
-                $hitStats = $hitRepository->getDwellTimes(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
+                $hitStats = $hitRepository->getDwellTimesForUrls(array($urlWithSqlWC), array('leadId' => $lead->getId()));
             }
             if (isset($hitStats['sum']) && $hitStats['sum'] >= $action['properties']['accumulative_time']) {
                 $changePoints['accumulative_time'] = true;
@@ -92,7 +93,7 @@ class PointActionHelper
 
         if ($action['properties']['page_hits']) {
             if (!isset($hitStats)) {
-                $hitStats = $hitRepository->getDwellTimes(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
+                $hitStats = $hitRepository->getDwellTimesForUrls(array($urlWithSqlWC), array('leadId' => $lead->getId()));
             }
             if (isset($hitStats['count']) && $hitStats['count'] >= $action['properties']['page_hits']) {
                 $changePoints['page_hits'] = true;
@@ -102,7 +103,7 @@ class PointActionHelper
         }
 
         if ($action['properties']['returns_within']) {
-            $latestHit = $hitRepository->getLatestHit(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
+            $latestHit = $hitRepository->getLatestHit(array('leadId' => $lead->getId(), $urlWithSqlWC));
             $latestPlus = clone $latestHit;
             $latestPlus->add(new \DateInterval('PT' . $action['properties']['returns_within'] . 'S'));
             $now = new \dateTime();
@@ -115,7 +116,7 @@ class PointActionHelper
 
         if ($action['properties']['returns_after']) {
             if (!isset($latestHit)) {
-                $latestHit = $hitRepository->getLatestHit(array('leadId' => $lead->getId(), 'urls' => str_replace('*', '%', $url)));
+                $latestHit = $hitRepository->getLatestHit(array('leadId' => $lead->getId(), $urlWithSqlWC));
             }
             $latestPlus = clone $latestHit;
             $latestPlus->add(new \DateInterval('PT' . $action['properties']['returns_after'] . 'S'));
