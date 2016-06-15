@@ -1077,7 +1077,7 @@ class ListModel extends FormModel
 
     public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true, $listName){
 
-        $chart = new PieChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         if (!$canViewOthers) {
@@ -1101,7 +1101,7 @@ class ListModel extends FormModel
             );
         }
 
-        return $chart->render();
+        return $chart->render(false);
     }
     
     /**
@@ -1117,8 +1117,6 @@ class ListModel extends FormModel
      */
     public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
     {
-        $chart     = new BarChart($unit, $dateFrom, $dateTo, $dateFormat);
-
         $data['values'] = array();
         $data['labels'] = array();
 
@@ -1150,7 +1148,7 @@ class ListModel extends FormModel
 
         $results = $q->execute()->fetchAll();
         foreach($results as $result){
-            $data['labels'][]=$result['stage'];
+            $data['labels'][]=substr($result['stage'],0,12);
             $data['values'][]=$result['leads'];
 
         }
@@ -1161,6 +1159,9 @@ class ListModel extends FormModel
             'label' => $this->translator->trans('mautic.lead.leads'),
             'data'  => $data['values'],
         );
+
+        $chart     = new BarChart($data['labels']);
+
         $datasetId = count($data['values']);
         $datasets[] = array_merge($baseData, $chart->generateColors($datasetId));
 

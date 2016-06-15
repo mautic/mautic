@@ -230,6 +230,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $list['name']
                     );
                     $items['columnName'][] = $list['name'];
+                    $items['value'][] = $list['leads'];
                     $items['link'][] = $listUrl;
                     $items['chartItems'][] = $column;
 
@@ -240,11 +241,12 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $params['filter'],
                         $canViewOthers);
                 }
-                $with = 100/count($lists);
-
+                $width = 100/count($lists);
+                $this->factory->getLogger()->addError(print_r($column,true));
                 $event->setTemplateData(array(
                     'columnName' => $items['columnName'],
-                    'width' => $with,
+                    'value' => $items['value'],
+                    'width' => $width,
                     'link' => $items['link'],
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 180,
@@ -387,7 +389,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 // Build table rows with links
                 if ($leads) {
                     foreach ($leads as &$lead) {
-                        $leadUrl = $this->factory->getRouter()->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $lead['id']));
+                        $leadUrl = $this->factory->getRouter()->generate('mautic_lead_action', array('objectAction' => 'view', 'objectId' => $lead['id']));
                         $row = array(
                             array(
                                 'value' => $lead['name'],
