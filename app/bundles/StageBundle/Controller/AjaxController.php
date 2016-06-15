@@ -43,7 +43,6 @@ class AjaxController extends CommonAjaxController
                     $themes[] = $actions['actions'][$type]['formTheme'];
                 }
 
-                $formType        = (!empty($actions['actions'][$type]['formType'])) ? $actions['actions'][$type]['formType'] : 'genericstage_settings';
                 $formTypeOptions = (!empty($actions['actions'][$type]['formTypeOptions'])) ? $actions['actions'][$type]['formTypeOptions'] : array();
                 $form            = $this->get('form.factory')->create('stageaction', array(), array('formType' => $formType, 'formTypeOptions' => $formTypeOptions));
                 $html            = $this->renderView('MauticStageBundle:Stage:actionform.html.php', array(

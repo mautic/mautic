@@ -84,16 +84,6 @@ class StageType extends AbstractType
             ),
         ));
 
-        $type = (!empty($options['actionType'])) ? $options['actionType'] : $options['data']->getType();
-        if ($type) {
-            $formType   =  (!empty($options['stageActions']['actions'][$type]['formType'])) ?
-                $options['stageActions']['actions'][$type]['formType'] : 'genericstage_settings';
-            $properties = ($options['data']) ? $options['data']->getProperties() : array();
-            $builder->add('properties', $formType, array(
-                'label' => false,
-                'data'  => $properties
-            ));
-        }
 
         if (!empty($options['data']) && $options['data'] instanceof Stage) {
             $readonly = !$this->security->hasEntityAccess(

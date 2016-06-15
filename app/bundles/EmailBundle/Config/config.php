@@ -117,18 +117,21 @@ return [
             'mautic.email.search.subscriber'         => [
                 'class' => 'Mautic\EmailBundle\EventListener\SearchSubscriber'
             ],
-            'mautic.email.webhook.subscriber'                => [
+            'mautic.email.webhook.subscriber'        => [
                 'class' => 'Mautic\EmailBundle\EventListener\WebhookSubscriber'
             ],
             'mautic.email.configbundle.subscriber'   => [
                 'class' => 'Mautic\EmailBundle\EventListener\ConfigSubscriber'
             ],
-            'mautic.email.pagebundle.subscriber'   => [
+            'mautic.email.pagebundle.subscriber'     => [
                 'class' => 'Mautic\EmailBundle\EventListener\PageSubscriber'
             ],
-            'mautic.email.dashboard.subscriber'           => [
+            'mautic.email.dashboard.subscriber'      => [
                 'class' => 'Mautic\EmailBundle\EventListener\DashboardSubscriber'
             ],
+            'mautic.email.stagebundle.subscriber'    => [
+                'class' => 'Mautic\EmailBundle\EventListener\StageSubscriber'
+            ]
         ],
         'forms'  => [
             'mautic.form.type.email'                          => [

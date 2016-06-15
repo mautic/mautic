@@ -58,7 +58,7 @@ class CampaignSubscriber extends CommonSubscriber
     {
         return array(
             CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],
-            StageEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0]
+            StageEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerActionChangeStage', 0]
         );
     }
 
@@ -71,9 +71,8 @@ class CampaignSubscriber extends CommonSubscriber
             'label'           => 'mautic.stage.campaign.event.change',
             'description'     => 'mautic.stage.campaign.event.change_descr',
             'eventName'       => StageEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-            'formType'        => 'stagechange',
-            'formTypeOptions' => array('update_select' => 'campaignevent_properties_stage'),
-            'formTheme'       => 'MauticStageBundle:FormTheme\StageChange'
+            'formType'        => 'stageaction_list',
+            'formTheme'       => 'MauticStageBundle:FormTheme\StageActionList'
         );
         $event->addAction('stage.change', $action);
     }
@@ -81,32 +80,31 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * @param CampaignExecutionEvent $event
      */
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerActionChangeStage(CampaignExecutionEvent $event)
     {
         $stageChange = false;
         $lead = $event->getLead();
+        $leadStage = null;
 
         if ($lead instanceof Lead) {
-            $fields = $lead->getFields();
-
-            $leadCredentials       = $this->leadModel->flattenFields($fields);
-            $leadCredentials['id'] = $lead->getId();
-        } else {
-            $leadCredentials = $lead;
+            $leadStage = $lead->getStage();
         }
 
         $stageId = (int) $event->getConfig()['stage'];
+        $stageToChangeTo = $this->stageModel->getEntity($stageId);
 
-        if (!empty($leadCredentials['stage']) && $leadCredentials['stage'] > $stageId) {
-            $stageChange = true;
+        if ($stageToChangeTo != null && $stageToChangeTo->isPublished()) {
+            if($leadStage && $leadStage->getWeight() < $stageToChangeTo->getWeight()){
+                $stageChange = true;
+            }
+            elseif(!$leadStage){
+
+                $stageChange = true;
+            }
         }
 
         if ($stageChange){
-            $stage = $this->stageModel->getEntity($stageId);
-
-            if ($stage != null && $stage->isPublished()) {
-                $this->factory->getModel('stage')->triggerAction('campaign.action', $event['campaign']['id']);
-            }
+                $this->factory->getModel('stage')->triggerAction('campaign.action', $event['campaign']['id'],null,$lead);
         }
 
         return $event->setResult($stageChange);

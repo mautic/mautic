@@ -77,7 +77,13 @@ return [
             ],
             'mautic.stage.type.action'                => [
                 'class' => 'Mautic\StageBundle\Form\Type\StageActionType',
+                'arguments' => 'mautic.factory',
                 'alias' => 'stageaction'
+            ],
+            'mautic.stage.type.action_list'                => [
+                'class' => 'Mautic\StageBundle\Form\Type\StageActionListType',
+                'arguments' => 'mautic.factory',
+                'alias' => 'stageaction_list'
             ]
         ],
         'models' =>  [

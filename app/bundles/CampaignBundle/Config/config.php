@@ -82,9 +82,6 @@ return array(
             'mautic.campaign.pointbundle.subscriber'    => array(
                 'class' => 'Mautic\CampaignBundle\EventListener\PointSubscriber'
             ),
-            'mautic.campaign.stagebundle.subscriber'    => array(
-                'class' => 'Mautic\CampaignBundle\EventListener\StageSubscriber'
-            ),
             'mautic.campaign.search.subscriber'         => array(
                 'class' => 'Mautic\CampaignBundle\EventListener\SearchSubscriber'
             ),

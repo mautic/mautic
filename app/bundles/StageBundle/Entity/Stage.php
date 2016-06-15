@@ -60,7 +60,6 @@ class Stage extends FormEntity
      */
     private $publishDown;
 
-
     /**
      * @var array
      */
@@ -88,6 +87,7 @@ class Stage extends FormEntity
      */
     public function __construct()
     {
+        $this->properties = new ArrayCollection();
         $this->log = new ArrayCollection();
     }
 
@@ -181,7 +181,7 @@ class Stage extends FormEntity
      *
      * @param array $properties
      *
-     * @return Action
+     * @return array
      */
     public function setProperties ($properties)
     {
@@ -207,7 +207,7 @@ class Stage extends FormEntity
      *
      * @param string $type
      *
-     * @return Action
+     * @return string
      */
     public function setType ($type)
     {
@@ -232,7 +232,7 @@ class Stage extends FormEntity
      *
      * @param integer $weight
      *
-     * @return Action
+     * @return integer
      */
     public function setWeight ($type)
     {
@@ -264,7 +264,7 @@ class Stage extends FormEntity
      *
      * @param string $description
      *
-     * @return Action
+     * @return string
      */
     public function setDescription ($description)
     {
@@ -289,7 +289,7 @@ class Stage extends FormEntity
      *
      * @param string $name
      *
-     * @return Action
+     * @return string
      */
     public function setName ($name)
     {

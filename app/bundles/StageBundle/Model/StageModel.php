@@ -10,6 +10,7 @@
 namespace Mautic\StageBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\StageBundle\Entity\Action;
 use Mautic\StageBundle\Entity\LeadStageLog;
@@ -22,6 +23,7 @@ use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Class StageModel
@@ -49,7 +51,7 @@ class StageModel extends CommonFormModel
      * @param Session $session
      * @param LeadModel $leadModel
      */
-    public function __construct(Session $session,  LeadModel $leadModel)
+    public function __construct(LeadModel $leadModel, Session $session)
     {
         $this->session = $session;
         $this->leadModel = $leadModel;
