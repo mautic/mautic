@@ -144,7 +144,7 @@ class EmailType extends AbstractType
             array(
                 'feature'     => 'email',
                 'attr'        => array(
-                    'class'    => 'form-control',
+                    'class'    => 'form-control not-chosen hidden',
                     'tooltip'  => 'mautic.email.form.template.help',
                 ),
                 'empty_value' => 'mautic.core.none'

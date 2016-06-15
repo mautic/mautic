@@ -31,6 +31,8 @@ $view['assets']->addScriptDeclaration('var mauticEntityId = '.$email->getSession
 if (!isset($attachmentSize)) {
     $attachmentSize = 0;
 }
+
+// echo "<pre>";var_dump($form);die("</pre>");
 ?>
 
 
@@ -49,11 +51,6 @@ if (!isset($attachmentSize)) {
                 <div class="tab-content pa-md">
                     <div class="tab-pane fade in active bdr-w-0" id="email-container">
                         <div class="row">
-                            <div class="col-md-4">
-                                <?php echo $view['form']->row($form['template']); ?>
-                            </div>
-                        </div>
-                        <div class="row">
                             <div class="custom-html-mask">
                                 <div class="well text-center col-md-6 col-md-offset-3">
                                     <h3 style="padding: 30px;">
@@ -64,24 +61,35 @@ if (!isset($attachmentSize)) {
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <?php echo $view['form']->row($form['template']); ?>
+                            </div>
+                        </div>
                         <?php if ($themes) : ?>
                         <div class="row">
                             <?php foreach ($themes as $themeKey => $themeInfo) : ?>
-                                <div class="col-md-2">
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
-                                            <h3 class="panel-title"><?php echo $themeInfo['name']; ?></h3>
-                                        </div>
+                                <div class="col-md-3 theme-list">
+                                <div class="panel panel-<?php  ?>default">
+                                    <div class="panel-body">
+                                    <h3 class="text-center"><?php echo $themeInfo['name']; ?></h3>
+                                    <?php if (file_exists($themeInfo['dir'].'/thumbnail.png')) : ?>
+                                        <div style="background-image: url(<?php echo $view['assets']->getUrl('themes/'.$themeKey.'/thumbnail.png') ?>);background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 250px"></div>
+                                    <?php else : ?>
                                         <div class="panel-body text-center" style="height: 250px">
-                                            <?php if (file_exists($themeInfo['dir'].'/thumbnail.png')) : ?>
-                                                <div style="background-image: url(<?php echo $view['assets']->getUrl('themes/'.$themeKey.'/thumbnail.png') ?>);background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 100%"></div>
-                                            <?php else : ?>
-                                                <i class="fa fa-file-image-o fa-5x text-muted" aria-hidden="true" style="padding-top: 75px; color: #E4E4E4"></i>
-                                            <?php endif; ?>
+                                            <i class="fa fa-file-image-o fa-5x text-muted" aria-hidden="true" style="padding-top: 75px; color: #E4E4E4;"></i>
                                         </div>
+                                    <?php endif; ?>
+                                    <div class="text-center">
+                                        <a href="#" data-theme="<?php echo $themeKey; ?>">Select</a>
+                                        <!-- |
+                                        <a href="#">Preview</a> -->
                                     </div>
                                 </div>
+                                </div>
+                                </div>
                             <?php endforeach; ?>
+                            <div class="clearfix"></div>
                         </div>
                         <?php endif; ?>
                     </div>

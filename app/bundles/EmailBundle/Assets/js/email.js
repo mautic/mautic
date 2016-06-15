@@ -127,6 +127,8 @@ Mautic.emailOnLoad = function (container, response) {
         Mautic.refreshCodeEditors();
         Mautic.initCodeEditors();
     });
+
+    Mautic.intiSelectTheme();
 };
 
 Mautic.emailOnUnload = function(id) {
@@ -139,6 +141,13 @@ Mautic.emailOnUnload = function(id) {
         // CKEDITOR.instances['emailform_plainText'].destroy(true);
     }
 };
+
+Mautic.intiSelectTheme = function() {
+    mQuery('[data-theme]').click(function(e) {
+        e.preventDefault();
+        mQuery('#emailform_template').val(mQuery(this).attr('data-theme'));
+    });
+}
 
 Mautic.renderListCompareChart = function (chartData) {
     if (!mQuery("#list-compare-chart").length) {
