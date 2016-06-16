@@ -238,7 +238,7 @@ return [
             'mautic.helper.user' => [
                 'class' => 'Mautic\CoreBundle\Helper\UserHelper',
                 'arguments' => [
-                    'security.context'
+                    'security.token_storage'
                 ]
             ],
             'mautic.helper.core_parameters' => [

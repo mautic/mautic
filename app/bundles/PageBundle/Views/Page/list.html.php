@@ -75,7 +75,7 @@ $view->extend('MauticPageBundle:Page:index.html.php');
                         </td>
                         <td>
                             <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'page.page')); ?>
-                            <a href="<?php echo $view['router']->generate('mautic_page_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
+                            <a href="<?php echo $view['router']->path('mautic_page_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
                                 <?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)
                                 <?php
                                 $hasVariants   = count($variantChildren);
@@ -110,7 +110,7 @@ $view->extend('MauticPageBundle:Page:index.html.php');
             "page"            => $page,
             "limit"           => $limit,
             "menuLinkId"      => 'mautic_page_index',
-            "baseUrl"         => $view['router']->generate('mautic_page_index'),
+            "baseUrl"         => $view['router']->path('mautic_page_index'),
             'sessionVar'      => 'page'
         )); ?>
         </div>

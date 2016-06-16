@@ -42,7 +42,7 @@ $view['slots']->set(
                     'attr'      => array(
                         'data-toggle' => '',
                         'target'      => '_blank',
-                        'href'        => $view['router']->generate(
+                        'href'        => $view['router']->path(
                             'mautic_form_action',
                             array('objectAction' => 'preview', 'objectId' => $activeForm->getId())
                         ),
@@ -54,7 +54,7 @@ $view['slots']->set(
                 array(
                     'attr'      => array(
                         'data-toggle' => 'ajax',
-                        'href'        => $view['router']->generate(
+                        'href'        => $view['router']->path(
                             'mautic_form_action',
                             array('objectAction' => 'results', 'objectId' => $activeForm->getId())
                         ),
@@ -302,7 +302,7 @@ $isStandalone = $activeForm->isStandalone();
                 <div class="modal-body">
                     <p><?php echo $view['translator']->trans('mautic.form.form.help.automaticcopy'); ?></p>
                     <h3><?php echo $view['translator']->trans('mautic.form.form.help.automaticcopy.js'); ?></h3>
-                    <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;script type="text/javascript" src="<?php echo $view['router']->generate(
+                    <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;script type="text/javascript" src="<?php echo $view['router']->path(
                             'mautic_form_generateform',
                             array('id' => $activeForm->getId()),
                             true
@@ -310,7 +310,7 @@ $isStandalone = $activeForm->isStandalone();
                     <h3 class="pt-lg"><?php echo $view['translator']->trans(
                             'mautic.form.form.help.automaticcopy.iframe'
                         ); ?></h3>
-                    <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;iframe src="<?php echo $view['router']->generate(
+                    <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;iframe src="<?php echo $view['router']->path(
                             'mautic_form_preview',
                             array('id' => $activeForm->getId()),
                             true

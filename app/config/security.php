@@ -91,12 +91,12 @@ $container->loadFromExtension(
             'main'                 => array(
                 'pattern'     => "^/s/",
                 'simple_form' => array(
-                    'authenticator'   => 'mautic.user.form_authenticator',
-                    'csrf_provider'   => 'form.csrf_provider',
-                    'success_handler' => 'mautic.security.authentication_handler',
-                    'failure_handler' => 'mautic.security.authentication_handler',
-                    'login_path'      => '/s/login',
-                    'check_path'      => '/s/login_check'
+                    'authenticator'        => 'mautic.user.form_authenticator',
+                    'csrf_token_generator' => 'security.csrf.token_manager',
+                    'success_handler'      => 'mautic.security.authentication_handler',
+                    'failure_handler'      => 'mautic.security.authentication_handler',
+                    'login_path'           => '/s/login',
+                    'check_path'           => '/s/login_check'
                 ),
                 'logout'      => array(
                     'handlers' => array(
@@ -106,7 +106,7 @@ $container->loadFromExtension(
                     'target'   => '/s/login'
                 ),
                 'remember_me' => array(
-                    'key'      => '%mautic.rememberme_key%',
+                    'secret'   => '%mautic.rememberme_key%',
                     'lifetime' => '%mautic.rememberme_lifetime%',
                     'path'     => '%mautic.rememberme_path%',
                     'domain'   => '%mautic.rememberme_domain%'

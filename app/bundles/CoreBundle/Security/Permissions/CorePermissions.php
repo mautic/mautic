@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Security\Permissions;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\Permission;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -25,6 +26,11 @@ class CorePermissions
      * @var Translator
      */
     private $translator;
+
+    /**
+     * @var UserHelper
+     */
+    protected $userHelper;
 
     /**
      * @var EntityManager
@@ -61,7 +67,7 @@ class CorePermissions
      * @param                       $bundles
      * @param                       $pluginBundles
      */
-    public function __construct(TranslatorInterface $translator, EntityManager $em, TokenStorageInterface $tokenStorage, array $parameters, $bundles, $pluginBundles)
+    public function __construct(UserHelper $userHelper, TranslatorInterface $translator, EntityManager $em, TokenStorageInterface $tokenStorage, array $parameters, $bundles, $pluginBundles)
     {
         $this->translator    = $translator;
         $this->em            = $em;
@@ -69,6 +75,7 @@ class CorePermissions
         $this->params        = $parameters;
         $this->bundles       = $bundles;
         $this->pluginBundles = $pluginBundles;
+        $this->userHelper    = $userHelper;
     }
 
     /**
@@ -242,7 +249,7 @@ class CorePermissions
         static $grantedPermissions = array();
 
         if ($userEntity === null) {
-            $userEntity = $this->getUser();
+            $userEntity = $this->userHelper->getUser();
         }
 
         if (!is_array($requestedPermission)) {
@@ -368,7 +375,7 @@ class CorePermissions
      */
     public function hasEntityAccess($ownPermission, $otherPermission, $ownerId = 0)
     {
-        $user = $this->getUser();
+        $user = $this->userHelper->getUser();
         if (!is_object($user)) {
             //user is likely anon. so assume no access and let controller handle via published status
             return false;
@@ -407,9 +414,9 @@ class CorePermissions
             } else {
                 return false;
             }
-        } elseif ($own && (int) $this->getUser()->getId() === (int) $ownerId) {
+        } elseif ($own && (int) $this->userHelper->getUser()->getId() === (int) $ownerId) {
             return true;
-        } elseif ($other && (int) $this->getUser()->getId() !== (int) $ownerId) {
+        } elseif ($other && (int) $this->userHelper->getUser()->getId() !== (int) $ownerId) {
             return true;
         } else {
             return false;
@@ -444,23 +451,11 @@ class CorePermissions
     }
 
     /**
-     * @return User|mixed
-     */
-    public function getUser()
-    {
-        $user = new User();
-        if ($token = $this->getTokenStorage()->getToken()) {
-            $user = $token->getUser();
-        }
-        return $user;
-    }
-
-    /**
      * @return bool
      */
     public function isAnonymous()
     {
-        $userEntity = $this->getUser();
+        $userEntity = $this->userHelper->getUser();
         return ($userEntity instanceof User && $userEntity->getId()) ? false : true;
     }
 
