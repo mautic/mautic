@@ -321,6 +321,8 @@ Mautic.initSlotListeners = function() {
             params.slot.css(fieldParam, params.field.val() + 'px');
         } else if (fieldParam === 'href') {
             params.slot.find('a').attr('href', params.field.val());
+        } else if (fieldParam === 'link-text') {
+            params.slot.find('a').text(params.field.val());
         }
     });
 

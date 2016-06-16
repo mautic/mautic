@@ -37,6 +37,16 @@ class SlotButtonType extends SlotType
                 'data-slot-param' => 'href',
             ),
         ));
+
+        $builder->add('link-text', 'text', array(
+            'label'      => 'mautic.core.button.text',
+            'label_attr' => array('class' => 'control-label'),
+            'required'   => false,
+            'attr'       => array(
+                'class'           => 'form-control',
+                'data-slot-param' => 'link-text',
+            ),
+        ));
     }
 
     /**
