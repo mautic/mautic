@@ -302,6 +302,7 @@ return [
             'mautic.security'                    => [
                 'class'     => 'Mautic\CoreBundle\Security\Permissions\CorePermissions',
                 'arguments' => [
+                    'mautic.helper.user',
                     'translator',
                     'doctrine.orm.entity_manager',
                     'security.token_storage',
