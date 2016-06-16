@@ -18,6 +18,10 @@ body > .container {
     background-color: rgba(255, 255, 255, 0.9);
     padding: 20px;
 }
+.container-transparent {
+    width: 970px;
+    margin: 20px auto;
+}
 .main-block.bg-primary {
     padding: 20px;
     margin: 20px auto;
