@@ -17,6 +17,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignDecisionEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Event\CampaignScheduledEvent;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -76,20 +77,27 @@ class EventModel extends CommonFormModel
     protected $logger;
 
     /**
-     * EventModel constructor.
-     * 
-     * @param IpLookupHelper $ipLookupHelper
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param LeadModel $leadModel
-     * @param CampaignModel $campaignModel
+     * @var MauticFactory
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, CoreParametersHelper $coreParametersHelper, LeadModel $leadModel, CampaignModel $campaignModel)
+    protected $factory;
+
+    /**
+     * EventModel constructor.
+     *
+     * @param IpLookupHelper       $ipLookupHelper
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param LeadModel            $leadModel
+     * @param CampaignModel        $campaignModel
+     * @param MauticFactory        $factory
+     */
+    public function __construct(IpLookupHelper $ipLookupHelper, CoreParametersHelper $coreParametersHelper, LeadModel $leadModel, CampaignModel $campaignModel, MauticFactory $factory)
     {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->leadModel = $leadModel;
-        $this->campaignModel = $campaignModel;
-        $this->batchSleepTime = $coreParametersHelper->getParameter('mautic.batch_sleep_time');
+        $this->ipLookupHelper         = $ipLookupHelper;
+        $this->leadModel              = $leadModel;
+        $this->campaignModel          = $campaignModel;
+        $this->batchSleepTime         = $coreParametersHelper->getParameter('mautic.batch_sleep_time');
         $this->batchCampaignSleepTime = $coreParametersHelper->getParameter('mautic.batch_campaign_sleep_time');
+        $this->factory                = $factory;
     }
 
     /**
@@ -1619,31 +1627,83 @@ class EventModel extends CommonFormModel
      */
     public function invokeEventCallback($event, $settings, $lead = null, $eventDetails = null, $systemTriggered = false, LeadEventLog $log = null)
     {
-        // Create a campaign event with a default successful result
-        $campaignEvent = new CampaignExecutionEvent([
-            'eventSettings'   => $settings,
-            'eventDetails'    => $eventDetails,
-            'event'           => $event,
-            'lead'            => $lead,
-            'systemTriggered' => $systemTriggered,
-            'config'          => $event['properties']
-        ], true, $log);
-        
-        $eventName = array_key_exists('eventName', $settings) ? $settings['eventName'] : null;
-        
-        if ($eventName && $this->dispatcher->hasListeners($eventName)) {
-            $this->dispatcher->dispatch($eventName, $campaignEvent);
-            
-            if ($event['eventType'] !== 'decision' && $this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_EXECUTION)) {
-                $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_EXECUTION, $campaignEvent);
+        if (isset($settings['eventName'])) {
+            // Create a campaign event with a default successful result
+            $campaignEvent = new CampaignExecutionEvent([
+                'eventSettings'   => $settings,
+                'eventDetails'    => $eventDetails,
+                'event'           => $event,
+                'lead'            => $lead,
+                'systemTriggered' => $systemTriggered,
+                'config'          => $event['properties']
+            ], true, $log);
+
+            $eventName = array_key_exists('eventName', $settings) ? $settings['eventName'] : null;
+
+            if ($eventName && $this->dispatcher->hasListeners($eventName)) {
+                $this->dispatcher->dispatch($eventName, $campaignEvent);
+
+                if ($event['eventType'] !== 'decision' && $this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_EXECUTION)) {
+                    $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_EXECUTION, $campaignEvent);
+                }
+
+                if ($campaignEvent->wasLogUpdatedByListener()) {
+                    $campaignEvent->setResult($campaignEvent->getLogEntry());
+                }
             }
-            
-            if ($campaignEvent->wasLogUpdatedByListener()) {
-                $campaignEvent->setResult($campaignEvent->getLogEntry());
-            }
+
+            return $campaignEvent->getResult();
         }
-        
-        return $campaignEvent->getResult();
+
+        /**
+         * @deprecated 2.0 - to be removed in 3.0; Use the new eventName method instead
+         */
+        if (isset($settings['callback']) && is_callable($settings['callback'])) {
+            $args = array(
+                'eventSettings'   => $settings,
+                'eventDetails'    => $eventDetails,
+                'event'           => $event,
+                'lead'            => $lead,
+                'factory'         => $this->factory,
+                'systemTriggered' => $systemTriggered,
+                'config'          => $event['properties']
+            );
+
+            if (is_array($settings['callback'])) {
+                $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
+            } elseif (strpos($settings['callback'], '::') !== false) {
+                $parts      = explode('::', $settings['callback']);
+                $reflection = new \ReflectionMethod($parts[0], $parts[1]);
+            } else {
+                $reflection = new \ReflectionMethod(null, $settings['callback']);
+            }
+
+            $pass = array();
+            foreach ($reflection->getParameters() as $param) {
+                if (isset($args[$param->getName()])) {
+                    $pass[] = $args[$param->getName()];
+                } else {
+                    $pass[] = null;
+                }
+            }
+
+            $result = $reflection->invokeArgs($this, $pass);
+
+            if ('decision' != $event['eventType'] && $this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_EXECUTION)) {
+                $executionEvent = $this->dispatcher->dispatch(
+                    CampaignEvents::ON_EVENT_EXECUTION,
+                    new CampaignExecutionEvent($args, $result, $log)
+                );
+
+                if ($executionEvent->wasLogUpdatedByListener()) {
+                    $result = $executionEvent->getLogEntry();
+                }
+            }
+        } else {
+            $result = true;
+        }
+
+        return $result;
     }
 
     /**

@@ -70,7 +70,7 @@ $view['slots']->set("headerTitle", $header);
                                             </li>
                                             <?php foreach ($event as $k => $e): ?>
                                                 <li id="event_<?php echo $k; ?>">
-                                                    <a data-toggle="ajaxmodal" data-target="#triggerEventModal" class="list-group-item" href="<?php echo $view['router']->generate('mautic_pointtriggerevent_action', array('objectAction' => 'new', 'type' => $k, 'tmpl'=> 'event', 'triggerId' => $sessionId)); ?>">
+                                                    <a data-toggle="ajaxmodal" data-target="#triggerEventModal" class="list-group-item" href="<?php echo $view['router']->path('mautic_pointtriggerevent_action', array('objectAction' => 'new', 'type' => $k, 'tmpl'=> 'event', 'triggerId' => $sessionId)); ?>">
                                                         <div data-toggle="tooltip" title="<?php echo $e['description']; ?>">
                                                             <span><?php echo $e['label']; ?></span>
                                                         </div>

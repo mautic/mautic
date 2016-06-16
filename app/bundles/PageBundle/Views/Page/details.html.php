@@ -26,7 +26,7 @@ if ((empty($variants['parent']) || ($variants['parent']->getId() == $activePage-
     $customButtons[] = array(
         'attr'      => array(
             'data-toggle' => 'ajax',
-            'href'        => $view['router']->generate(
+            'href'        => $view['router']->path(
                 'mautic_page_action',
                 array("objectAction" => 'abtest', 'objectId' => $activePage->getId())
             ),
@@ -273,7 +273,7 @@ $view['slots']->set(
                                                         </div>
                                                     <?php endif; ?>
                                                     <h5 class="fw-sb text-primary">
-                                                        <a href="<?php echo $view['router']->generate(
+                                                        <a href="<?php echo $view['router']->path(
                                                             'mautic_page_action',
                                                             array(
                                                                 'objectAction' => 'view',
@@ -366,7 +366,7 @@ $view['slots']->set(
                                                                  ); ?>">
                                                                 <a class="btn btn-warning"
                                                                    data-toggle="confirmation"
-                                                                   href="<?php echo $view['router']->generate(
+                                                                   href="<?php echo $view['router']->path(
                                                                        'mautic_page_action',
                                                                        array(
                                                                            'objectAction' => 'winner',
@@ -395,7 +395,7 @@ $view['slots']->set(
                                                             </div>
                                                         <?php endif; ?>
                                                         <h5 class="fw-sb text-primary">
-                                                            <a href="<?php echo $view['router']->generate(
+                                                            <a href="<?php echo $view['router']->path(
                                                                 'mautic_page_action',
                                                                 array(
                                                                     'objectAction' => 'view',
@@ -487,7 +487,7 @@ $view['slots']->set(
                                             </div>
                                             <div class="col-md-7 va-m">
                                                 <h5 class="fw-sb text-primary">
-                                                    <a href="<?php echo $view['router']->generate(
+                                                    <a href="<?php echo $view['router']->path(
                                                         'mautic_page_action',
                                                         array(
                                                             'objectAction' => 'view',
@@ -539,7 +539,7 @@ $view['slots']->set(
                                                 </div>
                                                 <div class="col-md-7 va-m">
                                                     <h5 class="fw-sb text-primary">
-                                                        <a href="<?php echo $view['router']->generate(
+                                                        <a href="<?php echo $view['router']->path(
                                                             'mautic_page_action',
                                                             array(
                                                                 'objectAction' => 'view',
@@ -581,7 +581,7 @@ $view['slots']->set(
             <div class="pa-md">
                 <div class="text-center" style="height: 100%; width: 100%; ">
                     <h3 style="padding: 30px;">
-                        <a class="create-abtest-link" href="<?php echo $view['router']->generate(
+                        <a class="create-abtest-link" href="<?php echo $view['router']->path(
                             'mautic_page_action',
                             array('objectAction' => 'abtest', 'objectId' => $activePage->getId())
                         ); ?>" data-toggle="ajax">

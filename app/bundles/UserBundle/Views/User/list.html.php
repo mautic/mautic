@@ -101,7 +101,7 @@ endif;
         "totalItems" => count($items),
         "page"       => $page,
         "limit"      => $limit,
-        "baseUrl"    =>  $view['router']->generate('mautic_user_index'),
+        "baseUrl"    =>  $view['router']->path('mautic_user_index'),
         'sessionVar' => 'user'
     )); ?>
     </div>
