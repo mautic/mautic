@@ -201,14 +201,16 @@ class CommonSubscriber implements EventSubscriberInterface
                         $defaults['_format'] = 'json';
                     }
 
-                    // Set requirements
-                    $requirements = (!empty($details['requirements'])) ? $details['requirements'] : array();
+                    $method = '';
 
                     if (isset($details['method'])) {
-                        $requirements['_method'] = $details['method'];
-                    } elseif ($type == 'api') {
-                        $requirements['_method'] = 'GET';
+                        $method = $details['method'];
+                    } elseif ($type === 'api') {
+                        $method = 'GET';
                     }
+
+                    // Set requirements
+                    $requirements = (!empty($details['requirements'])) ? $details['requirements'] : array();
 
                     // Set some very commonly used defaults and requirements
                     if (strpos($details['path'], '{page}') !== false) {
@@ -236,7 +238,7 @@ class CommonSubscriber implements EventSubscriberInterface
                     }
 
                     // Add the route
-                    $collection->add($name, new Route($details['path'], $defaults, $requirements));
+                    $collection->add($name, new Route($details['path'], $defaults, $requirements, [], '', [], $method));
                 }
             }
         }

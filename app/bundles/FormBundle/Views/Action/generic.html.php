@@ -20,7 +20,7 @@ $containerClass = (!empty($deleted)) ? ' bg-danger' : '';
             'formId'     => $formId
         ));
     ?>
-    <a data-toggle="ajaxmodal" data-target="#formComponentModal" href="<?php echo $view['router']->generate('mautic_formaction_action', array('objectAction' => 'edit', 'objectId' => $id, 'formId' => $formId)); ?>"><span class="action-label"><?php echo $action['name']; ?></span></a>
+    <a data-toggle="ajaxmodal" data-target="#formComponentModal" href="<?php echo $view['router']->path('mautic_formaction_action', array('objectAction' => 'edit', 'objectId' => $id, 'formId' => $formId)); ?>"><span class="action-label"><?php echo $action['name']; ?></span></a>
     <?php if (!empty($action['description'])): ?>
     <span class="action-descr"><?php echo $action['description']; ?></span>
     <?php endif; ?>

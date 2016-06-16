@@ -248,8 +248,8 @@ return [
             'mautic.helper.user'               => [
                 'class'     => 'Mautic\CoreBundle\Helper\UserHelper',
                 'arguments' => [
-                    'security.context',
-                ],
+                    'security.token_storage'
+                ]
             ],
             'mautic.helper.core_parameters'    => [
                 'class'     => 'Mautic\CoreBundle\Helper\CoreParametersHelper',
@@ -334,7 +334,10 @@ return [
             ],
             'mautic.security'                     => [
                 'class'     => 'Mautic\CoreBundle\Security\Permissions\CorePermissions',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.helper.user'
+                ]
             ],
             'mautic.translation.loader'           => [
                 'class'     => 'Mautic\CoreBundle\Loader\TranslationLoader',

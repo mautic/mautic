@@ -30,7 +30,7 @@ if (!$isVariant && $edit && $permissions['email:emails:create']) {
     $customButtons[] = array(
         'attr'      => array(
             'data-toggle' => 'ajax',
-            'href'        => $view['router']->generate(
+            'href'        => $view['router']->path(
                 'mautic_email_action',
                 array("objectAction" => 'abtest', 'objectId' => $email->getId())
             ),
@@ -44,7 +44,7 @@ if ($emailType == 'list') {
     $customButtons[] = array(
         'attr'      => array(
             'data-toggle' => 'ajax',
-            'href'        => $view['router']->generate(
+            'href'        => $view['router']->path(
                 'mautic_email_action',
                 array('objectAction' => 'send', 'objectId' => $email->getId())
             ),
@@ -57,7 +57,7 @@ if ($emailType == 'list') {
 $customButtons[] = array(
     'attr'      => array(
         'data-toggle' => 'ajax',
-        'href'        => $view['router']->generate(
+        'href'        => $view['router']->path(
             'mautic_email_action',
             array('objectAction' => 'example', 'objectId' => $email->getId())
         ),
@@ -292,7 +292,7 @@ $view['slots']->set(
                                                     </div>
                                                 <?php endif; ?>
                                                 <h5 class="fw-sb text-primary">
-                                                    <a href="<?php echo $view['router']->generate(
+                                                    <a href="<?php echo $view['router']->path(
                                                         'mautic_email_action',
                                                         array(
                                                             'objectAction' => 'view',
@@ -378,7 +378,7 @@ $view['slots']->set(
                                                              ); ?>">
                                                             <a class="btn btn-warning"
                                                                data-toggle="confirmation"
-                                                               href="<?php echo $view['router']->generate(
+                                                               href="<?php echo $view['router']->path(
                                                                    'mautic_email_action',
                                                                    array(
                                                                        'objectAction' => 'winner',
@@ -406,7 +406,7 @@ $view['slots']->set(
                                                         </div>
                                                     <?php endif; ?>
                                                     <h5 class="fw-sb text-primary">
-                                                        <a href="<?php echo $view['router']->generate(
+                                                        <a href="<?php echo $view['router']->path(
                                                             'mautic_email_action',
                                                             array(
                                                                 'objectAction' => 'view',
