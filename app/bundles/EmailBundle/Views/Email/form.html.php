@@ -47,17 +47,6 @@ if (!isset($attachmentSize)) {
                 <div class="tab-content pa-md">
                     <div class="tab-pane fade in active bdr-w-0" id="email-container">
                         <div class="row">
-                            <div class="custom-html-mask">
-                                <div class="well text-center col-md-6 col-md-offset-3">
-                                    <h3 style="padding: 30px;">
-                                        <a href="javascript: void(0);" onclick="Mautic.launchBuilder('emailform', 'email');">
-                                            <?php echo $view['translator']->trans('mautic.core.builder.launch'); ?> <i class="fa fa-angle-right"></i>
-                                        </a>
-                                    </h3>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-12">
                                 <?php echo $view['form']->row($form['template']); ?>
                             </div>

@@ -44,19 +44,6 @@ $template = $form['template']->vars['data'];
                 <div class="tab-content pa-md">
                     <div class="tab-pane fade in active bdr-w-0" id="theme-container">
                         <div class="row">
-                            <div class="custom-html-mask">
-                                <div class="well text-center" style="top: 110px; width: 50%; margin-left:auto; margin-right:auto;">
-                                    <h3 style="padding: 30px;">
-                                        <a href="javascript: void(0);" onclick="Mautic.launchBuilder('page');">
-                                            <?php echo $view['translator']->trans('mautic.core.builder.launch'); ?> <i class="fa fa-angle-right"></i>
-                                        </a>
-                                    </h3>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div class="row">
                             <div class="col-md-12">
                                 <?php echo $view['form']->row($form['template']); ?>
                             </div>

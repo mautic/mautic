@@ -4515,7 +4515,7 @@ body.noscroll {
   height: 32px;
 }
 .theme-selected {
-  border: 1px solid #A7A7A7;
+  border: 1px solid #5d6c7c;
   -webkit-box-shadow: 0px 0px 40px #f3f3f3;
   box-shadow: 0px 0px 40px #f3f3f3;
 }
