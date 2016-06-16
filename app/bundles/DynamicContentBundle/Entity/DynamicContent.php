@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\DynamicContentBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -79,18 +79,18 @@ class DynamicContent extends FormEntity
      */
     public function __construct()
     {
-        $this->variantChildren = new ArrayCollection;
+        $this->variantChildren = new ArrayCollection();
     }
 
     /**
-     * Clone method
+     * Clone method.
      */
     public function __clone()
     {
         $this->id = null;
         $this->sentCount = 0;
-        $this->variantChildren = new ArrayCollection;
-        
+        $this->variantChildren = new ArrayCollection();
+
         parent::__clone();
     }
 
@@ -100,14 +100,14 @@ class DynamicContent extends FormEntity
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
-        
+
         $builder->setTable('dynamic_content')
             ->setCustomRepositoryClass('Mautic\DynamicContentBundle\Entity\DynamicContentRepository');
-        
+
         $builder->addIdColumns();
-        
+
         $builder->addCategory();
-        
+
         $builder->addPublishDates();
 
         $builder->createField('sentCount', 'integer')
@@ -152,14 +152,14 @@ class DynamicContent extends FormEntity
             ->addListProperties([
                 'id',
                 'name',
-                'category'
+                'category',
             ])
             ->addProperties([
                 'publishUp',
                 'publishDown',
                 'sentCount',
                 'variantParent',
-                'variantChildren'
+                'variantChildren',
             ])
             ->build();
     }
@@ -170,14 +170,14 @@ class DynamicContent extends FormEntity
      */
     protected function isChanged($prop, $val)
     {
-        $getter  = "get" . ucfirst($prop);
+        $getter = 'get'.ucfirst($prop);
         $current = $this->$getter();
 
         if ($prop == 'variantParent' || $prop == 'category') {
             $currentId = ($current) ? $current->getId() : '';
-            $newId     = ($val) ? $val->getId() : null;
+            $newId = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
-                $this->changes[$prop] = array($currentId, $newId);
+                $this->changes[$prop] = [$currentId, $newId];
             }
         } else {
             parent::isChanged($prop, $val);
@@ -364,14 +364,14 @@ class DynamicContent extends FormEntity
     public function isVariant($isChild = false)
     {
         if ($isChild) {
-            return $this->variantParent instanceof DynamicContent;
+            return $this->variantParent instanceof self;
         } else {
-            return (!empty($this->variantParent) || count($this->variantChildren));
+            return !empty($this->variantParent) || count($this->variantChildren);
         }
     }
 
     /**
-     * Add a variant child
+     * Add a variant child.
      *
      * @param DynamicContent $variantChildren
      *
@@ -387,7 +387,7 @@ class DynamicContent extends FormEntity
     }
 
     /**
-     * Remove a variant child
+     * Remove a variant child.
      *
      * @param DynamicContent $variantChildren
      *
@@ -401,7 +401,7 @@ class DynamicContent extends FormEntity
     }
 
     /**
-     * Get variantChildren
+     * Get variantChildren.
      *
      * @return \Doctrine\Common\Collections\Collection
      */
@@ -411,7 +411,7 @@ class DynamicContent extends FormEntity
     }
 
     /**
-     * Set variantParent
+     * Set variantParent.
      *
      * @param DynamicContent $variantParent
      *
@@ -426,7 +426,7 @@ class DynamicContent extends FormEntity
     }
 
     /**
-     * Get variantParent
+     * Get variantParent.
      *
      * @return DynamicContent
      */

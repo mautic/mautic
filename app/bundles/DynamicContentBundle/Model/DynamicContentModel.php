@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\DynamicContentBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
@@ -31,7 +31,7 @@ class DynamicContentModel extends FormModel
     }
 
     /**
-     * Here just so PHPStorm calms down about type hinting
+     * Here just so PHPStorm calms down about type hinting.
      * 
      * @param null $id
      *
@@ -45,9 +45,9 @@ class DynamicContentModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param      $entity
-     * @param      $formFactory
-     * @param null $action
+     * @param       $entity
+     * @param       $formFactory
+     * @param null  $action
      * @param array $options
      * 
      * @return mixed
@@ -60,13 +60,13 @@ class DynamicContentModel extends FormModel
             throw new \InvalidArgumentException('Entity must be of class DynamicContent()');
         }
 
-        $params = (! empty($action)) ? ['action' => $action] : [];
+        $params = (!empty($action)) ? ['action' => $action] : [];
 
         return $formFactory->create('dwc', $entity, $params);
     }
 
     /**
-     * Get the variant parent/children
+     * Get the variant parent/children.
      *
      * @param DynamicContent $entity
      *
@@ -79,7 +79,7 @@ class DynamicContentModel extends FormModel
         if (!empty($parent)) {
             $children = $parent->getVariantChildren();
         } else {
-            $parent   = $entity;
+            $parent = $entity;
             $children = $entity->getVariantChildren();
         }
 

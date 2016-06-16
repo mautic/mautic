@@ -1,35 +1,36 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 /** @var \Mautic\DynamicContentBundle\Entity\DynamicContent $entity */
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'dwc');
-$view['slots']->set("headerTitle", $entity->getName());
+$view['slots']->set('headerTitle', $entity->getName());
 
-$showVariants     = (count($variants['children'])
+$showVariants = (count($variants['children'])
     || (!empty($variants['parent'])
         && $variants['parent']->getId() != $entity->getId()));
 
 if ((empty($variants['parent']) || ($variants['parent']->getId() == $entity->getId()))
     && $permissions['dynamicContent:dynamicContents:create']
 ) {
-    $customButtons[] = array(
-        'attr'      => array(
+    $customButtons[] = [
+        'attr' => [
             'data-toggle' => 'ajax',
-            'href'        => $view['router']->generate(
+            'href' => $view['router']->generate(
                 'mautic_dwc_action',
-                array("objectAction" => 'addvariant', 'objectId' => $entity->getId())
+                ['objectAction' => 'addvariant', 'objectId' => $entity->getId()]
             ),
-        ),
+        ],
         'iconClass' => 'fa fa-sitemap',
-        'btnText'   => $view['translator']->trans('mautic.core.form.addvariant')
-    );
+        'btnText' => $view['translator']->trans('mautic.core.form.addvariant'),
+    ];
 }
 
 $basicSecurity =
@@ -38,34 +39,34 @@ $view['slots']->set(
     'actions',
     $view->render(
         'MauticCoreBundle:Helper:page_actions.html.php',
-        array(
-            'item'            => $entity,
-            'customButtons'   => (isset($customButtons))?$customButtons:array(),
-            'templateButtons' => array(
-                'edit'   => $security->hasEntityAccess(
+        [
+            'item' => $entity,
+            'customButtons' => (isset($customButtons)) ? $customButtons : [],
+            'templateButtons' => [
+                'edit' => $security->hasEntityAccess(
                     $permissions['dynamicContent:dynamicContents:editown'],
                     $permissions['dynamicContent:dynamicContents:editother'],
                     $entity->getCreatedBy()
                 ),
-                'clone'  => $security->hasEntityAccess(
+                'clone' => $security->hasEntityAccess(
                     $permissions['dynamicContent:dynamicContents:editown'],
                     $permissions['dynamicContent:dynamicContents:editother'],
                     $entity->getCreatedBy()
                 ),
                 'delete' => $permissions['dynamicContent:dynamicContents:create'],
-                'close'  => $security->hasEntityAccess(
+                'close' => $security->hasEntityAccess(
                     $permissions['dynamicContent:dynamicContents:viewown'],
                     $permissions['dynamicContent:dynamicContents:viewother'],
                     $entity->getCreatedBy()
                 ),
-            ),
-            'routeBase'       => 'dwc'
-        )
+            ],
+            'routeBase' => 'dwc',
+        ]
     )
 );
 $view['slots']->set(
     'publishStatus',
-    $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', array('entity' => $entity))
+    $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $entity])
 );
 ?>
 
@@ -92,7 +93,7 @@ $view['slots']->set(
                             <tbody>
                             <?php echo $view->render(
                                 'MauticCoreBundle:Helper:details.html.php',
-                                array('entity' => $entity)
+                                ['entity' => $entity]
                             ); ?>
                             </tbody>
                         </table>
@@ -133,7 +134,7 @@ $view['slots']->set(
     <div class="col-md-3 bg-white bdr-l height-auto">
         <hr class="hr-w-2" style="width:50%">
         <!-- recent activity -->
-        <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', array('logs' => $logs)); ?>
+        <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]); ?>
     </div>
     <!--/ right section -->
 </div>

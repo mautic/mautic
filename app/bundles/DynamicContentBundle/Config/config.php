@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,25 +16,25 @@ return [
                     'route' => 'mautic_dwc_index',
                     'access' => ['dynamicContent:dynamicContents:viewown', 'dynamicContent:dynamicContents:viewother'],
                     'parent' => 'mautic.core.components',
-                    'priority' => 200
-                ]
-            ]
-        ]
+                    'priority' => 200,
+                ],
+            ],
+        ],
     ],
     'routes' => [
         'main' => [
             'mautic_dwc_index' => [
                 'path' => '/dwc/{page}',
-                'controller' => 'MauticDynamicContentBundle:DynamicContent:index'
+                'controller' => 'MauticDynamicContentBundle:DynamicContent:index',
             ],
             'mautic_dwc_action' => [
-                'path'       => '/dwc/{objectAction}/{objectId}',
-                'controller' => 'MauticDynamicContentBundle:DynamicContent:execute'
-            ]
+                'path' => '/dwc/{objectAction}/{objectId}',
+                'controller' => 'MauticDynamicContentBundle:DynamicContent:execute',
+            ],
         ],
         'api' => [
 
-        ]
+        ],
     ],
     'services' => [
         'events' => [
@@ -41,51 +42,51 @@ return [
                 'class' => 'Mautic\DynamicContentBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
                     'mautic.factory',
-                    'mautic.lead.model.lead'
-                ]
-            ]
+                    'mautic.lead.model.lead',
+                ],
+            ],
         ],
         'forms' => [
-            'mautic.form.type.dwc'                       => [
-                'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentType',
+            'mautic.form.type.dwc' => [
+                'class' => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentType',
                 'arguments' => [
                     'translator',
                     'mautic.security',
                     'mautic.dynamicContent.model.dynamicContent',
                     'request_stack',
-                    'doctrine.orm.entity_manager'
+                    'doctrine.orm.entity_manager',
                 ],
-                'alias'     => 'dwc'
+                'alias' => 'dwc',
             ],
             'mautic.form.type.dwcsend_list' => [
-                'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentSendType',
+                'class' => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentSendType',
                 'arguments' => [
                     'router',
-                    'request_stack'
+                    'request_stack',
                 ],
-                'alias'     => 'dwcsend_list'
+                'alias' => 'dwcsend_list',
             ],
             'mautic.form.type.dwcdecision_list' => [
-                'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentDecisionType',
+                'class' => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentDecisionType',
                 'arguments' => [
                     'router',
-                    'request_stack'
+                    'request_stack',
                 ],
-                'alias'     => 'dwcdecision_list'
+                'alias' => 'dwcdecision_list',
             ],
-            'mautic.form.type.dwc_list'     => [
-                'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentListType',
+            'mautic.form.type.dwc_list' => [
+                'class' => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentListType',
                 'arguments' => 'mautic.factory',
-                'alias'     => 'dwc_list'
+                'alias' => 'dwc_list',
             ],
         ],
         'models' => [
             'mautic.dynamicContent.model.dynamicContent' => [
                 'class' => 'Mautic\DynamicContentBundle\Model\DynamicContentModel',
                 'arguments' => [
-                    
-                ]
-            ]
-        ]
-    ]
+
+                ],
+            ],
+        ],
+    ],
 ];

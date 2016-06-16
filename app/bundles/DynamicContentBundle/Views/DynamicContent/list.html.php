@@ -1,14 +1,16 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index')
-$view->extend('MauticDynamicContentBundle:DynamicContent:index.html.php');
-/** @var \Mautic\DynamicContentBundle\Entity\DynamicContent[] $items */
+if ($tmpl == 'index') {
+    $view->extend('MauticDynamicContentBundle:DynamicContent:index.html.php');
+}
+/* @var \Mautic\DynamicContentBundle\Entity\DynamicContent[] $items */
 ?>
 
 <?php if (count($items)): ?>
@@ -17,32 +19,32 @@ $view->extend('MauticDynamicContentBundle:DynamicContent:index.html.php');
                 <thead>
                 <tr>
                     <?php
-                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                         'checkall' => 'true',
-                        'target'   => '#dwcTable'
-                    ));
+                        'target' => '#dwcTable',
+                    ]);
 
-                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                         'sessionVar' => 'dynamicContent',
-                        'orderBy'    => 'e.title',
-                        'text'       => 'mautic.core.title',
-                        'class'      => 'col-dwc-title',
-                        'default'    => true
-                    ));
+                        'orderBy' => 'e.title',
+                        'text' => 'mautic.core.title',
+                        'class' => 'col-dwc-title',
+                        'default' => true,
+                    ]);
 
-                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                         'sessionVar' => 'dynamicContent',
-                        'orderBy'    => 'e.name',
-                        'text'       => 'mautic.core.category',
-                        'class'      => 'visible-md visible-lg col-dwc-category'
-                    ));
+                        'orderBy' => 'e.name',
+                        'text' => 'mautic.core.category',
+                        'class' => 'visible-md visible-lg col-dwc-category',
+                    ]);
 
-                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                         'sessionVar' => 'dynamicContent',
-                        'orderBy'    => 'e.id',
-                        'text'       => 'mautic.core.id',
-                        'class'      => 'col-dwc-id visible-md visible-lg'
-                    ));
+                        'orderBy' => 'e.id',
+                        'text' => 'mautic.core.id',
+                        'class' => 'col-dwc-id visible-md visible-lg',
+                    ]);
                     ?>
                 </tr>
                 </thead>
@@ -53,21 +55,21 @@ $view->extend('MauticDynamicContentBundle:DynamicContent:index.html.php');
                     <tr>
                         <td>
                             <?php
-                            echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
-                                'item'      => $item,
-                                'templateButtons' => array(
-                                    'edit'      => $security->hasEntityAccess($permissions['dynamicContent:dynamicContents:editown'], $permissions['dynamicContent:dynamicContents:editother'], $item->getCreatedBy()),
-                                    'clone'     => $permissions['dynamicContent:dynamicContents:create'],
-                                    'delete'    => $security->hasEntityAccess($permissions['dynamicContent:dynamicContents:deleteown'], $permissions['dynamicContent:dynamicContents:deleteother'], $item->getCreatedBy()),
-                                ),
-                                'routeBase' => 'page',
-                                'nameGetter' => 'getName'
-                            ));
+                            echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', [
+                                'item' => $item,
+                                'templateButtons' => [
+                                    'edit' => $security->hasEntityAccess($permissions['dynamicContent:dynamicContents:editown'], $permissions['dynamicContent:dynamicContents:editother'], $item->getCreatedBy()),
+                                    'clone' => $permissions['dynamicContent:dynamicContents:create'],
+                                    'delete' => $security->hasEntityAccess($permissions['dynamicContent:dynamicContents:deleteown'], $permissions['dynamicContent:dynamicContents:deleteother'], $item->getCreatedBy()),
+                                ],
+                                'routeBase' => 'dwc',
+                                'nameGetter' => 'getName',
+                            ]);
                             ?>
                         </td>
                         <td>
-                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'page.page')); ?>
-                            <a href="<?php echo $view['router']->generate('mautic_dwc_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
+                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $item, 'model' => 'page.page']); ?>
+                            <a href="<?php echo $view['router']->generate('mautic_dwc_action', ['objectAction' => 'view', 'objectId' => $item->getId()]); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                                 <?php
                                 $hasVariants = count($variantChildren);
@@ -82,8 +84,8 @@ $view->extend('MauticDynamicContentBundle:DynamicContent:index.html.php');
                         </td>
                         <td class="visible-md visible-lg">
                             <?php $category = $item->getCategory(); ?>
-                            <?php $catName  = ($category) ? $category->getTitle() : $view['translator']->trans('mautic.core.form.uncategorized'); ?>
-                            <?php $color    = ($category) ? '#' . $category->getColor() : 'inherit'; ?>
+                            <?php $catName = ($category) ? $category->getTitle() : $view['translator']->trans('mautic.core.form.uncategorized'); ?>
+                            <?php $color = ($category) ? '#'.$category->getColor() : 'inherit'; ?>
                             <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
                         </td>
                         <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
@@ -92,14 +94,14 @@ $view->extend('MauticDynamicContentBundle:DynamicContent:index.html.php');
                 </tbody>
             </table>
         <div class="panel-footer">
-        <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-            "totalItems"      => count($items),
-            "page"            => $page,
-            "limit"           => $limit,
-            "menuLinkId"      => 'mautic_dwc_index',
-            "baseUrl"         => $view['router']->generate('mautic_dwc_index'),
-            'sessionVar'      => 'dynamicContent'
-        )); ?>
+        <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', [
+            'totalItems' => count($items),
+            'page' => $page,
+            'limit' => $limit,
+            'menuLinkId' => 'mautic_dwc_index',
+            'baseUrl' => $view['router']->generate('mautic_dwc_index'),
+            'sessionVar' => 'dynamicContent',
+        ]); ?>
         </div>
     </div>
 <?php else: ?>

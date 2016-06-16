@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\DynamicContentBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -18,7 +18,7 @@ class DynamicContentEvent extends CommonEvent
      * DynamicContentEvent constructor.
      * 
      * @param DynamicContent $entity
-     * @param bool $isNew
+     * @param bool           $isNew
      */
     public function __construct(DynamicContent $entity, $isNew = false)
     {

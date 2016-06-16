@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'dynamicContent');
 
@@ -17,7 +17,7 @@ $header = ($dynamicContent->getId()) ?
         ['%name%' => $dynamicContent->getName()]) :
     $view['translator']->trans('mautic.dynamicContent.header.new');
 
-$view['slots']->set("headerTitle", $header);
+$view['slots']->set('headerTitle', $header);
 
 ?>
 
@@ -47,7 +47,9 @@ $view['slots']->set("headerTitle", $header);
         </div>
         <div class="col-md-3 bg-white height-auto bdr-l">
             <div class="pr-lg pl-lg pt-md pb-md">
-                <?php echo $view['form']->row($form['variantParent']); ?>
+                <?php
+                // To be added back when we figure out the parent/variant relationship
+                //echo $view['form']->row($form['variantParent']); ?>
                 <?php echo $view['form']->row($form['category']); ?>
                 <?php echo $view['form']->row($form['language']); ?>
                 <div class="hide">

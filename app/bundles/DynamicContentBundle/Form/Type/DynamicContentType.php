@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\DynamicContentBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
@@ -23,9 +23,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class DynamicContentType
- *
- * @package Mautic\DynamicContentBundle\Form\Type
+ * Class DynamicContentType.
  */
 class DynamicContentType extends AbstractType
 {
@@ -40,16 +38,15 @@ class DynamicContentType extends AbstractType
         DynamicContentModel $dynamicContentModel,
         RequestStack $requestStack,
         EntityManager $entityManager
-    )
-    {
+    ) {
         $this->translator = $translator;
         $this->request = $requestStack->getCurrentRequest();
         $this->em = $entityManager;
 
         // Emails
-        $viewOther  = $security->isGranted('dynamicContent:dynamicContents:viewother');
-        $entities   = $dynamicContentModel->getRepository()->getDynamicContentList('', 0, 0, $viewOther);
-        
+        $viewOther = $security->isGranted('dynamicContent:dynamicContents:viewother');
+        $entities = $dynamicContentModel->getRepository()->getDynamicContentList('', 0, 0, $viewOther);
+
         foreach ($entities as $entity) {
             $this->dwcChoices[$entity['language']][$entity['id']] = $entity['name'];
         }
@@ -69,11 +66,11 @@ class DynamicContentType extends AbstractType
         $builder->add(
             'name',
             'text',
-            array(
-                'label'      => 'mautic.dynamicContent.form.internal.name',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
-            )
+            [
+                'label' => 'mautic.dynamicContent.form.internal.name',
+                'label_attr' => ['class' => 'control-label'],
+                'attr' => ['class' => 'form-control'],
+            ]
         );
 
         $emojiTransformer = new EmojiToShortTransformer();
@@ -81,12 +78,12 @@ class DynamicContentType extends AbstractType
             $builder->create(
                 'description',
                 'textarea',
-                array(
-                    'label'      => 'mautic.dynamicContent.description',
-                    'label_attr' => array('class' => 'control-label'),
-                    'attr'       => array('class' => 'form-control'),
-                    'required'   => false
-                )
+                [
+                    'label' => 'mautic.dynamicContent.description',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr' => ['class' => 'form-control'],
+                    'required' => false,
+                ]
             )->addModelTransformer($emojiTransformer)
         );
 
@@ -95,63 +92,62 @@ class DynamicContentType extends AbstractType
         $builder->add(
             'language',
             'locale',
-            array(
-                'label'      => 'mautic.core.language',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class' => 'form-control'
-                ),
-                'required'   => false,
-            )
+            [
+                'label' => 'mautic.core.language',
+                'label_attr' => ['class' => 'control-label'],
+                'attr' => [
+                    'class' => 'form-control',
+                ],
+                'required' => false,
+            ]
         );
 
         $builder->add(
             'publishUp',
             'datetime',
-            array(
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishup',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime'
-                ),
-                'format'     => 'yyyy-MM-dd HH:mm',
-                'required'   => false
-            )
+            [
+                'widget' => 'single_text',
+                'label' => 'mautic.core.form.publishup',
+                'label_attr' => ['class' => 'control-label'],
+                'attr' => [
+                    'class' => 'form-control',
+                    'data-toggle' => 'datetime',
+                ],
+                'format' => 'yyyy-MM-dd HH:mm',
+                'required' => false,
+            ]
         );
 
         $builder->add(
             'publishDown',
             'datetime',
-            array(
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishdown',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime'
-                ),
-                'format'     => 'yyyy-MM-dd HH:mm',
-                'required'   => false
-            )
+            [
+                'widget' => 'single_text',
+                'label' => 'mautic.core.form.publishdown',
+                'label_attr' => ['class' => 'control-label'],
+                'attr' => [
+                    'class' => 'form-control',
+                    'data-toggle' => 'datetime',
+                ],
+                'format' => 'yyyy-MM-dd HH:mm',
+                'required' => false,
+            ]
         );
 
         $builder->add(
             'content',
             'textarea',
-            array(
-                'label'      => 'mautic.dynamicContent.form.content',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'tooltip'              => 'mautic.dynamicContent.form.content.help',
-                    'class'                => 'form-control editor-advanced editor-builder-tokens',
-                    'rows'                 => '15'
-                ),
-                'required'   => false
-            )
+            [
+                'label' => 'mautic.dynamicContent.form.content',
+                'label_attr' => ['class' => 'control-label'],
+                'attr' => [
+                    'tooltip' => 'mautic.dynamicContent.form.content.help',
+                    'class' => 'form-control editor-advanced editor-builder-tokens',
+                    'rows' => '15',
+                ],
+                'required' => false,
+            ]
         );
-
 
         $transformer = new IdToEntityModelTransformer($this->em, 'MauticDynamicContentBundle:DynamicContent');
         $builder->add(
@@ -163,12 +159,12 @@ class DynamicContentType extends AbstractType
                     'label_attr' => ['class' => 'control-label'],
                     'attr' => [
                         'class' => 'form-control',
-                        'tooltip' => 'mautic.dynamicContent.form.variantParent.help'
+                        'tooltip' => 'mautic.dynamicContent.form.variantParent.help',
                     ],
                     'required' => false,
                     'multiple' => false,
                     'empty_value' => 'mautic.dynamicContent.form.variantParent.empty',
-                    'ignore_ids' => [(int) $options['data']->getId()]
+                    'ignore_ids' => [(int) $options['data']->getId()],
                 ]
             )->addModelTransformer($transformer)
         );
@@ -184,9 +180,8 @@ class DynamicContentType extends AbstractType
             'form_buttons'
         );
 
-
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
@@ -203,6 +198,6 @@ class DynamicContentType extends AbstractType
      */
     public function getName()
     {
-        return "dwc";
+        return 'dwc';
     }
 }

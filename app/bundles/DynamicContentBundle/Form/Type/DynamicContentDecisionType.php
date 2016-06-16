@@ -1,25 +1,19 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\DynamicContentBundle\Form\Type;
 
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class DynamicContentDecisionType
- *
- * @package Mautic\DynamicContentBundle\Form\Type
+ * Class DynamicContentDecisionType.
  */
 class DynamicContentDecisionType extends DynamicContentSendType
 {
@@ -33,11 +27,11 @@ class DynamicContentDecisionType extends DynamicContentSendType
                 'label_attr' => ['class' => 'control-label'],
                 'attr' => [
                     'class' => 'form-control',
-                    'tooltip' => 'mautic.dynamicContent.send.slot_name.tooltip'
+                    'tooltip' => 'mautic.dynamicContent.send.slot_name.tooltip',
                 ],
                 'constraints' => [
-                    new NotBlank(['message' => 'mautic.dynamicContent.slot_name.notblank'])
-                ]
+                    new NotBlank(['message' => 'mautic.dynamicContent.slot_name.notblank']),
+                ],
             ]
         );
 
@@ -47,17 +41,17 @@ class DynamicContentDecisionType extends DynamicContentSendType
             'dynamicContent',
             'dwc_list',
             [
-                'label'       => 'mautic.dynamicContent.send.selectDynamicContents',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
-                    'class'   => 'form-control',
+                'label' => 'mautic.dynamicContent.send.selectDynamicContents',
+                'label_attr' => ['class' => 'control-label'],
+                'attr' => [
+                    'class' => 'form-control',
                     'tooltip' => 'mautic.dynamicContent.choose.dynamicContents',
-                    'onchange'=> 'Mautic.disabledDynamicContentAction()'
+                    'onchange' => 'Mautic.disabledDynamicContentAction()',
                 ],
-                'multiple'    => false,
+                'multiple' => false,
                 'constraints' => [
-                    new NotBlank(['message' => 'mautic.dynamicContent.choosedynamicContent.notblank'])
-                ]
+                    new NotBlank(['message' => 'mautic.dynamicContent.choosedynamicContent.notblank']),
+                ],
             ]
         );
     }
@@ -67,6 +61,6 @@ class DynamicContentDecisionType extends DynamicContentSendType
      */
     public function getName()
     {
-        return "dwcdecision_list";
+        return 'dwcdecision_list';
     }
 }
