@@ -56,9 +56,12 @@ class DynamicContentListType extends AbstractType
                         return $choices;
                     }
 
+                    $variantParent = (int) (isset($options['variantParent']) ? $options['variantParent'] : 0);
+                    $ignoreIds     = isset($options['ignore_ids']) ? $options['ignore_ids'] : [];
+
                     $choices = array();
 
-                    $entities  = $repo->getDynamicContentList('', 0, 0, $viewOther, 0, $options['top_level'], $options['ignore_ids']);
+                    $entities  = $repo->getDynamicContentList('', 0, 0, $viewOther, $variantParent, $ignoreIds);
                     foreach ($entities as $entity) {
                         $choices[$entity['language']][$entity['id']] = $entity['name'];
                     }
@@ -80,7 +83,7 @@ class DynamicContentListType extends AbstractType
             )
         );
 
-        $resolver->setOptional(['top_level', 'ignore_ids']);
+        $resolver->setOptional(['ignore_ids', 'variantParent']);
     }
 
     /**

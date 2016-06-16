@@ -161,12 +161,11 @@ class DynamicContentRepository extends CommonRepository
      * @param int    $start
      * @param bool   $viewOther
      * @param int    $variantParentId
-     * @param mixed  $topLevel
      * @param array  $ignoreIds
      *
      * @return array
      */
-    public function getDynamicContentList($search = '', $limit = 10, $start = 0, $viewOther = false, $variantParentId = 0, $topLevel = false, $ignoreIds = [])
+    public function getDynamicContentList($search = '', $limit = 10, $start = 0, $viewOther = false, $variantParentId = 0, $ignoreIds = [])
     {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, name, language}');
@@ -184,9 +183,7 @@ class DynamicContentRepository extends CommonRepository
         if ($variantParentId) {
             $q->andWhere($q->expr()->eq('e.variantParent', ':variant_parent_id'))
                 ->setParameter('variant_parent_id', $variantParentId);
-        }
-        
-        if ($topLevel) {
+        } else {
             $q->andWhere($q->expr()->isNull('e.variantParent'));
         }
 

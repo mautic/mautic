@@ -59,8 +59,19 @@ return [
             ],
             'mautic.form.type.dwcsend_list' => [
                 'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentSendType',
-                'arguments' => 'router',
+                'arguments' => [
+                    'router',
+                    'request_stack'
+                ],
                 'alias'     => 'dwcsend_list'
+            ],
+            'mautic.form.type.dwcdecision_list' => [
+                'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentDecisionType',
+                'arguments' => [
+                    'router',
+                    'request_stack'
+                ],
+                'alias'     => 'dwcdecision_list'
             ],
             'mautic.form.type.dwc_list'     => [
                 'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentListType',

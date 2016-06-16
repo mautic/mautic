@@ -49,21 +49,37 @@ class CampaignSubscriber extends CommonSubscriber
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],
-            DynamicContentEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0]
+            DynamicContentEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
+            DynamicContentEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0]
         ];
     }
 
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-       $event->addLeadDecision(
+       $event->addAction(
             'dwc.push_content',
             [
-                'label'           => 'mautic.notification.campaign.send_notification',
-                'description'     => 'mautic.notification.campaign.send_notification.tooltip',
-                'eventName'       => DynamicContentEvents::ON_CAMPAIGN_TRIGGER_DECISION,
-                'formType'        => 'notificationsend_list',
+                'label'           => 'mautic.dynamicContent.campaign.send_dwc',
+                'description'     => 'mautic.dynamicContent.campaign.send_dwc.tooltip',
+                'eventName'       => DynamicContentEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                'formType'        => 'dwcsend_list',
                 'formTypeOptions' => ['update_select' => 'campaignevent_properties_dwc'],
-                'formTheme'       => 'MauticDynamicContentBundle:FormTheme\DynamicContentPushList'
+                'formTheme'       => 'MauticDynamicContentBundle:FormTheme\DynamicContentPushList',
+                'timelineTemplate'=> 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
+                'hideTriggerMode' => true
+            ]
+        );
+        
+        $event->addLeadDecision(
+            'dwc.decision',
+            [
+                'label'           => 'mautic.dynamicContent.campaign.decision_dwc',
+                'description'     => 'mautic.dynamicContent.campaign.decision_dwc.tooltip',
+                'eventName'       => DynamicContentEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+                'formType'        => 'dwcdecision_list',
+                'formTypeOptions' => ['update_select' => 'campaignevent_properties_dwc'],
+                'formTheme'       => 'MauticDynamicContentBundle:FormTheme\DynamicContentDecisionList'
+
             ]
         );
     }
@@ -72,6 +88,11 @@ class CampaignSubscriber extends CommonSubscriber
      * @param CampaignExecutionEvent $event
      */
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
+    {
+        // todo
+    }
+    
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
         // todo
     }

@@ -7,8 +7,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\NotificationBundle\Form\Type;
+namespace Mautic\DynamicContentBundle\Form\Type;
 
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,11 +17,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class NotificationSendType
+ * Class DynamicContentSendType
  *
- * @package Mautic\FormBundle\Form\Type
+ * @package Mautic\DynamicContentBundle\Form\Type
  */
-class NotificationSendType extends AbstractType
+class DynamicContentSendType extends AbstractType
 {
     /**
      * @var RouterInterface
@@ -28,11 +29,20 @@ class NotificationSendType extends AbstractType
     protected $router;
 
     /**
-     * @param RouterInterface $router
+     * @var null|\Symfony\Component\HttpFoundation\Request
      */
-    public function __construct(RouterInterface $router)
+    protected $request;
+
+    /**
+     * DynamicContentSendType constructor.
+     *
+     * @param RouterInterface   $router
+     * @param RequestStack|null $requestStack
+     */
+    public function __construct(RouterInterface $router, RequestStack $requestStack)
     {
-        $this->router = $router;
+        $this->router  = $router;
+        $this->request = $requestStack->getCurrentRequest();
     }
 
     /**
@@ -41,65 +51,82 @@ class NotificationSendType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('notification', 'notification_list', array(
-            'label'       => 'mautic.notification.send.selectnotifications',
-            'label_attr'  => array('class' => 'control-label'),
-            'attr'        => array(
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.notification.choose.notifications',
-                'onchange'=> 'Mautic.disabledNotificationAction()'
-            ),
-            'multiple'    => false,
-            'constraints' => array(
-                new NotBlank(
-                    array('message' => 'mautic.notification.choosenotification.notblank')
-                )
-            )
-        ));
+        $builder->add(
+            'dynamicContent',
+            'dwc_list',
+            [
+                'label'       => 'mautic.dynamicContent.send.selectDynamicContents',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.dynamicContent.choose.dynamicContents',
+                    'onchange'=> 'Mautic.disabledDynamicContentAction()'
+                ],
+                'multiple'    => false,
+                'constraints' => [
+                    new NotBlank(['message' => 'mautic.dynamicContent.choosedynamicContent.notblank'])
+                ],
+                'variantParent' => $this->request->get('variantParent', 0)
+            ]
+        );
 
         if (! empty($options['update_select'])) {
-            $windowUrl = $this->router->generate('mautic_notification_action', array(
-                'objectAction' => 'new',
-                'contentOnly'  => 1,
-                'updateSelect' => $options['update_select']
-            ));
+            $windowUrl = $this->router->generate(
+                'mautic_dwc_action',
+                [
+                    'objectAction' => 'new',
+                    'contentOnly'  => 1,
+                    'updateSelect' => $options['update_select']
+                ]
+            );
 
-            $builder->add('newNotificationButton', 'button', array(
-                'attr'  => array(
-                    'class'   => 'btn btn-primary btn-nospin',
-                    'onclick' => 'Mautic.loadNewNotificationWindow({
-                        "windowUrl": "' . $windowUrl . '"
-                    })',
-                    'icon'    => 'fa fa-plus'
-                ),
-                'label' => 'mautic.notification.send.new.notification'
-            ));
+            $builder->add(
+                'newDynamicContentButton',
+                'button',
+                [
+                    'label' => 'mautic.dynamicContent.send.new.dynamicContent',
+                    'attr'  => [
+                        'class'   => 'btn btn-primary btn-nospin',
+                        'onclick' => 'Mautic.loadNewDynamicContentWindow({
+                            "windowUrl": "' . $windowUrl . '"
+                        })',
+                        'icon'    => 'fa fa-plus'
+                    ]
+                ]
+            );
 
-            $notification = $options['data']['notification'];
+            $dynamicContent = is_array($options['data']) && array_key_exists('dynamicContent', $options['data']) ? $options['data']['dynamicContent'] : null;
 
             // create button edit notification
-            $windowUrlEdit = $this->router->generate('mautic_notification_action', array(
-                'objectAction' => 'edit',
-                'objectId'     => 'notificationId',
-                'contentOnly'  => 1,
-                'updateSelect' => $options['update_select']
-            ));
+            $windowUrlEdit = $this->router->generate(
+                'mautic_dwc_action',
+                [
+                    'objectAction' => 'edit',
+                    'objectId'     => 'dynamicContentId',
+                    'contentOnly'  => 1,
+                    'updateSelect' => $options['update_select']
+                ]
+            );
 
-            $builder->add('editNotificationButton', 'button', array(
-                'attr'  => array(
-                    'class'     => 'btn btn-primary btn-nospin',
-                    'onclick'   => 'Mautic.loadNewNotificationWindow(Mautic.standardNotificationUrl({"windowUrl": "' . $windowUrlEdit . '"}))',
-                    'disabled'  => !isset($notification),
-                    'icon'      => 'fa fa-edit'
-                ),
-                'label' => 'mautic.notification.send.edit.notification'
-            ));
+            $builder->add(
+                'editDynamicContentButton',
+                'button',
+                [
+                    'label' => 'mautic.dynamicContent.send.edit.dynamicContent',
+                    'attr'  => [
+                        'class'     => 'btn btn-primary btn-nospin',
+                        'onclick'   => 'Mautic.loadNewDynamicContentWindow(Mautic.standardDynamicContentUrl({"windowUrl": "' . $windowUrlEdit . '"}))',
+                        'disabled'  => !isset($dynamicContent),
+                        'icon'      => 'fa fa-edit'
+                    ]
+                ]
+            );
         }
     }
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setOptional(array('update_select'));
+        $resolver->setOptional(['update_select']);
     }
 
     /**
@@ -107,6 +134,6 @@ class NotificationSendType extends AbstractType
      */
     public function getName()
     {
-        return "notificationsend_list";
+        return "dwcsend_list";
     }
 }

@@ -48,7 +48,7 @@ class DynamicContentType extends AbstractType
 
         // Emails
         $viewOther  = $security->isGranted('dynamicContent:dynamicContents:viewother');
-        $entities   = $dynamicContentModel->getRepository()->getDynamicContentList('', 0, 0, $viewOther, true);
+        $entities   = $dynamicContentModel->getRepository()->getDynamicContentList('', 0, 0, $viewOther);
         
         foreach ($entities as $entity) {
             $this->dwcChoices[$entity['language']][$entity['id']] = $entity['name'];
@@ -167,7 +167,6 @@ class DynamicContentType extends AbstractType
                     ],
                     'required' => false,
                     'multiple' => false,
-                    'top_level' => true,
                     'empty_value' => 'mautic.dynamicContent.form.variantParent.empty',
                     'ignore_ids' => [(int) $options['data']->getId()]
                 ]
