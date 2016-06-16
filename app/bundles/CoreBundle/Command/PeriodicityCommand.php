@@ -25,7 +25,7 @@ class PeriodicityCommand extends ModeratedCommand
 
         $this->setName('mautic:periodicity:update')
             ->setDescription('Run all periodicity event')
-            ->addOption('--id', '-id', InputOption::VALUE_OPTIONAL, 'Id of periodicity', false)
+            ->addOption('--id', '-i', InputOption::VALUE_OPTIONAL, 'Id of periodicity', false)
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
             // ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of leads to process per round. Defaults to 300.', 300)
         parent::configure();
@@ -58,17 +58,11 @@ class PeriodicityCommand extends ModeratedCommand
 
             $env = $container->get('kernel')->getEnvironment();
 
-            $args = array(
-                '--env' => $env,
-                '--id' => $p->getTargetId()
-            );
-
-            if ($env == 'prod') {
-                $args[] = '--no-debug';
-            }
+            $args = array('console', 'mautic:'.$p->getType(), '--env='.$env);
+            $args[] = '--id='.$p->getTargetId();
 
             $input       = new ArgvInput($args);
-            $application = $this->getApplication()->find('mautic:'.$p->getType());
+            $application = $this->getApplication();
             $returnCode = $application->run($input, $output);
 
             if ($returnCode===0){
