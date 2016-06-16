@@ -135,6 +135,15 @@ Mautic.destroySlots = function() {
             delete Mautic.builderSlots[i];
         });
     }
+
+    // Destroy sortable
+    Mautic.builderContents.find('[data-slot-container]').sortable( "destroy" );
+
+    // Remove empty class="" attr
+    Mautic.builderContents.find('*[class=""]').removeAttr('class');
+
+    // Remove style="z-index: 2501;" which Froala forgets there
+    Mautic.builderContents.find('*[style="z-index: 2501;"]').removeAttr('style');
 };
 
 Mautic.toggleBuilderButton = function (hide) {
