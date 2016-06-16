@@ -22,7 +22,7 @@
         </div>
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h4 class="panel-title">Slot Types</h4>
+                <h4 class="panel-title"><?php echo $view['translator']->trans('mautic.core.slot.types'); ?></h4>
             </div>
             <div class="panel-body" id="slot-type-container">
                 <?php if ($slots): ?>
@@ -36,17 +36,17 @@
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
-                <p class="text-muted pt-md text-center"><i>Drag the slot type to the desired position.</i></p>
+                <p class="text-muted pt-md text-center"><i><?php echo $view['translator']->trans('mautic.core.drag.info'); ?></i></p>
             </div>
         </div>
 
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h4 class="panel-title">Customize Slot</h4>
+                <h4 class="panel-title"><?php echo $view['translator']->trans('mautic.core.customize.slot'); ?></h4>
             </div>
             <div class="panel-body" id="customize-form-container">
                 <div id="slot-form-container">
-                    <p class="text-muted pt-md text-center"><i>Select the slot to customize</i></p>
+                    <p class="text-muted pt-md text-center"><i><?php echo $view['translator']->trans('mautic.core.slot.customize.info'); ?></i></p>
                 </div>
                 <?php if ($slots): ?>
                     <?php foreach ($slots as $slotKey => $slot): ?>
