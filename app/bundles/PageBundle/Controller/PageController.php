@@ -405,12 +405,13 @@ class PageController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
-                'isVariant'   => $entity->isVariant(true),
-                'tokens'      => $model->getBuilderComponents($entity, 'tokenSections'),
-                'activePage'  => $entity,
-                'themes'      => $this->factory->getInstalledThemes('page', true),
-                'slots'       => $this->buildSlotForms($slotTypes),
+                'form'          => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
+                'isVariant'     => $entity->isVariant(true),
+                'tokens'        => $model->getBuilderComponents($entity, 'tokenSections'),
+                'activePage'    => $entity,
+                'themes'        => $this->factory->getInstalledThemes('page', true),
+                'slots'         => $this->buildSlotForms($slotTypes),
+                'builderTokens' => $model->getBuilderComponents(null, array('tokens')),
                 'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())) // strip new lines
             ),
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
@@ -550,12 +551,13 @@ class PageController extends FormController
         
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
-                'isVariant'   => $entity->isVariant(true),
-                'tokens'      => (!empty($tokens)) ? $tokens['tokenSections'] : $model->getBuilderComponents($entity, 'tokenSections'),
-                'activePage'  => $entity,
-                'themes'      => $this->factory->getInstalledThemes('page', true),
-                'slots'       => $this->buildSlotForms($slotTypes),
+                'form'          => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
+                'isVariant'     => $entity->isVariant(true),
+                'tokens'        => (!empty($tokens)) ? $tokens['tokenSections'] : $model->getBuilderComponents($entity, 'tokenSections'),
+                'activePage'    => $entity,
+                'themes'        => $this->factory->getInstalledThemes('page', true),
+                'slots'         => $this->buildSlotForms($slotTypes),
+                'builderTokens' => $model->getBuilderComponents(null, array('tokens')),
                 'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())) // strip new lines
             ),
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',

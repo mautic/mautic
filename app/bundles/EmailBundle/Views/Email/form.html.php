@@ -22,8 +22,8 @@ $header = ($email->getId()) ?
     $view['translator']->trans('mautic.email.header.new');
 
 $view['slots']->set("headerTitle", $header.$subheader);
+$view['assets']->addScriptDeclaration('var builderTokens = '.json_encode($builderTokens['tokens']).';', 'bodyClose');
 
-$template  = $form['template']->vars['data'];
 $emailType = $form['emailType']->vars['data'];
 
 if (!isset($attachmentSize)) {

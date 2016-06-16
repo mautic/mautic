@@ -282,6 +282,8 @@ Mautic.initSlotListeners = function() {
             });
         });
 
+        var linkList = Mautic.getPredefinedLinks();
+
         // Initialize different slot types
         if (type === 'text') {
             // init AtWho in a froala editor
@@ -297,13 +299,14 @@ Mautic.initSlotListeners = function() {
                 toolbarInline: true,
                 toolbarVisibleWithoutSelection: true,
                 toolbarButtons: ['bold', 'italic', 'insertImage', 'insertLink', 'undo', 'redo', '-', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'indent', 'outdent'],
-                zIndex: 2501
+                zIndex: 2501,
+                linkList: linkList
             };
 
             slot.froalaEditor(mQuery.extend(inlineFroalaOptions, Mautic.basicFroalaOptions));
         } else if (type === 'image') {
             // Init Froala editor
-            slot.find('img').froalaEditor(Mautic.basicFroalaOptions);
+            slot.find('img').froalaEditor(mQuery.extend({linkList: linkList}, Mautic.basicFroalaOptions));
         } else if (type === 'button') {
             slot.find('a').click(function(e) {
                 e.preventDefault();
@@ -313,6 +316,24 @@ Mautic.initSlotListeners = function() {
         // Store the slot to a global var
         Mautic.builderSlots.push({slot: slot, type: type});
     });
+
+    Mautic.getPredefinedLinks = function() {
+        var linkList = [];
+        mQuery.each(parent.builderTokens, function(token, label) {
+            if (token.startsWith('{pagelink=') || 
+                token.startsWith('{assetlink=') || 
+                token.startsWith('{webview_url') || 
+                token.startsWith('{unsubscribe_url')) {
+                
+                linkList.push({
+                    text: label,
+                    href: token
+                });
+            }
+        });
+
+        return linkList;
+    }
 
     Mautic.builderContents.on('slot:change', function(event, params) {
         // Change some slot styles when the values are changed in the slot edit form

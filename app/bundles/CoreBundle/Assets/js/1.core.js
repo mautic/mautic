@@ -2,6 +2,14 @@ var MauticVars  = {};
 var mQuery      = jQuery.noConflict(true);
 window.jQuery   = mQuery;
 
+// Polyfil for ES6 startsWith method
+if (!String.prototype.startsWith) {
+    String.prototype.startsWith = function(searchString, position){
+      position = position || 0;
+      return this.substr(position, searchString.length) === searchString;
+  };
+}
+
 //set default ajax options
 MauticVars.activeRequests = 0;
 
@@ -744,17 +752,28 @@ var Mautic = {
      * @param callback(tokens) to call when finished
      */
     getTokens: function(method, callback) {
+        // Check if the builderTokens var holding the tokens exists
+        if (typeof builderTokens === 'object') {
+            return callback(builderTokens);
+        }
+        // Check if the builderTokens var holding the tokens exists in the parent frame
+        if (typeof parent.builderTokens === 'object') {
+            return callback(parent.builderTokens);
+        }
+        // Check if the builderTokens var holding the tokens was already loaded
         if (!mQuery.isEmptyObject(Mautic.builderTokens)) {
             return callback(Mautic.builderTokens);
         }
 
         Mautic.builderTokensRequestInProgress = true;
 
+        // OK, let's fetch the tokens.
         mQuery.ajax({
             url: mauticAjaxUrl,
             data: 'action=' + method,
             success: function (response) {
                 if (typeof response.tokens === 'object') {
+
                     // store the tokens to the session storage
                     Mautic.builderTokens = response.tokens;
 
