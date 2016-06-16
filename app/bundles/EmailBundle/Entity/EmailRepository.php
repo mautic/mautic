@@ -549,4 +549,17 @@ class EmailRepository extends CommonRepository
 
         return $qb->getQuery()->iterate();
     }
+
+    public function getPeriodicity(Email $email) {
+        $q = $this->createQueryBuilder('e');
+
+        $q->select('p')
+          ->from('Mautic\CoreBundle\Entity\Periodicity', 'p')
+          ->where($q->expr()->andX(
+              $q->expr()->eq('p.type', ':type'),
+              $q->expr()->eq('p.targetId', $email->getId())
+          ))
+          ->setParameter('type', 'email:generate');
+        return $q->getQuery()->getSingleResult();
+    }
 }
