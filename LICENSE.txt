@@ -45,8 +45,6 @@ Javascript
 
     jQuery Form Plugin - MIT & GPL - Copyright (c) 2014 M. Alsup
 
-    jQuery Sparkline - New BSD - (c) Splunk, Inc
-
     jQuery UI - MIT - Copyright 2014 jQuery Foundation and other contributors
 
     jQuery UI Touchpoint - MIT & GPLv2 - Copyright 2011–2014, Dave Furfero

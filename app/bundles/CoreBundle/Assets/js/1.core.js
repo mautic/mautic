@@ -680,10 +680,6 @@ var Mautic = {
 
         Mautic.renderCharts();
         Mautic.renderMaps(container);
-
-        //instantiate sparkline plugin
-        mQuery('.plugin-sparkline').sparkline('html', {enableTagOptions: true});
-
         Mautic.stopIconSpinPostEvent();
 
         //stop loading bar
