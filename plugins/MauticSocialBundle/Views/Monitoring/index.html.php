@@ -23,7 +23,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
-    <?php echo $view->render('MauticCoreBundle:Helper:bulk_actions.html.php', array(
+    <?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', array(
             'searchValue' => $searchValue,
             'action'      => $currentRoute,
             'langVar'     => 'mautic.social.monitoring',

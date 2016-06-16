@@ -28,33 +28,38 @@ class AjaxController extends CommonAjaxController
     protected function getNetworkFormAction(Request $request)
     {
         // get the form type
-        $type       = InputHelper::clean($request->request->get('networkType'));
+        $type = InputHelper::clean($request->request->get('networkType'));
 
         // default to empty
-        $dataArray = array (
-            'html' => '',
+        $dataArray = [
+            'html'    => '',
             'success' => 0
-        );
+        ];
 
         if (!empty($type)) {
             //get the HTML for the form
 
             // get the network type form
-            $form = $this->get('form.factory')->create($type, array(), array('label' => false, 'csrf_protection' => false));
+            $form = $this->get('form.factory')->create($type, [], ['label' => false, 'csrf_protection' => false]);
 
-            $html = $this->renderView('MauticSocialBundle:FormTheme:' . $type .  '_widget.html.php',
-                array( 'form' => $form->createView() )
+            $html = $this->renderView(
+                'MauticSocialBundle:FormTheme:'.$type.'_widget.html.php',
+                ['form' => $form->createView()]
             );
 
-            $html = str_replace(array(
-                    $type . '[', // this is going to generate twitter_hashtag[ or twitter_mention[
-                    $type . '_', // this is going to generate twitter_hashtag_ or twitter_mention_
+            $html = str_replace(
+                [
+                    $type.'[', // this is going to generate twitter_hashtag[ or twitter_mention[
+                    $type.'_', // this is going to generate twitter_hashtag_ or twitter_mention_
                     $type
-                ), array(
+                ],
+                [
                     'monitoring[properties][',
                     'monitoring_properties_',
                     'monitoring'
-                ), $html);
+                ],
+                $html
+            );
 
 
             $dataArray['html']    = $html;
