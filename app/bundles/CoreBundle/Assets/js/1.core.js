@@ -964,53 +964,6 @@ var Mautic = {
     },
 
     /**
-     *
-     * Global CKEditor events
-     *
-     * @returns {{contentDom: Function}}
-     */
-    // getGlobalEditorEvents: function() {
-
-    //     return {
-    //         contentDom: function (event) {
-    //             var editable = event.editor.editable();
-
-    //             var doc = (editable.isInline()) ? '#' + event.editor.name : mQuery(event.editor.window.getFrame().$).contents();
-    //             var tokens = mQuery(doc).find('*[data-token]');
-
-    //             tokens.each(function (i) {
-    //                 mQuery(this).off('dblclick').on('dblclick', function (e) {
-    //                     var selEl = new CKEDITOR.dom.element(e.target);
-    //                     var rangeObjForSelection = new CKEDITOR.dom.range(event.editor.document);
-    //                     rangeObjForSelection.selectNodeContents(selEl);
-    //                     event.editor.getSelection().selectRanges([rangeObjForSelection]);
-
-    //                     // Remove contenteditable=false to make it deletable
-    //                     mQuery(e.target).prop('contenteditable', true);
-    //                 });
-    //             });
-
-    //             CKEDITOR.instances[event.editor.name].on('key', function (e) {
-    //                 var key = e.data.keyCode;
-    //                 if (key !== 8) {
-    //                     var tokens = mQuery(doc).find('*[data-token][contenteditable=\'true\']');
-    //                     tokens.each(function (i) {
-    //                         mQuery(this).prop('contenteditable', false);
-    //                     });
-    //                 }
-    //             });
-
-    //             editable.attachListener(editable, 'click', function (e) {
-    //                 var tokens = mQuery(doc).find('*[data-token][contenteditable=\'true\']');
-    //                 tokens.each(function (i) {
-    //                     mQuery(this).prop('contenteditable', false);
-    //                 });
-    //             });
-    //         }
-    //     }
-    // },
-
-    /**
      * Functions to be ran on ajax page unload
      */
     onPageUnload: function (container, response) {

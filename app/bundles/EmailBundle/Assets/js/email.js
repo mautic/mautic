@@ -135,11 +135,6 @@ Mautic.emailOnUnload = function(id) {
     if (id === '#app-content') {
         delete Mautic.listCompareChart;
     }
-
-    if (mQuery('#emailform_plainText').length) {
-        // Activate the plain text editor to support token inserts
-        // CKEDITOR.instances['emailform_plainText'].destroy(true);
-    }
 };
 
 Mautic.renderListCompareChart = function (chartData) {

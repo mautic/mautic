@@ -83,7 +83,7 @@ class CoreSubscriber extends CommonSubscriber
 
         $request->setLocale($locale);
 
-        // Set a cookie with session name for CKEditor's filemanager
+        // Set a cookie with session name for filemanager
         $sessionName = $request->cookies->get('mautic_session_name');
         if ($sessionName != session_name()) {
             /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
@@ -134,7 +134,7 @@ class CoreSubscriber extends CommonSubscriber
             $session->remove('mautic.user');
         }
 
-        //set a couple variables used by Ckeditor's filemanager
+        //set a couple variables used by filemanager
         $session->set('mautic.docroot', $event->getRequest()->server->get('DOCUMENT_ROOT'));
         $session->set('mautic.basepath', $event->getRequest()->getBasePath());
         $session->set('mautic.imagepath', $this->factory->getParameter('image_path'));
