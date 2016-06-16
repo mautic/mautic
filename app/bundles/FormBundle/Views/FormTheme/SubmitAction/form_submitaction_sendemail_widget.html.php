@@ -25,7 +25,7 @@
         <label class="control-label"><?php echo $view['translator']->trans('mautic.form.action.sendemail.dragfield'); ?></label>
         <div id="formFieldTokens" class="list-group" style="max-height: 250px; overflow-y: auto;">
             <?php foreach ($formFields as $token => $field): ?>
-            <a class="list-group-item ellipsis" href="#" onclick="CKEDITOR.instances['formaction_properties_message'].insertText('<?php echo $token; ?>');"><?php echo $field; ?></a>
+            <a class="list-group-item ellipsis" href="#" onclick="mQuery('#formaction_properties_message').froalaEditor('html.insert', '<?php echo $token; ?>');"><?php echo $field; ?></a>
             <?php endforeach; ?>
         </div>
     </div>
