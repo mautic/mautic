@@ -71,7 +71,7 @@ class LeadRepository extends CommonRepository
         $args = $this->convertOrmProperties('Mautic\\LeadBundle\\Entity\\Lead', $args);
 
         $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $sq->select('DISTINCT(cl.lead_id)')
+        $sq->select('cl.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl');
 
         $expr = $sq->expr()->andX(
