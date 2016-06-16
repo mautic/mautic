@@ -34,7 +34,7 @@ class EmailGenerateCommand extends ModeratedCommand
     {
         $this->setName('mautic:email:generate')
             ->setDescription('Generate Segment Email')
-            ->addOption('--id', null, InputOption::VALUE_OPTIONAL, 'Email ID')
+            ->addOption('--id', '-i', InputOption::VALUE_OPTIONAL, 'Email ID')
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.')
 
         // The <info>%command.name%</info> command is used to process the application's e-mail queue
@@ -55,7 +55,6 @@ class EmailGenerateCommand extends ModeratedCommand
         $options = $input->getOptions();
         $objectId = $options['id'];
         $factory = $this->getContainer()->get('mautic.factory');
-
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $factory->getModel('email');
         $email = $model->getEntity($objectId);
