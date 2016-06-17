@@ -62,8 +62,8 @@ class ReportSubscriber extends CommonSubscriber
             $event->addTable('forms', $data);
             if ($event->checkContext('form.submissions')) {
                 // Form submissions
-                $submissionPrefix = 'fs.';
-                $pagePrefix       = 'p.';
+                $submissionPrefix  = 'fs.';
+                $pagePrefix        = 'p.';
                 $submissionColumns = [
                     $submissionPrefix.'date_submitted' => [
                         'label' => 'mautic.form.report.submit.date_submitted',
@@ -87,7 +87,7 @@ class ReportSubscriber extends CommonSubscriber
                     'display_name' => 'mautic.form.report.submission.table',
                     'columns'      => array_merge($submissionColumns, $columns, $event->getLeadColumns(), $event->getIpColumn())
                 ];
-                $event->addTable('form.submissions', $data);
+                $event->addTable('form.submissions', $data, 'forms');
 
                 // Register graphs
                 $context = 'form.submissions';

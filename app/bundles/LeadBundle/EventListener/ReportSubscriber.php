@@ -84,9 +84,9 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        if ($event->checkContext(['leads', 'lead.pointlog', 'lead.attribution'])) {
+        if ($event->checkContext(['leads', 'lead.pointlog', 'contact.attribution.multi', 'contact.attribution.single'])) {
             $columns = [
-                'l.id'        => [
+                'l.id'              => [
                     'label' => 'mautic.lead.report.contact_id',
                     'type'  => 'int',
                     'link'  => 'mautic_contact_action'
@@ -158,10 +158,10 @@ class ReportSubscriber extends CommonSubscriber
                 $list[$segment['id']] = $segment['name'];
             }
             $filters['s.leadlist_id'] = [
-                'alias' => 'segment_id',
-                'label' => 'mautic.core.filter.lists',
-                'type'  => 'select',
-                'list'  => $list,
+                'alias'     => 'segment_id',
+                'label'     => 'mautic.core.filter.lists',
+                'type'      => 'select',
+                'list'      => $list,
                 'operators' => [
                     'eq' => 'mautic.core.operator.equals'
                 ]
@@ -173,10 +173,14 @@ class ReportSubscriber extends CommonSubscriber
                 'filters'      => $filters,
             ];
 
-            $event->addTable('leads', $data);
+            $event->addTable('leads', $data, 'contacts');
 
-            if ($event->checkContext('lead.attribution')) {
-                $this->injectAttributionReportData($event, $columns);
+            if ($event->checkContext('contact.attribution.multi')) {
+                $this->injectAttributionReportData($event, $columns, 'multi');
+            }
+
+            if ($event->checkContext('contact.attribution.single')) {
+                $this->injectAttributionReportData($event, $columns, 'single');
             } else {
                 // Add shared graphs
                 $event->addGraph('leads', 'line', 'mautic.lead.graph.line.leads');
@@ -229,12 +233,63 @@ class ReportSubscriber extends CommonSubscriber
 
                 break;
 
-            case 'lead.attribution':
+            case 'contact.attribution.multi':
                 $event->applyDateFilters($qb, 'date_added', 'la');
                 $qb->from(MAUTIC_TABLE_PREFIX.'lead_attributions', 'la')
                     ->leftJoin('la', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = la.lead_id')
                     ->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
 
+                break;
+
+            case 'contact.attribution.single':
+                //$event->applyDateFilters($qb, 'date_added', 'lafirst');
+
+                // Create a subquery for first touch
+                $firstQb = clone $qb;
+                $minQb   = clone $firstQb;
+
+                $available = [
+                    'campaign_id',
+                    'campaign_name',
+                    'date_added',
+                    'channel',
+                    'channel_id',
+                    'action',
+                    'stage_id',
+                    'stage_name',
+                    'comments'
+                ];
+
+                $firstSelect = ['first.lead_id'];
+                foreach ($available as $column) {
+                    $firstSelect[] = "first.$column as first_{$column}";
+                }
+                $firstQb->select($firstSelect)
+                    ->from(MAUTIC_TABLE_PREFIX.'lead_attributions', 'first');
+                $minQb->select('min(mini.id) as first_id')
+                    ->from(MAUTIC_TABLE_PREFIX.'lead_attributions', 'mini')
+                    ->groupBy('mini.lead_id');
+                $firstQb->join('first', sprintf('(%s)', $minQb->getSQL()), 'first_touch', 'first_touch.first_id = first.id');
+
+                $lastQb  = clone $qb;
+                $maxQb   = clone $lastQb;
+
+                $lastSelect = ['last.lead_id'];
+                foreach ($available as $column) {
+                    $lastSelect[] = "last.$column as last_{$column}";
+                }
+                $lastQb->select($lastSelect)
+                    ->from(MAUTIC_TABLE_PREFIX.'lead_attributions', 'last');
+                $maxQb->select('max(maxi.id) as last_id')
+                    ->from(MAUTIC_TABLE_PREFIX.'lead_attributions', 'maxi')
+                    ->groupBy('maxi.lead_id');
+                $lastQb->join('last', sprintf('(%s)', $maxQb->getSQL()), 'last_touch', 'last_touch.last_id = last.id');
+
+                $qb->from(sprintf('(%s)', $firstQb->getSQL()), 'lafirst')
+                    ->join('lafirst', sprintf('(%s)', $lastQb->getSQL()), 'lalast', 'lafirst.lead_id = lalast.lead_id')
+                    ->leftJoin('lafirst', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lafirst.lead_id')
+                    ->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
+                
                 break;
         }
 
@@ -251,7 +306,7 @@ class ReportSubscriber extends CommonSubscriber
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
         // Context check, we only want to fire for Lead reports
-        if (!$event->checkContext(['leads', 'lead.pointlog', 'lead.attribution'])) {
+        if (!$event->checkContext(['leads', 'lead.pointlog', 'contact.attribution.multi'])) {
 
             return;
         }
@@ -274,7 +329,7 @@ class ReportSubscriber extends CommonSubscriber
                 case 'mautic.lead.graph.pie.attribution_campaigns':
                 case 'mautic.lead.graph.pie.attribution_actions':
                 case 'mautic.lead.graph.pie.attribution_channels':
-                    $attributionQb->resetQueryParts(['select','orderBy']);
+                    $attributionQb->resetQueryParts(['select', 'orderBy']);
                     $outerQb = clone $attributionQb;
                     $outerQb->resetQueryParts()
                         ->select('slice, sum(avg_attribution) as total_attribution')
@@ -287,7 +342,9 @@ class ReportSubscriber extends CommonSubscriber
                                 ->groupBy('la.lead_id, la.stage_id');
                             break;
                         case 'campaigns':
-                            $attributionQb->select('CONCAT_WS(\':\', la.campaign_id, la.campaign_name) as slice, AVG(la.attribution) as avg_attribution')
+                            $attributionQb->select(
+                                'CONCAT_WS(\':\', la.campaign_id, la.campaign_name) as slice, AVG(la.attribution) as avg_attribution'
+                            )
                                 ->groupBy('la.lead_id, la.campaign_id');
                             break;
                         case 'actions':
@@ -306,7 +363,7 @@ class ReportSubscriber extends CommonSubscriber
                     );
 
                     $chart = new PieChart();
-                    $data = $outerQb->execute()->fetchAll();
+                    $data  = $outerQb->execute()->fetchAll();
 
                     foreach ($data as $row) {
                         $chart->setDataset($row['slice'], $row['total_attribution']);
@@ -454,23 +511,23 @@ class ReportSubscriber extends CommonSubscriber
             'display_name' => 'mautic.lead.report.points.table',
             'columns'      => array_merge($columns, $pointColumns, $event->getIpColumn())
         ];
-        $event->addTable('lead.pointlog', $data);
+        $event->addTable('lead.pointlog', $data, 'leads');
 
         // Register graphs
         $context = 'lead.pointlog';
         $event->addGraph($context, 'line', 'mautic.lead.graph.line.points')
-                ->addGraph($context, 'table', 'mautic.lead.table.most.points')
-                ->addGraph($context, 'table', 'mautic.lead.table.top.countries')
-                ->addGraph($context, 'table', 'mautic.lead.table.top.cities')
-                ->addGraph($context, 'table', 'mautic.lead.table.top.events')
-                ->addGraph($context, 'table', 'mautic.lead.table.top.actions');
+            ->addGraph($context, 'table', 'mautic.lead.table.most.points')
+            ->addGraph($context, 'table', 'mautic.lead.table.top.countries')
+            ->addGraph($context, 'table', 'mautic.lead.table.top.cities')
+            ->addGraph($context, 'table', 'mautic.lead.table.top.events')
+            ->addGraph($context, 'table', 'mautic.lead.table.top.actions');
     }
 
     /**
      * @param ReportBuilderEvent $event
      * @param array              $columns
      */
-    private function injectAttributionReportData(ReportBuilderEvent $event, array $columns)
+    private function injectAttributionReportData(ReportBuilderEvent $event, array $columns, $type)
     {
         $attributionColumns = [
             'la.campaign_id'   => [
@@ -516,35 +573,57 @@ class ReportSubscriber extends CommonSubscriber
             ]
         ];
 
-        $filters = $columns = array_merge($columns, $attributionColumns, $event->getIpColumn());
-
-        // Unset activity attribution for $filters since this data is calculated and not accurately filterable
         // Unset IP address
-        unset($filters['la.attribution'], $columns['i.ip_address'], $filters['i.ip_address']);
+        unset($columns['i.ip_address']);
 
-        // Append stage filters
-        $filters['la.stage_id'] = [
-            'label' => 'mautic.lead.report.attribution.filter.stage',
-            'type'  => 'multiselect',
-            'list'  => [
-                // @todo add stage lists
-                1 => 'Stage One',
-                2 => 'Stage Two'
-            ],
-        ];
+        $context = "contact.attribution.$type";
+        if ('multi' == $type) {
+            $filters = $columns = array_merge($columns, $attributionColumns);
+
+            // Unset activity attribution for $filters since this data is calculated and not accurately filterable
+            unset($filters['la.attribution']);
+
+            // Append stage filters
+            $filters['la.stage_id'] = [
+                'label' => 'mautic.lead.report.attribution.filter.stage',
+                'type'  => 'select',
+                'list'  => [
+                    // @todo add stage lists
+                    1 => 'Stage One',
+                    2 => 'Stage Two'
+                ],
+            ];
+
+            $event
+                ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_stages')
+                ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_campaigns')
+                ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_actions')
+                ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_channels');
+        } else {
+            // Add each column as first and last single touch
+            $singleTouchColumns = [];
+            foreach (['first','last'] as $touchType) {
+                foreach ($attributionColumns as $column => $data) {
+                    if ('la.attribution' == $column) {
+                        continue;
+                    }
+
+                    $column                      = str_replace('la.', "la{$touchType}.{$touchType}_", $column);
+                    $data['label']               = $data['label'].'_'.$touchType;
+                    $singleTouchColumns[$column] = $data;
+                }
+            }
+
+            $filters = $columns = array_merge($columns, $singleTouchColumns);
+        }
 
         $data = [
-            'display_name' => 'mautic.lead.report.attribution.table',
+            'display_name' => 'mautic.lead.report.attribution.'.$type,
             'columns'      => $columns,
             'filters'      => $filters,
         ];
 
-        $context = 'lead.attribution';
-        $event->addTable($context, $data)
-            ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_stages')
-            ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_campaigns')
-            ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_actions')
-            ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_channels');
+        $event->addTable($context, $data, 'contacts');
     }
 
     /**

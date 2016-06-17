@@ -111,7 +111,8 @@ class ReportSubscriber extends CommonSubscriber
                     [
                         'display_name' => 'mautic.asset.report.downloads.table',
                         'columns'      => array_merge($columns, $downloadColumns, $event->getLeadColumns(), $event->getIpColumn())
-                    ]
+                    ],
+                    'assets'
                 );
 
                 // Add Graphs

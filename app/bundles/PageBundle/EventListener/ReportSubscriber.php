@@ -100,7 +100,11 @@ class ReportSubscriber extends CommonSubscriber
                     'type'  => 'int'
                 ]
             ];
-            $columns = array_merge($columns, $event->getStandardColumns('p.', ['name', 'description'], 'mautic_page_action'), $event->getCategoryColumns());
+            $columns = array_merge(
+                $columns,
+                $event->getStandardColumns('p.', ['name', 'description'], 'mautic_page_action'),
+                $event->getCategoryColumns()
+            );
             $data    = [
                 'display_name' => 'mautic.page.pages',
                 'columns'      => $columns
@@ -201,7 +205,7 @@ class ReportSubscriber extends CommonSubscriber
                     'display_name' => 'mautic.page.hits',
                     'columns'      => array_merge($columns, $hitColumns, $event->getLeadColumns(), $event->getIpColumn())
                 ];
-                $event->addTable('page.hits', $data);
+                $event->addTable('page.hits', $data, 'pages');
 
                 // Register graphs
                 $context = 'page.hits';

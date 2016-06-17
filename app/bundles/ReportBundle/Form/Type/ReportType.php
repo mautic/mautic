@@ -311,7 +311,7 @@ class ReportType extends AbstractType
         $list = [];
 
         foreach ($temp as $table) {
-            $list[$table] = $tables[$table]['display_name'];
+            $list['mautic.report.group.'.$tables[$table]['group']][$table] = $tables[$table]['display_name'];
         }
 
         return $list;

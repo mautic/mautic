@@ -77,8 +77,10 @@ class ReportBuilderEvent extends Event
      *
      * @return ReportBuilderEvent
      */
-    public function addTable($context, array $data)
+    public function addTable($context, array $data, $group = null)
     {
+        $data['group'] = (null == $group) ? $context : $group;
+
         foreach ($data['columns'] as $column => &$d) {
             $d['label'] = $this->translator->trans($d['label']);
             if (!isset($d['alias'])) {

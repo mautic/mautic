@@ -252,7 +252,7 @@ class ReportModel extends FormModel
     public function getColumnList($context)
     {
         $tableData           = $this->getTableData($context);
-        $columns             = $tableData['columns'];
+        $columns             = isset($tableData['columns']) ? $tableData['columns'] : [];
         $return              = new \stdClass();
         $return->choices     = [];
         $return->choiceHtml  = '';
@@ -282,7 +282,7 @@ class ReportModel extends FormModel
         $tableData = $this->getTableData($context);
 
         $return                  = new \stdClass();
-        $filters                 = (isset($tableData['filters'])) ? $tableData['filters'] : $tableData['columns'];
+        $filters                 = (isset($tableData['filters'])) ? $tableData['filters'] : (isset($tableData['columns']) ? $tableData['columns'] : []);
         $return->choices         = [];
         $return->choiceHtml      = '';
         $return->definitions     = [];
