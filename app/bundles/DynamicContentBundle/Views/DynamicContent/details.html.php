@@ -17,21 +17,22 @@ $showVariants = (count($variants['children'])
     || (!empty($variants['parent'])
         && $variants['parent']->getId() != $entity->getId()));
 
-if ((empty($variants['parent']) || ($variants['parent']->getId() == $entity->getId()))
-    && $permissions['dynamicContent:dynamicContents:create']
-) {
-    $customButtons[] = [
-        'attr' => [
-            'data-toggle' => 'ajax',
-            'href' => $view['router']->generate(
-                'mautic_dwc_action',
-                ['objectAction' => 'addvariant', 'objectId' => $entity->getId()]
-            ),
-        ],
-        'iconClass' => 'fa fa-sitemap',
-        'btnText' => $view['translator']->trans('mautic.core.form.addvariant'),
-    ];
-}
+$customButtons = [];
+//if ((empty($variants['parent']) || ($variants['parent']->getId() == $entity->getId()))
+//    && $permissions['dynamicContent:dynamicContents:create']
+//) {
+//    $customButtons[] = [
+//        'attr' => [
+//            'data-toggle' => 'ajax',
+//            'href' => $view['router']->generate(
+//                'mautic_dwc_action',
+//                ['objectAction' => 'addvariant', 'objectId' => $entity->getId()]
+//            ),
+//        ],
+//        'iconClass' => 'fa fa-sitemap',
+//        'btnText' => $view['translator']->trans('mautic.core.form.addvariant'),
+//    ];
+//}
 
 $basicSecurity =
 
