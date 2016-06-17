@@ -159,9 +159,16 @@ class ChartQuery extends AbstractChart
      */
     public function applyDateFilters(&$query, $dateColumn, $tablePrefix = 't')
     {
+        // Check if the date filters have already been applied
+        if ($parameters = $query->getParameters()) {
+            if (array_key_exists('dateTo', $parameters) || array_key_exists('dateFrom', $parameters)) {
+
+                return;
+            }
+        }
+
         if ($dateColumn) {
             $isTime = (in_array($this->unit, array('H', 'i', 's')));
-
             if ($this->dateFrom && $this->dateTo) {
                 // Between is faster so if we know both dates...
                 $dateFrom = clone $this->dateFrom;
@@ -188,7 +195,7 @@ class ChartQuery extends AbstractChart
                     $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
                 }
             }
-            
+
         }
     }
 
