@@ -144,8 +144,7 @@ SQL;
         $this->addSql(
             "ALTER TABLE {$this->prefix}lead_attributions ADD CONSTRAINT {$this->keys['fk']['ip']} FOREIGN KEY (ip_id) REFERENCES {$this->prefix}ip_addresses (id) ON DELETE SET NULL"
         );
-
-
+        
         $this->addSql(
             "ALTER TABLE {$this->prefix}lead_attributions ADD CONSTRAINT {$this->keys['fk']['stage']} FOREIGN KEY (stage_id) REFERENCES {$this->prefix}stages (id) ON DELETE SET NULL"
         );
