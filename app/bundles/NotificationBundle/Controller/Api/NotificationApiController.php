@@ -30,7 +30,7 @@ class NotificationApiController extends CommonApiController
 
         if ($osid) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-            $leadModel = $this->factory->getModel('lead');
+            $leadModel = $this->getModel('lead');
 
             $currentLead = $leadModel->getCurrentLead();
 

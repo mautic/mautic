@@ -10,12 +10,12 @@ namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
-use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class IpLookupDownloadDataStoreButtonType extends AbstractType
 {
@@ -25,11 +25,17 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
     private $dateHelper;
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
-    public function __construct(DateHelper $dateHelper, Translator $translator)
+    /**
+     * IpLookupDownloadDataStoreButtonType constructor.
+     *
+     * @param DateHelper $dateHelper
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(DateHelper $dateHelper, TranslatorInterface $translator)
     {
         $this->dateHelper = $dateHelper;
         $this->translator = $translator;
@@ -45,13 +51,13 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
         $builder->add(
             'fetch_button',
             'button',
-            array(
+            [
                 'label' => ($localDataExists) ? 'mautic.core.ip_lookup.update_data' : 'mautic.core.ip_lookup.fetch_data',
-                'attr' => array(
+                'attr' => [
                     'class'   => 'btn btn-'.($localDataExists ? 'success' : 'danger'),
                     'onclick' => 'Mautic.downloadIpLookupDataStore()',
-                )
-            )
+                ]
+            ]
         );
     }
 
@@ -60,11 +66,8 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
-            'ip_lookup_service' => null
-        ));
+        $resolver->setDefaults(['ip_lookup_service' => null]);
     }
-
 
     /**
      * {@inheritdoc}
@@ -78,12 +81,15 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
                 $lastModified                            = $this->dateHelper->toText($lastModifiedTimestamp, 'UTC', 'U');
                 $view->vars['ipDataStoreLastDownloaded'] = $this->translator->trans(
                     'mautic.core.ip_lookup.last_updated',
-                    array('%date%' => $lastModified)
+                    ['%date%' => $lastModified]
                 );
             }
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'iplookup_download_data_store_button';

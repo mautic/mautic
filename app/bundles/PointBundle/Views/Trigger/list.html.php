@@ -78,7 +78,7 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
                     <div>
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'point.trigger')); ?>
                         <?php if ($permissions['point:triggers:edit']): ?>
-                        <a href="<?php echo $view['router']->generate('mautic_pointtrigger_action', array("objectAction" => "edit", "objectId" => $item->getId())); ?>" data-toggle="ajax">
+                        <a href="<?php echo $view['router']->path('mautic_pointtrigger_action', array("objectAction" => "edit", "objectId" => $item->getId())); ?>" data-toggle="ajax">
                             <?php echo $item->getName(); ?>
                         </a>
                         <?php else: ?>
@@ -108,7 +108,7 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
         "page"            => $page,
         "limit"           => $limit,
         "menuLinkId"      => 'mautic_pointtrigger_index',
-        "baseUrl"         => $view['router']->generate('mautic_pointtrigger_index'),
+        "baseUrl"         => $view['router']->path('mautic_pointtrigger_index'),
         'sessionVar'      => 'pointtrigger'
     )); ?>
 </div>

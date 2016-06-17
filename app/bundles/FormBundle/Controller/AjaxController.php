@@ -61,7 +61,7 @@ class AjaxController extends CommonAjaxController
     {
         $formId    = InputHelper::int($request->request->get('formId'));
         $dataArray = array('success' => 0);
-        $model = $this->factory->getModel('form');
+        $model = $this->getModel('form');
         $entity = $model->getEntity($formId);
         $formFields = $entity->getFields();
         $fields = array();

@@ -11,6 +11,7 @@ namespace Mautic\CoreBundle\Security\Permissions;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\Permission;
 use Symfony\Component\Security\Core\SecurityContext;
@@ -27,11 +28,18 @@ class CorePermissions
     protected $factory;
 
     /**
-     * @param MauticFactory $factory
+     * @var UserHelper
      */
-    public function __construct(MauticFactory $factory)
+    protected $userHelper;
+
+    /**
+     * @param MauticFactory $factory
+     * @param UserHelper    $userHelper
+     */
+    public function __construct(MauticFactory $factory, UserHelper $userHelper)
     {
         $this->factory = $factory;
+        $this->userHelper = $userHelper;
     }
 
     /**
@@ -253,7 +261,7 @@ class CorePermissions
         static $grantedPermissions = array();
 
         if ($userEntity === null) {
-            $userEntity = $this->getUser();
+            $userEntity = $this->userHelper->getUser();
         }
 
         if (!is_array($requestedPermission)) {
@@ -269,8 +277,7 @@ class CorePermissions
 
             $parts = explode(':', $permission);
 
-            // addon @deprecated 1.1.4; will be removed in 2.0
-            if (($parts[0] == 'addon' ||$parts[0] == 'plugin') && count($parts) == 4) {
+            if ($parts[0] == 'plugin' && count($parts) == 4) {
                 $isPlugin = true;
                 array_shift($parts);
             } else {
@@ -349,8 +356,8 @@ class CorePermissions
             }
 
             $parts = explode(':', $p);
-            // addon @deprecated 1.1.4; will be removed in 2.0
-            if (($parts[0] == 'addon' || $parts[0] == 'plugin') && count($parts) == 4) {
+
+            if ($parts[0] == 'plugin' && count($parts) == 4) {
                 $isPlugin = true;
                 array_shift($parts);
             } else {
@@ -380,7 +387,7 @@ class CorePermissions
      */
     public function hasEntityAccess($ownPermission, $otherPermission, $ownerId = 0)
     {
-        $user = $this->getUser();
+        $user = $this->userHelper->getUser();
         if (!is_object($user)) {
             //user is likely anon. so assume no access and let controller handle via published status
             return false;
@@ -419,9 +426,9 @@ class CorePermissions
             } else {
                 return false;
             }
-        } elseif ($own && (int) $this->getUser()->getId() === (int) $ownerId) {
+        } elseif ($own && (int) $this->userHelper->getUser()->getId() === (int) $ownerId) {
             return true;
-        } elseif ($other && (int) $this->getUser()->getId() !== (int) $ownerId) {
+        } elseif ($other && (int) $this->userHelper->getUser()->getId() !== (int) $ownerId) {
             return true;
         } else {
             return false;
@@ -456,24 +463,11 @@ class CorePermissions
     }
 
     /**
-     * @return User|mixed
-     */
-    private function getUser()
-    {
-        if ($token = $this->getSecurityContext()->getToken()) {
-            $this->user = $token->getUser();
-        } else {
-            $this->user = new User();
-        }
-        return $this->user;
-    }
-
-    /**
      * @return bool
      */
     public function isAnonymous()
     {
-        $userEntity = $this->getUser();
+        $userEntity = $this->userHelper->getUser();
         return ($userEntity instanceof User && $userEntity->getId()) ? false : true;
     }
 }

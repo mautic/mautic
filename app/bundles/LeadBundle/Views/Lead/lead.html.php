@@ -52,8 +52,8 @@ if (!empty($fields['core']['email']['value'])) {
                 'mautic.lead.email.send_email.header',
                 array('%email%' => $fields['core']['email']['value'])
             ),
-            'href'        => $view['router']->generate(
-                'mautic_lead_action',
+            'href'        => $view['router']->path(
+                'mautic_contact_action',
                 array('objectId' => $lead->getId(), 'objectAction' => 'email')
             )
         ),
@@ -71,8 +71,8 @@ $buttons[] = array(
             array('%name%' => $lead->getPrimaryIdentifier())
         ),
         'data-footer' => 'false',
-        'href'        => $view['router']->generate(
-            'mautic_lead_action',
+        'href'        => $view['router']->path(
+            'mautic_contact_action',
             array("objectId" => $lead->getId(), "objectAction" => "list")
         ),
     ),
@@ -91,8 +91,8 @@ if ($security->isGranted('campaign:campaigns:edit')) {
                 array('%name%' => $lead->getPrimaryIdentifier())
             ),
             'data-footer' => 'false',
-            'href'        => $view['router']->generate(
-                'mautic_lead_action',
+            'href'        => $view['router']->path(
+                'mautic_contact_action',
                 array("objectId" => $lead->getId(), "objectAction" => "campaign")
             )
         ),
@@ -118,8 +118,8 @@ if (($security->hasEntityAccess(
                 'mautic.lead.lead.header.merge',
                 array('%name%' => $lead->getPrimaryIdentifier())
             ),
-            'href'        => $view['router']->generate(
-                'mautic_lead_action',
+            'href'        => $view['router']->path(
+                'mautic_contact_action',
                 array("objectId" => $lead->getId(), "objectAction" => "merge")
             )
         ),
@@ -135,7 +135,7 @@ $view['slots']->set(
         'MauticCoreBundle:Helper:page_actions.html.php',
         array(
             'item'            => $lead,
-            'routeBase'       => 'lead',
+            'routeBase'       => 'contact',
             'langVar'         => 'lead.lead',
             'customButtons'   => $buttons,
             'templateButtons' => array(
@@ -475,7 +475,7 @@ $view['slots']->set(
                             <span class="figure"></span>
                         </div>
                         <div class="media-body">
-                            <?php $link = '<a href="' . $view['router']->generate('mautic_campaign_action', array("objectAction" => "view", "objectId" => $event['campaign_id'])) . '" data-toggle="ajax">' . $event['campaign_name'] . '</a>'; ?>
+                            <?php $link = '<a href="' . $view['router']->path('mautic_campaign_action', array("objectAction" => "view", "objectId" => $event['campaign_id'])) . '" data-toggle="ajax">' . $event['campaign_name'] . '</a>'; ?>
                             <?php echo $view['translator']->trans('mautic.lead.lead.upcoming.event.triggered.at', array('%event%' => $event['event_name'], '%link%' => $link)); ?>
                             <p class="fs-12 dark-sm"><?php echo $view['date']->toFull($event['trigger_date']); ?></p>
                         </div>

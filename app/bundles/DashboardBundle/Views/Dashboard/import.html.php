@@ -28,13 +28,13 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.dashboard.
                                 <p class="small"><?php echo $config['description']; ?></p>
                                 <?php endif; ?>
                                 <p class="list-group-item-text">
-                                    <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'import', 'preview' => $dashboard)); ?>">
+                                    <a href="<?php echo $view['router']->path('mautic_dashboard_action', array('objectAction' => 'import', 'preview' => $dashboard)); ?>">
                                         <?php echo $view['translator']->trans('mautic.dashboard.preview'); ?>
                                     </a>&#183;
-                                    <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'applyDashboardFile', 'file' => "{$config['type']}.{$dashboard}")); ?>">
+                                    <a href="<?php echo $view['router']->path('mautic_dashboard_action', array('objectAction' => 'applyDashboardFile', 'file' => "{$config['type']}.{$dashboard}")); ?>">
                                         <?php echo $view['translator']->trans('mautic.core.form.apply'); ?>
                                     </a><?php if ($config['type'] == 'user'): ?>&#183;
-                                    <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'deleteDashboardFile', 'file' => "{$config['type']}.{$dashboard}")); ?>" data-toggle="confirmation" data-message="<?php echo $view['translator']->trans('mautic.dashboard.delete_layout'); ?>" data-confirm-text="<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete")); ?>" data-confirm-callback="executeAction" data-cancel-text="<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel")); ?>">
+                                    <a href="<?php echo $view['router']->path('mautic_dashboard_action', array('objectAction' => 'deleteDashboardFile', 'file' => "{$config['type']}.{$dashboard}")); ?>" data-toggle="confirmation" data-message="<?php echo $view['translator']->trans('mautic.dashboard.delete_layout'); ?>" data-confirm-text="<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete")); ?>" data-confirm-callback="executeAction" data-cancel-text="<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel")); ?>">
                                         <?php echo $view['translator']->trans('mautic.core.form.delete'); ?>
                                     </a><?php endif; ?>
                                 </p>

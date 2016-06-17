@@ -9,6 +9,8 @@
 
 namespace Mautic\WebhookBundle\Model;
 
+use JMS\Serializer\Serializer;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\WebhookBundle\Entity\Log;
 use Mautic\WebhookBundle\Entity\Webhook;
@@ -30,18 +32,41 @@ use Mautic\CoreBundle\Factory\MauticFactory;
  */
 class WebhookModel extends FormModel
 {
+    protected $queueModel;
     protected $webhookStart;
     protected $webhookLimit;
     protected $webhookQueueIdList = array();
 
     /**
-     * @param MauticFactory $factory
+     * @var Serializer
      */
-    public function __construct(MauticFactory $factory)
+    protected $serializer;
+
+    /**
+     * @var Logger
+     */
+    protected $logger;
+
+    /**
+     * WebhookModel constructor.
+     * 
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param Serializer $serializer
+     */
+    public function __construct(CoreParametersHelper $coreParametersHelper, Serializer $serializer)
     {
-        parent::__construct($factory);
-        $this->webhookStart = $factory->getParameter('webhook_start');
-        $this->webhookLimit = $factory->getParameter('webhook_limit');
+        $this->queueMode    = $coreParametersHelper->getParameter('queue_mode');
+        $this->webhookStart = $coreParametersHelper->getParameter('webhook_start');
+        $this->webhookLimit = $coreParametersHelper->getParameter('webhook_limit');
+        $this->serializer   =  $serializer;
+    }
+
+    /**
+     * @param Logger $logger
+     */
+    public function setLogger(Logger $logger)
+    {
+        $this->logger = $logger;
     }
 
     /**
@@ -161,9 +186,7 @@ class WebhookModel extends FormModel
             $queueList = array();
         }
 
-        $queueMode = $this->factory->getParameter('queue_mode');
-
-        if ($queueMode == 'immediate_process') {
+        if ($this->queueMode == 'immediate_process') {
             $this->processWebhooks($webhookList);
         }
 
@@ -223,9 +246,6 @@ class WebhookModel extends FormModel
         /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $webhookQueueRepo */
         $webhookQueueRepo = $this->getQueueRepository();
 
-        /** @var Logger $log */
-        $log = $this->factory->getLogger();
-
         // instantiate new http class
         $http = new Http();
 
@@ -248,7 +268,7 @@ class WebhookModel extends FormModel
             }
         } catch (\Exception $e) {
             // log any errors but allow the script to keep running
-            $log->addError($e->getMessage());
+            $this->logger->addError($e->getMessage());
         }
 
         // delete all the queued items we just processed
@@ -303,9 +323,7 @@ class WebhookModel extends FormModel
      */
     public function getLogRepository()
     {
-        $logRepo = $this->em->getRepository('MauticWebhookBundle:Log');
-        $logRepo->setFactory($this->factory);
-        return $logRepo;
+        return $this->em->getRepository('MauticWebhookBundle:Log');
     }
 
     /*
@@ -423,7 +441,7 @@ class WebhookModel extends FormModel
         }
     }
 
-    /*
+    /**
      * Serialize Data
      */
     public function serializeData($payload, $groups = array())
@@ -443,9 +461,7 @@ class WebhookModel extends FormModel
         $context->setSerializeNull(true);
 
         // serialize the data and send it as a payload
-        $payload = $this->factory->getSerializer()->serialize($payload, 'json', $context);
-
-        return $payload;
+        return $this->serializer->serialize($payload, 'json', $context);
     }
 
     /**

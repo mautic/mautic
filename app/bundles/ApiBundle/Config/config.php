@@ -152,6 +152,14 @@ return array(
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'oauth_callback'
             )
+        ),
+        'models' =>  array(
+            'mautic.api.model.client' => array(
+                'class' => 'Mautic\ApiBundle\Model\ClientModel',
+                'arguments' => array(
+                    'request_stack'
+                )
+            )
         )
     ),
 

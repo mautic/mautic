@@ -58,14 +58,7 @@ class CampaignBuilderEvent extends Event
      *                        'formType'    => (optional) name of the form type SERVICE for the action
      *                        'formTypeOptions' => (optional) array of options to pass to the formType service
      *                        'formTheme'   => (optional) form theme
-     *                        'callback'    => (optional) callback function that will be passed when the event is triggered
-     *                            The callback function should return a bool to determine if the trigger's actions
-     *                            should be executed.  For example, only trigger actions for specific entities.
-     *                            it can can receive the following arguments by name (via ReflectionMethod::invokeArgs())
-     *                              mixed $eventDetails Whatever the bundle passes when triggering the event
-     *                              Mautic\CoreBundle\Factory\MauticFactory $factory
-     *                              Mautic\LeadBundle\Entity\Lead $lead
-     *                              array $event
+     *                        'eventName'   => (optional) The event name to fire when this event is triggered.
      */
     public function addLeadDecision ($key, array $action)
     {
@@ -169,17 +162,13 @@ class CampaignBuilderEvent extends Event
      *
      * @param string $key     - a unique identifier; it is recommended that it be namespaced i.e. lead.action
      * @param array  $action - can contain the following keys:
-     *                       'label'         => (required) what to display in the list
-     *                       'description'   => (optional) short description of event
-     *                       'formType'      => (optional) name of the form type SERVICE for the action
-     *                       'formTypeOptions' => (optional) array of options to pass to the formType service
-     *                       'formTheme'     => (optional) form theme
+     *                       'label'            => (required) what to display in the list
+     *                       'description'      => (optional) short description of event
+     *                       'formType'         => (optional) name of the form type SERVICE for the action
+     *                       'formTypeOptions'  => (optional) array of options to pass to the formType service
+     *                       'formTheme'        => (optional) form theme
      *                       'timelineTemplate' => (optional) custom template for the lead timeline
-     *                       'callback'      => (required) callback function that will be passed when the action is triggered
-     *                            The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
-     *                              Mautic\CoreBundle\Factory\MauticFactory $factory
-     *                              Mautic\LeadBundle\Entity\Lead $lead
-     *                              array $event
+     *                       'eventName'        => (required) The event to fire when this event is triggered.
      */
     public function addAction ($key, array $action)
     {
@@ -189,8 +178,8 @@ class CampaignBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            array('label', 'callback'),
-            array('callback'),
+            array('label'),
+            array(),
             $action
         );
 
