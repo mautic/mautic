@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Menu\MenuHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Symfony\Component\Routing\Route;
@@ -141,7 +142,8 @@ class CommonSubscriber implements EventSubscriberInterface
 
         if (empty($icons)) {
             $bundles    = $this->factory->getMauticBundles(true);
-            $menuHelper = $this->factory->getHelper('template.menu');
+            /** @var MenuHelper $menuHelper */
+            $menuHelper = $this->factory->getHelper('menu');
             foreach ($bundles as $bundle) {
                 if (!empty($bundle['config']['menu']['main'])) {
                     $items = (!isset($bundle['config']['menu']['main']['items']) ? $bundle['config']['menu']['main'] : $bundle['config']['menu']['main']['items']);
