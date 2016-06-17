@@ -96,7 +96,7 @@ if ($tmpl == 'index') {
                                 'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                 array('item' => $item, 'model' => 'point')
                             ); ?>
-                            <a href="<?php echo $view['router']->generate(
+                            <a href="<?php echo $view['router']->path(
                                 'mautic_point_action',
                                 array("objectAction" => "edit", "objectId" => $item->getId())
                             ); ?>" data-toggle="ajax">
@@ -140,7 +140,7 @@ if ($tmpl == 'index') {
                 "page"       => $page,
                 "limit"      => $limit,
                 "menuLinkId" => 'mautic_point_index',
-                "baseUrl"    => $view['router']->generate('mautic_point_index'),
+                "baseUrl"    => $view['router']->path('mautic_point_index'),
                 'sessionVar' => 'point'
             )
         ); ?>

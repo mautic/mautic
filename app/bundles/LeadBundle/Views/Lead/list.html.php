@@ -41,7 +41,12 @@ if ($tmpl == 'index')
                     'text'       => 'mautic.lead.lead.thead.location',
                     'class'      => 'col-lead-location visible-md visible-lg'
                 ));
-
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'sessionVar' => 'lead',
+                    'orderBy'    => 'l.stage',
+                    'text'       => 'mautic.lead.stage.label',
+                    'class'      => 'col-lead-stage'
+                ));
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'lead',
                     'orderBy'    => 'l.points',
@@ -83,7 +88,7 @@ if ($tmpl == 'index')
         "page"            => $page,
         "limit"           => $limit,
         "menuLinkId"      => 'mautic_contact_index',
-        "baseUrl"         => $view['router']->generate('mautic_contact_index'),
+        "baseUrl"         => $view['router']->path('mautic_contact_index'),
         "tmpl"            => $indexMode,
         'sessionVar'      => 'lead'
     )); ?>

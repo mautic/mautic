@@ -17,6 +17,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\UserBundle\Entity\User;
 use Mautic\NotificationBundle\Entity\PushID;
+use Mautic\StageBundle\Entity\Stage;
 
 /**
  * Class Lead
@@ -143,6 +144,15 @@ class Lead extends FormEntity
     private $tags;
 
     /**
+     * @var \Mautic\StageBundle\Entity\Stage
+     */
+    private $stage;
+    /**
+     * @var ArrayCollection
+     */
+    private $stageChangeLog;
+
+    /**
      * @param $name
      *
      * @return bool
@@ -251,6 +261,20 @@ class Lead extends FormEntity
             ->cascadePersist()
             ->cascadeDetach()
             ->build();
+        
+        $builder->createManyToOne('stage', 'Mautic\StageBundle\Entity\Stage')
+            ->cascadePersist()
+            ->cascadeMerge()
+            ->addJoinColumn('stage_id', 'id', false)
+            ->build();
+        
+        $builder->createOneToMany('stageChangeLog', 'StagesChangeLog')
+            ->orphanRemoval()
+            ->setOrderBy(array('dateAdded' => 'DESC'))
+            ->mappedBy('lead')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
     }
 
     /**
@@ -325,6 +349,7 @@ class Lead extends FormEntity
         $this->doNotContact    = new ArrayCollection();
         $this->pointsChangeLog = new ArrayCollection();
         $this->tags            = new ArrayCollection();
+        $this->stageChangeLog = new ArrayCollection();
     }
 
     /**
@@ -673,7 +698,40 @@ class Lead extends FormEntity
 
         return $this;
     }
+    /**
+     * Creates a points change entry
+     *
+     * @param           $type
+     * @param           $name
+     * @param           $action
+     * @param           $pointsDelta
+     * @param IpAddress $ip
+     */
+    public function stageChangeLogEntry ($type, $name, $action)
+    {
+        //create a new points change event
+        $event = new StagesChangeLog();
+        $event->setType($type);
+        $event->setEventName($name);
+        $event->setActionName($action);
+        $event->setDateAdded(new \DateTime());
+        $event->setLead($this);
+        $this->stageChangeLog($event);
+    }
 
+    /**
+     * Add pointsChangeLog
+     *
+     * @param PointsChangeLog $pointsChangeLog
+     *
+     * @return Lead
+     */
+    public function stageChangeLog(StagesChangeLog $stageChangeLog)
+    {
+        $this->stageChangeLog[] = $stageChangeLog;
+
+        return $this;
+    }
     /**
      * Remove pointsChangeLog
      *
@@ -1098,6 +1156,30 @@ class Lead extends FormEntity
         $this->tags = $tags;
 
         return $this;
+    }
+
+    /**
+     * Set stage
+     *
+     * @param \Mautic\StageBundle\Entity\Stage $stage
+     *
+     * @return Stage
+     */
+    public function setStage(\Mautic\StageBundle\Entity\Stage $stage)
+    {
+        $this->stage = $stage;
+
+        return $this;
+    }
+
+    /**
+     * Get stage
+     *
+     * @return \Mautic\StageBundle\Entity\Stage
+     */
+    public function getStage()
+    {
+        return $this->stage;
     }
 
     /**

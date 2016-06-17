@@ -16,7 +16,7 @@ $item = $event['extra']['asset'];
 	<div class="panel">
 	    <div class="panel-body">
 	    	<h3>
-	    		<a href="<?php echo $view['router']->generate('mautic_asset_action',
+	    		<a href="<?php echo $view['router']->path('mautic_asset_action',
 				    array("objectAction" => "view", "objectId" => $item->getId())); ?>"
 				   data-toggle="ajax">
 				    <?php echo $view->escape($item->getTitle()); ?>

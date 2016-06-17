@@ -566,7 +566,7 @@ return [
         'image_path'                     => 'media/images',
         'theme'                          => 'Mauve',
         'db_driver'                      => 'pdo_mysql',
-        'db_host'                        => 'localhost',
+        'db_host'                        => '127.0.0.1',
         'db_port'                        => 3306,
         'db_name'                        => '',
         'db_user'                        => '',

@@ -3129,8 +3129,14 @@ var Mautic = {
             data: data,
             options: {
                 scales: {
-                    xAxes: [{display: false,}],
-                    yAxes: [{display: false,}]
+                     xAxes: [{
+                         ticks: {
+                             fontSize: 9,
+                             stacked: true
+                         }
+                     }],
+                    yAxes: [{display: false,}],
+
                 },
                 legend: {
                     display: false
