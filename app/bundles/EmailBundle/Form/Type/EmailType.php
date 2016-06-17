@@ -14,7 +14,6 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -252,20 +251,6 @@ class EmailType extends AbstractType
 
         $url = $this->request->getSchemeAndHttpHost().$this->request->getBasePath();
         $formModifier = function(FormEvent $event, $eventName, $isVariant) use ($url) {
-            if (FormEvents::PRE_SUBMIT == $eventName) {
-                $parser = new PlainTextHelper(
-                    array(
-                        'base_url' => $url
-                    )
-                );
-
-                $data = $event->getData();
-
-                // Then strip out HTML
-                $data['plainText'] = $parser->setHtml($data['plainText'])->getText();
-                $event->setData($data);
-            }
-
             if ($isVariant) {
                 $event->getForm()->add(
                     'variantSettings',
