@@ -12,6 +12,7 @@ namespace Mautic\DynamicContentBundle\Model;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
+use Mautic\LeadBundle\Entity\Lead;
 
 class DynamicContentModel extends FormModel
 {
@@ -88,5 +89,47 @@ class DynamicContentModel extends FormModel
         }
 
         return [$parent, $children];
+    }
+
+    /**
+     * @param DynamicContent $dwc
+     * @param Lead           $lead
+     * @param                $slot
+     */
+    public function setSlotContentForLead(DynamicContent $dwc, Lead $lead, $slot)
+    {
+        $qb = $this->em->getConnection()->createQueryBuilder();
+
+        $qb->insert(MAUTIC_TABLE_PREFIX.'dynamic_content_lead_data')
+            ->values([
+                'lead_id' => $lead->getId(),
+                'dynamic_content_id' => $dwc->getId(),
+                'slot' => ':slot',
+                'date_added' => $qb->expr()->literal((new \DateTime())->format('Y-m-d H:i:s'))
+            ])->setParameter('slot', $slot);
+        
+        $qb->execute();
+    }
+
+    /**
+     * @param      $slot
+     * @param Lead $lead
+     * 
+     * @return DynamicContent
+     */
+    public function getSlotContentForLead($slot, Lead $lead)
+    {
+        $qb = $this->em->getConnection()->createQueryBuilder();
+        
+        $qb->select('dc.content')
+            ->from(MAUTIC_TABLE_PREFIX.'dynamic_content', 'dc')
+            ->leftJoin('dc', MAUTIC_TABLE_PREFIX.'dynamic_content_lead_data', 'dcld', 'dcld.dynamic_content_id = dc.id')
+            ->andWhere($qb->expr()->eq('dcld.slot', ':slot'))
+            ->andWhere($qb->expr()->eq('dcld.lead_id', ':lead_id'))
+            ->setParameter('slot', $slot)
+            ->setParameter('lead_id', $lead->getId())
+            ->orderBy('dcld.date_added', 'DESC');
+        
+        return $qb->execute()->fetchColumn();
     }
 }

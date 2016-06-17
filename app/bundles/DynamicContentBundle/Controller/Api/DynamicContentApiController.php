@@ -9,11 +9,49 @@
  */
 namespace Mautic\DynamicContentBundle\Controller\Api;
 
-use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\FormBundle\Controller\PublicController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Class DynamicContentApiController.
  */
-class DynamicContentApiController extends CommonApiController
+class DynamicContentApiController extends PublicController
 {
+    /**
+     * @param $objectAlias
+     *
+     * @return mixed
+     */
+    public function processAction($objectAlias)
+    {
+        $method = $this->request->getMethod();
+
+        if (method_exists($this, $method.'Action')) {
+            return $this->{$method.'Action'}($objectAlias);
+        } else {
+            throw new HttpException(Response::HTTP_FORBIDDEN, 'This endpoint is not able to process '.strtoupper($method).' requests.');
+        }
+    }
+
+    public function getAction($objectAlias)
+    {
+        /** @var EventModel $campaignEventModel */
+        $campaignEventModel = $this->getModel('campaign.event');
+        
+        $response = $campaignEventModel->triggerEvent('dwc.decision', $objectAlias, 'dwc.decision.' . $objectAlias);
+        $content  = null;
+        
+        if (is_array($response) && !empty($response['action']['dwc.push_content'])) {
+            $content = array_shift($response['action']['dwc.push_content']);
+        } else {
+            $lead = $this->getModel('lead')->getCurrentLead();
+            
+            $content = $this->getModel('dynamicContent')->getSlotContentForLead($objectAlias, $lead);
+        }
+
+        return empty($content) ? new Response('', Response::HTTP_NOT_FOUND) : new Response($content);
+    }
 }

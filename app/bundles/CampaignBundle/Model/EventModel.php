@@ -909,10 +909,18 @@ class EventModel extends CommonFormModel
 
                 if ($response !== true) {
                     if ($this->triggeredResponses !== false) {
-                        if (!is_array($this->triggeredResponses[$event['eventType']])) {
-                            $this->triggeredResponses[$event['eventType']] = array();
+                        $eventTypeKey = $event['eventType'];
+                        $typeKey      = $event['type'];
+                        
+                        if (!array_key_exists($eventTypeKey, $this->triggeredResponses) || !is_array($this->triggeredResponses[$eventTypeKey])) {
+                            $this->triggeredResponses[$eventTypeKey] = [];
                         }
-                        $this->triggeredResponses[$event['eventType']][$event['id']] = $response;
+                        
+                        if (!array_key_exists($typeKey, $this->triggeredResponses[$eventTypeKey]) || !is_array($this->triggeredResponses[$eventTypeKey][$typeKey])) {
+                            $this->triggeredResponses[$eventTypeKey][$typeKey] = [];
+                        }
+                        
+                        $this->triggeredResponses[$eventTypeKey][$typeKey][$event['id']] = $response;
                     }
 
                     $log->setMetadata($response);

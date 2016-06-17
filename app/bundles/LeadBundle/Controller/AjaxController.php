@@ -601,6 +601,7 @@ class AjaxController extends CommonAjaxController
         if ($leadField && in_array($leadField->getType(), $choiceTypes)) {
             $properties = $leadField->getProperties();
             $fieldType  = $leadField->getType();
+            $options    = [];
             if (!empty($properties['list'])) {
                 // Lookup/Select options
                 $options = explode('|', $properties['list']);

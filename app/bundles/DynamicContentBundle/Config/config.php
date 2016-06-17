@@ -32,8 +32,15 @@ return [
                 'controller' => 'MauticDynamicContentBundle:DynamicContent:execute',
             ],
         ],
-        'api' => [
-
+        'public' => [
+            'mautic_api_dwc_index' => [
+                'path' => '/dwc',
+                'controller' => 'MauticDynamicContentBundle:Api\DynamicContentApi:getEntities'
+            ],
+            'mautic_api_dwc_action' => [
+                'path' => '/dwc/{objectAlias}',
+                'controller' => 'MauticDynamicContentBundle:Api\DynamicContentApi:process'
+            ]
         ],
     ],
     'services' => [
@@ -43,6 +50,8 @@ return [
                 'arguments' => [
                     'mautic.factory',
                     'mautic.lead.model.lead',
+                    'mautic.dynamicContent.model.dynamicContent',
+                    'session'
                 ],
             ],
         ],

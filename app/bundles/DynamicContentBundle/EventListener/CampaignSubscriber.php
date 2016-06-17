@@ -15,7 +15,10 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
+use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Class CampaignSubscriber.
@@ -28,13 +31,27 @@ class CampaignSubscriber extends CommonSubscriber
     protected $leadModel;
 
     /**
+     * @var DynamicContentModel
+     */
+    protected $dynamicContentModel;
+
+    /**
+     * @var Session
+     */
+    protected $session;
+
+    /**
      * CampaignSubscriber constructor.
      *
-     * @param LeadModel $leadModel
+     * @param MauticFactory       $factory
+     * @param LeadModel           $leadModel
+     * @param DynamicContentModel $dynamicContentModel
      */
-    public function __construct(MauticFactory $factory, LeadModel $leadModel)
+    public function __construct(MauticFactory $factory, LeadModel $leadModel, DynamicContentModel $dynamicContentModel, Session $session)
     {
         $this->leadModel = $leadModel;
+        $this->dynamicContentModel = $dynamicContentModel;
+        $this->session = $session;
 
         parent::__construct($factory);
     }
@@ -86,11 +103,38 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
     {
-        // todo
+        $eventConfig  = $event->getConfig();
+        $eventDetails = $event->getEventDetails();
+        $lead         = $event->getLead();
+
+        $this->session->set('dwc.slot_name.lead.' . $lead->getId(), $eventDetails);
+
+        if ($eventConfig['dwc_slot_name'] === $eventDetails) {
+            $event->setResult($eventDetails);
+            $event->stopPropagation();
+        }
     }
 
+    /**
+     * @param CampaignExecutionEvent $event
+     */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
-        // todo
+        $eventConfig  = $event->getConfig();
+        $lead         = $event->getLead();
+        $slot         = $this->session->get('dwc.slot_name.lead.'.$lead->getId());
+
+        $dwc = $this->dynamicContentModel->getRepository()->getEntity($eventConfig['dynamicContent']);
+        
+        if ($dwc instanceof DynamicContent) {
+
+            if ($slot) {
+                $this->dynamicContentModel->setSlotContentForLead($dwc, $lead, $slot);
+            }
+
+            $event->setResult($dwc->getContent());
+
+            $event->stopPropagation();
+        }
     }
 }

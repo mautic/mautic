@@ -9,6 +9,7 @@
  */
 namespace Mautic\DynamicContentBundle\Entity;
 
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -201,5 +202,34 @@ class DynamicContentRepository extends CommonRepository
         }
 
         return $q->getQuery()->getArrayResult();
+    }
+
+    public function getDynamicContentForSlotFromCampaign($slot)
+    {
+        $qb = $this->_em->getConnection()->createQueryBuilder();
+
+        $qb->select('ce.properties')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_events', 'ce')
+            ->leftJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = ce.campaign_id')
+            ->andWhere($qb->expr()->eq('ce.type', $qb->expr()->literal('dwc.decision')))
+            ->andWhere($qb->expr()->like('ce.properties', ':slot'))
+            ->setParameter('slot', '%'.$slot.'%')
+            ->orderBy('c.is_published');
+
+        $result = $qb->execute()->fetchAll();
+
+        foreach ($result as $item) {
+            $properties = unserialize($item['properties']);
+
+            if (isset($properties['dynamicContent'])) {
+                $dwc = $this->getEntity($properties['dynamicContent']);
+                
+                if ($dwc instanceof DynamicContent) {
+                    return $dwc;
+                }
+            }
+        }
+        
+        return false;
     }
 }
