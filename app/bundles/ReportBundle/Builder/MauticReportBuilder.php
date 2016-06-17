@@ -133,10 +133,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
      */
     protected function configureBuilder(array $options)
     {
-        // Convert date ranges to UTC for tabular data
-        $options['dateFrom']->setTimeZone(new \DateTimeZone('UTC'));
-        $options['dateTo']->setTimeZone(new \DateTimeZone('UTC'));
-
         // Trigger the REPORT_ON_GENERATE event to initialize the QueryBuilder
         /** @var ReportGeneratorEvent $event */
         $event = $this->dispatcher->dispatch(

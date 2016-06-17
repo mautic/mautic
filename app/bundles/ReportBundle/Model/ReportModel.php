@@ -471,6 +471,34 @@ class ReportModel extends FormModel
      */
     public function getReportData($entity, $formFactory = null, $options = [])
     {
+        // Clone dateFrom/dateTo because they handled separately in charts
+        $chartDateFrom = isset($options['dateFrom']) ? clone $options['dateFrom'] : (new \DateTime('-30 days'));
+        $chartDateTo   = isset($options['dateTo']) ? clone $options['dateTo'] : (new \DateTime());
+
+        if (isset($options['dateFrom'])) {
+            // Fix date ranges if applicable
+            if (!isset($options['dateTo'])) {
+                $options['dateTo'] = new \DateTime();
+            }
+
+            // Fix the time frames
+            if ($options['dateFrom'] == $options['dateTo']) {
+                $options['dateTo']->modify('+1 day');
+            }
+
+            // Adjust dateTo to be end of day or to current hour if today
+            $now = new \DateTime();
+            if ($now->format('Y-m-d') == $options['dateTo']->format('Y-m-d')) {
+                $options['dateTo'] = $now;
+            } else {
+                $options['dateTo']->setTime(23, 59, 59);
+            }
+
+            // Convert date ranges to UTC for fetching tabular data
+            $options['dateFrom']->setTimeZone(new \DateTimeZone('UTC'));
+            $options['dateTo']->setTimeZone(new \DateTimeZone('UTC'));
+        }
+
         $paginate        = !empty($options['paginate']);
         $reportPage      = (isset($options['reportPage'])) ? $options['reportPage'] : 1;
         $data            = $graphs = [];
@@ -502,8 +530,6 @@ class ReportModel extends FormModel
 
         /** @var \Doctrine\DBAL\Query\QueryBuilder $query */
         $query   = $reportGenerator->getQuery($dataOptions);
-        $chartQuery            = new ChartQuery($this->em->getConnection(), $options['dateFrom'], $options['dateTo']);
-        $options['chartQuery'] = $chartQuery;
         $options['translator'] = $this->translator;
 
         $contentTemplate = $reportGenerator->getContentTemplate();
@@ -517,6 +543,9 @@ class ReportModel extends FormModel
         $query->resetQueryPart('orderBy');
 
         if (empty($options['ignoreGraphData'])) {
+            $chartQuery    = new ChartQuery($this->em->getConnection(), $chartDateFrom, $chartDateTo);
+            $options['chartQuery'] = $chartQuery;
+
             // Check to see if this is an update from AJAX
             $selectedGraphs = (!empty($options['graphName'])) ? [$options['graphName']] : $entity->getGraphs();
             if (!empty($selectedGraphs)) {
@@ -526,10 +555,14 @@ class ReportModel extends FormModel
                 }
 
                 $eventGraphs = [];
+                $defaultGraphOptions = $options;
+                $defaultGraphOptions['dateFrom'] = $chartDateFrom;
+                $defaultGraphOptions['dateTo']   = $chartDateTo;
+
                 foreach ($selectedGraphs as $g) {
                     if (isset($availableGraphs[$g])) {
                         $graphOptions    = isset($availableGraphs[$g]['options']) ? $availableGraphs[$g]['options'] : [];
-                        $graphOptions    = array_merge($graphOptions, $options);
+                        $graphOptions    = array_merge($defaultGraphOptions, $graphOptions);
                         $eventGraphs[$g] = [
                             'options' => $graphOptions,
                             'type'    => $availableGraphs[$g]['type']
@@ -540,6 +573,8 @@ class ReportModel extends FormModel
                 $event = new ReportGraphEvent($entity, $eventGraphs, $query);
                 $this->dispatcher->dispatch(ReportEvents::REPORT_ON_GRAPH_GENERATE, $event);
                 $graphs = $event->getGraphs();
+
+                unset($defaultGraphOptions);
             }
         }
 
