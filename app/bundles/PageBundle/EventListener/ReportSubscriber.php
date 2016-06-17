@@ -280,6 +280,7 @@ class ReportSubscriber extends CommonSubscriber
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
             $queryBuilder = clone $qb;
+
             /** @var ChartQuery $chartQuery */
             $chartQuery   = clone $options['chartQuery'];
             $chartQuery->applyDateFilters($queryBuilder, 'date_hit', 'ph');
@@ -298,20 +299,10 @@ class ReportSubscriber extends CommonSubscriber
 
                 case 'mautic.page.graph.line.time.on.site':
                     $chart = new LineChart(null, $options['dateFrom'], $options['dateTo']);
-                    $queryBuilder->select('ph.date_hit as "dateHit", ph.date_left as "dateLeft"');
+                    $queryBuilder->select('TIMESTAMPDIFF(SECOND, ph.date_hit, ph.date_left) as data, ph.date_hit as date');
                     $queryBuilder->andWhere($qb->expr()->isNotNull('ph.date_left'));
-                    $hits = $queryBuilder->execute()->fetchAll();
 
-                    foreach ($hits as $key => $hit) {
-                        $dateHit            = new \DateTime($hit['dateHit']);
-                        $dateLeft           = new \DateTime($hit['dateLeft']);
-                        $hits[$key]['data'] = $dateLeft->getTimestamp() - $dateHit->getTimestamp();
-                        $hits[$key]['date'] = $hit['dateHit'];
-                        unset($hits[$key]['dateHit']);
-                        unset($hits[$key]['dateLeft']);
-                    }
-
-                    $hits = $chartQuery->completeTimeData($hits, true);
+                    $hits = $chartQuery->loadAndBuildTimeData($queryBuilder);
                     $chart->setDataset($options['translator']->trans($g), $hits);
                     $data         = $chart->render();
                     $data['name'] = $g;
