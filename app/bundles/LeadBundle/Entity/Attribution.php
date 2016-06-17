@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\IpAddress;
 
 /**
  * Class Attribution
@@ -38,6 +39,11 @@ class Attribution
      * @var
      */
     private $stage;
+
+    /**
+     * @var string
+     */
+    private $stageName;
 
     /**
      * @var string
@@ -70,6 +76,16 @@ class Attribution
     private $campaign;
 
     /**
+     * @var string
+     */
+    private $campaignName;
+
+    /**
+     * @var IpAddress
+     */
+    private $ipAddress;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -84,6 +100,8 @@ class Attribution
             ->addIndex(['channel', 'lead_id', 'date_added'], 'attribution_channel_lead')
             ->addIndex(['channel', 'channel_id', 'date_added'], 'attribution_channel_specific')
             ->addIndex(['channel', 'channel_id', 'lead_id', 'date_added'], 'attribution_channel_specific_lead')
+            ->addIndex(['channel', 'channel_id', 'action'], 'attribution_channel_action_specific')
+            ->addIndex(['channel', 'channel_id', 'action', 'lead_id', 'date_added'], 'attribution_channel_action_specific_lead')
             ->addIndex(['campaign_id', 'date_added'], 'attribution_campaign')
             ->addIndex(['campaign_id', 'lead_id', 'date_added'], 'attribution_campaign_lead')
             ->addIndex(['stage_id', 'date_added'], 'attribution_stage')
@@ -97,18 +115,19 @@ class Attribution
             ->addIndex(['date_added', 'lead_id'], 'attribution_date_added_lead');
 
         $builder->addId();
-
         $builder->addLead();
-
+        $builder->addIpAddress();
         $builder->addDateAdded();
 
         $builder->createField('channel', 'string')
             ->build();
-
         $builder->addNamedField('channelId', 'integer', 'channel_id', true);
+        $builder->createField('action', 'string')
+            ->build();
 
         // @todo - change to Stage association
         $builder->addNamedField('stage', 'integer', 'stage_id', true);
+        $builder->addNamedField('stageName', 'text', 'stage_name', true);
 
         $builder->createField('comments', 'text')
             ->nullable()
@@ -117,6 +136,7 @@ class Attribution
         $builder->createManyToOne('campaign', 'Mautic\CampaignBundle\Entity\Campaign')
             ->addJoinColumn('campaign_id', 'id', true, false, 'SET NULL')
             ->build();
+        $builder->addNamedField('campaignName', 'text', 'campaign_name', true);
 
         $builder->createField('attribution', 'float')
             ->build();
@@ -188,6 +208,26 @@ class Attribution
     public function setStage($stage)
     {
         $this->stage = $stage;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStageName()
+    {
+        return $this->stageName;
+    }
+
+    /**
+     * @param string $stageName
+     *
+     * @return Attribution
+     */
+    public function setStageName($stageName)
+    {
+        $this->stageName = $stageName;
 
         return $this;
     }
@@ -313,6 +353,26 @@ class Attribution
     }
 
     /**
+     * @return string
+     */
+    public function getCampaignName()
+    {
+        return $this->campaignName;
+    }
+
+    /**
+     * @param string $campaignName
+     *
+     * @return Attribution
+     */
+    public function setCampaignName($campaignName)
+    {
+        $this->campaignName = $campaignName;
+
+        return $this;
+    }
+
+    /**
      * Get the attribution amount from the lead
      */
     public function extractAttribution()
@@ -324,5 +384,38 @@ class Attribution
         if (null == $this->dateAdded) {
             $this->dateAdded = new \DateTime;
         }
+
+        if ($this->campaign && empty($this->campaignName)) {
+            $this->campaignName = $this->campaign->getName();
+        }
+
+        if (!$this->stage) {
+            //$this->stage = $this->lead->getStage();
+        }
+
+        if ($this->stage && empty($this->stageName)) {
+            // @todo add stage name
+            //$this->stageName = $this->stage->getName();
+        }
+    }
+
+    /**
+     * @return IpAddress
+     */
+    public function getIpAddress()
+    {
+        return $this->ipAddress;
+    }
+
+    /**
+     * @param IpAddress $ipAddress
+     *
+     * @return Attribution
+     */
+    public function setIpAddress(IpAddress $ipAddress)
+    {
+        $this->ipAddress = $ipAddress;
+
+        return $this;
     }
 }

@@ -172,6 +172,7 @@ Mautic.updateWidgetForm = function (element) {
             var formHtml = mQuery(response.formHtml);
             formHtml.find('#widget_buttons').addClass('hide hidden');
             formWrapper.html(formHtml.children());
+            Mautic.onPageLoad('#widget_params');
         }
         Mautic.removeLabelLoadingIndicator();
     });

@@ -14,6 +14,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\EventListener\Decorator\AttributionTrait;
 use Mautic\LeadBundle\LeadEvents;
 
 /**
@@ -23,6 +24,7 @@ use Mautic\LeadBundle\LeadEvents;
  */
 class LeadSubscriber extends CommonSubscriber
 {
+    use AttributionTrait;
 
     /**
      * @return array
@@ -117,24 +119,13 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function logContactAttribution(AssetLoadEvent $event)
     {
-        $lead = $event->getLead();
+        if ($event->isUnique()) {
+            $lead       = $event->getLead();
+            $asset      = $event->getAsset();
+            $record     = $event->getRecord();
+            $campaignId = ($record->getSource() == 'campaign') ? $record->getSourceId() : null;
 
-        if (null != $lead->getAttribution()) {
-            $asset  = $event->getAsset();
-            $record = $event->getRecord();
-
-            $campaign = null;
-            if ($record->getSource() == 'campaign') {
-                $campaign = $this->factory->getEntityManager()->getReference('MauticCampaignBundle:Campaign', $record->getSourceId());
-            }
-
-            $attribution = (new Attribution())
-                ->setChannel('asset')
-                ->setChannelId($asset->getId())
-                ->setAction('download')
-                ->setCampaign($campaign);
-
-            $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Attribution')->saveEntity($attribution);
+            $this->attributionModel->addAttribution($lead, 'asset', $asset->getId(), 'download', $campaignId);
         }
     }
 }

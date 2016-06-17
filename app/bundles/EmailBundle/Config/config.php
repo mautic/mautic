@@ -106,7 +106,10 @@ return [
                 'class' => 'Mautic\EmailBundle\EventListener\ReportSubscriber'
             ],
             'mautic.email.leadbundle.subscriber'     => [
-                'class' => 'Mautic\EmailBundle\EventListener\LeadSubscriber'
+                'class'       => 'Mautic\EmailBundle\EventListener\LeadSubscriber',
+                'methodCalls' => [
+                    'setAttributionModel' => ['mautic.lead.model.attribution']
+                ]
             ],
             'mautic.email.pointbundle.subscriber'    => [
                 'class' => 'Mautic\EmailBundle\EventListener\PointSubscriber'

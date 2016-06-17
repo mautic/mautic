@@ -14,6 +14,7 @@ use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Attribution;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\EventListener\Decorator\AttributionTrait;
 use Mautic\LeadBundle\LeadEvents;
 
 /**
@@ -23,6 +24,7 @@ use Mautic\LeadBundle\LeadEvents;
  */
 class LeadSubscriber extends CommonSubscriber
 {
+    use AttributionTrait;
 
     /**
      * @return array
@@ -110,15 +112,7 @@ class LeadSubscriber extends CommonSubscriber
     public function logContactAttribution(SubmissionEvent $event)
     {
         $lead = $event->getLead();
-        if (null != $lead->getAttribution()) {
-            $form = $event->getForm();
-
-            $attribution = (new Attribution())
-                ->setChannel('form')
-                ->setChannelId($form->getId())
-                ->setAction('submission');
-
-            $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Attribution')->saveEntity($attribution);
-        }
+        $form = $event->getForm();
+        $this->attributionModel->addAttribution($lead, 'form', $form->getId(), 'submission');
     }
 }

@@ -11,6 +11,7 @@ namespace Mautic\AssetBundle\Model;
 
 use Doctrine\ORM\PersistentCollection;
 use Mautic\AssetBundle\Event\AssetEvent;
+use Mautic\AssetBundle\Event\AssetLoadEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -60,7 +61,7 @@ class AssetModel extends FormModel
 
     /***
      * AssetModel constructor.
-     * 
+     *
      * @param LeadModel $leadModel
      * @param CategoryModel $categoryModel
      * @param RequestStack $requestStack
@@ -236,7 +237,7 @@ class AssetModel extends FormModel
 
         // Dispatch event
         if ($this->dispatcher->hasListeners(AssetEvents::ASSET_ON_LOAD)) {
-            $event = new AssetLoadEvent($download);
+            $event = new AssetLoadEvent($download, $isUnique);
             $this->dispatcher->dispatch(AssetEvents::ASSET_ON_LOAD, $event);
         }
 

@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
+use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Generator\ReportGenerator;
@@ -41,11 +42,6 @@ class ReportModel extends FormModel
     protected $defaultPageLimit;
 
     /**
-     * @var SecurityContext
-     */
-    protected $securityContext;
-
-    /**
      * @var FormatterHelper
      */
     protected $formatterHelper;
@@ -61,15 +57,12 @@ class ReportModel extends FormModel
     protected $session;
 
     public function __construct(
-        SecurityContext $securityContext,
         CoreParametersHelper $coreParametersHelper,
         FormatterHelper $formatterHelper,
         TemplatingHelper $templatingHelper
-    )
-    {
-        $this->securityContext = $securityContext;
+    ) {
         $this->defaultPageLimit = $coreParametersHelper->getParameter('default_pagelimit');
-        $this->formatterHelper = $formatterHelper;
+        $this->formatterHelper  = $formatterHelper;
         $this->templatingHelper = $templatingHelper;
     }
 
@@ -117,7 +110,7 @@ class ReportModel extends FormModel
 
         $params['table_list'] = $this->getTableData();
 
-        $reportGenerator = new ReportGenerator($this->securityContext, $formFactory, $entity);
+        $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $formFactory);
 
         return $reportGenerator->getForm($entity, $params);
     }
@@ -253,130 +246,90 @@ class ReportModel extends FormModel
 
     /**
      * @param string $context
-     * @param bool   $asOptionHtml
      *
-     * @return array
+     * @return \stdClass ['choices' => [], 'choiceHtml' => '', definitions => []]
      */
-    public function getColumnList($context, $asOptionHtml = false)
+    public function getColumnList($context)
     {
-        $tableData = $this->getTableData($context);
-        $columns   = $tableData['columns'];
+        $tableData           = $this->getTableData($context);
+        $columns             = $tableData['columns'];
+        $return              = new \stdClass();
+        $return->choices     = [];
+        $return->choiceHtml  = '';
+        $return->definitions = [];
 
-        if ($asOptionHtml) {
-            $columnList = '';
-            $typeList   = [];
-            foreach ($columns as $column => $data) {
-                if (isset($data['label'])) {
-                    $columnList .= '<option value="'.$column.'">'.$data['label']."</option>\n";
-                    $typeList[$column] = $data['type'];
-                }
+        foreach ($columns as $column => $data) {
+            if (isset($data['label'])) {
+                $return->choiceHtml .= "<option value=\"$column\">{$data['label']}</option>\n";
+                $return->choices[$column]     = $data['label'];
+                $return->definitions[$column] = $data;
             }
-        } else {
-            $columnList = $typeList = [];
-            foreach ($columns as $column => $data) {
-                if (isset($data['label'])) {
-                    $columnList[$column] = $data['label'];
-                    $typeList[$column]   = $data['type'];
-                }
-            }
-
-            $typeList = htmlspecialchars(json_encode($typeList), ENT_QUOTES, 'UTF-8');
         }
 
-        return [$columnList, $typeList];
+        return $return;
+    }
+
+    /**
+     * @property filterList
+     * @property definitions
+     *
+     * @param string $context
+     *
+     * @return \stdClass [filterList => [], definitions => [], operatorChoices =>  [], operatorHtml => [], filterListHtml => '']
+     */
+    public function getFilterList($context = 'all')
+    {
+        $tableData = $this->getTableData($context);
+
+        $return                  = new \stdClass();
+        $filters                 = (isset($tableData['filters'])) ? $tableData['filters'] : $tableData['columns'];
+        $return->choices         = [];
+        $return->choiceHtml      = '';
+        $return->definitions     = [];
+        $return->operatorHtml    = [];
+        $return->operatorChoices = [];
+
+        foreach ($filters as $filter => $data) {
+            if (isset($data['label'])) {
+                $return->definitions[$filter] = $data;
+                $return->choices [$filter]    = $data['label'];
+                $return->choiceHtml          .= "<option value=\"$filter\">{$data['label']}</option>\n";
+
+                $return->operatorChoices[$filter] = $this->getOperatorOptions($data);
+                $return->operatorHtml[$filter]    = '';
+
+                foreach ($return->operatorChoices[$filter] as $value => $label) {
+                    $return->operatorHtml[$filter] .= "<option value=\"$value\">$label</option>\n";
+                }
+            }
+        }
+
+        return $return;
     }
 
     /**
      * @param string $context
-     * @param bool   $asOptionHtml
-     * @param bool   $operatorsAsOptionHtml
      *
-     * @return array
+     * @return \stdClass ['choices' => [], choiceHtml = '']
      */
-    public function getFilterList($context = 'all', $asOptionHtml = false, $operatorsAsOptionHtml = false)
+    public function getGraphList($context = 'all')
     {
-        $tableData = $this->getTableData($context);
-        $filters   = (isset($tableData['filters'])) ? $tableData['filters'] : $tableData['columns'];
-
-        if ($asOptionHtml) {
-            $filterList   = '';
-            $operatorList = '';
-            $typeList     = [];
-            foreach ($filters as $filter => $data) {
-                if (isset($data['label'])) {
-                    $filterList       .= '<option value="'.$filter.'">'.$data['label']."</option>\n";
-                    $typeList[$filter] = $data['type'];
-
-                    $operator = (isset($data['operatorGroup'])) ? $data['operatorGroup'] : 'default';
-                    if (!array_key_exists($operator, MauticReportBuilder::OPERATORS)) {
-                        $operator = 'default';
-                    }
-
-                    $operatorList[$filter] = '';
-                    foreach (MauticReportBuilder::OPERATORS[$operator] as $operatorOption) {
-                        $operatorList[$filter] .= '<option value="'.$operatorOption.'">'.htmlentities($operatorOption)."</option>\n";
-                    }
-                }
-            }
-        } else {
-            $filterList = $typeList = $operatorList = [];
-
-            foreach ($filters as $filter => $data) {
-                if (isset($data['label'])) {
-                    $filterList[$filter] = $data['label'];
-                    $typeList[$filter]   = $data['type'];
-                    $operator            = (isset($data['operatorGroup'])) ? $data['operatorGroup'] : 'default';
-                    if (!array_key_exists($operator, MauticReportBuilder::OPERATORS)) {
-                        $operator = 'default';
-                    }
-                    if ($operatorsAsOptionHtml) {
-                        $operatorList[$filter] = '';
-                        foreach (MauticReportBuilder::OPERATORS[$operator] as $operatorOption) {
-                            $operatorList[$filter] .= '<option value="'.$operatorOption.'">'.htmlentities($operatorOption)."</option>\n";
-                        }
-                    } else {
-                        $operatorList[$filter] = MauticReportBuilder::OPERATORS[$operator];
-                    }
-                }
-            }
-
-            $typeList = htmlspecialchars(json_encode($typeList), ENT_QUOTES, 'UTF-8');
-        }
-
-        if ($operatorsAsOptionHtml) {
-            $operatorList = htmlspecialchars(json_encode($operatorList), ENT_QUOTES, 'UTF-8');
-        }
-
-        return [$filterList, $typeList, $operatorList];
-    }
-
-    /**
-     * @param string $context
-     * @param bool   $asOptionHtml
-     *
-     * @return array
-     */
-    public function getGraphList($context, $asOptionHtml = false)
-    {
-        $graphData = $this->getGraphData($context);
+        $graphData          = $this->getGraphData($context);
+        $return             = new \stdClass();
+        $return->choices    = [];
+        $return->choiceHtml = '';
 
         // First sort
-        $translated = [];
         foreach ($graphData as $key => $details) {
-            $translated[$key] = $this->translator->trans($key)." (".$this->translator->trans('mautic.report.graph.'.$details['type']);
+            $return->choices[$key] = $this->translator->trans($key)." (".$this->translator->trans('mautic.report.graph.'.$details['type']).")";
         }
-        asort($translated);
+        natsort($return->choices);
 
-        if ($asOptionHtml) {
-            $graphList = '';
-            foreach ($translated as $key => $value) {
-                $graphList .= '<option value="'.$key.'">'.$value.")</option>\n";
-            }
-
-            return $graphList;
+        foreach ($return->choices as $key => $value) {
+            $return->choiceHtml .= '<option value="'.$key.'">'.$value."</option>\n";
         }
 
-        return $translated;
+        return $return;
     }
 
     /**
@@ -393,11 +346,10 @@ class ReportModel extends FormModel
     {
         $formatter = $this->formatterHelper;
         $date      = (new DateTimeHelper)->toLocalString();
-        $name      = str_replace(' ', '_', $date) . '_' . InputHelper::alphanum($report->getName(), false, '-');
+        $name      = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($report->getName(), false, '-');
 
         switch ($format) {
             case 'csv':
-
                 $response = new StreamedResponse(
                     function () use ($reportData, $report, $formatter) {
                         $handle = fopen('php://output', 'r+');
@@ -423,7 +375,7 @@ class ReportModel extends FormModel
                             }
 
                             //free memory
-                            unset($row, $reportData['data'][$k]);
+                            unset($row, $reportData['data'][$count]);
                         }
 
                         fclose($handle);
@@ -446,7 +398,9 @@ class ReportModel extends FormModel
                         'columns'   => $reportData['columns'],
                         'pageTitle' => $name,
                         'graphs'    => $reportData['graphs'],
-                        'report'    => $report
+                        'report'    => $report,
+                        'dateFrom'  => $reportData['dateFrom'],
+                        'dateTo'    => $reportData['dateTo'],
                     ]
                 )->getContent();
 
@@ -481,7 +435,7 @@ class ReportModel extends FormModel
                                 }
 
                                 //free memory
-                                unset($row, $reportData['data'][$k]);
+                                unset($row, $reportData['data'][$count]);
                             }
 
 
@@ -515,12 +469,12 @@ class ReportModel extends FormModel
      *
      * @return array
      */
-    public function getReportData($entity, $formFactory, $options = [])
+    public function getReportData($entity, $formFactory = null, $options = [])
     {
-        $paginate   = !empty($options['paginate']);
-        $reportPage = (isset($options['reportPage'])) ? $options['reportPage'] : 1;
-        $data       = $graphs = array();
-        $reportGenerator = new ReportGenerator($this->securityContext, $formFactory, $entity);
+        $paginate        = !empty($options['paginate']);
+        $reportPage      = (isset($options['reportPage'])) ? $options['reportPage'] : 1;
+        $data            = $graphs = [];
+        $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $formFactory);
 
         $selectedColumns = $entity->getColumns();
         $totalResults    = $limit = 0;
@@ -528,33 +482,26 @@ class ReportModel extends FormModel
         // Prepare the query builder
         $tableDetails = $this->getTableData($entity->getSource());
 
-        $orderBy    = $this->session->get('mautic.report.' . $entity->getId() . '.orderby', '');
-        $orderByDir = $this->session->get('mautic.report.' . $entity->getId() . '.orderbydir', 'ASC');
+        // Build a reference for column to data column (without table prefix)
+        $dataColumns = [];
+        foreach ($tableDetails['columns'] as $dbColumn => &$columnData) {
+            $dataColumns[$columnData['alias']] = $dbColumn;
+        }
+
+        $orderBy    = $this->session->get('mautic.report.'.$entity->getId().'.orderby', '');
+        $orderByDir = $this->session->get('mautic.report.'.$entity->getId().'.orderbydir', 'ASC');
 
         $dataOptions = [
-            'order'      => (!empty($orderBy)) ? [$orderBy, $orderByDir] : false,
-            'dispatcher' => $this->dispatcher,
-            'columns'    => $tableDetails['columns']
+            'order'          => (!empty($orderBy)) ? [$orderBy, $orderByDir] : false,
+            'columns'        => $tableDetails['columns'],
+            'filters'        => (isset($tableDetails['filters'])) ? $tableDetails['filters'] : $tableDetails['columns'],
+            'dateFrom'       => (isset($options['dateFrom'])) ? $options['dateFrom'] : null,
+            'dateTo'         => (isset($options['dateTo'])) ? $options['dateTo'] : null,
+            'dynamicFilters' => (isset($options['dynamicFilters'])) ? $options['dynamicFilters'] : []
         ];
 
         /** @var \Doctrine\DBAL\Query\QueryBuilder $query */
         $query   = $reportGenerator->getQuery($dataOptions);
-        $filters = $this->session->get('mautic.report.' . $entity->getId() . '.filters', array());
-        if (!empty($filters)) {
-            $filterParameters  = [];
-            $filterExpressions = $query->expr()->andX();
-            $repo              = $this->getRepository();
-            foreach ($filters as $f) {
-                list ($expr, $parameters) = $repo->getFilterExpr($query, $f);
-                $filterExpressions->add($expr);
-                if (is_array($parameters)) {
-                    $filterParameters = array_merge($filterParameters, $parameters);
-                }
-            }
-            $query->andWhere($filterExpressions);
-            $query->setParameters($filterParameters);
-        }
-
         $chartQuery            = new ChartQuery($this->em->getConnection(), $options['dateFrom'], $options['dateTo']);
         $options['chartQuery'] = $chartQuery;
         $options['translator'] = $this->translator;
@@ -562,7 +509,7 @@ class ReportModel extends FormModel
         $contentTemplate = $reportGenerator->getContentTemplate();
 
         //set what page currently on so that we can return here after form submission/cancellation
-        $this->session->set('mautic.report.' . $entity->getId() . '.page', $reportPage);
+        $this->session->set('mautic.report.'.$entity->getId().'.page', $reportPage);
 
         // Reset the orderBy as it causes errors in graphs and the count query in table data
         $parts = $query->getQueryParts();
@@ -599,7 +546,7 @@ class ReportModel extends FormModel
         if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
             if ($paginate) {
                 // Build the options array to pass into the query
-                $limit = $this->session->get('mautic.report.' . $entity->getId() . '.limit', $this->defaultPageLimit);
+                $limit = $this->session->get('mautic.report.'.$entity->getId().'.limit', $this->defaultPageLimit);
                 $start = ($reportPage === 1) ? 0 : (($reportPage - 1) * $limit);
                 if ($start < 0) {
                     $start = 0;
@@ -625,26 +572,65 @@ class ReportModel extends FormModel
             }
 
             $data = $query->execute()->fetchAll();
-
             if (!$paginate) {
                 $totalResults = count($data);
             }
-        }
 
-        // Build a reference for column to data
-        $dataColumns = [];
-        foreach ($tableDetails['columns'] as $dbColumn => $columnData) {
-            $dataColumns[$columnData['label']] = $dbColumn;
+            // Allow plugin to manipulate the data
+            $event = new ReportDataEvent($entity, $data, $totalResults, $dataOptions);
+            $this->dispatcher->dispatch(ReportEvents::REPORT_ON_DISPLAY, $event);
+            $data = $event->getData();
         }
 
         return [
             'totalResults'    => $totalResults,
             'data'            => $data,
+            'dataColumns'     => $dataColumns,
             'graphs'          => $graphs,
             'contentTemplate' => $contentTemplate,
             'columns'         => $tableDetails['columns'],
-            'dataColumns'     => $dataColumns,
-            'limit'           => ($paginate) ? $limit : 0
+            'limit'           => ($paginate) ? $limit : 0,
+            'dateFrom'        => $dataOptions['dateFrom'],
+            'dateTo'          => $dataOptions['dateTo']
         ];
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getReportsWithGraphs()
+    {
+        $ownedBy = $this->security->isGranted('report:reports:viewother') ? null : $this->user->getId();
+
+        return $this->getRepository()->findReportsWithGraphs($ownedBy);
+    }
+
+    /**
+     * Determine what operators should be used for the filter type
+     *
+     * @param array $data
+     *
+     * @return mixed|string
+     */
+    private function getOperatorOptions(array $data)
+    {
+        if (isset($data['operators'])) {
+            // Custom operators
+            $options = $data['operators'];
+        } else {
+            $operator = (isset($data['operatorGroup'])) ? $data['operatorGroup'] : $data['type'];
+
+            if (!array_key_exists($operator, MauticReportBuilder::OPERATORS)) {
+                $operator = 'default';
+            }
+
+            $options = MauticReportBuilder::OPERATORS[$operator];
+        }
+
+        foreach ($options as $value => &$label) {
+            $label = $this->translator->trans($label);
+        }
+
+        return $options;
     }
 }

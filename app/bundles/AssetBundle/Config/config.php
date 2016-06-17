@@ -86,7 +86,10 @@ return [
                 'class' => 'Mautic\AssetBundle\EventListener\BuilderSubscriber'
             ],
             'mautic.asset.leadbundle.subscriber' => [
-                'class' => 'Mautic\AssetBundle\EventListener\LeadSubscriber'
+                'class'       => 'Mautic\AssetBundle\EventListener\LeadSubscriber',
+                'methodCalls' => [
+                    'setAttributionModel' => ['mautic.lead.model.attribution']
+                ]
             ],
             'mautic.asset.pagebundle.subscriber' => [
                 'class' => 'Mautic\AssetBundle\EventListener\PageSubscriber'

@@ -1099,4 +1099,14 @@ class Lead extends FormEntity
 
         return $this;
     }
+
+    /**
+     * Get attribution value
+     *
+     * @return bool
+     */
+    public function getAttribution()
+    {
+        return (float) $this->getFieldValue('attribution');
+    }
 }

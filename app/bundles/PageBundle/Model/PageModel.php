@@ -47,7 +47,7 @@ class PageModel extends FormModel
      * @var CookieHelper
      */
     protected $cookieHelper;
-    
+
     /**
      * @var IpLookupHelper
      */
@@ -80,7 +80,7 @@ class PageModel extends FormModel
 
     /**
      * PageModel constructor.
-     * 
+     *
      * @param CookieHelper $cookieHelper
      * @param IpLookupHelper $ipLookupHelper
      * @param LeadModel $leadModel
@@ -92,8 +92,8 @@ class PageModel extends FormModel
         CookieHelper $cookieHelper,
         IpLookupHelper $ipLookupHelper,
         LeadModel $leadModel,
-        FieldModel $leadFieldModel, 
-        RedirectModel $pageRedirectModel, 
+        FieldModel $leadFieldModel,
+        RedirectModel $pageRedirectModel,
         TrackableModel $pageTrackableModel
     )
     {
@@ -716,7 +716,7 @@ class PageModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
-            $event = new PageHitEvent($hit, $request, $code, $clickthrough);
+            $event = new PageHitEvent($hit, $request, $code, $clickthrough, $isUnique);
             $this->dispatcher->dispatch(PageEvents::PAGE_ON_HIT, $event);
         }
 

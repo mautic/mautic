@@ -9,10 +9,13 @@
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\LeadBundle\Entity\Attribution;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\EventListener\Decorator\AttributionTrait;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\AttributionModel;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
 
@@ -21,6 +24,7 @@ use Mautic\PageBundle\PageEvents;
  */
 class LeadSubscriber extends CommonSubscriber
 {
+    use AttributionTrait;
 
     /**
      * {@inheritdoc}
@@ -170,24 +174,13 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function logContactAttribution(PageHitEvent $event)
     {
-        $lead = $event->getLead();
+        if ($event->isUnique()) {
+            $lead       = $event->getLead();
+            $hit        = $event->getHit();
+            $page       = $event->getPage();
+            $campaignId = ($hit->getSource() == 'campaign') ? $hit->getSourceId() : null;
 
-        if (null != $lead->getAttribution()) {
-            $hit  = $event->getHit();
-            $page = $event->getPage();
-
-            $campaign = null;
-            if ($hit->getSource() == 'campaign') {
-                $campaign = $this->factory->getEntityManager()->getReference('MauticCampaignBundle:Campaign', $hit->getSourceId());
-            }
-
-            $attribution = (new Attribution())
-                ->setChannel('page')
-                ->setChannelId($page->getId())
-                ->setAction('hit')
-                ->setCampaign($campaign);
-
-            $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Attribution')->saveEntity($attribution);
+            $this->attributionModel->addAttribution($lead, 'page', $page->getId(), 'hit', $campaignId);
         }
     }
 }

@@ -9,11 +9,14 @@
 
 namespace Mautic\ReportBundle\Builder;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Mautic Report Builder class
@@ -25,47 +28,43 @@ final class MauticReportBuilder implements ReportBuilderInterface
      */
     const OPERATORS = [
         'default'     => [
-            'eq'       => 'mautic.lead.list.form.operator.equals',
-            'gt'       => 'mautic.lead.list.form.operator.greaterthan',
-            'gte'      => 'mautic.lead.list.form.operator.greaterthanequals',
-            'lt'       => 'mautic.lead.list.form.operator.lessthan',
-            'lte'      => 'mautic.lead.list.form.operator.lessthanequals',
-            'neq'      => 'mautic.lead.list.form.operator.notequals',
-            'like'     => 'mautic.lead.list.form.operator.islike',
-            'notLike'  => 'mautic.lead.list.form.operator.isnotlike',
-            'empty'    => 'mautic.lead.list.form.operator.isempty',
-            'notEmpty' => 'mautic.lead.list.form.operator.isnotempty',
+            'eq'       => 'mautic.core.operator.equals',
+            'gt'       => 'mautic.core.operator.greaterthan',
+            'gte'      => 'mautic.core.operator.greaterthanequals',
+            'lt'       => 'mautic.core.operator.lessthan',
+            'lte'      => 'mautic.core.operator.lessthanequals',
+            'neq'      => 'mautic.core.operator.notequals',
+            'like'     => 'mautic.core.operator.islike',
+            'notLike'  => 'mautic.core.operator.isnotlike',
+            'empty'    => 'mautic.core.operator.isempty',
+            'notEmpty' => 'mautic.core.operator.isnotempty',
         ],
         'bool'        => [
-            'eq'  => 'mautic.lead.list.form.operator.equals',
-            'neq' => 'mautic.lead.list.form.operator.notequals',
+            'eq'  => 'mautic.core.operator.equals',
+            'neq' => 'mautic.core.operator.notequals',
         ],
         'multiselect' => [
-            'in'  => 'mautic.lead.list.form.operator.in',
-            '!in' => 'mautic.lead.list.form.operator.notin'
+            'in'    => 'mautic.core.operator.in',
+            'notIn' => 'mautic.core.operator.notin'
         ],
         'select'      => [
-            'eq'       => 'mautic.lead.list.form.operator.equals',
-            'neq'      => 'mautic.lead.list.form.operator.notequals',
-            'empty'    => 'mautic.lead.list.form.operator.isempty',
-            'notEmpty' => 'mautic.lead.list.form.operator.isnotempty',
-            'in'       => 'mautic.lead.list.form.operator.in',
-            '!in'      => 'mautic.lead.list.form.operator.notin',
+            'eq'       => 'mautic.core.operator.equals',
+            'neq'      => 'mautic.core.operator.notequals',
         ],
         'text'        => [
-            'eq'       => 'mautic.lead.list.form.operator.equals',
-            'neq'      => 'mautic.lead.list.form.operator.notequals',
-            'empty'    => 'mautic.lead.list.form.operator.isempty',
-            'notEmpty' => 'mautic.lead.list.form.operator.isnotempty',
-            'like'     => 'mautic.lead.list.form.operator.islike',
-            'notLike'  => 'mautic.lead.list.form.operator.isnotlike',
+            'eq'       => 'mautic.core.operator.equals',
+            'neq'      => 'mautic.core.operator.notequals',
+            'empty'    => 'mautic.core.operator.isempty',
+            'notEmpty' => 'mautic.core.operator.isnotempty',
+            'like'     => 'mautic.core.operator.islike',
+            'notLike'  => 'mautic.core.operator.isnotlike',
         ],
     ];
 
     /**
-     * @var \Symfony\Component\Security\Core\SecurityContextInterface
+     * @var Connection
      */
-    private $securityContext;
+    private $db;
 
     /**
      * @var \Mautic\ReportBundle\Entity\Report
@@ -78,15 +77,22 @@ final class MauticReportBuilder implements ReportBuilderInterface
     private $contentTemplate;
 
     /**
-     * Constructor
-     *
-     * @param \Symfony\Component\Security\Core\SecurityContextInterface $securityContext Symfony Core Security Context
-     * @param \Mautic\ReportBundle\Entity\Report                        $entity          Report entity
+     * @var EventDispatcher
      */
-    public function __construct(SecurityContextInterface $securityContext, Report $entity)
+    private $dispatcher;
+
+    /**
+     * MauticReportBuilder constructor.
+     *
+     * @param EventDispatcherInterface $dispatcher
+     * @param Connection               $db
+     * @param Report                   $entity
+     */
+    public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity)
     {
-        $this->securityContext = $securityContext;
-        $this->entity          = $entity;
+        $this->entity     = $entity;
+        $this->dispatcher = $dispatcher;
+        $this->db         = $db;
     }
 
     /**
@@ -99,6 +105,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $queryBuilder = $this->configureBuilder($options);
 
         if ($queryBuilder->getType() !== QueryBuilder::SELECT) {
+
             throw new InvalidReportQueryException('Only SELECT statements are valid');
         }
 
@@ -126,62 +133,38 @@ final class MauticReportBuilder implements ReportBuilderInterface
      */
     protected function configureBuilder(array $options)
     {
-        $source = $this->entity->getSource();
-        $fields = $this->entity->getColumns();
-        $order  = $this->entity->getTableOrder();
+        // Convert date ranges to UTC for tabular data
+        $options['dateFrom']->setTimeZone(new \DateTimeZone('UTC'));
+        $options['dateTo']->setTimeZone(new \DateTimeZone('UTC'));
 
         // Trigger the REPORT_ON_GENERATE event to initialize the QueryBuilder
-        /** @type \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher $dispatcher */
-        $dispatcher = $options['dispatcher'];
+        /** @var ReportGeneratorEvent $event */
+        $event = $this->dispatcher->dispatch(
+            ReportEvents::REPORT_ON_GENERATE,
+            new ReportGeneratorEvent($this->entity, $options, $this->db->createQueryBuilder())
+        );
 
-        $event = new ReportGeneratorEvent($source);
-        $dispatcher->dispatch(ReportEvents::REPORT_ON_GENERATE, $event);
+        // Build the QUERY
         $queryBuilder = $event->getQueryBuilder();
-
-        $selectColumns = [];
-        foreach ($fields as $field) {
-            if (isset($options['columns'][$field])) {
-                $selectColumns[] = "$field as \"{$options['columns'][$field]['label']}\"";
-            }
-        }
 
         // Set Content Template
         $this->contentTemplate = $event->getContentTemplate();
 
-        $queryBuilder->select(implode(', ', $selectColumns));
-
-        // Add filters as AND values to the WHERE clause if present
-        $filters = $this->entity->getFilters();
-
-        if (count($filters)) {
-            $expr = $queryBuilder->expr();
-            $and  = $expr->andX();
-
-            foreach ($filters as $filter) {
-                if ($filter['condition'] == 'notEmpty') {
-                    $and->add(
-                        $expr->isNotNull($filter['column'])
-                    );
-                    $and->add(
-                        $expr->neq($filter['column'], $expr->literal(''))
-                    );
-                } elseif ($filter['condition'] == 'empty') {
-                    $and->add(
-                        $expr->isNull($filter['column'])
-                    );
-                    $and->add(
-                        $expr->eq($filter['column'], $expr->literal(''))
-                    );
-                } else {
-                    $and->add(
-                        $expr->{$filter['condition']}($filter['column'], $expr->literal($filter['value']))
-                    );
-                }
-            }
-
-            $queryBuilder->where($and);
+        // Build WHERE clause
+        $filtersApplied =  false;
+        if (isset($options['dynamicFilters'])) {
+            $filtersApplied = $this->applyFilters($options['dynamicFilters'], $queryBuilder, $options['filters']);
         }
 
+        if (!$filtersApplied) {
+            if (!$filterExpr = $event->getFilterExpression()) {
+                $this->applyFilters($this->entity->getFilters(), $queryBuilder, $options['filters']);
+            } else {
+                $queryBuilder->andWhere($filterExpr);
+            }
+        }
+
+        // Build ORDER BY clause
         if (!empty($options['order'])) {
             if (is_array($options['order'])) {
                 list($column, $dir) = $options['order'];
@@ -190,7 +173,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 $dir    = 'ASC';
             }
             $queryBuilder->orderBy($column, $dir);
-        } elseif (!empty($order)) {
+        } elseif ($order = $this->entity->getTableOrder()) {
             foreach ($order as $o) {
                 if (!empty($o['column'])) {
                     $queryBuilder->orderBy($o['column'], $o['direction']);
@@ -198,11 +181,126 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
         }
 
+        // Build GROUP BY
+        if (!empty($options['groupby']) && is_array($options['groupby'])) {
+            $queryBuilder->groupBy($options['groupby']);
+        }
+
+        // Build LIMIT clause
         if (!empty($options['limit'])) {
             $queryBuilder->setFirstResult($options['start'])
                 ->setMaxResults($options['limit']);
         }
 
+        // Generate a count query in case a formula needs total number
+        $countQuery = clone $queryBuilder;
+        $countQuery->select('COUNT(*) as count');
+        $countSql = sprintf('(%s)', $countQuery->getSQL());
+
+        // Build SELECT clause
+        if (!$selectColumns = $event->getSelectColumns()) {
+            $fields = $this->entity->getColumns();
+            foreach ($fields as $field) {
+                if (isset($options['columns'][$field])) {
+                    $select = '';
+                    $select .= (isset($options['columns'][$field]['formula'])) ? $options['columns'][$field]['formula'] : $field;
+
+                    if (strpos($select, '{{count}}')) {
+                        $select = str_replace('{{count}}', $countSql, $select);
+                    }
+
+                    if (isset($options['columns'][$field]['alias'])) {
+                        $select .= " AS ".$options['columns'][$field]['alias'];
+                    }
+
+                    $selectColumns[] = $select;
+                }
+            }
+        }
+
+        $queryBuilder->select(implode(', ', $selectColumns));
+
         return $queryBuilder;
+    }
+
+    /**
+     * @param array        $filters
+     * @param QueryBuilder $queryBuilder
+     * @param array        $filterDefinitions
+     *
+     * @return bool
+     */
+    private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions)
+    {
+        $expr       = $queryBuilder->expr();
+        $filterExpr = $expr->andX();
+
+        if (count($filters)) {
+            foreach ($filters as $filter) {
+                $exprFunction = isset($filter['expr']) ? $filter['expr'] : $filter['condition'];
+                $paramName    = InputHelper::alphanum($filter['column']);
+                switch ($exprFunction) {
+                    case 'notEmpty':
+                        $filterExpr->add(
+                            $filterExpr->isNotNull($filter['column'])
+                        );
+                        $filterExpr->add(
+                            $expr->neq($filter['column'], $expr->literal(''))
+                        );
+                        break;
+                    case 'empty':
+                        $filterExpr->add(
+                            $expr->isNull($filter['column'])
+                        );
+                        $filterExpr->add(
+                            $expr->eq($filter['column'], $expr->literal(''))
+                        );
+                        break;
+                    default:
+                        if (trim($filter['value']) == '') {
+                            // Ignore empty
+                            break;
+                        }
+
+                        $columnValue = ":$paramName";
+                        switch ($filterDefinitions[$filter['column']]['type']) {
+                            case 'bool':
+                            case 'boolean':
+                                if ((int) $filter['value'] > 1) {
+                                    // Ignore the "reset" value of "2"
+                                    break;
+                                }
+
+                                $queryBuilder->setParameter($paramName, $filter['value'], 'boolean');
+                                break;
+
+                            case 'float':
+                                $columnValue = (float) $filter['value'];
+                                break;
+
+                            case 'int':
+                            case 'integer':
+                                $columnValue = (int) $filter['value'];
+                                break;
+
+                            default:
+                                $queryBuilder->setParameter($paramName, $filter['value']);
+                        }
+
+
+                        $filterExpr->add(
+                            $expr->{$exprFunction}($filter['column'], $columnValue)
+                        );
+                }
+            }
+        }
+
+        if ($filterExpr->count()) {
+            $queryBuilder->andWhere($filterExpr);
+
+            return true;
+        }
+
+        return false;
     }
 }

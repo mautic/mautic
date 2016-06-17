@@ -14,6 +14,7 @@ use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\LeadBundle\Entity\Attribution;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\EventListener\Decorator\AttributionTrait;
 use Mautic\LeadBundle\LeadEvents;
 
 /**
@@ -23,6 +24,7 @@ use Mautic\LeadBundle\LeadEvents;
  */
 class LeadSubscriber extends CommonSubscriber
 {
+    use AttributionTrait;
 
     /**
      * @return array
@@ -124,25 +126,14 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function logContactAttribution(EmailOpenEvent $event)
     {
-        if ($stat = $event->getStat()) {
-            $lead = $event->getLead();
+        $stat = $event->getStat();
+        if ($stat && $event->isFirstTime()) {
+            $lead       = $event->getLead();
+            $email      = $event->getEmail();
+            $emailId    = ($email ? $email->getId() : null);
+            $campaignId = ($stat->getSource() == 'campaign') ? $stat->getSourceId() : null;
 
-            if (null != $lead->getAttribution()) {
-                $email = $event->getEmail();
-
-                $campaign = null;
-                if ($stat->getSource() == 'campaign') {
-                    $campaign = $this->factory->getEntityManager()->getReference('MauticCampaignBundle:Campaign', $stat->getSourceId());
-                }
-
-                $attribution = (new Attribution())
-                    ->setChannel('email')
-                    ->setChannelId($email ? $email->getId() : null)
-                    ->setAction('open')
-                    ->setCampaign($campaign);
-
-                $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Attribution')->saveEntity($attribution);
-            }
+            $this->attributionModel->addAttribution($lead, 'email', $emailId, 'open', $campaignId);
         }
     }
 }

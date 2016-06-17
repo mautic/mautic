@@ -10,7 +10,14 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\ListModel;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
+use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
@@ -23,6 +30,37 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
  */
 class ReportSubscriber extends CommonSubscriber
 {
+    /**
+     * @var ListModel
+     */
+    protected $listModel;
+
+    /**
+     * @var ListModel
+     */
+    protected $fieldModel;
+
+    /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * ReportSubscriber constructor.
+     *
+     * @param MauticFactory $factory
+     * @param ListModel     $listModel
+     * @param FieldModel    $fieldModel
+     * @param LeadModel     $leadModel
+     */
+    public function __construct(MauticFactory $factory, ListModel $listModel, FieldModel $fieldModel, LeadModel $leadModel)
+    {
+        parent::__construct($factory);
+
+        $this->listModel  = $listModel;
+        $this->fieldModel = $fieldModel;
+        $this->leadModel  = $leadModel;
+    }
 
     /**
      * @return array
@@ -32,7 +70,8 @@ class ReportSubscriber extends CommonSubscriber
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
             ReportEvents::REPORT_ON_GENERATE       => ['onReportGenerate', 0],
-            ReportEvents::REPORT_ON_GRAPH_GENERATE => ['onReportGraphGenerate', 0]
+            ReportEvents::REPORT_ON_GRAPH_GENERATE => ['onReportGraphGenerate', 0],
+            ReportEvents::REPORT_ON_DISPLAY        => ['onReportDisplay', 0]
         ];
     }
 
@@ -46,39 +85,40 @@ class ReportSubscriber extends CommonSubscriber
     public function onReportBuilder(ReportBuilderEvent $event)
     {
         if ($event->checkContext(['leads', 'lead.pointlog', 'lead.attribution'])) {
-            $prefix     = 'l.';
-            $userPrefix = 'u.';
-            $ipPrefix   = 'i.';
-            $columns    = [
-                $ipPrefix.'ip_address'    => [
+            $columns = [
+                'l.id'        => [
+                    'label' => 'mautic.lead.report.contact_id',
+                    'type'  => 'int',
+                    'link'  => 'mautic_contact_action'
+                ],
+                'i.ip_address'      => [
                     'label' => 'mautic.core.ipaddress',
                     'type'  => 'text'
                 ],
-                $prefix.'date_identified' => [
+                'l.date_identified' => [
                     'label' => 'mautic.lead.report.date_identified',
                     'type'  => 'datetime'
                 ],
-                $prefix.'points'          => [
+                'l.points'          => [
                     'label' => 'mautic.lead.points',
                     'type'  => 'int'
                 ],
-                $prefix.'owner_id'        => [
+                'l.owner_id'        => [
                     'label' => 'mautic.lead.report.owner_id',
-                    'type'  => 'int'
+                    'type'  => 'int',
+                    'link'  => 'mautic_user_action'
                 ],
-                $userPrefix.'first_name'  => [
+                'u.first_name'      => [
                     'label' => 'mautic.lead.report.owner_firstname',
                     'type'  => 'string'
                 ],
-                $userPrefix.'last_name'   => [
+                'u.last_name'       => [
                     'label' => 'mautic.lead.report.owner_lastname',
                     'type'  => 'string'
                 ]
             ];
 
-            /** @var \Mautic\LeadBundle\Model\FieldModel $model */
-            $model        = $this->factory->getModel('lead.field');
-            $leadFields   = $model->getEntities();
+            $leadFields   = $this->fieldModel->getEntities();
             $fieldColumns = [];
             foreach ($leadFields as $f) {
                 switch ($f->getType()) {
@@ -96,131 +136,53 @@ class ReportSubscriber extends CommonSubscriber
                     case 'email':
                         $type = 'email';
                         break;
+                    case 'number':
+                        $type = 'float';
+                        break;
                     default:
                         $type = 'string';
                         break;
                 }
-                $fieldColumns[$prefix.$f->getAlias()] = [
+                $fieldColumns['l.'.$f->getAlias()] = [
                     'label' => $f->getLabel(),
                     'type'  => $type
                 ];
             }
-            $columns = array_merge($columns, $fieldColumns);
-            $data    = [
+
+            $filters = $columns = array_merge($columns, $fieldColumns);
+
+            // Append segment filters
+            $userSegments = $this->listModel->getUserLists();
+            $list         = [];
+            foreach ($userSegments as $segment) {
+                $list[$segment['id']] = $segment['name'];
+            }
+            $filters['s.leadlist_id'] = [
+                'alias' => 'segment_id',
+                'label' => 'mautic.core.filter.lists',
+                'type'  => 'select',
+                'list'  => $list,
+                'operators' => [
+                    'eq' => 'mautic.core.operator.equals'
+                ]
+            ];
+
+            $data = [
                 'display_name' => 'mautic.lead.leads',
                 'columns'      => $columns,
+                'filters'      => $filters,
             ];
 
             $event->addTable('leads', $data);
 
             if ($event->checkContext('lead.attribution')) {
-                $attributionPrefix  = 'la.';
-                $attributionColumns = [
-                    $attributionPrefix.'campaign_name' => [
-                        'label' => 'mautic.lead.report.attribution.campaign_name',
-                        'type'  => 'string'
-                    ],
-                    $attributionPrefix.'campaign_id'   => [
-                        'label' => 'mautic.lead.report.attribution.campaign_id',
-                        'type'  => 'int'
-                    ],
-                    $attributionPrefix.'date_added'    => [
-                        'label' => 'mautic.core.date.added',
-                        'type'  => 'datetime'
-                    ],
-                    $attributionPrefix.'channel'       => [
-                        'label' => 'mautic.lead.report.attribution.channel',
-                        'type'  => 'string'
-                    ],
-                    $attributionPrefix.'channel_id'    => [
-                        'label' => 'mautic.lead.report.attribution.channel_id',
-                        'type'  => 'int'
-                    ],
-                    $attributionPrefix.'stage_name'    => [
-                        'label' => 'mautic.lead.report.attribution.stage_name',
-                        'type'  => 'string'
-                    ],
-                    $attributionPrefix.'stage_id'      => [
-                        'label' => 'mautic.lead.report.attribution.stage_id',
-                        'type'  => 'int'
-                    ],
-                    $attributionPrefix.'attribution'   => [
-                        'label' => 'mautic.lead.report.attribution',
-                        'type'  => 'string'
-                    ],
-                    $attributionPrefix.'comments'      => [
-                        'label' => 'mautic.lead.report.attribution.comments',
-                        'type'  => 'string'
-                    ],
-                    $attributionPrefix.'touch'         => [
-                        'label' => 'mautic.lead.report.attribution.touch',
-                        'type'  => 'string'
-                    ],
-                ];
-
-                $filters = $columns = array_merge($columns, $attributionColumns, $event->getIpColumn());
-
-                // Append stage filters
-                $filters['stage_id'] = [
-                    'label'         => 'mautic.lead.report.attribution.filter.stage',
-                    'type'          => 'int',
-                    'operatorGroup' => 'multiselect',
-                    'list'          => [
-                        // @todo add stage lists
-                        1 => 'Stage One',
-                        2 => 'Stage Two'
-                    ],
-                ];
-
-                $data = [
-                    'display_name' => 'mautic.lead.report.attribution.table',
-                    'columns'      => $columns,
-                    'filters'      => $filters,
-                ];
-
-                $event->addTable('lead.attribution', $data);
+                $this->injectAttributionReportData($event, $columns);
             } else {
-                // Add graphs
+                // Add shared graphs
                 $event->addGraph('leads', 'line', 'mautic.lead.graph.line.leads');
 
                 if ($event->checkContext('lead.pointlog')) {
-                    $pointPrefix  = 'lp.';
-                    $pointColumns = [
-                        $pointPrefix.'type'        => [
-                            'label' => 'mautic.lead.report.points.type',
-                            'type'  => 'string'
-                        ],
-                        $pointPrefix.'event_name'  => [
-                            'label' => 'mautic.lead.report.points.event_name',
-                            'type'  => 'string'
-                        ],
-                        $pointPrefix.'action_name' => [
-                            'label' => 'mautic.lead.report.points.action_name',
-                            'type'  => 'string'
-                        ],
-                        $pointPrefix.'delta'       => [
-                            'label' => 'mautic.lead.report.points.delta',
-                            'type'  => 'int'
-                        ],
-                        $pointPrefix.'date_added'  => [
-                            'label' => 'mautic.lead.report.points.date_added',
-                            'type'  => 'datetime'
-                        ]
-                    ];
-                    $data         = [
-                        'display_name' => 'mautic.lead.report.points.table',
-                        'columns'      => array_merge($columns, $pointColumns, $event->getIpColumn())
-                    ];
-                    $event->addTable('lead.pointlog', $data);
-
-                    // Register graphs
-                    $context = 'lead.pointlog';
-                    $event->addGraph($context, 'line', 'mautic.lead.graph.line.points');
-                    $event->addGraph($context, 'table', 'mautic.lead.table.most.points');
-                    $event->addGraph($context, 'table', 'mautic.lead.table.top.countries');
-                    $event->addGraph($context, 'table', 'mautic.lead.table.top.cities');
-                    $event->addGraph($context, 'table', 'mautic.lead.table.top.events');
-                    $event->addGraph($context, 'table', 'mautic.lead.table.top.actions');
+                    $this->injectPointsReportData($event, $columns);
                 }
             }
         }
@@ -236,37 +198,47 @@ class ReportSubscriber extends CommonSubscriber
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
         $context = $event->getContext();
-        if ($context == 'leads') {
-            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb      = $event->getQueryBuilder();
 
-            $qb->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
-            $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
-            $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_ips_xref', 'lip', 'lip.lead_id = l.id');
-            $qb->leftJoin('lip', MAUTIC_TABLE_PREFIX.'ip_addresses', 'i', 'i.id = lip.ip_id');
+        switch ($context) {
+            case 'leads':
+                $event->applyDateFilters($qb, 'date_added', 'l');
+                $qb->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+                    ->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
 
-            $event->setQueryBuilder($qb);
-        } elseif ($context == 'lead.pointlog') {
-            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+                if ($event->hasColumn('i.ip_address') || $event->hasFilter('i.ip_address')) {
+                    $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_ips_xref', 'lip', 'lip.lead_id = l.id');
+                    $event->addIpAddressLeftJoin($qb, 'lip');
+                }
 
-            $qb->from(MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp')
-                ->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id')
-                ->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
-            $event->addIpAddressLeftJoin($qb, 'lp');
+                if ($event->hasFilter('s.leadlist_id')) {
+                    $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = 0');
+                }
+                break;
 
-            $event->setQueryBuilder($qb);
-        } elseif ($context == 'lead.attribution') {
-            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            case 'lead.pointlog':
+                $event->applyDateFilters($qb, 'date_added', 'lp');
+                $qb->from(MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp')
+                    ->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id')
+                    ->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
 
-            $qb->from(MAUTIC_TABLE_PREFIX.'lead_attribute', 'la')
-                ->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id')
-                ->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id')
-                ->leftJoin('c', MAUTIC_TABLE_PREFIX.'campaigns', 'la', 'c.id = a.campaign_id');
-                // @todo add stages
-                //->leftJoin('a', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = a.campaign_id')
-            $event->addIpAddressLeftJoin($qb, 'la');
+                if ($event->hasColumn('i.ip_address') || $event->hasFilter('i.ip_address')) {
+                    $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_ips_xref', 'lip', 'lip.lead_id = l.id');
+                    $event->addIpAddressLeftJoin($qb, 'lp');
+                }
 
-            $event->setQueryBuilder($qb);
+                break;
+
+            case 'lead.attribution':
+                $event->applyDateFilters($qb, 'date_added', 'la');
+                $qb->from(MAUTIC_TABLE_PREFIX.'lead_attributions', 'la')
+                    ->leftJoin('la', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = la.lead_id')
+                    ->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
+
+                break;
         }
+
+        $event->setQueryBuilder($qb);
     }
 
     /**
@@ -286,15 +258,70 @@ class ReportSubscriber extends CommonSubscriber
 
         $graphs       = $event->getRequestedGraphs();
         $qb           = $event->getQueryBuilder();
-        $pointLogRepo = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');
+        $pointLogRepo = $this->leadModel->getPointLogRepository();
 
         foreach ($graphs as $g) {
             $queryBuilder = clone $qb;
             $options      = $event->getOptions($g);
-            $chartQuery   = clone $options['chartQuery'];
+            /** @var ChartQuery $chartQuery */
+            $chartQuery    = clone $options['chartQuery'];
+            $attributionQb = clone $queryBuilder;
+
             $chartQuery->applyDateFilters($queryBuilder, 'date_added', 'l');
 
             switch ($g) {
+                case 'mautic.lead.graph.pie.attribution_stages':
+                case 'mautic.lead.graph.pie.attribution_campaigns':
+                case 'mautic.lead.graph.pie.attribution_actions':
+                case 'mautic.lead.graph.pie.attribution_channels':
+                    $attributionQb->resetQueryParts(['select','orderBy']);
+                    $outerQb = clone $attributionQb;
+                    $outerQb->resetQueryParts()
+                        ->select('slice, sum(avg_attribution) as total_attribution')
+                        ->groupBy('slice');
+
+                    $groupBy = str_replace('mautic.lead.graph.pie.attribution_', '', $g);
+                    switch ($groupBy) {
+                        case 'stages':
+                            $attributionQb->select('CONCAT_WS(\':\', la.stage_id, la.stage_name) as slice, AVG(la.attribution) as avg_attribution')
+                                ->groupBy('la.lead_id, la.stage_id');
+                            break;
+                        case 'campaigns':
+                            $attributionQb->select('CONCAT_WS(\':\', la.campaign_id, la.campaign_name) as slice, AVG(la.attribution) as avg_attribution')
+                                ->groupBy('la.lead_id, la.campaign_id');
+                            break;
+                        case 'actions':
+                            $attributionQb->select('CONCAT_WS(\':\', la.channel, la.action) as slice, AVG(la.attribution) as avg_attribution')
+                                ->groupBy('la.lead_id, la.action');
+                            break;
+                        case 'channels':
+                            $attributionQb->select('la.channel as slice, AVG(la.attribution) as avg_attribution')
+                                ->groupBy('la.lead_id, la.channel');
+                            break;
+                    }
+
+                    $outerQb->from(sprintf('(%s) subq', $attributionQb->getSQL()));
+                    $outerQb->setParameters(
+                        $attributionQb->getParameters()
+                    );
+
+                    $chart = new PieChart();
+                    $data = $outerQb->execute()->fetchAll();
+
+                    foreach ($data as $row) {
+                        $chart->setDataset($row['slice'], $row['total_attribution']);
+                    }
+
+                    $event->setGraph(
+                        $g,
+                        [
+                            'data'      => $chart->render(),
+                            'name'      => $g,
+                            'iconClass' => 'fa-dollar'
+                        ]
+                    );
+                    break;
+
                 case 'mautic.lead.graph.line.leads':
                     $chart = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_added', 'l');
@@ -392,6 +419,152 @@ class ReportSubscriber extends CommonSubscriber
                     break;
             }
             unset($queryBuilder);
+        }
+    }
+
+    /**
+     * @param ReportBuilderEvent $event
+     * @param array              $columns
+     */
+    private function injectPointsReportData(ReportBuilderEvent $event, array $columns)
+    {
+        $pointColumns = [
+            'lp.type'        => [
+                'label' => 'mautic.lead.report.points.type',
+                'type'  => 'string'
+            ],
+            'lp.event_name'  => [
+                'label' => 'mautic.lead.report.points.event_name',
+                'type'  => 'string'
+            ],
+            'lp.action_name' => [
+                'label' => 'mautic.lead.report.points.action_name',
+                'type'  => 'string'
+            ],
+            'lp.delta'       => [
+                'label' => 'mautic.lead.report.points.delta',
+                'type'  => 'int'
+            ],
+            'lp.date_added'  => [
+                'label' => 'mautic.lead.report.points.date_added',
+                'type'  => 'datetime'
+            ]
+        ];
+        $data         = [
+            'display_name' => 'mautic.lead.report.points.table',
+            'columns'      => array_merge($columns, $pointColumns, $event->getIpColumn())
+        ];
+        $event->addTable('lead.pointlog', $data);
+
+        // Register graphs
+        $context = 'lead.pointlog';
+        $event->addGraph($context, 'line', 'mautic.lead.graph.line.points')
+                ->addGraph($context, 'table', 'mautic.lead.table.most.points')
+                ->addGraph($context, 'table', 'mautic.lead.table.top.countries')
+                ->addGraph($context, 'table', 'mautic.lead.table.top.cities')
+                ->addGraph($context, 'table', 'mautic.lead.table.top.events')
+                ->addGraph($context, 'table', 'mautic.lead.table.top.actions');
+    }
+
+    /**
+     * @param ReportBuilderEvent $event
+     * @param array              $columns
+     */
+    private function injectAttributionReportData(ReportBuilderEvent $event, array $columns)
+    {
+        $attributionColumns = [
+            'la.campaign_id'   => [
+                'label' => 'mautic.lead.report.attribution.campaign_id',
+                'type'  => 'int'
+            ],
+            'la.campaign_name' => [
+                'label' => 'mautic.lead.report.attribution.campaign_name',
+                'type'  => 'string'
+            ],
+            'la.date_added'    => [
+                'label' => 'mautic.core.date.added',
+                'type'  => 'datetime'
+            ],
+            'la.channel'       => [
+                'label' => 'mautic.lead.report.attribution.channel',
+                'type'  => 'string'
+            ],
+            'la.channel_id'    => [
+                'label' => 'mautic.lead.report.attribution.channel_id',
+                'type'  => 'int'
+            ],
+            'la.action'        => [
+                'label' => 'mautic.lead.report.attribution.channel_action',
+                'type'  => 'string'
+            ],
+            'la.stage_id'      => [
+                'label' => 'mautic.lead.report.attribution.stage_id',
+                'type'  => 'int'
+            ],
+            'la.stage_name'    => [
+                'label' => 'mautic.lead.report.attribution.stage_name',
+                'type'  => 'string'
+            ],
+            'la.attribution'   => [
+                'label' => 'mautic.lead.report.attribution',
+                'type'  => 'float',
+                'alias' => 'activity_attribution'
+            ],
+            'la.comments'      => [
+                'label' => 'mautic.lead.report.attribution.comments',
+                'type'  => 'string'
+            ]
+        ];
+
+        $filters = $columns = array_merge($columns, $attributionColumns, $event->getIpColumn());
+
+        // Unset activity attribution for $filters since this data is calculated and not accurately filterable
+        // Unset IP address
+        unset($filters['la.attribution'], $columns['i.ip_address'], $filters['i.ip_address']);
+
+        // Append stage filters
+        $filters['la.stage_id'] = [
+            'label' => 'mautic.lead.report.attribution.filter.stage',
+            'type'  => 'multiselect',
+            'list'  => [
+                // @todo add stage lists
+                1 => 'Stage One',
+                2 => 'Stage Two'
+            ],
+        ];
+
+        $data = [
+            'display_name' => 'mautic.lead.report.attribution.table',
+            'columns'      => $columns,
+            'filters'      => $filters,
+        ];
+
+        $context = 'lead.attribution';
+        $event->addTable($context, $data)
+            ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_stages')
+            ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_campaigns')
+            ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_actions')
+            ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_channels');
+    }
+
+    /**
+     * @param ReportDataEvent $event
+     */
+    public function onReportDisplay(ReportDataEvent $event)
+    {
+        if ($data = $event->getData()) {
+            $total = $event->getTotalResults();
+
+            if (isset($data[0]['activity_attribution'])) {
+                // Divide attribution by total number of results
+                foreach ($data as $key => &$row) {
+                    if (!empty($row['activity_attribution'])) {
+                        $row['activity_attribution'] = round($row['activity_attribution'] / $total, 2);
+                    }
+                }
+            }
+
+            $event->setData($data);
         }
     }
 }

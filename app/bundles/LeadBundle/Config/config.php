@@ -175,7 +175,13 @@ return [
                 ]
             ],
             'mautic.lead.reportbundle.subscriber'   => [
-                'class' => 'Mautic\LeadBundle\EventListener\ReportSubscriber'
+                'class'     => 'Mautic\LeadBundle\EventListener\ReportSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.lead.model.list',
+                    'mautic.lead.model.field',
+                    'mautic.lead.model.lead'
+                ]
             ],
             'mautic.lead.doctrine.subscriber'       => [
                 'class' => 'Mautic\LeadBundle\EventListener\DoctrineSubscriber',
@@ -363,6 +369,12 @@ return [
             ],
             'mautic.lead.model.note' => [
                 'class' => 'Mautic\LeadBundle\Model\NoteModel'
+            ],
+            'mautic.lead.model.attribution' => [
+                'class'     => 'Mautic\LeadBundle\Model\AttributionModel',
+                'arguments' => [
+                    'mautic.helper.ip_lookup'
+                ]
             ]
         ]
     ]

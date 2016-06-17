@@ -32,43 +32,19 @@ class AjaxController extends CommonAjaxController
         $model   = $this->getModel('report');
         $context = $request->get('context');
 
-        $graphs = $model->getGraphList($context, true);
-        list($columns, $columnTypes) = $model->getColumnList($context, true);
-        list($filters, $filterTypes, $filterOperators) = $model->getFilterList($context, true);
+        $graphs  = $model->getGraphList($context);
+        $columns = $model->getColumnList($context);
+        $filters = $model->getFilterList($context);
 
         return $this->sendJsonResponse(
             [
-                'columns'         => $columns,
-                'types'           => $columnTypes,
-                'filters'         => $filters,
-                'filterTypes'     => $filterTypes,
-                'filterOperators' => $filterOperators,
-                'graphs'          => $graphs,
+                'columns'           => $columns->choiceHtml,
+                'columnDefinitions' => $columns->definitions,
+                'filters'           => $filters->choiceHtml,
+                'filterDefinitions' => $filters->definitions,
+                'filterOperators'   => $filters->operatorHtml,
+                'graphs'            => $graphs->choiceHtml,
             ]
         );
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function updateGraphAction(Request $request)
-    {
-        $reportId  = InputHelper::int($request->request->get('reportId'));
-        $options   = InputHelper::clean($request->request->all());
-        $dataArray = ['success' => 0];
-
-        /* @type \Mautic\ReportBundle\Model\ReportModel $model */
-        $model    = $this->getModel('report');
-        $report   = $model->getEntity($reportId);
-
-        $options['ignoreTableData'] = true;
-        $reportData                 = $model->getReportData($report, $this->container->get('form.factory'), $options);
-
-        $dataArray['graph']   = $reportData['graphs'][$options['graphName']]['data'];
-        $dataArray['success'] = 1;
-
-        return $this->sendJsonResponse($dataArray);
     }
 }

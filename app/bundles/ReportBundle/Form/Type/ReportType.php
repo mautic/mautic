@@ -131,8 +131,10 @@ class ReportType extends AbstractType
                     $source    = $first_key;
                 }
 
-                list($columnList, $ignore) = $model->getColumnList($source);
-                list($filters, $filterTypes, $operators) = $model->getFilterList($source, false, true);
+                $columns               = $model->getColumnList($source);
+                $filters               = $model->getFilterList($source);
+                $filterDefinitions     = htmlspecialchars(json_encode($filters->definitions), ENT_QUOTES, 'UTF-8');
+                $operatorHtml          = htmlspecialchars(json_encode($filters->operatorHtml), ENT_QUOTES, 'UTF-8');
 
                 if (is_array($currentColumns)) {
                     $orderColumns = array_values($currentColumns);
@@ -146,7 +148,7 @@ class ReportType extends AbstractType
                     'columns',
                     'choice',
                     [
-                        'choices'    => $columnList,
+                        'choices'    => $columns->choices,
                         'label'      => false,
                         'label_attr' => ['class' => 'control-label'],
                         'required'   => false,
@@ -168,18 +170,19 @@ class ReportType extends AbstractType
                         'type'         => 'filter_selector',
                         'label'        => false,
                         'options'      => [
-                            'columnList' => $filters,
-                            'required'   => false
+                            'filterList'   => $filters->choices,
+                            'operatorList' => $filters->operatorChoices,
+                            'required'     => false
                         ],
                         'allow_add'    => true,
                         'allow_delete' => true,
                         'prototype'    => true,
                         'required'     => false,
                         'attr'         => [
-                            'data-filter-types'     => $filterTypes,
-                            'data-filter-operators' => $operators,
+                            'data-filter-definitions' => $filterDefinitions,
+                            'data-filter-operators'   => $operatorHtml,
                         ],
-                        'filters'      => (isset($tableList[$source]['filters'])) ? $tableList[$source]['filters'] : $tableList[$source]['columns'],
+                        'filters'      => $filters->definitions,
                         'report'       => $formData
                     ]
                 );
@@ -191,7 +194,7 @@ class ReportType extends AbstractType
                         'type'         => 'table_order',
                         'label'        => false,
                         'options'      => [
-                            'columnList' => $columnList,
+                            'columnList' => $columns->choices,
                             'required'   => false
                         ],
                         'allow_add'    => true,
@@ -231,7 +234,7 @@ class ReportType extends AbstractType
                     'graphs',
                     'choice',
                     [
-                        'choices'    => $graphList,
+                        'choices'    => $graphList->choices,
                         'label'      => 'mautic.report.report.form.graphs',
                         'label_attr' => ['class' => 'control-label'],
                         'required'   => false,

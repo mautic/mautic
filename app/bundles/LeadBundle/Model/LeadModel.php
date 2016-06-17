@@ -90,7 +90,7 @@ class LeadModel extends FormModel
 
     /**
      * LeadModel constructor.
-     * 
+     *
      * @param RequestStack $requestStack
      * @param CookieHelper $cookieHelper
      * @param IpLookupHelper $ipLookupHelper
@@ -101,9 +101,9 @@ class LeadModel extends FormModel
      */
     public function __construct(
         RequestStack $requestStack,
-        CookieHelper $cookieHelper, 
-        IpLookupHelper $ipLookupHelper, 
-        PathsHelper $pathsHelper, 
+        CookieHelper $cookieHelper,
+        IpLookupHelper $ipLookupHelper,
+        PathsHelper $pathsHelper,
         IntegrationHelper $integrationHelper,
         FieldModel $leadFieldModel,
         ListModel $leadListModel
@@ -164,6 +164,15 @@ class LeadModel extends FormModel
     public function getTagRepository()
     {
         return $this->em->getRepository('MauticLeadBundle:Tag');
+    }
+
+    /**
+     * @return \Mautic\LeadBundle\Entity\PointsChangeLogRepository
+     */
+    public function getPointLogRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:PointsChangeLog');
+
     }
 
     /**
@@ -951,14 +960,14 @@ class LeadModel extends FormModel
 
     /**
      * Remove a Lead's EMAIL DNC entry.
-     * 
+     *
      * @param string $email
      */
     public function removeDncForEmail($email)
     {
         $repo = $this->getRepository();
         $leadId = (array) $repo->getLeadByEmail($email, true);
-        
+
         /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
         $leads = [];
 

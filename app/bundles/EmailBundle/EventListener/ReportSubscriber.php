@@ -87,7 +87,7 @@ class ReportSubscriber extends CommonSubscriber
                     'type'  => 'int'
                 )
             );
-            $columns       = array_merge($columns, $event->getStandardColumns($prefix), $event->getCategoryColumns());
+            $columns       = array_merge($columns, $event->getStandardColumns($prefix, [], 'mautic_email_action'), $event->getCategoryColumns());
             $data          = array(
                 'display_name' => 'mautic.email.emails',
                 'columns'      => $columns
@@ -163,26 +163,27 @@ class ReportSubscriber extends CommonSubscriber
     public function onReportGenerate (ReportGeneratorEvent $event)
     {
         $context = $event->getContext();
-        if ($context == 'emails') {
-            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb      = $event->getQueryBuilder();
 
-            $qb->from(MAUTIC_TABLE_PREFIX . 'emails', 'e')
-                ->leftJoin('e', MAUTIC_TABLE_PREFIX . 'emails', 'vp', 'vp.id = e.variant_parent_id');
-            $event->addCategoryLeftJoin($qb, 'e');
+        switch ($context) {
+            case 'emails':
+                $qb->from(MAUTIC_TABLE_PREFIX.'emails', 'e')
+                    ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id');
+                $event->addCategoryLeftJoin($qb, 'e');
+                break;
+            case 'email.stats':
+                $event->applyDateFilters($qb, 'date_sent', 'es');
 
-            $event->setQueryBuilder($qb);
-        } elseif ($context == 'email.stats') {
-            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-
-            $qb->from(MAUTIC_TABLE_PREFIX . 'email_stats', 'es')
-                ->leftJoin('es', MAUTIC_TABLE_PREFIX . 'emails', 'e', 'e.id = es.email_id')
-                ->leftJoin('e', MAUTIC_TABLE_PREFIX . 'emails', 'vp', 'vp.id = e.variant_parent_id');
-            $event->addCategoryLeftJoin($qb, 'e');
-            $event->addLeadLeftJoin($qb, 'es');
-            $event->addIpAddressLeftJoin($qb, 'es');
-
-            $event->setQueryBuilder($qb);
+                $qb->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
+                    ->leftJoin('es', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = es.email_id')
+                    ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id');
+                $event->addCategoryLeftJoin($qb, 'e');
+                $event->addLeadLeftJoin($qb, 'es');
+                $event->addIpAddressLeftJoin($qb, 'es');
+                break;
         }
+
+        $event->setQueryBuilder($qb);
     }
 
     /**
@@ -196,6 +197,7 @@ class ReportSubscriber extends CommonSubscriber
     {
         // Context check, we only want to fire for Lead reports
         if (!$event->checkContext('email.stats')) {
+
             return;
         }
 
