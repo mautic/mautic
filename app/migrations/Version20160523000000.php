@@ -19,8 +19,6 @@ use Mautic\LeadBundle\Entity\DoNotContact;
  */
 class Version20160523000000 extends AbstractMauticMigration
 {
-    private $leadIdIdx;
-    private $leadIdFk;
 
     /**
      * @param Schema $schema
@@ -61,8 +59,8 @@ CREATE TABLE `{$this->prefix}stages` (
   `publish_up` datetime DEFAULT NULL COMMENT '(DC2Type:datetime)',
   `publish_down` datetime DEFAULT NULL COMMENT '(DC2Type:datetime)',
   `type` varchar(50) DEFAULT NULL,
-  `weight` int(11) DEFAULT NULL
-  PRIMARY KEY (`id`),
+  `weight` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 SQL;
 
@@ -100,7 +98,7 @@ SQL;
         $this->addSql('ALTER TABLE ' . $this->prefix . 'stage_lead_action_log ADD CONSTRAINT ' . $this->generatePropertyName('stage_lead_action_log', 'fk', array('lead_id')) . ' FOREIGN KEY (lead_id) REFERENCES ' . $this->prefix . 'leads (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'stage_lead_action_log ADD CONSTRAINT ' . $this->generatePropertyName('stage_lead_action_log', 'fk', array('stage_id')) . ' FOREIGN KEY (stage_id) REFERENCES ' . $this->prefix . 'stages (id)');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'stage_lead_action_log ADD CONSTRAINT ' . $this->generatePropertyName('stage_lead_action_log', 'fk', array('ip_id')) . ' FOREIGN KEY (ip_id) REFERENCES ' . $this->prefix . 'ip_addresses (id)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead ADD COLUMN stage_id INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'leads ADD COLUMN stage_id INT DEFAULT NULL');
     }
 
     /**

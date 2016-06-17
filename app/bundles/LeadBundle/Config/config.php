@@ -180,7 +180,8 @@ return [
                     'mautic.factory',
                     'mautic.lead.model.list',
                     'mautic.lead.model.field',
-                    'mautic.lead.model.lead'
+                    'mautic.lead.model.lead',
+                    'mautic.stage.model.stage',
                 ]
             ],
             'mautic.lead.doctrine.subscriber'       => [

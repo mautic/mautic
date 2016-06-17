@@ -109,7 +109,10 @@ return [
                 ]
             ],
             'mautic.page.leadbundle.subscriber'     => [
-                'class' => 'Mautic\PageBundle\EventListener\LeadSubscriber'
+                'class'       => 'Mautic\PageBundle\EventListener\LeadSubscriber',
+                'methodCalls' => [
+                    'setAttributionModel' => ['mautic.lead.model.attribution']
+                ]
             ],
             'mautic.page.calendarbundle.subscriber' => [
                 'class' => 'Mautic\PageBundle\EventListener\CalendarSubscriber'

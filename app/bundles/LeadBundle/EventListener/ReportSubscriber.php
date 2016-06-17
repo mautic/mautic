@@ -22,6 +22,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\StageBundle\Model\StageModel;
 
 /**
  * Class ReportSubscriber
@@ -46,20 +47,27 @@ class ReportSubscriber extends CommonSubscriber
     protected $leadModel;
 
     /**
+     * @var StageModel
+     */
+    protected $stageModel;
+
+    /**
      * ReportSubscriber constructor.
      *
      * @param MauticFactory $factory
      * @param ListModel     $listModel
      * @param FieldModel    $fieldModel
      * @param LeadModel     $leadModel
+     * @param StageModel    $stageModel
      */
-    public function __construct(MauticFactory $factory, ListModel $listModel, FieldModel $fieldModel, LeadModel $leadModel)
+    public function __construct(MauticFactory $factory, ListModel $listModel, FieldModel $fieldModel, LeadModel $leadModel, StageModel $stageModel)
     {
         parent::__construct($factory);
 
         $this->listModel  = $listModel;
         $this->fieldModel = $fieldModel;
         $this->leadModel  = $leadModel;
+        $this->stageModel = $stageModel;
     }
 
     /**
@@ -289,7 +297,7 @@ class ReportSubscriber extends CommonSubscriber
                     ->join('lafirst', sprintf('(%s)', $lastQb->getSQL()), 'lalast', 'lafirst.lead_id = lalast.lead_id')
                     ->leftJoin('lafirst', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lafirst.lead_id')
                     ->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
-                
+
                 break;
         }
 
@@ -576,6 +584,16 @@ class ReportSubscriber extends CommonSubscriber
         // Unset IP address
         unset($columns['i.ip_address']);
 
+        // Setup stages list
+        static $stages;
+        if (null == $stages) {
+            $userStages = $this->stageModel->getUserStages();
+            $stages = [];
+            foreach ($userStages as $stage) {
+                $stages[$stage['id']] = $stage['name'];
+            }
+        }
+
         $context = "contact.attribution.$type";
         if ('multi' == $type) {
             $filters = $columns = array_merge($columns, $attributionColumns);
@@ -587,11 +605,7 @@ class ReportSubscriber extends CommonSubscriber
             $filters['la.stage_id'] = [
                 'label' => 'mautic.lead.report.attribution.filter.stage',
                 'type'  => 'select',
-                'list'  => [
-                    // @todo add stage lists
-                    1 => 'Stage One',
-                    2 => 'Stage Two'
-                ],
+                'list'  => $stages,
             ];
 
             $event
@@ -615,6 +629,18 @@ class ReportSubscriber extends CommonSubscriber
             }
 
             $filters = $columns = array_merge($columns, $singleTouchColumns);
+
+            // Append stage filters
+            $filters['lafirst.first_stage_id'] = [
+                'label' => 'mautic.lead.report.attribution.filter.stage_first',
+                'type'  => 'select',
+                'list'  => $stages,
+            ];
+            $filters['lalast.last_stage_id'] = [
+                'label' => 'mautic.lead.report.attribution.filter.stage_last',
+                'type'  => 'select',
+                'list'  => $stages,
+            ];
         }
 
         $data = [

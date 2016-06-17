@@ -14,6 +14,9 @@ Mautic.reportOnLoad = function (container) {
 		if (mQuery('.filter-columns').length) {
 			mQuery('.filter-columns').each(function () {
 				Mautic.updateReportFilterValueInput(this, true);
+                mQuery(this).on('change', function() {
+                    Mautic.updateReportFilterValueInput(this);
+                });
 			});
 		}
 	} else {
@@ -102,13 +105,12 @@ Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
         mQuery('#report_filters_' + idParts[2] + '_condition').val(currentOperator);
     }
 
-
     // Replace the value field appropriately
     if (mQuery('#' + valueId + '_chosen').length) {
         mQuery('#' + valueId).chosen('destroy');
     }
-
-    if (filterType == 'bool') {
+console.log(filterType);
+    if (filterType == 'bool' || filterType == 'boolean' ) {
 		if (mQuery(valueEl).attr('type') != 'radio') {
 			var template = mQuery('#filterValueYesNoTemplate .btn-group').clone(true);
 			mQuery(template).find('input[type="radio"]').each(function () {

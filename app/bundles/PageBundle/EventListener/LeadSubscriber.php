@@ -180,7 +180,7 @@ class LeadSubscriber extends CommonSubscriber
             $page       = $event->getPage();
             $campaignId = ($hit->getSource() == 'campaign') ? $hit->getSourceId() : null;
 
-            $this->attributionModel->addAttribution($lead, 'page', $page->getId(), 'hit', $campaignId);
+            $this->attributionModel->addAttribution($lead, 'page', ($page) ? $page->getId() : null, 'hit', $campaignId);
         }
     }
 }

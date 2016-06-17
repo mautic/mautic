@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\StageBundle\Entity\Stage;
 
 /**
  * Class Attribution
@@ -35,8 +36,7 @@ class Attribution
     private $dateAdded;
 
     /**
-     * @todo link to lifecycle stage
-     * @var
+     * @var Stage
      */
     private $stage;
 
@@ -88,7 +88,7 @@ class Attribution
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -125,8 +125,9 @@ class Attribution
         $builder->createField('action', 'string')
             ->build();
 
-        // @todo - change to Stage association
-        $builder->addNamedField('stage', 'integer', 'stage_id', true);
+        $builder->createManyToOne('stage', 'Mautic\StageBundle\Entity\Stage')
+            ->addJoinColumn('stage_id', 'id', true, false, 'SET NULL')
+            ->build();
         $builder->addNamedField('stageName', 'text', 'stage_name', true);
 
         $builder->createField('comments', 'text')
@@ -191,7 +192,7 @@ class Attribution
     }
 
     /**
-     * @return mixed
+     * @return Stage
      */
     public function getStage()
     {
@@ -199,13 +200,11 @@ class Attribution
     }
 
     /**
-     * @todo hint to stage entity
-     *
-     * @param mixed $stage
+     * @param Stage $stage
      *
      * @return Attribution
      */
-    public function setStage($stage)
+    public function setStage(Stage $stage = null)
     {
         $this->stage = $stage;
 
@@ -345,7 +344,7 @@ class Attribution
      *
      * @return Attribution
      */
-    public function setCampaign(Campaign $campaign)
+    public function setCampaign(Campaign $campaign = null)
     {
         $this->campaign = $campaign;
 
@@ -373,33 +372,6 @@ class Attribution
     }
 
     /**
-     * Get the attribution amount from the lead
-     */
-    public function extractAttribution()
-    {
-        if (null == $this->attribution) {
-            $this->attribution = (float) $this->lead->getAttribution();
-        }
-
-        if (null == $this->dateAdded) {
-            $this->dateAdded = new \DateTime;
-        }
-
-        if ($this->campaign && empty($this->campaignName)) {
-            $this->campaignName = $this->campaign->getName();
-        }
-
-        if (!$this->stage) {
-            //$this->stage = $this->lead->getStage();
-        }
-
-        if ($this->stage && empty($this->stageName)) {
-            // @todo add stage name
-            //$this->stageName = $this->stage->getName();
-        }
-    }
-
-    /**
      * @return IpAddress
      */
     public function getIpAddress()
@@ -417,5 +389,32 @@ class Attribution
         $this->ipAddress = $ipAddress;
 
         return $this;
+    }
+
+
+    /**
+     * Get the attribution amount from the lead
+     */
+    public function extractAttribution()
+    {
+        if (null == $this->attribution) {
+            $this->attribution = (float) $this->lead->getAttribution();
+        }
+
+        if (null == $this->dateAdded) {
+            $this->dateAdded = new \DateTime;
+        }
+
+        if ($this->campaign && empty($this->campaignName)) {
+            $this->campaignName = $this->campaign->getName();
+        }
+
+        if (!$this->stage) {
+            $this->stage = $this->lead->getStage();
+        }
+
+        if ($this->stage && empty($this->stageName)) {
+            $this->stageName = $this->stage->getName();
+        }
     }
 }
