@@ -4,11 +4,34 @@
  * Copyright Mautic
  */
 
-var FroalaEditorForFileManager;
+var FroalaEditorForFileManager = null;
+var FroalaEditorForFileManagerCurrentImage = null;
 
+// This method is called by the Filemanager after an image is selected
 function SetUrl( url, width, height, alt ) {
-  FroalaEditorForFileManager.image.insert(url, false);
-  oWindow = null;
+    if (typeof FroalaEditorForFileManagerCurrentImage !== 'undefined' && 
+        FroalaEditorForFileManagerCurrentImage.length && 
+        FroalaEditorForFileManagerCurrentImage.prop('tagName') === 'IMG') {
+        // Copy additional image attributes.
+        // data-url is set as src therefore not needed anymore.
+        // data-tag is only used to sort images by tag in the image manager.
+        var img_attributes = {};
+        var img_data = FroalaEditorForFileManagerCurrentImage.data();
+
+        for (var key in img_data) {
+            if (img_data.hasOwnProperty(key)) {
+                if (key != 'url' && key != 'tag') {
+                    img_attributes[key] = img_data[key];
+                }
+            }
+        }
+        FroalaEditorForFileManager.image.insert(url, false, img_attributes, FroalaEditorForFileManagerCurrentImage);
+        FroalaEditorForFileManagerCurrentImage = null;
+    } else {
+        FroalaEditorForFileManager.image.insert(url, false);
+    }
+    FroalaEditorForFileManagerCurrentImage = null;
+    oWindow = null;
 }
 
 (function (factory) {
@@ -41,14 +64,13 @@ function SetUrl( url, width, height, alt ) {
   'use strict';
 
   $.FE.PLUGINS.fileManager = function (editor) {
-    var $current_image;
-
     var urlobj;
 
     /*
      * Show the file manager.
      */
     function show () {
+      FroalaEditorForFileManagerCurrentImage = editor.image.get();
       FroalaEditorForFileManager = editor;
       openServerBrowser(
         mauticBasePath + '/' + mauticAssetPrefix + 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=Images',
