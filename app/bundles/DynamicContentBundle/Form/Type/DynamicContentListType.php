@@ -73,7 +73,7 @@ class DynamicContentListType extends AbstractType
                 'multiple' => false,
                 'required' => false,
                 'empty_value' => function (Options $options) {
-                    return (empty($options['choices'])) ? 'mautic.notification.no.notifications.note' : 'mautic.core.form.chooseone';
+                    return (empty($options['choices'])) ? 'mautic.dynamicContent.no.dynamicContent.note' : 'mautic.core.form.chooseone';
                 },
                 'disabled' => function (Options $options) {
                     return empty($options['choices']);

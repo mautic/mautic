@@ -34,8 +34,6 @@ $customButtons = [];
 //    ];
 //}
 
-$basicSecurity =
-
 $view['slots']->set(
     'actions',
     $view->render(

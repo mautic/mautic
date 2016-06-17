@@ -110,7 +110,7 @@ class CampaignSubscriber extends CommonSubscriber
         $this->session->set('dwc.slot_name.lead.' . $lead->getId(), $eventDetails);
 
         if ($eventConfig['dwc_slot_name'] === $eventDetails) {
-            $event->setResult($eventDetails);
+            $event->setResult(true);
             $event->stopPropagation();
         }
     }
