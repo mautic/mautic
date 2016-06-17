@@ -38,11 +38,13 @@ class Version20160606000000 extends AbstractMauticMigration
                 'lead'     => $this->generatePropertyName('lead_attributions', 'idx', ['lead_id']),
                 'campaign' => $this->generatePropertyName('lead_attributions', 'idx', ['campaign_id']),
                 'ip'       => $this->generatePropertyName('lead_attributions', 'idx', ['ip_id']),
+                'stage'    => $this->generatePropertyName('lead_attributions', 'idx', ['stage_id']),
             ],
             'fk'  => [
                 'lead'     => $this->generatePropertyName('lead_attributions', 'fk', ['lead_id']),
                 'campaign' => $this->generatePropertyName('lead_attributions', 'fk', ['campaign_id']),
                 'ip'       => $this->generatePropertyName('lead_attributions', 'fk', ['ip_id']),
+                'stage'    => $this->generatePropertyName('lead_attributions', 'fk', ['stage_id']),
             ],
         ];
     }
@@ -109,6 +111,7 @@ CREATE TABLE {$this->prefix}lead_attributions (
   INDEX {$this->keys['idx']['lead']} (lead_id), 
   INDEX {$this->keys['idx']['campaign']} (campaign_id), 
   INDEX {$this->keys['idx']['ip']} (ip_id),
+  INDEX {$this->keys['idx']['ip']} (stage_id),
   INDEX {$this->prefix}attribution_channel (channel, date_added), 
   INDEX {$this->prefix}attribution_channel_specific (channel, channel_id, date_added), 
   INDEX {$this->prefix}attribution_channel_lead (channel, lead_id, date_added), 
@@ -140,6 +143,11 @@ SQL;
 
         $this->addSql(
             "ALTER TABLE {$this->prefix}lead_attributions ADD CONSTRAINT {$this->keys['fk']['ip']} FOREIGN KEY (ip_id) REFERENCES {$this->prefix}ip_addresses (id) ON DELETE SET NULL"
+        );
+
+
+        $this->addSql(
+            "ALTER TABLE {$this->prefix}lead_attributions ADD CONSTRAINT {$this->keys['fk']['stage']} FOREIGN KEY (stage_id) REFERENCES {$this->prefix}stages (id) ON DELETE SET NULL"
         );
     }
 
