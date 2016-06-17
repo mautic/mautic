@@ -68,7 +68,7 @@ endif;
                 </td>
                 <td>
                     <?php if ($permissions['edit']) : ?>
-                    <a href="<?php echo $view['router']->generate('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajax">
+                    <a href="<?php echo $view['router']->path('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajax">
                         <?php echo $item->getName(); ?>
                     </a>
                     <?php else : ?>
@@ -79,7 +79,7 @@ endif;
                     <?php echo $item->getDescription(); ?>
                 </td>
                 <td class="visible-md visible-lg">
-                    <a class="label label-primary" href="<?php echo $view['router']->generate('mautic_user_index', array("search" => $view['translator']->trans('mautic.user.user.searchcommand.role') . ':&quot;' .  $item->getName() . '&quot;')); ?>" data-toggle="ajax"<?php echo ($userCounts[$item->getId()] == 0) ? "disabled=disabled" : ""; ?>>
+                    <a class="label label-primary" href="<?php echo $view['router']->path('mautic_user_index', array("search" => $view['translator']->trans('mautic.user.user.searchcommand.role') . ':&quot;' .  $item->getName() . '&quot;')); ?>" data-toggle="ajax"<?php echo ($userCounts[$item->getId()] == 0) ? "disabled=disabled" : ""; ?>>
                         <?php echo $view['translator']->transChoice('mautic.user.role.list.viewusers_count', $userCounts[$item->getId()], array('%count%' => $userCounts[$item->getId()])); ?>
                     </a>
                 </td>
@@ -96,7 +96,7 @@ endif;
         "totalItems" => count($items),
         "page"       => $page,
         "limit"      => $limit,
-        "baseUrl"    =>  $view['router']->generate('mautic_role_index'),
+        "baseUrl"    =>  $view['router']->path('mautic_role_index'),
         'sessionVar' => 'role'
     )); ?>
 </div>

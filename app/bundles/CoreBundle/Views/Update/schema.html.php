@@ -30,7 +30,7 @@ if ($failed) {
             </div>
             <?php if (!$failed): ?>
                 <div class="text-center">
-                    <a href="<?php echo $view['router']->generate('mautic_dashboard_index'); ?>" data-toggle="ajax"><?php echo $view['translator']->trans('mautic.core.go_to_dashboard'); ?></a>
+                    <a href="<?php echo $view['router']->path('mautic_dashboard_index'); ?>" data-toggle="ajax"><?php echo $view['translator']->trans('mautic.core.go_to_dashboard'); ?></a>
                 </div>
             <?php endif; ?>
         </div>
