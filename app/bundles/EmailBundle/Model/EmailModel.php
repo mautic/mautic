@@ -1525,17 +1525,17 @@ class EmailModel extends FormModel
             }
 
             $data = $query->loadAndBuildTimeData($q);
-            $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.clicked'), $data);
+            $chart->setDataset($this->translator()->trans('mautic.email.clicked'), $data);
         }
 
         if ($flag == 'all' || $flag == 'unsubscribed') {
             $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::UNSUBSCRIBED, $canViewOthers);
-            $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.unsubscribed'), $data);
+            $chart->setDataset($this->translator()->trans('mautic.email.unsubscribed'), $data);
         }
 
         if ($flag == 'all' || $flag == 'bounced') {
             $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::BOUNCED, $canViewOthers);
-            $chart->setDataset($this->factory->getTranslator()->trans('mautic.email.bounced'), $data);
+            $chart->setDataset($this->translator()->trans('mautic.email.bounced'), $data);
         }
 
         return $chart->render();
