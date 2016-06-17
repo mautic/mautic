@@ -24,17 +24,21 @@
             <div class="panel-heading">
                 <h4 class="panel-title"><?php echo $view['translator']->trans('mautic.core.slot.types'); ?></h4>
             </div>
-            <div class="panel-body" id="slot-type-container">
+            <div class="panel-body">
                 <?php if ($slots): ?>
+                <div id="slot-type-container">
                     <?php foreach ($slots as $slotKey => $slot): ?>
-                        <div class="slot-type-handle btn btn-default btn-lg btn-block" data-slot-type="<?php echo $slotKey; ?>">
+                        <div class="slot-type-handle btn btn-default btn-lg" data-slot-type="<?php echo $slotKey; ?>">
                             <i class="fa fa-<?php echo $slot['icon']; ?>" aria-hidden="true"></i>
+                            <br>
                             <?php echo $slot['header']; ?>
                             <script type="text/html">
                                 <?php echo $view->render($slot['content']); ?>
                             </script>
                         </div>
                     <?php endforeach; ?>
+                    <div class="clearfix"></div>
+                </div>
                 <?php endif; ?>
                 <p class="text-muted pt-md text-center"><i><?php echo $view['translator']->trans('mautic.core.drag.info'); ?></i></p>
             </div>

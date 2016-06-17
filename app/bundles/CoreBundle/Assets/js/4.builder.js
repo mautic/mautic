@@ -228,9 +228,15 @@ Mautic.initSlots = function() {
         cursorAt: {top: 15, left: 15},
         start: function( event, ui ) {
             mQuery(ui.helper).css({
-                background: 'blue',
-                height: '100px',
-                width: '100px'
+                color: '#5d6c7c',
+                background: '#f5f5f5',
+                border: '1px solid #d3d3d3',
+                height: '60px',
+                width: '115px',
+                borderRadius: '4px',
+                fontSize: '16px',
+                padding: '10px 16px',
+                lineHeight: '1.25'
             });
         },
         stop: function(event, ui) {
