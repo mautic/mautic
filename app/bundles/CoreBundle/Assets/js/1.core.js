@@ -53,7 +53,8 @@ mQuery( document ).ready(function() {
         enter: mQuery.FroalaEditor.ENTER_BR,
         imageUploadURL: mauticBaseUrl + 's/file/upload',
         imageManagerLoadURL: mauticBaseUrl + 's/file/list',
-        imageManagerDeleteURL: mauticBaseUrl + 's/file/delete'
+        imageManagerDeleteURL: mauticBaseUrl + 's/file/delete',
+        useClasses: false
     };
 
     // Set the Froala license key
