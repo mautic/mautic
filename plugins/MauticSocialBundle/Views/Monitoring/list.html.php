@@ -61,7 +61,7 @@ if ($tmpl == 'index')
                                     'item'       => $item,
                                     'model'      => 'plugin.mauticSocial.monitoring'
                                 )); ?>
-                            <a href="<?php echo $view['router']->generate('mautic_social_action',
+                            <a href="<?php echo $view['router']->path('mautic_social_action',
                                 array("objectAction" => "view", "objectId" => $item->getId())); ?>"
                                data-toggle="ajax">
                                 <?php echo $item->getTitle(); ?>
@@ -83,7 +83,7 @@ if ($tmpl == 'index')
             'page'            => $page,
             'limit'           => $limit,
             'menuLinkId'      => 'mautic_campaign_index',
-            'baseUrl'         => $view['router']->generate('mautic_social_index'),
+            'baseUrl'         => $view['router']->path('mautic_social_index'),
             'sessionVar'      => 'social.monitoring',
             'routeBase'       => 'social'
         )); ?>
