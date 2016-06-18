@@ -105,13 +105,6 @@ class Stat
     private $tokens = array();
 
     /**
-     * @var string
-     *
-     * @deprecated 1.2.3 - to be removed in 2.0
-     */
-    private $copy;
-
-    /**
      * @var Copy
      */
     private $storedCopy;
@@ -208,11 +201,6 @@ class Stat
         $builder->createField('tokens', 'array')
             ->nullable()
             ->build();
-
-        /**
-         * @deprecated 1.2.3 - to be removed in 2.0
-         */
-        $builder->addNullableField('copy', 'text');
 
         $builder->createManyToOne('storedCopy', 'Mautic\EmailBundle\Entity\Copy')
             ->addJoinColumn('copy_id', 'id', true, false, 'SET NULL')
@@ -526,33 +514,6 @@ class Stat
     public function setTokens ($tokens)
     {
         $this->tokens = $tokens;
-    }
-
-    /**
-     * @deprecated 1.2.3 - to be removed in 2.0
-     *
-     * @return mixed
-     */
-    public function getCopy()
-    {
-        return $this->copy;
-    }
-
-    /**
-     * @deprecated 1.2.3 - to be removed in 2.0
-     *
-     * @param mixed $copy
-     *
-     * @return Stat
-     */
-    public function setCopy($copy)
-    {
-        // Ensure it's clean of emoji
-        $copy = EmojiHelper::toShort($copy);
-
-        $this->copy = $copy;
-
-        return $this;
     }
 
     /**

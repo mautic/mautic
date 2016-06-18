@@ -66,7 +66,7 @@ if ($tmpl == 'index')
                             'item'       => $item,
                             'model'      => 'campaign'
                         )); ?>
-                        <a href="<?php echo $view['router']->generate('mautic_campaign_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
+                        <a href="<?php echo $view['router']->path('mautic_campaign_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
                             <?php echo $item->getName(); ?>
                         </a>
                     </div>
@@ -92,7 +92,7 @@ if ($tmpl == 'index')
         "page"            => $page,
         "limit"           => $limit,
         "menuLinkId"      => 'mautic_campaign_index',
-        "baseUrl"         => $view['router']->generate('mautic_campaign_index'),
+        "baseUrl"         => $view['router']->path('mautic_campaign_index'),
         'sessionVar'      => 'campaign'
     )); ?>
 </div>

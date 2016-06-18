@@ -25,7 +25,7 @@ class CampaignController extends FormController
     public function indexAction($page = 1)
     {
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
-        $model   = $this->factory->getModel('campaign');
+        $model   = $this->getModel('campaign');
         $session = $this->factory->getSession();
 
         //set some permissions
@@ -215,9 +215,13 @@ class CampaignController extends FormController
         $page = $this->factory->getSession()->get('mautic.campaign.page', 1);
 
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
-        $model    = $this->factory->getModel('campaign');
-        $security = $this->factory->getSecurity();
-        $entity   = $model->getEntity($objectId);
+        $model     = $this->getModel('campaign');
+
+        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        $pageModel = $this->getModel('page');
+
+        $security  = $this->factory->getSecurity();
+        $entity    = $model->getEntity($objectId);
 
         $permissions = $security->isGranted(
             array(
@@ -270,14 +274,10 @@ class CampaignController extends FormController
         }
 
         // Audit Log
-        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('campaign', $objectId, $entity->getDateAdded());
+        $logs = $this->getModel('core.auditLog')->getLogForObject('campaign', $objectId, $entity->getDateAdded());
 
         // Hit count per day for last 30 days
-        $hits = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->getHits(
-            30,
-            'D',
-            array('source_id' => $entity->getId(), 'source' => 'campaign')
-        );
+        $hits = $pageModel->getHitsBarChartData(null, new \DateTime('-30 days'), new \DateTime, null, array('source_id' => $objectId, 'source' => 'campaign'));
 
         // Sent emails stats
         $emailsSent = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat')->getIgnoredReadFailed(
@@ -286,7 +286,7 @@ class CampaignController extends FormController
         );
 
         // Lead count stats
-        $leadStats = $campaignLeadRepo->getLeadStats(30, 'D', array('campaign_id' => $entity->getId()));
+        $leadStats = $model->getLeadsAddedLineChartData(null, new \DateTime('-30 days'), new \DateTime, null, array('campaign_id' => $objectId));
 
         return $this->delegateView(
             array(
@@ -356,7 +356,7 @@ class CampaignController extends FormController
 
         // We need the EmailRepository to check if a lead is flagged as do not contact
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
-        $emailRepo = $this->factory->getModel('email')->getRepository();
+        $emailRepo = $this->getModel('email')->getRepository();
 
         $campaignLeadRepo = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Lead');
         $leads            = $campaignLeadRepo->getLeadsWithFields(
@@ -380,7 +380,7 @@ class CampaignController extends FormController
                 $lastPage = (ceil($count / $limit)) ?: 1;
             }
             $this->factory->getSession()->set('mautic.campaign.lead.page', $lastPage);
-            $returnUrl = $this->generateUrl('mautic_campaign_leads', array('objectId' => $objectId, 'page' => $lastPage));
+            $returnUrl = $this->generateUrl('mautic_campaign_contacts', array('objectId' => $objectId, 'page' => $lastPage));
 
             return $this->postActionRedirect(
                 array(
@@ -394,7 +394,7 @@ class CampaignController extends FormController
             );
         }
 
-        $triggerModel = $this->factory->getModel('point.trigger');
+        $triggerModel = $this->getModel('point.trigger');
         foreach ($leads['results'] as &$l) {
             $l['color'] = $triggerModel->getColorForLeadPoints($l['points']);
         }
@@ -407,7 +407,7 @@ class CampaignController extends FormController
                     'totalItems'    => $leads['count'],
                     'tmpl'          => 'campaignleads',
                     'indexMode'     => 'grid',
-                    'link'          => 'mautic_campaign_leads',
+                    'link'          => 'mautic_campaign_contacts',
                     'sessionVar'    => 'campaign.lead',
                     'limit'         => $limit,
                     'objectId'      => $objectId,
@@ -430,7 +430,7 @@ class CampaignController extends FormController
     public function newAction()
     {
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
-        $model = $this->factory->getModel('campaign');
+        $model = $this->getModel('campaign');
 
         $entity  = $model->getEntity();
         $session = $this->factory->getSession();
@@ -522,7 +522,9 @@ class CampaignController extends FormController
                             return $this->editAction($entity->getId(), true);
                         }
                     }
-                } else {
+                }
+
+                if (!$valid) {
                     $connections = $session->get('mautic.campaign.'.$sessionId.'.events.canvassettings');
                     $model->setCanvasSettings($entity, $connections, false, $modifiedEvents);
 
@@ -607,11 +609,11 @@ class CampaignController extends FormController
      */
     public function editAction($objectId, $ignorePost = false, Campaign $clonedEntity = null, array $currentSources = null)
     {
-
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
-        $model      = $this->factory->getModel('campaign');
+        $model      = $this->getModel('campaign');
         $formData   = $this->request->request->get('campaign');
         $sessionId  = isset($formData['sessionId']) ? $formData['sessionId'] : null;
+        $session    = $this->factory->getSession();
 
         $isClone = false;
         if ($clonedEntity instanceof Campaign) {
@@ -626,8 +628,6 @@ class CampaignController extends FormController
                 $isClone = true;
             }
         }
-
-        $session = $this->factory->getSession();
 
         //set the page we came from
         $page = $this->factory->getSession()->get('mautic.campaign.page', 1);
@@ -677,6 +677,7 @@ class CampaignController extends FormController
         if (!$ignorePost && $this->request->getMethod() == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
+
                 //set added/updated events
                 list($modifiedEvents, $deletedEvents, $campaignEvents) = $this->getSessionEvents($objectId);
 
@@ -702,6 +703,11 @@ class CampaignController extends FormController
                         );
                         $valid = false;
                     } else {
+                        // If this is a clone, we need to save the entity first to properly build the events, sources and canvas settings
+                        if ($isClone) {
+                            $model->getRepository()->saveEntity($entity);
+                        }
+
                         //set sources
                         $model->setLeadSources($entity, $addedSources, $deletedSources);
 
@@ -716,14 +722,11 @@ class CampaignController extends FormController
                             $model->setCanvasSettings($entity, $connections);
 
                             if (!empty($deletedEvents)) {
-                                $this->factory->getModel('campaign.event')->deleteEvents($entity->getEvents(), $modifiedEvents, $deletedEvents);
+                                $this->getModel('campaign.event')->deleteEvents($entity->getEvents(), $modifiedEvents, $deletedEvents);
                             }
                         }
 
                         $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
-
-                        // Reset objectId to entity ID (can be session ID in case of cloned entity)
-                        $objectId = $entity->getId();
 
                         $this->addFlash(
                             'mautic.core.notice.updated',
@@ -789,8 +792,10 @@ class CampaignController extends FormController
         }
 
         if ($cleanSlate) {
-            //clean slate
-            $this->clearSessionComponents($objectId);
+            if (!$isClone) {
+                //clean slate
+                $this->clearSessionComponents($objectId);
+            }
 
             //load existing events into session
             $campaignEvents = array();
@@ -875,7 +880,7 @@ class CampaignController extends FormController
      */
     public function cloneAction($objectId)
     {
-        $model    = $this->factory->getModel('campaign');
+        $model    = $this->getModel('campaign');
         $campaign = $model->getEntity($objectId);
 
         // Generate temporary ID
@@ -937,6 +942,9 @@ class CampaignController extends FormController
             }
 
             $campaign->setCanvasSettings($canvasSettings);
+
+            // Set the canvas settings into session to simulate edit
+            $this->get('session')->set('mautic.campaign.'.$tempId.'.events.canvassettings', $canvasSettings);
         }
 
         return $this->editAction($tempId, true, $campaign, $currentSources);
@@ -966,7 +974,7 @@ class CampaignController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->factory->getModel('campaign');
+            $model  = $this->getModel('campaign');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
@@ -1026,7 +1034,7 @@ class CampaignController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model     = $this->factory->getModel('campaign');
+            $model     = $this->getModel('campaign');
             $ids       = json_decode($this->request->query->get('ids', ''));
             $deleteIds = array();
 

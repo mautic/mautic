@@ -9,9 +9,8 @@
 
 namespace Mautic\ReportBundle\Event;
 
-use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class ReportBuilderEvent
@@ -24,7 +23,7 @@ class ReportBuilderEvent extends Event
     private $context = '';
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
@@ -54,7 +53,13 @@ class ReportBuilderEvent extends Event
      */
     private $graphArray = array();
 
-    public function __construct(Translator $translator, $context = '')
+    /**
+     * ReportBuilderEvent constructor.
+     *
+     * @param TranslatorInterface $translator
+     * @param string              $context
+     */
+    public function __construct(TranslatorInterface $translator, $context = '')
     {
         $this->context     = $context;
         $this->translator = $translator;

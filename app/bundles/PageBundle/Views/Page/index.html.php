@@ -11,12 +11,18 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'page');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.page.pages'));
 
-$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
-    'templateButtons' => array(
-        'new'=> $permissions['page:pages:create']
-    ),
-    'routeBase' => 'page'
-)));
+$view['slots']->set(
+    'actions',
+    $view->render(
+        'MauticCoreBundle:Helper:page_actions.html.php',
+        array(
+            'templateButtons' => array(
+                'new' => $permissions['page:pages:create']
+            ),
+            'routeBase'       => 'page'
+        )
+    )
+);
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">

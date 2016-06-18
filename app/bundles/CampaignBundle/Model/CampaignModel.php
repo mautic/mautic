@@ -10,14 +10,23 @@
 namespace Mautic\CampaignBundle\Model;
 
 use Doctrine\ORM\PersistentCollection;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\ListModel;
+use Monolog\Logger;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -29,6 +38,61 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class CampaignModel extends CommonFormModel
 {
+    /**
+     * @var mixed
+     */
+    protected $batchSleepTime;
+
+    /**
+     * @var mixed
+     */
+    protected $batchCampaignSleepTime;
+
+    /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+    
+    /**
+     * @var ListModel
+     */
+    protected $leadListModel;
+
+    /**
+     * @var FormModel
+     */
+    protected $formModel;
+
+    /**
+     * @var Logger
+     */
+    protected $logger;
+
+    /**
+     * CampaignModel constructor.
+     * 
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param LeadModel $leadModel
+     * @param ListModel $leadListModel
+     * @param FormModel $formModel
+     */
+    public function __construct(CoreParametersHelper $coreParametersHelper, LeadModel $leadModel, ListModel $leadListModel, FormModel $formModel)
+    {
+        $this->leadModel = $leadModel;
+        $this->leadListModel = $leadListModel;
+        $this->formModel = $formModel;
+        $this->batchSleepTime = $coreParametersHelper->getParameter('mautic.batch_sleep_time');
+        $this->batchCampaignSleepTime = $coreParametersHelper->getParameter('mautic.batch_campaign_sleep_time');
+    }
+
+    /**
+     * @param Logger $logger
+     */
+    public function setLogger(Logger $logger)
+    {
+        $this->logger = $logger;
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -225,7 +289,11 @@ class CampaignModel extends CommonFormModel
                 $source = $connection['sourceId'];
                 $target = $connection['targetId'];
 
-                $sourceDecision = (!empty($connection['anchors'])) ? $connection['anchors'][0]['endpoint'] : null;
+                if (in_array($source, array('lists', 'forms'))) {
+                    // Only concerned with events and not sources
+                    continue;
+                }
+                $sourceDecision = (!empty($connection['anchors'][0])) ? $connection['anchors'][0]['endpoint'] : null;
 
                 if ($sourceDecision == 'leadsource') {
                     // Lead source connection that does not matter
@@ -346,12 +414,15 @@ class CampaignModel extends CommonFormModel
             }
 
             // Rebuild anchors
-            $anchors = array();
-            foreach ($connection['anchors'] as $k => $anchor) {
-                $type           = ($k === 0) ? 'source' : 'target';
-                $anchors[$type] = $anchor['endpoint'];
+            if (!isset($connection['anchors']['source'])) {
+                $anchors = array();
+                foreach ($connection['anchors'] as $k => $anchor) {
+                    $type           = ($k === 0) ? 'source' : 'target';
+                    $anchors[$type] = $anchor['endpoint'];
+                }
+
+                $connection['anchors'] = $anchors;
             }
-            $connection['anchors'] = $anchors;
         }
 
         $entity->setCanvasSettings($settings);
@@ -486,8 +557,7 @@ class CampaignModel extends CommonFormModel
             case null:
                 $choices['lists'] = array();
 
-                $model = $this->factory->getModel('lead.list');
-                $lists = (empty($options['global_only'])) ? $model->getUserLists() : $model->getGlobalLists();
+                $lists = (empty($options['global_only'])) ? $this->leadListModel->getUserLists() : $this->leadListModel->getGlobalLists();
 
                 foreach ($lists as $list) {
                     $choices['lists'][$list['id']] = $list['name'];
@@ -497,9 +567,9 @@ class CampaignModel extends CommonFormModel
             case null:
                 $choices['forms'] = array();
 
-                $viewOther = $this->factory->getSecurity()->isGranted('form:forms:viewother');
-                $repo      = $this->factory->getModel('form')->getRepository();
-                $repo->setCurrentUser($this->factory->getUser());
+                $viewOther = $this->security->isGranted('form:forms:viewother');
+                $repo      = $this->formModel->getRepository();
+                $repo->setCurrentUser($this->user);
 
                 $forms = $repo->getFormList('', 0, 0, $viewOther, 'campaign');
                 foreach ($forms as $form) {
@@ -527,36 +597,19 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * Proxy for EventModel::triggerEvent
-     *
-     * @param string $eventType
-     * @param mixed  $eventDetails
-     * @param string $eventTypeId
-     *
-     * @return bool|mixed
-     */
-    public function triggerEvent ($eventType, $eventDetails = null, $eventTypeId = null)
-    {
-        /** @var \Mautic\CampaignBundle\Model\EventModel $eventModel */
-        $eventModel = $this->factory->getModel('campaign.event');
-
-        return $eventModel->triggerEvent($eventType, $eventDetails, $eventTypeId);
-    }
-
-    /**
      * Gets the campaigns a specific lead is part of
      *
      * @param Lead $lead
      * @param bool $forList
+     *
+     * @return mixed
      */
     public function getLeadCampaigns (Lead $lead = null, $forList = false)
     {
         static $campaigns = array();
-        $leadModel = $this->factory->getModel('lead');
 
         if ($lead === null) {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-            $lead = $leadModel->getCurrentLead();
+            $lead = $this->leadModel->getCurrentLead();
         }
 
         if (!isset($campaigns[$lead->getId()])) {
@@ -614,9 +667,6 @@ class CampaignModel extends CommonFormModel
      */
     public function addLeads (Campaign $campaign, array $leads, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1)
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead');
-
         foreach ($leads as $lead) {
             if (!$lead instanceof Lead) {
                 $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
@@ -647,7 +697,7 @@ class CampaignModel extends CommonFormModel
                         $this->getRepository()->saveEntity($campaignLead);
                     } catch (\Exception $exception) {
                         $dispatchEvent = false;
-                        $this->factory->getLogger()->log('error', $exception->getMessage());
+                        $this->logger->log('error', $exception->getMessage());
                     }
                 } else {
                     $this->em->detach($campaignLead);
@@ -670,7 +720,7 @@ class CampaignModel extends CommonFormModel
                     $this->getRepository()->saveEntity($campaignLead);
                 } catch (\Exception $exception) {
                     $dispatchEvent = false;
-                    $this->factory->getLogger()->log('error', $exception->getMessage());
+                    $this->logger->log('error', $exception->getMessage());
                 }
             }
 
@@ -820,7 +870,7 @@ class CampaignModel extends CommonFormModel
         $lists = $repo->getCampaignListIds($campaign->getId());
 
         $batchLimiters = array(
-            'dateTime' => $this->factory->getDate()->toUtcString()
+            'dateTime' => (new DateTimeHelper())->toUtcString()
         );
 
         if (count($lists)) {
@@ -1026,13 +1076,9 @@ class CampaignModel extends CommonFormModel
      */
     protected function batchSleep()
     {
-        $eventSleepTime = $this->factory->getParameter('batch_campaign_sleep_time', false);
-        if ($eventSleepTime === false) {
-            $eventSleepTime = $this->factory->getParameter('batch_sleep_time', 1);
-        }
+        $eventSleepTime = $this->batchCampaignSleepTime ? $this->batchCampaignSleepTime : ($this->batchSleepTime ? $this->batchSleepTime : 1);
 
         if (empty($eventSleepTime)) {
-
             return;
         }
 
@@ -1041,5 +1087,35 @@ class CampaignModel extends CommonFormModel
         } else {
             sleep($eventSleepTime);
         }
+    }
+
+    /**
+     * Get line chart data of leads added to campaigns
+     *
+     * @param char      $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param string    $dateFormat
+     * @param array     $filter
+     * @param boolean   $canViewOthers
+     *
+     * @return array
+     */
+    public function getLeadsAddedLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
+    {
+        $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query = $chart->getChartQuery($this->em->getConnection());
+        $q     = $query->prepareTimeDataQuery('campaign_leads', 'date_added', $filter);
+
+        if (!$canViewOthers) {
+            $q->join('t', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = c.campaign_id')
+                ->andWhere('c.created_by = :userId')
+                ->setParameter('userId', $this->user->getId());
+        }
+
+        $data = $query->loadAndBuildTimeData($q);
+        $chart->setDataset($this->translator->trans('mautic.campaign.campaign.leads'), $data);
+
+        return $chart->render();
     }
 }

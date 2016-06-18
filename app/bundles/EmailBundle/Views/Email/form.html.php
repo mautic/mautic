@@ -126,7 +126,7 @@ if (!isset($attachmentSize)) {
     <div class="col-md-3 bg-white height-auto bdr-l">
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php echo $view['form']->row($form['name']); ?>
-            <?php if (isset($form['variantSettings'])): ?>
+            <?php if ($isVariant): ?>
                 <?php echo $view['form']->row($form['variantSettings']); ?>
                 <?php echo $view['form']->row($form['isPublished']); ?>
                 <?php echo $view['form']->row($form['publishUp']); ?>
@@ -146,7 +146,9 @@ if (!isset($attachmentSize)) {
 
             <?php echo $view['form']->row($form['unsubscribeForm']); ?>
 
-            <?php echo $view['form']->rest($form); ?>
+            <div class="hide">
+                <?php echo $view['form']->rest($form); ?>
+            </div>
         </div>
     </div>
 </div>
@@ -154,7 +156,7 @@ if (!isset($attachmentSize)) {
 
 <div class="hide builder email-builder">
     <div class="builder-content">
-        <input type="hidden" id="builder_url" value="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'builder', 'objectId' => $email->getSessionId())); ?>" />
+        <input type="hidden" id="builder_url" value="<?php echo $view['router']->path('mautic_email_action', array('objectAction' => 'builder', 'objectId' => $email->getSessionId())); ?>" />
     </div>
     <div class="builder-panel">
         <div class="builder-panel-top">
@@ -205,7 +207,7 @@ if (empty($type) || !empty($forceTypeSelection)):
             'typeOneDescription' => 'mautic.email.type.template.description',
             'typeOneOnClick'     => "Mautic.selectEmailType('template');",
             'typeTwoHeader'      => 'mautic.email.type.list.header',
-            'typeTwoIconClass'   => 'fa-list',
+            'typeTwoIconClass'   => 'fa-pie-chart',
             'typeTwoDescription' => 'mautic.email.type.list.description',
             'typeTwoOnClick'     => "Mautic.selectEmailType('list');",
         ));

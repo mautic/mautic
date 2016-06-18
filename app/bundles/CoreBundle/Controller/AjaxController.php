@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\UpgradeEvent;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -67,9 +68,9 @@ class AjaxController extends CommonController
                 $parts     = explode(":", $action);
                 $namespace = 'Mautic';
                 $isPlugin  = false;
-                // @deprecated 1.1.4; will be removed in 2.0; BC support for MauticAddon
-                if (count($parts) == 3 && ($parts[0] == 'addon' || $parts['0'] == 'plugin')) {
-                    $namespace = ($parts[0] == 'addon') ? 'MauticAddon' : 'MauticPlugin';
+                
+                if (count($parts) == 3 && $parts['0'] == 'plugin') {
+                    $namespace = 'MauticPlugin';
                     array_shift($parts);
                     $isPlugin = true;
                 }
@@ -146,7 +147,7 @@ class AjaxController extends CommonController
     protected function commandListAction(Request $request)
     {
         $model      = InputHelper::clean($request->query->get('model'));
-        $commands   = $this->factory->getModel($model)->getCommandList();
+        $commands   = $this->getModel($model)->getCommandList();
         $dataArray  = array();
         $translator = $this->get('translator');
         foreach ($commands as $k => $c) {
@@ -230,7 +231,7 @@ class AjaxController extends CommonController
             $name = "$name.$name";
         }
         $id    = InputHelper::int($request->request->get('id'));
-        $model = $this->factory->getModel($name);
+        $model = $this->getModel($name);
 
         $post = $request->request->all();
         unset($post['model'], $post['id'], $post['action']);
@@ -301,7 +302,7 @@ class AjaxController extends CommonController
         $name        = InputHelper::clean($request->request->get('model'));
         $id          = InputHelper::int($request->request->get('id'));
         $extra       = InputHelper::clean($request->request->get('parameter'));
-        $model       = $this->factory->getModel($name);
+        $model       = $this->getModel($name);
         $entity      = $model->getEntity($id);
         $currentUser = $this->factory->getUser();
 
@@ -628,11 +629,17 @@ class AjaxController extends CommonController
             }
         }
 
+        // Execute the mautic.post_upgrade event
+        $this->factory->getDispatcher()->dispatch(CoreEvents::POST_UPGRADE, new UpgradeEvent($dataArray));
+
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
         /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
         $cookieHelper = $this->factory->getHelper('cookie');
         $cookieHelper->deleteCookie('mautic_update');
+
+        // Set a redirect to force a page reload to get new menu items, assets, etc
+        $dataArray['redirect'] = $this->get('router')->generate('mautic_core_update');
 
         return $this->sendJsonResponse($dataArray);
     }
@@ -647,7 +654,7 @@ class AjaxController extends CommonController
         $status = InputHelper::clean($request->request->get('status'));
 
         /** @var \Mautic\UserBundle\Model\UserModel $model */
-        $model = $this->factory->getModel('user');
+        $model = $this->getModel('user');
 
         $currentStatus = $this->factory->getUser()->getOnlineStatus();
         if (!in_array($currentStatus, array('manualaway', 'dnd'))) {
@@ -669,7 +676,7 @@ class AjaxController extends CommonController
     protected function markNotificationsReadAction(Request $request)
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model = $this->factory->getModel('core.notification');
+        $model = $this->getModel('core.notification');
 
         $model->markAllRead();
 
@@ -686,7 +693,7 @@ class AjaxController extends CommonController
         $id = InputHelper::int($request->get('id', 0));
 
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model = $this->factory->getModel('core.notification');
+        $model = $this->getModel('core.notification');
         $model->clearNotification($id);
 
         return $this->sendJsonResponse(array('success' => 1));

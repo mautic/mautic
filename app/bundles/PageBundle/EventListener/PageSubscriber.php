@@ -27,7 +27,8 @@ class PageSubscriber extends CommonSubscriber
     {
         return array(
             PageEvents::PAGE_POST_SAVE       => array('onPagePostSave', 0),
-            PageEvents::PAGE_POST_DELETE     => array('onPageDelete', 0)
+            PageEvents::PAGE_POST_DELETE     => array('onPageDelete', 0),
+            PageEvents::PAGE_ON_DISPLAY      => array('onPageDisplay', -255) // We want this to run last
         );
     }
 
@@ -69,5 +70,52 @@ class PageSubscriber extends CommonSubscriber
             "ipAddress"  => $this->factory->getIpAddressFromRequest()
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
+    }
+
+    /**
+     * Allow event listeners to add scripts to
+     * - </head> : onPageDisplay_headClose
+     * - <body>  : onPageDisplay_bodyOpen
+     * - </body> : onPageDisplay_bodyClose
+     *
+     * @param Events\PageDisplayEvent $event
+     */
+    public function onPageDisplay(Events\PageDisplayEvent $event)
+    {
+        $content = $event->getContent();
+
+        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
+        $assetsHelper = $this->factory->getHelper('template.assets');
+
+        // Get scripts to insert before </head>
+        ob_start();
+        $assetsHelper->outputScripts('onPageDisplay_headClose');
+        $headCloseScripts = ob_get_clean();
+
+        if ($headCloseScripts) {
+            $content = str_ireplace('</head>', $headCloseScripts . "\n</head>", $content);
+        }
+
+        // Get scripts to insert after <body>
+        ob_start();
+        $assetsHelper->outputScripts('onPageDisplay_bodyOpen');
+        $bodyOpenScripts = ob_get_clean();
+
+        if ($bodyOpenScripts) {
+            preg_match('/(<body[a-z=\s\-_:"\']*>)/i', $content, $matches);
+
+            $content = str_ireplace($matches[0], $matches[0] . "\n" . $bodyOpenScripts, $content);
+        }
+
+        // Get scripts to insert before </body>
+        ob_start();
+        $assetsHelper->outputScripts('onPageDisplay_bodyClose');
+        $bodyCloseScripts = ob_get_clean();
+
+        if ($bodyCloseScripts) {
+            $content = str_ireplace('</body>', $bodyCloseScripts . "\n</body>", $content);
+        }
+
+        $event->setContent($content);
     }
 }

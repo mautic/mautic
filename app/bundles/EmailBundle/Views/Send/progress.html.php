@@ -35,7 +35,7 @@ $id       = ($status != 'inprogress') ? 'emailSendProgressComplete' : 'emailSend
             <ul class="list-group">
                 <?php foreach ($stats['failedRecipients'] as $leadId => $failedEmail): ?>
                 <li class="list-group-item">
-                    <a target="_new" class="text-danger" href="<?php echo $view['router']->generate('mautic_lead_action', array('objectAction' => 'view', 'objectId' => $leadId)); ?>">
+                    <a target="_new" class="text-danger" href="<?php echo $view['router']->path('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $leadId)); ?>">
                         <?php echo $failedEmail; ?>
                     </a>
                 </li>
@@ -47,11 +47,11 @@ $id       = ($status != 'inprogress') ? 'emailSendProgressComplete' : 'emailSend
 
                 <?php if ($status == 'inprogress'): ?>
                 <div>
-                    <a class="text-danger mt-md" href="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'send', 'objectId' => $email->getId())); ?>" data-toggle="ajax"><?php echo $view['translator']->trans('mautic.core.form.cancel'); ?></a>
+                    <a class="text-danger mt-md" href="<?php echo $view['router']->path('mautic_email_action', array('objectAction' => 'send', 'objectId' => $email->getId())); ?>" data-toggle="ajax"><?php echo $view['translator']->trans('mautic.core.form.cancel'); ?></a>
                 </div>
                 <?php else: ?>
                 <div>
-                    <a class="text-success mt-md" href="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $email->getId())); ?>" data-toggle="ajax"><?php echo $view['translator']->trans('mautic.core.form.done'); ?></a>
+                    <a class="text-success mt-md" href="<?php echo $view['router']->path('mautic_email_action', array('objectAction' => 'view', 'objectId' => $email->getId())); ?>" data-toggle="ajax"><?php echo $view['translator']->trans('mautic.core.form.done'); ?></a>
                 </div>
                 <?php endif; ?>
             </div>

@@ -30,14 +30,7 @@ class ProcessEmailQueueCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:send:emails')
-            ->setAliases(array(
-                'mautic:process:email',
-                'mautic:process:emails',
-                'mautic:email:process',
-                'mautic:emails:process',
-                'mautic:send:email',
-            ))
+            ->setName('mautic:emails:send')
             ->setDescription('Processes SwiftMail\'s mail queue')
             ->addOption('--message-limit', null, InputOption::VALUE_OPTIONAL, 'Limit number of messages sent at a time. Defaults to value set in config.')
             ->addOption('--time-limit', null, InputOption::VALUE_OPTIONAL, 'Limit the number of seconds per batch. Defaults to value set in config.')
@@ -106,23 +99,26 @@ EOT
                     rename($failedFile, $tmpFilename);
 
                     $message = unserialize(file_get_contents($tmpFilename));
-
-                    $tryAgain = false;
-                    if ($dispatcher->hasListeners(EmailEvents::EMAIL_RESEND)) {
-                        $event = new QueueEmailEvent($message);
-                        $dispatcher->dispatch(EmailEvents::EMAIL_RESEND, $event);
-                        $tryAgain = $event->shouldTryAgain();
-                    }
-
-                    try {
-                        $transport->send($message);
-                    } catch (\Swift_TransportException $e) {
-                        if ($dispatcher->hasListeners(EmailEvents::EMAIL_FAILED)) {
+                    if ($message !== false && is_object($message) && get_class($message) === 'Swift_Message') {
+                        $tryAgain = false;
+                        if ($dispatcher->hasListeners(EmailEvents::EMAIL_RESEND)) {
                             $event = new QueueEmailEvent($message);
-                            $dispatcher->dispatch(EmailEvents::EMAIL_FAILED, $event);
+                            $dispatcher->dispatch(EmailEvents::EMAIL_RESEND, $event);
+                            $tryAgain = $event->shouldTryAgain();
                         }
+                        
+                        try {
+                            $transport->send($message);
+                        } catch (\Swift_TransportException $e) {
+                            if ($dispatcher->hasListeners(EmailEvents::EMAIL_FAILED)) {
+                                $event = new QueueEmailEvent($message);
+                                $dispatcher->dispatch(EmailEvents::EMAIL_FAILED, $event);
+                            }
+                        }
+                    } else {
+                        // $message isn't a valid message file
+                        $tryAgain = false;
                     }
-
                     if ($tryAgain) {
                         $retryFilename = str_replace('.finalretry', '.tryagain', $tmpFilename);
                         rename($tmpFilename, $retryFilename);

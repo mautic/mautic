@@ -54,9 +54,6 @@ class EmailType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html', 'customHtml' => 'html')));
         $builder->addEventSubscriber(new FormExitSubscriber('email.email', $options));
 
-        $variantParent = $options['data']->getVariantParent();
-        $isVariant     = !empty($variantParent);
-
         $builder->add(
             'name',
             'text',
@@ -207,24 +204,6 @@ class EmailType extends AbstractType
             )
         );
 
-        $url = $this->request->getSchemeAndHttpHost().$this->request->getBasePath();
-        $builder->addEventListener(
-            FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($url) {
-                $parser = new PlainTextHelper(
-                    array(
-                        'base_url' => $url
-                    )
-                );
-
-                $data = $event->getData();
-
-                // Then strip out HTML
-                $data['plainText'] = $parser->setHtml($data['plainText'])->getText();
-                $event->setData($data);
-            }
-        );
-
         $builder->add(
             $builder->create(
                 'customHtml',
@@ -263,58 +242,108 @@ class EmailType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
-        if ($isVariant) {
-            $builder->add(
-                'variantSettings',
-                'emailvariant',
-                array(
-                    'label' => false
-                )
-            );
-        } else {
-            //add category
-            $builder->add(
-                'category',
-                'category',
-                array(
-                    'bundle' => 'email'
-                )
-            );
 
-            //add lead lists
-            $transformer = new IdToEntityModelTransformer($this->em, 'MauticLeadBundle:LeadList', 'id', true);
-            $builder->add(
-                $builder->create(
-                    'lists',
-                    'leadlist_choices',
+        $transformer = new IdToEntityModelTransformer($this->em, 'MauticEmailBundle:Email');
+        $builder->add(
+            $builder->create(
+                'variantParent',
+                'hidden'
+            )->addModelTransformer($transformer)
+        );
+
+        $url = $this->request->getSchemeAndHttpHost().$this->request->getBasePath();
+        $formModifier = function(FormEvent $event, $eventName, $isVariant) use ($url) {
+            if (FormEvents::PRE_SUBMIT == $eventName) {
+                $parser = new PlainTextHelper(
                     array(
-                        'label'      => 'mautic.email.form.list',
-                        'label_attr' => array('class' => 'control-label'),
-                        'attr'       => array(
-                            'class' => 'form-control'
-                        ),
-                        'multiple'   => true,
-                        'expanded'   => false,
-                        'required'   => true
+                        'base_url' => $url
                     )
-                )
-                    ->addModelTransformer($transformer)
-            );
+                );
 
-            $builder->add(
-                'language',
-                'locale',
+                $data = $event->getData();
+
+                // Then strip out HTML
+                $data['plainText'] = $parser->setHtml($data['plainText'])->getText();
+                $event->setData($data);
+            }
+
+            if ($isVariant) {
+                $event->getForm()->add(
+                    'variantSettings',
+                    'emailvariant',
+                    array(
+                        'label' => false
+                    )
+                );
+            }
+        };
+
+        // Building the form
+        $builder->addEventListener(
+            FormEvents::PRE_SET_DATA,
+            function (FormEvent $event) use ($formModifier) {
+                $formModifier(
+                    $event,
+                    FormEvents::PRE_SET_DATA,
+                    $event->getData()->getVariantParent()
+                );
+            }
+        );
+
+        // After submit
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) use ($formModifier) {
+                $data = $event->getData();
+                $formModifier(
+                    $event,
+                    FormEvents::PRE_SUBMIT,
+                    $data['variantParent']
+                );
+            }
+        );
+
+        //add category
+        $builder->add(
+            'category',
+            'category',
+            array(
+                'bundle' => 'email'
+            )
+        );
+
+        //add lead lists
+        $transformer = new IdToEntityModelTransformer($this->em, 'MauticLeadBundle:LeadList', 'id', true);
+        $builder->add(
+            $builder->create(
+                'lists',
+                'leadlist_choices',
                 array(
-                    'label'      => 'mautic.core.language',
+                    'label'      => 'mautic.email.form.list',
                     'label_attr' => array('class' => 'control-label'),
                     'attr'       => array(
                         'class' => 'form-control'
                     ),
-                    'required'   => false,
+                    'multiple'   => true,
+                    'expanded'   => false,
+                    'required'   => true
                 )
-            );
-        }
+            )
+                ->addModelTransformer($transformer)
+        );
 
+        $builder->add(
+            'language',
+            'locale',
+            array(
+                'label'      => 'mautic.core.language',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class' => 'form-control'
+                ),
+                'required'   => false,
+            )
+        );
 
         //add lead lists
         $transformer = new IdToEntityModelTransformer(

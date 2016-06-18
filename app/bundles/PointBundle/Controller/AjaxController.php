@@ -57,7 +57,7 @@ class AjaxController extends CommonAjaxController
         if (!empty($type)) {
             //get the HTML for the form
             /** @var \Mautic\PointBundle\Model\PointModel $model */
-            $model   = $this->factory->getModel('point');
+            $model   = $this->getModel('point');
             $actions = $model->getPointActions();
 
             if (isset($actions['actions'][$type])) {

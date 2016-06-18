@@ -25,7 +25,7 @@ class CampaignRepository extends CommonRepository
      */
     public function getEntities($args = array())
     {
-        $q = $this->_em
+        $q = $this->getEntityManager()
             ->createQueryBuilder()
             ->select($this->getTableAlias() . ', cat')
             ->from('MauticCampaignBundle:Campaign', $this->getTableAlias(), $this->getTableAlias() . '.id')
@@ -53,7 +53,7 @@ class CampaignRepository extends CommonRepository
     public function deleteEntity($entity, $flush = true)
     {
         // Null parents of associated events first
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX . 'campaign_events')
             ->set('parent_id', ':null')
             ->setParameter('null', null)
@@ -61,7 +61,7 @@ class CampaignRepository extends CommonRepository
             ->execute();
 
         // Delete events
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->delete(MAUTIC_TABLE_PREFIX . 'campaign_events')
             ->where('campaign_id = ' . $entity->getId())
             ->execute();
@@ -80,7 +80,7 @@ class CampaignRepository extends CommonRepository
      */
     public function getPublishedCampaigns($specificId = null, $leadId = null, $forList = false)
     {
-        $q   = $this->_em->createQueryBuilder()
+        $q   = $this->getEntityManager()->createQueryBuilder()
             ->from('MauticCampaignBundle:Campaign', 'c', 'c.id');
 
         if ($forList && $leadId) {
@@ -175,7 +175,7 @@ class CampaignRepository extends CommonRepository
      */
     public function getCampaignListIds($id = null)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'cl');
 
         if ($id) {
@@ -207,7 +207,7 @@ class CampaignRepository extends CommonRepository
      */
     public function getCampaignListSources($id)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('cl.leadlist_id, l.name')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'cl')
             ->join('cl', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 'l.id = cl.leadlist_id');
@@ -234,7 +234,7 @@ class CampaignRepository extends CommonRepository
      */
     public function getCampaignFormSources($id)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('cf.form_id, f.name')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_form_xref', 'cf')
             ->join('cf', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = cf.form_id');
@@ -317,7 +317,7 @@ class CampaignRepository extends CommonRepository
      */
     public function getPopularCampaigns($limit = 10)
     {
-        $q  = $this->_em->getConnection()->createQueryBuilder();
+        $q  = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('count(cl.ip_id) as hits, c.id AS campaign_id, c.name')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'cl')
@@ -398,8 +398,11 @@ class CampaignRepository extends CommonRepository
 
         // Set limits if applied
         if (!empty($limit)) {
-            $q->setFirstResult($start)
-                ->setMaxResults($limit);
+            $q->setMaxResults($limit);
+        }
+
+        if ($start) {
+            $q->setFirstResult($start);
         }
 
         $results = $q->execute()->fetchAll();
@@ -438,7 +441,7 @@ class CampaignRepository extends CommonRepository
 
         $leads = ($countOnly) ? 0 : array();
 
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         if ($countOnly) {
             $q->select('max(campaign_leads.lead_id) as max_id, count(campaign_leads.lead_id) as lead_count');
         } else {
@@ -521,7 +524,7 @@ class CampaignRepository extends CommonRepository
      */
     public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = array())
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('count(cl.lead_id) as lead_count')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
@@ -540,7 +543,7 @@ class CampaignRepository extends CommonRepository
         }
 
         if (count($pendingEvents) > 0) {
-            $sq = $this->_em->getConnection()->createQueryBuilder();
+            $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
             $sq->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
@@ -573,7 +576,7 @@ class CampaignRepository extends CommonRepository
      */
     public function getCampaignLeadIds($campaignId, $start = 0, $limit = false, $pendingOnly = false)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('cl.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
@@ -588,7 +591,7 @@ class CampaignRepository extends CommonRepository
 
         if ($pendingOnly) {
             // Only leads that have not started the campaign
-            $sq = $this->_em->getConnection()->createQueryBuilder();
+            $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
             $sq->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
@@ -605,8 +608,11 @@ class CampaignRepository extends CommonRepository
         }
 
         if (!empty($limit)) {
-            $q->setFirstResult($start)
-                ->setMaxResults($limit);
+            $q->setMaxResults($limit);
+        }
+
+        if (!$pendingOnly && $start){
+            $q->setFirstResult($start);
         }
 
         $results = $q->execute()->fetchAll();
@@ -633,7 +639,7 @@ class CampaignRepository extends CommonRepository
      */
     public function getCampaignLeads($campaignId, $start = 0, $limit = false, $select = array('cl.lead_id'))
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select($select)
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')

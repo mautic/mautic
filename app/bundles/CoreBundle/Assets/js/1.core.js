@@ -102,28 +102,67 @@ MauticVars.intervalsInProgress   = {};
 var Mautic = {
     loadedContent: {},
 
+    keyboardShortcutHtml: {},
+
+    addKeyboardShortcut: function (sequence, description, func, section) {
+        Mousetrap.bind(sequence, func);
+        var sectionName = section || 'global';
+
+        if (! Mautic.keyboardShortcutHtml.hasOwnProperty(sectionName)) {
+            Mautic.keyboardShortcutHtml[sectionName] = {};
+        }
+
+        Mautic.keyboardShortcutHtml[sectionName][sequence] = '<div class="col-xs-6"><mark>' + sequence + '</mark>: ' + description + '</div>';
+    },
+
     /**
      * Binds global keyboard shortcuts
      */
     bindGlobalKeyboardShortcuts: function () {
-        Mousetrap.bind('shift+d', function (e) {
+        Mautic.addKeyboardShortcut('shift+d', 'Load the Dashboard', function (e) {
             mQuery('#mautic_dashboard_index').click();
         });
 
-        Mousetrap.bind('shift+l', function(e) {
-            mQuery('#menu_lead_parent_child > li:first > a').click();
+        Mautic.addKeyboardShortcut('shift+c', 'Load Contacts',  function(e) {
+            mQuery('#mautic_contact_index').click();
         });
 
-        Mousetrap.bind('shift+right', function (e) {
-            mQuery('.navbar-right > button.navbar-toggle').click();
+        Mautic.addKeyboardShortcut('shift+right', 'Activate Right Menu', function (e) {
+            mQuery(".navbar-right a[data-toggle='sidebar']").click();
         });
 
-        Mousetrap.bind('shift+n', function (e) {
+        Mautic.addKeyboardShortcut('shift+n', 'Show Notifications', function (e) {
             mQuery('.dropdown-notification').click();
         });
 
-        Mousetrap.bind('shift+s', function (e) {
+        Mautic.addKeyboardShortcut('shift+s', 'Global Search', function (e) {
             mQuery('#globalSearchContainer .search-button').click();
+        });
+
+        Mousetrap.bind('?', function (e) {
+            var modalWindow = mQuery('#MauticSharedModal');
+
+            modalWindow.find('.modal-title').html('Keyboard Shortcuts');
+            modalWindow.find('.modal-body').html(function() {
+                var modalHtml = '';
+                var sections = Object.keys(Mautic.keyboardShortcutHtml);
+                sections.forEach(function(section) {
+                    var sectionTitle = (section + '').replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function ($1) {
+                        return $1.toUpperCase();
+                    });
+                    modalHtml += '<h4>' + sectionTitle + '</h4><br />';
+                    modalHtml += '<div class="row">';
+                    var sequences = Object.keys(Mautic.keyboardShortcutHtml[section]);
+                    sequences.forEach(function(sequence) {
+                        modalHtml += Mautic.keyboardShortcutHtml[section][sequence];
+                    });
+                    modalHtml += '</div><hr />';
+                });
+
+                return modalHtml;
+            });
+            modalWindow.find('.modal-footer').html('<p>Press <mark>shift+?</mark> at any time to view this help modal.');
+            modalWindow.modal();
         });
     },
 
@@ -560,8 +599,6 @@ var Mautic = {
         if (container == '#app-content' || container == 'body') {
             //register global keyboard shortcuts
             Mautic.bindGlobalKeyboardShortcuts();
-
-            Mautic.setupBrowserNotifier();
         }
 
         if (contentSpecific && typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
@@ -608,6 +645,9 @@ var Mautic = {
                 Mautic.activateLiveSearch("#globalSearchInput", "lastGlobalSearchStr", "globalLivecache");
             }
         }
+
+        Mautic.renderCharts();
+        Mautic.renderMaps(container);
 
         //instantiate sparkline plugin
         mQuery('.plugin-sparkline').sparkline('html', {enableTagOptions: true});
@@ -898,6 +938,16 @@ var Mautic = {
                 delete Mautic.loadedContent[contentSpecific];
             }
         }
+
+        // trash created chart objects to save some memory
+        if (typeof Mautic.chartObjects !== 'undefined') {
+            delete Mautic.chartObjects;
+        }
+
+        // trash created map objects to save some memory
+        if (typeof Mautic.mapObjects !== 'undefined') {
+            delete Mautic.mapObjects;
+        }
     },
 
     /**
@@ -1078,7 +1128,7 @@ var Mautic = {
                 var identifierClass = (new Date).getTime();
                 MauticVars.iconClasses[identifierClass] = mQuery(el).attr('class');
 
-                var specialClasses = ['fa-fw', 'fa-lg', 'fa-2x', 'fa-3x', 'fa-4x', 'fa-5x', 'fa-li'];
+                var specialClasses = ['fa-fw', 'fa-lg', 'fa-2x', 'fa-3x', 'fa-4x', 'fa-5x', 'fa-li', 'text-white', 'text-muted'];
                 var appendClasses = "";
 
                 //check for special classes to add to spinner
@@ -2959,5 +3009,207 @@ var Mautic = {
         Mautic.loadContent(url);
 
         mQuery('body').removeClass('noscroll');
+    },
+
+    /**
+     * Render the chart.js charts
+     *
+     * @param mQuery|string scope
+     */
+    renderCharts: function(scope) {
+        var charts = [];
+        if (!Mautic.chartObjects) Mautic.chartObjects = [];
+
+        if (mQuery.type(scope) === 'string') {
+            charts = mQuery(scope).find('canvas.chart');
+        } else if (scope) {
+            charts = scope.find('canvas.chart');
+        } else {
+            charts = mQuery('canvas.chart');
+        }
+
+        if (charts.length) {
+            charts.each(function(index, canvas) {
+                canvas = mQuery(canvas);
+                if (!canvas.hasClass('chart-rendered')) {
+                    if (canvas.hasClass('line-chart')) {
+                        Mautic.renderLineChart(canvas)
+                    } else if (canvas.hasClass('pie-chart')) {
+                        Mautic.renderPieChart(canvas)
+                    } else if (canvas.hasClass('simple-bar-chart')) {
+                        Mautic.renderSimpleBarChart(canvas)
+                    }
+                }
+                canvas.addClass('chart-rendered');
+            });
+        }
+    },
+
+    /**
+     * Render the chart.js line chart
+     *
+     * @param mQuery element canvas
+     */
+    renderLineChart: function(canvas) {
+        var ctx = canvas[0].getContext("2d");
+        var data = mQuery.parseJSON(canvas.text());
+        if (!data.labels.length || !data.datasets.length) return;
+        var options = {
+            pointDotRadius : 2,
+            datasetStrokeWidth : 1,
+            bezierCurveTension : 0.2,
+            multiTooltipTemplate: "<%= datasetLabel %>: <%= value %>"
+        }
+        var chart = new Chart(ctx).Line(data, options);
+        canvas.closest('.chart-wrapper').find('.chart-legend').html(chart.generateLegend());
+        Mautic.chartObjects.push(chart);
+    },
+
+    /**
+     * Render the chart.js pie chart
+     *
+     * @param mQuery element canvas
+     */
+    renderPieChart: function(canvas) {
+        var ctx = canvas[0].getContext("2d");
+        var data = mQuery.parseJSON(canvas.text());
+        data = Mautic.emulateNoDataForPieChart(data);
+        var options = {segmentStrokeWidth : 1}
+        var pieChart = new Chart(ctx).Pie(data, options);
+        mQuery(canvas).closest('.chart-wrapper').find('.legend').html(pieChart.generateLegend());
+        Mautic.chartObjects.push(pieChart);
+    },
+
+    /**
+     * Render the chart.js simple bar chart
+     *
+     * @param mQuery element canvas
+     */
+    renderSimpleBarChart: function(canvas) {
+        var ctx = canvas[0].getContext("2d");
+        var data = mQuery.parseJSON(canvas.text());
+        var options = {
+            scaleShowGridLines : false,
+            barShowStroke : false,
+            barValueSpacing : 1,
+            showScale: false,
+            tooltipFontSize: 10,
+            tooltipCaretSize: 0
+        };
+        Mautic.chartObjects.push(new Chart(ctx).Bar(data, options));
+    },
+
+    /**
+     * Render vector maps
+     *
+     * @param mQuery element scope
+     */
+    renderMaps: function(scope) {
+        if (!Mautic.mapObjects) Mautic.mapObjects = [];
+        var maps = [];
+
+        if (mQuery.type(scope) === 'string') {
+            maps = mQuery(scope).find('.vector-map');
+        } else if (scope) {
+            maps = scope.find('.vector-map');
+        } else {
+            maps = mQuery('.vector-map');
+        }
+
+        if (maps.length) {
+            maps.each(function(index, element) {
+                var wrapper = mQuery(element);
+                try {
+                    var data = mQuery.parseJSON(wrapper.text());
+                } catch (error) {
+
+                    return;
+                }
+
+                // Markers have numerical indexes
+                var firstKey = Object.keys(data)[0];
+
+                // Check type of data
+                if (firstKey == "0") {
+                    // Markers
+                    var markersData = data,
+                        regionsData = {};
+                } else {
+                    // Regions
+                    var markersData = {},
+                        regionsData = data;
+                }
+
+                wrapper.text('');
+                wrapper.vectorMap({
+                    backgroundColor: 'transparent',
+                    zoomOnScroll: false,
+                    markers: markersData,
+                    markerStyle: {
+                        initial: {
+                            fill: '#40C7B5'
+                        },
+                        selected: {
+                            fill: '#40C7B5'
+                        }
+                    },
+                    regionStyle: {
+                        initial: {
+                            "fill": '#dce0e5',
+                            "fill-opacity": 1,
+                            "stroke": 'none',
+                            "stroke-width": 0,
+                            "stroke-opacity": 1
+                        },
+                        hover: {
+                            "fill-opacity": 0.7,
+                            "cursor": 'pointer'
+                        }
+                    },
+                    map: 'world_mill_en',
+                    series: {
+                        regions: [{
+                            values: regionsData,
+                            scale: ['#dce0e5', '#40C7B5'],
+                            normalizeFunction: 'polynomial'
+                        }]
+                    },
+                    onRegionTipShow: function (event, label, index) {
+                        if (data[index] > 0) {
+                            label.html(
+                                '<b>'+label.html()+'</b></br>'+
+                                data[index]+' Leads'
+                            );
+                        }
+                    }
+                });
+                Mautic.mapObjects.push(wrapper.vectorMap('get', 'mapObject'));
+            });
+        }
+    },
+
+    initDateRangePicker: function () {
+        var dateFrom = mQuery('#daterange_date_from');
+        var dateTo = mQuery('#daterange_date_to');
+
+        dateFrom.datetimepicker({
+            format: 'M j, Y',
+            onShow: function(ct) {
+                this.setOptions({
+                    maxDate: dateTo.val() ? new Date(dateTo.val()) : false
+                });
+            },
+            timepicker: false
+        });
+        dateTo.datetimepicker({
+            format: 'M j, Y',
+            onShow: function(ct) {
+                this.setOptions({
+                    maxDate: new Date(),
+                    minDate: dateFrom.val() ? new Date(dateFrom.val()) : false
+                });
+            },
+            timepicker: false
+        });
     }
 };

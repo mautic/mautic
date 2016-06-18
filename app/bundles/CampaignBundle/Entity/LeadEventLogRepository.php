@@ -9,6 +9,8 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\UserBundle\Entity\User;
 use Doctrine\ORM\EntityRepository;
 
 /**
@@ -16,6 +18,23 @@ use Doctrine\ORM\EntityRepository;
  */
 class LeadEventLogRepository extends EntityRepository
 {
+    /**
+     * @var User
+     */
+    protected $currentUser;
+
+    /**
+     * Set the current user (i.e. from security context) for use within repositories
+     *
+     * @param User $user
+     *
+     * @return void
+     */
+    public function setCurrentUser(User $user)
+    {
+        $this->currentUser = $user;
+    }
+
 	/**
      * Get a lead's page event log
      *
@@ -84,19 +103,23 @@ class LeadEventLogRepository extends EntityRepository
     {
         $leadIps = array();
 
-        $query = $this->createQueryBuilder('ll');
-        $query->select('IDENTITY(ll.event) AS event_id,
-                    IDENTITY(e.campaign) AS campaign_id,
-                    ll.triggerDate,
-                    IDENTITY(ll.lead) AS lead_id,
+        $query = $this->_em->getConnection()->createQueryBuilder();
+        $today = new DateTimeHelper();
+        $query->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
+            ->select('ll.event_id,
+                    ll.campaign_id,
+                    ll.trigger_date,
+                    ll.lead_id,
                     e.name AS event_name,
                     e.description AS event_description,
                     c.name AS campaign_name,
-                    c.description AS campaign_description')
-            ->leftJoin('MauticCampaignBundle:Event', 'e', 'WITH', 'e.id = ll.event')
-            ->leftJoin('MauticCampaignBundle:Campaign', 'c', 'WITH', 'c.id = e.campaign')
-            ->where($query->expr()->gte('ll.triggerDate', ':today'))
-            ->setParameter('today', new \DateTime());
+                    c.description AS campaign_description,
+                    CONCAT(CONCAT(l.firstname, \' \'), l.lastname) AS lead_name')
+            ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'e.id = ll.event_id')
+            ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = e.campaign_id')
+            ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = ll.lead_id')
+            ->where($query->expr()->gte('ll.trigger_date', ':today'))
+            ->setParameter('today', $today->toUtcString());
 
         if (isset($options['lead'])) {
             /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
@@ -104,17 +127,17 @@ class LeadEventLogRepository extends EntityRepository
                 $leadIps[] = $ip->getId();
             }
 
-            $query->andWhere('ll.lead = :leadId')
+            $query->andWhere('ll.lead_id = :leadId')
                 ->setParameter('leadId', $options['lead']->getId());
         }
 
         if (isset($options['scheduled'])) {
-            $query->andWhere('ll.isScheduled = :scheduled')
+            $query->andWhere('ll.is_scheduled = :scheduled')
                 ->setParameter('scheduled', $options['scheduled'], 'boolean');
         }
 
         if (isset($options['eventType'])) {
-            $query->andwhere('e.eventType = :eventType')
+            $query->andwhere('e.event_type = :eventType')
                 ->setParameter('eventType', $options['eventType']);
         }
 
@@ -129,14 +152,18 @@ class LeadEventLogRepository extends EntityRepository
             $query->setMaxResults(10);
         }
 
-        $query->orderBy('ll.triggerDate');
+        $query->orderBy('ll.trigger_date');
 
         if (!empty($ipIds)) {
-            $query->orWhere('ll.ipAddress IN (' . implode(',', $ipIds) . ')');
+            $query->orWhere('ll.ip_address IN (' . implode(',', $ipIds) . ')');
         }
 
-        return $query->getQuery()
-            ->getArrayResult();
+        if (!empty($options['canViewOthers']) && isset($this->currentUser)) {
+            $query->andWhere('c.created_by = :userId')
+                ->setParameter('userId', $this->currentUser->getId());
+        }
+
+        return $query->execute()->fetchAll();
     }
 
     /**

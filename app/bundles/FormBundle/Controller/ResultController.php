@@ -25,7 +25,7 @@ class ResultController extends CommonFormController
      */
     public function indexAction($objectId, $page)
     {
-        $formModel = $this->factory->getModel('form.form');
+        $formModel = $this->getModel('form.form');
         $form      = $formModel->getEntity($objectId);
         $session   = $this->factory->getSession();
         $formPage  = $session->get('mautic.form.page', 1);
@@ -65,11 +65,16 @@ class ResultController extends CommonFormController
             $start = 0;
         }
 
+        // Set order direction to desc if not set
+        if (!$session->get('mautic.formresult.'.$objectId.'.orderbydir', null)) {
+            $session->set('mautic.formresult.'.$objectId.'.orderbydir', 'DESC');
+        }
+
         $orderBy    = $session->get('mautic.formresult.'.$objectId.'.orderby', 's.date_submitted');
-        $orderByDir = $session->get('mautic.formresult.'.$objectId.'.orderbydir', 'ASC');
+        $orderByDir = $session->get('mautic.formresult.'.$objectId.'.orderbydir', 'DESC');
         $filters    = $session->get('mautic.formresult.'.$objectId.'.filters', array());
 
-        $model = $this->factory->getModel('form.submission');
+        $model = $this->getModel('form.submission');
 
         //get the results
         $entities = $model->getEntities(
@@ -141,7 +146,7 @@ class ResultController extends CommonFormController
      */
     public function exportAction($objectId, $format = 'csv')
     {
-        $formModel = $this->factory->getModel('form.form');
+        $formModel = $this->getModel('form.form');
         $form      = $formModel->getEntity($objectId);
         $session   = $this->factory->getSession();
         $formPage  = $session->get('mautic.form.page', 1);
@@ -170,7 +175,7 @@ class ResultController extends CommonFormController
         }
 
         $orderBy    = $session->get('mautic.formresult.'.$objectId.'.orderby', 's.date_submitted');
-        $orderByDir = $session->get('mautic.formresult.'.$objectId.'.orderbydir', 'ASC');
+        $orderByDir = $session->get('mautic.formresult.'.$objectId.'.orderbydir', 'DESC');
         $filters    = $session->get('mautic.formresult.'.$objectId.'.filters', array());
 
         $args = array(
@@ -182,7 +187,7 @@ class ResultController extends CommonFormController
         );
 
         /** @var \Mautic\FormBundle\Model\SubmissionModel $model */
-        $model = $this->factory->getModel('form.submission');
+        $model = $this->getModel('form.submission');
 
         return $model->exportResults($format, $form, $args);
     }
@@ -202,11 +207,11 @@ class ResultController extends CommonFormController
         $flashes = array();
 
         if ($this->request->getMethod() == 'POST') {
-            $model = $this->factory->getModel('form.submission');
+            $model = $this->getModel('form.submission');
             $ids   = json_decode($this->request->query->get('ids', ''));
 
             if (!empty($ids)) {
-                $formModel = $this->factory->getModel('form');
+                $formModel = $this->getModel('form');
                 $form      = $formModel->getEntity($formId);
 
                 if ($form === null) {

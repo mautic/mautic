@@ -11,11 +11,11 @@ $item = $event['extra']['log'];
 ?>
 
 <li class="wrapper campaign-event">
-    <div class="figure"><span class="fa <?php echo isset($icons['campaigns']) ? $icons['campaigns'] : '' ?>"></span></div>
+    <div class="figure"><span class="fa <?php echo isset($event['icon']) ? $event['icon'] : '' ?>"></span></div>
     <div class="panel">
         <div class="panel-body">
             <h3>
-                <a href="<?php echo $view['router']->generate('mautic_campaign_action',
+                <a href="<?php echo $view['router']->path('mautic_campaign_action',
                     array("objectAction" => "view", "objectId" => $item['campaign_id'])); ?>"
                    data-toggle="ajax">
                     <?php echo $item['campaign_name']; ?>

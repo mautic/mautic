@@ -34,7 +34,7 @@ class AjaxController extends CommonAjaxController
         );
 
         /* @type \Mautic\CalendarBundle\Model\CalendarModel $model */
-        $model  = $this->factory->getModel('calendar');
+        $model  = $this->getModel('calendar');
         $events = $model->getCalendarEvents($dates);
 
         // Can't use $this->sendJsonResponse, because it converts arrays to objects and Fullcalendar doesn't render events then. 
@@ -61,7 +61,7 @@ class AjaxController extends CommonAjaxController
         $response   = array('success' => false);
 
         /* @type \Mautic\CalendarBundle\Model\CalendarModel $model */
-        $calendarModel  = $this->factory->getModel('calendar');
+        $calendarModel  = $this->getModel('calendar');
         $event          = $calendarModel->editCalendarEvent($source, $entityId);
 
         $model   = $event->getModel();

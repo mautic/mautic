@@ -29,7 +29,7 @@ class PageController extends FormController
      */
     public function indexAction($page = 1)
     {
-        $model = $this->factory->getModel('page.page');
+        $model = $this->getModel('page.page');
 
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(array(
@@ -114,7 +114,7 @@ class PageController extends FormController
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         //retrieve a list of categories
-        $categories = $this->factory->getModel('page.page')->getLookupResults('category', '', 0);
+        $categories = $this->getModel('page.page')->getLookupResults('category', '', 0);
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
@@ -147,7 +147,7 @@ class PageController extends FormController
     public function viewAction($objectId)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model      = $this->factory->getModel('page.page');
+        $model      = $this->getModel('page.page');
         $security   = $this->factory->getSecurity();
         $activePage = $model->getEntity($objectId);
         //set the page we came from
@@ -254,10 +254,10 @@ class PageController extends FormController
         }
 
         // Audit Log
-        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('page', $activePage->getId(), $activePage->getDateAdded());
+        $logs = $this->getModel('core.auditLog')->getLogForObject('page', $activePage->getId(), $activePage->getDateAdded());
 
         // Hit count per day for last 30 days
-        $last30 = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->getHits(30, 'D', array('page_id' => $activePage->getId()));
+        $last30 = $model->getHitsBarChartData('d', new \DateTime('-30 days'), new \DateTime, null, array('page_id' => $activePage->getId()));
 
         //get related translations
         list($translationParent, $translationChildren) = $model->getTranslations($activePage);
@@ -296,7 +296,8 @@ class PageController extends FormController
                         'total'  => $activePage->getHits(),
                         'unique' => $activePage->getUniqueHits()
                     ),
-                    'dwellTime' => $model->getDwellTimeStats($activePage)
+                    'newVsReturning' => $model->getNewVsReturningPieChartData(new \DateTime('-30 days'), new \DateTime, array('page_id' => $objectId)),
+                    'dwellTime' => $model->getDwellTimesPieChartData(new \DateTime('-30 days'), new \DateTime, array('page_id' => $objectId))
                 ),
                 'abTestResults' => $abTestResults,
                 'security'      => $security,
@@ -323,7 +324,7 @@ class PageController extends FormController
     public function newAction($entity = null)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model   = $this->factory->getModel('page.page');
+        $model   = $this->getModel('page.page');
 
         if (!($entity instanceof Page)) {
             /** @var \Mautic\PageBundle\Entity\Page $entity */
@@ -420,6 +421,7 @@ class PageController extends FormController
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
+                'isVariant'   => $entity->isVariant(true),
                 'tokens'      => $model->getBuilderComponents($entity, 'tokenSections'),
                 'activePage'  => $entity
             ),
@@ -445,7 +447,7 @@ class PageController extends FormController
     public function editAction($objectId, $ignorePost = false)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model   = $this->factory->getModel('page.page');
+        $model   = $this->getModel('page.page');
         $entity  = $model->getEntity($objectId);
         $session = $this->factory->getSession();
         $page    = $this->factory->getSession()->get('mautic.page.page', 1);
@@ -581,6 +583,7 @@ class PageController extends FormController
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
+                'isVariant'   => $entity->isVariant(true),
                 'tokens'      => (!empty($tokens)) ? $tokens['tokenSections'] : $model->getBuilderComponents($entity, 'tokenSections'),
                 'activePage'  => $entity
             ),
@@ -606,7 +609,7 @@ class PageController extends FormController
     public function cloneAction($objectId)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model   = $this->factory->getModel('page.page');
+        $model   = $this->getModel('page.page');
         $entity  = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -655,7 +658,7 @@ class PageController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\PageBundle\Model\PageModel $model */
-            $model  = $this->factory->getModel('page.page');
+            $model  = $this->getModel('page.page');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
@@ -716,7 +719,7 @@ class PageController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\PageBundle\Model\PageModel $model */
-            $model     = $this->factory->getModel('page');
+            $model     = $this->getModel('page');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = array();
 
@@ -772,7 +775,7 @@ class PageController extends FormController
     public function builderAction($objectId)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model = $this->factory->getModel('page.page');
+        $model = $this->getModel('page.page');
 
         //permission check
         if (strpos($objectId, 'new') !== false) {
@@ -804,6 +807,8 @@ class PageController extends FormController
 
         if (is_array($newContent)) {
             $content = array_merge($content, $newContent);
+            // Update the content for processSlots
+            $entity->setContent($content);
         }
 
         $this->addAssetsForBuilder();
@@ -830,7 +835,7 @@ class PageController extends FormController
     public function abtestAction($objectId)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model   = $this->factory->getModel('page.page');
+        $model   = $this->getModel('page.page');
         $entity  = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -854,12 +859,9 @@ class PageController extends FormController
             $clone->setVariantStartDate(null);
             $clone->setIsPublished(false);
             $clone->setVariantParent($entity);
-
-            $model->saveEntity($clone);
-            $objectId = $clone->getId();
         }
 
-        return $this->editAction($objectId);
+        return $this->newAction($clone);
     }
 
     /**
@@ -888,7 +890,7 @@ class PageController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\PageBundle\Model\PageModel $model */
-            $model  = $this->factory->getModel('page.page');
+            $model  = $this->getModel('page.page');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
