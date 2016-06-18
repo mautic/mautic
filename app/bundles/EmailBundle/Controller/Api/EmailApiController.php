@@ -25,7 +25,7 @@ class EmailApiController extends CommonApiController
     public function initialize (FilterControllerEvent $event)
     {
         parent::initialize($event);
-        $this->model            = $this->factory->getModel('email');
+        $this->model            = $this->getModel('email');
         $this->entityClass      = 'Mautic\EmailBundle\Entity\Email';
         $this->entityNameOne    = 'email';
         $this->entityNameMulti  = 'emails';
@@ -112,7 +112,7 @@ class EmailApiController extends CommonApiController
                 return $this->accessDenied();
             }
 
-            $leadModel = $this->factory->getModel('lead');
+            $leadModel = $this->getModel('lead');
             $lead      = $leadModel->getEntity($leadId);
 
             if ($lead == null) {

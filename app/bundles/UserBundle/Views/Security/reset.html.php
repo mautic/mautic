@@ -23,5 +23,5 @@ echo $view['form']->end($form);
 ?>
 
 <div class="mt-sm">
-    <a href="<?php echo $view['router']->generate('login'); ?>"><?php echo $view['translator']->trans('mautic.user.user.passwordreset.back'); ?></a>
+    <a href="<?php echo $view['router']->path('login'); ?>"><?php echo $view['translator']->trans('mautic.user.user.passwordreset.back'); ?></a>
 </div>

@@ -27,7 +27,7 @@ class AjaxController extends CommonAjaxController
     protected function pageListAction(Request $request)
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
-        $results   = $this->factory->getModel('page.page')->getLookupResults('page', $filter);
+        $results   = $this->getModel('page.page')->getLookupResults('page', $filter);
         $dataArray = array();
 
         foreach ($results as $r) {
@@ -102,7 +102,7 @@ class AjaxController extends CommonAjaxController
         if (!empty($type)) {
             //get the HTML for the form
             /** @var \Mautic\PageBundle\Model\PageModel $model */
-            $model   = $this->factory->getModel('page');
+            $model   = $this->getModel('page');
 
             $page = $model->getEntity($pageId);
 
@@ -147,7 +147,7 @@ class AjaxController extends CommonAjaxController
     protected function getBuilderTokens($query)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model  = $this->factory->getModel('page');
+        $model  = $this->getModel('page');
 
         return $model->getBuilderComponents(null, array('tokens', 'visualTokens'), $query);
     }

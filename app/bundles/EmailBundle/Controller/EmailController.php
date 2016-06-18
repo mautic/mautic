@@ -29,7 +29,7 @@ class EmailController extends FormController
      */
     public function indexAction($page = 1)
     {
-        $model = $this->factory->getModel('email');
+        $model = $this->getModel('email');
 
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(
@@ -89,13 +89,13 @@ class EmailController extends FormController
 
         //retrieve a list of categories
         $listFilters['filters']['groups']['mautic.core.filter.categories'] = array(
-            'options'  => $this->factory->getModel('category')->getLookupResults('email', '', 0),
+            'options'  => $this->getModel('category')->getLookupResults('email', '', 0),
             'prefix'   => 'category'
         );
 
         //retrieve a list of Lead Lists
         $listFilters['filters']['groups']['mautic.core.filter.lists'] = array(
-            'options'  => $this->factory->getModel('lead.list')->getUserLists(),
+            'options'  => $this->getModel('lead.list')->getUserLists(),
             'prefix'   => 'list'
         );
 
@@ -247,7 +247,7 @@ class EmailController extends FormController
     public function viewAction($objectId)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model    = $this->factory->getModel('email');
+        $model    = $this->getModel('email');
         $security = $this->factory->getSecurity();
 
         /** @var \Mautic\EmailBundle\Entity\Email $email */
@@ -375,7 +375,7 @@ class EmailController extends FormController
             $model->getEmailListStats($email, $variant);
 
         // Audit Log
-        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('email', $email->getId(), $email->getDateAdded());
+        $logs = $this->getModel('core.auditLog')->getLogForObject('email', $email->getId(), $email->getDateAdded());
 
         // Get click through stats
         $trackableLinks = $model->getEmailClickStats($email->getId());
@@ -442,7 +442,7 @@ class EmailController extends FormController
      */
     public function newAction($entity = null)
     {
-        $model = $this->factory->getModel('email');
+        $model = $this->getModel('email');
 
         if (!($entity instanceof Email)) {
             /** @var \Mautic\EmailBundle\Entity\Email $entity */
@@ -607,7 +607,7 @@ class EmailController extends FormController
     public function editAction($objectId, $ignorePost = false, $forceTypeSelection = false)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model = $this->factory->getModel('email');
+        $model = $this->getModel('email');
         $method  = $this->request->getMethod();
         $entity  = $model->getEntity($objectId);
         $session = $this->factory->getSession();
@@ -787,7 +787,7 @@ class EmailController extends FormController
         }
 
         $assets         = $form['assetAttachments']->getData();
-        $attachmentSize = $this->factory->getModel('asset')->getTotalFilesize($assets);
+        $attachmentSize = $this->getModel('asset')->getTotalFilesize($assets);
 
         return $this->delegateView(
             array(
@@ -825,7 +825,7 @@ class EmailController extends FormController
      */
     public function cloneAction($objectId)
     {
-        $model  = $this->factory->getModel('email');
+        $model  = $this->getModel('email');
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -873,7 +873,7 @@ class EmailController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->factory->getModel('email');
+            $model  = $this->getModel('email');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
@@ -927,7 +927,7 @@ class EmailController extends FormController
     public function builderAction($objectId)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model = $this->factory->getModel('email');
+        $model = $this->getModel('email');
 
         //permission check
         if (strpos($objectId, 'new') !== false) {
@@ -997,7 +997,7 @@ class EmailController extends FormController
      */
     public function abtestAction($objectId)
     {
-        $model  = $this->factory->getModel('email');
+        $model  = $this->getModel('email');
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -1057,7 +1057,7 @@ class EmailController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->factory->getModel('email');
+            $model  = $this->getModel('email');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
@@ -1117,7 +1117,7 @@ class EmailController extends FormController
     public function sendAction($objectId)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model   = $this->factory->getModel('email');
+        $model   = $this->getModel('email');
         $entity  = $model->getEntity($objectId);
         $session = $this->factory->getSession();
         $page    = $session->get('mautic.email.page', 1);
@@ -1243,7 +1243,7 @@ class EmailController extends FormController
     public function exampleAction($objectId)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model  = $this->factory->getModel('email');
+        $model  = $this->getModel('email');
         $entity = $model->getEntity($objectId);
 
         //not found or not allowed
@@ -1259,7 +1259,7 @@ class EmailController extends FormController
 
         // Prepare a fake lead
         /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
-        $fieldModel   = $this->factory->getModel('lead.field');
+        $fieldModel   = $this->getModel('lead.field');
         $fields       = $fieldModel->getFieldList(false, false);
         array_walk($fields, function(&$field) {
             $field = "[$field]";
@@ -1307,7 +1307,7 @@ class EmailController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model     = $this->factory->getModel('email');
+            $model     = $this->getModel('email');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
 
             $deleteIds = array();
@@ -1357,22 +1357,6 @@ class EmailController extends FormController
                     'flashes' => $flashes
                 )
             )
-        );
-    }
-
-    /**
-     * Preview email
-     *
-     * @param $objectId
-     *
-     * @deprecated since 1.1.3
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function previewAction($objectId)
-    {
-        return $this->redirect(
-            $this->generateUrl('mautic_email_preview', array('objectId' => $objectId))
         );
     }
 

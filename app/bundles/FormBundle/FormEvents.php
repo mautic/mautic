@@ -70,4 +70,24 @@ final class FormEvents
      * @var string
      */
     const FORM_ON_SUBMIT = 'mautic.form_on_submit';
+
+    /**
+     * The mautic.form.on_campaign_trigger_condition event is fired when the campaign condition triggers.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_CONDITION = 'mautic.form.on_campaign_trigger_condition';
+
+    /**
+     * The mautic.form.on_campaign_trigger_decision event is fired when the campaign decision triggers.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.form.on_campaign_trigger_decision';
 }

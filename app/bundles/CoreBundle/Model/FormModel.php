@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /**
  * Class FormModel
  */
-class FormModel extends CommonModel
+class FormModel extends AbstractCommonModel
 {
     /**
      * Lock an entity to prevent multiple people from editing
@@ -30,10 +30,9 @@ class FormModel extends CommonModel
     {
         //lock the row if applicable
         if (method_exists($entity, 'setCheckedOut') && method_exists($entity, 'getId') && $entity->getId()) {
-            $user = $this->factory->getUser();
-            if ($user->getId()) {
+            if ($this->user->getId()) {
                 $entity->setCheckedOut(new \DateTime());
-                $entity->setCheckedOutBy($user);
+                $entity->setCheckedOutBy($this->user);
                 $this->em->persist($entity);
                 $this->em->flush();
             }
@@ -54,7 +53,7 @@ class FormModel extends CommonModel
             if (!empty($checkedOut)) {
                 //is it checked out by the current user?
                 $checkedOutBy = $entity->getCheckedOutBy();
-                if (!empty($checkedOutBy) && $checkedOutBy !== $this->factory->getUser()->getId()) {
+                if (!empty($checkedOutBy) && $checkedOutBy !== $this->user->getId()) {
                     return true;
                 }
             }
@@ -144,7 +143,7 @@ class FormModel extends CommonModel
         if (method_exists($entity, 'getId')) {
             $isNew = ($entity->getId()) ? false : true;
         } else {
-            $isNew = \Doctrine\ORM\UnitOfWork::STATE_NEW === $this->factory->getEntityManager()->getUnitOfWork()->getEntityState($entity);
+            $isNew = \Doctrine\ORM\UnitOfWork::STATE_NEW === $this->em->getUnitOfWork()->getEntityState($entity);
         }
 
         return $isNew;
@@ -198,17 +197,16 @@ class FormModel extends CommonModel
      */
     public function setTimestamps(&$entity, $isNew, $unlock = true)
     {
-        $user = $this->factory->getUser(true);
         if ($isNew) {
             if (method_exists($entity, 'setDateAdded') && !$entity->getDateAdded()) {
                 $entity->setDateAdded(new \DateTime());
             }
 
-            if ($user instanceof User) {
+            if ($this->user instanceof User) {
                 if (method_exists($entity, 'setCreatedBy') && !$entity->getCreatedBy()) {
-                    $entity->setCreatedBy($user);
+                    $entity->setCreatedBy($this->user);
                 } elseif (method_exists($entity, 'setCreatedByUser') && !$entity->getCreatedByUser()) {
-                    $entity->setCreatedByUser($user->getName());
+                    $entity->setCreatedByUser($this->user->getName());
                 }
             }
         } else {
@@ -216,11 +214,11 @@ class FormModel extends CommonModel
                 $entity->setDateModified(new \DateTime());
             }
 
-            if ($user instanceof User) {
+            if ($this->user instanceof User) {
                 if (method_exists($entity, 'setModifiedBy')) {
-                    $entity->setModifiedBy($user);
+                    $entity->setModifiedBy($this->user);
                 } elseif (method_exists($entity, 'setModifiedByUser')) {
-                    $entity->setModifiedByUser($user->getName());
+                    $entity->setModifiedByUser($this->user->getName());
                 }
             }
         }

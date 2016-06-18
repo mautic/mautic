@@ -70,7 +70,7 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
                 'totalItems'      => $totalResults,
                 'page'            => $reportPage,
                 'limit'           => $limit,
-                'baseUrl'         => $view['router']->generate('mautic_report_view', array(
+                'baseUrl'         => $view['router']->path('mautic_report_view', array(
                     'objectId' => $report->getId()
                 )),
                 'sessionVar'      => 'report.' . $report->getId(),

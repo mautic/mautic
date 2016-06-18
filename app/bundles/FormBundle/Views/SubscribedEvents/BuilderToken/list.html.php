@@ -30,7 +30,7 @@ if ($tmpl == 'index') {
         "page"              => $page,
         "limit"             => $limit,
         "fixedLimit"        => true,
-        "baseUrl"           => $view['router']->generate('mautic_form_pagetoken_index'),
+        "baseUrl"           => $view['router']->path('mautic_form_pagetoken_index'),
         "paginationWrapper" => 'text-center',
         "paginationClass"   => "sm",
         'sessionVar'        => 'form.pagetoken',

@@ -25,20 +25,20 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'leadlist',
+                    'sessionVar' => 'segment',
                     'orderBy'    => 'l.name',
                     'text'       => 'mautic.core.name',
                     'class'      => 'col-leadlist-name'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'leadlist',
+                    'sessionVar' => 'segment',
                     'text'       => 'mautic.lead.list.thead.leadcount',
                     'class'      => 'visible-md visible-lg col-leadlist-leadcount'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'leadlist',
+                    'sessionVar' => 'segment',
                     'orderBy'    => 'l.id',
                     'text'       => 'mautic.core.id',
                     'class'      => 'visible-md visible-lg col-leadlist-id'
@@ -56,13 +56,13 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                             'templateButtons' => array(
                                 'delete'    => $security->hasEntityAccess(true, $permissions['lead:lists:deleteother'], $item->getCreatedBy()),
                             ),
-                            'routeBase' => 'leadlist',
+                            'routeBase' => 'segment',
                             'langVar'   => 'lead.list',
                             'custom'    => array(
                                 array(
                                     'attr' => array(
                                         'data-toggle' => 'ajax',
-                                        'href'        => $view['router']->generate('mautic_lead_index', array(
+                                        'href'        => $view['router']->path('mautic_contact_index', array(
                                             'search' => "$listCommand:{$item->getAlias()}"
                                         )),
                                     ),
@@ -77,7 +77,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                         <div>
                             <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', array('item' => $item, 'model' => 'lead.list')); ?>
                             <?php if ($security->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy())) : ?>
-                                <a href="<?php echo $view['router']->generate('mautic_leadlist_action', array('objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajax">
+                                <a href="<?php echo $view['router']->path('mautic_segment_action', array('objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajax">
                                     <?php echo $item->getName(); ?> (<?php echo $item->getAlias(); ?>)
                                 </a>
                             <?php else : ?>
@@ -96,7 +96,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                         <?php endif; ?>
                     </td>
                     <td class="visible-md visible-lg">
-                        <a class="label label-primary" href="<?php echo $view['router']->generate('mautic_lead_index', array('search' => $view['translator']->trans('mautic.lead.lead.searchcommand.list') . ':' . $item->getAlias())); ?>" data-toggle="ajax"<?php echo ($leadCounts[$item->getId()] == 0) ? "disabled=disabled" : ""; ?>>
+                        <a class="label label-primary" href="<?php echo $view['router']->path('mautic_contact_index', array('search' => $view['translator']->trans('mautic.lead.lead.searchcommand.list') . ':' . $item->getAlias())); ?>" data-toggle="ajax"<?php echo ($leadCounts[$item->getId()] == 0) ? "disabled=disabled" : ""; ?>>
                             <?php echo $view['translator']->transChoice('mautic.lead.list.viewleads_count', $leadCounts[$item->getId()], array('%count%' => $leadCounts[$item->getId()])); ?>
                         </a>
                     </td>
@@ -110,8 +110,8 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                 "totalItems" => count($items),
                 "page"       => $page,
                 "limit"      => $limit,
-                "baseUrl"    =>  $view['router']->generate('mautic_leadlist_index'),
-                'sessionVar' => 'leadlist'
+                "baseUrl"    =>  $view['router']->path('mautic_segment_index'),
+                'sessionVar' => 'segment'
             )); ?>
         </div>
     </div>

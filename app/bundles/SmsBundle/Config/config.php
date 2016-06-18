@@ -7,105 +7,124 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-return array(
-    'services'    => array(
-        'events'  => array(
-            'mautic.sms.campaignbundle.subscriber' => array(
-                'class' => 'Mautic\SmsBundle\EventListener\CampaignSubscriber'
-            ),
-            'mautic.sms.configbundle.subscriber' => array(
+return [
+    'services'    => [
+        'events'  => [
+            'mautic.sms.campaignbundle.subscriber' => [
+                'class' => 'Mautic\SmsBundle\EventListener\CampaignSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.lead.model.lead',
+                    'mautic.sms.model.sms',
+                    'mautic.sms.api'
+                ]
+            ],
+            'mautic.sms.configbundle.subscriber' => [
                 'class' => 'Mautic\SmsBundle\EventListener\ConfigSubscriber'
-            ),
-            'mautic.sms.smsbundle.subscriber' => array(
+            ],
+            'mautic.sms.smsbundle.subscriber' => [
                 'class' => 'Mautic\SmsBundle\EventListener\SmsSubscriber'
-            )
-        ),
-        'forms' => array(
-            'mautic.form.type.sms' => array(
+            ]
+        ],
+        'forms' => [
+            'mautic.form.type.sms' => [
                 'class'     => 'Mautic\SmsBundle\Form\Type\SmsType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'sms'
-            ),
-            'mautic.form.type.smsconfig'  => array(
+            ],
+            'mautic.form.type.smsconfig'  => [
                 'class' => 'Mautic\SmsBundle\Form\Type\ConfigType',
                 'alias' => 'smsconfig'
-            ),
-            'mautic.form.type.smssend_list' => array(
+            ],
+            'mautic.form.type.smssend_list' => [
                 'class'     => 'Mautic\SmsBundle\Form\Type\SmsSendType',
                 'arguments' => 'router',
                 'alias'     => 'smssend_list'
-            ),
-            'mautic.form.type.sms_list'     => array(
+            ],
+            'mautic.form.type.sms_list'     => [
                 'class'     => 'Mautic\SmsBundle\Form\Type\SmsListType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'sms_list'
-            ),
-        ),
-        'helpers' => array(
-            'mautic.helper.sms' => array(
+            ],
+        ],
+        'helpers' => [
+            'mautic.helper.sms' => [
                 'class'     => 'Mautic\SmsBundle\Helper\SmsHelper',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.lead.model.lead',
+                    'mautic.helper.phone_number'
+                ],
                 'alias'     => 'sms_helper'
-            )
-        ),
-        'other' => array(
-            'mautic.sms.api' => array(
+            ]
+        ],
+        'other' => [
+            'mautic.sms.api' => [
                 'class'     => 'Mautic\SmsBundle\Api\TwilioApi',
-                'arguments' => array(
+                'arguments' => [
                     'mautic.factory',
                     'mautic.twilio.service',
+                    'mautic.helper.phone_number',
                     '%mautic.sms_sending_phone_number%'
-                ),
+                ],
                 'alias' => 'sms_api'
-            ),
-            'mautic.twilio.service' => array(
+            ],
+            'mautic.twilio.service' => [
                 'class'     => 'Services_Twilio',
-                'arguments' => array(
+                'arguments' => [
                     '%mautic.sms_username%',
                     '%mautic.sms_password%'
-                ),
+                ],
                 'alias' => 'twilio_service'
-            )
-        )
-    ),
-    'routes' => array(
-        'main'   => array(
-            'mautic_sms_index'  => array(
+            ]
+        ],
+        'models' =>  [
+            'mautic.sms.model.sms' => [
+                'class' => 'Mautic\SmsBundle\Model\SmsModel',
+                'arguments' => [
+                    'mautic.page.model.trackable'
+                ]
+            ]
+        ]
+    ],
+    'routes' => [
+        'main'   => [
+            'mautic_sms_index'  => [
                 'path'       => '/sms/{page}',
                 'controller' => 'MauticSmsBundle:Sms:index'
-            ),
-            'mautic_sms_action' => array(
+            ],
+            'mautic_sms_action' => [
                 'path'       => '/sms/{objectAction}/{objectId}',
                 'controller' => 'MauticSmsBundle:Sms:execute'
-            )
-        ),
-        'public' => array(
-            'mautic_receive_sms' => array(
+            ]
+        ],
+        'public' => [
+            'mautic_receive_sms' => [
                 'path'       => '/sms/receive',
                 'controller' => 'MauticSmsBundle:Api\SmsApi:receive'
-            )
-        )
-    ),
-    'menu'       => array(
-        'main' => array(
-            'items'    => array(
-                'mautic.sms.smses' => array(
+            ]
+        ]
+    ],
+    'menu'       => [
+        'main' => [
+            'items'    => [
+                'mautic.sms.smses' => [
                     'route'     => 'mautic_sms_index',
-                    'access'    => array('sms:smses:viewown', 'sms:smses:viewother'),
+                    'access'    => ['sms:smses:viewown', 'sms:smses:viewother'],
                     'parent'    => 'mautic.core.channels',
-                    'checks'    => array(
-                        'parameters' => array(
+                    'checks'    => [
+                        'parameters' => [
                             'sms_enabled' => true
-                        )
-                    )
-                )
-            )
-        )
-    ),
-    'parameters' => array(
+                        ]
+                    ]
+                ]
+            ]
+        ]
+    ],
+    'parameters' => [
         'sms_enabled' => false,
         'sms_username' => null,
         'sms_password' => null,
         'sms_sending_phone_number' => null
-    )
-);
+    ]
+];

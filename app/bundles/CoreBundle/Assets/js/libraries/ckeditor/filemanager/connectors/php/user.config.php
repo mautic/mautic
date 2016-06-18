@@ -23,24 +23,30 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 // Boot Symfony
-require_once __DIR__ . '/../../../../../../../../../bootstrap.php.cache';
-require_once __DIR__ . '/../../../../../../../../../AppKernel.php';
-$kernel = new AppKernel('prod', false);
-$kernel->boot();
-$container  = $kernel->getContainer();
-$request    = Request::createFromGlobals();
-$container->enterScope('request');
-$container->set('request', $request, 'request');
+try {
+    require_once __DIR__.'/../../../../../../../../../autoload.php';
+    require_once __DIR__.'/../../../../../../../../../bootstrap.php.cache';
+    require_once __DIR__.'/../../../../../../../../../AppKernel.php';
+    $kernel = new AppKernel('prod', false);
+    $kernel->boot();
+    $container = $kernel->getContainer();
+    $request   = Request::createFromGlobals();
+    $container->enterScope('request');
+    $container->set('request', $request, 'request');
+    
+    // Dispatch REQUEST event to setup authentication
+    $httpKernel = $container->get('http_kernel');
+    $event      = new GetResponseEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST);
+    $container->get('event_dispatcher')->dispatch(KernelEvents::REQUEST, $event);
 
-// Dispatch REQUEST event to setup authentication
-$httpKernel = $container->get('http_kernel');
-$event      = new GetResponseEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST);
-$container->get('event_dispatcher')->dispatch(KernelEvents::REQUEST, $event);
-
-$session       = $container->get('session');
-$securityToken = $container->get('security.token_storage');
-$token         = $securityToken->getToken();
-$authenticated = ($token instanceof TokenInterface) ? count($token->getRoles()) : false;
+    $session       = $container->get('session');
+    $securityToken = $container->get('security.token_storage');
+    $token         = $securityToken->getToken();
+    $authenticated = ($token instanceof TokenInterface) ? count($token->getRoles()) : false;
+} catch (\Exception $exception) {
+    error_log($exception);
+    $authenticated = false;
+}
 
 /**
  *	Check if user is authorized

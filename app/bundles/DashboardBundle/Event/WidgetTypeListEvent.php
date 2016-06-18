@@ -11,8 +11,8 @@ namespace Mautic\DashboardBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\DashboardBundle\Entity\Widget;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class WidgetTypeListEvent
@@ -27,7 +27,7 @@ class WidgetTypeListEvent extends CommonEvent
     protected $widgetTypes = array();
 
     /**
-     * @var Translator $translator
+     * @var TranslatorInterface $translator
      */
     protected $translator;
 
@@ -53,7 +53,7 @@ class WidgetTypeListEvent extends CommonEvent
         }
 
         if (!isset($this->widgetTypes[$bundle])) {
-            $this->widgetTypes[$bundle] = array();
+            $this->widgetTypes[$bundle] = [];
         }
 
         $this->widgetTypes[$bundle][$widgetType] = $widgetTypeName;
@@ -62,9 +62,9 @@ class WidgetTypeListEvent extends CommonEvent
     /**
      * Set translator if you want the strings to be translated
      *
-     * @param Translator $translator
+     * @param TranslatorInterface $translator
      */
-    public function setTranslator(Translator $translator)
+    public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
