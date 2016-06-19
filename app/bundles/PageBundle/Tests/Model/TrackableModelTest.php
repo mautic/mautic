@@ -26,13 +26,13 @@ class TrackableModelTest extends WebTestCase
      */
     public function testHtmlIsDetectedInContent()
     {
-        $mockFactory = $this->getMockBuilder('Mautic\CoreBundle\Factory\MauticFactory')
+        $mockRedirectModel = $this->getMockBuilder('Mautic\PageBundle\Model\RedirectModel')
             ->disableOriginalConstructor()
             ->getMock();
 
         $mockModel = $this->getMockBuilder('Mautic\PageBundle\Model\TrackableModel')
-            ->setConstructorArgs(array($mockFactory))
-            ->setMethods(array('getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromHtml'))
+            ->setConstructorArgs([$mockRedirectModel])
+            ->setMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromHtml'])
             ->getMock();
 
         $mockModel->expects($this->once())
@@ -71,13 +71,13 @@ class TrackableModelTest extends WebTestCase
      */
     public function testPlainTextIsDetectedInContent()
     {
-        $mockFactory = $this->getMockBuilder('Mautic\CoreBundle\Factory\MauticFactory')
+        $mockRedirectModel = $this->getMockBuilder('Mautic\PageBundle\Model\RedirectModel')
             ->disableOriginalConstructor()
             ->getMock();
 
         $mockModel = $this->getMockBuilder('Mautic\PageBundle\Model\TrackableModel')
-            ->setConstructorArgs(array($mockFactory))
-            ->setMethods(array('getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromText'))
+            ->setConstructorArgs([$mockRedirectModel])
+            ->setMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromText'])
             ->getMock();
 
         $mockModel->expects($this->once())
@@ -230,6 +230,53 @@ class TrackableModelTest extends WebTestCase
     }
 
     /**
+     * @testdox Test that tokens that are supposed to be ignored are
+     *
+     * @covers Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     */
+    public function testIgnoredTokensAreNotConverted()
+    {
+        $url   = 'https://{unsubscribe_url}';
+        $model = $this->getModel($url, null, array('{unsubscribe_url}'));
+
+        list($content, $trackables) = $model->parseContentForTrackables(
+            $this->generateContent($url, 'html'),
+            array(
+                '{unsubscribe_url}' => 'https://domain.com/email/unsubscribe/xxxxxxx'
+            ),
+            'email',
+            1
+        );
+
+        $this->assertEmpty($trackables, $content);
+        $this->assertFalse(strpos($url, $content), 'https:// should have been stripped from the token URL');
+    }
+
+    /**
+     * @testdox Test that a URL injected into the do not track list is not converted
+     *
+     * @covers Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     */
+    public function testIgnoredUrlDoesNotCrash()
+    {
+        $url   = 'https://domain.com';
+        $model = $this->getModel($url, null, array($url));
+
+        list($content, $trackables) = $model->parseContentForTrackables(
+            $this->generateContent($url, 'html'),
+            array(),
+            'email',
+            1
+        );
+
+        $this->assertTrue((strpos($content, $url) !== false), $content);
+    }
+
+    /**
      * @testdox Test that a token used in place of a URL is not parsed
      *
      * @covers Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
@@ -288,12 +335,12 @@ class TrackableModelTest extends WebTestCase
     }
 
     /**
-     * @param      $urls
-     * @param null $tokenUrls
-     *
+     * @param       $urls
+     * @param null  $tokenUrls
+     * @param array $doNotTrack
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getModel($urls, $tokenUrls = null)
+    protected function getModel($urls, $tokenUrls = null, $doNotTrack = array())
     {
         if (!is_array($urls)) {
             $urls = array($urls);
@@ -304,18 +351,18 @@ class TrackableModelTest extends WebTestCase
             $tokenUrls = array($tokenUrls);
         }
 
-        $mockFactory = $this->getMockBuilder('Mautic\CoreBundle\Factory\MauticFactory')
+        $mockRedirectModel = $this->getMockBuilder('Mautic\PageBundle\Model\RedirectModel')
             ->disableOriginalConstructor()
             ->getMock();
 
         $mockModel = $this->getMockBuilder('Mautic\PageBundle\Model\TrackableModel')
-            ->setConstructorArgs(array($mockFactory))
-            ->setMethods(array('getDoNotTrackList', 'getEntitiesFromUrls'))
+            ->setConstructorArgs([$mockRedirectModel])
+            ->setMethods(['getDoNotTrackList', 'getEntitiesFromUrls'])
             ->getMock();
 
         $mockModel->expects($this->once())
             ->method('getDoNotTrackList')
-            ->willReturn(array());
+            ->willReturn($doNotTrack);
 
         $entities = array();
         foreach ($urls as $k => $url) {

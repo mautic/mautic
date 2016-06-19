@@ -37,7 +37,7 @@ class PublicController extends CommonFormController
     {
         //find the page
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model      = $this->factory->getModel('page.page');
+        $model      = $this->getModel('page.page');
         $security   = $this->factory->getSecurity();
         $entity     = $model->getEntityBySlugs($slug);
 
@@ -291,7 +291,7 @@ class PublicController extends CommonFormController
      */
     public function previewAction($id)
     {
-        $model  = $this->factory->getModel('page');
+        $model  = $this->getModel('page');
         $entity = $model->getEntity($id);
 
         if ($entity === null || !$entity->isPublished(false)) {
@@ -349,7 +349,7 @@ class PublicController extends CommonFormController
     {
         //Create page entry
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model   = $this->factory->getModel('page');
+        $model   = $this->getModel('page');
         $model->hitPage(null, $this->request);
 
         return TrackingPixelHelper::getResponse($this->request);
@@ -364,14 +364,14 @@ class PublicController extends CommonFormController
     public function redirectAction($redirectId)
     {
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
-        $redirectModel = $this->factory->getModel('page.redirect');
+        $redirectModel = $this->getModel('page.redirect');
         $redirect      = $redirectModel->getRedirectById($redirectId);
 
         if (empty($redirect) || !$redirect->isPublished(false)) {
             throw $this->createNotFoundException($this->factory->getTranslator()->trans('mautic.core.url.error.404'));
         }
 
-        $this->factory->getModel('page')->hitPage($redirect, $this->request);
+        $this->getModel('page')->hitPage($redirect, $this->request);
 
         $url = $redirect->getUrl();
 
@@ -392,7 +392,7 @@ class PublicController extends CommonFormController
 
         // Search replace lead fields in the URL
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead');
+        $leadModel = $this->getModel('lead');
         $lead      = $leadModel->getCurrentLead();
         $fields    = $lead->getFields();
         $leadArray = $leadModel->flattenFields($fields);

@@ -34,7 +34,7 @@ class SmsApiController extends CommonApiController
         $from = $this->request->get('From');
 
         if ($body === 'STOP' && $this->factory->getHelper('sms')->unsubscribe($from)) {
-            return new Response("<Response><Sms>You have been unsubscribed.</Sms></Response>", 200, ['Content-Type' => 'text/xml; charset=utf-8']);
+            return new Response("<Response><Sms>You have been unsubscribed.</Sms></Response>", 200, array('Content-Type' => 'text/xml; charset=utf-8'));
         }
 
         // Return an empty response

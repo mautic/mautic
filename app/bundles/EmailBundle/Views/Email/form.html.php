@@ -156,7 +156,7 @@ if (!isset($attachmentSize)) {
 
 <div class="hide builder email-builder">
     <div class="builder-content">
-        <input type="hidden" id="builder_url" value="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'builder', 'objectId' => $email->getSessionId())); ?>" />
+        <input type="hidden" id="builder_url" value="<?php echo $view['router']->path('mautic_email_action', array('objectAction' => 'builder', 'objectId' => $email->getSessionId())); ?>" />
     </div>
     <div class="builder-panel">
         <div class="builder-panel-top">

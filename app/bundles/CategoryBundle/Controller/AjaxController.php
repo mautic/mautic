@@ -28,7 +28,7 @@ class AjaxController extends CommonAjaxController
     {
         $bundle    = InputHelper::clean($request->query->get('bundle'));
         $filter    = InputHelper::clean($request->query->get('filter'));
-        $results   = $this->factory->getModel('category')->getLookupResults($bundle, $filter, 10);
+        $results   = $this->getModel('category')->getLookupResults($bundle, $filter, 10);
         $dataArray = array();
         foreach ($results as $r) {
             $dataArray[] = array(

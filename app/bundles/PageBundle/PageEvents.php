@@ -89,4 +89,14 @@ final class PageEvents
      * @var string
      */
     const REDIRECT_DO_NOT_TRACK = 'mautic.redirect_do_not_track';
+
+    /**
+     * The mautic.page.on_campaign_trigger_decision event is fired when the campaign decision triggers.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.page.on_campaign_trigger_decision';
 }

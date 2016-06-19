@@ -29,13 +29,7 @@ class ProcessFetchEmailCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:fetch:email')
-            ->setAliases(array(
-                'mautic:email:fetch',
-                'mautic:fetch:mail',
-                'mautic:check:email',
-                'mautic:check:mail'
-            ))
+            ->setName('mautic:email:fetch')
             ->setDescription('Fetch and process monitored email.')
             ->addOption('--message-limit', '-m', InputOption::VALUE_OPTIONAL, 'Limit number of messages to process at a time.')
             ->setHelp(<<<EOT

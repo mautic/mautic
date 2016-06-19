@@ -12,11 +12,6 @@ $subject = $view['translator']->trans('mautic.email.timeline.event.custom_email'
 
 if (!empty($item['storedSubject'])) {
 	$subject .= ': '.$item['storedSubject'];
-} elseif (!empty($item['subject'])) {
-	/**
-	 * @deprecated 1.2.3 - to be removed in 2.0
-	 */
-	$subject = ': '.$item['subject'];
 }
 ?>
 
@@ -25,7 +20,7 @@ if (!empty($item['storedSubject'])) {
 	<div class="panel">
 	    <div class="panel-body">
 	    	<h3>
-	    		<a target="_new" href="<?php echo $view['router']->generate('mautic_email_webview', array("idHash" => $item['idHash'])); ?>">
+	    		<a target="_new" href="<?php echo $view['router']->path('mautic_email_webview', array("idHash" => $item['idHash'])); ?>">
 				    <?php echo $subject; ?>
 				</a>
 			</h3>

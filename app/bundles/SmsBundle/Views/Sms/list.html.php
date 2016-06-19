@@ -67,7 +67,7 @@ if (count($items)):
                                 'data-target' => '#MauticSharedModal',
                                 'data-header' => $view['translator']->trans('mautic.sms.smses.header.preview'),
                                 'data-footer' => 'false',
-                                'href' => $view['router']->generate('mautic_sms_action', array("objectId" => $item->getId(), "objectAction" => "preview")),
+                                'href' => $view['router']->path('mautic_sms_action', array("objectId" => $item->getId(), "objectAction" => "preview")),
                             ),
                             'btnText'   => $view['translator']->trans('mautic.sms.preview'),
                             'iconClass' => 'fa fa-share'
@@ -90,7 +90,7 @@ if (count($items)):
                         <?php else: ?>
                         <i class="fa fa-fw fa-lg fa-toggle-on text-muted disabled"></i>
                         <?php endif; ?>
-                        <a href="<?php echo $view['router']->generate('mautic_sms_action', array("objectAction" => "preview", "objectId" => $item->getId())); ?>" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-footer="" data-header="<?php echo $view['translator']->trans('mautic.sms.smses.header.preview')?>">
+                        <a href="<?php echo $view['router']->path('mautic_sms_action', array("objectAction" => "preview", "objectId" => $item->getId())); ?>" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-footer="" data-header="<?php echo $view['translator']->trans('mautic.sms.smses.header.preview')?>">
                             <?php echo $item->getName(); ?>
                             <?php if ($type == 'list'): ?>
                             <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.sms.icon_tooltip.list_sms'); ?>"><i class="fa fa-fw fa-list"></i></span>
@@ -118,7 +118,7 @@ if (count($items)):
         'totalItems'      => $totalItems,
         'page'            => $page,
         'limit'           => $limit,
-        'baseUrl'         => $view['router']->generate('mautic_sms_index'),
+        'baseUrl'         => $view['router']->path('mautic_sms_index'),
         'sessionVar'      => 'sms'
     )); ?>
 </div>

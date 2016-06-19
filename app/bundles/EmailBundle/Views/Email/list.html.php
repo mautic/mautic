@@ -65,7 +65,7 @@ if (count($items)):
                         array(
                             'attr' => array(
                                 'data-toggle' => 'ajax',
-                                'href'        => $view['router']->generate('mautic_email_action', array('objectAction' => 'send', 'objectId' => $item->getId())),
+                                'href'        => $view['router']->path('mautic_email_action', array('objectAction' => 'send', 'objectId' => $item->getId())),
                             ),
                             'iconClass' => 'fa fa-send-o',
                             'btnText'   => 'mautic.email.send'
@@ -91,7 +91,7 @@ if (count($items)):
                         <?php else: ?>
                         <i class="fa fa-fw fa-lg fa-toggle-on text-muted disabled"></i>
                         <?php endif; ?>
-                        <a href="<?php echo $view['router']->generate('mautic_email_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
+                        <a href="<?php echo $view['router']->path('mautic_email_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
                             <?php echo $item->getName(); ?>
                             <?php if ($hasVariants): ?>
                             <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.email.icon_tooltip.abtest'); ?>"><i class="fa fa-fw fa-sitemap"></i></span>
@@ -129,7 +129,7 @@ if (count($items)):
         'totalItems'      => $totalItems,
         'page'            => $page,
         'limit'           => $limit,
-        'baseUrl'         => $view['router']->generate('mautic_email_index'),
+        'baseUrl'         => $view['router']->path('mautic_email_index'),
         'sessionVar'      => 'email'
     )); ?>
 </div>

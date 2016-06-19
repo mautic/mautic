@@ -9,12 +9,12 @@
 
 namespace Mautic\ConfigBundle\Model;
 
-use Mautic\CoreBundle\Model\CommonModel;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 
 /**
  * Class ConfigModel
  */
-class ConfigModel extends CommonModel
+class ConfigModel extends AbstractCommonModel
 {
 
     /**
