@@ -255,7 +255,7 @@ return [
                     'setPassword' => array('%mautic.mailer_password%')
                 )
             ),
-        )
+        ]
     ),
     'parameters' => array(
         'mailer_api_key'               => null, // Api key from mail delivery provider.
