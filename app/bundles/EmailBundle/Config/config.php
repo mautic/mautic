@@ -237,7 +237,7 @@ return [
                     'setUsername' => array('%mautic.mailer_user%'),
                     'setPassword' => array('%mautic.mailer_password%')
                 )
-            ),
+            ],
             'mautic.transport.sparkpost'          => array(
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
