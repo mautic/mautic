@@ -254,21 +254,6 @@ return [
                     'setUsername' => array('%mautic.mailer_user%'),
                     'setPassword' => array('%mautic.mailer_password%')
                 ]
-            ],
-        ]
-    ],
-    'parameters' => [
-        'mailer_api_key' => null, // Api key from mail delivery provider.
-        'methodCalls'  => [
-            'setUsername' => ['%mautic.mailer_user%'],
-            'setPassword' => ['%mautic.mailer_password%']
-        ],
-        'mautic.transport.postmark' => [
-            'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\PostmarkTransport',
-            'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-            'methodCalls'  => [
-                'setUsername' => ['%mautic.mailer_user%'],
-                'setPassword' => ['%mautic.mailer_password%']
             ]
         ],
         'models' => [
@@ -287,6 +272,7 @@ return [
         ]
     ],
     'parameters' => [
+        'mailer_api_key' => null, // Api key from mail delivery provider.
         'mailer_from_name'             => 'Mautic',
         'mailer_from_email'            => 'email@yoursite.com',
         'mailer_return_path'           => null,
