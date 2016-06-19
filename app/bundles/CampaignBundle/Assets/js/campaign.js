@@ -326,10 +326,10 @@ Mautic.launchCampaignEditor = function() {
             );
         });
 
-        var overlayOptions = [["Arrow", {width: 15, length: 15, location: 0.5}]];
+        var overlayOptions = [["Arrow", {width: 8, length: 8, location: 0.5}]];
         var endpoint = "Dot";
         var connector = ["Bezier", {curviness: 25}];
-        var connectorStyleLineWidth = 3;
+        var connectorStyleLineWidth = 1;
 
         Mautic.campaignBuilderTopAnchor = [0.5, 0, 0, -1, 0, 0];
         Mautic.campaignBuilderTopEndpoint = {
@@ -680,31 +680,4 @@ Mautic.submitCampaignSource = function(e) {
     mQuery('#campaign_leadsource_droppedY').val(mQuery('#droppedY').val());
 
     mQuery('form[name="campaign_leadsource"]').submit();
-};
-
-Mautic.standardEmailUrl = function(options) {
-    if (!options) {
-        return;
-    }
-
-    var url = options.windowUrl;
-    if (url) {
-        var editEmailKey = '/emails/edit/emailId';
-        var previewEmailKey = '/email/preview/emailId';
-        if (url.indexOf(editEmailKey) > -1 ||
-            url.indexOf(previewEmailKey) > -1) {
-            options.windowUrl = url.replace('emailId', mQuery('#campaignevent_properties_email').val());
-        }
-    }
-
-    return options;
-};
-
-Mautic.disabledEmailAction = function() {
-    var email = mQuery('#campaignevent_properties_email').val();
-
-    var disabled = email === '' || email === null;
-
-    mQuery('#campaignevent_properties_editEmailButton').prop('disabled', disabled);
-    mQuery('#campaignevent_properties_previewEmailButton').prop('disabled', disabled);
 };

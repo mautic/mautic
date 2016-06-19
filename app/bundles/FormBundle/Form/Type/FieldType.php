@@ -68,7 +68,7 @@ class FieldType extends AbstractType
                 'addContainerAttributes',
                 'containerAttributesText',
                 'addLeadFieldList',
-                'addaddSaveResult',
+                'addSaveResult',
                 'addIsRequired'
             );
             foreach ($addFields as $f) {

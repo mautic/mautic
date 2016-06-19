@@ -11,13 +11,19 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'asset');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.asset.assets'));
 
-$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
-    'templateButtons' => array(
-        'new'    => $permissions['asset:assets:create']
-    ),
-    'routeBase' => 'asset',
-    'langVar'   => 'asset.asset'
-)));
+$view['slots']->set(
+    'actions',
+    $view->render(
+        'MauticCoreBundle:Helper:page_actions.html.php',
+        array(
+            'templateButtons' => array(
+                'new' => $permissions['asset:assets:create']
+            ),
+            'routeBase'       => 'asset',
+            'langVar'         => 'asset.asset'
+        )
+    )
+);
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">

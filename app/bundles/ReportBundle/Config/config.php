@@ -50,16 +50,14 @@ return array(
 
     'menu'     => array(
         'main' => array(
-            'priority' => 10,
-            'items'    => array(
-                'mautic.report.reports' => array(
-                    'route'     => 'mautic_report_index',
-                    'iconClass' => 'fa-line-chart',
-                    'access'    => array(
-                        'report:reports:viewown',
-                        'report:reports:viewother'
-                    )
-                )
+            'mautic.report.reports' => array(
+                'route'     => 'mautic_report_index',
+                'iconClass' => 'fa-line-chart',
+                'access'    => array(
+                    'report:reports:viewown',
+                    'report:reports:viewother'
+                ),
+                'priority' => 20
             )
         )
     ),
@@ -92,6 +90,17 @@ return array(
                 'class'     => 'Mautic\ReportBundle\Form\Type\ReportFiltersType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'report_filters'
+            )
+        ),
+        'models' =>  array(
+            'mautic.report.model.report' => array(
+                'class' => 'Mautic\ReportBundle\Model\ReportModel',
+                'arguments' => array(
+                    'security.context',
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.template.formatter',
+                    'mautic.helper.templating',
+                )
             )
         )
     )

@@ -22,13 +22,13 @@ return array(
                 'path'       => '/campaigns/{page}',
                 'controller' => 'MauticCampaignBundle:Campaign:index'
             ),
-            'mautic_campaign_leads'       => array(
-                'path'       => '/campaigns/view/{objectId}/leads/{page}',
-                'controller' => 'MauticCampaignBundle:Campaign:leads',
-            ),
             'mautic_campaign_action'      => array(
                 'path'       => '/campaigns/{objectAction}/{objectId}',
                 'controller' => 'MauticCampaignBundle:Campaign:execute'
+            ),
+            'mautic_campaign_contacts'       => array(
+                'path'       => '/campaigns/view/{objectId}/contact/{page}',
+                'controller' => 'MauticCampaignBundle:Campaign:leads',
             )
         ),
         'api'  => array(
@@ -40,13 +40,13 @@ return array(
                 'path'       => '/campaigns/{id}',
                 'controller' => 'MauticCampaignBundle:Api\CampaignApi:getEntity'
             ),
-            'mautic_api_campaignaddlead' => array(
-                'path'       => '/campaigns/{id}/lead/add/{leadId}',
+            'mautic_api_campaignaddcontact' => array(
+                'path'       => '/campaigns/{id}/contact/add/{leadId}',
                 'controller' => 'MauticCampaignBundle:Api\CampaignApi:addLead',
                 'method'     => 'POST'
             ),
-            'mautic_api_campaignremovelead' => array(
-                'path'       => '/campaigns/{id}/lead/remove/{leadId}',
+            'mautic_api_campaignremovecontact' => array(
+                'path'       => '/campaigns/{id}/contact/remove/{leadId}',
                 'controller' => 'MauticCampaignBundle:Api\CampaignApi:removeLead',
                 'method'     => 'POST'
             )
@@ -55,20 +55,11 @@ return array(
 
     'menu'     => array(
         'main' => array(
-            'priority' => 70,
-            'items'    => array(
-                'mautic.campaigns.menu.root' => array(
-                    'id'        => 'mautic_campaigns_root',
-                    'iconClass' => 'fa-clock-o',
-                    'access'    => 'campaign:campaigns:view',
-                    'children'  => array(
-                        'mautic.campaign.menu.index'  => array(
-                            'route'     => 'mautic_campaign_index',
-                            'access'    => 'campaign:campaigns:view',
-                            'priority'  => 110
-                        )
-                    )
-                )
+            'mautic.campaign.menu.index' => array(
+                'iconClass' => 'fa-clock-o',
+                'route'     => 'mautic_campaign_index',
+                'access'    => 'campaign:campaigns:view',
+                'priority'  => 50
             )
         )
     ),
@@ -130,6 +121,27 @@ return array(
                 'arguments' => 'mautic.factory',
                 'alias'     => 'campaign_leadsource'
             ),
+        ),
+        'models' =>  array(
+            'mautic.campaign.model.campaign' => array(
+                'class' => 'Mautic\CampaignBundle\Model\CampaignModel',
+                'arguments' => array(
+                    'mautic.helper.core_parameters',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.list',
+                    'mautic.form.model.form'
+                )
+            ),
+            'mautic.campaign.model.event' => array(
+                'class' => 'Mautic\CampaignBundle\Model\EventModel',
+                'arguments' => array(
+                    'mautic.helper.ip_lookup',
+                    'mautic.helper.core_parameters',
+                    'mautic.lead.model.lead',
+                    'mautic.campaign.model.campaign',
+                    'mautic.factory'
+                )
+            )
         )
     )
 );

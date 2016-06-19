@@ -28,9 +28,11 @@ class DashboardEmailsInTimeWidgetType extends AbstractType
         $builder->add('flag', 'choice', array(
                 'label'   => 'mautic.email.flag.filter',
                 'choices' => array(
-                    ''                  => 'mautic.email.flag.sent',
-                    'opened'            => 'mautic.email.flag.opened',
-                    'sent_and_opened'   => 'mautic.email.flag.sent.and.opened',
+                    ''                           => 'mautic.email.flag.sent',
+                    'opened'                     => 'mautic.email.flag.opened',
+                    'failed'                     => 'mautic.email.flag.failed',
+                    'sent_and_opened'            => 'mautic.email.flag.sent.and.opened',
+                    'sent_and_opened_and_failed' => 'mautic.email.flag.sent.and.opened.and.failed',
                 ),
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),

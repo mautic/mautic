@@ -13,17 +13,17 @@ $submission = $event['extra']['submission'];
 $results = $submission->getResults();
 
 if ($page->getId()) {
-	$link = '<a href="' . $view['router']->generate('mautic_page_action', array("objectAction" => "view", "objectId" => $page->getId())) . '" data-toggle="ajax">' . $page->getTitle() . '</a>';
+	$link = '<a href="' . $view['router']->path('mautic_page_action', array("objectAction" => "view", "objectId" => $page->getId())) . '" data-toggle="ajax">' . $page->getTitle() . '</a>';
 }
 
 ?>
 
 <li class="wrapper form-submitted">
-	<div class="figure"><span class="fa <?php echo isset($icons['form']) ? $icons['form'] : '' ?>"></span></div>
+	<div class="figure"><span class="fa <?php echo isset($event['icon']) ? $event['icon'] : '' ?>"></span></div>
 	<div class="panel">
 	    <div class="panel-body">
 	    	<h3>
-	    		<a href="<?php echo $view['router']->generate('mautic_form_action',
+	    		<a href="<?php echo $view['router']->path('mautic_form_action',
 				    array("objectAction" => "view", "objectId" => $form->getId())); ?>"
 				   data-toggle="ajax">
 				    <?php echo $form->getName(); ?>

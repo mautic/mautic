@@ -222,7 +222,7 @@ class LeadRepository extends CommonRepository
      * Get list of lead Ids by unique field data.
      *
      * @param $uniqueFieldsWithData is an array of columns & values to filter by
-     * @param $leadId is the current lead id. Added to query to skip and find other leads.
+     * @param int $leadId is the current lead id. Added to query to skip and find other leads.
      *
      * @return array
      */
@@ -250,11 +250,12 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param $email
+     * @param string $email
+     * @param boolean $all Set to true to return all matching lead id's
      *
-     * @return integer|null
+     * @return array|null
      */
-    public function getLeadByEmail($email)
+    public function getLeadByEmail($email, $all = false)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('l.id')
@@ -265,7 +266,7 @@ class LeadRepository extends CommonRepository
         $result = $q->execute()->fetchAll();
 
         if (count($result)) {
-            return $result[0];
+            return $all ? $result : $result[0];
         } else {
             return null;
         }
@@ -671,22 +672,7 @@ class LeadRepository extends CommonRepository
         switch ($command) {
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous'):
                 $expr = $q->expr()->$xFunc(
-                    $q->expr()->$xSubFunc(
-                        $q->expr()->$eqFunc("l.firstname", $q->expr()->literal('')),
-                        $q->expr()->$nullFunc("l.firstname")
-                    ),
-                    $q->expr()->$xSubFunc(
-                        $q->expr()->$eqFunc("l.lastname", $q->expr()->literal('')),
-                        $q->expr()->$nullFunc("l.lastname")
-                    ),
-                    $q->expr()->$xSubFunc(
-                        $q->expr()->$eqFunc("l.company", $q->expr()->literal('')),
-                        $q->expr()->$nullFunc("l.company")
-                    ),
-                    $q->expr()->$xSubFunc(
-                        $q->expr()->$eqFunc("l.email", $q->expr()->literal('')),
-                        $q->expr()->$nullFunc("l.email")
-                    )
+                    $q->expr()->$nullFunc('l.date_identified')
                 );
 
                 if (!empty($this->availableSocialFields)) {

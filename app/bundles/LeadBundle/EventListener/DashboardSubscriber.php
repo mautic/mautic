@@ -144,7 +144,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 // Build table rows with links
                 if ($lists) {
                     foreach ($lists as &$list) {
-                        $listUrl = $this->factory->getRouter()->generate('mautic_leadlist_action', array('objectAction' => 'edit', 'objectId' => $list['id']));
+                        $listUrl = $this->factory->getRouter()->generate('mautic_segment_action', array('objectAction' => 'edit', 'objectId' => $list['id']));
                         $row = array(
                             array(
                                 'value' => $list['name'],
@@ -302,7 +302,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 // Build table rows with links
                 if ($leads) {
                     foreach ($leads as &$lead) {
-                        $leadUrl = $this->factory->getRouter()->generate('mautic_lead_action', array('objectAction' => 'view', 'objectId' => $lead['id']));
+                        $leadUrl = $this->factory->getRouter()->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $lead['id']));
                         $row = array(
                             array(
                                 'value' => $lead['name'],

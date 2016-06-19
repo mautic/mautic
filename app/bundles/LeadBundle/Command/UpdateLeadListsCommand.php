@@ -19,25 +19,14 @@ class UpdateLeadListsCommand extends ModeratedCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:leadlists:update')
-            ->setAliases(
-                array(
-                    'mautic:lists:update',
-                    'mautic:update:leadlists',
-                    'mautic:update:lists',
-                    'mautic:rebuild:leadlists',
-                    'mautic:leadlists:rebuild',
-                    'mautic:lists:rebuild',
-                    'mautic:rebuild:lists',
-                )
-            )
-            ->setDescription('Update contacts in smart lists based on new lead data.')
+            ->setName('mautic:segments:update')
+            ->setDescription('Update contacts in smart segments based on new contact data.')
             ->addOption('--batch-limit', '-b', InputOption::VALUE_OPTIONAL, 'Set batch size of contacts to process per round. Defaults to 300.', 300)
             ->addOption(
                 '--max-contacts',
                 '-m',
                 InputOption::VALUE_OPTIONAL,
-                'Set max number of contacts to process per list for this script execution. Defaults to all.',
+                'Set max number of contacts to process per segment for this script execution. Defaults to all.',
                 false
             )
             ->addOption('--list-id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to rebuild. Defaults to all.', false);
@@ -69,7 +58,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
                 $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', array('%id%' => $id)).'</info>');
                 $processed = $listModel->rebuildListLeads($list, $batch, $max, $output);
                 $output->writeln(
-                    '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', array('%contacts%' => $processed)).'</comment>'
+                    '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', array('%leads%' => $processed)).'</comment>'
                 );
             } else {
                 $output->writeln('<error>'.$translator->trans('mautic.lead.list.rebuild.not_found', array('%id%' => $id)).'</error>');
@@ -89,7 +78,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
 
                 $processed = $listModel->rebuildListLeads($l, $batch, $max, $output);
                 $output->writeln(
-                    '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', array('%contacts%' => $processed)).'</comment>'."\n"
+                    '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', array('%leads%' => $processed)).'</comment>'."\n"
                 );
 
                 unset($l);

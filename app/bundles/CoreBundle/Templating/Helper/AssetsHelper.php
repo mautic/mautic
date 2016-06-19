@@ -11,12 +11,13 @@ namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
-use Symfony\Component\Templating\Helper\CoreAssetsHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Symfony\Component\Asset\Packages;
 
 /**
  * Class AssetsHelper
  */
-class AssetsHelper extends CoreAssetsHelper
+class AssetsHelper
 {
 
     /**
@@ -38,6 +39,28 @@ class AssetsHelper extends CoreAssetsHelper
      * @var
      */
     protected $version;
+
+    protected $packages;
+
+    protected $coreParametersHelper;
+
+    public function __construct(Packages $packages)
+    {
+        $this->packages = $packages;
+    }
+
+    public function setCharset()
+    {
+
+    }
+
+    /**
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function setParamsHelper(CoreParametersHelper $coreParametersHelper)
+    {
+        $this->coreParametersHelper = $coreParametersHelper;
+    }
 
     /**
      * Gets asset prefix
@@ -94,7 +117,7 @@ class AssetsHelper extends CoreAssetsHelper
             $path        = $assetPrefix.$path;
         }
 
-        $url = parent::getUrl($path, $packageName, $version);
+        $url = $this->packages->getUrl($path, $packageName, $version);
 
         if ($absolute) {
             $url = $this->getBaseUrl() . $url;
@@ -118,23 +141,24 @@ class AssetsHelper extends CoreAssetsHelper
      *
      * @param string $script
      * @param string $location
+     * @param boolean $async
      *
      * @return void
      */
-    public function addScript($script, $location = 'head')
+    public function addScript($script, $location = 'head', $async = false)
     {
         $assets     =& $this->assets;
-        $addScripts = function ($s) use ($location, &$assets) {
+        $addScripts = function ($s) use ($location, &$assets, $async) {
             if ($location == 'head') {
                 //special place for these so that declarations and scripts can be mingled
-                $assets['headDeclarations'][] = array('script' => $s);
+                $assets['headDeclarations'][] = array('script' => array($s, $async));
             } else {
                 if (!isset($assets['scripts'][$location])) {
                     $assets['scripts'][$location] = array();
                 }
 
                 if (!in_array($s, $assets['scripts'][$location])) {
-                    $assets['scripts'][$location][] = $s;
+                    $assets['scripts'][$location][] = array($s, $async);
                 }
             }
         };
@@ -316,7 +340,8 @@ class AssetsHelper extends CoreAssetsHelper
     {
         if (isset($this->assets['scripts'][$location])) {
             foreach (array_reverse($this->assets['scripts'][$location]) as $s) {
-                echo '<script src="'.$this->getUrl($s).'"></script>'."\n";
+                list($script, $async) = $s;
+                echo '<script src="'.$this->getUrl($script).'"' . ($async ? ' async' : '') . '></script>'."\n";
             }
         }
 
@@ -356,7 +381,9 @@ class AssetsHelper extends CoreAssetsHelper
                             $headOutput .= "\n</script>";
                             $scriptOpen = false;
                         }
-                        $headOutput .= "\n".'<script src="' . $this->getUrl($output) . '"></script>';
+                        list($script, $async) = $output;
+
+                        $headOutput .= "\n".'<script src="' . $this->getUrl($script) . '"' . ($async ? ' async' : '') . '></script>';
                         break;
                     case 'custom':
                     case 'declaration':

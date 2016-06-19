@@ -19,14 +19,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:campaigns:update')
-            ->setAliases(
-                array(
-                    'mautic:update:campaigns',
-                    'mautic:rebuild:campaigns',
-                    'mautic:campaigns:rebuild',
-                )
-            )
+            ->setName('mautic:campaigns:rebuild')
             ->setDescription('Rebuild campaigns based on contact segments.')
             ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of contacts to process per round. Defaults to 300.', 300)
             ->addOption(
@@ -67,7 +60,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
                 $output->writeln('<info>'.$translator->trans('mautic.campaign.rebuild.rebuilding', array('%id%' => $id)).'</info>');
                 $processed = $campaignModel->rebuildCampaignLeads($campaign, $batch, $max, $output);
                 $output->writeln(
-                    '<comment>'.$translator->trans('mautic.campaign.rebuild.leads_affected', array('%contacts%' => $processed)).'</comment>'."\n"
+                    '<comment>'.$translator->trans('mautic.campaign.rebuild.leads_affected', array('%leads%' => $processed)).'</comment>'."\n"
                 );
             } else {
                 $output->writeln('<error>'.$translator->trans('mautic.campaign.rebuild.not_found', array('%id%' => $id)).'</error>');
@@ -88,7 +81,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
 
                     $processed = $campaignModel->rebuildCampaignLeads($c, $batch, $max, $output);
                     $output->writeln(
-                        '<comment>'.$translator->trans('mautic.campaign.rebuild.leads_affected', array('%contacts%' => $processed)).'</comment>'."\n"
+                        '<comment>'.$translator->trans('mautic.campaign.rebuild.leads_affected', array('%leads%' => $processed)).'</comment>'."\n"
                     );
                 }
 

@@ -13,6 +13,8 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Entity\Plugin;
+use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
+use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -31,7 +33,7 @@ class PluginController extends FormController
         }
 
         /** @var \Mautic\PluginBundle\Model\PluginModel $pluginModel */
-        $pluginModel = $this->factory->getModel('plugin');
+        $pluginModel = $this->getModel('plugin');
 
         // List of plugins for filter and to show as a single integration
         $plugins = $pluginModel->getEntities(
@@ -137,7 +139,7 @@ class PluginController extends FormController
             throw $this->createNotFoundException($this->get('translator')->trans('mautic.core.url.error.404'));
         }
 
-        $leadFields = $this->factory->getModel('plugin')->getLeadFields();
+        $leadFields = $this->getModel('plugin')->getLeadFields();
 
         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
         $entity = $integrationObject->getIntegrationSettings();
@@ -201,7 +203,14 @@ class PluginController extends FormController
                     if ($authorize) {
                         //redirect to the oauth URL
                         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
-                        $oauthUrl = $integrationObject->getAuthLoginUrl();
+                        $event = $this->factory->getDispatcher()->dispatch(
+                            PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT,
+                            new PluginIntegrationAuthRedirectEvent(
+                                $integrationObject,
+                                $integrationObject->getAuthLoginUrl()
+                            )
+                        );
+                        $oauthUrl = $event->getAuthUrl();
 
                         return new JsonResponse(
                             array(
@@ -266,7 +275,7 @@ class PluginController extends FormController
         }
 
         /** @var \Mautic\PluginBundle\Model\PluginModel $pluginModel */
-        $pluginModel = $this->factory->getModel('plugin');
+        $pluginModel = $this->getModel('plugin');
 
         $bundle = $pluginModel->getRepository()->findOneBy(
             array(
@@ -309,7 +318,7 @@ class PluginController extends FormController
         }
 
         /** @var \Mautic\PluginBundle\Model\PluginModel $model */
-        $model   = $this->factory->getModel('plugin');
+        $model   = $this->getModel('plugin');
         $plugins = $this->factory->getParameter('plugin.bundles');
         $added   = $disabled = $updated = 0;
 

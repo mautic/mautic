@@ -11,7 +11,7 @@ $view->extend('MauticUserBundle:Security:base.html.php');
 $view['slots']->set('header', $view['translator']->trans('mautic.api.oauth.header'));
 ?>
 
-<form class="form-group login-form" name="login" data-toggle="ajax" role="form" action="<?php echo $view['router']->generate($route) ?>" method="post">
+<form class="form-group login-form" name="login" data-toggle="ajax" role="form" action="<?php echo $view['router']->path($route) ?>" method="post">
     <div class="input-group mb-md">
 
         <span class="input-group-addon"><i class="fa fa-user"></i></span>

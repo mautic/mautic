@@ -61,14 +61,14 @@ $container->loadFromExtension('security', array(
             'pattern'    => "^/",
             'http_basic' => array(),
             'form_login' => array(
-                'csrf_provider' => 'form.csrf_provider'
+                'csrf_token_generator' => 'security.csrf.token_manager'
             ),
             'context'    => 'mautic_test',
         ),
         'main' => array(
             'pattern' => "^/",
             'form_login' => array(
-                'csrf_provider' => 'form.csrf_provider'
+                'csrf_token_generator' => 'security.csrf.token_manager'
             ),
             'logout' => array(),
             'remember_me' => array(
@@ -84,5 +84,7 @@ $container->loadFromExtension('security', array(
         array('path' => '^/api', 'roles' => 'IS_AUTHENTICATED_FULLY')
     )
 ));
+
+$container->setParameter('mautic.security.disableUpdates', false);
 
 $this->import('security_api.php');

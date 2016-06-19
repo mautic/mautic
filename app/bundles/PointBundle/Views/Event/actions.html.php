@@ -22,10 +22,10 @@ if (empty($route))
 ?>
 
 <div class="form-buttons hide">
-    <a data-toggle="ajaxmodal" data-target="#triggerEventModal" href="<?php echo $view['router']->generate($route, array('objectAction' => 'edit', 'objectId' => $id, 'triggerId' => $sessionId)); ?>" class="btn btn-primary btn-xs btn-edit">
+    <a data-toggle="ajaxmodal" data-target="#triggerEventModal" href="<?php echo $view['router']->path($route, array('objectAction' => 'edit', 'objectId' => $id, 'triggerId' => $sessionId)); ?>" class="btn btn-primary btn-xs btn-edit">
         <i class="fa fa-pencil-square-o"></i>
     </a>
-    <a data-menu-link="mautic_point_index" data-toggle="ajax" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="<?php echo $view['router']->generate($route, array('objectAction' => $action, 'objectId' => $id, 'triggerId' => $sessionId)); ?>"  class="btn <?php echo $btnClass; ?> btn-xs">
+    <a data-menu-link="mautic_point_index" data-toggle="ajax" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="<?php echo $view['router']->path($route, array('objectAction' => $action, 'objectId' => $id, 'triggerId' => $sessionId)); ?>"  class="btn <?php echo $btnClass; ?> btn-xs">
         <i class="fa <?php echo $iconClass; ?>"></i>
     </a>
     <i class="fa fa-fw fa-ellipsis-v reorder-handle"></i>

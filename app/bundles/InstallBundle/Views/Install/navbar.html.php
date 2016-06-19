@@ -13,7 +13,7 @@ $start = 1;
     <ul class="horizontal-step">
         <?php while ($start < $count): ?>
         <li<?php echo ($start == $step) ? ' class="active"' : ''; ?>>
-            <?php $url = ($start == $step || in_array($start, $completedSteps) || in_array($start-1, $completedSteps)) ? $view['router']->generate('mautic_installer_step', array('index' => $start)) : '#'; ?>
+            <?php $url = ($start == $step || in_array($start, $completedSteps) || in_array($start-1, $completedSteps)) ? $view['router']->path('mautic_installer_step', array('index' => $start)) : '#'; ?>
             <a href="<?php echo $url; ?>" class="steps<?php echo ($url == '#') ? ' disabled' : ''; ?>">
                 <span class="steps-figure"><?php echo $view['translator']->trans('mautic.install.step.'.$start); ?></span>
             </a>

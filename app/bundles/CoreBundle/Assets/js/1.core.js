@@ -102,28 +102,67 @@ MauticVars.intervalsInProgress   = {};
 var Mautic = {
     loadedContent: {},
 
+    keyboardShortcutHtml: {},
+
+    addKeyboardShortcut: function (sequence, description, func, section) {
+        Mousetrap.bind(sequence, func);
+        var sectionName = section || 'global';
+
+        if (! Mautic.keyboardShortcutHtml.hasOwnProperty(sectionName)) {
+            Mautic.keyboardShortcutHtml[sectionName] = {};
+        }
+
+        Mautic.keyboardShortcutHtml[sectionName][sequence] = '<div class="col-xs-6"><mark>' + sequence + '</mark>: ' + description + '</div>';
+    },
+
     /**
      * Binds global keyboard shortcuts
      */
     bindGlobalKeyboardShortcuts: function () {
-        Mousetrap.bind('shift+d', function (e) {
+        Mautic.addKeyboardShortcut('shift+d', 'Load the Dashboard', function (e) {
             mQuery('#mautic_dashboard_index').click();
         });
 
-        Mousetrap.bind('shift+l', function(e) {
-            mQuery('#menu_lead_parent_child > li:first > a').click();
+        Mautic.addKeyboardShortcut('shift+c', 'Load Contacts',  function(e) {
+            mQuery('#mautic_contact_index').click();
         });
 
-        Mousetrap.bind('shift+right', function (e) {
-            mQuery('.navbar-right > button.navbar-toggle').click();
+        Mautic.addKeyboardShortcut('shift+right', 'Activate Right Menu', function (e) {
+            mQuery(".navbar-right a[data-toggle='sidebar']").click();
         });
 
-        Mousetrap.bind('shift+n', function (e) {
+        Mautic.addKeyboardShortcut('shift+n', 'Show Notifications', function (e) {
             mQuery('.dropdown-notification').click();
         });
 
-        Mousetrap.bind('shift+s', function (e) {
+        Mautic.addKeyboardShortcut('shift+s', 'Global Search', function (e) {
             mQuery('#globalSearchContainer .search-button').click();
+        });
+
+        Mousetrap.bind('?', function (e) {
+            var modalWindow = mQuery('#MauticSharedModal');
+
+            modalWindow.find('.modal-title').html('Keyboard Shortcuts');
+            modalWindow.find('.modal-body').html(function() {
+                var modalHtml = '';
+                var sections = Object.keys(Mautic.keyboardShortcutHtml);
+                sections.forEach(function(section) {
+                    var sectionTitle = (section + '').replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function ($1) {
+                        return $1.toUpperCase();
+                    });
+                    modalHtml += '<h4>' + sectionTitle + '</h4><br />';
+                    modalHtml += '<div class="row">';
+                    var sequences = Object.keys(Mautic.keyboardShortcutHtml[section]);
+                    sequences.forEach(function(sequence) {
+                        modalHtml += Mautic.keyboardShortcutHtml[section][sequence];
+                    });
+                    modalHtml += '</div><hr />';
+                });
+
+                return modalHtml;
+            });
+            modalWindow.find('.modal-footer').html('<p>Press <mark>shift+?</mark> at any time to view this help modal.');
+            modalWindow.modal();
         });
     },
 
@@ -560,8 +599,6 @@ var Mautic = {
         if (container == '#app-content' || container == 'body') {
             //register global keyboard shortcuts
             Mautic.bindGlobalKeyboardShortcuts();
-
-            Mautic.setupBrowserNotifier();
         }
 
         if (contentSpecific && typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
@@ -1091,7 +1128,7 @@ var Mautic = {
                 var identifierClass = (new Date).getTime();
                 MauticVars.iconClasses[identifierClass] = mQuery(el).attr('class');
 
-                var specialClasses = ['fa-fw', 'fa-lg', 'fa-2x', 'fa-3x', 'fa-4x', 'fa-5x', 'fa-li'];
+                var specialClasses = ['fa-fw', 'fa-lg', 'fa-2x', 'fa-3x', 'fa-4x', 'fa-5x', 'fa-li', 'text-white', 'text-muted'];
                 var appendClasses = "";
 
                 //check for special classes to add to spinner
@@ -3082,11 +3119,40 @@ var Mautic = {
         if (maps.length) {
             maps.each(function(index, element) {
                 var wrapper = mQuery(element);
-                var data = mQuery.parseJSON(wrapper.text());
+                try {
+                    var data = mQuery.parseJSON(wrapper.text());
+                } catch (error) {
+
+                    return;
+                }
+
+                // Markers have numerical indexes
+                var firstKey = Object.keys(data)[0];
+
+                // Check type of data
+                if (firstKey == "0") {
+                    // Markers
+                    var markersData = data,
+                        regionsData = {};
+                } else {
+                    // Regions
+                    var markersData = {},
+                        regionsData = data;
+                }
+
                 wrapper.text('');
                 wrapper.vectorMap({
                     backgroundColor: 'transparent',
                     zoomOnScroll: false,
+                    markers: markersData,
+                    markerStyle: {
+                        initial: {
+                            fill: '#40C7B5'
+                        },
+                        selected: {
+                            fill: '#40C7B5'
+                        }
+                    },
                     regionStyle: {
                         initial: {
                             "fill": '#dce0e5',
@@ -3103,7 +3169,7 @@ var Mautic = {
                     map: 'world_mill_en',
                     series: {
                         regions: [{
-                            values: data,
+                            values: regionsData,
                             scale: ['#dce0e5', '#40C7B5'],
                             normalizeFunction: 'polynomial'
                         }]
