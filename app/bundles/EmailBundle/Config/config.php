@@ -233,7 +233,6 @@ return [
             'mautic.transport.sendgrid'          => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-<<<<<<< HEAD
                 'methodCalls'  => array(
                     'setUsername' => array('%mautic.mailer_user%'),
                     'setPassword' => array('%mautic.mailer_password%')
@@ -260,7 +259,6 @@ return [
     ),
     'parameters' => array(
         'mailer_api_key'               => null, // Api key from mail delivery provider.
-=======
                 'methodCalls'  => [
                     'setUsername' => ['%mautic.mailer_user%'],
                     'setPassword' => ['%mautic.mailer_password%']
@@ -291,7 +289,6 @@ return [
         ]
     ],
     'parameters' => [
->>>>>>> 33df52da8eb3e4cbdc4acbe421347baabe931fea
         'mailer_from_name'             => 'Mautic',
         'mailer_from_email'            => 'email@yoursite.com',
         'mailer_return_path'           => null,
