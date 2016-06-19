@@ -233,31 +233,31 @@ return [
             'mautic.transport.sendgrid'          => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-                'methodCalls'  => array(
+                'methodCalls'  => [
                     'setUsername' => array('%mautic.mailer_user%'),
                     'setPassword' => array('%mautic.mailer_password%')
-                )
+                ]
             ],
-            'mautic.transport.sparkpost'          => array(
+            'mautic.transport.sparkpost'          => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-                'methodCalls'  => array(
+                'methodCalls'  => [
                     // Should be able to set api key here.
                     'setApiKey'        => array('%mautic.mailer_api_key%'),
                     'setMauticFactory' => array('mautic.factory')
-                )
-            ),
-            'mautic.transport.postmark'          => array(
+                        ]
+            ],
+            'mautic.transport.postmark'          => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\PostmarkTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-                'methodCalls'  => array(
+                'methodCalls'  => [
                     'setUsername' => array('%mautic.mailer_user%'),
                     'setPassword' => array('%mautic.mailer_password%')
-                )
-            ),
+                ]
+            ],
         ]
-    ),
-    'parameters' => array(
+    ],
+    'parameters' => [
         'mailer_api_key'               => null, // Api key from mail delivery provider.
                 'methodCalls'  => [
                     'setUsername' => ['%mautic.mailer_user%'],
