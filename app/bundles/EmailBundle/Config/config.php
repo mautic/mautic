@@ -245,7 +245,7 @@ return [
                     // Should be able to set api key here.
                     'setApiKey'        => array('%mautic.mailer_api_key%'),
                     'setMauticFactory' => array('mautic.factory')
-                        ]
+                ]
             ],
             'mautic.transport.postmark'          => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\PostmarkTransport',
