@@ -262,7 +262,7 @@ return [
         'methodCalls'  => [
             'setUsername' => ['%mautic.mailer_user%'],
             'setPassword' => ['%mautic.mailer_password%']
-        ]
+        ],
         'mautic.transport.postmark' => [
             'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\PostmarkTransport',
             'serviceAlias' => 'swiftmailer.mailer.transport.%s',
