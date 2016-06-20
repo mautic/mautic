@@ -175,10 +175,27 @@ class DynamicContentType extends AbstractType
             ['bundle' => 'dynamicContent']
         );
 
-        $builder->add(
-            'buttons',
-            'form_buttons'
-        );
+        if (!empty($options['update_select'])) {
+            $builder->add(
+                'buttons',
+                'form_buttons',
+                ['apply_text' => false]
+            );
+
+            $builder->add(
+                'updateSelect',
+                'hidden',
+                [
+                    'data'   => $options['update_select'],
+                    'mapped' => false
+                ]
+            );
+        } else {
+            $builder->add(
+                'buttons',
+                'form_buttons'
+            );
+        }
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
@@ -191,6 +208,8 @@ class DynamicContentType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(['data_class' => 'Mautic\DynamicContentBundle\Entity\DynamicContent']);
+        
+        $resolver->setOptional(['update_select']);
     }
 
     /**

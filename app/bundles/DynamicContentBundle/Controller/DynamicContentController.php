@@ -123,7 +123,12 @@ class DynamicContentController extends FormController
         $page = $this->factory->getSession()->get('mautic.dynamicContent.page', 1);
         $retUrl = $this->generateUrl('mautic_dwc_index', ['page' => $page]);
         $action = $this->generateUrl('mautic_dwc_action', ['objectAction' => 'new']);
-        $form = $model->createForm($entity, $this->get('form.factory'), $action);
+
+        $updateSelect = ($this->request->getMethod() === 'POST')
+            ? $this->request->request->get('dwc[updateSelect]', false, true)
+            : $this->request->get('updateSelect', false);
+
+        $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
         if ($this->request->getMethod() === 'POST') {
             $valid = false;
@@ -140,34 +145,64 @@ class DynamicContentController extends FormController
                             'objectId' => $entity->getId(),
                         ]),
                     ]);
+
+                    if ($form->get('buttons')->get('save')->isClicked()) {
+                        $viewParameters = [
+                            'objectAction' => 'view',
+                            'objectId'     => $entity->getId()
+                        ];
+                        $retUrl   = $this->generateUrl('mautic_dwc_action', $viewParameters);
+                        $template = 'MauticDynamicContentBundle:DynamicContent:view';
+                    } else {
+                        //return edit view so that all the session stuff is loaded
+                        return $this->editAction($entity->getId(), true);
+                    }
                 }
+            } else {
+                $viewParameters = ['page' => $page];
+                $retUrl         = $this->generateUrl('mautic_dwc_index', $viewParameters);
+                $template       = 'MauticDynamicContentBundle:DynamicContent:index';
+            }
+
+            $passthrough = [
+                'activeLink' => '#mautic_dwc_index',
+                'mauticContent' => 'dwc',
+            ];
+
+            // Check to see if this is a popup
+            if (isset($form['updateSelect'])) {
+                $template    = false;
+                $passthrough = array_merge(
+                    $passthrough,
+                    [
+                        'updateSelect'       => $form['updateSelect']->getData(),
+                        'dynamicContentId'   => $entity->getId(),
+                        'dynamicContentName' => $entity->getName(),
+                        'dynamicContentLang' => $entity->getLanguage()
+                    ]
+                );
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect([
-                    'returnUrl' => $retUrl,
-                    'viewParameters' => ['page' => $page],
-                    'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:index',
-                    'passthroughVars' => [
-                        'activeLink' => '#mautic_dwc_index',
-                        'mauticContent' => 'dwc',
-                    ],
+                    'returnUrl'       => $retUrl,
+                    'viewParameters'  => $viewParameters,
+                    'contentTemplate' => $template,
+                    'passthroughVars' => $passthrough
                 ]);
             } elseif ($valid && !$cancelled) {
                 return $this->editAction($entity->getId(), true);
             }
         }
 
+        $passthrough['route'] = $action;
+
         return $this->delegateView([
             'viewParameters' => [
                 'form' => $this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.php'),
             ],
             'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:form.html.php',
-            'passthroughVars' => [
-                'activeLink' => '#mautic_dwc_index',
-                'route' => $action,
-                'mauticContent' => 'dwc',
-            ],
+            'passthroughVars' => $passthrough
         ]);
     }
 
@@ -217,6 +252,11 @@ class DynamicContentController extends FormController
         }
 
         $action = $this->generateUrl('mautic_dwc_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
+
+        $updateSelect = ($this->request->getMethod() === 'POST')
+            ? $this->request->request->get('dynamicContent[updateSelect]', false, true)
+            : $this->request->get('updateSelect', false);
+
         $form = $model->createForm($entity, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it

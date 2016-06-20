@@ -58,12 +58,14 @@ class DynamicContentModel extends FormModel
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof DynamicContent) {
-            throw new \InvalidArgumentException('Entity must be of class DynamicContent()');
+            throw new \InvalidArgumentException('Entity must be of class DynamicContent');
         }
 
-        $params = (!empty($action)) ? ['action' => $action] : [];
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
 
-        return $formFactory->create('dwc', $entity, $params);
+        return $formFactory->create('dwc', $entity, $options);
     }
 
     /**

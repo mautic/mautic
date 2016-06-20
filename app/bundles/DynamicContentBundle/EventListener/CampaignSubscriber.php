@@ -77,7 +77,7 @@ class CampaignSubscriber extends CommonSubscriber
                 'description' => 'mautic.dynamicContent.campaign.send_dwc.tooltip',
                 'eventName' => DynamicContentEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                 'formType' => 'dwcsend_list',
-                'formTypeOptions' => ['update_select' => 'campaignevent_properties_dwc'],
+                'formTypeOptions' => ['update_select' => 'campaignevent_properties_dynamicContent'],
                 'formTheme' => 'MauticDynamicContentBundle:FormTheme\DynamicContentPushList',
                 'timelineTemplate' => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
                 'hideTriggerMode' => true,
@@ -91,7 +91,7 @@ class CampaignSubscriber extends CommonSubscriber
                 'description' => 'mautic.dynamicContent.campaign.decision_dwc.tooltip',
                 'eventName' => DynamicContentEvents::ON_CAMPAIGN_TRIGGER_DECISION,
                 'formType' => 'dwcdecision_list',
-                'formTypeOptions' => ['update_select' => 'campaignevent_properties_dwc'],
+                'formTypeOptions' => ['update_select' => 'campaignevent_properties_dynamicContent'],
                 'formTheme' => 'MauticDynamicContentBundle:FormTheme\DynamicContentDecisionList',
 
             ]
