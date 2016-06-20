@@ -56,6 +56,20 @@ class PeriodicityType extends AbstractType
                 'data' => (new \DateTime('now'))->format('Y-m-d H:i')
             )
         );
+
+        $builder->add('triggerMode', 'button_group', array(
+            'mapped'           => false,
+            'choices'          => array(
+                'timeInterval' => 'mautic.core.periodicity.form.interval',
+                'weekDays'     => 'mautic.core.periodicity.form.days_of_week'
+            ),
+            'label_attr'       => array('class' => 'control-label'),
+            'label'            => 'Kind of periodicity',
+            'attr'             => array(
+                'onchange'     => 'Mautic.feedToggleTriggerMode();'
+            )
+        ));
+
         $builder->add(
             'interval',
             'number',
@@ -76,9 +90,9 @@ class PeriodicityType extends AbstractType
                 'attr'       => array('class' => 'form-control'),
                 'mapped' => false,
                 'choices'  => array(
-                    'd' => 'Days',
-                    'w' => 'Weeks',
-                    'm' => 'Months'
+                    'd' => 'mautic.core.periodicity.form.unit.days',
+                    'w' => 'mautic.core.periodicity.form.unit.weeks',
+                    'm' => 'mautic.core.periodicity.form.unit.months'
                 ),
                 'multiple' => false,
                 'placeholder' => false,

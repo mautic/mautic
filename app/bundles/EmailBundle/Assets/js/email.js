@@ -677,3 +677,16 @@ Mautic.convertDynamicContentFilterInput = function(el) {
         Mautic.activateChosenSelect(filterEl);
     }
 };
+
+Mautic.feedToggleTriggerMode = function() {
+    var timeIntervalChecked = mQuery('#emailform_triggerMode_0').prop('checked');
+    var weekDaysChecked     = mQuery('#emailform_triggerMode_1').prop('checked');
+
+    if (timeIntervalChecked) {
+        mQuery('#timeInterval').removeClass('hide');
+        mQuery('#weekDays').addClass('hide');
+    } else if (weekDaysChecked) {
+        mQuery('#timeInterval').addClass('hide');
+        mQuery('#weekDays').removeClass('hide');
+    }
+}

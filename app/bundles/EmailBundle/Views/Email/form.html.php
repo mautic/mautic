@@ -209,29 +209,14 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
                 <?php echo $view['form']->row($form['feed']); ?>
                 <?php echo $view['form']->row($form['nextShoot']); ?>
 
-                <style>
-                    #recurency_days_of_week:checked + label + br + div.row,
-                    #recurency_days_of_week:checked + label + br + div.row + div.row{
-                        display: none;
-                    }
-                    #recurency_days_of_week:not(:checked) + label + br + div.row + div.row + div.row{
-                        display: none;
-                    }
-                    #recurency_days_of_week + label + br + div.row{          width: 50%;}
-                    #recurency_days_of_week + label + br + div.row + div.row{width: 50%;}
-                    #recurency_days_of_week + label + br + div.row,
-                    #recurency_days_of_week + label + br + div.row + div.row{
-                        float: left;
-                    }
-    			</style>
-                <label><?php echo $view['translator']->trans('mautic.core.periodicity.form.recurrence') ?> :</label>
-                <br/><input type="radio" value="interval" name="recurency" id="recurency_interval"<?php if(!empty($form['interval']->vars['value'])){?> checked="checked"<?php } ?>/>
-                <label for="recurency_interval"><?php echo $view['translator']->trans('mautic.core.periodicity.form.interval') ?></label>
-                <br/><input type="radio" value="days_of_week" name="recurency" id="recurency_days_of_week"<?php if(empty($form['interval']->vars['value'])){?> checked="checked"<?php } ?>/>
-                <label for="recurency_days_of_week"><?php echo $view['translator']->trans('mautic.core.periodicity.form.days_of_week') ?></label>
-                <br/><?php echo $view['form']->row($form['interval']); ?>
-                <?php echo $view['form']->row($form['intervalUnit']); ?>
-                <?php echo $view['form']->row($form['DaysOfWeek']); ?>
+                <?php echo $view['form']->row($form['triggerMode']) ?>
+                <div id="timeInterval" class="row">
+                    <span class="col-md-6 col-xs-12"><?php echo $view['form']->row($form['interval']); ?></span>
+                    <span class="col-md-6 col-xs-12"><?php echo $view['form']->row($form['intervalUnit']); ?></span>
+                </div>
+                <div id="weekDays">
+                    <?php echo $view['form']->row($form['DaysOfWeek']); ?>
+                </div>
             </div>
         </div>
         <div class="hide">
