@@ -45,8 +45,14 @@ class PluginToken extends AbstractToken
      * @param array                                                       $roles
      * @param Response                                                    $response
      */
-    public function __construct($providerKey, $authenticatingService = null, $user = '', $credentials = '', array $roles = array(), Response $response =  null)
-    {
+    public function __construct(
+        $providerKey,
+        $authenticatingService = null,
+        $user = '',
+        $credentials = '',
+        array $roles = [],
+        Response $response = null
+    ) {
         parent::__construct($roles);
 
         if (empty($providerKey)) {
@@ -99,7 +105,7 @@ class PluginToken extends AbstractToken
      */
     public function serialize()
     {
-        return serialize(array($this->authenticatingService, $this->credentials, $this->providerKey, parent::serialize()));
+        return serialize([$this->authenticatingService, $this->credentials, $this->providerKey, parent::serialize()]);
     }
 
     /**
