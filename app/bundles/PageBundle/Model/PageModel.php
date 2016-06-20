@@ -718,11 +718,10 @@ class PageModel extends FormModel
             $utmTags->setUtmSource($query['utm_source']);
         }
 
-        $em   = $this->factory->getEntityManager();
-        $repo = $em->getRepository('MauticLeadBundle:UtmTag');
+        $repo = $this->em->getRepository('MauticLeadBundle:UtmTag');
         $repo->saveEntity($utmTags);
 
-        $leadModel->setUtmTags($lead, $utmTags);
+        $this->leadModel->setUtmTags($lead, $utmTags);
 
         //get a list of the languages the user prefers
         $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');
