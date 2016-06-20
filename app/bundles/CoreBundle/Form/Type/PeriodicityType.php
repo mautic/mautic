@@ -100,7 +100,7 @@ class PeriodicityType extends AbstractType
             )
         );
         $builder->add(
-            'DaysOfWeek',
+            'weekDays',
             'choice',
             array(
                 'label_attr' => array('class' => 'control-label'),
