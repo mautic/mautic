@@ -210,11 +210,11 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
                 <?php echo $view['form']->row($form['nextShoot']); ?>
 
                 <?php echo $view['form']->row($form['triggerMode']) ?>
-                <div id="timeInterval" class="row hide">
+                <div id="timeInterval" class="row">
                     <span class="col-md-6 col-xs-12"><?php echo $view['form']->row($form['interval']); ?></span>
                     <span class="col-md-6 col-xs-12"><?php echo $view['form']->row($form['intervalUnit']); ?></span>
                 </div>
-                <div id="weekDays" class="hide">
+                <div id="weekDays">
                     <?php echo $view['form']->row($form['weekDays']); ?>
                 </div>
             </div>

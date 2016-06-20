@@ -45,6 +45,11 @@ class Periodicity
     private $triggerDate;
 
     /**
+     * @var string
+     */
+    private $triggerMode;
+
+    /**
      *
      * @var int
      */
@@ -80,6 +85,10 @@ class Periodicity
         $builder->createField('triggerDate', 'datetime')
             ->columnName('trigger_date')
             ->nullable()
+            ->build();
+
+        $builder->createField('triggerMode', 'string')
+            ->columnName('trigger_mode')
             ->build();
 
         $builder->createField('triggerInterval', 'integer')
@@ -280,6 +289,22 @@ class Periodicity
     {
         $this->isChanged('triggerDate', $triggerDate);
         $this->triggerDate = $triggerDate;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTriggerMode() {
+        return $this->triggerMode;
+    }
+
+    /**
+     * @param string $triggerMode
+     * @return Periodicity
+     */
+    public function setTriggerMode($triggerMode) {
+        $this->triggerMode = $triggerMode;
+        return $this;
     }
 
     /**
