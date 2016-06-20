@@ -93,14 +93,23 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
 
             // Try authenticating with a plugin
             if ($this->dispatcher->hasListeners(UserEvents::USER_PRE_AUTHENTICATION)) {
-                $integrations = $this->integrationHelper->getIntegrationObjects($authenticatingService, array('sso_service'), false, null, true);
+                $integrations = $this->integrationHelper->getIntegrationObjects($authenticatingService, ['sso_service'], false, null, true);
 
                 $loginCheck = ('mautic_sso_login_check' == $this->request->attributes->get('_route'));
-                $authEvent  = new AuthenticationEvent(null, $token, $this->userProvider, $this->request, $loginCheck, $authenticatingService, $integrations);
+                $authEvent  = new AuthenticationEvent(
+                    null,
+                    $token,
+                    $this->userProvider,
+                    $this->request,
+                    $loginCheck,
+                    $authenticatingService,
+                    $integrations
+                );
                 $this->dispatcher->dispatch(UserEvents::USER_PRE_AUTHENTICATION, $authEvent);
 
                 if ($authenticated = $authEvent->isAuthenticated()) {
-                    if ($eventToken = $authEvent->getToken() !== $token) {
+                    $eventToken = $authEvent->getToken();
+                    if ($eventToken !== $token) {
                         // A custom token has been set by the plugin so just return it
 
                         return $eventToken;
@@ -114,7 +123,7 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
 
                 if (!$authenticated && $loginCheck && !$response) {
                     // Set an empty JSON response
-                    $response = new JsonResponse(array());
+                    $response = new JsonResponse([]);
                 }
             }
 
@@ -129,7 +138,7 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
             $authenticatingService,
             $user,
             ($user instanceof User) ? $user->getPassword() : '',
-            ($user instanceof User) ? $user->getRoles() : array(),
+            ($user instanceof User) ? $user->getRoles() : [],
             $response
         );
     }
