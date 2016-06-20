@@ -108,7 +108,8 @@ class Stage extends FormEntity
             ->length(50)
             ->build();
 
-        $builder->createField('weight', 'integer');
+        $builder->createField('weight', 'integer')
+            ->build();
 
         $builder->addPublishDates();
 
