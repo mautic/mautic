@@ -88,26 +88,6 @@ class Copy
     }
 
     /**
-     * @return Email
-     */
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    /**
-     * @param Email $email
-     *
-     * @return Copy
-     */
-    public function setEmail($email)
-    {
-        $this->email = $email;
-
-        return $this;
-    }
-
-    /**
      * @return \DateTime
      */
     public function getDateCreated()
