@@ -70,6 +70,12 @@ class TemplateNameParser extends BaseTemplateNameParser
         }
 
         if (!preg_match('/^([^:]*):([^:]*):(.+)\.([^\.]+)\.([^\.]+)$/', $name, $matches)) {
+            $templateReference = parent::parse($name);
+
+            if ($templateReference->get('engine')) {
+                return $templateReference;
+            }
+
             throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.format.engine").', $name));
         }
 

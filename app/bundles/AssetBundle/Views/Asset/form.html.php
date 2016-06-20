@@ -34,7 +34,7 @@ $view['slots']->set('mauticContent', 'asset');
 					</div>
 			        <div class="col-md-5 text-left mt-lg<?php if ($startOnLocal) echo ' hide'; ?>" id="remote-button">
 						<?php if ($integrations) : ?>
-							<a data-toggle="ajaxmodal" data-target="#RemoteFileModal" data-header="<?php echo $view['translator']->trans('mautic.asset.remote.file.browse'); ?>" href="<?php echo $view['router']->generate('mautic_asset_remote'); ?>?tmpl=modal" class="btn btn-primary">
+							<a data-toggle="ajaxmodal" data-target="#RemoteFileModal" data-header="<?php echo $view['translator']->trans('mautic.asset.remote.file.browse'); ?>" href="<?php echo $view['router']->path('mautic_asset_remote'); ?>?tmpl=modal" class="btn btn-primary">
 								<?php echo $view['translator']->trans('mautic.asset.remote.file.browse'); ?>
 							</a>
 						<?php endif; ?>

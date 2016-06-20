@@ -1648,7 +1648,7 @@ class LeadController extends FormController
                         // Ensure safe emoji for notification
                         $subject = EmojiHelper::toHtml($email['subject']);
                         if ($mailer->send(true, false, false)) {
-                            $mailer->createLeadEmailStat();
+                            $mailer->createEmailStat();
                             $this->addFlash(
                                 'mautic.lead.email.notice.sent',
                                 array(

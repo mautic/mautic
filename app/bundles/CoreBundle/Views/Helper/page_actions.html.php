@@ -30,7 +30,7 @@ foreach ($templateButtons as $action => $enabled) {
         case 'clone':
         case 'abtest':
             $icon = ($action == 'clone') ? 'copy' : 'sitemap';
-            echo '<a class="'.$btnClass.'" href="'.$view['router']->generate(
+            echo '<a class="'.$btnClass.'" href="'.$view['router']->path(
                     'mautic_'.$routeBase.'_action',
                     array_merge(array("objectAction" => $action), $query)
                 ).'" data-toggle="ajax"'.$menuLink.">\n";
@@ -41,7 +41,7 @@ foreach ($templateButtons as $action => $enabled) {
             break;
         case 'close':
             $icon = 'remove';
-            echo '<a class="'.$btnClass.'" href="'.$view['router']->generate('mautic_'.$routeBase.'_index')
+            echo '<a class="'.$btnClass.'" href="'.$view['router']->path('mautic_'.$routeBase.'_index')
                 .'" data-toggle="'.$editMode.'"'.$editAttr.$menuLink.">\n";
             echo '  <i class="fa fa-'.$icon.'"></i> <span class="hidden-xs hidden-sm">'.$view['translator']->trans(
                     'mautic.core.form.'.$action
@@ -56,7 +56,7 @@ foreach ($templateButtons as $action => $enabled) {
                 $icon              = 'pencil-square-o';
                 $query['objectId'] = $item->getId();
             }
-            echo '<a class="'.$btnClass.'" href="'.$view['router']->generate(
+            echo '<a class="'.$btnClass.'" href="'.$view['router']->path(
                     'mautic_'.$routeBase.'_action',
                     array_merge(array("objectAction" => $action), $query)
                 ).'" data-toggle="'.$editMode.'"'.$editAttr.$menuLink.">\n";
@@ -73,7 +73,7 @@ foreach ($templateButtons as $action => $enabled) {
                         "mautic.".$langVar.".form.confirmdelete",
                         array("%name%" => $item->$nameGetter()." (".$item->getId().")")
                     ),
-                    'confirmAction' => $view['router']->generate(
+                    'confirmAction' => $view['router']->path(
                         'mautic_'.$routeBase.'_action',
                         array_merge(array("objectAction" => "delete", "objectId" => $item->getId()), $query)
                     ),

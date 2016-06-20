@@ -64,6 +64,7 @@ return [
                 'arguments' => [
                     'mautic.factory',
                     'mautic.twilio.service',
+                    'mautic.helper.phone_number',
                     '%mautic.sms_sending_phone_number%'
                 ],
                 'alias' => 'sms_api'

@@ -34,7 +34,7 @@ if ($tmpl == 'index')
             "page"            => $page,
             "limit"           => $limit,
             "menuLinkId"      => $link,
-            "baseUrl"         => (isset($objectId)) ? $view['router']->generate($link, array('objectId' => $objectId)) : $view['router']->generate($link),
+            "baseUrl"         => (isset($objectId)) ? $view['router']->path($link, array('objectId' => $objectId)) : $view['router']->path($link),
             "tmpl"            => (!in_array($tmpl, array('grid', 'index'))) ? $tmpl : $indexMode,
             'sessionVar'      => (isset($sessionVar)) ? $sessionVar : 'lead',
             'target'          => (isset($target)) ? $target : '.page-list'
