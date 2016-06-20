@@ -162,7 +162,7 @@ class CacheHelper
     {
         // Clear opcaches before rebuilding the cache to ensure latest file changes are used
         if (function_exists('opcache_reset')) {
-            if ($configSave) {
+            if ($configSave && function_exists('opcache_invalidate')) {
                 // Clear the cached config file
                 opcache_invalidate($this->configFile, true);
                 opcache_invalidate($this->containerFile, true);
