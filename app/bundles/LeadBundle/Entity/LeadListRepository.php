@@ -714,7 +714,7 @@ class LeadListRepository extends CommonRepository
             switch ($details['field']) {
                 case 'hit_url':
                     $operand = (($func == 'eq') || ($func == 'like')) ? 'EXISTS' : 'NOT EXISTS';
-                    
+
                     $subqb = $this->_em->getConnection()
                         ->createQueryBuilder()
                         ->select('null')
@@ -723,7 +723,7 @@ class LeadListRepository extends CommonRepository
                         case 'eq':
                         case 'neq':
                             $parameters[$parameter] = $details['filter'];
-                            
+
                             $subqb->where($q->expr()
                                 ->andX($q->expr()
                                 ->eq($alias . '.url', $exprParameter), $q->expr()
@@ -759,7 +759,7 @@ class LeadListRepository extends CommonRepository
                     if (count($parts) === 3) {
                         $channel = $parts[2];
                     }
-
+                    $channelParam = $this->generateRandomParameterName();
                     $subqb = $this->_em->getConnection()->createQueryBuilder()
                         ->select('null')
                         ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', $alias)
@@ -767,9 +767,10 @@ class LeadListRepository extends CommonRepository
                             $q->expr()->andX(
                                 $q->expr()->eq($alias . '.reason', $exprParameter),
                                 $q->expr()->eq($alias . '.lead_id', 'l.id'),
-                                $q->expr()->eq($alias . '.channel', $channel)
+                                $q->expr()->eq($alias . '.channel', ":$channelParam")
                             )
                         );
+                    $parameters[$channelParam] = $channel;
 
                     // Specific lead
                     if (!empty($leadId)) {
