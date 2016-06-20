@@ -75,8 +75,7 @@ class UpdateLeadActionType extends AbstractType
                         'label'         => $field['label'],
                         'label_attr'    => array('class' => 'control-label'),
                         'attr'          => $attr,
-                        'data'          => $value,
-                        'mapped'        => false,
+                        'data'          => (empty($value)) ? null : $value, // prevent error that it's not a number
                         'constraints'   => $constraints,
                         'precision'     => $properties['precision'],
                         'rounding_mode' => (int) $properties['roundmode']
@@ -90,7 +89,6 @@ class UpdateLeadActionType extends AbstractType
                     'label_attr'  => array('class' => 'control-label'),
                     'widget'      => 'single_text',
                     'attr'        => $attr,
-                    'mapped'      => false,
                     'input'       => 'string',
                     'html5'       => false,
                     'data'        => $value,
@@ -140,7 +138,6 @@ class UpdateLeadActionType extends AbstractType
                             'label_attr'  => array('class' => 'control-label'),
                             'data'        => ($type == 'boolean') ? (int) $value : $value,
                             'attr'        => $attr,
-                            'mapped'      => false,
                             'multiple'    => false,
                             'empty_value' => false,
                             'expanded'    => $expanded,
@@ -170,7 +167,6 @@ class UpdateLeadActionType extends AbstractType
                             'class'            => 'form-control',
                             'data-placeholder' => $field['label']
                         ),
-                        'mapped'      => false,
                         'multiple'    => false,
                         'expanded'    => false,
                         'constraints' => $constraints
@@ -195,7 +191,6 @@ class UpdateLeadActionType extends AbstractType
                         'label_attr'  => array('class' => 'control-label'),
                         'attr'        => $attr,
                         'data'        => $value,
-                        'mapped'      => false,
                         'constraints' => $constraints
                     )
                 );
