@@ -53,7 +53,7 @@ CREATE TABLE `{$this->prefix}lead_utmtags` (
   `referer` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `remote_host` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `user_agent` longtext COLLATE utf8_unicode_ci,
+  `user_agent` longtext COLLATE utf8_unicode_ci DEFAULT NULL,
   `utm_campaign` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `utm_content` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `utm_medium` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,

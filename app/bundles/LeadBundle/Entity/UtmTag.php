@@ -102,37 +102,23 @@ class UtmTag
 
         $builder->addNullableField('query', 'array');
 
-        $builder->addField('referer', 'string');
+        $builder->addNullableField('referer', 'string');
 
-        $builder->createField('remoteHost', 'string')
-            ->columnName('remote_host')
-            ->build();
+        $builder->addNullableField('remoteHost', 'string', 'remote_host');
 
-        $builder->addField('url', 'string');
+        $builder->addNullableField('url', 'string');
 
-        $builder->createField('userAgent', 'string')
-            ->columnName('user_agent')
-            ->build();
+        $builder->addNullableField('userAgent', 'string','user_agent');
 
-        $builder->createField('utmCampaign', 'string')
-            ->columnName('utm_campaign')
-            ->build();
+        $builder->addNullableField('utmCampaign', 'string','utm_campaign');
 
-        $builder->createField('utmContent', 'string')
-            ->columnName('utm_content')
-            ->build();
+        $builder->addNullableField('utmContent', 'string', 'utm_content');
 
-        $builder->createField('utmMedium', 'string')
-            ->columnName('utm_medium')
-            ->build();
+        $builder->addNullableField('utmMedium', 'string', 'utm_medium');
 
-        $builder->createField('utmSource', 'string')
-            ->columnName('utm_source')
-            ->build();
+        $builder->addNullableField('utmSource', 'string', 'utm_source');
 
-        $builder->createField('utmTerm', 'string')
-            ->columnName('utm_term')
-            ->build();
+        $builder->addNullableField('utmTerm', 'string', 'utm_term');
     }
 
     /**
