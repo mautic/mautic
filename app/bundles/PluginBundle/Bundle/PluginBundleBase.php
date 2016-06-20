@@ -11,7 +11,6 @@ namespace Mautic\PluginBundle\Bundle;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Tools\SchemaTool;
-use Mautic\PluginBundle\Entity\Addon;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -31,11 +30,6 @@ abstract class PluginBundleBase extends Bundle
 
     static public function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null)
     {
-        // BC support; @deprecated 1.1.4; to be removed in 2.0
-        if (method_exists(get_called_class(), 'onInstall')) {
-            static::onInstall($factory);
-        }
-
         if ($metadata !== null) {
             self::installPluginSchema($metadata, $factory);
         }
@@ -83,22 +77,6 @@ abstract class PluginBundleBase extends Bundle
      */
     static public function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null)
     {
-        // BC support; @deprecated 1.1.4; to be removed in 2.0
-        if (method_exists(get_called_class(), 'onUpdate')) {
-            // Create a bogus Addon
-            $addon = new Addon();
-            $addon->setAuthor($plugin->getAuthor())
-                ->setBundle($plugin->getBundle())
-                ->setDescription($plugin->getDescription())
-                ->setId($plugin->getId())
-                ->setIntegrations($plugin->getIntegrations())
-                ->setIsMissing($plugin->getIsMissing())
-                ->setName($plugin->getName())
-                ->setVersion($plugin->getVersion());
-
-            static::onUpdate($addon, $factory);
-        }
-
         // Not recommended although availalbe for simple schema changes - see updatePluginSchema docblock
         //self::updatePluginSchema($metadata, $installedSchema, $factory);
     }

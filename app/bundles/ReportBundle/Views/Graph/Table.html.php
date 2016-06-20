@@ -37,7 +37,7 @@
                             <?php foreach ($row as $cellName => $cell) : ?>
                                 <?php if (array_key_exists('id', $graph['data'][0]) && $cellName == 'title' && isset($graph['link'])) : ?>
                                     <td>
-                                        <a href="<?php echo $view['router']->generate($graph['link'], array("objectAction" => "view", "objectId" => $row['id'])); ?>" data-toggle="ajax">
+                                        <a href="<?php echo $view['router']->path($graph['link'], array("objectAction" => "view", "objectId" => $row['id'])); ?>" data-toggle="ajax">
                                             <?php echo $cell; ?>
                                         </a>
                                     </td>

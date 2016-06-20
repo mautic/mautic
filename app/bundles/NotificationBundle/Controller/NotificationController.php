@@ -31,7 +31,7 @@ class NotificationController extends FormController
     public function indexAction($page = 1)
     {
         /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
-        $model = $this->factory->getModel('notification');
+        $model = $this->getModel('notification');
 
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(
@@ -87,13 +87,13 @@ class NotificationController extends FormController
 
         //retrieve a list of categories
         $listFilters['filters']['groups']['mautic.core.filter.categories'] = array(
-            'options'  => $this->factory->getModel('category')->getLookupResults('email', '', 0),
+            'options'  => $this->getModel('category')->getLookupResults('email', '', 0),
             'prefix'   => 'category'
         );
 
         //retrieve a list of Lead Lists
         $listFilters['filters']['groups']['mautic.core.filter.lists'] = array(
-            'options'  => $this->factory->getModel('lead.list')->getUserLists(),
+            'options'  => $this->getModel('lead.list')->getUserLists(),
             'prefix'   => 'list'
         );
 
@@ -235,7 +235,7 @@ class NotificationController extends FormController
     public function viewAction($objectId)
     {
         /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
-        $model    = $this->factory->getModel('notification');
+        $model    = $this->getModel('notification');
         $security = $this->factory->getSecurity();
 
         /** @var \Mautic\NotificationBundle\Entity\Notification $notification */
@@ -277,7 +277,7 @@ class NotificationController extends FormController
         $stats = $model->getNotificationGeneralStats($notification);
 
         // Audit Log
-        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('notification', $notification->getId(), $notification->getDateAdded());
+        $logs = $this->getModel('core.auditLog')->getLogForObject('notification', $notification->getId(), $notification->getDateAdded());
 
         // Get click through stats
         $trackableLinks = $model->getNotificationClickStats($notification->getId());
@@ -331,7 +331,7 @@ class NotificationController extends FormController
     public function newAction($entity = null)
     {
         /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
-        $model = $this->factory->getModel('notification');
+        $model = $this->getModel('notification');
 
         if (! $entity instanceof Notification) {
             /** @var \Mautic\NotificationBundle\Entity\Notification $entity */
@@ -466,7 +466,7 @@ class NotificationController extends FormController
     public function editAction($objectId, $ignorePost = false, $forceTypeSelection = false)
     {
         /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
-        $model = $this->factory->getModel('notification');
+        $model = $this->getModel('notification');
         $method  = $this->request->getMethod();
         $entity  = $model->getEntity($objectId);
         $session = $this->factory->getSession();
@@ -628,7 +628,7 @@ class NotificationController extends FormController
      */
     public function cloneAction($objectId)
     {
-        $model  = $this->factory->getModel('notification');
+        $model  = $this->getModel('notification');
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -676,7 +676,7 @@ class NotificationController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->factory->getModel('notification');
+            $model  = $this->getModel('notification');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
@@ -740,7 +740,7 @@ class NotificationController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model     = $this->factory->getModel('notification');
+            $model     = $this->getModel('notification');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
 
             $deleteIds = array();
@@ -801,7 +801,7 @@ class NotificationController extends FormController
     public function previewAction($objectId)
     {
         /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
-        $model = $this->factory->getModel('notification');
+        $model = $this->getModel('notification');
         $notification = $model->getEntity($objectId);
 
         if ($notification != null

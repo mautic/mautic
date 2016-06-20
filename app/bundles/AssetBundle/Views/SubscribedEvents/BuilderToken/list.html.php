@@ -28,7 +28,7 @@ if ($tmpl == 'index') {
         "page"              => $page,
         "limit"             => $limit,
         "fixedLimit"        => true,
-        "baseUrl"           => $view['router']->generate('mautic_asset_buildertoken_index'),
+        "baseUrl"           => $view['router']->path('mautic_asset_buildertoken_index'),
         "paginationWrapper" => 'text-center',
         "paginationClass"   => "sm",
         'sessionVar'        => 'asset.buildertoken',

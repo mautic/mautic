@@ -114,6 +114,27 @@ return array(
                 'class' => 'Mautic\PointBundle\Form\Type\GenericPointSettingsType',
                 'alias' => 'genericpoint_settings'
             )
+        ),
+        'models' =>  array(
+            'mautic.point.model.point' => array(
+                'class' => 'Mautic\PointBundle\Model\PointModel',
+                'arguments' => array(
+                    'session',
+                    'mautic.helper.ip_lookup',
+                    'mautic.lead.model.lead'
+                )
+            ),
+            'mautic.point.model.triggerevent' => array(
+                'class' => 'Mautic\PointBundle\Model\TriggerEventModel'
+            ),
+            'mautic.point.model.trigger' => array(
+                'class' => 'Mautic\PointBundle\Model\TriggerModel',
+                'arguments' => array(
+                    'mautic.helper.ip_lookup',
+                    'mautic.lead.model.lead',
+                    'mautic.point.model.triggerevent'
+                )
+            )
         )
     )
 );

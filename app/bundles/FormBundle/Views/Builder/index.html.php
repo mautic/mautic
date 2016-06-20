@@ -61,7 +61,7 @@ $isStandalone = $activeForm->isStandalone();
                                     <ul class="dropdown-menu" role="menu">
                                         <?php foreach ($fields as $fieldType => $field): ?>
                                             <li id="field_<?php echo $fieldType; ?>">
-                                                <a class="list-group-item" data-toggle="ajaxmodal" data-target="#formComponentModal" href="<?php echo $view['router']->generate('mautic_formfield_action', array('objectAction' => 'new', 'type' => $fieldType, 'tmpl' => 'field', 'formId' => $formId)); ?>">
+                                                <a class="list-group-item" data-toggle="ajaxmodal" data-target="#formComponentModal" href="<?php echo $view['router']->path('mautic_formfield_action', array('objectAction' => 'new', 'type' => $fieldType, 'tmpl' => 'field', 'formId' => $formId)); ?>">
                                                     <div>
                                                         <?php echo $field; ?>
                                                     </div>
@@ -111,7 +111,7 @@ $isStandalone = $activeForm->isStandalone();
                                             </li>
                                             <?php foreach ($action as $k => $e): ?>
                                                 <li id="action_<?php echo $k; ?>">
-                                                    <a data-toggle="ajaxmodal" data-target="#formComponentModal" class="list-group-item" href="<?php echo $view['router']->generate('mautic_formaction_action', array('objectAction' => 'new', 'type' => $k, 'tmpl'=> 'action', 'formId' => $formId)); ?>">
+                                                    <a data-toggle="ajaxmodal" data-target="#formComponentModal" class="list-group-item" href="<?php echo $view['router']->path('mautic_formaction_action', array('objectAction' => 'new', 'type' => $k, 'tmpl'=> 'action', 'formId' => $formId)); ?>">
                                                         <div data-toggle="tooltip" title="<?php echo $view['translator']->trans($e['description']); ?>">
                                                             <span><?php echo $view['translator']->trans($e['label']); ?></span>
                                                         </div>

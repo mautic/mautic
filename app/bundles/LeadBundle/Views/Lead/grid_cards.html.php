@@ -42,7 +42,7 @@
                                 <div class="pull-right label label-danger"><i class="fa fa-ban"> </i></div>
                                 <?php endif; ?>
                                 <h4 class="fw-sb mb-xs ellipsis">
-                                    <a href="<?php echo $view['router']->generate('mautic_lead_action',
+                                    <a href="<?php echo $view['router']->path('mautic_contact_action',
                                         array("objectAction" => "view", "objectId" => $item->getId())); ?>"
                                        data-toggle="ajax">
                                         <span><?php echo $item->getPrimaryIdentifier(); ?></span>

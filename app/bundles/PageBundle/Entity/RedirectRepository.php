@@ -19,19 +19,6 @@ use Mautic\EmailBundle\Entity\Email;
 class RedirectRepository extends CommonRepository
 {
     /**
-     * @param $source
-     * @param $id
-     *
-     * @deprecated To be removed in 2.0; use TrackableRepository::findByChannel instead
-     *
-     * @return mixed
-     */
-    public function findBySource($source, $id)
-    {
-        return $this->getEntityManager()->getRepository('MauticPageBundle:Trackable')->findByChannel($source, $id);
-    }
-
-    /**
      * @param array $urls
      * @param Email $email
      *

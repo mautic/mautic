@@ -82,7 +82,7 @@ $container->loadFromExtension('security', array(
         'main'                 => array(
             'pattern'     => "^/s/",
             'form_login'  => array(
-                'csrf_provider' => 'form.csrf_provider',
+                'csrf_token_generator' => 'security.csrf.token_manager',
                 'success_handler' => 'mautic.security.authentication_handler',
                 'failure_handler' => 'mautic.security.authentication_handler',
                 'login_path' => '/s/login',
@@ -96,7 +96,7 @@ $container->loadFromExtension('security', array(
                 'target' => '/s/login'
             ),
             'remember_me' => array(
-                'key'      => '%mautic.rememberme_key%',
+                'secret'   => '%mautic.rememberme_key%',
                 'lifetime' => '%mautic.rememberme_lifetime%',
                 'path'     => '%mautic.rememberme_path%',
                 'domain'   => '%mautic.rememberme_domain%'
@@ -141,3 +141,4 @@ $container->setParameter('mautic.security.restrictedConfigFields', $restrictedCo
  * mautic.security.disableUpdates = disables remote checks for updates
  * mautic.security.restrictedConfigFields.displayMode = accepts either remove or mask; mask will disable the input with a "Set by system" message
  */
+$container->setParameter('mautic.security.disableUpdates', false);

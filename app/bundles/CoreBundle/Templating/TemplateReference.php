@@ -9,7 +9,8 @@
 
 namespace Mautic\CoreBundle\Templating;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference as BaseTemplateReference;
 
 /**
@@ -23,18 +24,29 @@ class TemplateReference extends BaseTemplateReference
     protected $themeOverride;
 
     /**
-     * @var MauticFactory
+     * @var ThemeHelper
      */
-    protected $factory;
+    protected $themeHelper;
 
     /**
-     * Set Mautic's factory class
-     *
-     * @param MauticFactory $factory
+     * @var PathsHelper
      */
-    public function setFactory(MauticFactory $factory)
+    protected $pathsHelper;
+
+    /**
+     * @param ThemeHelper $themeHelper
+     */
+    public function setThemeHelper(ThemeHelper $themeHelper)
     {
-        $this->factory = $factory;
+        $this->themeHelper = $themeHelper;
+    }
+
+    /**
+     * @param PathsHelper $pathsHelper
+     */
+    public function setPathsHelper(PathsHelper $pathsHelper)
+    {
+        $this->pathsHelper = $pathsHelper;
     }
 
     /**
@@ -56,11 +68,11 @@ class TemplateReference extends BaseTemplateReference
 
         if (!empty($this->themeOverride)) {
             try {
-                $theme    = $this->factory->getTheme($this->themeOverride);
+                $theme    = $this->themeHelper->getTheme($this->themeOverride);
                 $themeDir = $theme->getThemePath();
             } catch (\Exception $e) {}
         } else {
-            $theme    = $this->factory->getTheme();
+            $theme    = $this->themeHelper->getTheme();
             $themeDir = $theme->getThemePath();
         }
 
@@ -68,14 +80,11 @@ class TemplateReference extends BaseTemplateReference
         $path     = (empty($controller) ? '' : $controller.'/').$fileName;
 
         if (!empty($this->parameters['bundle'])) {
-            $bundleRoot = $this->factory->getSystemPath('bundles', true);
-            $pluginRoot = $this->factory->getSystemPath('plugins', true);
-
-            // @deprecated 1.1.4; to be removed in 2.0; BC support for MauticAddon
-            $addonRoot = $this->factory->getSystemPath('root') . '/addons';
+            $bundleRoot = $this->pathsHelper->getSystemPath('bundles', true);
+            $pluginRoot = $this->pathsHelper->getSystemPath('plugins', true);
 
             // Check for a system-wide override
-            $themePath      = $this->factory->getSystemPath('themes', true);
+            $themePath      = $this->pathsHelper->getSystemPath('themes', true);
             $systemTemplate = $themePath.'/system/'.$this->parameters['bundle'].'/'.$path;
 
             if (file_exists($systemTemplate)) {
@@ -90,8 +99,7 @@ class TemplateReference extends BaseTemplateReference
 
                     if (
                         (!empty($match[1]) && file_exists($bundleRoot.'/'.$match[1].'Bundle/Views/'.$path)) ||
-                        file_exists($pluginRoot.'/'.$this->parameters['bundle'].'/Views/'.$path) ||
-                        file_exists($addonRoot.'/'.$this->parameters['bundle'].'/Views/'.$path)
+                        file_exists($pluginRoot.'/'.$this->parameters['bundle'].'/Views/'.$path)
                     ) {
                         // Mautic core template
                         $template = '@'.$this->get('bundle').'/Views/'.$path;
@@ -99,10 +107,10 @@ class TemplateReference extends BaseTemplateReference
                 }
             }
         } else {
-            $themes = $this->factory->getInstalledThemes();
+            $themes = $this->themeHelper->getInstalledThemes();
             if (isset($themes[$controller])) {
                 //this is a file in a specific Mautic theme folder
-                $theme = $this->factory->getTheme($controller);
+                $theme = $this->themeHelper->getTheme($controller);
 
                 $template = $theme->getThemePath().'/html/'.$fileName;
             }

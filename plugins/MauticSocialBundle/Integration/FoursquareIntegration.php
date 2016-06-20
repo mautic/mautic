@@ -101,7 +101,7 @@ class FoursquareIntegration extends SocialIntegration
      */
     public function getUserData($identifier, &$socialCache)
     {
-        if ($id = $this->getUserId($identifier, $socialCache)) {
+        if ($id = $this->getContactUserId($identifier, $socialCache)) {
             $url  = $this->getApiUrl("users/{$id}");
             $data = $this->makeRequest($url);
             if (!empty($data) && isset($data->response->user)) {
@@ -125,7 +125,7 @@ class FoursquareIntegration extends SocialIntegration
      */
     public function getPublicActivity($identifier, &$socialCache)
     {
-        if ($id = $this->getUserId($identifier, $socialCache)) {
+        if ($id = $this->getContactUserId($identifier, $socialCache)) {
             $activity = array(
                 //'mayorships' => array(),
                 'tips'       => array(),
@@ -306,13 +306,18 @@ class FoursquareIntegration extends SocialIntegration
     }
 
     /**
-     * {@inheritdoc}
+     * @param $identifier
+     * @param $socialCache
+     *
+     * @return bool
      */
-    public function getUserId($identifier, &$socialCache)
+    private function getContactUserId(&$identifier, &$socialCache)
     {
         if (!empty($socialCache['id'])) {
+
             return $socialCache['id'];
         } elseif (empty($identifier)) {
+
             return false;
         }
 
@@ -328,6 +333,7 @@ class FoursquareIntegration extends SocialIntegration
 
             if (!empty($data) && isset($data->response->results) && count($data->response->results)) {
                 $socialCache['id'] = $data->response->results[0]->id;
+
                 return $socialCache['id'];
             }
         }

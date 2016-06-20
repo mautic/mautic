@@ -247,6 +247,19 @@ class MailHelper
     }
 
     /**
+     * Mirrors previous MauticFactory functionality
+     *
+     * @param bool $cleanSlate
+     * @return $this
+     */
+    public function getMailer($cleanSlate = true)
+    {
+        $this->reset($cleanSlate);
+
+        return $this;
+    }
+
+    /**
      * Send the message
      *
      * @param bool $dispatchSendEvent
@@ -1365,18 +1378,6 @@ class MailHelper
     }
 
     /**
-     * Set custom tokens
-     *
-     * @param array $tokens
-     *
-     * @deprecated Since 1.1.  Use setTokens() instead. To be removed in 2.0
-     */
-    public function setCustomTokens(array $tokens)
-    {
-        $this->setTokens($tokens);
-    }
-
-    /**
      * Get tokens
      *
      * @return array
@@ -1609,14 +1610,6 @@ class MailHelper
     }
 
     /**
-     * @deprecated 1.2.3 - to be removed in 2.0.  Use createEmailStat() instead
-     */
-    public function createLeadEmailStat()
-    {
-        $this->createEmailStat();
-    }
-
-    /**
      * Create an email stat
      *
      * @param bool|true   $persist
@@ -1676,21 +1669,13 @@ class MailHelper
 
             $copy = $emailModel->getCopyRepository()->findByHash($hash);
             if (null === $copy) {
-                // Create a copy entry
-                $copy = new Copy();
-                $copy->setId($hash)
-                    ->setBody($this->body['content'])
-                    ->setSubject($this->subject)
-                    ->setDateCreated(new \DateTime())
-                    ->setEmail($this->email);
-
-                $emailModel->getCopyRepository()->saveEntity($copy);
+                $emailModel->getCopyRepository()->saveCopy($hash, $this->subject, $this->body['content']);
             }
 
-            $copies[$id] = $copy;
+            $copies[$id] = $hash;
         }
 
-        $stat->setStoredCopy($copies[$id]);
+        $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $copies[$id]));
 
         if ($persist) {
             $emailModel->getStatRepository()->saveEntity($stat);
