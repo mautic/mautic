@@ -111,7 +111,7 @@ CREATE TABLE {$this->prefix}lead_attributions (
   INDEX {$this->keys['idx']['lead']} (lead_id), 
   INDEX {$this->keys['idx']['campaign']} (campaign_id), 
   INDEX {$this->keys['idx']['ip']} (ip_id),
-  INDEX {$this->keys['idx']['ip']} (stage_id),
+  INDEX {$this->keys['idx']['stage']} (stage_id),
   INDEX {$this->prefix}attribution_channel (channel, date_added), 
   INDEX {$this->prefix}attribution_channel_specific (channel, channel_id, date_added), 
   INDEX {$this->prefix}attribution_channel_lead (channel, lead_id, date_added), 
