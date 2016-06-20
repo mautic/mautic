@@ -25,9 +25,8 @@ class StageRepository extends CommonRepository
     {
         $q = $this->_em
             ->createQueryBuilder()
-            ->select($this->getTableAlias() . ', cat')
-            ->from('MauticStageBundle:Stage', $this->getTableAlias())
-            ->leftJoin($this->getTableAlias().'.category', 'cat');
+            ->select($this->getTableAlias() )
+            ->from('MauticStageBundle:Stage', $this->getTableAlias());
 
         $args['qb'] = $q;
 

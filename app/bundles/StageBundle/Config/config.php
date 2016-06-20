@@ -89,6 +89,11 @@ return [
                 'class' => 'Mautic\StageBundle\Form\Type\StageActionChangeType',
                 'arguments' => 'mautic.factory',
                 'alias' => 'stageaction_change'
+            ],
+            'mautic.stage.type.stage_list'                => [
+                'class' => 'Mautic\StageBundle\Form\Type\StageListType',
+                'arguments' => 'mautic.factory',
+                'alias' => 'stage_list'
             ]
         ],
         'models' =>  [
