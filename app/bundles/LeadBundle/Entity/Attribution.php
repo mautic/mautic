@@ -116,7 +116,7 @@ class Attribution
 
         $builder->addId();
         $builder->addLead();
-        $builder->addIpAddress();
+        $builder->addIpAddress(true);
         $builder->addDateAdded();
 
         $builder->createField('channel', 'string')

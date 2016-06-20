@@ -107,7 +107,7 @@ CREATE TABLE {$this->prefix}lead_attributions (
   stage_name LONGTEXT DEFAULT NULL,
   comments LONGTEXT DEFAULT NULL, 
   attribution DOUBLE PRECISION NOT NULL,
-  ip_id INT NOT NULL,
+  ip_id INT DEFAULT NULL,
   INDEX {$this->keys['idx']['lead']} (lead_id), 
   INDEX {$this->keys['idx']['campaign']} (campaign_id), 
   INDEX {$this->keys['idx']['ip']} (ip_id),
@@ -144,7 +144,7 @@ SQL;
         $this->addSql(
             "ALTER TABLE {$this->prefix}lead_attributions ADD CONSTRAINT {$this->keys['fk']['ip']} FOREIGN KEY (ip_id) REFERENCES {$this->prefix}ip_addresses (id) ON DELETE SET NULL"
         );
-        
+
         $this->addSql(
             "ALTER TABLE {$this->prefix}lead_attributions ADD CONSTRAINT {$this->keys['fk']['stage']} FOREIGN KEY (stage_id) REFERENCES {$this->prefix}stages (id) ON DELETE SET NULL"
         );

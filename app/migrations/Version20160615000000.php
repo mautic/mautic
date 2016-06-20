@@ -21,7 +21,11 @@ class Version20160615000000 extends AbstractMauticMigration
      */
     public function mysqlUp(Schema $schema)
     {
-        $this->addSql('DROP INDEX '.$this->prefix.'email_date_read ON '.$this->prefix.'email_stats');
+        $table = $schema->getTable($this->prefix.'email_stats');
+        if ($table->hasIndex($this->prefix.'email_date_read')) {
+            $this->addSql('DROP INDEX '.$this->prefix.'email_date_read ON '.$this->prefix.'email_stats');
+        }
+
         $this->addSql('CREATE INDEX '.$this->prefix.'email_date_read ON '.$this->prefix.'email_stats (date_read)');
     }
 
