@@ -172,4 +172,34 @@ class StageRepository extends CommonRepository
 
         return $results;
     }
+
+    /**
+     * Get a list of lists
+     *
+     * @param string $name
+     *
+     * @return array
+     */
+    public function getStageByName($stageName)
+    {
+        static $stages = array();
+
+        if (!$stageName) {
+            return false;
+        }
+
+        $q = $this->_em->createQueryBuilder()
+            ->from('MauticStageBundle:Stage', 's', 's.id');
+
+        $q->select('partial s.{id, name}')
+            ->andWhere($q->expr()->eq('s.isPublished', ':true'))
+            ->setParameter('true', true, 'boolean');
+        $q->andWhere(
+            $q->expr()->like('s.name', $stageName)
+        );
+
+        $results = $q->getQuery()->getArrayResult();
+
+        return $results;
+    }
 }
