@@ -10,7 +10,7 @@
 namespace Mautic\DynamicContentBundle\Controller\Api;
 
 use Mautic\CoreBundle\Controller\CommonController;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class JsController extends CommonController
 {
@@ -21,7 +21,13 @@ class JsController extends CommonController
         $response = $this->forward('MauticDynamicContentBundle:Api\DynamicContentApi:process', ['objectAlias' => $slot]);
 
         if ($response->getStatusCode() !== 200) {
-            return new JsonResponse(['failed' => 'Please specify a slot.']);
+            return new Response(
+                sprintf('if(console){console.log("The requested slot (%s) could not be populated. Using default.");}', $slot),
+                Response::HTTP_OK,
+                [
+                    'Content-Type' => 'text/javascript'
+                ]
+            );
         }
 
         //replace line breaks with literal symbol and escape quotations
