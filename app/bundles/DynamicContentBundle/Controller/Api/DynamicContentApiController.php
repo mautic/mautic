@@ -10,15 +10,15 @@
 namespace Mautic\DynamicContentBundle\Controller\Api;
 
 use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
-use Mautic\FormBundle\Controller\PublicController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Class DynamicContentApiController.
  */
-class DynamicContentApiController extends PublicController
+class DynamicContentApiController extends CommonController
 {
     /**
      * @param $objectAlias

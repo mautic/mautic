@@ -33,6 +33,10 @@ return [
             ],
         ],
         'public' => [
+            'mautic_dwc_generate_js' => [
+                'path' => '/dwc/generate.js',
+                'controller' => 'MauticDynamicContentBundle:Api\Js:generate'
+            ],
             'mautic_api_dwc_index' => [
                 'path' => '/dwc',
                 'controller' => 'MauticDynamicContentBundle:Api\DynamicContentApi:getEntities'
