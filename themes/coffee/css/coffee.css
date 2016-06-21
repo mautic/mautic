@@ -1,0 +1,59 @@
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    color: #333333;
+    background-color: #f7f7f7;
+}
+a {
+    color: #009af3;
+}
+a:hover, a:focus {
+    color: #009af3;
+}
+#header {
+    background-color: #f6f6f6;
+    border-color: #f6f6f6;
+    color: #999999;
+    -webkit-box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    right: 0;
+    left: 0;
+    z-index: 1030;
+    margin-bottom: 0;
+}
+#content {
+    padding-top: 100px;
+    padding-bottom: 30px;
+}
+#footer {
+    padding: 20px 15px 15px;
+    margin-bottom: 0;
+    font: 400 12px 'Raleway', sans-serif;
+    color: #fff;
+    background-color: #000000;
+    border-top: 1px solid #1e1e1e;
+}
+#footer ul {
+    list-style: none;
+    margin: 0;
+    padding: 0px;
+}
+#copyright {
+    background: #1a1a1a;
+    text-align: center;
+    font: 11px/40px Arial, Helvetica, sans-serif;
+    color: #fff;
+}
+
+.form-container {
+    margin-top: 50px;
+    width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.mauticform-selectbox, .mauticform-input, .mauticform-textarea {
+    width: 100% !important;
+}
