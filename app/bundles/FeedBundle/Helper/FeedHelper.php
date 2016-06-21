@@ -15,6 +15,7 @@ use Debril\RssAtomBundle\Protocol\Parser\Factory;
 use Debril\RssAtomBundle\Protocol\Parser\XmlParser;
 use Mautic\FeedBundle\Entity\Feed;
 use Debril\RssAtomBundle\Protocol\ItemOutInterface;
+use Debril\RssAtomBundle\Protocol\Filter\Limit;
 
 class FeedHelper
 {
@@ -38,10 +39,11 @@ class FeedHelper
      * Parse an xml string and create a FeedInInterface instance
      *
      * @param string $xmlString
+     * @param integer|null $itemCount
      *
      * @return FeedInterface
      */
-    public function getFeedContentFromString($xmlString)
+    public function getFeedContentFromString($xmlString, $itemCount=null)
     {
         // Parses the contents into a SimpleXMLElement
         $xmlBody = $this->xmlParser->parseString($xmlString); // TODO il manque la gestion des erreurs en cas d'objet XML non conforme
@@ -50,7 +52,13 @@ class FeedHelper
         $parser = $this->reader->getAccurateParser($xmlBody);
 
         // Parses the feed with the correct parser
-        $feedContent = $parser->parse($xmlBody, $this->factory->newFeed());
+        if (is_numeric($itemCount)) {
+            $feedContent = $parser->parse($xmlBody, $this->factory->newFeed(), array(
+                new Limit($itemCount)
+            ));
+        } else {
+            $feedContent = $parser->parse($xmlBody, $this->factory->newFeed());
+        }
 
         return $feedContent;
     }

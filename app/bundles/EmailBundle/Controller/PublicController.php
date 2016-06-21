@@ -348,13 +348,13 @@ class PublicController extends CommonFormController
 
         $feedFields = null;
 
-        if ($emailEntity->hasFeed()) {
+        if ($emailEntity->getEmailType() == 'feed') {
             //TODO A refactoriser pour
             $feed = $emailEntity->getFeed();
             /** @var Snapshot $snapshot */
             $snapshot = $feedRepository->latestSnapshot($this->factory, $feed);
             $xmlString = $snapshot->getXmlString();
-            $feedContent = $feedHelper->getFeedContentFromString($xmlString);
+            $feedContent = $feedHelper->getFeedContentFromString($xmlString, $emailEntity->getFeed()->getItemCount());
             $feedFields = $feedHelper->getFeedFields($feedContent);
         }
 

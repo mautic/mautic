@@ -40,7 +40,7 @@ class FeedRepository extends CommonRepository
             }
         }
         unset($s);
-        // there is no valid feed... need to pase a new one
+        // there is no valid feed... need to parse a new one
 
         /** @var FeedHelper $feedHelper */
         $feedHelper= $factory->getHelper('feed');
