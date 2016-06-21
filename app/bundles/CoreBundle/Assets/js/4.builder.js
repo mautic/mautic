@@ -278,7 +278,8 @@ Mautic.initSlotListeners = function() {
                 var match = regex.exec(attr.name);
 
                 if (match !== null) {
-                    focusForm.find('[data-slot-param="'+match[1]+'"]').val(attr.value);
+                    focusForm.find('input[type="text"][data-slot-param="'+match[1]+'"]').val(attr.value);
+                    focusForm.find('input[type="radio"][data-slot-param="'+match[1]+'"][value="'+attr.value+'"]').prop('checked', 1);
                 }
             });
 
@@ -294,6 +295,23 @@ Mautic.initSlotListeners = function() {
 
                 // Trigger the slot:change event
                 slot.trigger('slot:change', {slot: slot, field: field});
+            });
+
+            focusForm.find('.btn').on('click', function(e) {
+                var field = mQuery(this).find('input:radio');
+
+                if (field.length) {
+                    // Store the slot settings as attributes
+                    slot.attr('data-param-'+field.attr('data-slot-param'), field.val());
+
+                    // Trigger the slot:change event
+                    slot.trigger('slot:change', {slot: slot, field: field});
+                }
+            });
+
+            // Initialize the color picker
+            focusForm.find('input[data-toggle="color"]').each(function() {
+                parent.Mautic.activateColorPicker(this);
             });
         });
 
@@ -359,6 +377,16 @@ Mautic.initSlotListeners = function() {
             params.slot.find('a').attr('href', params.field.val());
         } else if (fieldParam === 'link-text') {
             params.slot.find('a').text(params.field.val());
+        } else if (fieldParam === 'float') {
+            var values = ['left', 'center', 'right'];
+            params.slot.find('a').parent().attr('align', values[params.field.val()]);
+        } else if (fieldParam === 'button-size') {
+            var values = [
+                {padding: '10px 13px', fontSize: '14px'},
+                {padding: '12px 18px', fontSize: '16px'},
+                {padding: '15px 20px', fontSize: '18px'}
+            ];
+            params.slot.find('a').css(values[params.field.val()]);
         }
     });
 

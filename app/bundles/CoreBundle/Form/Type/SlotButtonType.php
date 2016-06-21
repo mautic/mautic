@@ -12,6 +12,7 @@ namespace Mautic\CoreBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\Type\SlotType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 
 /**
  * Class SlotButtonType
@@ -28,25 +29,75 @@ class SlotButtonType extends SlotType
     {
         parent::buildForm($builder, $options);
 
-        $builder->add('href', 'text', array(
-            'label'      => 'URL',
-            'label_attr' => array('class' => 'control-label'),
-            'required'   => false,
-            'attr'       => array(
-                'class'           => 'form-control',
-                'data-slot-param' => 'href',
-            ),
-        ));
-
-        $builder->add('link-text', 'text', array(
+        $builder->add('link-text', 'text', [
             'label'      => 'mautic.core.button.text',
-            'label_attr' => array('class' => 'control-label'),
+            'label_attr' => ['class' => 'control-label'],
             'required'   => false,
-            'attr'       => array(
+            'attr'       => [
                 'class'           => 'form-control',
                 'data-slot-param' => 'link-text',
+            ],
+        ]);
+
+        $builder->add('href', 'text', [
+            'label'      => 'mautic.core.button.link',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => [
+                'class'           => 'form-control',
+                'data-slot-param' => 'href',
+            ],
+        ]);
+
+        $builder->add('button-size', 'button_group', [
+            'label'      => 'mautic.core.button.size',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => [
+                'class'           => 'form-control',
+                'data-slot-param' => 'button-size',
+            ],
+            'choice_list' => new ChoiceList(
+                ['s', 'm', 'l'],
+                ['S', 'M', 'L']
             ),
-        ));
+        ]);
+
+        $builder->add('float', 'button_group', [
+            'label'      => 'mautic.core.button.size',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => [
+                'class'           => 'form-control',
+                'data-slot-param' => 'float',
+            ],
+            'choice_list' => new ChoiceList(
+                ['left', 'center', 'right'],
+                ['mautic.core.left', 'mautic.core.center', 'mautic.core.right']
+            ),
+        ]);
+
+        // $builder->add('background-color', 'text', [
+        //     'label'      => 'mautic.core.background.color',
+        //     'label_attr' => ['class' => 'control-label'],
+        //     'required'   => false,
+        //     'attr'       => [
+        //         'class'           => 'form-control',
+        //         'data-slot-param' => 'background-color',
+        //         'data-toggle'     => 'color'
+        //     ],
+        // ]);
+
+        // $builder->add('color', 'text', [
+        //     'label'      => 'mautic.core.text.color',
+        //     'label_attr' => ['class' => 'control-label'],
+        //     'required'   => false,
+        //     'attr'       => [
+        //         'class'           => 'form-control',
+        //         'data-slot-param' => 'color',
+        //         'data-toggle'     => 'color'
+        //     ],
+        // ]);
     }
 
     /**
