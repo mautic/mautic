@@ -55,6 +55,7 @@ class EmailGenerateCommand extends ModeratedCommand
         $options = $input->getOptions();
         $objectId = $options['id'];
         $factory = $this->getContainer()->get('mautic.factory');
+        $translator = $factory->getTranslator();
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $factory->getModel('email');
         $email = $model->getEntity($objectId);
@@ -77,11 +78,11 @@ class EmailGenerateCommand extends ModeratedCommand
         }
 
         $pending = $model->getPendingLeads($email, null, true);
-        $output->writeln('<info>There is ' . $pending . ' mails to generate</info>');
+        $output->writeln('<info>'.$translator->trans('mautic.email.generate.pending', array('%pending%' => $pending)).'</info>');
         $sendStat = $model->sendEmailToLists($email);
         if ($pending > 0) {
-            $output->writeln('<info>' . $sendStat[0] . ' mails sent</info>');
-            $output->writeln('<info>' . $sendStat[1] . ' mails failed</info>');
+            $output->writeln('<info>'.$translator->trans('mautic.email.stat.sentcount', array('%count%' => $sendStat[0])).'</info>');
+            $output->writeln('<info>'.$translator->trans('mautic.email.stat.failed', array('%count%' => $sendStat[1])).'</info>');
         }
 
         $this->completeRun();
