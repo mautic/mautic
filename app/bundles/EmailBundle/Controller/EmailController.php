@@ -1358,7 +1358,7 @@ class EmailController extends FormController
 
             $value = isset($content[$slot]) ? $content[$slot] : "";
             $placeholder = isset($slotConfig['placeholder']) ? $slotConfig['placeholder'] : 'mautic.page.builder.addcontent';
-            $slotsHelper->set($slot, "<div id=\"slot-{$slot}\" class=\"mautic-editable\" contenteditable=true data-placeholder=\"{$translatorHelper->trans($placeholder)}\">{$value}</div>");
+            $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\" />{$value}</div>");
         }
 
         //add builder toolbar
