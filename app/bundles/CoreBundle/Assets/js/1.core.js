@@ -3347,6 +3347,15 @@ var Mautic = {
         mQuery('[data-theme]').click(function(e) {
             e.preventDefault();
             var currentLink = mQuery(this);
+            var customHtml = mQuery('textarea.builder-html');
+            
+            if (customHtml.val().length) {
+                if (confirm('You will lose the current content if you switch the theme.')) {
+                    customHtml.val('');
+                } else {
+                    return;
+                }
+            }
 
             // Set the theme field value
             themeField.val(currentLink.attr('data-theme'));
