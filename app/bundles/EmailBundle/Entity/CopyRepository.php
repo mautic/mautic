@@ -17,6 +17,29 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class CopyRepository extends CommonRepository
 {
+    /**
+     * @param $hash
+     * @param $subject
+     * @param $body
+     */
+    public function saveCopy($hash, $subject, $body)
+    {
+        $db = $this->getEntityManager()->getConnection();
+
+        try {
+            $db->insert(
+                MAUTIC_TABLE_PREFIX.'email_copies',
+                [
+                    'id'           => $hash,
+                    'body'         => $body,
+                    'subject'      => $subject,
+                    'date_created' => (new \DateTime())->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s')
+                ]
+            );
+        } catch (\Exception $e) {
+            error_log($e);
+        }
+    }
 
     /**
      * @param      $string   md5 hash or content

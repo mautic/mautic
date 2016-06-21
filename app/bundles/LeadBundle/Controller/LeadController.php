@@ -1338,13 +1338,25 @@ class LeadController extends FormController
 
                                 $data = array_combine($headers, $data);
                                 try {
-                                    $merged = $model->importLead($importFields, $data, $defaultOwner, $defaultList, $defaultTags);
-
-                                    if ($merged) {
-                                        $stats['merged']++;
-                                    } else {
-                                        $stats['created']++;
+                                    $prevent = false;
+                                    foreach ($data as $key => $value) {
+                                        if ($value != "") {
+                                            $prevent = true;
+                                            break;
+                                        }
                                     }
+                                    if ($prevent) {
+                                        $merged = $model->importLead($importFields, $data, $defaultOwner, $defaultList, $defaultTags);
+                                        if ($merged) {
+                                            $stats['merged']++;
+                                        } else {
+                                            $stats['created']++;
+                                        }
+                                    }     
+                                    else {
+                                        $stats['ignored']++;
+                                        $stats['failures'][$lineNumber] = $this->factory->getTranslator()->trans('mautic.lead.import.error.line_empty');
+                                    }        
                                 } catch (\Exception $e) {
                                     // Email validation likely failed
                                     $stats['ignored']++;
@@ -1648,7 +1660,7 @@ class LeadController extends FormController
                         // Ensure safe emoji for notification
                         $subject = EmojiHelper::toHtml($email['subject']);
                         if ($mailer->send(true, false, false)) {
-                            $mailer->createLeadEmailStat();
+                            $mailer->createEmailStat();
                             $this->addFlash(
                                 'mautic.lead.email.notice.sent',
                                 array(
