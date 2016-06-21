@@ -59,7 +59,7 @@ class CampaignSubscriber extends CommonSubscriber
     public function onAssetDownload(AssetLoadEvent $event)
     {
         $asset = $event->getRecord()->getAsset();
-        $this->factory->getModel('campaign')->triggerEvent('asset.download', $asset, 'asset.download.'.$asset->getId());
+        $this->factory->getModel('campaign.event')->triggerEvent('asset.download', $asset, 'asset.download.'.$asset->getId());
     }
 
     /**
