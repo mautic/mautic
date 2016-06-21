@@ -576,7 +576,7 @@ return [
         'db_user'                        => '',
         'db_password'                    => '',
         'db_table_prefix'                => '',
-        'db_path'                        => '',
+        'db_server_version'              => '5.5',
         'locale'                         => 'en_US',
         'secret_key'                     => '',
         'trusted_hosts'                  => null,

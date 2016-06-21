@@ -112,6 +112,7 @@ class InstallController extends CommonController
                                 $schemaHelper->testConnection();
 
                                 if ($schemaHelper->createDatabase()) {
+                                    $formData->server_version = $schemaHelper->getServerVersion();
                                     if ($this->saveConfiguration($formData, $step, true)) {
 
                                         // Refresh to install schema with new connection information in the container

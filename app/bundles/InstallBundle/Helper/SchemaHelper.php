@@ -58,17 +58,12 @@ class SchemaHelper
         }
 
         $dbParams['charset'] = 'UTF8';
-
         if (isset($dbParams['name'])) {
             $dbParams['dbname'] = $dbParams['name'];
             unset($dbParams['name']);
         }
 
         $this->db = DriverManager::getConnection($dbParams);
-
-        if ($this->db->isConnected()) {
-            $this->db->close();
-        }
 
         $this->dbParams = $dbParams;
     }
@@ -86,8 +81,26 @@ class SchemaHelper
      */
     public function testConnection()
     {
-        $this->db->connect();
-        $this->db->close();
+        if (isset($this->dbParams['dbname'])) {
+            // Test connection credentials
+            $dbParams = $this->dbParams;
+            unset($dbParams['dbname']);
+            $db = DriverManager::getConnection($dbParams);
+
+            $db->connect();
+            $db->close();
+        } else {
+            $this->db->connect();
+            $this->db->close();
+        }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getServerVersion()
+    {
+        return $this->db->getWrappedConnection()->getServerVersion();
     }
 
     /**
