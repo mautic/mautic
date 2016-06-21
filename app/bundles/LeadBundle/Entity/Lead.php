@@ -265,7 +265,7 @@ class Lead extends FormEntity
         $builder->createManyToOne('stage', 'Mautic\StageBundle\Entity\Stage')
             ->cascadePersist()
             ->cascadeMerge()
-            ->addJoinColumn('stage_id', 'id', false)
+            ->addJoinColumn('stage_id', 'id', true)
             ->build();
         
         $builder->createOneToMany('stageChangeLog', 'StagesChangeLog')

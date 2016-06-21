@@ -25,9 +25,8 @@ class StageRepository extends CommonRepository
     {
         $q = $this->_em
             ->createQueryBuilder()
-            ->select($this->getTableAlias() . ', cat')
-            ->from('MauticStageBundle:Stage', $this->getTableAlias())
-            ->leftJoin($this->getTableAlias().'.category', 'cat');
+            ->select($this->getTableAlias() )
+            ->from('MauticStageBundle:Stage', $this->getTableAlias());
 
         $args['qb'] = $q;
 
@@ -169,6 +168,36 @@ class StageRepository extends CommonRepository
         $results = $q->getQuery()->getArrayResult();
 
         $stages[$key] = $results;
+
+        return $results;
+    }
+
+    /**
+     * Get a list of lists
+     *
+     * @param string $name
+     *
+     * @return array
+     */
+    public function getStageByName($stageName)
+    {
+        static $stages = array();
+
+        if (!$stageName) {
+            return false;
+        }
+
+        $q = $this->_em->createQueryBuilder()
+            ->from('MauticStageBundle:Stage', 's', 's.id');
+
+        $q->select('partial s.{id, name}')
+            ->andWhere($q->expr()->eq('s.isPublished', ':true'))
+            ->setParameter('true', true, 'boolean');
+        $q->andWhere(
+            $q->expr()->like('s.name', $stageName)
+        );
+
+        $results = $q->getQuery()->getArrayResult();
 
         return $results;
     }

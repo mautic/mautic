@@ -369,7 +369,6 @@ class LeadController extends FormController
         foreach ($eventsByDate as $eventDate => $dateEvents) {
             $datetime = new \DateTime($eventDate);
             if ($datetime >= $fromDate) {
-                $total++;
                 $engagements[] = array(
                     'date' => $eventDate,
                     'data' => 1
