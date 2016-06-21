@@ -10,9 +10,10 @@
 <?php if ($themes) : ?>
 <div class="row">
     <?php foreach ($themes as $themeKey => $themeInfo) : ?>
+        <?php $isSelected = ($active === $themeKey); ?>
+        <?php if (!empty($themeInfo['config']['onlyForBC']) && !$isSelected) continue; ?>
         <?php $thumbnailUrl = $view['assets']->getUrl('themes/'.$themeKey.'/thumbnail.png'); ?>
         <?php $hasThumbnail = file_exists($themeInfo['dir'].'/thumbnail.png'); ?>
-        <?php $isSelected = ($active === $themeKey); ?>
         <div class="col-md-3 theme-list">
             <div class="panel panel-default <?php echo $isSelected ? 'theme-selected' : ''; ?>">
                 <div class="panel-body text-center">
