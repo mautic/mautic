@@ -21,6 +21,24 @@ use Mautic\FeedBundle\Entity\Feed;
 class FeedHelper
 {
 
+    public static $feedItems=array(
+        '{feedfield=feedtitle}' => 'mautic.feed.title',
+        '{feedfield=feeddescription}' => 'mautic.feed.description',
+        '{feedfield=feedlink}' => 'mautic.feed.link',
+        '{feedfield=feeddate}' => 'mautic.feed.date',
+        '{feedfield=itemtitle}' => 'mautic.feed.item.title',
+        '{feedfield=itemdescription}' => 'mautic.feed.item.description',
+        '{feedfield=itemauthor}' => 'mautic.feed.item.author',
+        '{feedfield=itemsummary}' => 'mautic.feed.item.summary',
+        '{feedfield=itemlink}' => 'mautic.feed.item.link',
+        '{feedfield=itemdate}' => 'mautic.feed.item.date'
+    );
+    public static $feedLoopAction=array(
+        '{feed=loopstart}' => 'mautic.feed.loopstart',
+        '{feed=loopend}' => 'mautic.feed.loopend'
+    );
+
+
     /**
      * @var Factory
      */

@@ -57,24 +57,10 @@ class EmailSubscriber extends CommonSubscriber
     public function onEmailBuild(EmailBuilderEvent $event)
     {
         if ($event->tokensRequested(self::$feedFieldRegex)) {
-            $event->addTokens(array(
-                '{feedfield=feedtitle}' => 'Feed Title',
-                '{feedfield=feeddescription}' => 'Feed Description',
-                '{feedfield=feedlink}' => 'Feed Link',
-                '{feedfield=feeddate}' => 'Feed Date',
-                '{feedfield=itemtitle}' => 'Item Title',
-                '{feedfield=itemdescription}' => 'Item Description',
-                '{feedfield=itemauthor}' => 'Item Author',
-                '{feedfield=itemsummary}' => 'Item Summary',
-                '{feedfield=itemlink}' => 'Item Link',
-                '{feedfield=itemdate}' => 'Item Date'
-            ));
+            $event->addTokens(array_flip(FeedHelper::$feedItems));
         }
         if ($event->tokensRequested(self::$feeditemsRegex)) {
-            $event->addTokens(array(
-                '{feed=loopstart}' => 'Start looping through the items',
-                '{feed=loopend}' => 'Stop looping through the items'
-            ));
+            $event->addTokens(array_flip(FeedHelper::$feedLoopAction));
         }
     }
 
