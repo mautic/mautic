@@ -18,6 +18,7 @@ use Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\MandrillTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\PostmarkTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport;
+use Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport;
 
 /**
  * Class AjaxController
@@ -329,6 +330,9 @@ class AjaxController extends CommonAjaxController
                 case 'mautic.transport.amazon':
                     $mailer = new AmazonTransport($settings['amazon_region']);
                     break;
+                case 'mautic.transport.sparkpost':
+                    $mailer = new SparkpostTransport($settings['api_key']);
+                    break;
                 default:
                     if ($this->container->has($transport)) {
                         $mailer = $this->container->get($transport);
@@ -340,11 +344,13 @@ class AjaxController extends CommonAjaxController
             }
 
             if (!empty($mailer)) {
-                if (empty($settings['password'])) {
-                    $settings['password'] = $this->factory->getParameter('mailer_password');
+                if (method_exists($mailer, "setUsername") && method_exists($mailer, "setPasssword")){
+                    if (empty($settings['password'])) {
+                        $settings['password'] = $this->factory->getParameter('mailer_password');
+                    }
+                    $mailer->setUsername($settings['user']);
+                    $mailer->setPassword($settings['password']);
                 }
-                $mailer->setUsername($settings['user']);
-                $mailer->setPassword($settings['password']);
 
                 $logger = new \Swift_Plugins_Loggers_ArrayLogger();
                 $mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($logger));
@@ -360,7 +366,13 @@ class AjaxController extends CommonAjaxController
                         );
 
                         $user = $this->factory->getUser();
-
+                        // If an exception is caught, collect some useful information to display.
+                        $logger->add("Recipient Name: "        .$user->getName());
+                        $logger->add("<br />Recipient Email: " .$user->getEmail());
+                        $logger->add("<br />Sender Name: "     .$settings['from_name']);
+                        $logger->add("<br />Sender Email: "    .$settings['from_email']);
+                        $logger->add("<br />Message: "         .$message->toString());
+                        
                         $message->setFrom(array($settings['from_email'] => $settings['from_name']));
                         $message->setTo(array($user->getEmail() => $user->getFirstName().' '.$user->getLastName()));
 
@@ -375,7 +387,6 @@ class AjaxController extends CommonAjaxController
                 }
             }
         }
-
         return $this->sendJsonResponse($dataArray);
     }
 

@@ -1,0 +1,6 @@
+<Files  ~ "\.yml">
+  Order allow,deny
+  Deny from all
+</Files>
+
+allow from all
