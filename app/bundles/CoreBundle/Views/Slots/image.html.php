@@ -8,4 +8,4 @@
  */
 ?>
 
-<img src="http://www.positivityblog.com/_images/090102_empty.jpg" alt="An image here"/>
+<img src="<?php echo $view['assets']->getUrl('themes/blank.png', null, null, true); ?>" alt="An image"/>

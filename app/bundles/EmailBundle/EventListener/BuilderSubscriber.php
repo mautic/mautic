@@ -99,7 +99,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'text',
                 'Text',
                 'font',
-                'MauticCoreBundle:Slots:text.html.twig',
+                'MauticCoreBundle:Slots:text.html.php',
                 'slot',
                 1000
             );
@@ -107,7 +107,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'image',
                 'Image',
                 'image',
-                'MauticCoreBundle:Slots:image.html.twig',
+                'MauticCoreBundle:Slots:image.html.php',
                 'slot',
                 900
             );
@@ -115,7 +115,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'button',
                 'Button',
                 'external-link',
-                'MauticCoreBundle:Slots:button.html.twig',
+                'MauticCoreBundle:Slots:button.html.php',
                 'slot_button',
                 800
             );
