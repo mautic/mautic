@@ -104,7 +104,7 @@ class AbTestHelper
 
         if ($startDate != null && !empty($pageIds)) {
             //get their bounce rates
-            $counts = $repo->getDwellTimes(array('pageIds' => $pageIds, 'startDate' => $startDate));
+            $counts = $repo->getDwellTimesForPages($pageIds, array('fromDate' => $startDate));
             $translator = $factory->getTranslator();
             $support = array();
 

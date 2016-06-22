@@ -21,3 +21,4 @@ endif;
 </div>
 
 <?php $view['slots']->output('modal'); ?>
+<?php echo $view['security']->getAuthenticationContent(); ?>

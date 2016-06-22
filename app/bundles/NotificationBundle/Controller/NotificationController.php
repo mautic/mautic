@@ -274,8 +274,6 @@ class NotificationController extends FormController
             return $this->accessDenied();
         }
 
-        $stats = $model->getNotificationGeneralStats($notification);
-
         // Audit Log
         $logs = $this->getModel('core.auditLog')->getLogForObject('notification', $notification->getId(), $notification->getDateAdded());
 
@@ -293,7 +291,7 @@ class NotificationController extends FormController
                 ),
                 'viewParameters'  => array(
                     'notification'   => $notification,
-                    'stats'          => $stats,
+                    'stats'          => array(), // @todo
                     'trackables'     => $trackableLinks,
                     'logs'           => $logs,
                     'permissions'    => $security->isGranted(

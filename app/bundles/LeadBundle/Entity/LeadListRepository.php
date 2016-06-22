@@ -679,6 +679,16 @@ class LeadListRepository extends CommonRepository
                             break;
                     }
 
+                    // check does this match php date params pattern?
+                    if(stristr($string[0], '-') or stristr($string[0], '+')){
+                        $date = new \DateTime('now');
+                        $date->modify($string);
+                        $dateTime = $date->format('Y-m-d H:i:s');
+                        $dtHelper->setDateTime($dateTime, null);
+                        $key = $string;
+                        $isRelative = true;
+                    }
+                    
                     if ($isRelative) {
                         if ($requiresBetween) {
                             $startWith = ($isTimestamp) ? $dtHelper->toUtcString('Y-m-d H:i:s') : $dtHelper->toUtcString('Y-m-d');
@@ -750,27 +760,27 @@ class LeadListRepository extends CommonRepository
                 case 'dnc_unsubscribed':
                 case 'dnc_bounced_sms':
                 case 'dnc_unsubscribed_sms':
-                    // Special handling of do not email
+                    // Special handling of do not contact
                     $func = (($func == 'eq' && $details['filter']) || ($func == 'neq' && !$details['filter'])) ? 'EXISTS' : 'NOT EXISTS';
 
-                    $parts = explode('_', $details['field']);
+                    $parts   = explode('_', $details['field']);
                     $channel = 'email';
 
                     if (count($parts) === 3) {
                         $channel = $parts[2];
                     }
-                    $channelParam = $this->generateRandomParameterName();
+
+                    $channelParameter = $this->generateRandomParameterName();
                     $subqb = $this->_em->getConnection()->createQueryBuilder()
                         ->select('null')
-                        ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', $alias)
+                        ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', $alias)
                         ->where(
                             $q->expr()->andX(
-                                $q->expr()->eq($alias . '.reason', $exprParameter),
-                                $q->expr()->eq($alias . '.lead_id', 'l.id'),
-                                $q->expr()->eq($alias . '.channel', ":$channelParam")
+                                $q->expr()->eq($alias.'.reason', $exprParameter),
+                                $q->expr()->eq($alias.'.lead_id', 'l.id'),
+                                $q->expr()->eq($alias.'.channel', ":$channelParameter")
                             )
                         );
-                    $parameters[$channelParam] = $channel;
 
                     // Specific lead
                     if (!empty($leadId)) {
@@ -788,7 +798,8 @@ class LeadListRepository extends CommonRepository
 
                     $ignoreAutoFilter = true;
 
-                    $parameters[$parameter] = ($parts[1] === 'bounced') ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
+                    $parameters[$parameter]        = ($parts[1] === 'bounced') ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
+                    $parameters[$channelParameter] = $channel;
 
                     break;
 
