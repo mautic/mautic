@@ -41,6 +41,17 @@ class StageActionType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber($masks));
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(array(
+            'formType'        => 'genericstage_settings',
+            'formTypeOptions' => array()
+        ));
+    }
+
 
     /**
      * {@inheritdoc}

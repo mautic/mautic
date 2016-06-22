@@ -51,7 +51,6 @@ class DashboardLeadsLifetimeWidgetType extends AbstractType
                 'choices' => $segments,
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
-                'empty_data' => '',
                 'required'   => false
             )
         );

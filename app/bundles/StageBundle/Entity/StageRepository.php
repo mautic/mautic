@@ -51,12 +51,11 @@ class StageRepository extends CommonRepository
     public function getPublishedByType($type)
     {
         $q = $this->createQueryBuilder('p')
-            ->select('partial p.{id, type, name, properties}')
+            ->select('partial p.{id, name}')
             ->setParameter('type', $type);
 
         //make sure the published up and down dates are good
         $expr = $this->getPublishedByDateExpression($q);
-        $expr->add($q->expr()->eq('p.type', ':type'));
 
         $q->where($expr);
 
@@ -79,11 +78,9 @@ class StageRepository extends CommonRepository
         //make sure the published up and down dates are good
         $q->where(
             $q->expr()->andX(
-                $q->expr()->eq('s.type', ':type'),
                 $q->expr()->eq('x.lead_id', (int) $leadId)
             )
-        )
-            ->setParameter('type', $type);
+        );
 
         $results = $q->execute()->fetchAll();
 

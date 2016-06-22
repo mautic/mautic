@@ -27,27 +27,22 @@ echo $view['form']->start($form);
                     <div class="pa-md">
                         <?php
                         echo $view['form']->row($form['name']);
-                        echo $view['form']->row($form['description']);
+
                         ?>
                     </div>
                 </div>
-                <div class="col-md-6">
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
                     <div class="pa-md">
-                        <?php echo $view['form']->row($form['weight']); ?>
-                        <?php echo $view['form']->row($form['type']); ?>
-                        <div id="stageActionProperties">
-                            <?php
-                            if (isset($form['properties'])):
-                                echo $view['form']->row($form['properties']);
-                            endif;
-                            ?>
-                        </div>
+                        <?php echo $view['form']->row($form['description']); ?>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3 bg-white height-auto">
             <div class="pr-lg pl-lg pt-md pb-md">
+                <?php echo $view['form']->row($form['weight']); ?>
                 <?php
                 echo $view['form']->row($form['category']);
                 echo $view['form']->row($form['isPublished']);

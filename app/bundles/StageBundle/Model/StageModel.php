@@ -262,7 +262,7 @@ class StageModel extends CommonFormModel
             if (isset($completedActions[$action->getId()])) {
                 continue;
             }
-            $this->factory->getLogger()->addError(print_r($availableActions,true));
+
             //make sure the action still exists
             if (!isset($availableActions['actions'][$action->getType()])) {
                 continue;
@@ -291,5 +291,4 @@ class StageModel extends CommonFormModel
             $this->em->clear('Mautic\StageBundle\Entity\LeadStageLog');
         }
     }
-
 }

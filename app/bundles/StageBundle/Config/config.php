@@ -94,7 +94,11 @@ return [
                 'class' => 'Mautic\StageBundle\Form\Type\StageListType',
                 'arguments' => 'mautic.factory',
                 'alias' => 'stage_list'
-            ]
+            ],
+            'mautic.point.type.genericstage_settings' => array(
+                'class' => 'Mautic\StageBundle\Form\Type\GenericStageSettingsType',
+                'alias' => 'genericstage_settings'
+            )
         ],
         'models' =>  [
             'mautic.stage.model.stage' => [

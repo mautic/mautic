@@ -131,9 +131,6 @@ return [
             ],
             'mautic.email.dashboard.subscriber'      => [
                 'class' => 'Mautic\EmailBundle\EventListener\DashboardSubscriber'
-            ],
-            'mautic.email.stagebundle.subscriber'    => [
-                'class' => 'Mautic\EmailBundle\EventListener\StageSubscriber'
             ]
         ],
         'forms'  => [

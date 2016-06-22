@@ -1047,6 +1047,12 @@ class ListModel extends FormModel
         if(!empty($segments)){
             $q->andWhere("ll.id IN (".$segmentlist.")");
         }
+        if(!empty($dateFrom)){
+            $q->andWhere("t.date_added >= '".$dateFrom->format('Y-m-d')."'");
+        }
+        if(!empty($dateTo)){
+            $q->andWhere("t.date_added <= '".$dateTo->format('Y-m-d')." 23:59:59'");
+        }
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('ll.created_by = :userId')
                 ->setParameter('userId', $this->factory->getUser()->getId());
@@ -1132,7 +1138,7 @@ class ListModel extends FormModel
             ->andWhere($q->expr()->gte('t.date_added', ':date_from'))
             ->setParameter('date_from', $dateFrom->format('Y-m-d'))
             ->andWhere($q->expr()->lte('t.date_added', ':date_to'))
-            ->setParameter('date_to', $dateTo->format('Y-m-d'))
+            ->setParameter('date_to', $dateTo->format('Y-m-d'." 23:59:59"))
             ->setParameter('published', true);
 
         if(isset($filter['leadlist_id']['value'])){
@@ -1147,7 +1153,9 @@ class ListModel extends FormModel
         }
 
         $results = $q->execute()->fetchAll();
+
         foreach($results as $result){
+            $percentage = $result['leads'];
             $data['labels'][]=substr($result['stage'],0,12);
             $data['values'][]=$result['leads'];
 
@@ -1163,7 +1171,7 @@ class ListModel extends FormModel
         $chart     = new BarChart($data['labels']);
 
         $datasetId = count($data['values']);
-        $datasets[] = array_merge($baseData, $chart->generateColors($datasetId));
+        $datasets[] = array_merge($baseData, $chart->generateColors(3));
 
         $chartData = array(
             'labels' => $data['labels'],

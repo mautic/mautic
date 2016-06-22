@@ -141,9 +141,6 @@ return [
             ],
             'mautic.form.dashboard.subscriber'      => [
                 'class' => 'Mautic\FormBundle\EventListener\DashboardSubscriber'
-            ],
-            'mautic.form.stagebundle.subscriber'    => [
-                'class' => 'Mautic\FormBundle\EventListener\StageSubscriber'
             ]
         ],
         'forms'  => [

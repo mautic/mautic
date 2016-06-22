@@ -26,7 +26,6 @@ class StagePermissions extends AbstractPermissions
         parent::__construct($params);
 
         $this->addStandardPermissions('stages');
-        $this->addStandardPermissions('triggers');
         $this->addStandardPermissions('categories');
     }
 
@@ -45,6 +44,5 @@ class StagePermissions extends AbstractPermissions
     {
         $this->addStandardFormFields('stage', 'categories', $builder, $data);
         $this->addStandardFormFields('stage', 'stages', $builder, $data);
-        $this->addStandardFormFields('stage', 'triggers', $builder, $data);
     }
 }

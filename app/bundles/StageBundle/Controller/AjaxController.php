@@ -33,7 +33,7 @@ class AjaxController extends CommonAjaxController
 
         if (!empty($type)) {
             //get the HTML for the form
-            /** @var \Mautic\PointBundle\Model\StageModel $model */
+            /** @var \Mautic\StageBundle\Model\StageModel $model */
             $model   = $this->getModel('stage');
             $actions = $model->getStageActions();
 
@@ -42,14 +42,14 @@ class AjaxController extends CommonAjaxController
                 if (!empty($actions['actions'][$type]['formTheme'])) {
                     $themes[] = $actions['actions'][$type]['formTheme'];
                 }
-
+                $formType        = (!empty($actions['actions'][$type]['formType'])) ? $actions['actions'][$type]['formType'] : 'genericstage_settings';
                 $formTypeOptions = (!empty($actions['actions'][$type]['formTypeOptions'])) ? $actions['actions'][$type]['formTypeOptions'] : array();
+
                 $form            = $this->get('form.factory')->create('stageaction', array(), array('formType' => $formType, 'formTypeOptions' => $formTypeOptions));
                 $html            = $this->renderView('MauticStageBundle:Stage:actionform.html.php', array(
                     'form' => $this->setFormTheme($form, 'MauticStageBundle:Stage:actionform.html.php', $themes)
                 ));
 
-                //replace pointaction with point
                 $html                 = str_replace('stageaction', 'stage', $html);
                 $dataArray['html']    = $html;
                 $dataArray['success'] = 1;

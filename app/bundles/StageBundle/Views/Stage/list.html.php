@@ -46,8 +46,6 @@ if ($tmpl == 'index') {
                     )
                 );
 
-                echo '<th class="col-stage-action">'.$view['translator']->trans('mautic.stage.thead.action').'</th>';
-
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     array(
@@ -110,11 +108,6 @@ if ($tmpl == 'index') {
                         <span style="white-space: nowrap;"><span class="label label-default pa-4"
                                                                  style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
                     </td>
-                    <?php
-                    $type   = $item->getType();
-                    $action = (isset($actions[$type])) ? $actions[$type]['label'] : '';
-                    ?>
-                    <td><?php echo $view['translator']->trans($action); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>
