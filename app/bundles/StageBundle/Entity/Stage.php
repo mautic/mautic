@@ -87,7 +87,6 @@ class Stage extends FormEntity
      */
     public function __construct()
     {
-        $this->properties = new ArrayCollection();
         $this->log = new ArrayCollection();
     }
 
