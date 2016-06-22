@@ -45,7 +45,7 @@ class DashboardLeadsLifetimeWidgetType extends AbstractType
             $segments[$list['id']] = $list['name'];
         }
 
-        $builder->add('lead', 'choice', array(
+        $builder->add('flag', 'choice', array(
                 'label'   => 'mautic.lead.list.filter',
                 'multiple'   => true,
                 'choices' => $segments,

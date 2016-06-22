@@ -1047,6 +1047,12 @@ class ListModel extends FormModel
         if(!empty($segments)){
             $q->andWhere("ll.id IN (".$segmentlist.")");
         }
+        if(!empty($dateFrom)){
+            $q->andWhere("t.date_added >= '".$dateFrom->format('Y-m-d')."'");
+        }
+        if(!empty($dateTo)){
+            $q->andWhere("t.date_added <= '".$dateTo->format('Y-m-d')."'");
+        }
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('ll.created_by = :userId')
                 ->setParameter('userId', $this->factory->getUser()->getId());

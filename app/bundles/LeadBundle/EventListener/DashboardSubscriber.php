@@ -197,7 +197,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $params['filter']['flag'] = $params['flag'];
                 $maxSegmentsToshow = count($params['filter']['flag']);
             }
-            $this->factory->getLogger()->addError(print_r($params['filter']['flag'],true));
+
             $lists = $model->getLifeCycleSegments($maxSegmentsToshow, $params['dateFrom'], $params['dateTo'], $canViewOthers, $params['filter']['flag']);
             $items = array();
 
@@ -242,7 +242,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $canViewOthers);
                 }
                 $width = 100/count($lists);
-                $this->factory->getLogger()->addError(print_r($column,true));
+
                 $event->setTemplateData(array(
                     'columnName' => $items['columnName'],
                     'value' => $items['value'],
