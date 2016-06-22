@@ -10,7 +10,6 @@
 namespace Mautic\PluginBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -57,19 +56,18 @@ class DetailsType extends AbstractType
 
         $features = $options['integration_object']->getSupportedFeatures();
         if (!empty($features)) {
-
             // Check to see if the integration is a new entry and thus not configured
             $configured      = $options['data']->getId() !== null;
             $enabledFeatures = $options['data']->getSupportedFeatures();
             $data            = ($configured) ? $enabledFeatures : $features;
 
-            $labels = array();
+            $choices = array();
             foreach ($features as $f) {
-                $labels[] = 'mautic.integration.form.feature.' . $f;
+                $choices[$f] = 'mautic.integration.form.feature.' . $f;
             }
 
             $builder->add('supportedFeatures', 'choice', array(
-                'choice_list' => new ChoiceList($features, $labels),
+                'choices'     => $choices,
                 'expanded'    => true,
                 'label_attr'  => array('class' => 'control-label'),
                 'multiple'    => true,
@@ -77,17 +75,17 @@ class DetailsType extends AbstractType
                 'required'    => false,
                 'data'        => $data
             ));
-
-            $builder->add('featureSettings', 'integration_featuresettings', array(
-                'label'              => 'mautic.integration.form.feature.settings',
-                'required'           => true,
-                'data'               => $options['data']->getFeatureSettings(),
-                'label_attr'         => array('class' => 'control-label'),
-                'integration'        => $options['integration'],
-                'integration_object' => $options['integration_object'],
-                'lead_fields'        => $options['lead_fields']
-            ));
         };
+
+        $builder->add('featureSettings', 'integration_featuresettings', array(
+            'label'              => 'mautic.integration.form.feature.settings',
+            'required'           => true,
+            'data'               => $options['data']->getFeatureSettings(),
+            'label_attr'         => array('class' => 'control-label'),
+            'integration'        => $options['integration'],
+            'integration_object' => $options['integration_object'],
+            'lead_fields'        => $options['lead_fields']
+        ));
 
         $builder->add('name', 'hidden', array('data' => $options['integration']));
 

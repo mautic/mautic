@@ -1,7 +1,7 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2015 Mautic Contributors. All rights reserved.
  * @author      Mautic
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -9,33 +9,33 @@
 
 namespace Mautic\UserBundle\Form\Type;
 
-use Mautic\UserBundle\Model\UserModel;
+use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class UserListType
- *
- * @package Mautic\UserBundle\Form\Type
+ * Class RoleListType
  */
-class UserListType extends AbstractType
+class RoleListType extends AbstractType
 {
-
+    /**
+     * @var array
+     */
     private $choices = [];
 
     /**
-     * UserListType constructor.
+     * RoleListType constructor.
      *
-     * @param UserModel $model
+     * @param RoleModel $model
      */
-    public function __construct(UserModel $model)
+    public function __construct(RoleModel $model)
     {
         $choices = $model->getRepository()->getEntities(
             [
                 'filter' => [
                     'force' => [
                         [
-                            'column' => 'u.isPublished',
+                            'column' => 'r.isPublished',
                             'expr'   => 'eq',
                             'value'  => true
                         ]
@@ -61,7 +61,7 @@ class UserListType extends AbstractType
             [
                 'choices'     => $this->choices,
                 'expanded'    => false,
-                'multiple'    => true,
+                'multiple'    => false,
                 'required'    => false,
                 'empty_value' => 'mautic.core.form.chooseone'
             ]
@@ -73,7 +73,7 @@ class UserListType extends AbstractType
      */
     public function getName()
     {
-        return "user_list";
+        return "role_list";
     }
 
     /**
