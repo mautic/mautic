@@ -31,10 +31,10 @@ class FeedRepository extends CommonRepository
      */
     public function latestSnapshot(MauticFactory $factory, Feed $feed, $maxDate=null)
     {
-        $snapshotnapshots = $feed->getSnapshots();
-        for ($i = count($snapshotnapshots) - 1; $i > 0; $i --) { //TODO faire une requette DQL pour eviter de charger tous les snapshot en memoire
+        $snapshots = $feed->getSnapshots();
+        for ($i = count($snapshots) - 1; $i > 0; $i --) { //TODO faire une requette DQL pour eviter de charger tous les snapshot en memoire
             /** @var \Mautic\FeedBundle\Entity\Snapshot $snapshot */
-            $snapshot = $snapshotnapshots->get($i);
+            $snapshot = $snapshots->get($i);
             if (!$snapshot->isExpired() && (is_null($maxDate) || $snapshot->getDate() > $maxDate)){
                 return $snapshot;
             }
