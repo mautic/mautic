@@ -90,6 +90,14 @@ $img = $view['lead_avatar']->getAvatar($lead);
                                     <?php echo $view['form']->widget($form['lastname'], array('attr' => array('placeholder' => $form['lastname']->vars['label']))); ?>
                                 </div>
                             </div>
+                            <hr class="mnr-md mnl-md">
+                            <div class="row">
+
+                                <div class="col-sm-8">
+                                    <?php echo $view['form']->label($form['stage']); ?>
+                                    <?php echo $view['form']->widget($form['stage']); ?>
+                                </div>
+                            </div>
                         </div>
                         <hr class="mnr-md mnl-md">
 
@@ -170,11 +178,8 @@ $img = $view['lead_avatar']->getAvatar($lead);
                                 <?php echo $view['form']->label($form['tags']); ?>
                                 <?php echo $view['form']->widget($form['tags']); ?>
                             </div>
-                            <div class="col-sm-4">
-                                <?php echo $view['form']->label($form['stage']); ?>
-                                <?php echo $view['form']->widget($form['stage']); ?>
-                            </div>
                         </div>
+
                         <?php endif; ?>
                     </div>
                 </div>
