@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Mautic\FeedBundle\Entity\Snapshot;
 use Mautic\FeedBundle\Helper\FeedHelper;
 use Mautic\FeedBundle\Entity\FeedRepository;
+use Mautic\FeedBundle\Exception\FeedNotFoundException;
 
 class PublicController extends CommonFormController
 {
@@ -349,13 +350,17 @@ class PublicController extends CommonFormController
         $feedFields = null;
 
         if ($emailEntity->getEmailType() == 'feed') {
-            //TODO A refactoriser pour
-            $feed = $emailEntity->getFeed();
-            /** @var Snapshot $snapshot */
-            $snapshot = $feedRepository->latestSnapshot($this->factory, $feed);
-            $xmlString = $snapshot->getXmlString();
-            $feedContent = $feedHelper->getFeedContentFromString($xmlString, $emailEntity->getFeed()->getItemCount());
-            $feedFields = $feedHelper->getFeedFields($feedContent);
+            try {
+                //TODO A refactoriser pour
+                $feed = $emailEntity->getFeed();
+                /** @var Snapshot $snapshot */
+                $snapshot = $feedRepository->latestSnapshot($this->factory, $feed);
+                $xmlString = $snapshot->getXmlString();
+                $feedContent = $feedHelper->getFeedContentFromString($xmlString, $emailEntity->getFeed()->getItemCount());
+                $feedFields = $feedHelper->getFeedFields($feedContent);
+            } catch (FeedNotFoundException $e) {
+                return new Response($e->getMessage());
+            }
         }
 
         if (

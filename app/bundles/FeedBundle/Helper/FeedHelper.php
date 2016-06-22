@@ -22,20 +22,20 @@ class FeedHelper
 {
 
     public static $feedItems=array(
-        '{feedfield=feedtitle}' => 'mautic.feed.title',
-        '{feedfield=feeddescription}' => 'mautic.feed.description',
-        '{feedfield=feedlink}' => 'mautic.feed.link',
-        '{feedfield=feeddate}' => 'mautic.feed.date',
-        '{feedfield=itemtitle}' => 'mautic.feed.item.title',
-        '{feedfield=itemdescription}' => 'mautic.feed.item.description',
-        '{feedfield=itemauthor}' => 'mautic.feed.item.author',
-        '{feedfield=itemsummary}' => 'mautic.feed.item.summary',
-        '{feedfield=itemlink}' => 'mautic.feed.item.link',
-        '{feedfield=itemdate}' => 'mautic.feed.item.date'
+        '{feedfield=feedtitle}' => 'Feed Title',
+        '{feedfield=feeddescription}' => 'Feed Description',
+        '{feedfield=feedlink}' => 'Feed Link',
+        '{feedfield=feeddate}' => 'Feed Date',
+        '{feedfield=itemtitle}' => 'Item Title',
+        '{feedfield=itemdescription}' => 'Item Description',
+        '{feedfield=itemauthor}' => 'Item Author',
+        '{feedfield=itemsummary}' => 'Item Summary',
+        '{feedfield=itemlink}' => 'Item Link',
+        '{feedfield=itemdate}' => 'Item Date'
     );
     public static $feedLoopAction=array(
-        '{feed=loopstart}' => 'mautic.feed.loopstart',
-        '{feed=loopend}' => 'mautic.feed.loopend'
+        '{feed=loopstart}' => 'Start looping through the items',
+        '{feed=loopend}' => 'Stop looping through the items'
     );
 
 

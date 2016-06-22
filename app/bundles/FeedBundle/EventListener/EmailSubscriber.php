@@ -57,10 +57,10 @@ class EmailSubscriber extends CommonSubscriber
     public function onEmailBuild(EmailBuilderEvent $event)
     {
         if ($event->tokensRequested(self::$feedFieldRegex)) {
-            $event->addTokens(array_flip(FeedHelper::$feedItems));
+            $event->addTokens(FeedHelper::$feedItems);
         }
         if ($event->tokensRequested(self::$feeditemsRegex)) {
-            $event->addTokens(array_flip(FeedHelper::$feedLoopAction));
+            $event->addTokens(FeedHelper::$feedLoopAction);
         }
     }
 

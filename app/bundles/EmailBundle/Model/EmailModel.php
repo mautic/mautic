@@ -49,6 +49,7 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Mautic\FeedBundle\Entity\Feed;
 use Mautic\FeedBundle\Entity\Snapshot;
+use Mautic\FeedBundle\Exception\FeedNotFoundException;
 
 /**
  * Class EmailModel
@@ -858,9 +859,13 @@ class EmailModel extends FormModel
         $snapshotId = is_null($email->getFeed()) ? null : $email->getFeed()->getSnapshots()->last()->getId();
 
         if ($email->getEmailType() == 'feed') {
-            $feedRepository = $this->em->getRepository('MauticFeedBundle:Feed');
-            $latestSnapshot = $feedRepository->latestSnapshot($this->factory, $email->getFeed());
-            $snapshotsId = $latestSnapshot->getId();
+            try {
+                $feedRepository = $this->em->getRepository('MauticFeedBundle:Feed');
+                $latestSnapshot = $feedRepository->latestSnapshot($this->factory, $email->getFeed());
+                $snapshotsId = $latestSnapshot->getId();
+            } catch (FeedNotFoundException $e) {
+                $snapshotsId = null;
+            }
         } else {
             $snapshotsId = null;
         }
