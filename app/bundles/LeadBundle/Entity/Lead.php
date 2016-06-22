@@ -880,6 +880,27 @@ class Lead extends FormEntity
     }
 
     /**
+     * Get profile values
+     *
+     * @return array
+     */
+    public function getProfileFields()
+    {
+        $fieldValues = [
+            'id' => $this->id
+        ];
+        if (isset($this->fields['core'])) {
+            foreach ($this->fields as $group => $fields) {
+                foreach ($fields as $alias => $field) {
+                    $fieldValues[$alias] = $field['value'];
+                }
+            }
+        }
+
+        return array_merge($fieldValues, $this->updatedFields);
+    }
+
+    /**
      * Add an updated field to persist to the DB and to note changes
      *
      * @param        $alias

@@ -10,47 +10,27 @@
 namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class PluginIntegrationAuthRedirectEvent
  */
-class PluginIntegrationAuthRedirectEvent extends Event
+class PluginIntegrationAuthRedirectEvent extends AbstractPluginIntegrationEvent
 {
-    /**
-     * @var AbstractIntegration
-     */
-    private $integration;
-
     /**
      * @var string
      */
     private $authUrl;
 
+    /**
+     * PluginIntegrationAuthRedirectEvent constructor.
+     *
+     * @param AbstractIntegration $integration
+     * @param                     $authUrl
+     */
     public function __construct(AbstractIntegration $integration, $authUrl)
     {
         $this->integration = $integration;
         $this->authUrl     = $authUrl;
-    }
-
-    /**
-     * Get the integration's name
-     *
-     * @return mixed
-     */
-    public function getIntegrationName()
-    {
-        return $this->getIntegrationName();
-    }
-
-    /**
-     * Get the integration object
-     *
-     * @return AbstractIntegration
-     */
-    public function getIntegration()
-    {
-        return $this->integration;
     }
 
     /**
@@ -67,5 +47,7 @@ class PluginIntegrationAuthRedirectEvent extends Event
     public function setAuthUrl($authUrl)
     {
         $this->authUrl = $authUrl;
+
+        $this->stopPropagation();
     }
 }

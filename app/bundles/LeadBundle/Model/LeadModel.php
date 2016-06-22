@@ -91,7 +91,7 @@ class LeadModel extends FormModel
 
     /**
      * LeadModel constructor.
-     * 
+     *
      * @param RequestStack $requestStack
      * @param CookieHelper $cookieHelper
      * @param IpLookupHelper $ipLookupHelper
@@ -102,9 +102,9 @@ class LeadModel extends FormModel
      */
     public function __construct(
         RequestStack $requestStack,
-        CookieHelper $cookieHelper, 
-        IpLookupHelper $ipLookupHelper, 
-        PathsHelper $pathsHelper, 
+        CookieHelper $cookieHelper,
+        IpLookupHelper $ipLookupHelper,
+        PathsHelper $pathsHelper,
         IntegrationHelper $integrationHelper,
         FieldModel $leadFieldModel,
         ListModel $leadListModel
@@ -549,6 +549,7 @@ class LeadModel extends FormModel
      * Takes leads organized by group and flattens them into just alias => value
      *
      * @param $fields
+     * @deprecated 2.0 to be removed in 3.0 - Use the Lead entity's getProfileFields() instead
      *
      * @return array
      */
@@ -969,14 +970,14 @@ class LeadModel extends FormModel
 
     /**
      * Remove a Lead's EMAIL DNC entry.
-     * 
+     *
      * @param string $email
      */
     public function removeDncForEmail($email)
     {
         $repo = $this->getRepository();
         $leadId = (array) $repo->getLeadByEmail($email, true);
-        
+
         /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
         $leads = [];
 

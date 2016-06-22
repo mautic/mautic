@@ -81,4 +81,21 @@ final class PluginEvents
      */
     const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.plugin.on_campaign_trigger_action';
 
+    /**
+     * The mautic.plugin_on_integration_get_auth_callback_url event is dispatched when generating the redirect/callback URL
+     *
+     * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationAuthCallbackUrlEvent instance.
+     *
+     * @var string
+     */
+    const PLUGIN_ON_INTEGRATION_GET_AUTH_CALLBACK_URL = 'mautic.plugin_on_integration_get_auth_callback_url';
+
+    /**
+     * The mautic.plugin_on_integration_form_display event is dispatched when fetching display settings for the integration's config form
+     *
+     * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationFormDisplayEvent instance.
+     *
+     * @var string
+     */
+    const PLUGIN_ON_INTEGRATION_FORM_DISPLAY = 'mautic.plugin_on_integration_form_display';
 }
