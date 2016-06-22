@@ -484,8 +484,10 @@ class PluginController extends FormController
             // Call the install callback
             $callback = $plugin['bundleClass'];
             $metadata = (isset($pluginMetadata[$plugin['namespace']])) ? $pluginMetadata[$plugin['namespace']] : null;
+            $installedSchema = (isset($pluginInstalledSchemas[$plugin['namespace']]))
+                ? $pluginInstalledSchemas[$plugin['namespace']] : null;
 
-            $callback::onPluginInstall($entity, $this->factory, $metadata);
+            $callback::onPluginInstall($entity, $this->factory, $metadata, $installedSchema);
 
             $persist[] = $entity;
         }

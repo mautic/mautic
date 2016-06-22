@@ -29,6 +29,13 @@ class DetailsType extends AbstractType
 
         $keys          = $options['integration_object']->getRequiredKeyFields();
         $decryptedKeys = $options['integration_object']->decryptApiKeys($options['data']->getApiKeys());
+        $formSettings  = $options['integration_object']->getFormDisplaySettings();
+
+        if (!empty($formSettings['hide_keys'])) {
+            foreach ($formSettings['hide_keys'] as $key) {
+                unset($keys[$key]);
+            }
+        }
 
         $builder->add('apiKeys', 'integration_keys', array(
             'label'               => false,
@@ -37,14 +44,13 @@ class DetailsType extends AbstractType
             'integration_object'  => $options['integration_object']
         ));
 
-        $formSettings = $options['integration_object']->getFormSettings();
         if (!empty($formSettings['requires_authorization'])) {
             $disabled     = false;
             $label        = ($options['integration_object']->isAuthorized()) ? 'reauthorize' : 'authorize';
 
             $builder->add('authButton', 'standalone_button', array(
                 'attr'     => array(
-                    'class'   => 'btn btn-primary',
+                    'class'   => 'btn btn-success btn-lg',
                     'onclick' => 'Mautic.initiateIntegrationAuthorization()',
                     'icon'    => 'fa fa-key'
 

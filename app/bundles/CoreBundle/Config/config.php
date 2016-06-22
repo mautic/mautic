@@ -271,9 +271,9 @@ return [
 
             // Configurator (used in installer and managing global config]
             'mautic.configurator' => [
-                'class'     => 'Mautic\CoreBundle\Configurator\Configurator', // In 2.0 change this to reference the CoreBundle
+                'class'     => 'Mautic\CoreBundle\Configurator\Configurator',
                 'arguments' => [
-                    'mautic.factory'
+                    'mautic.helper.paths'
                 ]
             ],
 
@@ -318,8 +318,9 @@ return [
                 'alias'     => 'mautic'
             ],
             'mautic.tblprefix_subscriber'        => [
-                'class' => 'Mautic\CoreBundle\EventListener\DoctrineEventsSubscriber',
-                'tag'   => 'doctrine.event_subscriber'
+                'class'     => 'Mautic\CoreBundle\EventListener\DoctrineEventsSubscriber',
+                'tag'       => 'doctrine.event_subscriber',
+                'arguments' => '%mautic.db_table_prefix%'
             ],
             'mautic.exception.listener'          => [
                 'class'        => 'Mautic\CoreBundle\EventListener\ExceptionListener',
@@ -590,7 +591,7 @@ return [
         'db_user'                        => '',
         'db_password'                    => '',
         'db_table_prefix'                => '',
-        'db_path'                        => '',
+        'db_server_version'              => '5.5',
         'locale'                         => 'en_US',
         'secret_key'                     => '',
         'trusted_hosts'                  => null,

@@ -330,7 +330,7 @@ class GooglePlusIntegration extends SocialIntegration
      */
     private function getContactUserId(&$identifier, &$socialCache)
     {
-        if (false && 'oauth2' == $this->getAuthenticationType()) {
+        if ('oauth2' == $this->getAuthenticationType()) {
             $accessToken = $this->getContactAccessToken($socialCache);
 
             if (isset($accessToken['access_token'])) {

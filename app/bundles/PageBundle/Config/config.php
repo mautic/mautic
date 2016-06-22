@@ -85,7 +85,11 @@ return [
                 'class' => 'Mautic\PageBundle\EventListener\PageSubscriber'
             ],
             'mautic.pagebuilder.subscriber'         => [
-                'class' => 'Mautic\PageBundle\EventListener\BuilderSubscriber'
+                'class' => 'Mautic\PageBundle\EventListener\BuilderSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.page.helper.token'
+                ]
             ],
             'mautic.pagetoken.subscriber'           => [
                 'class' => 'Mautic\PageBundle\EventListener\TokenSubscriber'
@@ -209,6 +213,12 @@ return [
                 'arguments' => [
                     'mautic.page.model.redirect'
                 ]
+            ]
+        ],
+        'other' => [
+            'mautic.page.helper.token' => [
+                'class'     => 'Mautic\PageBundle\Helper\TokenHelper',
+                'arguments' => 'mautic.page.model.page'
             ]
         ]
     ],
