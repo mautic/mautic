@@ -11,11 +11,12 @@ namespace Mautic\FeedBundle\Helper;
 
 use Debril\RssAtomBundle\Protocol\FeedInterface;
 use Debril\RssAtomBundle\Protocol\FeedReader;
+use Debril\RssAtomBundle\Protocol\Filter\Limit;
+use Debril\RssAtomBundle\Protocol\ItemOutInterface;
 use Debril\RssAtomBundle\Protocol\Parser\Factory;
 use Debril\RssAtomBundle\Protocol\Parser\XmlParser;
+use Mautic\FeedBundle\Exception\FeedNotFoundException;
 use Mautic\FeedBundle\Entity\Feed;
-use Debril\RssAtomBundle\Protocol\ItemOutInterface;
-use Debril\RssAtomBundle\Protocol\Filter\Limit;
 
 class FeedHelper
 {
@@ -74,7 +75,7 @@ class FeedHelper
         if ($response->getHttpCode() === 200) {
             return $response->getBody();
         } else {
-            return null;
+            throw new FeedNotFoundException();
         }
     }
 
