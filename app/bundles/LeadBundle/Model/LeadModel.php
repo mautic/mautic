@@ -805,7 +805,7 @@ class LeadModel extends FormModel
      * @param array|LeadList    $stage
      * @param bool              $manuallyAdded
      */
-    public function addToStages($lead, $stage, $field, $manuallyAdded = true)
+    public function addToStages($lead, $stage, $manuallyAdded = true)
     {
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;

@@ -2064,7 +2064,7 @@ class LeadController extends FormController
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
-            $data  = $this->request->request->get('lead_batch', array(), true);
+            $data  = $this->request->request->get('lead_batch_stage', array(), true);
             $ids   = json_decode($data['ids'], true);
 
             $this->factory->getLogger()->addError(print_r($ids,true));
@@ -2092,15 +2092,15 @@ class LeadController extends FormController
                 if ($this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getCreatedBy())) {
                     $count++;
 
-                    if (!empty($data['add'])) {
+                    if (!empty($data['addstage'])) {
                         $stageModel = $this->getModel('stage');
 
-                        $stage = $stageModel->getEntity($data['add'][0]);
-                        $model->addToStages($lead, $stage, $data['add']);
+                        $stage = $stageModel->getEntity((int) $data['addstage']);
+                        $model->addToStages($lead, $stage);
                     }
 
-                    if (!empty($data['remove'])) {
-                        $stage = $stageModel->getEntity($data['remove']);
+                    if (!empty($data['removestage'])) {
+                        $stage = $stageModel->getEntity($data['removestage']);
                         $model->removeFromStages($lead, $stage);
                     }
                 }
