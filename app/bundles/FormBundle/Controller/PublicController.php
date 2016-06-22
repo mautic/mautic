@@ -42,6 +42,7 @@ class PublicController extends CommonFormController
             //remove mauticError and mauticMessage from the referer so it doesn't get sent back
             $return = InputHelper::url($return, null, null, null, array('mauticError', 'mauticMessage'), true);
             $query  = (strpos($return, '?') === false) ? '?' : '&';
+            
         }
 
         $translator = $this->get('translator');
@@ -58,7 +59,7 @@ class PublicController extends CommonFormController
         } else {
             $formModel = $this->getModel('form.form');
             $form      = $formModel->getEntity($post['formId']);
-
+           
             //check to see that the form was found
             if ($form === null) {
                 $error = $translator->trans('mautic.form.submit.error.unavailable', array(), 'flashes');

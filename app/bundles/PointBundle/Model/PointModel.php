@@ -17,6 +17,7 @@ use Mautic\PointBundle\Entity\Action;
 use Mautic\PointBundle\Entity\LeadPointLog;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Event\PointBuilderEvent;
+use Mautic\PointBundle\Event\PointActionEvent;
 use Mautic\PointBundle\Event\PointEvent;
 use Mautic\PointBundle\PointEvents;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -185,7 +186,7 @@ class PointModel extends CommonFormModel
      * @param mixed $eventDetails passthrough from function triggering action to the callback function
      * @param mixed $typeId Something unique to the triggering event to prevent  unnecessary duplicate calls
      * @param Lead  $lead
-     *
+     *25
      * @return void
      */
     public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null)
@@ -286,6 +287,9 @@ class PointModel extends CommonFormModel
                         $delta,
                         $ipAddress
                     );
+                    
+                    $event = new PointActionEvent($action, $lead);
+                    $this->dispatcher->dispatch(PointEvents::POINT_ON_ACTION, $event);
 
                     $log = new LeadPointLog();
                     $log->setIpAddress($ipAddress);

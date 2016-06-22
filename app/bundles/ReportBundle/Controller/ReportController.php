@@ -528,7 +528,38 @@ class ReportController extends FormController
             $this->setListFilters();
         }
 
-        $reportData = $model->getReportData($entity, $this->container->get('form.factory'), array('paginate' => true, 'reportPage' => $reportPage));
+        $mysqlFormat     = 'Y-m-d';
+        $dateRangeValues = $this->request->get('daterange', array());
+        $session         = $this->factory->getSession();
+
+        // Get the date range filter values from the request of from the session 
+        if (!empty($dateRangeValues['date_from'])) {
+            $from = new \DateTime($dateRangeValues['date_from']);
+            $session->set('mautic.report.date.from', $from->format($mysqlFormat));
+        } elseif ($fromDate = $session->get('mautic.report.date.from')) {
+            $dateRangeValues['date_from'] = $fromDate;
+        }
+        if (!empty($dateRangeValues['date_to'])) {
+            $to = new \DateTime($dateRangeValues['date_to']);
+            $session->set('mautic.report.date.to', $to->format($mysqlFormat));
+        } elseif ($toDate = $session->get('mautic.report.date.to')) {
+            $dateRangeValues['date_to'] = $toDate;
+        }
+        
+        // Init the date range filter form
+        $action          = $this->generateUrl('mautic_report_action', array('objectAction' => 'view', 'objectId' => $objectId));
+        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, array('action' => $action));
+
+        $reportData = $model->getReportData(
+            $entity,
+            $this->container->get('form.factory'),
+            array(
+                'paginate'   => true,
+                'reportPage' => $reportPage,
+                'dateFrom'   => new \DateTime($dateRangeForm->get('date_from')->getData()),
+                'dateTo'     => new \DateTime($dateRangeForm->get('date_to')->getData())
+            )
+        );
 
         return $this->delegateView(array(
             'viewParameters'  => array(
@@ -550,6 +581,7 @@ class ReportController extends FormController
                     'report:reports:deleteown',
                     'report:reports:deleteother'
                 ), "RETURN_ARRAY"),
+                'dateRangeForm' => $dateRangeForm->createView()
             ),
             'contentTemplate' => $reportData['contentTemplate'],
             'passthroughVars' => array(

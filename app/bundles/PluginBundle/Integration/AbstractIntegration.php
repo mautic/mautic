@@ -97,6 +97,30 @@ abstract class AbstractIntegration
     }
 
     /**
+     * Get icon for Integration
+     *
+     * @return string
+     */
+    public function getIcon()
+    {
+        $systemPath  = $this->factory->getSystemPath('root');
+        $bundlePath  = $this->factory->getSystemPath('bundles');
+        $pluginPath  = $this->factory->getSystemPath('plugins');
+        $genericIcon = $bundlePath . '/PluginBundle/Assets/img/generic.png';
+
+        $name       = $this->getName();
+        $bundle     = $this->settings->getPlugin()->getBundle();
+        $icon       = $pluginPath.'/'.$bundle.'/Assets/img/'.strtolower($name).'.png';
+
+        if (file_exists($systemPath . '/' . $icon)) {
+
+            return $icon;
+        }
+
+        return $genericIcon;
+    }
+
+    /**
      * Get the type of authentication required for this API.  Values can be none, key, oauth2 or callback
      * (will call $this->authenticationTypeCallback)
      *
@@ -106,6 +130,14 @@ abstract class AbstractIntegration
 
     /**
      * Get a list of supported features for this integration
+     *
+     * Options are:
+     *  cloud_storage - Asset remote storage
+     *  public_profile - Lead social profile
+     *  public_activity - Lead social activity
+     *  share_button - Landing page share button
+     *  sso_service - SSO using 3rd party service via sso_login and sso_login_check routes
+     *  sso_form - SSO using submitted credentials through the login form
      *
      * @return array
      */
@@ -184,7 +216,6 @@ abstract class AbstractIntegration
      * @param bool|false  $return Returns the key array rather than setting them
      *
      * @return void|array
-     *
      */
     public function mergeApiKeys($mergeKeys, $withKeys = array(), $return = false)
     {
@@ -437,7 +468,11 @@ abstract class AbstractIntegration
      */
     public function parseCallbackResponse($data, $postAuthorization = false)
     {
-        return json_decode($data, true);
+        if (!$parsed = json_decode($data, true)) {
+            parse_str($data, $parsed);
+        }
+
+        return $parsed;
     }
 
     /**
@@ -529,6 +564,14 @@ abstract class AbstractIntegration
             $settings['query'] = array();
         }
 
+        if (isset($parameters['append_to_query'])) {
+            $settings['query'] = array_merge(
+                $settings['query'],
+                $parameters['append_to_query']
+            );
+            unset($parameters['append_to_query']);
+        }
+
         if (!$this->isConfigured()) {
             return array(
                 'error' => array(
@@ -538,7 +581,7 @@ abstract class AbstractIntegration
                 )
             );
         }
-
+        
         if ($method == 'GET' && !empty($parameters)) {
             $parameters = array_merge($settings['query'], $parameters);
             $query      = http_build_query($parameters);
@@ -571,13 +614,13 @@ abstract class AbstractIntegration
             }
         }
 
-        $referer = $this->getRefererUrl();
         $options = array(
             CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
             CURLOPT_HEADER         => 1,
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_FOLLOWLOCATION => 0,
-            CURLOPT_REFERER        => $referer
+            CURLOPT_REFERER        => $this->getRefererUrl(),
+            CURLOPT_USERAGENT      => $this->getUserAgent()
         );
 
         if (isset($settings['curl_options'])) {
@@ -598,14 +641,16 @@ abstract class AbstractIntegration
 
         // HTTP library requires that headers are in key => value pairs
         $headers = array();
-        foreach ($parseHeaders as $key => $value) {
-            if (strpos($value, ':') !== false) {
-                list($key, $value) = explode(':', $value);
-                $key   = trim($key);
-                $value = trim($value);
-            }
+        if (is_array($parseHeaders)) {
+            foreach ($parseHeaders as $key => $value) {
+                if (strpos($value, ':') !== false) {
+                    list($key, $value) = explode(':', $value);
+                    $key   = trim($key);
+                    $value = trim($value);
+                }
 
-            $headers[$key] = $value;
+                $headers[$key] = $value;
+            }
         }
 
         try {
@@ -627,7 +672,6 @@ abstract class AbstractIntegration
 
             return array('error' => array('message' => $exception->getMessage(), 'code' => $exception->getCode()));
         }
-
         if (empty($settings['ignore_event_dispatch'])) {
             $event->setResponse($result);
             $this->factory->getDispatcher()->dispatch(
@@ -635,7 +679,7 @@ abstract class AbstractIntegration
                 $event
             );
         }
-
+        
         if (!empty($settings['return_raw'])) {
 
             return $result;
@@ -657,8 +701,17 @@ abstract class AbstractIntegration
         $clientIdKey     = $this->getClientIdKey();
         $clientSecretKey = $this->getClientSecretKey();
         $authTokenKey    = $this->getAuthTokenKey();
-        $authToken       = (isset($this->keys[$authTokenKey])) ? $this->keys[$authTokenKey] : '';
-        $authTokenKey    = (empty($settings[$authTokenKey])) ? $authTokenKey : $settings[$authTokenKey];
+        $authToken       = '';
+        if (isset($settings['override_auth_token'])) {
+            $authToken = $settings['override_auth_token'];
+        } elseif (isset($this->keys[$authTokenKey])) {
+            $authToken = $this->keys[$authTokenKey];
+        }
+
+        // Override token parameter key if neede
+        if (!empty($settings[$authTokenKey])) {
+            $authTokenKey = $settings[$authTokenKey];
+        }
 
         $headers = array();
 
@@ -730,7 +783,10 @@ abstract class AbstractIntegration
                         );
                     } else {
                         if (!empty($settings['append_auth_token'])) {
-                            $settings['query'][$authTokenKey] = $authToken;
+                            // Workaround because $settings cannot be manipulated here
+                            $parameters['append_to_query'] = array(
+                                $authTokenKey => $authToken
+                            );
                         } else {
                             $parameters[$authTokenKey] = $authToken;
                         }
@@ -836,6 +892,7 @@ abstract class AbstractIntegration
                 if (!empty($settings['use_refresh_token'])) {
                     // Try refresh token
                     $refreshTokenKeys = $this->getRefreshTokenKeys();
+
                     if (!empty($refreshTokenKeys)) {
                         list($refreshTokenKey, $expiryKey) = $refreshTokenKeys;
 
@@ -858,7 +915,7 @@ abstract class AbstractIntegration
 
         $method = (!isset($settings['method'])) ? 'POST' : $settings['method'];
         $data   = $this->makeRequest($this->getAccessTokenUrl(), $parameters, $method, $settings);
-
+        
         return $this->extractAuthKeys($data);
 
     }
@@ -1148,7 +1205,21 @@ abstract class AbstractIntegration
     }
 
     /**
+     * Generate a user agent string
+     *
+     * @return string
+     */
+    protected function getUserAgent()
+    {
+        $request = $this->factory->getRequest();
+
+        return $request->server->get('HTTP_USER_AGENT');
+    }
+
+    /**
      * Get a list of available fields from the connecting API
+     *
+     * @param array $settings
      *
      * @return array
      */
@@ -1262,7 +1333,7 @@ abstract class AbstractIntegration
 
         // Match that data with mapped lead fields
         $matchedFields = $this->populateMauticLeadData($data);
-
+       
         if (empty($matchedFields)) {
 
             return;
@@ -1315,6 +1386,13 @@ abstract class AbstractIntegration
         }
 
         $lead->setSocialCache($leadSocialCache);
+
+        // Update the internal info integration object that has updated the record
+        if(isset($data['internal'])){
+            $internalInfo = $lead->getInternal();
+            $internalInfo[$this->getName()] = $data['internal'];
+            $lead->setInternal($internalInfo);
+        }
 
         $lead->setLastActive(new \DateTime());
 
@@ -1547,7 +1625,8 @@ abstract class AbstractIntegration
 
         return array(
             'requires_callback'      => $callback,
-            'requires_authorization' => $authorization
+            'requires_authorization' => $authorization,
+            'default_features'       => array()
         );
     }
 

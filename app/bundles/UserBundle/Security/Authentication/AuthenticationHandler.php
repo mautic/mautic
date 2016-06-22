@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 
@@ -28,11 +28,12 @@ class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, Au
     /**
      * Constructor
      *
-     * @author 	Joe Sexton <joe@webtipblog.com>
-     * @param 	RouterInterface $router
-     * @param 	Session $session
+     * @author    Joe Sexton <joe@webtipblog.com>
+     *
+     * @param    RouterInterface $router
+     * @param    Session         $session
      */
-    public function __construct( RouterInterface $router, Session $session )
+    public function __construct(RouterInterface $router, Session $session)
     {
         $this->router  = $router;
         $this->session = $session;
@@ -41,19 +42,24 @@ class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, Au
     /**
      * onAuthenticationSuccess
      *
-     * @author 	Joe Sexton <joe@webtipblog.com>
-     * @param 	Request $request
-     * @param 	TokenInterface $token
-     * @return 	Response
+     * @author    Joe Sexton <joe@webtipblog.com>
+     *
+     * @param    Request        $request
+     * @param    TokenInterface $token
+     *
+     * @return    Response
      */
-    public function onAuthenticationSuccess( Request $request, TokenInterface $token )
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token)
     {
-        $format  = $request->request->get('format');
+        // Remove post_logout if set
+        $request->getSession()->remove('post_logout');
+
+        $format = $request->request->get('format');
 
         if ($format == 'json') {
-            $array = array( 'success' => true );
-            $response = new Response( json_encode( $array ) );
-            $response->headers->set( 'Content-Type', 'application/json' );
+            $array    = ['success' => true];
+            $response = new Response(json_encode($array));
+            $response->headers->set('Content-Type', 'application/json');
 
             return $response;
         } else {
@@ -66,26 +72,31 @@ class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, Au
     /**
      * onAuthenticationFailure
      *
-     * @author 	Joe Sexton <joe@webtipblog.com>
-     * @param 	Request $request
-     * @param 	AuthenticationException $exception
-     * @return 	Response
+     * @author    Joe Sexton <joe@webtipblog.com>
+     *
+     * @param    Request                 $request
+     * @param    AuthenticationException $exception
+     *
+     * @return    Response
      */
-    public function onAuthenticationFailure( Request $request, AuthenticationException $exception )
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        $format  = $request->request->get('format');
+        // Remove post_logout if set
+        $request->getSession()->remove('post_logout');
+
+        $format = $request->request->get('format');
 
         if ($format == 'json') {
-            $array = array( 'success' => false, 'message' => $exception->getMessage() );
-            $response = new Response( json_encode( $array ) );
-            $response->headers->set( 'Content-Type', 'application/json' );
+            $array    = ['success' => false, 'message' => $exception->getMessage()];
+            $response = new Response(json_encode($array));
+            $response->headers->set('Content-Type', 'application/json');
 
             return $response;
         } else {
 
-            $request->getSession()->set(SecurityContextInterface::AUTHENTICATION_ERROR, $exception);
+            $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
 
-            return new RedirectResponse( $this->router->generate( 'login' ) );
+            return new RedirectResponse($this->router->generate('login'));
         }
     }
 }
