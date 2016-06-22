@@ -3122,14 +3122,18 @@ var Mautic = {
             data: data, 
             options: {
                 scales: {
-                     xAxes: [{
-                         ticks: {
-                             fontSize: 9,
-                             stacked: true
-                         }
-                     }],
-                    yAxes: [{display: false,}],
-
+                    xAxes: [{
+                        stacked: false,
+                        ticks: {fontSize: 9},
+                        gridLines: {display:false}
+                    }],
+                    yAxes: [{
+                        display: false,
+                        stacked: false,
+                        ticks: {beginAtZero: true, display: false},
+                        gridLines: {display:false}
+                    }],
+                    display: false,
                 },
                 legend: {
                     display: false
@@ -3138,6 +3142,8 @@ var Mautic = {
         });
         Mautic.chartObjects.push(chart);
     },
+
+
 
     /**
      * Render vector maps

@@ -31,7 +31,6 @@ foreach ($chartItems as $key => $chartData) :
     </div>
 </div>
     <?php if ($stages[$key]) : ?>
-        <hr>
         <div class="chart-wrapper">
                 <div>
                     <div class="chart-legend pt-sd pr-md pb-md pl-md"><h5><?php echo $view['translator']->trans('mautic.lead.lifecycle.graph.stage.cycle'); ?></h5></div>
