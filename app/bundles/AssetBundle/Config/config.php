@@ -129,6 +129,10 @@ return [
                 'class' => 'Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType',
                 'alias' => 'pointaction_assetdownload'
             ],
+            'mautic.form.type.stageaction_assetdownload' => [
+                'class' => 'Mautic\AssetBundle\Form\Type\StageActionAssetDownloadType',
+                'alias' => 'stageaction_assetdownload'
+            ],
             'mautic.form.type.campaignevent_assetdownload' => [
                 'class' => 'Mautic\AssetBundle\Form\Type\CampaignEventAssetDownloadType',
                 'alias' => 'campaignevent_assetdownload'

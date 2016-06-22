@@ -149,6 +149,14 @@ return [
                 'class' => 'Mautic\PageBundle\Form\Type\PointActionUrlHitType',
                 'alias' => 'pointaction_urlhit'
             ],
+            'mautic.form.type.stageaction_stagehit'     => [
+                'class' => 'Mautic\PageBundle\Form\Type\StageActionPageHitType',
+                'alias' => 'stageaction_pagehit'
+            ],
+            'mautic.form.type.stageaction_urlhit'       => [
+                'class' => 'Mautic\PageBundle\Form\Type\StageActionUrlHitType',
+                'alias' => 'stageaction_urlhit'
+            ],
             'mautic.form.type.pagehit.campaign_trigger' => [
                 'class' => 'Mautic\PageBundle\Form\Type\CampaignEventPageHitType',
                 'alias' => 'campaignevent_pagehit'

@@ -82,6 +82,7 @@ class StageType extends AbstractType
                 'class' => 'form-control',
                 'onchange' => 'Mautic.getStageActionPropertiesForm(this.value);'
             ),
+            'required'   => false
         ));
 
 
