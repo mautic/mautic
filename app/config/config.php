@@ -192,7 +192,7 @@ $dbalSettings = array(
         'point' => 'string',
         'bit'   => 'string',
     ),
-    'server_version' => 5.5
+    'server_version' => '%mautic.db_server_version%'
 );
 
 // If using pdo_sqlite as the database driver, add the path to config file

@@ -10,47 +10,27 @@
 namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class PluginIntegrationKeyEvent
  */
-class PluginIntegrationKeyEvent extends Event
+class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
 {
-    /**
-     * @var AbstractIntegration
-     */
-    private $integration;
-
     /**
      * @var array
      */
     private $keys;
 
+    /**
+     * PluginIntegrationKeyEvent constructor.
+     *
+     * @param AbstractIntegration $integration
+     * @param array|null          $keys
+     */
     public function __construct(AbstractIntegration $integration, array $keys = null)
     {
         $this->integration = $integration;
         $this->keys        = $keys;
-    }
-
-    /**
-     * Get the integration's name
-     *
-     * @return mixed
-     */
-    public function getIntegrationName()
-    {
-        return $this->getIntegrationName();
-    }
-
-    /**
-     * Get the integration object
-     *
-     * @return AbstractIntegration
-     */
-    public function getIntegration()
-    {
-        return $this->integration;
     }
 
     /**
