@@ -13,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
  * Class FetchLeadsCommand
@@ -75,10 +76,15 @@ class FetchLeadsCommand extends ContainerAwareCommand
         $endDate       = $input->getOption('end-date');
         $object       = $input->getOption('sf-object');
 
+        if(!$startDate){
+            $startDate= date('c');
+            $endDate= date('c');
+        }
+
         if ($integration && $startDate && $endDate) {
             /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
             $integrationHelper = $factory->getHelper('integration');
-            
+
             $integrationObject = $integrationHelper->getIntegrationObject($integration);
 
             if ($integrationObject !== null && method_exists($integrationObject, 'getLeads')) {
