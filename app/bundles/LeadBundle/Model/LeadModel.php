@@ -23,6 +23,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
@@ -164,6 +165,16 @@ class LeadModel extends FormModel
     public function getTagRepository()
     {
         return $this->em->getRepository('MauticLeadBundle:Tag');
+    }
+
+    /**
+     * Get the tags repository
+     *
+     * @return \Mautic\LeadBundle\Entity\UtmTagRepository
+     */
+    public function getUtmTagRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:UtmTag');
     }
 
     /**
@@ -906,6 +917,10 @@ class LeadModel extends FormModel
      */
     public function isContactable(Lead $lead, $channel)
     {
+        if (is_array($channel)) {
+            $channel = key($channel);
+        }
+
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
         $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
 
@@ -931,17 +946,20 @@ class LeadModel extends FormModel
      *
      * @param Lead $lead
      * @param string $channel
+     * @param bool|true $persist
      *
      * @return boolean
      */
-    public function removeDncForLead(Lead $lead, $channel)
+    public function removeDncForLead(Lead $lead, $channel, $persist = true)
     {
         /** @var DoNotContact $dnc */
         foreach ($lead->getDoNotContact() as $dnc) {
             if ($dnc->getChannel() === $channel) {
                 $lead->removeDoNotContactEntry($dnc);
 
-                $this->getRepository()->saveEntity($lead);
+                if ($persist) {
+                    $this->saveEntity($lead);
+                }
 
                 return true;
             }
@@ -979,12 +997,12 @@ class LeadModel extends FormModel
      * @param string|array $channel  If an array with an ID, use the structure ['email' => 123]
      * @param string       $comments
      * @param int          $reason   Must be a class constant from the DoNotContact class.
-     * @param bool         $flush
+     * @param bool         $persist
      *
      * @return boolean If a DNC entry is added or updated, returns true. If a DNC is already present
      *                 and has the specified reason, nothing is done and this returns false.
      */
-    public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $flush = true)
+    public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $persist = true)
     {
         $isContactable = $this->isContactable($lead, $channel);
 
@@ -1007,10 +1025,9 @@ class LeadModel extends FormModel
 
             $lead->addDoNotContactEntry($dnc);
 
-            $this->getRepository()->saveEntity($lead);
-
-            if ($flush) {
-                $this->em->flush();
+            if ($persist) {
+                // Use model saveEntity to trigger events for DNC change
+                $this->saveEntity($lead);
             }
 
             return true;
@@ -1034,11 +1051,9 @@ class LeadModel extends FormModel
                     // Re-add the entry to the lead
                     $lead->addDoNotContactEntry($dnc);
 
-                    // Persist
-                    $this->getRepository()->saveEntity($lead);
-
-                    if ($flush) {
-                        $this->em->flush();
+                    if ($persist) {
+                        // Use model saveEntity to trigger events for DNC change
+                        $this->saveEntity($lead);
                     }
 
                     return true;
@@ -1241,6 +1256,20 @@ class LeadModel extends FormModel
                 $this->getTagRepository()->deleteOrphans();
             }
         }
+    }
+
+    /**
+     * Update a leads tags
+     *
+     * @param Lead  $lead
+     * @param array $tags
+     * @param bool|false $removeOrphans
+     */
+    public function setUtmTags(Lead $lead, UtmTag $utmTags)
+    {
+        $lead->setUtmTags($utmTags);
+
+        $this->saveEntity($lead);
     }
 
     /**

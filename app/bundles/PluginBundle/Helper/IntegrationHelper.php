@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class IntegrationHelper
@@ -43,10 +42,11 @@ class IntegrationHelper
      * @param array        $withFeatures
      * @param bool         $alphabetical
      * @param null|int     $pluginFilter
+     * @param bool|false   $publishedOnly
      *
      * @return mixed
      */
-    public function getIntegrationObjects ($specificIntegrations = null, $withFeatures = null, $alphabetical = false, $pluginFilter = null)
+    public function getIntegrationObjects ($specificIntegrations = null, $withFeatures = null, $alphabetical = false, $pluginFilter = null, $publishedOnly = false)
     {
         static $integrations = array(), $available = array(), $byFeatureList = array(), $byPlugin = array();
 
@@ -186,6 +186,10 @@ class IntegrationHelper
 
         // Build the classes if not already
         foreach ($filteredIntegrations as $integrationName) {
+            if (!isset($available[$integrationName]) || ($publishedOnly && !$available[$integrationName]['settings']->isPublished())) {
+                continue;
+            }
+
             if (!isset($integrations[$integrationName])) {
                 $integration = $available[$integrationName];
                 $class           = "\\MauticPlugin\\" . $integration['namespace'] . "\\Integration\\" . $integrationName . "Integration";
@@ -216,8 +220,8 @@ class IntegrationHelper
         } else {
             // Sort by display name
             uasort($returnServices, function ($a, $b) {
-                $aName = (int)$a->getDisplayName();
-                $bName = (int)$b->getDisplayName();
+                $aName = $a->getDisplayName();
+                $bName = $b->getDisplayName();
 
                 return strcasecmp($aName, $bName);
             });
@@ -231,13 +235,13 @@ class IntegrationHelper
      *
      * @param $name
      *
-     * @return AbstractIntegration
+     * @return AbstractIntegration|bool
      */
     public function getIntegrationObject($name)
     {
         $integrationObjects = $this->getIntegrationObjects($name);
 
-        return (isset($integrationObjects[$name])) ? $integrationObjects[$name] : null;
+        return ((isset($integrationObjects[$name]))) ?  $integrationObjects[$name] : false;
     }
 
     /**
@@ -548,12 +552,9 @@ class IntegrationHelper
         } elseif ($integration instanceof Plugin) {
             // A bundle so check for an icon
             $icon = $pluginPath.'/'.$integration->getBundle().'/Assets/img/icon.png';
-        } else {
-            // For non-core bundles, we need to extract out the bundle's name to figure out where in the filesystem to look for the icon
-            $name      = $integration->getIntegrationSettings()->getName();
-            $className = get_class($integration);
-            $exploded  = explode('\\', $className);
-            $icon      = $pluginPath.'/'.$exploded[1].'/Assets/img/'.strtolower($name).'.png';
+        } elseif ($integration instanceof AbstractIntegration) {
+
+            return $integration->getIcon();
         }
 
         if (file_exists($systemPath . '/' . $icon)) {

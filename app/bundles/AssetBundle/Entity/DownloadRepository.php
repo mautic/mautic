@@ -11,7 +11,7 @@ namespace Mautic\AssetBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Helper\GraphHelper;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
 
 /**
  * Class DownloadRepository
@@ -145,25 +145,13 @@ class DownloadRepository extends CommonRepository
             ->orderBy('count', 'DESC');
 
         $results = $query->execute()->fetchAll();
+        $chart   = new PieChart();
 
-        $colors = GraphHelper::$colors;
-        $graphData = array();
-        $i = 0;
         foreach($results as $result) {
-            if (!isset($colors[$i])) {
-                $i = 0;
-            }
-            $color = $colors[$i];
-            $graphData[] = array(
-                'label' => $result['status'],
-                'color' => $colors[$i]['color'],
-                'highlight' => $colors[$i]['highlight'],
-                'value' => (int) $result['count']
-            );
-            $i++;
+            $chart->setDataset($result['status'], $result['count']);
         }
 
-        return $graphData;
+        return $chart->render();
     }
 
     /**

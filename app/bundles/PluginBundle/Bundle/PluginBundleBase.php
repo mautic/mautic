@@ -11,7 +11,6 @@ namespace Mautic\PluginBundle\Bundle;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Tools\SchemaTool;
-use Mautic\PluginBundle\Entity\Addon;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\HttpKernel\Bundle\Bundle;

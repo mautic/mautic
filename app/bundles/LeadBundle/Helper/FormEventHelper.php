@@ -11,6 +11,7 @@ namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 
 /**
@@ -70,4 +71,6 @@ class FormEventHelper
             $leadModel->removeFromLists($lead, $removeFrom);
         }
     }
+
+   
 }

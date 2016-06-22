@@ -129,6 +129,16 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.magic_quotes_enabled';
         }
 
+        if (
+            version_compare(PHP_VERSION, '5.6.0', '>=')
+            &&
+            version_compare(PHP_VERSION, '7', '<')
+            &&
+            ini_get('always_populate_raw_post_data') != -1
+        ) {
+            $messages[] = 'mautic.install.always_populate_raw_post_data_enabled';
+        }
+
         if (!function_exists('json_encode')) {
             $messages[] = 'mautic.install.function.jsonencode';
         }

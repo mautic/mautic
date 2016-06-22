@@ -247,12 +247,29 @@ class PluginController extends FormController
             $themes[] = $objectTheme;
         }
 
+        $formSettings = $integrationObject->getFormSettings();
+        $callbackUrl  = !empty($formSettings['requires_callback']) ? $integrationObject->getAuthCallbackUrl() : '';
+
+        $formNotes    = array();
+        $noteSections = array('authorization', 'features', 'feature_settings');
+        foreach ($noteSections as $section) {
+            list($specialInstructions, $alertType) = $integrationObject->getFormNotes($section);
+            if (!empty($specialInstructions)) {
+                $formNotes[$section] = array(
+                    'note' => $specialInstructions,
+                    'type' => $alertType
+                );
+            }
+        }
+
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
-                    'form'        => $this->setFormTheme($form, $template, $themes),
-                    'integration' => $integrationObject,
-                    'formSettings' => $integrationObject->getFormDisplaySettings()
+                    'form'         => $this->setFormTheme($form, $template, $themes),
+                    'description'  => $integrationObject->getDescription(),
+                    'formSettings' => $formSettings,
+                    'formNotes'    => $formNotes,
+                    'callbackUrl'  => $callbackUrl
                 ),
                 'contentTemplate' => $template,
                 'passthroughVars' => array(
