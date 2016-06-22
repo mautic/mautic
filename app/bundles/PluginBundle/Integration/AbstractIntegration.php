@@ -581,7 +581,7 @@ abstract class AbstractIntegration
                 )
             );
         }
-
+        
         if ($method == 'GET' && !empty($parameters)) {
             $parameters = array_merge($settings['query'], $parameters);
             $query      = http_build_query($parameters);
@@ -672,7 +672,6 @@ abstract class AbstractIntegration
 
             return array('error' => array('message' => $exception->getMessage(), 'code' => $exception->getCode()));
         }
-
         if (empty($settings['ignore_event_dispatch'])) {
             $event->setResponse($result);
             $this->factory->getDispatcher()->dispatch(
@@ -680,7 +679,7 @@ abstract class AbstractIntegration
                 $event
             );
         }
-
+        
         if (!empty($settings['return_raw'])) {
 
             return $result;
@@ -893,6 +892,7 @@ abstract class AbstractIntegration
                 if (!empty($settings['use_refresh_token'])) {
                     // Try refresh token
                     $refreshTokenKeys = $this->getRefreshTokenKeys();
+
                     if (!empty($refreshTokenKeys)) {
                         list($refreshTokenKey, $expiryKey) = $refreshTokenKeys;
 
@@ -915,7 +915,7 @@ abstract class AbstractIntegration
 
         $method = (!isset($settings['method'])) ? 'POST' : $settings['method'];
         $data   = $this->makeRequest($this->getAccessTokenUrl(), $parameters, $method, $settings);
-
+        
         return $this->extractAuthKeys($data);
 
     }
@@ -1333,7 +1333,7 @@ abstract class AbstractIntegration
 
         // Match that data with mapped lead fields
         $matchedFields = $this->populateMauticLeadData($data);
-
+       
         if (empty($matchedFields)) {
 
             return;
@@ -1386,6 +1386,13 @@ abstract class AbstractIntegration
         }
 
         $lead->setSocialCache($leadSocialCache);
+
+        // Update the internal info integration object that has updated the record
+        if(isset($data['internal'])){
+            $internalInfo = $lead->getInternal();
+            $internalInfo[$this->getName()] = $data['internal'];
+            $lead->setInternal($internalInfo);
+        }
 
         $lead->setLastActive(new \DateTime());
 
