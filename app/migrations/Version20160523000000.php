@@ -61,7 +61,7 @@ CREATE TABLE `{$this->prefix}stages` (
   `publish_up` datetime DEFAULT NULL COMMENT '(DC2Type:datetime)',
   `publish_down` datetime DEFAULT NULL COMMENT '(DC2Type:datetime)',
   `type` varchar(50) DEFAULT NULL,
-  `weight` int(11) DEFAULT NULL
+  `weight` int(11) NOT NULL DEFAULT '0'
   PRIMARY KEY (`id`),
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 SQL;
