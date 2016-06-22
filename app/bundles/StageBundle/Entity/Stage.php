@@ -133,10 +133,6 @@ class Stage extends FormEntity
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(array(
             'message' => 'mautic.core.name.required'
         )));
-
-        $metadata->addPropertyConstraint('type', new Assert\NotBlank(array(
-            'message' => 'mautic.stage.type.notblank'
-        )));
     }
 
     /**
