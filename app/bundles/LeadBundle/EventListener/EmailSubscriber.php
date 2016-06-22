@@ -23,8 +23,17 @@ use Mautic\LeadBundle\Helper\TokenHelper;
  */
 class EmailSubscriber extends CommonSubscriber
 {
-
+    /**
+     * @deprecated - to be removed in 3.0
+     *
+     * @var string
+     */
     private static $leadFieldRegex = '{leadfield=(.*?)}';
+
+    /**
+     * @var string
+     */
+    private static $contactFieldRegex = '{contactfield=(.*?)}';
 
     /**
      * @return array
@@ -73,6 +82,10 @@ class EmailSubscriber extends CommonSubscriber
 
         if ($event->tokensRequested(self::$leadFieldRegex)) {
             $event->addTokensFromHelper($tokenHelper, self::$leadFieldRegex, 'label', 'alias', true);
+        }
+
+        if ($event->tokensRequested(self::$contactFieldRegex)) {
+            $event->addTokensFromHelper($tokenHelper, self::$contactFieldRegex, 'label', 'alias', true);
         }
     }
 

@@ -771,7 +771,6 @@ class LeadListRepository extends CommonRepository
                     }
 
                     $channelParameter = $this->generateRandomParameterName();
-
                     $subqb = $this->_em->getConnection()->createQueryBuilder()
                         ->select('null')
                         ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', $alias)
