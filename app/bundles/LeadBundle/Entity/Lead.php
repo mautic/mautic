@@ -768,7 +768,6 @@ class Lead extends FormEntity
             'comments' => $doNotContact->getComments()
         );
 
-        // @deprecated - to be removed in 2.0
         switch ($doNotContact->getReason()) {
             case DoNotContact::BOUNCED:
                 $type = 'bounced';
@@ -777,6 +776,7 @@ class Lead extends FormEntity
                 $type = 'manual';
                 break;
             case DoNotContact::UNSUBSCRIBED:
+            default:
                 $type = 'unsubscribed';
                 break;
         }
