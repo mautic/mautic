@@ -20,7 +20,7 @@ class PathsHelper
      * @var array
      */
     protected $paths;
-    
+
     /**
      * @var string
      */
@@ -58,7 +58,7 @@ class PathsHelper
 
     /**
      * PathsHelper constructor.
-     * 
+     *
      * @param CoreParametersHelper
      * @param UserHelper $userHelper
      */
@@ -93,14 +93,14 @@ class PathsHelper
             return ($name === 'cache') ? $this->kernelCacheDir : $this->kernelLogsDir;
         } elseif ($name == 'images') {
             $path = $this->imagePath;
-            
+
             if (substr($path, -1) === '/') {
                 $path = substr($path, 0, -1);
             }
         } elseif ($name == 'dashboard.user' || $name == 'dashboard.global') {
             //these are absolute regardless as they are configurable
             $globalPath = $this->dashboardImportDir;
-            
+
             if (substr($globalPath, -1) === '/') {
                 $globalPath = substr($globalPath, 0, -1);
             }

@@ -54,13 +54,6 @@ if ($tmpl == 'index') {
             </div>
         </div>
     </div>
-    <div id="DatabaseSQLiteSettings"<?php if ($driver != 'pdo_sqlite') echo ' class="hide"'; ?>>
-        <div class="row">
-            <div class="col-sm-12">
-                <?php echo $view['form']->row($form['path']); ?>
-            </div>
-        </div>
-    </div>
 
     <div class="row">
         <div class="col-sm-6">

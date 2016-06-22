@@ -93,8 +93,8 @@ class CheckStep implements StepInterface
     {
         $messages = array();
 
-        if (version_compare(PHP_VERSION, '5.3.16', '==')) {
-            $messages[] = 'mautic.install.buggy.php.version';
+        if (version_compare(PHP_VERSION, '5.6.19', '<')) {
+            $messages[] = 'mautic.install.php.version.not.supported';
         }
 
         if (!is_dir(dirname($this->kernelRoot) . '/vendor/composer')) {
@@ -167,16 +167,19 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.extension.fileinfo';
         }
 
+        if (!function_exists('mb_strtolower')) {
+            $messages[] = 'mautic.install.extension.mbstring';
+        }
+
+        if (extension_loaded('eaccelerator') && ini_get('eaccelerator.enable')) {
+            $messages[] = 'mautic.install.extension.eaccelerator';
+        }
+
         if (function_exists('apc_store') && ini_get('apc.enabled')) {
             if (!version_compare(phpversion('apc'), '3.1.13', '>=')) {
                 $messages[] = 'mautic.install.apc.version';
             }
         }
-
-        // Commented for now, no idea what this check was actually supposed to be doing in the distro bundle
-        /*if (ini_get('zend.detect_unicode')) {
-            $messages[] = 'mautic.install.detect.unicode';
-        }*/
 
         if (extension_loaded('suhosin')) {
             if (stripos(ini_get('suhosin.executor.include.whitelist'), 'phar')) {
@@ -208,59 +211,7 @@ class CheckStep implements StepInterface
      */
     public function checkOptionalSettings()
     {
-        $phpSupportData = array(
-            '5.3' => array(
-                'security' => '2013-07-11',
-                'eos'      => '2014-08-14',
-            ),
-            '5.4' => array(
-                'security' => '2014-09-14',
-                'eos'      => '2015-09-14',
-            ),
-            '5.5' => array(
-                'security' => '2015-07-10',
-                'eos'      => '2016-07-10'
-            ),
-            '5.6' => array(
-                'security' => '2016-08-28',
-                'eos'      => '2017-08-28'
-            ),
-        );
-
-        $messages = array();
-
-        // Check the PHP version's support status
-        $activePhpVersion = PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;
-
-        // Do we have the PHP version's data?
-        if (isset($phpSupportData[$activePhpVersion])) {
-            // First check if the version has reached end of support
-            $today = new \DateTime();
-            $phpEndOfSupport = new \DateTime($phpSupportData[$activePhpVersion]['eos']);
-
-            if ($phpNotSupported = $today > $phpEndOfSupport) {
-                $messages[] = 'mautic.install.php.version.not.supported';
-            }
-
-            // If the version is still supported, check if it has reached security support only
-            $phpSecurityOnlyDate = new \DateTime($phpSupportData[$activePhpVersion]['security']);
-
-            if (!$phpNotSupported && $today > $phpSecurityOnlyDate) {
-                $messages[] = 'mautic.install.php.version.has.only.security.support';
-            }
-        }
-
-        if (version_compare(PHP_VERSION, '5.3.8', '<')) {
-            $messages[] = 'mautic.install.php.version.annotations';
-        }
-
-        if (version_compare(PHP_VERSION, '5.4.0', '=')) {
-            $messages[] = 'mautic.install.php.version.dump';
-        }
-
-        if ((PHP_MINOR_VERSION == 3 && PHP_RELEASE_VERSION < 18) || (PHP_MINOR_VERSION == 4 && PHP_RELEASE_VERSION < 8)) {
-            $messages[] = 'mautic.install.php.version.pretty.error';
-        }
+        $messages = [];
 
         $pcreVersion = defined('PCRE_VERSION') ? (float) PCRE_VERSION : null;
 
@@ -289,10 +240,6 @@ class CheckStep implements StepInterface
 
         if (!class_exists('\\DomDocument')) {
             $messages[] = 'mautic.install.module.phpxml';
-        }
-
-        if (!function_exists('mb_strlen')) {
-            $messages[] = 'mautic.install.function.mbstring';
         }
 
         if (!function_exists('iconv')) {
@@ -358,22 +305,6 @@ class CheckStep implements StepInterface
             if (version_compare($version, '4.0', '<')) {
                 $messages[] = 'mautic.install.intl.icu.version';
             }
-        }
-
-        $accelerator =
-            (extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'))
-            ||
-            (extension_loaded('apc') && ini_get('apc.enabled'))
-            ||
-            (extension_loaded('Zend OPcache') && ini_get('opcache.enable'))
-            ||
-            (extension_loaded('xcache') && ini_get('xcache.cacher'))
-            ||
-            (extension_loaded('wincache') && ini_get('wincache.ocenabled'))
-        ;
-
-        if (!$accelerator) {
-            $messages[] = 'mautic.install.accelerator';
         }
 
         return $messages;
