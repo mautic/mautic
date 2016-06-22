@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Menu\MenuHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Symfony\Component\Routing\Route;
@@ -106,7 +107,7 @@ class CommonSubscriber implements EventSubscriberInterface
 
         if (empty($allItems[$name])) {
             $bundles = $this->factory->getMauticBundles(true);
-
+            $menuItems = array();
             foreach ($bundles as $bundle) {
                 if (!empty($bundle['config']['menu'][$name])) {
                     $menu = $bundle['config']['menu'][$name];
@@ -141,6 +142,7 @@ class CommonSubscriber implements EventSubscriberInterface
 
         if (empty($icons)) {
             $bundles    = $this->factory->getMauticBundles(true);
+            /** @var MenuHelper $menuHelper */
             $menuHelper = $this->factory->getHelper('menu');
             foreach ($bundles as $bundle) {
                 if (!empty($bundle['config']['menu']['main'])) {

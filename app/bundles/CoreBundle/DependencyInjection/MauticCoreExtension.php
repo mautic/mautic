@@ -15,8 +15,6 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Loader;
 
 /**
@@ -35,6 +33,10 @@ class MauticCoreExtension extends Extension
     {
         $bundles = array_merge($container->getParameter('mautic.bundles'), $container->getParameter('mautic.plugin.bundles'));
 
+        // Store menu renderer options to create unique renderering classes per menu
+        // since KNP menus doesn't seem to support a Renderer factory
+        $menus = array();
+
         foreach ($bundles as $bundle) {
             if (!empty($bundle['config']['services'])) {
                 $config = $bundle['config']['services'];
@@ -48,6 +50,9 @@ class MauticCoreExtension extends Extension
                             break;
                         case 'helpers':
                             $defaultTag = 'templating.helper';
+                            break;
+                        case 'menus':
+                            $defaultTag = 'knp_menu.menu';
                             break;
                         case 'models':
                             $defaultTag = 'mautic.model';
@@ -64,8 +69,23 @@ class MauticCoreExtension extends Extension
                             continue;
                         }
 
+                        // Setup default menu details
+                        if ($type == 'menus') {
+                            $details = array_merge(
+                                array(
+                                    'class'   => 'Knp\Menu\MenuItem',
+                                    'factory' => array('@mautic.menu.builder', $details['alias'].'Menu'),
+                                ),
+                                $details
+                            );
+
+                            $menus[$details['alias']] = (isset($details['options'])) ? $details['options'] : array();
+                        }
+
                         // Set service alias
                         if (isset($details['serviceAlias'])) {
+                            // Fix escaped sprintf placeholders
+                            $details['serviceAlias'] = str_replace('%%', '%', $details['serviceAlias']);
                             $container->setAlias(sprintf($details['serviceAlias'], $name), $name);
                         }
 
@@ -280,6 +300,23 @@ class MauticCoreExtension extends Extension
                     }
                 }
             }
+        }
+
+        foreach ($menus as $alias => $options) {
+            $container->setDefinition('mautic.menu_renderer.'.$alias, new Definition(
+                'Mautic\CoreBundle\Menu\MenuRenderer',
+                array(
+                    new Reference('knp_menu.matcher'),
+                    new Reference('mautic.factory'),
+                    '%kernel.charset%',
+                    $options
+                )
+            ))
+                ->addTag('knp_menu.renderer',
+                    array(
+                        'alias' => $alias
+                    )
+                );
         }
 
         unset($bundles);
