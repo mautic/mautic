@@ -115,6 +115,8 @@ class EventController extends CommonFormController
             ) : '';
         }
 
+        $viewParams['hideTriggerMode'] = isset($event['settings']['hideTriggerMode']) && $event['settings']['hideTriggerMode'];
+
         $passthroughVars = array(
             'mauticContent' => 'campaignEvent',
             'success'       => $success,
@@ -252,6 +254,8 @@ class EventController extends CommonFormController
                     $event['settings']['description']
                 ) : '';
             }
+
+            $viewParams['hideTriggerMode'] = isset($event['settings']['hideTriggerMode']) && $event['settings']['hideTriggerMode'];
 
             $passthroughVars = array(
                 'mauticContent' => 'campaignEvent',

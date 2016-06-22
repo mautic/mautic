@@ -67,6 +67,29 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
+     * Check if a security level is granted
+     * 
+     * @param $level
+     * 
+     * @return bool
+     */
+    protected function accessGranted($level)
+    {
+        return in_array($level, $this->getPermissions());
+    }
+
+    /**
+     * Override this method in your controller
+     * for easy access to the permissions
+     * 
+     * @return array
+     */
+    protected function getPermissions()
+    {
+        return [];
+    }
+
+    /**
      * Get a model instance from the service container
      *
      * @param $modelNameKey

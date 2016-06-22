@@ -4538,3 +4538,6 @@ body.noscroll {
 .input-group .input-group-btn button {
   height: 32px;
 }
+#app-content.content-only .toolbar-form-buttons.pull-right {
+  padding-right: 20px;
+}
