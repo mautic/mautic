@@ -253,11 +253,21 @@ class PageController extends FormController
             }
         }
 
+        // Init the date range filter form
+        $dateRangeValues = $this->request->get('daterange', array());
+        $action          = $this->generateUrl('mautic_page_action', array('objectAction' => 'view', 'objectId' => $objectId));
+        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, array('action' => $action));
+
         // Audit Log
         $logs = $this->getModel('core.auditLog')->getLogForObject('page', $activePage->getId(), $activePage->getDateAdded());
 
-        // Hit count per day for last 30 days
-        $last30 = $model->getHitsBarChartData('d', new \DateTime('-30 days'), new \DateTime, null, array('page_id' => $activePage->getId()));
+        $pageviews = $model->getHitsLineChartData(
+            null,
+            new \DateTime($dateRangeForm->get('date_from')->getData()),
+            new \DateTime($dateRangeForm->get('date_to')->getData()),
+            null,
+            array('page_id' => $activePage->getId(), 'flag' => 'total_and_unique')
+        );
 
         //get related translations
         list($translationParent, $translationChildren) = $model->getTranslations($activePage);
@@ -291,20 +301,19 @@ class PageController extends FormController
                     'page:pages:publishother'
                 ), "RETURN_ARRAY"),
                 'stats'         => array(
+                    'pageviews' => $pageviews,
                     'bounces'   => $model->getBounces($activePage),
                     'hits'      => array(
                         'total'  => $activePage->getHits(),
                         'unique' => $activePage->getUniqueHits()
-                    ),
-                    'newVsReturning' => $model->getNewVsReturningPieChartData(new \DateTime('-30 days'), new \DateTime, array('page_id' => $objectId)),
-                    'dwellTime' => $model->getDwellTimesPieChartData(new \DateTime('-30 days'), new \DateTime, array('page_id' => $objectId))
+                    )
                 ),
                 'abTestResults' => $abTestResults,
                 'security'      => $security,
                 'pageUrl'       => $model->generateUrl($activePage, true),
                 'previewUrl'    => $this->generateUrl('mautic_page_preview', array('id' => $objectId), true),
                 'logs'          => $logs,
-                'last30'        => $last30
+                'dateRangeForm' => $dateRangeForm->createView()
             ),
             'contentTemplate' => 'MauticPageBundle:Page:details.html.php',
             'passthroughVars' => array(

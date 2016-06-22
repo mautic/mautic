@@ -12,7 +12,6 @@ namespace Mautic\PageBundle\Entity;
 use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Helper\GraphHelper;
 
 /**
  * Class HitRepository
@@ -349,40 +348,57 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Get the number of bounces
-     *
-     * @param array                             $options
-     * @param \Doctrine\DBAL\Query\QueryBuilder $q
+     * Get array of dwell time labels with ranges
      *
      * @return array
      */
-    public function getDwellTimes(array $options, $q = null)
+    public function getDwellTimeLabels()
     {
-        if (!$q) {
-            $q = $this->_em->getConnection()->createQueryBuilder()
-            ->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'ph')
-                ->leftJoin('ph', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'ph.page_id = p.id');
-        }
+        return array(
+            array(
+                'label' => '< 1m',
+                'from' => 0,
+                'till' => 60
+            ),
+            array(
+                'label' => '1 - 5m',
+                'from' => 60,
+                'till' => 300
+            ),
+            array(
+                'label' => '5 - 10m',
+                'value' => 0,
+                'from' => 300,
+                'till' => 600
+            ),
+            array(
+                'label' => '> 10m',
+                'from' => 600,
+                'till' => 999999
+            )
+        );
+    }
 
-        $q->select('ph.id, ph.page_id, ph.date_hit, ph.date_left, ph.tracking_id, ph.page_language, p.title');
-
-
-        if (isset($options['pageIds']) && $options['pageIds']) {
-            $inIds = (!is_array($options['pageIds'])) ? array($options['pageIds']) : $options['pageIds'];
-            $q->andWhere(
+    /**
+     * Get the dwell times for bunch of pages
+     *
+     * @param array $pageIds
+     * @param array $options
+     *
+     * @return array
+     */
+    public function getDwellTimesForPages(array $pageIds, array $options)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'ph')
+            ->leftJoin('ph', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'ph.page_id = p.id')
+            ->select('ph.page_id, ph.date_hit, ph.date_left, p.title')
+            ->orderBy('ph.date_hit', 'ASC')
+            ->andWhere(
                 $q->expr()->andX(
-                    $q->expr()->in('ph.page_id', $inIds)
+                    $q->expr()->in('ph.page_id', $pageIds)
                 )
             );
-        }
-
-        if (isset($options['urls']) && $options['urls']) {
-            $inUrls = (!is_array($options['urls'])) ? array($options['urls']) : $options['urls'];
-            foreach ($inUrls as $k => $u) {
-                $q->andWhere($q->expr()->like('ph.url', ':url_'.$k))
-                    ->setParameter('url_'.$k, $u);
-            }
-        }
 
         if (isset($options['fromDate']) && $options['fromDate'] !== null) {
             //make sure the date is UTC
@@ -392,97 +408,66 @@ class HitRepository extends CommonRepository
             );
         }
 
+        $results = $q->execute()->fetchAll();
+
+        //loop to structure
+        $times = array();
+        $titles = array();
+
+        foreach ($results as $r) {
+            $dateHit  = $r['date_hit'] ? new \DateTime($r['date_hit']) : 0;
+            $dateLeft = $r['date_left'] ? new \DateTime($r['date_left']) : 0;
+
+            $titles[$r['page_id']] = $r['title'];
+            $times[$r['page_id']][] = $dateLeft ? ($dateLeft->getTimestamp() - $dateHit->getTimestamp()) : 0;
+        }
+
+        //now loop to create stats
+        $stats = array();
+
+        foreach ($times as $pid => $time) {
+            $stats[$pid] = $this->countStats($time);
+            $stats[$pid]['title'] = $titles[$pid];
+        }
+
+        return $stats;
+    }
+
+    /**
+     * Get the dwell times for bunch of URLs
+     *
+     * @param string $url
+     * @param array  $options
+     *
+     * @return array
+     */
+    public function getDwellTimesForUrl($url, array $options)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'ph')
+            ->leftJoin('ph', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'ph.page_id = p.id')
+            ->select('ph.id, ph.page_id, ph.date_hit, ph.date_left, ph.tracking_id, ph.page_language, p.title')
+            ->orderBy('ph.date_hit', 'ASC')
+            ->andWhere($q->expr()->like('ph.url', ':url'))
+            ->setParameter('url', $url);
+
         if (isset($options['leadId']) && $options['leadId']) {
             $q->andWhere(
                 $q->expr()->eq('ph.lead_id', (int) $options['leadId'])
             );
         }
 
-        $q->orderBy('ph.date_hit', 'ASC');
         $results = $q->execute()->fetchAll();
 
-        //loop to structure
         $times = array();
-        $titles = array();
-        $trackingIds = array();
-        $languages = array();
-        foreach ($results as $r) {
 
+        foreach ($results as $r) {
             $dateHit  = $r['date_hit'] ? new \DateTime($r['date_hit']) : 0;
             $dateLeft = $r['date_left'] ? new \DateTime($r['date_left']) : 0;
-            if (isset($options['pageIds']) && $options['pageIds']) {
-                $titles[$r['page_id']] = $r['title'];
-                $times[$r['page_id']][] = $dateLeft ? ($dateLeft->getTimestamp() - $dateHit->getTimestamp()) : 0;
-                if (!isset($trackingIds[$r['page_id']])) {
-                    $trackingIds[$r['page_id']] = array();
-                }
-                if (array_key_exists($r['tracking_id'], $trackingIds[$r['page_id']])) {
-                    $trackingIds[$r['page_id']][$r['tracking_id']]++;
-                } else {
-                    $trackingIds[$r['page_id']][$r['tracking_id']] = 1;
-                }
-                if (!isset($languages[$r['page_id']])) {
-                    $languages[$r['page_id']] = array();
-                }
-                if (array_key_exists($r['page_language'], $languages)) {
-                    $languages[$r['page_id']][$r['page_language']]++;
-                } else {
-                    $languages[$r['page_id']][$r['page_language']] = 1;
-                }
-            } else {
-                $times[] = $dateLeft ? ($dateLeft->getTimestamp() - $dateHit->getTimestamp()) : 0;
-                if (array_key_exists($r['tracking_id'], $trackingIds)) {
-                    $trackingIds[$r['tracking_id']]++;
-                } else {
-                    $trackingIds[$r['tracking_id']] = 1;
-                }
-                if (array_key_exists($r['page_language'], $languages)) {
-                    $languages[$r['page_language']]++;
-                } else {
-                    $languages[$r['page_language']] = 1;
-                }
-            }
+            $times[]  = $dateLeft ? ($dateLeft->getTimestamp() - $dateHit->getTimestamp()) : 0;
         }
 
-        //now loop to create stats
-        $stats = array();
-        if (isset($options['pageIds']) && $options['pageIds']) {
-            foreach ($times as $pid => $time) {
-                $stats[$pid] = $this->countStats($time);
-                $stats[$pid]['returning'] = $this->countReturning($trackingIds[$pid]);
-                $stats[$pid]['new'] = count($trackingIds[$pid]) - $stats[$pid]['returning'];
-                $stats[$pid]['newVsReturning'] = $this->getNewVsReturningGraphData($stats[$pid]['new'], $stats[$pid]['returning']);
-                $stats[$pid]['languages'] = $this->getLaguageGraphData($languages[$pid]);
-                $stats[$pid]['title'] = $titles[$pid];
-            }
-        } else {
-            $stats = $this->countStats($times);
-            $stats['returning'] = $this->countReturning($trackingIds);
-            $stats['new'] = count($trackingIds) - $stats['returning'];
-            $stats['newVsReturning'] = $this->getNewVsReturningGraphData($stats['new'], $stats['returning']);
-            $stats['languages'] = $this->getLaguageGraphData($languages);
-        }
-
-        return (isset($options['pageIds']) && !is_array($options['pageIds']) && array_key_exists($options['pageIds'], $stats)) ? $stats[$options['pageIds']] : $stats;
-    }
-
-    /**
-     * Count returning visitors
-     *
-     * @param array $visitors
-     *
-     * @return array
-     */
-    public function countReturning($visitors)
-    {
-        $returning = 0;
-        foreach ($visitors as $visitor) {
-            if ($visitor > 1) {
-                $returning++;
-            }
-        }
-
-        return $returning;
+        return $this->countStats($times);
     }
 
     /**
@@ -494,57 +479,13 @@ class HitRepository extends CommonRepository
      */
     public function countStats($times)
     {
-        $stats = array(
+        return array(
             'sum'     => array_sum($times),
             'min'     => count($times) ? min($times) : 0,
             'max'     => count($times) ? max($times) : 0,
             'average' => count($times) ? round(array_sum($times) / count($times)) : 0,
             'count'   => count($times)
         );
-        if ($times) {
-            $timesOnSiteHelper = GraphHelper::$timesOnSite;
-            $timesOnSite = array();
-            foreach ($times as $seconds) {
-                foreach($timesOnSiteHelper as $tkey => $tos) {
-                    if (!isset($timesOnSite[$tos['label']])) {
-                        $timesOnSite[$tos['label']] = 0;
-                    }
-                    if ($seconds > $tos['from'] && $seconds <= $tos['till']) {
-                        $timesOnSite[$tos['label']]++;
-                    }
-                }
-            }
-            $stats['timesOnSite'] = GraphHelper::preparePieGraphData($timesOnSite);
-        } else {
-            $stats['timesOnSite'] = array();
-        }
-
-        return $stats;
-    }
-
-    /**
-     * Prepare data structure for New vs Returning graph
-     *
-     * @param integer $new
-     * @param integer $returning
-     *
-     * @return array
-     */
-    public function getNewVsReturningGraphData($new, $returning)
-    {
-        return GraphHelper::preparePieGraphData(array('new' => $new, 'returning' => $returning));
-    }
-
-    /**
-     * Prepare data structure for New vs Returning graph
-     *
-     * @param array $languages
-     *
-     * @return array
-     */
-    public function getLaguageGraphData($languages)
-    {
-        return GraphHelper::preparePieGraphData($languages);
     }
 
     /**

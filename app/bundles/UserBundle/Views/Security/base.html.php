@@ -17,8 +17,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="icon" type="image/x-icon" href="<?php echo $view['assets']->getUrl('media/images/favicon.ico') ?>" />
     <link rel="apple-touch-icon" href="<?php echo $view['assets']->getUrl('media/images/apple-touch-icon.png') ?>" />
-
     <?php $view['assets']->outputSystemStylesheets(); ?>
+    <?php echo $view->render('MauticCoreBundle:Default:script.html.php'); ?>
+    <?php $view['assets']->outputHeadDeclarations(); ?>
 </head>
 <body>
 <section id="main" role="main">
@@ -54,10 +55,6 @@
         </div>
     </div>
 </section>
-<script>
-    //clear typeahead caches
-    window.localStorage.clear();
-</script>
-
+<?php echo $view['security']->getAuthenticationContent(); ?>
 </body>
 </html>

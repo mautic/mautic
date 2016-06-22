@@ -212,7 +212,11 @@ return [
             ],
             'mautic.helper.template.security'  => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\SecurityHelper',
-                'arguments' => 'mautic.factory',
+                'arguments' => array(
+                    'mautic.security',
+                    'request_stack',
+                    'event_dispatcher'
+                ),
                 'alias'     => 'security'
             ],
             'mautic.helper.paths' => [
@@ -298,8 +302,13 @@ return [
             'mautic.security'                    => [
                 'class'     => 'Mautic\CoreBundle\Security\Permissions\CorePermissions',
                 'arguments' => [
-                    'mautic.factory',
-                    'mautic.helper.user'
+                    'mautic.helper.user',
+                    'translator',
+                    'doctrine.orm.entity_manager',
+                    'security.token_storage',
+                    '%mautic.parameters%',
+                    '%mautic.bundles%',
+                    '%mautic.plugin.bundles%'
                 ]
             ],
             'mautic.translation.loader'          => [
@@ -342,7 +351,13 @@ return [
             ],
             'mautic.helper.cookie'               => [
                 'class'     => 'Mautic\CoreBundle\Helper\CookieHelper',
-                'arguments' => 'mautic.factory'
+                'arguments' => [
+                    '%mautic.cookie_path%',
+                    '%mautic.cookie_domain%',
+                    '%mautic.cookie_secure%',
+                    '%mautic.cookie_httponly%',
+                    'request_stack'
+                ]
             ],
             'mautic.helper.update'               => [
                 'class'     => 'Mautic\CoreBundle\Helper\UpdateHelper',

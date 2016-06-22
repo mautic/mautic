@@ -10,7 +10,6 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\GraphHelper;
 use Doctrine\ORM\Query;
 
 /**

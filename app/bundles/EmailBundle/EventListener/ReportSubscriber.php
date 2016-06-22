@@ -10,11 +10,12 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
 
 /**
  * Class ReportSubscriber
@@ -205,43 +206,48 @@ class ReportSubscriber extends CommonSubscriber
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
             $queryBuilder = clone $qb;
+            $chartQuery   = clone $options['chartQuery'];
+            $origQuery    = clone $queryBuilder;
+            $chartQuery->applyDateFilters($queryBuilder, 'date_sent', 'es');
 
             switch ($g) {
                 case 'mautic.email.graph.line.stats':
-                    // Generate data for Stats line graph
-                    $unit   = 'D';
-                    $amount = 30;
+                    $chart        = new LineChart(null, $options['dateFrom'], $options['dateTo']);
+                    $sendQuery    = clone $queryBuilder;
+                    $readQuery    = clone $origQuery;
+                    $failedQuery  = clone $queryBuilder;
+                    $failedQuery->andWhere($qb->expr()->eq('es.is_failed', ':true'));
+                    $failedQuery->setParameter('true', true, 'boolean');
+                    $chartQuery->applyDateFilters($readQuery, 'date_read', 'es');
+                    $chartQuery->modifyTimeDataQuery($sendQuery, 'date_sent', 'es');
+                    $chartQuery->modifyTimeDataQuery($readQuery, 'date_read', 'es');
+                    $chartQuery->modifyTimeDataQuery($failedQuery, 'date_sent', 'es');
+                    $sends        = $chartQuery->loadAndBuildTimeData($sendQuery);
+                    $reads        = $chartQuery->loadAndBuildTimeData($readQuery);
+                    $failes       = $chartQuery->loadAndBuildTimeData($failedQuery);
+                    $chart->setDataset($options['translator']->trans('mautic.email.sent.emails'), $sends);
+                    $chart->setDataset($options['translator']->trans('mautic.email.read.emails'), $reads);
+                    $chart->setDataset($options['translator']->trans('mautic.email.failed.emails'), $failes);
+                    $data         = $chart->render();
+                    $data['name'] = $g;
 
-                    if (isset($options['amount'])) {
-                        $amount = $options['amount'];
-                    }
-
-                    if (isset($options['unit'])) {
-                        $unit = $options['unit'];
-                    }
-
-                    $timeStats = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('sent', 'read', 'failed'));
-
-                    $queryBuilder->select('es.email_id as email, es.date_sent as "dateSent", es.date_read as "dateRead", es.is_failed');
-                    $queryBuilder->andwhere($queryBuilder->expr()->gte('es.date_sent', ':date'))
-                        ->setParameter('date', $timeStats['fromDate']->format('Y-m-d H:i:s'));
-                    $stats = $queryBuilder->execute()->fetchAll();
-
-                    $timeStats         = GraphHelper::mergeLineGraphData($timeStats, $stats, $unit, 0, 'dateSent');
-                    $timeStats         = GraphHelper::mergeLineGraphData($timeStats, $stats, $unit, 1, 'dateRead');
-                    $timeStats         = GraphHelper::mergeLineGraphData($timeStats, $stats, $unit, 2, 'dateSent', 'is_failed');
-                    $timeStats['name'] = 'mautic.email.graph.line.stats';
-
-                    $event->setGraph($g, $timeStats);
+                    $event->setGraph($g, $data);
                     break;
 
                 case 'mautic.email.graph.pie.ignored.read.failed':
-                    $items                  = $statRepo->getIgnoredReadFailed($queryBuilder);
-                    $graphData              = array();
-                    $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.email.graph.pie.ignored.read.failed';
-                    $graphData['iconClass'] = 'fa-flag-checkered';
-                    $event->setGraph($g, $graphData);
+                    $counts                 = $statRepo->getIgnoredReadFailed($queryBuilder);
+                    $chart  = new PieChart();
+                    $chart->setDataset($options['translator']->trans('mautic.email.read.emails'), $counts['read']);
+                    $chart->setDataset($options['translator']->trans('mautic.email.failed.emails'), $counts['failed']);
+                    $chart->setDataset($options['translator']->trans('mautic.email.ignored.emails'), $counts['ignored']);
+                    $event->setGraph(
+                        $g,
+                        array(
+                            'data'      => $chart->render(),
+                            'name'      => $g,
+                            'iconClass' => 'fa-flag-checkered'
+                        )
+                    );
                     break;
 
                 case 'mautic.email.table.most.emails.sent':
@@ -253,7 +259,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.email.table.most.emails.sent';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-paper-plane-o';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
@@ -268,7 +274,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.email.table.most.emails.read';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-eye';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
@@ -284,7 +290,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.email.table.most.emails.failed';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-exclamation-triangle';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
@@ -299,7 +305,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.email.table.most.emails.read.percent';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-tachometer';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);

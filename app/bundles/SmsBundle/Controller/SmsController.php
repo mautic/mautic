@@ -275,8 +275,6 @@ class SmsController extends FormController
             return $this->accessDenied();
         }
 
-        $stats = $model->getSmsGeneralStats($sms);
-
         // Audit Log
         $logs = $this->getModel('core.auditLog')->getLogForObject('sms', $sms->getId(), $sms->getDateAdded());
 
@@ -294,7 +292,7 @@ class SmsController extends FormController
                 ),
                 'viewParameters'  => array(
                     'sms'         => $sms,
-                    'stats'       => $stats,
+                    'stats'       => array(), // @todo
                     'trackables'  => $trackableLinks,
                     'logs'        => $logs,
                     'permissions' => $security->isGranted(

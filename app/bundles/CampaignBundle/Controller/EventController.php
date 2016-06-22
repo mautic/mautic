@@ -115,6 +115,8 @@ class EventController extends CommonFormController
             ) : '';
         }
 
+        $viewParams['hideTriggerMode'] = isset($event['settings']['hideTriggerMode']) && $event['settings']['hideTriggerMode'];
+
         $passthroughVars = array(
             'mauticContent' => 'campaignEvent',
             'success'       => $success,
@@ -159,7 +161,6 @@ class EventController extends CommonFormController
             //just close the modal
             $passthroughVars['closeModal'] = 1;
             $response                      = new JsonResponse($passthroughVars);
-            $response->headers->set('Content-Length', strlen($response->getContent()));
 
             return $response;
         } else {
@@ -253,6 +254,8 @@ class EventController extends CommonFormController
                     $event['settings']['description']
                 ) : '';
             }
+
+            $viewParams['hideTriggerMode'] = isset($event['settings']['hideTriggerMode']) && $event['settings']['hideTriggerMode'];
 
             $passthroughVars = array(
                 'mauticContent' => 'campaignEvent',
@@ -427,7 +430,6 @@ class EventController extends CommonFormController
         }
 
         $response = new JsonResponse($dataArray);
-        $response->headers->set('Content-Length', strlen($response->getContent()));
 
         return $response;
     }
