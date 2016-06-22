@@ -94,7 +94,7 @@ class CampaignSubscriber extends CommonSubscriber
         $stageToChangeTo = $this->stageModel->getEntity($stageId);
 
         if ($stageToChangeTo != null && $stageToChangeTo->isPublished()) {
-            if($leadStage && $leadStage->getWeight() < $stageToChangeTo->getWeight()){
+            if($leadStage && $leadStage->getWeight() <= $stageToChangeTo->getWeight()){
                 $stageChange = true;
             }
             elseif(!$leadStage){

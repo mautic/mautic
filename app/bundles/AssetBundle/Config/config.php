@@ -110,9 +110,6 @@ return [
             ],
             'mautic.asset.dashboard.subscriber' => [
                 'class' => 'Mautic\AssetBundle\EventListener\DashboardSubscriber'
-            ],
-            'mautic.asset.stagebundle.subscriber' => [
-                'class' => 'Mautic\AssetBundle\EventListener\StageSubscriber'
             ]
         ],
         'forms' => [
@@ -128,10 +125,6 @@ return [
             'mautic.form.type.pointaction_assetdownload' => [
                 'class' => 'Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType',
                 'alias' => 'pointaction_assetdownload'
-            ],
-            'mautic.form.type.stageaction_assetdownload' => [
-                'class' => 'Mautic\AssetBundle\Form\Type\StageActionAssetDownloadType',
-                'alias' => 'stageaction_assetdownload'
             ],
             'mautic.form.type.campaignevent_assetdownload' => [
                 'class' => 'Mautic\AssetBundle\Form\Type\CampaignEventAssetDownloadType',

@@ -902,6 +902,7 @@ Mautic.leadBatchSubmit = function() {
 
             return true;
         }
+
     }
 
     mQuery('#MauticSharedModal').modal('hide');

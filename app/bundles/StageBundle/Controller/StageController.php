@@ -294,8 +294,7 @@ class StageController extends FormController
             return $this->isLocked($postActionVars, $entity, 'stage');
         }
 
-        $actionType = ($this->request->getMethod() == 'POST') ? $this->request->request->get('stage[type]', '', true)
-            : $entity->getType();
+        $actionType = 'moved to stage';
 
         $action  = $this->generateUrl('mautic_stage_action', array('objectAction' => 'edit', 'objectId' => $objectId));
         $actions = $model->getStageActions();

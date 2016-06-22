@@ -74,27 +74,6 @@ class StageType extends AbstractType
             'required' => false
         ));
 
-        $builder->add('type', 'choice', array(
-            'choices' => $options['stageActions']['choices'],
-            'empty_value' => '',
-            'label'       => 'mautic.stage.form.type',
-            'label_attr'  => array('class' => 'control-label'),
-            'attr'        => array(
-                'class' => 'form-control',
-                'onchange' => 'Mautic.getStageActionPropertiesForm(this.value);'
-            ),
-        ));
-
-        $type = (!empty($options['actionType'])) ? $options['actionType'] : $options['data']->getType();
-        if ($type) {
-            $formType   =  (!empty($options['stageActions']['actions'][$type]['formType'])) ?
-                $options['stageActions']['actions'][$type]['formType'] : 'genericstage_settings';
-            $properties = ($options['data']) ? $options['data']->getProperties() : array();
-            $builder->add('properties', $formType, array(
-                'label' => false,
-                'data'  => $properties
-            ));
-        }
 
         if (!empty($options['data']) && $options['data'] instanceof Stage) {
             $readonly = !$this->security->hasEntityAccess(

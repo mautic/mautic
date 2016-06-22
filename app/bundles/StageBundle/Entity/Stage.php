@@ -41,11 +41,6 @@ class Stage extends FormEntity
     private $description;
 
     /**
-     * @var string
-     */
-    private $type;
-
-    /**
      * @var int
      */
     private $weight = 0;
@@ -59,11 +54,6 @@ class Stage extends FormEntity
      * @var \DateTime
      */
     private $publishDown;
-
-    /**
-     * @var array
-     */
-    private $properties = array();
 
     /**
      * @var ArrayCollection
@@ -103,16 +93,10 @@ class Stage extends FormEntity
 
         $builder->addIdColumns();
 
-        $builder->createField('type', 'string')
-            ->length(50)
-            ->build();
-
         $builder->createField('weight', 'integer')
             ->build();
 
         $builder->addPublishDates();
-
-        $builder->addField('properties', 'array');
 
         $builder->createOneToMany('log', 'LeadStageLog')
             ->mappedBy('stage')
@@ -147,7 +131,6 @@ class Stage extends FormEntity
                     'id',
                     'name',
                     'category',
-                    'type',
                     'weight',
                     'description'
                 )
@@ -155,8 +138,7 @@ class Stage extends FormEntity
             ->addProperties(
                 array(
                     'publishUp',
-                    'publishDown',
-                    'properties'
+                    'publishDown'
                 )
             )
             ->build();
@@ -170,57 +152,6 @@ class Stage extends FormEntity
     public function getId ()
     {
         return $this->id;
-    }
-
-    /**
-     * Set properties
-     *
-     * @param array $properties
-     *
-     * @return array
-     */
-    public function setProperties ($properties)
-    {
-        $this->isChanged('properties', $properties);
-
-        $this->properties = $properties;
-
-        return $this;
-    }
-
-    /**
-     * Get properties
-     *
-     * @return array
-     */
-    public function getProperties ()
-    {
-        return $this->properties;
-    }
-
-    /**
-     * Set type
-     *
-     * @param string $type
-     *
-     * @return string
-     */
-    public function setType ($type)
-    {
-        $this->isChanged('type', $type);
-        $this->type = $type;
-
-        return $this;
-    }
-
-    /**
-     * Get type
-     *
-     * @return string
-     */
-    public function getType ()
-    {
-        return $this->type;
     }
 
     /**

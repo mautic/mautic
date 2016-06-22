@@ -72,43 +72,4 @@ class StageSubscriber extends CommonSubscriber
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
 
-    /**
-     * Add an entry to the audit log
-     *
-     * @param Events\TriggerEvent $event
-     */
-    public function onTriggerPostSave(Events\TriggerEvent $event)
-    {
-        $trigger = $event->getTrigger();
-        if ($details = $event->getChanges()) {
-            $log = array(
-                "bundle"    => "stage",
-                "object"    => "trigger",
-                "objectId"  => $trigger->getId(),
-                "action"    => ($event->isNew()) ? "create" : "update",
-                "details"   => $details,
-                "ipAddress" => $this->factory->getIpAddressFromRequest()
-            );
-            $this->factory->getModel('core.auditLog')->writeToLog($log);
-        }
-    }
-
-    /**
-     * Add a delete entry to the audit log
-     *
-     * @param Events\TriggerEvent $event
-     */
-    public function onTriggerDelete(Events\TriggerEvent $event)
-    {
-        $trigger = $event->getTrigger();
-        $log = array(
-            "bundle"     => "stage",
-            "object"     => "trigger",
-            "objectId"   => $trigger->deletedId,
-            "action"     => "delete",
-            "details"    => array('name' => $trigger->getName()),
-            "ipAddress"  => $this->factory->getIpAddressFromRequest()
-        );
-        $this->factory->getModel('core.auditLog')->writeToLog($log);
-    }
 }

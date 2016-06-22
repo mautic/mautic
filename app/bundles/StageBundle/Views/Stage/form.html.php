@@ -31,19 +31,6 @@ echo $view['form']->start($form);
                         ?>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="pa-md">
-                        <?php echo $view['form']->row($form['type']); ?>
-                        <div id="stageActionProperties">
-                            <?php
-                            if (isset($form['properties'])):
-                                echo $view['form']->row($form['properties']);
-                            endif;
-                            ?>
-                        </div>
-                    </div>
-                </div>
-
             </div>
             <div class="row">
                 <div class="col-xs-12">
