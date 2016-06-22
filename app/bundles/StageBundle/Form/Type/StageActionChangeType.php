@@ -38,7 +38,7 @@ class StageActionChangeType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->add('stage', 'stageaction_list', array(
-            'label'       => 'mautic.stage.send.selectemails',
+            'label'       => 'mautic.stage.selectstage',
             'label_attr'  => array('class' => 'control-label'),
             'attr'        => array(
                 'class'   => 'form-control',

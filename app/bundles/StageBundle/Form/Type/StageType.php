@@ -71,7 +71,8 @@ class StageType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.stage.action.weight.help'
                 ),
-            'precision'  => 0
+            'precision'  => 0,
+            'required'   => false
         ));
         $builder->add('type', 'choice', array(
             'choices' => $options['stageActions']['choices'],

@@ -296,6 +296,10 @@ return [
                 'class'     => 'Mautic\LeadBundle\Form\Type\DncType',
                 'alias'     => 'lead_batch_dnc'
             ],
+            'mautic.form.type.lead_batch_stage'               => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\StageType',
+                'alias'     => 'lead_batch_stage'
+            ],
             'mautic.form.type.lead_merge'               => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\MergeType',
                 'alias'     => 'lead_merge'

@@ -2051,4 +2051,113 @@ class LeadController extends FormController
             );
         }
     }
+
+    /**
+     * Bulk edit lead campaigns
+     *
+     * @param int $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function batchStagesAction($objectId = 0)
+    {
+        if ($this->request->getMethod() == 'POST') {
+            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            $model = $this->getModel('lead');
+            $data  = $this->request->request->get('lead_batch', array(), true);
+            $ids   = json_decode($data['ids'], true);
+
+            $this->factory->getLogger()->addError(print_r($ids,true));
+
+            $entities  = array();
+            if (is_array($ids)) {
+                $entities = $model->getEntities(
+                    array(
+                        'filter' => array(
+                            'force' => array(
+                                array(
+                                    'column' => 'l.id',
+                                    'expr'   => 'in',
+                                    'value'  => $ids
+                                )
+                            ),
+                        ),
+                        'ignore_paginator' => true
+                    )
+                );
+            }
+
+            $count = 0;
+            foreach ($entities as $lead) {
+                if ($this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getCreatedBy())) {
+                    $count++;
+
+                    if (!empty($data['add'])) {
+                        $stageModel = $this->getModel('stage');
+
+                        $stage = $stageModel->getEntity($data['add'][0]);
+                        $model->addToStages($lead, $stage, $data['add']);
+                    }
+
+                    if (!empty($data['remove'])) {
+                        $stage = $stageModel->getEntity($data['remove']);
+                        $model->removeFromStages($lead, $stage);
+                    }
+                }
+            }
+            // Save entities
+            $model->saveEntities($entities);
+            $this->addFlash('mautic.lead.batch_leads_affected',
+                array(
+                    'pluralCount' => $count,
+                    '%count%'     => $count
+                )
+            );
+
+            return new JsonResponse(
+                array(
+                    'closeModal' => true,
+                    'flashes'    => $this->getFlashContent()
+                )
+            );
+        } else {
+            // Get a list of lists
+            /** @var \Mautic\StageBundle\Model\StageModel $model */
+            $model = $this->getModel('stage');
+            $stages = $model->getUserStages();
+            $items = array();
+            foreach ($stages as $stage) {
+                $items[$stage['id']] = $stage['name'];
+            }
+
+            $route = $this->generateUrl(
+                'mautic_contact_action',
+                array(
+                    'objectAction' => 'batchStages'
+                )
+            );
+            return $this->delegateView(
+                array(
+                    'viewParameters'  => array(
+                        'form' => $this->createForm(
+                            'lead_batch_stage',
+                            array(),
+                            array(
+                                'items'  => $items,
+                                'action' => $route
+                            )
+                        )->createView()
+                    ),
+                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                    'passthroughVars' => array(
+                        'activeLink'    => '#mautic_contact_index',
+                        'mauticContent' => 'leadBatch',
+                        'route'         => $route
+                    )
+                )
+            );
+        }
+    }
+
+
 }
