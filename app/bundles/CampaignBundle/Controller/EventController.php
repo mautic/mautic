@@ -159,7 +159,6 @@ class EventController extends CommonFormController
             //just close the modal
             $passthroughVars['closeModal'] = 1;
             $response                      = new JsonResponse($passthroughVars);
-            $response->headers->set('Content-Length', strlen($response->getContent()));
 
             return $response;
         } else {
@@ -427,7 +426,6 @@ class EventController extends CommonFormController
         }
 
         $response = new JsonResponse($dataArray);
-        $response->headers->set('Content-Length', strlen($response->getContent()));
 
         return $response;
     }

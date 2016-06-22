@@ -245,7 +245,7 @@ class CommonController extends Controller implements MauticController
         if ($this->request->get('ignoreAjax', false)) {
             $response = new Response();
             $response->setContent($newContent);
-            
+
             return $response;
         }
 
@@ -309,7 +309,6 @@ class CommonController extends Controller implements MauticController
             $response = new JsonResponse($dataArray, $code);
         }
 
-        //$response->headers->set('Content-Length', strlen($response->getContent()));
         return $response;
     }
 
