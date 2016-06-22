@@ -328,8 +328,10 @@ class AjaxController extends CommonAjaxController
         $dncId     = $request->request->get('id');
 
         if (!empty($dncId)) {
-            /** @var \Mautic\EmailBundle\Entity\DoNotEmail $dnc */
-            $dnc = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:DoNotEmail')->findOneBy(
+            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            $model = $this->getModel('lead');
+            /** @var \Mautic\LeadBundle\Entity\DoNotContact $dnc */
+            $dnc = $this->getEntityManager()->getRepository('MauticLeadBundle:DoNotContact')->findOneBy(
                 array(
                     'id' => $dncId
                 )
@@ -338,8 +340,7 @@ class AjaxController extends CommonAjaxController
             $lead = $dnc->getLead();
             if ($lead) {
                 // Use lead model to trigger listeners
-                $lead->removeDoNotEmailEntry($dnc);
-                $this->getModel('lead')->saveEntity($lead);
+                $model->removeDncForLead($lead, 'email');
             } else {
                 $this->getModel('email')->getRepository()->deleteDoNotEmailEntry($dncId);
             }
