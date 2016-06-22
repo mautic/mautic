@@ -27,6 +27,8 @@ Mautic.pageOnLoad = function (container) {
             Mautic.autoHideRedirectUrl(container);
         });
     }
+
+    Mautic.initDateRangePicker();
 };
 
 Mautic.getPageAbTestWinnerForm = function(abKey) {

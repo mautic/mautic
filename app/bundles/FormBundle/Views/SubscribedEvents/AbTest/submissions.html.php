@@ -9,8 +9,13 @@
 
 $support = $results['support'];
 $label = $view['translator']->trans($variants['criteria'][$results['basedOn']]['label']);
+$chart = new \Mautic\CoreBundle\Helper\Chart\BarChart($support['labels']);
 
-$barData = \Mautic\CoreBundle\Helper\GraphHelper::prepareBarGraphData($support['labels'], $support['data']);
+if ($support['data']) {
+    foreach ($support['data'] as $datasetLabel => $values) {
+        $chart->setDataset($datasetLabel, $values);
+    }
+}
 
 ?>
 <div class="panel ovf-h bg-auto bg-light-xs abtest-bar-chart">
@@ -25,11 +30,8 @@ $barData = \Mautic\CoreBundle\Helper\GraphHelper::prepareBarGraphData($support['
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-7">
+        <div class="col-sm-12">
             <canvas id="abtest-bar-chart" height="300"></canvas>
-        </div>
-        <div class="col-sm-5">
-            <div class="abtest-bar-legend legend-container"></div>
         </div>
     </div>
 </div>
@@ -38,22 +40,8 @@ $barData = \Mautic\CoreBundle\Helper\GraphHelper::prepareBarGraphData($support['
     mQuery(document).ready(function() {
         mQuery('#abStatsModal').on('shown.bs.modal', function (event) {
             var canvas = document.getElementById("abtest-bar-chart");
-            var barData = mQuery.parseJSON('<?php echo json_encode($barData); ?>');
-            var barGraph = new Chart(canvas.getContext("2d")).Bar(barData, {
-                responsive: true,
-                animation: false,
-                tooltipTitleFontSize: 10,
-                tooltipTitleFontStyle: '',
-                scaleOverride: true,
-                scaleSteps: 11,
-                scaleStepWidth: <?php echo $support['step_width'] ?>,
-                scaleStartValue: 0
-            });
-
-            var legendHolder = document.createElement('div');
-            legendHolder.innerHTML = barGraph.generateLegend();
-            mQuery('.abtest-bar-legend').html(legendHolder.firstChild);
-            barGraph.update();
+            var barData = mQuery.parseJSON('<?php echo json_encode($chart->render()); ?>');
+            var barGraph = new Chart(canvas, {type: 'bar', data: barData});
         });
     });
 </script>
