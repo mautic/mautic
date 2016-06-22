@@ -98,7 +98,7 @@ class CampaignSubscriber extends CommonSubscriber
     public function onFormSubmit(SubmissionEvent $event)
     {
         $form = $event->getSubmission()->getForm();
-        $this->factory->getModel('campaign')->triggerEvent('form.submit', $form, 'form.submit' . $form->getId());
+        $this->factory->getModel('campaign.event')->triggerEvent('form.submit', $form, 'form.submit' . $form->getId());
     }
 
     /**

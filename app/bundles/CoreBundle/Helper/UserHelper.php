@@ -10,7 +10,7 @@
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
 /**
  * Class IpLookupHelper
@@ -18,17 +18,18 @@ use Symfony\Component\Security\Core\SecurityContext;
 class UserHelper
 {
     /**
-     * @var SecurityContext
+     * @var TokenStorage
      */
-    protected $securityContext;
+    protected $tokenStorage;
 
-    /***
+    /**
      * UserHelper constructor.
-     * @param SecurityContext $securityContext
+     *
+     * @param TokenStorage $tokenStorage
      */
-    public function __construct(SecurityContext $securityContext)
+    public function __construct(TokenStorage $tokenStorage)
     {
-        $this->securityContext = $securityContext;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -39,7 +40,7 @@ class UserHelper
     public function getUser($nullIfGuest = false)
     {
         $user  = null;
-        $token = $this->securityContext->getToken();
+        $token = $this->tokenStorage->getToken();
 
         if ($token !== null) {
             $user = $token->getUser();

@@ -50,7 +50,7 @@ if ($tmpl == 'index')
                 </td>
                 <td>
                     <span class="ellipsis">
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'lead.field')); ?>
+                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'lead.field', 'disableToggle' => ($item->getAlias() == 'email'))); ?>
                         <a href="<?php echo $view['router']->path('mautic_contactfield_action', array('objectAction' => 'edit', 'objectId' => $item->getId())); ?>"><?php echo $item->getLabel(); ?></a>
                     </span>
                 </td>

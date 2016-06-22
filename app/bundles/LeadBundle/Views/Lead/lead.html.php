@@ -447,21 +447,26 @@ $view['slots']->set(
                     <?php echo $view['translator']->trans('mautic.lead.field.address'); ?>
                 </h6>
                 <address class="text-muted">
+                    <?php if (isset($fields['core']['address1'])): ?>
                     <?php echo $fields['core']['address1']['value']; ?><br>
+                    <?php endif; ?>
                     <?php if (!empty($fields['core']['address2']['value'])) : echo $fields['core']['address2']['value']
                         .'<br>'; endif ?>
-                    <?php echo $lead->getLocation(); ?> <?php echo $fields['core']['zipcode']['value']; ?><br>
-                    <abbr title="Phone">P:</abbr> <?php echo $fields['core']['phone']['value']; ?>
+                    <?php echo $lead->getLocation(); ?> <?php if (isset($fields['core']['zipcode'])) echo $fields['core']['zipcode']['value']; ?><br>
                 </address>
 
                 <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.core.type.email'); ?></h6>
                 <p class="text-muted"><?php echo $fields['core']['email']['value']; ?></p>
 
+                <?php if (isset( $fields['core']['phone'])): ?>
                 <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.field.type.tel.home'); ?></h6>
                 <p class="text-muted"><?php echo $fields['core']['phone']['value']; ?></p>
+                <?php endif; ?>
 
+                <?php if (isset($fields['core']['mobile'])): ?>
                 <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.field.type.tel.mobile'); ?></h6>
                 <p class="text-muted mb-0"><?php echo $fields['core']['mobile']['value']; ?></p>
+                <?php endif; ?>
             </div>
         </div>
         <!--/ form HTML -->
