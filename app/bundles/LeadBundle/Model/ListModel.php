@@ -1169,7 +1169,7 @@ class ListModel extends FormModel
         $chart     = new BarChart($data['labels']);
 
         $datasetId = count($data['values']);
-        $datasets[] = array_merge($baseData, $chart->generateColors($datasetId));
+        $datasets[] = array_merge($baseData, $chart->generateColors(3));
 
         $chartData = array(
             'labels' => $data['labels'],
