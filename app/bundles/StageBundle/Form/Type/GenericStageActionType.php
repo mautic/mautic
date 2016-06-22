@@ -28,7 +28,7 @@ class GenericStageSettingsType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $default = (empty($options['data']['weight'])) ? 0 : (int) $options['data']['weight'];
-        $builder->add('delta', 'number', array(
+        $builder->add('weight', 'number', array(
             'label'      => 'mautic.stage.action.weight',
             'label_attr' => array('class' => 'control-label'),
             'attr'       =>
