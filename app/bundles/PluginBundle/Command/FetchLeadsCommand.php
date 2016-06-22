@@ -95,7 +95,8 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 $params['end']=$endDate;
                 $params['object']=$object;
                 if(strtotime($startDate) > strtotime('-30 days')) {
-                    $processed = $integrationObject->getLeads($params);
+                    $processed = 0;
+                    $processed = intval($integrationObject->getLeads($params));
 
                     $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 
