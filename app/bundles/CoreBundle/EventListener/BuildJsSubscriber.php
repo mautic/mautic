@@ -104,6 +104,7 @@ MauticJS.ajaxRequest = function(method, url, data, callbackSuccess, callbackErro
     }
 
     xhr.open(method, url);
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
     xhr.send(MauticJS.serialize(data));
 };
 
