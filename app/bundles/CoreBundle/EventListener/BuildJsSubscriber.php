@@ -48,12 +48,9 @@ s=this.x64Rotl(s,33),s=this.x64Multiply(s,l),n=this.x64Xor(n,s);case 8:o=this.x6
 var MauticJS = MauticJS || {};
 
 MauticJS.serialize = function(obj) {
-    var str = [];
-    for (var p in obj)
-        if (obj.hasOwnProperty(p)) {
-            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-        }
-    return str.join("&");
+    return Object.keys(obj).map(function(key) {
+        return key + '=' + obj[key];
+    }).join('&');
 };
 
 MauticJS.documentReady = function(f) {
@@ -62,7 +59,7 @@ MauticJS.documentReady = function(f) {
 
 MauticJS.iterateCollection = function(collection) {
     return function(f) {
-        for (var i = 0; collection[i], i++) {
+        for (var i = 0; collection[i]; i++) {
             f(collection[i], i);
         }
     };
