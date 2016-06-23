@@ -88,8 +88,7 @@ class Stage extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('stages')
-            ->setCustomRepositoryClass('Mautic\StageBundle\Entity\StageRepository')
-            ->addIndex(array('type'), 'stage_type_search');
+            ->setCustomRepositoryClass('Mautic\StageBundle\Entity\StageRepository');
 
         $builder->addIdColumns();
 

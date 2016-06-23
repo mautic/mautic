@@ -83,13 +83,14 @@ return [
                 'class' => 'Mautic\AssetBundle\EventListener\ReportSubscriber'
             ],
             'mautic.asset.builder.subscriber' => [
-                'class' => 'Mautic\AssetBundle\EventListener\BuilderSubscriber'
+                'class' => 'Mautic\AssetBundle\EventListener\BuilderSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.asset.helper.token'
+                ]
             ],
             'mautic.asset.leadbundle.subscriber' => [
                 'class'       => 'Mautic\AssetBundle\EventListener\LeadSubscriber',
-                'methodCalls' => [
-                    'setAttributionModel' => ['mautic.lead.model.attribution']
-                ]
             ],
             'mautic.asset.pagebundle.subscriber' => [
                 'class' => 'Mautic\AssetBundle\EventListener\PageSubscriber'
@@ -158,7 +159,11 @@ return [
                 'arguments' => 'mautic.factory'
             ],
             // Override the DropzoneController
-            'oneup_uploader.controller.dropzone.class' => 'Mautic\AssetBundle\Controller\UploadController'
+            'oneup_uploader.controller.dropzone.class' => 'Mautic\AssetBundle\Controller\UploadController',
+            'mautic.asset.helper.token' => [
+                'class'     => 'Mautic\AssetBundle\Helper\TokenHelper',
+                'arguments' => 'mautic.asset.model.asset'
+            ]
         ],
         'models' =>  [
             'mautic.asset.model.asset' => [

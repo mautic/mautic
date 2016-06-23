@@ -184,10 +184,6 @@ return [
                     'mautic.stage.model.stage',
                 ]
             ],
-            'mautic.lead.doctrine.subscriber'       => [
-                'class' => 'Mautic\LeadBundle\EventListener\DoctrineSubscriber',
-                'tag'   => 'doctrine.event_subscriber'
-            ],
             'mautic.lead.calendarbundle.subscriber' => [
                 'class' => 'Mautic\LeadBundle\EventListener\CalendarSubscriber'
             ],
@@ -234,6 +230,11 @@ return [
                 'class'     => 'Mautic\LeadBundle\Form\Type\FormSubmitActionPointsChangeType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'lead_submitaction_pointschange'
+            ],
+            'mautic.form.type.lead.submitaction.addutmtags' => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\ActionAddUtmTagsType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'lead_action_addutmtags'
             ],
             'mautic.form.type.lead.submitaction.changelist'   => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\EventListType',
@@ -332,6 +333,10 @@ return [
             ]
         ],
         'other'   => [
+            'mautic.lead.doctrine.subscriber'       => [
+                'class'     => 'Mautic\LeadBundle\EventListener\DoctrineSubscriber',
+                'tag'       => 'doctrine.event_subscriber',
+            ],
             'mautic.validator.leadlistaccess' => [
                 'class'     => 'Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator',
                 'arguments' => 'mautic.factory',
@@ -380,12 +385,6 @@ return [
             'mautic.lead.model.note' => [
                 'class' => 'Mautic\LeadBundle\Model\NoteModel'
             ],
-            'mautic.lead.model.attribution' => [
-                'class'     => 'Mautic\LeadBundle\Model\AttributionModel',
-                'arguments' => [
-                    'mautic.helper.ip_lookup'
-                ]
-            ]
         ]
     ]
 ];

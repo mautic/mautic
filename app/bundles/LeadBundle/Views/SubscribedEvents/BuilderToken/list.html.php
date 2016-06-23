@@ -16,7 +16,7 @@ if ($tmpl == 'index') {
     <div class="list-group">
         <?php
         foreach ($items as $i):
-        $token = $view->escape(\Mautic\CoreBundle\Helper\BuilderTokenHelper::getVisualTokenHtml('{leadfield=' . $i['alias'] . '}', $i['label']))
+        $token = $view->escape(\Mautic\CoreBundle\Helper\BuilderTokenHelper::getVisualTokenHtml('{contactfield=' . $i['alias'] . '}', $i['label']))
         ?>
             <a href="#" class="list-group-item" data-token="<?php echo $token; ?>">
                 <span><?php echo $i['label']; ?></span>

@@ -15,7 +15,8 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
 }
 
 // Get the URLs base path
-$base = str_replace('index.php', '', $_SERVER['SCRIPT_NAME']);
+$inDev = strpos($_SERVER['SCRIPT_NAME'], 'index_dev.php') !== false;
+$base  = str_replace(['index.php', 'index_dev.php'], '', $_SERVER['SCRIPT_NAME']);
 
 // Determine if there is an asset prefix
 $root = __DIR__;

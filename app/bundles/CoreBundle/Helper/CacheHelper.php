@@ -94,8 +94,10 @@ class CacheHelper
 
     /**
      * Delete's the file Symfony caches settings in
+     *
+     * @param bool $configSave
      */
-    public function clearContainerFile()
+    public function clearContainerFile($configSave = true)
     {
         $this->clearSessionItems();
 
@@ -104,7 +106,7 @@ class CacheHelper
             unlink($containerFile);
         }
 
-        $this->clearOpcaches(true);
+        $this->clearOpcaches($configSave);
     }
 
     /**

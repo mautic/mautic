@@ -3073,8 +3073,18 @@ var Mautic = {
         if (!data.labels.length || !data.datasets.length) return;
         var chart = new Chart(canvas, {
             type: 'line',
-            data: data,
-            options: {lineTension : 0.2, borderWidth: 1}
+            data: data, 
+            options: {
+                lineTension : 0.2,
+                borderWidth: 1,
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
         });
         Mautic.chartObjects.push(chart);
     },

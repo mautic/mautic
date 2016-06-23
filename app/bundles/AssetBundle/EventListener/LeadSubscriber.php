@@ -9,12 +9,10 @@
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\AssetEvents;
-use Mautic\AssetBundle\Event\AssetLoadEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\LeadBundle\EventListener\Decorator\AttributionTrait;
 use Mautic\LeadBundle\LeadEvents;
 
 /**
@@ -24,8 +22,6 @@ use Mautic\LeadBundle\LeadEvents;
  */
 class LeadSubscriber extends CommonSubscriber
 {
-    use AttributionTrait;
-
     /**
      * @return array
      */
@@ -112,20 +108,5 @@ class LeadSubscriber extends CommonSubscriber
     public function onLeadMerge(LeadMergeEvent $event)
     {
         $this->factory->getModel('asset')->getDownloadRepository()->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
-    }
-
-    /**
-     * @param $event
-     */
-    public function logContactAttribution(AssetLoadEvent $event)
-    {
-        if ($event->isUnique()) {
-            $lead       = $event->getLead();
-            $asset      = $event->getAsset();
-            $record     = $event->getRecord();
-            $campaignId = ($record->getSource() == 'campaign') ? $record->getSourceId() : null;
-
-            $this->attributionModel->addAttribution($lead, 'asset', $asset->getId(), 'download', $campaignId);
-        }
     }
 }

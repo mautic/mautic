@@ -13,7 +13,7 @@ if ($item->hasChildren() && $options['depth'] !== 0 && $item->getDisplayChildren
     if ($item->isRoot()) {
         echo '<ul class="nav mt-10" data-toggle="menu">' . "\n";
     } else {
-        echo "<ul{$view["menu_helper"]->parseAttributes($item->getChildrenAttributes())}>\n";
+        echo "<ul{$view['menu']->parseAttributes($item->getChildrenAttributes())}>\n";
     }
 
     /** Submenu levels  start*/
@@ -23,7 +23,7 @@ if ($item->hasChildren() && $options['depth'] !== 0 && $item->getDisplayChildren
         }
 
         //builds the class attributes based on options
-        $view["menu_helper"]->buildClasses($child, $matcher, $options);
+        $view['menu']->buildClasses($child, $matcher, $options);
 
         $showChildren = ($child->hasChildren() && $child->getDisplayChildren());
         $liAttributes = $child->getAttributes();
@@ -32,7 +32,7 @@ if ($item->hasChildren() && $options['depth'] !== 0 && $item->getDisplayChildren
         $liAttributes['class'] = (isset($liAttributes['class'])) ? $liAttributes['class'] . ' nav-group' : 'nav-group';
 
         /** Menu item start */
-        echo "<li{$view["menu_helper"]->parseAttributes($liAttributes)}>\n";
+        echo "<li{$view['menu']->parseAttributes($liAttributes)}>\n";
 
         $linkAttributes = $child->getLinkAttributes();
         $extras         = $child->getExtras();
@@ -40,13 +40,16 @@ if ($item->hasChildren() && $options['depth'] !== 0 && $item->getDisplayChildren
         /** Menu link start */
         if ($showChildren) {
             //Main item
-            echo '<a href="javascript:void(0);" data-target="#' . $linkAttributes['id'] . '_child" data-toggle="submenu" data-parent=".nav" ' . $view["menu_helper"]->parseAttributes($linkAttributes) . ">\n";
+            echo '<a href="javascript:void(0);" data-target="#' . $linkAttributes['id'] . '_child" data-toggle="submenu" data-parent=".nav" ' . $view['menu']->parseAttributes($linkAttributes) . ">\n";
             echo '<span class="arrow pull-right text-right"></span>' . "\n";
         } else {
             //Submenu item
             $url = $child->getUri();
             $url = (empty($url)) ? 'javascript:void(0);' : $url;
-            echo "<a href=\"$url\" data-toggle=\"ajax\"{$view["menu_helper"]->parseAttributes($linkAttributes)}>";
+            if (empty($linkAttributes['target'])) {
+                $linkAttributes['data-toggle'] = 'ajax';
+            }
+            echo "<a href=\"$url\"{$view['menu']->parseAttributes($linkAttributes)}>";
         }
 
         if (!empty($extras["iconClass"])) {
@@ -60,7 +63,7 @@ if ($item->hasChildren() && $options['depth'] !== 0 && $item->getDisplayChildren
         $labelPull = $extras['depth'] === 0 ? ' pull-left' : '';
         $labelAttributes['class'] .= ' text' . $labelPull;
 
-        echo "<span{$view["menu_helper"]->parseAttributes($labelAttributes)}>{$view['translator']->trans($child->getLabel())}</span>";
+        echo "<span{$view['menu']->parseAttributes($labelAttributes)}>{$view['translator']->trans($child->getLabel())}</span>";
 
         echo "</a>\n";
         /** Menu link end */

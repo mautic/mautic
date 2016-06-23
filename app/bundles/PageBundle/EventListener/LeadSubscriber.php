@@ -24,8 +24,6 @@ use Mautic\PageBundle\PageEvents;
  */
 class LeadSubscriber extends CommonSubscriber
 {
-    use AttributionTrait;
-
     /**
      * {@inheritdoc}
      */
@@ -167,20 +165,5 @@ class LeadSubscriber extends CommonSubscriber
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
-    }
-
-    /**
-     * @param PageHitEvent $event
-     */
-    public function logContactAttribution(PageHitEvent $event)
-    {
-        if ($event->isUnique()) {
-            $lead       = $event->getLead();
-            $hit        = $event->getHit();
-            $page       = $event->getPage();
-            $campaignId = ($hit->getSource() == 'campaign') ? $hit->getSourceId() : null;
-
-            $this->attributionModel->addAttribution($lead, 'page', ($page) ? $page->getId() : null, 'hit', $campaignId);
-        }
     }
 }

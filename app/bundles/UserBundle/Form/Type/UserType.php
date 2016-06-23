@@ -9,13 +9,17 @@
 
 namespace Mautic\UserBundle\Form\Type;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\LanguageHelper;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -45,25 +49,34 @@ class UserType extends AbstractType
     private $model;
 
     /**
-     * @param MauticFactory $factory
+     * UserType constructor.
+     *
+     * @param TranslatorInterface  $translator
+     * @param EntityManager        $em
+     * @param UserModel            $model
+     * @param LanguageHelper       $languageHelper
+     * @param CoreParametersHelper $parametersHelper
      */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->translator = $factory->getTranslator();
-        $this->em         = $factory->getEntityManager();
-        $this->model      = $factory->getModel('user');
+    public function __construct(
+        TranslatorInterface $translator,
+        EntityManager $em,
+        UserModel $model,
+        LanguageHelper $languageHelper,
+        CoreParametersHelper $parametersHelper
+    ) {
+        $this->translator = $translator;
+        $this->em         = $em;
+        $this->model      = $model;
 
         // Get the list of available languages
-        /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
-        $languageHelper = $factory->getHelper('language');
-        $languages      = $languageHelper->fetchLanguages(false, false);
-        $langChoices    = [];
+        $languages   = $languageHelper->fetchLanguages(false, false);
+        $langChoices = [];
 
         foreach ($languages as $code => $langData) {
             $langChoices[$code] = $langData['name'];
         }
 
-        $langChoices = array_merge($langChoices, $factory->getParameter('supported_languages'));
+        $langChoices = array_merge($langChoices, $parametersHelper->getParameter('supported_languages'));
 
         // Alpha sort the languages by name
         asort($langChoices);

@@ -10,11 +10,8 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
-use Mautic\EmailBundle\Event\EmailOpenEvent;
-use Mautic\LeadBundle\Entity\Attribution;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\LeadBundle\EventListener\Decorator\AttributionTrait;
 use Mautic\LeadBundle\LeadEvents;
 
 /**
@@ -24,8 +21,6 @@ use Mautic\LeadBundle\LeadEvents;
  */
 class LeadSubscriber extends CommonSubscriber
 {
-    use AttributionTrait;
-
     /**
      * @return array
      */
@@ -119,21 +114,5 @@ class LeadSubscriber extends CommonSubscriber
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
-    }
-
-    /**
-     * @param EmailOpenEvent $event
-     */
-    public function logContactAttribution(EmailOpenEvent $event)
-    {
-        $stat = $event->getStat();
-        if ($stat && $event->isFirstTime()) {
-            $lead       = $event->getLead();
-            $email      = $event->getEmail();
-            $emailId    = ($email ? $email->getId() : null);
-            $campaignId = ($stat->getSource() == 'campaign') ? $stat->getSourceId() : null;
-
-            $this->attributionModel->addAttribution($lead, 'email', $emailId, 'open', $campaignId);
-        }
     }
 }

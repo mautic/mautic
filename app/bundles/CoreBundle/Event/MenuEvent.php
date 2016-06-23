@@ -10,11 +10,7 @@
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Menu\MenuHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\SecurityContext;
 
 /**
  * Class MenuEvent
@@ -71,7 +67,7 @@ class MenuEvent extends Event
         $defaultPriority = isset($menuItems['priority']) ? $menuItems['priority'] : 9999;
         $items           = isset($menuItems['items']) ? $menuItems['items'] : $menuItems;
 
-        $isRoot = isset($items['name']) && ($items['name'] == 'root' || $items['name'] == 'admin');
+        $isRoot = isset($items['name']) && ($items['name'] == 'root' || $items['name'] == $items['name']);
         if (!$isRoot) {
             $this->helper->createMenuStructure($items, 0, $defaultPriority);
 

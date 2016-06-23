@@ -242,6 +242,14 @@ class ReportSubscriber extends CommonSubscriber
                 break;
 
             case 'contact.attribution.multi':
+                $event->applyDateFilters($qb, 'attribution_date', 'l');
+                $qb->from(MAUTIC_TABLE_PREFIX.'lead_attributions', 'la')
+                    ->leftJoin('la', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = la.lead_id')
+                    ->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
+
+                break;
+
+            case 'contact.attribution.first':
                 $event->applyDateFilters($qb, 'date_added', 'la');
                 $qb->from(MAUTIC_TABLE_PREFIX.'lead_attributions', 'la')
                     ->leftJoin('la', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = la.lead_id')
@@ -249,7 +257,7 @@ class ReportSubscriber extends CommonSubscriber
 
                 break;
 
-            case 'contact.attribution.single':
+            case 'contact.attribution.last':
                 //$event->applyDateFilters($qb, 'date_added', 'lafirst');
 
                 // Create a subquery for first touch
@@ -538,47 +546,7 @@ class ReportSubscriber extends CommonSubscriber
     private function injectAttributionReportData(ReportBuilderEvent $event, array $columns, $type)
     {
         $attributionColumns = [
-            'la.campaign_id'   => [
-                'label' => 'mautic.lead.report.attribution.campaign_id',
-                'type'  => 'int'
-            ],
-            'la.campaign_name' => [
-                'label' => 'mautic.lead.report.attribution.campaign_name',
-                'type'  => 'string'
-            ],
-            'la.date_added'    => [
-                'label' => 'mautic.core.date.added',
-                'type'  => 'datetime'
-            ],
-            'la.channel'       => [
-                'label' => 'mautic.lead.report.attribution.channel',
-                'type'  => 'string'
-            ],
-            'la.channel_id'    => [
-                'label' => 'mautic.lead.report.attribution.channel_id',
-                'type'  => 'int'
-            ],
-            'la.action'        => [
-                'label' => 'mautic.lead.report.attribution.channel_action',
-                'type'  => 'string'
-            ],
-            'la.stage_id'      => [
-                'label' => 'mautic.lead.report.attribution.stage_id',
-                'type'  => 'int'
-            ],
-            'la.stage_name'    => [
-                'label' => 'mautic.lead.report.attribution.stage_name',
-                'type'  => 'string'
-            ],
-            'la.attribution'   => [
-                'label' => 'mautic.lead.report.attribution',
-                'type'  => 'float',
-                'alias' => 'activity_attribution'
-            ],
-            'la.comments'      => [
-                'label' => 'mautic.lead.report.attribution.comments',
-                'type'  => 'string'
-            ]
+
         ];
 
         // Unset IP address
@@ -602,7 +570,7 @@ class ReportSubscriber extends CommonSubscriber
             unset($filters['la.attribution']);
 
             // Append stage filters
-            $filters['la.stage_id'] = [
+            $filters['l.stage_id'] = [
                 'label' => 'mautic.lead.report.attribution.filter.stage',
                 'type'  => 'select',
                 'list'  => $stages,

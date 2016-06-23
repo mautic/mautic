@@ -674,17 +674,6 @@ class LeadRepository extends CommonRepository
                 $expr = $q->expr()->$xFunc(
                     $q->expr()->$nullFunc('l.date_identified')
                 );
-
-                if (!empty($this->availableSocialFields)) {
-                    foreach ($this->availableSocialFields as $field) {
-                        $expr->add(
-                            $q->expr()->$xSubFunc(
-                                $q->expr()->$eqFunc("l.$field", $q->expr()->literal('')),
-                                $q->expr()->$nullFunc("l.$field")
-                            )
-                        );
-                    }
-                }
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
