@@ -96,6 +96,7 @@ return [
             ],
             'mautic.page.pointbundle.subscriber'    => [
                 'class' => 'Mautic\PageBundle\EventListener\PointSubscriber'
+
             ],
             'mautic.page.reportbundle.subscriber'   => [
                 'class' => 'Mautic\PageBundle\EventListener\ReportSubscriber'

@@ -472,7 +472,7 @@ class SubmissionModel extends CommonFormModel
         };
 
         // Closure to help search for a conflict
-        $checkForIdentifierConflict = function($fieldSet1, $fieldSet2) use ($logger) {
+        $checkForIdentifierConflict = function($fieldSet1, $fieldSet2) {
             // Find fields in both sets
             $potentialConflicts = array_keys(
                 array_intersect_key($fieldSet1, $fieldSet2)
@@ -542,15 +542,15 @@ class SubmissionModel extends CommonFormModel
             // Check for conflicts with the submitted data and the currently tracked lead
             list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsWithData, $uniqueFieldsCurrent);
 
-            $logger->debug('FORM: Current unique contact fields ' . implode(', ', array_keys($uniqueFieldsCurrent)) . ' = ' . implode(', ', $uniqueFieldsCurrent));
+            $this->logger->debug('FORM: Current unique contact fields ' . implode(', ', array_keys($uniqueFieldsCurrent)) . ' = ' . implode(', ', $uniqueFieldsCurrent));
 
-            $logger->debug('FORM: Submitted unique contact fields ' . implode(', ', array_keys($uniqueFieldsWithData)) . ' = ' . implode(', ', $uniqueFieldsWithData));
+            $this->logger->debug('FORM: Submitted unique contact fields ' . implode(', ', array_keys($uniqueFieldsWithData)) . ' = ' . implode(', ', $uniqueFieldsWithData));
             if ($hasConflict) {
                 // There's a conflict so create a new lead
                 $lead = new Lead();
                 $lead->setNewlyCreated(true);
 
-                $logger->debug('FORM: Conflicts found in ' . implode(', ' , $conflicts) . ' between current tracked contact and submitted data so assuming a new contact');
+                $this->logger->debug('FORM: Conflicts found in ' . implode(', ' , $conflicts) . ' between current tracked contact and submitted data so assuming a new contact');
             }
         }
 
@@ -561,7 +561,7 @@ class SubmissionModel extends CommonFormModel
         if ($lead->isNewlyCreated()) {
             if (!$inKioskMode) {
                 $lead->addIpAddress($ipAddress);
-                $logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to contact');
+                $this->logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to contact');
             }
 
         } elseif (!$inKioskMode) {
@@ -569,7 +569,7 @@ class SubmissionModel extends CommonFormModel
             if (!$leadIpAddresses->contains($ipAddress)) {
                 $lead->addIpAddress($ipAddress);
 
-                $logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to contact');
+                $this->logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to contact');
             }
         }
 

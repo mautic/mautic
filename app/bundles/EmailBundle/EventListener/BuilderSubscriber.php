@@ -93,6 +93,33 @@ class BuilderSubscriber extends CommonSubscriber
                 $event->filterTokens($tokens)
             );
         }
+
+        if ($event->slotTypesRequested()) {
+            $event->addSlotType(
+                'text',
+                'Text',
+                'font',
+                'MauticCoreBundle:Slots:text.html.php',
+                'slot',
+                1000
+            );
+            $event->addSlotType(
+                'image',
+                'Image',
+                'image',
+                'MauticCoreBundle:Slots:image.html.php',
+                'slot',
+                900
+            );
+            $event->addSlotType(
+                'button',
+                'Button',
+                'external-link',
+                'MauticCoreBundle:Slots:button.html.php',
+                'slot_button',
+                800
+            );
+        }
     }
 
     /**

@@ -376,12 +376,13 @@ class MauticFactory
      * Gets a list of installed themes
      *
      * @param string $specificFeature limits list to those that support a specific feature
+     * @param boolean $extended returns extended information about the themes
      *
      * @return array
      */
-    public function getInstalledThemes($specificFeature = 'all')
+    public function getInstalledThemes($specificFeature = 'all', $extended = false)
     {
-        return $this->container->get('mautic.helper.theme')->getInstalledThemes($specificFeature);
+        return $this->container->get('mautic.helper.theme')->getInstalledThemes($specificFeature, $extended);
     }
 
     /**

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{{ page.getTitle() }}</title>
+        <meta name="description" content="{{ page.getMetaDescription() }}">
+        <link rel="stylesheet" href="{{ getAssetUrl('themes/oxygen/css/oxygen.css') }}" type="text/css" />
+    </head>
+    <body>
+        {{ outputScripts('bodyOpen') }}
+        {% block content %}{% endblock %}
+        {{ outputScripts('bodyClose') }}
+    </body>
+</html>

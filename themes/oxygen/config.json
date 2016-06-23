@@ -1,0 +1,8 @@
+{
+  "name": "Oxygen",
+  "features": [
+    "page",
+    "email",
+    "form"
+  ]
+}

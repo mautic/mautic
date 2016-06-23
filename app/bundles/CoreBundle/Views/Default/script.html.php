@@ -22,5 +22,4 @@
         pleaseWait: '<?php echo $view['translator']->trans('mautic.core.wait'); ?>'
     };
 </script>
-<?php $view['assets']->outputSystemScripts(); ?>
-<?php $view['assets']->loadEditor(); ?>
+<?php $view['assets']->outputSystemScripts(true); ?>
