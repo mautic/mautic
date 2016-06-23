@@ -28,6 +28,12 @@ Mautic.pageOnLoad = function (container) {
         });
     }
 
+    mQuery(document).on('shown.bs.tab', 'a[href="#source-container"]', function (e) {
+        Mautic.refreshCodeEditors();
+        Mautic.initCodeEditors();
+    });
+
+    Mautic.intiSelectTheme(mQuery('#page_template'));
     Mautic.initDateRangePicker();
 };
 

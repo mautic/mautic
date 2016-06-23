@@ -182,4 +182,14 @@ class CampaignExecutionEvent extends Event
     {
         return $this->logUpdatedByListener;
     }
+
+    /**
+     * Check if an event is applicable
+     *
+     * @param $eventType
+     */
+    public function checkContext($eventType)
+    {
+        return (strtolower($eventType) == strtolower($this->event['type']));
+    }
 }

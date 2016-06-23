@@ -235,9 +235,8 @@ class AppKernel extends Kernel
         if (!defined('MAUTIC_TABLE_PREFIX')) {
             //set the table prefix before boot
             $localParams = $this->getLocalParams();
-            if (isset($localParams['db_table_prefix'])) {
-                define('MAUTIC_TABLE_PREFIX', $localParams['db_table_prefix']);
-            }
+            $prefix = isset($localParams['db_table_prefix']) ? $localParams['db_table_prefix'] : '';
+            define('MAUTIC_TABLE_PREFIX', $prefix);
         }
 
         if ($this->loadClassCache) {

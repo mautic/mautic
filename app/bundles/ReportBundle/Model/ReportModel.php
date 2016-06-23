@@ -475,6 +475,8 @@ class ReportModel extends FormModel
         $chartDateFrom = isset($options['dateFrom']) ? clone $options['dateFrom'] : (new \DateTime('-30 days'));
         $chartDateTo   = isset($options['dateTo']) ? clone $options['dateTo'] : (new \DateTime());
 
+        $debugData = [];
+
         if (isset($options['dateFrom'])) {
             // Fix date ranges if applicable
             if (!isset($options['dateTo'])) {
@@ -605,8 +607,9 @@ class ReportModel extends FormModel
                 $query->select($select);
                 $query->add('orderBy', $order);
             }
-
+            $queryTime = time();
             $data = $query->execute()->fetchAll();
+            $queryTime = time() - $queryTime;
             if (!$paginate) {
                 $totalResults = count($data);
             }
@@ -617,6 +620,17 @@ class ReportModel extends FormModel
             $data = $event->getData();
         }
 
+        if (MAUTIC_ENV == 'dev') {
+            $debugData['query'] = $query->getSQL();
+            $params = $query->getParameters();
+
+            foreach ($params as $name => $param) {
+                $debugData['query'] = str_replace(":$name", "'$param'", $debugData['query']);
+            }
+            if (!empty($queryTime)) {
+                $debugData['query_time'] = $queryTime;
+            }
+        }
         return [
             'totalResults'    => $totalResults,
             'data'            => $data,
@@ -626,7 +640,8 @@ class ReportModel extends FormModel
             'columns'         => $tableDetails['columns'],
             'limit'           => ($paginate) ? $limit : 0,
             'dateFrom'        => $dataOptions['dateFrom'],
-            'dateTo'          => $dataOptions['dateTo']
+            'dateTo'          => $dataOptions['dateTo'],
+            'debug'           => $debugData
         ];
     }
 

@@ -119,6 +119,9 @@ class ReportBuilderEvent extends Event
 
         $this->tableArray[$context] = $data;
 
+        if ($this->context == $context) {
+            $this->stopPropagation();
+        }
         return $this;
     }
 

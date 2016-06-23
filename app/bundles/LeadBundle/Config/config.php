@@ -182,6 +182,8 @@ return [
                     'mautic.lead.model.field',
                     'mautic.lead.model.lead',
                     'mautic.stage.model.stage',
+                    'mautic.campaign.model.campaign',
+                    'mautic.user.model.user'
                 ]
             ],
             'mautic.lead.calendarbundle.subscriber' => [

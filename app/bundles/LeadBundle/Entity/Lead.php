@@ -144,11 +144,6 @@ class Lead extends FormEntity
     private $tags;
 
     /**
-     * @var ArrayCollection
-     */
-    private $utmtags;
-
-    /**
      * @var \Mautic\StageBundle\Entity\Stage
      */
     private $stage;
@@ -156,6 +151,24 @@ class Lead extends FormEntity
      * @var ArrayCollection
      */
     private $stageChangeLog;
+
+    /**
+     * @var ArrayCollection
+     */
+    private $utmtags;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->ipAddresses     = new ArrayCollection();
+        $this->pushIds         = new ArrayCollection();
+        $this->doNotContact    = new ArrayCollection();
+        $this->pointsChangeLog = new ArrayCollection();
+        $this->tags            = new ArrayCollection();
+        $this->stageChangeLog = new ArrayCollection();
+    }
 
     /**
      * @param $name
@@ -178,7 +191,8 @@ class Lead extends FormEntity
             ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadRepository')
             ->addLifecycleEvent('checkDateIdentified', 'preUpdate')
             ->addLifecycleEvent('checkDateIdentified', 'prePersist')
-            ->addIndex(['date_added'], 'lead_date_added');
+            ->addIndex(['date_added'], 'lead_date_added')
+            ->addIndex(['stage_id'], 'lead_stage');
 
         $builder->createField('id', 'integer')
             ->isPrimaryKey()
@@ -266,13 +280,13 @@ class Lead extends FormEntity
             ->cascadePersist()
             ->cascadeDetach()
             ->build();
-        
+
         $builder->createManyToOne('stage', 'Mautic\StageBundle\Entity\Stage')
             ->cascadePersist()
             ->cascadeMerge()
-            ->addJoinColumn('stage_id', 'id', true)
+            ->addJoinColumn('stage_id', 'id', true, false, 'SET NULL')
             ->build();
-        
+
         $builder->createOneToMany('stageChangeLog', 'StagesChangeLog')
             ->orphanRemoval()
             ->setOrderBy(array('dateAdded' => 'DESC'))
@@ -280,7 +294,7 @@ class Lead extends FormEntity
             ->cascadeAll()
             ->fetchExtraLazy()
             ->build();
-        
+
         $builder->createOneToMany('utmtags', 'Mautic\LeadBundle\Entity\UtmTag')
             ->orphanRemoval()
             ->mappedBy('lead')
@@ -313,6 +327,7 @@ class Lead extends FormEntity
                     'ipAddresses',
                     'tags',
                     'utmtags',
+                    'stage',
                     'dateIdentified',
                     'preferredProfileImage'
                 )
@@ -360,19 +375,6 @@ class Lead extends FormEntity
         } elseif ($this->$getter() != $val) {
             $this->changes[$prop] = array($this->$getter(), $val);
         }
-    }
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->ipAddresses     = new ArrayCollection();
-        $this->pushIds         = new ArrayCollection();
-        $this->doNotContact    = new ArrayCollection();
-        $this->pointsChangeLog = new ArrayCollection();
-        $this->tags            = new ArrayCollection();
-        $this->stageChangeLog = new ArrayCollection();
     }
 
     /**
@@ -838,6 +840,7 @@ class Lead extends FormEntity
             'comments' => $doNotContact->getComments()
         );
 
+        // @deprecated - to be removed in 2.0
         switch ($doNotContact->getReason()) {
             case DoNotContact::BOUNCED:
                 $type = 'bounced';
@@ -1211,8 +1214,6 @@ class Lead extends FormEntity
     {
         return $this->utmtags;
     }
-    
-    
 
     /**
      * Set tags
@@ -1236,7 +1237,7 @@ class Lead extends FormEntity
      *
      * @return Stage
      */
-    public function setStage(\Mautic\StageBundle\Entity\Stage $stage)
+    public function setStage(Stage $stage)
     {
         $this->stage = $stage;
 

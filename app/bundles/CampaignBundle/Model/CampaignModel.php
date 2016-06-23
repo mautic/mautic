@@ -52,7 +52,7 @@ class CampaignModel extends CommonFormModel
      * @var LeadModel
      */
     protected $leadModel;
-    
+
     /**
      * @var ListModel
      */
@@ -70,7 +70,7 @@ class CampaignModel extends CommonFormModel
 
     /**
      * CampaignModel constructor.
-     * 
+     *
      * @param CoreParametersHelper $coreParametersHelper
      * @param LeadModel $leadModel
      * @param ListModel $leadListModel
@@ -239,7 +239,7 @@ class CampaignModel extends CommonFormModel
      */
     public function setEvents (Campaign $entity, $sessionEvents, $sessionConnections, $deletedEvents)
     {
-        $existingEvents = $entity->getEvents();
+        $existingEvents = $entity->getEvents()->toArray();
         $events =
         $hierarchy =
         $parentUpdated = array();
@@ -1135,7 +1135,7 @@ class CampaignModel extends CommonFormModel
         $events = array();
         $chart  = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query  = $chart->getChartQuery($this->em->getConnection());
-        
+
         $contacts = $query->fetchTimeData('campaign_leads', 'date_added', $filter);
         $chart->setDataset($this->translator->trans('mautic.campaign.campaign.leads'), $contacts);
 

@@ -274,6 +274,16 @@ class ReportGeneratorEvent extends Event
             }
         }
 
+        if (is_array($column)) {
+            foreach ($column as $checkMe) {
+                if (isset($sorted[$checkMe])) {
+
+                    return true;
+                }
+            }
+            return false;
+        }
+
         return isset($sorted[$column]);
     }
 
@@ -294,6 +304,16 @@ class ReportGeneratorEvent extends Event
             foreach ($filters as $field) {
                 $sorted[$field['column']] = true;
             }
+        }
+
+        if (is_array($column)) {
+            foreach ($column as $checkMe) {
+                if (isset($sorted[$checkMe])) {
+
+                    return true;
+                }
+            }
+            return false;
         }
 
         return isset($sorted[$column]);

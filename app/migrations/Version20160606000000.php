@@ -62,9 +62,9 @@ VALUES
 SQL;
         $this->addSql($sql);
 
-        $this->addSql("ALTER TABLE {$this->prefix}leads ADD COLUMN attribution longtext");
-        $this->addSql("ALTER TABLE {$this->prefix}leads ADD COLUMN attribution_date longtext");
-
+        $this->addSql("ALTER TABLE {$this->prefix}leads ADD COLUMN attribution double DEFAULT NULL");
+        $this->addSql("ALTER TABLE {$this->prefix}leads ADD COLUMN attribution_date datetime DEFAULT NULL");
+        $this->addSql("CREATE INDEX {$this->prefix}contact_attribution ON {$this->prefix}leads (attribution, attribution_date)");
     }
 
     /**

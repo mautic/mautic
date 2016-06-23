@@ -61,7 +61,9 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
 
                 $columnDef = FieldModel::getSchemaDefinition($f['alias'], $f['type'], !empty($f['is_unique']));
                 $table->addColumn($columnDef['name'], $columnDef['type'], $columnDef['options']);
-                $table->addIndex(array($f['alias']), MAUTIC_TABLE_PREFIX.'lead_field'.$f['alias'].'_search');
+
+                $indexOptions = ($columnDef['type'] == 'text') ? ['where' => "({$columnDef['name']}(767))"] : [];
+                $table->addIndex(array($f['alias']), MAUTIC_TABLE_PREFIX.$f['alias'].'_search', $indexOptions);
             }
 
             // Only allow indexes for string types
@@ -83,6 +85,8 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                 $uniqueFields = array_slice($uniqueFields, 0, 3);
                 $table->addIndex($uniqueFields, MAUTIC_TABLE_PREFIX.'unique_identifier_search');
             }
+
+            $table->addIndex(['attribution', 'attribution_date'], MAUTIC_TABLE_PREFIX.'_contact_attribution');
 
         } catch (\Exception $e) {
             //table doesn't exist or something bad happened so oh well

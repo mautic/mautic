@@ -86,7 +86,6 @@ class Stage extends FormEntity
     public static function loadMetadata (ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
-
         $builder->setTable('stages')
             ->setCustomRepositoryClass('Mautic\StageBundle\Entity\StageRepository');
 

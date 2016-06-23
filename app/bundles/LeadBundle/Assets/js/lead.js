@@ -843,7 +843,7 @@ Mautic.getLeadEmailContent = function (el) {
     mQuery('#MauticSharedModal .btn-primary').prop('disabled', true);
     Mautic.ajaxActionRequest('lead:getEmailTemplate', {'template': mQuery(el).val()}, function(response) {
         mQuery('#MauticSharedModal .btn-primary').prop('disabled', false);
-        CKEDITOR.instances['lead_quickemail_body'].setData(response.body);
+        mQuery('#lead_quickemail_body').froalaEditor('html.set', response.body);
         mQuery('#lead_quickemail_subject').val(response.subject);
         Mautic.removeLabelLoadingIndicator();
     });

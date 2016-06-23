@@ -239,8 +239,10 @@ class PublicController extends CommonFormController
 
             $analytics = $this->factory->getHelper('template.analytics')->getCode();
 
-            $template = $entity->getTemplate();
-            if (!empty($template)) {
+            $BCcontent = $entity->getContent();
+            // This condition remains so the Mautic v1 themes would display the content
+            if (!empty($BCcontent)) {
+                $template = $entity->getTemplate();
                 //all the checks pass so display the content
                 $slots   = $this->factory->getTheme($template)->getSlots('page');
                 $content = $entity->getContent();

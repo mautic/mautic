@@ -664,6 +664,7 @@ class ReportController extends FormController
                     'columns'           => $reportData['columns'],
                     'dataColumns'       => $reportData['dataColumns'],
                     'totalResults'      => $reportData['totalResults'],
+                    'debug'             => $reportData['debug'],
                     'report'            => $entity,
                     'reportPage'        => $reportPage,
                     'graphs'            => $reportData['graphs'],

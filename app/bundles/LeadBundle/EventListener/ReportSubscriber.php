@@ -9,6 +9,8 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -23,6 +25,7 @@ use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\StageBundle\Model\StageModel;
+use Mautic\UserBundle\Model\UserModel;
 
 /**
  * Class ReportSubscriber
@@ -52,6 +55,16 @@ class ReportSubscriber extends CommonSubscriber
     protected $stageModel;
 
     /**
+     * @var CampaignModel
+     */
+    protected $campaignModel;
+
+    /**
+     * @var UserModel
+     */
+    protected $userModel;
+
+    /**
      * ReportSubscriber constructor.
      *
      * @param MauticFactory $factory
@@ -59,15 +72,19 @@ class ReportSubscriber extends CommonSubscriber
      * @param FieldModel    $fieldModel
      * @param LeadModel     $leadModel
      * @param StageModel    $stageModel
+     * @param CampaignModel $campaignModel
+     * @param UserModel     $userModel
      */
-    public function __construct(MauticFactory $factory, ListModel $listModel, FieldModel $fieldModel, LeadModel $leadModel, StageModel $stageModel)
+    public function __construct(MauticFactory $factory, ListModel $listModel, FieldModel $fieldModel, LeadModel $leadModel, StageModel $stageModel, CampaignModel $campaignModel, UserModel $userModel)
     {
         parent::__construct($factory);
 
-        $this->listModel  = $listModel;
-        $this->fieldModel = $fieldModel;
-        $this->leadModel  = $leadModel;
-        $this->stageModel = $stageModel;
+        $this->listModel     = $listModel;
+        $this->fieldModel    = $fieldModel;
+        $this->leadModel     = $leadModel;
+        $this->stageModel    = $stageModel;
+        $this->campaignModel = $campaignModel;
+        $this->userModel     = $userModel;
     }
 
     /**
@@ -92,7 +109,9 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        if ($event->checkContext(['leads', 'lead.pointlog', 'contact.attribution.multi', 'contact.attribution.single'])) {
+        $leadContexts = ['leads', 'lead.pointlog', 'contact.attribution.multi', 'contact.attribution.first', 'contact.attribution.last'];
+
+        if ($event->checkContext($leadContexts)) {
             $columns = [
                 'l.id'              => [
                     'label' => 'mautic.lead.report.contact_id',
@@ -175,6 +194,12 @@ class ReportSubscriber extends CommonSubscriber
                 ]
             ];
 
+            $filters['l.owner_id'] = [
+                'label' => 'mautic.lead.list.filter.owner',
+                'type'  => 'select',
+                'list'  => $this->userModel->getRepository()->getUserList('', 0)
+            ];
+
             $data = [
                 'display_name' => 'mautic.lead.leads',
                 'columns'      => $columns,
@@ -183,12 +208,21 @@ class ReportSubscriber extends CommonSubscriber
 
             $event->addTable('leads', $data, 'contacts');
 
-            if ($event->checkContext('contact.attribution.multi')) {
-                $this->injectAttributionReportData($event, $columns, 'multi');
-            }
+            $attributionTypes = [
+                'contact.attribution.multi',
+                'contact.attribution.first',
+                'contact.attribution.last'
+            ];
 
-            if ($event->checkContext('contact.attribution.single')) {
-                $this->injectAttributionReportData($event, $columns, 'single');
+            if ($event->checkContext($attributionTypes)) {
+                $context = $event->getContext();
+                foreach ($attributionTypes as $attributionType) {
+                    if (empty($context) || $event->checkContext($attributionType)) {
+                        $type = str_replace('contact.attribution.','',$attributionType);
+                        $this->injectAttributionReportData($event, $columns, $type);
+                    }
+                }
+
             } else {
                 // Add shared graphs
                 $event->addGraph('leads', 'line', 'mautic.lead.graph.line.leads');
@@ -215,8 +249,11 @@ class ReportSubscriber extends CommonSubscriber
         switch ($context) {
             case 'leads':
                 $event->applyDateFilters($qb, 'date_added', 'l');
-                $qb->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-                    ->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
+                $qb->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+
+                if ($event->hasColumn(['u.first_name', 'u.last_name']) || $event->hasFilter(['u.first_name', 'u.last_name'])) {
+                    $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
+                }
 
                 if ($event->hasColumn('i.ip_address') || $event->hasFilter('i.ip_address')) {
                     $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_ips_xref', 'lip', 'lip.lead_id = l.id');
@@ -231,8 +268,11 @@ class ReportSubscriber extends CommonSubscriber
             case 'lead.pointlog':
                 $event->applyDateFilters($qb, 'date_added', 'lp');
                 $qb->from(MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp')
-                    ->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id')
-                    ->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
+                    ->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id');
+
+                if ($event->hasColumn(['u.first_name', 'u.last_name']) || $event->hasFilter(['u.first_name', 'u.last_name'])) {
+                    $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
+                }
 
                 if ($event->hasColumn('i.ip_address') || $event->hasFilter('i.ip_address')) {
                     $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_ips_xref', 'lip', 'lip.lead_id = l.id');
@@ -242,71 +282,47 @@ class ReportSubscriber extends CommonSubscriber
                 break;
 
             case 'contact.attribution.multi':
-                $event->applyDateFilters($qb, 'attribution_date', 'l');
-                $qb->from(MAUTIC_TABLE_PREFIX.'lead_attributions', 'la')
-                    ->leftJoin('la', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = la.lead_id')
-                    ->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
-
-                break;
-
             case 'contact.attribution.first':
-                $event->applyDateFilters($qb, 'date_added', 'la');
-                $qb->from(MAUTIC_TABLE_PREFIX.'lead_attributions', 'la')
-                    ->leftJoin('la', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = la.lead_id')
-                    ->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
-
-                break;
-
             case 'contact.attribution.last':
-                //$event->applyDateFilters($qb, 'date_added', 'lafirst');
+                $event->applyDateFilters($qb, 'attribution_date', 'l');
+                $qb->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+                    ->leftJoin('l', MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log', 'l.id = log.lead_id')
+                    ->leftJoin('l', MAUTIC_TABLE_PREFIX.'stages', 's', 'l.stage_id = s.id')
+                    ->leftJoin('log', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'log.event_id = e.id')
+                    ->leftJoin('e', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'e.campaign_id = c.id')
+                    ->andWhere(
+                        $qb->expr()->andX(
+                            $qb->expr()->eq('e.event_type', $qb->expr()->literal('decision')),
+                            $qb->expr()->eq('log.is_scheduled', 0),
+                            $qb->expr()->isNotNull('l.attribution'),
+                            $qb->expr()->neq('l.attribution', 0)
+                        )
+                    );
 
-                // Create a subquery for first touch
-                $firstQb = clone $qb;
-                $minQb   = clone $firstQb;
+                    if ($event->hasColumn(['u.first_name', 'u.last_name']) || $event->hasFilter(['u.first_name', 'u.last_name'])) {
+                        $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
+                    }
 
-                $available = [
-                    'campaign_id',
-                    'campaign_name',
-                    'date_added',
-                    'channel',
-                    'channel_id',
-                    'action',
-                    'stage_id',
-                    'stage_name',
-                    'comments'
-                ];
+                    if ($event->hasColumn('i.ip_address') || $event->hasFilter('i.ip_address')) {
+                        $event->addIpAddressLeftJoin($qb, 'log');
+                    }
 
-                $firstSelect = ['first.lead_id'];
-                foreach ($available as $column) {
-                    $firstSelect[] = "first.$column as first_{$column}";
-                }
-                $firstQb->select($firstSelect)
-                    ->from(MAUTIC_TABLE_PREFIX.'lead_attributions', 'first');
-                $minQb->select('min(mini.id) as first_id')
-                    ->from(MAUTIC_TABLE_PREFIX.'lead_attributions', 'mini')
-                    ->groupBy('mini.lead_id');
-                $firstQb->join('first', sprintf('(%s)', $minQb->getSQL()), 'first_touch', 'first_touch.first_id = first.id');
+                    if ($event->hasColumn(['cat.id', 'cat.title']) || $event->hasColumn(['cat.id', 'cat.title'])) {
+                        $event->addCategoryLeftJoin($qb, 'c', 'cat');
+                    }
 
-                $lastQb  = clone $qb;
-                $maxQb   = clone $lastQb;
+                    // If first or last, group by lead ID and limit to very first event or very last
+                    if ('contact.attribution.multi' != $context) {
+                        $qb->groupBy('l.id');
 
-                $lastSelect = ['last.lead_id'];
-                foreach ($available as $column) {
-                    $lastSelect[] = "last.$column as last_{$column}";
-                }
-                $lastQb->select($lastSelect)
-                    ->from(MAUTIC_TABLE_PREFIX.'lead_attributions', 'last');
-                $maxQb->select('max(maxi.id) as last_id')
-                    ->from(MAUTIC_TABLE_PREFIX.'lead_attributions', 'maxi')
-                    ->groupBy('maxi.lead_id');
-                $lastQb->join('last', sprintf('(%s)', $maxQb->getSQL()), 'last_touch', 'last_touch.last_id = last.id');
+                        if ('contact.attribution.first' == $context) {
+                          //  $qb->andWhere('log.date_triggered');
+                        }
+                    }
 
-                $qb->from(sprintf('(%s)', $firstQb->getSQL()), 'lafirst')
-                    ->join('lafirst', sprintf('(%s)', $lastQb->getSQL()), 'lalast', 'lafirst.lead_id = lalast.lead_id')
-                    ->leftJoin('lafirst', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lafirst.lead_id')
-                    ->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
+            //$event->applyDateFilters($qb, 'date_added', 'lafirst');
 
-                break;
+            break;
         }
 
         $event->setQueryBuilder($qb);
@@ -546,70 +562,97 @@ class ReportSubscriber extends CommonSubscriber
     private function injectAttributionReportData(ReportBuilderEvent $event, array $columns, $type)
     {
         $attributionColumns = [
-
+            'log.campaign_id'              => [
+                'label' => 'mautic.lead.report.attribution.campaign_id',
+                'type'  => 'int',
+                'link'  => 'mautic_campaign_action'
+            ],
+            'log.date_triggered'              => [
+                'label' => 'mautic.lead.report.attribution.action_date',
+                'type'  => 'datetime'
+            ],
+            'c.name'              => [
+                'label' => 'mautic.lead.report.attribution.campaign_name',
+                'type'  => 'string'
+            ],
+            'l.stage_id'              => [
+                'label' => 'mautic.lead.report.attribution.stage_id',
+                'type'  => 'int',
+                'link'  => 'mautic_stage_action'
+            ],
+            's.name'              => [
+                'label' => 'mautic.lead.report.attribution.stage_name',
+                'type'  => 'string'
+            ],
+            'channel'              => [
+                'alias' => 'channel',
+                'formula' => 'SUBSTRING_INDEX(e.type, \'.\', 1)',
+                'label' => 'mautic.lead.report.attribution.channel',
+                'type'  => 'string'
+            ],
+            'channel_action'       => [
+                'alias' => 'channel_action',
+                'formula' => 'SUBSTRING_INDEX(e.type, \'.\', -1)',
+                'label' => 'mautic.lead.report.attribution.channel_action',
+                'type'  => 'string'
+            ],
+            'e.name' => [
+                'alias' => 'action_name',
+                'label' => 'mautic.lead.report.attribution.action_name',
+                'type'  => 'string'
+            ],
         ];
 
-        // Unset IP address
-        unset($columns['i.ip_address']);
+        $filters = $columns = array_merge($columns, $event->getCategoryColumns('cat.'), $attributionColumns);
+
+        // Setup available channels
+        $availableChannels = $this->campaignModel->getEvents();
+        $channels       = [];
+        $channelActions = [];
+            foreach ($availableChannels['decision'] as $channel => $decision) {
+                $parts = explode('.', $channel);
+                $channels[] = $parts[0];
+                unset($parts[0]);
+                $channelActions[] = implode('.', $parts);
+            }
+
+        $filters['channel'] = [
+            'label' => 'mautic.lead.report.attribution.channel',
+            'type'  => 'select',
+            'list'  => $channels,
+        ];
+        $filters['channel_action'] = [
+            'label' => 'mautic.lead.report.attribution.channel_action',
+            'type'  => 'select',
+            'list'  => $channelActions,
+        ];
+
+        // Setup available channels
+        $campaigns = $this->campaignModel->getRepository()->getSimpleList();
+        $filters['c.id'] = [
+            'label' => 'mautic.lead.report.attribution.filter.campaign',
+            'type'  => 'select',
+            'list'  => $campaigns,
+        ];
 
         // Setup stages list
-        static $stages;
-        if (null == $stages) {
-            $userStages = $this->stageModel->getUserStages();
-            $stages = [];
-            foreach ($userStages as $stage) {
-                $stages[$stage['id']] = $stage['name'];
-            }
+        $userStages = $this->stageModel->getUserStages();
+        $stages = [];
+        foreach ($userStages as $stage) {
+            $stages[$stage['id']] = $stage['name'];
         }
+        $filters['l.stage_id'] = [
+            'label' => 'mautic.lead.report.attribution.filter.stage',
+            'type'  => 'select',
+            'list'  => $stages,
+        ];
 
         $context = "contact.attribution.$type";
-        if ('multi' == $type) {
-            $filters = $columns = array_merge($columns, $attributionColumns);
-
-            // Unset activity attribution for $filters since this data is calculated and not accurately filterable
-            unset($filters['la.attribution']);
-
-            // Append stage filters
-            $filters['l.stage_id'] = [
-                'label' => 'mautic.lead.report.attribution.filter.stage',
-                'type'  => 'select',
-                'list'  => $stages,
-            ];
-
-            $event
-                ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_stages')
-                ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_campaigns')
-                ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_actions')
-                ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_channels');
-        } else {
-            // Add each column as first and last single touch
-            $singleTouchColumns = [];
-            foreach (['first','last'] as $touchType) {
-                foreach ($attributionColumns as $column => $data) {
-                    if ('la.attribution' == $column) {
-                        continue;
-                    }
-
-                    $column                      = str_replace('la.', "la{$touchType}.{$touchType}_", $column);
-                    $data['label']               = $data['label'].'_'.$touchType;
-                    $singleTouchColumns[$column] = $data;
-                }
-            }
-
-            $filters = $columns = array_merge($columns, $singleTouchColumns);
-
-            // Append stage filters
-            $filters['lafirst.first_stage_id'] = [
-                'label' => 'mautic.lead.report.attribution.filter.stage_first',
-                'type'  => 'select',
-                'list'  => $stages,
-            ];
-            $filters['lalast.last_stage_id'] = [
-                'label' => 'mautic.lead.report.attribution.filter.stage_last',
-                'type'  => 'select',
-                'list'  => $stages,
-            ];
-        }
+        $event
+            ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_stages')
+            ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_campaigns')
+            ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_actions')
+            ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_channels');
 
         $data = [
             'display_name' => 'mautic.lead.report.attribution.'.$type,
@@ -628,11 +671,11 @@ class ReportSubscriber extends CommonSubscriber
         if ($data = $event->getData()) {
             $total = $event->getTotalResults();
 
-            if (isset($data[0]['activity_attribution'])) {
+           if (isset($data[0]['attribution'])) {
                 // Divide attribution by total number of results
                 foreach ($data as $key => &$row) {
-                    if (!empty($row['activity_attribution'])) {
-                        $row['activity_attribution'] = round($row['activity_attribution'] / $total, 2);
+                    if (!empty($row['attribution'])) {
+                        $row['attribution'] = round($row['attribution'] / $total, 2);
                     }
                 }
             }

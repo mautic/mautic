@@ -528,7 +528,7 @@ class FieldModel extends FormModel
             ];
         }
 
-        $schemaType = in_array($alias, ['title', 'firstname', 'lastname', 'position', 'company', 'city', 'state', 'zipcode']) ? 'string' : 'text';
+        $schemaType = in_array($alias, ['fax', 'phone', 'mobile', 'title', 'firstname', 'lastname', 'position', 'company', 'city', 'state', 'zipcode']) ? 'string' : 'text';
         $options    = ['notnull' => false];
 
         switch ($type) {
