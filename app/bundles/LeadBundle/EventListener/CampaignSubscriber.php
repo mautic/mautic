@@ -34,7 +34,7 @@ class CampaignSubscriber extends CommonSubscriber
      * @var IpLookupHelper
      */
     protected $ipLookupHelper;
-    
+
     /**
      * @var LeadModel
      */
@@ -47,16 +47,16 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * CampaignSubscriber constructor.
-     * 
-     * @param MauticFactory $factory
+     *
+     * @param MauticFactory  $factory
      * @param IpLookupHelper $ipLookupHelper
-     * @param LeadModel $leadModel
-     * @param FieldModel $leadFieldModel
+     * @param LeadModel      $leadModel
+     * @param FieldModel     $leadFieldModel
      */
     public function __construct(MauticFactory $factory, IpLookupHelper $ipLookupHelper, LeadModel $leadModel, FieldModel $leadFieldModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
-        $this->leadModel = $leadModel;
+        $this->leadModel      = $leadModel;
         $this->leadFieldModel = $leadFieldModel;
 
         parent::__construct($factory);
@@ -67,16 +67,16 @@ class CampaignSubscriber extends CommonSubscriber
      */
     static public function getSubscribedEvents()
     {
-        return array(
-            CampaignEvents::CAMPAIGN_ON_BUILD => array('onCampaignBuild', 0),
-            LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION => [
+        return [
+            CampaignEvents::CAMPAIGN_ON_BUILD         => ['onCampaignBuild', 0],
+            LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION    => [
                 ['onCampaignTriggerActionChangePoints', 0],
                 ['onCampaignTriggerActionChangeLists', 1],
                 ['onCampaignTriggerActionUpdateLead', 2],
                 ['onCampaignTriggerActionUpdateTags', 3]
             ],
             LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0]
-        );
+        ];
     }
 
     /**
@@ -87,46 +87,46 @@ class CampaignSubscriber extends CommonSubscriber
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         //Add actions
-        $action = array(
+        $action = [
             'label'       => 'mautic.lead.lead.events.changepoints',
             'description' => 'mautic.lead.lead.events.changepoints_descr',
             'formType'    => 'leadpoints_action',
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION
-        );
+        ];
         $event->addAction('lead.changepoints', $action);
 
-        $action = array(
-            'label'        => 'mautic.lead.lead.events.changelist',
-            'description'  => 'mautic.lead.lead.events.changelist_descr',
-            'formType'     => 'leadlist_action',
+        $action = [
+            'label'       => 'mautic.lead.lead.events.changelist',
+            'description' => 'mautic.lead.lead.events.changelist_descr',
+            'formType'    => 'leadlist_action',
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION
-        );
+        ];
         $event->addAction('lead.changelist', $action);
 
-        $action = array(
-            'label'        => 'mautic.lead.lead.events.updatelead',
-            'description'  => 'mautic.lead.lead.events.updatelead_descr',
-            'formType'     => 'updatelead_action',
-            'formTheme'    => 'MauticLeadBundle:FormTheme\ActionUpdateLead',
+        $action = [
+            'label'       => 'mautic.lead.lead.events.updatelead',
+            'description' => 'mautic.lead.lead.events.updatelead_descr',
+            'formType'    => 'updatelead_action',
+            'formTheme'   => 'MauticLeadBundle:FormTheme\ActionUpdateLead',
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION
-        );
+        ];
         $event->addAction('lead.updatelead', $action);
 
-        $action = array(
+        $action = [
             'label'       => 'mautic.lead.lead.events.changetags',
             'description' => 'mautic.lead.lead.events.changetags_descr',
             'formType'    => 'modify_lead_tags',
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION
-        );
+        ];
         $event->addAction('lead.changetags', $action);
 
-        $trigger = array(
+        $trigger = [
             'label'       => 'mautic.lead.lead.events.field_value',
             'description' => 'mautic.lead.lead.events.field_value_descr',
             'formType'    => 'campaignevent_lead_field_value',
             'formTheme'   => 'MauticLeadBundle:FormTheme\FieldValueCondition',
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION
-        );
+        ];
         $event->addLeadCondition('lead.field_value', $trigger);
     }
 
@@ -135,6 +135,11 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignTriggerActionChangePoints(CampaignExecutionEvent $event)
     {
+        if (!$event->checkContext('lead.changepoints')) {
+
+            return;
+        }
+
         $lead   = $event->getLead();
         $points = $event->getConfig()['points'];
 
@@ -166,10 +171,15 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignTriggerActionChangeLists(CampaignExecutionEvent $event)
     {
+        if (!$event->checkContext('lead.changelist')) {
+
+            return;
+        }
+
         $addTo      = $event->getConfig()['addToLists'];
         $removeFrom = $event->getConfig()['removeFromLists'];
 
-        $lead = $event->getLead();
+        $lead              = $event->getLead();
         $somethingHappened = false;
 
         if (!empty($addTo)) {
@@ -190,6 +200,11 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignTriggerActionUpdateLead(CampaignExecutionEvent $event)
     {
+        if (!$event->checkContext('lead.updatelead')) {
+
+            return;
+        }
+
         $lead = $event->getLead();
 
         $this->leadModel->setFieldValues($lead, $event->getConfig(), false);
@@ -203,11 +218,16 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignTriggerActionUpdateTags(CampaignExecutionEvent $event)
     {
+        if (!$event->checkContext('lead.changetags')) {
+
+            return;
+        }
+
         $config = $event->getConfig();
         $lead   = $event->getLead();
 
-        $addTags    = (! empty($config['add_tags'])) ? $config['add_tags'] : [];
-        $removeTags = (! empty($config['remove_tags'])) ? $config['remove_tags'] : [];
+        $addTags    = (!empty($config['add_tags'])) ? $config['add_tags'] : [];
+        $removeTags = (!empty($config['remove_tags'])) ? $config['remove_tags'] : [];
 
         $this->leadModel->modifyTags($lead, $addTags, $removeTags);
 
@@ -220,7 +240,7 @@ class CampaignSubscriber extends CommonSubscriber
     public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
     {
         $lead = $event->getLead();
-        
+
         if (!$lead || !$lead->getId()) {
             return $event->setResult(false);
         }
@@ -233,9 +253,7 @@ class CampaignSubscriber extends CommonSubscriber
             $event->getConfig()['value'],
             $operators[$event->getConfig()['operator']]['expr']
         );
-        
+
         return $event->setResult($result);
     }
-    
-    
 }
