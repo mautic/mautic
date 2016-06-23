@@ -173,6 +173,7 @@ class AppKernel extends Kernel
             new Mautic\PointBundle\MauticPointBundle(),
             new Mautic\ReportBundle\MauticReportBundle(),
             new Mautic\SmsBundle\MauticSmsBundle(),
+            new Mautic\StageBundle\MauticStageBundle(),
             new Mautic\UserBundle\MauticUserBundle(),
             new Mautic\WebhookBundle\MauticWebhookBundle()
         ];

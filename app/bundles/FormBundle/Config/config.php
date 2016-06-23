@@ -138,7 +138,7 @@ return [
             ],
             'mautic.form.dashboard.subscriber'      => [
                 'class' => 'Mautic\FormBundle\EventListener\DashboardSubscriber'
-            ],
+            ]
         ],
         'forms'  => [
             'mautic.form.type.form'                      => [

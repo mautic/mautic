@@ -98,6 +98,15 @@
                     $color = $item->getColor();
                     $style = !empty($color) ? ' style="background-color: ' . $color . ';"' : '';
                     ?>
+                    <?php if($item->getStage()):?>
+                    <span class="label label-default"<?php echo $style; ?>><?php echo $item->getStage()->getName(); ?></span>
+                    <?php endif?>
+                </td>
+                <td class="text-center">
+                    <?php
+                    $color = $item->getColor();
+                    $style = !empty($color) ? ' style="background-color: ' . $color . ';"' : '';
+                    ?>
                     <span class="label label-default"<?php echo $style; ?>><?php echo $item->getPoints(); ?></span>
                 </td>
                 <td class="visible-md visible-lg">

@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
@@ -810,6 +811,45 @@ class LeadModel extends FormModel
     }
 
     /**
+     * Add lead to lists
+     *
+     * @param array|Lead        $lead
+     * @param array|LeadList    $stage
+     * @param bool              $manuallyAdded
+     */
+    public function addToStages($lead, $stage, $manuallyAdded = true)
+    {
+        if (!$lead instanceof Lead) {
+            $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
+            $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+        }
+        $lead->setStage($stage);
+        $lead->stageChangeLogEntry(
+            'batch',
+            $stage->getId() . ": " . $stage->getName(),
+            'Manually Added'
+        );
+
+    }
+
+    /**
+     * Remove lead from Stage
+     *
+     * @param      $lead
+     * @param      $stage
+     * @param bool $manuallyRemoved
+     */
+    public function removeFromStages($lead, $stage, $manuallyRemoved = true)
+    {
+        $lead->setStage(null);
+        $lead->stageChangeLogEntry(
+            'batch',
+            null,
+            'Manually Removed'
+        );
+    }
+
+    /**
      * Merge two leads; if a conflict of data occurs, the newest lead will get precedence
      *
      * @param Lead $lead
@@ -1161,7 +1201,25 @@ class LeadModel extends FormModel
             $log->setDateAdded(new \DateTime());
             $lead->addPointsChangeLog($log);
         }
-        unset($fields['points']);
+
+        if (!empty($fields['stage']) && !empty($data[$fields['stage']]) && $lead->getId() === null) {
+            // Add points only for new leads
+            $lead->setStage($data[$fields['stage']]);
+
+            //add a lead point change log
+            $log = new StagesChangeLog();
+            $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($fields['stage']);
+            $log->setEventName($stage);
+            $log->setLead($lead);
+            $log->setType('lead');
+            $log->setActionName($this->translator->trans('mautic.lead.import.action.name', array(
+                '%name%' => $this->user->getUsername()
+            )));
+            $log->setDateAdded(new \DateTime());
+            $lead->stageChangeLog($log);
+        }
+
+        unset($fields['stage']);
 
         // Set unsubscribe status
         if (!empty($fields['doNotEmail']) && !empty($data[$fields['doNotEmail']]) && $hasEmail) {
@@ -1314,7 +1372,7 @@ class LeadModel extends FormModel
                     $newTag = new Tag();
                     $newTag->setTag($tag);
                     $lead->addTag($newTag);
-                    $logger->debug('LEAD: Added ' . $tag);
+                    $this->logger->debug('LEAD: Added ' . $tag);
                 } elseif (!$leadTags->contains($foundTags[$tag])) {
                     $lead->addTag($foundTags[$tag]);
 

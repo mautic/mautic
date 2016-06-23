@@ -392,6 +392,12 @@ $view['slots']->set(
                 $color = $lead->getColor();
                 $style = !empty($color) ? ' style="font-color: '.$color.' !important;"' : '';
                 ?>
+                <?php if ($lead->getStage()): ?>
+                    <h1 <?php echo $style; ?>>
+                        <?php echo $view['translator']->trans('mautic.lead.stage',array('%stage%' => $lead->getStage()->getName())); ?>
+                    </h1>
+                    <hr>
+                <?php endif; ?>
                 <h1 <?php echo $style; ?>>
                     <?php echo $view['translator']->transChoice(
                         'mautic.lead.points.count',
