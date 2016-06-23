@@ -10,10 +10,6 @@
 namespace Mautic\FeedBundle\Exception;
 
 
-class FeedNotFoundException extends \RuntimeException
+class MalformedXMLException extends \RuntimeException
 {
-    public function __construct($message = 'Could not find feed with given URL')
-    {
-        parent::__construct($message);
-    }
 }

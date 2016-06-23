@@ -15,7 +15,9 @@ use Debril\RssAtomBundle\Protocol\Filter\Limit;
 use Debril\RssAtomBundle\Protocol\ItemOutInterface;
 use Debril\RssAtomBundle\Protocol\Parser\Factory;
 use Debril\RssAtomBundle\Protocol\Parser\XmlParser;
+use Debril\RssAtomBundle\Exception\ParserException;
 use Mautic\FeedBundle\Exception\FeedNotFoundException;
+use Mautic\FeedBundle\Exception\MalformedXMLException;
 use Mautic\FeedBundle\Entity\Feed;
 
 class FeedHelper
@@ -60,12 +62,18 @@ class FeedHelper
      * @param string $xmlString
      * @param integer|null $itemCount
      *
+     * @throws MalformedXMLException|ParserException
+     *
      * @return FeedInterface
      */
     public function getFeedContentFromString($xmlString, $itemCount=null)
     {
         // Parses the contents into a SimpleXMLElement
-        $xmlBody = $this->xmlParser->parseString($xmlString); // TODO il manque la gestion des erreurs en cas d'objet XML non conforme
+        try {
+            $xmlBody = $this->xmlParser->parseString($xmlString);
+        } catch (Exception $e) {
+            throw new MalformedXMLException($e->getMessage());
+        }
 
         // Finds the appropriate parser for the given feed
         $parser = $this->reader->getAccurateParser($xmlBody);
@@ -85,7 +93,9 @@ class FeedHelper
     /**
      * @param string $feedUrl
      *
-     * @return null|string
+     * @throws FeedNotFoundException
+     *
+     * @return string
      */
     public function getStringFromFeed($feedUrl)
     {
