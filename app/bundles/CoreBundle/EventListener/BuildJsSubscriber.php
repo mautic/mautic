@@ -76,11 +76,27 @@ MauticJS.log = function() {
     }
 };
 
-MauticJS.ajaxRequest = function(method, url, data, callbackSuccess, callbackError) {
+MauticJS.createCORSRequest = function(method, url) {
     var xhr = new XMLHttpRequest();
-    var response;
-
+    
     method = method.toUpperCase();
+    
+    if ("withCredentials" in xhr) {
+        xhr.open(method, url, true);
+    } else if (typeof XDomainRequest != "undefined") {
+        xhr = new XDomainRequest();
+        xhr.open(method, url);
+    }
+    
+    return xhr;
+};
+
+MauticJS.ajaxRequest = function(method, url, data, callbackSuccess, callbackError) {
+    var xhr = MauticJS.createCORSRequest(method, url);
+    var response;
+    
+    callbackSuccess = callbackSuccess || function(response, xhr) { MauticJS.log(response); };
+    callbackError = callbackError || function(response, xhr) { MauticJS.log(response); };
 
     if (!xhr) {
         MauticJS.log('MauticJS.debug: Could not create an XMLHttpRequest instance.');
@@ -99,12 +115,12 @@ MauticJS.ajaxRequest = function(method, url, data, callbackSuccess, callbackErro
         }
     };
 
-    if (method === 'POST') {
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    if (method.toUpperCase() === 'POST') {
+        xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
     }
 
-    xhr.open(method, url);
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    xhr.withCredentials = true;
     xhr.send(MauticJS.serialize(data));
 };
 

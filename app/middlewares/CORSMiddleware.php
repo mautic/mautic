@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
 {
-    const PRIORITY = 90;
+    const PRIORITY = 1;
 
     /**
      * @var HttpKernelInterface
@@ -37,15 +37,15 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
      */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
-        $response = $this->app->handle($request, $type, $catch);
-
-        if ($request->isXmlHttpRequest()) {
-            $response->headers->set('Access-Control-Allow-Origin', '*');
-            $response->headers->set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type');
-            $response->headers->set('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+        if ($request->getMethod() === 'OPTIONS') {
+            header('Access-Control-Allow-Origin: *');
+            header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type');
+            header('Access-Control-Allow-Methods: PUT, GET, POST, DELETE, OPTIONS');
+            header('Access-Control-Allow-Credentials: true');
+            exit();
         }
 
-        return $response;
+        return $this->app->handle($request, $type, $catch);
     }
 
     /**
