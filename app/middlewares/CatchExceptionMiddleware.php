@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class CatchExceptionMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
 {
     const PRIORITY = 100;
-    
+
     /**
      * @var HttpKernelInterface
      */
@@ -49,8 +49,14 @@ class CatchExceptionMiddleware implements HttpKernelInterface, PrioritizedMiddle
             $message = $e->getMessage();
         } catch (\Exception $e) {
             error_log($e);
-            $message    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
-            $submessage = 'System administrators, check server logs for errors.';
+
+            if (MAUTIC_ENV == 'dev') {
+                $message    = "<pre>{$e->getMessage()} - in file {$e->getFile()} - at line {$e->getLine()}</pre>";
+                $submessage = "<pre>{$e->getTraceAsString()}</pre>";
+            } else {
+                $message    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
+                $submessage = 'System administrators, check server logs for errors.';
+            }
         }
 
         if (isset($message)) {
@@ -69,6 +75,6 @@ class CatchExceptionMiddleware implements HttpKernelInterface, PrioritizedMiddle
      */
     public function getPriority()
     {
-        return self::PRIORITY; 
+        return self::PRIORITY;
     }
 }

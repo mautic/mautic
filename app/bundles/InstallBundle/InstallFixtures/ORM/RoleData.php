@@ -41,9 +41,9 @@ class RoleData extends AbstractFixture implements OrderedFixtureInterface, Conta
     public function load(ObjectManager $manager)
     {
         $translator = $this->container->get('translator');
-        $role = new Role();
-        $role->setName($translator->trans('mautic.user.role.admin.name', array(), 'fixtures'));
-        $role->setDescription($translator->trans('mautic.user.role.admin.description', array(), 'fixtures'));
+        $role       = new Role();
+        $role->setName($translator->trans('mautic.user.role.admin.name', [], 'fixtures'));
+        $role->setDescription($translator->trans('mautic.user.role.admin.description', [], 'fixtures'));
         $role->setIsAdmin(1);
         $manager->persist($role);
         $manager->flush();

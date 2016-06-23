@@ -62,4 +62,28 @@ class SalesforceApi extends CrmApi
     {
         return $this->request('', $data, 'POST');
     }
+
+    /**
+     * Get Salesforce leads
+     *
+     * @param string $query
+     *
+     * @return mixed
+     */
+    public function getLeads($query)
+    {
+        return $this->request('updated/', $query);
+    }
+
+    /**
+     * Get Salesforce leads
+     *
+     * @param string $query
+     *
+     * @return mixed
+     */
+    public function getSalesForceLeadById($id, $params)
+    {
+        return $this->request($id.'/',$params);
+    }
 }

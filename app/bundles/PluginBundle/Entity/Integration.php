@@ -105,7 +105,7 @@ class Integration extends CommonEntity
     }
 
     /**
-     * @return mixed
+     * @return Plugin
      */
     public function getPlugin()
     {

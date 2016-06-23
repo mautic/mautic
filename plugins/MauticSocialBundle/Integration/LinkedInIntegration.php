@@ -100,7 +100,7 @@ class LinkedInIntegration extends SocialIntegration
     public function getUserData($identifier, &$socialCache)
     {
         $persistLead = false;
-        $accessToken = $this->getAccessToken($socialCache);
+        $accessToken = $this->getContactAccessToken($socialCache);
 
         if (!isset($accessToken['access_token'])) {
 

@@ -62,13 +62,6 @@ class DoctrineStep implements StepInterface
     public $password;
 
     /**
-     * Path to database
-     *
-     * @var string
-     */
-    public $path;
-
-    /**
      * Backup tables if they exist; otherwise drop them
      *
      * @var bool
@@ -81,6 +74,11 @@ class DoctrineStep implements StepInterface
      * @var string
      */
     public $backup_prefix = 'bak_';
+
+    /**
+     * @var
+     */
+    public $server_version = '5.5';
 
     /**
      * Constructor

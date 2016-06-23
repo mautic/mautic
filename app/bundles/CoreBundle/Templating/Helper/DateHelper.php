@@ -146,6 +146,8 @@ class DateHelper extends Helper
      * @param        $datetime
      * @param string $timezone
      * @param string $fromFormat
+     *
+     * @return string
      */
     public function toText($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
     {
@@ -159,11 +161,18 @@ class DateHelper extends Helper
         $dt = $this->helper->getLocalDateTime();
 
         if ($textDate) {
+
             return $this->translator->trans('mautic.core.date.' . $textDate, array('%time%' => $dt->format("g:i a")));
         } else {
             $interval = $this->helper->getDiff('now', null, true);
 
-            return $this->translator->trans('mautic.core.date.ago', array('%days%' => $interval->days));
+            if ($interval->invert) {
+                // In the past
+                return $this->translator->trans('mautic.core.date.ago', array('%days%' => $interval->days));
+            } else {
+                // In the future
+                return $this->toFullConcat($datetime, $timezone, $fromFormat);
+            }
         }
     }
 

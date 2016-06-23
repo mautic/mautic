@@ -111,6 +111,7 @@ class LeadTimelineEvent extends Event
         // Sort by certain event actions
         $order = array(
             'lead.ipadded',
+            'lead.utmtagsadded',
             'page.hit',
             'form.submitted',
             'asset.download',

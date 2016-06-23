@@ -16,8 +16,6 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 /**
  * Class MenuBuilder
@@ -50,56 +48,25 @@ class MenuBuilder
      * @param MatcherInterface $matcher
      * @param MauticFactory    $factory
      */
-    public function __construct(FactoryInterface $knpFactory, MatcherInterface $matcher, MauticFactory $factory)
+    public function __construct(FactoryInterface $knpFactory, MatcherInterface $matcher, EventDispatcherInterface $dispatcher, MenuHelper $menuHelper)
     {
         $this->factory    = $knpFactory;
         $this->matcher    = $matcher;
-        $this->dispatcher = $factory->getDispatcher();
-        $this->menuHelper = $factory->getHelper('menu');
+        $this->dispatcher = $dispatcher;
+        $this->menuHelper = $menuHelper;
     }
 
     /**
-     * Generate menu navigation object
+     * @param $name
+     * @param $arguments
      *
-     * @return \Knp\Menu\ItemInterface
+     * @return mixed
      */
-    public function mainMenu()
+    public function __call($name, $arguments)
     {
-        static $menu;
+        $name = str_replace('Menu', '', $name);
 
-        if (empty($menu)) {
-            $loader = new ArrayLoader($this->factory);
-
-            //dispatch the MENU_BUILD event to retrieve bundle menu items
-            $event = new MenuEvent($this->menuHelper, 'main');
-            $this->dispatcher->dispatch(CoreEvents::BUILD_MENU, $event);
-            $menuItems = $event->getMenuItems();
-            $menu      = $loader->load($menuItems);
-        }
-
-        return $menu;
-    }
-
-    /**
-     * Generate admin menu navigation object
-     *
-     * @return \Knp\Menu\ItemInterface
-     */
-    public function adminMenu()
-    {
-        static $adminMenu;
-
-        if (empty($adminMenu)) {
-            $loader = new ArrayLoader($this->factory);
-
-            //dispatch the MENU_BUILD event to retrieve bundle menu items
-            $event = new MenuEvent($this->menuHelper, 'admin');
-            $this->dispatcher->dispatch(CoreEvents::BUILD_MENU, $event);
-            $menuItems = $event->getMenuItems();
-            $adminMenu = $loader->load($menuItems);
-        }
-
-        return $adminMenu;
+        return $this->buildMenu($name);
     }
 
     /**
@@ -136,5 +103,28 @@ class MenuBuilder
         }
 
         return null;
+    }
+
+    /**
+     * @param $name
+     *
+     * @return mixed
+     */
+    private function buildMenu($name)
+    {
+        static $menus = array();
+
+        if (!isset($menus[$name])) {
+            $loader = new ArrayLoader($this->factory);
+
+            //dispatch the MENU_BUILD event to retrieve bundle menu items
+            $event = new MenuEvent($this->menuHelper, $name);
+            $this->dispatcher->dispatch(CoreEvents::BUILD_MENU, $event);
+
+            $menuItems    = $event->getMenuItems();
+            $menus[$name] = $loader->load($menuItems);
+        }
+
+        return $menus[$name];
     }
 }

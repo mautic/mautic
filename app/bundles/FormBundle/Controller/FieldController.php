@@ -171,7 +171,6 @@ class FieldController extends CommonFormController
             //just close the modal
             $passthroughVars['closeModal'] = 1;
             $response                      = new JsonResponse($passthroughVars);
-            $response->headers->set('Content-Length', strlen($response->getContent()));
 
             return $response;
         }
@@ -313,7 +312,6 @@ class FieldController extends CommonFormController
                 //just close the modal
                 $passthroughVars['closeModal'] = 1;
                 $response                      = new JsonResponse($passthroughVars);
-                $response->headers->set('Content-Length', strlen($response->getContent()));
 
                 return $response;
             }
@@ -326,7 +324,6 @@ class FieldController extends CommonFormController
         }
 
         $response = new JsonResponse(array('success' => 0));
-        $response->headers->set('Content-Length', strlen($response->getContent()));
 
         return $response;
     }
@@ -394,7 +391,6 @@ class FieldController extends CommonFormController
         }
 
         $response = new JsonResponse($dataArray);
-        $response->headers->set('Content-Length', strlen($response->getContent()));
 
         return $response;
     }
@@ -463,7 +459,6 @@ class FieldController extends CommonFormController
         }
 
         $response = new JsonResponse($dataArray);
-        $response->headers->set('Content-Length', strlen($response->getContent()));
 
         return $response;
     }

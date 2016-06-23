@@ -153,6 +153,11 @@ class Lead extends FormEntity
     private $stageChangeLog;
 
     /**
+     * @var ArrayCollection
+     */
+    private $utmtags;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -250,16 +255,22 @@ class Lead extends FormEntity
             ->cascadePersist()
             ->cascadeDetach()
             ->build();
-        
+
         $builder->createManyToOne('stage', 'Mautic\StageBundle\Entity\Stage')
             ->cascadePersist()
             ->cascadeMerge()
             ->addJoinColumn('stage_id', 'id', true)
             ->build();
-        
+
         $builder->createOneToMany('stageChangeLog', 'StagesChangeLog')
             ->orphanRemoval()
             ->setOrderBy(array('dateAdded' => 'DESC'))
+            ->mappedBy('lead')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
+        $builder->createOneToMany('utmtags', 'Mautic\LeadBundle\Entity\UtmTag')
+            ->orphanRemoval()
             ->mappedBy('lead')
             ->cascadeAll()
             ->fetchExtraLazy()
@@ -289,6 +300,8 @@ class Lead extends FormEntity
                     'owner',
                     'ipAddresses',
                     'tags',
+                    'utmtags',
+                    'stage',
                     'dateIdentified',
                     'preferredProfileImage'
                 )
@@ -322,6 +335,16 @@ class Lead extends FormEntity
                 $this->changes['tags']['added'][] = $val->getTag();
             } else {
                 $this->changes['tags']['removed'][] = $val;
+            }
+        } elseif ($prop == 'utmtags') {
+
+            if ($val instanceof UtmTag) {
+                if($val->getUtmContent()) $this->changes['utmtags'] = array('utm_content',$val->getUtmContent());
+                if($val->getUtmMedium()) $this->changes['utmtags'] = array('utm_medium',$val->getUtmMedium());
+                if($val->getUtmCampaign()) $this->changes['utmtags'] = array('utm_campaign',$val->getUtmCampaign());
+                if($val->getUtmTerm()) $this->changes['utmtags'] = array('utm_term',$val->getUtmTerm());
+                if($val->getUtmSource()) $this->changes['utmtags'] = array('utm_source',$val->getUtmSource());
+
             }
         } elseif ($this->$getter() != $val) {
             $this->changes[$prop] = array($this->$getter(), $val);
@@ -813,6 +836,7 @@ class Lead extends FormEntity
                 $type = 'manual';
                 break;
             case DoNotContact::UNSUBSCRIBED:
+            default:
                 $type = 'unsubscribed';
                 break;
         }
@@ -913,6 +937,27 @@ class Lead extends FormEntity
         }
 
         return $this->fields;
+    }
+
+    /**
+     * Get profile values
+     *
+     * @return array
+     */
+    public function getProfileFields()
+    {
+        $fieldValues = [
+            'id' => $this->id
+        ];
+        if (isset($this->fields['core'])) {
+            foreach ($this->fields as $group => $fields) {
+                foreach ($fields as $alias => $field) {
+                    $fieldValues[$alias] = $field['value'];
+                }
+            }
+        }
+
+        return array_merge($fieldValues, $this->updatedFields);
     }
 
     /**
@@ -1081,7 +1126,7 @@ class Lead extends FormEntity
     }
 
     /**
-     * @param mixed $lastActive
+     * @param mixed $lastActive $this->tags            = new ArrayCollection();
      */
     public function setLastActive($lastActive)
     {
@@ -1143,6 +1188,33 @@ class Lead extends FormEntity
     public function setTags($tags)
     {
         $this->tags = $tags;
+
+        return $this;
+    }
+
+    /**
+     * Get tags
+     *
+     * @return mixed
+     */
+    public function getUtmTags ()
+    {
+        return $this->utmtags;
+    }
+
+
+
+    /**
+     * Set tags
+     *
+     * @param $tags
+     *
+     * @return $this
+     */
+    public function setUtmTags($utmTags)
+    {
+        $this->isChanged('utmtags', $utmTags);
+        $this->utmtags[] = $utmTags;
 
         return $this;
     }

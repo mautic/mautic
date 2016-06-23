@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\ApiBundle\Event as ApiEvents;
 use Mautic\InstallBundle\Controller\InstallController;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Event\LoginEvent;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -127,7 +128,7 @@ class CoreSubscriber extends CommonSubscriber
             //dispatch on login events
             $dispatcher = $this->factory->getDispatcher();
             if ($dispatcher->hasListeners(UserEvents::USER_LOGIN)) {
-                $event = new LoginEvent($this->factory);
+                $event = new LoginEvent($this->factory->getUser());
                 $dispatcher->dispatch(UserEvents::USER_LOGIN, $event);
             }
         } else {

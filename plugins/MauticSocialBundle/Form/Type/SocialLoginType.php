@@ -9,12 +9,9 @@
 
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
-
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 
 /**
@@ -25,42 +22,44 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class SocialLoginType extends AbstractType
 {
     /**
-     * @var MauticFactory
+     * @var IntegrationHelper
      */
-    private $factory;
+    private $helper;
 
-    public function __construct(MauticFactory $factory)
+    /**
+     * SocialLoginType constructor.
+     *
+     * @param IntegrationHelper $helper
+     */
+    public function __construct(IntegrationHelper $helper)
     {
-        $this->factory = $factory;
+        $this->helper = $helper;
     }
 
     /**
      * @param FormBuilderInterface $builder
-     * @param array $options
+     * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->factory->getHelper('integration');
-        $integrations      = '';
-
-        $integrationObjects = $integrationHelper->getIntegrationObjects(null, 'login_button');
+        $integrations       = '';
+        $integrationObjects = $this->helper->getIntegrationObjects(null, 'login_button');
 
         foreach ($integrationObjects as $integrationObject) {
             if ($integrationObject->getIntegrationSettings()->isPublished()) {
                 /** @var \Mautic\AssetBundle\Model\AssetModel $model */
                 $model = $this->factory->getModel('form');
-                $integrations.= $integrationObject->getName().",";
-                $integration = array(
+                $integrations .= $integrationObject->getName().",";
+                $integration = [
                     'integration' => $integrationObject->getName(),
-                );
+                ];
 
                 $builder->add(
                     'authUrl_'.$integrationObject->getName(),
                     'hidden',
-                    array(
-                        'data' => $model->buildUrl('mautic_integration_auth_user', $integration, true, array()),
-                    )
+                    [
+                        'data' => $model->buildUrl('mautic_integration_auth_user', $integration, true, []),
+                    ]
                 );
 
             }
@@ -69,9 +68,9 @@ class SocialLoginType extends AbstractType
         $builder->add(
             'integrations',
             'hidden',
-            array(
+            [
                 'data' => $integrations,
-            )
+            ]
         );
     }
 
