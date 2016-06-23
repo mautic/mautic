@@ -52,7 +52,7 @@ MauticJS.replaceDynamicContent = function () {
             var slotName = node.dataset.slotName;
             var url = '{$dwcUrl}'.replace('slotNamePlaceholder', slotName);
 
-            MauticJS.ajaxRequest('GET', url, {}, function(response, xhr) {
+            MauticJS.makeCORSRequest('GET', url, {}, function(response, xhr) {
                 if (response.length) {
                     node.innerHTML = response;
                 }

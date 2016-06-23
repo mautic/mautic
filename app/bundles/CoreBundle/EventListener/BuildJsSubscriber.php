@@ -91,7 +91,7 @@ MauticJS.createCORSRequest = function(method, url) {
     return xhr;
 };
 
-MauticJS.ajaxRequest = function(method, url, data, callbackSuccess, callbackError) {
+MauticJS.makeCORSRequest = function(method, url, data, callbackSuccess, callbackError) {
     var xhr = MauticJS.createCORSRequest(method, url);
     var response;
     
@@ -103,7 +103,7 @@ MauticJS.ajaxRequest = function(method, url, data, callbackSuccess, callbackErro
         return false;
     }
 
-    xhr.onreadystatechange = function() {
+    xhr.onload = function() {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             response = MauticJS.parseTextToJSON(xhr.responseText);
 

@@ -18,6 +18,16 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
     const PRIORITY = 1;
 
     /**
+     * @var array
+     */
+    protected $corsHeaders = [
+        'Access-Control-Allow-Origin' => '*',
+        'Access-Control-Allow-Headers' => 'Origin, X-Requested-With, Content-Type',
+        'Access-Control-Allow-Methods' => 'PUT, GET, POST, DELETE, OPTIONS',
+        'Access-Control-Allow-Credentials' => 'true'
+    ];
+
+    /**
      * @var HttpKernelInterface
      */
     protected $app;
@@ -37,15 +47,22 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
      */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
-        if ($request->getMethod() === 'OPTIONS') {
-            header('Access-Control-Allow-Origin: *');
-            header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type');
-            header('Access-Control-Allow-Methods: PUT, GET, POST, DELETE, OPTIONS');
-            header('Access-Control-Allow-Credentials: true');
+        if ($request->getMethod() === 'OPTIONS' && $request->headers->has('Access-Control-Request-Headers')) {
+            foreach ($this->corsHeaders as $header => $value) {
+                header("$header: $value");
+            }
             exit();
         }
 
-        return $this->app->handle($request, $type, $catch);
+        $response = $this->app->handle($request, $type, $catch);
+
+        if ($request->isXmlHttpRequest()) {
+            foreach ($this->corsHeaders as $header => $value) {
+                $response->headers->set($header, $value);
+            }
+        }
+
+        return $response;
     }
 
     /**
