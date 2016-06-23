@@ -59,6 +59,8 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
 
                 header("$header: $value");
             }
+
+            header('HTTP/1.1 204 No Content');
             exit();
         }
 
@@ -66,6 +68,10 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
 
         if ($request->isXmlHttpRequest()) {
             foreach ($this->corsHeaders as $header => $value) {
+                if ($header === 'Access-Control-Allow-Origin') {
+                    $value = $request->headers->get('Origin');
+                }
+
                 $response->headers->set($header, $value);
             }
         }
