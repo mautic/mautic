@@ -86,11 +86,7 @@ class Stage extends FormEntity
     public static function loadMetadata (ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('stages')
-            ->setCustomRepositoryClass('Mautic\StageBundle\Entity\StageRepository')
-            ->addIndex(array('type'), 'stage_type_search');
-
+        
         $builder->addIdColumns();
 
         $builder->createField('weight', 'integer')
