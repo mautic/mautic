@@ -29,13 +29,13 @@ class FeedRepository extends CommonRepository
      *
      * @return Snapshot
      */
-    public function latestSnapshot(MauticFactory $factory, Feed $feed, $maxDate=null)
+    public function latestSnapshot(MauticFactory $factory, Feed $feed, $preview=false)
     {
         $snapshots = $feed->getSnapshots();
         for ($i = count($snapshots) - 1; $i > 0; $i --) { //TODO faire une requette DQL pour eviter de charger tous les snapshot en memoire
             /** @var \Mautic\FeedBundle\Entity\Snapshot $snapshot */
             $snapshot = $snapshots->get($i);
-            if (!$snapshot->isExpired() && (is_null($maxDate) || $snapshot->getDate() > $maxDate)){
+            if (!$snapshot->isExpired()){
                 return $snapshot;
             }
         }
@@ -45,15 +45,17 @@ class FeedRepository extends CommonRepository
         /** @var FeedHelper $feedHelper */
         $feedHelper= $factory->getHelper('feed');
 
-        if (!is_null($xmlString=$feedHelper->getStringFromFeed($feed->getFeedUrl()))){
+        if (!is_null($xmlString=$feedHelper->getStringFromFeed($feed->getFeedUrl()))) {
             $ns= new Snapshot();
             $ns->setDate(new \DateTime());
             $ns->setXmlString($xmlString);
             $ns->setFeed($feed);
 
-            $this->_em->persist($ns);
-            $this->_em->persist($feed);
-            $this->_em->flush();
+            if (!$preview) {
+                $this->_em->persist($ns);
+                $this->_em->persist($feed);
+                $this->_em->flush();
+            }
             return $ns;
         }
 

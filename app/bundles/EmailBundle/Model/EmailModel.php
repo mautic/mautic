@@ -1358,7 +1358,7 @@ class EmailModel extends FormModel
                 $mailer->setLead($lead);
 
                 /** @var Feed $feed */
-                if ($email->hasFeed()){
+                if ($email->getEmailType() === 'feed') {
                     /** @var FeedHelper $feedHelper */
                     $feedHelper = $this->factory->getHelper('feed');
                     /** @var FeedRepository $feedRepository */
@@ -1481,7 +1481,7 @@ class EmailModel extends FormModel
 
         unset($saveEntities, $badEmails, $emailSentCounts, $emailSettings, $options, $tokens, $useEmail, $sendTo);
 
-        if ($email->hasFeed()){
+        if ($email->getEmailType() === 'feed'){
             //set usedfeedSnapShot expired
             /** @var Snapshot $snapshot */
             $snapshot->setDateExpired(new \DateTime());

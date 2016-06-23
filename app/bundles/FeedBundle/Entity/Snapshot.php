@@ -82,7 +82,11 @@ class Snapshot
      */
     public function isExpired()
     {
-        return new \DateTime() > $this->getDateExpired();
+        if (is_null($this->getDateExpired())) {
+            return false;
+        } else {
+            return new \DateTime() > $this->getDateExpired();
+        }
     }
 
     public function getId()

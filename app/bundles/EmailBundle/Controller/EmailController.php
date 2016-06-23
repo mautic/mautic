@@ -403,12 +403,6 @@ class EmailController extends FormController
         // Get click through stats
         $trackableLinks = $model->getEmailClickStats($email->getId());
 
-        try {
-            $pending = $model->getPendingLeads($email, null, true);
-        } catch (FeedNotFoundException $e) {
-            $pending = null;
-        }
-
         return $this->delegateView(
             [
                 'returnUrl' => $this->generateUrl(
@@ -424,7 +418,6 @@ class EmailController extends FormController
                     'statsDevices' => $statsDevices,
                     'showAllStats' => $includeVariants,
                     'trackables'   => $trackableLinks,
-                    'pending'      => $pending,
                     'logs'         => $logs,
                     'variants'     => [
                         'parent'     => $parent,
