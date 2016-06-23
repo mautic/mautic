@@ -58,6 +58,9 @@ return [
                     'session'
                 ],
             ],
+            'mautic.dwc.js.subscriber' => [
+                'class' => 'Mautic\DynamicContentBundle\EventListener\BuildJsSubscriber'
+            ]
         ],
         'forms' => [
             'mautic.form.type.dwc' => [
