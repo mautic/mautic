@@ -1,0 +1,8 @@
+{
+  "name": "Neopolitan - Confirm",
+  "features": [
+    "page",
+    "email",
+    "form"
+  ]
+}
