@@ -30,6 +30,11 @@ class ThemeHelper
     /**
      * @var array
      */
+    private $themesInfo = array();
+
+    /**
+     * @var array
+     */
     private $steps = array();
 
     /**
@@ -226,18 +231,21 @@ class ThemeHelper
 
     /**
      * @param string $specificFeature
+     * @param boolean $extended returns extended information about the themes
      * 
      * @return mixed
      */
-    public function getInstalledThemes($specificFeature = 'all')
+    public function getInstalledThemes($specificFeature = 'all', $extended = false)
     {
         if (empty($this->themes[$specificFeature])) {
             $dir = $this->pathsHelper->getSystemPath('themes', true);
+            $addTheme = false;
 
             $finder = new Finder();
             $finder->directories()->depth('0')->ignoreDotFiles(true)->in($dir);
 
             $this->themes[$specificFeature] = array();
+            $this->themesInfo[$specificFeature] = array();
             foreach ($finder as $theme) {
                 if (file_exists($theme->getRealPath().'/config.json')) {
                     $config = json_decode(file_get_contents($theme->getRealPath() . '/config.json'), true);
@@ -247,15 +255,28 @@ class ThemeHelper
 
                 if ($specificFeature != 'all') {
                     if (isset($config['features']) && in_array($specificFeature, $config['features'])) {
-                        $this->themes[$specificFeature][$theme->getBasename()] = $config['name'];
+                        $addTheme = true;
                     }
                 } else {
+                    $addTheme = true;
+                }
+
+                if ($addTheme) {
                     $this->themes[$specificFeature][$theme->getBasename()] = $config['name'];
+                    $this->themesInfo[$specificFeature][$theme->getBasename()] = array();
+                    $this->themesInfo[$specificFeature][$theme->getBasename()]['name'] = $config['name'];
+                    $this->themesInfo[$specificFeature][$theme->getBasename()]['key'] = $theme->getBasename();
+                    $this->themesInfo[$specificFeature][$theme->getBasename()]['dir'] = $theme->getRealPath();
+                    $this->themesInfo[$specificFeature][$theme->getBasename()]['config'] = $config;
                 }
             }
         }
 
-        return $this->themes[$specificFeature];
+        if ($extended) {
+            return $this->themesInfo[$specificFeature];
+        } else {
+            return $this->themes[$specificFeature];
+        }
     }
 
     /**

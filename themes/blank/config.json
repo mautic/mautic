@@ -1,0 +1,8 @@
+{
+  "name": "Blank",
+  "features": [
+    "page",
+    "email",
+    "form"
+  ]
+}

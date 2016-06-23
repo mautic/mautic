@@ -26,9 +26,13 @@ return [
                 'path'       => '/action/{objectAction}/{objectModel}/{objectId}',
                 'controller' => 'MauticCoreBundle:Form:execute',
                 'defaults'   => [
-                    'objectModel' => '',
-                ],
+                    'objectModel' => ''
+                ]
             ],
+            'mautic_core_file_action' => [
+                'path'       => '/file/{objectAction}/{objectId}',
+                'controller' => 'MauticCoreBundle:File:execute'
+            ]
         ],
         'public' => [
             'mautic_js'                    => [
@@ -176,8 +180,22 @@ return [
             'mautic.form.type.daterange'                                      => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\DateRangeType',
                 'arguments' => 'mautic.factory',
-                'alias'     => 'daterange',
+                'alias'     => 'daterange'
             ],
+            'mautic.form.type.slot'               => [
+                'class'     => 'Mautic\CoreBundle\Form\Type\SlotType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'slot'
+            ],
+            'mautic.form.type.slot.button'        => [
+                'class'     => 'Mautic\CoreBundle\Form\Type\SlotButtonType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'slot_button'
+            ]
+        ],
+        'helpers' => [
+            'mautic.helper.menu'               => [
+            ]
         ],
         'helpers' => [
             'mautic.helper.template.menu'      => [

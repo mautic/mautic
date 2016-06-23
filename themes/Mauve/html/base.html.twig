@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>{{ slot('pageTitle', 'Mautic') }}</title>
         {% if page is defined %}
+            <title>{{ page.getTitle() }}</title>
             <meta name="description" content="{{ page.metaDescription }}">
         {% endif %}
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>

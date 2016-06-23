@@ -26,53 +26,6 @@ use Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport;
  */
 class AjaxController extends CommonAjaxController
 {
-
-    /**
-     * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function setBuilderContentAction(Request $request)
-    {
-        $dataArray = array('success' => 0);
-        $entityId  = InputHelper::clean($request->request->get('entity'));
-        $session   = $this->factory->getSession();
-
-        if (!empty($entityId)) {
-            $sessionVar = 'mautic.emailbuilder.'.$entityId.'.content';
-
-            // Check for an array of slots
-            $slots   = InputHelper::_($request->request->get('slots', array(), true), 'html');
-            $content = $session->get($sessionVar, array());
-
-            if (!is_array($content)) {
-                $content = array();
-            }
-
-            if (!empty($slots)) {
-                // Builder was closed so save each content
-                foreach ($slots as $slot => $newContent) {
-                    $content[$slot] = $newContent;
-                }
-
-                $session->set($sessionVar, $content);
-                $dataArray['success'] = 1;
-            } else {
-                // Check for a single slot
-                $newContent = InputHelper::html($request->request->get('content'));
-                $slot       = InputHelper::clean($request->request->get('slot'));
-
-                if (!empty($slot)) {
-                    $content[$slot] = $newContent;
-                    $session->set($sessionVar, $content);
-                    $dataArray['success'] = 1;
-                }
-            }
-        }
-
-        return $this->sendJsonResponse($dataArray);
-    }
-
     /**
      * @param Request $request
      *
@@ -195,7 +148,7 @@ class AjaxController extends CommonAjaxController
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $this->getModel('email');
 
-        return $model->getBuilderComponents(null, array('tokens', 'visualTokens'), $query);
+        return $model->getBuilderComponents(null, array('tokens'), $query);
     }
 
     /**
@@ -205,8 +158,6 @@ class AjaxController extends CommonAjaxController
      */
     protected function generatePlaintTextAction(Request $request)
     {
-        $dataArray = array();
-        $mode      = $request->request->get('mode');
         $custom    = $request->request->get('custom');
         $id        = $request->request->get('id');
 
@@ -216,28 +167,12 @@ class AjaxController extends CommonAjaxController
             )
         );
 
-        if ($mode == 'custom') {
-            // Convert placeholders into raw tokens
-            BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($custom);
+        // Convert placeholders into raw tokens
+        BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($custom);
 
-            $dataArray['text'] = $parser->setHtml($custom)->getText();
-        } else {
-            $session     = $this->factory->getSession();
-            $contentName = 'mautic.emailbuilder.'.$id.'.content';
-
-            $content = $session->get($contentName, array());
-            if (strpos($id, 'new') === false) {
-                $entity          = $this->getModel('email')->getEntity($id);
-                $existingContent = $entity->getContent();
-                $content         = array_merge($existingContent, $content);
-            }
-
-            // Convert placeholders into raw tokens
-            BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($content);
-
-            $content           = implode("<br /><br />", $content);
-            $dataArray['text'] = $parser->setHtml($content)->getText();
-        }
+        $dataArray = [
+            'text' => $parser->setHtml($custom)->getText()
+        ];
 
         return $this->sendJsonResponse($dataArray);
     }
