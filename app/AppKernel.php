@@ -55,7 +55,7 @@ class AppKernel extends Kernel
     /**
      * @var array
      */
-    private $pluginBundles  = array();
+    private $pluginBundles = [];
 
     /**
      * Constructor.
@@ -68,6 +68,10 @@ class AppKernel extends Kernel
     public function __construct($environment, $debug)
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', $environment);
+        defined('MAUTIC_VERSION') or define(
+            'MAUTIC_VERSION',
+            self::MAJOR_VERSION.'.'.self::MINOR_VERSION.'.'.self::PATCH_VERSION.self::EXTRA_VERSION
+        );
 
         parent::__construct($environment, $debug);
     }
@@ -82,24 +86,28 @@ class AppKernel extends Kernel
             define('MAUTIC_INSTALLER', 1);
         }
 
-        if (false === $this->booted) {
-            $this->boot();
+        if (defined('MAUTIC_INSTALLER')) {
+            $uri = $request->getRequestUri();
+            if (strpos($uri, 'installer') === false) {
+                $base = $request->getBaseUrl();
+                //check to see if the .htaccess file exists or if not running under apache
+                if ((strpos(strtolower($_SERVER["SERVER_SOFTWARE"]), 'apache') === false
+                    || !file_exists(__DIR__.'../.htaccess')
+                    && strpos(
+                        $base,
+                        'index'
+                    ) === false)
+                ) {
+                    $base .= '/index.php';
+                }
+
+                return new RedirectResponse($base.'/installer');
+            }
         }
 
-        //the context is not populated at this point so have to do it manually
-        $router = $this->getContainer()->get('router');
-        $requestContext = new \Symfony\Component\Routing\RequestContext();
-        $requestContext->fromRequest($request);
-        $router->setContext($requestContext);
+        if (false === $this->booted) {
 
-        if (strpos($request->getRequestUri(), 'installer') === false && !$this->isInstalled()) {
-            $base  = $requestContext->getBaseUrl();
-            //check to see if the .htaccess file exists or if not running under apache
-            if ((strpos(strtolower($_SERVER["SERVER_SOFTWARE"]), 'apache') === false || !file_exists(__DIR__ .'../.htaccess') && strpos($base, 'index') === false)) {
-                $base .= '/index.php';
-            }
-
-            return new RedirectResponse($base . '/installer');
+            $this->boot();
         }
 
         // Check for an an active db connection and die with error if unable to connect
@@ -110,10 +118,13 @@ class AppKernel extends Kernel
             } catch (\Exception $e) {
                 error_log($e);
                 throw new \Mautic\CoreBundle\Exception\DatabaseConnectionException(
-                    $this->getContainer()->get('translator')->trans('mautic.core.db.connection.error', array(
+                    $this->getContainer()->get('translator')->trans(
+                        'mautic.core.db.connection.error',
+                        [
                             '%code%' => $e->getCode()
-                        )
-                    ));
+                        ]
+                    )
+                );
             }
         }
 
@@ -125,7 +136,7 @@ class AppKernel extends Kernel
      */
     public function registerBundles()
     {
-        $bundles = array(
+        $bundles = [
             // Symfony/Core Bundles
             new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
             new Symfony\Bundle\SecurityBundle\SecurityBundle(),
@@ -151,6 +162,7 @@ class AppKernel extends Kernel
             new Mautic\ConfigBundle\MauticConfigBundle(),
             new Mautic\CoreBundle\MauticCoreBundle(),
             new Mautic\DashboardBundle\MauticDashboardBundle(),
+            new Mautic\DynamicContentBundle\MauticDynamicContentBundle(),
             new Mautic\EmailBundle\MauticEmailBundle(),
             new Mautic\FormBundle\MauticFormBundle(),
             new Mautic\InstallBundle\MauticInstallBundle(),
@@ -163,10 +175,10 @@ class AppKernel extends Kernel
             new Mautic\SmsBundle\MauticSmsBundle(),
             new Mautic\UserBundle\MauticUserBundle(),
             new Mautic\WebhookBundle\MauticWebhookBundle()
-        );
+        ];
 
         //dynamically register Mautic Plugin Bundles
-        $searchPath = dirname(__DIR__) . '/plugins';
+        $searchPath = dirname(__DIR__).'/plugins';
         $finder     = new \Symfony\Component\Finder\Finder();
         $finder->files()
             ->followLinks()
@@ -178,7 +190,7 @@ class AppKernel extends Kernel
             $dirname  = basename($file->getRelativePath());
             $filename = substr($file->getFilename(), 0, -4);
 
-            $class = '\\MauticPlugin' . '\\' . $dirname . '\\' . $filename;
+            $class = '\\MauticPlugin'.'\\'.$dirname.'\\'.$filename;
             if (class_exists($class)) {
                 $plugin = new $class();
 
@@ -190,20 +202,20 @@ class AppKernel extends Kernel
             }
         }
 
-        if (in_array($this->getEnvironment(), array('dev', 'test'))) {
+        if (in_array($this->getEnvironment(), ['dev', 'test'])) {
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
             $bundles[] = new Sensio\Bundle\DistributionBundle\SensioDistributionBundle();
             $bundles[] = new Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle();
             $bundles[] = new Webfactory\Bundle\ExceptionsBundle\WebfactoryExceptionsBundle();
         }
 
-        if (in_array($this->getEnvironment(), array('test'))) {
+        if (in_array($this->getEnvironment(), ['test'])) {
             $bundles[] = new Liip\FunctionalTestBundle\LiipFunctionalTestBundle();
         }
 
         // Check for local bundle inclusion
-        if (file_exists(__DIR__ .'/config/bundles_local.php')) {
-            include __DIR__ . '/config/bundles_local.php';
+        if (file_exists(__DIR__.'/config/bundles_local.php')) {
+            include __DIR__.'/config/bundles_local.php';
         }
 
         return $bundles;
@@ -215,13 +227,14 @@ class AppKernel extends Kernel
     public function boot()
     {
         if (true === $this->booted) {
+
             return;
         }
 
-        if (!defined('MAUTIC_INSTALLER') && !defined('MAUTIC_TABLE_PREFIX')) {
+        if (!defined('MAUTIC_TABLE_PREFIX')) {
             //set the table prefix before boot
             $localParams = $this->getLocalParams();
-            $prefix      = isset($localParams['db_table_prefix']) ? $localParams['db_table_prefix'] : '';
+            $prefix = isset($localParams['db_table_prefix']) ? $localParams['db_table_prefix'] : '';
             define('MAUTIC_TABLE_PREFIX', $prefix);
         }
 
@@ -269,7 +282,7 @@ class AppKernel extends Kernel
      */
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
-        $loader->load(__DIR__ . '/config/config_' . $this->getEnvironment() . '.php');
+        $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.php');
     }
 
     /**
@@ -279,7 +292,7 @@ class AppKernel extends Kernel
      */
     public function getVersion()
     {
-        return self::MAJOR_VERSION . '.' . self::MINOR_VERSION . '.' . self::PATCH_VERSION . self::EXTRA_VERSION;
+        return MAUTIC_VERSION;
     }
 
     /**
@@ -306,21 +319,21 @@ class AppKernel extends Kernel
      * @throws Exception
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function getDatabaseConnection($params = array())
+    public function getDatabaseConnection($params = [])
     {
         if (empty($params)) {
             $params = $this->getLocalParams();
         }
 
         if (!empty($params) && !empty($params['db_driver'])) {
-            $testParams = array('driver', 'host', 'port', 'name', 'user', 'password', 'path');
-            $dbParams   = array();
+            $testParams = ['driver', 'host', 'port', 'name', 'user', 'password', 'path'];
+            $dbParams   = [];
             foreach ($testParams as &$p) {
                 $param = (isset($params["db_{$p}"])) ? $params["db_{$p}"] : '';
                 if ($p == 'port') {
                     $param = (int) $param;
                 }
-                $name  = ($p == 'name') ? 'dbname' : $p;
+                $name            = ($p == 'name') ? 'dbname' : $p;
                 $dbParams[$name] = $param;
             }
 
@@ -343,8 +356,9 @@ class AppKernel extends Kernel
     {
         $parameters = $this->getLocalParams();
         if (isset($parameters['cache_path'])) {
-            $envFolder = (strpos($parameters['cache_path'], -1) != '/') ? '/' . $this->environment : $this->environment;
-            return str_replace('%kernel.root_dir%', $this->getRootDir(), $parameters['cache_path'] . $envFolder);
+            $envFolder = (strpos($parameters['cache_path'], -1) != '/') ? '/'.$this->environment : $this->environment;
+
+            return str_replace('%kernel.root_dir%', $this->getRootDir(), $parameters['cache_path'].$envFolder);
         } else {
             return parent::getCacheDir();
         }
@@ -377,20 +391,20 @@ class AppKernel extends Kernel
         if (!is_array($localParameters)) {
             /** @var $paths */
             $root = $this->getRootDir();
-            include $root . '/config/paths.php';
+            include $root.'/config/paths.php';
 
             if ($configFile = $this->getLocalConfigFile()) {
                 /** @var $parameters */
                 include $configFile;
-                $localParameters = (isset($parameters) && is_array($parameters)) ? $parameters : array();
+                $localParameters = (isset($parameters) && is_array($parameters)) ? $parameters : [];
             } else {
-                $localParameters = array();
+                $localParameters = [];
             }
 
             //check for parameter overrides
-            if (file_exists($root . '/config/parameters_local.php')) {
+            if (file_exists($root.'/config/parameters_local.php')) {
                 /** @var $parameters */
-                include $root . '/config/parameters_local.php';
+                include $root.'/config/parameters_local.php';
                 $localParameters = array_merge($localParameters, $parameters);
             }
 
@@ -415,7 +429,7 @@ class AppKernel extends Kernel
     {
         /** @var $paths */
         $root = $this->getRootDir();
-        include $root . '/config/paths.php';
+        include $root.'/config/paths.php';
 
         if (isset($paths['local_config'])) {
             $paths['local_config'] = str_replace('%kernel.root_dir%', $root, $paths['local_config']);
@@ -436,7 +450,7 @@ class AppKernel extends Kernel
      */
     public function getContainerFile($fullPath = true)
     {
-        $fileName = $this->getContainerClass() . '.php';
+        $fileName = $this->getContainerClass().'.php';
 
         if ($fullPath) {
             // Override the container class for the local instance
@@ -449,7 +463,7 @@ class AppKernel extends Kernel
 
             $containerPath = (isset($params['container_path'])) ? $params['container_path'] : $this->getCacheDir();
 
-            $fileName = $containerPath . '/' . $fileName;
+            $fileName = $containerPath.'/'.$fileName;
         }
 
         return $fileName;
@@ -498,7 +512,7 @@ class AppKernel extends Kernel
      */
     protected function buildContainer()
     {
-        foreach (array('cache' => $this->getCacheDir(), 'logs' => $this->getLogDir()) as $name => $dir) {
+        foreach (['cache' => $this->getCacheDir(), 'logs' => $this->getLogDir()] as $name => $dir) {
             if (!is_dir($dir)) {
                 if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
                     throw new \RuntimeException(sprintf("Unable to create the %s directory (%s)\n", $name, $dir));
