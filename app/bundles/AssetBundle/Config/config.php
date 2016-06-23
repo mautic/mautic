@@ -114,7 +114,7 @@ return [
             ],
             'mautic.asset.dashboard.subscriber' => [
                 'class' => 'Mautic\AssetBundle\EventListener\DashboardSubscriber'
-            ],
+            ]
         ],
         'forms' => [
             'mautic.form.type.asset' => [

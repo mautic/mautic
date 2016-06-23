@@ -97,6 +97,14 @@ $img = $view['lead_avatar']->getAvatar($lead);
                                 </div>
                                 <?php endif; ?>
                             </div>
+                            <hr class="mnr-md mnl-md">
+                            <div class="row">
+
+                                <div class="col-sm-8">
+                                    <?php echo $view['form']->label($form['stage']); ?>
+                                    <?php echo $view['form']->widget($form['stage']); ?>
+                                </div>
+                            </div>
                         </div>
                         <hr class="mnr-md mnl-md">
                         <?php endif; ?>
@@ -198,6 +206,7 @@ $img = $view['lead_avatar']->getAvatar($lead);
                                 <?php echo $view['form']->widget($form['tags']); ?>
                             </div>
                         </div>
+
                         <?php endif; ?>
                     </div>
                 </div>

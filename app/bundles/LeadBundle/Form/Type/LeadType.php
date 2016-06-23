@@ -308,6 +308,28 @@ class LeadType extends AbstractType
             ->addModelTransformer($transformer)
         );
 
+        $transformer = new IdToEntityModelTransformer(
+            $this->factory->getEntityManager(),
+            'MauticStageBundle:Stage'
+        );
+
+        $builder->add(
+            $builder->create(
+                'stage',
+                'stage_list',
+                array(
+                    'label'      => 'mautic.lead.lead.field.stage',
+                    'label_attr' => array('class' => 'control-label'),
+                    'attr'       => array(
+                        'class' => 'form-control'
+                    ),
+                    'required'   => false,
+                    'multiple'   => false
+                )
+            )
+                ->addModelTransformer($transformer)
+        );
+
         if (!$options['isShortForm']) {
             $builder->add('buttons', 'form_buttons');
         } else {
