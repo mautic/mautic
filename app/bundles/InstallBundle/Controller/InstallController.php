@@ -109,12 +109,12 @@ class InstallController extends CommonController
                             $schemaHelper = new SchemaHelper($dbParams);
 
                             try {
+
                                 $schemaHelper->testConnection();
 
                                 if ($schemaHelper->createDatabase()) {
                                     $formData->server_version = $schemaHelper->getServerVersion();
                                     if ($this->saveConfiguration($formData, $step, true)) {
-
                                         // Refresh to install schema with new connection information in the container
                                         return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1.1]));
                                     }
@@ -460,7 +460,7 @@ class InstallController extends CommonController
         }
 
         if ($clearCache) {
-            $this->get('mautic.helper.cache')->clearCache();
+            $this->get('mautic.helper.cache')->clearContainerFile(false);
         }
 
         return true;
