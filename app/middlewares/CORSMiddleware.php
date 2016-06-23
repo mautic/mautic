@@ -47,8 +47,16 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
      */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
-        if ($request->getMethod() === 'OPTIONS' && $request->headers->has('Access-Control-Request-Headers')) {
+        if (
+            $request->getMethod() === 'OPTIONS'
+            && $request->headers->has('Access-Control-Request-Headers')
+            && $request->headers->has('Origin')
+        ) {
             foreach ($this->corsHeaders as $header => $value) {
+                if ($header === 'Access-Control-Allow-Origin') {
+                    $value = $request->headers->get('Origin');
+                }
+
                 header("$header: $value");
             }
             exit();
