@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
 {
-    const PRIORITY = 1;
+    const PRIORITY = 1000;
 
     /**
      * @var array
