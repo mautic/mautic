@@ -50,6 +50,7 @@ $template = $form['template']->vars['data'];
                         </div>
 
                         <?php echo $view->render('MauticCoreBundle:Helper:theme_select.html.php', array(
+                            'type'   => 'page',
                             'themes' => $themes,
                             'active' => $form['template']->vars['value']
                         )); ?>

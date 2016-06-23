@@ -143,7 +143,7 @@ Mautic.destroySlots = function() {
     Mautic.builderContents.find('*[class=""]').removeAttr('class');
 
     // Remove border highlighted by Froala
-    mQuery.each(Mautic.builderContents.find('td, table'), function() {
+    mQuery.each(Mautic.builderContents.find('td, th, table'), function() {
         var td = mQuery(this);
         if (td.attr('fr-original-class')) {
             td.attr('class', td.attr('fr-original-class'));

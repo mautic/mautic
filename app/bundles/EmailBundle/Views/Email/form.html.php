@@ -55,6 +55,7 @@ if (!isset($attachmentSize)) {
                             </div>
                         </div>
                         <?php echo $view->render('MauticCoreBundle:Helper:theme_select.html.php', array(
+                            'type'   => 'email',
                             'themes' => $themes,
                             'active' => $form['template']->vars['value']
                         )); ?>
