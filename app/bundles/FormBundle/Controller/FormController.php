@@ -819,7 +819,7 @@ class FormController extends CommonFormController
             $entity->setIsPublished(false);
 
             // Clone the forms's fields
-            $fields = $entity->getFields();
+            $fields = $entity->getFields()->toArray();
             /** @var \Mautic\FormBundle\Entity\Field $field */
             foreach ($fields as $field) {
                 $fieldClone = clone $field;
@@ -829,7 +829,7 @@ class FormController extends CommonFormController
             }
 
             // Clone the forms's actions
-            $actions = $entity->getActions();
+            $actions = $entity->getActions()->toArray();
             /** @var \Mautic\FormBundle\Entity\Action $action */
             foreach ($actions as $action) {
                 $actionClone = clone $action;
