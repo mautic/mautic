@@ -60,6 +60,69 @@ MauticJS.documentReady = function(f) {
     /in/.test(document.readyState) ? setTimeout('MauticJS.documentReady(' + f + ')', 9) : f();
 };
 
+MauticJS.iterateCollection = function(collection) {
+    return function(f) {
+        for (var i = 0; collection[i], i++) {
+            f(collection[i], i);
+        }
+    };
+};
+
+MauticJS.log = function() {
+    var log = {};
+    log.history = log.history || [];
+
+    log.history.push(arguments);
+
+    if (window.console) {
+        console.log(Array.prototype.slice.call(arguments));
+    }
+};
+
+MauticJS.ajaxRequest = function(method, url, data, callbackSuccess, callbackError) {
+    var xhr = new XMLHttpRequest();
+    var response;
+
+    method = method.toUpperCase();
+
+    if (!xhr) {
+        MauticJS.log('MauticJS.debug: Could not create an XMLHttpRequest instance.');
+        return false;
+    }
+
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+            response = MauticJS.parseTextToJSON(xhr.responseText);
+
+            if (xhr.status === 200) {
+                callbackSuccess(response, xhr);
+            } else {
+                callbackError(response, xhr);
+            }
+        }
+    };
+
+    if (method === 'POST') {
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    }
+
+    xhr.open(method, url);
+    xhr.send(MauticJS.serialize(data));
+};
+
+MauticJS.parseTextToJSON = function(maybeJSON) {
+    var response;
+
+    try {
+        // handle JSON data being returned
+        response = JSON.parse(maybeJSON);
+    } catch (error) {
+        response = maybeJSON;
+    }
+
+    return response;
+};
+
 if (typeof window[window.MauticTrackingObject] === 'undefined') {
     console.log('Mautic tracking is not initiated correctly. Follow the documentation.');
 } else {
