@@ -10,7 +10,6 @@
 namespace Mautic\PluginBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -30,6 +29,13 @@ class DetailsType extends AbstractType
 
         $keys          = $options['integration_object']->getRequiredKeyFields();
         $decryptedKeys = $options['integration_object']->decryptApiKeys($options['data']->getApiKeys());
+        $formSettings  = $options['integration_object']->getFormDisplaySettings();
+
+        if (!empty($formSettings['hide_keys'])) {
+            foreach ($formSettings['hide_keys'] as $key) {
+                unset($keys[$key]);
+            }
+        }
 
         $builder->add('apiKeys', 'integration_keys', array(
             'label'               => false,
@@ -38,14 +44,13 @@ class DetailsType extends AbstractType
             'integration_object'  => $options['integration_object']
         ));
 
-        $formSettings = $options['integration_object']->getFormSettings();
         if (!empty($formSettings['requires_authorization'])) {
             $disabled     = false;
             $label        = ($options['integration_object']->isAuthorized()) ? 'reauthorize' : 'authorize';
 
             $builder->add('authButton', 'standalone_button', array(
                 'attr'     => array(
-                    'class'   => 'btn btn-primary',
+                    'class'   => 'btn btn-success btn-lg',
                     'onclick' => 'Mautic.initiateIntegrationAuthorization()',
                     'icon'    => 'fa fa-key'
 
@@ -57,19 +62,18 @@ class DetailsType extends AbstractType
 
         $features = $options['integration_object']->getSupportedFeatures();
         if (!empty($features)) {
-
             // Check to see if the integration is a new entry and thus not configured
             $configured      = $options['data']->getId() !== null;
             $enabledFeatures = $options['data']->getSupportedFeatures();
             $data            = ($configured) ? $enabledFeatures : $features;
 
-            $labels = array();
+            $choices = array();
             foreach ($features as $f) {
-                $labels[] = 'mautic.integration.form.feature.' . $f;
+                $choices[$f] = 'mautic.integration.form.feature.' . $f;
             }
 
             $builder->add('supportedFeatures', 'choice', array(
-                'choice_list' => new ChoiceList($features, $labels),
+                'choices'     => $choices,
                 'expanded'    => true,
                 'label_attr'  => array('class' => 'control-label'),
                 'multiple'    => true,
@@ -77,17 +81,17 @@ class DetailsType extends AbstractType
                 'required'    => false,
                 'data'        => $data
             ));
-
-            $builder->add('featureSettings', 'integration_featuresettings', array(
-                'label'              => 'mautic.integration.form.feature.settings',
-                'required'           => true,
-                'data'               => $options['data']->getFeatureSettings(),
-                'label_attr'         => array('class' => 'control-label'),
-                'integration'        => $options['integration'],
-                'integration_object' => $options['integration_object'],
-                'lead_fields'        => $options['lead_fields']
-            ));
         };
+
+        $builder->add('featureSettings', 'integration_featuresettings', array(
+            'label'              => 'mautic.integration.form.feature.settings',
+            'required'           => true,
+            'data'               => $options['data']->getFeatureSettings(),
+            'label_attr'         => array('class' => 'control-label'),
+            'integration'        => $options['integration'],
+            'integration_object' => $options['integration_object'],
+            'lead_fields'        => $options['lead_fields']
+        ));
 
         $builder->add('name', 'hidden', array('data' => $options['integration']));
 

@@ -66,8 +66,28 @@ class ErrorHandlingListener implements EventSubscriberInterface
 
             if ($error['type'] === E_ERROR || $error['type'] === E_CORE_ERROR || $error['type'] === E_USER_ERROR) {
                 defined('MAUTIC_OFFLINE') or define('MAUTIC_OFFLINE', 1);
-                $message    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
-                $submessage = 'System administrators, check server logs for errors.';
+
+                if (MAUTIC_ENV == 'dev') {
+                    $message    = "<pre>{$error['message']} - in file {$error['file']} - at line {$error['line']}</pre>";
+
+                    // Get a trace
+                    ob_start();
+                    debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+                    $trace = ob_get_contents();
+                    ob_end_clean();
+
+                    // Remove first item from backtrace as it's this function which
+                    // is redundant.
+                    $trace = preg_replace ('/^#0\s+' . __FUNCTION__ . "[^\n]*\n/", '', $trace, 1);
+
+                    // Renumber backtrace items.
+                    $trace = preg_replace ('/^#(\d+)/me', '\'#\' . ($1 - 1)', $trace);
+
+                    $submessage = "<pre>$trace</pre>";
+                } else {
+                    $message    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
+                    $submessage = 'System administrators, check server logs for errors.';
+                }
 
                 include __DIR__.'/../../../../offline.php';
             }

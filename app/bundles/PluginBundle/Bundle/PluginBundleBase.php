@@ -11,7 +11,6 @@ namespace Mautic\PluginBundle\Bundle;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Tools\SchemaTool;
-use Mautic\PluginBundle\Entity\Addon;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -22,17 +21,17 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 abstract class PluginBundleBase extends Bundle
 {
     /**
-     * Called by PluginController::reloadAction when adding a new addon that's not already installed
-     *
      * @param Plugin        $plugin
      * @param MauticFactory $factory
      * @param null          $metadata
+     * @param null          $installedSchema
+     *
+     * @throws \Exception
      */
-
-    static public function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null)
+    static public function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null)
     {
         if ($metadata !== null) {
-            self::installPluginSchema($metadata, $factory);
+            self::installPluginSchema($metadata, $factory, $installedSchema);
         }
     }
 
@@ -41,13 +40,17 @@ abstract class PluginBundleBase extends Bundle
      *
      * @param array         $metadata
      * @param MauticFactory $factory
+     * @param null          $installedSchema
      *
-     * @throws \Doctrine\DBAL\ConnectionException
-     * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    static public function installPluginSchema(array $metadata, MauticFactory $factory)
+    static public function installPluginSchema(array $metadata, MauticFactory $factory, $installedSchema = null)
     {
+        if (null !== $installedSchema) {
+            // Schema exists so bail
+            return;
+        }
+
         $db             = $factory->getDatabase();
         $schemaTool     = new SchemaTool($factory->getEntityManager());
         $installQueries = $schemaTool->getCreateSchemaSql($metadata);

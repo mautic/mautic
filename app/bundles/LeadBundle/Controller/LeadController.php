@@ -15,7 +15,6 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
-use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Form\Type\TagListType;
@@ -369,7 +368,8 @@ class LeadController extends FormController
         $events = array();
         foreach ($eventsByDate as $eventDate => $dateEvents) {
             $datetime = new \DateTime($eventDate);
-            if ($datetime > $fromDate) {
+            if ($datetime >= $fromDate) {
+                $total++;
                 $engagements[] = array(
                     'date' => $eventDate,
                     'data' => 1
@@ -1338,13 +1338,25 @@ class LeadController extends FormController
 
                                 $data = array_combine($headers, $data);
                                 try {
-                                    $merged = $model->importLead($importFields, $data, $defaultOwner, $defaultList, $defaultTags);
-
-                                    if ($merged) {
-                                        $stats['merged']++;
-                                    } else {
-                                        $stats['created']++;
+                                    $prevent = false;
+                                    foreach ($data as $key => $value) {
+                                        if ($value != "") {
+                                            $prevent = true;
+                                            break;
+                                        }
                                     }
+                                    if ($prevent) {
+                                        $merged = $model->importLead($importFields, $data, $defaultOwner, $defaultList, $defaultTags);
+                                        if ($merged) {
+                                            $stats['merged']++;
+                                        } else {
+                                            $stats['created']++;
+                                        }
+                                    }     
+                                    else {
+                                        $stats['ignored']++;
+                                        $stats['failures'][$lineNumber] = $this->factory->getTranslator()->trans('mautic.lead.import.error.line_empty');
+                                    }        
                                 } catch (\Exception $e) {
                                     // Email validation likely failed
                                     $stats['ignored']++;
@@ -1648,7 +1660,7 @@ class LeadController extends FormController
                         // Ensure safe emoji for notification
                         $subject = EmojiHelper::toHtml($email['subject']);
                         if ($mailer->send(true, false, false)) {
-                            $mailer->createLeadEmailStat();
+                            $mailer->createEmailStat();
                             $this->addFlash(
                                 'mautic.lead.email.notice.sent',
                                 array(

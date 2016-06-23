@@ -9,7 +9,6 @@
 
 namespace Mautic\NotificationBundle\Model;
 
-use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Entity\Stat;
@@ -219,104 +218,6 @@ class NotificationModel extends FormModel
             ),
             array('dateSent' => 'DESC')
         );
-    }
-
-    /**
-     * Get a stats for notification by list
-     *
-     * @param Notification|int $notification
-     *
-     * @return array
-     */
-    public function getNotificationListStats($notification)
-    {
-        if (! $notification instanceof Notification) {
-            $notification = $this->getEntity($notification);
-        }
-
-        $notificationIds = array($notification->getId());
-
-        $lists     = $notification->getLists();
-        $listCount = count($lists);
-
-        $combined = $this->translator->trans('mautic.notification.lists.combined');
-        $datasets = array(
-            $combined => array(0, 0, 0)
-        );
-
-        $labels = array(
-            $this->translator->trans('mautic.notification.sent'),
-            $this->translator->trans('mautic.notification.read'),
-            $this->translator->trans('mautic.notification.failed')
-        );
-
-        if ($listCount) {
-            /** @var \Mautic\NotificationBundle\Entity\StatRepository $statRepo */
-            $statRepo = $this->em->getRepository('MauticNotificationBundle:Stat');
-
-            foreach ($lists as $l) {
-                $name = $l->getTitle();
-
-                $sentCount = $statRepo->getSentCount($notificationIds, $l->getId());
-                $datasets[$combined][0] += $sentCount;
-
-                $readCount = $statRepo->getReadCount($notificationIds, $l->getId());
-                $datasets[$combined][1] += $readCount;
-
-                $datasets[$name] = array();
-
-                $datasets[$name] = array(
-                    $sentCount,
-                    $readCount
-                );
-
-                $datasets[$name]['datasetKey'] = $l->getId();
-            }
-        }
-
-        if ($listCount === 1) {
-            unset($datasets[$combined]);
-        }
-
-        $data = GraphHelper::prepareBarGraphData($labels, $datasets);
-
-        return $data;
-    }
-
-    /**
-     * @param int|Notification $notification
-     * @param int       $amount
-     * @param string    $unit
-     *
-     * @return array
-     */
-    public function getNotificationGeneralStats($notification, $amount = 30, $unit = 'D')
-    {
-        if (! $notification instanceof Notification) {
-            $notification = $this->getEntity($notification);
-        }
-
-        $notificationIds = array($notification->getId());
-
-        /** @var \Mautic\NotificationBundle\Entity\StatRepository $statRepo */
-        $statRepo = $this->em->getRepository('MauticNotificationBundle:Stat');
-
-        $graphData = GraphHelper::prepareDatetimeLineGraphData($amount, $unit,
-            array(
-                $this->translator->trans('mautic.notification.stat.sent'),
-                $this->translator->trans('mautic.notification.stat.read')
-            )
-        );
-
-        $fromDate = $graphData['fromDate'];
-
-        $sentData  = $statRepo->getNotificationStats($notificationIds, $fromDate, 'sent');
-        $graphData = GraphHelper::mergeLineGraphData($graphData, $sentData, $unit, 0, 'date', 'data');
-
-        $readData  = $statRepo->getNotificationStats($notificationIds, $fromDate, 'read');
-        $graphData = GraphHelper::mergeLineGraphData($graphData, $readData, $unit, 1, 'date', 'data');
-
-        return $graphData;
     }
 
     /**

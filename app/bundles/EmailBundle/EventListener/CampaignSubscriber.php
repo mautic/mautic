@@ -39,14 +39,14 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * CampaignSubscriber constructor.
-     * 
+     *
      * @param MauticFactory $factory
-     * @param LeadModel $leadModel
-     * @param EmailModel $emailModel
+     * @param LeadModel     $leadModel
+     * @param EmailModel    $emailModel
      */
     public function __construct(MauticFactory $factory, LeadModel $leadModel, EmailModel $emailModel)
     {
-        $this->leadModel = $leadModel;
+        $this->leadModel  = $leadModel;
         $this->emailModel = $emailModel;
 
         parent::__construct($factory);
@@ -57,12 +57,12 @@ class CampaignSubscriber extends CommonSubscriber
      */
     static public function getSubscribedEvents()
     {
-        return array(
-            CampaignEvents::CAMPAIGN_ON_BUILD => array('onCampaignBuild', 0),
-            EmailEvents::EMAIL_ON_OPEN        => array('onEmailOpen', 0),
-            EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0],
+        return [
+            CampaignEvents::CAMPAIGN_ON_BUILD         => ['onCampaignBuild', 0],
+            EmailEvents::EMAIL_ON_OPEN                => ['onEmailOpen', 0],
+            EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION   => ['onCampaignTriggerAction', 0],
             EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0]
-        );
+        ];
     }
 
     /**
@@ -70,21 +70,21 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        $trigger = array(
-            'label'           => 'mautic.email.campaign.event.open',
-            'description'     => 'mautic.email.campaign.event.open_descr',
-            'eventName'       => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION
-        );
+        $trigger = [
+            'label'       => 'mautic.email.campaign.event.open',
+            'description' => 'mautic.email.campaign.event.open_descr',
+            'eventName'   => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION
+        ];
         $event->addLeadDecision('email.open', $trigger);
 
-        $action = array(
+        $action = [
             'label'           => 'mautic.email.campaign.event.send',
             'description'     => 'mautic.email.campaign.event.send_descr',
             'eventName'       => EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION,
             'formType'        => 'emailsend_list',
-            'formTypeOptions' => array('update_select' => 'campaignevent_properties_email'),
+            'formTypeOptions' => ['update_select' => 'campaignevent_properties_email'],
             'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList'
-        );
+        ];
         $event->addAction('email.send', $action);
     }
 
@@ -96,7 +96,7 @@ class CampaignSubscriber extends CommonSubscriber
     public function onEmailOpen(EmailOpenEvent $event)
     {
         $email = $event->getEmail();
-        $this->factory->getModel('campaign')->triggerEvent('email.open', $email, 'email.open' . $email->getId());
+        $this->factory->getModel('campaign.event')->triggerEvent('email.open', $email, 'email.open' . $email->getId());
     }
 
     /**
@@ -106,7 +106,7 @@ class CampaignSubscriber extends CommonSubscriber
     {
         $eventDetails = $event->getEventDetails();
         $eventParent  = $event->getEvent()['parent'];
-        
+
         if ($eventDetails == null) {
             return $event->setResult(false);
         }
@@ -124,17 +124,9 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
-        $emailSent = false;
-        $lead = $event->getLead();
-
-        if ($lead instanceof Lead) {
-            $fields = $lead->getFields();
-
-            $leadCredentials       = $this->leadModel->flattenFields($fields);
-            $leadCredentials['id'] = $lead->getId();
-        } else {
-            $leadCredentials = $lead;
-        }
+        $emailSent       = false;
+        $lead            = $event->getLead();
+        $leadCredentials = ($lead instanceof Lead) ? $lead->getProfileFields() : $lead;
 
         if (!empty($leadCredentials['email'])) {
             $emailId = (int) $event->getConfig()['email'];

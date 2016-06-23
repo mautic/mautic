@@ -365,14 +365,18 @@ class EmailController extends FormController
 
         // Prepare stats for bargraph
         $variant = ($parent && $parent === $email);
-        $stats   = ($email->getEmailType() == 'template') ?
-            $model->getEmailGeneralStats(
+        
+        if ($email->getEmailType() == 'template') {
+            $stats = $model->getEmailGeneralStats(
                 $email,
                 $variant,
                 null,
                 new \DateTime($dateRangeForm->get('date_from')->getData()),
-                new \DateTime($dateRangeForm->get('date_to')->getData())) :
-            $model->getEmailListStats($email, $variant);
+                new \DateTime($dateRangeForm->get('date_to')->getData())
+            ); 
+        } else {
+            $stats = $model->getEmailListStats($email, $variant);
+        }
 
         // Audit Log
         $logs = $this->getModel('core.auditLog')->getLogForObject('email', $email->getId(), $email->getDateAdded());

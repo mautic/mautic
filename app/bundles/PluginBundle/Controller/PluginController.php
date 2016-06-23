@@ -247,11 +247,29 @@ class PluginController extends FormController
             $themes[] = $objectTheme;
         }
 
+        $formSettings = $integrationObject->getFormSettings();
+        $callbackUrl  = !empty($formSettings['requires_callback']) ? $integrationObject->getAuthCallbackUrl() : '';
+
+        $formNotes    = array();
+        $noteSections = array('authorization', 'features', 'feature_settings');
+        foreach ($noteSections as $section) {
+            list($specialInstructions, $alertType) = $integrationObject->getFormNotes($section);
+            if (!empty($specialInstructions)) {
+                $formNotes[$section] = array(
+                    'note' => $specialInstructions,
+                    'type' => $alertType
+                );
+            }
+        }
+
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
-                    'form'        => $this->setFormTheme($form, $template, $themes),
-                    'integration' => $integrationObject
+                    'form'         => $this->setFormTheme($form, $template, $themes),
+                    'description'  => $integrationObject->getDescription(),
+                    'formSettings' => $formSettings,
+                    'formNotes'    => $formNotes,
+                    'callbackUrl'  => $callbackUrl
                 ),
                 'contentTemplate' => $template,
                 'passthroughVars' => array(
@@ -466,8 +484,10 @@ class PluginController extends FormController
             // Call the install callback
             $callback = $plugin['bundleClass'];
             $metadata = (isset($pluginMetadata[$plugin['namespace']])) ? $pluginMetadata[$plugin['namespace']] : null;
+            $installedSchema = (isset($pluginInstalledSchemas[$plugin['namespace']]))
+                ? $pluginInstalledSchemas[$plugin['namespace']] : null;
 
-            $callback::onPluginInstall($entity, $this->factory, $metadata);
+            $callback::onPluginInstall($entity, $this->factory, $metadata, $installedSchema);
 
             $persist[] = $entity;
         }

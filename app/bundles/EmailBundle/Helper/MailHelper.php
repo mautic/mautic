@@ -248,14 +248,14 @@ class MailHelper
 
     /**
      * Mirrors previous MauticFactory functionality
-     * 
+     *
      * @param bool $cleanSlate
      * @return $this
      */
     public function getMailer($cleanSlate = true)
     {
         $this->reset($cleanSlate);
-        
+
         return $this;
     }
 
@@ -1671,21 +1671,13 @@ class MailHelper
 
             $copy = $emailModel->getCopyRepository()->findByHash($hash);
             if (null === $copy) {
-                // Create a copy entry
-                $copy = new Copy();
-                $copy->setId($hash)
-                    ->setBody($this->body['content'])
-                    ->setSubject($this->subject)
-                    ->setDateCreated(new \DateTime())
-                    ->setEmail($this->email);
-
-                $emailModel->getCopyRepository()->saveEntity($copy);
+                $emailModel->getCopyRepository()->saveCopy($hash, $this->subject, $this->body['content']);
             }
 
-            $copies[$id] = $copy;
+            $copies[$id] = $hash;
         }
 
-        $stat->setStoredCopy($copies[$id]);
+        $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $copies[$id]));
 
         if ($persist) {
             $emailModel->getStatRepository()->saveEntity($stat);

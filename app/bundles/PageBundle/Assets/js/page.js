@@ -34,6 +34,7 @@ Mautic.pageOnLoad = function (container) {
     });
 
     Mautic.intiSelectTheme(mQuery('#page_template'));
+    Mautic.initDateRangePicker();
 };
 
 Mautic.getPageAbTestWinnerForm = function(abKey) {

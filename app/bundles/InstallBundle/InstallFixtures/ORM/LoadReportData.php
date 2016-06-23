@@ -41,14 +41,14 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
      */
     public function load(ObjectManager $manager)
     {
-        $reports = CsvHelper::csv_to_array(__DIR__ . '/fakereportdata.csv');
+        $reports = CsvHelper::csv_to_array(__DIR__.'/fakereportdata.csv');
         foreach ($reports as $count => $rows) {
             $report = new Report();
             $key    = $count + 1;
             foreach ($rows as $col => $val) {
                 if ($val != "NULL") {
-                    $setter = "set" . ucfirst($col);
-                    if (in_array($col, array('columns', 'filters', 'graphs', 'tableOrder'))) {
+                    $setter = "set".ucfirst($col);
+                    if (in_array($col, ['columns', 'filters', 'graphs', 'tableOrder'])) {
                         $val = unserialize(stripslashes($val));
                     }
                     $report->$setter($val);
@@ -57,7 +57,7 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
 
             $manager->persist($report);
 
-            $this->setReference('report-' . $key, $report);
+            $this->setReference('report-'.$key, $report);
         }
         $manager->flush();
     }

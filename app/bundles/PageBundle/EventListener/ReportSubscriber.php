@@ -10,11 +10,12 @@
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\PieChart;
 
 /**
  * Class ReportSubscriber
@@ -273,103 +274,106 @@ class ReportSubscriber extends CommonSubscriber
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
             $queryBuilder = clone $qb;
+            $chartQuery   = clone $options['chartQuery'];
+            $chartQuery->applyDateFilters($queryBuilder, 'date_hit', 'ph');
 
             switch ($g) {
                 case 'mautic.page.graph.line.hits':
-                    // Generate data for Downloads line graph
-                    $unit   = 'D';
-                    $amount = 30;
+                    $chart        = new LineChart(null, $options['dateFrom'], $options['dateTo']);
+                    $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_hit', 'ph');
+                    $hits         = $chartQuery->loadAndBuildTimeData($queryBuilder);
+                    $chart->setDataset($options['translator']->trans($g), $hits);
+                    $data         = $chart->render();
+                    $data['name'] = $g;
 
-                    if (isset($options['amount'])) {
-                        $amount = $options['amount'];
-                    }
-
-                    if (isset($options['unit'])) {
-                        $unit = $options['unit'];
-                    }
-
-                    $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('dateHit'));
-
-                    $queryBuilder->select('ph.page_id as page, ph.date_hit as "dateHit"');
-                    $queryBuilder->andwhere($queryBuilder->expr()->gte('ph.date_hit', ':date'))
-                        ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
-                    $hits = $queryBuilder->execute()->fetchAll();
-
-                    $timeStats         = GraphHelper::mergeLineGraphData($data, $hits, $unit, 0, 'dateHit');
-                    $timeStats['name'] = 'mautic.page.graph.line.hits';
-
-                    $event->setGraph($g, $timeStats);
+                    $event->setGraph($g, $data);
                     break;
 
                 case 'mautic.page.graph.line.time.on.site':
-                    // Generate data for Downloads line graph
-                    $unit   = 'D';
-                    $amount = 30;
-
-                    if (isset($options['amount'])) {
-                        $amount = $options['amount'];
-                    }
-
-                    if (isset($options['unit'])) {
-                        $unit = $options['unit'];
-                    }
-
-                    $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('dateHit'));
-
-                    $queryBuilder->select('ph.page_id as page, ph.date_hit as "dateHit", ph.date_left as "dateLeft"');
-                    $queryBuilder->andwhere($queryBuilder->expr()->gte('ph.date_hit', ':date'))
-                        ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
+                    $chart      = new LineChart(null, $options['dateFrom'], $options['dateTo']);
+                    $queryBuilder->select('ph.date_hit as "dateHit", ph.date_left as "dateLeft"');
+                    $queryBuilder->andWhere($qb->expr()->isNotNull('ph.date_left'));
                     $hits = $queryBuilder->execute()->fetchAll();
 
-                    // Count time on site
                     foreach ($hits as $key => $hit) {
-                        if ($hit['dateLeft']) {
-                            $dateHit                      = new \DateTime($hit['dateHit']);
-                            $dateLeft                     = new \DateTime($hit['dateLeft']);
-                            $hits[$key]['timeOnSite']     = $dateLeft->getTimestamp() - $dateHit->getTimestamp();
-                            $hits[$key]['timeOnSiteDate'] = $hit['dateHit'];
-                        } else {
-                            $hits[$key]['timeOnSite']     = 0;
-                            $hits[$key]['timeOnSiteDate'] = $hit['dateHit'];
-                        }
+                        $dateHit            = new \DateTime($hit['dateHit']);
+                        $dateLeft           = new \DateTime($hit['dateLeft']);
+                        $hits[$key]['data'] = $dateLeft->getTimestamp() - $dateHit->getTimestamp();
+                        $hits[$key]['date'] = $hit['dateHit'];
+                        unset($hits[$key]['dateHit']);
                         unset($hits[$key]['dateLeft']);
                     }
 
-                    $timeStats         = GraphHelper::mergeLineGraphData($data, $hits, $unit, 0, 'dateHit', 'timeOnSite', true);
-                    $timeStats['name'] = 'mautic.page.graph.line.time.on.site';
+                    $hits = $chartQuery->completeTimeData($hits, true);
+                    $chart->setDataset($options['translator']->trans($g), $hits);
+                    $data         = $chart->render();
+                    $data['name'] = $g;
 
-                    $event->setGraph($g, $timeStats);
+                    $event->setGraph($g, $data);
                     break;
 
                 case 'mautic.page.graph.pie.time.on.site':
-                    $hitStats               = $hitRepo->getDwellTimes(array(), $queryBuilder);
-                    $graphData              = array();
-                    $graphData['data']      = $hitStats['timesOnSite'];
-                    $graphData['name']      = 'mautic.page.graph.pie.time.on.site';
-                    $graphData['iconClass'] = 'fa-clock-o';
-                    $event->setGraph($g, $graphData);
+                    $timesOnSite = $hitRepo->getDwellTimeLabels();
+                    $chart       = new PieChart();
+
+                    foreach ($timesOnSite as $time) {
+                        $q = clone $queryBuilder;
+                        $chartQuery->modifyCountDateDiffQuery($q, 'date_hit', 'date_left', $time['from'], $time['till'], 'ph');
+                        $data = $chartQuery->fetchCountDateDiff($q);
+                        $chart->setDataset($time['label'], $data);
+                    }
+
+                    $event->setGraph(
+                        $g,
+                        array(
+                            'data'      => $chart->render(),
+                            'name'      => $g,
+                            'iconClass' => 'fa-clock-o'
+                        )
+                    );
                     break;
 
                 case 'mautic.page.graph.pie.new.vs.returning':
-                    if (!isset($hitstats)) {
-                        $hitStats = $hitRepo->getDwellTimes(array(), $queryBuilder);
-                    }
-                    $graphData              = array();
-                    $graphData['data']      = $hitStats['newVsReturning'];
-                    $graphData['name']      = 'mautic.page.graph.pie.new.vs.returning';
-                    $graphData['iconClass'] = 'fa-bookmark-o';
-                    $event->setGraph($g, $graphData);
+                    $chart     = new PieChart();
+                    $allQ      = clone $queryBuilder;
+                    $uniqueQ   = clone $queryBuilder;
+                    $chartQuery->modifyCountQuery($allQ, 'date_hit', array(), 'ph');
+                    $chartQuery->modifyCountQuery($uniqueQ, 'date_hit', array('getUnique' => true, 'selectAlso' => array('ph.page_id')), 'ph');
+                    $all       = $chartQuery->fetchCount($allQ);
+                    $unique    = $chartQuery->fetchCount($uniqueQ);
+                    $returning = $all - $unique;
+                    $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.unique'), $unique);
+                    $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.graph.pie.new.vs.returning.returning'), $returning);
+
+                    $event->setGraph(
+                        $g,
+                        array(
+                            'data'      => $chart->render(),
+                            'name'      => $g,
+                            'iconClass' => 'fa-bookmark-o'
+                        )
+                    );
                     break;
 
                 case 'mautic.page.graph.pie.languages':
-                    if (!isset($hitstats)) {
-                        $hitStats = $hitRepo->getDwellTimes(array(), $queryBuilder);
+                    $queryBuilder->select('ph.page_language, COUNT(distinct(ph.id))')
+                        ->groupBy('ph.page_language')
+                        ->andWhere($qb->expr()->isNotNull('ph.page_language'));
+                    $data  = $queryBuilder->execute()->fetchAll();
+                    $chart = new PieChart();
+                    
+                    foreach ($data as $lang) {
+                        $chart->setDataset($lang['page_language'], $lang['count']);
                     }
-                    $graphData              = array();
-                    $graphData['data']      = $hitStats['languages'];
-                    $graphData['name']      = 'mautic.page.graph.pie.languages';
-                    $graphData['iconClass'] = 'fa-globe';
-                    $event->setGraph($g, $graphData);
+
+                    $event->setGraph(
+                        $g,
+                        array(
+                            'data'      => $chart->render(),
+                            'name'      => $g,
+                            'iconClass' => 'fa-globe'
+                        )
+                    );
                     break;
 
                 case 'mautic.page.table.referrers':
@@ -378,7 +382,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $hitRepo->getReferers($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.page.table.referrers';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-sign-in';
                     $event->setGraph($g, $graphData);
                     break;
@@ -389,7 +393,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $hitRepo->getMostVisited($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.page.table.most.visited';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-eye';
                     $graphData['link']      = 'mautic_page_action';
                     $event->setGraph($g, $graphData);
@@ -401,7 +405,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $hitRepo->getMostVisited($queryBuilder, $limit, $offset, 'p.unique_hits', 'sessions');
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.page.table.most.visited.unique';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-eye';
                     $graphData['link']      = 'mautic_page_action';
                     $event->setGraph($g, $graphData);

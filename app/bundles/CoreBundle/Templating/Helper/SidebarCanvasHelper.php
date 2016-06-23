@@ -40,7 +40,7 @@ class SidebarCanvasHelper extends Helper
             $this->content = $event->getCanvasContent();
         }
 
-        $adminMenuContent = $templating['knp_menu']->render('admin', array("menu" => "admin"));
+        $adminMenuContent = $templating['menu']->render('admin');
 
         if (!empty($adminMenuContent)) {
             $settingsMenu = array(

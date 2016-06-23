@@ -9,24 +9,32 @@
 
 namespace Mautic\CoreBundle\Menu;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Templating\Helper\Helper;
-use Knp\Menu\Matcher\MatcherInterface;
-use Knp\Menu\ItemInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * Class MenuHelper
  */
-class MenuHelper extends Helper
+class MenuHelper
 {
 
     /**
-     * @var MauticFactory
+     * @var CorePermissions
      */
-    private $factory;
+    protected $security;
+
+    /**
+     * @var null|Request
+     */
+    protected $request;
+
+    /**
+     * @var User
+     */
+    protected $user;
 
     /**
      * Stores items that are assigned to another parent outside it's bundle
@@ -36,132 +44,31 @@ class MenuHelper extends Helper
     private $orphans = array();
 
     /**
-     * @param MauticFactory $factory
+     * @var array
      */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
+    protected $mauticParameters;
 
     /**
-     * @return mixed
-     */
-    protected function getUser()
-    {
-        return $this->factory->getUser();
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function getSecurity()
-    {
-        return $this->factory->getSecurity();
-    }
-
-    /**
-     * @return Request
-     */
-    protected function getRequest()
-    {
-       return $this->factory->getRequest();
-    }
-
-    /**
-     * @param $name
+     * MenuHelper constructor.
      *
-     * @return bool|mixed
+     * @param CorePermissions       $security
+     * @param TokenStorageInterface $tokenStorage
+     * @param RequestStack          $requestStack
+     * @param array                 $mauticParameters
      */
-    protected function getParameter($name)
+    public function __construct(CorePermissions $security, TokenStorageInterface $tokenStorage, RequestStack $requestStack, array $mauticParameters)
     {
-        return $this->factory->getParameter($name);
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return 'menu_helper';
-    }
-
-    /**
-     * Parses attributes for the menu view
-     *
-     * @param $attributes
-     * @param $overrides
-     *
-     * @return string
-     */
-    public function parseAttributes($attributes, $overrides = array())
-    {
-        if (!is_array($attributes)) {
-            $attributes = array();
-        }
-
-        $attributes = array_merge($attributes, $overrides);
-
-        $string = '';
-        foreach ($attributes as $name => $value) {
-            $name  = trim($name);
-            $value = trim($value);
-            if ($name == $value) {
-                $string .= " $name";
-            } else {
-                $string .= " $name=\"$value\"";
-            }
-        }
-
-        return $string;
-    }
-
-    /**
-     * Concats the appropriate classes for menu links
-     *
-     * @param ItemInterface    $item
-     * @param MatcherInterface $matcher
-     * @param array            $options
-     */
-    public function buildClasses(ItemInterface &$item, MatcherInterface &$matcher, $options)
-    {
-
-        $showChildren = ($item->hasChildren() && $item->getDisplayChildren());
-        $isAncestor   = $matcher->isAncestor($item, $options["matchingDepth"]);
-        $isCurrent    = $matcher->isCurrent($item);
-
-        $class   = $item->getAttribute("class");
-        $classes = ($class) ? " {$class}" : "";
-        $classes .= ($isCurrent) ? " {$options["currentClass"]}" : "";
-        $classes .= ($isAncestor) ? " {$options["ancestorClass"]}" : "";
-        $classes .= ($isAncestor && $this->invisibleChildSelected($item, $matcher)) ? " {$options["currentClass"]}" : "";
-        $classes .= ($item->actsLikeFirst()) ? " {$options["firstClass"]}" : "";
-        $classes .= ($item->actsLikeLast()) ? " {$options["lastClass"]}" : "";
-        $item->setAttribute("class", trim($classes));
-    }
-
-    /**
-     * @param ItemInterface    $menu
-     * @param MatcherInterface $matcher
-     *
-     * @return bool
-     */
-    public function invisibleChildSelected($menu, MatcherInterface $matcher)
-    {
-        /** @var ItemInterface $item */
-        foreach ($menu as $item) {
-            if ($matcher->isCurrent($item)) {
-                return ($item->isDisplayed()) ? false : true;
-            }
-        }
-
-        return false;
+        $this->security         = $security;
+        $this->user             = $tokenStorage->getToken()->getUser();
+        $this->mauticParameters = $mauticParameters;
+        $this->request          = $requestStack->getCurrentRequest();
     }
 
     /**
      * Converts menu config into something KNP menus expects
      *
-     * @param     $items
-     * @param int $depth
+     * @param      $items
+     * @param int  $depth
      * @param int $defaultPriority
      */
     public function createMenuStructure(&$items, $depth = 0, $defaultPriority = 9999)
@@ -174,8 +81,8 @@ class MenuHelper extends Helper
             if (isset($i['bundle'])) {
                 // Category shortcut
                 $bundleName = $i['bundle'];
-                $i = array(
-                    'access'          => $bundleName . ':categories:view',
+                $i          = array(
+                    'access'          => $bundleName.':categories:view',
                     'route'           => 'mautic_category_index',
                     'id'              => 'mautic_'.$bundleName.'category_index',
                     'routeParameters' => array('bundle' => $bundleName),
@@ -185,11 +92,11 @@ class MenuHelper extends Helper
             // Check to see if menu is restricted
             if (isset($i['access'])) {
                 if ($i['access'] == 'admin') {
-                    if (!$this->getUser()->isAdmin()) {
+                    if (!$this->user->isAdmin()) {
                         unset($items[$k]);
                         continue;
                     }
-                } elseif (!$this->getSecurity()->isGranted($i['access'], 'MATCH_ONE')) {
+                } elseif (!$this->security->isGranted($i['access'], 'MATCH_ONE')) {
                     unset($items[$k]);
                     continue;
                 }
@@ -205,7 +112,7 @@ class MenuHelper extends Helper
                                 break;
                             }
                         } elseif ($checkGroup == 'request') {
-                            if ($this->getRequest()->get($name) != $value) {
+                            if ($this->request->get($name) != $value) {
                                 $passChecks = false;
                                 break;
                             }
@@ -219,18 +126,39 @@ class MenuHelper extends Helper
             }
 
             //Set ID to route name
-            if (!isset($i['id']) && isset($i['route'])) {
-                $i['id'] = $i['route'];
+            if (!isset($i['id'])) {
+                if (!empty($i['route'])) {
+                    $i['id'] = $i['route'];
+                } else {
+                    $i['id'] = 'menu-item-'.uniqid();
+                }
             }
 
             //Set link attributes
-            $i['linkAttributes'] = array(
-                'data-menu-link' => $i['id'],
-                'id'             => $i['id']
-            );
+            if (!isset($i['linkAttributes'])) {
+                $i['linkAttributes'] = array(
+                    'data-menu-link' => $i['id'],
+                    'id'             => $i['id']
+                );
+            } elseif (!isset($i['linkAttributes']['id'])) {
+                $i['linkAttributes']['id']             = $i['id'];
+                $i['linkAttributes']['data-menu-link'] = $i['id'];
+            } elseif (!isset($i['linkAttributes']['data-menu-link'])) {
+                $i['linkAttributes']['data-menu-link'] = $i['id'];
+            }
 
-            $i['extras'] = array();
+            $i['extras']          = array();
             $i['extras']['depth'] = $depth;
+
+            // Note a divider
+            if (!empty($i['divider'])) {
+                $i['extras']['divider'] = true;
+            }
+
+            // Note a header
+            if (!empty($i['header'])) {
+                $i['extras']['header'] = $i['header'];
+            }
 
             //Set the icon class for the menu item
             if (!empty($i['iconClass'])) {
@@ -346,5 +274,16 @@ class MenuHelper extends Helper
                 return ($ap > $bp) ? -1 : 1;
             }
         );
+    }
+
+
+    /**
+     * @param $name
+     *
+     * @return bool
+     */
+    protected function getParameter($name)
+    {
+        return isset($this->mauticParameters[$name]) ? $this->mauticParameters[$name] : false;
     }
 }

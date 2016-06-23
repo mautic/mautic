@@ -12,7 +12,6 @@ namespace Mautic\EmailBundle\Entity;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Helper\GraphHelper;
 
 /**
  * Class StatRepository
@@ -289,39 +288,24 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * Get pie graph data for Sent, Read and Failed email count
+     * Get counts for Sent, Read and Failed emails
      *
      * @param QueryBuilder $query
-     * @param array $args
      *
      * @return array
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getIgnoredReadFailed($query = null, $args = array())
+    public function getIgnoredReadFailed($query = null)
     {
-        if (!$query) {
-            $query = $this->_em->getConnection()->createQueryBuilder()
-                ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
-                ->leftJoin('es', MAUTIC_TABLE_PREFIX.'emails', 'e', 'es.email_id = e.id');
-        }
-
         $query->select('count(es.id) as sent, count(CASE WHEN es.is_read THEN 1 ELSE null END) as "read", count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed');
-
-        if (isset($args['source'])) {
-            $query->andWhere($query->expr()->eq('es.source', $query->expr()->literal($args['source'])));
-        }
-
-        if (isset($args['source_id'])) {
-            $query->andWhere($query->expr()->eq('es.source_id', (int) $args['source_id']));
-        }
 
         $results = $query->execute()->fetch();
 
         $results['ignored'] = $results['sent'] - $results['read'] - $results['failed'];
         unset($results['sent']);
 
-        return GraphHelper::preparePieGraphData($results);
+        return $results;
     }
 
     /**

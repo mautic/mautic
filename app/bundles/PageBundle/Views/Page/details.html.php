@@ -116,66 +116,30 @@ $view['slots']->set(
             </div>
             <!--/ page detail collapseable toggler -->
 
-            <!--
-            some stats: need more input on what type of form data to show.
-            delete if it is not require
-            -->
+            <!-- some stats -->
             <div class="pa-md">
-                <div class="row stat-boxes">
-                    <div class="col-md-4">
-                        <div class="panel ovf-h bg-auto bg-light-xs page-stat-charts">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="panel">
                             <div class="panel-body box-layout">
-                                <div class="col-xs-8 va-m">
-                                    <h5 class="dark-md fw-sb mb-xs">
+                                <div class="col-md-3 va-m">
+                                    <h5 class="text-white dark-md fw-sb mb-xs">
+                                        <span class="fa fa-line-chart"></span>
                                         <?php echo $view['translator']->trans('mautic.page.pageviews'); ?>
                                     </h5>
                                 </div>
-                                <div class="col-xs-4 va-t text-right">
-                                    <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
+                                <div class="col-md-9 va-m">
+                                    <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', array('dateRangeForm' => $dateRangeForm, 'class' => 'pull-right')); ?>
                                 </div>
                             </div>
-                            <div class="pt-0 pl-10 pb-0 pr-10">
-                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $last30, 'chartType' => 'simple-bar', 'chartHeight' => 93)); ?>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="panel ovf-h bg-auto bg-light-xs">
-                            <div class="panel-body box-layout pb-0">
-                                <div class="col-xs-8 va-m">
-                                    <h5 class="dark-md fw-sb mb-xs">
-                                        <?php echo $view['translator']->trans('mautic.page.new.returning'); ?>
-                                    </h5>
-                                </div>
-                                <div class="col-xs-4 va-t text-right">
-                                    <h3 class="text-white dark-sm"><span class="fa fa-bookmark-o"></span></h3>
-                                </div>
-                            </div>
-                            <div class="text-center">
-                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $stats['newVsReturning'], 'chartType' => 'pie', 'chartHeight' => 93)); ?>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="panel ovf-h bg-auto bg-light-xs">
-                            <div class="panel-body box-layout pb-0">
-                                <div class="col-xs-8 va-m">
-                                    <h5 class="dark-md fw-sb mb-xs">
-                                        <?php echo $view['translator']->trans('mautic.page.time.on.page'); ?>
-                                    </h5>
-                                </div>
-                                <div class="col-xs-4 va-t text-right">
-                                    <h3 class="text-white dark-sm"><span class="fa fa-clock-o"></span></h3>
-                                </div>
-                            </div>
-                            <div class="text-center">
-                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $stats['dwellTime'], 'chartType' => 'pie', 'chartHeight' => 93)); ?>
+                            <div class="pt-0 pl-15 pb-10 pr-15">
+                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $stats['pageviews'], 'chartType' => 'line', 'chartHeight' => 300)); ?>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!--/ some stats -->
+            <!--/ stats -->
 
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">

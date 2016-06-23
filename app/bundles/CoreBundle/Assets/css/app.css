@@ -527,7 +527,7 @@ body > #app-wrapper {
   background-color: rgba(255, 255, 255, 0.06);
 }
 .app-sidebar .sidebar-header {
-  z-index: 10;
+  z-index: 100;
   height: 60px;
   padding-left: 15px;
   padding-right: 15px;
@@ -1541,6 +1541,19 @@ a.media {
   color: #f2f2f2;
   background-color: #4e5d9d;
 }
+.extra-menu {
+  height: 60px;
+  padding-top: 20px;
+  position: absolute;
+  right: 15px;
+}
+.extra-menu a {
+  font-size: 1.1em;
+  color: rgba(255, 255, 255, 0.55);
+}
+.extra-menu a:hover {
+  color: #fff;
+}
 .list-group-item > a {
   position: relative;
   z-index: 1;
@@ -1840,6 +1853,9 @@ ul.dropdown-menu-form {
   padding-right: 32px;
   width: 100%;
   overflow: hidden;
+}
+.mautic-brand.pull-left {
+  width: 75%;
 }
 .mautic-brand > svg.mautic-logo-figure {
   width: 32px;
@@ -4518,4 +4534,7 @@ body.noscroll {
   border: 1px solid #4e5e9e;
   -webkit-box-shadow: 0px 0px 40px #f3f3f3;
   box-shadow: 0px 0px 40px #f3f3f3;
+}
+#app-content.content-only .toolbar-form-buttons.pull-right {
+  padding-right: 20px;
 }
