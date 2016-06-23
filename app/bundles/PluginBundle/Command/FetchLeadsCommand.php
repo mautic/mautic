@@ -54,6 +54,12 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 InputOption::VALUE_OPTIONAL,
                 'Send the object name Lead - will import leads to mautic contacts, Contact will import contacts to mautic contacts.'
             )
+            ->addOption(
+                '--time-interval',
+                '-ti',
+                InputOption::VALUE_OPTIONAL,
+                'Send time interval to check updates on Salesforce, it should be a correct php formatted time interval in the past eg:(-10 minutes)'
+            )
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
 
         parent::configure();
@@ -70,14 +76,21 @@ class FetchLeadsCommand extends ContainerAwareCommand
         $factory = $container->get('mautic.factory');
 
 
-        $translator    = $factory->getTranslator();
-        $integration   = $input->getOption('integration');
-        $startDate     = $input->getOption('start-date');
-        $endDate       = $input->getOption('end-date');
-        $object       = $input->getOption('sf-object');
+        $translator     = $factory->getTranslator();
+        $integration    = $input->getOption('integration');
+        $startDate      = $input->getOption('start-date');
+        $endDate        = $input->getOption('end-date');
+        $object         = $input->getOption('sf-object');
+        $interval       = $input->getOption('time-interval');
 
+        if(!$interval){
+            $interval = "15 minutes";
+        }
         if(!$startDate){
-            $startDate= date('c');
+            $startDate= date('c', strtotime("-".$interval));
+        }
+
+        if(!$endDate){
             $endDate= date('c');
         }
 
@@ -94,6 +107,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 $params['start']=$startDate;
                 $params['end']=$endDate;
                 $params['object']=$object;
+
                 if(strtotime($startDate) > strtotime('-30 days')) {
                     $processed = 0;
                     $processed = intval($integrationObject->getLeads($params));
