@@ -11,6 +11,7 @@
 namespace Mautic\Middleware;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
@@ -28,6 +29,21 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
     ];
 
     /**
+     * @var bool
+     */
+    protected $requestOriginIsValid = false;
+
+    /**
+     * @var bool
+     */
+    protected $restrictCORSDomains;
+
+    /**
+     * @var array
+     */
+    protected $validCORSDomains;
+
+    /**
      * @var HttpKernelInterface
      */
     protected $app;
@@ -40,6 +56,11 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
     public function __construct(HttpKernelInterface $app)
     {
         $this->app = $app;
+
+        include __DIR__.'/../config/local.php';
+
+        $this->restrictCORSDomains = (bool) $parameters['cors_restrict_domains'];
+        $this->validCORSDomains    = (array) $parameters['cors_valid_domains'];
     }
 
     /**
@@ -47,36 +68,58 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
      */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
+        $this->corsHeaders['Access-Control-Allow-Origin'] = $this->getAllowOriginHeaderValue($request);
+
+        // If this is an initial OPTIONS request, just set the CORS headers and exit.
         if (
             $request->getMethod() === 'OPTIONS'
             && $request->headers->has('Access-Control-Request-Headers')
             && $request->headers->has('Origin')
         ) {
-            foreach ($this->corsHeaders as $header => $value) {
-                if ($header === 'Access-Control-Allow-Origin') {
-                    $value = $request->headers->get('Origin');
-                }
+            $response = new Response('', Response::HTTP_NO_CONTENT);
 
-                header("$header: $value");
+            // Only add the CORS headers if the request Origin is valid.
+            if ($this->requestOriginIsValid) {
+                foreach ($this->corsHeaders as $header => $value) {
+                    $response->headers->set($header, $value);
+                }
             }
 
-            header('HTTP/1.1 204 No Content');
-            exit();
+            return $response;
         }
 
         $response = $this->app->handle($request, $type, $catch);
 
         if ($request->isXmlHttpRequest()) {
             foreach ($this->corsHeaders as $header => $value) {
-                if ($header === 'Access-Control-Allow-Origin') {
-                    $value = $request->headers->get('Origin');
-                }
-
                 $response->headers->set($header, $value);
             }
         }
 
         return $response;
+    }
+
+    /**
+     * Get the value for the Access-Control-Allow-Origin header
+     * based on the Request and local configuration options.
+     *
+     * @param Request $request
+     *
+     * @return string|null
+     */
+    private function getAllowOriginHeaderValue(Request $request)
+    {
+        $origin = $request->headers->get('Origin');
+
+        // If we're not restricting domains, set the header to the request origin
+        if (!$this->restrictCORSDomains || in_array($origin, $this->validCORSDomains)) {
+            $this->requestOriginIsValid = true;
+            return $origin;
+        }
+
+        $this->requestOriginIsValid = false;
+
+        return null;
     }
 
     /**
