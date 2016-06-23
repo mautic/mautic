@@ -19,6 +19,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Entity\Periodicity;
 use Mautic\FeedBundle\Entity\Feed;
+use Mautic\FeedBundle\Exception\FeedNotFoundException;
 
 class EmailController extends FormController
 {
@@ -402,6 +403,12 @@ class EmailController extends FormController
         // Get click through stats
         $trackableLinks = $model->getEmailClickStats($email->getId());
 
+        try {
+            $pending = $model->getPendingLeads($email, null, true);
+        } catch (FeedNotFoundException $e) {
+            $pending = null;
+        }
+
         return $this->delegateView(
             [
                 'returnUrl' => $this->generateUrl(
@@ -417,7 +424,7 @@ class EmailController extends FormController
                     'statsDevices' => $statsDevices,
                     'showAllStats' => $includeVariants,
                     'trackables'   => $trackableLinks,
-                    'pending'      => $model->getPendingLeads($email, null, true),
+                    'pending'      => $pending,
                     'logs'         => $logs,
                     'variants'     => [
                         'parent'     => $parent,
@@ -528,7 +535,7 @@ class EmailController extends FormController
                     $model->saveEntity($entity);
 
                     //Here we save the Periodicity, if needed
-                    if ($entity->hasFeed()) {
+                    if ($entity->getEmailType() === 'feed') {
                         //We need a new Periodicity
                         $periodicity = new Periodicity();
 
@@ -743,7 +750,7 @@ class EmailController extends FormController
 
                     $entity->setCustomHtml($content);
 
-                    if ($entity->hasFeed()) {
+                    if ($entity->getEmailType() === 'feed') {
                         //We persist the feed entity
                         $this->factory->getEntityManager()->persist($entity->getFeed());
                         $this->factory->getEntityManager()->flush();
@@ -753,7 +760,7 @@ class EmailController extends FormController
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
                     //Save the Periodicity too (if exist)
-                    if ($entity->hasFeed()) {
+                    if ($entity->getEmailType() === 'feed') {
                         //We find the Periodicity
                         $periodicity = $this->factory
                             ->getEntityManager()
@@ -869,7 +876,7 @@ class EmailController extends FormController
                 $form['customHtml']->setData($content);
             }
 
-            if ($entity->hasFeed()) {
+            if ($entity->getEmailType() === 'feed') {
                 //Set the periodicity for the edit form
                 /** @var $periodicity Periodicity */
                 $periodicity = $this->factory
