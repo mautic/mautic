@@ -240,6 +240,7 @@ class DynamicContent extends FormEntity
      */
     public function setName($name)
     {
+        $this->isChanged('name', $name);
         $this->name = $name;
 
         return $this;
@@ -343,6 +344,7 @@ class DynamicContent extends FormEntity
      */
     public function setContent($content)
     {
+        $this->isChanged('content', $content);
         $this->content = $content;
 
         return $this;

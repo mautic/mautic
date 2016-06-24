@@ -58,7 +58,7 @@ class DynamicContentSubscriber extends CommonSubscriber
      *
      * @param Events\DynamicContentEvent $event
      */
-    public function onEmailDelete(Events\DynamicContentEvent $event)
+    public function onDelete(Events\DynamicContentEvent $event)
     {
         $entity = $event->getDynamicContent();
         $log = [
