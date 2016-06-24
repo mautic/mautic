@@ -92,11 +92,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     public function getLeads($params = array())
     {
         $executed = null;
-        
-        if (empty($config['leadFields'])) {
-            return null;
-        }
-        $this->factory->getLogger()->addError(print_r($params,true));
+
         $query = $this->getFetchQuery($params);
         
         try {
@@ -104,7 +100,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 $result = $this->getApiHelper()->getLeads($query);
                 
                 $executed = $this->amendLeadDataBeforeMauticPopulate($result);
-               
+
                 return $executed;
             }
         } catch (\Exception $e) {

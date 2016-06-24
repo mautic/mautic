@@ -138,3 +138,7 @@ ul.tag-cloud li {
 #lead_merge_lead_to_merge_chosen .chosen-search {
     display:none;
 }
+.history-search{
+    overflow: visible!important;
+    height: 53px;
+}

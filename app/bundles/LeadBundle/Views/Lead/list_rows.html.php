@@ -102,7 +102,7 @@
                     <span class="label label-default"<?php echo $style; ?>><?php echo $item->getStage()->getName(); ?></span>
                     <?php endif?>
                 </td>
-                <td class="text-center">
+                <td class="visible-md visible-lg text-center">
                     <?php
                     $color = $item->getColor();
                     $style = !empty($color) ? ' style="background-color: ' . $color . ';"' : '';
