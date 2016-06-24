@@ -9,6 +9,8 @@
  */
 namespace Mautic\DynamicContentBundle\Model;
 
+use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -210,5 +212,67 @@ class DynamicContentModel extends FormModel
         } else {
             return null;
         }
+    }
+
+    /**
+     * Joins the page table and limits created_by to currently logged in user
+     *
+     * @param QueryBuilder $q
+     */
+    public function limitQueryToCreator(QueryBuilder &$q)
+    {
+        $q->join('t', MAUTIC_TABLE_PREFIX.'pages', 'p', 'p.id = t.page_id')
+            ->andWhere('p.created_by = :userId')
+            ->setParameter('userId', $this->user->getId());
+    }
+
+    /**
+     * Get line chart data of hits
+     *
+     * @param char      $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param string    $dateFormat
+     * @param array     $filter
+     * @param boolean   $canViewOthers
+     *
+     * @return array
+     */
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
+    {
+        $flag = null;
+
+        if (isset($filter['flag'])) {
+            $flag = $filter['flag'];
+            unset($filter['flag']);
+        }
+
+        $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query = $chart->getChartQuery($this->em->getConnection());
+
+        if (!$flag || $flag === 'total_and_unique') {
+            $q = $query->prepareTimeDataQuery('dynamic_content_stats', 'date_sent', $filter);
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->translator->trans('mautic.dynamicContent.show.total.views'), $data);
+        }
+
+        if ($flag === 'unique' || $flag === 'total_and_unique') {
+            $q = $query->prepareTimeDataQuery('dynamic_content_stats', 'date_sent', $filter);
+            $q->groupBy('t.lead_id, t.date_sent');
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->translator->trans('mautic.dynamicContent.show.unique.views'), $data);
+        }
+
+        return $chart->render();
     }
 }
