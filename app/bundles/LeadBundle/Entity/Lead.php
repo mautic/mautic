@@ -293,7 +293,7 @@ class Lead extends FormEntity
             ->cascadeAll()
             ->fetchExtraLazy()
             ->build();
-        
+
         $builder->createOneToMany('utmtags', 'Mautic\LeadBundle\Entity\UtmTag')
             ->orphanRemoval()
             ->mappedBy('lead')
@@ -984,6 +984,13 @@ class Lead extends FormEntity
         if ($this->wasAnonymous == null) {
             $this->wasAnonymous = $this->isAnonymous();
         }
+
+        $value = trim($value);
+        if ($value == '') {
+            // Ensure value is null for consistency
+            $value = null;
+        }
+
         $this->changes['fields'][$alias] = array($oldValue, $value);
         $this->updatedFields[$alias]     = $value;
     }
