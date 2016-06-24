@@ -18,8 +18,6 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
  */
 class Version20160606000000 extends AbstractMauticMigration
 {
-    private $keys = [];
-
     /**
      * @param Schema $schema
      *
@@ -28,25 +26,11 @@ class Version20160606000000 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        if ($schema->hasTable($this->prefix.'lead_attributions')) {
+        $table = $schema->getTable(MAUTIC_TABLE_PREFIX.'leads');
+        if ($table->hasColumn('attribution')) {
 
             throw new SkipMigrationException('Schema includes this migration');
         }
-
-        $this->keys = [
-            'idx' => [
-                'lead'     => $this->generatePropertyName('lead_attributions', 'idx', ['lead_id']),
-                'campaign' => $this->generatePropertyName('lead_attributions', 'idx', ['campaign_id']),
-                'ip'       => $this->generatePropertyName('lead_attributions', 'idx', ['ip_id']),
-                'stage'    => $this->generatePropertyName('lead_attributions', 'idx', ['stage_id']),
-            ],
-            'fk'  => [
-                'lead'     => $this->generatePropertyName('lead_attributions', 'fk', ['lead_id']),
-                'campaign' => $this->generatePropertyName('lead_attributions', 'fk', ['campaign_id']),
-                'ip'       => $this->generatePropertyName('lead_attributions', 'fk', ['ip_id']),
-                'stage'    => $this->generatePropertyName('lead_attributions', 'fk', ['stage_id']),
-            ],
-        ];
     }
 
     /**
