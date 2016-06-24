@@ -58,7 +58,13 @@ return [
                 'class' => 'Mautic\DynamicContentBundle\EventListener\BuildJsSubscriber'
             ],
             'mautic.dynamicContent.subscriber' => [
-                'class' => 'Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber'
+                'class' => 'Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.page.model.trackable',
+                    'mautic.page.helper.token',
+                    'mautic.asset.helper.token'
+                ]
             ]
         ],
         'forms' => [

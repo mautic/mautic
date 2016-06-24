@@ -11,8 +11,15 @@ namespace Mautic\DynamicContentBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Event as Events;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
+use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
+use Mautic\PageBundle\Model\TrackableModel;
 
 /**
  * Class DynamicContentSubscriber
@@ -21,6 +28,37 @@ use Mautic\DynamicContentBundle\Event as Events;
  */
 class DynamicContentSubscriber extends CommonSubscriber
 {
+    /**
+     * @var TrackableModel
+     */
+    protected $trackableModel;
+
+    /**
+     * @var PageTokenHelper
+     */
+    protected $pageTokenHelper;
+
+    /**
+     * @var AssetTokenHelper
+     */
+    protected $assetTokenHelper;
+
+    /**
+     * DynamicContentSubscriber constructor.
+     *
+     * @param MauticFactory    $factory
+     * @param TrackableModel   $trackableModel
+     * @param PageTokenHelper  $pageTokenHelper
+     * @param AssetTokenHelper $assetTokenHelper
+     */
+    public function __construct(MauticFactory $factory, TrackableModel $trackableModel, PageTokenHelper $pageTokenHelper, AssetTokenHelper $assetTokenHelper)
+    {
+        $this->trackableModel = $trackableModel;
+        $this->pageTokenHelper = $pageTokenHelper;
+        $this->assetTokenHelper = $assetTokenHelper;
+
+        parent::__construct($factory);
+    }
 
     /**
      * @return array
@@ -29,7 +67,8 @@ class DynamicContentSubscriber extends CommonSubscriber
     {
         return [
             DynamicContentEvents::POST_SAVE    => ['onPostSave', 0],
-            DynamicContentEvents::POST_DELETE  => ['onDelete', 0]
+            DynamicContentEvents::POST_DELETE  => ['onDelete', 0],
+            DynamicContentEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0]
         ];
     }
 
@@ -69,5 +108,40 @@ class DynamicContentSubscriber extends CommonSubscriber
             "details"    => ['name' => $entity->getName()]
         ];
         $this->factory->getModel('core.auditLog')->writeToLog($log);
+    }
+
+    public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event)
+    {
+        /** @var Lead $lead */
+        $lead = $event->getLead();
+        $content = $event->getContent();
+        $clickthrough = $event->getClickthrough();
+
+        if ($content) {
+            $tokens = array_merge(
+                TokenHelper::findLeadTokens($content, $lead->getProfileFields()),
+                $this->pageTokenHelper->findPageTokens($content, $clickthrough),
+                $this->assetTokenHelper->findAssetTokens($content, $clickthrough)
+            );
+
+            list($content, $trackables) = $this->trackableModel->parseContentForTrackables(
+                $content,
+                $tokens,
+                'dynamicContent',
+                $clickthrough['dynamic_content_id']
+            );
+
+            /**
+             * @var string $token
+             * @var Trackable $trackable
+             */
+            foreach ($trackables as $token => $trackable) {
+                $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $clickthrough);
+            }
+
+            $content = str_replace(array_keys($tokens), array_values($tokens), $content);
+
+            $event->setContent($content);
+        }
     }
 }
