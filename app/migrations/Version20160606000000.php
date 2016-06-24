@@ -42,12 +42,12 @@ class Version20160606000000 extends AbstractMauticMigration
 INSERT INTO `{$this->prefix}lead_fields` (`is_published`, `label`, `alias`, `type`, `field_group`, `default_value`, `is_required`, `is_fixed`, `is_visible`, `is_short_visible`, `is_listable`, `is_publicly_updatable`, `is_unique_identifer`, `field_order`, `properties`) 
 VALUES 
   (1,'Attribution', 'attribution', 'number', 'core', '0', 0, 1, 1, 0, 1, 0, 0, 23, 'a:2:{s:9:\"roundmode\";s:1:\"4\";s:9:\"precision\";s:1:\"2\";}'),
-  (1,'Attribution Date', 'attribution_date', 'date', 'core', '0', 0, 1, 1, 0, 1, 0, 0, 24, 'a:0:{}')
+  (1,'Attribution Date', 'attribution_date', 'date', 'core', NULL , 0, 1, 1, 0, 1, 0, 0, 24, 'a:0:{}')
 SQL;
         $this->addSql($sql);
 
         $this->addSql("ALTER TABLE {$this->prefix}leads ADD COLUMN attribution double DEFAULT NULL");
-        $this->addSql("ALTER TABLE {$this->prefix}leads ADD COLUMN attribution_date datetime DEFAULT NULL");
+        $this->addSql("ALTER TABLE {$this->prefix}leads ADD COLUMN attribution_date date DEFAULT NULL");
         $this->addSql("CREATE INDEX {$this->prefix}contact_attribution ON {$this->prefix}leads (attribution, attribution_date)");
 
         $this->addSql("CREATE INDEX {$this->prefix}event_type ON {$this->prefix}campaign_events (event_type)");
