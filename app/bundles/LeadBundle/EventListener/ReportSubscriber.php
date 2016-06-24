@@ -305,7 +305,8 @@ class ReportSubscriber extends CommonSubscriber
                             $qb->expr()->eq('e.event_type', $qb->expr()->literal('decision')),
                             $qb->expr()->eq('log.is_scheduled', 0),
                             $qb->expr()->isNotNull('l.attribution'),
-                            $qb->expr()->neq('l.attribution', 0)
+                            $qb->expr()->neq('l.attribution', 0),
+                            $qb->expr()->lte('log.date_triggered', 'l.attribution_date')
                         )
                     );
 
@@ -749,20 +750,8 @@ class ReportSubscriber extends CommonSubscriber
     {
         $data = $event->getData();
 
-        if ($event->checkContext('contact.attribution.multi')) {
-           if (isset($data[0]['activity_count']) && isset($data[0]['attribution'])) {
-                // Divide attribution by total number of results
-                foreach ($data as $key => &$row) {
-                    if (!empty($row['attribution'])) {
-                        $row['attribution'] = round($row['attribution'] / $row['activity_count'], 2);
-                    }
-                    unset($row);
-                }
-            }
-        }
-
         if ($event->checkContext(['contact.attribution.first', 'contact.attribution.last', 'contact.attribution.multi'])) {
-            if (isset($data[0]['channel']) || isset($data[0]['channel_action'])) {
+            if (isset($data[0]['channel']) || isset($data[0]['channel_action']) || (isset($data[0]['activity_count']) && isset($data[0]['attribution']))) {
                 foreach ($data as $key => &$row) {
                     if (isset($row['channel'])) {
                         $row['channel'] = $this->channels[$row['channel']];
@@ -771,6 +760,16 @@ class ReportSubscriber extends CommonSubscriber
                     if (isset($row['channel_action'])) {
                         $row['channel_action'] = $this->channelActions[$row['channel_action']];
                     }
+
+                    if (isset($row['activity_count']) && isset($row['attribution'])) {
+                        $row['attribution'] = round($row['attribution'] / $row['activity_count'], 2);
+                    }
+
+                    if (isset($row['attribution'])) {
+                        $row['attribution'] = number_format($row['attribution'], 2);
+                    }
+
+                    unset($row);
                 }
             }
         }
