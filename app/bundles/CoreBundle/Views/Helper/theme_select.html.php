@@ -12,6 +12,7 @@
     <?php foreach ($themes as $themeKey => $themeInfo) : ?>
         <?php $isSelected = ($active === $themeKey); ?>
         <?php if (!empty($themeInfo['config']['onlyForBC']) && !$isSelected) continue; ?>
+        <?php if (isset($themeInfo['config']['features']) && !in_array($type, $themeInfo['config']['features'])) continue; ?>
         <?php $thumbnailUrl = $view['assets']->getUrl('themes/'.$themeKey.'/thumbnail.png'); ?>
         <?php $hasThumbnail = file_exists($themeInfo['dir'].'/thumbnail.png'); ?>
         <div class="col-md-3 theme-list">
