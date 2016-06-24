@@ -165,7 +165,7 @@ if ($tmpl == 'index') {
 </div>
 <?php if (!empty($debug)): ?>
 <div class="well">
-    <h4>Debug: <?php echo $debug['query_time']; ?>s</h4>
+    <h4>Debug: <?php echo $debug['query_time']; ?></h4>
     <div><?php echo $debug['query']; ?></div>
 </div>
 <?php endif; ?>

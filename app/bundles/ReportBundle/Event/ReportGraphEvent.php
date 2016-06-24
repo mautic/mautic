@@ -11,21 +11,12 @@ namespace Mautic\ReportBundle\Event;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ReportBundle\Entity\Report;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class ReportGeneratorEvent
  */
-class ReportGraphEvent extends Event
+class ReportGraphEvent extends AbstractReportEvent
 {
-
-    /**
-     * Report entity
-     *
-     * @var Report
-     */
-    private $report;
-
     /**
      * @var array
      */
@@ -48,16 +39,6 @@ class ReportGraphEvent extends Event
         $this->context         = $report->getSource();
         $this->requestedGraphs = $graphs;
         $this->queryBuilder    = $queryBuilder;
-    }
-
-    /**
-     * Retrieve the event context
-     *
-     * @return string
-     */
-    public function getContext()
-    {
-        return $this->context;
     }
 
     /**
@@ -127,36 +108,6 @@ class ReportGraphEvent extends Event
     public function setOptions($graph, $options)
     {
         $this->requestedGraphs[$graph]['options'] = $options;
-    }
-
-    /**
-     * Report Entity
-     *
-     * @return Report
-     */
-    public function getReport()
-    {
-        return $this->report;
-    }
-
-    /**
-     * @param $context
-     *
-     * @return bool
-     */
-    public function checkContext($context)
-    {
-        if (empty($this->context)) {
-            return true;
-        }
-
-        if (is_array($context)) {
-            return in_array($this->context, $context);
-        } else if($this->context == $context) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     /**

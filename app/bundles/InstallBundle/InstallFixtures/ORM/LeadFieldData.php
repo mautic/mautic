@@ -14,6 +14,7 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
+use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -93,6 +94,10 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
             } elseif ($name == 'email') {
                 $type = 'email';
                 $entity->setIsUniqueIdentifer(true);
+            } elseif ($name == 'attribution_date') {
+                $type = 'datetime';
+            } elseif ($name == 'attribution') {
+                $type = 'number';
             } else {
                 $type = 'text';
             }
@@ -163,7 +168,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
                 FieldModel::getSchemaDefinition($name, $type, $entity->getIsUniqueIdentifier())
             );
 
-            $indexHelper->addIndex([$name], MAUTIC_TABLE_PREFIX.$name.'_search');
+            $indexHelper->addIndex([$name], MAUTIC_TABLE_PREFIX.$name.'_search', ['where' => "({$name}(767))"] );
             $this->addReference('leadfield-'.$name, $entity);
         }
 

@@ -191,8 +191,7 @@ class Lead extends FormEntity
             ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadRepository')
             ->addLifecycleEvent('checkDateIdentified', 'preUpdate')
             ->addLifecycleEvent('checkDateIdentified', 'prePersist')
-            ->addIndex(['date_added'], 'lead_date_added')
-            ->addIndex(['stage_id'], 'lead_stage');
+            ->addIndex(['date_added'], 'lead_date_added');
 
         $builder->createField('id', 'integer')
             ->isPrimaryKey()

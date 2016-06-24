@@ -86,7 +86,7 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                 $table->addIndex($uniqueFields, MAUTIC_TABLE_PREFIX.'unique_identifier_search');
             }
 
-            $table->addIndex(['attribution', 'attribution_date'], MAUTIC_TABLE_PREFIX.'_contact_attribution');
+            $table->addIndex(['attribution', 'attribution_date'], MAUTIC_TABLE_PREFIX.'contact_attribution');
 
         } catch (\Exception $e) {
             //table doesn't exist or something bad happened so oh well

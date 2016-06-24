@@ -43,6 +43,14 @@ final class MauticReportBuilder implements ReportBuilderInterface
             'eq'  => 'mautic.core.operator.equals',
             'neq' => 'mautic.core.operator.notequals',
         ],
+        'int' => [
+            'eq'       => 'mautic.core.operator.equals',
+            'gt'       => 'mautic.core.operator.greaterthan',
+            'gte'      => 'mautic.core.operator.greaterthanequals',
+            'lt'       => 'mautic.core.operator.lessthan',
+            'lte'      => 'mautic.core.operator.lessthanequals',
+            'neq'      => 'mautic.core.operator.notequals'
+        ],
         'multiselect' => [
             'in'    => 'mautic.core.operator.in',
             'notIn' => 'mautic.core.operator.notin'
@@ -163,12 +171,19 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // Build ORDER BY clause
         if (!empty($options['order'])) {
             if (is_array($options['order'])) {
-                list($column, $dir) = $options['order'];
+                if (isset($o['column'])) {
+                    $queryBuilder->orderBy($options['order']['column'], $options['order']['direction']);
+                } elseif (!empty($options['order'][0][1])) {
+                    list($column, $dir) = $options['order'];
+                    $queryBuilder->orderBy($column, $dir);
+                } else {
+                    foreach ($options['order'] as $order) {
+                        $queryBuilder->orderBy($order);
+                    }
+                }
             } else {
-                $column = $options['order'];
-                $dir    = 'ASC';
+                $queryBuilder->orderBy($options['order']);
             }
-            $queryBuilder->orderBy($column, $dir);
         } elseif ($order = $this->entity->getTableOrder()) {
             foreach ($order as $o) {
                 if (!empty($o['column'])) {
@@ -178,14 +193,30 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         // Build GROUP BY
-        if (!empty($options['groupby']) && is_array($options['groupby'])) {
-            $queryBuilder->groupBy($options['groupby']);
+        if (!empty($options['groupby'])) {
+            if (is_array($options['groupby'])) {
+                foreach ($options['groupby'] as $groupBy) {
+                    $queryBuilder->addGroupBy($groupBy);
+                }
+            } else {
+                $queryBuilder->groupBy($options['groupby']);
+            }
         }
 
         // Build LIMIT clause
         if (!empty($options['limit'])) {
             $queryBuilder->setFirstResult($options['start'])
                 ->setMaxResults($options['limit']);
+        }
+
+        if (!empty($options['having'])) {
+            if (is_array($options['having'])) {
+                foreach ($options['having'] as $having) {
+                    $queryBuilder->andHaving($having);
+                }
+            } else {
+                $queryBuilder->having($options['having']);
+            }
         }
 
         // Generate a count query in case a formula needs total number
@@ -214,7 +245,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
         }
 
-        $queryBuilder->select(implode(', ', $selectColumns));
+        $queryBuilder->addSelect(implode(', ', $selectColumns));
 
         return $queryBuilder;
     }

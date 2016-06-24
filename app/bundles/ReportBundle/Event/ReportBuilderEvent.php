@@ -9,24 +9,13 @@
 
 namespace Mautic\ReportBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class ReportBuilderEvent
  */
-class ReportBuilderEvent extends Event
+class ReportBuilderEvent extends AbstractReportEvent
 {
-    /**
-     * @var string
-     */
-    private $context = '';
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
     /**
      * Container with registered tables and columns
      *
@@ -148,43 +137,53 @@ class ReportBuilderEvent extends Event
             $prefix.'id'               => [
                 'label' => 'mautic.core.id',
                 'type'  => 'int',
-                'link'  => $idLink
+                'link'  => $idLink,
+                'alias' => "{$prefix}_id"
             ],
             $prefix.'name'             => [
                 'label' => 'mautic.core.name',
-                'type'  => 'string'
+                'type'  => 'string',
+                'alias' => "{$prefix}_name"
             ],
             $prefix.'created_by_user'  => [
                 'label' => 'mautic.core.createdby',
-                'type'  => 'string'
+                'type'  => 'string',
+                'alias' => "{$prefix}_created_by_user"
             ],
             $prefix.'date_added'       => [
                 'label' => 'mautic.report.field.date_added',
-                'type'  => 'datetime'
+                'type'  => 'datetime',
+                'alias' => "{$prefix}_date_added"
             ],
             $prefix.'modified_by_user' => [
                 'label' => 'mautic.report.field.modified_by_user',
-                'type'  => 'string'
+                'type'  => 'string',
+                'alias' => "{$prefix}_modified_by_user"
             ],
             $prefix.'date_modified'    => [
                 'label' => 'mautic.report.field.date_modified',
-                'type'  => 'datetime'
+                'type'  => 'datetime',
+                'alias' => "{$prefix}_date_modified"
             ],
             $prefix.'description'      => [
                 'label' => 'mautic.core.description',
-                'type'  => 'string'
+                'type'  => 'string',
+                'alias' => "{$prefix}_description"
             ],
             $prefix.'publish_up'       => [
                 'label' => 'mautic.report.field.publish_up',
-                'type'  => 'datetime'
+                'type'  => 'datetime',
+                'alias' => "{$prefix}_publish_up"
             ],
             $prefix.'publish_down'     => [
                 'label' => 'mautic.report.field.publish_down',
-                'type'  => 'datetime'
+                'type'  => 'datetime',
+                'alias' => "{$prefix}_publish_down"
             ],
             $prefix.'is_published'     => [
                 'label' => 'mautic.report.field.is_published',
-                'type'  => 'bool'
+                'type'  => 'bool',
+                'alias' => "{$prefix}_is_published"
             ]
         ];
 
@@ -215,11 +214,13 @@ class ReportBuilderEvent extends Event
         return [
             $prefix.'id'        => [
                 'label' => 'mautic.report.field.lead.id',
-                'type'  => 'int'
+                'type'  => 'int',
+                'alias' => 'contact_id'
             ],
             $prefix.'title'     => [
                 'label' => 'mautic.report.field.lead.title',
-                'type'  => 'string'
+                'type'  => 'string',
+                'alias' => 'contact_title'
             ],
             $prefix.'firstname' => [
                 'label' => 'mautic.report.field.lead.firstname',
@@ -301,43 +302,15 @@ class ReportBuilderEvent extends Event
         return [
             $prefix.'id'    => [
                 'label' => 'mautic.report.field.category_id',
-                'type'  => 'int'
+                'type'  => 'int',
+                'alias' => 'category_id'
             ],
             $prefix.'title' => [
                 'label' => 'mautic.report.field.category_name',
-                'type'  => 'string'
+                'type'  => 'string',
+                'alias' => 'category_title'
             ],
         ];
-    }
-
-    /**
-     * Get the context
-     *
-     * @return string
-     */
-    public function getContext()
-    {
-        return $this->context;
-    }
-
-    /**
-     * @param $context
-     *
-     * @return bool
-     */
-    public function checkContext($context)
-    {
-        if (empty($this->context)) {
-            return true;
-        }
-
-        if (is_array($context)) {
-            return in_array($this->context, $context);
-        } else if ($this->context == $context) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     /**

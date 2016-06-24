@@ -9,24 +9,13 @@
 
 namespace Mautic\ReportBundle\Event;
 
-use Doctrine\DBAL\Query\QueryBuilder;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Entity\Report;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class ReportDataEvent
  */
-class ReportDataEvent extends Event
+class ReportDataEvent extends AbstractReportEvent
 {
-
-    /**
-     * Report entity
-     *
-     * @var Report
-     */
-    private $report;
-
     /**
      * @var array
      */
@@ -43,11 +32,6 @@ class ReportDataEvent extends Event
     private $totalResults = 0;
 
     /**
-     * @var string
-     */
-    private $context;
-
-    /**
      * ReportDataEvent constructor.
      *
      * @param Report $report
@@ -62,24 +46,6 @@ class ReportDataEvent extends Event
         $this->data         = $data;
         $this->options      = $options;
         $this->totalResults = (int) $totalResults;
-    }
-
-    /**
-     * Retrieve the event context
-     *
-     * @return string
-     */
-    public function getContext()
-    {
-        return $this->context;
-    }
-
-    /**
-     * @return Report
-     */
-    public function getReport()
-    {
-        return $this->report;
     }
 
     /**
@@ -114,13 +80,5 @@ class ReportDataEvent extends Event
     public function getTotalResults()
     {
         return $this->totalResults;
-    }
-
-    /**
-     * @return Translator
-     */
-    public function getTranslator()
-    {
-        return $this->options['translator'];
     }
 }

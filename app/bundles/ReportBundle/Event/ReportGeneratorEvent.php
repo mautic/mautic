@@ -12,31 +12,17 @@ namespace Mautic\ReportBundle\Event;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ReportBundle\Entity\Report;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class ReportGeneratorEvent
  */
-class ReportGeneratorEvent extends Event
+class ReportGeneratorEvent extends AbstractReportEvent
 {
     /**
      * @var array
      */
     private $selectColumns = [];
-
-    /**
-     * @var Report
-     */
-    private $report;
-
-    /**
-     * Event context
-     *
-     * @var string
-     */
-    private $context;
-
+    
     /**
      * QueryBuilder object
      *
@@ -72,16 +58,6 @@ class ReportGeneratorEvent extends Event
         $this->context      = $report->getSource();
         $this->options      = $options;
         $this->queryBuilder = $qb;
-    }
-
-    /**
-     * Retrieve the event context
-     *
-     * @return string
-     */
-    public function getContext()
-    {
-        return $this->context;
     }
 
     /**
@@ -138,16 +114,6 @@ class ReportGeneratorEvent extends Event
     public function setContentTemplate($contentTemplate)
     {
         $this->contentTemplate = $contentTemplate;
-    }
-
-    /**
-     * Return Report entity
-     *
-     * @return Report
-     */
-    public function getReport()
-    {
-        return $this->report;
     }
 
     /**
@@ -317,5 +283,15 @@ class ReportGeneratorEvent extends Event
         }
 
         return isset($sorted[$column]);
+    }
+
+    /**
+     * @return string
+     */
+    public function createParameterName()
+    {
+        $alpha_numeric = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+        return substr(str_shuffle($alpha_numeric), 0, 8);
     }
 }

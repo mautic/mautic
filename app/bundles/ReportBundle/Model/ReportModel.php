@@ -282,7 +282,8 @@ class ReportModel extends FormModel
         $tableData = $this->getTableData($context);
 
         $return                  = new \stdClass();
-        $filters                 = (isset($tableData['filters'])) ? $tableData['filters'] : (isset($tableData['columns']) ? $tableData['columns'] : []);
+        $filters                 = (isset($tableData['filters'])) ? $tableData['filters']
+            : (isset($tableData['columns']) ? $tableData['columns'] : []);
         $return->choices         = [];
         $return->choiceHtml      = '';
         $return->definitions     = [];
@@ -293,7 +294,7 @@ class ReportModel extends FormModel
             if (isset($data['label'])) {
                 $return->definitions[$filter] = $data;
                 $return->choices [$filter]    = $data['label'];
-                $return->choiceHtml          .= "<option value=\"$filter\">{$data['label']}</option>\n";
+                $return->choiceHtml .= "<option value=\"$filter\">{$data['label']}</option>\n";
 
                 $return->operatorChoices[$filter] = $this->getOperatorOptions($data);
                 $return->operatorHtml[$filter]    = '';
@@ -531,7 +532,7 @@ class ReportModel extends FormModel
         ];
 
         /** @var \Doctrine\DBAL\Query\QueryBuilder $query */
-        $query   = $reportGenerator->getQuery($dataOptions);
+        $query                 = $reportGenerator->getQuery($dataOptions);
         $options['translator'] = $this->translator;
 
         $contentTemplate = $reportGenerator->getContentTemplate();
@@ -545,7 +546,7 @@ class ReportModel extends FormModel
         $query->resetQueryPart('orderBy');
 
         if (empty($options['ignoreGraphData'])) {
-            $chartQuery    = new ChartQuery($this->em->getConnection(), $chartDateFrom, $chartDateTo);
+            $chartQuery            = new ChartQuery($this->em->getConnection(), $chartDateFrom, $chartDateTo);
             $options['chartQuery'] = $chartQuery;
 
             // Check to see if this is an update from AJAX
@@ -556,8 +557,8 @@ class ReportModel extends FormModel
                     $query = $reportGenerator->getQuery();
                 }
 
-                $eventGraphs = [];
-                $defaultGraphOptions = $options;
+                $eventGraphs                     = [];
+                $defaultGraphOptions             = $options;
                 $defaultGraphOptions['dateFrom'] = $chartDateFrom;
                 $defaultGraphOptions['dateTo']   = $chartDateTo;
 
@@ -607,9 +608,19 @@ class ReportModel extends FormModel
                 $query->select($select);
                 $query->add('orderBy', $order);
             }
-            $queryTime = time();
-            $data = $query->execute()->fetchAll();
-            $queryTime = time() - $queryTime;
+
+            $queryTime = microtime(true);
+            $data      = $query->execute()->fetchAll();
+            $queryTime = round((microtime(true) - $queryTime) * 1000);
+
+            if ($queryTime >= 1000) {
+                $queryTime *= 1000;
+
+                $queryTime .= "s";
+            } else {
+                $queryTime .= "ms";
+            }
+
             if (!$paginate) {
                 $totalResults = count($data);
             }
@@ -622,15 +633,15 @@ class ReportModel extends FormModel
 
         if (MAUTIC_ENV == 'dev') {
             $debugData['query'] = $query->getSQL();
-            $params = $query->getParameters();
+            $params             = $query->getParameters();
 
             foreach ($params as $name => $param) {
                 $debugData['query'] = str_replace(":$name", "'$param'", $debugData['query']);
             }
-            if (!empty($queryTime)) {
-                $debugData['query_time'] = $queryTime;
-            }
+
+            $debugData['query_time'] = (isset($queryTime)) ? $queryTime : "N/A";
         }
+
         return [
             'totalResults'    => $totalResults,
             'data'            => $data,
