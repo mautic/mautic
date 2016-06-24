@@ -12,6 +12,7 @@ namespace Mautic\DynamicContentBundle\Model;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
+use Mautic\DynamicContentBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 
 class DynamicContentModel extends FormModel
@@ -29,6 +30,14 @@ class DynamicContentModel extends FormModel
         $repo->setTranslator($this->translator);
 
         return $repo;
+    }
+
+    /**
+     * @return \Mautic\DynamicContentBundle\Entity\StatRepository
+     */
+    public function getStatRepository()
+    {
+        return $this->em->getRepository('MauticDynamicContentBundle:Stat');
     }
 
     /**
@@ -123,7 +132,7 @@ class DynamicContentModel extends FormModel
     {
         $qb = $this->em->getConnection()->createQueryBuilder();
         
-        $qb->select('dc.content')
+        $qb->select('dc.id, dc.content')
             ->from(MAUTIC_TABLE_PREFIX.'dynamic_content', 'dc')
             ->leftJoin('dc', MAUTIC_TABLE_PREFIX.'dynamic_content_lead_data', 'dcld', 'dcld.dynamic_content_id = dc.id')
             ->andWhere($qb->expr()->eq('dcld.slot', ':slot'))
@@ -131,7 +140,23 @@ class DynamicContentModel extends FormModel
             ->setParameter('slot', $slot)
             ->setParameter('lead_id', $lead->getId())
             ->orderBy('dcld.date_added', 'DESC');
-        
-        return $qb->execute()->fetchColumn();
+
+        return $qb->execute()->fetch();
+    }
+
+    /**
+     * @param DynamicContent $dynamicContent
+     * @param Lead           $lead
+     * @param string         $source
+     */
+    public function createStatEntry(DynamicContent $dynamicContent, Lead $lead, $source = null)
+    {
+        $stat = new Stat();
+        $stat->setDateSent(new \DateTime());
+        $stat->setLead($lead);
+        $stat->setDynamicContent($dynamicContent);
+        $stat->setSource($source);
+
+        $this->getStatRepository()->saveEntity($stat);
     }
 }

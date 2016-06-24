@@ -137,6 +137,8 @@ class CampaignSubscriber extends CommonSubscriber
             if ($slot) {
                 $this->dynamicContentModel->setSlotContentForLead($dwc, $lead, $slot);
             }
+            
+            $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
 
             $event->setResult($dwc->getContent());
 

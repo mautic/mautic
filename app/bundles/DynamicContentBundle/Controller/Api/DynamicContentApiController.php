@@ -12,6 +12,7 @@ namespace Mautic\DynamicContentBundle\Controller\Api;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -48,8 +49,20 @@ class DynamicContentApiController extends CommonController
             $content = array_shift($response['action']['dwc.push_content']);
         } else {
             $lead = $this->getModel('lead')->getCurrentLead();
+            /** @var DynamicContentModel $dwcModel */
+            $dwcModel = $this->getModel('dynamicContent');
             
-            $content = $this->getModel('dynamicContent')->getSlotContentForLead($objectAlias, $lead);
+            $data = $dwcModel->getSlotContentForLead($objectAlias, $lead);
+            
+            if (!empty($data)) {
+                list($id, $content) = $data;
+                
+                $dwc = $dwcModel->getEntity($id);
+                
+                if ($dwc instanceof DynamicContent) {
+                    $dwcModel->createStatEntry($dwc, $lead, $objectAlias);
+                }
+            }
         }
 
         return empty($content) ? new Response('', Response::HTTP_NOT_FOUND) : new Response($content);
