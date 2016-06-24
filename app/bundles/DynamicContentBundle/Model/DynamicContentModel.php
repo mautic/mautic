@@ -10,10 +10,14 @@
 namespace Mautic\DynamicContentBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Entity\Stat;
+use Mautic\DynamicContentBundle\Event\DynamicContentEvent;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class DynamicContentModel extends FormModel
 {
@@ -159,5 +163,52 @@ class DynamicContentModel extends FormModel
         $stat->setSource($source);
 
         $this->getStatRepository()->saveEntity($stat);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $action
+     * @param $entity
+     * @param $isNew
+     * @param $event
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     */
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    {
+        if (!$entity instanceof DynamicContent) {
+            throw new MethodNotAllowedHttpException(['Dynamic Content']);
+        }
+
+        switch ($action) {
+            case "pre_save":
+                $name = DynamicContentEvents::PRE_SAVE;
+                break;
+            case "post_save":
+                $name = DynamicContentEvents::POST_SAVE;
+                break;
+            case "pre_delete":
+                $name = DynamicContentEvents::PRE_DELETE;
+                break;
+            case "post_delete":
+                $name = DynamicContentEvents::POST_DELETE;
+                break;
+            default:
+                return null;
+        }
+
+        if ($this->dispatcher->hasListeners($name)) {
+            if (empty($event)) {
+                $event = new DynamicContentEvent($entity, $isNew);
+                $event->setEntityManager($this->em);
+            }
+
+            $this->dispatcher->dispatch($name, $event);
+
+            return $event;
+        } else {
+            return null;
+        }
     }
 }

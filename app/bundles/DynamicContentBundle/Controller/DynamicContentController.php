@@ -257,7 +257,7 @@ class DynamicContentController extends FormController
             ? $this->request->request->get('dynamicContent[updateSelect]', false, true)
             : $this->request->get('updateSelect', false);
 
-        $form = $model->createForm($entity, $this->get('form.factory'), $action);
+        $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
         ///Check for a submitted form and process it
         if (!$ignorePost && $this->request->getMethod() == 'POST') {

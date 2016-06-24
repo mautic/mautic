@@ -60,6 +60,9 @@ return [
             ],
             'mautic.dwc.js.subscriber' => [
                 'class' => 'Mautic\DynamicContentBundle\EventListener\BuildJsSubscriber'
+            ],
+            'mautic.dwc.subscriber' => [
+                'class' => 'Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber'
             ]
         ],
         'forms' => [
