@@ -741,6 +741,10 @@ class LeadController extends FormController
                         )
                     )
                 );
+            } elseif ($valid) {
+                // Refetch and recreate the form in order to populate data manipulated in the entity itself
+                $lead = $model->getEntity($objectId);
+                $form = $model->createForm($lead, $this->get('form.factory'), $action, array('fields' => $fields));
             }
         } else {
             //lock the entity
@@ -1351,11 +1355,11 @@ class LeadController extends FormController
                                         } else {
                                             $stats['created']++;
                                         }
-                                    }     
+                                    }
                                     else {
                                         $stats['ignored']++;
                                         $stats['failures'][$lineNumber] = $this->factory->getTranslator()->trans('mautic.lead.import.error.line_empty');
-                                    }        
+                                    }
                                 } catch (\Exception $e) {
                                     // Email validation likely failed
                                     $stats['ignored']++;
