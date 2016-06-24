@@ -33,15 +33,9 @@ class EmailGenerateCommand extends ModeratedCommand
     protected function configure()
     {
         $this->setName('mautic:email:generate')
-            ->setDescription('Generate Segment Email')
-            ->addOption('--id', '-i', InputOption::VALUE_OPTIONAL, 'Email ID')
+            ->setDescription('Generate Segment or Feed Email')
+            ->addOption('--id', '-id', InputOption::VALUE_REQUIRED, 'Email ID')
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.')
-
-        // The <info>%command.name%</info> command is used to process the application's e-mail queue
-
-        // <info>php %command.full_name%</info>
-        // EOT
-        // )
         ;
     }
 
@@ -61,13 +55,14 @@ class EmailGenerateCommand extends ModeratedCommand
         $email = $model->getEntity($objectId);
 
         if (is_null($email) || $email->getEmailType() == 'template') {
-            // return $this->accessDenied();
+            // this command can be use only for list and feed mail
             return 0;
         }
 
         if (!$this->checkRunStatus($input, $output, ($objectId) ? $objectId : 'all')) {
             return 0;
         }
+
         // make sure email and category are published
         $category = $email->getCategory();
         $catPublished = (!empty($category)) ? $category->isPublished() : true;
@@ -82,7 +77,7 @@ class EmailGenerateCommand extends ModeratedCommand
         $sendStat = $model->sendEmailToLists($email);
         if ($pending > 0) {
             $output->writeln('<info>'.$translator->trans('mautic.email.stat.sentcount', array('%count%' => $sendStat[0])).'</info>');
-            $output->writeln('<info>'.$translator->trans('mautic.email.stat.failed', array('%count%' => $sendStat[1])).'</info>');
+            $output->writeln('<info>'.$translator->trans('mautic.email.stat.failcount', array('%count%' => $sendStat[1])).'</info>');
         }
 
         $this->completeRun();

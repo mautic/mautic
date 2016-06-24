@@ -881,8 +881,8 @@ class EmailController extends FormController
                             'type' => Periodicity::getTypeEmail()
                         ), null, 1, null )[0];
                 $form->get('triggerMode')->setData($periodicity->getTriggerMode());
-                $form->get('interval')->setData($periodicity->getTriggerInterval());
-                $form->get('intervalUnit')->setData($periodicity->getTriggerIntervalUnit());
+                $form->get('triggerInterval')->setData($periodicity->getTriggerInterval());
+                $form->get('triggerIntervalUnit')->setData($periodicity->getTriggerIntervalUnit());
 
                 $tmp = $periodicity->getDaysOfWeekMask();
                 $formDaysOfWeek = array();

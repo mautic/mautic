@@ -45,15 +45,17 @@ class PeriodicityType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('Periodicity.Periodicity', $options));
 
         $builder->add(
-            'nextShoot',
-            'text',
+            'triggerDate',
+            'datetime',
             array(
-                'label'      => 'mautic.core.periodicity.form.next_shoot',
+                'label'      => 'mautic.core.periodicity.form.triggerdate',
                 'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control'),
+                'attr'       => array('class' => 'form-control',
+                                      'data-toggle' => 'datetime'),
                 'mapped' => false,
+                'format'     => 'yyyy-MM-dd HH:mm',
                 'required' => false,
-                'data' => (new \DateTime('now'))->format('Y-m-d H:i')
+//                 'data' => (new \DateTime('now'))->format('yyyy-MM-dd HH:mm')
             )
         );
 
@@ -71,7 +73,7 @@ class PeriodicityType extends AbstractType
         ));
 
         $builder->add(
-            'interval',
+            'triggerInterval',
             'number',
             array(
                 'label'      => 'mautic.core.periodicity.form.interval',
@@ -82,7 +84,7 @@ class PeriodicityType extends AbstractType
             )
         );
         $builder->add(
-            'intervalUnit',
+            'triggerIntervalUnit',
             'choice',
             array(
                 'label'      => 'mautic.core.periodicity.form.interval_unit',
