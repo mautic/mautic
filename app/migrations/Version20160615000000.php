@@ -19,7 +19,7 @@ class Version20160615000000 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function mysqlUp(Schema $schema)
+    public function up(Schema $schema)
     {
         $table = $schema->getTable($this->prefix.'email_stats');
         if ($table->hasIndex($this->prefix.'email_date_read')) {
@@ -27,10 +27,5 @@ class Version20160615000000 extends AbstractMauticMigration
         }
 
         $this->addSql('CREATE INDEX '.$this->prefix.'email_date_read ON '.$this->prefix.'email_stats (date_read)');
-    }
-
-    public function postgresqlUp(Schema $schema)
-    {
-        // TODO: Implement postgresqlUp() method.
     }
 }

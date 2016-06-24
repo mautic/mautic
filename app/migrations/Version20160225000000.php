@@ -36,16 +36,8 @@ class Version20160225000000 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function mysqlUp(Schema $schema)
+    public function up(Schema $schema)
     {
         $this->addSql('ALTER TABLE ' . $this->prefix.'users ADD signature LONGTEXT DEFAULT NULL');
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    public function postgresqlUp(Schema $schema)
-    {
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'users ADD signature TEXT DEFAULT NULL');
     }
 }

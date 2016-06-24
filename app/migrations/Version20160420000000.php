@@ -72,7 +72,7 @@ class Version20160420000000 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function mysqlUp(Schema $schema)
+    public function up(Schema $schema)
     {
         $mainTableSql = <<<SQL
 CREATE TABLE `{$this->prefix}sms_messages` (
@@ -144,91 +144,5 @@ CREATE TABLE `{$this->prefix}sms_message_list_xref` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 SQL;
         $this->addSql($listXrefSql);
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    public function postgresqlUp(Schema $schema)
-    {
-        $this->addSql("CREATE SEQUENCE {$this->prefix}sms_messages_id_seq INCREMENT BY 1 MINVALUE 1 START 1");
-        $this->addSql("CREATE SEQUENCE {$this->prefix}sms_message_stats_id_seq INCREMENT BY 1 MINVALUE 1 START 1");
-
-        $sql = <<<SQL
-CREATE TABLE {$this->prefix}sms_messages (
-  id INT NOT NULL, category_id INT DEFAULT NULL, 
-  is_published BOOLEAN NOT NULL, 
-  date_added TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, 
-  created_by INT DEFAULT NULL, 
-  created_by_user VARCHAR(255) DEFAULT NULL, 
-  date_modified TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, 
-  modified_by INT DEFAULT NULL, 
-  modified_by_user VARCHAR(255) DEFAULT NULL, 
-  checked_out TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, 
-  checked_out_by INT DEFAULT NULL, 
-  checked_out_by_user VARCHAR(255) DEFAULT NULL, 
-  name VARCHAR(255) NOT NULL, 
-  description TEXT DEFAULT NULL, 
-  lang VARCHAR(255) NOT NULL, 
-  message TEXT NOT NULL, 
-  sms_type TEXT DEFAULT NULL, 
-  publish_up TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, 
-  publish_down TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, 
-  sent_count INT NOT NULL, 
-  PRIMARY KEY(id)
-)
-SQL;
-        $this->addSql($sql);
-        $this->addSql("CREATE INDEX {$this->keys['sms_messages']['idx']['category']} ON {$this->prefix}sms_messages (category_id)");
-        $this->addSql("COMMENT ON COLUMN {$this->prefix}sms_messages.date_added IS '(DC2Type:datetime)'");
-        $this->addSql("COMMENT ON COLUMN {$this->prefix}sms_messages.date_modified IS '(DC2Type:datetime)'");
-        $this->addSql("COMMENT ON COLUMN {$this->prefix}sms_messages.checked_out IS '(DC2Type:datetime)'");
-        $this->addSql("COMMENT ON COLUMN {$this->prefix}sms_messages.publish_up IS '(DC2Type:datetime)'");
-        $this->addSql("COMMENT ON COLUMN {$this->prefix}sms_messages.publish_down IS '(DC2Type:datetime)'");
-
-        $sql = <<<SQL
-CREATE TABLE {$this->prefix}sms_message_list_xref (
-  sms_id INT NOT NULL, 
-  leadlist_id INT NOT NULL, 
-  PRIMARY KEY(sms_id, leadlist_id)
-)
-SQL;
-        $this->addSql($sql);
-        $this->addSql("CREATE INDEX {$this->keys['sms_message_list_xref']['idx']['sms']} ON {$this->prefix}sms_message_list_xref (sms_id)");
-        $this->addSql("CREATE INDEX {$this->keys['sms_message_list_xref']['idx']['leadlist']} ON {$this->prefix}sms_message_list_xref (leadlist_id)");
-
-        $sql = <<<SQL
-CREATE TABLE {$this->prefix}sms_message_stats (
-  id INT NOT NULL, 
-  sms_id INT DEFAULT NULL, 
-  lead_id INT DEFAULT NULL, 
-  list_id INT DEFAULT NULL, 
-  ip_id INT DEFAULT NULL, 
-  date_sent TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, 
-  tracking_hash VARCHAR(255) DEFAULT NULL, 
-  source VARCHAR(255) DEFAULT NULL, 
-  source_id INT DEFAULT NULL, 
-  tokens TEXT DEFAULT NULL, 
-  PRIMARY KEY(id)
-)
-SQL;
-        $this->addSql($sql);
-        $this->addSql("CREATE INDEX {$this->keys['sms_message_stats']['idx']['sms']} ON {$this->prefix}sms_message_stats (sms_id)");
-        $this->addSql("CREATE INDEX {$this->keys['sms_message_stats']['idx']['lead']} ON {$this->prefix}sms_message_stats (lead_id)");
-        $this->addSql("CREATE INDEX {$this->keys['sms_message_stats']['idx']['list']} ON {$this->prefix}sms_message_stats (list_id)");
-        $this->addSql("CREATE INDEX {$this->keys['sms_message_stats']['idx']['ip']} ON {$this->prefix}sms_message_stats (ip_id)");
-        $this->addSql("CREATE INDEX {$this->prefix}stat_sms_search ON {$this->prefix}sms_message_stats (sms_id, lead_id)");
-        $this->addSql("CREATE INDEX {$this->prefix}stat_sms_hash_search ON {$this->prefix}sms_message_stats (tracking_hash)");
-        $this->addSql("CREATE INDEX {$this->prefix}stat_sms_source_search ON {$this->prefix}sms_message_stats (source, source_id)");
-        $this->addSql("COMMENT ON COLUMN {$this->prefix}sms_message_stats.date_sent IS '(DC2Type:datetime)'");
-        $this->addSql("COMMENT ON COLUMN {$this->prefix}sms_message_stats.tokens IS '(DC2Type:array)'");
-
-        $this->addSql("ALTER TABLE {$this->prefix}sms_messages ADD CONSTRAINT {$this->keys['sms_messages']['fk']['category']} FOREIGN KEY (category_id) REFERENCES {$this->prefix}categories (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE");
-        $this->addSql("ALTER TABLE {$this->prefix}sms_message_list_xref ADD CONSTRAINT {$this->keys['sms_message_list_xref']['fk']['sms']} FOREIGN KEY (sms_id) REFERENCES {$this->prefix}sms_messages (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE");
-        $this->addSql("ALTER TABLE {$this->prefix}sms_message_list_xref ADD CONSTRAINT {$this->keys['sms_message_list_xref']['fk']['leadlist']} FOREIGN KEY (leadlist_id) REFERENCES {$this->prefix}lead_lists (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE");
-        $this->addSql("ALTER TABLE {$this->prefix}sms_message_stats ADD CONSTRAINT {$this->keys['sms_message_stats']['fk']['sms']} FOREIGN KEY (sms_id) REFERENCES {$this->prefix}sms_messages (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE");
-        $this->addSql("ALTER TABLE {$this->prefix}sms_message_stats ADD CONSTRAINT {$this->keys['sms_message_stats']['fk']['lead']} FOREIGN KEY (lead_id) REFERENCES {$this->prefix}leads (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE");
-        $this->addSql("ALTER TABLE {$this->prefix}sms_message_stats ADD CONSTRAINT {$this->keys['sms_message_stats']['fk']['list']} FOREIGN KEY (list_id) REFERENCES {$this->prefix}lead_lists (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE");
-        $this->addSql("ALTER TABLE {$this->prefix}sms_message_stats ADD CONSTRAINT {$this->keys['sms_message_stats']['fk']['ip']} FOREIGN KEY (ip_id) REFERENCES {$this->prefix}ip_addresses (id) NOT DEFERRABLE INITIALLY IMMEDIATE");
     }
 }

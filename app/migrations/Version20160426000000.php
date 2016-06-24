@@ -41,7 +41,7 @@ class Version20160426000000 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function mysqlUp(Schema $schema)
+    public function up(Schema $schema)
     {
 
         $sql = <<<SQL
@@ -61,34 +61,6 @@ CREATE TABLE `{$this->prefix}lead_donotcontact` (
 SQL;
 
         $this->addSql($sql);
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    public function postgresqlUp(Schema $schema)
-    {
-        $this->addSql("CREATE SEQUENCE {$this->prefix}lead_donotcontact_id_seq INCREMENT BY 1 MINVALUE 1 START 1");
-
-        $sql = <<<SQL
-CREATE TABLE {$this->prefix}lead_donotcontact (
-  id INT NOT NULL, 
-  lead_id INT DEFAULT NULL, 
-  date_added TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, 
-  reason SMALLINT NOT NULL, 
-  channel VARCHAR(255) NOT NULL, 
-  channel_id INT DEFAULT NULL, 
-  comments TEXT DEFAULT NULL, 
-  PRIMARY KEY(id)
-);
-SQL;
-
-        $this->addSql($sql);
-
-        $this->addSql("CREATE INDEX {$this->leadIdIdx} ON {$this->prefix}lead_donotcontact (lead_id)");
-        $this->addSql("CREATE INDEX {$this->prefix}dnc_reason_search ON {$this->prefix}lead_donotcontact (reason)");
-        $this->addSql("COMMENT ON COLUMN {$this->prefix}lead_donotcontact.date_added IS '(DC2Type:datetime)'");
-        $this->addSql("ALTER TABLE {$this->prefix}lead_donotcontact ADD CONSTRAINT {$this->leadIdFk} FOREIGN KEY (lead_id) REFERENCES {$this->prefix}leads (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE");
     }
 
     /**
@@ -123,14 +95,6 @@ SQL;
                     'date_added' => $row['date_added'],
                     'comments'   => $row['comments']
                 );
-
-                if ('postgresql' == $this->platform) {
-                    // Get ID from sequence
-                    $nextVal = (int)$this->connection->fetchColumn(
-                        $this->connection->getDatabasePlatform()->getSequenceNextValSQL("{$this->prefix}lead_donotcontact_id_seq")
-                    );
-                    $insert['id'] = $nextVal;
-                }
 
                 switch (true) {
                     case (!empty($row['unsubscribed'])):

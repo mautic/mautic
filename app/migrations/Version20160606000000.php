@@ -52,7 +52,7 @@ class Version20160606000000 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function mysqlUp(Schema $schema)
+    public function up(Schema $schema)
     {
         $sql = <<<SQL
 INSERT INTO `{$this->prefix}lead_fields` (`is_published`, `label`, `alias`, `type`, `field_group`, `default_value`, `is_required`, `is_fixed`, `is_visible`, `is_short_visible`, `is_listable`, `is_publicly_updatable`, `is_unique_identifer`, `field_order`, `properties`) 
@@ -65,13 +65,9 @@ SQL;
         $this->addSql("ALTER TABLE {$this->prefix}leads ADD COLUMN attribution double DEFAULT NULL");
         $this->addSql("ALTER TABLE {$this->prefix}leads ADD COLUMN attribution_date datetime DEFAULT NULL");
         $this->addSql("CREATE INDEX {$this->prefix}contact_attribution ON {$this->prefix}leads (attribution, attribution_date)");
-    }
 
-    /**
-     * @param Schema $schema
-     */
-    public function postgresqlUp(Schema $schema)
-    {
-
+        $this->addSql("CREATE INDEX {this->prefix}event_type ON {this->prefix}campaign_events (event_type)");
+        $this->addSql("CREATE INDEX {this->prefix}campaign_leads ON {this->prefix}campaign_leads (campaign_id, manually_removed, date_added, lead_id)");
+        $this->addSql("CREATE INDEX {this->prefix}campaign_leads ON {this->prefix}campaign_lead_event_log (lead_id, campaign_id)");
     }
 }

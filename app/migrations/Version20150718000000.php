@@ -35,17 +35,8 @@ class Version20150718000000 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function mysqlUp(Schema $schema)
+    public function up(Schema $schema)
     {
         $this->addSql('ALTER TABLE ' . $this->prefix . 'pages ADD redirect_type VARCHAR(100) DEFAULT NULL, ADD redirect_url VARCHAR(200) DEFAULT NULL');
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    public function postgresqlUp(Schema $schema)
-    {
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'pages ADD redirect_type VARCHAR(100) DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'pages ADD redirect_url VARCHAR(200) DEFAULT NULL');
     }
 }

@@ -44,23 +44,6 @@ class ChartQuery extends AbstractChart
     );
 
     /**
-     * Match date/time unit to a PostgreSQL datetime format
-     * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * {@link www.postgresql.org/docs/9.1/static/functions-datetime.html}
-     *
-     * @var array
-     */
-    protected $postgresTimeUnits = array(
-        's' => 'second',
-        'i' => 'minute',
-        'H' => 'hour',
-        'd' => 'day', 'D' => 'day', // ('D' is BC. Can be removed when all charts use this class)
-        'W' => 'week',
-        'm' => 'month', 'M' => 'month', // ('M' is BC. Can be removed when all charts use this class)
-        'Y' => 'year'
-    );
-
-    /**
      * Match date/time unit to a MySql datetime format
      * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * {@link dev.mysql.com/doc/refman/5.5/en/date-and-time-functions.html#function_date-format}
@@ -90,28 +73,6 @@ class ChartQuery extends AbstractChart
         $this->setDateRange($dateFrom, $dateTo);
         $this->connection = $connection;
         $this->unit       = !$unit ? $this->getTimeUnitFromDateRange() : $unit;
-    }
-
-    /**
-     * Check if the DB connection is to PostgreSQL database
-     *
-     * @return boolean
-     */
-    public function isPostgres()
-    {
-        $platform = $this->connection->getDatabasePlatform();
-        return $platform instanceof \doctrine\DBAL\Platforms\PostgreSqlPlatform;
-    }
-
-    /**
-     * Check if the DB connection is to MySql database
-     *
-     * @return boolean
-     */
-    public function isMysql()
-    {
-        $platform = $this->connection->getDatabasePlatform();
-        return $platform instanceof \doctrine\DBAL\Platforms\MySqlPlatform;
     }
 
     /**
@@ -208,21 +169,11 @@ class ChartQuery extends AbstractChart
      */
     public function translateTimeUnit($unit)
     {
-        if ($this->isPostgres()) {
-            if (!isset($this->postgresTimeUnits[$unit])) {
-                throw new \UnexpectedValueException('Date/Time unit "' . $unit . '" is not available for Postgres.');
-            }
-
-            return $this->postgresTimeUnits[$unit];
-        } elseif ($this->isMySql()) {
-            if (!isset($this->mysqlTimeUnits[$unit])) {
-                throw new \UnexpectedValueException('Date/Time unit "' . $unit . '" is not available for MySql.');
-            }
-
-            return $this->mysqlTimeUnits[$unit];
+        if (!isset($this->mysqlTimeUnits[$unit])) {
+            throw new \UnexpectedValueException('Date/Time unit "' . $unit . '" is not available for MySql.');
         }
 
-        return $unit;
+        return $this->mysqlTimeUnits[$unit];
     }
 
     /**
@@ -261,28 +212,13 @@ class ChartQuery extends AbstractChart
         $limit   = $this->countAmountFromDateRange($this->unit);
         $groupBy = '';
 
-        // Postgres and MySql are handeling date/time SQL funciton differently
-        if ($this->isPostgres()) {
-            if (isset($filters['groupBy'])) {
-                $count = 'COUNT(DISTINCT(' . $tablePrefix . '.' . $filters['groupBy'] . '))';
-                unset($filters['groupBy']);
-            } else {
-                $count = 'COUNT(*)';
-            }
-            $dateConstruct = 'DATE_TRUNC(\'' . $dbUnit . '\', ' . $tablePrefix . '.' . $column . ')';
-            $query->select($dateConstruct . ' AS date, ' . $count . ' AS count')
-                ->groupBy($dateConstruct);
-        } elseif ($this->isMysql()) {
-            if (isset($filters['groupBy'])) {
-                $groupBy = ', ' . $tablePrefix . '.' . $filters['groupBy'];
-                unset($filters['groupBy']);
-            }
-            $dateConstruct = 'DATE_FORMAT(' . $tablePrefix . '.' . $column . ', \'' . $dbUnit . '\')';
-            $query->select($dateConstruct . ' AS date, COUNT(*) AS count')
-                ->groupBy($dateConstruct . $groupBy);
-        } else {
-            throw new \UnexpectedValueException(__CLASS__ . '::' . __METHOD__ . ' supports only MySql a PosgreSQL database platforms.');
+        if (isset($filters['groupBy'])) {
+            $groupBy = ', ' . $tablePrefix . '.' . $filters['groupBy'];
+            unset($filters['groupBy']);
         }
+        $dateConstruct = 'DATE_FORMAT(' . $tablePrefix . '.' . $column . ', \'' . $dbUnit . '\')';
+        $query->select($dateConstruct . ' AS date, COUNT(*) AS count')
+            ->groupBy($dateConstruct . $groupBy);
 
         $query->orderBy($dateConstruct, 'ASC')->setMaxResults($limit);
     }
@@ -558,16 +494,8 @@ class ChartQuery extends AbstractChart
     public function modifyCountDateDiffQuery(QueryBuilder &$query, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $tablePrefix = 't')
     {
         $query->select('COUNT(' . $tablePrefix . '.' . $dateColumn1 . ') AS count');
-
-        if ($this->isPostgres()) {
-            $query->where('extract(epoch from(' . $tablePrefix . '.' . $dateColumn2 . '::timestamp - ' . $tablePrefix . '.' . $dateColumn1 . '::timestamp)) >= :startSecond');
-            $query->andWhere('extract(epoch from(' . $tablePrefix . '.' . $dateColumn2 . '::timestamp - ' . $tablePrefix . '.' . $dateColumn1 . '::timestamp)) < :endSecond');
-        }
-
-        if ($this->isMysql()) {
-            $query->where('TIMESTAMPDIFF(SECOND, ' . $tablePrefix . '.' . $dateColumn2 . ', ' . $tablePrefix . '.' . $dateColumn1 . ') >= :startSecond');
-            $query->andWhere('TIMESTAMPDIFF(SECOND, ' . $tablePrefix . '.' . $dateColumn2 . ', ' . $tablePrefix . '.' . $dateColumn1 . ') < :endSecond');
-        }
+        $query->where('TIMESTAMPDIFF(SECOND, ' . $tablePrefix . '.' . $dateColumn2 . ', ' . $tablePrefix . '.' . $dateColumn1 . ') >= :startSecond');
+        $query->andWhere('TIMESTAMPDIFF(SECOND, ' . $tablePrefix . '.' . $dateColumn2 . ', ' . $tablePrefix . '.' . $dateColumn1 . ') < :endSecond');
 
         $query->setParameter('startSecond', $startSecond);
         $query->setParameter('endSecond', $endSecond);
