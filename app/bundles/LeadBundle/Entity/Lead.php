@@ -293,7 +293,7 @@ class Lead extends FormEntity
             ->cascadeAll()
             ->fetchExtraLazy()
             ->build();
-
+        
         $builder->createOneToMany('utmtags', 'Mautic\LeadBundle\Entity\UtmTag')
             ->orphanRemoval()
             ->mappedBy('lead')
