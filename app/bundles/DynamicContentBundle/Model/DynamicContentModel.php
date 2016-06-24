@@ -139,7 +139,8 @@ class DynamicContentModel extends FormModel
             ->andWhere($qb->expr()->eq('dcld.lead_id', ':lead_id'))
             ->setParameter('slot', $slot)
             ->setParameter('lead_id', $lead->getId())
-            ->orderBy('dcld.date_added', 'DESC');
+            ->orderBy('dcld.date_added', 'DESC')
+            ->addOrderBy('dcld.id', 'DESC');
 
         return $qb->execute()->fetch();
     }
