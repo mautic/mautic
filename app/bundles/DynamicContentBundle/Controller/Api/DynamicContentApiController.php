@@ -41,24 +41,23 @@ class DynamicContentApiController extends CommonController
     {
         /** @var EventModel $campaignEventModel */
         $campaignEventModel = $this->getModel('campaign.event');
-        
+
         $response = $campaignEventModel->triggerEvent('dwc.decision', $objectAlias, 'dwc.decision.' . $objectAlias);
         $content  = null;
-        
+
         if (is_array($response) && !empty($response['action']['dwc.push_content'])) {
             $content = array_shift($response['action']['dwc.push_content']);
         } else {
             $lead = $this->getModel('lead')->getCurrentLead();
             /** @var DynamicContentModel $dwcModel */
             $dwcModel = $this->getModel('dynamicContent');
-            
+
             $data = $dwcModel->getSlotContentForLead($objectAlias, $lead);
-            
+
             if (!empty($data)) {
-                list($id, $content) = $data;
-                
-                $dwc = $dwcModel->getEntity($id);
-                
+                $content = $data['content'];
+                $dwc = $dwcModel->getEntity($data['id']);
+
                 if ($dwc instanceof DynamicContent) {
                     $dwcModel->createStatEntry($dwc, $lead, $objectAlias);
                 }
