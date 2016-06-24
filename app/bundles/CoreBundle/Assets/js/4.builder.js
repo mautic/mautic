@@ -142,6 +142,22 @@ Mautic.destroySlots = function() {
     // Remove empty class="" attr
     Mautic.builderContents.find('*[class=""]').removeAttr('class');
 
+    // Remove border highlighted by Froala
+    mQuery.each(Mautic.builderContents.find('td, th, table'), function() {
+        var td = mQuery(this);
+        if (td.attr('fr-original-class')) {
+            td.attr('class', td.attr('fr-original-class'));
+            td.removeAttr('fr-original-class');
+        }
+        if (td.attr('fr-original-style')) {
+            td.attr('style', td.attr('fr-original-style'));
+            td.removeAttr('fr-original-style');
+        }
+        if (td.css('border') === '1px solid rgb(221, 221, 221)') {
+            td.css('border', '');
+        }
+    });
+
     // Remove style="z-index: 2501;" which Froala forgets there
     Mautic.builderContents.find('*[style="z-index: 2501;"]').removeAttr('style');
 };

@@ -4538,3 +4538,6 @@ body.noscroll {
 #app-content.content-only .toolbar-form-buttons.pull-right {
   padding-right: 20px;
 }
+.fr-toolbar {
+  border-top: 2px solid #4e5d9d;
+}
