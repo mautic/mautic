@@ -53,7 +53,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     public function getSupportedFeatures()
     {
-        return array('push_lead');
+        return array('push_lead', 'get_leads');
     }
 
     /**
@@ -87,6 +87,30 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
+     * @param $lead
+     */
+    public function getLeads($params = array())
+    {
+        $executed = null;
+
+        $query = $this->getFetchQuery($params);
+        
+        try {
+            if ($this->isAuthorized()) {
+                $result = $this->getApiHelper()->getLeads($query);
+                
+                $executed = $this->amendLeadDataBeforeMauticPopulate($result);
+
+                return $executed;
+            }
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+        }
+        
+        return $executed;
+    }
+    
+    /**
      * Amend mapped lead data before pushing to CRM
      *
      * @param $mappedData
@@ -94,6 +118,26 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     public function amendLeadDataBeforePush(&$mappedData)
     {
 
+    }
+
+    /**
+     * get query to fetch lead data
+     *
+     * @param $config
+     */
+    public function getFetchQuery($config)
+    {
+
+    }
+
+    /**
+     * Amend mapped lead data before creating to Mautic
+     *
+     * @param $mappedData
+     */
+    public function amendLeadDataBeforeMauticPopulate($data)
+    {
+        return null;
     }
 
     /**

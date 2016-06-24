@@ -15,7 +15,6 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
-use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Form\Type\TagListType;
@@ -369,7 +368,7 @@ class LeadController extends FormController
         $events = array();
         foreach ($eventsByDate as $eventDate => $dateEvents) {
             $datetime = new \DateTime($eventDate);
-            if ($datetime > $fromDate) {
+            if ($datetime >= $fromDate) {
                 $engagements[] = array(
                     'date' => $eventDate,
                     'data' => 1
@@ -1338,13 +1337,25 @@ class LeadController extends FormController
 
                                 $data = array_combine($headers, $data);
                                 try {
-                                    $merged = $model->importLead($importFields, $data, $defaultOwner, $defaultList, $defaultTags);
-
-                                    if ($merged) {
-                                        $stats['merged']++;
-                                    } else {
-                                        $stats['created']++;
+                                    $prevent = false;
+                                    foreach ($data as $key => $value) {
+                                        if ($value != "") {
+                                            $prevent = true;
+                                            break;
+                                        }
                                     }
+                                    if ($prevent) {
+                                        $merged = $model->importLead($importFields, $data, $defaultOwner, $defaultList, $defaultTags);
+                                        if ($merged) {
+                                            $stats['merged']++;
+                                        } else {
+                                            $stats['created']++;
+                                        }
+                                    }     
+                                    else {
+                                        $stats['ignored']++;
+                                        $stats['failures'][$lineNumber] = $this->factory->getTranslator()->trans('mautic.lead.import.error.line_empty');
+                                    }        
                                 } catch (\Exception $e) {
                                     // Email validation likely failed
                                     $stats['ignored']++;
@@ -2052,4 +2063,113 @@ class LeadController extends FormController
             );
         }
     }
+
+    /**
+     * Bulk edit lead campaigns
+     *
+     * @param int $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function batchStagesAction($objectId = 0)
+    {
+        if ($this->request->getMethod() == 'POST') {
+            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            $model = $this->getModel('lead');
+            $data  = $this->request->request->get('lead_batch_stage', array(), true);
+            $ids   = json_decode($data['ids'], true);
+
+            $this->factory->getLogger()->addError(print_r($ids,true));
+
+            $entities  = array();
+            if (is_array($ids)) {
+                $entities = $model->getEntities(
+                    array(
+                        'filter' => array(
+                            'force' => array(
+                                array(
+                                    'column' => 'l.id',
+                                    'expr'   => 'in',
+                                    'value'  => $ids
+                                )
+                            ),
+                        ),
+                        'ignore_paginator' => true
+                    )
+                );
+            }
+
+            $count = 0;
+            foreach ($entities as $lead) {
+                if ($this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getCreatedBy())) {
+                    $count++;
+
+                    if (!empty($data['addstage'])) {
+                        $stageModel = $this->getModel('stage');
+
+                        $stage = $stageModel->getEntity((int) $data['addstage']);
+                        $model->addToStages($lead, $stage);
+                    }
+
+                    if (!empty($data['removestage'])) {
+                        $stage = $stageModel->getEntity($data['removestage']);
+                        $model->removeFromStages($lead, $stage);
+                    }
+                }
+            }
+            // Save entities
+            $model->saveEntities($entities);
+            $this->addFlash('mautic.lead.batch_leads_affected',
+                array(
+                    'pluralCount' => $count,
+                    '%count%'     => $count
+                )
+            );
+
+            return new JsonResponse(
+                array(
+                    'closeModal' => true,
+                    'flashes'    => $this->getFlashContent()
+                )
+            );
+        } else {
+            // Get a list of lists
+            /** @var \Mautic\StageBundle\Model\StageModel $model */
+            $model = $this->getModel('stage');
+            $stages = $model->getUserStages();
+            $items = array();
+            foreach ($stages as $stage) {
+                $items[$stage['id']] = $stage['name'];
+            }
+
+            $route = $this->generateUrl(
+                'mautic_contact_action',
+                array(
+                    'objectAction' => 'batchStages'
+                )
+            );
+            return $this->delegateView(
+                array(
+                    'viewParameters'  => array(
+                        'form' => $this->createForm(
+                            'lead_batch_stage',
+                            array(),
+                            array(
+                                'items'  => $items,
+                                'action' => $route
+                            )
+                        )->createView()
+                    ),
+                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                    'passthroughVars' => array(
+                        'activeLink'    => '#mautic_contact_index',
+                        'mauticContent' => 'leadBatch',
+                        'route'         => $route
+                    )
+                )
+            );
+        }
+    }
+
+
 }

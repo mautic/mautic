@@ -10,8 +10,6 @@
 $defaultInputClass = $containerType = 'freetext';
 include __DIR__.'/field_helper.php';
 
-$text = html_entity_decode($properties['text']);
-
 $formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
     array(
         'deleted'  => (!empty($deleted)) ? $deleted : false,
@@ -21,9 +19,9 @@ $formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actio
     )) : '';
 
 $label = (!$field['showLabel']) ? '' :
-<<<HTML
-
-                <h3 $labelAttr id="mauticform_label_{$field['alias']} for="mauticform_input{$formName}_{$field['alias']}">
+    <<<HTML
+    
+                <h3 $labelAttr>
                     {$view->escape($field['label'])}
                 </h3>
 HTML;
@@ -32,8 +30,8 @@ HTML;
 $html = <<<HTML
 
             <div $containerAttr>{$formButtons}{$label}
-                <div $inputAttr id="mauticform_input{$formName}_{$field['alias']}">
-                    $text
+                <div $inputAttr>
+                    {$properties['text']}
                 </div>
             </div>
 

@@ -28,8 +28,6 @@ class PublicController extends CommonFormController
         $stat  = $model->getEmailStatus($idHash);
 
         if (!empty($stat)) {
-            $emailEntity = $stat->getEmail();
-
             if ($this->factory->getSecurity()->isAnonymous()) {
                 $model->hitEmail($stat, $this->request, true);
             }
@@ -340,8 +338,9 @@ class PublicController extends CommonFormController
         //bogus ID
         $idHash = 'xxxxxxxxxxxxxx';
 
-        $template = $emailEntity->getTemplate();
-        if (!empty($template)) {
+        $BCcontent = $emailEntity->getContent();
+        if (!empty($BCcontent)) {
+            $template = $emailEntity->getTemplate();
             $slots = $this->factory->getTheme($template)->getSlots('email');
 
             $assetsHelper = $this->factory->getHelper('template.assets');

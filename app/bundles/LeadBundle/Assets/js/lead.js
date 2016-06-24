@@ -843,7 +843,7 @@ Mautic.getLeadEmailContent = function (el) {
     mQuery('#MauticSharedModal .btn-primary').prop('disabled', true);
     Mautic.ajaxActionRequest('lead:getEmailTemplate', {'template': mQuery(el).val()}, function(response) {
         mQuery('#MauticSharedModal .btn-primary').prop('disabled', false);
-        CKEDITOR.instances['lead_quickemail_body'].setData(response.body);
+        mQuery('#lead_quickemail_body').froalaEditor('html.set', response.body);
         mQuery('#lead_quickemail_subject').val(response.subject);
         Mautic.removeLabelLoadingIndicator();
     });
@@ -861,7 +861,7 @@ Mautic.updateLeadTags = function () {
     });
 };
 
-Mautic.createLeadTag = function (el) {
+Mautic.createLeadUtmTag = function (el) {
     var newFound = false;
     mQuery('#' + mQuery(el).attr('id') + ' :selected').each(function(i, selected) {
         if (!mQuery.isNumeric(mQuery(selected).val())) {
@@ -887,19 +887,48 @@ Mautic.createLeadTag = function (el) {
     });
 };
 
+Mautic.createLeadUtmTag = function (el) {
+    var newFound = false;
+    mQuery('#' + mQuery(el).attr('id') + ' :selected').each(function(i, selected) {
+        if (!mQuery.isNumeric(mQuery(selected).val())) {
+            newFound = true;
+        }
+    });
+
+    if (!newFound) {
+        return;
+    }
+
+    Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
+
+    var utmtags = JSON.stringify(mQuery(el).val());
+
+    Mautic.ajaxActionRequest('lead:addLeadUtmTags', {utmtags: utmtags}, function(response) {
+        if (response.tags) {
+            mQuery('#' + mQuery(el).attr('id')).html(response.utmtags);
+            mQuery('#' + mQuery(el).attr('id')).trigger('chosen:updated');
+        }
+
+        Mautic.removeLabelLoadingIndicator();
+    });
+};
+
 Mautic.leadBatchSubmit = function() {
     if (Mautic.batchActionPrecheck()) {
-        if (mQuery('#lead_batch_remove').val() || mQuery('#lead_batch_add').val() || mQuery('#lead_batch_dnc_reason').length) {
+        if (mQuery('#lead_batch_remove').val() || mQuery('#lead_batch_add').val() || mQuery('#lead_batch_dnc_reason').length || mQuery('#lead_batch_stage_addstage').length) {
             var ids = Mautic.getCheckedListIds(false, true);
 
             if (mQuery('#lead_batch_ids').length) {
                 mQuery('#lead_batch_ids').val(ids);
             } else if (mQuery('#lead_batch_dnc_reason').length) {
                 mQuery('#lead_batch_dnc_ids').val(ids);
+            } else if (mQuery('#lead_batch_stage_addstage').length) {
+                mQuery('#lead_batch_stage_ids').val(ids);
             }
 
             return true;
         }
+
     }
 
     mQuery('#MauticSharedModal').modal('hide');

@@ -228,6 +228,11 @@ return [
                 'arguments' => 'mautic.factory',
                 'alias'     => 'lead_submitaction_pointschange'
             ],
+            'mautic.form.type.lead.submitaction.addutmtags' => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\ActionAddUtmTagsType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'lead_action_addutmtags'
+            ],
             'mautic.form.type.lead.submitaction.changelist'   => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\EventListType',
                 'arguments' => 'mautic.factory',
@@ -296,6 +301,10 @@ return [
                 'class'     => 'Mautic\LeadBundle\Form\Type\DncType',
                 'alias'     => 'lead_batch_dnc'
             ],
+            'mautic.form.type.lead_batch_stage'               => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\StageType',
+                'alias'     => 'lead_batch_stage'
+            ],
             'mautic.form.type.lead_merge'               => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\MergeType',
                 'alias'     => 'lead_merge'
@@ -313,6 +322,11 @@ return [
             'mautic.form.type.lead_dashboard_leads_in_time_widget'  => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\DashboardLeadsInTimeWidgetType',
                 'alias'     => 'lead_dashboard_leads_in_time_widget'
+            ],
+            'mautic.form.type.lead_dashboard_leads_lifetime_widget'  => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\DashboardLeadsLifetimeWidgetType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'lead_dashboard_leads_lifetime_widget'
             ]
         ],
         'other'   => [

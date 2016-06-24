@@ -164,13 +164,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (\Exception $e) {
+       } catch (\Exception $e) {
             $this->logIntegrationError($e);
 
             if (!$silenceExceptions) {
                 throw $e;
-            }
-        }
+           }
+       }
 
         return $salesFields;
     }
@@ -190,4 +190,37 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         return parent::getFormNotes($section);
     }
+
+    public function getFetchQuery($params){
+        
+        $dateRange=$params;
+        return $dateRange;
+    }
+
+    /**
+     * Amend mapped lead data before creating to Mautic
+     *
+     * @param $data
+     */
+    public function amendLeadDataBeforeMauticPopulate($data)
+    {
+        $fields = array_keys($this->getAvailableLeadFields());
+        $params['fields']=implode(',',$fields);
+
+        $internal = array('latestDateCovered' => $data['latestDateCovered']);
+        $count = 0;
+        if(isset($data['ids'])){
+            foreach($data['ids'] as $salesforceId)
+            {
+                $data = $this->getApiHelper()->getSalesForceLeadById($salesforceId,$params);
+                $data['internal'] = $internal;
+                if($data){
+                    $this->getMauticLead($data,true,null,null);
+                    $count++;
+                }
+            }
+        }
+        return $count;
+    }
+
 }

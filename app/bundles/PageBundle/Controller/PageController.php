@@ -253,11 +253,21 @@ class PageController extends FormController
             }
         }
 
+        // Init the date range filter form
+        $dateRangeValues = $this->request->get('daterange', array());
+        $action          = $this->generateUrl('mautic_page_action', array('objectAction' => 'view', 'objectId' => $objectId));
+        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, array('action' => $action));
+
         // Audit Log
         $logs = $this->getModel('core.auditLog')->getLogForObject('page', $activePage->getId(), $activePage->getDateAdded());
 
-        // Hit count per day for last 30 days
-        $last30 = $model->getHitsBarChartData('d', new \DateTime('-30 days'), new \DateTime, null, array('page_id' => $activePage->getId()));
+        $pageviews = $model->getHitsLineChartData(
+            null,
+            new \DateTime($dateRangeForm->get('date_from')->getData()),
+            new \DateTime($dateRangeForm->get('date_to')->getData()),
+            null,
+            array('page_id' => $activePage->getId(), 'flag' => 'total_and_unique')
+        );
 
         //get related translations
         list($translationParent, $translationChildren) = $model->getTranslations($activePage);
@@ -291,20 +301,19 @@ class PageController extends FormController
                     'page:pages:publishother'
                 ), "RETURN_ARRAY"),
                 'stats'         => array(
+                    'pageviews' => $pageviews,
                     'bounces'   => $model->getBounces($activePage),
                     'hits'      => array(
                         'total'  => $activePage->getHits(),
                         'unique' => $activePage->getUniqueHits()
-                    ),
-                    'newVsReturning' => $model->getNewVsReturningPieChartData(new \DateTime('-30 days'), new \DateTime, array('page_id' => $objectId)),
-                    'dwellTime' => $model->getDwellTimesPieChartData(new \DateTime('-30 days'), new \DateTime, array('page_id' => $objectId))
+                    )
                 ),
                 'abTestResults' => $abTestResults,
                 'security'      => $security,
                 'pageUrl'       => $model->generateUrl($activePage, true),
                 'previewUrl'    => $this->generateUrl('mautic_page_preview', array('id' => $objectId), true),
                 'logs'          => $logs,
-                'last30'        => $last30
+                'dateRangeForm' => $dateRangeForm->createView()
             ),
             'contentTemplate' => 'MauticPageBundle:Page:details.html.php',
             'passthroughVars' => array(
@@ -349,32 +358,15 @@ class PageController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $session     = $this->factory->getSession();
-                    $contentName = 'mautic.pagebuilder.'.$entity->getSessionId().'.content';
-
-                    $template = $entity->getTemplate();
-                    if (!empty($template)) {
-                        $content = $session->get($contentName, array());
-                        $entity->setCustomHtml(null);
-                    } else {
-                        $content = $entity->getCustomHtml();
-                        $entity->setContent(array());
-                    }
+                    $content = $entity->getCustomHtml();
 
                     // Parse visual placeholders into tokens
                     BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($content);
 
-                    if (!empty($template)) {
-                        $entity->setContent($content);
-                    } else {
-                        $entity->setCustomHtml($content);
-                    }
+                    $entity->setCustomHtml($content);
 
                     //form is valid so process the data
                     $model->saveEntity($entity);
-
-                    //clear the session
-                    $session->remove($contentName);
 
                     $this->addFlash('mautic.core.notice.created', array(
                         '%name%'      => $entity->getTitle(),
@@ -418,12 +410,18 @@ class PageController extends FormController
             }
         }
 
+        $slotTypes = $model->getBuilderComponents($entity, 'slotTypes');
+
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
-                'isVariant'   => $entity->isVariant(true),
-                'tokens'      => $model->getBuilderComponents($entity, 'tokenSections'),
-                'activePage'  => $entity
+                'form'          => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
+                'isVariant'     => $entity->isVariant(true),
+                'tokens'        => $model->getBuilderComponents($entity, 'tokenSections'),
+                'activePage'    => $entity,
+                'themes'        => $this->factory->getInstalledThemes('page', true),
+                'slots'         => $this->buildSlotForms($slotTypes),
+                'builderTokens' => $model->getBuilderComponents(null, array('tokens')),
+                'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())) // strip new lines
             ),
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
             'passthroughVars' => array(
@@ -496,36 +494,14 @@ class PageController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $contentName     = 'mautic.pagebuilder.'.$entity->getSessionId().'.content';
+                    $content = $entity->getCustomHtml();
 
-                    $template = $entity->getTemplate();
-                    if (!empty($template)) {
-                        $existingContent = $entity->getContent();
-                        $newContent      = $session->get($contentName, array());
-                        $viewContent     = array_merge($existingContent, $newContent);
+                    BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($content);
 
-                        $entity->setCustomHtml(null);
-                    } else {
-                        $entity->setContent(array());
-
-                        $viewContent = $entity->getCustomHtml();
-                    }
-
-                    // Copy model content then parse from visual to tokens
-                    $modelContent = $viewContent;
-                    BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($modelContent);
-
-                    if (!empty($template)) {
-                        $entity->setContent($modelContent);
-                    } else {
-                        $entity->setCustomHtml($modelContent);
-                    }
+                    $entity->setCustomHtml($content);
 
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
-
-                    //clear the session
-                    $session->remove($contentName);
 
                     $this->addFlash('mautic.core.notice.updated', array(
                         '%name%'      => $entity->getTitle(),
@@ -580,12 +556,18 @@ class PageController extends FormController
             }
         }
 
+        $slotTypes = $model->getBuilderComponents($entity, 'slotTypes');
+        
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
-                'isVariant'   => $entity->isVariant(true),
-                'tokens'      => (!empty($tokens)) ? $tokens['tokenSections'] : $model->getBuilderComponents($entity, 'tokenSections'),
-                'activePage'  => $entity
+                'form'          => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
+                'isVariant'     => $entity->isVariant(true),
+                'tokens'        => (!empty($tokens)) ? $tokens['tokenSections'] : $model->getBuilderComponents($entity, 'tokenSections'),
+                'activePage'    => $entity,
+                'themes'        => $this->factory->getInstalledThemes('page', true),
+                'slots'         => $this->buildSlotForms($slotTypes),
+                'builderTokens' => $model->getBuilderComponents(null, array('tokens')),
+                'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())) // strip new lines
             ),
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
             'passthroughVars' => array(
@@ -811,7 +793,6 @@ class PageController extends FormController
             $entity->setContent($content);
         }
 
-        $this->addAssetsForBuilder();
         $this->processSlots($slots, $entity);
 
         $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':page.html.php');
@@ -975,11 +956,7 @@ class PageController extends FormController
 
             $value = isset($content[$slot]) ? $content[$slot] : "";
 
-            if ($slotConfig['type'] == 'text') {
-                $slotsHelper->set($slot, "<input id=\"slot-{$slot}\" type=\"text\" value=\"{$value}\" class=\"mautic-editable\" placeholder=\"{$translatorHelper->trans($slotConfig['placeholder'])}\"/>");
-            } elseif ($slotConfig['type'] == 'textarea') {
-                $slotsHelper->set($slot, "<textarea id=\"slot-{$slot}\" class=\"mautic-editable\" placeholder=\"{$translatorHelper->trans($slotConfig['placeholder'])}\">{$value}</textarea>");
-            } elseif ($slotConfig['type'] == 'slideshow') {
+            if ($slotConfig['type'] == 'slideshow') {
                 if (isset($content[$slot])) {
                     $options = json_decode($content[$slot], true);
                 } else {
@@ -1048,8 +1025,7 @@ class PageController extends FormController
                 }
                 $slotsHelper->set($slot, $renderingEngine->render('MauticPageBundle:Page:Slots/slideshow.html.php', $options));
             } else {
-                // valback for html and unknown field types
-                $slotsHelper->set($slot, "<div id=\"slot-{$slot}\" class=\"mautic-editable\" contenteditable=true data-placeholder=\"{$translatorHelper->trans($slotConfig['placeholder'])}\">{$value}</div>");
+                $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\" />{$value}</div>");
             }
         }
 
@@ -1061,7 +1037,7 @@ class PageController extends FormController
         $slotsHelper->stop();
     }
 
-    private function addAssetsForBuilder()
+    private function getAssetsForBuilder()
     {
         /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
         $assetsHelper = $this->factory->getHelper('template.assets');
@@ -1070,10 +1046,24 @@ class PageController extends FormController
 
         $assetsHelper->addScriptDeclaration("var mauticBasePath    = '" . $this->request->getBasePath() . "';");
         $assetsHelper->addScriptDeclaration("var mauticAjaxUrl     = '" . $routerHelper->generate("mautic_core_ajax") . "';");
+        $assetsHelper->addScriptDeclaration("var mauticBaseUrl     = '" . $routerHelper->generate("mautic_base_index") . "';");
         $assetsHelper->addScriptDeclaration("var mauticAssetPrefix = '" . $assetsHelper->getAssetPrefix(true) . "';");
         $assetsHelper->addCustomDeclaration($assetsHelper->getSystemScripts(true, true));
-        $assetsHelper->addScript('app/bundles/PageBundle/Assets/builder/builder.js');
-        $assetsHelper->addStylesheet('app/bundles/PageBundle/Assets/builder/pick-a-color.css');
-        $assetsHelper->addStylesheet('app/bundles/PageBundle/Assets/builder/builder.css');
+        $assetsHelper->addStylesheet('app/bundles/CoreBundle/Assets/css/libraries/builder.css');
+        $builderAssets = $assetsHelper->getHeadDeclarations();
+        $assetsHelper->clear();
+        return $builderAssets;
+    }
+
+    private function buildSlotForms($slotTypes)
+    {
+        foreach ($slotTypes as &$slotType) {
+            if (isset($slotType['form'])) {
+                $slotForm = $this->get('form.factory')->create($slotType['form']);
+                $slotType['form'] = $slotForm->createView();
+            }
+        }
+
+        return $slotTypes;
     }
 }

@@ -27,6 +27,14 @@ Mautic.pageOnLoad = function (container) {
             Mautic.autoHideRedirectUrl(container);
         });
     }
+
+    mQuery(document).on('shown.bs.tab', 'a[href="#source-container"]', function (e) {
+        Mautic.refreshCodeEditors();
+        Mautic.initCodeEditors();
+    });
+
+    Mautic.intiSelectTheme(mQuery('#page_template'));
+    Mautic.initDateRangePicker();
 };
 
 Mautic.getPageAbTestWinnerForm = function(abKey) {

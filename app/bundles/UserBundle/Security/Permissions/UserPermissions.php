@@ -24,15 +24,15 @@ class UserPermissions extends AbstractPermissions
     public function __construct($params)
     {
         parent::__construct($params);
-        $this->permissions = array(
-            'profile' => array(
-                'editusername'  => 1,
-                'editemail'     => 2,
-                'editposition'  => 4,
-                'editname'      => 8,
-                'full'          => 1024
-            )
-        );
+        $this->permissions = [
+            'profile' => [
+                'editusername' => 1,
+                'editemail'    => 2,
+                'editposition' => 4,
+                'editname'     => 8,
+                'full'         => 1024,
+            ],
+        ];
         $this->addStandardPermissions('users', false);
         $this->addStandardPermissions('roles', false);
 
@@ -54,18 +54,22 @@ class UserPermissions extends AbstractPermissions
         $this->addStandardFormFields('user', 'users', $builder, $data, false);
         $this->addStandardFormFields('user', 'roles', $builder, $data, false);
 
-        $builder->add('user:profile', 'permissionlist', array(
-            'choices'    => array(
-                'editname'     => 'mautic.user.account.permissions.editname',
-                'editusername' => 'mautic.user.account.permissions.editusername',
-                'editemail'    => 'mautic.user.account.permissions.editemail',
-                'editposition' => 'mautic.user.account.permissions.editposition',
-                'full'         => 'mautic.user.account.permissions.editall',
-            ),
-            'label'      => 'mautic.user.permissions.profile',
-            'data'       => (!empty($data['profile']) ? $data['profile'] : array()),
-            'bundle'     => 'user',
-            'level'      => 'profile'
-        ));
+        $builder->add(
+            'user:profile',
+            'permissionlist',
+            [
+                'choices' => [
+                    'editname'     => 'mautic.user.account.permissions.editname',
+                    'editusername' => 'mautic.user.account.permissions.editusername',
+                    'editemail'    => 'mautic.user.account.permissions.editemail',
+                    'editposition' => 'mautic.user.account.permissions.editposition',
+                    'full'         => 'mautic.user.account.permissions.editall',
+                ],
+                'label'   => 'mautic.user.permissions.profile',
+                'data'    => (!empty($data['profile']) ? $data['profile'] : []),
+                'bundle'  => 'user',
+                'level'   => 'profile',
+            ]
+        );
     }
 }

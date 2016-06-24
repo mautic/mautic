@@ -755,6 +755,9 @@ class EventModel extends CommonFormModel
         &$executedEventCount = 0,
         &$totalEventCount = 0
     ) {
+
+        $eventWaitTimeOnResponseFalse =  $this->factory->getParameter('campaign_time_wait_on_event_false');
+
         $evaluatedEventCount++;
         $totalEventCount++;
 
@@ -897,9 +900,16 @@ class EventModel extends CommonFormModel
 
                 // Something failed
                 if ($wasScheduled) {
+
+                    $date = new \DateTime();
+
+                    if ($eventWaitTimeOnResponseFalse != '' && $eventWaitTimeOnResponseFalse != null) {
+                        $date->add(new \DateInterval($eventWaitTimeOnResponseFalse));
+                    }
+
                     // Reschedule
                     $log->setIsScheduled(true);
-                    $log->setTriggerDate(new \DateTime());
+                    $log->setTriggerDate($date);
                     $log->setDateTriggered(null);
 
                     $repo->saveEntity($log);
@@ -910,17 +920,24 @@ class EventModel extends CommonFormModel
 
                 $this->logger->debug(
                     'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId().' failed with a response of '
-                    .var_export($response, true)
-                );
+                    .var_export($response, true) . " placed on hold ".$eventWaitTimeOnResponseFalse );
             } else {
                 $executedEventCount++;
 
                 if ($response !== true) {
                     if ($this->triggeredResponses !== false) {
-                        if (!is_array($this->triggeredResponses[$event['eventType']])) {
-                            $this->triggeredResponses[$event['eventType']] = array();
+                        $eventTypeKey = $event['eventType'];
+                        $typeKey      = $event['type'];
+                        
+                        if (!array_key_exists($eventTypeKey, $this->triggeredResponses) || !is_array($this->triggeredResponses[$eventTypeKey])) {
+                            $this->triggeredResponses[$eventTypeKey] = [];
                         }
-                        $this->triggeredResponses[$event['eventType']][$event['id']] = $response;
+                        
+                        if (!array_key_exists($typeKey, $this->triggeredResponses[$eventTypeKey]) || !is_array($this->triggeredResponses[$eventTypeKey][$typeKey])) {
+                            $this->triggeredResponses[$eventTypeKey][$typeKey] = [];
+                        }
+                        
+                        $this->triggeredResponses[$eventTypeKey][$typeKey][$event['id']] = $response;
                     }
 
                     $log->setMetadata($response);

@@ -9,28 +9,76 @@
 
 namespace Mautic\UserBundle\Event;
 
-use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Symfony\Component\EventDispatcher\Event;
+use Mautic\UserBundle\Entity\User;
+use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Class LogoutEvent
+ */
 class LogoutEvent extends Event
 {
-
-    private $factory;
+    /**
+     * @var User
+     */
     private $user;
 
-    public function __construct(MauticFactory $factory)
+    /**
+     * @var array
+     */
+    private $session = array();
+
+    /**
+     * @var Request
+     */
+    private $request;
+
+    /**
+     * LogoutEvent constructor.
+     *
+     * @param User    $user
+     * @param Request $request
+     */
+    public function __construct(User $user, Request $request)
     {
-        $this->factory = $factory;
-        $this->user    = $factory->getUser();
+        $this->user    = $user;
+        $this->request = $request;
     }
 
-    public function getFactory()
-    {
-        return $this->factory;
-    }
-
+    /**
+     * @return User
+     */
     public function getUser()
     {
         return $this->user;
+    }
+
+    /**
+     * Add value to session after it's been cleared
+     *
+     * @param $key
+     * @param $value
+     */
+    public function setPostSessionItem($key, $value)
+    {
+        $this->session[$key] = $value;
+    }
+
+    /**
+     * Get session items to be added after session has been cleared
+     *
+     * @return array
+     */
+    public function getPostSessionItems()
+    {
+        return $this->session;
+    }
+
+    /**
+     * @return Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
     }
 }

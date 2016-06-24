@@ -50,6 +50,8 @@ Mautic.campaignOnLoad = function (container) {
                 mQuery(this).find('.btn-edit').first().click();
             });
     }
+    
+    Mautic.initDateRangePicker();
 };
 
 /**

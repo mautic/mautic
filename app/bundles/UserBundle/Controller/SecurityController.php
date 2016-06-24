@@ -11,6 +11,8 @@ namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\Exception as Exception;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -26,11 +28,12 @@ class SecurityController extends CommonController
      */
     public function initialize (FilterControllerEvent $event)
     {
-        $securityContext = $this->get('security.context');
+        /** @var \Symfony\Component\Security\Core\Authorization\AuthorizationChecker $authChecker */
+        $authChecker = $this->get('security.authorization_checker');
 
         //redirect user if they are already authenticated
-        if ($securityContext->isGranted('IS_AUTHENTICATED_FULLY') ||
-            $securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')
+        if ($authChecker->isGranted('IS_AUTHENTICATED_FULLY') ||
+            $authChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
         ) {
 
             $redirectUrl = $this->generateUrl('mautic_dashboard_index');
@@ -77,11 +80,12 @@ class SecurityController extends CommonController
 
         // get the login error if there is one
         if ($this->request->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
-            $error = $this->request->attributes->get(SecurityContext::AUTHENTICATION_ERROR);
+            $error = $this->request->attributes->get(Security::AUTHENTICATION_ERROR);
         } else {
-            $error = $session->get(SecurityContext::AUTHENTICATION_ERROR);
-            $session->remove(SecurityContext::AUTHENTICATION_ERROR);
+            $error = $session->get(Security::AUTHENTICATION_ERROR);
+            $session->remove(Security::AUTHENTICATION_ERROR);
         }
+
         if (!empty($error)) {
             if (($error instanceof Exception\BadCredentialsException)) {
                 $msg = 'mautic.user.auth.error.invalidlogin';
@@ -95,8 +99,16 @@ class SecurityController extends CommonController
         }
         $this->request->query->set('tmpl', 'login');
 
+        // Get a list of SSO integrations
+        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
+        $integrationHelper = $this->factory->getHelper('integration');
+        $integrations = $integrationHelper->getIntegrationObjects(null, array('sso_service'), true, null, true);
+
         return $this->delegateView(array(
-            'viewParameters'  => array('last_username' => $session->get(SecurityContext::LAST_USERNAME)),
+            'viewParameters'  => array(
+                'last_username' => $session->get(Security::LAST_USERNAME),
+                'integrations'  => $integrations
+            ),
             'contentTemplate' => 'MauticUserBundle:Security:login.html.php',
             'passthroughVars' => array(
                 'route'          => $this->generateUrl('login'),
@@ -104,5 +116,40 @@ class SecurityController extends CommonController
                 'sessionExpired' => true
             )
         ));
+    }
+
+    /**
+     * Do nothing
+     */
+    public function loginCheckAction()
+    {
+
+    }
+
+    /**
+     * The plugin should be handling this in it's listener
+     *
+     * @param $integration
+     *
+     * @return RedirectResponse
+     */
+    public function ssoLoginAction($integration)
+    {
+
+        return new RedirectResponse($this->generateUrl('login'));
+    }
+
+    /**
+     * The plugin should be handling this in it's listener
+     *
+     * @param $integration
+     *
+     * @return RedirectResponse
+     */
+    public function ssoLoginCheckAction($integration)
+    {
+        // The plugin should be handling this in it's listener
+
+        return new RedirectResponse($this->generateUrl('login'));
     }
 }

@@ -1,0 +1,10 @@
+{% extends ":coffee:base.html.twig" %}
+
+{% block content %}
+    <div class="well text-center">
+        <h2>{{ message|raw }}</h2>
+        {% if content is defined %}
+        <div class="text-left">{{ content|raw }}</div>
+        {% endif %}
+    </div>
+{% endblock %}

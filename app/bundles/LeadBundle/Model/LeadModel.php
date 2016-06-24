@@ -22,7 +22,9 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
@@ -90,7 +92,7 @@ class LeadModel extends FormModel
 
     /**
      * LeadModel constructor.
-     * 
+     *
      * @param RequestStack $requestStack
      * @param CookieHelper $cookieHelper
      * @param IpLookupHelper $ipLookupHelper
@@ -101,9 +103,9 @@ class LeadModel extends FormModel
      */
     public function __construct(
         RequestStack $requestStack,
-        CookieHelper $cookieHelper, 
-        IpLookupHelper $ipLookupHelper, 
-        PathsHelper $pathsHelper, 
+        CookieHelper $cookieHelper,
+        IpLookupHelper $ipLookupHelper,
+        PathsHelper $pathsHelper,
         IntegrationHelper $integrationHelper,
         FieldModel $leadFieldModel,
         ListModel $leadListModel
@@ -164,6 +166,16 @@ class LeadModel extends FormModel
     public function getTagRepository()
     {
         return $this->em->getRepository('MauticLeadBundle:Tag');
+    }
+
+    /**
+     * Get the tags repository
+     *
+     * @return \Mautic\LeadBundle\Entity\UtmTagRepository
+     */
+    public function getUtmTagRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:UtmTag');
     }
 
     /**
@@ -538,6 +550,7 @@ class LeadModel extends FormModel
      * Takes leads organized by group and flattens them into just alias => value
      *
      * @param $fields
+     * @deprecated 2.0 to be removed in 3.0 - Use the Lead entity's getProfileFields() instead
      *
      * @return array
      */
@@ -798,6 +811,45 @@ class LeadModel extends FormModel
     }
 
     /**
+     * Add lead to lists
+     *
+     * @param array|Lead        $lead
+     * @param array|LeadList    $stage
+     * @param bool              $manuallyAdded
+     */
+    public function addToStages($lead, $stage, $manuallyAdded = true)
+    {
+        if (!$lead instanceof Lead) {
+            $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
+            $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+        }
+        $lead->setStage($stage);
+        $lead->stageChangeLogEntry(
+            'batch',
+            $stage->getId() . ": " . $stage->getName(),
+            'Manually Added'
+        );
+
+    }
+
+    /**
+     * Remove lead from Stage
+     *
+     * @param      $lead
+     * @param      $stage
+     * @param bool $manuallyRemoved
+     */
+    public function removeFromStages($lead, $stage, $manuallyRemoved = true)
+    {
+        $lead->setStage(null);
+        $lead->stageChangeLogEntry(
+            'batch',
+            null,
+            'Manually Removed'
+        );
+    }
+
+    /**
      * Merge two leads; if a conflict of data occurs, the newest lead will get precedence
      *
      * @param Lead $lead
@@ -905,6 +957,10 @@ class LeadModel extends FormModel
      */
     public function isContactable(Lead $lead, $channel)
     {
+        if (is_array($channel)) {
+            $channel = key($channel);
+        }
+
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
         $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
 
@@ -930,17 +986,20 @@ class LeadModel extends FormModel
      *
      * @param Lead $lead
      * @param string $channel
+     * @param bool|true $persist
      *
      * @return boolean
      */
-    public function removeDncForLead(Lead $lead, $channel)
+    public function removeDncForLead(Lead $lead, $channel, $persist = true)
     {
         /** @var DoNotContact $dnc */
         foreach ($lead->getDoNotContact() as $dnc) {
             if ($dnc->getChannel() === $channel) {
                 $lead->removeDoNotContactEntry($dnc);
 
-                $this->getRepository()->saveEntity($lead);
+                if ($persist) {
+                    $this->saveEntity($lead);
+                }
 
                 return true;
             }
@@ -951,14 +1010,14 @@ class LeadModel extends FormModel
 
     /**
      * Remove a Lead's EMAIL DNC entry.
-     * 
+     *
      * @param string $email
      */
     public function removeDncForEmail($email)
     {
         $repo = $this->getRepository();
         $leadId = (array) $repo->getLeadByEmail($email, true);
-        
+
         /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
         $leads = [];
 
@@ -978,12 +1037,12 @@ class LeadModel extends FormModel
      * @param string|array $channel  If an array with an ID, use the structure ['email' => 123]
      * @param string       $comments
      * @param int          $reason   Must be a class constant from the DoNotContact class.
-     * @param bool         $flush
+     * @param bool         $persist
      *
      * @return boolean If a DNC entry is added or updated, returns true. If a DNC is already present
      *                 and has the specified reason, nothing is done and this returns false.
      */
-    public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $flush = true)
+    public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $persist = true)
     {
         $isContactable = $this->isContactable($lead, $channel);
 
@@ -1006,10 +1065,9 @@ class LeadModel extends FormModel
 
             $lead->addDoNotContactEntry($dnc);
 
-            $this->getRepository()->saveEntity($lead);
-
-            if ($flush) {
-                $this->em->flush();
+            if ($persist) {
+                // Use model saveEntity to trigger events for DNC change
+                $this->saveEntity($lead);
             }
 
             return true;
@@ -1033,11 +1091,9 @@ class LeadModel extends FormModel
                     // Re-add the entry to the lead
                     $lead->addDoNotContactEntry($dnc);
 
-                    // Persist
-                    $this->getRepository()->saveEntity($lead);
-
-                    if ($flush) {
-                        $this->em->flush();
+                    if ($persist) {
+                        // Use model saveEntity to trigger events for DNC change
+                        $this->saveEntity($lead);
                     }
 
                     return true;
@@ -1145,7 +1201,25 @@ class LeadModel extends FormModel
             $log->setDateAdded(new \DateTime());
             $lead->addPointsChangeLog($log);
         }
-        unset($fields['points']);
+
+        if (!empty($fields['stage']) && !empty($data[$fields['stage']]) && $lead->getId() === null) {
+            // Add points only for new leads
+            $lead->setStage($data[$fields['stage']]);
+
+            //add a lead point change log
+            $log = new StagesChangeLog();
+            $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($fields['stage']);
+            $log->setEventName($stage);
+            $log->setLead($lead);
+            $log->setType('lead');
+            $log->setActionName($this->translator->trans('mautic.lead.import.action.name', array(
+                '%name%' => $this->user->getUsername()
+            )));
+            $log->setDateAdded(new \DateTime());
+            $lead->stageChangeLog($log);
+        }
+
+        unset($fields['stage']);
 
         // Set unsubscribe status
         if (!empty($fields['doNotEmail']) && !empty($data[$fields['doNotEmail']]) && $hasEmail) {
@@ -1243,6 +1317,20 @@ class LeadModel extends FormModel
     }
 
     /**
+     * Update a leads tags
+     *
+     * @param Lead  $lead
+     * @param array $tags
+     * @param bool|false $removeOrphans
+     */
+    public function setUtmTags(Lead $lead, UtmTag $utmTags)
+    {
+        $lead->setUtmTags($utmTags);
+
+        $this->saveEntity($lead);
+    }
+
+    /**
      * Modify tags with support to remove via a prefixed minus sign
      *
      * @param Lead $lead
@@ -1284,7 +1372,7 @@ class LeadModel extends FormModel
                     $newTag = new Tag();
                     $newTag->setTag($tag);
                     $lead->addTag($newTag);
-                    $logger->debug('LEAD: Added ' . $tag);
+                    $this->logger->debug('LEAD: Added ' . $tag);
                 } elseif (!$leadTags->contains($foundTags[$tag])) {
                     $lead->addTag($foundTags[$tag]);
 

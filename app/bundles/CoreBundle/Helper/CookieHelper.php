@@ -10,6 +10,8 @@
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class CookieHelper
@@ -24,19 +26,26 @@ class CookieHelper
     private $httponly = false;
 
     /**
-     * @param MauticFactory $factory
+     * CookieHelper constructor.
+     *
+     * @param              $cookiePath
+     * @param              $cookieDomain
+     * @param              $cookieSecure
+     * @param              $cookieHttp
+     * @param RequestStack $requestStack
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct($cookiePath, $cookieDomain, $cookieSecure, $cookieHttp, RequestStack $requestStack)
     {
-        $this->path = $factory->getParameter('cookie_path');
-        $this->domain = $factory->getParameter('cookie_domain');
-        $this->secure = $factory->getParameter('cookie_secure');
+        $this->path   = $cookiePath;
+        $this->domain = $cookieDomain;
+        $this->secure = $cookieSecure;
+        $this->request = $requestStack->getCurrentRequest();
 
-        if ($this->secure == '' || $this->secure == null) {
-            $this->secure = ( $factory->getRequest()->server->get('HTTPS', false));
+        if (($this->secure == '' || $this->secure == null) && $this->request) {
+            $this->secure = ($requestStack->getCurrentRequest()->server->get('HTTPS', false));
         }
 
-        $this->httponly = $factory->getParameter('cookie_httponly');
+        $this->httponly = $cookieHttp;
     }
 
     /**
@@ -50,6 +59,11 @@ class CookieHelper
      */
     public function setCookie($name, $value, $expire = 1800, $path = null, $domain = null, $secure = null, $httponly = true)
     {
+
+        if($this->request==null){
+            return true;
+        }
+
         setcookie(
             $name,
             $value,

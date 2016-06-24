@@ -17,6 +17,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\UserBundle\Entity\User;
 use Mautic\NotificationBundle\Entity\PushID;
+use Mautic\StageBundle\Entity\Stage;
 
 /**
  * Class Lead
@@ -143,6 +144,20 @@ class Lead extends FormEntity
     private $tags;
 
     /**
+     * @var \Mautic\StageBundle\Entity\Stage
+     */
+    private $stage;
+    /**
+     * @var ArrayCollection
+     */
+    private $stageChangeLog;
+
+    /**
+     * @var ArrayCollection
+     */
+    private $utmtags;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -240,6 +255,26 @@ class Lead extends FormEntity
             ->cascadePersist()
             ->cascadeDetach()
             ->build();
+
+        $builder->createManyToOne('stage', 'Mautic\StageBundle\Entity\Stage')
+            ->cascadePersist()
+            ->cascadeMerge()
+            ->addJoinColumn('stage_id', 'id', true, false, 'SET NULL')
+            ->build();
+
+        $builder->createOneToMany('stageChangeLog', 'StagesChangeLog')
+            ->orphanRemoval()
+            ->setOrderBy(array('dateAdded' => 'DESC'))
+            ->mappedBy('lead')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
+        $builder->createOneToMany('utmtags', 'Mautic\LeadBundle\Entity\UtmTag')
+            ->orphanRemoval()
+            ->mappedBy('lead')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
     }
 
     /**
@@ -265,6 +300,8 @@ class Lead extends FormEntity
                     'owner',
                     'ipAddresses',
                     'tags',
+                    'utmtags',
+                    'stage',
                     'dateIdentified',
                     'preferredProfileImage'
                 )
@@ -299,6 +336,16 @@ class Lead extends FormEntity
             } else {
                 $this->changes['tags']['removed'][] = $val;
             }
+        } elseif ($prop == 'utmtags') {
+
+            if ($val instanceof UtmTag) {
+                if($val->getUtmContent()) $this->changes['utmtags'] = array('utm_content',$val->getUtmContent());
+                if($val->getUtmMedium()) $this->changes['utmtags'] = array('utm_medium',$val->getUtmMedium());
+                if($val->getUtmCampaign()) $this->changes['utmtags'] = array('utm_campaign',$val->getUtmCampaign());
+                if($val->getUtmTerm()) $this->changes['utmtags'] = array('utm_term',$val->getUtmTerm());
+                if($val->getUtmSource()) $this->changes['utmtags'] = array('utm_source',$val->getUtmSource());
+
+            }
         } elseif ($this->$getter() != $val) {
             $this->changes[$prop] = array($this->$getter(), $val);
         }
@@ -314,6 +361,7 @@ class Lead extends FormEntity
         $this->doNotContact    = new ArrayCollection();
         $this->pointsChangeLog = new ArrayCollection();
         $this->tags            = new ArrayCollection();
+        $this->stageChangeLog = new ArrayCollection();
     }
 
     /**
@@ -662,7 +710,40 @@ class Lead extends FormEntity
 
         return $this;
     }
+    /**
+     * Creates a points change entry
+     *
+     * @param           $type
+     * @param           $name
+     * @param           $action
+     * @param           $pointsDelta
+     * @param IpAddress $ip
+     */
+    public function stageChangeLogEntry ($type, $name, $action)
+    {
+        //create a new points change event
+        $event = new StagesChangeLog();
+        $event->setType($type);
+        $event->setEventName($name);
+        $event->setActionName($action);
+        $event->setDateAdded(new \DateTime());
+        $event->setLead($this);
+        $this->stageChangeLog($event);
+    }
 
+    /**
+     * Add pointsChangeLog
+     *
+     * @param PointsChangeLog $pointsChangeLog
+     *
+     * @return Lead
+     */
+    public function stageChangeLog(StagesChangeLog $stageChangeLog)
+    {
+        $this->stageChangeLog[] = $stageChangeLog;
+
+        return $this;
+    }
     /**
      * Remove pointsChangeLog
      *
@@ -755,6 +836,7 @@ class Lead extends FormEntity
                 $type = 'manual';
                 break;
             case DoNotContact::UNSUBSCRIBED:
+            default:
                 $type = 'unsubscribed';
                 break;
         }
@@ -855,6 +937,27 @@ class Lead extends FormEntity
         }
 
         return $this->fields;
+    }
+
+    /**
+     * Get profile values
+     *
+     * @return array
+     */
+    public function getProfileFields()
+    {
+        $fieldValues = [
+            'id' => $this->id
+        ];
+        if (isset($this->fields['core'])) {
+            foreach ($this->fields as $group => $fields) {
+                foreach ($fields as $alias => $field) {
+                    $fieldValues[$alias] = $field['value'];
+                }
+            }
+        }
+
+        return array_merge($fieldValues, $this->updatedFields);
     }
 
     /**
@@ -1023,7 +1126,7 @@ class Lead extends FormEntity
     }
 
     /**
-     * @param mixed $lastActive
+     * @param mixed $lastActive $this->tags            = new ArrayCollection();
      */
     public function setLastActive($lastActive)
     {
@@ -1087,5 +1190,56 @@ class Lead extends FormEntity
         $this->tags = $tags;
 
         return $this;
+    }
+
+    /**
+     * Get tags
+     *
+     * @return mixed
+     */
+    public function getUtmTags ()
+    {
+        return $this->utmtags;
+    }
+
+
+
+    /**
+     * Set tags
+     *
+     * @param $tags
+     *
+     * @return $this
+     */
+    public function setUtmTags($utmTags)
+    {
+        $this->isChanged('utmtags', $utmTags);
+        $this->utmtags[] = $utmTags;
+
+        return $this;
+    }
+
+    /**
+     * Set stage
+     *
+     * @param \Mautic\StageBundle\Entity\Stage $stage
+     *
+     * @return Stage
+     */
+    public function setStage(\Mautic\StageBundle\Entity\Stage $stage)
+    {
+        $this->stage = $stage;
+
+        return $this;
+    }
+
+    /**
+     * Get stage
+     *
+     * @return \Mautic\StageBundle\Entity\Stage
+     */
+    public function getStage()
+    {
+        return $this->stage;
     }
 }

@@ -1,0 +1,111 @@
+<?php
+/**
+ * @package     Mautic
+ * @copyright   2016 Mautic, Inc. All rights reserved
+ * @author      Mautic, Inc
+ * @link        https://mautic.org
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace MauticPlugin\MauticSocialBundle\Event;
+
+use Mautic\CoreBundle\Event\CommonEvent;
+use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
+
+/**
+ * Class SocialMonitorEvent
+ */
+class SocialMonitorEvent extends CommonEvent
+{
+    /**
+     * @var
+     */
+    protected $integrationName;
+
+    /**
+     * @var int
+     */
+    protected $newLeadCount = 0;
+
+    /**
+     * @var int
+     */
+    protected $updatedLeadCount = 0;
+
+    /**
+     * @var array
+     */
+    protected $leadIds = array();
+
+    /**
+     * SocialMonitorEvent constructor.
+     *
+     * @param            $integrationName
+     * @param Monitoring $monitoring
+     * @param array      $leadIds
+     * @param            $newLeadCount
+     * @param            $updatedLeadCount
+     */
+    public function __construct($integrationName, Monitoring $monitoring, array $leadIds, $newLeadCount, $updatedLeadCount)
+    {
+        $this->integrationName  = $integrationName;
+        $this->entity           = $monitoring;
+        $this->leadIds          = $this->leadIds;
+        $this->newLeadCount     = (int) $newLeadCount;
+        $this->updatedLeadCount = (int) $updatedLeadCount;
+    }
+
+    /**
+     * Returns the Monitoring entity
+     *
+     * @return Monitoring
+     */
+    public function getMonitoring()
+    {
+        return $this->entity;
+    }
+
+    /**
+     * Get count of new leads
+     *
+     * @return int
+     */
+    public function getNewLeadCount()
+    {
+        return $this->newLeads;
+    }
+
+    /**
+     * Get count of updated leads
+     *
+     * @return int
+     */
+    public function getUpdatedLeadCount()
+    {
+        return $this->updatedLeads;
+    }
+
+    /**
+     * @return array|int
+     */
+    public function getTotalLeadCount()
+    {
+        return $this->updatedLeads + $this->newLeads;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLeadIds()
+    {
+        return $this->leadIds;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIntegrationName()
+    {
+        return $this->integrationName;
+    }
+}

@@ -9,8 +9,10 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
+use Mautic\AssetBundle\Helper\TokenHelper;
 use Mautic\CoreBundle\Event\BuilderEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -19,13 +21,31 @@ use Mautic\PageBundle\PageEvents;
 
 /**
  * Class BuilderSubscriber
- *
- * @package Mautic\AssetBundle\EventListener
  */
 class BuilderSubscriber extends CommonSubscriber
 {
+    /**
+     * @var string
+     */
+    protected $assetToken = '{assetlink=(.*?)}';
 
-    private $assetToken = '{assetlink=(.*?)}';
+    /**
+     * @var TokenHelper
+     */
+    protected $tokenHelper;
+
+    /**
+     * BuilderSubscriber constructor.
+     *
+     * @param MauticFactory $factory
+     * @param TokenHelper   $tokenHelper
+     */
+    public function __construct(MauticFactory $factory, TokenHelper $tokenHelper)
+    {
+        $this->tokenHelper = $tokenHelper;
+
+        parent::__construct($factory);
+    }
 
     /**
      * @return array
@@ -107,9 +127,6 @@ class BuilderSubscriber extends CommonSubscriber
     {
         $content = $event->getContent();
 
-        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-        $model = $this->factory->getModel('asset');
-
         $clickthrough = array();
         if ($event instanceof PageDisplayEvent || ($event instanceof EmailSendEvent && $event->shouldAppendClickthrough())) {
             $clickthrough = array('source' => $source);
@@ -123,22 +140,6 @@ class BuilderSubscriber extends CommonSubscriber
             }
         }
 
-        $tokens = array();
-
-        preg_match_all('/'.$this->assetToken.'/', $content, $matches);
-        if (!empty($matches[1])) {
-            foreach ($matches[1] as $key => $assetId) {
-                $token = $matches[0][$key];
-
-                if (isset($tokens[$token])) {
-                    continue;
-                }
-
-                $asset          = $model->getEntity($assetId);
-                $tokens[$token] = ($asset !== null) ? $model->generateUrl($asset, true, $clickthrough) : '';
-            }
-        }
-
-        return $tokens;
+        return $this->tokenHelper->findAssetTokens($content, $clickthrough);
     }
 }

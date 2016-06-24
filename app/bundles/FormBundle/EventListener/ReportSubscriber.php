@@ -10,11 +10,11 @@
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 
 /**
  * Class ReportSubscriber
@@ -148,32 +148,20 @@ class ReportSubscriber extends CommonSubscriber
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
             $queryBuilder = clone $qb;
+            $chartQuery   = clone $options['chartQuery'];
+            $chartQuery->applyDateFilters($queryBuilder, 'date_submitted', 'fs');
 
             switch ($g) {
                 case 'mautic.form.graph.line.submissions':
-                    // Generate data for submissions line graph
-                    $unit   = 'D';
-                    $amount = 30;
+                    $chart      = new LineChart(null, $options['dateFrom'], $options['dateTo']);
+                    $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_submitted', 'fs');
+                    $hits  = $chartQuery->loadAndBuildTimeData($queryBuilder);
+                    $chart->setDataset($options['translator']->trans($g), $hits);
+                    $data         = $chart->render();
+                    $data['name'] = $g;
 
-                    if (isset($options['amount'])) {
-                        $amount = $options['amount'];
-                    }
-
-                    if (isset($options['unit'])) {
-                        $unit = $options['unit'];
-                    }
-
-                    $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('submissions'));
-
-                    $queryBuilder->select('fs.form_id as form, fs.date_submitted as "dateSubmitted"');
-                    $queryBuilder->andwhere($queryBuilder->expr()->gte('fs.date_submitted', ':date'))
-                        ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
-                    $submissions = $queryBuilder->execute()->fetchAll();
-
-                    $timeStats         = GraphHelper::mergeLineGraphData($data, $submissions, $unit, 0, 'dateSubmitted');
-                    $timeStats['name'] = 'mautic.form.graph.line.submissions';
-
-                    $event->setGraph($g, $timeStats);
+                    $event->setGraph($g, $data);
+                    break;
                     break;
 
                 case 'mautic.form.table.top.referrers':
@@ -182,7 +170,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $submissionRepo->getTopReferrers($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.form.table.top.referrers';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-sign-in';
                     $graphData['link']      = 'mautic_form_action';
                     $event->setGraph($g, $graphData);
@@ -194,7 +182,7 @@ class ReportSubscriber extends CommonSubscriber
                     $items                  = $submissionRepo->getMostSubmitted($queryBuilder, $limit, $offset);
                     $graphData              = array();
                     $graphData['data']      = $items;
-                    $graphData['name']      = 'mautic.form.table.most.submitted';
+                    $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-check-square-o';
                     $graphData['link']      = 'mautic_form_action';
                     $event->setGraph($g, $graphData);

@@ -10,7 +10,7 @@
 namespace Mautic\UserBundle\Event;
 
 use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\UserBundle\Entity\User;
 
 /**
  * Class LoginEvent
@@ -20,32 +20,17 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 class LoginEvent extends Event
 {
     /**
-     * @var MauticFactory
-     */
-    private $factory;
-
-    /**
      * @var \Mautic\UserBundle\Entity\User|null
      */
     private $user;
 
     /**
-     * @param MauticFactory $factory
+     * @param User $user
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(User $user)
     {
-        $this->factory = $factory;
-        $this->user    = $factory->getUser();
+        $this->user = $user;
     }
-
-    /**
-     * @return MauticFactory
-     */
-    public function getFactory()
-    {
-        return $this->factory;
-    }
-
     /**
      * @return \Mautic\UserBundle\Entity\User|null
      */
