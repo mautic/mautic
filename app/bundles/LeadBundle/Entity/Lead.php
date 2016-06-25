@@ -1280,6 +1280,8 @@ class Lead extends FormEntity
 
         if (!empty($attribution) && empty($attributionDate)) {
             $this->addUpdatedField('attribution_date', (new \DateTime())->format('Y-m-d'));
+        } elseif (empty($attribution)) {
+            $this->addUpdatedField('attribution_date', null);
         }
     }
 
@@ -1296,5 +1298,4 @@ class Lead extends FormEntity
             }
         }
     }
-
 }

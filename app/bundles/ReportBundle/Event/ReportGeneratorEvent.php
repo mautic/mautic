@@ -216,16 +216,18 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function applyDateFilters(QueryBuilder $queryBuilder, $dateColumn, $tablePrefix = 't', $dateOnly = false)
     {
+        if ($tablePrefix) {
+            $tablePrefix  .= ".";
+        }
         if ($dateOnly) {
-            $queryBuilder->andWhere('DATE('.$tablePrefix.'.'.$dateColumn.') BETWEEN :dateFrom AND :dateTo');
+            $queryBuilder->andWhere('DATE('.$tablePrefix.$dateColumn.') BETWEEN :dateFrom AND :dateTo');
             $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d'));
             $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d'));
         } else {
-            $queryBuilder->andWhere($tablePrefix.'.'.$dateColumn.' BETWEEN :dateFrom AND :dateTo');
+            $queryBuilder->andWhere($tablePrefix.$dateColumn.' BETWEEN :dateFrom AND :dateTo');
             $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d H:i:s'));
             $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d H:i:s'));
         }
-
     }
 
     /**

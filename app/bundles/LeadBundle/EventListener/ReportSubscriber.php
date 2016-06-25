@@ -163,9 +163,13 @@ class ReportSubscriber extends CommonSubscriber
                         $type = 'bool';
                         break;
                     case 'date':
+                        $type = 'date';
+                        break;
                     case 'datetime':
-                    case 'time':
                         $type = 'datetime';
+                        break;
+                    case 'time':
+                        $type = 'time';
                         break;
                     case 'url':
                         $type = 'url';
@@ -294,6 +298,7 @@ class ReportSubscriber extends CommonSubscriber
             case 'contact.attribution.multi':
             case 'contact.attribution.first':
             case 'contact.attribution.last':
+                $localDateTriggered = 'CONVERT_TZ(log.date_triggered,\'UTC\',\''.date_default_timezone_get().'\')';
                 $event->applyDateFilters($qb, 'attribution_date', 'l', true);
                 $qb->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
                     ->join('l', MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log', 'l.id = log.lead_id')
@@ -306,7 +311,7 @@ class ReportSubscriber extends CommonSubscriber
                             $qb->expr()->eq('log.is_scheduled', 0),
                             $qb->expr()->isNotNull('l.attribution'),
                             $qb->expr()->neq('l.attribution', 0),
-                            $qb->expr()->lte('DATE(log.date_triggered)', 'DATE(l.attribution_date)')
+                            $qb->expr()->lte("DATE($localDateTriggered)", "DATE(l.attribution_date)")
                         )
                     );
 
