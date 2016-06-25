@@ -979,16 +979,11 @@ var Mautic = {
                 MauticVars.modalsReset = {};
             }
 
-            // mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage'], function (index, editorClass) {
-            //     mQuery(container + ' textarea.' + editorClass).each(function () {
-            //         for (var name in CKEDITOR.instances) {
-            //             var instance = CKEDITOR.instances[name];
-            //             if (this && this == instance.element.$) {
-            //                 instance.destroy(true);
-            //             }
-            //         }
-            //     });
-            // });
+            mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage'], function (index, editorClass) {
+                mQuery(container + ' textarea.' + editorClass).each(function () {
+                    mQuery('textarea.'+editorClass).froalaEditor('destroy');
+                });
+            });
 
             //turn off shuffle events
             mQuery('html')
