@@ -142,7 +142,7 @@ class DynamicContentType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr' => [
                     'tooltip' => 'mautic.dynamicContent.form.content.help',
-                    'class' => 'form-control editor-advanced editor-builder-tokens',
+                    'class' => 'form-control editor editor-advanced editor-builder-tokens',
                     'rows' => '15',
                 ],
                 'required' => false,

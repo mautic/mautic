@@ -566,8 +566,13 @@ var Mautic = {
                     //     settings.extraPlugins = "sourcedialog,docprops,filemanager";
                     // }
 
-
-                    if (editorClass == 'editor') {
+                    if (textarea.hasClass('editor-advanced')) {
+                        textarea.froalaEditor(mQuery.extend({
+                            // Set custom buttons with separator between them.
+                            toolbarButtons: ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikeThrough', 'fontFamily', 'fontSize', 'color', 'paragraphFormat', 'align', 'orderedList', 'unorderedList', 'quote', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertImage','insertTable', 'html', 'fullscrean'],
+                            heightMin: 300
+                        }, Mautic.basicFroalaOptions));
+                    } else if (editorClass == 'editor') {
                         //     settings.removePlugins = 'resize';
 
                         textarea.froalaEditor(mQuery.extend({
