@@ -566,7 +566,7 @@ var Mautic = {
                     //     settings.extraPlugins = "sourcedialog,docprops,filemanager";
                     // }
 
-                    if (textarea.hasClass('editor-advanced')) {
+                    if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
                         textarea.froalaEditor(mQuery.extend({
                             // Set custom buttons with separator between them.
                             toolbarButtons: ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikeThrough', 'fontFamily', 'fontSize', 'color', 'paragraphFormat', 'align', 'orderedList', 'unorderedList', 'quote', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertImage','insertTable', 'html', 'fullscrean'],
