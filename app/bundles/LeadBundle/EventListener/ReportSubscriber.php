@@ -334,7 +334,7 @@ class ReportSubscriber extends CommonSubscriber
 
                 $expr = $subQ->expr()->andX(
                     $subQ->expr()->eq("{$alias}e.event_type", $subQ->expr()->literal('decision')),
-                    $subQ->expr()->eq("{$alias}log.lead_id", "l.id")
+                    $subQ->expr()->eq("{$alias}log.lead_id", "log.lead_id")
                 );
 
                 $subsetFilters = ['log.campaign_id', 'c.name', 'channel', 'channel_action', 'e.name'];
