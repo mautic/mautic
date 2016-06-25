@@ -294,7 +294,7 @@ class ReportSubscriber extends CommonSubscriber
             case 'contact.attribution.multi':
             case 'contact.attribution.first':
             case 'contact.attribution.last':
-                $event->applyDateFilters($qb, 'attribution_date', 'l');
+                $event->applyDateFilters($qb, 'attribution_date', 'l', true);
                 $qb->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
                     ->join('l', MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log', 'l.id = log.lead_id')
                     ->leftJoin('l', MAUTIC_TABLE_PREFIX.'stages', 's', 'l.stage_id = s.id')
@@ -306,7 +306,7 @@ class ReportSubscriber extends CommonSubscriber
                             $qb->expr()->eq('log.is_scheduled', 0),
                             $qb->expr()->isNotNull('l.attribution'),
                             $qb->expr()->neq('l.attribution', 0),
-                            $qb->expr()->lte('log.date_triggered', 'l.attribution_date')
+                            $qb->expr()->lte('DATE(log.date_triggered)', 'DATE(l.attribution_date)')
                         )
                     );
 
