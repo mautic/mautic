@@ -160,6 +160,10 @@ Mautic.destroySlots = function() {
 
     // Remove style="z-index: 2501;" which Froala forgets there
     Mautic.builderContents.find('*[style="z-index: 2501;"]').removeAttr('style');
+
+    // Remove the class attr vrom HTML tag used by Modernizer
+    var htmlTags = document.getElementsByTagName('html');
+    htmlTags[0].removeAttribute('class');
 };
 
 Mautic.toggleBuilderButton = function (hide) {
