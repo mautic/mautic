@@ -372,18 +372,20 @@ Mautic.initSlotListeners = function() {
 
     Mautic.getPredefinedLinks = function() {
         var linkList = [];
-        mQuery.each(parent.builderTokens, function(token, label) {
-            if (token.startsWith('{pagelink=') || 
-                token.startsWith('{assetlink=') || 
-                token.startsWith('{webview_url') || 
-                token.startsWith('{unsubscribe_url')) {
-                
-                linkList.push({
-                    text: label,
-                    href: token
-                });
-            }
-        });
+        if (typeof parent.builderTokens !== 'undefined' && parent.builderTokens.length) {
+            mQuery.each(parent.builderTokens, function(token, label) {
+                if (token.startsWith('{pagelink=') || 
+                    token.startsWith('{assetlink=') || 
+                    token.startsWith('{webview_url') || 
+                    token.startsWith('{unsubscribe_url')) {
+                    
+                    linkList.push({
+                        text: label,
+                        href: token
+                    });
+                }
+            });
+        }
 
         return linkList;
     }
