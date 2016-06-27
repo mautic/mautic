@@ -53,15 +53,12 @@ class PeriodicityType extends AbstractType
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control',
                                       'data-toggle' => 'datetime'),
-                'mapped' => false,
                 'format'     => 'yyyy-MM-dd HH:mm',
-                'required' => false,
-//                 'data' => (new \DateTime('now'))->format('yyyy-MM-dd HH:mm')
+                'required' => false
             )
         );
 
         $builder->add('triggerMode', 'button_group', array(
-            'mapped'           => false,
             'choices'          => array(
                 'timeInterval' => 'mautic.core.periodicity.form.interval',
                 'weekDays'     => 'mautic.core.periodicity.form.days_of_week'
@@ -80,7 +77,6 @@ class PeriodicityType extends AbstractType
                 'label'      => 'mautic.core.periodicity.form.interval',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
-                'mapped' => false,
                 'required' => false
             )
         );
@@ -91,7 +87,6 @@ class PeriodicityType extends AbstractType
                 'label'      => 'mautic.core.periodicity.form.interval_unit',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
-                'mapped' => false,
                 'choices'  => array(
                     'd' => 'mautic.core.periodicity.form.unit.days',
                     'w' => 'mautic.core.periodicity.form.unit.weeks',
@@ -108,7 +103,6 @@ class PeriodicityType extends AbstractType
             array(
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
-                'mapped' => false,
                 'choices'  => array(
                     0 => 'mautic.core.periodicity.form.days_of_week.monday',
                     1 => 'mautic.core.periodicity.form.days_of_week.tuesday',
@@ -118,6 +112,7 @@ class PeriodicityType extends AbstractType
                     5 => 'mautic.core.periodicity.form.days_of_week.saturday',
                     6 => 'mautic.core.periodicity.form.days_of_week.sunday'
                 ),
+                'mapped'   => false,
                 'multiple' => true,
                 'required' => false
             )

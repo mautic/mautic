@@ -274,9 +274,18 @@ class EmailType extends AbstractType
             )
         );
 
-        //For periodicity
-        $periodicity = new PeriodicityType();
-        $periodicity->buildForm($builder, $options);
+        // For periodicity
+        // $periodicity = new PeriodicityType();
+        // $periodicity->buildForm($builder, $options);
+
+        $builder->add(
+            'periodicity',
+            new PeriodicityType(),
+            array(
+                'label' => false,
+                'mapped' => false
+            )
+        );
 
         $transformer = new IdToEntityModelTransformer($this->em, 'MauticEmailBundle:Email');
         $builder->add(

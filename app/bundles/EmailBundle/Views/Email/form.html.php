@@ -33,7 +33,7 @@ $header = $isExisting ?
 $view['slots']->set('headerTitle', $header.$subheader);
 
 $emailType = $form['emailType']->vars['data'];
-$triggerMode = $form['triggerMode']->vars['data'];
+// $triggerMode = $form['triggerMode']->vars['data'];
 
 if (!isset($attachmentSize)) {
     $attachmentSize = 0;
@@ -208,16 +208,7 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
             <div id="feedInputs"<?php echo ($emailType === 'feed') ? '' : ' class="hide"'; ?>>
                 <hr/>
                 <?php echo $view['form']->row($form['feed']); ?>
-                <?php echo $view['form']->row($form['triggerDate']); ?>
-
-                <?php echo $view['form']->row($form['triggerMode']) ?>
-                <div id="timeInterval" class="row<?php echo ($triggerMode == 'timeInterval') ? '' : ' hide' ?>">
-                    <span class="col-md-6 col-xs-12"><?php echo $view['form']->row($form['triggerInterval']); ?></span>
-                    <span class="col-md-6 col-xs-12"><?php echo $view['form']->row($form['triggerIntervalUnit']); ?></span>
-                </div>
-                <div id="weekDays" class="<?php echo ($triggerMode == 'weekDays') ? '' : ' hide' ?>">
-                    <?php echo $view['form']->row($form['weekDays']); ?>
-                </div>
+                <?php echo($view['form']->row($form['periodicity'])); ?>
             </div>
         </div>
         <div class="hide">
