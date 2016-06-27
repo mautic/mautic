@@ -48,6 +48,7 @@ class PeriodicityType extends AbstractType
             'triggerDate',
             'datetime',
             array(
+                'widget'     => 'single_text',
                 'label'      => 'mautic.core.periodicity.form.triggerdate',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control',
