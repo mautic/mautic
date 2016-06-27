@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.3 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -41,6 +41,11 @@
 
   $.FE.PLUGINS.draggable = function (editor) {
     function _dragStart (e) {
+      // Image with link.
+      if (e.target && e.target.tagName == 'A' && e.target.childNodes.length == 1 && e.target.childNodes[0].tagName == 'IMG') {
+        e.target = e.target.childNodes[0];
+      }
+
       if (!$(e.target).hasClass('fr-draggable')) {
         e.preventDefault();
         return false;
@@ -143,6 +148,7 @@
 
           editor.events.on('shared.destroy', function () {
             $draggable_helper.html('').removeData().remove();
+            $draggable_helper = null;
           }, true);
         }
 
@@ -291,32 +297,42 @@
           editor.undo.saveStep();
         }
 
+        // Image with link.
+        var $droppedEl = $draggedEl;
+        if ($draggedEl.parent().is('A')) {
+          $droppedEl = $draggedEl.parent();
+        }
+
         // Replace marker with the dragged element.
         if (!editor.core.isEmpty()) {
           var $marker = editor.$el.find('.fr-marker');
-          $marker.replaceWith($draggedEl);
+          $marker.replaceWith($droppedEl);
           $draggedEl.after($.FE.MARKERS);
           editor.selection.restore();
         }
         else {
-          editor.$el.html($draggedEl);
+          editor.$el.html($droppedEl);
         }
 
         $draggedEl.removeClass('fr-dragging');
-        editor.$el.find(editor.html.emptyBlockTagsQuery()).remove();
+        editor.$el.find(editor.html.emptyBlockTagsQuery()).not('TD, TH, LI, .fr-inner').remove();
         editor.html.wrap();
+        editor.html.fillEmptyBlocks();
         editor.undo.saveStep();
+
+        if (editor.opts.iframe) editor.size.syncIframe();
 
         // Mark changes in the original instance as well.
         if (inst != editor) {
           inst.popups.hideAll();
-          inst.$el.find(editor.html.emptyBlockTagsQuery()).remove();
+          inst.$el.find(editor.html.emptyBlockTagsQuery()).not('TD, TH, LI, .fr-inner').remove();
           inst.html.wrap();
+          inst.html.fillEmptyBlocks();
           inst.undo.saveStep();
           inst.events.trigger('element.dropped');
-        }
 
-        if (editor.opts.iframe) editor.size.syncIframe();
+          if (inst.opts.iframe) inst.size.syncIframe();
+        }
 
         editor.events.trigger('element.dropped', [$draggedEl]);
 

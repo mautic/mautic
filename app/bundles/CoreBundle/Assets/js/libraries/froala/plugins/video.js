@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.3 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -54,10 +54,10 @@
 
   $.FE.VIDEO_PROVIDERS = [
     {
-      test_regex: /^.*((youtu.be\/)|(youtube.com))\/((v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/,
+      test_regex: /^.*((youtu.be)|(youtube.com))\/((v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))?\??v?=?([^#\&\?]*).*/,
       url_regex: /(?:https?:\/\/)?(?:www\.)?(?:m\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=|embed\/)?([0-9a-zA-Z_\-]+)(.+)?/g,
       url_text: '//www.youtube.com/embed/$1',
-      html: '<iframe width="640" height="360" src="{url}" frameborder="0" allowfullscreen></iframe>'
+      html: '<iframe width="640" height="360" src="{url}?wmode=opaque" frameborder="0" allowfullscreen></iframe>'
     },
     {
       test_regex: /^.*(vimeo\.com\/)((channels\/[A-z]+\/)|(groups\/[A-z]+\/videos\/))?([0-9]+)/,
@@ -435,9 +435,11 @@
       // Shared destroy.
       editor.events.on('shared.destroy', function () {
         $video_resizer.html('').removeData().remove();
+        $video_resizer = null;
 
         if (editor.opts.videoResize) {
           $overlay.remove();
+          $overlay = null;
         }
       }, true);
 
@@ -581,7 +583,7 @@
     function _initEditPopup () {
       // Image buttons.
       var video_buttons = '';
-      if (editor.opts.videoEditButtons.length > 1) {
+      if (editor.opts.videoEditButtons.length >= 1) {
         video_buttons += '<div class="fr-buttons">';
         video_buttons += editor.button.buildList(editor.opts.videoEditButtons);
         video_buttons += '</div>';
