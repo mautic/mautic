@@ -46,6 +46,7 @@ class EmailGenerateCommand extends ModeratedCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+
         $options = $input->getOptions();
         $objectId = $options['id'];
         $factory = $this->getContainer()->get('mautic.factory');

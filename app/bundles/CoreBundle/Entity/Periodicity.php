@@ -45,6 +45,7 @@ class Periodicity
     private $triggerDate;
 
     /**
+     *
      * @var string
      */
     private $triggerMode;
@@ -110,7 +111,7 @@ class Periodicity
             ->build();
 
         $builder->createField('weekDays', 'array')
-            ->columnName('days_of_week_mask')
+            ->columnName('days_of_week')
             ->length(1)
             ->nullable()
             ->build();
@@ -287,17 +288,21 @@ class Periodicity
     }
 
     /**
+     *
      * @return string
      */
-    public function getTriggerMode() {
+    public function getTriggerMode()
+    {
         return $this->triggerMode;
     }
 
     /**
+     *
      * @param string $triggerMode
      * @return Periodicity
      */
-    public function setTriggerMode($triggerMode) {
+    public function setTriggerMode($triggerMode)
+    {
         $this->triggerMode = $triggerMode;
         return $this;
     }
@@ -376,46 +381,46 @@ class Periodicity
     public function nextShoot()
     {
         // define date of next execution
-
-        if (is_null($this->getLastShoot())){
+        if (is_null($this->getLastShoot())) {
             // last shoot was never set... mean it's the first execution of this periodicity
             return $this->getTriggerDate();
         }
+        switch ($this->getTriggerMode()) {
 
-        switch ($this->getTriggerIntervalUnit()) {
-            case 'd':
-                /** @var \DateTime $nextShoot */
-                $nextShoot = clone $this->getLastShoot()
-                ->setTime(0, 0)
-                ->modify('+' . $this->getTriggerInterval() . 'day');
-                break;
-            case 'w':
-                /** @var \DateTime $nextShoot */
-                $nextShoot = clone $this->getLastShoot()
-                    ->setTime(0, 0)
-                    ->modify('+' . $this->getTriggerInterval() . 'week');
-
-                break;
-            case 'm':
-                /** @var \DateTime $nextShoot */
-                $nextShoot = clone $this->getLastShoot()
-                    ->setTime(0, 0)
-                    ->modify('+' . $this->getTriggerInterval() . 'month');
-                break;
-
-                // if  TriggerIntervalUnit is null, that mean we are on days of week pattern
-            case null:
-                $dates = array();
-                foreach ($this->getDaysOfWeekMask() as $day => $activated) {
-                    if ($activated === true) {
-
-                        $dates[] = clone $this->getLastShoot()
+            case 'weekDays':
+                $allowedDates = array();
+                foreach ($this->getWeekDays() as $allowedDay) {
+                    $allowedDates[] = clone $this->getLastShoot()
                         ->setTime(0, 0)
-                        ->modify('next ' . $day);
-                    }
+                        ->modify('next ' . $allowedDay);
                 }
-                /** @var \DateTime $nextShoot */
-                $nextShoot = min($dates);
+
+                $nextShoot = min($allowedDates);
+                break;
+
+            case 'timeInterval':
+
+                switch ($this->getTriggerIntervalUnit()) {
+                    case 'd':
+                        /** @var \DateTime $nextShoot */
+                        $nextShoot = clone $this->getLastShoot()
+                            ->setTime(0, 0)
+                            ->modify('+' . $this->getTriggerInterval() . 'day');
+                        break;
+                    case 'w':
+                        /** @var \DateTime $nextShoot */
+                        $nextShoot = clone $this->getLastShoot()
+                            ->setTime(0, 0)
+                            ->modify('+' . $this->getTriggerInterval() . 'week');
+
+                        break;
+                    case 'm':
+                        /** @var \DateTime $nextShoot */
+                        $nextShoot = clone $this->getLastShoot()
+                            ->setTime(0, 0)
+                            ->modify('+' . $this->getTriggerInterval() . 'month');
+                        break;
+                }
                 break;
         }
 
@@ -423,6 +428,7 @@ class Periodicity
         $nextShoot->setTime($this->getTriggerDate()
             ->format('H'), $this->getTriggerDate()
             ->format('i'));
+//         echo (clone $nextShoot->format('d/m/Y'));
         return $nextShoot;
     }
 }

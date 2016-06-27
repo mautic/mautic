@@ -16,18 +16,16 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Mautic\CoreBundle\Model\PeriodicityModel;
 
-
 class PeriodicityCommand extends ModeratedCommand
 {
 
     protected function configure()
     {
-
         $this->setName('mautic:periodicity:update')
             ->setDescription('Run all periodicity event')
             ->addOption('--id', '-i', InputOption::VALUE_OPTIONAL, 'Id of periodicity', false)
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
-            // ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of leads to process per round. Defaults to 300.', 300)
+        // ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of leads to process per round. Defaults to 300.', 300)
         parent::configure();
     }
 
@@ -42,7 +40,7 @@ class PeriodicityCommand extends ModeratedCommand
         $container = $this->getContainer();
         $factory = $container->get('mautic.factory');
         $translator = $factory->getTranslator();
-//         $em = $factory->getEntityManager();
+        // $em = $factory->getEntityManager();
         /**@var PeriodicityModel $periodicityModel */
         $periodicityModel = $factory->getModel('core.periodicity');
         $periodicitys = $periodicityModel->getRepository()->getEntities();
@@ -51,32 +49,52 @@ class PeriodicityCommand extends ModeratedCommand
 
         foreach ($periodicitys as $p) {
             if ($p->nextShoot() > new \DateTime()) {
-                $output->writeln('<info>' . $translator->trans('mautic.core.command.perodicity.next_exec', array('%id%' => $p->getid(), '%nextShoot%' => $p->nextShoot()->format($factory->getParameter('date_format_full')))) . '</info>');
+                $output->writeln('<info>' . $translator->trans('mautic.core.command.perodicity.next_exec', array(
+                    '%id%' => $p->getid(),
+                    '%nextShoot%' => $p->nextShoot()
+                        ->format($factory->getParameter('date_format_full'))
+                )) . '</info>');
                 continue;
             }
-            $output->writeln('<info>' . $translator->trans('mautic.core.command.perodicity.update', array('%id%' => $p->getid())) . '</info>');
+            $output->writeln('<info>' . $translator->trans('mautic.core.command.perodicity.update', array(
+                '%id%' => $p->getid()
+            )) . '</info>');
 
             $env = $container->get('kernel')->getEnvironment();
 
-            $args = array('console', 'mautic:'.$p->getType(), '--env='.$env);
-            $args[] = '--id='.$p->getTargetId();
+            $args = array(
+                'console',
+                'mautic:' . $p->getType(),
+                '--env=' . $env
+            );
+            $args[] = '--id=' . $p->getTargetId();
 
-            $input       = new ArgvInput($args);
+            if (isset($options['force']) || isset($options['f'])) {
+                $args[] = '--force';
+            }
+
+            $input = new ArgvInput($args);
             $application = $this->getApplication();
+            $application->setAutoExit(false);
+            // var_dump('tot');
             $returnCode = $application->run($input, $output);
+            // var_dump($returnCode);
 
-            if ($returnCode===0){
+            $output->writeln('<info>qsdfqsdf' . $returnCode . '</info>');
+
+            var_dump(array(
+                'returnCode' => $returnCode
+            ));
+
+            if ($returnCode == 0) {
                 // command done and success
                 $p->setLastShoot(new \DateTime());
-                $periodicityModel->getRepository()->saveEntity($p,true);;
-            }
-            else{
+                $periodicityModel->getRepository()->saveEntity($p, true);
+                ;
+            } else {
                 // command not finished normaly
             }
-
         }
         $this->completeRun();
-
-
     }
 }
