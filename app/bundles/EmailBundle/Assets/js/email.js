@@ -679,8 +679,8 @@ Mautic.convertDynamicContentFilterInput = function(el) {
 };
 
 Mautic.feedToggleTriggerMode = function() {
-    var timeIntervalChecked = mQuery('#emailform_triggerMode_0').prop('checked');
-    var weekDaysChecked     = mQuery('#emailform_triggerMode_1').prop('checked');
+    var timeIntervalChecked = mQuery('#emailform_periodicity_triggerMode_0').prop('checked');
+    var weekDaysChecked     = mQuery('#emailform_periodicity_triggerMode_1').prop('checked');
 
     if (timeIntervalChecked) {
         mQuery('#timeInterval').removeClass('hide');

@@ -502,6 +502,8 @@ class EmailController extends FormController
         //create the form
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
+        $form['periodicity']['triggerMode']->setData('timeInterval');
+
         ///Check for a submitted form and process it
         if ($method == 'POST') {
             $valid = false;
@@ -939,6 +941,8 @@ class EmailController extends FormController
                 return $this->isLocked($postActionVars, $entity, 'email');
             }
 
+            $periodicity = $model->getRepository()->getPeriodicity($entity);
+            $this->factory->getEntityManager()->remove($periodicity);
             $model->deleteEntity($entity);
 
             $flashes[] = [

@@ -59,13 +59,13 @@ class PeriodicityType extends AbstractType
         );
 
         $builder->add('triggerMode', 'button_group', array(
-            'choices'          => array(
+            'choices'    => array(
                 'timeInterval' => 'mautic.core.periodicity.form.interval',
                 'weekDays'     => 'mautic.core.periodicity.form.days_of_week'
             ),
-            'label_attr'       => array('class' => 'control-label'),
-            'label'            => 'Kind of periodicity',
-            'attr'             => array(
+            'label_attr' => array('class' => 'control-label'),
+            'label'      => 'Kind of periodicity',
+            'attr'       => array(
                 'onchange'     => 'Mautic.feedToggleTriggerMode();'
             )
         ));
