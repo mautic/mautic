@@ -40,7 +40,7 @@ class Periodicity
 
     /**
      *
-     * @var null|\DateTime
+     * @var \DateTime
      */
     private $triggerDate;
 
@@ -53,27 +53,25 @@ class Periodicity
      *
      * @var int
      */
-    private $triggerInterval = 0;
+    private $triggerInterval = null;
 
     /**
      *
      * @var string
      */
-    private $triggerIntervalUnit;
+    private $triggerIntervalUnit = null;
 
     /**
      *
-     * @var integer
+     * @var array
      */
-    private $daysOfWeekMask;
+    private $weekDays = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('periodicity')->setCustomRepositoryClass('Mautic\CoreBundle\Entity\PeriodicityRepository');
-        // ->addIndex(array('object', 'object_id'), 'object_search')
-        // ->addIndex(array('bundle', 'object', 'action', 'object_id'), 'timeline_search')
 
         $builder->addId();
 
@@ -111,7 +109,7 @@ class Periodicity
             ->columnName('target_id')
             ->build();
 
-        $builder->createField('daysOfWeekMask', 'integer')
+        $builder->createField('weekDays', 'array')
             ->columnName('days_of_week_mask')
             ->length(1)
             ->nullable()
@@ -136,11 +134,8 @@ class Periodicity
     protected $changes;
 
     /**
-     *
-     * @param
-     *            $prop
-     * @param
-     *            $val
+     * @param $prop
+     * @param $val
      *
      * @return void
      */
@@ -345,56 +340,6 @@ class Periodicity
         $this->triggerIntervalUnit = $triggerIntervalUnit;
     }
 
-    public static function getDaysOfWeek()
-    {
-        return array(
-            "monday",
-            "tuesday",
-            "wednesday",
-            "thursday",
-            "friday",
-            "saturday",
-            "sunday"
-        );
-    }
-
-    /**
-     * convert bitmask to array
-     *
-     * @return array
-     */
-    public function getDaysOfWeekMask()
-    {
-        $tmp = $this->daysOfWeekMask;
-        $return = array();
-        for ($i = 6; $i >= 0; $i --) {
-            if ($tmp >= pow(2, $i)) {
-                $tmp = $tmp - pow(2, $i);
-                $return[$this->getDaysOfWeek()[6 - $i]] = true;
-            } else {
-                $return[$this->getDaysOfWeek()[6 - $i]] = false;
-            }
-        }
-        return $return;
-    }
-
-    /**
-     * convert array to bitmask
-     *
-     * @param array $daysOfWeekMask
-     */
-    public function setDaysOfWeekMask($daysOfWeekMask)
-    {
-        $tmp = 0;
-        for ($i = 6; $i >= 0; $i --) {
-            if ($daysOfWeekMask[$this->getDaysOfWeek()[6 - $i]] === true) {
-                $tmp += pow(2, $i);
-            }
-        }
-        $this->daysOfWeekMask = $tmp;
-        return $this;
-    }
-
     public function getLastShoot()
     {
         return $this->lastShoot;
@@ -403,6 +348,23 @@ class Periodicity
     public function setLastShoot($lastShoot)
     {
         $this->lastShoot = $lastShoot;
+        return $this;
+    }
+
+    /**
+     * @return null|array
+     */
+    public function getWeekDays() {
+        return $this->weekDays;
+    }
+
+    /**
+     * @param array $weekDays
+     *
+     * @return Periodicity
+     */
+    public function setWeekDays($weekDays) {
+        $this->weekDays = $weekDays;
         return $this;
     }
 

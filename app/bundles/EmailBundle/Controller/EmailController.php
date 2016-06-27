@@ -531,41 +531,9 @@ class EmailController extends FormController
                         $periodicity = $form['periodicity']->getData();
                         $periodicity->setTargetId($entity->getId());
                         $periodicity->setType(Periodicity::getTypeEmail());
-                        $periodicity->setDaysOfWeekMask(null);
                         $this->factory->getEntityManager()->persist($periodicity);
                         $this->factory->getEntityManager()->flush();
                     }
-
-                    //Here we save the Periodicity, if needed
-                    // if ($entity->getEmailType() === 'feed') {
-                    //     //We need a new Periodicity
-                    //     $periodicity = new Periodicity();
-                    //
-                    //     $periodicity->setTriggerDate(new \DateTime($this->request->get('emailform')['triggerDate']));
-                    //     $periodicity->setType(Periodicity::getTypeEmail());
-                    //     $periodicity->setTargetId($entity->getId());
-                    //     $periodicity->setTriggerMode($this->request->get('emailform')['triggerMode']);
-                    //     if ($periodicity->getTriggerMode() == 'timeInterval') {
-                    //         $periodicity->setTriggerInterval($this->request->get('emailform')['interval']);
-                    //         $periodicity->setTriggerIntervalUnit($this->request->get('emailform')['intervalUnit']);
-                    //         $periodicity->setDaysOfWeekMask(null);
-                    //     } else {
-                    //         $daysOfWeekMask = array();
-                    //         for($i = 0; $i < 7; $i++){
-                    //             if(array_search(strval($i), $this->request->get('emailform')['weekDays']) !== false){
-                    //                 $daysOfWeekMask[Periodicity::getDaysOfWeek()[$i]] = true;
-                    //             } else {
-                    //                 $daysOfWeekMask[Periodicity::getDaysOfWeek()[$i]] = false;
-                    //             }
-                    //         }
-                    //         $periodicity->setDaysOfWeekMask($daysOfWeekMask);
-                    //         $periodicity->setTriggerInterval(null);
-                    //         $periodicity->setTriggerIntervalUnit(null);
-                    //     }
-                    //     //We persist the Periodicity
-                    //     $this->factory->getEntityManager()->persist($periodicity);
-                    //     $this->factory->getEntityManager()->flush();
-                    // }
 
                     //clear the session
                     $session->remove($contentName);
@@ -742,6 +710,10 @@ class EmailController extends FormController
 
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
+        if ($entity->getEmailType() === 'feed') {
+            $form['periodicity']->setData($model->getRepository()->getPeriodicity($entity));
+        }
+
         ///Check for a submitted form and process it
         if (!$ignorePost && $method == 'POST') {
             $valid = false;
@@ -763,35 +735,9 @@ class EmailController extends FormController
 
                     //Save the Periodicity too (if exist)
                     if ($entity->getEmailType() === 'feed') {
-                        //We find the Periodicity
-                        $periodicity = $this->factory
-                            ->getEntityManager()
-                            ->getRepository("MauticCoreBundle:Periodicity")
-                            ->findBy(array(
-                                    'targetId' => $entity->getId(),
-                                    'type' => Periodicity::getTypeEmail()
-                                ), null, 1, null )[0];
-
-                        $periodicity->setTriggerDate(new \DateTime($this->request->get('emailform')['nextShoot']));
-                        $periodicity->setTriggerMode($this->request->get('emailform')['triggerMode']);
-                        if ($periodicity->getTriggerMode() == 'timeInterval') {
-                            $periodicity->setTriggerInterval($this->request->get('emailform')['interval']);
-                            $periodicity->setTriggerIntervalUnit($this->request->get('emailform')['intervalUnit']);
-                            $periodicity->setDaysOfWeekMask(null);
-                        } else {
-                            $daysOfWeekMask = array();
-                            for($i = 0; $i < 7; $i++){
-                                if(array_search(strval($i), $this->request->get('emailform')['weekDays']) !== false){
-                                    $daysOfWeekMask[Periodicity::getDaysOfWeek()[$i]] = true;
-                                } else {
-                                    $daysOfWeekMask[Periodicity::getDaysOfWeek()[$i]] = false;
-                                }
-                            }
-                            $periodicity->setDaysOfWeekMask($daysOfWeekMask);
-                            $periodicity->setTriggerInterval(null);
-                            $periodicity->setTriggerIntervalUnit(null);
-                        }
-                        //We persist the Periodicity
+                        $periodicity = $form['periodicity']->getData();
+                        $periodicity->setTargetId($entity->getId());
+                        $periodicity->setType(Periodicity::getTypeEmail());
                         $this->factory->getEntityManager()->persist($periodicity);
                         $this->factory->getEntityManager()->flush();
                     }
@@ -876,31 +822,6 @@ class EmailController extends FormController
             if (empty($template)) {
                 $content = $entity->getCustomHtml();
                 $form['customHtml']->setData($content);
-            }
-
-            if ($entity->getEmailType() === 'feed') {
-                //Set the periodicity for the edit form
-                /** @var $periodicity Periodicity */
-                $periodicity = $this->factory
-                    ->getEntityManager()
-                    ->getRepository("MauticCoreBundle:Periodicity")
-                    ->findBy(
-                        array(
-                            'targetId' => $entity->getId(),
-                            'type' => Periodicity::getTypeEmail()
-                        ), null, 1, null )[0];
-                $form->get('triggerMode')->setData($periodicity->getTriggerMode());
-                $form->get('triggerInterval')->setData($periodicity->getTriggerInterval());
-                $form->get('triggerIntervalUnit')->setData($periodicity->getTriggerIntervalUnit());
-
-                $tmp = $periodicity->getDaysOfWeekMask();
-                $formDaysOfWeek = array();
-                for ($i = 0; $i < count($tmp); $i++) {
-                    if (array_values($tmp)[$i] === true) {
-                        array_push($formDaysOfWeek, $i);
-                    }
-                }
-                $form->get('weekDays')->setData($formDaysOfWeek);
             }
         }
 

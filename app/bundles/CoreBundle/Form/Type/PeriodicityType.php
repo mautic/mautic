@@ -104,15 +104,14 @@ class PeriodicityType extends AbstractType
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
                 'choices'  => array(
-                    0 => 'mautic.core.periodicity.form.days_of_week.monday',
-                    1 => 'mautic.core.periodicity.form.days_of_week.tuesday',
-                    2 => 'mautic.core.periodicity.form.days_of_week.wednesday',
-                    3 => 'mautic.core.periodicity.form.days_of_week.thursday',
-                    4 => 'mautic.core.periodicity.form.days_of_week.friday',
-                    5 => 'mautic.core.periodicity.form.days_of_week.saturday',
-                    6 => 'mautic.core.periodicity.form.days_of_week.sunday'
+                    'monday'    => 'mautic.core.periodicity.form.days_of_week.monday',
+                    'tuesday'   => 'mautic.core.periodicity.form.days_of_week.tuesday',
+                    'wednesday' => 'mautic.core.periodicity.form.days_of_week.wednesday',
+                    'thursday'  => 'mautic.core.periodicity.form.days_of_week.thursday',
+                    'friday'    => 'mautic.core.periodicity.form.days_of_week.friday',
+                    'saturday'  => 'mautic.core.periodicity.form.days_of_week.saturday',
+                    'sunday'    => 'mautic.core.periodicity.form.days_of_week.sunday'
                 ),
-                'mapped'   => false,
                 'multiple' => true,
                 'required' => false
             )
