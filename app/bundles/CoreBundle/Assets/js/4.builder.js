@@ -348,7 +348,7 @@ Mautic.initSlotListeners = function() {
                 Mautic.initAtWho(editor.$el, method, editor);
             });
 
-            var buttons = ['bold', 'italic', 'insertImage', 'insertLink', 'undo', 'redo', '-', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'indent', 'outdent'];
+            var buttons = ['bold', 'italic', 'fontSize', 'insertImage', 'insertLink', 'undo', 'redo', '-', 'paragraphFormat', 'align', 'color', 'formatOL', 'formatUL', 'indent', 'outdent'];
 
             var inlineFroalaOptions = {
                 toolbarInline: true,
