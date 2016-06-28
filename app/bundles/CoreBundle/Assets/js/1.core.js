@@ -283,8 +283,7 @@ var Mautic = {
             imageUploadURL: mauticBaseUrl + 's/file/upload',
             imageManagerLoadURL: mauticBaseUrl + 's/file/list',
             imageManagerDeleteURL: mauticBaseUrl + 's/file/delete',
-            useClasses: false,
-            fullPage: true
+            useClasses: false
         };
 
         // Set the Froala license key
@@ -572,11 +571,17 @@ var Mautic = {
                     // }
 
                     if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
-                        textarea.froalaEditor(mQuery.extend({
+                        var options = {
                             // Set custom buttons with separator between them.
                             toolbarButtons: ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikeThrough', 'fontFamily', 'fontSize', 'color', 'paragraphFormat', 'align', 'orderedList', 'unorderedList', 'quote', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertImage','insertTable', 'html', 'fullscrean'],
                             heightMin: 300
-                        }, Mautic.basicFroalaOptions));
+                        };
+
+                        if (textarea.hasClass('editor-basic-fullpage')) {
+                            options.fullPage = true;
+                        }
+
+                        textarea.froalaEditor(mQuery.extend(options, Mautic.basicFroalaOptions));
                     } else if (editorClass == 'editor') {
                         //     settings.removePlugins = 'resize';
 
