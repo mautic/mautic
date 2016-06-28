@@ -16,6 +16,13 @@ $columnOrder = $report->getColumns();
 $graphOrder  = $report->getGraphs();
 $startCount  = 1;
 ?>
+
+<div class="pa-md">
+    <h3><?php echo $report->getName(); ?></h3>
+    <div class="small">
+        <?php echo $view['date']->toDate($dateFrom, 'UTC') . " - " . $view['date']->toDate($dateTo, 'UTC'); ?>
+    </div>
+</div>
 <?php if (!empty($graphOrder) && !empty($graphs)): ?>
     <div class="row">
         <div class="pa-md">
@@ -43,7 +50,7 @@ $startCount  = 1;
             <tr>
                 <td><?php echo $startCount; ?></td>
                 <?php foreach ($columnOrder as $key): ?>
-                    <td><?php echo $view['formatter']->_($row[$columns[$key]['label']], $columns[$key]['type']); ?></td>
+                    <td><?php echo $view['formatter']->_($row[$columns[$key]['alias']], $columns[$key]['type']); ?></td>
                 <?php endforeach; ?>
             </tr>
             <?php $startCount++; ?>

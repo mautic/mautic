@@ -28,13 +28,13 @@ class ReportSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    static public function getSubscribedEvents ()
+    static public function getSubscribedEvents()
     {
-        return array(
-            ReportEvents::REPORT_ON_BUILD          => array('onReportBuilder', 0),
-            ReportEvents::REPORT_ON_GENERATE       => array('onReportGenerate', 0),
-            ReportEvents::REPORT_ON_GRAPH_GENERATE => array('onReportGraphGenerate', 0)
-        );
+        return [
+            ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
+            ReportEvents::REPORT_ON_GENERATE       => ['onReportGenerate', 0],
+            ReportEvents::REPORT_ON_GRAPH_GENERATE => ['onReportGraphGenerate', 0]
+        ];
     }
 
     /**
@@ -44,102 +44,102 @@ class ReportSubscriber extends CommonSubscriber
      *
      * @return void
      */
-    public function onReportBuilder (ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event)
     {
-        if ($event->checkContext(array('emails', 'email.stats'))) {
+        if ($event->checkContext(['emails', 'email.stats'])) {
             $prefix        = 'e.';
             $variantParent = 'vp.';
-            $columns       = array(
-                $prefix . 'subject'            => array(
+            $columns       = [
+                $prefix.'subject'            => [
                     'label' => 'mautic.email.subject',
                     'type'  => 'string'
-                ),
-                $prefix . 'lang'               => array(
+                ],
+                $prefix.'lang'               => [
                     'label' => 'mautic.core.language',
                     'type'  => 'string'
-                ),
-                $prefix . 'read_count'         => array(
+                ],
+                $prefix.'read_count'         => [
                     'label' => 'mautic.email.report.read_count',
                     'type'  => 'int'
-                ),
-                $prefix . 'revision'           => array(
+                ],
+                $prefix.'revision'           => [
                     'label' => 'mautic.email.report.revision',
                     'type'  => 'int'
-                ),
-                $variantParent . 'id'          => array(
+                ],
+                $variantParent.'id'          => [
                     'label' => 'mautic.email.report.variant_parent_id',
                     'type'  => 'int'
-                ),
-                $variantParent . 'subject'     => array(
+                ],
+                $variantParent.'subject'     => [
                     'label' => 'mautic.email.report.variant_parent_subject',
                     'type'  => 'string'
-                ),
-                $prefix . 'variant_start_date' => array(
+                ],
+                $prefix.'variant_start_date' => [
                     'label' => 'mautic.email.report.variant_start_date',
                     'type'  => 'datetime'
-                ),
-                $prefix . 'variant_sent_count' => array(
+                ],
+                $prefix.'variant_sent_count' => [
                     'label' => 'mautic.email.report.variant_sent_count',
                     'type'  => 'int'
-                ),
-                $prefix . 'variant_read_count' => array(
+                ],
+                $prefix.'variant_read_count' => [
                     'label' => 'mautic.email.report.variant_read_count',
                     'type'  => 'int'
-                )
-            );
-            $columns       = array_merge($columns, $event->getStandardColumns($prefix), $event->getCategoryColumns());
-            $data          = array(
+                ]
+            ];
+            $columns       = array_merge($columns, $event->getStandardColumns($prefix, [], 'mautic_email_action'), $event->getCategoryColumns());
+            $data          = [
                 'display_name' => 'mautic.email.emails',
                 'columns'      => $columns
-            );
+            ];
             $event->addTable('emails', $data);
 
             if ($event->checkContext('email.stats')) {
                 $statPrefix  = 'es.';
-                $statColumns = array(
-                    $statPrefix . 'email_address'     => array(
+                $statColumns = [
+                    $statPrefix.'email_address'     => [
                         'label' => 'mautic.email.report.stat.email_address',
                         'type'  => 'email'
-                    ),
-                    $statPrefix . 'date_sent'         => array(
+                    ],
+                    $statPrefix.'date_sent'         => [
                         'label' => 'mautic.email.report.stat.date_sent',
                         'type'  => 'datetime'
-                    ),
-                    $statPrefix . 'is_read'           => array(
+                    ],
+                    $statPrefix.'is_read'           => [
                         'label' => 'mautic.email.report.stat.is_read',
                         'type'  => 'bool'
-                    ),
-                    $statPrefix . 'is_failed'         => array(
+                    ],
+                    $statPrefix.'is_failed'         => [
                         'label' => 'mautic.email.report.stat.is_failed',
                         'type'  => 'bool'
-                    ),
-                    $statPrefix . 'viewed_in_browser' => array(
+                    ],
+                    $statPrefix.'viewed_in_browser' => [
                         'label' => 'mautic.email.report.stat.viewed_in_browser',
                         'type'  => 'bool'
-                    ),
-                    $statPrefix . 'date_read'         => array(
+                    ],
+                    $statPrefix.'date_read'         => [
                         'label' => 'mautic.email.report.stat.date_read',
                         'type'  => 'datetime'
-                    ),
-                    $statPrefix . 'retry_count'       => array(
+                    ],
+                    $statPrefix.'retry_count'       => [
                         'label' => 'mautic.email.report.stat.retry_count',
                         'type'  => 'int'
-                    ),
-                    $statPrefix . 'source'            => array(
+                    ],
+                    $statPrefix.'source'            => [
                         'label' => 'mautic.report.field.source',
                         'type'  => 'string'
-                    ),
-                    $statPrefix . 'source_id'         => array(
+                    ],
+                    $statPrefix.'source_id'         => [
                         'label' => 'mautic.report.field.source_id',
                         'type'  => 'int'
-                    )
-                );
+                    ]
+                ];
 
-                $data = array(
+                $data = [
                     'display_name' => 'mautic.email.stats.report.table',
                     'columns'      => array_merge($columns, $statColumns, $event->getLeadColumns(), $event->getIpColumn())
-                );
-                $event->addTable('email.stats', $data);
+                ];
+                $event->addTable('email.stats', $data, 'emails');
 
                 // Register Graphs
                 $context = 'email.stats';
@@ -160,29 +160,30 @@ class ReportSubscriber extends CommonSubscriber
      *
      * @return void
      */
-    public function onReportGenerate (ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event)
     {
         $context = $event->getContext();
-        if ($context == 'emails') {
-            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb      = $event->getQueryBuilder();
 
-            $qb->from(MAUTIC_TABLE_PREFIX . 'emails', 'e')
-                ->leftJoin('e', MAUTIC_TABLE_PREFIX . 'emails', 'vp', 'vp.id = e.variant_parent_id');
-            $event->addCategoryLeftJoin($qb, 'e');
+        switch ($context) {
+            case 'emails':
+                $qb->from(MAUTIC_TABLE_PREFIX.'emails', 'e')
+                    ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id');
+                $event->addCategoryLeftJoin($qb, 'e');
+                break;
+            case 'email.stats':
+                $event->applyDateFilters($qb, 'date_sent', 'es');
 
-            $event->setQueryBuilder($qb);
-        } elseif ($context == 'email.stats') {
-            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-
-            $qb->from(MAUTIC_TABLE_PREFIX . 'email_stats', 'es')
-                ->leftJoin('es', MAUTIC_TABLE_PREFIX . 'emails', 'e', 'e.id = es.email_id')
-                ->leftJoin('e', MAUTIC_TABLE_PREFIX . 'emails', 'vp', 'vp.id = e.variant_parent_id');
-            $event->addCategoryLeftJoin($qb, 'e');
-            $event->addLeadLeftJoin($qb, 'es');
-            $event->addIpAddressLeftJoin($qb, 'es');
-
-            $event->setQueryBuilder($qb);
+                $qb->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
+                    ->leftJoin('es', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = es.email_id')
+                    ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id');
+                $event->addCategoryLeftJoin($qb, 'e');
+                $event->addLeadLeftJoin($qb, 'es');
+                $event->addIpAddressLeftJoin($qb, 'es');
+                break;
         }
+
+        $event->setQueryBuilder($qb);
     }
 
     /**
@@ -192,10 +193,11 @@ class ReportSubscriber extends CommonSubscriber
      *
      * @return void
      */
-    public function onReportGraphGenerate (ReportGraphEvent $event)
+    public function onReportGraphGenerate(ReportGraphEvent $event)
     {
         // Context check, we only want to fire for Lead reports
         if (!$event->checkContext('email.stats')) {
+
             return;
         }
 
@@ -212,19 +214,19 @@ class ReportSubscriber extends CommonSubscriber
 
             switch ($g) {
                 case 'mautic.email.graph.line.stats':
-                    $chart        = new LineChart(null, $options['dateFrom'], $options['dateTo']);
-                    $sendQuery    = clone $queryBuilder;
-                    $readQuery    = clone $origQuery;
-                    $failedQuery  = clone $queryBuilder;
+                    $chart       = new LineChart(null, $options['dateFrom'], $options['dateTo']);
+                    $sendQuery   = clone $queryBuilder;
+                    $readQuery   = clone $origQuery;
+                    $failedQuery = clone $queryBuilder;
                     $failedQuery->andWhere($qb->expr()->eq('es.is_failed', ':true'));
                     $failedQuery->setParameter('true', true, 'boolean');
                     $chartQuery->applyDateFilters($readQuery, 'date_read', 'es');
                     $chartQuery->modifyTimeDataQuery($sendQuery, 'date_sent', 'es');
                     $chartQuery->modifyTimeDataQuery($readQuery, 'date_read', 'es');
                     $chartQuery->modifyTimeDataQuery($failedQuery, 'date_sent', 'es');
-                    $sends        = $chartQuery->loadAndBuildTimeData($sendQuery);
-                    $reads        = $chartQuery->loadAndBuildTimeData($readQuery);
-                    $failes       = $chartQuery->loadAndBuildTimeData($failedQuery);
+                    $sends  = $chartQuery->loadAndBuildTimeData($sendQuery);
+                    $reads  = $chartQuery->loadAndBuildTimeData($readQuery);
+                    $failes = $chartQuery->loadAndBuildTimeData($failedQuery);
                     $chart->setDataset($options['translator']->trans('mautic.email.sent.emails'), $sends);
                     $chart->setDataset($options['translator']->trans('mautic.email.read.emails'), $reads);
                     $chart->setDataset($options['translator']->trans('mautic.email.failed.emails'), $failes);
@@ -235,18 +237,18 @@ class ReportSubscriber extends CommonSubscriber
                     break;
 
                 case 'mautic.email.graph.pie.ignored.read.failed':
-                    $counts                 = $statRepo->getIgnoredReadFailed($queryBuilder);
+                    $counts = $statRepo->getIgnoredReadFailed($queryBuilder);
                     $chart  = new PieChart();
                     $chart->setDataset($options['translator']->trans('mautic.email.read.emails'), $counts['read']);
                     $chart->setDataset($options['translator']->trans('mautic.email.failed.emails'), $counts['failed']);
                     $chart->setDataset($options['translator']->trans('mautic.email.ignored.emails'), $counts['ignored']);
                     $event->setGraph(
                         $g,
-                        array(
+                        [
                             'data'      => $chart->render(),
                             'name'      => $g,
                             'iconClass' => 'fa-flag-checkered'
-                        )
+                        ]
                     );
                     break;
 
@@ -257,7 +259,7 @@ class ReportSubscriber extends CommonSubscriber
                     $limit                  = 10;
                     $offset                 = 0;
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
-                    $graphData              = array();
+                    $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-paper-plane-o';
@@ -272,7 +274,7 @@ class ReportSubscriber extends CommonSubscriber
                     $limit                  = 10;
                     $offset                 = 0;
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
-                    $graphData              = array();
+                    $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-eye';
@@ -288,7 +290,7 @@ class ReportSubscriber extends CommonSubscriber
                     $limit                  = 10;
                     $offset                 = 0;
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
-                    $graphData              = array();
+                    $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-exclamation-triangle';
@@ -303,7 +305,7 @@ class ReportSubscriber extends CommonSubscriber
                     $limit                  = 10;
                     $offset                 = 0;
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
-                    $graphData              = array();
+                    $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-tachometer';

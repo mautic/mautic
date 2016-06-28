@@ -92,9 +92,6 @@ abstract class PluginBundleBase extends Bundle
      * that Doctrine will generate an incorrect query leading to lost data. If using this method,
      * be sure to thoroughly test the queries Doctrine generates
      *
-     * It is preferred to check for MySql or PostgreSQL and execute appropriate raw queries to upgrade
-     * from the current version installed to the new version's schema.
-     *
      * @param array         $metadata
      * @param Schema        $installedSchema
      * @param MauticFactory $factory

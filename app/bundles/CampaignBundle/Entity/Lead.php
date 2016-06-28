@@ -53,7 +53,9 @@ class Lead
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('campaign_leads')
-            ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\LeadRepository');
+            ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\LeadRepository')
+            ->addIndex(['date_added'], 'campaign_leads_date_added')
+            ->addIndex(['campaign_id', 'manually_removed', 'date_added', 'lead_id'], 'campaign_leads');
 
         $builder->createManyToOne('campaign', 'Campaign')
             ->isPrimaryKey()

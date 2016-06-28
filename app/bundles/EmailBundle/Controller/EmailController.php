@@ -59,7 +59,8 @@ class EmailController extends FormController
 
         $listFilters = array(
             'filters'      => array(
-                'multiple' => true
+                'placeholder' => $this->get('translator')->trans('mautic.email.filter.placeholder'),
+                'multiple'    => true
             ),
         );
 
@@ -86,12 +87,6 @@ class EmailController extends FormController
             $filter['force'][] =
                 array('column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
         }
-
-        //retrieve a list of categories
-        $listFilters['filters']['groups']['mautic.core.filter.categories'] = array(
-            'options'  => $this->getModel('category')->getLookupResults('email', '', 0),
-            'prefix'   => 'category'
-        );
 
         //retrieve a list of Lead Lists
         $listFilters['filters']['groups']['mautic.core.filter.lists'] = array(
@@ -365,7 +360,7 @@ class EmailController extends FormController
 
         // Prepare stats for bargraph
         $variant = ($parent && $parent === $email);
-        
+
         if ($email->getEmailType() == 'template') {
             $stats = $model->getEmailGeneralStats(
                 $email,
@@ -373,7 +368,7 @@ class EmailController extends FormController
                 null,
                 new \DateTime($dateRangeForm->get('date_from')->getData()),
                 new \DateTime($dateRangeForm->get('date_to')->getData())
-            ); 
+            );
         } else {
             $stats = $model->getEmailListStats($email, $variant);
         }

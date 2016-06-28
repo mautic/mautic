@@ -9,10 +9,15 @@
 
 namespace Mautic\ReportBundle\Generator;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Report generator
@@ -20,9 +25,14 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 class ReportGenerator
 {
     /**
-     * @var \Symfony\Component\Security\Core\SecurityContextInterface
+     * @var Connection
      */
-    private $securityContext;
+    private $db;
+
+    /**
+     * @var EventDispatcher
+     */
+    private $dispatcher;
 
     /**
      * @var \Symfony\Component\Form\FormFactoryInterface
@@ -45,17 +55,20 @@ class ReportGenerator
     private $contentTemplate;
 
     /**
-     * Constructor
+     * ReportGenerator constructor.
      *
-     * @param \Symfony\Component\Security\Core\SecurityContextInterface $securityContext Security context
-     * @param \Symfony\Component\Form\FormFactoryInterface              $formFactory     Form factory
-     * @param \Mautic\ReportBundle\Entity\Report                        $entity          Report entity
+     * @param EventDispatcherInterface $dispatcher
+     * @param Connection               $db
+     * @param FormFactoryInterface     $formFactory
+     * @param Report                   $entity
+     * @param array                    $options
      */
-    public function __construct(SecurityContextInterface $securityContext, FormFactoryInterface $formFactory, Report $entity)
+    public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity, FormFactoryInterface $formFactory = null)
     {
-        $this->securityContext = $securityContext;
-        $this->formFactory     = $formFactory;
-        $this->entity          = $entity;
+        $this->db          = $db;
+        $this->dispatcher  = $dispatcher;
+        $this->formFactory = $formFactory;
+        $this->entity      = $entity;
     }
 
     /**
@@ -65,7 +78,7 @@ class ReportGenerator
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function getQuery(array $options = array())
+    public function getQuery(array $options = [])
     {
         $builder = $this->getBuilder();
 
@@ -107,7 +120,7 @@ class ReportGenerator
      */
     protected function getBuilder()
     {
-        $className  = '\\Mautic\\ReportBundle\\Builder\\MauticReportBuilder';
+        $className = '\\Mautic\\ReportBundle\\Builder\\MauticReportBuilder';
 
         if (!class_exists($className)) {
             throw new RuntimeException("The MauticReportBuilder does not exist.");
@@ -116,9 +129,11 @@ class ReportGenerator
         $reflection = new \ReflectionClass($className);
 
         if (!$reflection->implementsInterface($this->validInterface)) {
-            throw new RuntimeException(sprintf("ReportBuilders have to implement %s, and %s doesn't implement it", $this->validInterface, $className));
+            throw new RuntimeException(
+                sprintf("ReportBuilders have to implement %s, and %s doesn't implement it", $this->validInterface, $className)
+            );
         }
 
-        return $reflection->newInstanceArgs(array($this->securityContext, $this->entity));
+        return $reflection->newInstanceArgs([$this->dispatcher, $this->db, $this->entity]);
     }
 }

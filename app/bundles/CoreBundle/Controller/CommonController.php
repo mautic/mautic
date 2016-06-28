@@ -459,7 +459,8 @@ class CommonController extends Controller implements MauticController
                 $filter  = InputHelper::clean($this->request->query->get("filterby"), true);
                 $value   = InputHelper::clean($this->request->query->get("value"), true);
                 $filters = $session->get("mautic.$name.filters", array());
-                if (empty($value)) {
+
+                if ($value == '') {
                     if (isset($filters[$filter])) {
                         unset($filters[$filter]);
                     }
@@ -471,6 +472,7 @@ class CommonController extends Controller implements MauticController
                         'strict' => false
                     );
                 }
+
                 $session->set("mautic.$name.filters", $filters);
             }
         }

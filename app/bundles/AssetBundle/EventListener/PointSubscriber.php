@@ -9,7 +9,7 @@
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\AssetEvents;
-use Mautic\AssetBundle\Event\AssetEvent;
+use Mautic\AssetBundle\Event\AssetLoadEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\PointEvents;
@@ -29,7 +29,7 @@ class PointSubscriber extends CommonSubscriber
     {
         return array(
             PointEvents::POINT_ON_BUILD    => array('onPointBuild', 0),
-            AssetEvents::ASSET_ON_DOWNLOAD => array('onAssetDownload', 0)
+            AssetEvents::ASSET_ON_LOAD => array('onAssetDownload', 0)
         );
     }
 
@@ -52,10 +52,10 @@ class PointSubscriber extends CommonSubscriber
     /**
      * Trigger point actions for asset download
      *
-     * @param AssetEvent $event
+     * @param AssetLoadEvent $event
      */
-    public function onAssetDownload(AssetEvent $event)
+    public function onAssetDownload(AssetLoadEvent $event)
     {
-        $this->factory->getModel('point')->triggerAction('asset.download', $event->getAsset());
+        $this->factory->getModel('point')->triggerAction('asset.download', $event->getRecord()->getAsset());
     }
 }

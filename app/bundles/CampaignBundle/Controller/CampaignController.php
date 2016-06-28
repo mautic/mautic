@@ -67,6 +67,7 @@ class CampaignController extends FormController
         $sourceLists = $model->getSourceLists();
         $listFilters = array(
             'filters'      => array(
+                'placeholder' => $this->get('translator')->trans('mautic.campaign.filter.placeholder'),
                 'multiple' => true,
                 'groups'   => array(
                     'mautic.campaign.leadsource.form' => array(
@@ -106,7 +107,7 @@ class CampaignController extends FormController
         if (!empty($currentFilters)) {
             $listIds = $catIds = array();
             foreach ($currentFilters as $type => $typeFilters) {
-                $listFilters['filters']['groups']['mautic.campaign.leadsource.' . $type]['values'] = $typeFilters;
+                $listFilters['filters'] ['groups']['mautic.campaign.leadsource.' . $type]['values'] = $typeFilters;
 
                 foreach ($typeFilters as $fltr) {
                     if ($type == 'list') {

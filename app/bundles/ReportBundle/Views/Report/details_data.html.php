@@ -32,7 +32,6 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
                                 'orderBy'    => $key,
                                 'text'       => $columns[$key]['label'],
                                 'class'      => 'col-report-' . $columns[$key]['type'],
-                                'filterBy'   => $key,
                                 'dataToggle' => in_array($columns[$key]['type'], array('date', 'datetime')) ? 'date' : '',
                                 'target'     => '.report-content'
                             ));
@@ -49,7 +48,16 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
                         <tr>
                             <td><?php echo $startCount; ?></td>
                             <?php foreach ($columnOrder as $key): ?>
-                                <td><?php echo $view['formatter']->_($row[$columns[$key]['label']], $columns[$key]['type']); ?></td>
+                                <td>
+                                    <?php $closeLink = false; ?>
+                                    <?php if (isset($columns[$key]['link']) && !empty($row[$columns[$key]['alias']])): ?>
+                                    <?php $closeLink = true; ?>
+                                    <a href="<?php echo $view['router']->path($columns[$key]['link'], ['objectAction' => 'view', 'objectId' => $row[$columns[$key]['alias']]]); ?>" class="label label-success">
+                                    <?php endif;?>
+                                    <?php echo $view['formatter']->_($row[$columns[$key]['alias']], $columns[$key]['type']); ?>
+                                    <?php if ($closeLink): ?></a><?php endif; ?>
+                                </td>
+
                             <?php endforeach; ?>
                         </tr>
                         <?php $startCount++; ?>
@@ -91,6 +99,8 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
             $rowCount = 0;
             foreach ($graphOrder as $key):
                 $details =  $graphs[$key];
+                if (!isset($details['data']))
+                    continue;
                 if ($rowCount >= 12):
                     echo '</div><div class="row equal">';
                     $rowCount = 0;

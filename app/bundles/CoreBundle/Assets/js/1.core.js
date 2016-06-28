@@ -2478,34 +2478,41 @@ var Mautic = {
     toggleYesNoButtonClass: function (changedId) {
         changedId = '#' + changedId;
 
-        var isYesButton = mQuery(changedId).parent().hasClass('btn-yes');
+        var isYesButton   = mQuery(changedId).parent().hasClass('btn-yes');
+        var isExtraButton = mQuery(changedId).parent().hasClass('btn-extra');
 
-        //change the other
-        var otherButton = isYesButton ? '.btn-no' : '.btn-yes';
-        var otherLabel = mQuery(changedId).parent().parent().find(otherButton);
-
-        if (mQuery(changedId).prop('checked')) {
-            var thisRemove = 'btn-default',
-                otherAdd = 'btn-default';
-            if (isYesButton) {
-                var thisAdd = 'btn-success',
-                    otherRemove = 'btn-danger';
-            } else {
-                var thisAdd = 'btn-danger',
-                    otherRemove = 'btn-success';
-            }
+        if (isExtraButton) {
+            mQuery(changedId).parents('.btn-group').find('.btn').removeClass('btn-success btn-danger').addClass('btn-default');
+            console.log(mQuery(changedId).parents('.btn-group').find('.btn-default'));
         } else {
-            var thisAdd = 'btn-default';
-            if (isYesButton) {
-                var thisAdd = 'btn-success',
-                    otherRemove = 'btn-danger';
+            //change the other
+            var otherButton = isYesButton ? '.btn-no' : '.btn-yes';
+            var otherLabel = mQuery(changedId).parent().parent().find(otherButton);
+
+            if (mQuery(changedId).prop('checked')) {
+                var thisRemove = 'btn-default',
+                    otherAdd = 'btn-default';
+                if (isYesButton) {
+                    var thisAdd = 'btn-success',
+                        otherRemove = 'btn-danger';
+                } else {
+                    var thisAdd = 'btn-danger',
+                        otherRemove = 'btn-success';
+                }
             } else {
-                var thisAdd = 'btn-danger',
-                    otherRemove = 'btn-success';
+                var thisAdd = 'btn-default';
+                if (isYesButton) {
+                    var thisAdd = 'btn-success',
+                        otherRemove = 'btn-danger';
+                } else {
+                    var thisAdd = 'btn-danger',
+                        otherRemove = 'btn-success';
+                }
             }
+
+            mQuery(changedId).parent().removeClass(thisRemove).addClass(thisAdd);
+            mQuery(otherLabel).removeClass(otherRemove).addClass(otherAdd);
         }
-        mQuery(changedId).parent().removeClass(thisRemove).addClass(thisAdd);
-        mQuery(otherLabel).removeClass(otherRemove).addClass(otherAdd);
     },
 
     /**

@@ -30,10 +30,10 @@ class FieldModel extends FormModel
      * @var SchemaHelperFactory
      */
     protected $schemaHelperFactory;
-    
+
     /**
      * FieldModel constructor.
-     * 
+     *
      * @param SchemaHelperFactory $schemaHelperFactory
      */
     public function __construct(SchemaHelperFactory $schemaHelperFactory)
@@ -157,13 +157,7 @@ class FieldModel extends FormModel
             $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', 'leads');
             if ($isNew || (!$isNew && !$leadsSchema->checkColumnExists($alias))) {
                 $leadsSchema->addColumn(
-                    array(
-                        'name'    => $alias,
-                        'type'    => (in_array($alias, array('country', 'email') ) || $isUnique) ? 'string' : 'text',
-                        'options' => array(
-                            'notnull' => false
-                        )
-                    )
+                    self::getSchemaDefinition($alias, $entity->getType(), $isUnique)
                 );
                 $leadsSchema->executeChanges();
 
@@ -509,5 +503,83 @@ class FieldModel extends FormModel
     public function getUniqueIdentifierFields()
     {
         return $this->getUniqueIdentiferFields();
+    }
+
+    /**
+     * Get the MySQL database type based on the field type
+     * Use a static function so that it's accessible from DoctrineSubscriber
+     * without causing a circular service injection error
+     *
+     * @param $fieldType
+     *
+     * @return array
+     */
+    static public function getSchemaDefinition($alias, $type, $isUnique = false)
+    {
+        // Unique is always a string in order to control index length
+        if ($isUnique) {
+
+            return [
+                'name'    => $alias,
+                'type'    => 'string',
+                'options' => [
+                    'notnull' => false
+                ]
+            ];
+        }
+
+        $schemaType = in_array(
+            $alias, [
+                'title',
+                'firstname',
+                'lastname',
+                'company',
+                'position',
+                'email',
+                'phone',
+                'mobile',
+                'fax',
+                'address1',
+                'address2',
+                'city',
+                'state',
+                'zipcode',
+                'country',
+                'website',
+                'twitter',
+                'facebook',
+                'googleplus',
+                'skype',
+                'linkedin',
+                'instagram',
+                'foursquare',
+            ]
+        ) ? 'string' : 'text';
+        $options    = ['notnull' => false];
+
+        switch ($type) {
+            case 'datetime':
+            case 'date':
+            case 'time':
+            case 'boolean':
+                $schemaType = $type;
+                break;
+            case 'number':
+                $schemaType = 'float';
+                break;
+            case 'country':
+            case 'email':
+            case 'lookup':
+            case 'region':
+            case 'tel':
+                $schemaType = 'string';
+                break;
+        }
+
+        return [
+            'name'    => $alias,
+            'type'    => $schemaType,
+            'options' => $options
+        ];
     }
 }

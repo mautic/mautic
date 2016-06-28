@@ -14,13 +14,13 @@ $header = ($report->getId()) ?
     $view['translator']->trans('mautic.report.report.header.edit',
         array('%name%' => $view['translator']->trans($report->getName()))) :
     $view['translator']->trans('mautic.report.report.header.new');
-
+//die(var_dump($form->vars));
 $view['slots']->set("headerTitle", $header);
-
 $showGraphTab = count($form['graphs']->vars['choices']);
 ?>
 
 <?php echo $view['form']->start($form); ?>
+<?php echo $view['form']->errors($form, true); ?>
 <div class="box-layout">
     <div class="col-md-9 bg-white height-auto">
         <div class="row">

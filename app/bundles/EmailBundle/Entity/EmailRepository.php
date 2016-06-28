@@ -393,7 +393,7 @@ class EmailRepository extends CommonRepository
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.category'):
-                $expr = $q->expr()->like('e.alias', ":$unique");
+                $expr = $q->expr()->like('c.alias', ":$unique");
                 $filter->strict = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.lang'):

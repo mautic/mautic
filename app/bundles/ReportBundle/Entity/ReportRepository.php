@@ -127,4 +127,33 @@ class ReportRepository extends CommonRepository
     {
         return 'r';
     }
+
+    /**
+     * @param $viewOther
+     */
+    public function findReportsWithGraphs($ownedBy = null)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $qb->select('r.id, r.name, r.graphs')
+            ->from(MAUTIC_TABLE_PREFIX.'reports', 'r')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->isNotNull('r.graphs'),
+                    $qb->expr()->neq('r.graphs', $qb->expr()->literal('a:0:{}')),
+                    $qb->expr()->eq('r.is_published', ':true')
+                )
+            );
+        $qb->setParameter('true', true, 'boolean');
+
+        if ($ownedBy) {
+            $qb->andWhere(
+                $qb->expr()->eq('r.created_by', (int) $ownedBy)
+            );
+        }
+
+        $qb->orderBy('r.name');
+
+        return $qb->execute()->fetchAll();
+    }
 }
