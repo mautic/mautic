@@ -292,6 +292,8 @@ var Mautic = {
      * Initiate various functions on page load, manual or ajax
      */
     onPageLoad: function (container, response, inModal) {
+        Mautic.initDateRangePicker('#daterange_date_from', '#daterange_date_to');
+
         //initiate links
         mQuery(container + " a[data-toggle='ajax']").off('click.ajax');
         mQuery(container + " a[data-toggle='ajax']").on('click.ajax', function (event) {
@@ -739,8 +741,8 @@ var Mautic = {
 
             if (froala) {
                 froala.events.on('keydown', function (e) {
-                    if ((e.which == mQuery.FroalaEditor.KEYCODE.TAB || 
-                        e.which == mQuery.FroalaEditor.KEYCODE.ENTER) && 
+                    if ((e.which == mQuery.FroalaEditor.KEYCODE.TAB ||
+                        e.which == mQuery.FroalaEditor.KEYCODE.ENTER) &&
                         froala.$el.atwho('isSelecting')) {
                         return false;
                     }
@@ -1007,7 +1009,7 @@ var Mautic = {
             Mousetrap.reset();
 
             contentSpecific = mauticContent;
-            
+
             // trash created chart objects to save some memory
             if (typeof Mautic.chartObjects !== 'undefined') {
                 mQuery.each(Mautic.chartObjects, function (i, chart) {
@@ -3152,7 +3154,7 @@ var Mautic = {
         if (!data.labels.length || !data.datasets.length) return;
         var chart = new Chart(canvas, {
             type: 'line',
-            data: data, 
+            data: data,
             options: {
                 lineTension : 0.2,
                 borderWidth: 1,
@@ -3200,7 +3202,7 @@ var Mautic = {
         var data = mQuery.parseJSON(canvas.text());
         var chart = new Chart(canvas, {
             type: 'bar',
-            data: data, 
+            data: data,
             options: {}
         });
         Mautic.chartObjects.push(chart);
@@ -3215,7 +3217,7 @@ var Mautic = {
         var data = mQuery.parseJSON(canvas.text());
         var chart = new Chart(canvas, {
             type: 'bar',
-            data: data, 
+            data: data,
             options: {
                 scales: {
                     xAxes: [{
@@ -3238,8 +3240,6 @@ var Mautic = {
         });
         Mautic.chartObjects.push(chart);
     },
-
-
 
     /**
      * Render vector maps
@@ -3330,29 +3330,35 @@ var Mautic = {
         }
     },
 
-    initDateRangePicker: function () {
-        var dateFrom = mQuery('#daterange_date_from');
-        var dateTo = mQuery('#daterange_date_to');
+    /**
+     * Initialize graph date range selectors
+     */
+    initDateRangePicker: function (fromId, toId) {
+        var dateFrom = mQuery(fromId);
+        var dateTo = mQuery(toId);
 
-        dateFrom.datetimepicker({
-            format: 'M j, Y',
-            onShow: function(ct) {
-                this.setOptions({
-                    maxDate: dateTo.val() ? new Date(dateTo.val()) : false
-                });
-            },
-            timepicker: false
-        });
-        dateTo.datetimepicker({
-            format: 'M j, Y',
-            onShow: function(ct) {
-                this.setOptions({
-                    maxDate: new Date(),
-                    minDate: dateFrom.val() ? new Date(dateFrom.val()) : false
-                });
-            },
-            timepicker: false
-        });
+        if (dateFrom.length && dateTo.length) {
+            dateFrom.datetimepicker({
+                format: 'M j, Y',
+                onShow: function (ct) {
+                    this.setOptions({
+                        maxDate: dateTo.val() ? new Date(dateTo.val()) : false
+                    });
+                },
+                timepicker: false
+            });
+
+            dateTo.datetimepicker({
+                format: 'M j, Y',
+                onShow: function (ct) {
+                    this.setOptions({
+                        maxDate: new Date(),
+                        minDate: dateFrom.val() ? new Date(dateFrom.val()) : false
+                    });
+                },
+                timepicker: false
+            });
+        }
     },
 
     initCodeEditors: function() {
@@ -3405,7 +3411,7 @@ var Mautic = {
             e.preventDefault();
             var currentLink = mQuery(this);
             var customHtml = mQuery('textarea.builder-html');
-            
+
             if (customHtml.val().length) {
                 if (confirm('You will lose the current content if you switch the theme.')) {
                     customHtml.val('');

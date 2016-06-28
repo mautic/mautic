@@ -17,8 +17,6 @@ Mautic.reportOnLoad = function (container) {
 			});
 		}
 	}
-
-    Mautic.initDateRangePicker();
 };
 
 /**

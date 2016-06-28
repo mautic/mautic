@@ -3,8 +3,6 @@ Mautic.assetOnLoad = function (container) {
     if (typeof mauticAssetUploadEndpoint !== 'undefined' && mQuery('div#dropzone').length) {
         Mautic.initializeDropzone();
     }
-
-    Mautic.initDateRangePicker();
 };
 
 Mautic.assetOnUnload = function(id) {

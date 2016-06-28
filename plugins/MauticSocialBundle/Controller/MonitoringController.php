@@ -10,6 +10,8 @@
 namespace MauticPlugin\MauticSocialBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
 /**
@@ -407,12 +409,6 @@ class MonitoringController extends FormController
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'details') : 'details';
 
-        // Audit Log
-        $logs = $this->getModel('core.auditLog')->getLogForObject('monitoring', $objectId);
-
-        $leadStats = $postCountRepo->getLeadStatsPost(30, 'D', ['monitor_id' => $monitoringEntity->getId()]);
-
-
         if ($monitoringEntity === null) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_social_index', ['page' => $page]);
@@ -437,21 +433,41 @@ class MonitoringController extends FormController
             );
         }
 
+
+        // Audit Log
+        $logs = $this->getModel('core.auditLog')->getLogForObject('monitoring', $objectId);
+
+        $returnUrl = $this->generateUrl(
+            'mautic_social_action',
+            [
+                'objectAction' => 'view',
+                'objectId'     => $monitoringEntity->getId()
+            ]
+        );
+
+        // Init the date range filter form
+        $dateRangeValues = $this->request->get('daterange', []);
+        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $returnUrl]);
+        $dateFrom = new \DateTime($dateRangeForm['date_from']->getData());
+        $dateTo = new \DateTime($dateRangeForm['date_to']->getData());
+
+        $chart           = new LineChart(null, $dateFrom, $dateTo);
+        $leadStats       = $postCountRepo->getLeadStatsPost(
+            $dateFrom,
+            $dateTo,
+            ['monitor_id' => $monitoringEntity->getId()]
+        );
+        $chart->setDataset($this->get('translator')->trans('mautic.social.twitter.tweet.count'), $leadStats);
+
         return $this->delegateView(
             [
-                'returnUrl'       => $this->generateUrl(
-                    'mautic_social_action',
-                    [
-                        'objectAction' => 'view',
-                        'objectId'     => $monitoringEntity->getId()
-                    ]
-                ),
+                'returnUrl'       => $returnUrl,
                 'viewParameters'  => [
                     'activeMonitoring' => $monitoringEntity,
                     'logs'             => $logs,
                     'tmpl'             => $tmpl,
                     'security'         => $security,
-                    'leadStats'        => $leadStats,
+                    'leadStats'        => $chart->render(),
                     'monitorLeads'     => $this->forward(
                         'MauticSocialBundle:Monitoring:leads',
                         [
@@ -459,7 +475,8 @@ class MonitoringController extends FormController
                             'page'       => $page,
                             'ignoreAjax' => true
                         ]
-                    )->getContent()
+                    )->getContent(),
+                    'dateRangeForm'    => $dateRangeForm->createView()
                 ],
                 'contentTemplate' => 'MauticSocialBundle:Monitoring:'.$tmpl.'.html.php',
                 'passthroughVars' => [

@@ -60,26 +60,21 @@ echo $view['assets']->includeScript('plugins/MauticSocialBundle/Assets/js/social
         <div class="bg-auto bg-dark-xs">
             <!-- stats -->
             <div class="pa-md">
-                <div class="row stat-boxes">
-                    <div class="col-md-12">
-                        <div class="panel ovf-h bg-auto bg-light-xs monitoring-stat-charts">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="panel">
                             <div class="panel-body box-layout">
-                                <div class="col-xs-8 va-m">
-                                    <h5 class="dark-md fw-sb mb-xs">
-                                        <?php echo $view['translator']->trans('mautic.social.monitoring.' . $activeMonitoring->getNetworkType() . '.popularity'); ?>
-                                    </h5>
+                                <div class="col-md-3 va-m">
+                                    <h5 class="text-white dark-md fw-sb mb-xs">
+                                        <span class="fa fa-twitter"></span>
+                                        <?php echo $view['translator']->trans('mautic.social.monitoring.' . $activeMonitoring->getNetworkType() . '.popularity'); ?>                                    </h5>
                                 </div>
-                                <div class="col-xs-4 va-t text-right">
-                                    <h3 class="text-white dark-sm"><span class="fa fa-user"></span></h3>
-                                </div>
-                            </div>
-                            <div class="pt-0 pl-10 pb-0 pr-10">
-                                <div>
-                                    <canvas id="monitoring-leads-chart" height="93"></canvas>
+                                <div class="col-md-9 va-m">
+                                    <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', array('dateRangeForm' => $dateRangeForm, 'class' => 'pull-right')); ?>
                                 </div>
                             </div>
-                            <div id="monitoring-leads-chart-data" class="hide">
-                                <?php echo json_encode($leadStats); ?>
+                            <div class="pt-0 pl-15 pb-10 pr-15">
+                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $leadStats, 'chartType' => 'line', 'chartHeight' => 300)); ?>
                             </div>
                         </div>
                     </div>

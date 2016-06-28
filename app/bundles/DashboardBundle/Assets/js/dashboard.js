@@ -1,7 +1,6 @@
 //DashboardBundle
 Mautic.dashboardOnLoad = function (container) {
     Mautic.initWidgetSorting();
-    Mautic.initDateRangePicker();
     Mautic.initWidgetRemoveButtons(mQuery('#dashboard-widgets'));
 };
 

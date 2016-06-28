@@ -1,21 +1,3 @@
-// Monitoring Bundle
-
-/*
- * Setup the monitor view
-*/
-Mautic.monitoringOnLoad = function(container) {
-    Mautic.renderMonitoringLeadsBarChart();
-};
-
-/**
- * Delete the builder instance so it's regenerated when reopening the campaign event builder
- */
-Mautic.monitoringOnUnload = function(container) {
-    if (container === '#app-content') {
-        delete Mautic.monitoringLeadsBarChart;
-    }
-};
-
 Mautic.getNetworkFormAction = function(networkType) {
     // removes errors when network type properties has changed
     if (networkType && mQuery(networkType).val() && mQuery(networkType).closest('.form-group').hasClass('has-error')) {
@@ -137,31 +119,4 @@ Mautic.insertSocialLink = function(id, type, skipId) {
     textarea.val(newVal);
 
     Mautic.updateCharacterCount();
-};
-
-Mautic.renderMonitoringLeadsBarChart = function() {
-    if (!mQuery('#monitoring-leads-chart').length) {
-        return;
-    }
-
-    chartData = mQuery.parseJSON(mQuery('#monitoring-leads-chart-data').text());
-
-    if (typeof chartData.labels === "undefined") {
-        return;
-    }
-
-    var ctx = document.getElementById("monitoring-leads-chart").getContext("2d");
-
-    var options = {
-        scaleShowGridLines : false,
-        barShowStroke : false,
-        barValueSpacing : 1,
-        showScale: false,
-        tooltipFontSize: 10,
-        tooltipCaretSize: 0
-    };
-
-    if (typeof Mautic.monitoringLeadsBarChart === 'undefined') {
-        Mautic.monitoringLeadsBarChart = new Chart(ctx).Line(chartData, options);
-    }
 };
