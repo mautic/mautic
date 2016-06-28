@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.3 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -46,7 +46,7 @@
     imageEditButtons: ['imageReplace', 'imageAlign', 'imageRemove', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove', '-', 'imageDisplay', 'imageStyle', 'imageAlt', 'imageSize'],
     imageAltButtons: ['imageBack', '|'],
     imageSizeButtons: ['imageBack', '|'],
-    imageUploadURL: 'http://i.froala.com/upload',
+    imageUploadURL: 'https://i.froala.com/upload',
     imageUploadParam: 'file',
     imageUploadParams: {},
     imageUploadToS3: false,
@@ -68,6 +68,7 @@
     imageMultipleStyles: true,
     imageTextNear: true,
     imagePaste: true,
+    imagePasteProcess: false,
     imageMinWidth: 16,
     imageOutputSize: false
   });
@@ -273,6 +274,8 @@
         image_srcs.push(c_images[i].getAttribute('src'));
 
         $(c_images[i]).toggleClass('fr-draggable', editor.opts.imageMove);
+        if (c_images[i].className === '') c_images[i].removeAttribute('class');
+        if (c_images[i].getAttribute('style') === '') c_images[i].removeAttribute('style');
       }
 
       // Loop previous images and check their src.
@@ -468,7 +471,7 @@
 
       // Image buttons.
       var image_buttons = '';
-      if (editor.opts.imageEditButtons.length > 1) {
+      if (editor.opts.imageEditButtons.length > 0) {
         image_buttons += '<div class="fr-buttons">';
         image_buttons += editor.button.buildList(editor.opts.imageEditButtons);
         image_buttons += '</div>';
@@ -491,13 +494,12 @@
       var $popup = editor.popups.get('image.insert');
       if (!$popup) $popup = _initInsertPopup();
 
-      editor.popups.setContainer('image.insert', $(editor.opts.scrollableContainer));
-
       $popup.find('.fr-layer.fr-active').removeClass('fr-active').addClass('fr-pactive');
       $popup.find('.fr-image-progress-bar-layer').addClass('fr-active');
       $popup.find('.fr-buttons').hide();
 
       if ($current_image) {
+        editor.popups.setContainer('image.insert', $(editor.opts.scrollableContainer));
         var left = $current_image.offset().left + $current_image.width() / 2;
         var top = $current_image.offset().top + $current_image.height();
 
@@ -558,6 +560,7 @@
      */
 
     function _showErrorMessage (message) {
+      showProgressBar();
       var $popup = editor.popups.get('image.insert');
       var $layer = $popup.find('.fr-image-progress-bar-layer');
       $layer.addClass('fr-error')
@@ -794,13 +797,13 @@
         }
       }
 
-      var width = editor.opts.imageDefaultWidth || 'auto';
-      if (width && width != 'auto' && ('' + width).indexOf('px') < 0 && ('' + width).indexOf('%') < 0) {
-        width = width + 'px';
+      var width = editor.opts.imageDefaultWidth;
+      if (width && width != 'auto') {
+        width = width + (editor.opts.imageResizeWithPercent ? '%' : 'px');
       }
 
       // Create image object and set the load event.
-      var $img = $('<img class="fr-di' + (editor.opts.imageDefaultDisplay[0]) + (editor.opts.imageDefaultAlign != 'center' ? ' fr-fi' + editor.opts.imageDefaultAlign[0] : '') + '" src="' + link + '"' + data_str + (width ? ' style="width: ' + width + ';"' : '') + '>');
+      var $img = $('<img class="' + (editor.opts.imageDefaultDisplay ? 'fr-di' + editor.opts.imageDefaultDisplay[0] : '') + (editor.opts.imageDefaultAlign ? (editor.opts.imageDefaultAlign != 'center' ? ' fr-fi' + editor.opts.imageDefaultAlign[0] : '') : '') + '" src="' + link + '"' + data_str + (width ? ' style="width: ' + width + ';"' : '') + '>');
 
       $img.on('load', loadCallback);
 
@@ -1013,13 +1016,18 @@
         var dt = e.originalEvent.dataTransfer;
         if (dt && dt.files) {
           var inst = $popup.data('instance') || editor;
+          inst.events.disableBlur();
           inst.image.upload(dt.files);
+          inst.events.enableBlur();
         }
       });
 
       editor.events.$on($popup, 'change', '.fr-image-upload-layer input[type="file"]', function () {
         if (this.files) {
           var inst = $popup.data('instance') || editor;
+          inst.events.disableBlur();
+          $popup.find('input:focus').blur();
+          inst.events.enableBlur();
           inst.image.upload(this.files);
         }
         // Else IE 9 case.
@@ -1078,7 +1086,12 @@
             p_node = editor.node.blockParent(t);
             if (p_node && editor.html.defaultTag()) {
               if (!p_node.nextSibling) {
-                $(p_node).after('<' + editor.html.defaultTag() + '><br>' + $.FE.MARKERS + '</' + editor.html.defaultTag() + '>');
+                if (['TD', 'TH'].indexOf(p_node.tagName) < 0) {
+                  $(p_node).after('<' + editor.html.defaultTag() + '><br>' + $.FE.MARKERS + '</' + editor.html.defaultTag() + '>');
+                }
+                else {
+                  $(img).after('<br>' + $.FE.MARKERS);
+                }
                 editor.selection.restore();
               }
             }
@@ -1095,7 +1108,12 @@
             p_node = editor.node.blockParent(t);
             if (p_node && editor.html.defaultTag()) {
               if (!p_node.previousSibling) {
-                $(p_node).before('<' + editor.html.defaultTag() + '><br>' + $.FE.MARKERS + '</' + editor.html.defaultTag() + '>');
+                if (['TD', 'TH'].indexOf(p_node.tagName) < 0) {
+                  $(p_node).before('<' + editor.html.defaultTag() + '><br>' + $.FE.MARKERS + '</' + editor.html.defaultTag() + '>');
+                }
+                else {
+                  $(img).before('<br>' + $.FE.MARKERS);
+                }
                 editor.selection.restore();
               }
             }
@@ -1144,6 +1162,20 @@
           }
         }
       });
+
+      // Show image popup when it was selected.
+      editor.events.on('keyup', function (e) {
+        if (e.shiftKey && editor.selection.text().replace(/\n/g, '') === '') {
+          var s_el = editor.selection.element();
+          var e_el = editor.selection.endElement();
+          if (s_el && s_el.tagName == 'IMG') {
+            _editImg($(s_el));
+          }
+          else if (e_el && e_el.tagName == 'IMG') {
+            _editImg($(e_el));
+          }
+        }
+      }, true);
 
       // Drop inside the editor.
       editor.events.on('drop', _drop);
@@ -1202,7 +1234,7 @@
           active = '';
         }
 
-        upload_layer = '<div class="fr-image-upload-layer' + active + ' fr-layer" id="fr-image-upload-layer-' + editor.id + '"><strong>' + editor.language.translate('Drop image') + '</strong><br>(' + editor.language.translate('or click') + ')<div class="fr-form"><input type="file" accept="image/*" tabIndex="-1"></div></div>'
+        upload_layer = '<div class="fr-image-upload-layer' + active + ' fr-layer" id="fr-image-upload-layer-' + editor.id + '"><strong>' + editor.language.translate('Drop image') + '</strong><br>(' + editor.language.translate('or click') + ')<div class="fr-form"><input type="file" accept="image/' + editor.opts.imageAllowedTypes.join(', image/').toLowerCase() + '" tabIndex="-1"></div></div>'
       }
 
       // Image by url layer.
@@ -1505,9 +1537,11 @@
       // Shared destroy.
       editor.events.on('shared.destroy', function () {
         $image_resizer.html('').removeData().remove();
+        $image_resizer = null;
 
         if (editor.opts.imageResize) {
           $overlay.remove();
+          $overlay = null;
         }
       }, true);
 
@@ -1602,7 +1636,10 @@
         }
 
         if ($current_image && key_code == $.FE.KEYCODE.ESC) {
+          var $img = $current_image;
           _exitEdit(true);
+          editor.selection.setAfter($img.get(0));
+          editor.selection.restore();
           e.preventDefault();
           return false;
         }
@@ -1610,6 +1647,26 @@
         if ($current_image && !editor.keys.ctrlKey(e)) {
           e.preventDefault();
           return false;
+        }
+      }, true);
+
+      // Copy/cut image.
+      editor.events.on('window.cut window.copy', function (e) {
+        _selectImage();
+        $.FE.copied_text = '\n';
+        $.FE.copied_html = $current_image.get(0).outerHTML;
+
+        if (e.type == 'copy') {
+          setTimeout(function () {
+            _editImg($current_image);
+          })
+        }
+        else {
+          _exitEdit(true);
+          editor.undo.saveStep();
+          setTimeout(function () {
+            editor.undo.saveStep();
+          }, 0);
         }
       }, true);
 
@@ -1630,6 +1687,12 @@
         }
       });
 
+      editor.events.on('destroy', function () {
+        if ($current_image && $current_image.hasClass('fr-uploading')) {
+          $current_image.trigger('abortUpload');
+        }
+      });
+
       editor.events.on('paste.before', _clipboardPaste);
       editor.events.on('paste.beforeCleanup', _clipboardPasteCleanup);
       editor.events.on('paste.after', _uploadPastedImages);
@@ -1637,6 +1700,9 @@
       editor.events.on('html.set', _refreshImageList);
       editor.events.on('html.inserted', _refreshImageList);
       _refreshImageList();
+      editor.events.on('destroy', function () {
+        images = [];
+      })
 
       editor.events.on('html.get', function (html) {
         html = html.replace(/<(img)((?:[\w\W]*?))class="([\w\W]*?)(fr-uploading|fr-error)([\w\W]*?)"((?:[\w\W]*?))>/g, '');
@@ -1700,15 +1766,17 @@
       } else {
         // Safari won't work https://bugs.webkit.org/show_bug.cgi?id=49141
         editor.$el.find('img[data-fr-image-pasted]').each(function (index, img) {
-          var width = editor.opts.imageDefaultWidth || 'auto';
-          if (width != 'auto') {
-            width = width + (editor.opts.imageResizeWithPercent ? '%' : 'px');
-          }
-          $(img).css('width', width);
+          if (editor.opts.imagePasteProcess) {
+            var width = editor.opts.imageDefaultWidth;
+            if (width && width != 'auto') {
+              width = width + (editor.opts.imageResizeWithPercent ? '%' : 'px');
+            }
+            $(img).css('width', width);
 
-          $(img)
-            .removeClass('fr-dii fr-dib fr-fir fr-fil')
-            .addClass('fr-di' + (editor.opts.imageDefaultDisplay[0]) + (editor.opts.imageDefaultAlign != 'center' ? ' fr-fi' + editor.opts.imageDefaultAlign[0] : ''));
+            $(img)
+              .removeClass('fr-dii fr-dib fr-fir fr-fil')
+              .addClass((editor.opts.imageDefaultDisplay ? 'fr-di' + editor.opts.imageDefaultDisplay[0] : '') + (editor.opts.imageDefaultAlign ? (editor.opts.imageDefaultAlign != 'center' ? ' fr-fi' + editor.opts.imageDefaultAlign[0] : '') : ''));
+          }
 
           // Data images.
           if (img.src.indexOf('data:') === 0) {
@@ -1763,12 +1831,12 @@
               var result = e.target.result;
 
               // Default width.
-              var width = editor.opts.imageDefaultWidth || 'auto';
-              if (width && width != 'auto' && ('' + width).indexOf('px') < 0 && ('' + width).indexOf('%') < 0) {
-                width = width + 'px';
+              var width = editor.opts.imageDefaultWidth;
+              if (width && width != 'auto') {
+                width = width + (editor.opts.imageResizeWithPercent ? '%' : 'px');
               }
 
-              editor.html.insert('<img data-fr-image-pasted="true" class="fr-di' + (editor.opts.imageDefaultDisplay[0]) + (editor.opts.imageDefaultAlign != 'center' ? ' fr-fi' + editor.opts.imageDefaultAlign[0] : '') + '" src="' + result + '"' + (width ? ' style="width: ' + width + ';"' : '') + '>');
+              editor.html.insert('<img data-fr-image-pasted="true" class="' + (editor.opts.imageDefaultDisplay ? 'fr-di' + editor.opts.imageDefaultDisplay[0] : '') + (editor.opts.imageDefaultAlign ? (editor.opts.imageDefaultAlign != 'center' ? ' fr-fi' + editor.opts.imageDefaultAlign[0] : '') : '') + '" src="' + result + '"' + (width ? ' style="width: ' + width + ';"' : '') + '>');
 
               editor.events.trigger('paste.after');
             };
@@ -2065,12 +2133,12 @@
   $.FE.DefineIcon('insertImage', {
     NAME: 'image'
   });
-  $.FE.RegisterShortcut(80, 'insertImage');
+  $.FE.RegisterShortcut($.FE.KEYCODE.P, 'insertImage', null, 'P');
   $.FE.RegisterCommand('insertImage', {
     title: 'Insert Image',
     undo: false,
     focus: true,
-    refershAfterCallback: false,
+    refreshAfterCallback: false,
     popup: true,
     callback: function () {
       if (!this.popups.isVisible('image.insert')) {

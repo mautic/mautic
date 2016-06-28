@@ -160,6 +160,10 @@ Mautic.destroySlots = function() {
 
     // Remove style="z-index: 2501;" which Froala forgets there
     Mautic.builderContents.find('*[style="z-index: 2501;"]').removeAttr('style');
+
+    // Remove the class attr vrom HTML tag used by Modernizer
+    var htmlTags = document.getElementsByTagName('html');
+    htmlTags[0].removeAttribute('class');
 };
 
 Mautic.toggleBuilderButton = function (hide) {
@@ -344,10 +348,15 @@ Mautic.initSlotListeners = function() {
                 Mautic.initAtWho(editor.$el, method, editor);
             });
 
+            var buttons = ['bold', 'italic', 'fontSize', 'insertImage', 'insertLink', 'undo', 'redo', '-', 'paragraphFormat', 'align', 'color', 'formatOL', 'formatUL', 'indent', 'outdent'];
+
             var inlineFroalaOptions = {
                 toolbarInline: true,
                 toolbarVisibleWithoutSelection: true,
-                toolbarButtons: ['bold', 'italic', 'insertImage', 'insertLink', 'undo', 'redo', '-', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'indent', 'outdent'],
+                toolbarButtons: buttons,
+                toolbarButtonsMD: buttons,
+                toolbarButtonsSM: buttons,
+                toolbarButtonsXS: buttons,
                 zIndex: 2501,
                 linkList: linkList
             };
@@ -368,18 +377,20 @@ Mautic.initSlotListeners = function() {
 
     Mautic.getPredefinedLinks = function() {
         var linkList = [];
-        mQuery.each(parent.builderTokens, function(token, label) {
-            if (token.startsWith('{pagelink=') || 
-                token.startsWith('{assetlink=') || 
-                token.startsWith('{webview_url') || 
-                token.startsWith('{unsubscribe_url')) {
-                
-                linkList.push({
-                    text: label,
-                    href: token
-                });
-            }
-        });
+        if (typeof parent.builderTokens !== 'undefined' && parent.builderTokens.length) {
+            mQuery.each(parent.builderTokens, function(token, label) {
+                if (token.startsWith('{pagelink=') || 
+                    token.startsWith('{assetlink=') || 
+                    token.startsWith('{webview_url') || 
+                    token.startsWith('{unsubscribe_url')) {
+                    
+                    linkList.push({
+                        text: label,
+                        href: token
+                    });
+                }
+            });
+        }
 
         return linkList;
     }
