@@ -244,8 +244,18 @@ class BuilderEvent extends Event
      *
      * @return array
      */
-    public function getTokens()
+    public function getTokens($withBC)
     {
+        if ($withBC === false) {
+            $tokens = [];
+            foreach ($this->tokens as $key => $value) {
+                if (substr($key, 0, 10) !== '{leadfield') {
+                    $tokens[$key] = $value;
+                }
+            }
+            return $tokens;
+        }
+
         return $this->tokens;
     }
 
