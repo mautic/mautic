@@ -35,7 +35,7 @@ class Version20160624032452 extends AbstractMauticMigration
         $statLeadIDX = $this->generatePropertyName('dynamic_content_stats', 'idx', ['lead_id']);
 
         $sql = <<<SQL
-CREATE TABLE mtc_dynamic_content_stats (
+CREATE TABLE {$this->prefix}dynamic_content_stats (
 	id INT AUTO_INCREMENT NOT NULL,
 	dynamic_content_id INT DEFAULT NULL,
 	lead_id INT DEFAULT NULL,
@@ -48,14 +48,14 @@ CREATE TABLE mtc_dynamic_content_stats (
 	sent_details LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)',
 	INDEX {$statDwcIDX} (dynamic_content_id),
 	INDEX {$statLeadIDX} (lead_id),
-	INDEX mtc_stat_dynamic_content_search (dynamic_content_id, lead_id),
-	INDEX mtc_stat_dynamic_content_source_search (source, source_id),
+	INDEX {$this->prefix}stat_dynamic_content_search (dynamic_content_id, lead_id),
+	INDEX {$this->prefix}stat_dynamic_content_source_search (source, source_id),
 	PRIMARY KEY(id)
 ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
 SQL;
         $this->addSql($sql);
-        $this->addSql("ALTER TABLE mtc_dynamic_content_stats ADD CONSTRAINT {$statDwcFK} FOREIGN KEY (dynamic_content_id) REFERENCES mtc_dynamic_content (id) ON DELETE SET NULL;");
-        $this->addSql("ALTER TABLE mtc_dynamic_content_stats ADD CONSTRAINT {$statLeadFK} FOREIGN KEY (lead_id) REFERENCES mtc_leads (id) ON DELETE SET NULL;");
+        $this->addSql("ALTER TABLE {$this->prefix}dynamic_content_stats ADD CONSTRAINT {$statDwcFK} FOREIGN KEY (dynamic_content_id) REFERENCES {$this->prefix}dynamic_content (id) ON DELETE SET NULL;");
+        $this->addSql("ALTER TABLE {$this->prefix}dynamic_content_stats ADD CONSTRAINT {$statLeadFK} FOREIGN KEY (lead_id) REFERENCES {$this->prefix}leads (id) ON DELETE SET NULL;");
     }
 
     /**
