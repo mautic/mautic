@@ -760,14 +760,6 @@ var Mautic = {
      * @param callback(tokens) to call when finished
      */
     getTokens: function(method, callback) {
-        // Check if the builderTokens var holding the tokens exists
-        if (typeof builderTokens === 'object') {
-            return callback(builderTokens);
-        }
-        // Check if the builderTokens var holding the tokens exists in the parent frame
-        if (typeof parent.builderTokens === 'object') {
-            return callback(parent.builderTokens);
-        }
         // Check if the builderTokens var holding the tokens was already loaded
         if (!mQuery.isEmptyObject(Mautic.builderTokens)) {
             return callback(Mautic.builderTokens);
