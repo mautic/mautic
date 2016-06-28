@@ -208,6 +208,7 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
             <div id="feedInputs"<?php echo ($emailType === 'feed') ? '' : ' class="hide"'; ?>>
                 <hr/>
                 <?php echo $view['form']->row($form['feed']); ?>
+                <?php echo $view['form']->row($form['periodicity']['triggerDate']) ?>
                 <?php echo $view['form']->row($form['periodicity']['triggerMode']) ?>
                 <div id="timeInterval" class="row<?php echo ($triggerMode === 'timeInterval') ? '' : ' hide' ?>">
                     <span class="col-md-6 col-xs-12"><?php echo $view['form']->row($form['periodicity']['triggerInterval']); ?></span>

@@ -274,10 +274,6 @@ class EmailType extends AbstractType
             )
         );
 
-        // For periodicity
-        // $periodicity = new PeriodicityType();
-        // $periodicity->buildForm($builder, $options);
-
         $builder->add(
             'periodicity',
             new PeriodicityType(),
