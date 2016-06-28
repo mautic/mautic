@@ -133,57 +133,58 @@ class ReportBuilderEvent extends AbstractReportEvent
      */
     public function getStandardColumns($prefix, $removeColumns = [], $idLink = null)
     {
+        $aliasPrefix = str_replace('.', '_', $prefix);
         $columns = [
             $prefix.'id'               => [
                 'label' => 'mautic.core.id',
                 'type'  => 'int',
                 'link'  => $idLink,
-                'alias' => "{$prefix}_id"
+                'alias' => "{$aliasPrefix}id"
             ],
             $prefix.'name'             => [
                 'label' => 'mautic.core.name',
                 'type'  => 'string',
-                'alias' => "{$prefix}_name"
+                'alias' => "{$aliasPrefix}name"
             ],
             $prefix.'created_by_user'  => [
                 'label' => 'mautic.core.createdby',
                 'type'  => 'string',
-                'alias' => "{$prefix}_created_by_user"
+                'alias' => "{$aliasPrefix}created_by_user"
             ],
             $prefix.'date_added'       => [
                 'label' => 'mautic.report.field.date_added',
                 'type'  => 'datetime',
-                'alias' => "{$prefix}_date_added"
+                'alias' => "{$aliasPrefix}date_added"
             ],
             $prefix.'modified_by_user' => [
                 'label' => 'mautic.report.field.modified_by_user',
                 'type'  => 'string',
-                'alias' => "{$prefix}_modified_by_user"
+                'alias' => "{$aliasPrefix}modified_by_user"
             ],
             $prefix.'date_modified'    => [
                 'label' => 'mautic.report.field.date_modified',
                 'type'  => 'datetime',
-                'alias' => "{$prefix}_date_modified"
+                'alias' => "{$aliasPrefix}date_modified"
             ],
             $prefix.'description'      => [
                 'label' => 'mautic.core.description',
                 'type'  => 'string',
-                'alias' => "{$prefix}_description"
+                'alias' => "{$aliasPrefix}description"
             ],
             $prefix.'publish_up'       => [
                 'label' => 'mautic.report.field.publish_up',
                 'type'  => 'datetime',
-                'alias' => "{$prefix}_publish_up"
+                'alias' => "{$aliasPrefix}publish_up"
             ],
             $prefix.'publish_down'     => [
                 'label' => 'mautic.report.field.publish_down',
                 'type'  => 'datetime',
-                'alias' => "{$prefix}_publish_down"
+                'alias' => "{$aliasPrefix}publish_down"
             ],
             $prefix.'is_published'     => [
                 'label' => 'mautic.report.field.is_published',
                 'type'  => 'bool',
-                'alias' => "{$prefix}_is_published"
+                'alias' => "{$aliasPrefix}is_published"
             ]
         ];
 
