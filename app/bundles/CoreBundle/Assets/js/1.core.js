@@ -49,17 +49,6 @@ mQuery( document ).ajaxStop(function(event) {
 });
 
 mQuery( document ).ready(function() {
-    Mautic.basicFroalaOptions = {
-        enter: mQuery.FroalaEditor.ENTER_BR,
-        imageUploadURL: mauticBaseUrl + 's/file/upload',
-        imageManagerLoadURL: mauticBaseUrl + 's/file/list',
-        imageManagerDeleteURL: mauticBaseUrl + 's/file/delete',
-        useClasses: false
-    };
-
-    // Set the Froala license key
-    mQuery.FroalaEditor.DEFAULTS.key = 'MCHCPd1XQVZFSHSd1C==';
-
     if (typeof mauticContent !== 'undefined') {
         mQuery("html").Core({
             console: false
@@ -285,7 +274,20 @@ var Mautic = {
      * Remove the spinner from label
      */
     removeLabelLoadingIndicator: function() {
-        mQuery(Mautic.labelSpinner).remove();;
+        mQuery(Mautic.labelSpinner).remove();
+    },
+
+    activateGlobalFroalaOptions: function() {
+        Mautic.basicFroalaOptions = {
+            enter: mQuery.FroalaEditor.ENTER_BR,
+            imageUploadURL: mauticBaseUrl + 's/file/upload',
+            imageManagerLoadURL: mauticBaseUrl + 's/file/list',
+            imageManagerDeleteURL: mauticBaseUrl + 's/file/delete',
+            useClasses: false
+        };
+
+        // Set the Froala license key
+        mQuery.FroalaEditor.DEFAULTS.key = 'MCHCPd1XQVZFSHSd1C==';
     },
 
     /**
@@ -308,6 +310,8 @@ var Mautic = {
         mQuery('.sidebar-right a[data-toggle="ajax"]').on('click.ajax', function (event) {
             mQuery("html").removeClass('sidebar-open-rtl');
         });
+
+        Mautic.activateGlobalFroalaOptions();
 
         //initialize forms
         mQuery(container + " form[data-toggle='ajax']").each(function (index) {
@@ -545,7 +549,7 @@ var Mautic = {
                     // init AtWho in a froala editor
                     if (textarea.hasClass('editor-builder-tokens')) {
                         textarea.on('froalaEditor.initialized', function (e, editor) {
-                            Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'));
+                            Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'), editor);
                         });
                     }
 
@@ -568,19 +572,28 @@ var Mautic = {
                     //     settings.extraPlugins = "sourcedialog,docprops,filemanager";
                     // }
 
+                    var maxButtons = ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikeThrough', 'fontFamily', 'fontSize', 'color', 'paragraphFormat', 'align', 'orderedList', 'unorderedList', 'quote', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertImage','insertTable', 'html', 'fullscrean'];
+
                     if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
-                        textarea.froalaEditor(mQuery.extend({
+                        var options = {
                             // Set custom buttons with separator between them.
-                            toolbarButtons: ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikeThrough', 'fontFamily', 'fontSize', 'color', 'paragraphFormat', 'align', 'orderedList', 'unorderedList', 'quote', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertImage','insertTable', 'html', 'fullscrean'],
+                            toolbarButtons: maxButtons,
+                            toolbarButtonsMD: maxButtons,
                             heightMin: 300
-                        }, Mautic.basicFroalaOptions));
+                        };
+
+                        if (textarea.hasClass('editor-basic-fullpage')) {
+                            options.fullPage = true;
+                        }
+
+                        textarea.froalaEditor(mQuery.extend(options, Mautic.basicFroalaOptions));
                     } else if (editorClass == 'editor') {
                         //     settings.removePlugins = 'resize';
 
                         textarea.froalaEditor(mQuery.extend({
                             // Set custom buttons with separator between them.
-                            toolbarButtons: ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertImage','insertTable', 'html'],
-                            toolbarButtonsMD: ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertImage', 'insertTable', 'html'],
+                            toolbarButtons: maxButtons,
+                            toolbarButtonsMD: maxButtons,
                             toolbarButtonsSM: ['undo', 'redo' , '-', 'bold', 'italic', 'underline'],
                             toolbarButtonsXS: ['undo', 'redo' , '-', 'bold', 'italic', 'underline'],
                             heightMin: 100
@@ -758,14 +771,6 @@ var Mautic = {
      * @param callback(tokens) to call when finished
      */
     getTokens: function(method, callback) {
-        // Check if the builderTokens var holding the tokens exists
-        if (typeof builderTokens === 'object') {
-            return callback(builderTokens);
-        }
-        // Check if the builderTokens var holding the tokens exists in the parent frame
-        if (typeof parent.builderTokens === 'object') {
-            return callback(parent.builderTokens);
-        }
         // Check if the builderTokens var holding the tokens was already loaded
         if (!mQuery.isEmptyObject(Mautic.builderTokens)) {
             return callback(Mautic.builderTokens);

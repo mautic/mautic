@@ -566,7 +566,6 @@ class EmailController extends FormController
                     'email'         => $entity,
                     'slots'         => $this->buildSlotForms($slotTypes),
                     'themes'        => $this->factory->getInstalledThemes('email', true),
-                    'builderTokens' => $model->getBuilderComponents(null, array('tokens'), null, false),
                     'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())) // strip new lines
                 ),
                 'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
@@ -769,7 +768,6 @@ class EmailController extends FormController
                     'email'              => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
                     'attachmentSize'     => $attachmentSize,
-                    'builderTokens'      => $model->getBuilderComponents(null, array('tokens'), null, false),
                     'builderAssets'      => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())) // strip new lines
                 ),
                 'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',

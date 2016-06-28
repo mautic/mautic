@@ -244,7 +244,7 @@ class BuilderEvent extends Event
      *
      * @return array
      */
-    public function getTokens($withBC)
+    public function getTokens($withBC = true)
     {
         if ($withBC === false) {
             $tokens = [];
