@@ -566,8 +566,13 @@ var Mautic = {
                     //     settings.extraPlugins = "sourcedialog,docprops,filemanager";
                     // }
 
-
-                    if (editorClass == 'editor') {
+                    if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
+                        textarea.froalaEditor(mQuery.extend({
+                            // Set custom buttons with separator between them.
+                            toolbarButtons: ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikeThrough', 'fontFamily', 'fontSize', 'color', 'paragraphFormat', 'align', 'orderedList', 'unorderedList', 'quote', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertImage','insertTable', 'html', 'fullscrean'],
+                            heightMin: 300
+                        }, Mautic.basicFroalaOptions));
+                    } else if (editorClass == 'editor') {
                         //     settings.removePlugins = 'resize';
 
                         textarea.froalaEditor(mQuery.extend({
@@ -979,16 +984,11 @@ var Mautic = {
                 MauticVars.modalsReset = {};
             }
 
-            // mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage'], function (index, editorClass) {
-            //     mQuery(container + ' textarea.' + editorClass).each(function () {
-            //         for (var name in CKEDITOR.instances) {
-            //             var instance = CKEDITOR.instances[name];
-            //             if (this && this == instance.element.$) {
-            //                 instance.destroy(true);
-            //             }
-            //         }
-            //     });
-            // });
+            mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage'], function (index, editorClass) {
+                mQuery(container + ' textarea.' + editorClass).each(function () {
+                    mQuery('textarea.'+editorClass).froalaEditor('destroy');
+                });
+            });
 
             //turn off shuffle events
             mQuery('html')

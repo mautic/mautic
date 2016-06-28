@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.3 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -115,8 +115,8 @@
   }
 
   // Register the quote command.
-  $.FE.RegisterShortcut(222, 'quote', 'increase');
-  $.FE.RegisterShortcut(222, 'quote', 'decrease', true);
+  $.FE.RegisterShortcut($.FE.KEYCODE.SINGLE_QUOTE, 'quote', 'increase', '\'');
+  $.FE.RegisterShortcut($.FE.KEYCODE.SINGLE_QUOTE, 'quote', 'decrease', '\'', true);
   $.FE.RegisterCommand('quote', {
     title: 'Quote',
     type: 'dropdown',

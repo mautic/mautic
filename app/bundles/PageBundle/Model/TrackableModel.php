@@ -427,9 +427,12 @@ class TrackableModel extends AbstractCommonModel
      */
     protected function extractTrackablesFromText($text)
     {
+        // Remove any HTML tags (such as img) that could contain href or src attributes prior to parsing for links
+        $text = strip_tags($text);
+
         // Plaintext links
         $trackableUrls = [];
-        if (preg_match_all('/((https?|ftps?):\/\/)([a-zA-Z0-9-\.{}]*[a-zA-Z0-9=}]*)(\??)([^\s\]]+)?/i', $text, $matches)) {
+        if (preg_match_all('/((https?|ftps?):\/\/)([a-zA-Z0-9-\.{}]*[a-zA-Z0-9=}]*)(\??)([^\s\]"]+)?/i', $text, $matches)) {
             foreach ($matches[0] as $url) {
                 if ($preparedUrl = $this->prepareUrlForTracking($url)) {
                     list($urlKey, $urlValue) = $preparedUrl;

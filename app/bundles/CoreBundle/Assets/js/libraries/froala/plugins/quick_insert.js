@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.3 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -277,7 +277,12 @@
 
       editor.events.on('shared.destroy', function () {
         $quick_insert.html('').removeData().remove();
-        if ($helper) $helper.html('').removeData().remove();
+        $quick_insert = null;
+
+        if ($helper) {
+          $helper.html('').removeData().remove();
+          $helper = null;
+        }
       }, true);
 
       // Hide before a command is executed.

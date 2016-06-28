@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.3 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -42,7 +42,7 @@
 
   $.FE.PLUGINS.fontSize = function (editor) {
     function apply (val) {
-      editor.commands.applyProperty('font-size', val);
+      editor.format.applyStyle('font-size', val);
     }
 
     function refreshOnShow($btn, $dropdown) {

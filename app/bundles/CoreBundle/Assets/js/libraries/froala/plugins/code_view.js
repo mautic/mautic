@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.3 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -43,6 +43,15 @@
       lineWrapping: true,
       mode: 'text/html',
       tabSize: 2
+    },
+    codeBeautifierOptions: {
+      end_with_newline: true,
+      indent_inner_html: true,
+      extra_liners: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre', 'ul', 'ol', 'table', 'dl'],
+      brace_style: 'expand',
+      indent_char: '\t',
+      indent_size: 1,
+      wrap_line_length: 0
     }
   })
 
@@ -90,7 +99,7 @@
     /**
      * Get to code mode.
      */
-    function _showHTML ($btn, height) {
+    function _showHTML ($btn) {
       if (!$html_area) _initArea();
 
       // Enable code mirror.
@@ -111,27 +120,20 @@
           editor.$el.find('.fr-marker[data-type="true"]:first').replaceWith('<span class="fr-tmp fr-sm">F</span>');
           editor.$el.find('.fr-marker[data-type="false"]:last').replaceWith('<span class="fr-tmp fr-em">F</span>');
         }
-
-        editor.$el.blur();
       }
 
       // Get HTML.
       var html = editor.html.get(false, true);
       editor.$el.find('span.fr-tmp').remove();
+
+      if (editor.core.hasFocus()) editor.$el.blur();
+
       html = html.replace(/<span class="fr-tmp fr-sm">F<\/span>/, 'FROALA-SM');
       html = html.replace(/<span class="fr-tmp fr-em">F<\/span>/, 'FROALA-EM');
 
       // Beautify HTML.
       if (editor.codeBeautifier) {
-        html = editor.codeBeautifier.run(html, {
-          end_with_newline: true,
-          indent_inner_html: true,
-          extra_liners: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre', 'ul', 'ol', 'table', 'dl'],
-          brace_style: 'expand',
-          indent_char: '\t',
-          indent_size: 1,
-          wrap_line_length: 0
-        });
+        html = editor.codeBeautifier.run(html, editor.opts.codeBeautifierOptions);
       }
 
       var s_index;
@@ -156,7 +158,8 @@
         s_index = html.substring(0, s_index).length - html.substring(0, html.substring(0, s_index).lastIndexOf('\n') + 1).length;
         e_index = html.substring(0, e_index).length - html.substring(0, html.substring(0, e_index).lastIndexOf('\n')  + 1).length;
 
-        code_mirror.setSize(null, Math.max(height, 150));
+        code_mirror.setSize(null, editor.opts.height ? editor.opts.height : 'auto');
+        if (editor.opts.heightMin) editor.$box.find('.CodeMirror-scroll').css('min-height', editor.opts.heightMin);
         code_mirror.setValue(html);
         code_mirror.focus();
         code_mirror.setSelection({ line: s_line, ch: s_index }, { line: e_line, ch: e_index })
@@ -169,9 +172,15 @@
         s_index = html.indexOf('FROALA-SM');
         e_index = html.indexOf('FROALA-EM') - 9;
 
-        $html_area.css('height', height);
+        if (editor.opts.heightMin) {
+          $html_area.css('min-height', editor.opts.heightMin);
+        }
 
-        if (editor.opts.height || editor.opts.heightMax) {
+        if (editor.opts.height) {
+          $html_area.css('height', editor.opts.height);
+        }
+
+        if (editor.opts.heightMax) {
           $html_area.css('max-height', editor.opts.height || editor.opts.heightMax);
         }
 
@@ -202,9 +211,8 @@
         _showText($btn);
       } else {
         editor.popups.hideAll();
-        var height = editor.$wp.outerHeight();
         editor.$box.toggleClass('fr-code-view', true);
-        _showHTML($btn, height);
+        _showHTML($btn);
       }
     }
 
@@ -214,10 +222,16 @@
     function _destroy () {
       if (isActive()) {
         toggle(editor.$tb.find('button[data-cmd="html"]'));
-        $html_area.val('').removeData().remove();
       }
 
-      if ($back_button) $back_button.remove();
+      if (code_mirror) code_mirror.toTextArea();
+      $html_area.val('').removeData().remove();
+      $html_area = null;
+
+      if ($back_button) {
+        $back_button.remove();
+        $back_button = null;
+      }
     }
 
     function _initArea () {
@@ -228,7 +242,7 @@
       $html_area.attr('dir', editor.opts.direction);
 
       // Exit code view button for inline toolbar.
-      if (editor.opts.toolbarInline) {
+      if (!editor.$box.hasClass('fr-basic')) {
         $back_button = $('<a data-cmd="html" title="Code View" class="fr-command fr-btn html-switch' + (editor.helpers.isMobile() ? '' : ' fr-desktop') + '" role="button" tabindex="-1"><i class="fa fa-code"></i></button>');
         editor.$box.append($back_button);
 

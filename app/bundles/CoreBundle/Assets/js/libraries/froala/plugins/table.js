@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.3 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -45,6 +45,7 @@
     tableInsertMaxSize: 10,
     tableEditButtons: ['tableHeader', 'tableRemove', '|', 'tableRows', 'tableColumns', 'tableStyle', '-', 'tableCells', 'tableCellBackground', 'tableCellVerticalAlign', 'tableCellHorizontalAlign', 'tableCellStyle'],
     tableInsertButtons: ['tableBack', '|'],
+    tableResizer: true,
     tableResizerOffset: 5,
     tableResizingLimit: 30,
     tableColorsButtons: ['tableBack', '|'],
@@ -118,7 +119,7 @@
         editor.popups.show('table.edit', left, top, offset.bottom - offset.top);
 
         // Disable toolbar buttons only if there are more than one cells selected.
-        if (selectedCells().length > 1) {
+        if (editor.edit.isDisabled()) {
           // Disable toolbar.
           editor.toolbar.disable();
 
@@ -396,6 +397,9 @@
 
         // Delete table.
         $current_table.remove();
+
+        // Enable toolbar.
+        editor.toolbar.enable();
       }
     }
 
@@ -1321,7 +1325,6 @@
         // Prevent text selection while selecting multiple cells.
         // Happens in Chrome.
         editor.$el.addClass('fr-no-selection');
-        editor.edit.off();
 
         // Cursor will not appear if we don't make blur.
         editor.$el.blur();
@@ -1474,11 +1477,18 @@
         // Remove previous selection.
         _removeSelection();
 
+        // Enable editor toolbar.
+        editor.edit.on();
+
         $(firstCell).addClass('fr-selected-cell');
 
+      // Select multiple celss.
       } else {
         // Prevent Firefox cell selection.
         _clearSelection();
+
+        // Turn editor toolbar off.
+        editor.edit.off();
 
         // Create a table map.
         var map = _tableMap();
@@ -1549,61 +1559,66 @@
         _stopEdit();
       }
 
-      // On left click.
-      if (e.which == 1) {
-        mouseDownFlag = true;
+      // Only do mouseDown if the editor is not disabled by user.
+      if (!editor.edit.isDisabled() || editor.popups.isVisible('table.edit')) {
+        // On left click.
+        if (e.which == 1 && !(e.which == 1 && editor.helpers.isMac() && e.ctrlKey)) {
+          mouseDownFlag = true;
 
-        // User clicked on a table cell.
-        if (cell) {
-          // We always have to clear previous selection except when using shift key to select multiple cells.
-          if (selectedCells().length > 0 && !e.shiftKey) {
-            _stopEdit();
-          }
-
-          e.stopPropagation();
-
-          editor.events.trigger('image.hideResizer');
-          editor.events.trigger('video.hideResizer');
-
-          // Keep record of left mouse click being down
-          mouseDownCellFlag = true;
-
-          var tag_name = cell.tagName.toLowerCase();
-
-          // Select multiple cells using Shift key
-          if (e.shiftKey && editor.$el.find(tag_name + '.fr-selected-cell').length > 0) {
-
-            // Cells must be in the same table.
-            if ($(editor.$el.find(tag_name + '.fr-selected-cell').closest('table')).is($(cell).closest('table'))) {
-              // Select cells between.
-              _selectCells(mouseDownCell, cell);
-
-            // Do nothing if cells are not in the same table.
-            } else {
-              // Prevent Firefox selection.
-              _clearSelection();
-            }
-          }
-
-          else {
-            // Prevent Firefox selection for ctrl / cmd key.
-            if (editor.keys.ctrlKey(e) || e.shiftKey) {
-              _clearSelection();
+          // User clicked on a table cell.
+          if (cell) {
+            // We always have to clear previous selection except when using shift key to select multiple cells.
+            if (selectedCells().length > 0 && !e.shiftKey) {
+              _stopEdit();
             }
 
-            // Save cell where mouse has been clicked
-            mouseDownCell = cell;
+            e.stopPropagation();
 
-            // Select cell.
-            _selectCells(mouseDownCell, mouseDownCell);
+            editor.events.trigger('image.hideResizer');
+            editor.events.trigger('video.hideResizer');
+
+            // Keep record of left mouse click being down
+            mouseDownCellFlag = true;
+
+            var tag_name = cell.tagName.toLowerCase();
+
+            // Select multiple cells using Shift key
+            if (e.shiftKey && editor.$el.find(tag_name + '.fr-selected-cell').length > 0) {
+
+              // Cells must be in the same table.
+              if ($(editor.$el.find(tag_name + '.fr-selected-cell').closest('table')).is($(cell).closest('table'))) {
+                // Select cells between.
+                _selectCells(mouseDownCell, cell);
+
+              // Do nothing if cells are not in the same table.
+              } else {
+                // Prevent Firefox selection.
+                _clearSelection();
+              }
+            }
+
+            else {
+              // Prevent Firefox selection for ctrl / cmd key.
+              // https://github.com/froala/wysiwyg-editor/issues/1323:
+              //  - we have more than one cell selected or
+              //  - selection is starting in another cell than the one we clicked on.
+              if ((editor.keys.ctrlKey(e) || e.shiftKey) && (selectedCells().length > 1 || ($(cell).find(editor.selection.element()).length === 0 && !$(cell).is(editor.selection.element())))) {
+                _clearSelection();
+              }
+
+              // Save cell where mouse has been clicked
+              mouseDownCell = cell;
+
+              // Select cell.
+              _selectCells(mouseDownCell, mouseDownCell);
+            }
           }
         }
-      }
 
-
-      // On right click stop table editing.
-      else if (e.which == 3 && cell) {
-        _stopEdit();
+        // On right click stop table editing.
+        else if ((e.which == 3 || (e.which == 1 && editor.helpers.isMac() && e.ctrlKey)) && cell) {
+          _stopEdit();
+        }
       }
     }
 
@@ -1611,8 +1626,18 @@
      * Notify that mouse is no longer pressed.
      */
     function _mouseUp (e) {
+      // User clicked somewhere else in the editor (except the toolbar).
+      // We need this because mouse down is not triggered outside the editor.
+      if (!mouseDownCellFlag && !editor.$tb.is(e.target) && !editor.$tb.is($(e.target).closest(editor.$tb.get(0)))) {
+        if (selectedCells().length > 0) {
+          editor.toolbar.enable();
+        }
+
+        _removeSelection();
+      }
+
       // On left click.
-      if (e.which == 1) {
+      if (e.which == 1 && !(e.which == 1 && editor.helpers.isMac() && e.ctrlKey)) {
         mouseDownFlag = false;
 
         // Mouse down was in a table cell.
@@ -1639,16 +1664,6 @@
               _removeSelection();
             }
           }
-        }
-
-        // User clicked somewhere else in the editor (except the toolbar).
-        // We need this because mouse down is not triggered outside the editor.
-        else if (!editor.$tb.is(e.target) && !editor.$tb.is($(e.target).closest(editor.$tb.get(0)))) {
-          if (editor.$el.get(0).querySelectorAll('.fr-selected-cell').length > 0) {
-            editor.toolbar.enable();
-          }
-
-          _removeSelection();
         }
 
         // Resizing stops.
@@ -1704,7 +1719,7 @@
           }
         }
 
-       // Prevent firefox selection.
+        // Prevent firefox selection.
         _clearSelection();
       }
     }
@@ -1746,6 +1761,9 @@
           // Prevent text selection while dragging the table resizer.
           _clearSelection();
 
+          // Turn editor toolbar off while resizing.
+          editor.edit.off();
+
           // Show resizer.
           $resizer.find('div').css('opacity', 1);
 
@@ -1770,6 +1788,7 @@
       // Editor destroy.
       editor.events.on('shared.destroy', function () {
         $resizer.html('').removeData().remove();
+        $resizer = null;
       }, true);
 
       editor.events.on('destroy', function () {
@@ -2143,12 +2162,12 @@
       var tag_under = editor.doc.elementFromPoint(e.pageX - editor.win.pageXOffset, e.pageY - editor.win.pageYOffset);
 
       // Place table resizer if necessary.
-      if (!editor.popups.areVisible() || (editor.popups.areVisible() && editor.popups.isVisible('table.edit'))) {
+      if (editor.opts.tableResizer && (!editor.popups.areVisible() || (editor.popups.areVisible() && editor.popups.isVisible('table.edit')))) {
         _placeResizer(e, tag_under);
       }
 
       // Show the insert column / row helper button.
-      if (!editor.popups.areVisible() && !(editor.$tb.hasClass('fr-inline') && editor.$tb.is(':visible'))) {
+      if (editor.opts.tableInsertHelper && !editor.popups.areVisible() && !(editor.$tb.hasClass('fr-inline') && editor.$tb.is(':visible'))) {
         _insertHelper(e, tag_under);
       }
     }
@@ -2299,8 +2318,11 @@
           clearTimeout(mouseMoveTimer);
         }
 
-        // Check tag under in order to place the table resizer or insert helper button.
-        mouseMoveTimer = setTimeout(_tagUnder, 30, e);
+        // Only resize table if the editor is not disabled by user.
+        if (!editor.edit.isDisabled() || editor.popups.isVisible('table.edit')) {
+          // Check tag under in order to place the table resizer or insert helper button.
+          mouseMoveTimer = setTimeout(_tagUnder, 30, e);
+        }
 
       // Move table resizer.
       } else if (resizingFlag) {
@@ -2470,6 +2492,7 @@
         // Editor destroy.
         editor.events.on('shared.destroy', function () {
           editor.shared.$ti_helper.html('').removeData().remove();
+          editor.shared.$ti_helper = null;
         }, true);
 
         // Prevent the insert helper hide when mouse is over it.
@@ -2489,8 +2512,58 @@
 
       $insert_helper = editor.shared.$ti_helper;
 
+      editor.events.on('destroy', function () {
+        $insert_helper = null;
+      });
+
       // Table insert helper tooltip.
       editor.tooltip.bind(editor.$box, '.fr-insert-helper > a.fr-floating-btn');
+    }
+
+    /**
+     * Destroy
+     */
+    function _destroy () {
+      mouseDownCell = null;
+      clearTimeout(mouseMoveTimer);
+    }
+
+    /*
+     * Go back to the table edit popup.
+     */
+    function back () {
+      if (selectedCells().length > 0) {
+        _showEditPopup();
+      }
+      else {
+        editor.popups.hide('table.insert');
+        editor.toolbar.showInline();
+      }
+    }
+
+    /**
+     * Return selected cells.
+     */
+    function selectedCells () {
+      return editor.$el.get(0).querySelectorAll('.fr-selected-cell');
+    }
+
+    /**
+     * Return selected table.
+     */
+    function selectedTable () {
+      var cells = selectedCells();
+      if (cells.length) {
+        var cell = cells[0];
+        while (cell && cell.tagName != 'TABLE' && cell.parentNode != editor.$el.get(0)) {
+          cell = cell.parentNode;
+        }
+
+        if (cell && cell.tagName == 'TABLE') return $(cell);
+        return $([]);
+      }
+
+      return $([]);
     }
 
     /*
@@ -2572,8 +2645,10 @@
 
         // Prevent backspace from doing browser back.
         editor.events.on('keydown', function (e) {
-          var selected_cells = editor.$el.get(0).querySelectorAll('.fr-selected-cell');
+          var selected_cells = selectedCells();
+
           if (selected_cells.length > 0) {
+            // ESC clear table cell selection.
             if (e.which == $.FE.KEYCODE.ESC) {
               if (editor.popups.isVisible('table.edit')) {
                 _removeSelection();
@@ -2581,22 +2656,47 @@
                 e.preventDefault();
                 e.stopPropagation();
                 e.stopImmediatePropagation();
+                selected_cells = [];
                 return false;
               }
             }
 
-            if (selected_cells.length > 1) {
+            // Backspace clears selected cells content.
+            if (selected_cells.length > 1 && e.which == $.FE.KEYCODE.BACKSPACE) {
+              editor.undo.saveStep();
+
+              for (var i = 0; i < selected_cells.length; i++) {
+                $(selected_cells[i]).html('<br>');
+
+                if (i == selected_cells.length - 1) {
+                  $(selected_cells[i]).prepend($.FE.MARKERS);
+                }
+              }
+
+              editor.selection.restore();
+              editor.undo.saveStep();
+              selected_cells = [];
+              return false;
+            }
+
+            // Prevent typing if cells are selected. (Allow browser refresh using keyboard)
+            if (selected_cells.length > 1 && !editor.keys.ctrlKey(e)) {
               e.preventDefault();
+              selected_cells = [];
               return false;
             }
           }
+
+          selected_cells = [];
         }, true);
 
         // Clean selected cells.
-        var $selected_cells;
+        var c_selected_cells = [];
         editor.events.on('html.beforeGet', function () {
-          $selected_cells = editor.$el.find('.fr-selected-cell');
-          $selected_cells.removeClass('fr-selected-cell');
+          c_selected_cells = selectedCells();
+          for (var i = 0; i < c_selected_cells.length; i++) {
+            c_selected_cells[i].className = (c_selected_cells[i].className || '').replace(/fr-selected-cell/g, '');
+          }
         });
 
         editor.events.on('html.get', function (html) {
@@ -2606,7 +2706,10 @@
         });
 
         editor.events.on('html.afterGet', function () {
-          $selected_cells.addClass('fr-selected-cell');
+          for (var i = 0; i < c_selected_cells.length; i++) {
+            c_selected_cells[i].className = (c_selected_cells[i].className ? c_selected_cells[i].className + ' ' : '') + 'fr-selected-cell';
+          }
+          c_selected_cells = [];
         });
 
         _initInsertPopup(true);
@@ -2615,36 +2718,8 @@
 
       // Tab in cell
       editor.events.on('keydown', _useTab, true);
-    }
 
-    /*
-     * Go back to the table edit popup.
-     */
-    function back () {
-      if (selectedCells().length > 0) {
-        _showEditPopup();
-      }
-      else {
-        editor.popups.hide('table.insert');
-        editor.toolbar.showInline();
-      }
-    }
-
-    function selectedCells () {
-      return editor.$el.get(0).querySelectorAll('.fr-selected-cell');
-    }
-
-    function selectedTable () {
-      var cells = selectedCells();
-      if (cells.length) {
-        var cell = cells[0];
-        while (cell && cell.tagName != 'TABLE' && cell.parentNode != editor.$el.get(0)) {
-          cell = cell.parentNode;
-        }
-
-        if (cell && cell.tagName == 'TABLE') return $(cell);
-        return $([]);
-      }
+      editor.events.on('destroy', _destroy);
     }
 
     return {

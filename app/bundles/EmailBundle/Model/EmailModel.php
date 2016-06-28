@@ -465,7 +465,7 @@ class EmailModel extends FormModel
      *
      * @return array
      */
-    public function getBuilderComponents(Email $email = null, $requestedComponents = 'all', $tokenFilter = null)
+    public function getBuilderComponents (Email $email = null, $requestedComponents = 'all', $tokenFilter = null, $withBC = true)
     {
         $singleComponent = (!is_array($requestedComponents) && $requestedComponents != 'all');
         $components      = [];
@@ -479,7 +479,7 @@ class EmailModel extends FormModel
         foreach ($requestedComponents as $requested) {
             switch ($requested) {
                 case 'tokens':
-                    $components[$requested] = $event->getTokens();
+                    $components[$requested] = $event->getTokens($withBC);
                     break;
                 case 'visualTokens':
                     $components[$requested] = $event->getVisualTokens();
@@ -494,7 +494,7 @@ class EmailModel extends FormModel
                     $components[$requested] = $event->getSlotTypes();
                     break;
                 default:
-                    $components['tokens']               = $event->getTokens();
+                    $components['tokens']               = $event->getTokens($withBC);
                     $components['tokenSections']        = $event->getTokenSections();
                     $components['abTestWinnerCriteria'] = $event->getAbTestWinnerCriteria();
                     $components['slotTypes']            = $event->getSlotTypes();

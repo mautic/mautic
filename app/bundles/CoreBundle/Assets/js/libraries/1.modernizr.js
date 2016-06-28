@@ -11,7 +11,7 @@ window.Modernizr = (function( window, document, undefined ) {
 
         Modernizr = {},
 
-        enableClasses = false,
+        enableClasses = true,
 
         docElement = document.documentElement,
 

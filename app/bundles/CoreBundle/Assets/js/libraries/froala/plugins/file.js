@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.3 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -92,13 +92,13 @@
      */
     function showProgressBar () {
       var $popup = editor.popups.get('file.insert');
-      if ($popup) {
-        $popup.find('.fr-layer.fr-active').removeClass('fr-active').addClass('fr-pactive');
-        $popup.find('.fr-file-progress-bar-layer').addClass('fr-active');
-        $popup.find('.fr-buttons').hide();
+      if (!$popup) $popup = _initInsertPopup();
 
-        _setProgressMessage('Uploading', 0);
-      }
+      $popup.find('.fr-layer.fr-active').removeClass('fr-active').addClass('fr-pactive');
+      $popup.find('.fr-file-progress-bar-layer').addClass('fr-active');
+      $popup.find('.fr-buttons').hide();
+
+      _setProgressMessage('Uploading', 0);
     }
 
     /**
@@ -144,6 +144,7 @@
      * Show error message to the user.
      */
     function _showErrorMessage (message) {
+      showProgressBar();
       var $popup = editor.popups.get('file.insert');
       var $layer = $popup.find('.fr-file-progress-bar-layer');
       $layer.addClass('fr-error')
@@ -509,8 +510,15 @@
 
       editor.events.$on(editor.$win, 'keydown', function (e) {
         var key_code = e.which;
-        var $popup = editor.popups.get('file.insert')
+        var $popup = editor.popups.get('file.insert');
         if ($popup && key_code == $.FE.KEYCODE.ESC) {
+          $popup.trigger('abortUpload');
+        }
+      });
+
+      editor.events.on('destroy', function () {
+        var $popup = editor.popups.get('file.insert');
+        if ($popup) {
           $popup.trigger('abortUpload');
         }
       });
@@ -552,7 +560,7 @@
     title: 'Upload File',
     undo: false,
     focus: true,
-    refershAfterCallback: false,
+    refreshAfterCallback: false,
     popup: true,
     callback: function () {
       if (!this.popups.isVisible('file.insert')) {
