@@ -283,7 +283,7 @@ class FormController extends CommonFormController
         //set the page we came from
         $page = $this->factory->getSession()->get('mautic.form.page', 1);
 
-        $sessionId = $this->request->request->get('mauticform[sessionId]', sha1(uniqid(mt_rand(), true)), true);
+        $sessionId = $this->request->request->get('mauticform[sessionId]', 'mautic_'.sha1(uniqid(mt_rand(), true)), true);
 
         //set added/updated fields
         $modifiedFields = $session->get('mautic.form.'.$sessionId.'.fields.modified', array());
@@ -473,7 +473,7 @@ class FormController extends CommonFormController
 
         if ($objectId instanceof Form) {
             $entity   = $objectId;
-            $objectId = sha1(uniqid(mt_rand(), true));
+            $objectId = 'mautic_'.sha1(uniqid(mt_rand(), true));
         } else {
             $entity = $model->getEntity($objectId);
 

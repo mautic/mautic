@@ -443,7 +443,7 @@ class CampaignController extends FormController
         //set the page we came from
         $page = $this->factory->getSession()->get('mautic.campaign.page', 1);
 
-        $sessionId = $this->request->request->get('campaign[sessionId]', sha1(uniqid(mt_rand(), true)), true);
+        $sessionId = $this->request->request->get('campaign[sessionId]', 'mautic_'.sha1(uniqid(mt_rand(), true)), true);
 
         //set added/updated events
         list($modifiedEvents, $deletedEvents, $campaignEvents) = $this->getSessionEvents($sessionId);
@@ -887,7 +887,6 @@ class CampaignController extends FormController
 
         // Generate temporary ID
         $tempId = 'mautic_'.sha1(uniqid(mt_rand(), true));
-
 
         // load sources to session
         $currentSources = $model->getLeadSources($objectId);
