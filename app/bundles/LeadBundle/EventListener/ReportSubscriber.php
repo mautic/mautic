@@ -365,7 +365,7 @@ class ReportSubscriber extends CommonSubscriber
 
                 if ('multi' != $alias) {
                     // Get the min/max row and group by lead for first touch or last touch events
-                    $func = ('first' == $context) ? 'min' : 'max';
+                    $func = ('first' == $alias) ? 'min' : 'max';
                     $subQ->select("$func({$alias}log.date_triggered)")
                         ->setMaxResults(1);
                     $qb->andWhere(
