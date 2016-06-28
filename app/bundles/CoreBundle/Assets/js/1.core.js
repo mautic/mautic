@@ -570,10 +570,13 @@ var Mautic = {
                     //     settings.extraPlugins = "sourcedialog,docprops,filemanager";
                     // }
 
+                    var maxButtons = ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikeThrough', 'fontFamily', 'fontSize', 'color', 'paragraphFormat', 'align', 'orderedList', 'unorderedList', 'quote', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertImage','insertTable', 'html', 'fullscrean'];
+
                     if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
                         var options = {
                             // Set custom buttons with separator between them.
-                            toolbarButtons: ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikeThrough', 'fontFamily', 'fontSize', 'color', 'paragraphFormat', 'align', 'orderedList', 'unorderedList', 'quote', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertImage','insertTable', 'html', 'fullscrean'],
+                            toolbarButtons: maxButtons,
+                            toolbarButtonsMD: maxButtons,
                             heightMin: 300
                         };
 
@@ -587,8 +590,8 @@ var Mautic = {
 
                         textarea.froalaEditor(mQuery.extend({
                             // Set custom buttons with separator between them.
-                            toolbarButtons: ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertImage','insertTable', 'html'],
-                            toolbarButtonsMD: ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertImage', 'insertTable', 'html'],
+                            toolbarButtons: maxButtons,
+                            toolbarButtonsMD: maxButtons,
                             toolbarButtonsSM: ['undo', 'redo' , '-', 'bold', 'italic', 'underline'],
                             toolbarButtonsXS: ['undo', 'redo' , '-', 'bold', 'italic', 'underline'],
                             heightMin: 100
