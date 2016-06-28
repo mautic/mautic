@@ -271,6 +271,7 @@ Mautic.initSlots = function() {
 }
 
 Mautic.initSlotListeners = function() {
+    Mautic.activateGlobalFroalaOptions();
     Mautic.builderSlots = [];
     Mautic.builderContents.on('slot:init', function(event, slot) {
         slot = mQuery(slot);
