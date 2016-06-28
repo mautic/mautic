@@ -91,26 +91,22 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
 <?php endif; ?>
 
 <?php if (!empty($graphOrder) && !empty($graphs)): ?>
-<div class="mt-lg">
-    <div class="row">
-        <div class="pa-md">
-            <div class="row equal">
-            <?php
+<div class="mt-lg pa-md">
+    <div class="row equal">
+    <?php
+    $rowCount = 0;
+    foreach ($graphOrder as $key):
+        $details =  $graphs[$key];
+        if (!isset($details['data']))
+            continue;
+        if ($rowCount >= 12):
+            echo '</div><div class="row equal">';
             $rowCount = 0;
-            foreach ($graphOrder as $key):
-                $details =  $graphs[$key];
-                if (!isset($details['data']))
-                    continue;
-                if ($rowCount >= 12):
-                    echo '</div><div class="row equal">';
-                    $rowCount = 0;
-                endif;
-                echo $view->render('MauticReportBundle:Graph:'.ucfirst($details['type']).'.html.php', array('graph' => $details['data'], 'options' => $details['options'], 'report' => $report));
-                $rowCount += ($details['type'] == 'line') ? 12 : 4;
-            endforeach;
-            ?>
-            </div>
-        </div>
+        endif;
+        echo $view->render('MauticReportBundle:Graph:'.ucfirst($details['type']).'.html.php', array('graph' => $details['data'], 'options' => $details['options'], 'report' => $report));
+        $rowCount += ($details['type'] == 'line') ? 12 : 4;
+    endforeach;
+    ?>
     </div>
 </div>
 <?php endif; ?>

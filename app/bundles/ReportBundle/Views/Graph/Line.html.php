@@ -8,16 +8,18 @@
  */
 
 ?>
-<div class="bg-auto bg-dark-xs col-xs-12 pa-md mb-lg">
+<div class="col-sm-12">
     <div class="panel">
         <div class="panel-body box-layout">
-            <div class="col-xs-6 va-m">
-                <h5 class="text-white dark-md fw-sb mb-xs pull-left">
-                    <span class="fa fa-download"></span>
-                    <?php echo $view['translator']->trans($graph['name']); ?>
-                </h5>
+            <div class="col-xs-8 va-m">
+                <h5 class="text-white dark-md fw-sb mb-xs"><?php echo $view['translator']->trans($graph['name']); ?></h5>
+            </div>
+            <div class="col-xs-4 va-t text-right">
+                <h3 class="text-white dark-sm"><span class="fa fa-<?php echo isset($graph['iconClass']) ? $graph['iconClass'] : ''; ?>"></span></h3>
             </div>
         </div>
+
         <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $graph, 'chartType' => 'line', 'chartHeight' => 300)); ?>
     </div>
 </div>
+
