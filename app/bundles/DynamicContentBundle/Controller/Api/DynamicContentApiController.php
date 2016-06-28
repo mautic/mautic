@@ -11,7 +11,12 @@ namespace Mautic\DynamicContentBundle\Controller\Api;
 
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Event\TokenReplacementEvent;
+use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Event\DynamicContentEvent;
+use Mautic\DynamicContentBundle\Model\DynamicContentModel;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -40,18 +45,34 @@ class DynamicContentApiController extends CommonController
     {
         /** @var EventModel $campaignEventModel */
         $campaignEventModel = $this->getModel('campaign.event');
-        
+
         $response = $campaignEventModel->triggerEvent('dwc.decision', $objectAlias, 'dwc.decision.' . $objectAlias);
         $content  = null;
-        
+        $lead     = $this->getModel('lead')->getCurrentLead();
+
         if (is_array($response) && !empty($response['action']['dwc.push_content'])) {
             $content = array_shift($response['action']['dwc.push_content']);
         } else {
-            $lead = $this->getModel('lead')->getCurrentLead();
-            
-            $content = $this->getModel('dynamicContent')->getSlotContentForLead($objectAlias, $lead);
-        }
+            /** @var DynamicContentModel $dwcModel */
+            $dwcModel = $this->getModel('dynamicContent');
 
+            $data = $dwcModel->getSlotContentForLead($objectAlias, $lead);
+
+            if (!empty($data)) {
+                $content = $data['content'];
+                $dwc = $dwcModel->getEntity($data['id']);
+
+                if ($dwc instanceof DynamicContent) {
+                    $dwcModel->createStatEntry($dwc, $lead, $objectAlias);
+
+                    $event = new TokenReplacementEvent($content, $lead, ['slot' => $objectAlias, 'dynamic_content_id' => $dwc->getId()]);
+                    $this->factory->getDispatcher()->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $event);
+                    
+                    $content = $event->getContent();
+                }
+            }
+        }
+        
         return empty($content) ? new Response('', Response::HTTP_NOT_FOUND) : new Response($content);
     }
 }

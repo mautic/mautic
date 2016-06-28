@@ -491,8 +491,6 @@ class Email extends FormEntity
                     'variantChildren'
                 )
             )
-            ->setMaxDepth(1, 'variantParent')
-            ->setMaxDepth(1, 'variantChildren')
             ->build();
     }
 

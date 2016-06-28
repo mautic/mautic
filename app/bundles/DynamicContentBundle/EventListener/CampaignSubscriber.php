@@ -10,6 +10,7 @@
 namespace Mautic\DynamicContentBundle\EventListener;
 
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\CampaignEvents;
@@ -137,8 +138,15 @@ class CampaignSubscriber extends CommonSubscriber
             if ($slot) {
                 $this->dynamicContentModel->setSlotContentForLead($dwc, $lead, $slot);
             }
+            
+            $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
 
-            $event->setResult($dwc->getContent());
+            $event = new TokenReplacementEvent($dwc->getContent(), $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
+            $this->factory->getDispatcher()->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $event);
+
+            $content = $event->getContent();
+
+            $event->setResult($content);
 
             $event->stopPropagation();
         }

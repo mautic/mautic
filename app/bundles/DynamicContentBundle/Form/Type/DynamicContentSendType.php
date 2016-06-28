@@ -70,7 +70,7 @@ class DynamicContentSendType extends AbstractType
 
         if (!empty($options['update_select'])) {
             $windowUrl = $this->router->generate(
-                'mautic_dwc_action',
+                'mautic_dynamicContent_action',
                 [
                     'objectAction' => 'new',
                     'contentOnly' => 1,
@@ -97,7 +97,7 @@ class DynamicContentSendType extends AbstractType
 
             // create button edit notification
             $windowUrlEdit = $this->router->generate(
-                'mautic_dwc_action',
+                'mautic_dynamicContent_action',
                 [
                     'objectAction' => 'edit',
                     'objectId' => 'dynamicContentId',

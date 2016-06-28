@@ -20,7 +20,7 @@ $view['slots']->set(
             'templateButtons' => [
                 'new' => $permissions['dynamicContent:dynamicContents:create'],
             ],
-            'routeBase' => 'dwc',
+            'routeBase' => 'dynamicContent',
         ]
     )
 );
@@ -31,7 +31,7 @@ $view['slots']->set(
         'searchValue' => $searchValue,
         'searchHelp' => 'mautic.page.help.searchcommands',
         'action' => $currentRoute,
-        'routeBase' => 'dwc',
+        'routeBase' => 'dynamicContent',
         'templateButtons' => [
             'delete' => $permissions['dynamicContent:dynamicContents:deleteown'] || $permissions['dynamicContent:dynamicContents:deleteother'],
         ],

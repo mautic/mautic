@@ -13,7 +13,7 @@ return [
         'main' => [
             'items' => [
                 'mautic.dynamicContent.dynamicContent' => [
-                    'route' => 'mautic_dwc_index',
+                    'route' => 'mautic_dynamicContent_index',
                     'access' => ['dynamicContent:dynamicContents:viewown', 'dynamicContent:dynamicContents:viewother'],
                     'parent' => 'mautic.core.components',
                     'priority' => 200,
@@ -23,25 +23,21 @@ return [
     ],
     'routes' => [
         'main' => [
-            'mautic_dwc_index' => [
+            'mautic_dynamicContent_index' => [
                 'path' => '/dwc/{page}',
                 'controller' => 'MauticDynamicContentBundle:DynamicContent:index',
             ],
-            'mautic_dwc_action' => [
+            'mautic_dynamicContent_action' => [
                 'path' => '/dwc/{objectAction}/{objectId}',
                 'controller' => 'MauticDynamicContentBundle:DynamicContent:execute',
             ],
         ],
         'public' => [
-            'mautic_dwc_generate_js' => [
-                'path' => '/dwc/generate.js',
-                'controller' => 'MauticDynamicContentBundle:Api\Js:generate'
-            ],
-            'mautic_api_dwc_index' => [
+            'mautic_api_dynamicContent_index' => [
                 'path' => '/dwc',
                 'controller' => 'MauticDynamicContentBundle:Api\DynamicContentApi:getEntities'
             ],
-            'mautic_api_dwc_action' => [
+            'mautic_api_dynamicContent_action' => [
                 'path' => '/dwc/{objectAlias}',
                 'controller' => 'MauticDynamicContentBundle:Api\DynamicContentApi:process'
             ]
@@ -49,7 +45,7 @@ return [
     ],
     'services' => [
         'events' => [
-            'mautic.dwc.campaignbundle.subscriber' => [
+            'mautic.dynamicContent.campaignbundle.subscriber' => [
                 'class' => 'Mautic\DynamicContentBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
                     'mautic.factory',
@@ -58,6 +54,18 @@ return [
                     'session'
                 ],
             ],
+            'mautic.dynamicContent.js.subscriber' => [
+                'class' => 'Mautic\DynamicContentBundle\EventListener\BuildJsSubscriber'
+            ],
+            'mautic.dynamicContent.subscriber' => [
+                'class' => 'Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.page.model.trackable',
+                    'mautic.page.helper.token',
+                    'mautic.asset.helper.token'
+                ]
+            ]
         ],
         'forms' => [
             'mautic.form.type.dwc' => [

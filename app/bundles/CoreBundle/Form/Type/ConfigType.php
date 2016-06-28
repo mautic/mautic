@@ -697,6 +697,36 @@ class ConfigType extends AbstractType
                 'required'   => false
             )
         );
+
+        $builder->add(
+            'cors_restrict_domains',
+            'yesno_button_group',
+            array(
+                'label' => 'mautic.core.config.cors.restrict.domains',
+                'data'  => (array_key_exists('cors_restrict_domains', $options['data']) && !empty($options['data']['cors_restrict_domains'])),
+                'attr'  => array(
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.cors.restrict.domains.tooltip'
+                )
+            )
+        );
+
+        $arrayLinebreakTransformer = new ArrayLinebreakTransformer();
+        $builder->add(
+            $builder->create(
+                'cors_valid_domains',
+                'textarea',
+                array(
+                    'label'      => 'mautic.core.config.cors.valid.domains',
+                    'label_attr' => array('class' => 'control-label'),
+                    'attr'       => array(
+                        'class'        => 'form-control',
+                        'tooltip'      => 'mautic.core.config.cors.valid.domains.tooltip',
+                        'data-show-on' => '{"config_coreconfig_cors_restrict_domains_1":"checked"}',
+                    )
+                )
+            )->addViewTransformer($arrayLinebreakTransformer)
+        );
     }
 
     /**
