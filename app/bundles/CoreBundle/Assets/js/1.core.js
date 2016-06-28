@@ -283,7 +283,8 @@ var Mautic = {
             imageUploadURL: mauticBaseUrl + 's/file/upload',
             imageManagerLoadURL: mauticBaseUrl + 's/file/list',
             imageManagerDeleteURL: mauticBaseUrl + 's/file/delete',
-            useClasses: false
+            useClasses: false,
+            fullPage: true
         };
 
         // Set the Froala license key
