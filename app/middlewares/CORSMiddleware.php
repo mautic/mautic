@@ -59,8 +59,8 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
 
         include __DIR__.'/../config/local.php';
 
-        $this->restrictCORSDomains = (bool) $parameters['cors_restrict_domains'];
-        $this->validCORSDomains    = (array) $parameters['cors_valid_domains'];
+        $this->restrictCORSDomains = (bool) array_key_exists('cors_restrict_domains', $parameters) ? $parameters['cors_restrict_domains'] : false;
+        $this->validCORSDomains    = (array) array_key_exists('cors_valid_domains', $parameters) ? $parameters['cors_valid_domains'] : [];
     }
 
     /**
