@@ -49,17 +49,6 @@ mQuery( document ).ajaxStop(function(event) {
 });
 
 mQuery( document ).ready(function() {
-    Mautic.basicFroalaOptions = {
-        enter: mQuery.FroalaEditor.ENTER_BR,
-        imageUploadURL: mauticBaseUrl + 's/file/upload',
-        imageManagerLoadURL: mauticBaseUrl + 's/file/list',
-        imageManagerDeleteURL: mauticBaseUrl + 's/file/delete',
-        useClasses: false
-    };
-
-    // Set the Froala license key
-    mQuery.FroalaEditor.DEFAULTS.key = 'MCHCPd1XQVZFSHSd1C==';
-
     if (typeof mauticContent !== 'undefined') {
         mQuery("html").Core({
             console: false
@@ -285,7 +274,20 @@ var Mautic = {
      * Remove the spinner from label
      */
     removeLabelLoadingIndicator: function() {
-        mQuery(Mautic.labelSpinner).remove();;
+        mQuery(Mautic.labelSpinner).remove();
+    },
+
+    activateGlobalFroalaOptions: function() {
+        Mautic.basicFroalaOptions = {
+            enter: mQuery.FroalaEditor.ENTER_BR,
+            imageUploadURL: mauticBaseUrl + 's/file/upload',
+            imageManagerLoadURL: mauticBaseUrl + 's/file/list',
+            imageManagerDeleteURL: mauticBaseUrl + 's/file/delete',
+            useClasses: false
+        };
+
+        // Set the Froala license key
+        mQuery.FroalaEditor.DEFAULTS.key = 'MCHCPd1XQVZFSHSd1C==';
     },
 
     /**
@@ -306,6 +308,8 @@ var Mautic = {
         mQuery('.sidebar-right a[data-toggle="ajax"]').on('click.ajax', function (event) {
             mQuery("html").removeClass('sidebar-open-rtl');
         });
+
+        Mautic.activateGlobalFroalaOptions();
 
         //initialize forms
         mQuery(container + " form[data-toggle='ajax']").each(function (index) {
