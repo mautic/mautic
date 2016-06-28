@@ -547,7 +547,7 @@ var Mautic = {
                     // init AtWho in a froala editor
                     if (textarea.hasClass('editor-builder-tokens')) {
                         textarea.on('froalaEditor.initialized', function (e, editor) {
-                            Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'));
+                            Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'), editor);
                         });
                     }
 
