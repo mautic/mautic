@@ -223,4 +223,33 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $count;
     }
 
+    /**
+     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
+     * @param array                                             $data
+     * @param string                                            $formArea
+     */
+    public function appendToForm(&$builder, $data, $formArea)
+    {
+        if ($formArea == 'features') {
+            $name = strtolower($this->getName());
+
+            $builder->add('objects', 'choice' , array(
+                'choices'     => array(
+                    'leads'  => 'leads',
+                    'contacts' => 'contacts'
+                ),
+                'expanded'    => true,
+                'multiple'    => true,
+                'label'       => 'mautic.plugins.salesforce.choose.objects.to.pull.from',
+                'label_attr'  => array('class' => 'control-label'),
+                'empty_value' => false,
+                'required'    => false,
+                'attr'        => array(
+                    'class' => 'form-control not-chosen'
+                )
+            ));
+
+        }
+    }
+
 }
