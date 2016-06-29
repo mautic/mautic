@@ -373,7 +373,8 @@ class FilterType extends AbstractType
                 'fields',
                 'lists',
                 'emails',
-                'tags'
+                'tags',
+                'stage'
             )
         );
 
