@@ -91,7 +91,7 @@ class FilterType extends AbstractType
             $displayAttr = array();
 
             $customOptions = array();
-echo $fieldType;
+
             switch ($fieldType) {
                 case 'leadlist':
                     if (!isset($data['filter'])) {
@@ -140,13 +140,7 @@ echo $fieldType;
                     $type                      = 'choice';
                     break;
                 case 'stage':
-                    if (!isset($data['filter'])) {
-                        $data['filter'] = array();
-                    } elseif (!is_array($data['filter'])) {
-                        $data['filter'] = array($data['filter']);
-                    }
                     $customOptions['choices']  = $options['stage'];
-                    $customOptions['multiple'] = false;
                     $type                      = 'choice';
                     break;
                 case 'timezone':

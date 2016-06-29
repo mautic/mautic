@@ -868,9 +868,9 @@ class LeadListRepository extends CommonRepository
 
                     break;
                 case 'stage':
-                    $operand = (($func == 'eq') || ($func == 'neq')) ? 'EXISTS' : 'NOT EXISTS';
+                    $operand = in_array($func, array('eq', 'in')) ? 'EXISTS' : 'NOT EXISTS';
 
-                    $subqb = $this->_em->getConnection()
+                    $subQb = $this->_em->getConnection()
                         ->createQueryBuilder()
                         ->select('null')
                         ->from(MAUTIC_TABLE_PREFIX . 'stages', $alias);
@@ -878,9 +878,11 @@ class LeadListRepository extends CommonRepository
                         case 'eq':
                         case 'neq':
                             $parameters[$parameter] = $details['filter'];
+
+                            $subQb->where($subQb->expr()->eq($alias . '.id', 'l.stage_id'));
                             break;
                     }
-                    $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
+                    $groupExpr->add(sprintf('%s (%s)', $operand, $subQb->getSQL()));
                     break;
                 default:
                     switch ($func) {
