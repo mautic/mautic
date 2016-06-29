@@ -33,7 +33,6 @@ class LeadSubscriber extends CommonSubscriber
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
             LeadEvents::CURRENT_LEAD_CHANGED => ['onLeadChange', 0],
             LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
-            PageEvents::PAGE_ON_HIT          => ['logContactAttribution', 0]
         ];
     }
 
