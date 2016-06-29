@@ -31,8 +31,6 @@ class LeadSubscriber extends CommonSubscriber
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
             LeadEvents::CURRENT_LEAD_CHANGED => ['onLeadChange', 0],
             LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
-            // Execute this event after potential campaign decision triggers
-            AssetEvents::ASSET_ON_LOAD       => ['logContactAttribution', -10],
         ];
     }
 

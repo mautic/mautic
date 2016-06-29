@@ -29,8 +29,6 @@ class LeadSubscriber extends CommonSubscriber
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
             LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
-            // Execute this event after potential campaign decision triggers
-            EmailEvents::EMAIL_ON_OPEN       => ['logContactAttribution', -10],
         ];
     }
 
