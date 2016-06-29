@@ -867,7 +867,7 @@ class LeadListRepository extends CommonRepository
                     );
 
                     break;
-                case 'stages':
+                case 'stage':
                     $operand = (($func == 'eq') || ($func == 'neq')) ? 'EXISTS' : 'NOT EXISTS';
 
                     $subqb = $this->_em->getConnection()
