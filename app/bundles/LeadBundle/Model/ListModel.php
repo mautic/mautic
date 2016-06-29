@@ -378,6 +378,18 @@ class ListModel extends FormModel
                         'like'
                     )
                 )
+            ),
+            'stage' => array(
+                'label' => $this->translator->trans('mautic.lead.lead.field.stage'),
+                'properties' => array(
+                    'type' => 'stage'
+                ),
+                'operators' => array(
+                    'include' => array(
+                        '=',
+                        '!='
+                    )
+                )
             )
         );
 

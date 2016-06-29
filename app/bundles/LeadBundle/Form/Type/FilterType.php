@@ -139,6 +139,16 @@ class FilterType extends AbstractType
                     );
                     $type                      = 'choice';
                     break;
+                case 'stage':
+                    if (!isset($data['filter'])) {
+                        $data['filter'] = array();
+                    } elseif (!is_array($data['filter'])) {
+                        $data['filter'] = array($data['filter']);
+                    }
+                    $customOptions['choices']  = $options['stage'];
+                    $customOptions['multiple'] = false;
+                    $type                      = 'choice';
+                    break;
                 case 'timezone':
                 case 'country':
                 case 'region':
@@ -363,7 +373,8 @@ class FilterType extends AbstractType
                 'fields',
                 'lists',
                 'emails',
-                'tags'
+                'tags',
+                'stage'
             )
         );
 
