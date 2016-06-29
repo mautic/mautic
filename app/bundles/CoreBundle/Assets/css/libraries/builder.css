@@ -4614,10 +4614,16 @@ div[data-slot] {
   margin: 20px 0;
 }
 .fr-toolbar {
-  border-top: 5px solid #5d6c7c;
+  border-top: 2px solid #4e5d9d;
 }
 .slot-type-handle.btn {
   float: left;
   width: 106px;
   margin: 2px;
+}
+.theme-list .panel-body {
+  height: 350px;
+}
+.theme-list .select-theme-link {
+  margin-top: 5px;
 }

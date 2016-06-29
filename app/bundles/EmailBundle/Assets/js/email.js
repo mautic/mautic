@@ -87,8 +87,6 @@ Mautic.emailOnLoad = function (container, response) {
         Mautic.activateSearchAutocomplete('list-search', 'email');
     }
 
-    Mautic.initDateRangePicker();
-
     mQuery(document).on('shown.bs.tab', 'a[href="#source-container"]', function (e) {
         Mautic.refreshCodeEditors();
         Mautic.initCodeEditors();

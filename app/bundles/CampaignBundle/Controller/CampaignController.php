@@ -67,6 +67,7 @@ class CampaignController extends FormController
         $sourceLists = $model->getSourceLists();
         $listFilters = array(
             'filters'      => array(
+                'placeholder' => $this->get('translator')->trans('mautic.campaign.filter.placeholder'),
                 'multiple' => true,
                 'groups'   => array(
                     'mautic.campaign.leadsource.form' => array(
@@ -106,7 +107,7 @@ class CampaignController extends FormController
         if (!empty($currentFilters)) {
             $listIds = $catIds = array();
             foreach ($currentFilters as $type => $typeFilters) {
-                $listFilters['filters']['groups']['mautic.campaign.leadsource.' . $type]['values'] = $typeFilters;
+                $listFilters['filters'] ['groups']['mautic.campaign.leadsource.' . $type]['values'] = $typeFilters;
 
                 foreach ($typeFilters as $fltr) {
                     if ($type == 'list') {
@@ -288,7 +289,7 @@ class CampaignController extends FormController
 
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('campaign', $objectId, $entity->getDateAdded());
-        
+
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
@@ -442,7 +443,7 @@ class CampaignController extends FormController
         //set the page we came from
         $page = $this->factory->getSession()->get('mautic.campaign.page', 1);
 
-        $sessionId = $this->request->request->get('campaign[sessionId]', sha1(uniqid(mt_rand(), true)), true);
+        $sessionId = $this->request->request->get('campaign[sessionId]', 'mautic_'.sha1(uniqid(mt_rand(), true)), true);
 
         //set added/updated events
         list($modifiedEvents, $deletedEvents, $campaignEvents) = $this->getSessionEvents($sessionId);
@@ -716,7 +717,7 @@ class CampaignController extends FormController
 
                         if ($connections != null) {
                             // Build and persist events
-                            $model->setEvents($entity, $campaignEvents, $connections, $deletedEvents, $currentSources);
+                            $model->setEvents($entity, $campaignEvents, $connections, $deletedEvents);
 
                             // Update canvas settings with new event IDs if applicable then save
                             $model->setCanvasSettings($entity, $connections);
@@ -799,6 +800,7 @@ class CampaignController extends FormController
 
             //load existing events into session
             $campaignEvents = array();
+
             $existingEvents = $entity->getEvents()->toArray();
 
             foreach ($existingEvents as $e) {
@@ -884,7 +886,7 @@ class CampaignController extends FormController
         $campaign = $model->getEntity($objectId);
 
         // Generate temporary ID
-        $tempId = sha1(uniqid(mt_rand(), true));
+        $tempId = 'mautic_'.sha1(uniqid(mt_rand(), true));
 
         // load sources to session
         $currentSources = $model->getLeadSources($objectId);
@@ -895,7 +897,7 @@ class CampaignController extends FormController
             }
 
             // Get the events that need to be duplicated as well
-            $events = $campaign->getEvents();
+            $events = $campaign->getEvents()->toArray();
 
             // Clone the campaign
             /** @var \Mautic\CampaignBundle\Entity\Campaign $campaign */

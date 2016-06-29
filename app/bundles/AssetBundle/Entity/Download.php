@@ -79,14 +79,15 @@ class Download
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('asset_downloads')
             ->setCustomRepositoryClass('Mautic\AssetBundle\Entity\DownloadRepository')
-            ->addIndex(array('tracking_id'), 'download_tracking_search')
-            ->addIndex(array('source', 'source_id'), 'download_source_search');
+            ->addIndex(['tracking_id'], 'download_tracking_search')
+            ->addIndex(['source', 'source_id'], 'download_source_search')
+            ->addIndex(['date_download'], 'asset_date_download');
 
         $builder->createField('id', 'integer')
             ->isPrimaryKey()
@@ -134,7 +135,7 @@ class Download
      *
      * @return integer
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
@@ -146,7 +147,7 @@ class Download
      *
      * @return Download
      */
-    public function setDateDownload ($dateDownload)
+    public function setDateDownload($dateDownload)
     {
         $this->dateDownload = $dateDownload;
 
@@ -158,7 +159,7 @@ class Download
      *
      * @return \DateTime
      */
-    public function getDateDownload ()
+    public function getDateDownload()
     {
         return $this->dateDownload;
     }
@@ -170,7 +171,7 @@ class Download
      *
      * @return Download
      */
-    public function setCode ($code)
+    public function setCode($code)
     {
         $this->code = $code;
 
@@ -182,7 +183,7 @@ class Download
      *
      * @return integer
      */
-    public function getCode ()
+    public function getCode()
     {
         return $this->code;
     }
@@ -194,7 +195,7 @@ class Download
      *
      * @return Download
      */
-    public function setReferer ($referer)
+    public function setReferer($referer)
     {
         $this->referer = $referer;
 
@@ -206,7 +207,7 @@ class Download
      *
      * @return string
      */
-    public function getReferer ()
+    public function getReferer()
     {
         return $this->referer;
     }
@@ -218,7 +219,7 @@ class Download
      *
      * @return Download
      */
-    public function setAsset (Asset $asset = null)
+    public function setAsset(Asset $asset = null)
     {
         $this->asset = $asset;
 
@@ -230,7 +231,7 @@ class Download
      *
      * @return Asset
      */
-    public function getAsset ()
+    public function getAsset()
     {
         return $this->asset;
     }
@@ -242,7 +243,7 @@ class Download
      *
      * @return Download
      */
-    public function setIpAddress (\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
+    public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
     {
         $this->ipAddress = $ipAddress;
 
@@ -254,7 +255,7 @@ class Download
      *
      * @return \Mautic\CoreBundle\Entity\IpAddress
      */
-    public function getIpAddress ()
+    public function getIpAddress()
     {
         return $this->ipAddress;
     }
@@ -266,7 +267,7 @@ class Download
      *
      * @return Download
      */
-    public function setTrackingId ($trackingId)
+    public function setTrackingId($trackingId)
     {
         $this->trackingId = $trackingId;
 
@@ -278,7 +279,7 @@ class Download
      *
      * @return integer
      */
-    public function getTrackingId ()
+    public function getTrackingId()
     {
         return $this->trackingId;
     }
@@ -286,7 +287,7 @@ class Download
     /**
      * @return mixed
      */
-    public function getLead ()
+    public function getLead()
     {
         return $this->lead;
     }
@@ -294,7 +295,7 @@ class Download
     /**
      * @param mixed $lead
      */
-    public function setLead ($lead)
+    public function setLead($lead)
     {
         $this->lead = $lead;
     }
@@ -302,7 +303,7 @@ class Download
     /**
      * @return mixed
      */
-    public function getSource ()
+    public function getSource()
     {
         return $this->source;
     }
@@ -310,7 +311,7 @@ class Download
     /**
      * @param mixed $source
      */
-    public function setSource ($source)
+    public function setSource($source)
     {
         $this->source = $source;
     }
@@ -318,7 +319,7 @@ class Download
     /**
      * @return integer
      */
-    public function getSourceId ()
+    public function getSourceId()
     {
         return $this->sourceId;
     }
@@ -326,15 +327,15 @@ class Download
     /**
      * @param mixed $sourceId
      */
-    public function setSourceId ($sourceId)
+    public function setSourceId($sourceId)
     {
-        $this->sourceId = (int)$sourceId;
+        $this->sourceId = (int) $sourceId;
     }
 
     /**
      * @return mixed
      */
-    public function getEmail ()
+    public function getEmail()
     {
         return $this->email;
     }
@@ -342,7 +343,7 @@ class Download
     /**
      * @param mixed $email
      */
-    public function setEmail (Email $email)
+    public function setEmail(Email $email)
     {
         $this->email = $email;
     }

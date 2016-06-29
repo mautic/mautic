@@ -11,7 +11,7 @@ namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\GraphHelper;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
 class PostCountRepository extends CommonRepository
 {
@@ -37,29 +37,24 @@ class PostCountRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadStatsPost($quantity, $unit, $options)
+    public function getLeadStatsPost($dateFrom, $dateTo, $options)
     {
-        $graphData = GraphHelper::prepareDatetimeLineGraphData($quantity, $unit, array('viewed'));
+        $chartQuery = new ChartQuery($this->getEntityManager()->getConnection(), $dateFrom, $dateTo);
 
         // Load points for selected period
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('cl.post_count, cl.post_date')
-            ->from(MAUTIC_TABLE_PREFIX.'monitor_post_count', 'cl');
-
-        $utc = new \DateTimeZone('UTC');
-        $graphData['fromDate']->setTimezone($utc);
-
-        $q->setParameter('post_date', $graphData['fromDate']->format('Y-m-d'))
-            // ->setParameter('false', false, 'boolean')
+            ->from(MAUTIC_TABLE_PREFIX.'monitor_post_count', 'cl')
             ->orderBy('cl.post_date', 'ASC');
-
 
         if (isset($options['monitor_id'])) {
             $q->andwhere($q->expr()->eq('cl.monitor_id', (int) $options['monitor_id']));
         }
 
+        $chartQuery->applyDateFilters($q, 'post_date', 'cl');
+
         $postCount = $q->execute()->fetchAll();
 
-        return GraphHelper::mergeLineGraphData($graphData, $postCount, $unit, 0, 'post_date', 'post_count');
+        return $postCount;
     }
 }

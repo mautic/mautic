@@ -76,7 +76,8 @@ class Submission
 
         $builder->setTable('form_submissions')
             ->setCustomRepositoryClass('Mautic\FormBundle\Entity\SubmissionRepository')
-            ->addIndex(array('tracking_id'), 'form_submission_tracking_search');
+            ->addIndex(['tracking_id'], 'form_submission_tracking_search')
+            ->addIndex(['date_submitted'], 'form_date_submitted');
 
         $builder->addId();
 

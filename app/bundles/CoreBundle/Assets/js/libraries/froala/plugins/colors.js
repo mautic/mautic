@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.3 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -75,9 +75,15 @@
         _refreshColor($popup.find('.fr-selected-tab').attr('data-param1'));
 
         // Colors popup left and top position.
-        var left = $btn.offset().left + $btn.outerWidth() / 2;
-        var top = $btn.offset().top + (editor.opts.toolbarBottom ? 10 : $btn.outerHeight() - 10);
-        editor.popups.show('colors.picker', left, top, $btn.outerHeight());
+        if ($btn.is(':visible')) {
+          var left = $btn.offset().left + $btn.outerWidth() / 2;
+          var top = $btn.offset().top + (editor.opts.toolbarBottom ? 10 : $btn.outerHeight() - 10);
+          editor.popups.show('colors.picker', left, top, $btn.outerHeight());
+        }
+        else {
+          editor.position.forSelection($popup);
+          editor.popups.show('colors.picker');
+        }
       }
     }
 
@@ -152,7 +158,7 @@
         }
 
         else {
-          colors_html += '<span class="fr-command fr-select-color" data-cmd="' + tab + 'Color" data-param1="REMOVE" title="' + editor.language.translate('Clear Formatting') + '"><i class="fa fa-eraser"></i></span>';
+          colors_html += '<span class="fr-command fr-select-color" data-cmd="' + tab + 'Color" data-param1="REMOVE" title="' + editor.language.translate('Clear Formatting') + '">' + editor.icon.create('remove') + '</span>';
         }
       }
 
@@ -218,23 +224,12 @@
     function background (val) {
       // Set background  color.
       if (val != 'REMOVE') {
-        editor.commands.applyProperty('background-color', editor.helpers.HEXtoRGB(val));
+        editor.format.applyStyle('background-color', editor.helpers.HEXtoRGB(val));
       }
 
       // Remove background color.
       else {
-        editor.commands.applyProperty('background-color', '#123456');
-
-        editor.selection.save();
-        editor.$el.find('span').each(function (index, span) {
-          var $span = $(span);
-          var color = $span.css('background-color');
-
-          if (color === '#123456' || editor.helpers.RGBToHex(color) === '#123456') {
-            $span.replaceWith($span.html());
-          }
-        });
-        editor.selection.restore();
+        editor.format.removeStyle('background-color');
       }
 
       _hideColorsPopup();
@@ -246,23 +241,12 @@
     function text (val) {
       // Set text color.
       if (val != 'REMOVE') {
-        editor.commands.applyProperty('color', editor.helpers.HEXtoRGB(val));
+        editor.format.applyStyle('color', editor.helpers.HEXtoRGB(val));
       }
 
       // Remove text color.
       else {
-        editor.commands.applyProperty('color', '#123456');
-
-        editor.selection.save();
-        editor.$el.find('span').each(function (index, span) {
-          var $span = $(span);
-          var color = $span.css('color');
-
-          if (color === '#123456' || editor.helpers.RGBToHex(color) === '#123456') {
-            $span.replaceWith($span.html());
-          }
-        });
-        editor.selection.restore();
+        editor.format.removeStyle('color');
       }
 
       _hideColorsPopup();
@@ -346,5 +330,7 @@
       this.colors.back();
     }
   });
+
+  $.FE.DefineIcon('remove', { NAME: 'eraser' });
 
 }));

@@ -39,8 +39,9 @@ class CookieHelper
         $this->path   = $cookiePath;
         $this->domain = $cookieDomain;
         $this->secure = $cookieSecure;
+        $this->request = $requestStack->getCurrentRequest();
 
-        if ($this->secure == '' || $this->secure == null) {
+        if (($this->secure == '' || $this->secure == null) && $this->request) {
             $this->secure = ($requestStack->getCurrentRequest()->server->get('HTTPS', false));
         }
 
@@ -58,6 +59,11 @@ class CookieHelper
      */
     public function setCookie($name, $value, $expire = 1800, $path = null, $domain = null, $secure = null, $httponly = true)
     {
+
+        if($this->request==null){
+            return true;
+        }
+
         setcookie(
             $name,
             $value,

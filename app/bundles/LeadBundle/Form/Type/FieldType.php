@@ -226,7 +226,7 @@ class FieldType extends AbstractType
                     $constraints = [
                         new Assert\Callback(
                             function ($object, ExecutionContextInterface $context) {
-                                if (\DateTime::createFromFormat('Y-m-d H:i', $object) === false) {
+                                if (!empty($object)&& \DateTime::createFromFormat('Y-m-d H:i', $object) === false) {
                                     $context->buildViolation('mautic.lead.datetime.invalid')->addViolation();
                                 }
                             }
@@ -234,19 +234,32 @@ class FieldType extends AbstractType
                     ];
                 } elseif ($type === 'date') {
                     $constraints = [
-                        new Assert\Date(
-                            [
-                                'message' => 'mautic.lead.date.invalid'
-                            ]
+                        new Assert\Callback(
+                            function ($object, ExecutionContextInterface $context) {
+                                if (!empty($object)) {
+                                    $validator = $context->getValidator();
+                                    $violations = $validator->validateValue($object, new Assert\Date());
+
+                                    if (count($violations) > 0) {
+                                        $context->buildViolation('mautic.lead.date.invalid')->addViolation();
+                                    }
+                                }
+                            }
                         )
                     ];
                 } elseif ($type === 'time') {
                     $constraints = [
-                        new Assert\Regex(
-                            [
-                                'pattern' => '/(2[0-3]|[01][0-9]):([0-5][0-9])/',
-                                'message' => 'mautic.lead.time.invalid'
-                            ]
+                        new Assert\Callback(
+                            function ($object, ExecutionContextInterface $context) {
+                                if (!empty($object)) {
+                                    $validator = $context->getValidator();
+                                    $violations = $validator->validateValue($object, new Assert\Regex(['pattern' => '/(2[0-3]|[01][0-9]):([0-5][0-9])/']));
+
+                                    if (count($violations) > 0) {
+                                        $context->buildViolation('mautic.lead.time.invalid')->addViolation();
+                                    }
+                                }
+                            }
                         )
                     ];
                 }

@@ -16,7 +16,7 @@
             <span class="the-icon fa fa-search text-muted mt-xs"></span>
         </div>
         <?php if (isset($eventTypes) && is_array($eventTypes)) : ?>
-            <div class=" panel-footer text-muted">
+            <div class="history-search panel-footer text-muted">
                 <div class="col-sm-6">
                     <select name="includeEvents[]" multiple="multiple" class="form-control bdr-w-0" data-placeholder="<?php echo $view['translator']->trans('mautic.lead.lead.filter.bundles.include.placeholder'); ?>">
                         <?php foreach ($eventTypes as $typeKey => $typeName) : ?>

@@ -27,13 +27,13 @@ class ReportSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    static public function getSubscribedEvents ()
+    static public function getSubscribedEvents()
     {
-        return array(
-            ReportEvents::REPORT_ON_BUILD          => array('onReportBuilder', 0),
-            ReportEvents::REPORT_ON_GENERATE       => array('onReportGenerate', 0),
-            ReportEvents::REPORT_ON_GRAPH_GENERATE => array('onReportGraphGenerate', 0)
-        );
+        return [
+            ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
+            ReportEvents::REPORT_ON_GENERATE       => ['onReportGenerate', 0],
+            ReportEvents::REPORT_ON_GRAPH_GENERATE => ['onReportGraphGenerate', 0]
+        ];
     }
 
     /**
@@ -43,51 +43,51 @@ class ReportSubscriber extends CommonSubscriber
      *
      * @return void
      */
-    public function onReportBuilder (ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event)
     {
-        if ($event->checkContext(array('forms', 'form.submissions'))) {
+        if ($event->checkContext(['forms', 'form.submissions'])) {
             // Forms
             $prefix  = 'f.';
-            $columns = array(
-                $prefix . 'alias' => array(
+            $columns = [
+                $prefix.'alias' => [
                     'label' => 'mautic.core.alias',
-                    'type'  => 'int'
-                )
-            );
-            $columns = array_merge($columns, $event->getStandardColumns($prefix), $event->getCategoryColumns());
-            $data    = array(
+                    'type'  => 'string'
+                ]
+            ];
+            $columns = array_merge($columns, $event->getStandardColumns($prefix, [], 'mautic_form_action'), $event->getCategoryColumns());
+            $data    = [
                 'display_name' => 'mautic.form.forms',
                 'columns'      => $columns
-            );
+            ];
             $event->addTable('forms', $data);
             if ($event->checkContext('form.submissions')) {
                 // Form submissions
-                $submissionPrefix = 'fs.';
-                $pagePrefix       = 'p.';
-
-                $submissionColumns = array(
-                    $submissionPrefix . 'date_submitted' => array(
+                $submissionPrefix  = 'fs.';
+                $pagePrefix        = 'p.';
+                $submissionColumns = [
+                    $submissionPrefix.'date_submitted' => [
                         'label' => 'mautic.form.report.submit.date_submitted',
                         'type'  => 'datetime'
-                    ),
-                    $submissionPrefix . 'referer'        => array(
+                    ],
+                    $submissionPrefix.'referer'        => [
                         'label' => 'mautic.core.referer',
                         'type'  => 'string'
-                    ),
-                    $pagePrefix . 'id'                   => array(
+                    ],
+                    $pagePrefix.'id'                   => [
                         'label' => 'mautic.form.report.page_id',
-                        'type'  => 'int'
-                    ),
-                    $pagePrefix . 'name'                 => array(
+                        'type'  => 'int',
+                        'link'  => 'mautic_page_action'
+                    ],
+                    $pagePrefix.'name'                 => [
                         'label' => 'mautic.form.report.page_name',
                         'type'  => 'string'
-                    )
-                );
-                $data              = array(
+                    ]
+                ];
+                $data              = [
                     'display_name' => 'mautic.form.report.submission.table',
                     'columns'      => array_merge($submissionColumns, $columns, $event->getLeadColumns(), $event->getIpColumn())
-                );
-                $event->addTable('form.submissions', $data);
+                ];
+                $event->addTable('form.submissions', $data, 'forms');
 
                 // Register graphs
                 $context = 'form.submissions';
@@ -105,28 +105,29 @@ class ReportSubscriber extends CommonSubscriber
      *
      * @return void
      */
-    public function onReportGenerate (ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event)
     {
         $context = $event->getContext();
-        if ($context == 'forms') {
-            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb      = $event->getQueryBuilder();
 
-            $qb->from(MAUTIC_TABLE_PREFIX . 'forms', 'f');
-            $event->addCategoryLeftJoin($qb, 'f');
+        switch ($context) {
+            case 'forms':
+                $qb->from(MAUTIC_TABLE_PREFIX.'forms', 'f');
+                $event->addCategoryLeftJoin($qb, 'f');
+                break;
+            case 'form.submissions':
+                $event->applyDateFilters($qb, 'date_submitted', 'fs');
 
-            $event->setQueryBuilder($qb);
-        } elseif ($context == 'form.submissions') {
-            $qb = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-
-            $qb->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs')
-                ->leftJoin('fs', MAUTIC_TABLE_PREFIX . 'forms', 'f', 'f.id = fs.form_id')
-                ->leftJoin('fs', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'p.id = fs.page_id');
-            $event->addCategoryLeftJoin($qb, 'f');
-            $event->addLeadLeftJoin($qb, 'fs');
-            $event->addIpAddressLeftJoin($qb, 'fs');
-
-            $event->setQueryBuilder($qb);
+                $qb->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
+                    ->leftJoin('fs', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = fs.form_id')
+                    ->leftJoin('fs', MAUTIC_TABLE_PREFIX.'pages', 'p', 'p.id = fs.page_id');
+                $event->addCategoryLeftJoin($qb, 'f');
+                $event->addLeadLeftJoin($qb, 'fs');
+                $event->addIpAddressLeftJoin($qb, 'fs');
+                break;
         }
+
+        $event->setQueryBuilder($qb);
     }
 
     /**
@@ -134,7 +135,7 @@ class ReportSubscriber extends CommonSubscriber
      *
      * @param ReportGraphEvent $event
      */
-    public function onReportGraphGenerate (ReportGraphEvent $event)
+    public function onReportGraphGenerate(ReportGraphEvent $event)
     {
         // Context check, we only want to fire for Lead reports
         if (!$event->checkContext('form.submissions')) {
@@ -153,9 +154,9 @@ class ReportSubscriber extends CommonSubscriber
 
             switch ($g) {
                 case 'mautic.form.graph.line.submissions':
-                    $chart      = new LineChart(null, $options['dateFrom'], $options['dateTo']);
+                    $chart = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_submitted', 'fs');
-                    $hits  = $chartQuery->loadAndBuildTimeData($queryBuilder);
+                    $hits = $chartQuery->loadAndBuildTimeData($queryBuilder);
                     $chart->setDataset($options['translator']->trans($g), $hits);
                     $data         = $chart->render();
                     $data['name'] = $g;
@@ -168,7 +169,7 @@ class ReportSubscriber extends CommonSubscriber
                     $limit                  = 10;
                     $offset                 = 0;
                     $items                  = $submissionRepo->getTopReferrers($queryBuilder, $limit, $offset);
-                    $graphData              = array();
+                    $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-sign-in';
@@ -180,7 +181,7 @@ class ReportSubscriber extends CommonSubscriber
                     $limit                  = 10;
                     $offset                 = 0;
                     $items                  = $submissionRepo->getMostSubmitted($queryBuilder, $limit, $offset);
-                    $graphData              = array();
+                    $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
                     $graphData['iconClass'] = 'fa-check-square-o';

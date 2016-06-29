@@ -182,6 +182,20 @@ $img = $view['lead_avatar']->getAvatar($lead);
                         <hr class="mnr-md mnl-md">
                         <?php endif; ?>
                     <?php endif; ?>
+                    <?php if (isset($form['attribution']) && isset($form['attribution_date'])): ?>
+                        <div class="form-group mb-0">
+                            <label class="control-label mb-xs"><?php echo $view['translator']->trans('mautic.lead.attribution'); ?></label>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <?php echo $view['form']->widget($form['attribution'], array('attr' => array('placeholder' => $form['attribution']->vars['label'], 'preaddon' => 'fa fa-money'))); ?>
+                                </div>
+                                <div class="col-sm-4">
+                                    <?php echo $view['form']->widget($form['attribution_date'], array('attr' => array('placeholder' => $form['attribution_date']->vars['label']))); ?>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="mnr-md mnl-md">
+                    <?php endif; ?>
 
                         <div class="row">
                         <?php foreach ($groupFields as $alias => $field): ?>

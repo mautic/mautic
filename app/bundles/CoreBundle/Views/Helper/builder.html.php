@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-<div class="hide builder <?php echo 'type'; ?>-builder">
+<div class="hide builder <?php echo $type; ?>-builder">
     <script type="text/html" data-builder-assets>
         <?php echo htmlspecialchars($builderAssets); ?>
     </script>

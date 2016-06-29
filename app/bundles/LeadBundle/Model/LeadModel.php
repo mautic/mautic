@@ -169,6 +169,15 @@ class LeadModel extends FormModel
     }
 
     /**
+     * @return \Mautic\LeadBundle\Entity\PointsChangeLogRepository
+     */
+    public function getPointLogRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:PointsChangeLog');
+
+    }
+
+    /**
      * Get the tags repository
      *
      * @return \Mautic\LeadBundle\Entity\UtmTagRepository

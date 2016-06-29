@@ -31,28 +31,13 @@ class Version20160506000000 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function mysqlUp(Schema $schema)
+    public function up(Schema $schema)
     {
         $this->addSql('CREATE INDEX ' . $this->prefix . 'asset_date_download ON ' . $this->prefix . 'asset_downloads (date_download)');
         $this->addSql('CREATE INDEX ' . $this->prefix . 'campaign_leads_date_added ON ' . $this->prefix . 'campaign_leads (date_added)');
         $this->addSql('CREATE INDEX ' . $this->prefix . 'campaign_date_triggered ON ' . $this->prefix . 'campaign_lead_event_log (date_triggered)');
         $this->addSql('CREATE INDEX ' . $this->prefix . 'email_date_sent ON ' . $this->prefix . 'email_stats (date_sent)');
-        $this->addSql('CREATE INDEX ' . $this->prefix . 'email_date_read ON ' . $this->prefix . 'email_stats (date_sent)');
-        $this->addSql('CREATE INDEX ' . $this->prefix . 'form_date_submitted ON ' . $this->prefix . 'form_submissions (date_submitted)');
-        $this->addSql('CREATE INDEX ' . $this->prefix . 'lead_date_added ON ' . $this->prefix . 'leads (date_added)');
-        $this->addSql('CREATE INDEX ' . $this->prefix . 'page_date_hit ON ' . $this->prefix . 'page_hits (date_hit)');
-        $this->addSql('CREATE INDEX ' . $this->prefix . 'point_date_added ON ' . $this->prefix . 'lead_points_change_log (date_added)');
-    }
-    /**
-     * @param Schema $schema
-     */
-    public function postgresqlUp(Schema $schema)
-    {
-        $this->addSql('CREATE INDEX ' . $this->prefix . 'asset_date_download ON ' . $this->prefix . 'asset_downloads (date_download)');
-        $this->addSql('CREATE INDEX ' . $this->prefix . 'campaign_leads_date_added ON ' . $this->prefix . 'campaign_leads (date_added)');
-        $this->addSql('CREATE INDEX ' . $this->prefix . 'campaign_date_triggered ON ' . $this->prefix . 'campaign_lead_event_log (date_triggered)');
-        $this->addSql('CREATE INDEX ' . $this->prefix . 'email_date_sent ON ' . $this->prefix . 'email_stats (date_sent)');
-        $this->addSql('CREATE INDEX ' . $this->prefix . 'email_date_read ON ' . $this->prefix . 'email_stats (date_sent)');
+        $this->addSql('CREATE INDEX ' . $this->prefix . 'email_date_read ON ' . $this->prefix . 'email_stats (date_read)');
         $this->addSql('CREATE INDEX ' . $this->prefix . 'form_date_submitted ON ' . $this->prefix . 'form_submissions (date_submitted)');
         $this->addSql('CREATE INDEX ' . $this->prefix . 'lead_date_added ON ' . $this->prefix . 'leads (date_added)');
         $this->addSql('CREATE INDEX ' . $this->prefix . 'page_date_hit ON ' . $this->prefix . 'page_hits (date_hit)');

@@ -420,7 +420,6 @@ class PageController extends FormController
                 'activePage'    => $entity,
                 'themes'        => $this->factory->getInstalledThemes('page', true),
                 'slots'         => $this->buildSlotForms($slotTypes),
-                'builderTokens' => $model->getBuilderComponents(null, array('tokens')),
                 'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())) // strip new lines
             ),
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
@@ -566,7 +565,6 @@ class PageController extends FormController
                 'activePage'    => $entity,
                 'themes'        => $this->factory->getInstalledThemes('page', true),
                 'slots'         => $this->buildSlotForms($slotTypes),
-                'builderTokens' => $model->getBuilderComponents(null, array('tokens')),
                 'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())) // strip new lines
             ),
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',

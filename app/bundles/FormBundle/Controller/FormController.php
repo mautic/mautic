@@ -283,7 +283,7 @@ class FormController extends CommonFormController
         //set the page we came from
         $page = $this->factory->getSession()->get('mautic.form.page', 1);
 
-        $sessionId = $this->request->request->get('mauticform[sessionId]', sha1(uniqid(mt_rand(), true)), true);
+        $sessionId = $this->request->request->get('mauticform[sessionId]', 'mautic_'.sha1(uniqid(mt_rand(), true)), true);
 
         //set added/updated fields
         $modifiedFields = $session->get('mautic.form.'.$sessionId.'.fields.modified', array());
@@ -473,7 +473,7 @@ class FormController extends CommonFormController
 
         if ($objectId instanceof Form) {
             $entity   = $objectId;
-            $objectId = sha1(uniqid(mt_rand(), true));
+            $objectId = 'mautic_'.sha1(uniqid(mt_rand(), true));
         } else {
             $entity = $model->getEntity($objectId);
 
@@ -819,7 +819,7 @@ class FormController extends CommonFormController
             $entity->setIsPublished(false);
 
             // Clone the forms's fields
-            $fields = $entity->getFields();
+            $fields = $entity->getFields()->toArray();
             /** @var \Mautic\FormBundle\Entity\Field $field */
             foreach ($fields as $field) {
                 $fieldClone = clone $field;
@@ -829,7 +829,7 @@ class FormController extends CommonFormController
             }
 
             // Clone the forms's actions
-            $actions = $entity->getActions();
+            $actions = $entity->getActions()->toArray();
             /** @var \Mautic\FormBundle\Entity\Action $action */
             foreach ($actions as $action) {
                 $actionClone = clone $action;

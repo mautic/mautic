@@ -193,7 +193,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     public function getFetchQuery($params){
         
-        $dateRange=array($params);
+        $dateRange=$params;
         return $dateRange;
     }
 
@@ -206,16 +206,21 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         $fields = array_keys($this->getAvailableLeadFields());
         $params['fields']=implode(',',$fields);
-        $internal = array('latestDateCovered' => $data['latestDateCovered']);
-        foreach($data['ids'] as $salesforceId)
-        {
-            $data = $this->getApiHelper()->getSalesForceLeadById($salesforceId,$params);
-            $data['internal'] = $internal;
-            $this->getMauticLead($data,true,null,null);
-        }
-        
-        return count($data['ids']);
 
+        $internal = array('latestDateCovered' => $data['latestDateCovered']);
+        $count = 0;
+        if(isset($data['ids'])){
+            foreach($data['ids'] as $salesforceId)
+            {
+                $data = $this->getApiHelper()->getSalesForceLeadById($salesforceId,$params);
+                $data['internal'] = $internal;
+                if($data){
+                    $this->getMauticLead($data,true,null,null);
+                    $count++;
+                }
+            }
+        }
+        return $count;
     }
 
 }

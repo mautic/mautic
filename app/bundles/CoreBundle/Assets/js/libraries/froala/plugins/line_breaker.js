@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.3 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -36,7 +36,7 @@
 
   // Extend defaults.
   $.extend($.FE.DEFAULTS, {
-    lineBreakerTags: ['table', 'hr', 'iframe', 'form', 'dl'],
+    lineBreakerTags: ['table', 'hr', 'form', 'dl', 'span.fr-video'],
     lineBreakerOffset: 15
   });
 
@@ -203,7 +203,7 @@
         if (editor.$el.find($tag).length === 0) return null;
 
         // Tag is in the line breaker tags list.
-        if (tag.nodeType != Node.TEXT_NODE && editor.opts.lineBreakerTags.indexOf(tag.tagName.toLowerCase()) >= 0) {
+        if (tag.nodeType != Node.TEXT_NODE && $tag.is(editor.opts.lineBreakerTags.join(','))) {
           return $tag;
         }
 
@@ -352,7 +352,7 @@
       // Either way the line break is after the first tag.
       } else {
         // If the tag is in a TD tag then just add <br> no matter what the default_tag is.
-        if (default_tag && $tag1.parent().get(0).tagName != 'TD') {
+        if (default_tag && $tag1.parent().get(0).tagName != 'TD' && $tag1.parents(default_tag).length === 0) {
           $tag1.after('<' + default_tag + '>' + $.FE.MARKERS + '<br></' + default_tag + '>')
         }
         else {
@@ -378,11 +378,13 @@
       // Editor shared destroy.
       editor.events.on('shared.destroy', function () {
         $line_breaker.html('').removeData().remove();
+        $line_breaker = null;
       }, true);
 
       // Editor destroy.
       editor.events.on('destroy', function () {
         $line_breaker.removeData('instance').removeClass('fr-visible').appendTo('body');
+        clearTimeout(mouseMoveTimer);
       }, true)
 
       editor.events.$on($line_breaker, 'mouseleave', _hide, true);

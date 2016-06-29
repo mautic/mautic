@@ -36,17 +36,8 @@ class Version20151022000000 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function mysqlUp(Schema $schema)
+    public function up(Schema $schema)
     {
         $this->addSql('ALTER TABLE ' . $this->prefix.'page_hits ADD query LONGTEXT DEFAULT NULL COMMENT \'(DC2Type:array)\'');
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    public function postgresqlUp(Schema $schema)
-    {
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_hits ADD query TEXT DEFAULT NULL');
-        $this->addSql('COMMENT ON COLUMN ' . $this->prefix . 'page_hits.query IS \'(DC2Type:array)\'');
     }
 }

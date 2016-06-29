@@ -134,7 +134,8 @@ class CampaignSubscriber extends CommonSubscriber
             $email = $this->emailModel->getEntity($emailId);
 
             if ($email != null && $email->isPublished()) {
-                $options   = ['source' => ['campaign', $event['campaign']['id']]];
+                $eventDetails = $event->getEventDetails();
+                $options   = ['source' => ['campaign', $eventDetails['campaign']['id']]];
                 $emailSent = $this->emailModel->sendEmail($email, $leadCredentials, $options);
             }
         }

@@ -108,7 +108,7 @@ Mautic.leadOnLoad = function (container) {
 
     mQuery(document).on('shown.bs.tab', 'a#load-lead-map', function (e) {
         mQuery('#place-container svg').resize();
-    })
+    });
 };
 
 Mautic.leadOnUnload = function(id) {
@@ -123,6 +123,15 @@ Mautic.leadOnUnload = function(id) {
 
 Mautic.getLeadId = function() {
     return mQuery('input#leadId').val();
+}
+
+Mautic.leadEmailOnLoad = function(container, response) {
+    mQuery('[name="lead_quickemail"]').on('submit', function() {
+        // Todo: fix the table borders
+        // var content = mQuery(this).find('.editor').froalaEditor('html.get', true);
+        // console.log('onsubmit', content);
+        // return false;
+    });
 }
 
 Mautic.activateLeadFieldTypeahead = function(field, target, options) {
