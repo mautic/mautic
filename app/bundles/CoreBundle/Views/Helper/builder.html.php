@@ -28,7 +28,7 @@
                 <?php if ($slots): ?>
                 <div id="slot-type-container">
                     <?php foreach ($slots as $slotKey => $slot): ?>
-                        <div class="slot-type-handle btn btn-default btn-lg" data-slot-type="<?php echo $slotKey; ?>">
+                        <div class="slot-type-handle btn btn-default btn-lg btn-nospin" data-slot-type="<?php echo $slotKey; ?>">
                             <i class="fa fa-<?php echo $slot['icon']; ?>" aria-hidden="true"></i>
                             <br>
                             <?php echo $slot['header']; ?>
