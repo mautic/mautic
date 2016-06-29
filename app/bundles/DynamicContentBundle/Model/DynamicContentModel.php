@@ -11,6 +11,7 @@ namespace Mautic\DynamicContentBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -248,7 +249,7 @@ class DynamicContentModel extends FormModel
         }
 
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query = $chart->getChartQuery($this->em->getConnection());
+        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         if (!$flag || $flag === 'total_and_unique') {
             $q = $query->prepareTimeDataQuery('dynamic_content_stats', 'date_sent', $filter);

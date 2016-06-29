@@ -990,7 +990,7 @@ class PageModel extends FormModel
         }
 
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query = $chart->getChartQuery($this->em->getConnection());
+        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         if (!$flag || $flag == 'total_and_unique') {
             $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', $filter);

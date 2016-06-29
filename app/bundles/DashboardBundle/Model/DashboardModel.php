@@ -261,9 +261,8 @@ class DashboardModel extends FormModel
         $lastMonth->sub(new \DateInterval('P30D'));
 
         $today       = new \DateTime();
-        $mysqlFormat = 'Y-m-d H:i:s';
-        $dateFrom    = new \DateTime($this->session->get('mautic.dashboard.date.from', $lastMonth->format($mysqlFormat)));
-        $dateTo      = new \DateTime($this->session->get('mautic.dashboard.date.to', $today->format($mysqlFormat)));
+        $dateFrom    = new \DateTime($this->session->get('mautic.dashboard.date.from', $lastMonth->format('Y-m-d 00:00:00')));
+        $dateTo      = new \DateTime($this->session->get('mautic.dashboard.date.to', $today->format('Y-m-d H:i:s')));
 
         return array(
             'dateFrom' => $dateFrom,

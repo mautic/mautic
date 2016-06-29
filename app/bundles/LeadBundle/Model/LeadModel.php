@@ -1483,7 +1483,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Get bar chart data of hits
+     * Get bar chart data of contacts
      *
      * @param char      $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
@@ -1512,7 +1512,7 @@ class LeadModel extends FormModel
         }
 
         $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = $chart->getChartQuery($this->em->getConnection());
+        $query     = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $anonymousFilter = $filter;
         $anonymousFilter['date_identified'] = array(
             'expression' => 'isNull'

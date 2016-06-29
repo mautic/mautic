@@ -209,18 +209,6 @@ abstract class AbstractChart
     }
 
     /**
-     * Returns the initiated chart query object
-     *
-     * @param Connection $connection
-     *
-     * @return ChartQuery
-     */
-    public function getChartQuery(Connection $connection)
-    {
-        return new ChartQuery($connection, $this->dateFrom, $this->dateTo, $this->unit);
-    }
-
-    /**
      * Generate unique color for the dataset
      *
      * @param  integer  $datasetId

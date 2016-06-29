@@ -500,7 +500,7 @@ class AssetModel extends FormModel
     public function getDownloadsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
     {
         $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = $chart->getChartQuery($this->em->getConnection());
+        $query     = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $q         = $query->prepareTimeDataQuery('asset_downloads', 'date_download', $filter);
 
         if (!$canViewOthers) {
