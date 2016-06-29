@@ -17,6 +17,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             'templateButtons' => array(
                 'edit'       => $view['security']->isGranted('plugin:mauticSocial:monitoring:edit'),
                 'delete'     => $view['security']->isGranted('plugin:mauticSocial:monitoring:delete'),
+                'close'      => $view['security']->isGranted('plugin:mauticSocial:monitoring:view')
             ),
             'routeBase'  => 'social',
             'langVar'    => 'monitoring',
