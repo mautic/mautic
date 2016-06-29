@@ -273,6 +273,15 @@ Mautic.initSlots = function() {
 Mautic.initSlotListeners = function() {
     Mautic.activateGlobalFroalaOptions();
     Mautic.builderSlots = [];
+    Mautic.selectedSlot = null;
+    
+    Mautic.builderContents.on('slot:selected', function(event, slot) {
+        slot = mQuery(slot);
+        Mautic.builderContents.find('[data-slot-focus]').remove();
+        var focus = mQuery('<div/>').attr('data-slot-focus', true);
+        slot.append(focus);
+    });
+
     Mautic.builderContents.on('slot:init', function(event, slot) {
         slot = mQuery(slot);
         var type = slot.attr('data-slot');
@@ -286,6 +295,9 @@ Mautic.initSlotListeners = function() {
         });
 
         slot.on('click', function() {
+
+            // Trigger the slot:change event
+            slot.trigger('slot:selected', slot);
 
             // Update form in the Customize tab to the form of the focused slot type
             var focusType = mQuery(this).attr('data-slot');
