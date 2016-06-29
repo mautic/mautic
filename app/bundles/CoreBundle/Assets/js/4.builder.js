@@ -164,6 +164,9 @@ Mautic.destroySlots = function() {
     // Remove style="z-index: 2501;" which Froala forgets there
     Mautic.builderContents.find('*[style="z-index: 2501;"]').removeAttr('style');
 
+    // Make sure that the Froala editor is gone
+    Mautic.builderContents.find('.fr-toolbar, .fr-line-breaker').remove();
+
     // Remove the class attr vrom HTML tag used by Modernizer
     var htmlTags = document.getElementsByTagName('html');
     htmlTags[0].removeAttribute('class');
