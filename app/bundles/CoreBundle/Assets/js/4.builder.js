@@ -291,10 +291,16 @@ Mautic.initSlotListeners = function() {
 
         // initialize the drag handle
         var handle = mQuery('<div/>').attr('data-slot-handle', true);
+        var slotToolbar = mQuery('<div/>').attr('data-slot-toolbar', true);
+        var deleteLink = mQuery('<i/>').attr('data-slot-action', 'delete').attr('alt', 'delete').addClass('fa fa-times-circle').click(function(e) {
+            slot.remove();
+        });
+        deleteLink.appendTo(slotToolbar);
+        slotToolbar.appendTo(handle);
         slot.hover(function() {
             slot.append(handle);
         }, function() {
-            handle.remove('div[data-slot-handle]');
+            handle.remove();
         });
 
         slot.on('click', function() {
@@ -317,10 +323,6 @@ Mautic.initSlotListeners = function() {
                     focusForm.find('input[type="text"][data-slot-param="'+match[1]+'"]').val(attr.value);
                     focusForm.find('input[type="radio"][data-slot-param="'+match[1]+'"][value="'+attr.value+'"]').prop('checked', 1);
                 }
-            });
-
-            focusForm.find('.delete-slot').click(function(e) {
-                slot.remove();
             });
 
             focusForm.on('keyup', function(e) {
