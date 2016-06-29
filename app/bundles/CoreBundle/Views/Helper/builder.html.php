@@ -26,7 +26,7 @@
             </div>
             <div class="panel-body">
                 <?php if ($slots): ?>
-                <div id="slot-type-container">
+                <div id="slot-type-container" class="col-md-12">
                     <?php foreach ($slots as $slotKey => $slot): ?>
                         <div class="slot-type-handle btn btn-default btn-lg btn-nospin" data-slot-type="<?php echo $slotKey; ?>">
                             <i class="fa fa-<?php echo $slot['icon']; ?>" aria-hidden="true"></i>
@@ -49,7 +49,7 @@
                 <h4 class="panel-title"><?php echo $view['translator']->trans('mautic.core.customize.slot'); ?></h4>
             </div>
             <div class="panel-body" id="customize-form-container">
-                <div id="slot-form-container">
+                <div id="slot-form-container" class="col-md-12">
                     <p class="text-muted pt-md text-center"><i><?php echo $view['translator']->trans('mautic.core.slot.customize.info'); ?></i></p>
                 </div>
                 <?php if ($slots): ?>
