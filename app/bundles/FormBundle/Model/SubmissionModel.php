@@ -778,7 +778,7 @@ class SubmissionModel extends CommonFormModel
     public function getSubmissionsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
     {
         $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = $chart->getChartQuery($this->em->getConnection());
+        $query     = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $q = $query->prepareTimeDataQuery('form_submissions', 'date_submitted', $filter);
 
         if (!$canViewOthers) {

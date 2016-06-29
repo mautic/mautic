@@ -182,7 +182,7 @@ class StageModel extends CommonFormModel
     public function getStageLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
     {
         $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $query     = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $q         = $query->prepareTimeDataQuery('lead_stages_change_log', 'date_added', $filter);
 
         if (!$canViewOthers) {

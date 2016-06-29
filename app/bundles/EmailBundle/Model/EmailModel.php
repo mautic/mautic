@@ -1477,7 +1477,7 @@ class EmailModel extends FormModel
         }
 
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query = $chart->getChartQuery($this->em->getConnection());
+        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         if ($flag == 'sent_and_opened_and_failed' || $flag == 'all' || $flag == 'sent_and_opened' || !$flag) {
             $q = $query->prepareTimeDataQuery('email_stats', 'date_sent', $filter);

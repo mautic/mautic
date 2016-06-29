@@ -22,6 +22,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -378,7 +379,7 @@ class LeadController extends FormController
         }
 
         $lineChart   = new LineChart(null, $fromDate, $toDate);
-        $query       = $lineChart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $query       = new ChartQuery($this->factory->getEntityManager()->getConnection(), $fromDate, $toDate);
         $engagements = $query->completeTimeData($engagements);
         $pointStats  = $query->fetchTimeData('lead_points_change_log', 'date_added', array('lead_id' => $lead->getId()));
         $lineChart->setDataset($translator->trans('mautic.lead.graph.line.all_engagements'), $engagements);

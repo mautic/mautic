@@ -1104,7 +1104,7 @@ class CampaignModel extends CommonFormModel
     public function getLeadsAddedLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query = $chart->getChartQuery($this->em->getConnection());
+        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $q     = $query->prepareTimeDataQuery('campaign_leads', 'date_added', $filter);
 
         if (!$canViewOthers) {
@@ -1134,7 +1134,7 @@ class CampaignModel extends CommonFormModel
     {
         $events = array();
         $chart  = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query  = $chart->getChartQuery($this->em->getConnection());
+        $query  = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         $contacts = $query->fetchTimeData('campaign_leads', 'date_added', $filter);
         $chart->setDataset($this->translator->trans('mautic.campaign.campaign.leads'), $contacts);
