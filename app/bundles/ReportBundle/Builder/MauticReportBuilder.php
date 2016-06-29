@@ -269,7 +269,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 switch ($exprFunction) {
                     case 'notEmpty':
                         $filterExpr->add(
-                            $filterExpr->isNotNull($filter['column'])
+                            $expr->isNotNull($filter['column'])
                         );
                         $filterExpr->add(
                             $expr->neq($filter['column'], $expr->literal(''))
