@@ -299,7 +299,7 @@ Mautic.initSlotListeners = function() {
         deleteLink.appendTo(slotToolbar);
         slotToolbar.appendTo(handle);
         slot.hover(function() {
-            handle.click(function(e) {
+            deleteLink.click(function(e) {
                 slot.remove();
             });
             slot.append(handle);
