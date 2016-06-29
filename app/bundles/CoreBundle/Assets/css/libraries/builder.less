@@ -33,7 +33,31 @@ div[data-slot-handle] {
     right: -15px;
     top: -5px;
     z-index: -1;
-    border: 1px solid blue;
+    border: 1px solid #4e5d9d;
+}
+
+div[data-slot-focus] {
+    cursor: move!important;
+    bottom: -5px;
+    content: '';
+    left: -15px;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    right: -15px;
+    top: -5px;
+    z-index: -1;
+    border: 1px solid #4e5d9d;
+}
+
+div[data-slot-toolbar] {
+    position: absolute;
+    left: 0;
+    top: -20px;
+    padding: 2px;
+    z-index: 1;
+    cursor: pointer;
+    cursor: hand;
 }
 
 div[data-slot] {

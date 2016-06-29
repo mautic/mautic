@@ -109,6 +109,9 @@ Mautic.closeBuilder = function(model) {
     themeHtml.find('[data-source="mautic"]').remove();
     themeHtml.find('.atwho-container').remove();
 
+    // Remove the slot focus highlight
+    themeHtml.find('[data-slot-focus], [data-slot-handle]').remove();
+
     // Store the HTML content to the HTML textarea
     mQuery('.builder-html').val(themeHtml.find('html').get(0).outerHTML);
 
@@ -273,19 +276,37 @@ Mautic.initSlots = function() {
 Mautic.initSlotListeners = function() {
     Mautic.activateGlobalFroalaOptions();
     Mautic.builderSlots = [];
+    Mautic.selectedSlot = null;
+    
+    Mautic.builderContents.on('slot:selected', function(event, slot) {
+        slot = mQuery(slot);
+        Mautic.builderContents.find('[data-slot-focus]').remove();
+        var focus = mQuery('<div/>').attr('data-slot-focus', true);
+        slot.append(focus);
+    });
+
     Mautic.builderContents.on('slot:init', function(event, slot) {
         slot = mQuery(slot);
         var type = slot.attr('data-slot');
 
         // initialize the drag handle
         var handle = mQuery('<div/>').attr('data-slot-handle', true);
+        var slotToolbar = mQuery('<div/>').attr('data-slot-toolbar', true);
+        var deleteLink = mQuery('<i/>').attr('data-slot-action', 'delete').attr('alt', 'delete').addClass('fa fa-times-circle').click(function(e) {
+            slot.remove();
+        });
+        deleteLink.appendTo(slotToolbar);
+        slotToolbar.appendTo(handle);
         slot.hover(function() {
             slot.append(handle);
         }, function() {
-            handle.remove('div[data-slot-handle]');
+            handle.remove();
         });
 
         slot.on('click', function() {
+
+            // Trigger the slot:change event
+            slot.trigger('slot:selected', slot);
 
             // Update form in the Customize tab to the form of the focused slot type
             var focusType = mQuery(this).attr('data-slot');
@@ -302,10 +323,6 @@ Mautic.initSlotListeners = function() {
                     focusForm.find('input[type="text"][data-slot-param="'+match[1]+'"]').val(attr.value);
                     focusForm.find('input[type="radio"][data-slot-param="'+match[1]+'"][value="'+attr.value+'"]').prop('checked', 1);
                 }
-            });
-
-            focusForm.find('.delete-slot').click(function(e) {
-                slot.remove();
             });
 
             focusForm.on('keyup', function(e) {
