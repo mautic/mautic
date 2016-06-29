@@ -84,7 +84,6 @@ Mautic.emailOnLoad = function (container, response) {
     } else if (mQuery('#emailform_plainText').length) {
         // @todo initiate the token dropdown
     } else if (mQuery(container + ' #list-search').length) {
-        console.log('hello');
         Mautic.activateSearchAutocomplete('list-search', 'email');
     }
 
