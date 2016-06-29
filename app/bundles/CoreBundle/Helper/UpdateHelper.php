@@ -35,11 +35,7 @@ class UpdateHelper
     {
         $this->factory = $factory;
 
-        $options = array('transport.curl' => array(
-            CURLOPT_SSL_VERIFYPEER  => false
-        ));
-
-        $this->connector = HttpFactory::getHttp($options);
+        $this->connector = HttpFactory::getHttp();
     }
 
     /**
