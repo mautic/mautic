@@ -12,7 +12,7 @@ namespace MauticPlugin\MauticSocialBundle\Form\Type;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-
+use Mautic\CoreBundle\Factory\MauticFactory;
 
 /**
  * Class FacebookLoginType
@@ -25,15 +25,17 @@ class SocialLoginType extends AbstractType
      * @var IntegrationHelper
      */
     private $helper;
+    private $factory;
 
     /**
      * SocialLoginType constructor.
      *
      * @param IntegrationHelper $helper
      */
-    public function __construct(IntegrationHelper $helper)
+    public function __construct(IntegrationHelper $helper, MauticFactory $factory)
     {
         $this->helper = $helper;
+        $this->factory = $factory;
     }
 
     /**
