@@ -51,7 +51,7 @@ return [
                 'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\SocialLoginType',
                 'arguments' => [
                     'mautic.helper.integration',
-                    'mautic.factory',
+                    'mautic.form.model.form',
                     ],
                 'alias'     => 'sociallogin',
             ],

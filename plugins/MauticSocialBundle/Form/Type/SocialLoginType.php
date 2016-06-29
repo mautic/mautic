@@ -9,10 +9,10 @@
 
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
+use Mautic\FormBundle\MauticFormBundle;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Mautic\CoreBundle\Factory\MauticFactory;
 
 /**
  * Class FacebookLoginType
@@ -25,17 +25,17 @@ class SocialLoginType extends AbstractType
      * @var IntegrationHelper
      */
     private $helper;
-    private $factory;
+    private $formModel;
 
     /**
      * SocialLoginType constructor.
      *
      * @param IntegrationHelper $helper
      */
-    public function __construct(IntegrationHelper $helper, MauticFactory $factory)
+    public function __construct(IntegrationHelper $helper, $form)
     {
         $this->helper = $helper;
-        $this->factory = $factory;
+        $this->formModel = $form;
     }
 
     /**
@@ -49,8 +49,7 @@ class SocialLoginType extends AbstractType
 
         foreach ($integrationObjects as $integrationObject) {
             if ($integrationObject->getIntegrationSettings()->isPublished()) {
-                /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-                $model = $this->factory->getModel('form');
+                $model = $this->formModel;
                 $integrations .= $integrationObject->getName().",";
                 $integration = [
                     'integration' => $integrationObject->getName(),
