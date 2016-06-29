@@ -170,7 +170,7 @@ a {
 }
 
 @media screen {
-    @import url(http://fonts.googleapis.com/css?family=Oxygen:400,700);
+    @import url(https://fonts.googleapis.com/css?family=Oxygen:400,700);
 
     /* Thanks Outlook 2013! */
     body {
