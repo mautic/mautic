@@ -10,6 +10,7 @@
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Mautic\FormBundle\MauticFormBundle;
+use Mautic\FormBundle\Model\FormModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -32,7 +33,7 @@ class SocialLoginType extends AbstractType
      *
      * @param IntegrationHelper $helper
      */
-    public function __construct(IntegrationHelper $helper, $form)
+    public function __construct(IntegrationHelper $helper, FormModel $form)
     {
         $this->helper = $helper;
         $this->formModel = $form;
