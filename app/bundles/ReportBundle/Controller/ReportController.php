@@ -780,8 +780,8 @@ class ReportController extends FormController
         }
 
         $session    = $this->get('session');
-        $fromDate   = $session->get('mautic.report.date.from', (new \DateTime('-30 days')));
-        $toDate     = $session->get('mautic.report.date.to', (new \DateTime()));
+        $fromDate   = $session->get('mautic.report.date.from', (new \DateTime('-30 days'))->format('Y-m-d'));
+        $toDate     = $session->get('mautic.report.date.to', (new \DateTime())->format('Y-m-d'));
 
         $reportData = $model->getReportData($entity, null, [
             'dateFrom' => new \DateTime($fromDate),
