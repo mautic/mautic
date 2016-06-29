@@ -91,7 +91,7 @@ class FilterType extends AbstractType
             $displayAttr = array();
 
             $customOptions = array();
-
+echo $fieldType;
             switch ($fieldType) {
                 case 'leadlist':
                     if (!isset($data['filter'])) {

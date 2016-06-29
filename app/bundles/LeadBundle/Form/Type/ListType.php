@@ -78,9 +78,9 @@ class ListType extends AbstractType
             $this->tagChoices[$tag['value']] = $tag['label'];
         }
 
-        $stages      = $factory->getModel('stage');
+        $stages = $factory->getModel('stage')->getRepository()->getSimpleList();
         foreach ($stages as $stage) {
-            $this->tagChoices[$stage['id']] = $stage['name'];
+            $this->stageChoices[$stage['value']] = $stage['label'];
         }
     }
 
