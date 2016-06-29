@@ -65,10 +65,10 @@ class DynamicContentApiController extends CommonController
                 if ($dwc instanceof DynamicContent) {
                     $dwcModel->createStatEntry($dwc, $lead, $objectAlias);
 
-                    $event = new TokenReplacementEvent($content, $lead, ['slot' => $objectAlias, 'dynamic_content_id' => $dwc->getId()]);
-                    $this->factory->getDispatcher()->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $event);
+                    $tokenEvent = new TokenReplacementEvent($content, $lead, ['slot' => $objectAlias, 'dynamic_content_id' => $dwc->getId()]);
+                    $this->factory->getDispatcher()->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
                     
-                    $content = $event->getContent();
+                    $content = $tokenEvent->getContent();
                 }
             }
         }

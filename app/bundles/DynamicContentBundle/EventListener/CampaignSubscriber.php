@@ -107,18 +107,19 @@ class CampaignSubscriber extends CommonSubscriber
         $eventConfig  = $event->getConfig();
         $eventDetails = $event->getEventDetails();
         $lead         = $event->getLead();
-        $defaultDwc   = $this->dynamicContentModel->getRepository()->getEntity($eventConfig['dynamicContent']);
-        
-        if ($defaultDwc instanceof DynamicContent) {
-            // Set the default content in case none of the actions return data
-            $this->dynamicContentModel->setSlotContentForLead($defaultDwc, $lead, $eventDetails);
-        }
-        
-        $this->session->set('dwc.slot_name.lead.' . $lead->getId(), $eventDetails);
 
         if ($eventConfig['dwc_slot_name'] === $eventDetails) {
-            $event->setResult(true);
+            $defaultDwc = $this->dynamicContentModel->getRepository()->getEntity($eventConfig['dynamicContent']);
+
+            if ($defaultDwc instanceof DynamicContent) {
+                // Set the default content in case none of the actions return data
+                $this->dynamicContentModel->setSlotContentForLead($defaultDwc, $lead, $eventDetails);
+            }
+
+            $this->session->set('dwc.slot_name.lead.' . $lead->getId(), $eventDetails);
+
             $event->stopPropagation();
+            return $event->setResult(true);
         }
     }
 
@@ -141,14 +142,13 @@ class CampaignSubscriber extends CommonSubscriber
             
             $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
 
-            $event = new TokenReplacementEvent($dwc->getContent(), $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
-            $this->factory->getDispatcher()->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $event);
+            $tokenEvent = new TokenReplacementEvent($dwc->getContent(), $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
+            $this->factory->getDispatcher()->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
 
-            $content = $event->getContent();
-
-            $event->setResult($content);
+            $content = $tokenEvent->getContent();
 
             $event->stopPropagation();
+            return $event->setResult($content);
         }
     }
 }
