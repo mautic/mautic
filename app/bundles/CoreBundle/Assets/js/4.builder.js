@@ -109,6 +109,9 @@ Mautic.closeBuilder = function(model) {
     themeHtml.find('[data-source="mautic"]').remove();
     themeHtml.find('.atwho-container').remove();
 
+    // Remove the slot focus highlight
+    themeHtml.find('[data-slot-focus], [data-slot-handle]').remove();
+
     // Store the HTML content to the HTML textarea
     mQuery('.builder-html').val(themeHtml.find('html').get(0).outerHTML);
 
