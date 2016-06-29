@@ -43,7 +43,7 @@ if ($tmpl == 'index')
                 ));
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'lead',
-                    'orderBy'    => 'l.stage',
+                    'orderBy'    => 'l.stage_id',
                     'text'       => 'mautic.lead.stage.label',
                     'class'      => 'col-lead-stage'
                 ));
