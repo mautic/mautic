@@ -878,12 +878,12 @@ class LeadListRepository extends CommonRepository
                         case 'eq':
                         case 'neq':
                             $parameters[$parameter] = $details['filter'];
-                        $subQb->where(
-                            $q->expr()->andX(
-                                $q->expr()->eq($alias.'.id', 'l.stage_id'),
-                                $q->expr()->eq($alias.'.id', ":$parameter")
-                            )
-                        );
+                            $subQb->where(
+                                $q->expr()->andX(
+                                    $q->expr()->eq($alias.'.id', 'l.stage_id'),
+                                    $q->expr()->eq($alias.'.id', ":$parameter")
+                                )
+                            );
                             break;
                     }
 
