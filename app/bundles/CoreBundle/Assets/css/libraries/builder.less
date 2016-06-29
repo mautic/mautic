@@ -52,12 +52,44 @@ div[data-slot-focus] {
 
 div[data-slot-toolbar] {
     position: absolute;
-    left: 0;
-    top: -20px;
-    padding: 2px;
-    z-index: 1;
+    right: -10px;
+    top: -12px;
+    z-index: 10;
     cursor: pointer;
     cursor: hand;
+}
+
+div[data-slot-toolbar] .btn {
+    border-radius: 10px;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: 600;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    line-height: 1.3856;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-size: 11px;
+    line-height: 1.456;
+}
+
+div[data-slot-toolbar] .btn .fa {
+    padding-top: 4px;
+}
+
+div[data-slot-toolbar] .btn-danger {
+    color: #ffffff;
+    background-color: #f86b4f;
+    border-color: #fff;
 }
 
 div[data-slot] {

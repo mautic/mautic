@@ -292,12 +292,16 @@ Mautic.initSlotListeners = function() {
         // initialize the drag handle
         var handle = mQuery('<div/>').attr('data-slot-handle', true);
         var slotToolbar = mQuery('<div/>').attr('data-slot-toolbar', true);
-        var deleteLink = mQuery('<i/>').attr('data-slot-action', 'delete').attr('alt', 'delete').addClass('fa fa-times-circle').click(function(e) {
-            slot.remove();
-        });
+        var deleteLink = mQuery('<a><i class="fa fa-times"></i></a>')
+            .attr('data-slot-action', 'delete')
+            .attr('alt', 'delete')
+            .addClass('btn btn-delete btn-danger btn-xs');
         deleteLink.appendTo(slotToolbar);
         slotToolbar.appendTo(handle);
         slot.hover(function() {
+            handle.click(function(e) {
+                slot.remove();
+            });
             slot.append(handle);
         }, function() {
             handle.remove();
