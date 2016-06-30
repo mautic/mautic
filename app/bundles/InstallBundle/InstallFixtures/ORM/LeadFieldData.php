@@ -45,6 +45,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
     {
         $translator = $this->container->get('translator');
 
+        $indexesToAdd = [];
         $textfields = [
             'title',
             'firstname',
@@ -75,8 +76,6 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
 
         /** @var ColumnSchemaHelper $leadsSchema */
         $leadsSchema = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('column', 'leads');
-        /** @var IndexSchemaHelper $indexHelper */
-        $indexHelper = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('index', 'leads');
 
         foreach ($textfields as $key => $name) {
             $entity = new LeadField();
@@ -168,14 +167,23 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
                 FieldModel::getSchemaDefinition($name, $type, $entity->getIsUniqueIdentifier())
             );
 
-            $indexHelper->addIndex([$name], MAUTIC_TABLE_PREFIX.$name.'_search', ['where' => "({$name}(767))"] );
+            $indexesToAdd[] = $name;
+
             $this->addReference('leadfield-'.$name, $entity);
+        }
+
+        $leadsSchema->executeChanges();
+
+        /** @var IndexSchemaHelper $indexHelper */
+        $indexHelper = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('index', 'leads');
+
+        foreach ($indexesToAdd as $name) {
+            $indexHelper->addIndex([$name], MAUTIC_TABLE_PREFIX.$name.'_search', ['where' => "({$name}(767))"] );
         }
 
         // Add an attribution index
         $indexHelper->addIndex(['attribution', 'attribution_date'], MAUTIC_TABLE_PREFIX.'_contact_attribution');
 
-        $leadsSchema->executeChanges();
         $indexHelper->executeChanges();
     }
 
