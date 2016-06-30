@@ -49,6 +49,8 @@ SQL;
         $this->addSql("ALTER TABLE {$this->prefix}leads ADD COLUMN attribution double DEFAULT NULL");
         $this->addSql("ALTER TABLE {$this->prefix}leads ADD COLUMN attribution_date date DEFAULT NULL");
         $this->addSql("CREATE INDEX {$this->prefix}contact_attribution ON {$this->prefix}leads (attribution, attribution_date)");
+        $this->addSql("CREATE INDEX {$this->prefix}attribution_search ON {$this->prefix}leads (attribution)");
+        $this->addSql("CREATE INDEX {$this->prefix}attribution_date_search ON {$this->prefix}leads (attribution_date)");
 
         $this->addSql("CREATE INDEX {$this->prefix}event_type ON {$this->prefix}campaign_events (event_type)");
         $this->addSql("CREATE INDEX {$this->prefix}campaign_leads ON {$this->prefix}campaign_leads (campaign_id, manually_removed, date_added, lead_id)");

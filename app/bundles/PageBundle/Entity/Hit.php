@@ -157,7 +157,6 @@ class Hit
 
         $builder->setTable('page_hits')
             ->setCustomRepositoryClass('Mautic\PageBundle\Entity\HitRepository')
-            ->addIndex(['ip_id'], 'page_hit_ip_search')
             ->addIndex(['tracking_id'], 'page_hit_tracking_search')
             ->addIndex(['code'], 'page_hit_code_search')
             ->addIndex(['source', 'source_id'], 'page_hit_source_search')

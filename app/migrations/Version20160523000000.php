@@ -49,15 +49,15 @@ CREATE TABLE `{$this->prefix}stages` (
   `created_by` int(11) DEFAULT NULL,
   `created_by_user` varchar(255) DEFAULT NULL,
   `description` longtext,
-  `date_added` datetime NOT NULL COMMENT '(DC2Type:datetime)',
+  `date_added` datetime NULL COMMENT '(DC2Type:datetime)',
   `date_modified` datetime DEFAULT NULL COMMENT '(DC2Type:datetime)',
-  `is_published` tinyint(1) DEFAULT NULL,  
+  `is_published` tinyint(1) NOT NULL,  
   `modified_by` int(11) DEFAULT NULL,
   `modified_by_user` varchar(255) DEFAULT NULL,  
-  `name` varchar(255) DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
   `publish_up` datetime DEFAULT NULL COMMENT '(DC2Type:datetime)',
   `publish_down` datetime DEFAULT NULL COMMENT '(DC2Type:datetime)',
-  `weight` int(11) NOT NULL DEFAULT '0',
+  `weight` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 SQL;
@@ -68,12 +68,12 @@ SQL;
 CREATE TABLE `{$this->prefix}lead_stages_change_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `lead_id` int(11) NOT NULL,
-  `type` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `event_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `action_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `type` TINYTEXT NOT NULL,
+  `event_name` varchar(255) NOT NULL,
+  `action_name` varchar(255) NOT NULL,
   `date_added` datetime NOT NULL  COMMENT '(DC2Type:datetime)',
   PRIMARY KEY (`id`),
-  INDEX {$this->generatePropertyName('lead_stages_change_log', 'fk', array('lead_id'))} (lead_id)
+  INDEX {$this->generatePropertyName('lead_stages_change_log', 'idx', array('lead_id'))} (lead_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 SQL;
 
@@ -86,6 +86,7 @@ CREATE TABLE `{$this->prefix}stage_lead_action_log` (
   `lead_id` int(11) NOT NULL,
   `ip_id` int(11) DEFAULT NULL,
   `date_fired` datetime NOT NULL,
+  PRIMARY KEY (`stage_id`, `lead_id`),
   INDEX {$this->generatePropertyName('stage_lead_action_log', 'idx', array('lead_id'))} (lead_id),
   INDEX {$this->generatePropertyName('stage_lead_action_log', 'idx', array('stage_id'))} (stage_id),
   INDEX {$this->generatePropertyName('stage_lead_action_log', 'idx', array('ip_id'))} (ip_id)
@@ -94,7 +95,7 @@ SQL;
         $this->addSql($sql);
 
         $this->addSql('ALTER TABLE ' . $this->prefix . 'stage_lead_action_log ADD CONSTRAINT ' . $this->generatePropertyName('stage_lead_action_log', 'fk', array('lead_id')) . ' FOREIGN KEY (lead_id) REFERENCES ' . $this->prefix . 'leads (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'stage_lead_action_log ADD CONSTRAINT ' . $this->generatePropertyName('stage_lead_action_log', 'fk', array('stage_id')) . ' FOREIGN KEY (stage_id) REFERENCES ' . $this->prefix . 'stages (id)');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'stage_lead_action_log ADD CONSTRAINT ' . $this->generatePropertyName('stage_lead_action_log', 'fk', array('stage_id')) . ' FOREIGN KEY (stage_id) REFERENCES ' . $this->prefix . 'stages (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'stage_lead_action_log ADD CONSTRAINT ' . $this->generatePropertyName('stage_lead_action_log', 'fk', array('ip_id')) . ' FOREIGN KEY (ip_id) REFERENCES ' . $this->prefix . 'ip_addresses (id)');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'leads ADD COLUMN stage_id INT DEFAULT NULL');
     }

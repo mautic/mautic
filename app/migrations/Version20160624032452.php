@@ -27,7 +27,7 @@ class Version20160624032452 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function mysqlUp(Schema $schema)
+    public function up(Schema $schema)
     {
         $statDwcFK  = $this->generatePropertyName('dynamic_content_stats', 'fk', ['dynamic_content_id']);
         $statDwcIDX = $this->generatePropertyName('dynamic_content_stats', 'idx', ['dynamic_content_id']);
@@ -56,13 +56,5 @@ SQL;
         $this->addSql($sql);
         $this->addSql("ALTER TABLE {$this->prefix}dynamic_content_stats ADD CONSTRAINT {$statDwcFK} FOREIGN KEY (dynamic_content_id) REFERENCES {$this->prefix}dynamic_content (id) ON DELETE SET NULL;");
         $this->addSql("ALTER TABLE {$this->prefix}dynamic_content_stats ADD CONSTRAINT {$statLeadFK} FOREIGN KEY (lead_id) REFERENCES {$this->prefix}leads (id) ON DELETE SET NULL;");
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    public function postgresqlUp(Schema $schema)
-    {
-        // TODO: Implement postgresqlUp() method.
     }
 }

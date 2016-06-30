@@ -34,8 +34,8 @@ class Version20160504000000 extends AbstractMauticMigration
             throw new SkipMigrationException('Schema includes this migration');
         }
 
-        $this->leadIdIdx = $this->generatePropertyName($this->prefix . 'lead_utmtags', 'idx', array('lead_id'));
-        $this->leadIdFk  = $this->generatePropertyName($this->prefix . 'lead_utmtags', 'fk', array('lead_id'));
+        $this->leadIdIdx = $this->generatePropertyName('lead_utmtags', 'idx', array('lead_id'));
+        $this->leadIdFk  = $this->generatePropertyName('lead_utmtags', 'fk', array('lead_id'));
     }
 
     /**
@@ -43,22 +43,21 @@ class Version20160504000000 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-
         $sql = <<<SQL
 CREATE TABLE `{$this->prefix}lead_utmtags` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `date_added` datetime NOT NULL COMMENT '(DC2Type:datetime)',
-  `lead_id` int(11) DEFAULT NULL,
+  `lead_id` int(11) NOT NULL,
   `query` LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)' DEFAULT NULL,
-  `referer` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `remote_host` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `user_agent` longtext COLLATE utf8_unicode_ci DEFAULT NULL,
-  `utm_campaign` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `utm_content` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `utm_medium` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `utm_source` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `utm_term` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `referer` varchar(255) DEFAULT NULL,
+  `remote_host` varchar(255) DEFAULT NULL,
+  `url` varchar(255) DEFAULT NULL,
+  `user_agent` longtext DEFAULT NULL,
+  `utm_campaign` varchar(255) DEFAULT NULL,
+  `utm_content` varchar(255) DEFAULT NULL,
+  `utm_medium` varchar(255) DEFAULT NULL,
+  `utm_source` varchar(255) DEFAULT NULL,
+  `utm_term` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `{$this->leadIdIdx}` (`lead_id`),
   CONSTRAINT `{$this->leadIdFk}` FOREIGN KEY (`lead_id`) REFERENCES `{$this->prefix}leads` (`id`) ON DELETE CASCADE
