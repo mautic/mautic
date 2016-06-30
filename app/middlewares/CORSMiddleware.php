@@ -36,12 +36,12 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
     /**
      * @var bool
      */
-    protected $restrictCORSDomains;
+    protected $restrictCORSDomains = true;
 
     /**
      * @var array
      */
-    protected $validCORSDomains;
+    protected $validCORSDomains = [];
 
     /**
      * @var HttpKernelInterface
@@ -57,11 +57,15 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
     {
         $this->app = $app;
 
-        /** @var array $parameters */
-        include __DIR__.'/../config/local.php';
+        $localConfig = __DIR__.'/../config/local.php';
 
-        $this->restrictCORSDomains = array_key_exists('cors_restrict_domains', $parameters) ? (bool) $parameters['cors_restrict_domains'] : false;
-        $this->validCORSDomains    = array_key_exists('cors_valid_domains', $parameters) ? (array) $parameters['cors_valid_domains'] : [];
+        if (file_exists($localConfig)) {
+            /** @var array $parameters */
+            include $localConfig;
+
+            $this->restrictCORSDomains = array_key_exists('cors_restrict_domains', $parameters) ? (bool) $parameters['cors_restrict_domains'] : true;
+            $this->validCORSDomains = array_key_exists('cors_valid_domains', $parameters) ? (array) $parameters['cors_valid_domains'] : [];
+        }
     }
 
     /**
