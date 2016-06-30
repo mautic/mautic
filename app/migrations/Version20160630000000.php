@@ -26,12 +26,12 @@ class Version20160630000000 extends AbstractMauticMigration
     public function preUp(Schema $schema)
     {
         $table = $schema->getTable($this->prefix.'oauth2_accesstokens');
-        if ($table->hasIndex(MAUTIC_TABLE_PREFIX.'oauth2_accesstokens')) {
+        if ($table->hasIndex(MAUTIC_TABLE_PREFIX.'oauth2_access_token_search')) {
 
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
-    
+
     /**
      * @param Schema $schema
      */

@@ -13,19 +13,19 @@
  */
 
 // List of critical migrations
-$criticalMigrations = array(
-    '20160225000000'
-);
+$criticalMigrations = [
+    '20160225000000',
+];
 
 $baseDir = __DIR__;
 
 // Check if the version is in a branch or tag
-$args             = getopt('b::', array('repackage'));
+$args              = getopt('b::', ['repackage']);
 $gitSourceLocation = (isset($args['b'])) ? ' ' : ' tags/';
 
 // We need the version number so get the app kernel
-require_once dirname(__DIR__) . '/vendor/autoload.php';
-require_once dirname(__DIR__) . '/app/AppKernel.php';
+require_once dirname(__DIR__).'/vendor/autoload.php';
+require_once dirname(__DIR__).'/app/AppKernel.php';
 
 $appVersion = AppKernel::MAJOR_VERSION.'.'.AppKernel::MINOR_VERSION.'.'.AppKernel::PATCH_VERSION.AppKernel::EXTRA_VERSION;
 
@@ -88,11 +88,15 @@ if (!isset($args['repackage'])) {
     $tags = explode("\n", trim(ob_get_clean()));
 
     // Only add deleted files to our list; new and modified files will be covered by the archive
-    $deletedFiles  = array();
-    $modifiedFiles = array();
+    $deletedFiles  = [];
+    $modifiedFiles = [
+        'deleted_files.txt'       => true,
+        'critical_migrations.txt' => true,
+        'upgrade.php'             => true,
+    ];
 
     // Build an array of paths which we won't ever distro, this is used for the update packages
-    $doNotPackage = array(
+    $doNotPackage = [
         '.github/CONTRIBUTING.md',
         '.github/ISSUE_TEMPLATE.md',
         '.github/PULL_REQUEST_TEMPLATE.md',
@@ -105,8 +109,8 @@ if (!isset($args['repackage'])) {
         'Gruntfile.js',
         'index_dev.php',
         'package.json',
-        'upgrade.php'
-    );
+        'upgrade.php',
+    ];
 
     // Create a flag to check if the vendors changed
     $vendorsChanged = false;
@@ -143,18 +147,14 @@ if (!isset($args['repackage'])) {
         }
     }
 
-    // Add our update files to the $modifiedFiles array so they get packaged
-    $modifiedFiles['deleted_files.txt'] = true;
-    $modifiedFiles['upgrade.php']       = true;
-
     // Include assets just in case they weren't
-    $assetFiles = array(
-        'media/css/app.css' => true,
+    $assetFiles    = [
+        'media/css/app.css'       => true,
         'media/css/libraries.css' => true,
-        'media/js/app.js' => true,
-        'media/js/libraries.js' => true,
-        'media/js/mautic-form.js' => true
-    );
+        'media/js/app.js'         => true,
+        'media/js/libraries.js'   => true,
+        'media/js/mautic-form.js' => true,
+    ];
     $modifiedFiles = $modifiedFiles + $assetFiles;
 
     // Package the vendor folder if the lock changed
@@ -176,12 +176,12 @@ if (!isset($args['repackage'])) {
 }
 
 // Post-processing - ZIP it up
-chdir(__DIR__ . '/packaging');
+chdir(__DIR__.'/packaging');
 
 system("rm -f ../packages/{$appVersion}.zip ../packages/{$appVersion}-update.zip");
 
 echo "Packaging Mautic Full Installation\n";
-system('zip -r ../packages/' . $appVersion . '.zip . -x@../excludefiles.txt > /dev/null');
+system('zip -r ../packages/'.$appVersion.'.zip . -x@../excludefiles.txt > /dev/null');
 
 echo "Packaging Mautic Update Package\n";
-system('zip -r ../packages/' . $appVersion . '-update.zip -@ < modified_files.txt > /dev/null');
+system('zip -r ../packages/'.$appVersion.'-update.zip -@ < modified_files.txt > /dev/null');
