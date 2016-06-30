@@ -126,11 +126,24 @@ Mautic.getLeadId = function() {
 }
 
 Mautic.leadEmailOnLoad = function(container, response) {
-    mQuery('[name="lead_quickemail"]').on('submit', function() {
-        // Todo: fix the table borders
-        // var content = mQuery(this).find('.editor').froalaEditor('html.get', true);
-        // console.log('onsubmit', content);
-        // return false;
+    mQuery('[name="lead_quickemail"]').on('click.ajaxform', function() {
+        var emailHtml = mQuery('.fr-iframe').contents();
+        var textarea = mQuery(this).find('#lead_quickemail_body');
+        mQuery.each(emailHtml.find('td, th, table'), function() {
+            var td = mQuery(this);
+            if (td.attr('fr-original-class')) {
+                td.attr('class', td.attr('fr-original-class'));
+                td.removeAttr('fr-original-class');
+            }
+            if (td.attr('fr-original-style')) {
+                td.attr('style', td.attr('fr-original-style'));
+                td.removeAttr('fr-original-style');
+            }
+            if (td.css('border') === '1px solid rgb(221, 221, 221)') {
+                td.css('border', '');
+            }
+        });
+        textarea.val(emailHtml.find('html').get(0).outerHTML);
     });
 }
 
