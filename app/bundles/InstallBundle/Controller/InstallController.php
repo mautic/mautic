@@ -178,7 +178,7 @@ class InstallController extends CommonController
                             return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1]));
                         case 2:
                             try {
-                                $this->installDatabaseFixures();
+                                $this->installDatabaseFixtures();
                                 $complete = true;
                             } catch (\Exception $exception) {
                                 $this->addFlash('mautic.installer.error.adding.fixtures', ['%exception%' => $exception->getMessage()], 'error');
@@ -348,7 +348,7 @@ class InstallController extends CommonController
      *
      * @return array|bool Array containing the flash message data on a failure, boolean true on success
      */
-    private function installDatabaseFixures()
+    private function installDatabaseFixtures()
     {
         $entityManager = $this->get('doctrine.orm.entity_manager');
         $paths         = [dirname(__DIR__).'/InstallFixtures/ORM'];
