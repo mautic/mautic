@@ -279,7 +279,6 @@ class EmailType extends AbstractType
             new PeriodicityType(),
             array(
                 'label' => false,
-                'mapped' => false
             )
         );
 

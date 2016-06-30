@@ -83,7 +83,6 @@ class Periodicity
 
         $builder->createField('triggerDate', 'datetime')
             ->columnName('trigger_date')
-            ->nullable()
             ->build();
 
         $builder->createField('triggerMode', 'string')
