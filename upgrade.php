@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-//ini_set('display_errors', 'Off');
+ini_set('display_errors', 'Off');
 date_default_timezone_set('UTC');
 
 $standalone = (int) getVar('standalone', 0);
