@@ -189,11 +189,13 @@ class ClientController extends FormController
         if (!$this->factory->getSecurity()->isGranted('api:clients:create')) {
             return $this->accessDenied();
         }
+
         $api_mode = ($objectId === 0) ? $this->factory->getSession()->get('mautic.client.filter.api_mode', 'oauth1a') : $objectId;
         $this->factory->getSession()->set('mautic.client.filter.api_mode', $api_mode);
 
         /** @var \Mautic\ApiBundle\Model\ClientModel $model */
         $model = $this->getModel('api.client');
+
         //retrieve the entity
         $client = $model->getEntity();
 
