@@ -446,6 +446,7 @@ class ReportModel extends FormModel
                             $objWriter->save('php://output');
                         }
                     );
+
                     $response->headers->set('Content-Type', 'application/force-download');
                     $response->headers->set('Content-Type', 'application/octet-stream');
                     $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.xlsx"');
