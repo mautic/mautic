@@ -80,11 +80,11 @@ class PeriodicityCommand extends ModeratedCommand
             $returnCode = $application->run($input, $output);
             // var_dump($returnCode);
 
-            $output->writeln('<info>qsdfqsdf' . $returnCode . '</info>');
+//             $output->writeln('<info>qsdfqsdf' . $returnCode . '</info>');
 
-            var_dump(array(
-                'returnCode' => $returnCode
-            ));
+//             var_dump(array(
+//                 'returnCode' => $returnCode
+//             ));
 
             if ($returnCode == 0) {
                 // command done and success

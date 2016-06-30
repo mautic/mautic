@@ -9,15 +9,11 @@
  */
 namespace Mautic\EmailBundle\Command;
 
-use Mautic\EmailBundle\EmailEvents;
-use Mautic\EmailBundle\Event\QueueEmailEvent;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Finder\Finder;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Factory\MauticFactory;
 
 /**
  * CLI command to generate Segment Email
@@ -35,8 +31,7 @@ class EmailGenerateCommand extends ModeratedCommand
         $this->setName('mautic:email:generate')
             ->setDescription('Generate Segment or Feed Email')
             ->addOption('--id', '-id', InputOption::VALUE_REQUIRED, 'Email ID')
-            ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.')
-        ;
+            ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
     }
 
     /**
@@ -46,10 +41,11 @@ class EmailGenerateCommand extends ModeratedCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
         $options = $input->getOptions();
         $objectId = $options['id'];
+        /** @var MauticFactory $factory */
         $factory = $this->getContainer()->get('mautic.factory');
+        $logger = $factory->getLogger();
         $translator = $factory->getTranslator();
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $factory->getModel('email');
@@ -72,17 +68,28 @@ class EmailGenerateCommand extends ModeratedCommand
         if (!$catPublished || !$published) {
             return 0;
         }
+        try {
+            $pending = $model->getPendingLeads($email, null, true);
+            $output->writeln('<info>' . $translator->trans('mautic.email.generate.pending', array(
+                '%pending%' => $pending
+            )) . '</info>');
+            $sendStat = $model->sendEmailToLists($email);
+            if ($pending > 0) {
+                $output->writeln('<info>' . $translator->trans('mautic.email.stat.sentcount', array(
+                    '%count%' => $sendStat[0]
+                )) . '</info>');
+                $output->writeln('<info>' . $translator->trans('mautic.email.stat.failcount', array(
+                    '%count%' => $sendStat[1]
+                )) . '</info>');
+            }
 
-        $pending = $model->getPendingLeads($email, null, true);
-        $output->writeln('<info>'.$translator->trans('mautic.email.generate.pending', array('%pending%' => $pending)).'</info>');
-        $sendStat = $model->sendEmailToLists($email);
-        if ($pending > 0) {
-            $output->writeln('<info>'.$translator->trans('mautic.email.stat.sentcount', array('%count%' => $sendStat[0])).'</info>');
-            $output->writeln('<info>'.$translator->trans('mautic.email.stat.failcount', array('%count%' => $sendStat[1])).'</info>');
+            $this->completeRun();
+            return 0;
+        } catch (\Exception $e) {
+            $output->writeln('<info>'.$e->getMessage().'</info>');
+            $logger->addError($e->getMessage());
+            $this->completeRun();
+            return -1;
         }
-
-        $this->completeRun();
-
-        return 0;
     }
 }

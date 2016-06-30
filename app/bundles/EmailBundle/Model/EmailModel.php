@@ -1364,12 +1364,17 @@ class EmailModel extends FormModel
                     /** @var FeedRepository $feedRepository */
                     $feedRepository = $this->factory->getEntityManager()->getRepository('MauticFeedBundle:Feed');
                     /** @var Snapshot $snapshot */
+                    try{
                     $snapshot = $feedRepository->latestSnapshot($this->factory,$email->getFeed());
-
                     $xmlString = $snapshot->getXmlString();
                     $feedContent = $feedHelper->getFeedContentFromString($xmlString);
                     $feedFields = $feedHelper->getFeedFields($feedContent);
+
                     $mailer->setFeed($feedFields);
+                    }catch(\Exception $e){
+                        $errors[$lead['id']] = $lead['email'];
+                        exit('catch '.$e->getMessage());
+                    }
                 }
 
                 $mailer->setIdHash($idHash);

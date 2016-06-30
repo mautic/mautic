@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
@@ -6,7 +7,6 @@
  * @link        http://webmecanik.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\FeedBundle\Helper;
 
 use Debril\RssAtomBundle\Protocol\FeedInterface;
@@ -19,11 +19,11 @@ use Debril\RssAtomBundle\Exception\ParserException;
 use Mautic\FeedBundle\Exception\FeedNotFoundException;
 use Mautic\FeedBundle\Exception\MalformedXMLException;
 use Mautic\FeedBundle\Entity\Feed;
+use Debril\RssAtomBundle\Exception\DriverUnreachableResourceException;
 
 class FeedHelper
 {
-
-    public static $feedItems=array(
+    public static $feedItems = array(
         '{feedfield=feedtitle}' => 'Feed Title',
         '{feedfield=feeddescription}' => 'Feed Description',
         '{feedfield=feedlink}' => 'Feed Link',
@@ -35,23 +35,25 @@ class FeedHelper
         '{feedfield=itemlink}' => 'Item Link',
         '{feedfield=itemdate}' => 'Item Date'
     );
-    public static $feedLoopAction=array(
+    public static $feedLoopAction = array(
         '{feed=loopstart}' => 'Start looping through the items',
         '{feed=loopend}' => 'Stop looping through the items'
     );
 
-
     /**
+     *
      * @var Factory
      */
     protected $factory;
 
     /**
+     *
      * @var XmlParser
      */
     protected $xmlParser;
 
     /**
+     *
      * @var FeedReader
      */
     protected $reader;
@@ -66,7 +68,7 @@ class FeedHelper
      *
      * @return FeedInterface
      */
-    public function getFeedContentFromString($xmlString, $itemCount=null)
+    public function getFeedContentFromString($xmlString, $itemCount = null)
     {
         // Parses the contents into a SimpleXMLElement
         try {
@@ -91,6 +93,7 @@ class FeedHelper
     }
 
     /**
+     *
      * @param string $feedUrl
      *
      * @throws FeedNotFoundException
@@ -99,7 +102,12 @@ class FeedHelper
      */
     public function getStringFromFeed($feedUrl)
     {
-        $response = $this->reader->getResponse($feedUrl);
+        try {
+            $response = $this->reader->getResponse($feedUrl);
+        } catch (DriverUnreachableResourceException $e) {
+            throw new FeedNotFoundException();
+        }
+
         if ($response->getHttpCode() === 200) {
             return $response->getBody();
         } else {
@@ -132,7 +140,8 @@ class FeedHelper
      *
      * @return array
      */
-    public function getItemFields($items) {
+    public function getItemFields($items)
+    {
         $itemFields = array();
         foreach ($items as $item) {
             $itemFields[] = array(
@@ -150,10 +159,11 @@ class FeedHelper
     /**
      * Unfolds the feed loop
      *
-     * @param array  $feed
+     * @param array $feed
      * @param string $content
      */
-    public function unfoldFeedItems($feed, $content) {
+    public function unfoldFeedItems($feed, $content)
+    {
         // Get the string to replicate
         $matches = array();
         $unfoldedContent = '';
@@ -163,8 +173,8 @@ class FeedHelper
             $inner = $matches[1][0];
             // Create the replicas
             $count = count($feed['*items']);
-            for ($i = 0; $i < $count; ++$i) {
-                $unfoldedContent .= preg_replace('/\{feedfield=item(\w+)\}/s', '{feedfield=item$1#'.$i.'}', $inner);
+            for ($i = 0; $i < $count; ++ $i) {
+                $unfoldedContent .= preg_replace('/\{feedfield=item(\w+)\}/s', '{feedfield=item$1#' . $i . '}', $inner);
             }
         }
 
@@ -179,7 +189,8 @@ class FeedHelper
      * @param array $items
      * @return array
      */
-    public function flattenItems($items) {
+    public function flattenItems($items)
+    {
         $flatItems = array();
         foreach ($items as $index => $item) {
             foreach ($item as $field => $content) {
@@ -196,7 +207,8 @@ class FeedHelper
      * @param array $feed
      * @return array
      */
-    public function flattenFeed($feed) {
+    public function flattenFeed($feed)
+    {
         $flatFeed = array_merge($feed, $this->flattenItems($feed['*items']));
         unset($flatFeed['*items']);
         return $flatFeed;
