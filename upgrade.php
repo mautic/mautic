@@ -100,7 +100,7 @@ function run_symfony_command($command, array $args)
 {
     static $application;
 
-    require_once dirname(__DIR__) . '/app/bootstrap.php.cache';
+    require_once dirname(__DIR__) . '/app/autoload.php';
     require_once dirname(__DIR__) . '/app/AppKernel.php';
 
     $args = array_merge(
