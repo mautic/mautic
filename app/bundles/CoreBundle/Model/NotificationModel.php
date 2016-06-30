@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Entity\Notification;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UpdateHelper;
 use Mautic\UserBundle\Entity\User;
@@ -24,7 +25,7 @@ class NotificationModel extends FormModel
      * @var boolean
      */
     protected $disableUpdates;
-    
+
     /**
      * @var Session
      */
@@ -42,7 +43,7 @@ class NotificationModel extends FormModel
 
     /**
      * NotificationModel constructor.
-     * 
+     *
      * @param PathsHelper $pathsHelper
      * @param UpdateHelper $updateHelper
      */
@@ -110,8 +111,8 @@ class NotificationModel extends FormModel
         $notification = new Notification();
         $notification->setType($type);
         $notification->setIsRead($isRead);
-        $notification->setHeader($header);
-        $notification->setMessage($message);
+        $notification->setHeader(InputHelper::html($header));
+        $notification->setMessage(InputHelper::html($message));
         $notification->setIconClass($iconClass);
         $notification->setUser($user);
         if ($datetime == null) {

@@ -40,13 +40,9 @@ class LanguageHelper
     {
         $this->factory = $factory;
 
-        $options = array('transport.curl' => array(
-            CURLOPT_SSL_VERIFYPEER  => false
-        ));
-
         // Moved to outside environment folder so that it doesn't get wiped on each config update
         $this->cacheFile = $this->factory->getSystemPath('cache') . '/../languageList.txt';
-        $this->connector = HttpFactory::getHttp($options);
+        $this->connector = HttpFactory::getHttp();
     }
 
     /**

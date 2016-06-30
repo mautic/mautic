@@ -28,12 +28,7 @@ class StagesChangeLog
      * @var Lead
      */
     private $lead;
-    
 
-    /**
-     * @var string
-     */
-    private $type;
 
     /**
      * @var string
@@ -64,10 +59,6 @@ class StagesChangeLog
         $builder->addId();
 
         $builder->addLead(false, 'CASCADE', false, 'stageChangeLog');
-        
-        $builder->createField('type', 'text')
-            ->length(50)
-            ->build();
 
         $builder->createField('eventName', 'string')
             ->columnName('event_name')

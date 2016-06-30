@@ -56,7 +56,7 @@ class FormModel extends CommonFormModel
 
     /**
      * FormModel constructor.
-     * 
+     *
      * @param ActionModel $formActionModel
      * @param FieldModel $formFieldModel
      */
@@ -170,7 +170,7 @@ class FormModel extends CommonFormModel
     public function setFields(Form $entity, $sessionFields)
     {
         $order          = 1;
-        $existingFields = $entity->getFields();
+        $existingFields = $entity->getFields()->toArray();
 
         foreach ($sessionFields as $key => $properties) {
             $isNew = (!empty($properties['id']) && isset($existingFields[$properties['id']])) ? false : true;
@@ -203,7 +203,7 @@ class FormModel extends CommonFormModel
 
         // Persist if the entity is known
         if ($entity->getId()) {
-            $this->formFieldModel->saveEntities($entity->getFields());
+            $this->formFieldModel->saveEntities($existingFields);
         }
     }
 
@@ -218,7 +218,7 @@ class FormModel extends CommonFormModel
             return;
         }
 
-        $existingFields = $entity->getFields();
+        $existingFields = $entity->getFields()->toArray();
         $deleteFields   = array();
         foreach ($sessionFields as $fieldId) {
             if (isset($existingFields[$fieldId])) {
@@ -240,8 +240,8 @@ class FormModel extends CommonFormModel
     public function setActions(Form $entity, $sessionActions)
     {
         $order   = 1;
-        $existingActions = $entity->getActions();
-        $savedFields     = $entity->getFields();
+        $existingActions = $entity->getActions()->toArray();
+        $savedFields     = $entity->getFields()->toArray();
 
         //match sessionId with field Id to update mapped fields
         $fieldIds = array();
@@ -281,7 +281,7 @@ class FormModel extends CommonFormModel
 
         // Persist if form is being edited
         if ($entity->getId()) {
-            $this->formActionModel->saveEntities($entity->getActions());
+            $this->formActionModel->saveEntities($existingActions);
         }
     }
 
@@ -443,7 +443,7 @@ class FormModel extends CommonFormModel
      */
     public function generateFieldColumns(Form $form)
     {
-        $fields = $form->getFields();
+        $fields = $form->getFields()->toArray();
 
         $columns = array(
             array(
@@ -542,7 +542,7 @@ class FormModel extends CommonFormModel
     {
         $formName = $form->generateFormName();
 
-        $fields = $form->getFields();
+        $fields = $form->getFields()->toArray();
         /** @var \Mautic\FormBundle\Entity\Field $f */
         foreach ($fields as $f) {
             $alias = $f->getAlias();

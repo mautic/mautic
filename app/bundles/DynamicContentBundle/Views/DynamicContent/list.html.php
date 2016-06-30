@@ -62,14 +62,14 @@ if ($tmpl == 'index') {
                                     'clone' => $permissions['dynamicContent:dynamicContents:create'],
                                     'delete' => $security->hasEntityAccess($permissions['dynamicContent:dynamicContents:deleteown'], $permissions['dynamicContent:dynamicContents:deleteother'], $item->getCreatedBy()),
                                 ],
-                                'routeBase' => 'dwc',
+                                'routeBase' => 'dynamicContent',
                                 'nameGetter' => 'getName',
                             ]);
                             ?>
                         </td>
                         <td>
-                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $item, 'model' => 'page.page']); ?>
-                            <a href="<?php echo $view['router']->generate('mautic_dwc_action', ['objectAction' => 'view', 'objectId' => $item->getId()]); ?>" data-toggle="ajax">
+                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $item, 'model' => 'dynamicContent']); ?>
+                            <a href="<?php echo $view['router']->generate('mautic_dynamicContent_action', ['objectAction' => 'view', 'objectId' => $item->getId()]); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                                 <?php
                                 $hasVariants = count($variantChildren);
@@ -98,8 +98,8 @@ if ($tmpl == 'index') {
             'totalItems' => count($items),
             'page' => $page,
             'limit' => $limit,
-            'menuLinkId' => 'mautic_dwc_index',
-            'baseUrl' => $view['router']->generate('mautic_dwc_index'),
+            'menuLinkId' => 'mautic_dynamicContent_index',
+            'baseUrl' => $view['router']->generate('mautic_dynamicContent_index'),
             'sessionVar' => 'dynamicContent',
         ]); ?>
         </div>

@@ -41,7 +41,7 @@ class DynamicContentDecisionType extends DynamicContentSendType
             'dynamicContent',
             'dwc_list',
             [
-                'label' => 'mautic.dynamicContent.send.selectDynamicContents',
+                'label' => 'mautic.dynamicContent.send.selectDynamicContents.default',
                 'label_attr' => ['class' => 'control-label'],
                 'attr' => [
                     'class' => 'form-control',

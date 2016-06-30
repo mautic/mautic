@@ -515,7 +515,7 @@ class Version20150521000000 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function mysqlUp(Schema $schema)
+    public function up(Schema $schema)
     {
         // Ensure the render_style column exists to prevent ORM errors
         $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD COLUMN render_style bool DEFAULT NULL');
@@ -560,69 +560,5 @@ class Version20150521000000 extends AbstractMauticMigration
         $this->addSql('CREATE TABLE ' . $this->prefix . 'campaign_form_xref (campaign_id INT NOT NULL, form_id INT NOT NULL, INDEX ' . $this->generatePropertyName('campaign_form_xref', 'idx', array('campaign_id')) . ' (campaign_id), INDEX ' . $this->generatePropertyName('campaign_form_xref', 'idx', array('form_id')) . ' (form_id), PRIMARY KEY(campaign_id, form_id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_form_xref ADD CONSTRAINT ' . $this->generatePropertyName('campaign_form_xref', 'fk', array('campaign_id')) . ' FOREIGN KEY (campaign_id) REFERENCES ' . $this->prefix . 'campaigns (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_form_xref ADD CONSTRAINT ' . $this->generatePropertyName('campaign_form_xref', 'fk', array('form_id')) . ' FOREIGN KEY (form_id) REFERENCES ' . $this->prefix . 'forms (id) ON DELETE CASCADE');
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    public function postgresqlUp(Schema $schema)
-    {
-        // Ensure the render_style column exists to prevent ORM errors
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD COLUMN render_style BOOLEAN DEFAULT NULL');
-
-        $this->addSql('CREATE TABLE ' . $this->prefix . 'email_assets_xref (email_id INT NOT NULL, asset_id INT NOT NULL, PRIMARY KEY(email_id, asset_id))');
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('email_assets_xref', 'idx', array('email_id')) . '  ON ' . $this->prefix . 'email_assets_xref (email_id)');
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('email_assets_xref', 'idx', array('asset_id')) . '  ON ' . $this->prefix . 'email_assets_xref (asset_id)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('email_id')) . '  FOREIGN KEY (email_id) REFERENCES ' . $this->prefix . 'emails (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('asset_id')) . '  FOREIGN KEY (asset_id) REFERENCES ' . $this->prefix . 'assets (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'assets ADD size INT DEFAULT NULL');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log DROP CONSTRAINT ' . $this->findPropertyName('campaign_lead_event_log', 'fk', 'F639F774'));
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD CONSTRAINT ' . $this->generatePropertyName('campaign_lead_event_log', 'fk', array('campaign_id')) . '  FOREIGN KEY (campaign_id) REFERENCES ' . $this->prefix . 'campaigns (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD name VARCHAR(255) DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD description TEXT DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD from_address VARCHAR(255) DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD from_name VARCHAR(255) DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD reply_to_address VARCHAR(255) DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD bcc_address VARCHAR(255) DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ADD email_type VARCHAR(255) DEFAULT NULL');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ALTER subject TYPE TEXT');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ALTER subject DROP NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ALTER template DROP NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ALTER content_mode DROP NOT NULL');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats ADD copy TEXT DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats ADD open_count INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats ADD last_opened TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats ADD open_details TEXT DEFAULT NULL');
-        $this->addSql('COMMENT ON COLUMN ' . $this->prefix . 'email_stats.open_details IS \'(DC2Type:array)\'');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats ALTER email_id DROP NOT NULL');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ADD container_attr VARCHAR(255) DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ADD lead_field VARCHAR(255) DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ADD save_result BOOLEAN DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER label TYPE TEXT');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER default_value TYPE TEXT');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER validation_message TYPE TEXT');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER help_message TYPE TEXT');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'pages ALTER template DROP NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'pages ALTER content_mode DROP NOT NULL');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_redirects ADD email_id INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_redirects ADD CONSTRAINT ' . $this->generatePropertyName('page_redirects', 'fk', array('email_id')) . ' FOREIGN KEY (email_id) REFERENCES ' . $this->prefix . 'emails (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
-
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('page_redirects', 'idx', array('email_id')) . ' ON ' . $this->prefix  . 'page_redirects (email_id)');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD form_type VARCHAR(255) DEFAULT NULL');
-
-        $this->addSql('CREATE TABLE ' . $this->prefix . 'campaign_form_xref (campaign_id INT NOT NULL, form_id INT NOT NULL, PRIMARY KEY(campaign_id, form_id))');
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('campaign_form_xref', 'idx', array('campaign_id')) . '  ON ' . $this->prefix . 'campaign_form_xref (campaign_id)');
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('campaign_form_xref', 'idx', array('form_id')) . '  ON ' . $this->prefix . 'campaign_form_xref (form_id)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_form_xref ADD CONSTRAINT ' . $this->generatePropertyName('campaign_form_xref', 'fk', array('campaign_id')) . '  FOREIGN KEY (campaign_id) REFERENCES ' . $this->prefix . 'campaigns (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_form_xref ADD CONSTRAINT ' . $this->generatePropertyName('campaign_form_xref', 'fk', array('form_id')) . '  FOREIGN KEY (form_id) REFERENCES ' . $this->prefix . 'forms (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
     }
 }

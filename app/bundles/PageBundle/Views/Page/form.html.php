@@ -22,7 +22,6 @@ $header = ($activePage->getId()) ?
     $view['translator']->trans('mautic.page.header.new');
 
 $view['slots']->set("headerTitle", $header.$subheader);
-$view['assets']->addScriptDeclaration('var builderTokens = '.json_encode($builderTokens['tokens']).';', 'bodyClose');
 
 $template = $form['template']->vars['data'];
 ?>
@@ -50,6 +49,7 @@ $template = $form['template']->vars['data'];
                         </div>
 
                         <?php echo $view->render('MauticCoreBundle:Helper:theme_select.html.php', array(
+                            'type'   => 'page',
                             'themes' => $themes,
                             'active' => $form['template']->vars['value']
                         )); ?>

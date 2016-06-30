@@ -43,7 +43,7 @@ if ($tmpl == 'index')
                 ));
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'lead',
-                    'orderBy'    => 'l.stage',
+                    'orderBy'    => 'l.stage_id',
                     'text'       => 'mautic.lead.stage.label',
                     'class'      => 'col-lead-stage'
                 ));
@@ -51,7 +51,7 @@ if ($tmpl == 'index')
                     'sessionVar' => 'lead',
                     'orderBy'    => 'l.points',
                     'text'       => 'mautic.lead.points',
-                    'class'      => 'col-lead-points'
+                    'class'      => 'visible-md visible-lg col-lead-points'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(

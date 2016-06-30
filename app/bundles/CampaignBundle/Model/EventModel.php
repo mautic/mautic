@@ -755,6 +755,9 @@ class EventModel extends CommonFormModel
         &$executedEventCount = 0,
         &$totalEventCount = 0
     ) {
+
+        $eventWaitTimeOnResponseFalse =  $this->factory->getParameter('campaign_time_wait_on_event_false');
+
         $evaluatedEventCount++;
         $totalEventCount++;
 
@@ -897,9 +900,16 @@ class EventModel extends CommonFormModel
 
                 // Something failed
                 if ($wasScheduled) {
+
+                    $date = new \DateTime();
+
+                    if ($eventWaitTimeOnResponseFalse != '' && $eventWaitTimeOnResponseFalse != null) {
+                        $date->add(new \DateInterval($eventWaitTimeOnResponseFalse));
+                    }
+
                     // Reschedule
                     $log->setIsScheduled(true);
-                    $log->setTriggerDate(new \DateTime());
+                    $log->setTriggerDate($date);
                     $log->setDateTriggered(null);
 
                     $repo->saveEntity($log);
@@ -910,8 +920,7 @@ class EventModel extends CommonFormModel
 
                 $this->logger->debug(
                     'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId().' failed with a response of '
-                    .var_export($response, true)
-                );
+                    .var_export($response, true) . " placed on hold ".$eventWaitTimeOnResponseFalse );
             } else {
                 $executedEventCount++;
 
@@ -1903,7 +1912,7 @@ class EventModel extends CommonFormModel
     public function getEventLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query = $chart->getChartQuery($this->em->getConnection());
+        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $q     = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
 
         if (!$canViewOthers) {

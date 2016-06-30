@@ -10,7 +10,7 @@
 
 /** @var \Mautic\DynamicContentBundle\Entity\DynamicContent $entity */
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'dwc');
+$view['slots']->set('mauticContent', 'dynamicContent');
 $view['slots']->set('headerTitle', $entity->getName());
 
 $showVariants = (count($variants['children'])
@@ -25,7 +25,7 @@ $customButtons = [];
 //        'attr' => [
 //            'data-toggle' => 'ajax',
 //            'href' => $view['router']->generate(
-//                'mautic_dwc_action',
+//                'mautic_dynamicContent_action',
 //                ['objectAction' => 'addvariant', 'objectId' => $entity->getId()]
 //            ),
 //        ],
@@ -59,7 +59,7 @@ $view['slots']->set(
                     $entity->getCreatedBy()
                 ),
             ],
-            'routeBase' => 'dwc',
+            'routeBase' => 'dynamicContent',
         ]
     )
 );
@@ -107,25 +107,60 @@ $view['slots']->set(
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
                     <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse"
-                       data-target="#page-details"><span class="caret"></span> <?php echo $view['translator']->trans(
-                            'mautic.core.details'
-                        ); ?></a>
+                       data-target="#page-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?></a>
                 </span>
             </div>
             <!--/ page detail collapseable toggler -->
 
+            <!-- some stats -->
+            <div class="pa-md">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="panel">
+                            <div class="panel-body box-layout">
+                                <div class="col-md-3 va-m">
+                                    <h5 class="text-white dark-md fw-sb mb-xs">
+                                        <span class="fa fa-line-chart"></span>
+                                        <?php echo $view['translator']->trans('mautic.dynamicContent.views'); ?>
+                                    </h5>
+                                </div>
+                                <div class="col-md-9 va-m">
+                                    <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', ['dateRangeForm' => $dateRangeForm, 'class' => 'pull-right']); ?>
+                                </div>
+                            </div>
+                            <div class="pt-0 pl-15 pb-10 pr-15">
+                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', ['chartData' => $entityViews, 'chartType' => 'line', 'chartHeight' => 300]); ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--/ stats -->
+
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
+                <li class="active">
+                    <a href="#clicks-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.trackable.click_counts'); ?>
+                    </a>
+                </li>
                 <?php if ($showVariants): ?>
-                    <li class="active">
-                        <a href="#variants-container" role="tab" data-toggle="tab">
-                            <?php echo $view['translator']->trans('mautic.dynamicContent.variants'); ?>
-                        </a>
-                    </li>
+                <li class>
+                    <a href="#variants-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.dynamicContent.variants'); ?>
+                    </a>
+                </li>
                 <?php endif; ?>
             </ul>
             <!--/ tabs controls -->
         </div>
+        <!-- start: tab-content -->
+        <div class="tab-content pa-md">
+            <div class="tab-pane active bdr-w-0" id="clicks-container">
+                <?php echo $view->render('MauticPageBundle:Trackable:click_counts.html.php', ['trackables' => $trackables]); ?>
+            </div>
+        </div>
+        <!-- end: tab-content -->
     </div>
     <!--/ left section -->
 

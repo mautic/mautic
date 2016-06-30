@@ -93,7 +93,7 @@ class UtmTag
 
         $builder->setTable('lead_utmtags')
             ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\UtmTagRepository');
-        
+
         $builder->addId();
 
         $builder->addDateAdded();
@@ -108,7 +108,7 @@ class UtmTag
 
         $builder->addNullableField('url', 'string');
 
-        $builder->addNullableField('userAgent', 'string','user_agent');
+        $builder->addNullableField('userAgent', 'text','user_agent');
 
         $builder->addNullableField('utmCampaign', 'string','utm_campaign');
 

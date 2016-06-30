@@ -1102,7 +1102,7 @@ abstract class AbstractIntegration
     {
         // Child classes can easily pass in custom settings this way
         $settings = array_merge(
-            array('authorize_session' => true, 'append_callback' => false, 'ssl_verifypeer' => false),
+            array('authorize_session' => true, 'append_callback' => false, 'ssl_verifypeer' => true),
             $settings
         );
 

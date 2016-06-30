@@ -175,11 +175,16 @@ return [
                 ]
             ],
             'mautic.lead.reportbundle.subscriber'   => [
-                'class' => 'Mautic\LeadBundle\EventListener\ReportSubscriber'
-            ],
-            'mautic.lead.doctrine.subscriber'       => [
-                'class' => 'Mautic\LeadBundle\EventListener\DoctrineSubscriber',
-                'tag'   => 'doctrine.event_subscriber'
+                'class'     => 'Mautic\LeadBundle\EventListener\ReportSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.lead.model.list',
+                    'mautic.lead.model.field',
+                    'mautic.lead.model.lead',
+                    'mautic.stage.model.stage',
+                    'mautic.campaign.model.campaign',
+                    'mautic.user.model.user'
+                ]
             ],
             'mautic.lead.calendarbundle.subscriber' => [
                 'class' => 'Mautic\LeadBundle\EventListener\CalendarSubscriber'
@@ -330,6 +335,10 @@ return [
             ]
         ],
         'other'   => [
+            'mautic.lead.doctrine.subscriber'       => [
+                'class'     => 'Mautic\LeadBundle\EventListener\DoctrineSubscriber',
+                'tag'       => 'doctrine.event_subscriber',
+            ],
             'mautic.validator.leadlistaccess' => [
                 'class'     => 'Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator',
                 'arguments' => 'mautic.factory',
@@ -377,7 +386,7 @@ return [
             ],
             'mautic.lead.model.note' => [
                 'class' => 'Mautic\LeadBundle\Model\NoteModel'
-            ]
+            ],
         ]
     ]
 ];

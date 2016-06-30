@@ -18,6 +18,9 @@ use Symfony\Component\Templating\Helper\Helper;
  */
 class FormatterHelper extends Helper
 {
+    /**
+     * @var DateHelper
+     */
     private $dateHelper;
     private $version;
 

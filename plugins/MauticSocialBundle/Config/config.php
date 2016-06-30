@@ -49,7 +49,10 @@ return [
         'forms'  => [
             'mautic.form.type.social.sociallogin'              => [
                 'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\SocialLoginType',
-                'arguments' => 'mautic.helper.integration',
+                'arguments' => [
+                    'mautic.helper.integration',
+                    'mautic.form.model.form',
+                    ],
                 'alias'     => 'sociallogin',
             ],
             'mautic.form.type.social.facebook'                 => [

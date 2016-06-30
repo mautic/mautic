@@ -22,6 +22,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -378,7 +379,7 @@ class LeadController extends FormController
         }
 
         $lineChart   = new LineChart(null, $fromDate, $toDate);
-        $query       = $lineChart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $query       = new ChartQuery($this->factory->getEntityManager()->getConnection(), $fromDate, $toDate);
         $engagements = $query->completeTimeData($engagements);
         $pointStats  = $query->fetchTimeData('lead_points_change_log', 'date_added', array('lead_id' => $lead->getId()));
         $lineChart->setDataset($translator->trans('mautic.lead.graph.line.all_engagements'), $engagements);
@@ -741,6 +742,10 @@ class LeadController extends FormController
                         )
                     )
                 );
+            } elseif ($valid) {
+                // Refetch and recreate the form in order to populate data manipulated in the entity itself
+                $lead = $model->getEntity($objectId);
+                $form = $model->createForm($lead, $this->get('form.factory'), $action, array('fields' => $fields));
             }
         } else {
             //lock the entity
@@ -1351,11 +1356,11 @@ class LeadController extends FormController
                                         } else {
                                             $stats['created']++;
                                         }
-                                    }     
+                                    }
                                     else {
                                         $stats['ignored']++;
                                         $stats['failures'][$lineNumber] = $this->factory->getTranslator()->trans('mautic.lead.import.error.line_empty');
-                                    }        
+                                    }
                                 } catch (\Exception $e) {
                                     // Email validation likely failed
                                     $stats['ignored']++;

@@ -9,6 +9,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\EmailBundle\EmailEvents;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -20,16 +21,15 @@ use Mautic\LeadBundle\LeadEvents;
  */
 class LeadSubscriber extends CommonSubscriber
 {
-
     /**
      * @return array
      */
     static public function getSubscribedEvents()
     {
-        return array(
-            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
-            LeadEvents::LEAD_POST_MERGE      => array('onLeadMerge', 0)
-        );
+        return [
+            LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
+            LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
+        ];
     }
 
     /**
@@ -52,7 +52,7 @@ class LeadSubscriber extends CommonSubscriber
         $filters = $event->getEventFilters();
 
         $lead    = $event->getLead();
-        $options = array('ipIds' => array(), 'filters' => $filters);
+        $options = ['ipIds' => [], 'filters' => $filters];
 
         /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
         /*
@@ -70,34 +70,34 @@ class LeadSubscriber extends CommonSubscriber
         foreach ($stats as $stat) {
             if ($stat['dateRead'] && $event->isApplicable($eventTypeKeyRead, true)) {
                 $event->addEvent(
-                    array(
+                    [
                         'event'           => $eventTypeKeyRead,
                         'eventLabel'      => $eventTypeNameRead,
                         'timestamp'       => $stat['dateRead'],
-                        'extra'           => array(
+                        'extra'           => [
                             'stat' => $stat,
                             'type' => 'read'
-                        ),
+                        ],
                         'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php',
                         'icon'            => 'fa-envelope-o'
-                    )
+                    ]
                 );
             }
 
             // Email read
             if ($stat['dateSent'] && $event->isApplicable($eventTypeKeySent)) {
                 $event->addEvent(
-                    array(
+                    [
                         'event'           => $eventTypeKeySent,
                         'eventLabel'      => $eventTypeNameSent,
                         'timestamp'       => $stat['dateSent'],
-                        'extra'           => array(
+                        'extra'           => [
                             'stat' => $stat,
                             'type' => 'sent'
-                        ),
+                        ],
                         'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php',
                         'icon'            => 'fa-envelope'
-                    )
+                    ]
                 );
             }
         }

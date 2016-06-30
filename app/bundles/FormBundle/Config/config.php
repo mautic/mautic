@@ -125,7 +125,7 @@ return [
                 'class' => 'Mautic\FormBundle\EventListener\CalendarSubscriber'
             ],
             'mautic.form.leadbundle.subscriber'     => [
-                'class' => 'Mautic\FormBundle\EventListener\LeadSubscriber'
+                'class'       => 'Mautic\FormBundle\EventListener\LeadSubscriber',
             ],
             'mautic.form.emailbundle.subscriber'    => [
                 'class' => 'Mautic\FormBundle\EventListener\EmailSubscriber'

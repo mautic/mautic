@@ -48,16 +48,93 @@ s=this.x64Rotl(s,33),s=this.x64Multiply(s,l),n=this.x64Xor(n,s);case 8:o=this.x6
 var MauticJS = MauticJS || {};
 
 MauticJS.serialize = function(obj) {
-    var str = [];
-    for (var p in obj)
-        if (obj.hasOwnProperty(p)) {
-            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-        }
-    return str.join("&");
+    return Object.keys(obj).map(function(key) {
+        return key + '=' + obj[key];
+    }).join('&');
 };
 
 MauticJS.documentReady = function(f) {
     /in/.test(document.readyState) ? setTimeout('MauticJS.documentReady(' + f + ')', 9) : f();
+};
+
+MauticJS.iterateCollection = function(collection) {
+    return function(f) {
+        for (var i = 0; collection[i]; i++) {
+            f(collection[i], i);
+        }
+    };
+};
+
+MauticJS.log = function() {
+    var log = {};
+    log.history = log.history || [];
+
+    log.history.push(arguments);
+
+    if (window.console) {
+        console.log(Array.prototype.slice.call(arguments));
+    }
+};
+
+MauticJS.createCORSRequest = function(method, url) {
+    var xhr = new XMLHttpRequest();
+    
+    method = method.toUpperCase();
+    
+    if ("withCredentials" in xhr) {
+        xhr.open(method, url, true);
+    } else if (typeof XDomainRequest != "undefined") {
+        xhr = new XDomainRequest();
+        xhr.open(method, url);
+    }
+    
+    return xhr;
+};
+
+MauticJS.makeCORSRequest = function(method, url, data, callbackSuccess, callbackError) {
+    var xhr = MauticJS.createCORSRequest(method, url);
+    var response;
+    
+    callbackSuccess = callbackSuccess || function(response, xhr) { MauticJS.log(response); };
+    callbackError = callbackError || function(response, xhr) { MauticJS.log(response); };
+
+    if (!xhr) {
+        MauticJS.log('MauticJS.debug: Could not create an XMLHttpRequest instance.');
+        return false;
+    }
+
+    xhr.onload = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+            response = MauticJS.parseTextToJSON(xhr.responseText);
+
+            if (xhr.status === 200) {
+                callbackSuccess(response, xhr);
+            } else {
+                callbackError(response, xhr);
+            }
+        }
+    };
+
+    if (method.toUpperCase() === 'POST') {
+        xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+    }
+
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    xhr.withCredentials = true;
+    xhr.send(MauticJS.serialize(data));
+};
+
+MauticJS.parseTextToJSON = function(maybeJSON) {
+    var response;
+
+    try {
+        // handle JSON data being returned
+        response = JSON.parse(maybeJSON);
+    } catch (error) {
+        response = maybeJSON;
+    }
+
+    return response;
 };
 
 if (typeof window[window.MauticTrackingObject] === 'undefined') {

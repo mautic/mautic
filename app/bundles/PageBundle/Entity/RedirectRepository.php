@@ -20,28 +20,16 @@ class RedirectRepository extends CommonRepository
 {
     /**
      * @param array $urls
-     * @param Email $email
      *
      * @return array
      */
-    public function findByUrls(array $urls, Email $email = null)
+    public function findByUrls(array $urls)
     {
         $q = $this->createQueryBuilder('r');
 
         $expr = $q->expr()->andX(
             $q->expr()->in('r.url', ':urls')
         );
-
-        if ($email === null) {
-            $expr->add(
-                $q->expr()->isNull('r.email')
-            );
-        } else {
-            $expr->add(
-                $q->expr()->eq('r.email', ':email')
-            );
-            $q->setParameter('email', $email);
-        }
 
         $q->where($expr)
             ->setParameter('urls', $urls);

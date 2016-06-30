@@ -115,8 +115,7 @@ class FileController extends AjaxController
      */
     public function getMediaAbsolutePath()
     {
-        $mediaDirRaw = $this->container->getParameter('kernel.root_dir').'/../'.$this->factory->getParameter('image_path');
-        $mediaDir = realpath($mediaDirRaw);
+        $mediaDir = realpath($this->get('mautic.helper.paths')->getSystemPath('images', true));
 
         if ($mediaDir === false) {
             $this->response['error'] = 'Media dir does not exist';

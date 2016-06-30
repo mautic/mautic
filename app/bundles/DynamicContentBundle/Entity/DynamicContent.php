@@ -75,10 +75,16 @@ class DynamicContent extends FormEntity
     private $variantChildren;
 
     /**
+     * @var ArrayCollection
+     */
+    private $stats;
+
+    /**
      * DynamicContent constructor.
      */
     public function __construct()
     {
+        $this->stats = new ArrayCollection();
         $this->variantChildren = new ArrayCollection();
     }
 
@@ -89,9 +95,27 @@ class DynamicContent extends FormEntity
     {
         $this->id = null;
         $this->sentCount = 0;
+        $this->stats = new ArrayCollection();
         $this->variantChildren = new ArrayCollection();
 
         parent::__clone();
+    }
+
+    /**
+     * Clear stats
+     */
+    public function clearStats()
+    {
+        $this->stats = new ArrayCollection();
+    }
+
+    /**
+     * Clear variants
+     */
+    public function clearVariants()
+    {
+        $this->variantChildren = new ArrayCollection();
+        $this->variantParent   = null;
     }
 
     /**
@@ -133,6 +157,13 @@ class DynamicContent extends FormEntity
         $builder->createField('language', 'string')
             ->columnName('lang')
             ->build();
+
+        $builder->createOneToMany('stats', 'Stat')
+            ->setIndexBy('id')
+            ->mappedBy('dynamicContent')
+            ->cascadePersist()
+            ->fetchExtraLazy()
+            ->build();
     }
 
     /**
@@ -161,6 +192,8 @@ class DynamicContent extends FormEntity
                 'variantParent',
                 'variantChildren',
             ])
+            ->setMaxDepth(1, 'variantParent')
+            ->setMaxDepth(1, 'variantChildren')
             ->build();
     }
 
@@ -207,6 +240,7 @@ class DynamicContent extends FormEntity
      */
     public function setName($name)
     {
+        $this->isChanged('name', $name);
         $this->name = $name;
 
         return $this;
@@ -310,6 +344,7 @@ class DynamicContent extends FormEntity
      */
     public function setContent($content)
     {
+        $this->isChanged('content', $content);
         $this->content = $content;
 
         return $this;
@@ -454,5 +489,13 @@ class DynamicContent extends FormEntity
         $this->language = $language;
 
         return $this;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getStats()
+    {
+        return $this->stats;
     }
 }

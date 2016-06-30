@@ -110,7 +110,7 @@ return [
                 ]
             ],
             'mautic.page.leadbundle.subscriber'     => [
-                'class' => 'Mautic\PageBundle\EventListener\LeadSubscriber'
+                'class'       => 'Mautic\PageBundle\EventListener\LeadSubscriber',
             ],
             'mautic.page.calendarbundle.subscriber' => [
                 'class' => 'Mautic\PageBundle\EventListener\CalendarSubscriber'

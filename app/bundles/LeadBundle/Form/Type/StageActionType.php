@@ -36,7 +36,7 @@ class StageActionType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        /** @var \Mautic\LeadBundle\Model\ListModel $model */
+        /** @var \Mautic\StageBundle\Model\StageModel $model */
         $model = $this->model;
         $resolver->setDefaults(array(
             'choices' => function (Options $options) use ($model) {

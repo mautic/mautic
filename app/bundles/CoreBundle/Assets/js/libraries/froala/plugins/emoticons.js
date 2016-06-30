@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.3 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -194,7 +194,7 @@
      */
     function insert (emoticon, img) {
       // Insert emoticon.
-      editor.html.insert('<span class="fr-emoticon' + (img ? ' fr-emoticon-img' : '') + '"' + (img ? ' style="background: url(' + img + ')"' : '') + '>' + (img ? '&nbsp;' : emoticon) + '</span>' + $.FE.MARKERS, true);
+      editor.html.insert('<span class="fr-emoticon fr-deletable' + (img ? ' fr-emoticon-img' : '') + '"' + (img ? ' style="background: url(' + img + ');"' : '') + '>' + (img ? '&nbsp;' : emoticon) + '</span>' + '&nbsp;' + $.FE.MARKERS, true);
     }
 
     /*
@@ -209,6 +209,16 @@
      * Init emoticons.
      */
     function _init () {
+      var setDeletable = function () {
+        var emtcs = editor.$el.get(0).querySelectorAll('.fr-emoticon:not(.fr-deletable)');
+        for (var i = 0; i < emtcs.length; i++) {
+          emtcs[i].className += ' fr-deletable';
+        }
+      }
+      setDeletable();
+
+      editor.events.on('html.set', setDeletable);
+
       // Replace emoticons with unicode.
       editor.events.on('html.get', function (html) {
         for (var i = 0; i < editor.opts.emoticonsSet.length; i++) {
@@ -248,7 +258,7 @@
           var range = editor.selection.ranges(0);
           var el = inEmoticon();
           if (el) {
-            if (range.startOffset === 0) {
+            if (range.startOffset === 0 && editor.selection.element() === el) {
               $(el).before($.FE.MARKERS + $.FE.INVISIBLE_SPACE);
             }
             else {
@@ -259,12 +269,20 @@
         }
       });
 
-      editor.events.on('keyup', function () {
+      editor.events.on('keyup', function (e) {
         var emtcs = editor.$el.get(0).querySelectorAll('.fr-emoticon');
 
         for (var i = 0; i < emtcs.length; i++) {
           if (typeof emtcs[i].textContent != 'undefined' && emtcs[i].textContent.replace(/\u200B/gi, '').length === 0) {
             $(emtcs[i]).remove();
+          }
+        }
+
+        if (!(e.which >= 37 && e.which <= 40)) {
+          var el = inEmoticon();
+          if (el && (el.className || '').indexOf('fr-emoticon-img')) {
+            $(el).append($.FE.MARKERS);
+            editor.selection.restore();
           }
         }
       });

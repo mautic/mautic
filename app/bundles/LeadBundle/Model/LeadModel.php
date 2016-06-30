@@ -169,6 +169,15 @@ class LeadModel extends FormModel
     }
 
     /**
+     * @return \Mautic\LeadBundle\Entity\PointsChangeLogRepository
+     */
+    public function getPointLogRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:PointsChangeLog');
+
+    }
+
+    /**
      * Get the tags repository
      *
      * @return \Mautic\LeadBundle\Entity\UtmTagRepository
@@ -1211,7 +1220,6 @@ class LeadModel extends FormModel
             $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($fields['stage']);
             $log->setEventName($stage);
             $log->setLead($lead);
-            $log->setType('lead');
             $log->setActionName($this->translator->trans('mautic.lead.import.action.name', array(
                 '%name%' => $this->user->getUsername()
             )));
@@ -1474,7 +1482,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Get bar chart data of hits
+     * Get bar chart data of contacts
      *
      * @param char      $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
@@ -1503,7 +1511,7 @@ class LeadModel extends FormModel
         }
 
         $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = $chart->getChartQuery($this->em->getConnection());
+        $query     = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $anonymousFilter = $filter;
         $anonymousFilter['date_identified'] = array(
             'expression' => 'isNull'

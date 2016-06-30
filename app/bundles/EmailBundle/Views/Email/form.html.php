@@ -22,7 +22,6 @@ $header = ($email->getId()) ?
     $view['translator']->trans('mautic.email.header.new');
 
 $view['slots']->set("headerTitle", $header.$subheader);
-$view['assets']->addScriptDeclaration('var builderTokens = '.json_encode($builderTokens['tokens']).';', 'bodyClose');
 
 $emailType = $form['emailType']->vars['data'];
 
@@ -55,6 +54,7 @@ if (!isset($attachmentSize)) {
                             </div>
                         </div>
                         <?php echo $view->render('MauticCoreBundle:Helper:theme_select.html.php', array(
+                            'type'   => 'email',
                             'themes' => $themes,
                             'active' => $form['template']->vars['value']
                         )); ?>

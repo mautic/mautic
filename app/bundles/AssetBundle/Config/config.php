@@ -90,7 +90,7 @@ return [
                 ]
             ],
             'mautic.asset.leadbundle.subscriber' => [
-                'class' => 'Mautic\AssetBundle\EventListener\LeadSubscriber'
+                'class'       => 'Mautic\AssetBundle\EventListener\LeadSubscriber',
             ],
             'mautic.asset.pagebundle.subscriber' => [
                 'class' => 'Mautic\AssetBundle\EventListener\PageSubscriber'

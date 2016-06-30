@@ -10,6 +10,7 @@ namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Event\AssetEvent;
+use Mautic\AssetBundle\Event\AssetLoadEvent;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
@@ -28,11 +29,11 @@ class CampaignSubscriber extends CommonSubscriber
      */
     static public function getSubscribedEvents()
     {
-        return array(
-            CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],
-            AssetEvents::ASSET_ON_DOWNLOAD    => ['onAssetDownload', 0],
-            AssetEvents::ON_CAMPAIGN_TRIGGER_DECISION  => ['onCampaignTrigger', 0]
-        );
+        return [
+            CampaignEvents::CAMPAIGN_ON_BUILD         => ['onCampaignBuild', 0],
+            AssetEvents::ASSET_ON_LOAD                => ['onAssetDownload', 0],
+            AssetEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTrigger', 0]
+        ];
     }
 
     /**
@@ -40,12 +41,12 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        $trigger = array(
+        $trigger = [
             'label'       => 'mautic.asset.campaign.event.download',
             'description' => 'mautic.asset.campaign.event.download_descr',
             'eventName'   => AssetEvents::ON_CAMPAIGN_TRIGGER_DECISION,
             'formType'    => 'campaignevent_assetdownload'
-        );
+        ];
 
         $event->addLeadDecision('asset.download', $trigger);
     }
@@ -55,9 +56,9 @@ class CampaignSubscriber extends CommonSubscriber
      *
      * @param AssetEvent $event
      */
-    public function onAssetDownload(AssetEvent $event)
+    public function onAssetDownload(AssetLoadEvent $event)
     {
-        $asset = $event->getAsset();
+        $asset = $event->getRecord()->getAsset();
         $this->factory->getModel('campaign.event')->triggerEvent('asset.download', $asset, 'asset.download.'.$asset->getId());
     }
 

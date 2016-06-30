@@ -23,10 +23,9 @@ class StageRepository extends CommonRepository
      */
     public function getEntities($args = array())
     {
-        $q = $this->_em
-            ->createQueryBuilder()
-            ->select($this->getTableAlias() )
-            ->from('MauticStageBundle:Stage', $this->getTableAlias());
+        $q = $this
+            ->createQueryBuilder($this->getTableAlias())
+            ->leftJoin($this->getTableAlias().'.category', 'c');
 
         $args['qb'] = $q;
 

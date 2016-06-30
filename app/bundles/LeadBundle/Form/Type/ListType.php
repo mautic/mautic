@@ -37,6 +37,7 @@ class ListType extends AbstractType
     private $listChoices = array();
     private $emailChoices = array();
     private $tagChoices = array();
+    private $stageChoices = array();
 
     /**
      * @param MauticFactory $factory
@@ -75,6 +76,11 @@ class ListType extends AbstractType
         $tags      = $leadModel->getTagList();
         foreach ($tags as $tag) {
             $this->tagChoices[$tag['value']] = $tag['label'];
+        }
+
+        $stages = $factory->getModel('stage')->getRepository()->getSimpleList();
+        foreach ($stages as $stage) {
+            $this->stageChoices[$stage['value']] = $stage['label'];
         }
     }
 
@@ -148,7 +154,8 @@ class ListType extends AbstractType
                         'fields'    => $this->fieldChoices,
                         'lists'     => $this->listChoices,
                         'emails'    => $this->emailChoices,
-                        'tags'      => $this->tagChoices
+                        'tags'      => $this->tagChoices,
+                        'stage'     => $this->stageChoices
                     ),
                     'error_bubbling' => false,
                     'mapped'         => true,
@@ -190,6 +197,7 @@ class ListType extends AbstractType
         $view->vars['lists']     = $this->listChoices;
         $view->vars['emails']    = $this->emailChoices;
         $view->vars['tags']      = $this->tagChoices;
+        $view->vars['stage']     = $this->stageChoices;
     }
 
     /**

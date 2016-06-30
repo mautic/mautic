@@ -108,7 +108,7 @@ Mautic.leadOnLoad = function (container) {
 
     mQuery(document).on('shown.bs.tab', 'a#load-lead-map', function (e) {
         mQuery('#place-container svg').resize();
-    })
+    });
 };
 
 Mautic.leadOnUnload = function(id) {
@@ -123,6 +123,28 @@ Mautic.leadOnUnload = function(id) {
 
 Mautic.getLeadId = function() {
     return mQuery('input#leadId').val();
+}
+
+Mautic.leadEmailOnLoad = function(container, response) {
+    mQuery('[name="lead_quickemail"]').on('click.ajaxform', function() {
+        var emailHtml = mQuery('.fr-iframe').contents();
+        var textarea = mQuery(this).find('#lead_quickemail_body');
+        mQuery.each(emailHtml.find('td, th, table'), function() {
+            var td = mQuery(this);
+            if (td.attr('fr-original-class')) {
+                td.attr('class', td.attr('fr-original-class'));
+                td.removeAttr('fr-original-class');
+            }
+            if (td.attr('fr-original-style')) {
+                td.attr('style', td.attr('fr-original-style'));
+                td.removeAttr('fr-original-style');
+            }
+            if (td.css('border') === '1px solid rgb(221, 221, 221)') {
+                td.css('border', '');
+            }
+        });
+        textarea.val(emailHtml.find('html').get(0).outerHTML);
+    });
 }
 
 Mautic.activateLeadFieldTypeahead = function(field, target, options) {
@@ -283,7 +305,7 @@ Mautic.addLeadListFilter = function (elId) {
 
     var prototype = mQuery('.available-filters').data('prototype');
     var fieldType = mQuery(filterId).data('field-type');
-    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'boolean', 'select', 'country', 'timezone', 'region']) != -1);
+    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'boolean', 'select', 'country', 'timezone', 'region', 'stage']) != -1);
 
     prototype = prototype.replace(/__name__/g, filterNum);
     prototype = prototype.replace(/__label__/g, label);
@@ -844,6 +866,7 @@ Mautic.getLeadEmailContent = function (el) {
     Mautic.ajaxActionRequest('lead:getEmailTemplate', {'template': mQuery(el).val()}, function(response) {
         mQuery('#MauticSharedModal .btn-primary').prop('disabled', false);
         mQuery('#lead_quickemail_body').froalaEditor('html.set', response.body);
+        mQuery('#lead_quickemail_body').val(response.body);
         mQuery('#lead_quickemail_subject').val(response.subject);
         Mautic.removeLabelLoadingIndicator();
     });
@@ -861,7 +884,7 @@ Mautic.updateLeadTags = function () {
     });
 };
 
-Mautic.createLeadUtmTag = function (el) {
+Mautic.createLeadTag = function (el) {
     var newFound = false;
     mQuery('#' + mQuery(el).attr('id') + ' :selected').each(function(i, selected) {
         if (!mQuery.isNumeric(mQuery(selected).val())) {

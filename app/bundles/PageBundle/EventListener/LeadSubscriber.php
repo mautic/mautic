@@ -9,27 +9,31 @@
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\LeadBundle\Entity\Attribution;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\EventListener\Decorator\AttributionTrait;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\AttributionModel;
+use Mautic\PageBundle\Event\PageHitEvent;
+use Mautic\PageBundle\PageEvents;
 
 /**
  * Class LeadSubscriber
  */
 class LeadSubscriber extends CommonSubscriber
 {
-
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
-            LeadEvents::CURRENT_LEAD_CHANGED => array('onLeadChange', 0),
-            LeadEvents::LEAD_POST_MERGE      => array('onLeadMerge', 0)
-        );
+        return [
+            LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
+            LeadEvents::CURRENT_LEAD_CHANGED => ['onLeadChange', 0],
+            LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
+        ];
     }
 
     /**
@@ -51,7 +55,7 @@ class LeadSubscriber extends CommonSubscriber
         }
 
         $lead    = $event->getLead();
-        $options = array('ipIds' => array(), 'filters' => $filters);
+        $options = ['ipIds' => [], 'filters' => $filters];
 
         /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
         /*
@@ -69,8 +73,8 @@ class LeadSubscriber extends CommonSubscriber
 
         // Add the hits to the event array
         foreach ($hits as $hit) {
-            $template      = 'MauticPageBundle:SubscribedEvents\Timeline:index.html.php';
-            $eventLabel    = $eventTypeName;
+            $template   = 'MauticPageBundle:SubscribedEvents\Timeline:index.html.php';
+            $eventLabel = $eventTypeName;
 
             if ($hit['source'] && $hit['sourceId']) {
                 $sourceModel = false;
@@ -102,10 +106,10 @@ class LeadSubscriber extends CommonSubscriber
                         if ($this->factory->getRouter()->getRouteCollection()->get($routeSourceName) !== null) {
                             $hit['sourceRoute'] = $this->factory->getRouter()->generate(
                                 $routeSourceName,
-                                array(
+                                [
                                     'objectAction' => 'view',
                                     'objectId'     => $hit['sourceId']
-                                )
+                                ]
                             );
                         }
 
@@ -124,17 +128,17 @@ class LeadSubscriber extends CommonSubscriber
             }
 
             $event->addEvent(
-                array(
+                [
                     'event'           => $eventTypeKey,
                     'eventLabel'      => $eventLabel,
                     'timestamp'       => $hit['dateHit'],
-                    'extra'           => array(
+                    'extra'           => [
                         'page' => $model->getEntity($hit['page_id']),
                         'hit'  => $hit
-                    ),
+                    ],
                     'contentTemplate' => $template,
                     'icon'            => 'fa-link'
-                )
+                ]
             );
         }
     }

@@ -22,36 +22,45 @@ class PageHitEvent extends CommonEvent
     /**
      * @var
      */
-    private $request;
+    protected $request;
 
     /**
      * @var
      */
-    private $code;
+    protected $code;
 
     /**
      * @var Page
      */
-    private $page;
+    protected $page;
 
     /**
      * @var array
      */
-    private $clickthroughData = array();
+    protected $clickthroughData = [];
 
     /**
+     * @var bool
+     */
+    protected $unique;
+
+    /**
+     * PageHitEvent constructor.
+     *
      * @param Hit   $hit
      * @param       $request
      * @param       $code
      * @param array $clickthrough
+     * @param bool  $isUnique
      */
-    public function __construct(Hit $hit, $request, $code, $clickthrough = array())
+    public function __construct(Hit $hit, $request, $code, $clickthrough = [], $isUnique = false)
     {
         $this->entity           = $hit;
         $this->page             = $hit->getPage();
         $this->request          = $request;
         $this->code             = $code;
         $this->clickthroughData = $clickthrough;
+        $this->unique           = $isUnique;
     }
 
     /**
@@ -98,5 +107,15 @@ class PageHitEvent extends CommonEvent
     public function getClickthroughData()
     {
         return $this->clickthroughData;
+    }
+
+    /**
+     * Returns if this page hit is unique
+     *
+     * @return bool
+     */
+    public function isUnique()
+    {
+        return $this->unique;
     }
 }

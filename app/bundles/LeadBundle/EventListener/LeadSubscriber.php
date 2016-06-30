@@ -65,7 +65,7 @@ class LeadSubscriber extends CommonSubscriber
 
                 return;
             }
-           $this->factory->getLogger()->addDebug(print_r(serialize($details),true));
+
             $check = base64_encode($lead->getId() . serialize($details));
             if (!in_array($check, $preventLoop)) {
                 $preventLoop[] = $check;
@@ -200,7 +200,7 @@ class LeadSubscriber extends CommonSubscriber
             'lead.ipadded'    => 'mautic.lead.event.ipadded',
             'lead.utmtagsadded' => 'mautic.lead.event.utmtagsadded'
         );
-       
+
         foreach ($eventTypes as $type => $label) {
             $event->addEventType($type, $this->translator->trans($label));
         }
@@ -211,7 +211,7 @@ class LeadSubscriber extends CommonSubscriber
         $utmTagsRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:UtmTag');
 
         $utmTags = $utmTagsRepository->getUtmTagsByLead($lead, $filters);
-        
+
         $eventTypeKey = 'lead.utmtagsadded';
         $eventTypeName = $this->factory->getTranslator()->trans('mautic.lead.event.utmtagsadded');
         $event->addEventType($eventTypeKey, $eventTypeName);

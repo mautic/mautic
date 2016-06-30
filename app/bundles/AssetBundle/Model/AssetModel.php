@@ -11,10 +11,9 @@ namespace Mautic\AssetBundle\Model;
 
 use Doctrine\ORM\PersistentCollection;
 use Mautic\AssetBundle\Event\AssetEvent;
+use Mautic\AssetBundle\Event\AssetLoadEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
-use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\AssetBundle\Entity\Asset;
@@ -62,7 +61,7 @@ class AssetModel extends FormModel
 
     /***
      * AssetModel constructor.
-     * 
+     *
      * @param LeadModel $leadModel
      * @param CategoryModel $categoryModel
      * @param RequestStack $requestStack
@@ -235,6 +234,12 @@ class AssetModel extends FormModel
         $download->setCode($code);
         $download->setIpAddress($ipAddress);
         $download->setReferer($request->server->get('HTTP_REFERER'));
+
+        // Dispatch event
+        if ($this->dispatcher->hasListeners(AssetEvents::ASSET_ON_LOAD)) {
+            $event = new AssetLoadEvent($download, $isUnique);
+            $this->dispatcher->dispatch(AssetEvents::ASSET_ON_LOAD, $event);
+        }
 
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
@@ -495,7 +500,7 @@ class AssetModel extends FormModel
     public function getDownloadsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
     {
         $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = $chart->getChartQuery($this->em->getConnection());
+        $query     = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $q         = $query->prepareTimeDataQuery('asset_downloads', 'date_download', $filter);
 
         if (!$canViewOthers) {
@@ -509,7 +514,7 @@ class AssetModel extends FormModel
         $chart->setDataset($this->translator->trans('mautic.asset.downloadcount'), $data);
         return $chart->render();
     }
-    
+
     /**
      * Get pie chart data of unique vs repetitive downloads.
      * Repetitive in this case mean if a lead downloaded any of the assets more than once
