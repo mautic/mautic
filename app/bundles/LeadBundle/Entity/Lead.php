@@ -748,7 +748,6 @@ class Lead extends FormEntity
     {
         //create a new points change event
         $event = new StagesChangeLog();
-        $event->setType($type);
         $event->setEventName($name);
         $event->setActionName($action);
         $event->setDateAdded(new \DateTime());

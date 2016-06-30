@@ -12,6 +12,11 @@
  * so if the version string is 1.0.0-beta2 then the tag must be 1.0.0-beta2
  */
 
+// List of critical migrations
+$criticalMigrations = array(
+    '20160225000000'
+);
+
 $baseDir = __DIR__;
 
 // Check if the version is in a branch or tag
@@ -167,6 +172,7 @@ if (!isset($args['repackage'])) {
     // Write our files arrays into text files
     file_put_contents(__DIR__.'/packaging/deleted_files.txt', json_encode($deletedFiles));
     file_put_contents(__DIR__.'/packaging/modified_files.txt', implode("\n", $modifiedFiles));
+    file_put_contents(__DIR__.'/packaging/critical_migrations.txt', json_encode($criticalMigrations));
 }
 
 // Post-processing - ZIP it up

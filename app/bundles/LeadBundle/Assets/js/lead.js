@@ -884,7 +884,7 @@ Mautic.updateLeadTags = function () {
     });
 };
 
-Mautic.createLeadUtmTag = function (el) {
+Mautic.createLeadTag = function (el) {
     var newFound = false;
     mQuery('#' + mQuery(el).attr('id') + ' :selected').each(function(i, selected) {
         if (!mQuery.isNumeric(mQuery(selected).val())) {
