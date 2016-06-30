@@ -126,17 +126,21 @@ function run_symfony_command($command, array $args)
 
 function build_cache()
 {
+    // Have to nuke the cache due to an upgrade bringing changed/deleted files
+    recursive_remove_directory(MAUTIC_CACHE_DIR);
+
+    // Rebuild the cache
     run_symfony_command('cache:clear',  array('--no-interaction', '--env=prod', '--no-debug'));
 }
 
 function apply_critical_migrations()
 {
-    $criticalMigrations = array(
-        '20160225000000'
-    );
+    $criticalMigrations = json_decode(file_get_contents(__DIR__ . '/critical_migrations.txt'), true);
 
-    foreach ($criticalMigrations as $version) {
-        run_symfony_command('doctrine:migrations:migrate',  array('--no-interaction', '--env=prod', '--no-debug', $version));
+    if ($criticalMigrations) {
+        foreach ($criticalMigrations as $version) {
+            run_symfony_command('doctrine:migrations:migrate', ['--no-interaction', '--env=prod', '--no-debug', $version]);
+        }
     }
 }
 
@@ -429,7 +433,7 @@ function move_mautic_core(array $status)
     /** @var FilesystemIterator $file */
     foreach ($iterator as $file) {
         // Sanity checks
-        if ($file->isFile() && !in_array($file->getFilename(), array('deleted_files.txt', 'upgrade.php'))) {
+        if ($file->isFile() && !in_array($file->getFilename(), array('deleted_files.txt', 'critical_migrations.txt', 'upgrade.php'))) {
             $src  = $file->getPath() . '/' . $file->getFilename();
             $dest = str_replace(MAUTIC_UPGRADE_ROOT, MAUTIC_ROOT, $src);
 
