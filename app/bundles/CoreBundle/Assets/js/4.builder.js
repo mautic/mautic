@@ -196,32 +196,12 @@ Mautic.toggleBuilderButton = function (hide) {
     }
 };
 
-/**
- * Save the builder content to the session by a AJAX call
- *
- * @param model
- * @param entityId
- * @param content
- * @param callback
- */
-Mautic.saveBuilderContent = function (model, entityId, content, callback) {
-    mQuery.ajax({
-        url: mauticAjaxUrl + '?action=' + model + ':setBuilderContent',
-        type: "POST",
-        data: {
-            slots: content,
-            entity: entityId
-        },
-        success: function (response) {
-            if (typeof callback === "function") {
-                callback(response);
-            }
-        }
-    });
-};
-
 Mautic.initSlots = function() {
     var slotContainers = Mautic.builderContents.find('[data-slot-container]');
+
+    Mautic.builderContents.find('a').on('click', function(e) {
+        e.preventDefault();
+    });
 
     // Make slots sortable
     slotContainers.sortable({
