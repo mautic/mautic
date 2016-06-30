@@ -1220,7 +1220,6 @@ class LeadModel extends FormModel
             $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($fields['stage']);
             $log->setEventName($stage);
             $log->setLead($lead);
-            $log->setType('lead');
             $log->setActionName($this->translator->trans('mautic.lead.import.action.name', array(
                 '%name%' => $this->user->getUsername()
             )));
