@@ -38,18 +38,22 @@ class PublicController extends CommonFormController
                 $tokens['{tracking_pixel}'] = MailHelper::getBlankPixel();
             }
 
-            $copy    = $stat->getStoredCopy();
-            $subject = $copy->getSubject();
-            $content = $copy->getBody();
+            if ($copy = $stat->getStoredCopy()) {
+                $subject = $copy->getSubject();
+                $content = $copy->getBody();
 
-            // Convert emoji
-            $content = EmojiHelper::toEmoji($content, 'short');
-            $subject = EmojiHelper::toEmoji($subject, 'short');
+                // Convert emoji
+                $content = EmojiHelper::toEmoji($content, 'short');
+                $subject = EmojiHelper::toEmoji($subject, 'short');
 
-            // Replace tokens
-            if (!empty($tokens)) {
-                $content = str_ireplace(array_keys($tokens), $tokens, $content);
-                $subject = str_ireplace(array_keys($tokens), $tokens, $subject);
+                // Replace tokens
+                if (!empty($tokens)) {
+                    $content = str_ireplace(array_keys($tokens), $tokens, $content);
+                    $subject = str_ireplace(array_keys($tokens), $tokens, $subject);
+                }
+            } else {
+                $subject = '';
+                $content = '';
             }
 
             // Add analytics
