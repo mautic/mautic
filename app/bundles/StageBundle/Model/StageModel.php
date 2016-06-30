@@ -210,7 +210,7 @@ class StageModel extends CommonFormModel
     }
 
     /**
-     * Triggers a specific stage change
+     * Triggers a specific stage change (this function is not being used any more but leaving it in case we do want to move stages through different actions)
      *
      * @param $type
      * @param mixed $eventDetails passthrough from function triggering action to the callback function
@@ -264,15 +264,15 @@ class StageModel extends CommonFormModel
             }
 
             //make sure the action still exists
-            if (!isset($availableActions['actions'][$action->getType()])) {
+            if (!isset($availableActions['actions'][$action->getName()])) {
                 continue;
             }
             
-            $parsed = explode('.', $action->getType());
+            $parsed = explode('.', $action->getName());
             $lead->stageChangeLogEntry(
                 $parsed[0],
                 $action->getId() . ": " . $action->getName(),
-                $parsed[1]
+                'Moved by an action'
             );
             $lead->setStage($action);
             $log = new LeadStageLog();
