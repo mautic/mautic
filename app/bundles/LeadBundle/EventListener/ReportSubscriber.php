@@ -237,7 +237,9 @@ class ReportSubscriber extends CommonSubscriber
                     }
                 }
 
-            } else {
+            }
+
+            if ($event->checkContext(['leads', 'lead.pointlog'])) {
                 // Add shared graphs
                 $event->addGraph('leads', 'line', 'mautic.lead.graph.line.leads');
 

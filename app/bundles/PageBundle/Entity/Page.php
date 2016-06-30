@@ -316,7 +316,6 @@ class Page extends FormEntity
                     }
 
                     if ($total > 100) {
-                        //die(var_dump($context));
                         $context->buildViolation('mautic.core.variant_weights_invalid')
                             ->atPath('variantSettings[weight]')
                             ->addViolation();

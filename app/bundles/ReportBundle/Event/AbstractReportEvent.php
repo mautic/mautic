@@ -51,14 +51,18 @@ class AbstractReportEvent extends Event
     public function checkContext($context)
     {
         if (empty($this->context)) {
+
             return true;
         }
 
         if (is_array($context)) {
+
             return in_array($this->context, $context);
         } else if ($this->context == $context) {
+
             return true;
         } else {
+
             return false;
         }
     }
