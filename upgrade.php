@@ -57,6 +57,85 @@ if (isset($localParameters['cache_path'])) {
 
 define('MAUTIC_CACHE_DIR', $cacheDir);
 
+
+// Fetch the update state out of the request
+$state = json_decode(base64_decode(getVar('updateState', 'W10=')), true);
+
+// Prime the state if it's empty
+if (empty($state)) {
+    $state['pluginComplete']  = false;
+    $state['bundleComplete'] = false;
+    $state['cacheComplete']  = false;
+    $state['coreComplete']   = false;
+    $state['vendorComplete'] = false;
+}
+
+// Grab the update task
+$task = getVar('task');
+
+// Build the base status array
+// TODO - Find a way to translate the step status
+$status = array('complete' => false, 'error' => false, 'updateState' => $state, 'stepStatus' => 'In Progress');
+$url    =  "//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
+switch ($task) {
+    case 'moveBundles':
+        $status = move_mautic_bundles($status);
+        break;
+
+    case 'moveCore':
+        $status = move_mautic_core($status);
+        break;
+
+    case 'moveVendors':
+        $status = move_mautic_vendors($status);
+        break;
+
+    case 'clearCache':
+        clear_mautic_cache();
+
+        // Redirect to prevent timeouts
+        header("Location: $url?task=buildCache");
+        exit;
+        break;
+
+    case 'buildCache':
+        build_cache();
+
+        // Redirect to prevent timeouts
+        header("Location: $url?task=applyCriticalMigrations");
+        exit;
+
+    case 'applyCriticalMigrations':
+        // Apply critical migrations
+        apply_critical_migrations();
+
+        $status['complete']                     = true;
+        $status['stepStatus']                   = 'Success';
+        $status['nextStep']                     = 'Processing Database Updates';
+        $status['nextStepStatus']               = 'In Progress';
+        $status['updateState']['cacheComplete'] = true;
+    default:
+        $status['error']      = true;
+        $status['message']    = 'Invalid task';
+        $status['stepStatus'] = 'Failed';
+        break;
+}
+
+// A way to keep the upgrade from failing if the session is lost after
+// the cache is cleared by upgrade.php
+$isSSL           = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off');
+$cookie_path     = (isset($localParameters['cookie_path'])) ? $localParameters['cookie_path'] : '/';
+$cookie_domain   = (isset($localParameters['cookie_domain'])) ? $localParameters['cookie_domain'] : '';
+$cookie_secure   = (isset($localParameters['cookie_secure'])) ? $localParameters['cookie_secure'] : $isSSL;
+$cookie_httponly = (isset($localParameters['cookie_httponly'])) ? $localParameters['cookie_httponly'] : false;
+
+setcookie('mautic_update', $task, time() + 300, $cookie_path, $cookie_domain, $cookie_secure, $cookie_httponly);
+
+// Encode the state for the next request
+$status['updateState'] = base64_encode(json_encode($status['updateState']));
+
+send_response($status);
+
 /**
  * Clears the application cache
  *
@@ -68,26 +147,14 @@ define('MAUTIC_CACHE_DIR', $cacheDir);
  *
  * @return array
  */
-function clear_mautic_cache(array $status)
+function clear_mautic_cache()
 {
     if (!recursive_remove_directory(MAUTIC_CACHE_DIR)) {
         process_error_log(array('Could not remove the application cache.  You will need to manually delete ' . MAUTIC_CACHE_DIR . '.'));
     }
-
-    // Build the cache for migrations
-    build_cache();
-
-    // Apply critical migrations
-    apply_critical_migrations();
-
-    $status['complete']                     = true;
-    $status['stepStatus']                   = 'Success';
-    $status['nextStep']                     = 'Processing Database Updates';
-    $status['nextStepStatus']               = 'In Progress';
-    $status['updateState']['cacheComplete'] = true;
-
-    return $status;
 }
+
+
 
 /**
  * @param       $command
@@ -126,11 +193,8 @@ function run_symfony_command($command, array $args)
 
 function build_cache()
 {
-    // Have to nuke the cache due to an upgrade bringing changed/deleted files
-    recursive_remove_directory(MAUTIC_CACHE_DIR);
-
     // Rebuild the cache
-    run_symfony_command('cache:clear',  array('--no-interaction', '--env=prod', '--no-debug'));
+    return run_symfony_command('cache:clear',  array('--no-interaction', '--env=prod', '--no-debug'));
 }
 
 function apply_critical_migrations()
@@ -884,61 +948,3 @@ function send_response(array $status)
 
     echo json_encode($status);
 }
-
-// Fetch the update state out of the request
-$state = json_decode(base64_decode(getVar('updateState', 'W10=')), true);
-
-// Prime the state if it's empty
-if (empty($state)) {
-    $state['pluginComplete']  = false;
-    $state['bundleComplete'] = false;
-    $state['cacheComplete']  = false;
-    $state['coreComplete']   = false;
-    $state['vendorComplete'] = false;
-}
-
-// Grab the update task
-$task = getVar('task');
-
-// Build the base status array
-// TODO - Find a way to translate the step status
-$status = array('complete' => false, 'error' => false, 'updateState' => $state, 'stepStatus' => 'In Progress');
-
-switch ($task) {
-    case 'moveBundles':
-        $status = move_mautic_bundles($status);
-        break;
-
-    case 'moveCore':
-        $status = move_mautic_core($status);
-        break;
-
-    case 'moveVendors':
-        $status = move_mautic_vendors($status);
-        break;
-
-    case 'clearCache':
-        $status = clear_mautic_cache($status);
-        break;
-
-    default:
-        $status['error']      = true;
-        $status['message']    = 'Invalid task';
-        $status['stepStatus'] = 'Failed';
-        break;
-}
-
-// A way to keep the upgrade from failing if the session is lost after
-// the cache is cleared by upgrade.php
-$isSSL           = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off');
-$cookie_path     = (isset($localParameters['cookie_path'])) ? $localParameters['cookie_path'] : '/';
-$cookie_domain   = (isset($localParameters['cookie_domain'])) ? $localParameters['cookie_domain'] : '';
-$cookie_secure   = (isset($localParameters['cookie_secure'])) ? $localParameters['cookie_secure'] : $isSSL;
-$cookie_httponly = (isset($localParameters['cookie_httponly'])) ? $localParameters['cookie_httponly'] : false;
-
-setcookie('mautic_update', $task, time() + 300, $cookie_path, $cookie_domain, $cookie_secure, $cookie_httponly);
-
-// Encode the state for the next request
-$status['updateState'] = base64_encode(json_encode($status['updateState']));
-
-send_response($status);
