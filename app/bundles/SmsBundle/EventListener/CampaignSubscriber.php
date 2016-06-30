@@ -131,12 +131,16 @@ class CampaignSubscriber extends CommonSubscriber
             return $event->setResult(false);
         }
 
-        $event->setResult([
-            'type' => 'mautic.sms.sms',
-            'status' => 'mautic.sms.timeline.status.delivered',
-            'id' => $sms->getId(),
-            'name' => $sms->getName(),
-            'content' => $smsEvent->getContent()
-        ]);
+        $this->smsModel->getRepository()->upCount($smsId);
+        
+        $event->setResult(
+            [
+                'type'    => 'mautic.sms.sms',
+                'status'  => 'mautic.sms.timeline.status.delivered',
+                'id'      => $sms->getId(),
+                'name'    => $sms->getName(),
+                'content' => $smsEvent->getContent()
+            ]
+        );
     }
 }
