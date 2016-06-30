@@ -21,7 +21,6 @@ use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 

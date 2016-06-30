@@ -10,9 +10,9 @@
 namespace Mautic\CoreBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
@@ -85,7 +85,7 @@ EOT
         if (!$force) {
             /** @var \Symfony\Component\Console\Helper\SymfonyQuestionHelper $helper */
             $helper   = $this->getHelperSet()->get('question');
-            $question = new ConfirmationQuestion($translator->trans('mautic.core.update.confirm_application_update'), false);
+            $question = new ConfirmationQuestion($translator->trans('mautic.core.update.confirm_application_update'). " ", false);
 
             if (!$helper->ask($input, $output, $question)) {
                 $output->writeln($translator->trans('mautic.core.update.aborted'));
@@ -230,36 +230,12 @@ EOT
             }
         }
 
-        if (file_exists($appRoot.'/critical_migrations.txt')) {
-            $progressBar->setMessage($translator->trans('mautic.core.command.update.step.critical_migrations'."                  "));
-            $progressBar->advance();
-            if ($criticalMigrations = json_decode(file_get_contents($appRoot.'/critical_migrations.txt'), true)) {
-                foreach ($criticalMigrations as $version) {
-                    $migrationCommand     = $this->getApplication()->find('doctrine:migrations:migrate');
-                    $migrationCommandArgs = new ArgvInput(
-                        [
-                            'command' => 'doctrine:migrations:migrate',
-                            '--env'   => $options['env'],
-                            $version
-                        ]
-                    );
-
-                    // The `--no-interaction` flag isn't being respected, so manually force it
-                    $migrationCommandArgs->setInteractive(false);
-
-                    $migrationCommand->run($migrationCommandArgs, new NullOutput());
-                }
-            }
-            @unlink($appRoot.'/critical_migrations.txt');
-        }
-
         // Clear the dev and prod cache instances to reset the system
         $progressBar->setMessage($translator->trans('mautic.core.update.clear.cache')."                  ");
         $progressBar->advance();
 
         $cacheHelper = $this->getContainer()->get('mautic.helper.cache');
         $cacheHelper->nukeCache();
-        $cacheHelper->clearCache();
 
         // Update languages
         $supportedLanguages = $this->getContainer()->get('mautic.factory')->getParameter('supported_languages');
@@ -299,20 +275,14 @@ EOT
         $progressBar->setMessage($translator->trans('mautic.core.update.migrating.database.schema'."                  "));
         $progressBar->advance();
 
-        $migrateCommand = $this->getApplication()->find('doctrine:migrations:migrate');
-        $migrateInput   = new ArrayInput(
-            [
-                'command' => 'doctrine:migrations:migrate',
-                '--env'   => $options['env']
-            ]
-        );
+        $migrationApplication = new Application($this->getContainer()->get('kernel'));
+        $migrationApplication->setAutoExit(false);
+        $migrationCommandArgs = new ArgvInput(['console', 'doctrine:migrations:migrate', '--quiet', '--no-interaction']);
+        $migrationCommandArgs->setInteractive(false);
+        $migrateExitCode = $migrationApplication->run($migrationCommandArgs, new NullOutput());
+        unset($migrationApplication);
 
-        // The `--no-interaction` flag isn't being respected, so manually force it
-        $migrateInput->setInteractive(false);
-
-        $migrateExitCode = $migrateCommand->run($migrateInput, new NullOutput());
-
-        $progressBar->setMessage($translator->trans('mautic.core.command.update.step.wrapping_up'."                  "));
+        $progressBar->setMessage($translator->trans('mautic.core.update.step.wrapping_up'."                  "));
         $progressBar->advance();
 
         // Clear the cached update data and the download package now that we've updated
