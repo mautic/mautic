@@ -145,12 +145,13 @@ if (!IN_CLI) {
             // Apply critical migrations
             apply_critical_migrations();
             $nextTask = 'finish';
+            $redirect = true;
+            break;
 
-            $status['complete']                     = true;
-            $status['stepStatus']                   = 'Success';
-            $status['nextStep']                     = 'Processing Database Updates';
-            $status['nextStepStatus']               = 'In Progress';
-            $status['updateState']['cacheComplete'] = true;
+        case 'clearCache':
+            clear_mautic_cache();
+            $nextTask = 'buildCache';
+            $redirect = true;
             break;
 
         case 'applyMigrations':
@@ -162,7 +163,16 @@ if (!IN_CLI) {
 
         case 'finish':
             clear_mautic_cache();
-            html_body("<h1 class='text-center text-success'>Success! Be sure to remove this script.</h1>");
+
+            if (!empty($standalone)) {
+                html_body("<div class='well'><h3 class='text-center'>Success!</h3><h4 class='text-danger text-center'>Remove this script!</h4></div>");
+            } else {
+                $status['complete']                     = true;
+                $status['stepStatus']                   = 'Success';
+                $status['nextStep']                     = 'Processing Database Updates';
+                $status['nextStepStatus']               = 'In Progress';
+                $status['updateState']['cacheComplete'] = true;
+            }
             break;
 
         default:
