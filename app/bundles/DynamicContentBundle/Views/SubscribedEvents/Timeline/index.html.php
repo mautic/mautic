@@ -19,12 +19,13 @@ if (isset($data['failed'])) {
     <div class="panel">
         <div class="panel-body">
             <h3><?php echo $data['name']; ?></h3>
-            <p class="mb-0"><?php echo $view['translator']->trans('mautic.core.timeline.event.time', ['%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel']]); ?></p>
+            <p class="mb-0"><?php echo $view['translator']->trans('mautic.core.timeline.event.time', ['%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $view['translator']->trans('mautic.dynamicContent.timeline.title')]
+                ); ?></p>
         </div>
         <div class="panel-footer">
             <dl class="dl-horizontal">
-                <dt><?php echo $view['translator']->trans('mautic.dynamicContent.timeline.status'); ?></dt>
-                <dd class="ellipsis"><?php echo $view['translator']->trans($data['status']); ?></dd>
+                <dt><?php echo $view['translator']->trans('mautic.dynamicContent.timeline.content'); ?></dt>
+                <dd class="ellipsis"><?php echo $view['translator']->trans($data['timeline']); ?></dd>
             </dl>
         </div>
     </div>
