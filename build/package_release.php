@@ -42,10 +42,14 @@ if (!isset($args['repackage'])) {
     ob_start();
     passthru('which git', $systemGit);
     $systemGit = trim(ob_get_clean());
-
     // Checkout the version tag into the packaging space
     chdir(dirname(__DIR__));
     system($systemGit.' archive '.$gitSource.' | tar -x -C '.__DIR__.'/packaging', $result);
+
+    // Get a list of all files in this release
+    ob_start();
+    passthru($systemGit.' ls-tree -r -t --name-only '.$gitSource, $releaseFiles);
+    $releaseFiles = explode("\n", trim(ob_get_clean()));
 
     if ($result !== 0) {
         exit;
@@ -78,19 +82,17 @@ if (!isset($args['repackage'])) {
     passthru($systemGit.' tag -l', $tags);
     $tags = explode("\n", trim(ob_get_clean()));
 
-    // Get the list of modified files from the initial tag
-    // TODO - Hardcode this to the 1.0.0 tag when we're there
-    ob_start();
-    passthru($systemGit.' diff tags/'.$tags[0].$gitSourceLocation.$gitSource.' --name-status', $fileDiff);
-    $fileDiff = explode("\n", trim(ob_get_clean()));
-
     // Only add deleted files to our list; new and modified files will be covered by the archive
     $deletedFiles  = array();
     $modifiedFiles = array();
 
     // Build an array of paths which we won't ever distro, this is used for the update packages
     $doNotPackage = array(
+        '.github/CONTRIBUTING.md',
+        '.github/ISSUE_TEMPLATE.md',
+        '.github/PULL_REQUEST_TEMPLATE.md',
         '.gitignore',
+        '.travis.yml',
         'app/phpunit.xml.dist',
         'build',
         'composer.json',
@@ -104,26 +106,35 @@ if (!isset($args['repackage'])) {
     // Create a flag to check if the vendors changed
     $vendorsChanged = false;
 
-    foreach ($fileDiff as $file) {
-        $filename       = substr($file, 2);
-        $folderPath     = explode('/', $filename);
-        $baseFolderName = $folderPath[0];
+    // Get a list of changed files since 1.0.0
+    foreach ($tags as $tag) {
+        ob_start();
+        passthru($systemGit.' diff tags/'.$tag.$gitSourceLocation.$gitSource.' --name-status', $fileDiff);
+        $fileDiff = explode("\n", trim(ob_get_clean()));
 
-        if (!$vendorsChanged && $filename == 'composer.lock') {
-            $vendorsChanged = true;
-        }
+        foreach ($fileDiff as $file) {
+            $filename       = substr($file, 2);
+            $folderPath     = explode('/', $filename);
+            $baseFolderName = $folderPath[0];
 
-        $doNotPackageFile   = in_array($filename, $doNotPackage);
-        $doNotPackageFolder = in_array($baseFolderName, $doNotPackage);
+            if (!$vendorsChanged && $filename == 'composer.lock') {
+                $vendorsChanged = true;
+            }
 
-        if ($doNotPackageFile || $doNotPackageFolder) {
-            continue;
-        }
+            $doNotPackageFile   = in_array($filename, $doNotPackage);
+            $doNotPackageFolder = in_array($baseFolderName, $doNotPackage);
 
-        if (substr($file, 0, 1) == 'D') {
-            $deletedFiles[] = $filename;
-        } else {
-            $modifiedFiles[$filename] = true;
+            if ($doNotPackageFile || $doNotPackageFolder) {
+                continue;
+            }
+
+            if (substr($file, 0, 1) == 'D') {
+                if (!in_array($filename, $releaseFiles)) {
+                    $deletedFiles[$filename] = true;
+                }
+            } elseif (in_array($filename, $releaseFiles)) {
+                $modifiedFiles[$filename] = true;
+            }
         }
     }
 
@@ -147,12 +158,15 @@ if (!isset($args['repackage'])) {
         $modifiedFiles['app/bootstrap.php.cache'] = true;
     }
 
-    $filePut = array_keys($modifiedFiles);
-    sort($filePut);
+    $modifiedFiles = array_keys($modifiedFiles);
+    sort($modifiedFiles);
+
+    $deletedFiles = array_keys($deletedFiles);
+    sort($deletedFiles);
 
     // Write our files arrays into text files
     file_put_contents(__DIR__.'/packaging/deleted_files.txt', json_encode($deletedFiles));
-    file_put_contents(__DIR__.'/packaging/modified_files.txt', implode("\n", $filePut));
+    file_put_contents(__DIR__.'/packaging/modified_files.txt', implode("\n", $modifiedFiles));
 }
 
 // Post-processing - ZIP it up

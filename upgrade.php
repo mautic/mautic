@@ -406,7 +406,8 @@ function move_mautic_core(array $status)
     $nestedDirectories = array(
         '/media',
         '/themes',
-        '/translations'
+        '/translations',
+        '/app/middlewares'
     );
 
     foreach ($nestedDirectories as $dir) {
