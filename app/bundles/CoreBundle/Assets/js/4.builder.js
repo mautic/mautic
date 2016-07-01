@@ -362,7 +362,6 @@ Mautic.initSlotListeners = function() {
                 toolbarButtonsMD: buttons,
                 toolbarButtonsSM: buttons,
                 toolbarButtonsXS: buttons,
-                zIndex: 2501,
                 linkList: [] // TODO push here the list of tokens from Mautic.getPredefinedLinks
             };
 
