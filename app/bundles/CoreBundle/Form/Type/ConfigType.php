@@ -288,6 +288,23 @@ class ConfigType extends AbstractType
             )->addViewTransformer($arrayLinebreakTransformer)
         );
 
+        $arrayLinebreakTransformer = new ArrayLinebreakTransformer();
+        $builder->add(
+            $builder->create(
+                'dev_hosts',
+                'textarea',
+                array(
+                    'label'      => 'mautic.core.config.form.dev_hosts',
+                    'label_attr' => array('class' => 'control-label'),
+                    'attr'       => array(
+                        'class'   => 'form-control',
+                        'tooltip' => 'mautic.core.config.form.dev_hosts.tooltip'
+                    ),
+                    'required'   => false
+                )
+            )->addViewTransformer($arrayLinebreakTransformer)
+        );        
+        
         $builder->add(
             'rememberme_key',
             'text',
