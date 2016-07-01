@@ -265,7 +265,7 @@ Mautic.initSlotListeners = function() {
         slot = mQuery(slot);
         Mautic.builderContents.find('[data-slot-focus]').remove();
         var focus = mQuery('<div/>').attr('data-slot-focus', true);
-        slot.prepend(focus);
+        slot.append(focus);
     });
 
     Mautic.builderContents.on('slot:init', function(event, slot) {
