@@ -37,9 +37,8 @@
   $.FE.PLUGINS.token = function (editor) {
 
     function apply () {
-      editor.html.insert('{');
+      editor.html.insert(' {');
       editor.$el.keyup();
-      editor.toolbar.hide();
     }
 
     return {

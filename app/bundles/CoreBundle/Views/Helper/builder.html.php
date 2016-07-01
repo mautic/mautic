@@ -50,7 +50,9 @@
             </div>
             <div class="panel-body" id="customize-form-container">
                 <div id="slot-form-container" class="col-md-12">
-                    <p class="text-muted pt-md text-center"><i><?php echo $view['translator']->trans('mautic.core.slot.customize.info'); ?></i></p>
+                    <p class="text-muted pt-md text-center">
+                        <i><?php echo $view['translator']->trans('mautic.core.slot.customize.info'); ?></i>
+                    </p>
                 </div>
                 <?php if ($slots): ?>
                     <?php foreach ($slots as $slotKey => $slot): ?>
@@ -60,6 +62,22 @@
                         </script>
                     <?php endforeach; ?>
                 <?php endif; ?>
+            </div>
+        </div>
+        <div class="panel panel-default" id="section">
+            <div class="panel-heading">
+                <h4 class="panel-title"><?php echo $view['translator']->trans('mautic.core.customize.section'); ?></h4>
+            </div>
+            <div class="panel-body" id="customize-form-container">
+                <div id="section-form-container" class="col-md-12">
+                    <p class="text-muted pt-md text-center">
+                        <i><?php echo $view['translator']->trans('mautic.core.section.customize.info'); ?></i>
+                    </p>
+                </div>
+                <script type="text/html" data-section-form>
+                    <?php echo $view['form']->start($sectionForm); ?>
+                    <?php echo $view['form']->end($sectionForm); ?>
+                </script>
             </div>
         </div>
     </div>

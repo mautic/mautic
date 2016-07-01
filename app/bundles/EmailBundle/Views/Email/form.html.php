@@ -152,6 +152,7 @@ if (!isset($attachmentSize)) {
 
 <?php echo $view->render('MauticCoreBundle:Helper:builder.html.php', array(
     'type'          => 'email',
+    'sectionForm'   => $sectionForm,
     'builderAssets' => $builderAssets,
     'slots'         => $slots,
     'objectId'      => $email->getSessionId()

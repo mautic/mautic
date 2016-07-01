@@ -149,6 +149,14 @@ class BuilderSubscriber extends CommonSubscriber
                 'slot_button',
                 800
             );
+            $event->addSlotType(
+                'separator',
+                'Separator',
+                'minus',
+                'MauticCoreBundle:Slots:separator.html.php',
+                'slot',
+                700
+            );
         }
     }
 

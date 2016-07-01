@@ -24,30 +24,39 @@
 /* BUILDER CSS */
 div[data-slot-handle] {
     cursor: move!important;
-    bottom: -5px;
+    bottom: -1px;
     content: '';
     left: -15px;
     margin: 0;
     padding: 0;
     position: absolute;
     right: -15px;
-    top: -5px;
-    z-index: -1;
-    border: 1px solid #4e5d9d;
+    top: -1px;
+    border: 1px solid #4e5e9e;
 }
 
 div[data-slot-focus] {
     cursor: move!important;
-    bottom: -5px;
+    bottom: -1px;
     content: '';
     left: -15px;
     margin: 0;
     padding: 0;
     position: absolute;
     right: -15px;
-    top: -5px;
+    top: -1px;
+    border: 1px solid #4e5e9e;
+}
+
+div[data-section-focus] {
+    bottom: 0px;
+    content: '';
+    left: 0px;
+    position: absolute;
+    right: -0px;
+    top: 0px;
+    border: 1px solid #fdb933;
     z-index: -1;
-    border: 1px solid #4e5d9d;
 }
 
 div[data-slot-toolbar] {
@@ -92,18 +101,51 @@ div[data-slot-toolbar] .btn-danger {
     border-color: #fff;
 }
 
-div[data-slot] {
+div[data-slot], [data-section-wrapper] {
     position: relative;
-    z-index: 5;
+}
+
+div[data-slot="image"] img {
+    z-index: 1;
 }
 
 .slot-placeholder {
-    border: 1px solid red;
-    margin: 20px 0;
+    border-top: 1px solid #4e5e9e;
+    margin-top: -1px;
 }
 
 .fr-toolbar {
-    border-top: 2px solid #4e5d9d;
+    border-top: 2px solid #4e5e9e;
+    position: absolute;
+    top: -78px !important;
+    left: -15px;
+    bottom: initial !important;
+    min-width: 340px;
+}
+
+.fr-box {
+    padding: initial;
+}
+
+.fr-box.fr-basic.fr-top .fr-wrapper {
+    border-radius: 0 0 0px 0px;
+    -moz-border-radius: 0 0 0px 0px;
+    -webkit-border-radius: 0 0 0px 0px;
+    -webkit-box-shadow: none  !important;
+    -moz-box-shadow: none  !important;
+    box-shadow: none  !important;
+}
+
+.fr-box.fr-basic .fr-wrapper {
+    background: transparent !important;
+}
+
+.fr-basic .fr-element {
+    text-align: inherit !important;
+    padding: 0 !important;
+    overflow-x: initial !important;
+    color: inherit !important;
+    min-height: inherit !important;
 }
 
 .slot-type-handle.btn {
