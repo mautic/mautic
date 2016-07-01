@@ -9,3 +9,4 @@
 ?>
 
 <img src="<?php echo $view['assets']->getUrl('themes/blank.png', null, null, true); ?>" alt="An image"/>
+<div style="clear:both"></div>
