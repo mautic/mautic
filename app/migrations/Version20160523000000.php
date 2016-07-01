@@ -68,7 +68,6 @@ SQL;
 CREATE TABLE `{$this->prefix}lead_stages_change_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `lead_id` int(11) NOT NULL,
-  `type` TINYTEXT NOT NULL,
   `event_name` varchar(255) NOT NULL,
   `action_name` varchar(255) NOT NULL,
   `date_added` datetime NOT NULL  COMMENT '(DC2Type:datetime)',

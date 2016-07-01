@@ -9,16 +9,30 @@
 
 namespace Mautic\PageBundle\Model;
 
+use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Entity\Redirect;
-use Mautic\PageBundle\Entity\Trackable;
 
 /**
  * Class RedirectModel
  */
 class RedirectModel extends FormModel
 {
+    /**
+     * @var UrlHelper
+     */
+    protected $urlHelper;
+
+    /**
+     * RedirectModel constructor.
+     *
+     * @param UrlHelper $urlHelper
+     */
+    public function __construct(UrlHelper $urlHelper)
+    {
+        $this->urlHelper = $urlHelper;
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -50,13 +64,19 @@ class RedirectModel extends FormModel
      */
     public function generateRedirectUrl(Redirect $redirect, $clickthrough = array(), $shortenUrl = false)
     {
-        return $this->buildUrl(
+        $url = $this->buildUrl(
             'mautic_url_redirect',
             array('redirectId' => $redirect->getRedirectId()),
             true,
             $clickthrough,
             $shortenUrl
         );
+
+        if ($shortenUrl) {
+            $url = $this->urlHelper->buildShortUrl($url);
+        }
+
+        return $url;
     }
 
     /**
