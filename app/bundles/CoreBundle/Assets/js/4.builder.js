@@ -205,7 +205,7 @@ Mautic.initSections = function() {
         var previouslyFoccused = Mautic.builderContents.find('[data-section-focus]');
         var sectionWrapper = mQuery(this);
         var section = sectionWrapper.find('[data-section]');
-        var focus = mQuery('<div/>').attr('data-section-focus', true);
+        var focusParts = ['top', 'right', 'bottom', 'left'];
         var sectionForm = mQuery(parent.mQuery('script[data-section-form]').html());
         var sectionFormContainer = parent.mQuery('#section-form-container');
 
@@ -221,7 +221,9 @@ Mautic.initSections = function() {
         }
 
         // Highlight the section
-        sectionWrapper.append(focus);
+        mQuery.each(focusParts, function (index, value) {
+            sectionWrapper.append(mQuery('<div/>').attr('data-section-focus', value));
+        });
 
         // Open the section customize form
         sectionFormContainer.html(sectionForm);

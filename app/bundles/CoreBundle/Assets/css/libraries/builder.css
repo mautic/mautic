@@ -4617,14 +4617,29 @@ div[data-slot-focus] {
   border: 1px solid #4e5e9e;
 }
 div[data-section-focus] {
-  bottom: 0px;
   content: '';
-  left: 0px;
   position: absolute;
+  border: 1px solid #fdb933;
+}
+div[data-section-focus="top"] {
+  left: 0px;
   right: 0px;
   top: 0px;
-  border: 1px solid #fdb933;
-  z-index: -1;
+}
+div[data-section-focus="right"] {
+  bottom: 0px;
+  right: 0px;
+  top: 0px;
+}
+div[data-section-focus="bottom"] {
+  bottom: 0px;
+  right: 0px;
+  left: 0px;
+}
+div[data-section-focus="left"] {
+  bottom: 0px;
+  top: 0px;
+  left: 0px;
 }
 div[data-slot-toolbar] {
   position: absolute;
