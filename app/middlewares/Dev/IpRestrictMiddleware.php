@@ -39,6 +39,17 @@ class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMiddleware
         $this->app = $app;
         $this->allowedIps = ['127.0.0.1', 'fe80::1', '::1'];
 
+        $localConfig = __DIR__.'/../../config/local.php';
+
+        if (file_exists($localConfig)) {
+            /** @var array $parameters */
+            include $localConfig;
+
+            if (array_key_exists('dev_hosts', $parameters)) {
+                $this->allowedIps = array_merge($this->allowedIps, $parameters['dev_hosts']);
+            }
+        }
+
         if (isset($_SERVER['MAUTIC_DEV_HOSTS'])) {
             $localIps         = explode(' ', $_SERVER['MAUTIC_DEV_HOSTS']);
             $this->allowedIps = array_merge($this->allowedIps, $localIps);
