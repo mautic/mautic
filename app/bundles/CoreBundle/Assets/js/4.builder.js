@@ -69,8 +69,10 @@ Mautic.buildBuilderIframe = function(themeHtml, builderCss) {
     doc.open();
     doc.write(themeHtml);
     doc.close();
-    mQuery('#builder-overlay').addClass('hide');
-    mQuery('.btn-close-builder').prop('disabled', false);
+    mQuery(doc).ready(function(){
+        mQuery('#builder-overlay').addClass('hide');
+        mQuery('.btn-close-builder').prop('disabled', false);
+    });
 };
 
 Mautic.htmlspecialchars_decode = function(encodedHtml) {
