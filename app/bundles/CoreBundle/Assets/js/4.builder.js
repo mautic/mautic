@@ -227,7 +227,7 @@ Mautic.initSections = function() {
         sectionFormContainer.html(sectionForm);
 
         // Prefill the sectionform with section color
-        if (section.css('background-color') !== 'rgba(0, 0, 0, 0)') {
+        if (section.length && section.css('background-color') !== 'rgba(0, 0, 0, 0)') {
             sectionForm.find('#builder_section_content-background-color').val(Mautic.rgb2hex(section.css('backgroundColor')));
         }
 
@@ -245,7 +245,7 @@ Mautic.initSections = function() {
         sectionForm.on('keyup paste change touchmove', function(e) {
             var field = mQuery(e.target);
 
-            if (field.attr('id') === 'builder_section_content-background-color') {
+            if (section.length && field.attr('id') === 'builder_section_content-background-color') {
                 Mautic.sectionBackgroundChanged(section, field.val());
             } else if (field.attr('id') === 'builder_section_wrapper-background-color') {
                 Mautic.sectionBackgroundChanged(sectionWrapper, field.val());
@@ -254,8 +254,8 @@ Mautic.initSections = function() {
 
         sectionForm.find('.minicolors-panel').on('click', function() {
             var field = mQuery(this).parent().find('input');
-            
-            if (field.attr('id') === 'builder_section_content-background-color') {
+
+            if (section.length && field.attr('id') === 'builder_section_content-background-color') {
                 Mautic.sectionBackgroundChanged(section, field.val());
             } else if (field.attr('id') === 'builder_section_wrapper-background-color') {
                 Mautic.sectionBackgroundChanged(sectionWrapper, field.val());
