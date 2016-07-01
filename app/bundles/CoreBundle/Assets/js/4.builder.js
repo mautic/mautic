@@ -436,6 +436,9 @@ Mautic.initSlotListeners = function() {
 
             slot.on('froalaEditor.focus', function (e, editor) {
                 slot.froalaEditor('toolbar.show');
+                if (slot.offset().top < 78) {
+                    slot.find('.fr-toolbar').removeClass('fr-top').addClass('fr-bottom');
+                }
             });
 
             slot.on('froalaEditor.blur', function (e, editor) {

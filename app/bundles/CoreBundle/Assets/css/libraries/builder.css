@@ -4693,10 +4693,17 @@ div[data-slot="image"] img {
 .fr-toolbar {
   border-top: 2px solid #4e5e9e;
   position: absolute;
-  top: -78px !important;
   left: -15px;
   bottom: initial !important;
   min-width: 340px;
+}
+.fr-toolbar.fr-top {
+  top: -78px !important;
+  bottom: initial !important;
+}
+.fr-toolbar.fr-bottom {
+  bottom: -78px !important;
+  top: initial !important;
 }
 .fr-box {
   padding: initial;
