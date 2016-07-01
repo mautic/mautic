@@ -125,11 +125,11 @@ class DynamicContentController extends FormController
         $action = $this->generateUrl('mautic_dynamicContent_action', ['objectAction' => 'new']);
 
         $updateSelect = ($this->request->getMethod() === 'POST')
-            ? $this->request->request->get('dynamicContent[updateSelect]', false, true)
+            ? $this->request->request->get('dwc[updateSelect]', false, true)
             : $this->request->get('updateSelect', false);
 
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
-
+        
         if ($this->request->getMethod() === 'POST') {
             $valid = false;
 
@@ -254,7 +254,7 @@ class DynamicContentController extends FormController
         $action = $this->generateUrl('mautic_dynamicContent_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
 
         $updateSelect = ($this->request->getMethod() === 'POST')
-            ? $this->request->request->get('dynamicContent[updateSelect]', false, true)
+            ? $this->request->request->get('dwc[updateSelect]', false, true)
             : $this->request->get('updateSelect', false);
 
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);

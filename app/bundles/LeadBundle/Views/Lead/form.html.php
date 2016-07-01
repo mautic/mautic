@@ -98,15 +98,6 @@ $img = $view['lead_avatar']->getAvatar($lead);
                                 <?php endif; ?>
                             </div>
                             <hr class="mnr-md mnl-md">
-                            <div class="row">
-
-                                <div class="col-sm-8">
-                                    <?php echo $view['form']->label($form['stage']); ?>
-                                    <?php echo $view['form']->widget($form['stage']); ?>
-                                </div>
-                            </div>
-                        </div>
-                        <hr class="mnr-md mnl-md">
                         <?php endif; ?>
 
                         <div class="form-group mb-0">
@@ -205,7 +196,15 @@ $img = $view['lead_avatar']->getAvatar($lead);
                             </div>
                         <?php endforeach; ?>
                         </div>
+                            <div class="row">
 
+                                <div class="col-sm-8">
+                                    <?php echo $view['form']->label($form['stage']); ?>
+                                    <?php echo $view['form']->widget($form['stage']); ?>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="mnr-md mnl-md">
                         <?php if ($group == 'core'): ?>
 
                         <hr class="mnr-md mnl-md">
