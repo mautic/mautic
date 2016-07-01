@@ -4616,6 +4616,15 @@ div[data-slot-focus] {
   top: -1px;
   border: 1px solid #4e5e9e;
 }
+div[data-section-focus] {
+  bottom: 0px;
+  content: '';
+  left: 0px;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  border: 1px solid #fdb933;
+}
 div[data-slot-toolbar] {
   position: absolute;
   right: -10px;
@@ -4654,7 +4663,8 @@ div[data-slot-toolbar] .btn-danger {
   background-color: #f86b4f;
   border-color: #fff;
 }
-div[data-slot] {
+div[data-slot],
+[data-section-wrapper] {
   position: relative;
 }
 div[data-slot="image"] img {

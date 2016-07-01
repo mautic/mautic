@@ -110,7 +110,10 @@ Mautic.closeBuilder = function(model) {
     themeHtml.find('.atwho-container').remove();
 
     // Remove the slot focus highlight
-    themeHtml.find('[data-slot-focus], [data-slot-handle]').remove();
+    themeHtml.find('[data-slot-focus], [data-slot-handle], [data-section-focus]').remove();
+
+    // Clear the customize forms
+    mQuery('#slot-form-container, #section-form-container').html('');
 
     // Store the HTML content to the HTML textarea
     mQuery('.builder-html').val(themeHtml.find('html').get(0).outerHTML);
@@ -195,6 +198,71 @@ Mautic.toggleBuilderButton = function (hide) {
         }
     }
 };
+Mautic.initSections = function() {
+    var sectionWrappers = Mautic.builderContents.find('[data-section-wrapper]');
+
+    sectionWrappers.on('click', function(e) {
+        var previouslyFoccused = Mautic.builderContents.find('[data-section-focus]');
+        var sectionWrapper = mQuery(this);
+        var section = sectionWrapper.find('[data-section]');
+        var focus = mQuery('<div/>').attr('data-section-focus', true);
+        var sectionForm = mQuery(parent.mQuery('script[data-section-form]').html());
+        var sectionFormContainer = parent.mQuery('#section-form-container');
+
+        if (previouslyFoccused.length) {
+
+            // Unfocus other section
+            previouslyFoccused.remove();
+
+            // Destroy minicolors
+            sectionFormContainer.find('input[data-toggle="color"]').each(function() {
+                mQuery(this).minicolors('destroy');
+            });
+        }
+
+        // Highlight the section
+        sectionWrapper.append(focus);
+
+        // Open the section customize form
+        sectionFormContainer.html(sectionForm);
+
+        // Prefill the sectionform with section color
+        if (section.css('background-color') !== 'rgba(0, 0, 0, 0)') {
+            sectionForm.find('#builder_section_background-color').val(Mautic.rgb2hex(section.css('backgroundColor')));
+        }
+
+        // Initialize the color picker
+        sectionFormContainer.find('input[data-toggle="color"]').each(function() {
+            parent.Mautic.activateColorPicker(this);
+        });
+
+        // Handle color change events
+        sectionForm.on('keyup paste change touchmove', function(e) {
+            Mautic.sectionBackgroundChanged(section, mQuery(e.target).val());
+        });
+
+        sectionForm.find('.minicolors-panel').on('click', function() {
+            Mautic.sectionBackgroundChanged(section, mQuery(this).parent().find('input').val());
+        });
+    });
+};
+
+Mautic.sectionBackgroundChanged = function(section, color) {
+    if (color.length) {
+        color = '#'+color;
+    } else {
+        color = 'transparent';
+    }
+    section.css('background-color', color);
+}
+
+Mautic.rgb2hex = function(orig) {
+    var rgb = orig.replace(/\s/g,'').match(/^rgba?\((\d+),(\d+),(\d+)/i);
+    return (rgb && rgb.length === 4) ? "#" +
+        ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
+        ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
+        ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : orig;
+}
 
 Mautic.initSlots = function() {
     var slotContainers = Mautic.builderContents.find('[data-slot-container]');
@@ -453,6 +521,7 @@ mQuery(function() {
     if (parent.mQuery('#builder-template-content').length) {
         Mautic.builderContents = mQuery('body');
         Mautic.initSlotListeners();
+        Mautic.initSections();
         Mautic.initSlots();
     }
 });

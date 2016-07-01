@@ -108,6 +108,7 @@ $template = $form['template']->vars['data'];
 
 <?php echo $view->render('MauticCoreBundle:Helper:builder.html.php', array(
     'type'          => 'page',
+    'sectionForm'   => $sectionForm,
     'builderAssets' => $builderAssets,
     'slots'         => $slots,
     'objectId'      => $activePage->getSessionId()

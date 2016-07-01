@@ -411,6 +411,7 @@ class PageController extends FormController
         }
 
         $slotTypes = $model->getBuilderComponents($entity, 'slotTypes');
+        $sectionForm = $this->get('form.factory')->create('builder_section');
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
@@ -420,7 +421,8 @@ class PageController extends FormController
                 'activePage'    => $entity,
                 'themes'        => $this->factory->getInstalledThemes('page', true),
                 'slots'         => $this->buildSlotForms($slotTypes),
-                'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())) // strip new lines
+                'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
+                'sectionForm'   => $sectionForm->createView()
             ),
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
             'passthroughVars' => array(
@@ -556,6 +558,7 @@ class PageController extends FormController
         }
 
         $slotTypes = $model->getBuilderComponents($entity, 'slotTypes');
+        $sectionForm = $this->get('form.factory')->create('builder_section');
         
         return $this->delegateView(array(
             'viewParameters'  =>  array(
@@ -565,7 +568,8 @@ class PageController extends FormController
                 'activePage'    => $entity,
                 'themes'        => $this->factory->getInstalledThemes('page', true),
                 'slots'         => $this->buildSlotForms($slotTypes),
-                'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())) // strip new lines
+                'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
+                'sectionForm'   => $sectionForm->createView()
             ),
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
             'passthroughVars' => array(

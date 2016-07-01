@@ -48,6 +48,16 @@ div[data-slot-focus] {
     border: 1px solid #4e5e9e;
 }
 
+div[data-section-focus] {
+    bottom: 0px;
+    content: '';
+    left: 0px;
+    position: absolute;
+    right: -0px;
+    top: 0px;
+    border: 1px solid #fdb933;
+}
+
 div[data-slot-toolbar] {
     position: absolute;
     right: -10px;
@@ -90,7 +100,7 @@ div[data-slot-toolbar] .btn-danger {
     border-color: #fff;
 }
 
-div[data-slot] {
+div[data-slot], [data-section-wrapper] {
     position: relative;
 }
 

@@ -182,6 +182,11 @@ return [
                 'arguments' => 'mautic.factory',
                 'alias'     => 'daterange'
             ],
+            'mautic.form.type.builder.section'        => [
+                'class'     => 'Mautic\CoreBundle\Form\Type\BuilderSectionType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'builder_section'
+            ],
             'mautic.form.type.slot'               => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\SlotType',
                 'arguments' => 'mautic.factory',
