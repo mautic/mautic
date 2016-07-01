@@ -51,11 +51,12 @@ Mautic.launchBuilder = function (formName, actionName) {
 };
 
 Mautic.buildBuilderIframe = function(themeHtml, builderCss) {
-
     var builder = mQuery("<iframe />", {
         css: builderCss,
         id: "builder-template-content"
-    }).appendTo('.builder-content');
+    });
+
+    builder.appendTo('.builder-content');
 
     // Insert the Mautic assets to the header
     var assets = Mautic.htmlspecialchars_decode(mQuery('[data-builder-assets]').html());
@@ -68,11 +69,9 @@ Mautic.buildBuilderIframe = function(themeHtml, builderCss) {
     doc.open();
     doc.write(themeHtml);
     doc.close();
-    builder.load(function() {
-        mQuery('#builder-overlay').addClass('hide');
-        mQuery('.btn-close-builder').prop('disabled', false);
-    });
-}
+    mQuery('#builder-overlay').addClass('hide');
+    mQuery('.btn-close-builder').prop('disabled', false);
+};
 
 Mautic.htmlspecialchars_decode = function(encodedHtml) {
     encodedHtml = encodedHtml.replace(/&quot;/g, '"');
