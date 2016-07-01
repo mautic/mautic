@@ -64,7 +64,7 @@ class SlotButtonType extends SlotType
         ]);
 
         $builder->add('float', 'button_group', [
-            'label'      => 'mautic.core.button.size',
+            'label'      => 'mautic.core.button.position',
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,
             'attr'       => [
