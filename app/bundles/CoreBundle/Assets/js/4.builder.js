@@ -253,7 +253,7 @@ Mautic.sectionBackgroundChanged = function(section, color) {
     } else {
         color = 'transparent';
     }
-    section.css('background-color', color);
+    section.css('background-color', color).attr('bgcolor', color);
 }
 
 Mautic.rgb2hex = function(orig) {
@@ -430,7 +430,8 @@ Mautic.initSlotListeners = function() {
                 toolbarButtonsMD: buttons,
                 toolbarButtonsSM: buttons,
                 toolbarButtonsXS: buttons,
-                linkList: [] // TODO push here the list of tokens from Mautic.getPredefinedLinks
+                linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
+                useClasses: false
             };
 
             slot.froalaEditor(mQuery.extend(inlineFroalaOptions, Mautic.basicFroalaOptions));
@@ -438,7 +439,7 @@ Mautic.initSlotListeners = function() {
         } else if (type === 'image') {
             // Init Froala editor
             slot.find('img').froalaEditor(mQuery.extend(
-                {linkList: []}, // TODO push here the list of tokens from Mautic.getPredefinedLinks
+                {linkList: [], useClasses: false}, // TODO push here the list of tokens from Mautic.getPredefinedLinks
                 Mautic.basicFroalaOptions
             ));
         } else if (type === 'button') {
