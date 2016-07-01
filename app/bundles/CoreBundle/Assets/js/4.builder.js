@@ -228,7 +228,12 @@ Mautic.initSections = function() {
 
         // Prefill the sectionform with section color
         if (section.css('background-color') !== 'rgba(0, 0, 0, 0)') {
-            sectionForm.find('#builder_section_background-color').val(Mautic.rgb2hex(section.css('backgroundColor')));
+            sectionForm.find('#builder_section_content-background-color').val(Mautic.rgb2hex(section.css('backgroundColor')));
+        }
+
+        // Prefill the sectionform with section wrapper color
+        if (sectionWrapper.css('background-color') !== 'rgba(0, 0, 0, 0)') {
+            sectionForm.find('#builder_section_wrapper-background-color').val(Mautic.rgb2hex(sectionWrapper.css('backgroundColor')));
         }
 
         // Initialize the color picker
@@ -238,22 +243,34 @@ Mautic.initSections = function() {
 
         // Handle color change events
         sectionForm.on('keyup paste change touchmove', function(e) {
-            Mautic.sectionBackgroundChanged(section, mQuery(e.target).val());
+            var field = mQuery(e.target);
+
+            if (field.attr('id') === 'builder_section_content-background-color') {
+                Mautic.sectionBackgroundChanged(section, field.val());
+            } else if (field.attr('id') === 'builder_section_wrapper-background-color') {
+                Mautic.sectionBackgroundChanged(sectionWrapper, field.val());
+            }
         });
 
         sectionForm.find('.minicolors-panel').on('click', function() {
-            Mautic.sectionBackgroundChanged(section, mQuery(this).parent().find('input').val());
+            var field = mQuery(this).parent().find('input');
+            
+            if (field.attr('id') === 'builder_section_content-background-color') {
+                Mautic.sectionBackgroundChanged(section, field.val());
+            } else if (field.attr('id') === 'builder_section_wrapper-background-color') {
+                Mautic.sectionBackgroundChanged(sectionWrapper, field.val());
+            }
         });
     });
 };
 
-Mautic.sectionBackgroundChanged = function(section, color) {
+Mautic.sectionBackgroundChanged = function(element, color) {
     if (color.length) {
         color = '#'+color;
     } else {
         color = 'transparent';
     }
-    section.css('background-color', color).attr('bgcolor', color);
+    element.css('background-color', color).attr('bgcolor', color);
 }
 
 Mautic.rgb2hex = function(orig) {
