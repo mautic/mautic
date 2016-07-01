@@ -1,5 +1,5 @@
 /** DynamicContentBundle **/
-Mautic.dwcOnLoad = function (container, response) {
+Mautic.dynamicContentOnLoad = function (container, response) {
     if (response && response.updateSelect) {
         //added dwc through a popup
         var newOption = mQuery('<option />').val(response.dynamicContentId);
