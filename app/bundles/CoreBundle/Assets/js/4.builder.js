@@ -265,7 +265,7 @@ Mautic.initSlotListeners = function() {
         slot = mQuery(slot);
         Mautic.builderContents.find('[data-slot-focus]').remove();
         var focus = mQuery('<div/>').attr('data-slot-focus', true);
-        slot.append(focus);
+        slot.prepend(focus);
     });
 
     Mautic.builderContents.on('slot:init', function(event, slot) {
@@ -347,11 +347,17 @@ Mautic.initSlotListeners = function() {
                 Mautic.initAtWho(editor.$el, Mautic.getBuilderTokensMethod(), editor);
             });
 
+            slot.on('froalaEditor.focus', function (e, editor) {
+                slot.froalaEditor('toolbar.show');
+            });
+
+            slot.on('froalaEditor.blur', function (e, editor) {
+                slot.froalaEditor('toolbar.hide');
+            });
+
             var buttons = ['bold', 'italic', 'fontSize', 'insertImage', 'insertLink', 'insertTable', 'undo', 'redo', '-', 'paragraphFormat', 'align', 'color', 'formatOL', 'formatUL', 'indent', 'outdent', 'token'];
 
             var inlineFroalaOptions = {
-                toolbarInline: true,
-                toolbarVisibleWithoutSelection: true,
                 toolbarButtons: buttons,
                 toolbarButtonsMD: buttons,
                 toolbarButtonsSM: buttons,
@@ -361,6 +367,7 @@ Mautic.initSlotListeners = function() {
             };
 
             slot.froalaEditor(mQuery.extend(inlineFroalaOptions, Mautic.basicFroalaOptions));
+            slot.froalaEditor('toolbar.hide');
         } else if (type === 'image') {
             // Init Froala editor
             slot.find('img').froalaEditor(mQuery.extend(

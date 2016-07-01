@@ -4594,27 +4594,27 @@ body.prevent-scroll.fr-mobile {
 /* BUILDER CSS */
 div[data-slot-handle] {
   cursor: move!important;
-  bottom: -5px;
+  bottom: 1px;
   content: '';
   left: -15px;
   margin: 0;
   padding: 0;
   position: absolute;
   right: -15px;
-  top: -5px;
+  top: 1px;
   z-index: -1;
   border: 1px solid #4e5e9e;
 }
 div[data-slot-focus] {
   cursor: move!important;
-  bottom: -5px;
+  bottom: 1px;
   content: '';
   left: -15px;
   margin: 0;
   padding: 0;
   position: absolute;
   right: -15px;
-  top: -5px;
+  top: 1px;
   z-index: -1;
   border: 1px solid #4e5e9e;
 }
@@ -4666,6 +4666,29 @@ div[data-slot] {
 }
 .fr-toolbar {
   border-top: 2px solid #4e5e9e;
+  position: absolute;
+  top: -78px !important;
+  bottom: initial !important;
+}
+.fr-box {
+  padding: initial;
+}
+.fr-box.fr-basic.fr-top .fr-wrapper {
+  border-radius: 0 0 0px 0px;
+  -moz-border-radius: 0 0 0px 0px;
+  -webkit-border-radius: 0 0 0px 0px;
+  -webkit-box-shadow: none  !important;
+  -moz-box-shadow: none  !important;
+  box-shadow: none  !important;
+}
+.fr-box.fr-basic .fr-wrapper {
+  background: transparent !important;
+}
+.fr-basic .fr-element {
+  text-align: inherit !important;
+  padding: 0 !important;
+  overflow-x: initial !important;
+  color: inherit !important;
 }
 .slot-type-handle.btn {
   float: left;
