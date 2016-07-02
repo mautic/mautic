@@ -27,8 +27,19 @@ class BuilderSectionType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('background-color', 'text', [
-            'label'      => 'mautic.core.background.color',
+        $builder->add('content-background-color', 'text', [
+            'label'      => 'mautic.core.content.background.color',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => [
+                'class'           => 'form-control',
+                'data-slot-param' => 'background-color',
+                'data-toggle'     => 'color'
+            ],
+        ]);
+
+        $builder->add('wrapper-background-color', 'text', [
+            'label'      => 'mautic.core.wrapper.background.color',
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,
             'attr'       => [

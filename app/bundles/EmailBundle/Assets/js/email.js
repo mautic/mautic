@@ -87,19 +87,40 @@ Mautic.emailOnLoad = function (container, response) {
         Mautic.activateSearchAutocomplete('list-search', 'email');
     }
 
-    mQuery(document).on('shown.bs.tab', 'a[href="#source-container"]', function (e) {
-        Mautic.refreshCodeEditors();
-        Mautic.initCodeEditors();
+    mQuery(document).on('shown.bs.tab', function (e) {
+        mQuery('#emailform_customHtml').froalaEditor('popups.hideAll');
+    });
+
+    mQuery('.btn-builder').on('click', function (e) {
+        mQuery('#emailform_customHtml').froalaEditor('popups.hideAll');
     });
 
     Mautic.intiSelectTheme(mQuery('#emailform_template'));
+    Mautic.fixFroalaEmailOutput();
+
+    var plaintext = mQuery('#emailform_plainText');
+    Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
 };
 
 Mautic.emailOnUnload = function(id) {
     if (id === '#app-content') {
         delete Mautic.listCompareChart;
     }
+    mQuery('#emailform_customHtml').froalaEditor('popups.hideAll');
 };
+
+Mautic.fixFroalaEmailOutput = function() {
+    if (mQuery('form[name="emailform"]').length) {
+        var textarea = mQuery('textarea.builder-html');
+        mQuery('form[name="emailform"]').on('before.submit.ajaxform', function() {
+            var editorHtmlString = textarea.val();
+            Mautic.buildBuilderIframe(editorHtmlString, 'helper-iframe-for-html-manipulation');
+            var editorHtml = mQuery('iframe#helper-iframe-for-html-manipulation').contents();
+            editorHtml = Mautic.clearFroalaStyles(editorHtml);
+            textarea.val(editorHtml.find('html').get(0).outerHTML);
+        });
+    }
+}
 
 Mautic.insertEmailBuilderToken = function(editorId, token) {
     var editor = Mautic.getEmailBuilderEditorInstances();
