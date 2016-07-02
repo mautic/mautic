@@ -28,14 +28,21 @@ Mautic.pageOnLoad = function (container) {
         });
     }
 
-    mQuery(document).on('shown.bs.tab', 'a[href="#source-container"]', function (e) {
-        Mautic.refreshCodeEditors();
-        Mautic.initCodeEditors();
+    mQuery(document).on('shown.bs.tab', function (e) {
+        mQuery('#page_customHtml').froalaEditor('popups.hideAll');
+    });
+
+    mQuery('.btn-builder').on('click', function (e) {
+        mQuery('#page_customHtml').froalaEditor('popups.hideAll');
     });
 
     Mautic.intiSelectTheme(mQuery('#page_template'));
     Mautic.fixFroalaPageOutput();
 };
+
+Mautic.pageOnUnload = function (id) {
+    mQuery('#page_customHtml').froalaEditor('popups.hideAll');
+}
 
 Mautic.fixFroalaPageOutput = function() {
     if (mQuery('form[name="page"]').length) {
