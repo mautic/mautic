@@ -4594,29 +4594,52 @@ body.prevent-scroll.fr-mobile {
 /* BUILDER CSS */
 div[data-slot-handle] {
   cursor: move!important;
-  bottom: -5px;
+  bottom: -1px;
   content: '';
   left: -15px;
   margin: 0;
   padding: 0;
   position: absolute;
   right: -15px;
-  top: -5px;
-  z-index: -1;
-  border: 1px solid #4e5d9d;
+  top: -1px;
+  border: 1px solid #4e5e9e;
 }
 div[data-slot-focus] {
   cursor: move!important;
-  bottom: -5px;
+  bottom: -1px;
   content: '';
   left: -15px;
   margin: 0;
   padding: 0;
   position: absolute;
   right: -15px;
-  top: -5px;
-  z-index: -1;
-  border: 1px solid #4e5d9d;
+  top: -1px;
+  border: 1px solid #4e5e9e;
+}
+div[data-section-focus] {
+  content: '';
+  position: absolute;
+  border: 1px solid #fdb933;
+}
+div[data-section-focus="top"] {
+  left: 0px;
+  right: 0px;
+  top: 0px;
+}
+div[data-section-focus="right"] {
+  bottom: 0px;
+  right: 0px;
+  top: 0px;
+}
+div[data-section-focus="bottom"] {
+  bottom: 0px;
+  right: 0px;
+  left: 0px;
+}
+div[data-section-focus="left"] {
+  bottom: 0px;
+  top: 0px;
+  left: 0px;
 }
 div[data-slot-toolbar] {
   position: absolute;
@@ -4656,16 +4679,50 @@ div[data-slot-toolbar] .btn-danger {
   background-color: #f86b4f;
   border-color: #fff;
 }
-div[data-slot] {
+div[data-slot],
+[data-section-wrapper] {
   position: relative;
-  z-index: 5;
+}
+div[data-slot="image"] img {
+  z-index: 1;
 }
 .slot-placeholder {
-  border: 1px solid red;
-  margin: 20px 0;
+  border-top: 1px solid #4e5e9e;
+  margin-top: -1px;
 }
-.fr-toolbar {
-  border-top: 2px solid #4e5d9d;
+[data-slot="text"].fr-box {
+  padding: initial;
+}
+[data-slot="text"].fr-box .fr-toolbar {
+  border-top: 2px solid #4e5e9e;
+  position: absolute;
+  left: -15px;
+  bottom: initial !important;
+  min-width: 340px;
+}
+[data-slot="text"].fr-box .fr-toolbar.fr-top {
+  top: -78px !important;
+  bottom: initial !important;
+}
+[data-slot="text"].fr-box .fr-toolbar.fr-bottom {
+  bottom: -78px !important;
+  top: initial !important;
+}
+[data-slot="text"].fr-box .fr-wrapper {
+  border-radius: 0 0 0px 0px;
+  -moz-border-radius: 0 0 0px 0px;
+  -webkit-border-radius: 0 0 0px 0px;
+  -webkit-box-shadow: none  !important;
+  -moz-box-shadow: none  !important;
+  box-shadow: none  !important;
+  background: transparent !important;
+}
+[data-slot="text"].fr-box .fr-wrapper .fr-element {
+  text-align: inherit !important;
+  padding: 0 !important;
+  overflow-x: initial !important;
+  color: inherit !important;
+  min-height: inherit !important;
 }
 .slot-type-handle.btn {
   float: left;

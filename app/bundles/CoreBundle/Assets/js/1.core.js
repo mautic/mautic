@@ -283,7 +283,9 @@ var Mautic = {
             imageUploadURL: mauticBaseUrl + 's/file/upload',
             imageManagerLoadURL: mauticBaseUrl + 's/file/list',
             imageManagerDeleteURL: mauticBaseUrl + 's/file/delete',
-            useClasses: false
+            useClasses: false,
+            htmlAllowedTags: ['a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base', 'bdi', 'bdo', 'blockquote', 'br', 'button', 'canvas', 'caption', 'cite', 'code', 'col', 'colgroup', 'datalist', 'dd', 'del', 'details', 'dfn', 'dialog', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'i', 'iframe', 'img', 'input', 'ins', 'kbd', 'keygen', 'label', 'legend', 'li', 'link', 'main', 'map', 'mark', 'menu', 'menuitem', 'meter', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'option', 'output', 'p', 'param', 'pre', 'progress', 'queue', 'rp', 'rt', 'ruby', 's', 'samp', 'script', 'style', 'section', 'select', 'small', 'source', 'span', 'strike', 'strong', 'sub', 'summary', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'time', 'title', 'tr', 'track', 'u', 'ul', 'var', 'video', 'wbr', 'center'],
+            htmlAllowedAttrs: ['data-section', 'data-section-wrapper', 'accept', 'accept-charset', 'accesskey', 'action', 'align', 'alt', 'async', 'autocomplete', 'autofocus', 'autoplay', 'autosave', 'background', 'bgcolor', 'border', 'charset', 'cellpadding', 'cellspacing', 'checked', 'cite', 'class', 'color', 'cols', 'colspan', 'content', 'contenteditable', 'contextmenu', 'controls', 'coords', 'data', 'data-.*', 'datetime', 'default', 'defer', 'dir', 'dirname', 'disabled', 'download', 'draggable', 'dropzone', 'enctype', 'for', 'form', 'formaction', 'headers', 'height', 'hidden', 'high', 'href', 'hreflang', 'http-equiv', 'icon', 'id', 'ismap', 'itemprop', 'keytype', 'kind', 'label', 'lang', 'language', 'list', 'loop', 'low', 'max', 'maxlength', 'media', 'method', 'min', 'multiple', 'name', 'novalidate', 'open', 'optimum', 'pattern', 'ping', 'placeholder', 'poster', 'preload', 'pubdate', 'radiogroup', 'readonly', 'rel', 'required', 'reversed', 'rows', 'rowspan', 'sandbox', 'scope', 'scoped', 'scrolling', 'seamless', 'selected', 'shape', 'size', 'sizes', 'span', 'src', 'srcdoc', 'srclang', 'srcset', 'start', 'step', 'summary', 'spellcheck', 'style', 'tabindex', 'target', 'title', 'type', 'translate', 'usemap', 'value', 'valign', 'width', 'wrap']
         };
 
         // Set the Froala license key
@@ -546,12 +548,18 @@ var Mautic = {
                 mQuery(container + ' textarea.' + editorClass).each(function () {
                     var textarea = mQuery(this);
 
+
+
                     // init AtWho in a froala editor
                     if (textarea.hasClass('editor-builder-tokens')) {
                         textarea.on('froalaEditor.initialized', function (e, editor) {
                             Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'), editor);
                         });
                     }
+
+                    textarea.on('froalaEditor.blur', function (e, editor) {
+                        editor.popups.hideAll();
+                    });
 
                     // var settings = {};
 
@@ -1553,6 +1561,8 @@ var Mautic = {
         mQuery(form).off('submit.ajaxform');
         mQuery(form).on('submit.ajaxform', (function (e) {
             e.preventDefault();
+
+            mQuery(this).trigger('before.submit.ajaxform');
 
             if (MauticVars.formSubmitInProgress) {
                 return false;
@@ -3373,75 +3383,50 @@ var Mautic = {
         }
     },
 
-    initCodeEditors: function() {
-        var codeEditors = mQuery('textarea.code-editor').not('[data-code-editor=loaded]');
-        Mautic.codeEditors = [];
-        if (codeEditors.length) {
-            codeEditors.each(function() {
-                var textarea = mQuery(this);
-                var editor = CodeMirror.fromTextArea(this, {
-                    // lineNumbers: true,
-                    // matchBrackets: true,
-                    indentUnit: 4,
-                    mode: 'htmlmixed'
-                });
-
-                // Mark the textarea that the editor was loaded
-                textarea.attr('data-code-editor', 'loaded');
-
-                // Set editor content from the textarea on init
-                editor.setValue(textarea.val());
-                editor.refresh();
-
-                // Update the textarea content on editor blur
-                editor.on('blur', function() {
-                    textarea.val(editor.getValue());
-                });
-
-                // Init the atWho dropdown
-                // Mautic.initAtWho(mQuery('.CodeMirror-code'), textarea.attr('data-token-callback'));
-                // CodeMirror doesn't use contentEditable ;(
-
-                // Save the textarea with the editor to a global array so it can be used elsewhere
-                Mautic.codeEditors.push({editor: editor, textarea: textarea});
-            });
-        }
-    },
-
-    refreshCodeEditors: function() {
-        if (typeof Mautic.codeEditors !== 'undefined' && Mautic.codeEditors.length) {
-            mQuery.each(Mautic.codeEditors, function (i, value) {
-                value.editor.setValue(value.textarea.val());
-                value.editor.refresh();
-            });
-        }
-    },
-
+    froalaEmptyContent: '<!DOCTYPE html><html><head><title></title></head><body></body></html>',
 
     intiSelectTheme: function(themeField) {
-        mQuery('[data-theme]').click(function(e) {
-            e.preventDefault();
-            var currentLink = mQuery(this);
-            var customHtml = mQuery('textarea.builder-html');
+        var customHtml = mQuery('textarea.builder-html');
+        if (customHtml.length) {
 
-            if (customHtml.val().length) {
-                if (confirm('You will lose the current content if you switch the theme.')) {
-                    customHtml.val('');
-                } else {
-                    return;
-                }
+            if (!customHtml.val().length || customHtml.val() === Mautic.froalaEmptyContent) {
+                Mautic.setThemeHtml(themeField.val());
             }
 
-            // Set the theme field value
-            themeField.val(currentLink.attr('data-theme'));
+            mQuery('[data-theme]').click(function(e) {
+                e.preventDefault();
+                var currentLink = mQuery(this);
 
-            // Manipulate classes to achieve the theme selection ilustion
-            mQuery('.theme-list .panel').removeClass('theme-selected');
-            currentLink.closest('.panel').addClass('theme-selected');
-            mQuery('.theme-list .select-theme-selected').addClass('hide');
-            mQuery('.theme-list .select-theme-link').removeClass('hide');
-            currentLink.closest('.panel').find('.select-theme-selected').removeClass('hide');
-            currentLink.addClass('hide');
+                if (customHtml.val().length && customHtml.val() !== Mautic.froalaEmptyContent) {
+                    if (confirm('You will lose the current content if you switch the theme.')) {
+                        customHtml.val('');
+                    } else {
+                        return;
+                    }
+                }
+
+                // Set the theme field value
+                themeField.val(currentLink.attr('data-theme'));
+
+                // Load the theme HTML to the source textarea
+                Mautic.setThemeHtml(currentLink.attr('data-theme'));
+
+                // Manipulate classes to achieve the theme selection illustion
+                mQuery('.theme-list .panel').removeClass('theme-selected');
+                currentLink.closest('.panel').addClass('theme-selected');
+                mQuery('.theme-list .select-theme-selected').addClass('hide');
+                mQuery('.theme-list .select-theme-link').removeClass('hide');
+                currentLink.closest('.panel').find('.select-theme-selected').removeClass('hide');
+                currentLink.addClass('hide');
+            });
+        }
+    },
+
+    setThemeHtml: function(theme) {
+        mQuery.get(mQuery('#builder_url').val()+'?template=' + theme, function(themeHtml) {
+            var textarea = mQuery('textarea.builder-html');
+            textarea.val(themeHtml);
+            textarea.froalaEditor('html.set', themeHtml);
         });
     }
 };

@@ -36,7 +36,7 @@ $template = $form['template']->vars['data'];
                 <!-- tabs controls -->
                 <ul class="bg-auto nav nav-tabs pr-md pl-md">
                     <li class="active"><a href="#theme-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.page.page'); ?></a></li>
-                    <li class=""><a href="#source-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.source'); ?></a></li>
+                    <li class=""><a href="#source-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.content'); ?></a></li>
                 </ul>
 
                 <!--/ tabs controls -->
@@ -108,6 +108,7 @@ $template = $form['template']->vars['data'];
 
 <?php echo $view->render('MauticCoreBundle:Helper:builder.html.php', array(
     'type'          => 'page',
+    'sectionForm'   => $sectionForm,
     'builderAssets' => $builderAssets,
     'slots'         => $slots,
     'objectId'      => $activePage->getSessionId()
