@@ -97,6 +97,9 @@ Mautic.emailOnLoad = function (container, response) {
 
     Mautic.intiSelectTheme(mQuery('#emailform_template'));
     Mautic.fixFroalaEmailOutput();
+
+    var plaintext = mQuery('#emailform_plainText');
+    Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
 };
 
 Mautic.emailOnUnload = function(id) {
