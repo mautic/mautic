@@ -105,7 +105,7 @@ Mautic.emailOnUnload = function(id) {
 Mautic.fixFroalaOutput = function() {
     if (mQuery('[name="emailform"]').length) {
         var textarea = mQuery('textarea.builder-html');
-        mQuery('[name="emailform"]').on('click.ajaxform', function() {
+        mQuery('#emailform_buttons_apply_toolbar, #emailform_buttons_save_toolbar').on('mouseover', function() {
             var editorHtmlString = textarea.val();
             Mautic.buildBuilderIframe(editorHtmlString, 'helper-iframe-for-html-manipulation');
             var editorHtml = mQuery('iframe#helper-iframe-for-html-manipulation').contents();
