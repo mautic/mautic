@@ -1562,6 +1562,8 @@ var Mautic = {
         mQuery(form).on('submit.ajaxform', (function (e) {
             e.preventDefault();
 
+            mQuery(this).trigger('before.submit.ajaxform');
+
             if (MauticVars.formSubmitInProgress) {
                 return false;
             } else {
