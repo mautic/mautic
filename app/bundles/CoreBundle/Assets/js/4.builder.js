@@ -43,10 +43,12 @@ Mautic.launchBuilder = function (formName, actionName) {
     var assets = Mautic.htmlspecialchars_decode(mQuery('[data-builder-assets]').html());
     themeHtml = themeHtml.replace('</head>', assets+'</head>');
 
-    Mautic.buildBuilderIframe(themeHtml, 'builder-template-content');
+    var doc = Mautic.buildBuilderIframe(themeHtml, 'builder-template-content');
 
-    mQuery('#builder-overlay').addClass('hide');
-    mQuery('.btn-close-builder').prop('disabled', false);
+    mQuery(doc).ready(function(){
+        mQuery('#builder-overlay').addClass('hide');
+        mQuery('.btn-close-builder').prop('disabled', false);
+    });
 };
 
 Mautic.buildBuilderIframe = function(themeHtml, id) {
@@ -72,7 +74,9 @@ Mautic.buildBuilderIframe = function(themeHtml, id) {
     doc.open();
     doc.write(themeHtml);
     doc.close();
-}
+
+    return doc;
+};
 
 Mautic.htmlspecialchars_decode = function(encodedHtml) {
     encodedHtml = encodedHtml.replace(/&quot;/g, '"');
