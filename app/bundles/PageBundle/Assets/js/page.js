@@ -34,7 +34,21 @@ Mautic.pageOnLoad = function (container) {
     });
 
     Mautic.intiSelectTheme(mQuery('#page_template'));
+    Mautic.fixFroalaPageOutput();
 };
+
+Mautic.fixFroalaPageOutput = function() {
+    if (mQuery('form[name="page"]').length) {
+        var textarea = mQuery('textarea.builder-html');
+        mQuery('form[name="page"]').on('before.submit.ajaxform', function() {
+            var editorHtmlString = textarea.val();
+            Mautic.buildBuilderIframe(editorHtmlString, 'helper-iframe-for-html-manipulation');
+            var editorHtml = mQuery('iframe#helper-iframe-for-html-manipulation').contents();
+            editorHtml = Mautic.clearFroalaStyles(editorHtml);
+            textarea.val(editorHtml.find('html').get(0).outerHTML);
+        });
+    }
+}
 
 Mautic.getPageAbTestWinnerForm = function(abKey) {
     if (abKey && mQuery(abKey).val() && mQuery(abKey).closest('.form-group').hasClass('has-error')) {
