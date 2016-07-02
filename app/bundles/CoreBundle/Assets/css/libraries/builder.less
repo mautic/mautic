@@ -133,47 +133,45 @@ div[data-slot="image"] img {
     margin-top: -1px;
 }
 
-.fr-toolbar {
-    border-top: 2px solid #4e5e9e;
-    position: absolute;
-    left: -15px;
-    bottom: initial !important;
-    min-width: 340px;
+[data-slot="text"] {
+    &.fr-box {
+        padding: initial;
 
-    &.fr-top {
-        top: -78px !important;
-        bottom: initial !important;
+        .fr-toolbar {
+            border-top: 2px solid #4e5e9e;
+            position: absolute;
+            left: -15px;
+            bottom: initial !important;
+            min-width: 340px;
+
+            &.fr-top {
+                top: -78px !important;
+                bottom: initial !important;
+            }
+            &.fr-bottom {
+                bottom: -78px !important;
+                top: initial !important;
+            }
+        }
+        .fr-wrapper {
+            border-radius: 0 0 0px 0px;
+            -moz-border-radius: 0 0 0px 0px;
+            -webkit-border-radius: 0 0 0px 0px;
+            -webkit-box-shadow: none  !important;
+            -moz-box-shadow: none  !important;
+            box-shadow: none  !important;
+            background: transparent !important;
+
+            .fr-element {
+                text-align: inherit !important;
+                padding: 0 !important;
+                overflow-x: initial !important;
+                color: inherit !important;
+                min-height: inherit !important;
+            }
+        }
     }
-    &.fr-bottom {
-        bottom: -78px !important;
-        top: initial !important;
-    }
-}
-
-.fr-box {
-    padding: initial;
-}
-
-.fr-box.fr-basic.fr-top .fr-wrapper {
-    border-radius: 0 0 0px 0px;
-    -moz-border-radius: 0 0 0px 0px;
-    -webkit-border-radius: 0 0 0px 0px;
-    -webkit-box-shadow: none  !important;
-    -moz-box-shadow: none  !important;
-    box-shadow: none  !important;
-}
-
-.fr-box.fr-basic .fr-wrapper {
-    background: transparent !important;
-}
-
-.fr-basic .fr-element {
-    text-align: inherit !important;
-    padding: 0 !important;
-    overflow-x: initial !important;
-    color: inherit !important;
-    min-height: inherit !important;
-}
+} 
 
 .slot-type-handle.btn {
     float: left;
@@ -181,10 +179,11 @@ div[data-slot="image"] img {
     margin: 2px;
 }
 
-.theme-list .panel-body {
-    height: 350px;
-}
-
-.theme-list .select-theme-link {
-    margin-top: 5px;
+.theme-list {
+    .panel-body {
+        height: 350px;
+    }
+    .select-theme-link {
+        margin-top: 5px;
+    }
 }

@@ -93,6 +93,7 @@ Mautic.emailOnLoad = function (container, response) {
     });
 
     Mautic.intiSelectTheme(mQuery('#emailform_template'));
+    Mautic.fixFroalaOutput();
 };
 
 Mautic.emailOnUnload = function(id) {
@@ -100,6 +101,19 @@ Mautic.emailOnUnload = function(id) {
         delete Mautic.listCompareChart;
     }
 };
+
+Mautic.fixFroalaOutput = function() {
+    if (mQuery('[name="emailform"]').length) {
+        var textarea = mQuery('textarea.builder-html');
+        mQuery('[name="emailform"]').on('click.ajaxform', function() {
+            var editorHtmlString = textarea.val();
+            Mautic.buildBuilderIframe(editorHtmlString, 'helper-iframe-for-html-manipulation');
+            var editorHtml = mQuery('iframe#helper-iframe-for-html-manipulation').contents();
+            editorHtml = Mautic.clearFroalaStyles(editorHtml);
+            textarea.val(editorHtml.find('html').get(0).outerHTML);
+        });
+    }
+}
 
 Mautic.insertEmailBuilderToken = function(editorId, token) {
     var editor = Mautic.getEmailBuilderEditorInstances();
