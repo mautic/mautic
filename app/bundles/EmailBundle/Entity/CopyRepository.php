@@ -11,6 +11,7 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 
 /**
  * Class CopyRepository
@@ -27,6 +28,7 @@ class CopyRepository extends CommonRepository
         $db = $this->getEntityManager()->getConnection();
 
         try {
+            $body = EmojiHelper::toShort($body);
             $db->insert(
                 MAUTIC_TABLE_PREFIX.'email_copies',
                 [
@@ -36,8 +38,12 @@ class CopyRepository extends CommonRepository
                     'date_created' => (new \DateTime())->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s')
                 ]
             );
+
+            return true;
         } catch (\Exception $e) {
             error_log($e);
+
+            return false;
         }
     }
 

@@ -40,7 +40,7 @@ if (!isset($attachmentSize)) {
                 <ul class="bg-auto nav nav-tabs pr-md pl-md">
                     <li class="active"><a href="#email-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.email.email'); ?></a></li>
                     <li class=""><a href="#advanced-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.advanced'); ?></a></li>
-                    <li class=""><a href="#source-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.source'); ?></a></li>
+                    <li class=""><a href="#source-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.content'); ?></a></li>
                 </ul>
                 <!--/ tabs controls -->
                 <div class="tab-content pa-md">
@@ -152,6 +152,7 @@ if (!isset($attachmentSize)) {
 
 <?php echo $view->render('MauticCoreBundle:Helper:builder.html.php', array(
     'type'          => 'email',
+    'sectionForm'   => $sectionForm,
     'builderAssets' => $builderAssets,
     'slots'         => $slots,
     'objectId'      => $email->getSessionId()

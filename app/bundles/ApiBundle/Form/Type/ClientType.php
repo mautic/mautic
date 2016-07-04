@@ -57,7 +57,6 @@ class ClientType extends AbstractType
         $this->validator  = $factory->getValidator();
         $this->apiMode    = $factory->getRequest()->get('api_mode', $factory->getSession()->get('mautic.client.filter.api_mode', 'oauth1a'));
         $this->router     = $factory->getRouter();
-
     }
 
     /**

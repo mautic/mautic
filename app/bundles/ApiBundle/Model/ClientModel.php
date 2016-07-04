@@ -43,12 +43,21 @@ class ClientModel extends FormModel
 
     /**
      * ClientModel constructor.
-     * 
+     *
      * @param RequestStack $requestStack
      */
     public function __construct(RequestStack $requestStack)
     {
         $this->request = $requestStack->getCurrentRequest();
+        $this->apiMode = $this->request->get('api_mode', $this->request->getSession()->get('mautic.client.filter.api_mode', 'oauth1a'));
+    }
+
+    /**
+     * @param $apiMode
+     */
+    public function setApiMode($apiMode)
+    {
+        $this->apiMode = $apiMode;
     }
 
     /**
@@ -57,14 +66,6 @@ class ClientModel extends FormModel
     public function setSession(Session $session)
     {
         $this->session = $session;
-    }
-
-    /**
-     * @return void
-     */
-    public function initialize()
-    {
-        $this->apiMode = $this->request->get('api_mode', $this->session->get('mautic.client.filter.api_mode', 'oauth1a'));
     }
 
     /**

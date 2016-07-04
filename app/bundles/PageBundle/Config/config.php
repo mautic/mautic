@@ -88,7 +88,8 @@ return [
                 'class' => 'Mautic\PageBundle\EventListener\BuilderSubscriber',
                 'arguments' => [
                     'mautic.factory',
-                    'mautic.page.helper.token'
+                    'mautic.page.helper.token',
+                    'mautic.page.model.page',
                 ]
             ],
             'mautic.pagetoken.subscriber'           => [
@@ -207,7 +208,10 @@ return [
                 ]
             ],
             'mautic.page.model.redirect' => [
-                'class' => 'Mautic\PageBundle\Model\RedirectModel'
+                'class' => 'Mautic\PageBundle\Model\RedirectModel',
+                'arguments' => [
+                    'mautic.helper.url'
+                ]
             ],
             'mautic.page.model.trackable' => [
                 'class' => 'Mautic\PageBundle\Model\TrackableModel',

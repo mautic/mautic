@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\Helper\TokenHelper;
+use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
@@ -29,15 +30,21 @@ class BuilderSubscriber extends CommonSubscriber
      */
     protected $tokenHelper;
 
+    /**
+     * @var PageModel
+     */
+    protected $pageModel;
+
     protected $pageTokenRegex = '{pagelink=(.*?)}';
     protected $langBarRegex = '{langbar}';
     protected $shareButtonsRegex = '{sharebuttons}';
     protected $emailIsInternalSend = false;
     protected $emailEntity = null;
 
-    public function __construct(MauticFactory $factory, TokenHelper $tokenHelper)
+    public function __construct(MauticFactory $factory, TokenHelper $tokenHelper, PageModel $pageModel)
     {
         $this->tokenHelper = $tokenHelper;
+        $this->pageModel   = $pageModel;
 
         parent::__construct($factory);
     }
@@ -141,6 +148,14 @@ class BuilderSubscriber extends CommonSubscriber
                 'MauticCoreBundle:Slots:button.html.php',
                 'slot_button',
                 800
+            );
+            $event->addSlotType(
+                'separator',
+                'Separator',
+                'minus',
+                'MauticCoreBundle:Slots:separator.html.php',
+                'slot',
+                700
             );
         }
     }

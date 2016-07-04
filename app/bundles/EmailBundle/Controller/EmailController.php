@@ -556,6 +556,7 @@ class EmailController extends FormController
         }
 
         $slotTypes = $model->getBuilderComponents($entity, 'slotTypes');
+        $sectionForm = $this->get('form.factory')->create('builder_section');
 
         return $this->delegateView(
             array(
@@ -566,7 +567,8 @@ class EmailController extends FormController
                     'email'         => $entity,
                     'slots'         => $this->buildSlotForms($slotTypes),
                     'themes'        => $this->factory->getInstalledThemes('email', true),
-                    'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())) // strip new lines
+                    'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
+                    'sectionForm'   => $sectionForm->createView()
                 ),
                 'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
                 'passthroughVars' => array(
@@ -756,6 +758,7 @@ class EmailController extends FormController
         $attachmentSize = $this->getModel('asset')->getTotalFilesize($assets);
 
         $slotTypes = $model->getBuilderComponents($entity, 'slotTypes');
+        $sectionForm = $this->get('form.factory')->create('builder_section');
 
         return $this->delegateView(
             array(
@@ -768,7 +771,8 @@ class EmailController extends FormController
                     'email'              => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
                     'attachmentSize'     => $attachmentSize,
-                    'builderAssets'      => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())) // strip new lines
+                    'builderAssets'      => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
+                    'sectionForm'        => $sectionForm->createView()
                 ),
                 'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
                 'passthroughVars' => array(

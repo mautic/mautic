@@ -11,6 +11,7 @@ namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Comparator;
+use Doctrine\DBAL\Schema\Table;
 use Mautic\CoreBundle\Exception\SchemaException;
 
 /**
@@ -42,12 +43,12 @@ class ColumnSchemaHelper
     protected $tableName;
 
     /**
-     * @var string
+     * @var Table
      */
     protected $fromTable;
 
     /**
-     * @var string
+     * @var Table
      */
     protected $toTable;
 

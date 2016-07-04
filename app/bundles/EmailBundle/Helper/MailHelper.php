@@ -387,7 +387,6 @@ class MailHelper
 
                 if (!empty($failures)) {
                     $this->errors['failures'] = $failures;
-
                     $this->logError('Sending failed for one or more recipients');
                 }
 
@@ -1669,15 +1668,25 @@ class MailHelper
         if (!isset($copies[$id])) {
             $hash = (strlen($id) !== 32) ? md5($this->subject.$this->body['content']) : $id;
 
-            $copy = $emailModel->getCopyRepository()->findByHash($hash);
+            $copy        = $emailModel->getCopyRepository()->findByHash($hash);
+            $copyCreated = false;
             if (null === $copy) {
-                $emailModel->getCopyRepository()->saveCopy($hash, $this->subject, $this->body['content']);
+                if (!$emailModel->getCopyRepository()->saveCopy($hash, $this->subject, $this->body['content'])) {
+                    // Try one more time to find the ID in case there was overlap when creating
+                    $copy = $emailModel->getCopyRepository()->findByHash($hash);
+                } else {
+                    $copyCreated = true;
+                }
             }
 
-            $copies[$id] = $hash;
+            if ($copy || $copyCreated) {
+                $copies[$id] = $hash;
+            }
         }
 
-        $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $copies[$id]));
+        if (isset($copies[$id])) {
+            $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $copies[$id]));
+        }
 
         if ($persist) {
             $emailModel->getStatRepository()->saveEntity($stat);

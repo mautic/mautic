@@ -211,7 +211,7 @@ class EmailType extends AbstractType
                     'label_attr' => array('class' => 'control-label'),
                     'required'   => false,
                     'attr'       => array(
-                        'class'                => 'form-control code-editor editor-builder-tokens builder-html',
+                        'class'                => 'form-control editor-basic-fullpage editor-builder-tokens builder-html',
                         'data-token-callback'  => 'email:getBuilderTokens',
                         'data-token-activator' => '{'
                     )

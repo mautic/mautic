@@ -33,14 +33,21 @@ abstract class AbstractCommonModel
      * Do not use Factory in Models. There's a couple places where we
      * still need to in core, but we are working on refactoring. This
      * is completely temporary.
-     * 
+     *
      * @param MauticFactory $factory
      */
     public function setFactory(MauticFactory $factory)
     {
         $this->factory = $factory;
     }
-    
+
+    /**
+     * @deprecated 2.0; to be removed in 3.0
+     *             
+     * @var MauticFactory
+     */
+    protected $factory;
+
     /**
      * @var \Doctrine\ORM\EntityManager
      */
@@ -65,7 +72,7 @@ abstract class AbstractCommonModel
      * @var TranslatorInterface
      */
     protected $translator;
-    
+
     /**
      * @var User
      */
@@ -244,7 +251,7 @@ abstract class AbstractCommonModel
      *
      * @return string
      */
-    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [])
+    public function buildUrl($route, $routeParams = array(), $absolute = true, $clickthrough = array())
     {
         $url  = $this->router->generate($route, $routeParams, $absolute);
         $url .= (!empty($clickthrough)) ? '?ct=' . $this->encodeArrayForUrl($clickthrough) : '';
