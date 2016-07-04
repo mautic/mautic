@@ -61,6 +61,7 @@ class DeprecatedTokenHelper
         $matches   = array();
 
         $foundMatches = preg_match_all($regex, $content, $matches);
+
         if ($foundMatches) {
             foreach ($matches[2] as $key => $match) {
                 $token = $matches[0][$key];

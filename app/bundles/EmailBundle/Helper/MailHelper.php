@@ -458,6 +458,7 @@ class MailHelper
     {
         if ($this->tokenizationEnabled) {
 
+
             // Dispatch event to get custom tokens from listeners
             if ($dispatchSendEvent) {
                 $this->dispatchSendEvent();

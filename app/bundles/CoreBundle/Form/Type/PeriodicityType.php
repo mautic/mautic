@@ -54,7 +54,7 @@ class PeriodicityType extends AbstractType
                 'attr'       => array('class' => 'form-control',
                                       'data-toggle' => 'datetime'),
                 'format'     => 'yyyy-MM-dd HH:mm',
-                'required' => false
+                'required' => true
             )
         );
 
@@ -77,7 +77,7 @@ class PeriodicityType extends AbstractType
                 'label'      => 'mautic.core.periodicity.form.interval',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control'),
-                'required' => false
+                'required' => true
             )
         );
         $builder->add(
@@ -113,7 +113,7 @@ class PeriodicityType extends AbstractType
                     'sunday'    => 'mautic.core.periodicity.form.days_of_week.sunday'
                 ),
                 'multiple' => true,
-                'required' => false
+                'required' => true
             )
         );
     }

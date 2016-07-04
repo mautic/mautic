@@ -23,7 +23,7 @@ class Periodicity
 
     /**
      *
-     * @var date
+     * @var \DateTime
      */
     private $lastShoot;
 
@@ -134,8 +134,11 @@ class Periodicity
     protected $changes;
 
     /**
-     * @param $prop
-     * @param $val
+     *
+     * @param
+     *            $prop
+     * @param
+     *            $val
      *
      * @return void
      */
@@ -356,18 +359,22 @@ class Periodicity
     }
 
     /**
+     *
      * @return null|array
      */
-    public function getWeekDays() {
+    public function getWeekDays()
+    {
         return $this->weekDays;
     }
 
     /**
+     *
      * @param array $weekDays
      *
      * @return Periodicity
      */
-    public function setWeekDays($weekDays) {
+    public function setWeekDays($weekDays)
+    {
         $this->weekDays = $weekDays;
         return $this;
     }
@@ -402,22 +409,19 @@ class Periodicity
                 switch ($this->getTriggerIntervalUnit()) {
                     case 'd':
                         /** @var \DateTime $nextShoot */
-                        $nextShoot = clone $this->getLastShoot()
-                            ->setTime(0, 0)
-                            ->modify('+' . $this->getTriggerInterval() . 'day');
+                        $nextShoot = clone $this->getLastShoot();
+                        $nextShoot->setTime(0, 0, 0)->modify('+' . $this->getTriggerInterval() . 'day');
                         break;
                     case 'w':
                         /** @var \DateTime $nextShoot */
-                        $nextShoot = clone $this->getLastShoot()
-                            ->setTime(0, 0)
-                            ->modify('+' . $this->getTriggerInterval() . 'week');
+                        $nextShoot = clone $this->getLastShoot();
+                        $nextShoot->setTime(0, 0, 0)->modify('+' . $this->getTriggerInterval() . 'week');
 
                         break;
                     case 'm':
                         /** @var \DateTime $nextShoot */
-                        $nextShoot = clone $this->getLastShoot()
-                            ->setTime(0, 0)
-                            ->modify('+' . $this->getTriggerInterval() . 'month');
+                        $nextShoot = clone $this->getLastShoot();
+                        $nextShoot->setTime(0, 0, 0)->modify('+' . $this->getTriggerInterval() . 'month');
                         break;
                 }
                 break;
@@ -427,7 +431,6 @@ class Periodicity
         $nextShoot->setTime($this->getTriggerDate()
             ->format('H'), $this->getTriggerDate()
             ->format('i'));
-//         echo (clone $nextShoot->format('d/m/Y'));
         return $nextShoot;
     }
 }

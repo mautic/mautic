@@ -35,9 +35,9 @@ class EmailSubscriber extends CommonSubscriber
      */
     protected $feedHelper;
 
-    private static $feedFieldPrefix = 'feedfield';
-    private static $feedFieldRegex = '{feedfield=(.*?)}';
-    private static $feeditemsRegex = '{feed=(loopstart|loopend)}';
+    public static $feedFieldPrefix = 'feedfield';
+    public static $feedFieldRegex = '{feedfield=(.*?)}';
+    public static $feeditemsRegex = '{feed=(loopstart|loopend)}';
 
     /**
      * @return array
@@ -45,9 +45,10 @@ class EmailSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            EmailEvents::EMAIL_ON_BUILD   => array('onEmailBuild', 0),
-            EmailEvents::EMAIL_ON_SEND    => array('onEmailGenerate', 0),
-            EmailEvents::EMAIL_ON_DISPLAY => array('onEmailDisplay', 0)
+            // priority is 300 because  it's needed to be before token event
+            EmailEvents::EMAIL_ON_BUILD   => array('onEmailBuild', 300),
+            EmailEvents::EMAIL_ON_SEND    => array('onEmailGenerate', 300),
+            EmailEvents::EMAIL_ON_DISPLAY => array('onEmailDisplay', 300)
         );
     }
 

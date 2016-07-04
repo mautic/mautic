@@ -33,14 +33,14 @@ class FeedRepository extends CommonRepository
     public function latestSnapshot(MauticFactory $factory, Feed $feed, $preview = false)
     {
         $snapshots = $feed->getSnapshots();
-        for ($i = count($snapshots) - 1; $i > 0; $i --) { // TODO faire une requette DQL pour eviter de charger tous les snapshot en memoire
+        for ($i = count($snapshots)-1; $i >= 0; $i --) {
             /** @var \Mautic\FeedBundle\Entity\Snapshot $snapshot */
             $snapshot = $snapshots->get($i);
             if (!$snapshot->isExpired()) {
                 return $snapshot;
             }
         }
-        unset($snapshot);
+
         // there is no valid feed... need to parse a new one
 
         /** @var FeedHelper $feedHelper */
@@ -52,9 +52,9 @@ class FeedRepository extends CommonRepository
         $ns->setDate(new \DateTime());
         $ns->setXmlString($xmlString);
         $ns->setFeed($feed);
+        $feed->addSnapshot($ns);
 
-        if (!$preview && !is_null($xmlString)) {
-            $this->_em->persist($ns);
+        if ($preview===false && !is_null($xmlString)) {
             $this->_em->persist($feed);
             $this->_em->flush();
         }

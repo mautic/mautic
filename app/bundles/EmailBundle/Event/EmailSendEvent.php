@@ -176,7 +176,6 @@ class EmailSendEvent extends CommonEvent
         } else {
             $content = $this->content;
         }
-
         return ($replaceTokens) ? str_replace(array_keys($this->getTokens()), $this->getTokens(), $content) : $content;
     }
 

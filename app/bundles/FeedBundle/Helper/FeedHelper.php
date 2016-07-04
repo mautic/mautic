@@ -20,6 +20,10 @@ use Mautic\FeedBundle\Exception\FeedNotFoundException;
 use Mautic\FeedBundle\Exception\MalformedXMLException;
 use Mautic\FeedBundle\Entity\Feed;
 use Debril\RssAtomBundle\Exception\DriverUnreachableResourceException;
+use Mautic\EmailBundle\Entity\Email;
+use Mautic\FeedBundle\Entity\SnapshotRepository;
+use Mautic\FeedBundle\Entity\FeedRepository;
+use Mautic\CoreBundle\Factory\MauticFactory;
 
 class FeedHelper
 {
@@ -68,6 +72,20 @@ class FeedHelper
      *
      * @return FeedInterface
      */
+
+    public function expireFeedSnapshot(MauticFactory $factory, Email $email){
+        /** @var FeedRepository $repoFeed */
+        $repoFeed = $factory->getEntityManager()->getRepository('MauticFeedBundle:Feed');
+        $em= $factory->getEntityManager();
+
+        $currentSnapshot=$repoFeed->latestSnapshot($factory, $email->getFeed());
+
+        $currentSnapshot->setDateExpired(new \DateTime());
+
+        $em->persist($currentSnapshot);
+        $em->flush();
+
+    }
     public function getFeedContentFromString($xmlString, $itemCount = null)
     {
         // Parses the contents into a SimpleXMLElement

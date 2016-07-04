@@ -19,7 +19,23 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class SnapshotRepository extends CommonRepository
 {
+    /**
+     *
+     * @param Snapshot $snapshot
+     * @param \DateTime $date
+     */
+    public function expireSnapshot(Snapshot $snapshot, \DateTime $date=null){
+        if (is_null($date)){
+            $date = new \DateTime();
+        }
 
+        $snapshot->setDateExpired($date);
+
+        $this->_em->persist($snapshot);
+
+        return $snapshot;
+
+    }
     /**
      * @return string
      */

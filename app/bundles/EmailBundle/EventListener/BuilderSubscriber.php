@@ -96,12 +96,8 @@ class BuilderSubscriber extends CommonSubscriber
             $content = $this->templating->render('MauticEmailBundle:SubscribedEvents\EmailToken:token.html.php');
             $event->addTokenSection('email.emailtokens', 'mautic.email.builder.index', $content);
 
-            // TODO ddc trouver un moyen de savoir si il y un feed
-//             if ($event->feedCriteriaRequested()) {
             $content = $this->templating->render('MauticEmailBundle:SubscribedEvents\EmailToken:feedToken.html.php');
             $event->addTokenSection('email.emailfeedtokens', 'mautic.email.builder.feed', $content);
-
-//             }
         }
 
 
@@ -256,10 +252,13 @@ class BuilderSubscriber extends CommonSubscriber
         $clickthrough = $event->generateClickthrough();
         $trackables   = $this->parseContentForUrls($event, $emailId);
 
+
         /**
          * @var string
          * @var Trackable $trackable
          */
+
+
         foreach ($trackables as $token => $trackable) {
             $url = ($trackable instanceof Trackable)
                 ?
@@ -269,6 +268,7 @@ class BuilderSubscriber extends CommonSubscriber
 
             $event->addToken($token, $url);
         }
+
     }
 
     /**

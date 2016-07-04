@@ -52,7 +52,7 @@ class StatRepository extends CommonRepository
      *
      * @return array
      */
-    public function getSentStats($emailIds, $listId = null)
+    public function getSentStats($emailIds, $listId = null, $snapshootId = null)
     {
         if (!is_array($emailIds)) {
             $emailIds = [(int) $emailIds];
@@ -68,6 +68,11 @@ class StatRepository extends CommonRepository
         if ($listId) {
             $q->andWhere('s.list_id = :list')
                 ->setParameter('list', $listId);
+        }
+
+        if ($snapshootId) {
+            $q->andWhere('s.snapshot_id = :snapshot_id')
+            ->setParameter('snapshot_id', $snapshootId);
         }
 
         $result = $q->execute()->fetchAll();
