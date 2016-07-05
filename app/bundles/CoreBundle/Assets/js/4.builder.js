@@ -550,6 +550,8 @@ Mautic.initSlotListeners = function() {
     Mautic.builderContents.on('slot:destroy', function(event, params) {
         if (params.type === 'text') {
             params.slot.froalaEditor('destroy');
+            params.slot.find('.atwho-inserted').atwho('destroy');
+            params.slot.find('[data-atwho-at-query]').removeAttr('data-atwho-at-query');
         } else if (params.type === 'image') {
             params.slot.find('img').froalaEditor('destroy');
         }
