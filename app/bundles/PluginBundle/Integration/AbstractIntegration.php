@@ -1410,7 +1410,7 @@ abstract class AbstractIntegration
      *
      * @return array|mixed
      */
-    public function ç($config = array())
+    public function mergeConfigToFeatureSettings($config = array())
     {
         $featureSettings = $this->settings->getFeatureSettings();
 

@@ -53,7 +53,6 @@ class FeatureSettingsType extends AbstractType
                 'silence_exceptions' => false,
                 'feature_settings'   => $data
             );
-            $this->factory->getLogger()->addError(print_r($settings,true));
             try {
                 $fields = $integration_object->getFormLeadFields($settings);
                 if (!is_array($fields)) {

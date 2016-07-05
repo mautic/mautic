@@ -145,7 +145,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         $salesFields = array();
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
-        $salesForceobjects = array('Lead');
+        $salesForceobjects = array();
 
         if(isset($settings['feature_settings']['objects'])) {
             $salesForceobjects = $settings['feature_settings']['objects'];
@@ -153,6 +153,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
+                if(!empty($salesForceobjects)){
                 foreach ($salesForceobjects as $sfObject){
                     $leadObject[$sfObject]  = $this->getApiHelper()->getLeadFields($sfObject);
                     if (!empty($leadObject) && isset($leadObject[$sfObject]['fields'])) {
@@ -165,6 +166,23 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             $salesFields[$fieldInfo['name'].' - '.$sfObject] = array(
                                 'type'     => 'string',
                                 'label'    => $sfObject.' - '.$fieldInfo['label'],
+                                'required' => (empty($fieldInfo['nillable']) && !in_array($fieldInfo['name'], array('Status')))
+                            );
+                        }
+                    }
+                }
+                }else{
+                    $leadObject  = $this->getApiHelper()->getLeadFields('Lead');
+                    if (!empty($leadObject) && isset($leadObject['fields'])) {
+
+                        foreach ($leadObject['fields'] as $fieldInfo) {
+                            if (!$fieldInfo['updateable'] || !isset($fieldInfo['name']) || in_array($fieldInfo['type'], array('reference', 'boolean'))) {
+                                continue;
+                            }
+
+                            $salesFields[$fieldInfo['name']] = array(
+                                'type'     => 'string',
+                                'label'    => $fieldInfo['label'],
                                 'required' => (empty($fieldInfo['nillable']) && !in_array($fieldInfo['name'], array('Status')))
                             );
                         }
@@ -258,5 +276,51 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         }
     }
+    /**
+     * @param $lead
+     */
+    public function pushLead($lead, $config = array())
+    {
+        $config = $this->mergeConfigToFeatureSettings($config);
 
+        if (empty($config['leadFields'])) {
+            return array();
+        }
+
+        if (empty($config['objects'])) {
+            $objects = ['Lead'];//Salesforce objects, default is Lead
+        }
+        else{
+            $objects = $config['objects'];
+        }
+
+        $fields = array_keys($config['leadFields']);
+        foreach ($objects as $object){
+            foreach ($fields as $key){
+                if(strstr($key,'__'.$object)){
+                    $newKey = str_replace('__'.$object,'',$key);
+                    $leadFields[$object][$newKey] = $config['leadFields'][$key];
+                }
+            }
+            $mappedData[$object] = $this->populateLeadData($lead, array('leadFields' => $leadFields[$object]));
+            $this->factory->getLogger()->addError(print_r($mappedData[$object],true));
+
+            $this->amendLeadDataBeforePush($mappedData[$object]);
+
+            if (empty($mappedData[$object])) {
+                return false;
+            }
+
+            try {
+                if ($this->isAuthorized()) {
+                    $this->getApiHelper()->createLead($mappedData[$object]);
+                    return true;
+                }
+            } catch (\Exception $e) {
+                $this->logIntegrationError($e);
+            }
+        }
+
+        return false;
+    }
 }
