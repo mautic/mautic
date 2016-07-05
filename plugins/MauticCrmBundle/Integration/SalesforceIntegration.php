@@ -9,6 +9,8 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Mautic\LeadBundle\Entity\Lead;
+
 /**
  * Class SalesforceIntegration
  */
@@ -227,25 +229,57 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @param $data
      */
-    public function amendLeadDataBeforeMauticPopulate($data)
+    public function amendLeadDataBeforeMauticPopulate($data, $object)
     {
-        $fields = array_keys($this->getAvailableLeadFields());
+        $settings['feature_settings']['objects']=$object;
+        $fields = array_keys($this->getAvailableLeadFields($settings));
+
         $params['fields']=implode(',',$fields);
+
+        $fields = array_keys($params['fields']);
+
+        $leadFields = $this->cleanSalesForceData($params,$fields, $object);
 
         $internal = array('latestDateCovered' => $data['latestDateCovered']);
         $count = 0;
+
         if(isset($data['ids'])){
             foreach($data['ids'] as $salesforceId)
             {
-                $data = $this->getApiHelper()->getSalesForceLeadById($salesforceId,$params);
-                $data['internal'] = $internal;
-                if($data){
-                    $this->getMauticLead($data,true,null,null);
+                $data = $this->getApiHelper()->getSalesForceLeadById($salesforceId,$leadFields[$object],$object);
+
+                foreach ($data as $key=>$item){
+                    $dataObject[$key."__".$object] = $item;
+                }
+
+                $dataObject["internal__".$object] = $internal;
+
+                if($dataObject){
+                    $this->getMauticLead($dataObject,true,null,null);
                     $count++;
                 }
+                unset($data);
             }
         }
         return $count;
+    }
+    /**
+     * @param array  $fields
+     * @param array  $keys
+     * @param string $object
+     */
+    public function cleanSalesForceData($fields, $keys, $object){
+
+        $leadFields = array();
+
+        foreach ($keys as $key){
+            if(strstr($key,'__'.$object)){
+                $newKey = str_replace('__'.$object,'',$key);
+                $leadFields[$object][$newKey] = $fields['fields'][$key];
+            }
+        }
+
+        return $leadFields;
     }
 
     /**
@@ -287,40 +321,153 @@ class SalesforceIntegration extends CrmAbstractIntegration
             return array();
         }
 
-        if (empty($config['objects'])) {
-            $objects = ['Lead'];//Salesforce objects, default is Lead
-        }
-        else{
-            $objects = $config['objects'];
-        }
+        $object = 'Lead';//Salesforce objects, default is Lead
 
         $fields = array_keys($config['leadFields']);
-        foreach ($objects as $object){
-            foreach ($fields as $key){
-                if(strstr($key,'__'.$object)){
-                    $newKey = str_replace('__'.$object,'',$key);
-                    $leadFields[$object][$newKey] = $config['leadFields'][$key];
-                }
+
+        $leadFields = $this->cleanSalesForceData($config,$fields, $object);
+
+        $mappedData[$object] = $this->populateLeadData($lead, array('leadFields' => $leadFields[$object]));
+        $this->amendLeadDataBeforePush($mappedData[$object]);
+
+        if (empty($mappedData[$object])) {
+            return false;
+        }
+
+        try {
+            if ($this->isAuthorized()) {
+                $this->getApiHelper()->createLead($mappedData[$object]);
+                return true;
             }
-            $mappedData[$object] = $this->populateLeadData($lead, array('leadFields' => $leadFields[$object]));
-            $this->factory->getLogger()->addError(print_r($mappedData[$object],true));
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+        }
+        return false;
+    }
 
-            $this->amendLeadDataBeforePush($mappedData[$object]);
+    /**
+     * @param $lead
+     */
+    public function getLeads($params = array())
+    {
+        $executed = null;
 
-            if (empty($mappedData[$object])) {
-                return false;
-            }
+        $config = $this->mergeConfigToFeatureSettings(array());
 
-            try {
-                if ($this->isAuthorized()) {
-                    $this->getApiHelper()->createLead($mappedData[$object]);
-                    return true;
+        $salesForceObjects[] = "Lead";
+
+        if(isset($config['objects'])){
+            $salesForceObjects = $config['objects'];
+        }
+
+        $query = $this->getFetchQuery($params);
+
+        try {
+            if ($this->isAuthorized()) {
+                foreach ($salesForceObjects as $object){
+                    $result = $this->getApiHelper()->getLeads($query, $object);
+
+                    $executed+= $this->amendLeadDataBeforeMauticPopulate($result, $object);
                 }
-            } catch (\Exception $e) {
-                $this->logIntegrationError($e);
+                return $executed;
+            }
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+        }
+
+        return $executed;
+    }
+
+    /**
+     * Create or update existing Mautic lead from the integration's profile data
+     *
+     * @param mixed      $data    Profile data from integration
+     * @param bool|true  $persist Set to false to not persist lead to the database in this method
+     * @param array|null $socialCache
+     * @param mixed||null $identifiers
+     *
+     * @return Lead
+     */
+    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null)
+    {
+        if (is_object($data)) {
+            // Convert to array in all levels
+            $data = json_encode(json_decode($data), true);
+        } elseif (is_string($data)) {
+            // Assume JSON
+            $data = json_decode($data, true);
+        }
+        $config = $this->mergeConfigToFeatureSettings(array());
+        // Match that data with mapped lead fields
+        $matchedFields = $this->populateMauticLeadData($data, $config);
+
+        if (empty($matchedFields)) {
+
+            return;
+        }
+
+        // Find unique identifier fields used by the integration
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel           = $this->factory->getModel('lead');
+        $uniqueLeadFields    = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
+        $uniqueLeadFieldData = array();
+
+        foreach ($matchedFields as $leadField => $value) {
+            if (array_key_exists($leadField, $uniqueLeadFields) && !empty($value)) {
+                $uniqueLeadFieldData[$leadField] = $value;
             }
         }
 
-        return false;
+        // Default to new lead
+        $lead = new Lead();
+        $lead->setNewlyCreated(true);
+
+        if (count($uniqueLeadFieldData)) {
+
+            $existingLeads = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')
+                ->getLeadsByUniqueFields($uniqueLeadFieldData);
+
+            if (!empty($existingLeads)) {
+                $lead = array_shift($existingLeads);
+                // Update remaining leads
+                if (count($existingLeads)) {
+                    foreach ($existingLeads as $existingLead) {
+                        $existingLead->setLastActive(new \DateTime());
+                    }
+                }
+            }
+        }
+
+        $leadModel->setFieldValues($lead, $matchedFields, false, false);
+
+        // Update the social cache
+        $leadSocialCache = $lead->getSocialCache();
+        if (!isset($leadSocialCache[$this->getName()])) {
+            $leadSocialCache[$this->getName()] = array();
+        }
+        $leadSocialCache[$this->getName()] = array_merge($leadSocialCache[$this->getName()], $socialCache);
+
+        // Check for activity while here
+        if (null !== $identifiers && in_array('public_activity', $this->getSupportedFeatures())) {
+            $this->getPublicActivity($identifiers, $leadSocialCache[$this->getName()]);
+        }
+
+        $lead->setSocialCache($leadSocialCache);
+
+        // Update the internal info integration object that has updated the record
+        if(isset($data['internal'])){
+            $internalInfo = $lead->getInternal();
+            $internalInfo[$this->getName()] = $data['internal'];
+            $lead->setInternal($internalInfo);
+        }
+
+        $lead->setLastActive(new \DateTime());
+
+        if ($persist) {
+            // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
+            $leadModel->saveEntity($lead, false);
+        }
+
+        return $lead;
     }
 }

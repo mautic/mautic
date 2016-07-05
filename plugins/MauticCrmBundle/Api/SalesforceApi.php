@@ -10,10 +10,12 @@ class SalesforceApi extends CrmApi
         'encode_parameters' => 'json'
     );
 
-    public function request($operation, $elementData = array(), $method = 'GET', $retry = false)
+    public function request($operation, $elementData = array(), $method = 'GET', $retry = false, $object = null)
     {
-        $request_url = sprintf($this->integration->getApiUrl() . '/%s/%s', $this->object, $operation);
-
+        if(!$object){
+            $object = $this->object;
+        }
+        $request_url = sprintf($this->integration->getApiUrl() . '/%s/%s', $object, $operation);
         $response = $this->integration->makeRequest($request_url, $elementData, $method, $this->requestSettings);
 
         if (!empty($response['errors'])) {
@@ -70,9 +72,9 @@ class SalesforceApi extends CrmApi
      *
      * @return mixed
      */
-    public function getLeads($query)
+    public function getLeads($query, $object)
     {
-        return $this->request('updated/', $query);
+        return $this->request('updated/', $query, 'GET', false, $object);
     }
 
     /**
@@ -82,8 +84,8 @@ class SalesforceApi extends CrmApi
      *
      * @return mixed
      */
-    public function getSalesForceLeadById($id, $params)
+    public function getSalesForceLeadById($id, $params, $object)
     {
-        return $this->request($id.'/',$params);
+        return $this->request($id.'/',$params, 'GET', false,$object);
     }
 }
