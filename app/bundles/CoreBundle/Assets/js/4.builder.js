@@ -143,8 +143,8 @@ Mautic.destroySlots = function() {
     if (typeof Mautic.builderSlots !== 'undefined' && Mautic.builderSlots.length) {
         mQuery.each(Mautic.builderSlots, function(i, slotParams) {
             mQuery(slotParams.slot).trigger('slot:destroy', slotParams);
-            delete Mautic.builderSlots[i];
         });
+        delete Mautic.builderSlots;
     }
 
     // Destroy sortable
@@ -381,6 +381,13 @@ Mautic.initSlotListeners = function() {
         slotToolbar.appendTo(handle);
         slot.hover(function() {
             deleteLink.click(function(e) {
+                slot.trigger('slot:destroy', {slot, type});
+                mQuery.each(Mautic.builderSlots, function(i, slotParams) {
+                    if (slotParams.slot.is(slot)) {
+                        Mautic.builderSlots.splice(i, 1);
+                        return false; // break the loop
+                    }
+                });
                 slot.remove();
             });
             slot.append(handle);
@@ -543,6 +550,8 @@ Mautic.initSlotListeners = function() {
     Mautic.builderContents.on('slot:destroy', function(event, params) {
         if (params.type === 'text') {
             params.slot.froalaEditor('destroy');
+            params.slot.find('.atwho-inserted').atwho('destroy');
+            params.slot.find('[data-atwho-at-query]').removeAttr('data-atwho-at-query');
         } else if (params.type === 'image') {
             params.slot.find('img').froalaEditor('destroy');
         }
