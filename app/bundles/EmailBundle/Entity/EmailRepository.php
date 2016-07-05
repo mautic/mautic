@@ -230,29 +230,38 @@ class EmailRepository extends CommonRepository
             $listIds = array($listIds);
         }
 
-        $listQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $listQb->select('null')
-            ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll')
-            ->where(
-                $listQb->expr()->andX(
-                    $listQb->expr()->in('ll.leadlist_id', $listIds),
-                    $listQb->expr()->eq('ll.lead_id', 'l.id'),
-                    $listQb->expr()->eq('ll.manually_removed', ':false')
-                )
-            );
-
         // Main query
         $q  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         if ($countOnly) {
-            $q->select('count(l.id) as count');
+            // distinct with an inner join seems faster
+            $q->select('count(distinct(l.id)) as count');
+
+            $q->innerJoin('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll',
+                $q->expr()->andX(
+                    $q->expr()->in('ll.leadlist_id', $listIds),
+                    $q->expr()->eq('ll.lead_id', 'l.id'),
+                    $q->expr()->eq('ll.manually_removed', ':false')
+                )
+            );
         } else {
-            $q->select('l.*')
-                ->orderBy('l.id');
+            $q->select('l.*');
+
+            // use a derived table in order to retrieve distinct leads in case they belong to multiple
+            // lead lists associated with this email
+            $listQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $listQb->select('distinct(ll.lead_id) lead_id')
+                ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll')
+                ->where(
+                    $listQb->expr()->andX(
+                        $listQb->expr()->in('ll.leadlist_id', $listIds),
+                        $listQb->expr()->eq('ll.manually_removed', ':false')
+                    )
+                );
+            $q->innerJoin('l', sprintf('(%s)', $listQb->getSQL()), 'in_list', 'l.id = in_list.lead_id');
         }
         $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->andWhere(sprintf('NOT EXISTS (%s)', $dncQb->getSQL()))
             ->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()))
-            ->andWhere(sprintf('EXISTS (%s)', $listQb->getSQL()))
             ->setParameter('false', false, 'boolean');
 
         // Has an email
@@ -384,7 +393,7 @@ class EmailRepository extends CommonRepository
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.category'):
-                $expr = $q->expr()->like('e.alias', ":$unique");
+                $expr = $q->expr()->like('c.alias', ":$unique");
                 $filter->strict = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.lang'):

@@ -7,152 +7,181 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-return array(
-    'routes' => array(
-        'main' => array(
-            'mautic_asset_buildertoken_index' => array(
+return [
+    'routes' => [
+        'main' => [
+            'mautic_asset_buildertoken_index' => [
                 'path' => '/asset/buildertokens/{page}',
                 'controller' => 'MauticAssetBundle:SubscribedEvents\BuilderToken:index'
-            ),
-            'mautic_asset_index' => array(
+            ],
+            'mautic_asset_index' => [
                 'path' => '/assets/{page}',
                 'controller' => 'MauticAssetBundle:Asset:index'
-            ),
-            'mautic_asset_remote' => array(
+            ],
+            'mautic_asset_remote' => [
                 'path' => '/assets/remote',
                 'controller' => 'MauticAssetBundle:Asset:remote',
-            ),
-            'mautic_asset_action' => array(
+            ],
+            'mautic_asset_action' => [
                 'path' => '/assets/{objectAction}/{objectId}',
                 'controller' => 'MauticAssetBundle:Asset:execute',
-            )
-        ),
-        'api' => array(
-            'mautic_api_getassets' => array(
+            ]
+        ],
+        'api' => [
+            'mautic_api_getassets' => [
                 'path' => '/assets',
                 'controller' => 'MauticAssetBundle:Api\AssetApi:getEntities'
-            ),
-            'mautic_api_getasset' => array(
+            ],
+            'mautic_api_getasset' => [
                 'path' => '/assets/{id}',
                 'controller' => 'MauticAssetBundle:Api\AssetApi:getEntity'
-            )
-        ),
-        'public' => array(
-            'mautic_asset_download' => array(
+            ]
+        ],
+        'public' => [
+            'mautic_asset_download' => [
                 'path' => '/asset/{slug}',
                 'controller' => 'MauticAssetBundle:Public:download',
-                'defaults' => array(
+                'defaults' => [
                     "slug"    => ''
-                )
-            )
-        )
-    ),
+                ]
+            ]
+        ]
+    ],
 
-    'menu' => array(
-        'main' => array(
-            'items'    => array(
-                'mautic.asset.assets' => array(
+    'menu' => [
+        'main' => [
+            'items'    => [
+                'mautic.asset.assets' => [
                     'route'     => 'mautic_asset_index',
-                    'access'    => array('asset:assets:viewown', 'asset:assets:viewother'),
+                    'access'    => ['asset:assets:viewown', 'asset:assets:viewother'],
                     'parent'    => 'mautic.core.components',
                     'priority'  => 300,
-                )
-            )
-        )
-    ),
+                ]
+            ]
+        ]
+    ],
 
-    'categories' => array(
+    'categories' => [
         'asset' => null
-    ),
+    ],
 
-    'services' => array(
-        'events' => array(
-            'mautic.asset.subscriber' => array(
+    'services' => [
+        'events' => [
+            'mautic.asset.subscriber' => [
                 'class' => 'Mautic\AssetBundle\EventListener\AssetSubscriber'
-            ),
-            'mautic.asset.pointbundle.subscriber' => array(
+            ],
+            'mautic.asset.pointbundle.subscriber' => [
                 'class' => 'Mautic\AssetBundle\EventListener\PointSubscriber'
-            ),
-            'mautic.asset.formbundle.subscriber' => array(
+            ],
+            'mautic.asset.formbundle.subscriber' => [
                 'class' => 'Mautic\AssetBundle\EventListener\FormSubscriber'
-            ),
-            'mautic.asset.campaignbundle.subscriber' => array(
+            ],
+            'mautic.asset.campaignbundle.subscriber' => [
                 'class' => 'Mautic\AssetBundle\EventListener\CampaignSubscriber'
-            ),
-            'mautic.asset.reportbundle.subscriber' => array(
+            ],
+            'mautic.asset.reportbundle.subscriber' => [
                 'class' => 'Mautic\AssetBundle\EventListener\ReportSubscriber'
-            ),
-            'mautic.asset.builder.subscriber' => array(
-                'class' => 'Mautic\AssetBundle\EventListener\BuilderSubscriber'
-            ),
-            'mautic.asset.leadbundle.subscriber' => array(
-                'class' => 'Mautic\AssetBundle\EventListener\LeadSubscriber'
-            ),
-            'mautic.asset.pagebundle.subscriber' => array(
+            ],
+            'mautic.asset.builder.subscriber' => [
+                'class' => 'Mautic\AssetBundle\EventListener\BuilderSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.asset.helper.token'
+                ]
+            ],
+            'mautic.asset.leadbundle.subscriber' => [
+                'class'       => 'Mautic\AssetBundle\EventListener\LeadSubscriber',
+            ],
+            'mautic.asset.pagebundle.subscriber' => [
                 'class' => 'Mautic\AssetBundle\EventListener\PageSubscriber'
-            ),
-            'mautic.asset.emailbundle.subscriber' => array(
+            ],
+            'mautic.asset.emailbundle.subscriber' => [
                 'class' => 'Mautic\AssetBundle\EventListener\EmailSubscriber'
-            ),
-            'mautic.asset.configbundle.subscriber' => array(
+            ],
+            'mautic.asset.configbundle.subscriber' => [
                 'class' => 'Mautic\AssetBundle\EventListener\ConfigSubscriber'
-            ),
-            'mautic.asset.search.subscriber' => array(
+            ],
+            'mautic.asset.search.subscriber' => [
                 'class' => 'Mautic\AssetBundle\EventListener\SearchSubscriber'
-            ),
-            'oneup_uploader.pre_upload' => array(
-                'class' => 'Mautic\AssetBundle\EventListener\UploadSubscriber'
-            ),
-            'mautic.asset.dashboard.subscriber' => array(
+            ],
+            'oneup_uploader.pre_upload' => [
+                'class' => 'Mautic\AssetBundle\EventListener\UploadSubscriber',
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.core_parameters',
+                    'mautic.asset.model.asset'
+                ]
+            ],
+            'mautic.asset.dashboard.subscriber' => [
                 'class' => 'Mautic\AssetBundle\EventListener\DashboardSubscriber'
-            ),
-        ),
-        'forms' => array(
-            'mautic.form.type.asset' => array(
+            ]
+        ],
+        'forms' => [
+            'mautic.form.type.asset' => [
                 'class' => 'Mautic\AssetBundle\Form\Type\AssetType',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.theme',
+                    'mautic.asset.model.asset'
+                ],
                 'alias' => 'asset'
-            ),
-            'mautic.form.type.pointaction_assetdownload' => array(
+            ],
+            'mautic.form.type.pointaction_assetdownload' => [
                 'class' => 'Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType',
                 'alias' => 'pointaction_assetdownload'
-            ),
-            'mautic.form.type.campaignevent_assetdownload' => array(
+            ],
+            'mautic.form.type.campaignevent_assetdownload' => [
                 'class' => 'Mautic\AssetBundle\Form\Type\CampaignEventAssetDownloadType',
                 'alias' => 'campaignevent_assetdownload'
-            ),
-            'mautic.form.type.formsubmit_assetdownload' => array(
+            ],
+            'mautic.form.type.formsubmit_assetdownload' => [
                 'class' => 'Mautic\AssetBundle\Form\Type\FormSubmitActionDownloadFileType',
                 'alias' => 'asset_submitaction_downloadfile'
-            ),
-            'mautic.form.type.assetlist' => array(
+            ],
+            'mautic.form.type.assetlist' => [
                 'class' => 'Mautic\AssetBundle\Form\Type\AssetListType',
                 'arguments' => 'mautic.factory',
                 'alias' => 'asset_list'
-            ),
-            'mautic.form.type.assetconfig' => array(
+            ],
+            'mautic.form.type.assetconfig' => [
                 'class' => 'Mautic\AssetBundle\Form\Type\ConfigType',
                 'arguments' => 'mautic.factory',
                 'alias' => 'assetconfig'
-            ),
-            'mautic.form.type.asset_dashboard_downloads_in_time_widget' => array(
+            ],
+            'mautic.form.type.asset_dashboard_downloads_in_time_widget' => [
                 'class'     => 'Mautic\AssetBundle\Form\Type\DashboardDownloadsInTimeWidgetType',
                 'alias'     => 'asset_dashboard_downloads_in_time_widget'
-            )
-        ),
-        'others' => array(
-            'mautic.asset.upload.error.handler' => array(
+            ]
+        ],
+        'others' => [
+            'mautic.asset.upload.error.handler' => [
                 'class' => 'Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler',
                 'arguments' => 'mautic.factory'
-            ),
+            ],
             // Override the DropzoneController
-            'oneup_uploader.controller.dropzone.class' => 'Mautic\AssetBundle\Controller\UploadController'
-        )
-    ),
+            'oneup_uploader.controller.dropzone.class' => 'Mautic\AssetBundle\Controller\UploadController',
+            'mautic.asset.helper.token' => [
+                'class'     => 'Mautic\AssetBundle\Helper\TokenHelper',
+                'arguments' => 'mautic.asset.model.asset'
+            ]
+        ],
+        'models' =>  [
+            'mautic.asset.model.asset' => [
+                'class' => 'Mautic\AssetBundle\Model\AssetModel',
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.category.model.category',
+                    'request_stack',
+                    'mautic.helper.ip_lookup',
+                    'mautic.helper.core_parameters'
+                ]
+            ]
+        ]
+    ],
 
-    'parameters' => array(
+    'parameters' => [
         'upload_dir'            => '%kernel.root_dir%/../media/files',
         'max_size'              => '6',
-        'allowed_extensions'    => array('csv', 'doc', 'docx', 'epub', 'gif', 'jpg', 'jpeg', 'mpg', 'mpeg', 'mp3', 'odt', 'odp', 'ods', 'pdf', 'png', 'ppt', 'pptx', 'tif', 'tiff', 'txt', 'xls', 'xlsx', 'wav')
-    )
-);
+        'allowed_extensions'    => ['csv', 'doc', 'docx', 'epub', 'gif', 'jpg', 'jpeg', 'mpg', 'mpeg', 'mp3', 'odt', 'odp', 'ods', 'pdf', 'png', 'ppt', 'pptx', 'tif', 'tiff', 'txt', 'xls', 'xlsx', 'wav']
+    ]
+];

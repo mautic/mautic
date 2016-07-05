@@ -247,6 +247,19 @@ class MailHelper
     }
 
     /**
+     * Mirrors previous MauticFactory functionality
+     *
+     * @param bool $cleanSlate
+     * @return $this
+     */
+    public function getMailer($cleanSlate = true)
+    {
+        $this->reset($cleanSlate);
+
+        return $this;
+    }
+
+    /**
      * Send the message
      *
      * @param bool $dispatchSendEvent
@@ -374,7 +387,6 @@ class MailHelper
 
                 if (!empty($failures)) {
                     $this->errors['failures'] = $failures;
-
                     $this->logError('Sending failed for one or more recipients');
                 }
 
@@ -1260,8 +1272,10 @@ class MailHelper
             $this->setPlainText($plainText);
         }
 
-        $template = $email->getTemplate();
-        if (!empty($template)) {
+        $BCcontent = $email->getContent();
+        // Process emails created by Mautic v1
+        if (!empty($BCcontent)) {
+            $template = $email->getTemplate();
             if (empty($slots)) {
                 $template = $email->getTemplate();
                 $slots    = $this->factory->getTheme($template)->getSlots('email');
@@ -1362,18 +1376,6 @@ class MailHelper
     public function setTokens(array $tokens)
     {
         $this->globalTokens = $tokens;
-    }
-
-    /**
-     * Set custom tokens
-     *
-     * @param array $tokens
-     *
-     * @deprecated Since 1.1.  Use setTokens() instead. To be removed in 2.0
-     */
-    public function setCustomTokens(array $tokens)
-    {
-        $this->setTokens($tokens);
     }
 
     /**
@@ -1609,14 +1611,6 @@ class MailHelper
     }
 
     /**
-     * @deprecated 1.2.3 - to be removed in 2.0.  Use createEmailStat() instead
-     */
-    public function createLeadEmailStat()
-    {
-        $this->createEmailStat();
-    }
-
-    /**
      * Create an email stat
      *
      * @param bool|true   $persist
@@ -1674,23 +1668,25 @@ class MailHelper
         if (!isset($copies[$id])) {
             $hash = (strlen($id) !== 32) ? md5($this->subject.$this->body['content']) : $id;
 
-            $copy = $emailModel->getCopyRepository()->findByHash($hash);
+            $copy        = $emailModel->getCopyRepository()->findByHash($hash);
+            $copyCreated = false;
             if (null === $copy) {
-                // Create a copy entry
-                $copy = new Copy();
-                $copy->setId($hash)
-                    ->setBody($this->body['content'])
-                    ->setSubject($this->subject)
-                    ->setDateCreated(new \DateTime())
-                    ->setEmail($this->email);
-
-                $emailModel->getCopyRepository()->saveEntity($copy);
+                if (!$emailModel->getCopyRepository()->saveCopy($hash, $this->subject, $this->body['content'])) {
+                    // Try one more time to find the ID in case there was overlap when creating
+                    $copy = $emailModel->getCopyRepository()->findByHash($hash);
+                } else {
+                    $copyCreated = true;
+                }
             }
 
-            $copies[$id] = $copy;
+            if ($copy || $copyCreated) {
+                $copies[$id] = $hash;
+            }
         }
 
-        $stat->setStoredCopy($copies[$id]);
+        if (isset($copies[$id])) {
+            $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $copies[$id]));
+        }
 
         if ($persist) {
             $emailModel->getStatRepository()->saveEntity($stat);

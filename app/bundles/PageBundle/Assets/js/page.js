@@ -7,7 +7,7 @@ Mautic.pageOnLoad = function (container) {
     if (mQuery(container + ' #page_template').length) {
         Mautic.toggleBuilderButton(mQuery('#page_template').val() == '');
     }
-    
+
     if (mQuery(container + ' form[name="page"]').length) {
         mQuery("*[data-toggle='field-lookup']").each(function (index) {
             var target = mQuery(this).attr('data-target');
@@ -16,18 +16,46 @@ Mautic.pageOnLoad = function (container) {
             Mautic.activatePageFieldTypeahead(field, target, options);
         });
     }
-    
+
     //Handle autohide of "Redirect URL" field if "Redirect Type" is none
     if (mQuery(container + ' select[name="page[redirectType]"]').length) {
         //Auto-hide on page loading
         Mautic.autoHideRedirectUrl(container);
-        
+
         //Auto-hide on select changing
         mQuery(container + ' select[name="page[redirectType]"]').chosen().change(function(){
             Mautic.autoHideRedirectUrl(container);
         });
     }
+
+    mQuery(document).on('shown.bs.tab', function (e) {
+        mQuery('#page_customHtml').froalaEditor('popups.hideAll');
+    });
+
+    mQuery('.btn-builder').on('click', function (e) {
+        mQuery('#page_customHtml').froalaEditor('popups.hideAll');
+    });
+
+    Mautic.intiSelectTheme(mQuery('#page_template'));
+    Mautic.fixFroalaPageOutput();
 };
+
+Mautic.pageOnUnload = function (id) {
+    mQuery('#page_customHtml').froalaEditor('popups.hideAll');
+}
+
+Mautic.fixFroalaPageOutput = function() {
+    if (mQuery('form[name="page"]').length) {
+        var textarea = mQuery('textarea.builder-html');
+        mQuery('form[name="page"]').on('before.submit.ajaxform', function() {
+            var editorHtmlString = textarea.val();
+            Mautic.buildBuilderIframe(editorHtmlString, 'helper-iframe-for-html-manipulation');
+            var editorHtml = mQuery('iframe#helper-iframe-for-html-manipulation').contents();
+            editorHtml = Mautic.clearFroalaStyles(editorHtml);
+            textarea.val(editorHtml.find('html').get(0).outerHTML);
+        });
+    }
+}
 
 Mautic.getPageAbTestWinnerForm = function(abKey) {
     if (abKey && mQuery(abKey).val() && mQuery(abKey).closest('.form-group').hasClass('has-error')) {
@@ -97,7 +125,7 @@ Mautic.activatePageFieldTypeahead = function(field, target, options) {
             action: "page:fieldList&field=" + target
         });
     }
-    
+
     mQuery(fieldTypeahead).on('typeahead:selected', function (event, datum) {
         if (mQuery("#" + field).length && datum["value"]) {
             mQuery("#" + field).val(datum["value"]);
@@ -112,7 +140,7 @@ Mautic.activatePageFieldTypeahead = function(field, target, options) {
 Mautic.autoHideRedirectUrl = function(container) {
     var select = mQuery(container + ' select[name="page[redirectType]"]');
     var input = mQuery(container + ' input[name="page[redirectUrl]"]');
-    
+
     //If value is none we autohide the "Redirect URL" field and empty it
     if (select.val() == '') {
         input.closest('.form-group').hide();

@@ -160,6 +160,19 @@ class LeadImportFieldType extends AbstractType
         );
 
         $properties->add(
+            'stage',
+            'choice',
+            array(
+                'choices'    => $options['import_fields'],
+                'label'      => 'mautic.lead.import.label.stage',
+                'required'   => false,
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control'),
+                'data'       => $this->getDefaultValue('stage', $options['import_fields'])
+            )
+        );
+
+        $properties->add(
             'doNotEmail',
             'choice',
             array(

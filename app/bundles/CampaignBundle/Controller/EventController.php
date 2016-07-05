@@ -63,7 +63,7 @@ class EventController extends CommonFormController
         }
 
         //fire the builder event
-        $events            = $this->factory->getModel('campaign')->getEvents();
+        $events            = $this->getModel('campaign')->getEvents();
         $form              = $this->get('form.factory')->create('campaignevent', $event, array(
             'action'   => $this->generateUrl('mautic_campaignevent_action', array('objectAction' => 'new')),
             'settings' => $events[$eventType][$type]
@@ -115,6 +115,8 @@ class EventController extends CommonFormController
             ) : '';
         }
 
+        $viewParams['hideTriggerMode'] = isset($event['settings']['hideTriggerMode']) && $event['settings']['hideTriggerMode'];
+
         $passthroughVars = array(
             'mauticContent' => 'campaignEvent',
             'success'       => $success,
@@ -159,7 +161,6 @@ class EventController extends CommonFormController
             //just close the modal
             $passthroughVars['closeModal'] = 1;
             $response                      = new JsonResponse($passthroughVars);
-            $response->headers->set('Content-Length', strlen($response->getContent()));
 
             return $response;
         } else {
@@ -205,7 +206,7 @@ class EventController extends CommonFormController
             }
 
             //fire the builder event
-            $events            = $this->factory->getModel('campaign')->getEvents();
+            $events            = $this->getModel('campaign')->getEvents();
             $form              = $this->get('form.factory')->create('campaignevent', $event, array(
                 'action'   => $this->generateUrl('mautic_campaignevent_action', array('objectAction' => 'edit', 'objectId' => $objectId)),
                 'settings' => $events[$eventType][$type]
@@ -253,6 +254,8 @@ class EventController extends CommonFormController
                     $event['settings']['description']
                 ) : '';
             }
+
+            $viewParams['hideTriggerMode'] = isset($event['settings']['hideTriggerMode']) && $event['settings']['hideTriggerMode'];
 
             $passthroughVars = array(
                 'mauticContent' => 'campaignEvent',
@@ -340,7 +343,7 @@ class EventController extends CommonFormController
         $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
 
         if ($this->request->getMethod() == 'POST' && $event !== null) {
-            $events            = $this->factory->getModel('campaign')->getEvents();
+            $events            = $this->getModel('campaign')->getEvents();
             $event['settings'] = $events[$event['eventType']][$event['type']];
 
             // Add the field to the delete list
@@ -393,7 +396,7 @@ class EventController extends CommonFormController
         $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
 
         if ($this->request->getMethod() == 'POST' && $event !== null) {
-            $events            = $this->factory->getModel('campaign')->getEvents();
+            $events            = $this->getModel('campaign')->getEvents();
             $event['settings'] = $events[$event['eventType']][$event['type']];
 
             //add the field to the delete list
@@ -427,7 +430,6 @@ class EventController extends CommonFormController
         }
 
         $response = new JsonResponse($dataArray);
-        $response->headers->set('Content-Length', strlen($response->getContent()));
 
         return $response;
     }

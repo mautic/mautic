@@ -15,9 +15,9 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\EmailBundle\Entity\DoNotEmail;
 use Mautic\UserBundle\Entity\User;
 use Mautic\NotificationBundle\Entity\PushID;
+use Mautic\StageBundle\Entity\Stage;
 
 /**
  * Class Lead
@@ -31,7 +31,7 @@ class Lead extends FormEntity
      *
      * @var array
      */
-    private $availableSocialFields = array();
+    private $availableSocialFields = [];
 
     /**
      * @var int
@@ -76,19 +76,19 @@ class Lead extends FormEntity
     /**
      * @var array
      */
-    private $internal = array();
+    private $internal = [];
 
     /**
      * @var array
      */
-    private $socialCache = array();
+    private $socialCache = [];
 
     /**
      * Just a place to store updated field values so we don't have to loop through them again comparing
      *
      * @var array
      */
-    private $updatedFields = array();
+    private $updatedFields = [];
 
     /**
      * Used to populate trigger color
@@ -119,7 +119,7 @@ class Lead extends FormEntity
      *
      * @var array
      */
-    protected $fields = array();
+    protected $fields = [];
 
     /**
      * @var string
@@ -144,16 +144,56 @@ class Lead extends FormEntity
     private $tags;
 
     /**
+     * @var \Mautic\StageBundle\Entity\Stage
+     */
+    private $stage;
+    /**
+     * @var ArrayCollection
+     */
+    private $stageChangeLog;
+
+    /**
+     * @var ArrayCollection
+     */
+    private $utmtags;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->ipAddresses     = new ArrayCollection();
+        $this->pushIds         = new ArrayCollection();
+        $this->doNotContact    = new ArrayCollection();
+        $this->pointsChangeLog = new ArrayCollection();
+        $this->tags            = new ArrayCollection();
+        $this->stageChangeLog  = new ArrayCollection();
+    }
+
+    /**
+     * @param $name
+     *
+     * @return bool
+     */
+    public function __get($name)
+    {
+        return $this->getFieldValue(strtolower($name));
+    }
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('leads')
             ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadRepository')
             ->addLifecycleEvent('checkDateIdentified', 'preUpdate')
-            ->addLifecycleEvent('checkDateIdentified', 'prePersist');
+            ->addLifecycleEvent('checkDateIdentified', 'prePersist')
+            ->addLifecycleEvent('checkAttributionDate', 'preUpdate')
+            ->addLifecycleEvent('checkAttributionDate', 'prePersist')
+            ->addIndex(['date_added'], 'lead_date_added');
 
         $builder->createField('id', 'integer')
             ->isPrimaryKey()
@@ -169,7 +209,7 @@ class Lead extends FormEntity
 
         $builder->createOneToMany('pointsChangeLog', 'PointsChangeLog')
             ->orphanRemoval()
-            ->setOrderBy(array('dateAdded' => 'DESC'))
+            ->setOrderBy(['dateAdded' => 'DESC'])
             ->mappedBy('lead')
             ->cascadeAll()
             ->fetchExtraLazy()
@@ -220,7 +260,7 @@ class Lead extends FormEntity
 
         $builder->createOneToMany('notes', 'LeadNote')
             ->orphanRemoval()
-            ->setOrderBy(array('dateAdded' => 'DESC'))
+            ->setOrderBy(['dateAdded' => 'DESC'])
             ->mappedBy('lead')
             ->fetchExtraLazy()
             ->build();
@@ -234,12 +274,33 @@ class Lead extends FormEntity
             ->setJoinTable('lead_tags_xref')
             ->addInverseJoinColumn('tag_id', 'id', false)
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
-            ->setOrderBy(array('tag' => 'ASC'))
+            ->setOrderBy(['tag' => 'ASC'])
             ->setIndexBy('tag')
             ->fetchLazy()
             ->cascadeMerge()
             ->cascadePersist()
             ->cascadeDetach()
+            ->build();
+
+        $builder->createManyToOne('stage', 'Mautic\StageBundle\Entity\Stage')
+            ->cascadePersist()
+            ->cascadeMerge()
+            ->addJoinColumn('stage_id', 'id', true, false, 'SET NULL')
+            ->build();
+
+        $builder->createOneToMany('stageChangeLog', 'StagesChangeLog')
+            ->orphanRemoval()
+            ->setOrderBy(['dateAdded' => 'DESC'])
+            ->mappedBy('lead')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createOneToMany('utmtags', 'Mautic\LeadBundle\Entity\UtmTag')
+            ->orphanRemoval()
+            ->mappedBy('lead')
+            ->cascadeAll()
+            ->fetchExtraLazy()
             ->build();
     }
 
@@ -253,22 +314,24 @@ class Lead extends FormEntity
         $metadata->setGroupPrefix('lead')
             ->setRoot('lead')
             ->addListProperties(
-                array(
+                [
                     'id',
                     'points',
                     'color',
                     'fields',
-                )
+                ]
             )
             ->addProperties(
-                array(
+                [
                     'lastActive',
                     'owner',
                     'ipAddresses',
                     'tags',
+                    'utmtags',
+                    'stage',
                     'dateIdentified',
                     'preferredProfileImage'
-                )
+                ]
             )
             ->build();
     }
@@ -283,44 +346,52 @@ class Lead extends FormEntity
         $current = $this->$getter();
         if ($prop == 'owner') {
             if ($current && !$val) {
-                $this->changes['owner'] = array($current->getName().' ('.$current->getId().')', $val);
+                $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
             } elseif (!$current && $val) {
-                $this->changes['owner'] = array($current, $val->getName().' ('.$val->getId().')');
+                $this->changes['owner'] = [$current, $val->getName().' ('.$val->getId().')'];
             } elseif ($current && $val && $current->getId() != $val->getId()) {
-                $this->changes['owner'] = array(
+                $this->changes['owner'] = [
                     $current->getName().'('.$current->getId().')',
                     $val->getName().'('.$val->getId().')'
-                );
+                ];
             }
         } elseif ($prop == 'ipAddresses') {
-            $this->changes['ipAddresses'] = array('', $val->getIpAddress());
+            $this->changes['ipAddresses'] = ['', $val->getIpAddress()];
         } elseif ($prop == 'tags') {
             if ($val instanceof Tag) {
                 $this->changes['tags']['added'][] = $val->getTag();
             } else {
                 $this->changes['tags']['removed'][] = $val;
             }
-        } elseif ($this->$getter() != $val) {
-            $this->changes[$prop] = array($this->$getter(), $val);
-        }
-    }
+        } elseif ($prop == 'utmtags') {
 
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->ipAddresses     = new ArrayCollection();
-        $this->pushIds         = new ArrayCollection();
-        $this->doNotContact    = new ArrayCollection();
-        $this->pointsChangeLog = new ArrayCollection();
-        $this->tags            = new ArrayCollection();
+            if ($val instanceof UtmTag) {
+                if ($val->getUtmContent()) {
+                    $this->changes['utmtags'] = ['utm_content', $val->getUtmContent()];
+                }
+                if ($val->getUtmMedium()) {
+                    $this->changes['utmtags'] = ['utm_medium', $val->getUtmMedium()];
+                }
+                if ($val->getUtmCampaign()) {
+                    $this->changes['utmtags'] = ['utm_campaign', $val->getUtmCampaign()];
+                }
+                if ($val->getUtmTerm()) {
+                    $this->changes['utmtags'] = ['utm_term', $val->getUtmTerm()];
+                }
+                if ($val->getUtmSource()) {
+                    $this->changes['utmtags'] = ['utm_source', $val->getUtmSource()];
+                }
+
+            }
+        } elseif ($this->$getter() != $val) {
+            $this->changes[$prop] = [$this->$getter(), $val];
+        }
     }
 
     /**
      * @return array
      */
-    public function convertToArray ()
+    public function convertToArray()
     {
         return get_object_vars($this);
     }
@@ -332,7 +403,7 @@ class Lead extends FormEntity
      *
      * @return Lead
      */
-    public function setId ($id)
+    public function setId($id)
     {
         $this->id = $id;
 
@@ -344,7 +415,7 @@ class Lead extends FormEntity
      *
      * @return integer
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
@@ -369,7 +440,7 @@ class Lead extends FormEntity
      *
      * @return User
      */
-    public function getOwner ()
+    public function getOwner()
     {
         return $this->owner;
     }
@@ -411,7 +482,7 @@ class Lead extends FormEntity
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getIpAddresses ()
+    public function getIpAddresses()
     {
         return $this->ipAddresses;
     }
@@ -423,7 +494,7 @@ class Lead extends FormEntity
      *
      * @return string
      */
-    public function getName ($lastFirst = false)
+    public function getName($lastFirst = false)
     {
         if (isset($this->updatedFields['firstname'])) {
             $firstName = $this->updatedFields['firstname'];
@@ -437,7 +508,7 @@ class Lead extends FormEntity
             $lastName = (isset($this->fields['core']['lastname']['value'])) ? $this->fields['core']['lastname']['value'] : '';
         }
 
-        $fullName  = "";
+        $fullName = "";
         if ($lastFirst && !empty($firstName) && !empty($lastName)) {
             $fullName = $lastName.", ".$firstName;
         } elseif (!empty($firstName) && !empty($lastName)) {
@@ -530,7 +601,7 @@ class Lead extends FormEntity
      *
      * @return string
      */
-    public function getPrimaryIdentifier ($lastFirst = false)
+    public function getPrimaryIdentifier($lastFirst = false)
     {
         if ($name = $this->getName($lastFirst)) {
             return $name;
@@ -552,7 +623,7 @@ class Lead extends FormEntity
      *
      * @return string
      */
-    public function getSecondaryIdentifier ()
+    public function getSecondaryIdentifier()
     {
         if (!empty($this->fields['core']['company']['value'])) {
             return $this->fields['core']['company']['value'];
@@ -566,7 +637,7 @@ class Lead extends FormEntity
      *
      * @return string
      */
-    public function getLocation ()
+    public function getLocation()
     {
         $location = '';
 
@@ -590,7 +661,7 @@ class Lead extends FormEntity
      *
      * @param $points
      */
-    public function addToPoints ($points)
+    public function addToPoints($points)
     {
         $newPoints = $this->points + $points;
         $this->setPoints($newPoints);
@@ -603,7 +674,7 @@ class Lead extends FormEntity
      *
      * @return Lead
      */
-    public function setPoints ($points)
+    public function setPoints($points)
     {
         $this->isChanged('points', $points);
         $this->points = $points;
@@ -616,7 +687,7 @@ class Lead extends FormEntity
      *
      * @return integer
      */
-    public function getPoints ()
+    public function getPoints()
     {
         return $this->points;
     }
@@ -630,7 +701,7 @@ class Lead extends FormEntity
      * @param           $pointsDelta
      * @param IpAddress $ip
      */
-    public function addPointsChangeLogEntry ($type, $name, $action, $pointsDelta, IpAddress $ip)
+    public function addPointsChangeLogEntry($type, $name, $action, $pointsDelta, IpAddress $ip)
     {
         if ($pointsDelta <= 0) {
             // No need to record this
@@ -665,6 +736,40 @@ class Lead extends FormEntity
     }
 
     /**
+     * Creates a points change entry
+     *
+     * @param           $type
+     * @param           $name
+     * @param           $action
+     * @param           $pointsDelta
+     * @param IpAddress $ip
+     */
+    public function stageChangeLogEntry($type, $name, $action)
+    {
+        //create a new points change event
+        $event = new StagesChangeLog();
+        $event->setEventName($name);
+        $event->setActionName($action);
+        $event->setDateAdded(new \DateTime());
+        $event->setLead($this);
+        $this->stageChangeLog($event);
+    }
+
+    /**
+     * Add pointsChangeLog
+     *
+     * @param PointsChangeLog $pointsChangeLog
+     *
+     * @return Lead
+     */
+    public function stageChangeLog(StagesChangeLog $stageChangeLog)
+    {
+        $this->stageChangeLog[] = $stageChangeLog;
+
+        return $this;
+    }
+
+    /**
      * Remove pointsChangeLog
      *
      * @param PointsChangeLog $pointsChangeLog
@@ -679,7 +784,7 @@ class Lead extends FormEntity
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getPointsChangeLog ()
+    public function getPointsChangeLog()
     {
         return $this->pointsChangeLog;
     }
@@ -742,10 +847,10 @@ class Lead extends FormEntity
      */
     public function addDoNotContactEntry(DoNotContact $doNotContact)
     {
-        $this->changes['dnc_channel_status'][$doNotContact->getChannel()] = array(
+        $this->changes['dnc_channel_status'][$doNotContact->getChannel()] = [
             'reason'   => $doNotContact->getReason(),
             'comments' => $doNotContact->getComments()
-        );
+        ];
 
         // @deprecated - to be removed in 2.0
         switch ($doNotContact->getReason()) {
@@ -756,10 +861,11 @@ class Lead extends FormEntity
                 $type = 'manual';
                 break;
             case DoNotContact::UNSUBSCRIBED:
+            default:
                 $type = 'unsubscribed';
                 break;
         }
-        $this->changes['dnc_status'] = array($type, $doNotContact->getComments());
+        $this->changes['dnc_status'] = [$type, $doNotContact->getComments()];
 
         $this->doNotContact[] = $doNotContact;
 
@@ -771,14 +877,14 @@ class Lead extends FormEntity
      */
     public function removeDoNotContactEntry(DoNotContact $doNotContact)
     {
-        $this->changes['dnc_channel_status'][$doNotContact->getChannel()] = array(
+        $this->changes['dnc_channel_status'][$doNotContact->getChannel()] = [
             'reason'     => DoNotContact::IS_CONTACTABLE,
             'old_reason' => $doNotContact->getReason(),
             'comments'   => $doNotContact->getComments()
-        );
+        ];
 
         // @deprecated to be removed in 2.0
-        $this->changes['dnc_status'] = array('removed', $doNotContact->getComments());
+        $this->changes['dnc_status'] = ['removed', $doNotContact->getComments()];
 
         $this->doNotContact->removeElement($doNotContact);
     }
@@ -796,7 +902,7 @@ class Lead extends FormEntity
      *
      * @param $internal
      */
-    public function setInternal ($internal)
+    public function setInternal($internal)
     {
         $this->internal = $internal;
     }
@@ -806,7 +912,7 @@ class Lead extends FormEntity
      *
      * @return mixed
      */
-    public function getInternal ()
+    public function getInternal()
     {
         return $this->internal;
     }
@@ -816,7 +922,7 @@ class Lead extends FormEntity
      *
      * @param $cache
      */
-    public function setSocialCache ($cache)
+    public function setSocialCache($cache)
     {
         $this->socialCache = $cache;
     }
@@ -826,7 +932,7 @@ class Lead extends FormEntity
      *
      * @return mixed
      */
-    public function getSocialCache ()
+    public function getSocialCache()
     {
         return $this->socialCache;
     }
@@ -834,7 +940,7 @@ class Lead extends FormEntity
     /**
      * @param $fields
      */
-    public function setFields ($fields)
+    public function setFields($fields)
     {
         $this->fields = $fields;
     }
@@ -844,10 +950,10 @@ class Lead extends FormEntity
      *
      * @return array
      */
-    public function getFields ($ungroup = false)
+    public function getFields($ungroup = false)
     {
         if ($ungroup && isset($this->fields['core'])) {
-            $return = array();
+            $return = [];
             foreach ($this->fields as $group => $fields) {
                 $return += $fields;
             }
@@ -859,18 +965,46 @@ class Lead extends FormEntity
     }
 
     /**
+     * Get profile values
+     *
+     * @return array
+     */
+    public function getProfileFields()
+    {
+        $fieldValues = [
+            'id' => $this->id
+        ];
+        if (isset($this->fields['core'])) {
+            foreach ($this->fields as $group => $fields) {
+                foreach ($fields as $alias => $field) {
+                    $fieldValues[$alias] = $field['value'];
+                }
+            }
+        }
+
+        return array_merge($fieldValues, $this->updatedFields);
+    }
+
+    /**
      * Add an updated field to persist to the DB and to note changes
      *
      * @param        $alias
      * @param        $value
      * @param string $oldValue
      */
-    public function addUpdatedField ($alias, $value, $oldValue = '')
+    public function addUpdatedField($alias, $value, $oldValue = '')
     {
         if ($this->wasAnonymous == null) {
             $this->wasAnonymous = $this->isAnonymous();
         }
-        $this->changes['fields'][$alias] = array($oldValue, $value);
+
+        $value = trim($value);
+        if ($value == '') {
+            // Ensure value is null for consistency
+            $value = null;
+        }
+
+        $this->changes['fields'][$alias] = [$oldValue, $value];
         $this->updatedFields[$alias]     = $value;
     }
 
@@ -879,7 +1013,7 @@ class Lead extends FormEntity
      *
      * @return array
      */
-    public function getUpdatedFields ()
+    public function getUpdatedFields()
     {
         return $this->updatedFields;
     }
@@ -972,7 +1106,7 @@ class Lead extends FormEntity
      *
      * @return void
      */
-    public function setPreferredProfileImage ($source)
+    public function setPreferredProfileImage($source)
     {
         $this->preferredProfileImage = $source;
     }
@@ -980,7 +1114,7 @@ class Lead extends FormEntity
     /**
      * @return string
      */
-    public function getPreferredProfileImage ()
+    public function getPreferredProfileImage()
     {
         return $this->preferredProfileImage;
     }
@@ -1002,20 +1136,6 @@ class Lead extends FormEntity
     }
 
     /**
-     * Set date identified
-     */
-    public function checkDateIdentified ()
-    {
-        if ($this->dateIdentified == null && $this->wasAnonymous) {
-            //check the changes to see if the user is now known
-            if (!$this->isAnonymous()) {
-                $this->dateIdentified            = new \DateTime();
-                $this->changes['dateIdentified'] = array('', $this->dateIdentified);
-            }
-        }
-    }
-
-    /**
      * @return mixed
      */
     public function getLastActive()
@@ -1028,7 +1148,7 @@ class Lead extends FormEntity
      */
     public function setLastActive($lastActive)
     {
-        $this->changes['dateLastActive'] = array($this->lastActive, $lastActive);
+        $this->changes['dateLastActive'] = [$this->lastActive, $lastActive];
         $this->lastActive                = $lastActive;
     }
 
@@ -1071,7 +1191,7 @@ class Lead extends FormEntity
      *
      * @return mixed
      */
-    public function getTags ()
+    public function getTags()
     {
         return $this->tags;
     }
@@ -1088,5 +1208,93 @@ class Lead extends FormEntity
         $this->tags = $tags;
 
         return $this;
+    }
+
+    /**
+     * Get tags
+     *
+     * @return mixed
+     */
+    public function getUtmTags()
+    {
+        return $this->utmtags;
+    }
+
+    /**
+     * Set tags
+     *
+     * @param $tags
+     *
+     * @return $this
+     */
+    public function setUtmTags($utmTags)
+    {
+        $this->isChanged('utmtags', $utmTags);
+        $this->utmtags[] = $utmTags;
+
+        return $this;
+    }
+
+    /**
+     * Set stage
+     *
+     * @param \Mautic\StageBundle\Entity\Stage $stage
+     *
+     * @return Stage
+     */
+    public function setStage(Stage $stage)
+    {
+        $this->stage = $stage;
+
+        return $this;
+    }
+
+    /**
+     * Get stage
+     *
+     * @return \Mautic\StageBundle\Entity\Stage
+     */
+    public function getStage()
+    {
+        return $this->stage;
+    }
+
+    /**
+     * Get attribution value
+     *
+     * @return bool
+     */
+    public function getAttribution()
+    {
+        return (float) $this->getFieldValue('attribution');
+    }
+
+    /**
+     * If there is an attribution amount but no date, insert today's date
+     */
+    public function checkAttributionDate()
+    {
+        $attribution     = $this->getFieldValue('attribution');
+        $attributionDate = $this->getFieldValue('attribution_date');
+
+        if (!empty($attribution) && empty($attributionDate)) {
+            $this->addUpdatedField('attribution_date', (new \DateTime())->format('Y-m-d'));
+        } elseif (empty($attribution)) {
+            $this->addUpdatedField('attribution_date', null);
+        }
+    }
+
+    /**
+     * Set date identified
+     */
+    public function checkDateIdentified()
+    {
+        if ($this->dateIdentified == null && $this->wasAnonymous) {
+            //check the changes to see if the user is now known
+            if (!$this->isAnonymous()) {
+                $this->dateIdentified            = new \DateTime();
+                $this->changes['dateIdentified'] = ['', $this->dateIdentified];
+            }
+        }
     }
 }

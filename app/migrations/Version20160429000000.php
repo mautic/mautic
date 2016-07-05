@@ -42,7 +42,7 @@ class Version20160429000000 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function mysqlUp(Schema $schema)
+    public function up(Schema $schema)
     {
 
         $sql = <<<SQL
@@ -60,27 +60,6 @@ SQL;
         $this->addSql($sql);
 
         $this->addSql("ALTER TABLE {$this->prefix}channel_url_trackables ADD CONSTRAINT {$this->redirectFk} FOREIGN KEY (redirect_id) REFERENCES {$this->prefix}page_redirects (id) ON DELETE CASCADE");
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    public function postgresqlUp(Schema $schema)
-    {
-        $sql = <<<SQL
-CREATE TABLE {$this->prefix}channel_url_trackables (
-  redirect_id INT NOT NULL, 
-  channel_id INT NOT NULL, 
-  channel VARCHAR(255) NOT NULL, 
-  hits INT NOT NULL, 
-  unique_hits INT NOT NULL, PRIMARY KEY(redirect_id, channel_id)
-)
-SQL;
-        $this->addSql($sql);
-
-        $this->addSql("CREATE INDEX {$this->redirectIdx} ON {$this->prefix}channel_url_trackables (redirect_id)");
-        $this->addSql("CREATE INDEX {$this->prefix} ON {$this->prefix}channel_url_trackables (channel, channel_id)");
-        $this->addSql("ALTER TABLE {$this->prefix}channel_url_trackables ADD CONSTRAINT {$this->redirectFk} FOREIGN KEY (redirect_id) REFERENCES {$this->prefix}page_redirects (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE");
     }
 
     /**

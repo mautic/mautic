@@ -679,6 +679,16 @@ class LeadListRepository extends CommonRepository
                             break;
                     }
 
+                    // check does this match php date params pattern?
+                    if(stristr($string[0], '-') or stristr($string[0], '+')){
+                        $date = new \DateTime('now');
+                        $date->modify($string);
+                        $dateTime = $date->format('Y-m-d H:i:s');
+                        $dtHelper->setDateTime($dateTime, null);
+                        $key = $string;
+                        $isRelative = true;
+                    }
+                    
                     if ($isRelative) {
                         if ($requiresBetween) {
                             $startWith = ($isTimestamp) ? $dtHelper->toUtcString('Y-m-d H:i:s') : $dtHelper->toUtcString('Y-m-d');
@@ -714,16 +724,16 @@ class LeadListRepository extends CommonRepository
             switch ($details['field']) {
                 case 'hit_url':
                     $operand = (($func == 'eq') || ($func == 'like')) ? 'EXISTS' : 'NOT EXISTS';
-                    
+
                     $subqb = $this->_em->getConnection()
                         ->createQueryBuilder()
-                        ->select('null')
+                        ->select('id')
                         ->from(MAUTIC_TABLE_PREFIX . 'page_hits', $alias);
                     switch ($func) {
                         case 'eq':
                         case 'neq':
                             $parameters[$parameter] = $details['filter'];
-                            
+
                             $subqb->where($q->expr()
                                 ->andX($q->expr()
                                 ->eq($alias . '.url', $exprParameter), $q->expr()
@@ -750,24 +760,25 @@ class LeadListRepository extends CommonRepository
                 case 'dnc_unsubscribed':
                 case 'dnc_bounced_sms':
                 case 'dnc_unsubscribed_sms':
-                    // Special handling of do not email
+                    // Special handling of do not contact
                     $func = (($func == 'eq' && $details['filter']) || ($func == 'neq' && !$details['filter'])) ? 'EXISTS' : 'NOT EXISTS';
 
-                    $parts = explode('_', $details['field']);
+                    $parts   = explode('_', $details['field']);
                     $channel = 'email';
 
                     if (count($parts) === 3) {
                         $channel = $parts[2];
                     }
 
+                    $channelParameter = $this->generateRandomParameterName();
                     $subqb = $this->_em->getConnection()->createQueryBuilder()
                         ->select('null')
-                        ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', $alias)
+                        ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', $alias)
                         ->where(
                             $q->expr()->andX(
-                                $q->expr()->eq($alias . '.reason', $exprParameter),
-                                $q->expr()->eq($alias . '.lead_id', 'l.id'),
-                                $q->expr()->eq($alias . '.channel', $channel)
+                                $q->expr()->eq($alias.'.reason', $exprParameter),
+                                $q->expr()->eq($alias.'.lead_id', 'l.id'),
+                                $q->expr()->eq($alias.'.channel', ":$channelParameter")
                             )
                         );
 
@@ -787,7 +798,8 @@ class LeadListRepository extends CommonRepository
 
                     $ignoreAutoFilter = true;
 
-                    $parameters[$parameter] = ($parts[1] === 'bounced') ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
+                    $parameters[$parameter]        = ($parts[1] === 'bounced') ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
+                    $parameters[$channelParameter] = $channel;
 
                     break;
 
@@ -853,6 +865,30 @@ class LeadListRepository extends CommonRepository
                     $groupExpr->add(
                         sprintf('%s (%s)', $func, $subQb->getSQL())
                     );
+
+                    break;
+                case 'stage':
+                    $operand = in_array($func, array('eq', 'neq')) ? 'EXISTS' : 'NOT EXISTS';
+
+                    $subQb = $this->_em->getConnection()
+                        ->createQueryBuilder()
+                        ->select('null')
+                        ->from(MAUTIC_TABLE_PREFIX . 'stages', $alias);
+                    switch ($func) {
+                        case 'eq':
+                        case 'neq':
+                            $parameters[$parameter] = $details['filter'];
+                            $subQb->where(
+                                $q->expr()->andX(
+                                    $q->expr()->eq($alias.'.id', 'l.stage_id'),
+                                    $q->expr()->eq($alias.'.id', ":$parameter")
+                                )
+                            );
+                            break;
+                    }
+
+                    $groupExpr->add(sprintf('%s (%s)', $operand, $subQb->getSQL()));
+
 
                     break;
                 default:

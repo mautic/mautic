@@ -29,7 +29,7 @@ if ($tmpl == 'index') {
         'target'          => '#notes-container',
         'page'            => $page,
         'limit'           => $limit,
-        'baseUrl'         => $view['router']->generate('mautic_leadnote_index', array('leadId' => $lead->getId(), 'page' => $page)),
+        'baseUrl'         => $view['router']->path('mautic_contactnote_index', array('leadId' => $lead->getId(), 'page' => $page)),
         'sessionVar'      => 'leadnote'
     )); ?>
 </div>

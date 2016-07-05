@@ -128,6 +128,25 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
+     * @param $result
+     */
+    public function setResult($result)
+    {
+        $this->result = $result;
+    }
+
+    /**
+     * Set the result to failed
+     */
+    public function setFailed($reason = null)
+    {
+        $this->result = [
+            'failed' => 1,
+            'reason' => $reason
+        ];
+    }
+
+    /**
      * @return mixed
      */
     public function getEventSettings()
@@ -162,5 +181,15 @@ class CampaignExecutionEvent extends Event
     public function wasLogUpdatedByListener()
     {
         return $this->logUpdatedByListener;
+    }
+
+    /**
+     * Check if an event is applicable
+     *
+     * @param $eventType
+     */
+    public function checkContext($eventType)
+    {
+        return (strtolower($eventType) == strtolower($this->event['type']));
     }
 }

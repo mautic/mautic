@@ -53,13 +53,13 @@ class FieldController extends CommonFormController
         }
 
         //fire the form builder event
-        $customComponents = $this->factory->getModel('form.form')->getCustomComponents();
+        $customComponents = $this->getModel('form.form')->getCustomComponents();
         $customParams     = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
 
         // Only show the lead fields not already used
         $usedLeadFields = $session->get('mautic.form.'.$formId.'.fields.leadfields', array());
         $testLeadFields = array_flip($usedLeadFields);
-        $leadFields     = $this->factory->getModel('lead.field')->getFieldList();
+        $leadFields     = $this->getModel('lead.field')->getFieldList();
         foreach ($leadFields as &$group) {
             $group = array_diff_key($group, $testLeadFields);
         }
@@ -96,7 +96,7 @@ class FieldController extends CommonFormController
                     foreach ($fields as $f) {
                         $aliases[] = $f['alias'];
                     }
-                    $formField['alias'] = $this->factory->getModel('form.field')->generateAlias($formField['label'], $aliases);
+                    $formField['alias'] = $this->getModel('form.field')->generateAlias($formField['label'], $aliases);
 
                     if (empty($formField['alias'])) {
                         // Likely a bogus label so generate random alias for column name
@@ -171,7 +171,6 @@ class FieldController extends CommonFormController
             //just close the modal
             $passthroughVars['closeModal'] = 1;
             $response                      = new JsonResponse($passthroughVars);
-            $response->headers->set('Content-Length', strlen($response->getContent()));
 
             return $response;
         }
@@ -221,7 +220,7 @@ class FieldController extends CommonFormController
             if (!empty($currentLeadField) && isset($testLeadFields[$currentLeadField])) {
                 unset($testLeadFields[$currentLeadField]);
             }
-            $leadFields     = $this->factory->getModel('lead.field')->getFieldList();
+            $leadFields     = $this->getModel('lead.field')->getFieldList();
             foreach ($leadFields as &$group) {
                 $group = array_diff_key($group, $testLeadFields);
             }
@@ -257,7 +256,7 @@ class FieldController extends CommonFormController
                                     $aliases[] = $f['alias'];
                                 }
                             }
-                            $formField['alias'] = $this->factory->getModel('form.field')->generateAlias($formField['label'], $aliases);
+                            $formField['alias'] = $this->getModel('form.field')->generateAlias($formField['label'], $aliases);
                         }
 
                         $fields[$objectId] = $formField;
@@ -313,7 +312,6 @@ class FieldController extends CommonFormController
                 //just close the modal
                 $passthroughVars['closeModal'] = 1;
                 $response                      = new JsonResponse($passthroughVars);
-                $response->headers->set('Content-Length', strlen($response->getContent()));
 
                 return $response;
             }
@@ -326,7 +324,6 @@ class FieldController extends CommonFormController
         }
 
         $response = new JsonResponse(array('success' => 0));
-        $response->headers->set('Content-Length', strlen($response->getContent()));
 
         return $response;
     }
@@ -394,7 +391,6 @@ class FieldController extends CommonFormController
         }
 
         $response = new JsonResponse($dataArray);
-        $response->headers->set('Content-Length', strlen($response->getContent()));
 
         return $response;
     }
@@ -463,7 +459,6 @@ class FieldController extends CommonFormController
         }
 
         $response = new JsonResponse($dataArray);
-        $response->headers->set('Content-Length', strlen($response->getContent()));
 
         return $response;
     }

@@ -11,12 +11,13 @@ namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
-use Symfony\Component\Templating\Helper\CoreAssetsHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Symfony\Component\Asset\Packages;
 
 /**
  * Class AssetsHelper
  */
-class AssetsHelper extends CoreAssetsHelper
+class AssetsHelper
 {
 
     /**
@@ -38,6 +39,28 @@ class AssetsHelper extends CoreAssetsHelper
      * @var
      */
     protected $version;
+
+    protected $packages;
+
+    protected $coreParametersHelper;
+
+    public function __construct(Packages $packages)
+    {
+        $this->packages = $packages;
+    }
+
+    public function setCharset()
+    {
+
+    }
+
+    /**
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function setParamsHelper(CoreParametersHelper $coreParametersHelper)
+    {
+        $this->coreParametersHelper = $coreParametersHelper;
+    }
 
     /**
      * Gets asset prefix
@@ -94,7 +117,7 @@ class AssetsHelper extends CoreAssetsHelper
             $path        = $assetPrefix.$path;
         }
 
-        $url = parent::getUrl($path, $packageName, $version);
+        $url = $this->packages->getUrl($path, $packageName, $version);
 
         if ($absolute) {
             $url = $this->getBaseUrl() . $url;
@@ -202,24 +225,6 @@ class AssetsHelper extends CoreAssetsHelper
         }
     }
 
-    /**
-     * Load ckeditor source files
-     *
-     * @return void
-     */
-    public function loadEditor()
-    {
-        static $editorLoaded;
-
-        if (empty($editorLoaded)) {
-            $editorLoaded = true;
-            $this->addScript(array(
-                'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js?v' . $this->version,
-                'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js?v' . $this->version
-            ));
-        }
-    }
-
     /*
      * Loads an addon script
      *
@@ -229,7 +234,7 @@ class AssetsHelper extends CoreAssetsHelper
      */
     public function includeScript($assetFilePath, $onLoadCallback = '', $alreadyLoadedCallback = '')
     {
-        return  '<script async="async" type="text/javascript">Mautic.loadScript(\''.$this->getUrl($assetFilePath)."', '$onLoadCallback', '$alreadyLoadedCallback');</script>";
+        return  '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadScript(\''.$this->getUrl($assetFilePath)."', '$onLoadCallback', '$alreadyLoadedCallback');</script>";
     }
 
     /*
@@ -239,7 +244,7 @@ class AssetsHelper extends CoreAssetsHelper
      */
     public function includeStylesheet($assetFilePath)
     {
-        return  '<script async="async" type="text/javascript">Mautic.loadStylesheet(\'' . $this->getUrl($assetFilePath) . '\');</script>';
+        return  '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadStylesheet(\'' . $this->getUrl($assetFilePath) . '\');</script>';
     }
 
     /**
@@ -290,20 +295,33 @@ class AssetsHelper extends CoreAssetsHelper
      */
     public function outputStyles()
     {
-        if (isset($this->assets['stylesheets'])) {
+        echo $this->getStyles();
+    }
 
+    /**
+     * Outputs the stylesheets and style declarations
+     *
+     * @return void
+     */
+    public function getStyles()
+    {
+        $styles = '';
+
+        if (isset($this->assets['stylesheets'])) {
             foreach (array_reverse($this->assets['stylesheets']) as $s) {
-                echo '<link rel="stylesheet" href="' . $this->getUrl($s) . '" />' . "\n";
+                $styles .= '<link rel="stylesheet" href="' . $this->getUrl($s) . '" data-source="mautic" />' . "\n";
             }
         }
 
         if (isset($this->assets['styleDeclarations'])) {
-            echo "<style>\n";
+            $styles .=  "<style data-source=\"mautic\">\n";
             foreach (array_reverse($this->assets['styleDeclarations']) as $d) {
-                echo "$d\n";
+                $styles .=  "$d\n";
             }
-            echo "</style>\n";
+            $styles .=  "</style>\n";
         }
+
+        return $styles;
     }
 
     /**
@@ -318,12 +336,12 @@ class AssetsHelper extends CoreAssetsHelper
         if (isset($this->assets['scripts'][$location])) {
             foreach (array_reverse($this->assets['scripts'][$location]) as $s) {
                 list($script, $async) = $s;
-                echo '<script src="'.$this->getUrl($script).'"' . ($async ? ' async' : '') . '></script>'."\n";
+                echo '<script src="'.$this->getUrl($script).'"' . ($async ? ' async' : '') . ' data-source="mautic"></script>'."\n";
             }
         }
 
         if (isset($this->assets['scriptDeclarations'][$location])) {
-            echo "<script>\n";
+            echo "<script data-source=\"mautic\">\n";
             foreach (array_reverse($this->assets['scriptDeclarations'][$location]) as $d) {
                 echo "$d\n";
             }
@@ -344,8 +362,17 @@ class AssetsHelper extends CoreAssetsHelper
      */
     public function outputHeadDeclarations()
     {
-        $this->outputStyles();
-        $headOutput = '';
+        echo $this->getHeadDeclarations();
+    }
+
+    /**
+     * Returns head scripts, stylesheets, and custom declarations
+     *
+     * @return void
+     */
+    public function getHeadDeclarations()
+    {
+        $headOutput = $this->getStyles();
         if (!empty($this->assets['headDeclarations'])) {
             $scriptOpen = false;
             foreach ($this->assets['headDeclarations'] as $declaration) {
@@ -360,7 +387,7 @@ class AssetsHelper extends CoreAssetsHelper
                         }
                         list($script, $async) = $output;
 
-                        $headOutput .= "\n".'<script src="' . $this->getUrl($script) . '"' . ($async ? ' async' : '') . '></script>';
+                        $headOutput .= "\n".'<script src="' . $this->getUrl($script) . '"' . ($async ? ' async' : '') . ' data-source="mautic"></script>';
                         break;
                     case 'custom':
                     case 'declaration':
@@ -368,7 +395,7 @@ class AssetsHelper extends CoreAssetsHelper
                             $headOutput .= "\n</script>";
                             $scriptOpen = false;
                         } elseif ($type == 'declaration' && !$scriptOpen) {
-                            $headOutput .= "\n<script>";
+                            $headOutput .= "\n<script data-source=\"mautic\">";
                             $scriptOpen = true;
                         }
                         $headOutput .= "\n$output";
@@ -380,7 +407,7 @@ class AssetsHelper extends CoreAssetsHelper
                 $headOutput .= "\n</script>\n\n";
             }
         }
-        echo $headOutput;
+        return $headOutput;
     }
 
     /**
@@ -394,7 +421,7 @@ class AssetsHelper extends CoreAssetsHelper
 
         if (isset($assets['css'])) {
             foreach ($assets['css'] as $url) {
-                echo '<link rel="stylesheet" href="' . $this->getUrl($url) . '" />' . "\n";
+                echo '<link rel="stylesheet" href="' . $this->getUrl($url) . '" data-source="mautic" />' . "\n";
             }
         }
     }
@@ -409,13 +436,12 @@ class AssetsHelper extends CoreAssetsHelper
         $assets = $this->assetHelper->getAssets();
 
         if ($includeEditor) {
-            $assets['js'][] = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js?v' . $this->version;
-            $assets['js'][] = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js?v' . $this->version;
+            $assets['js'] = array_merge($assets['js'], $this->getFroalaScripts());
         }
 
         if (isset($assets['js'])) {
             foreach ($assets['js'] as $url) {
-                echo '<script src="' . $this->getUrl($url) . '"></script>' . "\n";
+                echo '<script src="' . $this->getUrl($url) . '" data-source="mautic"></script>' . "\n";
             }
         }
     }
@@ -433,21 +459,57 @@ class AssetsHelper extends CoreAssetsHelper
         $assets = $this->assetHelper->getAssets();
 
         if ($includeEditor) {
-            $assets['js'][] = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js?v' . $this->version;
-            $assets['js'][] = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js?v' . $this->version;
+            $assets['js'] = array_merge($assets['js'], $this->getFroalaScripts());
         }
 
         if ($render) {
             $js = '';
             if (isset($assets['js'])) {
                 foreach ($assets['js'] as $url) {
-                    $js .= '<script src="' . $this->getUrl($url) . '"></script>' . "\n";
+                    $js .= '<script src="' . $this->getUrl($url) . '" data-source="mautic"></script>' . "\n";
                 }
             }
             return $js;
         }
 
         return $assets['js'];
+    }
+
+    /**
+     * Load Froala JS source files
+     *
+     * @return array
+     */
+    public function getFroalaScripts()
+    {
+        $base = 'app/bundles/CoreBundle/Assets/js/libraries/froala/';
+        $plugins = $base . 'plugins/';
+        return array(
+            $base . 'froala_editor.js?v' . $this->version,
+            $plugins . 'align.js?v' . $this->version,
+            $plugins . 'code_beautifier.js?v' . $this->version,
+            $plugins . 'code_view.js?v' . $this->version,
+            $plugins . 'colors.js?v' . $this->version,
+            // $plugins . 'file.js?v' . $this->version,  // @todo
+            $plugins . 'font_family.js?v' . $this->version,
+            $plugins . 'font_size.js?v' . $this->version,
+            $plugins . 'fullscreen.js?v' . $this->version,
+            $plugins . 'image.js?v' . $this->version,
+            // $plugins . 'image_manager.js?v' . $this->version,
+            $plugins . 'filemanager.js?v' . $this->version,
+            $plugins . 'inline_style.js?v' . $this->version,
+            $plugins . 'line_breaker.js?v' . $this->version,
+            $plugins . 'link.js?v' . $this->version,
+            $plugins . 'lists.js?v' . $this->version,
+            $plugins . 'paragraph_format.js?v' . $this->version,
+            $plugins . 'paragraph_style.js?v' . $this->version,
+            $plugins . 'quick_insert.js?v' . $this->version,
+            $plugins . 'quote.js?v' . $this->version,
+            $plugins . 'table.js?v' . $this->version,
+            $plugins . 'url.js?v' . $this->version,
+            $plugins . 'video.js?v' . $this->version,
+            $plugins . 'token.js?v' . $this->version
+        );
     }
 
     /**
@@ -544,7 +606,7 @@ class AssetsHelper extends CoreAssetsHelper
     public function shortenText($text, $charCount = null)
     {
         if ($charCount && strlen($text) > $charCount) {
-            return substr($text, 0, $charCount) . '...';
+            return mb_substr($text, 0, $charCount, "utf-8") . '...';
         }
 
         return $text;
@@ -593,7 +655,14 @@ class AssetsHelper extends CoreAssetsHelper
         } else {
             return '<img src="' . $flagImg . '" class="'.$class.'" />';
         }
+    }
 
+    /**
+     * Clear all the assets
+     */
+    public function clear()
+    {
+        $this->assets = [];
     }
 
     /**

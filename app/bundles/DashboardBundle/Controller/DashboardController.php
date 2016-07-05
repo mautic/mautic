@@ -28,8 +28,8 @@ class DashboardController extends FormController
     public function indexAction()
     {
         /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
-        $model           = $this->factory->getModel('dashboard');
-        $widgets         = $model->getWidgets();
+        $model   = $this->getModel('dashboard');
+        $widgets = $model->getWidgets();
 
         // Apply the default dashboard if no widget exists
         if (!count($widgets) && $this->factory->getUser()->getId()) {
@@ -93,7 +93,7 @@ class DashboardController extends FormController
         //retrieve the entity
         $widget = new Widget();
 
-        $model  = $this->factory->getModel('dashboard');
+        $model  = $this->getModel('dashboard');
         $action = $this->generateUrl('mautic_dashboard_action', array('objectAction' => 'new'));
 
         //get the user form factory
@@ -136,7 +136,6 @@ class DashboardController extends FormController
             }
 
             $response = new JsonResponse($passthroughVars);
-            $response->headers->set('Content-Length', strlen($response->getContent()));
 
             return $response;
         } else {
@@ -159,7 +158,7 @@ class DashboardController extends FormController
      */
     public function editAction($objectId)
     {
-        $model  = $this->factory->getModel('dashboard');
+        $model  = $this->getModel('dashboard');
         $widget = $model->getEntity($objectId);
         $action = $this->generateUrl('mautic_dashboard_action', array('objectAction' => 'edit', 'objectId' => $objectId));
 
@@ -203,7 +202,6 @@ class DashboardController extends FormController
 
 
             $response = new JsonResponse($passthroughVars);
-            $response->headers->set('Content-Length', strlen($response->getContent()));
 
             return $response;
         } else {
@@ -241,7 +239,7 @@ class DashboardController extends FormController
         );
 
         /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
-        $model  = $this->factory->getModel('dashboard');
+        $model  = $this->getModel('dashboard');
         $entity = $model->getEntity($objectId);
         if ($entity === null) {
             $flashes[] = array(
@@ -280,7 +278,7 @@ class DashboardController extends FormController
     public function exportAction()
     {
         /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
-        $model            = $this->factory->getModel('dashboard');
+        $model            = $this->getModel('dashboard');
         $widgetsPaginator = $model->getWidgets();
         $usersName        = $this->factory->getUser()->getName();
         $dateTime         = new \DateTime;
@@ -329,7 +327,6 @@ class DashboardController extends FormController
 
         $response = new JsonResponse($dashboard);
         $response->setEncodingOptions($response->getEncodingOptions() | JSON_PRETTY_PRINT);
-        $response->headers->set('Content-Length', strlen($response->getContent()));
         $response->headers->set('Content-Type', 'application/force-download');
         $response->headers->set('Content-Type', 'application/octet-stream');
         $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
@@ -392,7 +389,7 @@ class DashboardController extends FormController
 
             if ($widgets) {
                 /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
-                $model = $this->factory->getModel('dashboard');
+                $model = $this->getModel('dashboard');
 
                 $model->clearDashboardCache();
 
@@ -425,7 +422,7 @@ class DashboardController extends FormController
         $preview = $this->request->get('preview');
 
         /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
-        $model = $this->factory->getModel('dashboard');
+        $model = $this->getModel('dashboard');
 
         $directories = array(
             'user'   => $this->factory->getSystemPath('dashboard.user'),

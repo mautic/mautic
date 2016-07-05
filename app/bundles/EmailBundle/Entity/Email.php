@@ -444,7 +444,6 @@ class Email extends FormEntity
                     }
 
                     if ($total > 100) {
-                        //die(var_dump($context));
                         $context->buildViolation('mautic.core.variant_weights_invalid')
                             ->atPath('variantSettings[weight]')
                             ->addViolation();
@@ -491,8 +490,6 @@ class Email extends FormEntity
                     'variantChildren'
                 )
             )
-            ->setMaxDepth(1, 'variantParent')
-            ->setMaxDepth(1, 'variantChildren')
             ->build();
     }
 

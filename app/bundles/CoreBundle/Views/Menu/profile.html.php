@@ -8,6 +8,8 @@
  */
 
 /** @var \Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables $app */
+
+$inline = $view['menu']->render('profile');
 ?>
 <li class="dropdown">
     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -17,14 +19,19 @@
     </a>
     <ul class="dropdown-menu dropdown-menu-right">
         <li>
-            <a href="<?php echo $view['router']->generate("mautic_user_account"); ?>" data-toggle="ajax">
+            <a href="<?php echo $view['router']->path("mautic_user_account"); ?>" data-toggle="ajax">
                 <i class="fa fa-user fs-14"></i><span><?php echo $view["translator"]->trans("mautic.user.account.settings"); ?></span>
             </a>
         </li>
         <li>
-            <a href="<?php echo $view['router']->generate("mautic_user_logout"); ?>">
+            <a href="<?php echo $view['router']->path("mautic_user_logout"); ?>">
                 <i class="fa fa-sign-out fs-14"></i><span><?php echo $view["translator"]->trans("mautic.user.auth.logout"); ?></span>
             </a>
         </li>
+
+        <?php if (!empty($inline)): ?>
+        <li role="separator" class="divider"></li>
+        <?php echo $inline; ?>
+        <?php endif; ?>
     </ul>
 </li>

@@ -9,8 +9,8 @@
 
 namespace Mautic\SmsBundle\Model;
 
-use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Event\SmsEvent;
@@ -27,6 +27,21 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class SmsModel extends FormModel
 {
     /**
+     * @var TrackableModel
+     */
+    protected $pageTrackableModel;
+
+    /**
+     * SmsModel constructor.
+     * 
+     * @param TrackableModel $pageTrackableModel
+     */
+    public function __construct(TrackableModel $pageTrackableModel)
+    {
+        $this->pageTrackableModel = $pageTrackableModel;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return \Mautic\SmsBundle\Entity\SmsRepository
@@ -41,7 +56,7 @@ class SmsModel extends FormModel
      */
     public function getStatRepository()
     {
-        return $this->factory->getEntityManager()->getRepository('MauticSmsBundle:Stat');
+        return $this->em->getRepository('MauticSmsBundle:Stat');
     }
 
     /**
@@ -206,94 +221,6 @@ class SmsModel extends FormModel
     }
 
     /**
-     * Get a stats for sms by list
-     *
-     * @param Sms|int $sms
-     *
-     * @return array
-     */
-    public function getSmsListStats($sms)
-    {
-        if (! $sms instanceof Sms) {
-            $sms = $this->getEntity($sms);
-        }
-
-        $smsIds = array($sms->getId());
-
-        $lists     = $sms->getLists();
-        $listCount = count($lists);
-
-        $combined = $this->translator->trans('mautic.sms.lists.combined');
-        $datasets = array(
-            $combined => array(0, 0, 0)
-        );
-
-        $labels = array(
-            $this->translator->trans('mautic.sms.sent')
-        );
-
-        if ($listCount) {
-            /** @var \Mautic\SmsBundle\Entity\StatRepository $statRepo */
-            $statRepo = $this->em->getRepository('MauticSmsBundle:Stat');
-
-            foreach ($lists as $l) {
-                $name = $l->getTitle();
-
-                $sentCount = $statRepo->getSentCount($smsIds, $l->getId());
-                $datasets[$combined][0] += $sentCount;
-
-                $datasets[$name] = array();
-
-                $datasets[$name] = array(
-                    $sentCount
-                );
-
-                $datasets[$name]['datasetKey'] = $l->getId();
-            }
-        }
-
-        if ($listCount === 1) {
-            unset($datasets[$combined]);
-        }
-
-        $data = GraphHelper::prepareBarGraphData($labels, $datasets);
-
-        return $data;
-    }
-
-    /**
-     * @param int|Sms $sms
-     * @param int       $amount
-     * @param string    $unit
-     *
-     * @return array
-     */
-    public function getSmsGeneralStats($sms, $amount = 30, $unit = 'D')
-    {
-        if (! $sms instanceof Sms) {
-            $sms = $this->getEntity($sms);
-        }
-
-        $smsIds = array($sms->getId());
-
-        /** @var \Mautic\SmsBundle\Entity\StatRepository $statRepo */
-        $statRepo = $this->em->getRepository('MauticSmsBundle:Stat');
-
-        $graphData = GraphHelper::prepareDatetimeLineGraphData($amount, $unit,
-            array(
-                $this->translator->trans('mautic.sms.stat.sent')
-            )
-        );
-
-        $fromDate = $graphData['fromDate'];
-
-        $sentData  = $statRepo->getSmsStats($smsIds, $fromDate, 'sent');
-        $graphData = GraphHelper::mergeLineGraphData($graphData, $sentData, $unit, 0, 'date', 'data');
-
-        return $graphData;
-    }
-
-    /**
      * Get an array of tracked links
      *
      * @param $smsId
@@ -302,6 +229,6 @@ class SmsModel extends FormModel
      */
     public function getSmsClickStats($smsId)
     {
-        return $this->factory->getModel('page.trackable')->getTrackableList('sms', $smsId);
+        return $this->pageTrackableModel->getTrackableList('sms', $smsId);
     }
 }

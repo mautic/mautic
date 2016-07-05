@@ -23,14 +23,13 @@ $header = ($email->getId()) ?
 
 $view['slots']->set("headerTitle", $header.$subheader);
 
-$template  = $form['template']->vars['data'];
 $emailType = $form['emailType']->vars['data'];
 
 if (!isset($attachmentSize)) {
     $attachmentSize = 0;
 }
-?>
 
+?>
 
 <?php echo $view['form']->start($form); ?>
 <div class="box-layout">
@@ -41,49 +40,24 @@ if (!isset($attachmentSize)) {
                 <ul class="bg-auto nav nav-tabs pr-md pl-md">
                     <li class="active"><a href="#email-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.email.email'); ?></a></li>
                     <li class=""><a href="#advanced-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.advanced'); ?></a></li>
+                    <li class=""><a href="#source-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.content'); ?></a></li>
                 </ul>
                 <!--/ tabs controls -->
                 <div class="tab-content pa-md">
                     <div class="tab-pane fade in active bdr-w-0" id="email-container">
                         <div class="row">
-                            <div class="col-md-8">
+                            <div class="col-md-12">
                                 <?php echo $view['form']->row($form['subject']); ?>
                             </div>
-
-                            <div class="col-md-4">
+                            <div class="col-md-12">
                                 <?php echo $view['form']->row($form['template']); ?>
                             </div>
                         </div>
-
-                        <div class="row">
-                            <div class="col-md-12" id="customHtmlContainer" style="min-height: 325px;">
-                                <div class="custom-html-mask<?php if (!$template) echo ' hide'; ?>">
-                                    <div class="well text-center" style="position: absolute; top: 110px; width: 50%; left:0; right:0; margin-left:auto; margin-right:auto; z-index: 1010;">
-                                        <h3 style="padding: 30px;">
-                                            <a href="javascript: void(0);" onclick="Mautic.launchBuilder('emailform', 'email');">
-                                                <?php echo $view['translator']->trans('mautic.core.builder.launch'); ?> <i class="fa fa-angle-right"></i>
-                                            </a>
-                                        </h3>
-                                    </div>
-                                    <div style="height: 100%; width: 100%; position: absolute; top: 0; left: 0; bottom: 0; right: 0; opacity: 0.8; background-color: #fff; z-index: 1000"></div>
-                                </div>
-                                <?php echo $view['form']->row($form['customHtml']); ?>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="pull-left">
-                                    <?php echo $view['form']->label($form['plainText']); ?>
-                                </div>
-                                <div class="text-right pr-10">
-                                    <i class="fa fa-spinner fa-spin ml-2 plaintext-spinner hide"></i>
-                                    <a class="small" onclick="Mautic.autoGeneratePlaintext();"><?php echo $view['translator']->trans('mautic.email.plaintext.generate'); ?></a>
-                                </div>
-                                <div class="clearfix"></div>
-                                <?php echo $view['form']->widget($form['plainText']); ?>
-                            </div>
-                        </div>
+                        <?php echo $view->render('MauticCoreBundle:Helper:theme_select.html.php', array(
+                            'type'   => 'email',
+                            'themes' => $themes,
+                            'active' => $form['template']->vars['value']
+                        )); ?>
                     </div>
 
                     <div class="tab-pane fade bdr-w-0" id="advanced-container">
@@ -116,6 +90,28 @@ if (!isset($attachmentSize)) {
                                 </div>
                                 <div class="clearfix"></div>
                                 <?php echo $view['form']->widget($form['assetAttachments']); ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade bdr-w-0" id="source-container">
+                        <div class="row">
+                            <div class="col-md-12" id="customHtmlContainer" style="min-height: 325px;">
+                                <?php echo $view['form']->row($form['customHtml']); ?>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="pull-left">
+                                    <?php echo $view['form']->label($form['plainText']); ?>
+                                </div>
+                                <div class="text-right pr-10">
+                                    <i class="fa fa-spinner fa-spin ml-2 plaintext-spinner hide"></i>
+                                    <a class="small" onclick="Mautic.autoGeneratePlaintext();"><?php echo $view['translator']->trans('mautic.email.plaintext.generate'); ?></a>
+                                </div>
+                                <div class="clearfix"></div>
+                                <?php echo $view['form']->widget($form['plainText']); ?>
                             </div>
                         </div>
                     </div>
@@ -154,40 +150,13 @@ if (!isset($attachmentSize)) {
 </div>
 <?php echo $view['form']->end($form); ?>
 
-<div class="hide builder email-builder">
-    <div class="builder-content">
-        <input type="hidden" id="builder_url" value="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'builder', 'objectId' => $email->getSessionId())); ?>" />
-    </div>
-    <div class="builder-panel">
-        <div class="builder-panel-top">
-            <p>
-                <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeBuilder('email');"><?php echo $view['translator']->trans('mautic.core.close.builder'); ?></button>
-            </p>
-            <div class="well well-small mb-10" id="customHtmlDropzone">
-                <div class="template-dnd-help<?php echo (!$template) ? ' hide' : ''; ?>"><?php echo $view['translator']->trans('mautic.core.builder.token.help'); ?></div>
-                <div class="custom-dnd-help<?php echo (!$template) ? '' : ' hide'; ?>">
-                    <div class="custom-drop-message hide text-center"><?php echo $view['translator']->trans('mautic.core.builder.token.drophere'); ?></div>
-                    <div class="custom-general-message"><?php echo $view['translator']->trans('mautic.core.builder.token.help_custom'); ?></div>
-                </div>
-            </div>
-        </div>
-        <div class="panel-group builder-tokens" id="emailTokensPanel">
-            <?php foreach ($tokens as $k => $t): ?>
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h4 class="panel-title"><?php echo $t['header']; ?></h4>
-                    </div>
-                    <div class="panel-body">
-                        <?php echo $t['content']; ?>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-
-            <?php echo $view->render('MauticCoreBundle:Helper:buildermodal_feedback.html.php'); ?>
-            <?php echo $view->render('MauticCoreBundle:Helper:buildermodal_link.html.php'); ?>
-        </div>
-    </div>
-</div>
+<?php echo $view->render('MauticCoreBundle:Helper:builder.html.php', array(
+    'type'          => 'email',
+    'sectionForm'   => $sectionForm,
+    'builderAssets' => $builderAssets,
+    'slots'         => $slots,
+    'objectId'      => $email->getSessionId()
+)); ?>
 
 <?php
 $type = $email->getEmailType();

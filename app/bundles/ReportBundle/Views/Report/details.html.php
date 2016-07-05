@@ -25,7 +25,7 @@ if ($tmpl == 'index') {
                 'target'      => '_new',
                 'data-toggle' => '',
                 'class'       => 'btn btn-default btn-nospin',
-                'href'        => $view['router']->generate(
+                'href'        => $view['router']->path(
                     'mautic_report_export',
                     array('objectId' => $report->getId(), 'format' => 'html')
                 )
@@ -39,7 +39,7 @@ if ($tmpl == 'index') {
                 'attr'      => array(
                     'data-toggle' => 'download',
                     'class'       => 'btn btn-default btn-nospin',
-                    'href'        => $view['router']->generate(
+                    'href'        => $view['router']->path(
                         'mautic_report_export',
                         array('objectId' => $report->getId(), 'format' => 'csv')
                     )
@@ -53,7 +53,7 @@ if ($tmpl == 'index') {
                     'attr'      => array(
                         'data-toggle' => 'download',
                         'class'       => 'btn btn-default btn-nospin',
-                        'href'        => $view['router']->generate(
+                        'href'        => $view['router']->path(
                             'mautic_report_export',
                             array('objectId' => $report->getId(), 'format' => 'xlsx')
                         )
@@ -72,17 +72,17 @@ if ($tmpl == 'index') {
             array(
                 'item'              => $report,
                 'templateButtons'   => array(
-                    'edit'   => $security->hasEntityAccess(
+                    'edit'   => $view['security']->hasEntityAccess(
                         $permissions['report:reports:editown'],
                         $permissions['report:reports:editother'],
                         $report->getCreatedBy()
                     ),
-                    'delete' => $security->hasEntityAccess(
+                    'delete' => $view['security']->hasEntityAccess(
                         $permissions['report:reports:deleteown'],
                         $permissions['report:reports:deleteother'],
                         $report->getCreatedBy()
                     ),
-                    'close'  => $security->hasEntityAccess(
+                    'close'  => $view['security']->hasEntityAccess(
                         $permissions['report:reports:viewown'],
                         $permissions['report:reports:viewother'],
                         $report->getCreatedBy()
@@ -102,56 +102,72 @@ if ($tmpl == 'index') {
 }
 ?>
 
-<!-- start: box layout -->
-<div class="box-layout">
-    <!-- left section -->
-    <div class="col-md-9 bg-white height-auto">
-        <div class="bg-auto">
-            <!-- report detail header -->
-            <div class="pr-md pl-md pt-lg pb-lg">
-                <div class="box-layout">
-                    <div class="col-xs-10 va-m">
-                        <div class="text-white dark-sm mb-0"><?php echo $report->getDescription(); ?></div>
-                    </div>
-                </div>
+<!-- report detail header -->
+<?php if ($report->getDescription()): ?>
+<div class="pr-md pl-md pt-lg pb-lg">
+    <div class="text-white dark-sm mb-0"><?php echo $report->getDescription(); ?></div>
+</div>
+<?php endif; ?>
+<!--/ report detail header -->
+<!-- report detail collapseable -->
+<div id="report-shelves" class="mb-5" aria-multiselectable="true">
+    <div class="collapse" id="report-details">
+        <div class="pr-md pl-md pb-md">
+            <div class="panel shd-none mb-0">
+                <table class="table table-bordered table-striped mb-0">
+                    <tbody>
+                    <?php echo $view->render(
+                        'MauticCoreBundle:Helper:details.html.php',
+                        array('entity' => $report)
+                    ); ?>
+                    </tbody>
+                </table>
             </div>
-            <!--/ report detail header -->
-            <!-- report detail collapseable -->
-            <div class="collapse" id="report-details">
-                <div class="pr-md pl-md pb-md">
-                    <div class="panel shd-none mb-0">
-                        <table class="table table-bordered table-striped mb-0">
-                            <tbody>
-                            <?php echo $view->render(
-                                'MauticCoreBundle:Helper:details.html.php',
-                                array('entity' => $report)
-                            ); ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <!--/ report detail collapseable -->
-        </div>
-
-        <div class="bg-auto bg-dark-xs">
-            <!-- report detail collapseable toggler -->
-            <div class="hr-expand nm">
-                <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse"
-                       data-target="#report-details"><span class="caret"></span> <?php echo $view['translator']->trans(
-                            'mautic.core.details'
-                        ); ?></a>
-                </span>
-            </div>
-            <!--/ report detail collapseable toggler -->
-        </div>
-
-        <div class="report-content">
-            <?php $view['slots']->output('_content'); ?>
         </div>
     </div>
-    <!--/ left section -->
+    <div class="collapse" id="report-filters">
+        <div class="pr-md pl-md pb-md">
+            <div class="panel shd-none mb-0 pa-lg">
+                <div class="row">
+                    <div class="col-sm-12 mb-10">
+                        <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', array('dateRangeForm' => $dateRangeForm)); ?>
+                    </div>
+                    <?php $view['form']->start($dynamicFilterForm); ?>
+                    <?php foreach ($dynamicFilterForm->children as $filter): ?>
+                    <?php if ($filter->vars['block_prefixes'][1] == 'hidden') continue; ?>
+                    <div class="col-sm-4">
+                        <?php echo $view['form']->row($filter); ?>
+                    </div>
+                    <?php endforeach; ?>
+                    <?php $view['form']->end($dynamicFilterForm); ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/ report detail collapseable -->
+
+    <div class="bg-auto bg-dark-xs">
+        <!-- report detail collapseable toggler -->
+        <div class="hr-expand nm">
+            <a href="#report-details" class="arrow text-muted collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="report-details">
+                <span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?>
+            </a>
+            <a href="#report-filters" class="arrow text-muted collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="report-filters">
+                <span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.filters'); ?>
+            </a>
+        </div>
+        <!--/ report detail collapseable toggler -->
+    </div>
 </div>
+
+<div class="report-content">
+    <?php $view['slots']->output('_content'); ?>
+</div>
+<?php if (!empty($debug)): ?>
+<div class="well">
+    <h4>Debug: <?php echo $debug['query_time']; ?></h4>
+    <div><?php echo $debug['query']; ?></div>
+</div>
+<?php endif; ?>
 <!--/ end: box layout -->
 <input type="hidden" name="entityId" id="entityId" value="<?php echo $report->getId(); ?>"/>

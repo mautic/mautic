@@ -24,43 +24,8 @@ if ($event['extra']['hit']['dateLeft']) {
 
 $icon = (isset($event['icon'])) ? $event['icon'] : '';
 
-// Check for UTM codes
 $query = $event['extra']['hit']['query'];
-if (isset($query['utm_medium'])) {
-    switch (strtolower($query['utm_medium'])) {
-        case 'social':
-        case 'socialmedia':
-            $icon = 'fa-' . ((isset($query['utm_source'])) ? strtolower($query['utm_source']) : 'share-alt');
-            break;
-        case 'email':
-        case 'newsletter':
-            $icon = 'fa-envelope-o';
-            break;
-        case 'banner':
-        case 'ad':
-            $icon = 'fa-bullseye';
-            break;
-        case 'cpc':
-            $icon = 'fa-money';
-            break;
-        case 'location':
-            $icon = 'fa-map-marker';
-            break;
-        case 'device':
-            $icon = 'fa-' . ((isset($query['utm_source'])) ? strtolower($query['utm_source']) : 'tablet');
-            break;
-    }
-}
 
-if (isset($query['utm_campaign'])) {
-    $title = $query['utm_campaign'];
-}
-
-if (!empty($query['utm_source'])) {
-    $event['eventLabel'] = ucfirst($query['utm_source']);
-}
-
-$counter = 3;
 ?>
 
 <li class="wrapper page-hit">
@@ -71,7 +36,7 @@ $counter = 3;
                 <?php if (!empty($title)): ?>
                     <?php echo $title; ?>
                 <?php elseif ($event['extra']['hit']['page_id']) : ?>
-                    <a href="<?php echo $view['router']->generate('mautic_page_action',
+                    <a href="<?php echo $view['router']->path('mautic_page_action',
                         array("objectAction" => "view", "objectId" => $item->getId())); ?>"
                        data-toggle="ajax">
                         <?php echo $item->getTitle(); ?>
@@ -96,7 +61,7 @@ $counter = 3;
                     <dt><?php echo $view['translator']->trans('mautic.page.url'); ?>:</dt>
                     <dd class="ellipsis"><?php echo $event['extra']['hit']['url'] ? $view['assets']->makeLinks($event['extra']['hit']['url']) : $view['translator']->trans('mautic.core.unknown'); ?></dd>
                     <?php if (isset($event['extra']['hit']['sourceName'])): ?>
-                    <?php $counter++; ?>
+
                     <dt><?php echo $view['translator']->trans('mautic.core.source'); ?>:</dt>
                     <dd class="ellipsis">
                         <?php if (isset($event['extra']['hit']['sourceRoute'])): ?>
@@ -108,50 +73,6 @@ $counter = 3;
                         <?php endif; ?>
                     </dd>
                     <?php endif; ?>
-                    <?php
-                    if (! empty($query)) {
-                        foreach ($query as $k => $v) {
-                            if (in_array($v, array('', null, array()))) continue;
-                            if (in_array($k, array('ct', 'page_title', 'page_referrer', 'page_url'))) continue;
-                            if (is_array($v)) {
-                                foreach ($v as $k2 => $v2) {
-                                    $counter++;
-                                    $k2 = ucwords(str_replace('_', ' ', $k));
-
-                                    echo '<dt>' . $k2 . ':</dt>';
-                                    echo '<dd class="ellipsis">' . $v2 . '</dd>';
-
-                                    if (empty($showMore) && $counter > 5) {
-                                        $showMore = true;
-
-                                        echo '<div style="display:none">';
-                                    }
-                                }
-
-                                continue;
-                            }
-
-                            $counter++;
-                            $k = ucwords(str_replace('_', ' ', $k));
-
-                            echo '<dt>' . $k . ':</dt>';
-                            echo '<dd class="ellipsis">' . $v . '</dd>';
-
-                            if (empty($showMore) && $counter > 5) {
-                                $showMore = true;
-
-                                echo '<div style="display:none">';
-                            }
-                        }
-
-                        if (! empty($showMore)) {
-                            echo '</div>';
-                            echo '<a href="javascript:void(0);" class="text-center small center-block mt-xs" onclick="Mautic.toggleTimelineMoreVisiblity(mQuery(this).prev());">';
-                            echo $view['translator']->trans('mautic.core.more.show');
-                            echo '</a>';
-                        }
-                    }
-                    ?>
                 </dl>
                 <div class="small">
                     <?php echo $event['extra']['hit']['userAgent']; ?>

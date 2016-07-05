@@ -11,7 +11,9 @@ namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Debug\Exception\ClassNotFoundException;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -62,6 +64,60 @@ class CommonController extends Controller implements MauticController
      */
     public function initialize(FilterControllerEvent $event)
     {
+    }
+
+    /**
+     * Check if a security level is granted
+     * 
+     * @param $level
+     * 
+     * @return bool
+     */
+    protected function accessGranted($level)
+    {
+        return in_array($level, $this->getPermissions());
+    }
+
+    /**
+     * Override this method in your controller
+     * for easy access to the permissions
+     * 
+     * @return array
+     */
+    protected function getPermissions()
+    {
+        return [];
+    }
+
+    /**
+     * Get a model instance from the service container
+     *
+     * @param $modelNameKey
+     *
+     * @return AbstractCommonModel
+     */
+    protected function getModel($modelNameKey)
+    {
+        // Shortcut for models with the same name as the bundle
+        if (strpos($modelNameKey, '.') === false) {
+            $modelNameKey = "$modelNameKey.$modelNameKey";
+        }
+
+        $parts = explode('.', $modelNameKey);
+
+        if (count($parts) !== 2) {
+            throw new \InvalidArgumentException($modelNameKey . " is not a valid model key.");
+        }
+
+        list($bundle, $name) = $parts;
+
+        $containerKey = str_replace(array('%bundle%', '%name%'), array($bundle, $name), 'mautic.%bundle%.model.%name%');
+
+        if ($this->container->has($containerKey)) {
+            return $this->container->get($containerKey);
+        }
+
+        throw new \InvalidArgumentException($containerKey . ' is not a registered container key.');
     }
 
     /**
@@ -212,7 +268,7 @@ class CommonController extends Controller implements MauticController
         if ($this->request->get('ignoreAjax', false)) {
             $response = new Response();
             $response->setContent($newContent);
-            
+
             return $response;
         }
 
@@ -276,7 +332,6 @@ class CommonController extends Controller implements MauticController
             $response = new JsonResponse($dataArray, $code);
         }
 
-        //$response->headers->set('Content-Length', strlen($response->getContent()));
         return $response;
     }
 
@@ -404,7 +459,8 @@ class CommonController extends Controller implements MauticController
                 $filter  = InputHelper::clean($this->request->query->get("filterby"), true);
                 $value   = InputHelper::clean($this->request->query->get("value"), true);
                 $filters = $session->get("mautic.$name.filters", array());
-                if (empty($value)) {
+
+                if ($value == '') {
                     if (isset($filters[$filter])) {
                         unset($filters[$filter]);
                     }
@@ -416,6 +472,7 @@ class CommonController extends Controller implements MauticController
                         'strict' => false
                     );
                 }
+
                 $session->set("mautic.$name.filters", $filters);
             }
         }
@@ -475,7 +532,7 @@ class CommonController extends Controller implements MauticController
         $afterId = $request->get('mauticLastNotificationId', null);
 
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model = $this->factory->getModel('core.notification');
+        $model = $this->getModel('core.notification');
 
         list($notifications, $showNewIndicator, $updateMessage) = $model->getNotificationContent($afterId);
 
@@ -503,7 +560,7 @@ class CommonController extends Controller implements MauticController
     public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null)
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
-        $notificationModel = $this->factory->getModel('core.notification');
+        $notificationModel = $this->getModel('core.notification');
         $notificationModel->addNotification($message, $type, $isRead, $header, $iconClass, $datetime );
     }
 

@@ -11,7 +11,6 @@ namespace Mautic\PluginBundle\Bundle;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Tools\SchemaTool;
-use Mautic\PluginBundle\Entity\Addon;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -22,22 +21,17 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 abstract class PluginBundleBase extends Bundle
 {
     /**
-     * Called by PluginController::reloadAction when adding a new addon that's not already installed
-     *
      * @param Plugin        $plugin
      * @param MauticFactory $factory
      * @param null          $metadata
+     * @param null          $installedSchema
+     *
+     * @throws \Exception
      */
-
-    static public function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null)
+    static public function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null)
     {
-        // BC support; @deprecated 1.1.4; to be removed in 2.0
-        if (method_exists(get_called_class(), 'onInstall')) {
-            static::onInstall($factory);
-        }
-
         if ($metadata !== null) {
-            self::installPluginSchema($metadata, $factory);
+            self::installPluginSchema($metadata, $factory, $installedSchema);
         }
     }
 
@@ -46,13 +40,17 @@ abstract class PluginBundleBase extends Bundle
      *
      * @param array         $metadata
      * @param MauticFactory $factory
+     * @param null          $installedSchema
      *
-     * @throws \Doctrine\DBAL\ConnectionException
-     * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    static public function installPluginSchema(array $metadata, MauticFactory $factory)
+    static public function installPluginSchema(array $metadata, MauticFactory $factory, $installedSchema = null)
     {
+        if (null !== $installedSchema) {
+            // Schema exists so bail
+            return;
+        }
+
         $db             = $factory->getDatabase();
         $schemaTool     = new SchemaTool($factory->getEntityManager());
         $installQueries = $schemaTool->getCreateSchemaSql($metadata);
@@ -83,22 +81,6 @@ abstract class PluginBundleBase extends Bundle
      */
     static public function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null)
     {
-        // BC support; @deprecated 1.1.4; to be removed in 2.0
-        if (method_exists(get_called_class(), 'onUpdate')) {
-            // Create a bogus Addon
-            $addon = new Addon();
-            $addon->setAuthor($plugin->getAuthor())
-                ->setBundle($plugin->getBundle())
-                ->setDescription($plugin->getDescription())
-                ->setId($plugin->getId())
-                ->setIntegrations($plugin->getIntegrations())
-                ->setIsMissing($plugin->getIsMissing())
-                ->setName($plugin->getName())
-                ->setVersion($plugin->getVersion());
-
-            static::onUpdate($addon, $factory);
-        }
-
         // Not recommended although availalbe for simple schema changes - see updatePluginSchema docblock
         //self::updatePluginSchema($metadata, $installedSchema, $factory);
     }
@@ -109,9 +91,6 @@ abstract class PluginBundleBase extends Bundle
      * WARNING - this is not recommended as Doctrine does not guarantee results. There is a risk
      * that Doctrine will generate an incorrect query leading to lost data. If using this method,
      * be sure to thoroughly test the queries Doctrine generates
-     *
-     * It is preferred to check for MySql or PostgreSQL and execute appropriate raw queries to upgrade
-     * from the current version installed to the new version's schema.
      *
      * @param array         $metadata
      * @param Schema        $installedSchema

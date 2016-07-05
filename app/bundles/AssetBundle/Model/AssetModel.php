@@ -11,8 +11,10 @@ namespace Mautic\AssetBundle\Model;
 
 use Doctrine\ORM\PersistentCollection;
 use Mautic\AssetBundle\Event\AssetEvent;
-use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\AssetBundle\Event\AssetLoadEvent;
+use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\Download;
@@ -22,7 +24,9 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -30,6 +34,49 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class AssetModel extends FormModel
 {
+    /**
+     * @var CategoryModel
+     */
+    protected $categoryModel;
+
+    /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * @var null|\Symfony\Component\HttpFoundation\Request
+     */
+    protected $request;
+
+    /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
+
+    /**
+     * @var int
+     */
+    protected $maxAssetSize;
+
+    /***
+     * AssetModel constructor.
+     *
+     * @param LeadModel $leadModel
+     * @param CategoryModel $categoryModel
+     * @param RequestStack $requestStack
+     * @param IpLookupHelper $ipLookupHelper
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function __construct(LeadModel $leadModel, CategoryModel $categoryModel, RequestStack $requestStack, IpLookupHelper $ipLookupHelper, CoreParametersHelper $coreParametersHelper)
+    {
+        $this->leadModel = $leadModel;
+        $this->categoryModel = $categoryModel;
+        $this->request = $requestStack->getCurrentRequest();
+        $this->ipLookupHelper = $ipLookupHelper;
+        $this->maxAssetSize = $coreParametersHelper->getParameter('mautic.max_size');
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -71,29 +118,26 @@ class AssetModel extends FormModel
     }
 
     /**
-     * @param        $asset
-     * @param        $request
+     * @param $asset
+     * @param null $request
      * @param string $code
-     * @param array  $systemEntry
-     *
+     * @param array $systemEntry
      * @throws \Doctrine\ORM\ORMException
+     * @throws \Exception
      */
     public function trackDownload($asset, $request = null, $code = '200', $systemEntry = array())
     {
         // Don't skew results with in-house downloads
-        if (empty($systemEntry) && !$this->factory->getSecurity()->isAnonymous()) {
+        if (empty($systemEntry) && !$this->security->isAnonymous()) {
             return;
         }
 
         if ($request == null) {
-            $request = $this->factory->getRequest();
+            $request = $this->request;
         }
 
         $download = new Download();
         $download->setDateDownload(new \Datetime());
-
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead');
 
         // Download triggered by lead
         if (empty($systemEntry)) {
@@ -104,13 +148,13 @@ class AssetModel extends FormModel
                 $clickthrough = $this->decodeArrayFromUrl($clickthrough);
 
                 if (!empty($clickthrough['lead'])) {
-                    $lead = $leadModel->getEntity($clickthrough['lead']);
+                    $lead = $this->leadModel->getEntity($clickthrough['lead']);
                     if ($lead !== null) {
-                        $leadModel->setLeadCookie($clickthrough['lead']);
-                        list($trackingId, $trackingNewlyGenerated) = $leadModel->getTrackingCookie();
+                        $this->leadModel->setLeadCookie($clickthrough['lead']);
+                        list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie();
                         $leadClickthrough = true;
 
-                        $leadModel->setCurrentLead($lead);
+                        $this->leadModel->setCurrentLead($lead);
                     }
                 }
 
@@ -125,7 +169,7 @@ class AssetModel extends FormModel
             }
 
             if (empty($leadClickthrough)) {
-                list($lead, $trackingId, $trackingNewlyGenerated) = $leadModel->getCurrentLead(true);
+                list($lead, $trackingId, $trackingNewlyGenerated) = $this->leadModel->getCurrentLead(true);
             }
 
             $download->setLead($lead);
@@ -160,10 +204,10 @@ class AssetModel extends FormModel
             if (isset($systemEntry['tracking_id'])) {
                 $trackingId             = $systemEntry['tracking_id'];
                 $trackingNewlyGenerated = false;
-            } elseif ($this->factory->getSecurity()->isAnonymous() && !defined('IN_MAUTIC_CONSOLE')) {
+            } elseif ($this->security->isAnonymous() && !defined('IN_MAUTIC_CONSOLE')) {
                 // If the session is anonymous and not triggered via CLI, assume the lead did something to trigger the
                 // system forced download such as an email
-                list($trackingId, $trackingNewlyGenerated) = $leadModel->getTrackingCookie();
+                list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie();
             }
         }
 
@@ -185,18 +229,24 @@ class AssetModel extends FormModel
         }
 
         //check for existing IP
-        $ipAddress = $this->factory->getIpAddress();
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         $download->setCode($code);
         $download->setIpAddress($ipAddress);
         $download->setReferer($request->server->get('HTTP_REFERER'));
+
+        // Dispatch event
+        if ($this->dispatcher->hasListeners(AssetEvents::ASSET_ON_LOAD)) {
+            $event = new AssetLoadEvent($download, $isUnique);
+            $this->dispatcher->dispatch(AssetEvents::ASSET_ON_LOAD, $event);
+        }
 
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
             $this->em->persist($download);
             $this->em->flush($download);
         } catch (\Exception $e) {
-            if ($this->factory->getEnvironment() == 'dev') {
+            if (MAUTIC_ENV === 'dev') {
                 throw $e;
             } else {
                 error_log($e);
@@ -344,11 +394,11 @@ class AssetModel extends FormModel
             case 'asset':
                 $viewOther = $this->security->isGranted('asset:assets:viewother');
                 $repo      = $this->getRepository();
-                $repo->setCurrentUser($this->factory->getUser());
+                $repo->setCurrentUser($this->user);
                 $results = $repo->getAssetList($filter, $limit, 0, $viewOther);
                 break;
             case 'category':
-                $results = $this->factory->getModel('category.category')->getRepository()->getCategoryList($filter, $limit, 0);
+                $results = $this->categoryModel->getRepository()->getCategoryList($filter, $limit, 0);
                 break;
         }
 
@@ -385,7 +435,7 @@ class AssetModel extends FormModel
      */
     public function getMaxUploadSize($unit = 'M', $humanReadable = false)
     {
-        $maxAssetSize  = $this->factory->getParameter('max_size');
+        $maxAssetSize  = $this->maxAssetSize;
         $maxAssetSize  = ($maxAssetSize == -1 || $maxAssetSize === 0) ? PHP_INT_MAX : Asset::convertSizeToBytes($maxAssetSize.'M');
         $maxPostSize   = Asset::getIniValue('post_max_size');
         $maxUploadSize = Asset::getIniValue('upload_max_filesize');
@@ -438,33 +488,33 @@ class AssetModel extends FormModel
     /**
      * Get line chart data of downloads
      *
-     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     * @param string   $dateFormat
-     * @param array    $filter
-     * @param boolean  $canViewOthers
+     * @param char      $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param string    $dateFormat
+     * @param array     $filter
+     * @param boolean   $canViewOthers
      *
      * @return array
      */
     public function getDownloadsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
     {
         $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $query     = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $q         = $query->prepareTimeDataQuery('asset_downloads', 'date_download', $filter);
 
         if (!$canViewOthers) {
             $q->join('t', MAUTIC_TABLE_PREFIX.'assets', 'a', 'a.id = t.asset_id')
                 ->andWhere('a.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
         }
 
         $data = $query->loadAndBuildTimeData($q);
 
-        $chart->setDataset($this->factory->getTranslator()->trans('mautic.asset.downloadcount'), $data);
+        $chart->setDataset($this->translator->trans('mautic.asset.downloadcount'), $data);
         return $chart->render();
     }
-    
+
     /**
      * Get pie chart data of unique vs repetitive downloads.
      * Repetitive in this case mean if a lead downloaded any of the assets more than once
@@ -479,25 +529,25 @@ class AssetModel extends FormModel
     public function getUniqueVsRepetitivePieChartData($dateFrom, $dateTo, $filters = array(), $canViewOthers = true)
     {
         $chart      = new PieChart();
-        $query      = new ChartQuery($this->factory->getEntityManager()->getConnection(), $dateFrom, $dateTo);
+        $query      = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $allQ       = $query->getCountQuery('asset_downloads', 'id', 'date_download', $filters);
         $uniqueQ    = $query->getCountQuery('asset_downloads', 'lead_id', 'date_download', $filters, array('getUnique' => true));
 
         if (!$canViewOthers) {
             $allQ->join('t', MAUTIC_TABLE_PREFIX.'assets', 'a', 'a.id = t.asset_id')
                 ->andWhere('a.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
             $uniqueQ->join('t', MAUTIC_TABLE_PREFIX.'assets', 'a', 'a.id = t.asset_id')
                 ->andWhere('a.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
         }
 
         $all = $query->fetchCount($allQ);
         $unique = $query->fetchCount($uniqueQ);
 
         $repetitive = $all - $unique;
-        $chart->setDataset($this->factory->getTranslator()->trans('mautic.asset.unique'), $unique);
-        $chart->setDataset($this->factory->getTranslator()->trans('mautic.asset.repetitive'), $repetitive);
+        $chart->setDataset($this->translator->trans('mautic.asset.unique'), $unique);
+        $chart->setDataset($this->translator->trans('mautic.asset.repetitive'), $repetitive);
 
         return $chart->render();
     }
@@ -525,7 +575,7 @@ class AssetModel extends FormModel
 
         if (!$canViewOthers) {
             $q->andWhere('a.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -540,11 +590,11 @@ class AssetModel extends FormModel
     /**
      * Get a list of assets in a date range
      *
-     * @param integer  $limit
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     * @param array    $filters
-     * @param array    $options
+     * @param integer   $limit
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param array     $filters
+     * @param array     $options
      *
      * @return array
      */
@@ -557,7 +607,7 @@ class AssetModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('t.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);

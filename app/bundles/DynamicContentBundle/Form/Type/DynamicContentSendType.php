@@ -1,0 +1,137 @@
+<?php
+/**
+ * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+namespace Mautic\DynamicContentBundle\Form\Type;
+
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+/**
+ * Class DynamicContentSendType.
+ */
+class DynamicContentSendType extends AbstractType
+{
+    /**
+     * @var RouterInterface
+     */
+    protected $router;
+
+    /**
+     * @var null|\Symfony\Component\HttpFoundation\Request
+     */
+    protected $request;
+
+    /**
+     * DynamicContentSendType constructor.
+     *
+     * @param RouterInterface   $router
+     * @param RequestStack|null $requestStack
+     */
+    public function __construct(RouterInterface $router, RequestStack $requestStack)
+    {
+        $this->router = $router;
+        $this->request = $requestStack->getCurrentRequest();
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array                $options
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder->add(
+            'dynamicContent',
+            'dwc_list',
+            [
+                'label' => 'mautic.dynamicContent.send.selectDynamicContents',
+                'label_attr' => ['class' => 'control-label'],
+                'attr' => [
+                    'class' => 'form-control',
+                    'tooltip' => 'mautic.dynamicContent.choose.dynamicContents',
+                    'onchange' => 'Mautic.disabledDynamicContentAction()',
+                ],
+                'multiple' => false,
+                'constraints' => [
+                    new NotBlank(['message' => 'mautic.dynamicContent.choosedynamicContent.notblank']),
+                ],
+                'variantParent' => $this->request->get('variantParent', 0),
+            ]
+        );
+
+        if (!empty($options['update_select'])) {
+            $windowUrl = $this->router->generate(
+                'mautic_dynamicContent_action',
+                [
+                    'objectAction' => 'new',
+                    'contentOnly' => 1,
+                    'updateSelect' => $options['update_select'],
+                ]
+            );
+
+            $builder->add(
+                'newDynamicContentButton',
+                'button',
+                [
+                    'label' => 'mautic.dynamicContent.send.new.dynamicContent',
+                    'attr' => [
+                        'class' => 'btn btn-primary btn-nospin',
+                        'onclick' => 'Mautic.loadNewDynamicContentWindow({
+                            "windowUrl": "'.$windowUrl.'"
+                        })',
+                        'icon' => 'fa fa-plus',
+                    ],
+                ]
+            );
+
+            $dynamicContent = is_array($options['data']) && array_key_exists('dynamicContent', $options['data']) ? $options['data']['dynamicContent'] : null;
+
+            // create button edit notification
+            $windowUrlEdit = $this->router->generate(
+                'mautic_dynamicContent_action',
+                [
+                    'objectAction' => 'edit',
+                    'objectId' => 'dynamicContentId',
+                    'contentOnly' => 1,
+                    'updateSelect' => $options['update_select'],
+                ]
+            );
+
+            $builder->add(
+                'editDynamicContentButton',
+                'button',
+                [
+                    'label' => 'mautic.dynamicContent.send.edit.dynamicContent',
+                    'attr' => [
+                        'class' => 'btn btn-primary btn-nospin',
+                        'onclick' => 'Mautic.loadNewDynamicContentWindow(Mautic.standardDynamicContentUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
+                        'disabled' => !isset($dynamicContent),
+                        'icon' => 'fa fa-edit',
+                    ],
+                ]
+            );
+        }
+    }
+
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setOptional(['update_select']);
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'dwcsend_list';
+    }
+}

@@ -105,13 +105,6 @@ class Stat
     private $tokens = array();
 
     /**
-     * @var string
-     *
-     * @deprecated 1.2.3 - to be removed in 2.0
-     */
-    private $copy;
-
-    /**
      * @var Copy
      */
     private $storedCopy;
@@ -140,11 +133,14 @@ class Stat
 
         $builder->setTable('email_stats')
             ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatRepository')
-            ->addIndex(array('email_id', 'lead_id'), 'stat_email_search')
-            ->addIndex(array('is_failed'), 'stat_email_failed_search')
-            ->addIndex(array('is_read'), 'stat_email_read_search')
-            ->addIndex(array('tracking_hash'), 'stat_email_hash_search')
-            ->addIndex(array('source', 'source_id'), 'stat_email_source_search');
+            ->addIndex(['email_id', 'lead_id'], 'stat_email_search')
+            ->addIndex(['is_failed'], 'stat_email_failed_search')
+            ->addIndex(['is_read'], 'stat_email_read_search')
+            ->addIndex(['tracking_hash'], 'stat_email_hash_search')
+            ->addIndex(['source', 'source_id'], 'stat_email_source_search')
+            ->addIndex(['date_sent'], 'email_date_sent')
+            ->addIndex(['date_read'], 'email_date_read');
+
 
         $builder->addId();
 
@@ -208,11 +204,6 @@ class Stat
         $builder->createField('tokens', 'array')
             ->nullable()
             ->build();
-
-        /**
-         * @deprecated 1.2.3 - to be removed in 2.0
-         */
-        $builder->addNullableField('copy', 'text');
 
         $builder->createManyToOne('storedCopy', 'Mautic\EmailBundle\Entity\Copy')
             ->addJoinColumn('copy_id', 'id', true, false, 'SET NULL')
@@ -526,33 +517,6 @@ class Stat
     public function setTokens ($tokens)
     {
         $this->tokens = $tokens;
-    }
-
-    /**
-     * @deprecated 1.2.3 - to be removed in 2.0
-     *
-     * @return mixed
-     */
-    public function getCopy()
-    {
-        return $this->copy;
-    }
-
-    /**
-     * @deprecated 1.2.3 - to be removed in 2.0
-     *
-     * @param mixed $copy
-     *
-     * @return Stat
-     */
-    public function setCopy($copy)
-    {
-        // Ensure it's clean of emoji
-        $copy = EmojiHelper::toShort($copy);
-
-        $this->copy = $copy;
-
-        return $this;
     }
 
     /**

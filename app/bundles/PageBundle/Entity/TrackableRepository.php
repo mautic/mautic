@@ -135,6 +135,43 @@ class TrackableRepository extends CommonRepository
     }
 
     /**
+     * get the hit count
+     *
+     * @param  string  $channel
+     * @param  array   $channelIds
+     * @param  integer $listId
+     *
+     * @return integer
+     */
+    public function getCount($channel, $channelIds, $listId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('count(DISTINCT(cut.redirect_id)) as click_count')
+            ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut')
+            ->leftJoin('cut', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 'ph.redirect_id = cut.redirect_id');
+
+        if ($channelIds) {
+            if (!is_array($channelIds)) {
+                $channelIds = array((int) $channelIds);
+            }
+            $q->where(
+                $q->expr()->in('cut.channel_id', $channelIds)
+            );
+        }
+
+        if ($listId) {
+            $q->leftJoin('ph', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'cs', 'cs.lead_id = ph.lead_id')
+                ->andWhere('cs.leadlist_id = :list_id')
+                ->setParameter('list_id', $listId);
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        return (isset($results[0])) ? $results[0]['click_count'] : 0;
+    }
+
+    /**
      * @return string
      */
     public function getTableAlias()

@@ -125,12 +125,21 @@ abstract class AbstractChart
     {
         $this->dateFrom = clone $dateFrom;
         $this->dateTo   = clone $dateTo;
-        $this->timezone = $dateFrom->getTimezone();
 
         // a diff of two identical dates returns 0, but we expect 24 hours
         if ($dateFrom == $dateTo) {
             $this->dateTo->modify('+1 day');
         }
+
+        // Adjust dateTo to be end of day or to current hour if today
+        $now = new \DateTime();
+        if ($now->format('Y-m-d') == $this->dateTo->format('Y-m-d')) {
+            $this->dateTo = $now;
+        } else {
+            $this->dateTo->setTime(23, 59, 59);
+        }
+
+        $this->timezone = $dateFrom->getTimezone();
     }
 
     /**
@@ -197,18 +206,6 @@ abstract class AbstractChart
         if ($diff > 1000) $unit = 'Y';
 
         return $unit;
-    }
-
-    /**
-     * Returns the initiated chart query object
-     *
-     * @param Connection $connection
-     *
-     * @return ChartQuery
-     */
-    public function getChartQuery(Connection $connection)
-    {
-        return new ChartQuery($connection, $this->dateFrom, $this->dateTo, $this->unit);
     }
 
     /**

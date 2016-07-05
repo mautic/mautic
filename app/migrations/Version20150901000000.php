@@ -36,15 +36,7 @@ class Version20150901000000 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function mysqlUp(Schema $schema)
-    {
-        $this->addSql('CREATE INDEX ' . $this->prefix . 'lead_tag_search ON ' . $this->prefix . 'lead_tags (tag)');
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    public function postgresqlUp(Schema $schema)
+    public function up(Schema $schema)
     {
         $this->addSql('CREATE INDEX ' . $this->prefix . 'lead_tag_search ON ' . $this->prefix . 'lead_tags (tag)');
     }

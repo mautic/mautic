@@ -139,6 +139,10 @@ class FilterType extends AbstractType
                     );
                     $type                      = 'choice';
                     break;
+                case 'stage':
+                    $customOptions['choices']  = $options['stage'];
+                    $type                      = 'choice';
+                    break;
                 case 'timezone':
                 case 'country':
                 case 'region':
@@ -363,7 +367,8 @@ class FilterType extends AbstractType
                 'fields',
                 'lists',
                 'emails',
-                'tags'
+                'tags',
+                'stage'
             )
         );
 

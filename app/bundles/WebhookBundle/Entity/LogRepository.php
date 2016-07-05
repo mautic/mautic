@@ -1,8 +1,8 @@
 <?php
 /**
- * @package     Allyde mPower Social Bundle
- * @copyright   Allyde, Inc. All rights reserved
- * @author      Allyde, Inc
+ * @package     Mautic
+ * @copyright   Mautic, Inc
+ * @author      Mautic, Inc
  * @link        http://allyde.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -20,7 +20,7 @@ class LogRepository extends CommonRepository
      *
      * @return int
      */
-    public function removeOldLogs($webhook_id)
+    public function removeOldLogs($webhook_id, $logMax)
     {
         // if no idea was sent (the hook was deleted) then return a count of 0
         if (! $webhook_id) {
@@ -34,9 +34,7 @@ class LogRepository extends CommonRepository
             ->where('webhook_id = ' . $webhook_id)
             ->execute()->fetch();
 
-        $totalCount = $count['log_count'];
-
-        if ($totalCount >= $this->factory->getParameter('webhook_log_max', 10)) {
+        if ((int) $count['log_count'] >= (int) $logMax) {
 
             $qb = $this->_em->getConnection()->createQueryBuilder();
 

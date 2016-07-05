@@ -48,6 +48,16 @@ final class LeadEvents
     const LEAD_POINTS_CHANGE = 'mautic.lead_points_change';
 
     /**
+     * The mautic.lead_points_change event is dispatched if a lead's points changes.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\PointsChangeEvent instance.
+     *
+     * @var string
+     */
+    const LEAD_UTMTAGS_ADD = 'mautic.lead_utmtags_add';
+
+    /**
      * The mautic.lead_list_change event is dispatched if a lead's lists changes.
      *
      * The event listener receives a
@@ -267,4 +277,24 @@ final class LeadEvents
      * @var string
      */
     const FILTER_CHOICE_FIELDS = 'mautic.filter_choice_fields';
+
+    /**
+     * The mautic.lead.on_campaign_trigger_action event is fired when the campaign action triggers.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.lead.on_campaign_trigger_action';
+
+    /**
+     * The mautic.lead.on_campaign_trigger_condition event is fired when the campaign condition triggers.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_CONDITION = 'mautic.lead.on_campaign_trigger_condition';
 }

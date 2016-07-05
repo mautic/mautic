@@ -57,7 +57,7 @@ class TriggerEventController extends CommonFormController
         }
 
         //fire the builder event
-        $events = $this->factory->getModel('point.trigger')->getEvents();
+        $events = $this->getModel('point.trigger')->getEvents();
         $form   = $this->get('form.factory')->create('pointtriggerevent', $triggerEvent, array(
             'action'   => $this->generateUrl('mautic_pointtriggerevent_action', array('objectAction' => 'new')),
             'settings' => $events[$eventType]
@@ -131,7 +131,6 @@ class TriggerEventController extends CommonFormController
             //just close the modal
             $passthroughVars['closeModal'] = 1;
             $response                      = new JsonResponse($passthroughVars);
-            $response->headers->set('Content-Length', strlen($response->getContent()));
 
             return $response;
         }
@@ -163,7 +162,7 @@ class TriggerEventController extends CommonFormController
         if ($triggerEvent !== null) {
             $eventType = $triggerEvent['type'];
 
-            $events = $this->factory->getModel('point.trigger')->getEvents();
+            $events = $this->getModel('point.trigger')->getEvents();
             $triggerEvent['settings'] = $events[$eventType];
 
             //ajax only for form fields
@@ -251,7 +250,6 @@ class TriggerEventController extends CommonFormController
                 //just close the modal
                 $passthroughVars['closeModal'] = 1;
                 $response                      = new JsonResponse($passthroughVars);
-                $response->headers->set('Content-Length', strlen($response->getContent()));
 
                 return $response;
             }
@@ -264,7 +262,6 @@ class TriggerEventController extends CommonFormController
         }
 
         $response = new JsonResponse(array('success' => 0));
-        $response->headers->set('Content-Length', strlen($response->getContent()));
 
         return $response;
     }
@@ -328,7 +325,6 @@ class TriggerEventController extends CommonFormController
         }
 
         $response = new JsonResponse($dataArray);
-        $response->headers->set('Content-Length', strlen($response->getContent()));
 
         return $response;
     }
@@ -394,7 +390,6 @@ class TriggerEventController extends CommonFormController
         }
 
         $response = new JsonResponse($dataArray);
-        $response->headers->set('Content-Length', strlen($response->getContent()));
 
         return $response;
     }

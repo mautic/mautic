@@ -32,7 +32,6 @@ $view['slots']->set(
         array(
             'searchValue' => $searchValue,
             'searchHelp'  => 'mautic.email.help.searchcommands',
-            'searchId'        => 'email-search',
             'action'          => $currentRoute,
             'routeBase'       => 'email',
             'templateButtons' => array(

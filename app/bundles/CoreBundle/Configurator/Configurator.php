@@ -9,8 +9,8 @@
 
 namespace Mautic\CoreBundle\Configurator;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\InstallBundle\Configurator\Step\StepInterface;
+use Mautic\CoreBundle\Configurator\Step\StepInterface;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
@@ -51,13 +51,13 @@ class Configurator
     protected $parameters;
 
     /**
-     * Constructor.
+     * Configurator constructor.
      *
-     * @param MauticFactory $factory
+     * @param PathsHelper $pathsHelper
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(PathsHelper $pathsHelper)
     {
-        $this->filename   = $factory->getLocalConfigFile(false);
+        $this->filename   = $pathsHelper->getSystemPath('local_config');
         $this->parameters = $this->read();
     }
 

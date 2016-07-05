@@ -82,115 +82,45 @@ Mautic.emailOnLoad = function (container, response) {
 
         window.close();
     } else if (mQuery('#emailform_plainText').length) {
-        // Activate the plain text editor to support token inserts
-
-        // Get the plain text first
-        var plainText = mQuery('#emailform_plainText').val();
-
-        // Now empty it so that ckeditor doesn't load it as html
-        mQuery('#emailform_plainText').val('');
-
-        var events = Mautic.getGlobalEditorEvents();
-        events.instanceReady = function( event ) {
-            event.editor.insertText(plainText);
-        };
-
-        mQuery('#emailform_plainText').ckeditor({
-            removePlugins: 'elementspath,toolbar',
-            extraPlugins: 'tokens',
-            autoParagraph: false,
-            height: "235px",
-            on: events
-        });
-
-        if (mQuery('#emailform_emailType').val() == '') {
-            mQuery('body').addClass('noscroll');
-        }
-
-        Mautic.toggleBuilderButton(mQuery('#emailform_template').val() == '');
+        // @todo initiate the token dropdown
     } else if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'email');
-    } else {
-        if (typeof Mautic.listCompareChart === 'undefined') {
-            Mautic.renderListCompareChart();
-        }
-
-        Mautic.variantChartData = 'variant';
-        var switchChartData;
-        switchChartData = function() {
-            Mautic.variantChartData = mQuery(this).data('chart');
-
-            // Convert this one to a span
-            mQuery(this).replaceWith(function() {
-                return '<span data-chart="' + Mautic.variantChartData + '">' + mQuery(this).text() + '</span>';
-            });
-
-            // Convert the other to an a tag
-            var opposite = (Mautic.variantChartData == 'variant') ? 'all' : 'variant';
-            mQuery('span[data-chart="' + opposite + '"]').replaceWith(function() {
-                return '<a href="javascript:void(0)" data-chart="' + opposite + '">' + mQuery(this).text() + '</a>';
-            });
-            mQuery('a[data-chart="' + opposite + '"]').on('click', switchChartData);
-
-            if (mQuery('#time-scopes').length) {
-                var activeButton = mQuery('#time-scopes').parent().find('a').filter(
-                    function (index) {
-                        return mQuery.trim(mQuery(this).text()) === mQuery.trim(mQuery('#time-scopes span.button-label').text());
-                    }
-                );
-                activeButton[0].click();
-            } else {
-                Mautic.updateListCompareChart();
-            }
-        };
-        mQuery('a[data-chart]').on('click', switchChartData);
     }
 
-    Mautic.initDateRangePicker();
+    mQuery(document).on('shown.bs.tab', function (e) {
+        mQuery('#emailform_customHtml').froalaEditor('popups.hideAll');
+    });
+
+    mQuery('.btn-builder').on('click', function (e) {
+        mQuery('#emailform_customHtml').froalaEditor('popups.hideAll');
+    });
+
+    Mautic.intiSelectTheme(mQuery('#emailform_template'));
+    Mautic.fixFroalaEmailOutput();
+
+    var plaintext = mQuery('#emailform_plainText');
+    Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
 };
 
 Mautic.emailOnUnload = function(id) {
     if (id === '#app-content') {
         delete Mautic.listCompareChart;
     }
-
-    if (mQuery('#emailform_plainText').length) {
-        // Activate the plain text editor to support token inserts
-        CKEDITOR.instances['emailform_plainText'].destroy(true);
-    }
+    mQuery('#emailform_customHtml').froalaEditor('popups.hideAll');
 };
 
-Mautic.renderListCompareChart = function (chartData) {
-    if (!mQuery("#list-compare-chart").length) {
-        return;
+Mautic.fixFroalaEmailOutput = function() {
+    if (mQuery('form[name="emailform"]').length) {
+        var textarea = mQuery('textarea.builder-html');
+        mQuery('form[name="emailform"]').on('before.submit.ajaxform', function() {
+            var editorHtmlString = textarea.val();
+            Mautic.buildBuilderIframe(editorHtmlString, 'helper-iframe-for-html-manipulation');
+            var editorHtml = mQuery('iframe#helper-iframe-for-html-manipulation').contents();
+            editorHtml = Mautic.clearFroalaStyles(editorHtml);
+            textarea.val(editorHtml.find('html').get(0).outerHTML);
+        });
     }
-
-    if (!chartData) {
-        var chartData = mQuery.parseJSON(mQuery('#list-compare-chart-data').text());
-    } else if (chartData.stats) {
-        chartData = chartData.stats;
-    }
-
-    var options = {
-        legendTemplate: "<% for (var i=0; i<datasets.length; i++){%><span class=\"label label-default mr-xs\" style=\"background-color:<%=datasets[i].fillColor%>\"><%if(datasets[i].label){%><%=datasets[i].label%><%}%></span><%}%>"
-    };
-
-    Mautic.listCompareChart = new Chart(document.getElementById("list-compare-chart").getContext("2d")).Bar(chartData, options);
-    var legendHolder = document.createElement('div');
-    legendHolder.innerHTML = Mautic.listCompareChart.generateLegend();
-    mQuery('#legend').html(legendHolder);
-    Mautic.listCompareChart.update();
-};
-
-Mautic.updateListCompareChart = function() {
-    var emailId         = Mautic.getEntityId();
-    var includeVariants = (Mautic.variantChartData == 'all');
-    var query           = "emailType=list&emailId=" + emailId + "&includeVariants=" + includeVariants;
-
-    Mautic.ajaxActionRequest('email:updateStatsChart', query, function(response) {
-        Mautic.renderListCompareChart(response);
-    }, true);
-};
+}
 
 Mautic.insertEmailBuilderToken = function(editorId, token) {
     var editor = Mautic.getEmailBuilderEditorInstances();
@@ -320,21 +250,14 @@ Mautic.sendEmailBatch = function () {
 Mautic.autoGeneratePlaintext = function() {
     mQuery('.plaintext-spinner').removeClass('hide');
 
-    var mode = (mQuery('#emailform_template').val() == '') ? 'custom' : 'template';
-    var custom = mQuery('#emailform_customHtml').val();
-    var id = mQuery('#emailform_sessionId').val();
-
-    var data = {
-        mode: mode,
-        id: id,
-        custom: custom
-    };
-
     Mautic.ajaxActionRequest(
         'email:generatePlaintText',
-        data,
+        {
+            id: mQuery('#emailform_sessionId').val(),
+            custom: mQuery('#emailform_customHtml').val()
+        },
         function (response) {
-            CKEDITOR.instances['emailform_plainText'].insertText(response.text);
+            mQuery('#emailform_plainText').val(response.text);
             mQuery('.plaintext-spinner').addClass('hide');
         }
     );

@@ -16,7 +16,7 @@ else:
 endif;
 ?>
 
-<form class="form-group login-form" name="login" data-toggle="ajax" role="form" action="<?php echo $view['router']->generate('mautic_user_logincheck') ?>" method="post">
+<form class="form-group login-form" name="login" data-toggle="ajax" role="form" action="<?php echo $view['router']->path('mautic_user_logincheck') ?>" method="post">
     <div class="input-group mb-md">
 
         <span class="input-group-addon"><i class="fa fa-user"></i></span>
@@ -45,6 +45,16 @@ endif;
     <button class="btn btn-lg btn-primary btn-block" type="submit"><?php echo $view['translator']->trans('mautic.user.auth.form.loginbtn'); ?></button>
 
     <div class="mt-sm text-right">
-        <a href="<?php echo $view['router']->generate('mautic_user_passwordreset'); ?>"><?php echo $view['translator']->trans('mautic.user.user.passwordreset.link'); ?></a>
+        <a href="<?php echo $view['router']->path('mautic_user_passwordreset'); ?>"><?php echo $view['translator']->trans('mautic.user.user.passwordreset.link'); ?></a>
     </div>
 </form>
+<?php if (!empty($integrations)): ?>
+<ul class="list-group">
+<?php foreach ($integrations as $sso): ?>
+    <a href="<?php echo $view['router']->path('mautic_sso_login', array('integration' => $sso->getName())); ?>" class="list-group-item">
+        <img class="pull-left mr-xs" style="height: 16px;" src="<?php echo $view['assets']->getUrl($sso->getIcon()); ?>" >
+        <p class="list-group-item-text"><?php echo $view['translator']->trans('mautic.integration.sso.' . $sso->getName()); ?></p>
+    </a>
+<?php endforeach; ?>
+</ul>
+<?php endif; ?>

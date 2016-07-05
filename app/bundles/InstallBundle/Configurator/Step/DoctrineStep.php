@@ -11,6 +11,7 @@ namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\InstallBundle\Configurator\Form\DoctrineStepType;
+use Mautic\CoreBundle\Configurator\Step\StepInterface;
 
 /**
  * Doctrine Step.
@@ -61,13 +62,6 @@ class DoctrineStep implements StepInterface
     public $password;
 
     /**
-     * Path to database
-     *
-     * @var string
-     */
-    public $path;
-
-    /**
      * Backup tables if they exist; otherwise drop them
      *
      * @var bool
@@ -80,6 +74,11 @@ class DoctrineStep implements StepInterface
      * @var string
      */
     public $backup_prefix = 'bak_';
+
+    /**
+     * @var
+     */
+    public $server_version = '5.5';
 
     /**
      * Constructor
@@ -179,7 +178,7 @@ class DoctrineStep implements StepInterface
         $mauticSupported = array(
             'pdo_mysql' => 'MySQL PDO (Recommended)',
             'mysqli'    => 'MySQLi',
-            'pdo_pgsql' => 'PostgreSQL',
+            //'pdo_pgsql' => 'PostgreSQL',
             //'pdo_sqlite' => 'SQLite',
             //'pdo_sqlsrv' => 'SQL Server',
             //'pdo_oci'    => 'Oracle (PDO)',

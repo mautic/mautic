@@ -57,7 +57,7 @@ if ($tmpl == 'index')
                     <td>
                         <div>
                             <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item'=> $item, 'model' => 'report.report')); ?>
-                            <a href="<?php echo $view['router']->generate('mautic_report_view', array("objectId" => $item->getId())); ?>" data-toggle="ajax">
+                            <a href="<?php echo $view['router']->path('mautic_report_view', array("objectId" => $item->getId())); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>
                         </div>
@@ -76,7 +76,7 @@ if ($tmpl == 'index')
             "page"            => $page,
             "limit"           => $limit,
             "menuLinkId"      => 'mautic_report_index',
-            "baseUrl"         => $view['router']->generate('mautic_report_index'),
+            "baseUrl"         => $view['router']->path('mautic_report_index'),
             'sessionVar'      => 'report'
         )); ?>
         </div>

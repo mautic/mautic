@@ -27,7 +27,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
      *
      * @var array
      */
-    protected $supported = array('mysql', 'postgresql');
+    protected $supported = array('mysql');
 
     /**
      * Database prefix
@@ -62,7 +62,10 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
         $this->abortIf(!in_array($platform, $this->supported), 'The database platform is unsupported for migrations');
 
         $function = $this->platform . "Up";
-        $this->$function($schema);
+
+        if (method_exists($this, $function)) {
+            $this->$function($schema);
+        }
     }
 
     /**
@@ -86,16 +89,6 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
         $this->platform  = $this->connection->getDatabasePlatform()->getName();
         $this->factory   = $container->get('mautic.factory');
     }
-
-    /**
-     * @param Schema $schema
-     */
-    abstract public function mysqlUp(Schema $schema);
-
-    /**
-     * @param Schema $schema
-     */
-    abstract public function postgresqlUp(Schema $schema);
 
     /**
      * Finds/creates the local name for constraints and indexes

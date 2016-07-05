@@ -21,6 +21,9 @@ function postFormHandler() {
     window.close()
 
 }
+(function() {
+   postFormHandler();
+})();
 JS;
 ?>
 <script>

@@ -22,17 +22,9 @@ class Version20151120000000 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function mysqlUp(Schema $schema)
+    public function up(Schema $schema)
     {
         $this->addSql('ALTER TABLE ' . $this->prefix.'page_hits CHANGE user_agent user_agent LONGTEXT DEFAULT NULL');
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    public function postgresqlUp(Schema $schema)
-    {
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_hits ALTER user_agent TYPE TEXT');
     }
 }
 

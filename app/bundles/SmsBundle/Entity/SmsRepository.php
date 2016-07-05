@@ -167,13 +167,17 @@ class SmsRepository extends CommonRepository
      */
     public function upCount($id, $type = 'sent', $increaseBy = 1)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        try {
+            $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $q->update(MAUTIC_TABLE_PREFIX . 'push_smss')
-            ->set($type . '_count', $type . '_count + ' . (int) $increaseBy)
-            ->where('id = ' . (int) $id);
+            $q->update(MAUTIC_TABLE_PREFIX.'sms_messages')
+                ->set($type.'_count', $type.'_count + '.(int) $increaseBy)
+                ->where('id = '.(int) $id);
 
-        $q->execute();
+            $q->execute();
+        } catch (\Exception $exception) {
+            // not important
+        }
     }
 
     /**

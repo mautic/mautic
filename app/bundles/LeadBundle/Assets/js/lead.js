@@ -108,7 +108,7 @@ Mautic.leadOnLoad = function (container) {
 
     mQuery(document).on('shown.bs.tab', 'a#load-lead-map', function (e) {
         mQuery('#place-container svg').resize();
-    })
+    });
 };
 
 Mautic.leadOnUnload = function(id) {
@@ -123,6 +123,28 @@ Mautic.leadOnUnload = function(id) {
 
 Mautic.getLeadId = function() {
     return mQuery('input#leadId').val();
+}
+
+Mautic.leadEmailOnLoad = function(container, response) {
+    mQuery('[name="lead_quickemail"]').on('click.ajaxform', function() {
+        var emailHtml = mQuery('.fr-iframe').contents();
+        var textarea = mQuery(this).find('#lead_quickemail_body');
+        mQuery.each(emailHtml.find('td, th, table'), function() {
+            var td = mQuery(this);
+            if (td.attr('fr-original-class')) {
+                td.attr('class', td.attr('fr-original-class'));
+                td.removeAttr('fr-original-class');
+            }
+            if (td.attr('fr-original-style')) {
+                td.attr('style', td.attr('fr-original-style'));
+                td.removeAttr('fr-original-style');
+            }
+            if (td.css('border') === '1px solid rgb(221, 221, 221)') {
+                td.css('border', '');
+            }
+        });
+        textarea.val(emailHtml.find('html').get(0).outerHTML);
+    });
 }
 
 Mautic.activateLeadFieldTypeahead = function(field, target, options) {
@@ -283,7 +305,7 @@ Mautic.addLeadListFilter = function (elId) {
 
     var prototype = mQuery('.available-filters').data('prototype');
     var fieldType = mQuery(filterId).data('field-type');
-    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'boolean', 'select', 'country', 'timezone', 'region']) != -1);
+    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'boolean', 'select', 'country', 'timezone', 'region', 'stage']) != -1);
 
     prototype = prototype.replace(/__name__/g, filterNum);
     prototype = prototype.replace(/__label__/g, label);
@@ -843,7 +865,8 @@ Mautic.getLeadEmailContent = function (el) {
     mQuery('#MauticSharedModal .btn-primary').prop('disabled', true);
     Mautic.ajaxActionRequest('lead:getEmailTemplate', {'template': mQuery(el).val()}, function(response) {
         mQuery('#MauticSharedModal .btn-primary').prop('disabled', false);
-        CKEDITOR.instances['lead_quickemail_body'].setData(response.body);
+        mQuery('#lead_quickemail_body').froalaEditor('html.set', response.body);
+        mQuery('#lead_quickemail_body').val(response.body);
         mQuery('#lead_quickemail_subject').val(response.subject);
         Mautic.removeLabelLoadingIndicator();
     });
@@ -887,19 +910,48 @@ Mautic.createLeadTag = function (el) {
     });
 };
 
+Mautic.createLeadUtmTag = function (el) {
+    var newFound = false;
+    mQuery('#' + mQuery(el).attr('id') + ' :selected').each(function(i, selected) {
+        if (!mQuery.isNumeric(mQuery(selected).val())) {
+            newFound = true;
+        }
+    });
+
+    if (!newFound) {
+        return;
+    }
+
+    Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
+
+    var utmtags = JSON.stringify(mQuery(el).val());
+
+    Mautic.ajaxActionRequest('lead:addLeadUtmTags', {utmtags: utmtags}, function(response) {
+        if (response.tags) {
+            mQuery('#' + mQuery(el).attr('id')).html(response.utmtags);
+            mQuery('#' + mQuery(el).attr('id')).trigger('chosen:updated');
+        }
+
+        Mautic.removeLabelLoadingIndicator();
+    });
+};
+
 Mautic.leadBatchSubmit = function() {
     if (Mautic.batchActionPrecheck()) {
-        if (mQuery('#lead_batch_remove').val() || mQuery('#lead_batch_add').val() || mQuery('#lead_batch_dnc_reason').length) {
+        if (mQuery('#lead_batch_remove').val() || mQuery('#lead_batch_add').val() || mQuery('#lead_batch_dnc_reason').length || mQuery('#lead_batch_stage_addstage').length) {
             var ids = Mautic.getCheckedListIds(false, true);
 
             if (mQuery('#lead_batch_ids').length) {
                 mQuery('#lead_batch_ids').val(ids);
             } else if (mQuery('#lead_batch_dnc_reason').length) {
                 mQuery('#lead_batch_dnc_ids').val(ids);
+            } else if (mQuery('#lead_batch_stage_addstage').length) {
+                mQuery('#lead_batch_stage_ids').val(ids);
             }
 
             return true;
         }
+
     }
 
     mQuery('#MauticSharedModal').modal('hide');

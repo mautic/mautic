@@ -52,8 +52,8 @@ if (!empty($fields['core']['email']['value'])) {
                 'mautic.lead.email.send_email.header',
                 array('%email%' => $fields['core']['email']['value'])
             ),
-            'href'        => $view['router']->generate(
-                'mautic_lead_action',
+            'href'        => $view['router']->path(
+                'mautic_contact_action',
                 array('objectId' => $lead->getId(), 'objectAction' => 'email')
             )
         ),
@@ -71,8 +71,8 @@ $buttons[] = array(
             array('%name%' => $lead->getPrimaryIdentifier())
         ),
         'data-footer' => 'false',
-        'href'        => $view['router']->generate(
-            'mautic_lead_action',
+        'href'        => $view['router']->path(
+            'mautic_contact_action',
             array("objectId" => $lead->getId(), "objectAction" => "list")
         ),
     ),
@@ -91,8 +91,8 @@ if ($security->isGranted('campaign:campaigns:edit')) {
                 array('%name%' => $lead->getPrimaryIdentifier())
             ),
             'data-footer' => 'false',
-            'href'        => $view['router']->generate(
-                'mautic_lead_action',
+            'href'        => $view['router']->path(
+                'mautic_contact_action',
                 array("objectId" => $lead->getId(), "objectAction" => "campaign")
             )
         ),
@@ -118,8 +118,8 @@ if (($security->hasEntityAccess(
                 'mautic.lead.lead.header.merge',
                 array('%name%' => $lead->getPrimaryIdentifier())
             ),
-            'href'        => $view['router']->generate(
-                'mautic_lead_action',
+            'href'        => $view['router']->path(
+                'mautic_contact_action',
                 array("objectId" => $lead->getId(), "objectAction" => "merge")
             )
         ),
@@ -135,7 +135,7 @@ $view['slots']->set(
         'MauticCoreBundle:Helper:page_actions.html.php',
         array(
             'item'            => $lead,
-            'routeBase'       => 'lead',
+            'routeBase'       => 'contact',
             'langVar'         => 'lead.lead',
             'customButtons'   => $buttons,
             'templateButtons' => array(
@@ -400,6 +400,10 @@ $view['slots']->set(
                     ); ?>
                 </h1>
                 <hr/>
+                <?php if ($lead->getStage()): ?>
+                        <?php echo $lead->getStage()->getName(); ?>
+                    <hr>
+                <?php endif; ?>
             </div>
             <?php if ($doNotContact) : ?>
                 <div id="bounceLabel<?php echo $doNotContact['id']; ?>">
@@ -441,21 +445,26 @@ $view['slots']->set(
                     <?php echo $view['translator']->trans('mautic.lead.field.address'); ?>
                 </h6>
                 <address class="text-muted">
+                    <?php if (isset($fields['core']['address1'])): ?>
                     <?php echo $fields['core']['address1']['value']; ?><br>
+                    <?php endif; ?>
                     <?php if (!empty($fields['core']['address2']['value'])) : echo $fields['core']['address2']['value']
                         .'<br>'; endif ?>
-                    <?php echo $lead->getLocation(); ?> <?php echo $fields['core']['zipcode']['value']; ?><br>
-                    <abbr title="Phone">P:</abbr> <?php echo $fields['core']['phone']['value']; ?>
+                    <?php echo $lead->getLocation(); ?> <?php if (isset($fields['core']['zipcode'])) echo $fields['core']['zipcode']['value']; ?><br>
                 </address>
 
                 <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.core.type.email'); ?></h6>
                 <p class="text-muted"><?php echo $fields['core']['email']['value']; ?></p>
 
+                <?php if (isset( $fields['core']['phone'])): ?>
                 <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.field.type.tel.home'); ?></h6>
                 <p class="text-muted"><?php echo $fields['core']['phone']['value']; ?></p>
+                <?php endif; ?>
 
+                <?php if (isset($fields['core']['mobile'])): ?>
                 <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.field.type.tel.mobile'); ?></h6>
                 <p class="text-muted mb-0"><?php echo $fields['core']['mobile']['value']; ?></p>
+                <?php endif; ?>
             </div>
         </div>
         <!--/ form HTML -->
@@ -475,7 +484,7 @@ $view['slots']->set(
                             <span class="figure"></span>
                         </div>
                         <div class="media-body">
-                            <?php $link = '<a href="' . $view['router']->generate('mautic_campaign_action', array("objectAction" => "view", "objectId" => $event['campaign_id'])) . '" data-toggle="ajax">' . $event['campaign_name'] . '</a>'; ?>
+                            <?php $link = '<a href="' . $view['router']->path('mautic_campaign_action', array("objectAction" => "view", "objectId" => $event['campaign_id'])) . '" data-toggle="ajax">' . $event['campaign_name'] . '</a>'; ?>
                             <?php echo $view['translator']->trans('mautic.lead.lead.upcoming.event.triggered.at', array('%event%' => $event['event_name'], '%link%' => $link)); ?>
                             <p class="fs-12 dark-sm"><?php echo $view['date']->toFull($event['trigger_date']); ?></p>
                         </div>

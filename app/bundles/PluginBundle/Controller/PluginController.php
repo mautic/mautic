@@ -33,7 +33,7 @@ class PluginController extends FormController
         }
 
         /** @var \Mautic\PluginBundle\Model\PluginModel $pluginModel */
-        $pluginModel = $this->factory->getModel('plugin');
+        $pluginModel = $this->getModel('plugin');
 
         // List of plugins for filter and to show as a single integration
         $plugins = $pluginModel->getEntities(
@@ -139,7 +139,7 @@ class PluginController extends FormController
             throw $this->createNotFoundException($this->get('translator')->trans('mautic.core.url.error.404'));
         }
 
-        $leadFields = $this->factory->getModel('plugin')->getLeadFields();
+        $leadFields = $this->getModel('plugin')->getLeadFields();
 
         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
         $entity = $integrationObject->getIntegrationSettings();
@@ -247,11 +247,29 @@ class PluginController extends FormController
             $themes[] = $objectTheme;
         }
 
+        $formSettings = $integrationObject->getFormSettings();
+        $callbackUrl  = !empty($formSettings['requires_callback']) ? $integrationObject->getAuthCallbackUrl() : '';
+
+        $formNotes    = array();
+        $noteSections = array('authorization', 'features', 'feature_settings');
+        foreach ($noteSections as $section) {
+            list($specialInstructions, $alertType) = $integrationObject->getFormNotes($section);
+            if (!empty($specialInstructions)) {
+                $formNotes[$section] = array(
+                    'note' => $specialInstructions,
+                    'type' => $alertType
+                );
+            }
+        }
+
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
-                    'form'        => $this->setFormTheme($form, $template, $themes),
-                    'integration' => $integrationObject
+                    'form'         => $this->setFormTheme($form, $template, $themes),
+                    'description'  => $integrationObject->getDescription(),
+                    'formSettings' => $formSettings,
+                    'formNotes'    => $formNotes,
+                    'callbackUrl'  => $callbackUrl
                 ),
                 'contentTemplate' => $template,
                 'passthroughVars' => array(
@@ -275,7 +293,7 @@ class PluginController extends FormController
         }
 
         /** @var \Mautic\PluginBundle\Model\PluginModel $pluginModel */
-        $pluginModel = $this->factory->getModel('plugin');
+        $pluginModel = $this->getModel('plugin');
 
         $bundle = $pluginModel->getRepository()->findOneBy(
             array(
@@ -318,7 +336,7 @@ class PluginController extends FormController
         }
 
         /** @var \Mautic\PluginBundle\Model\PluginModel $model */
-        $model   = $this->factory->getModel('plugin');
+        $model   = $this->getModel('plugin');
         $plugins = $this->factory->getParameter('plugin.bundles');
         $added   = $disabled = $updated = 0;
 
@@ -466,8 +484,10 @@ class PluginController extends FormController
             // Call the install callback
             $callback = $plugin['bundleClass'];
             $metadata = (isset($pluginMetadata[$plugin['namespace']])) ? $pluginMetadata[$plugin['namespace']] : null;
+            $installedSchema = (isset($pluginInstalledSchemas[$plugin['namespace']]))
+                ? $pluginInstalledSchemas[$plugin['namespace']] : null;
 
-            $callback::onPluginInstall($entity, $this->factory, $metadata);
+            $callback::onPluginInstall($entity, $this->factory, $metadata, $installedSchema);
 
             $persist[] = $entity;
         }

@@ -9,7 +9,10 @@
 
 namespace Mautic\DashboardBundle\Model;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
@@ -22,6 +25,41 @@ use Mautic\CoreBundle\Helper\CacheStorageHelper;
  */
 class DashboardModel extends FormModel
 {
+    /**
+     * @var Session
+     */
+    protected $session;
+    
+    /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
+     * @var PathsHelper
+     */
+    protected $pathsHelper;
+
+    /**
+     * DashboardModel constructor.
+     * 
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param PathsHelper $pathsHelper
+     */
+    public function __construct(CoreParametersHelper $coreParametersHelper, PathsHelper $pathsHelper)
+    {
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->pathsHelper = $pathsHelper;
+    }
+
+    /**
+     * @param Session $session
+     */
+    public function setSession(Session $session)
+    {
+        $this->session = $session;
+    }
+    
     /**
      * {@inheritdoc}
      *
@@ -73,7 +111,7 @@ class DashboardModel extends FormModel
                     array(
                         'column' => 'w.createdBy',
                         'expr'   => 'eq',
-                        'value'  => $this->factory->getUser()->getId()
+                        'value'  => $this->user->getId()
                     )
                 )
             )
@@ -130,11 +168,10 @@ class DashboardModel extends FormModel
      */
     public function populateWidgetContent(Widget &$widget, $filter = array())
     {
-        $cacheDir   = $this->factory->getParameter('cached_data_dir', $this->factory->getSystemPath('cache', true));
-        $dispatcher = $this->factory->getDispatcher();
+        $cacheDir   = $this->coreParametersHelper->getParameter('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
 
         if ($widget->getCacheTimeout() == null || $widget->getCacheTimeout() == -1) {
-            $widget->setCacheTimeout($this->factory->getParameter('cached_data_timeout'));
+            $widget->setCacheTimeout($this->coreParametersHelper->getParameter('cached_data_timeout'));
         }
 
         // Merge global filter with widget params
@@ -143,7 +180,7 @@ class DashboardModel extends FormModel
 
         // Add the user timezone
         if (empty($resultParams['timezone'])) {
-            $resultParams['timezone'] = $this->factory->getUser()->getTimezone();
+            $resultParams['timezone'] = $this->user->getTimezone();
         }
 
         // Clone the objects in param array to avoid reference issues if some subscriber changes them
@@ -157,9 +194,10 @@ class DashboardModel extends FormModel
 
         $event = new WidgetDetailEvent($this->translator);
         $event->setWidget($widget);
-        $event->setCacheDir($cacheDir, $this->factory->getUser()->getId());
-        $event->setSecurity($this->factory->getSecurity());
-        $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
+
+        $event->setCacheDir($cacheDir, $this->user->getId());
+        $event->setSecurity($this->security);
+        $this->dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
     }
 
     /**
@@ -167,15 +205,15 @@ class DashboardModel extends FormModel
      */
     public function clearDashboardCache()
     {
-        $cacheDir = $this->factory->getParameter('cached_data_dir', $this->factory->getSystemPath('cache', true));
-        $cacheStorage = new CacheStorageHelper($cacheDir, $this->factory->getUser()->getId());
+        $cacheDir = $this->coreParametersHelper->getParameter('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
+        $cacheStorage = new CacheStorageHelper($cacheDir, $this->user->getId());
         $cacheStorage->clear();
     }
 
     /**
      * {@inheritdoc}
      *
-     * @param Lead                                $entity
+     * @param Widget                                $entity
      * @param \Symfony\Component\Form\FormFactory $formFactory
      * @param string|null                         $action
      * @param array                               $options
@@ -222,11 +260,9 @@ class DashboardModel extends FormModel
         $lastMonth = new \DateTime();
         $lastMonth->sub(new \DateInterval('P30D'));
 
-        $session     = $this->factory->getSession();
         $today       = new \DateTime();
-        $mysqlFormat = 'Y-m-d H:i:s';
-        $dateFrom    = new \DateTime($session->get('mautic.dashboard.date.from', $lastMonth->format($mysqlFormat)));
-        $dateTo      = new \DateTime($session->get('mautic.dashboard.date.to', $today->format($mysqlFormat)));
+        $dateFrom    = new \DateTime($this->session->get('mautic.dashboard.date.from', $lastMonth->format('Y-m-d 00:00:00')));
+        $dateTo      = new \DateTime($this->session->get('mautic.dashboard.date.to', $today->format('Y-m-d H:i:s')));
 
         return array(
             'dateFrom' => $dateFrom,

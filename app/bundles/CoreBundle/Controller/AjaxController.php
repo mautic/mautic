@@ -30,18 +30,25 @@ class AjaxController extends CommonController
 {
 
     /**
-     * @param array $dataArray
+     * @param array   $dataArray
+     * @param integer $statusCoce
+     * @param boolean $addIgnoreWdt
      *
      * @return JsonResponse
      * @throws \Exception
      */
-    protected function sendJsonResponse($dataArray)
+    protected function sendJsonResponse($dataArray, $statusCode = null, $addIgnoreWdt = true)
     {
         $response = new JsonResponse();
 
-        if ($this->factory->getEnvironment() == 'dev') {
+        if ($this->factory->getEnvironment() == 'dev' && $addIgnoreWdt) {
             $dataArray['ignore_wdt'] = 1;
         }
+
+        if ($statusCode !== null) {
+            $response->setStatusCode($statusCode);
+        }
+
         $response->setData($dataArray);
 
         return $response;
@@ -68,9 +75,9 @@ class AjaxController extends CommonController
                 $parts     = explode(":", $action);
                 $namespace = 'Mautic';
                 $isPlugin  = false;
-                // @deprecated 1.1.4; will be removed in 2.0; BC support for MauticAddon
-                if (count($parts) == 3 && ($parts[0] == 'addon' || $parts['0'] == 'plugin')) {
-                    $namespace = ($parts[0] == 'addon') ? 'MauticAddon' : 'MauticPlugin';
+                
+                if (count($parts) == 3 && $parts['0'] == 'plugin') {
+                    $namespace = 'MauticPlugin';
                     array_shift($parts);
                     $isPlugin = true;
                 }
@@ -147,7 +154,7 @@ class AjaxController extends CommonController
     protected function commandListAction(Request $request)
     {
         $model      = InputHelper::clean($request->query->get('model'));
-        $commands   = $this->factory->getModel($model)->getCommandList();
+        $commands   = $this->getModel($model)->getCommandList();
         $dataArray  = array();
         $translator = $this->get('translator');
         foreach ($commands as $k => $c) {
@@ -231,7 +238,7 @@ class AjaxController extends CommonController
             $name = "$name.$name";
         }
         $id    = InputHelper::int($request->request->get('id'));
-        $model = $this->factory->getModel($name);
+        $model = $this->getModel($name);
 
         $post = $request->request->all();
         unset($post['model'], $post['id'], $post['action']);
@@ -302,7 +309,7 @@ class AjaxController extends CommonController
         $name        = InputHelper::clean($request->request->get('model'));
         $id          = InputHelper::int($request->request->get('id'));
         $extra       = InputHelper::clean($request->request->get('parameter'));
-        $model       = $this->factory->getModel($name);
+        $model       = $this->getModel($name);
         $entity      = $model->getEntity($id);
         $currentUser = $this->factory->getUser();
 
@@ -654,7 +661,7 @@ class AjaxController extends CommonController
         $status = InputHelper::clean($request->request->get('status'));
 
         /** @var \Mautic\UserBundle\Model\UserModel $model */
-        $model = $this->factory->getModel('user');
+        $model = $this->getModel('user');
 
         $currentStatus = $this->factory->getUser()->getOnlineStatus();
         if (!in_array($currentStatus, array('manualaway', 'dnd'))) {
@@ -676,7 +683,7 @@ class AjaxController extends CommonController
     protected function markNotificationsReadAction(Request $request)
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model = $this->factory->getModel('core.notification');
+        $model = $this->getModel('core.notification');
 
         $model->markAllRead();
 
@@ -693,7 +700,7 @@ class AjaxController extends CommonController
         $id = InputHelper::int($request->get('id', 0));
 
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model = $this->factory->getModel('core.notification');
+        $model = $this->getModel('core.notification');
         $model->clearNotification($id);
 
         return $this->sendJsonResponse(array('success' => 1));
@@ -706,33 +713,14 @@ class AjaxController extends CommonController
      */
     protected function getBuilderTokensAction(Request $request)
     {
-        $dataArray = array();
+        $tokens = array();
 
         if (method_exists($this, 'getBuilderTokens')) {
             $query  = $request->get('query');
-            $visual = $request->get('visual');
-
-            if ($query && $query !== '{' && $query !== '{@') {
-                $tokenList = $this->getBuilderTokens($query);
-
-                $tokens       = (isset($tokenList['tokens'])) ? $tokenList['tokens'] : array();
-                $visualTokens = ($visual !== 'false' && isset($tokenList['visualTokens'])) ? $tokenList['visualTokens'] : array();
-
-                if (!empty($tokens)) {
-                    asort($tokens);
-
-                    $dataArray['html'] = $this->render(
-                        'MauticCoreBundle:Helper:buildertoken_list.html.php',
-                        array(
-                            'tokens'       => $tokens,
-                            'visualTokens' => $visualTokens
-                        )
-                    )->getContent();
-                }
-            }
+            $tokens = $this->getBuilderTokens($query);
         }
 
-        return $this->sendJsonResponse($dataArray);
+        return $this->sendJsonResponse($tokens);
     }
 
     /**

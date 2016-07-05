@@ -9,7 +9,11 @@
 
 namespace Mautic\FormBundle\Model;
 
+use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Result;
@@ -20,6 +24,10 @@ use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PageBundle\Model\PageModel;
+use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -28,6 +36,90 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class SubmissionModel extends CommonFormModel
 {
+    /**
+     * @deprecated Remove in 2.0
+     *
+     * @var MauticFactory
+     */
+    protected $factory;
+
+    /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
+
+    /**
+     * @var TemplatingHelper
+     */
+    protected $templatingHelper;
+
+    /**
+     * @var FormModel
+     */
+    protected $formModel;
+
+    /**
+     * @var PageModel
+     */
+    protected $pageModel;
+
+    /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * @var CampaignModel
+     */
+    protected $campaignModel;
+
+    /**
+     * @var LeadFieldModel
+     */
+    protected $leadFieldModel;
+
+    /**
+     * @var Logger
+     */
+    protected $logger;
+
+    /**
+     * SubmissionModel constructor.
+     *
+     * @param IpLookupHelper $ipLookupHelper
+     * @param TemplatingHelper $templatingHelper
+     * @param FormModel $formModel
+     * @param PageModel $pageModel
+     * @param LeadModel $leadModel
+     * @param CampaignModel $campaignModel
+     * @param LeadFieldModel $leadFieldModel
+     */
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        TemplatingHelper $templatingHelper,
+        FormModel $formModel,
+        PageModel $pageModel,
+        LeadModel $leadModel,
+        CampaignModel $campaignModel,
+        LeadFieldModel $leadFieldModel
+    )
+    {
+        $this->ipLookupHelper = $ipLookupHelper;
+        $this->templatingHelper = $templatingHelper;
+        $this->formModel = $formModel;
+        $this->pageModel = $pageModel;
+        $this->leadModel = $leadModel;
+        $this->campaignModel = $campaignModel;
+        $this->leadFieldModel = $leadFieldModel;
+    }
+
+    /**
+     * @param Logger $logger
+     */
+    public function setLogger(Logger $logger)
+    {
+        $this->logger = $logger;
+    }
 
     /**
      * {@inheritdoc}
@@ -55,7 +147,7 @@ class SubmissionModel extends CommonFormModel
         $submission->setDateSubmitted(new \DateTime());
         $submission->setForm($form);
 
-        $ipAddress = $this->factory->getIpAddress();
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
         $submission->setIpAddress($ipAddress);
 
         if (!empty($post['return'])) {
@@ -175,13 +267,13 @@ class SubmissionModel extends CommonFormModel
         $actions = $form->getActions();
 
         //get post submit actions to make sure it still exists
-        $components       = $this->factory->getModel('form')->getCustomComponents();
+        $components       = $this->formModel->getCustomComponents();
         $availableActions = $components['actions'];
 
         $args = array(
             'post'       => $post,
             'server'     => $server,
-            'factory'    => $this->factory,
+            'factory'    => $this->factory, // WHAT??
             'submission' => $submission,
             'fields'     => $fieldArray,
             'form'       => $form,
@@ -232,7 +324,7 @@ class SubmissionModel extends CommonFormModel
 
         //set the landing page the form was submitted from if applicable
         if (!empty($post['mauticpage'])) {
-            $page = $this->factory->getModel('page.page')->getEntity((int)$post['mauticpage']);
+            $page = $this->pageModel->getEntity((int)$post['mauticpage']);
             if ($page != null) {
                 $submission->setPage($page);
             }
@@ -240,9 +332,6 @@ class SubmissionModel extends CommonFormModel
 
         // Add a feedback parameter
         $args['feedback'] = array();
-
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead');
 
         // Create/update lead
         if (!empty($leadFieldMatches)) {
@@ -262,7 +351,7 @@ class SubmissionModel extends CommonFormModel
                 $args['config'] = $action->getProperties();
 
                 // Set the lead each time in case an action updates it
-                $args['lead'] = $leadModel->getCurrentLead();
+                $args['lead'] = $this->leadModel->getCurrentLead();
 
                 $callback = $settings['callback'];
                 if (is_callable($callback)) {
@@ -291,9 +380,9 @@ class SubmissionModel extends CommonFormModel
 
         // Get updated lead with tracking ID
         if ($form->isInKioskMode()) {
-            $lead = $leadModel->getCurrentLead();
+            $lead = $this->leadModel->getCurrentLead();
         } else {
-            list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
+            list($lead, $trackingId, $generated) = $this->leadModel->getCurrentLead(true);
 
             //set tracking ID for stats purposes to determine unique hits
             $submission->setTrackingId($trackingId);
@@ -302,14 +391,10 @@ class SubmissionModel extends CommonFormModel
 
         if (!$form->isStandalone()) {
             // Find and add the lead to the associated campaigns
-
-            /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-            $campaignModel = $this->factory->getModel('campaign');
-
-            $campaigns = $campaignModel->getCampaignsByForm($form);
+            $campaigns = $this->campaignModel->getCampaignsByForm($form);
             if (!empty($campaigns)) {
                 foreach ($campaigns as $campaign) {
-                    $campaignModel->addLead($campaign, $lead);
+                    $this->campaignModel->addLead($campaign, $lead);
                 }
             }
         }
@@ -342,22 +427,17 @@ class SubmissionModel extends CommonFormModel
      */
     protected function createLeadFromSubmit($form, array $leadFieldMatches)
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model      = $this->factory->getModel('lead');
-        $em         = $this->factory->getEntityManager();
-        $logger     = $this->factory->getLogger();
-
         //set the mapped data
-        $leadFields = $this->factory->getModel('lead.field')->getRepository()->getAliases(null, true, false);
+        $leadFields = $this->leadFieldModel->getRepository()->getAliases(null, true, false);
         $inKioskMode = $form->isInKioskMode();
 
         if (!$inKioskMode) {
             // Default to currently tracked lead
-            $lead          = $model->getCurrentLead();
+            $lead          = $this->leadModel->getCurrentLead();
             $leadId        = $lead->getId();
-            $currentFields = $model->flattenFields($lead->getFields());
+            $currentFields = $this->leadModel->flattenFields($lead->getFields());
 
-            $logger->debug('FORM: Not in kiosk mode so using current contact ID #' . $lead->getId());
+            $this->logger->debug('FORM: Not in kiosk mode so using current contact ID #' . $lead->getId());
         } else {
             // Default to a new lead in kiosk mode
             $lead = new Lead();
@@ -366,10 +446,10 @@ class SubmissionModel extends CommonFormModel
 
             $leadId = null;
 
-            $logger->debug('FORM: In kiosk mode so assuming a new contact');
+            $this->logger->debug('FORM: In kiosk mode so assuming a new contact');
         }
 
-        $uniqueLeadFields = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
+        $uniqueLeadFields = $this->leadFieldModel->getUniqueIdentiferFields();
 
         // Closure to get data and unique fields
         $getData = function($currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields) {
@@ -392,13 +472,13 @@ class SubmissionModel extends CommonFormModel
         };
 
         // Closure to help search for a conflict
-        $checkForIdentifierConflict = function($fieldSet1, $fieldSet2) use ($logger) {
+        $checkForIdentifierConflict = function($fieldSet1, $fieldSet2) {
             // Find fields in both sets
             $potentialConflicts = array_keys(
                 array_intersect_key($fieldSet1, $fieldSet2)
             );
 
-            $logger->debug('FORM: Potential conflicts ' . implode(', ', array_keys($potentialConflicts)) . ' = ' . implode(', ', $potentialConflicts));
+            $this->logger->debug('FORM: Potential conflicts ' . implode(', ', array_keys($potentialConflicts)) . ' = ' . implode(', ', $potentialConflicts));
 
             $conflicts = array();
             foreach ($potentialConflicts as $field) {
@@ -414,23 +494,23 @@ class SubmissionModel extends CommonFormModel
 
         // Get data for the form submission
         list ($data, $uniqueFieldsWithData) = $getData($leadFieldMatches);
-        $logger->debug('FORM: Unique fields submitted include ' . implode(', ', $uniqueFieldsWithData));
+        $this->logger->debug('FORM: Unique fields submitted include ' . implode(', ', $uniqueFieldsWithData));
 
         // Check for duplicate lead
-        /** @var \Mautic\LeadBundle\Entity\LeadRepository $leads */
-        $leads = (!empty($uniqueFieldsWithData)) ? $em->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields($uniqueFieldsWithData, $leadId) : array();
+        /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
+        $leads = (!empty($uniqueFieldsWithData)) ? $this->em->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields($uniqueFieldsWithData, $leadId) : array();
 
         $uniqueFieldsCurrent = $getData($currentFields, true);
         if (count($leads)) {
-            $logger->debug(count($leads) . ' found based on unique identifiers');
+            $this->logger->debug(count($leads) . ' found based on unique identifiers');
 
             /** @var \Mautic\LeadBundle\Entity\Lead $foundLead */
             $foundLead = $leads[0];
 
-            $logger->debug('FORM: Testing contact ID# ' . $foundLead->getId() . ' for conflicts');
+            $this->logger->debug('FORM: Testing contact ID# ' . $foundLead->getId() . ' for conflicts');
 
             // Check for a conflict with the currently tracked lead
-            $foundLeadFields =  $model->flattenFields($foundLead->getFields());
+            $foundLeadFields =  $this->leadModel->flattenFields($foundLead->getFields());
 
             // Get unique identifier fields for the found lead then compare with the lead currently tracked
             $uniqueFieldsFound = $getData($foundLeadFields, true);
@@ -441,20 +521,20 @@ class SubmissionModel extends CommonFormModel
                 $lead = $foundLead;
 
                 if ($hasConflict) {
-                    $logger->debug('FORM: Conflicts found in ' . implode(', ' , $conflicts) . ' so not merging');
+                    $this->logger->debug('FORM: Conflicts found in ' . implode(', ' , $conflicts) . ' so not merging');
                 } else {
-                    $logger->debug('FORM: In kiosk mode so not merging');
+                    $this->logger->debug('FORM: In kiosk mode so not merging');
                 }
 
             } else {
-                $logger->debug('FORM: Merging contacts ' . $lead->getId() . ' and ' . $foundLead->getId());
+                $this->logger->debug('FORM: Merging contacts ' . $lead->getId() . ' and ' . $foundLead->getId());
 
                 // Merge the found lead with currently tracked lead
-                $lead = $model->mergeLeads($lead, $foundLead);
+                $lead = $this->leadModel->mergeLeads($lead, $foundLead);
             }
 
             // Update unique fields data for comparison with submitted data
-            $currentFields       = $model->flattenFields($lead->getFields());
+            $currentFields       = $this->leadModel->flattenFields($lead->getFields());
             $uniqueFieldsCurrent = $getData($currentFields, true);
         }
 
@@ -462,26 +542,26 @@ class SubmissionModel extends CommonFormModel
             // Check for conflicts with the submitted data and the currently tracked lead
             list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsWithData, $uniqueFieldsCurrent);
 
-            $logger->debug('FORM: Current unique contact fields ' . implode(', ', array_keys($uniqueFieldsCurrent)) . ' = ' . implode(', ', $uniqueFieldsCurrent));
+            $this->logger->debug('FORM: Current unique contact fields ' . implode(', ', array_keys($uniqueFieldsCurrent)) . ' = ' . implode(', ', $uniqueFieldsCurrent));
 
-            $logger->debug('FORM: Submitted unique contact fields ' . implode(', ', array_keys($uniqueFieldsWithData)) . ' = ' . implode(', ', $uniqueFieldsWithData));
+            $this->logger->debug('FORM: Submitted unique contact fields ' . implode(', ', array_keys($uniqueFieldsWithData)) . ' = ' . implode(', ', $uniqueFieldsWithData));
             if ($hasConflict) {
                 // There's a conflict so create a new lead
                 $lead = new Lead();
                 $lead->setNewlyCreated(true);
 
-                $logger->debug('FORM: Conflicts found in ' . implode(', ' , $conflicts) . ' between current tracked contact and submitted data so assuming a new contact');
+                $this->logger->debug('FORM: Conflicts found in ' . implode(', ' , $conflicts) . ' between current tracked contact and submitted data so assuming a new contact');
             }
         }
 
         //check for existing IP address
-        $ipAddress = $this->factory->getIpAddress();
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         //no lead was found by a mapped email field so create a new one
         if ($lead->isNewlyCreated()) {
             if (!$inKioskMode) {
                 $lead->addIpAddress($ipAddress);
-                $logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to contact');
+                $this->logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to contact');
             }
 
         } elseif (!$inKioskMode) {
@@ -489,12 +569,12 @@ class SubmissionModel extends CommonFormModel
             if (!$leadIpAddresses->contains($ipAddress)) {
                 $lead->addIpAddress($ipAddress);
 
-                $logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to contact');
+                $this->logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to contact');
             }
         }
 
         //set the mapped fields
-        $model->setFieldValues($lead, $data, false);
+        $this->leadModel->setFieldValues($lead, $data, false);
 
         if (!empty($event)) {
             $event->setIpAddress($ipAddress);
@@ -505,14 +585,14 @@ class SubmissionModel extends CommonFormModel
         $lead->setLastActive(new \DateTime());
 
         //create a new lead
-        $model->saveEntity($lead, false);
+        $this->leadModel->saveEntity($lead, false);
 
         if (!$inKioskMode) {
             // Set the current lead which will generate tracking cookies
-            $model->setCurrentLead($lead);
+            $this->leadModel->setCurrentLead($lead);
         } else {
             // Set system current lead which will still allow execution of events without generating tracking cookies
-            $model->setSystemCurrentLead($lead);
+            $this->leadModel->setSystemCurrentLead($lead);
         }
 
         return $lead;
@@ -523,10 +603,7 @@ class SubmissionModel extends CommonFormModel
      */
     public function getEntities (array $args = array())
     {
-        $repo = $this->getRepository();
-        $repo->setFactory($this->factory);
-
-        return $repo->getEntities($args);
+        return $this->getRepository()->getEntities($args);
     }
 
     /**
@@ -542,7 +619,7 @@ class SubmissionModel extends CommonFormModel
         $results    = $this->getEntities($queryArgs);
         $translator = $this->translator;
 
-        $date = $this->factory->getDate()->toLocalString();
+        $date = (new DateTimeHelper)->toLocalString();
         $name = str_replace(' ', '_', $date) . '_' . $form->getAlias();
 
         switch ($format) {
@@ -603,7 +680,7 @@ class SubmissionModel extends CommonFormModel
 
                 return $response;
             case 'html':
-                $content = $this->factory->getTemplating()->renderResponse(
+                $content = $this->templatingHelper->getTemplating()->renderResponse(
                     'MauticFormBundle:Result:export.html.php',
                     array(
                         'form'      => $form,
@@ -689,29 +766,29 @@ class SubmissionModel extends CommonFormModel
     /**
      * Get line chart data of submissions
      *
-     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     * @param string   $dateFormat
-     * @param array    $filter
-     * @param boolean  $canViewOthers
+     * @param char      $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param string    $dateFormat
+     * @param array     $filter
+     * @param boolean   $canViewOthers
      *
      * @return array
      */
     public function getSubmissionsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
     {
         $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = $chart->getChartQuery($this->factory->getEntityManager()->getConnection());
+        $query     = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $q = $query->prepareTimeDataQuery('form_submissions', 'date_submitted', $filter);
 
         if (!$canViewOthers) {
             $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
                 ->andWhere('f.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
         }
 
         $data = $query->loadAndBuildTimeData($q);
-        $chart->setDataset($this->factory->getTranslator()->trans('mautic.form.submission.count'), $data);
+        $chart->setDataset($this->translator->trans('mautic.form.submission.count'), $data);
         return $chart->render();
     }
 
@@ -738,7 +815,7 @@ class SubmissionModel extends CommonFormModel
         if (!$canViewOthers) {
             $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
                 ->andWhere('f.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -774,7 +851,7 @@ class SubmissionModel extends CommonFormModel
         if (!$canViewOthers) {
             $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
                 ->andWhere('f.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);

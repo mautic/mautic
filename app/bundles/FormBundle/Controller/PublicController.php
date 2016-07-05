@@ -42,6 +42,7 @@ class PublicController extends CommonFormController
             //remove mauticError and mauticMessage from the referer so it doesn't get sent back
             $return = InputHelper::url($return, null, null, null, array('mauticError', 'mauticMessage'), true);
             $query  = (strpos($return, '?') === false) ? '?' : '&';
+            
         }
 
         $translator = $this->get('translator');
@@ -56,9 +57,9 @@ class PublicController extends CommonFormController
         if (!isset($post['formId'])) {
             $error =  $translator->trans('mautic.form.submit.error.unavailable', array(), 'flashes');
         } else {
-            $formModel = $this->factory->getModel('form.form');
+            $formModel = $this->getModel('form.form');
             $form      = $formModel->getEntity($post['formId']);
-
+           
             //check to see that the form was found
             if ($form === null) {
                 $error = $translator->trans('mautic.form.submit.error.unavailable', array(), 'flashes');
@@ -81,7 +82,7 @@ class PublicController extends CommonFormController
                 } elseif ($status != 'published') {
                     $error = $translator->trans('mautic.form.submit.error.unavailable', array(), 'flashes');
                 } else {
-                    $result = $this->factory->getModel('form.submission')->saveSubmission($post, $server, $form);
+                    $result = $this->getModel('form.submission')->saveSubmission($post, $server, $form);
                     if (!empty($result['errors'])) {
                         if ($messengerMode) {
                             $error = $result['errors'];
@@ -242,9 +243,10 @@ class PublicController extends CommonFormController
     {
         $objectId          = (empty($id)) ? InputHelper::int($this->request->get('id')) : $id;
         $css               = InputHelper::string($this->request->get('css'));
-        $model             = $this->factory->getModel('form.form');
+        $model             = $this->getModel('form.form');
         $form              = $model->getEntity($objectId);
-        $customStylesheets = (!empty($css)) ? explode(',', $css) : array();
+        $customStylesheets = (!empty($css)) ? explode(',', $css) : [];
+        $template          = null;
 
         if ($form === null || !$form->isPublished()) {
 
@@ -279,10 +281,9 @@ class PublicController extends CommonFormController
         $viewParams['template'] = $template;
 
         if (! empty($template)) {
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':form.html.php');
+            $logicalName  = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $template . ':form.html.php');
             $assetsHelper = $this->factory->getHelper('template.assets');
-            $slotsHelper = $this->factory->getHelper('template.slots');
-            $analyticsHelper = $this->factory->getHelper('template.analytics');
+            $analytics    = $this->factory->getHelper('template.analytics')->getCode();
 
             if (! empty($customStylesheets)) {
                 foreach ($customStylesheets as $css) {
@@ -290,9 +291,8 @@ class PublicController extends CommonFormController
                 }
             }
 
-            $slotsHelper->set('pageTitle', $form->getName());
+            $this->factory->getHelper('template.slots')->set('pageTitle', $form->getName());
 
-            $analytics = $analyticsHelper->getCode();
 
             if (! empty($analytics)) {
                 $assetsHelper->addCustomDeclaration($analytics);
@@ -313,7 +313,7 @@ class PublicController extends CommonFormController
     {
         $formId = InputHelper::int($this->request->get('id'));
 
-        $model  = $this->factory->getModel('form.form');
+        $model  = $this->getModel('form.form');
         $form   = $model->getEntity($formId);
         $js     = '';
 

@@ -10,13 +10,64 @@
 namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Entity\Notification;
+use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\UpdateHelper;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Class NotificationModel
  */
 class NotificationModel extends FormModel
 {
+    /**
+     * @var boolean
+     */
+    protected $disableUpdates;
+
+    /**
+     * @var Session
+     */
+    protected $session;
+
+    /**
+     * @var PathsHelper
+     */
+    protected $pathsHelper;
+
+    /**
+     * @var UpdateHelper
+     */
+    protected $updateHelper;
+
+    /**
+     * NotificationModel constructor.
+     *
+     * @param PathsHelper $pathsHelper
+     * @param UpdateHelper $updateHelper
+     */
+    public function __construct(PathsHelper $pathsHelper, UpdateHelper $updateHelper)
+    {
+        $this->pathsHelper = $pathsHelper;
+        $this->updateHelper = $updateHelper;
+    }
+
+    /**
+     * @param Session $session
+     */
+    public function setSession(Session $session)
+    {
+        $this->session = $session;
+    }
+
+    /**
+     * @param $disableUpdates
+     */
+    public function setDisableUpdates($disableUpdates)
+    {
+        $this->disableUpdates = $disableUpdates;
+    }
 
     /**
      * {@inheritdoc}
@@ -49,7 +100,7 @@ class NotificationModel extends FormModel
         User $user = null
     ) {
         if ($user === null) {
-            $user = $this->factory->getUser();
+            $user = $this->user;
         }
 
         if ($user === null || !$user->getId()) {
@@ -60,8 +111,8 @@ class NotificationModel extends FormModel
         $notification = new Notification();
         $notification->setType($type);
         $notification->setIsRead($isRead);
-        $notification->setHeader($header);
-        $notification->setMessage($message);
+        $notification->setHeader(InputHelper::html($header));
+        $notification->setMessage(InputHelper::html($message));
         $notification->setIconClass($iconClass);
         $notification->setUser($user);
         if ($datetime == null) {
@@ -79,15 +130,13 @@ class NotificationModel extends FormModel
      */
     public function getNotifications($afterId = null, $key = null)
     {
-        $user = $this->factory->getUser();
-
-        if ($user->getId()) {
+        if ($this->user->getId()) {
             $filter = array(
                 'force' => array(
                     array(
                         'column' => 'n.user',
                         'expr'   => 'eq',
-                        'value'  => $this->factory->getUser()
+                        'value'  => $this->user
                     )
                 )
             );
@@ -125,7 +174,7 @@ class NotificationModel extends FormModel
      */
     public function markAllRead()
     {
-        $this->getRepository()->markAllReadForUser($this->factory->getUser()->getId());
+        $this->getRepository()->markAllReadForUser($this->user->getId());
     }
 
     /**
@@ -135,7 +184,7 @@ class NotificationModel extends FormModel
      */
     public function clearNotification($id)
     {
-        $this->getRepository()->clearNotificationsForUser($this->factory->getUser()->getId(), $id);
+        $this->getRepository()->clearNotificationsForUser($this->user->getId(), $id);
     }
 
     /**
@@ -147,7 +196,7 @@ class NotificationModel extends FormModel
      */
     public function getNotificationContent($afterId = null)
     {
-        if ($this->factory->getUser()->isGuest) {
+        if ($this->user->isGuest) {
             return array(array(), false, '');
         }
 
@@ -167,42 +216,38 @@ class NotificationModel extends FormModel
         $updateMessage = '';
         $newUpdate     = false;
 
-        if (!$this->factory->getParameter('security.disableUpdates') && $this->factory->getUser()->isAdmin()) {
+        if (!$this->disableUpdates && $this->user->isAdmin()) {
             $updateData = array();
-            $cacheFile  = $this->factory->getSystemPath('cache').'/lastUpdateCheck.txt';
-            $session    = $this->factory->getSession();
+            $cacheFile  = $this->pathsHelper->getSystemPath('cache').'/lastUpdateCheck.txt';
 
             //check to see when we last checked for an update
-            $lastChecked = $session->get('mautic.update.checked', 0);
+            $lastChecked = $this->session->get('mautic.update.checked', 0);
 
             if (time() - $lastChecked > 3600) {
-                $session->set('mautic.update.checked', time());
+                $this->session->set('mautic.update.checked', time());
 
-                /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
-                $updateHelper = $this->factory->getHelper('update');
-                $updateData   = $updateHelper->fetchData();
+                $updateData   = $this->updateHelper->fetchData();
             } elseif (file_exists($cacheFile)) {
                 $updateData = json_decode(file_get_contents($cacheFile), true);
             }
 
             // If the version key is set, we have an update
             if (isset($updateData['version'])) {
-                $translator   = $this->factory->getTranslator();
-                $announcement = $translator->trans(
+                $announcement = $this->translator->trans(
                     'mautic.core.updater.update.announcement_link',
                     array('%announcement%' => $updateData['announcement'])
                 );
 
-                $updateMessage = $translator->trans(
+                $updateMessage = $this->translator->trans(
                     $updateData['message'],
                     array('%version%' => $updateData['version'], '%announcement%' => $announcement)
                 );
 
-                $alreadyNotified = $session->get('mautic.update.notified');
+                $alreadyNotified = $this->session->get('mautic.update.notified');
 
                 if (empty($alreadyNotified) || $alreadyNotified != $updateData['version']) {
                     $newUpdate = true;
-                    $session->set('mautic.update.notified', $updateData['version']);
+                    $this->session->set('mautic.update.notified', $updateData['version']);
                 }
             }
         }

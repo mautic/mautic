@@ -14,7 +14,6 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -144,11 +143,10 @@ class EmailType extends AbstractType
             array(
                 'feature'     => 'email',
                 'attr'        => array(
-                    'class'    => 'form-control',
+                    'class'    => 'form-control not-chosen hidden',
                     'tooltip'  => 'mautic.email.form.template.help',
-                    'onchange' => 'Mautic.onBuilderModeSwitch(this);'
                 ),
-                'empty_value' => 'mautic.core.none'
+                'data' => $options['data']->getTemplate() ? $options['data']->getTemplate() : 'blank'
             )
         );
 
@@ -213,7 +211,7 @@ class EmailType extends AbstractType
                     'label_attr' => array('class' => 'control-label'),
                     'required'   => false,
                     'attr'       => array(
-                        'class'                => 'form-control editor-fullpage editor-builder-tokens',
+                        'class'                => 'form-control editor-basic-fullpage editor-builder-tokens builder-html',
                         'data-token-callback'  => 'email:getBuilderTokens',
                         'data-token-activator' => '{'
                     )
@@ -253,20 +251,6 @@ class EmailType extends AbstractType
 
         $url = $this->request->getSchemeAndHttpHost().$this->request->getBasePath();
         $formModifier = function(FormEvent $event, $eventName, $isVariant) use ($url) {
-            if (FormEvents::PRE_SUBMIT == $eventName) {
-                $parser = new PlainTextHelper(
-                    array(
-                        'base_url' => $url
-                    )
-                );
-
-                $data = $event->getData();
-
-                // Then strip out HTML
-                $data['plainText'] = $parser->setHtml($data['plainText'])->getText();
-                $event->setData($data);
-            }
-
             if ($isVariant) {
                 $event->getForm()->add(
                     'variantSettings',

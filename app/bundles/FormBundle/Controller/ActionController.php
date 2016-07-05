@@ -53,7 +53,7 @@ class ActionController extends CommonFormController
         }
 
         //fire the form builder event
-        $customComponents = $this->factory->getModel('form.form')->getCustomComponents();
+        $customComponents = $this->getModel('form.form')->getCustomComponents();
         $form             = $this->get('form.factory')->create('formaction', $formAction, array(
             'action'   => $this->generateUrl('mautic_formaction_action', array('objectAction' => 'new')),
             'settings' => $customComponents['actions'][$actionType],
@@ -127,7 +127,6 @@ class ActionController extends CommonFormController
             //just close the modal
             $passthroughVars['closeModal'] = 1;
             $response                      = new JsonResponse($passthroughVars);
-            $response->headers->set('Content-Length', strlen($response->getContent()));
 
             return $response;
         }
@@ -158,7 +157,7 @@ class ActionController extends CommonFormController
 
         if ($formAction !== null) {
             $actionType             = $formAction['type'];
-            $customComponents       = $this->factory->getModel('form.form')->getCustomComponents();
+            $customComponents       = $this->getModel('form.form')->getCustomComponents();
             $formAction['settings'] = $customComponents['actions'][$actionType];
 
             //ajax only for form fields
@@ -255,7 +254,6 @@ class ActionController extends CommonFormController
                 //just close the modal
                 $passthroughVars['closeModal'] = 1;
                 $response                      = new JsonResponse($passthroughVars);
-                $response->headers->set('Content-Length', strlen($response->getContent()));
 
                 return $response;
             }
@@ -268,7 +266,6 @@ class ActionController extends CommonFormController
         }
 
         $response = new JsonResponse(array('success' => 0));
-        $response->headers->set('Content-Length', strlen($response->getContent()));
 
         return $response;
     }
@@ -340,7 +337,6 @@ class ActionController extends CommonFormController
         }
 
         $response = new JsonResponse($dataArray);
-        $response->headers->set('Content-Length', strlen($response->getContent()));
 
         return $response;
     }
@@ -413,7 +409,6 @@ class ActionController extends CommonFormController
         }
 
         $response = new JsonResponse($dataArray);
-        $response->headers->set('Content-Length', strlen($response->getContent()));
 
         return $response;
     }

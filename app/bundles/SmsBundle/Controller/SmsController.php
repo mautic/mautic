@@ -31,7 +31,7 @@ class SmsController extends FormController
     public function indexAction($page = 1)
     {
         /** @var \Mautic\SmsBundle\Model\SmsModel $model */
-        $model = $this->factory->getModel('sms');
+        $model = $this->getModel('sms');
 
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(
@@ -87,13 +87,13 @@ class SmsController extends FormController
 
         //retrieve a list of categories
         $listFilters['filters']['groups']['mautic.core.filter.categories'] = array(
-            'options'  => $this->factory->getModel('category')->getLookupResults('email', '', 0),
+            'options'  => $this->getModel('category')->getLookupResults('email', '', 0),
             'prefix'   => 'category'
         );
 
         //retrieve a list of Lead Lists
         $listFilters['filters']['groups']['mautic.core.filter.lists'] = array(
-            'options'  => $this->factory->getModel('lead.list')->getUserLists(),
+            'options'  => $this->getModel('lead.list')->getUserLists(),
             'prefix'   => 'list'
         );
 
@@ -236,7 +236,7 @@ class SmsController extends FormController
     public function viewAction($objectId)
     {
         /** @var \Mautic\SmsBundle\Model\SmsModel $model */
-        $model    = $this->factory->getModel('sms');
+        $model    = $this->getModel('sms');
         $security = $this->factory->getSecurity();
 
         /** @var \Mautic\SmsBundle\Entity\Sms $sms */
@@ -275,10 +275,8 @@ class SmsController extends FormController
             return $this->accessDenied();
         }
 
-        $stats = $model->getSmsGeneralStats($sms);
-
         // Audit Log
-        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('sms', $sms->getId(), $sms->getDateAdded());
+        $logs = $this->getModel('core.auditLog')->getLogForObject('sms', $sms->getId(), $sms->getDateAdded());
 
         // Get click through stats
         $trackableLinks = $model->getSmsClickStats($sms->getId());
@@ -294,7 +292,7 @@ class SmsController extends FormController
                 ),
                 'viewParameters'  => array(
                     'sms'         => $sms,
-                    'stats'       => $stats,
+                    'stats'       => array(), // @todo
                     'trackables'  => $trackableLinks,
                     'logs'        => $logs,
                     'permissions' => $security->isGranted(
@@ -332,7 +330,7 @@ class SmsController extends FormController
     public function newAction($entity = null)
     {
         /** @var \Mautic\SmsBundle\Model\SmsModel $model */
-        $model = $this->factory->getModel('sms');
+        $model = $this->getModel('sms');
 
         if (! $entity instanceof Sms) {
             /** @var \Mautic\SmsBundle\Entity\Sms $entity */
@@ -467,7 +465,7 @@ class SmsController extends FormController
     public function editAction($objectId, $ignorePost = false, $forceTypeSelection = false)
     {
         /** @var \Mautic\SmsBundle\Model\SmsModel $model */
-        $model = $this->factory->getModel('sms');
+        $model = $this->getModel('sms');
         $method  = $this->request->getMethod();
         $entity  = $model->getEntity($objectId);
         $session = $this->factory->getSession();
@@ -630,7 +628,7 @@ class SmsController extends FormController
      */
     public function cloneAction($objectId)
     {
-        $model  = $this->factory->getModel('sms');
+        $model  = $this->getModel('sms');
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -678,7 +676,7 @@ class SmsController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->factory->getModel('sms');
+            $model  = $this->getModel('sms');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
@@ -742,7 +740,7 @@ class SmsController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model     = $this->factory->getModel('sms');
+            $model     = $this->getModel('sms');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
 
             $deleteIds = array();
@@ -803,7 +801,7 @@ class SmsController extends FormController
     public function previewAction($objectId)
     {
         /** @var \Mautic\SmsBundle\Model\SmsModel $model */
-        $model = $this->factory->getModel('sms');
+        $model = $this->getModel('sms');
         $sms = $model->getEntity($objectId);
 
         if ($sms != null

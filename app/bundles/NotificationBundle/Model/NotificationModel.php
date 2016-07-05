@@ -9,13 +9,13 @@
 
 namespace Mautic\NotificationBundle\Model;
 
-use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Entity\Stat;
 use Mautic\NotificationBundle\Event\NotificationEvent;
 use Mautic\NotificationBundle\Event\NotificationClickEvent;
 use Mautic\NotificationBundle\NotificationEvents;
+use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -26,6 +26,21 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class NotificationModel extends FormModel
 {
+    /**
+     * @var TrackableModel
+     */
+    protected $pageTrackableModel;
+    
+    /**
+     * NotificationModel constructor.
+     * 
+     * @param TrackableModel $pageTrackableModel
+     */
+    public function __construct(TrackableModel $pageTrackableModel)
+    {
+        $this->pageTrackableModel = $pageTrackableModel;
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -41,7 +56,7 @@ class NotificationModel extends FormModel
      */
     public function getStatRepository()
     {
-        return $this->factory->getEntityManager()->getRepository('MauticNotificationBundle:Stat');
+        return $this->em->getRepository('MauticNotificationBundle:Stat');
     }
 
     /**
@@ -206,104 +221,6 @@ class NotificationModel extends FormModel
     }
 
     /**
-     * Get a stats for notification by list
-     *
-     * @param Notification|int $notification
-     *
-     * @return array
-     */
-    public function getNotificationListStats($notification)
-    {
-        if (! $notification instanceof Notification) {
-            $notification = $this->getEntity($notification);
-        }
-
-        $notificationIds = array($notification->getId());
-
-        $lists     = $notification->getLists();
-        $listCount = count($lists);
-
-        $combined = $this->translator->trans('mautic.notification.lists.combined');
-        $datasets = array(
-            $combined => array(0, 0, 0)
-        );
-
-        $labels = array(
-            $this->translator->trans('mautic.notification.sent'),
-            $this->translator->trans('mautic.notification.read'),
-            $this->translator->trans('mautic.notification.failed')
-        );
-
-        if ($listCount) {
-            /** @var \Mautic\NotificationBundle\Entity\StatRepository $statRepo */
-            $statRepo = $this->em->getRepository('MauticNotificationBundle:Stat');
-
-            foreach ($lists as $l) {
-                $name = $l->getTitle();
-
-                $sentCount = $statRepo->getSentCount($notificationIds, $l->getId());
-                $datasets[$combined][0] += $sentCount;
-
-                $readCount = $statRepo->getReadCount($notificationIds, $l->getId());
-                $datasets[$combined][1] += $readCount;
-
-                $datasets[$name] = array();
-
-                $datasets[$name] = array(
-                    $sentCount,
-                    $readCount
-                );
-
-                $datasets[$name]['datasetKey'] = $l->getId();
-            }
-        }
-
-        if ($listCount === 1) {
-            unset($datasets[$combined]);
-        }
-
-        $data = GraphHelper::prepareBarGraphData($labels, $datasets);
-
-        return $data;
-    }
-
-    /**
-     * @param int|Notification $notification
-     * @param int       $amount
-     * @param string    $unit
-     *
-     * @return array
-     */
-    public function getNotificationGeneralStats($notification, $amount = 30, $unit = 'D')
-    {
-        if (! $notification instanceof Notification) {
-            $notification = $this->getEntity($notification);
-        }
-
-        $notificationIds = array($notification->getId());
-
-        /** @var \Mautic\NotificationBundle\Entity\StatRepository $statRepo */
-        $statRepo = $this->em->getRepository('MauticNotificationBundle:Stat');
-
-        $graphData = GraphHelper::prepareDatetimeLineGraphData($amount, $unit,
-            array(
-                $this->translator->trans('mautic.notification.stat.sent'),
-                $this->translator->trans('mautic.notification.stat.read')
-            )
-        );
-
-        $fromDate = $graphData['fromDate'];
-
-        $sentData  = $statRepo->getNotificationStats($notificationIds, $fromDate, 'sent');
-        $graphData = GraphHelper::mergeLineGraphData($graphData, $sentData, $unit, 0, 'date', 'data');
-
-        $readData  = $statRepo->getNotificationStats($notificationIds, $fromDate, 'read');
-        $graphData = GraphHelper::mergeLineGraphData($graphData, $readData, $unit, 1, 'date', 'data');
-
-        return $graphData;
-    }
-
-    /**
      * Get an array of tracked links
      *
      * @param $notificationId
@@ -312,6 +229,6 @@ class NotificationModel extends FormModel
      */
     public function getNotificationClickStats($notificationId)
     {
-        return $this->factory->getModel('page.trackable')->getTrackableList('notification', $notificationId);
+        return $this->pageTrackableModel->getTrackableList('notification', $notificationId);
     }
 }

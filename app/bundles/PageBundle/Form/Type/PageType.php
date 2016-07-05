@@ -94,7 +94,7 @@ class PageType extends AbstractType
                 'label'      => 'mautic.page.form.customhtml',
                 'required'   => false,
                 'attr'       => array(
-                    'class'                => 'form-control editor-fullpage editor-builder-tokens',
+                    'class'                => 'form-control editor-basic-fullpage editor-builder-tokens builder-html',
                     'data-token-callback'  => 'page:getBuilderTokens',
                     'data-token-activator' => '{'
                 )
@@ -112,11 +112,11 @@ class PageType extends AbstractType
                 'feature' => 'page',
                 'data'    => $template,
                 'attr'    => array(
-                    'class'   => 'form-control',
+                    'class'   => 'form-control not-chosen hidden',
                     'tooltip' => 'mautic.page.form.template.help',
-                    'onchange' => 'Mautic.onBuilderModeSwitch(this);'
                 ),
-                'empty_value' => 'mautic.core.none'
+                'empty_value' => 'mautic.core.none',
+                'data' => $options['data']->getTemplate() ? $options['data']->getTemplate() : 'blank'
             )
         );
 

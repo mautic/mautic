@@ -7,248 +7,262 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-return array(
-    'routes'     => array(
-        'main'   => array(
-            'mautic_email_index'  => array(
+return [
+    'routes'     => [
+        'main'   => [
+            'mautic_email_index'  => [
                 'path'       => '/emails/{page}',
                 'controller' => 'MauticEmailBundle:Email:index'
-            ),
-            'mautic_email_action' => array(
+            ],
+            'mautic_email_action' => [
                 'path'       => '/emails/{objectAction}/{objectId}',
                 'controller' => 'MauticEmailBundle:Email:execute'
-            )
-        ),
-        'api'    => array(
-            'mautic_api_getemails'     => array(
+            ]
+        ],
+        'api'    => [
+            'mautic_api_getemails'     => [
                 'path'       => '/emails',
                 'controller' => 'MauticEmailBundle:Api\EmailApi:getEntities'
-            ),
-            'mautic_api_getemail'      => array(
+            ],
+            'mautic_api_getemail'      => [
                 'path'       => '/emails/{id}',
                 'controller' => 'MauticEmailBundle:Api\EmailApi:getEntity'
-            ),
-            'mautic_api_sendemail'     => array(
+            ],
+            'mautic_api_sendemail'     => [
                 'path'       => '/emails/{id}/send',
                 'controller' => 'MauticEmailBundle:Api\EmailApi:send',
                 'method'     => 'POST'
-            ),
-            'mautic_api_sendcontactemail' => array(
+            ],
+            'mautic_api_sendcontactemail' => [
                 'path'       => '/emails/{id}/send/contact/{leadId}',
                 'controller' => 'MauticEmailBundle:Api\EmailApi:sendLead',
                 'method'     => 'POST'
-            ),
-
-            // @deprecated - to be removed in 2.0
-            'mautic_api_sendleademail' => array(
-                'path'       => '/emails/{id}/send/contact/{leadId}',
-                'controller' => 'MauticEmailBundle:Api\EmailApi:sendLead',
-                'method'     => 'POST'
-            ),
-            'mautic_api_sendleademail_bc' => array(
-                'path'       => '/emails/{id}/send/lead/{leadId}',
-                'controller' => 'MauticEmailBundle:Api\EmailApi:sendLead',
-                'method'     => 'POST'
-            )
-        ),
-        'public' => array(
-            'mautic_email_tracker'             => array(
+            ]
+        ],
+        'public' => [
+            'mautic_email_tracker'             => [
                 'path'       => '/email/{idHash}.gif',
                 'controller' => 'MauticEmailBundle:Public:trackingImage'
-            ),
-            'mautic_email_webview'             => array(
+            ],
+            'mautic_email_webview'             => [
                 'path'       => '/email/view/{idHash}',
                 'controller' => 'MauticEmailBundle:Public:index'
-            ),
-            'mautic_email_unsubscribe'         => array(
+            ],
+            'mautic_email_unsubscribe'         => [
                 'path'       => '/email/unsubscribe/{idHash}',
                 'controller' => 'MauticEmailBundle:Public:unsubscribe'
-            ),
-            'mautic_email_resubscribe'         => array(
+            ],
+            'mautic_email_resubscribe'         => [
                 'path'       => '/email/resubscribe/{idHash}',
                 'controller' => 'MauticEmailBundle:Public:resubscribe'
-            ),
-            'mautic_mailer_transport_callback' => array(
+            ],
+            'mautic_mailer_transport_callback' => [
                 'path'       => '/mailer/{transport}/callback',
                 'controller' => 'MauticEmailBundle:Public:mailerCallback'
-            ),
-            'mautic_email_preview'             => array(
+            ],
+            'mautic_email_preview'             => [
                 'path'       => '/email/preview/{objectId}',
                 'controller' => 'MauticEmailBundle:Public:preview'
-            )
-        )
-    ),
-    'menu'       => array(
-        'main' => array(
-            'items'    => array(
-                'mautic.email.emails' => array(
+            ]
+        ]
+    ],
+    'menu'       => [
+        'main' => [
+            'items'    => [
+                'mautic.email.emails' => [
                     'route'     => 'mautic_email_index',
-                    'access'    => array('email:emails:viewown', 'email:emails:viewother'),
+                    'access'    => ['email:emails:viewown', 'email:emails:viewother'],
                     'parent'    => 'mautic.core.channels'
-                )
-            )
-        )
-    ),
-    'categories' => array(
+                ]
+            ]
+        ]
+    ],
+    'categories' => [
         'email' => null
-    ),
-    'services'   => array(
-        'events' => array(
-            'mautic.email.subscriber'                => array(
+    ],
+    'services'   => [
+        'events' => [
+            'mautic.email.subscriber'                => [
                 'class' => 'Mautic\EmailBundle\EventListener\EmailSubscriber'
-            ),
-            'mautic.emailbuilder.subscriber'         => array(
+            ],
+            'mautic.emailbuilder.subscriber'         => [
                 'class' => 'Mautic\EmailBundle\EventListener\BuilderSubscriber'
-            ),
-            'mautic.emailtoken.subscriber'     => array(
+            ],
+            'mautic.emailtoken.subscriber'     => [
                 'class' => 'Mautic\EmailBundle\EventListener\TokenSubscriber'
-            ),
-            'mautic.email.campaignbundle.subscriber' => array(
-                'class' => 'Mautic\EmailBundle\EventListener\CampaignSubscriber'
-            ),
-            'mautic.email.formbundle.subscriber'     => array(
+            ],
+            'mautic.email.campaignbundle.subscriber' => [
+                'class' => 'Mautic\EmailBundle\EventListener\CampaignSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.lead.model.lead',
+                    'mautic.email.model.email'
+                ]
+            ],
+            'mautic.email.formbundle.subscriber'     => [
                 'class' => 'Mautic\EmailBundle\EventListener\FormSubscriber'
-            ),
-            'mautic.email.reportbundle.subscriber'   => array(
+            ],
+            'mautic.email.reportbundle.subscriber'   => [
                 'class' => 'Mautic\EmailBundle\EventListener\ReportSubscriber'
-            ),
-            'mautic.email.leadbundle.subscriber'     => array(
-                'class' => 'Mautic\EmailBundle\EventListener\LeadSubscriber'
-            ),
-            'mautic.email.pointbundle.subscriber'    => array(
+            ],
+            'mautic.email.leadbundle.subscriber'     => [
+                'class'       => 'Mautic\EmailBundle\EventListener\LeadSubscriber',
+            ],
+            'mautic.email.pointbundle.subscriber'    => [
                 'class' => 'Mautic\EmailBundle\EventListener\PointSubscriber'
-            ),
-            'mautic.email.calendarbundle.subscriber' => array(
+            ],
+            'mautic.email.calendarbundle.subscriber' => [
                 'class' => 'Mautic\EmailBundle\EventListener\CalendarSubscriber'
-            ),
-            'mautic.email.search.subscriber'         => array(
+            ],
+            'mautic.email.search.subscriber'         => [
                 'class' => 'Mautic\EmailBundle\EventListener\SearchSubscriber'
-            ),
-            'mautic.email.webhook.subscriber'                => array(
+            ],
+            'mautic.email.webhook.subscriber'        => [
                 'class' => 'Mautic\EmailBundle\EventListener\WebhookSubscriber'
-            ),
-            'mautic.email.configbundle.subscriber'   => array(
+            ],
+            'mautic.email.configbundle.subscriber'   => [
                 'class' => 'Mautic\EmailBundle\EventListener\ConfigSubscriber'
-            ),
-            'mautic.email.pagebundle.subscriber'   => array(
+            ],
+            'mautic.email.pagebundle.subscriber'     => [
                 'class' => 'Mautic\EmailBundle\EventListener\PageSubscriber'
-            ),
-            'mautic.email.dashboard.subscriber'           => array(
+            ],
+            'mautic.email.dashboard.subscriber'      => [
                 'class' => 'Mautic\EmailBundle\EventListener\DashboardSubscriber'
-            ),
-        ),
-        'forms'  => array(
-            'mautic.form.type.email'                          => array(
+            ]
+        ],
+        'forms'  => [
+            'mautic.form.type.email'                          => [
                 'class'     => 'Mautic\EmailBundle\Form\Type\EmailType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'emailform'
-            ),
-            'mautic.form.type.emailvariant'                   => array(
+            ],
+            'mautic.form.type.emailvariant'                   => [
                 'class'     => 'Mautic\EmailBundle\Form\Type\VariantType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'emailvariant'
-            ),
-            'mautic.form.type.email_list'                     => array(
+            ],
+            'mautic.form.type.email_list'                     => [
                 'class'     => 'Mautic\EmailBundle\Form\Type\EmailListType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'email_list'
-            ),
-            'mautic.form.type.emailopen_list'                 => array(
+            ],
+            'mautic.form.type.emailopen_list'                 => [
                 'class' => 'Mautic\EmailBundle\Form\Type\EmailOpenType',
                 'alias' => 'emailopen_list'
-            ),
-            'mautic.form.type.emailsend_list'                 => array(
+            ],
+            'mautic.form.type.emailsend_list'                 => [
                 'class'     => 'Mautic\EmailBundle\Form\Type\EmailSendType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'emailsend_list'
-            ),
-            'mautic.form.type.formsubmit_sendemail_admin'     => array(
+            ],
+            'mautic.form.type.formsubmit_sendemail_admin'     => [
                 'class' => 'Mautic\EmailBundle\Form\Type\FormSubmitActionUserEmailType',
                 'alias' => 'email_submitaction_useremail'
-            ),
-            'mautic.email.type.email_abtest_settings'         => array(
+            ],
+            'mautic.email.type.email_abtest_settings'         => [
                 'class' => 'Mautic\EmailBundle\Form\Type\AbTestPropertiesType',
                 'alias' => 'email_abtest_settings'
-            ),
-            'mautic.email.type.batch_send'                    => array(
+            ],
+            'mautic.email.type.batch_send'                    => [
                 'class' => 'Mautic\EmailBundle\Form\Type\BatchSendType',
                 'alias' => 'batch_send'
-            ),
-            'mautic.form.type.emailconfig'                    => array(
+            ],
+            'mautic.form.type.emailconfig'                    => [
                 'class'     => 'Mautic\EmailBundle\Form\Type\ConfigType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'emailconfig'
-            ),
-            'mautic.form.type.coreconfig_monitored_mailboxes' => array(
+            ],
+            'mautic.form.type.coreconfig_monitored_mailboxes' => [
                 'class'     => 'Mautic\EmailBundle\Form\Type\ConfigMonitoredMailboxesType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'monitored_mailboxes'
-            ),
-            'mautic.form.type.coreconfig_monitored_email'     => array(
+            ],
+            'mautic.form.type.coreconfig_monitored_email'     => [
                 'class'     => 'Mautic\EmailBundle\Form\Type\ConfigMonitoredEmailType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'monitored_email'
-            ),
-            'mautic.form.type.email_dashboard_emails_in_time_widget' => array(
+            ],
+            'mautic.form.type.email_dashboard_emails_in_time_widget' => [
                 'class'     => 'Mautic\EmailBundle\Form\Type\DashboardEmailsInTimeWidgetType',
                 'alias'     => 'email_dashboard_emails_in_time_widget'
-            )
-        ),
-        'other'  => array(
-            'mautic.validator.leadlistaccess' => array(
+            ]
+        ],
+        'other'  => [
+            'mautic.validator.leadlistaccess' => [
                 'class'     => 'Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator',
                 'arguments' => 'mautic.factory',
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'leadlist_access'
-            ),
-            'mautic.helper.mailbox'              => array(
+            ],
+            'mautic.helper.mailbox'              => [
                 'class'     => 'Mautic\EmailBundle\MonitoredEmail\Mailbox',
                 'arguments' => 'mautic.factory'
-            ),
-            'mautic.helper.message'            => array(
+            ],
+            'mautic.helper.message'            => [
                 'class'     => 'Mautic\EmailBundle\Helper\MessageHelper',
                 'arguments' => 'mautic.factory'
-            ),
+            ],
+            'mautic.helper.mailer'             => [
+                'class'     => 'Mautic\EmailBundle\Helper\MailHelper',
+                'arguments' => [
+                    'mautic.factory',
+                    'mailer'
+                ]
+            ],
             // Mailers
-            'mautic.transport.amazon'            => array(
+            'mautic.transport.amazon'            => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-                'arguments'    => array(
+                'arguments'    => [
                     '%mautic.mailer_amazon_region%'
-                ),
-                'methodCalls'  => array(
-                    'setUsername' => array('%mautic.mailer_user%'),
-                    'setPassword' => array('%mautic.mailer_password%')
-                )
-            ),
-            'mautic.transport.mandrill'          => array(
+                ],
+                'methodCalls'  => [
+                    'setUsername' => ['%mautic.mailer_user%'],
+                    'setPassword' => ['%mautic.mailer_password%']
+                ]
+            ],
+            'mautic.transport.mandrill'          => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\MandrillTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-                'methodCalls'  => array(
-                    'setUsername'      => array('%mautic.mailer_user%'),
-                    'setPassword'      => array('%mautic.mailer_password%'),
-                    'setMauticFactory' => array('mautic.factory')
-                )
-            ),
-            'mautic.transport.sendgrid'          => array(
+                'methodCalls'  => [
+                    'setUsername'      => ['%mautic.mailer_user%'],
+                    'setPassword'      => ['%mautic.mailer_password%'],
+                    'setMauticFactory' => ['mautic.factory']
+                ]
+            ],
+            'mautic.transport.sendgrid'          => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-                'methodCalls'  => array(
-                    'setUsername' => array('%mautic.mailer_user%'),
-                    'setPassword' => array('%mautic.mailer_password%')
-                )
-            ),
-            'mautic.transport.postmark'          => array(
+                'methodCalls'  => [
+                    'setUsername' => ['%mautic.mailer_user%'],
+                    'setPassword' => ['%mautic.mailer_password%']
+                ]
+            ],
+            'mautic.transport.postmark'          => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\PostmarkTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-                'methodCalls'  => array(
-                    'setUsername' => array('%mautic.mailer_user%'),
-                    'setPassword' => array('%mautic.mailer_password%')
-                )
-            ),
-        )
-    ),
-    'parameters' => array(
+                'methodCalls'  => [
+                    'setUsername' => ['%mautic.mailer_user%'],
+                    'setPassword' => ['%mautic.mailer_password%']
+                ]
+            ],
+        ],
+        'models' =>  [
+            'mautic.email.model.email' => [
+                'class' => 'Mautic\EmailBundle\Model\EmailModel',
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.helper.theme',
+                    'mautic.helper.mailbox',
+                    'mautic.helper.mailer',
+                    'mautic.lead.model.lead',
+                    'mautic.page.model.trackable',
+                    'mautic.user.model.user'
+                ]
+            ]
+        ]
+    ],
+    'parameters' => [
         'mailer_from_name'             => 'Mautic',
         'mailer_from_email'            => 'email@yoursite.com',
         'mailer_return_path'           => null,
@@ -272,8 +286,8 @@ return array(
         'webview_text'                 => null,
         'unsubscribe_message'          => null,
         'resubscribe_message'          => null,
-        'monitored_email'              => array(),
+        'monitored_email'              => [],
         'mailer_is_owner'              => false,
         'default_signature_text'       => null
-    )
-);
+    ]
+];

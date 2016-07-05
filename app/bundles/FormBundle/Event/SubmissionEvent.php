@@ -9,19 +9,14 @@
 
 namespace Mautic\FormBundle\Event;
 
+use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\FormBundle\Entity\Submission;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class SubmissionEvent
  */
-class SubmissionEvent extends Event
+class SubmissionEvent extends CommonEvent
 {
-
-    /**
-     * @var Submission
-     */
-    private $entity;
 
     /**
      * @var array
@@ -69,5 +64,13 @@ class SubmissionEvent extends Event
     public function getServer()
     {
         return $this->server;
+    }
+
+    /**
+     * @return \Mautic\FormBundle\Entity\Form
+     */
+    public function getForm()
+    {
+        return $this->entity->getForm();
     }
 }

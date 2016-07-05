@@ -10,18 +10,12 @@
 namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class PluginIntegrationRequestEvent
  */
-class PluginIntegrationRequestEvent extends Event
+class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
 {
-    /**
-     * @var AbstractIntegration
-     */
-    private $integration;
-
     /**
      * @var
      */
@@ -77,26 +71,6 @@ class PluginIntegrationRequestEvent extends Event
         $this->method      = $method;
         $this->settings    = $settings;
         $this->authType    = $authType;
-    }
-
-    /**
-     * Get the integration's name
-     *
-     * @return mixed
-     */
-    public function getIntegrationName()
-    {
-        return $this->getIntegrationName();
-    }
-
-    /**
-     * Get the integration object
-     *
-     * @return AbstractIntegration
-     */
-    public function getIntegration()
-    {
-        return $this->integration;
     }
 
     /**

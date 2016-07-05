@@ -29,35 +29,22 @@ class AjaxController extends CommonAjaxController
     public function getSourceDataAction(Request $request)
     {
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
-        $model   = $this->factory->getModel('report');
+        $model   = $this->getModel('report');
         $context = $request->get('context');
 
-        list($list, $types) = $model->getColumnList($context, true);
-        $graphs             = $model->getGraphList($context, true);
+        $graphs  = $model->getGraphList($context);
+        $columns = $model->getColumnList($context);
+        $filters = $model->getFilterList($context);
 
-        return $this->sendJsonResponse(array('columns' => $list, 'types' => $types, 'graphs' => $graphs));
-    }
-
-    /**
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function updateGraphAction(Request $request)
-    {
-        $reportId  = InputHelper::int($request->request->get('reportId'));
-        $options   = InputHelper::clean($request->request->all());
-        $dataArray = array('success' => 0);
-
-        /* @type \Mautic\ReportBundle\Model\ReportModel $model */
-        $model    = $this->factory->getModel('report');
-        $report   = $model->getEntity($reportId);
-
-        $options['ignoreTableData'] = true;
-        $reportData = $model->getReportData($report, $this->container->get('form.factory'), $options);
-
-        $dataArray['graph']   = $reportData['graphs'][$options['graphName']]['data'];
-        $dataArray['success'] = 1;
-
-        return $this->sendJsonResponse($dataArray);
+        return $this->sendJsonResponse(
+            [
+                'columns'           => $columns->choiceHtml,
+                'columnDefinitions' => $columns->definitions,
+                'filters'           => $filters->choiceHtml,
+                'filterDefinitions' => $filters->definitions,
+                'filterOperators'   => $filters->operatorHtml,
+                'graphs'            => $graphs->choiceHtml,
+            ]
+        );
     }
 }
