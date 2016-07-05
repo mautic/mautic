@@ -183,6 +183,9 @@ Mautic.clearFroalaStyles = function(content) {
         }
     });
     content.find('link[href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css"]').remove();
+
+    // data-atwho-at-query causes not working tokens
+    content.find('[data-atwho-at-query]').removeAttr('data-atwho-at-query');
     return content;
 }
 
@@ -551,7 +554,6 @@ Mautic.initSlotListeners = function() {
         if (params.type === 'text') {
             params.slot.froalaEditor('destroy');
             params.slot.find('.atwho-inserted').atwho('destroy');
-            params.slot.find('[data-atwho-at-query]').removeAttr('data-atwho-at-query');
         } else if (params.type === 'image') {
             params.slot.find('img').froalaEditor('destroy');
         }
