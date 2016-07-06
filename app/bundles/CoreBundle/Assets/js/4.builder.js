@@ -268,13 +268,15 @@ Mautic.initSections = function() {
             }
         });
 
-        sectionForm.find('.minicolors-panel').on('click', function() {
-            var field = mQuery(this).parent().find('input');
+        parent.mQuery('body').on('change.minicolors', function(e, hex) {
+            var field = mQuery(e.target);
+            var focussedSectionWrapper = mQuery('[data-section-focus]').parent();
+            var focussedSection = focussedSectionWrapper.find('[data-section]');
 
-            if (section.length && field.attr('id') === 'builder_section_content-background-color') {
-                Mautic.sectionBackgroundChanged(section, field.val());
+            if (focussedSection.length && field.attr('id') === 'builder_section_content-background-color') {
+                Mautic.sectionBackgroundChanged(focussedSection, field.val());
             } else if (field.attr('id') === 'builder_section_wrapper-background-color') {
-                Mautic.sectionBackgroundChanged(sectionWrapper, field.val());
+                Mautic.sectionBackgroundChanged(focussedSectionWrapper, field.val());
             }
         });
     });

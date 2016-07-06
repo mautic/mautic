@@ -2860,7 +2860,10 @@ var Mautic = {
         var pickerOptions = mQuery(el).data('color-options');
         if (!pickerOptions) {
             pickerOptions = {
-                theme: 'bootstrap'
+                theme: 'bootstrap',
+                change: function (hex, opacity) {
+                    mQuery(el).trigger('change.minicolors', hex);
+                }
             };
         }
 
