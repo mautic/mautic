@@ -570,4 +570,35 @@ class CommonApiController extends FOSRestController implements MauticController
 
         return array($entities, $totalCount);
     }
+
+    /**
+     * Get a model instance from the service container
+     *
+     * @param $modelNameKey
+     *
+     * @return AbstractCommonModel
+     */
+    protected function getModel($modelNameKey)
+    {
+        // Shortcut for models with the same name as the bundle
+        if (strpos($modelNameKey, '.') === false) {
+            $modelNameKey = "$modelNameKey.$modelNameKey";
+        }
+
+        $parts = explode('.', $modelNameKey);
+
+        if (count($parts) !== 2) {
+            throw new \InvalidArgumentException($modelNameKey . " is not a valid model key.");
+        }
+
+        list($bundle, $name) = $parts;
+
+        $containerKey = str_replace(array('%bundle%', '%name%'), array($bundle, $name), 'mautic.%bundle%.model.%name%');
+
+        if ($this->container->has($containerKey)) {
+            return $this->container->get($containerKey);
+        }
+
+        throw new \InvalidArgumentException($containerKey . ' is not a registered container key.');
+    }
 }
