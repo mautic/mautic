@@ -1664,10 +1664,8 @@ class MailHelper
         $emailModel = $this->factory->getModel('email');
 
         // Save a copy of the email - use email ID if available simply to prevent from having to rehash over and over
-        $id = (null !== $this->email) ? $this->email->getId() : md5($this->subject.$this->body['content']);
-        if (!isset($copies[$id])) {
-            $hash = (strlen($id) !== 32) ? md5($this->subject.$this->body['content']) : $id;
-
+        $hash = md5($this->subject.$this->body['content']);
+        if (!isset($copies[$hash])) {
             $copy        = $emailModel->getCopyRepository()->findByHash($hash);
             $copyCreated = false;
             if (null === $copy) {
@@ -1680,12 +1678,12 @@ class MailHelper
             }
 
             if ($copy || $copyCreated) {
-                $copies[$id] = $hash;
+                $copies[$hash] = $hash;
             }
         }
 
-        if (isset($copies[$id])) {
-            $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $copies[$id]));
+        if (isset($copies[$hash])) {
+            $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $copies[$hash]));
         }
 
         if ($persist) {
