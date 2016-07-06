@@ -110,7 +110,6 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 else{
                     $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
                 }
-               
             }
         }
 
