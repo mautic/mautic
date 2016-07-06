@@ -96,7 +96,10 @@ class CampaignSubscriber extends CommonSubscriber
     public function onEmailOpen(EmailOpenEvent $event)
     {
         $email = $event->getEmail();
-        $this->factory->getModel('campaign.event')->triggerEvent('email.open', $email, 'email.open' . $email->getId());
+        if($email != null)
+        {
+            $this->factory->getModel('campaign.event')->triggerEvent('email.open', $email, 'email.open' . $email->getId());
+        }
     }
 
     /**
