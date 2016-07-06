@@ -85,6 +85,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getAccessTokenUrl()
     {
+        $config = $this->mergeConfigToFeatureSettings(array());
+
+        if(isset($config['sandbox']) and $config['sandbox'] === true)
+        {
+            return 'https://test.salesforce.com/services/oauth2/token';
+        }
         return 'https://login.salesforce.com/services/oauth2/token';
     }
 
@@ -95,6 +101,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getAuthenticationUrl()
     {
+        $config = $this->mergeConfigToFeatureSettings(array());
+
+        if(isset($config['sandbox']) and $config['sandbox'] === true)
+        {
+            return 'https://test.salesforce.com/services/oauth2/token';
+        }
         return 'https://login.salesforce.com/services/oauth2/authorize';
     }
 
@@ -221,6 +233,30 @@ class SalesforceIntegration extends CrmAbstractIntegration
             }
         }
         return $count;
+    }
+
+    /**
+     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
+     * @param array                                             $data
+     * @param string                                            $formArea
+     */
+    public function appendToForm(&$builder, $data, $formArea)
+    {
+        if ($formArea == 'features') {
+            $name = strtolower($this->getName());
+
+            $builder->add('sandbox', 'choice', array(
+                'choices'     => array(
+                    'sandbox'    => 'mautic.salesforce.integration.form.feature.sandbox'
+                ),
+                'expanded'    => true,
+                'multiple'    => true,
+                'label'       => 'mautic.plugins.salesforce.sandbox',
+                'label_attr'  => array('class' => 'control-label'),
+                'empty_value' => false,
+                'required'    => false
+            ));
+        }
     }
 
 }
