@@ -297,7 +297,6 @@ class CommonApiController extends FOSRestController implements MauticController
             $statusCode = Codes::HTTP_CREATED;
             $action     = 'new';
         }
-
         $form         = $this->createEntityForm($entity);
         $submitParams = $this->prepareParametersForBinding($parameters, $entity, $action);
         $form->submit($submitParams, 'PATCH' !== $method);
@@ -319,10 +318,30 @@ class CommonApiController extends FOSRestController implements MauticController
             $view = $this->view(array($this->entityNameOne => $entity), $statusCode, $headers);
             $this->setSerializationContext($view);
         } else {
-            $view = $this->view($form, Codes::HTTP_BAD_REQUEST);
+            $view = $this->view($this->getFormErrorMessages($form), Codes::HTTP_BAD_REQUEST);
         }
 
         return $this->handleView($view);
+    }
+
+    public function getFormErrorMessages(\Symfony\Component\Form\Form $form) {
+        $errors = [];
+
+        foreach ($form->getErrors() as $key => $error) {
+            if ($form->isRoot()) {
+                $errors['#'][] = $error->getMessage();
+            } else {
+                $errors[] = $error->getMessage();
+            }
+        }
+
+        foreach ($form->all() as $child) {
+            if (!$child->isValid()) {
+                $errors[$child->getName()] = $this->getErrorMessages($child);
+            }
+        }
+
+        return $errors;
     }
 
     /**
