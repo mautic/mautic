@@ -384,7 +384,7 @@ Mautic.initSlotListeners = function() {
         slotToolbar.appendTo(handle);
         slot.hover(function() {
             deleteLink.click(function(e) {
-                slot.trigger('slot:destroy', {slot, type});
+                slot.trigger('slot:destroy', {slot: slot, type: type});
                 mQuery.each(Mautic.builderSlots, function(i, slotParams) {
                     if (slotParams.slot.is(slot)) {
                         Mautic.builderSlots.splice(i, 1);
