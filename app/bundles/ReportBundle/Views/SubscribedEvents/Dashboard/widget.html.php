@@ -7,6 +7,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+if (isset($chartData['data'])) {
+    $chartData = $chartData['data'];
+}
+
 echo $view->render(
     'MauticCoreBundle:Helper:chart.html.php',
     [
