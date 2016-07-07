@@ -11,14 +11,23 @@ if (isset($chartData['data'])) {
     $chartData = $chartData['data'];
 }
 
-echo $view->render(
-    'MauticCoreBundle:Helper:chart.html.php',
-    [
-        'chartData'   => $chartData,
-        'chartType'   => $chartType,
-        'chartHeight' => $chartHeight
-    ]
-);
+if ($chartType === 'table') {
+    echo $view->render(
+        'MauticCoreBundle:Helper:table.html.php',
+        [
+            'bodyItems'   => $chartData
+        ]
+    );
+} else {
+    echo $view->render(
+        'MauticCoreBundle:Helper:chart.html.php',
+        [
+            'chartData'   => $chartData,
+            'chartType'   => $chartType,
+            'chartHeight' => $chartHeight
+        ]
+    );
+}
 ?>
 
 <div class="pull-right mr-md mb-md">
