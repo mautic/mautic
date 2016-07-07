@@ -87,7 +87,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         $config = $this->mergeConfigToFeatureSettings(array());
 
-        if(isset($config['sandbox']) and $config['sandbox'] === true)
+        if(isset($config['sandbox']) and $config['sandbox'][0] === 'sandbox')
         {
             return 'https://test.salesforce.com/services/oauth2/token';
         }
@@ -102,10 +102,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function getAuthenticationUrl()
     {
         $config = $this->mergeConfigToFeatureSettings(array());
-
-        if(isset($config['sandbox']) and $config['sandbox'] === true)
+        $this->factory->getLogger()->addError(print_r($config['sandbox'][0],true));
+        if(isset($config['sandbox']) and $config['sandbox'][0] === 'sandbox')
         {
-            return 'https://test.salesforce.com/services/oauth2/token';
+            return 'https://test.salesforce.com/services/oauth2/authorize';
         }
         return 'https://login.salesforce.com/services/oauth2/authorize';
     }
