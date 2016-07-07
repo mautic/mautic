@@ -15,6 +15,7 @@ if ($chartType === 'table') {
     echo $view->render(
         'MauticCoreBundle:Helper:table.html.php',
         [
+            'headItems'   => isset($chartData[0]) ? array_keys($chartData[0]) : [],
             'bodyItems'   => $chartData
         ]
     );
