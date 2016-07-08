@@ -240,8 +240,9 @@ class PublicController extends CommonFormController
             $analytics = $this->factory->getHelper('template.analytics')->getCode();
 
             $BCcontent = $entity->getContent();
+            $content = $entity->getCustomHtml();
             // This condition remains so the Mautic v1 themes would display the content
-            if (!empty($BCcontent)) {
+            if (empty($content) && !empty($BCcontent)) {
                 $template = $entity->getTemplate();
                 //all the checks pass so display the content
                 $slots   = $this->factory->getTheme($template)->getSlots('page');
@@ -269,7 +270,6 @@ class PublicController extends CommonFormController
 
                 $content = $response->getContent();
             } else {
-                $content = $entity->getCustomHtml();
                 if (!empty($analytics)) {
                     $content = str_replace('</head>', $analytics."\n</head>", $content);
                 }
@@ -307,8 +307,10 @@ class PublicController extends CommonFormController
 
         $analytics = $this->factory->getHelper('template.analytics')->getCode();
 
-        $template = $entity->getTemplate();
-        if (!empty($template)) {
+        $BCcontent = $entity->getContent();
+        $content = $entity->getCustomHtml();
+        if (empty($content) && !empty($BCcontent)) {
+            $template = $entity->getTemplate();
             //all the checks pass so display the content
             $slots   = $this->factory->getTheme($template)->getSlots('page');
             $content = $entity->getContent();
@@ -335,8 +337,6 @@ class PublicController extends CommonFormController
 
             $content = $response->getContent();
         } else {
-            $content = $entity->getCustomHtml();
-
             if (!empty($analytics)) {
                 $content = str_replace('</head>', $analytics."\n</head>", $content);
             }

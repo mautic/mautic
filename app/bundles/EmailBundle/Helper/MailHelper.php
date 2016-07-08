@@ -1273,8 +1273,9 @@ class MailHelper
         }
 
         $BCcontent = $email->getContent();
+        $customHtml = $email->getCustomHtml();
         // Process emails created by Mautic v1
-        if (!empty($BCcontent)) {
+        if (empty($customHtml) && !empty($BCcontent)) {
             $template = $email->getTemplate();
             if (empty($slots)) {
                 $template = $email->getTemplate();
@@ -1295,9 +1296,6 @@ class MailHelper
                 'email'    => $email,
                 'template' => $template
             ), true);
-        } else {
-            // Tak on the tracking pixel token
-            $customHtml = $email->getCustomHtml();
         }
 
         // Convert short codes to emoji

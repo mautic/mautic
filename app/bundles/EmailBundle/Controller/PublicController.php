@@ -343,7 +343,8 @@ class PublicController extends CommonFormController
         $idHash = 'xxxxxxxxxxxxxx';
 
         $BCcontent = $emailEntity->getContent();
-        if (!empty($BCcontent)) {
+        $content = $emailEntity->getCustomHtml();
+        if (empty($content) && !empty($BCcontent)) {
             $template = $emailEntity->getTemplate();
             $slots = $this->factory->getTheme($template)->getSlots('email');
 
@@ -369,8 +370,6 @@ class PublicController extends CommonFormController
 
             //replace tokens
             $content = $response->getContent();
-        } else {
-            $content = $emailEntity->getCustomHtml();
         }
 
         // Convert emojis
