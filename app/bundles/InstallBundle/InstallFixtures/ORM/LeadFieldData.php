@@ -97,6 +97,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
                 $type = 'datetime';
             } elseif ($name == 'attribution') {
                 $type = 'number';
+                $entity->setProperties(["roundmode" => 4, "precision" => 2]);
             } else {
                 $type = 'text';
             }
