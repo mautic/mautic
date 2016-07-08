@@ -145,7 +145,7 @@ class LeadType extends AbstractType
                         'mapped'        => false,
                         'constraints'   => $constraints,
                         'precision'     => $properties['precision'],
-                        'rounding_mode' => (int) $properties['roundmode']
+                        'rounding_mode' => isset($properties['roundmode']) ? (int) $properties['roundmode'] : 0
                     )
                 );
             } elseif (in_array($type, array('date', 'datetime', 'time'))) {
