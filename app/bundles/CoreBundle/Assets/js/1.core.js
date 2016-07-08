@@ -587,12 +587,14 @@ var Mautic = {
                             // Set custom buttons with separator between them.
                             toolbarButtons: maxButtons,
                             toolbarButtonsMD: maxButtons,
-                            heightMin: 300,
-                            htmlRemoveTags: []
+                            heightMin: 300 
                         };
 
                         if (textarea.hasClass('editor-basic-fullpage')) {
                             options.fullPage = true;
+                            options.htmlAllowedTags = ['.*'];
+                            options.htmlRemoveTags = [];
+                            options.lineBreakerTags = [];
                         }
 
                         textarea.froalaEditor(mQuery.extend(options, Mautic.basicFroalaOptions));
