@@ -29,8 +29,8 @@ class LeadApiController extends CommonApiController
         parent::initialize($event);
         $this->model            = $this->getModel('lead.lead');
         $this->entityClass      = 'Mautic\LeadBundle\Entity\Lead';
-        $this->entityNameOne    = 'lead';
-        $this->entityNameMulti  = 'leads';
+        $this->entityNameOne    = 'contact';
+        $this->entityNameMulti  = 'contacts';
         $this->permissionBase   = 'lead:leads';
         $this->serializerGroups = array("leadDetails", "userList", "publishDetails", "ipAddress");
     }
@@ -89,7 +89,7 @@ class LeadApiController extends CommonApiController
             )
         );
 
-        return $this->model->createForm($entity, $this->get('form.factory'), null, array('fields' => $fields));
+        return $this->model->createForm($entity, $this->get('form.factory'), null, ['fields' => $fields, 'csrf_protection' => false]);
     }
 
     /**

@@ -94,7 +94,7 @@ return [
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getCampaigns'
             ],
             'mautic_api_getcontactssegments'     => [
-                'path'       => '/segments/{id}',
+                'path'       => '/contacts/{id}/segments',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getLists'
             ],
             'mautic_api_getcontactowners'     => [

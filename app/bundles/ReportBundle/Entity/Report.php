@@ -130,19 +130,21 @@ class Report extends FormEntity
     {
         $metadata->setGroupPrefix('report')
             ->addListProperties(
-                'id',
-                'name',
-                'description',
-                'system'
+                [
+                    'id',
+                    'name',
+                    'description',
+                    'system'
+                ]
             )
             ->addProperties(
-                array(
+                [
                     'source',
                     'columns',
                     'filters',
                     'tableOrder',
                     'graphs'
-                )
+                ]
             )
             ->build();
     }
