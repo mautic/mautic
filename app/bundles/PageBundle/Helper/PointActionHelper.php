@@ -71,8 +71,8 @@ class PointActionHelper
         $lead           = $eventDetails->getLead();
         $urlWithSqlWC   = str_replace('*', '%', $url);
 
-        if ($action['properties']['first_time'] === true) {
-            $hitStats = $hitRepository->getDwellTimesForUrls(array($urlWithSqlWC), array('leadId' => $lead->getId()));
+        if (isset($action['properties']['first_time']) && $action['properties']['first_time'] === true) {
+            $hitStats = $hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
             if (isset($hitStats['count']) && $hitStats['count']) {
                 $changePoints['first_time'] = false;
             } else {
@@ -82,7 +82,7 @@ class PointActionHelper
 
         if ($action['properties']['accumulative_time']) {
             if (!isset($hitStats)) {
-                $hitStats = $hitRepository->getDwellTimesForUrls(array($urlWithSqlWC), array('leadId' => $lead->getId()));
+                $hitStats = $hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
             }
             if (isset($hitStats['sum']) && $hitStats['sum'] >= $action['properties']['accumulative_time']) {
                 $changePoints['accumulative_time'] = true;
@@ -93,7 +93,7 @@ class PointActionHelper
 
         if ($action['properties']['page_hits']) {
             if (!isset($hitStats)) {
-                $hitStats = $hitRepository->getDwellTimesForUrls(array($urlWithSqlWC), array('leadId' => $lead->getId()));
+                $hitStats = $hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
             }
             if (isset($hitStats['count']) && $hitStats['count'] >= $action['properties']['page_hits']) {
                 $changePoints['page_hits'] = true;
@@ -103,7 +103,7 @@ class PointActionHelper
         }
 
         if ($action['properties']['returns_within']) {
-            $latestHit = $hitRepository->getLatestHit(array('leadId' => $lead->getId(), $urlWithSqlWC));
+            $latestHit = $hitRepository->getLatestHit(['leadId' => $lead->getId(), $urlWithSqlWC]);
             $latestPlus = clone $latestHit;
             $latestPlus->add(new \DateInterval('PT' . $action['properties']['returns_within'] . 'S'));
             $now = new \dateTime();
@@ -116,7 +116,7 @@ class PointActionHelper
 
         if ($action['properties']['returns_after']) {
             if (!isset($latestHit)) {
-                $latestHit = $hitRepository->getLatestHit(array('leadId' => $lead->getId(), $urlWithSqlWC));
+                $latestHit = $hitRepository->getLatestHit(['leadId' => $lead->getId(), $urlWithSqlWC]);
             }
             $latestPlus = clone $latestHit;
             $latestPlus->add(new \DateInterval('PT' . $action['properties']['returns_after'] . 'S'));
