@@ -38,6 +38,15 @@ Mautic.pageOnLoad = function (container) {
 
     Mautic.intiSelectTheme(mQuery('#page_template'));
     Mautic.fixFroalaPageOutput();
+
+    // update textarea from Froala's CodeMirror view on save
+    var form = mQuery('form[name="page"]');
+    var textarea = mQuery('textarea.builder-html');
+    if (form.length && textarea.length) {
+        form.on('before.submit.ajaxform', function() {
+            textarea.froalaEditor('events.trigger', 'form.submit');
+        });
+    }
 };
 
 Mautic.pageOnUnload = function (id) {
