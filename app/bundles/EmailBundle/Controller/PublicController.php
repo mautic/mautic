@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceCallbackTransport;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends CommonFormController
@@ -123,7 +124,7 @@ class PublicController extends CommonFormController
                 $leadModel->setCurrentLead($lead);
             }
 
-            $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), 'unsubscribed');
+            $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
 
             $message = $this->factory->getParameter('unsubscribe_message');
             if (!$message) {
