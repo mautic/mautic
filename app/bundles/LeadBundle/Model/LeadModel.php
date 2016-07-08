@@ -1018,28 +1018,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Remove a Lead's EMAIL DNC entry.
-     *
-     * @param string $email
-     */
-    public function removeDncForEmail($email)
-    {
-        $repo = $this->getRepository();
-        $leadId = (array) $repo->getLeadByEmail($email, true);
-
-        /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
-        $leads = [];
-
-        foreach ($leadId as $lead) {
-            $leads[] = $repo->getEntity($lead['id']);
-        }
-
-        foreach ($leads as $lead) {
-            $this->removeDncForLead($lead, 'email');
-        }
-    }
-
-    /**
      * Create a DNC entry for a lead
      *
      * @param Lead         $lead

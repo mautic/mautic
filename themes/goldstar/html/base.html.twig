@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
     <head>
+        {% if page is defined %}
         <title>{{ page.getTitle() }}</title>
         <meta name="description" content="{{ page.getMetaDescription() }}">
+        {% endif %}
         <link rel="stylesheet" href="{{ getAssetUrl('themes/goldstar/css/goldstar.css') }}" type="text/css" />
     </head>
     <body>
