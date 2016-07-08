@@ -117,8 +117,8 @@ class BuilderSubscriber extends CommonSubscriber
             $event->addTokens(
                 $event->filterTokens(
                     [
-                        $this->shareButtonsRegex => $this->translator->trans('mautic.page.token.lang'),
-                        $this->langBarRegex      => $this->translator->trans('mautic.page.token.share'),
+                        $this->langBarRegex      => $this->translator->trans('mautic.page.token.lang'),
+                        $this->shareButtonsRegex => $this->translator->trans('mautic.page.token.share'),
                     ]
                 )
             );
