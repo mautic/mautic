@@ -1027,7 +1027,7 @@ class PageController extends FormController
                 }
                 $slotsHelper->set($slot, $renderingEngine->render('MauticPageBundle:Page:Slots/slideshow.html.php', $options));
             } else {
-                $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\" />{$value}</div>");
+                $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\">{$value}</div>");
             }
         }
 
