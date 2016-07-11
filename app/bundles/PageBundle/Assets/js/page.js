@@ -38,15 +38,6 @@ Mautic.pageOnLoad = function (container) {
 
     Mautic.intiSelectTheme(mQuery('#page_template'));
     Mautic.fixFroalaPageOutput();
-
-    // update textarea from Froala's CodeMirror view on save
-    var form = mQuery('form[name="page"]');
-    var textarea = mQuery('textarea.builder-html');
-    if (form.length && textarea.length) {
-        form.on('before.submit.ajaxform', function() {
-            textarea.froalaEditor('events.trigger', 'form.submit');
-        });
-    }
 };
 
 Mautic.pageOnUnload = function (id) {
@@ -57,6 +48,9 @@ Mautic.fixFroalaPageOutput = function() {
     if (mQuery('form[name="page"]').length) {
         var textarea = mQuery('textarea.builder-html');
         mQuery('form[name="page"]').on('before.submit.ajaxform', function() {
+            // update textarea from Froala's CodeMirror view on save
+            textarea.froalaEditor('events.trigger', 'form.submit');
+
             var editorHtmlString = textarea.val();
             Mautic.buildBuilderIframe(editorHtmlString, 'helper-iframe-for-html-manipulation');
             var editorHtml = mQuery('iframe#helper-iframe-for-html-manipulation').contents();
