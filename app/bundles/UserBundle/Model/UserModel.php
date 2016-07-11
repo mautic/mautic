@@ -261,7 +261,7 @@ class UserModel extends FormModel
         $mailer->setSubject($this->translator->trans('mautic.user.user.passwordreset.subject'));
         $body = $this->translator->trans('mautic.user.user.passwordreset.email.body', array('%name%' => $user->getFirstName(), '%resetlink%' => $resetLink));
         $body = str_replace('\\n', "\n", $body);
-        $mailer->setBody($body, 'text/plain');
+        $mailer->setBody($body, 'text/plain', null, true);
 
         $mailer->send();
     }
