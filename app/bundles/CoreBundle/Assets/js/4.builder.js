@@ -168,7 +168,7 @@ Mautic.destroySlots = function() {
 };
 
 Mautic.clearFroalaStyles = function(content) {
-    mQuery.each(content.find('td, th, table'), function() {
+    mQuery.each(content.find('td, th, table, strong'), function() {
         var td = mQuery(this);
         if (td.attr('fr-original-class')) {
             td.attr('class', td.attr('fr-original-class'));
@@ -183,6 +183,9 @@ Mautic.clearFroalaStyles = function(content) {
         }
     });
     content.find('link[href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css"]').remove();
+
+    // fix Mautc's tokens in the strong tag
+    content.find('strong[contenteditable="false"]').removeAttr('style');
 
     // data-atwho-at-query causes not working tokens
     content.find('[data-atwho-at-query]').removeAttr('data-atwho-at-query');
