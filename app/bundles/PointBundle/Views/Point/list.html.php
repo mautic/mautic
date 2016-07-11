@@ -40,7 +40,7 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     array(
                         'sessionVar' => 'point',
-                        'orderBy'    => 'c.title',
+                        'orderBy'    => 'cat.title',
                         'text'       => 'mautic.core.category',
                         'class'      => 'visible-md visible-lg col-point-category'
                     )
