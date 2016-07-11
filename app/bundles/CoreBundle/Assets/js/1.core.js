@@ -592,6 +592,9 @@ var Mautic = {
 
                         if (textarea.hasClass('editor-basic-fullpage')) {
                             options.fullPage = true;
+                            options.htmlAllowedTags = ['.*'];
+                            options.htmlRemoveTags = [];
+                            options.lineBreakerTags = [];
                         }
 
                         textarea.froalaEditor(mQuery.extend(options, Mautic.basicFroalaOptions));
