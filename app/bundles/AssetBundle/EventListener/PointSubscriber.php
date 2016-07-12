@@ -56,6 +56,10 @@ class PointSubscriber extends CommonSubscriber
      */
     public function onAssetDownload(AssetLoadEvent $event)
     {
-        $this->factory->getModel('point')->triggerAction('asset.download', $event->getRecord()->getAsset());
+        $asset = $event->getRecord()->getAsset();
+        
+        if ($asset !== null) {
+            $this->factory->getModel('point')->triggerAction('asset.download', $asset);
+        }
     }
 }
