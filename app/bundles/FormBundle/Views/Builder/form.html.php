@@ -20,7 +20,7 @@ $fields   = $form->getFields();
         <div class="mauticform-innerform">
 <?php
 foreach ($fields as $f):
-    if ($f->showForContact()):
+    if ($f->showForContact($submissions)):
         if ($f->isCustom()):
             $params = $f->getCustomParameters();
             $template = $params['template'];

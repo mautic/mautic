@@ -799,10 +799,28 @@ class Field
     }
 
     /**
-     * @param integer $showAfterXSubmissions
+     * Decide if the field should be displayed based on thr progressive profiling conditions
+     *
+     * @param array|null $submissions
      */
-    public function showForContact($contact)
+    public function showForContact($submissions)
     {
-        //todo
+        // Hide the field if there is the submission count limit and hide it untill the limit is overcame
+        if ($this->showAfterXSubmissions > 1 && $this->showAfterXSubmissions > count($submissions)) {
+            return false;
+        }
+
+        // Hide the field if there is the value condition and if we already know the value for this field
+        if ($submissions) {
+            if ($this->showWhenValueExists === false) {
+                foreach ($submissions as $submission) {
+                    if (!empty($submission[$this->alias])) {
+                        return false;
+                    }               
+                }
+            }
+        }
+
+        return true;
     }
 }
