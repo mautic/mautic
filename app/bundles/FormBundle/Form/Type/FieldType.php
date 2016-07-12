@@ -312,6 +312,34 @@ class FieldType extends AbstractType
             );
         }
 
+        $default = (!isset($options['data']['showWhenValueExists']) || $options['data']['showWhenValueExists'] === null) ? true
+            : (boolean) $options['data']['showWhenValueExists'];
+        $builder->add(
+            'showWhenValueExists',
+            'yesno_button_group',
+            array(
+                'label' => 'mautic.form.field.form.show.when.value.exists',
+                'data'  => $default,
+                'attr'  => array(
+                    'tooltip' => 'mautic.form.field.help.show.when.value.exists'
+                )
+            )
+        );
+
+        $builder->add(
+            'showAfterXsubmission',
+            'text',
+            array(
+                'label'      => 'mautic.form.field.form.show.after.x.submission',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'     => 'form-control',
+                    'tooltip'   => 'mautic.form.field.help.show.after.x.submission',
+                ),
+                'required'   => false
+            )
+        );
+
         if ($addLeadFieldList) {
 
             if (!isset($options['data']['leadField'])) {

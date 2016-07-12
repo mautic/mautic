@@ -95,6 +95,12 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                 </a>
             </li>
             <?php endif; ?>
+
+            <li role="progressive-profiling">
+                <a href="#progressive-profiling" aria-controls="progressive-profiling" role="tab" data-toggle="tab">
+                    <?php echo $view['translator']->trans('mautic.form.field.section.progressive.profiling'); ?>
+                </a>
+            </li>
         </ul>
 
         <!-- Tab panes -->
@@ -167,6 +173,13 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                 </div>
             </div>
             <?php endif; ?>
+
+            <div role="tabpanel" class="tab-pane" id="progressive-profiling">
+                <div class="row">
+                    <?php echo $view['form']->rowIfExists($form, 'showWhenValueExists', $template); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'showAfterXsubmission', $template); ?>
+                </div>
+            </div>
         </div>
     </div>
 
