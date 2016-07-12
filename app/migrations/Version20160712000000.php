@@ -6,10 +6,7 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\Migrations;
-
-use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 /**
@@ -19,24 +16,9 @@ class Version20160712000000 extends AbstractMauticMigration
 {
     /**
      * @param Schema $schema
-     *
-     * @throws SkipMigrationException
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
-    public function preUp(Schema $schema)
-    {
-        $table = $schema->getTable($this->prefix.'form_fields');
-        if ($table->hasColumn('show_when_value_exists')) {
-
-            throw new SkipMigrationException('Schema includes this migration');
-        }
-    }
-    /**
-     * @param Schema $schema
      */
     public function up(Schema $schema)
     {
-        $this->addSql('ALTER TABLE ' . $this->prefix.'form_fields ADD show_when_value_exists BOOLEAN DEFAULT TRUE');
-        $this->addSql('ALTER TABLE ' . $this->prefix.'form_fields ADD show_after_x_submissions INT DEFAULT NULL');
+        $this->addSql("UPDATE {$this->prefix}lead_fields SET properties = 'a:2:{s:9:\"roundmode\";s:1:\"4\";s:9:\"precision\";s:1:\"2\";}' WHERE alias = 'attribution'");
     }
 }
