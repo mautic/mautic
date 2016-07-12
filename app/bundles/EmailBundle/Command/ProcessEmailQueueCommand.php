@@ -99,7 +99,7 @@ EOT
                     rename($failedFile, $tmpFilename);
 
                     $message = unserialize(file_get_contents($tmpFilename));
-                    if ($message !== false && is_object($message) && get_class($message) === 'Swift_Message') {
+                    if ($message !== false && is_object($message) && is_a($message, '\Swift_Message')) {
                         $tryAgain = false;
                         if ($dispatcher->hasListeners(EmailEvents::EMAIL_RESEND)) {
                             $event = new QueueEmailEvent($message);
