@@ -13,6 +13,8 @@ use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
@@ -55,18 +57,38 @@ class FormModel extends CommonFormModel
     protected $formFieldModel;
 
     /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * @var SubmissionModel
+     */
+    protected $submissionModel;
+
+    /**
      * FormModel constructor.
      *
      * @param ActionModel $formActionModel
      * @param FieldModel $formFieldModel
      */
-    public function __construct(RequestStack $requestStack, TemplatingHelper $templatingHelper, SchemaHelperFactory $schemaHelperFactory, ActionModel $formActionModel, FieldModel $formFieldModel)
+    public function __construct(
+        RequestStack $requestStack,
+        TemplatingHelper $templatingHelper,
+        SchemaHelperFactory $schemaHelperFactory,
+        ActionModel $formActionModel,
+        FieldModel $formFieldModel,
+        LeadModel $leadModel,
+        SubmissionModel $submissionModel
+    )
     {
         $this->request = $requestStack->getCurrentRequest();
         $this->templatingHelper = $templatingHelper;
         $this->schemaHelperFactory = $schemaHelperFactory;
         $this->formActionModel = $formActionModel;
         $this->formFieldModel = $formFieldModel;
+        $this->leadModel = $leadModel;
+        $this->submissionModel = $submissionModel;
     }
 
     /**
@@ -356,6 +378,7 @@ class FormModel extends CommonFormModel
             [
                 'form'  => $entity,
                 'theme' => $theme,
+                'lead'  => $this->leadModel->getCurrentLead()
             ]
         );
 

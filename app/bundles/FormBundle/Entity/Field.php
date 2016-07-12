@@ -797,4 +797,12 @@ class Field
     {
         $this->showAfterXSubmissions = $showAfterXSubmissions;
     }
+
+    /**
+     * @param integer $showAfterXSubmissions
+     */
+    public function showForContact($contact)
+    {
+        //todo
+    }
 }
