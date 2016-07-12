@@ -2,6 +2,7 @@
 namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 
 class SalesforceApi extends CrmApi
 {
@@ -9,6 +10,15 @@ class SalesforceApi extends CrmApi
     protected $requestSettings = array(
         'encode_parameters' => 'json'
     );
+
+    public function __construct(CrmAbstractIntegration $integration)
+    {
+        parent::__construct($integration);
+
+        $this->requestSettings['curl_options'] = array(
+            CURLOPT_SSLVERSION => defined('CURL_SSLVERSION_TLSv1_1') ? CURL_SSLVERSION_TLSv1_1 : CURL_SSLVERSION_TLSv1_1
+        );
+    }
 
     public function request($operation, $elementData = array(), $method = 'GET', $retry = false)
     {

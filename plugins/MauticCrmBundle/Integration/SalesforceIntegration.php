@@ -102,7 +102,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function getAuthenticationUrl()
     {
         $config = $this->mergeConfigToFeatureSettings(array());
-        $this->factory->getLogger()->addError(print_r($config['sandbox'][0],true));
         if(isset($config['sandbox']) and $config['sandbox'][0] === 'sandbox')
         {
             return 'https://test.salesforce.com/services/oauth2/authorize';
@@ -217,24 +216,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function amendLeadDataBeforeMauticPopulate($data)
     {
         $fields = array_keys($this->getAvailableLeadFields());
-        $params['fields']=implode(',',$fields);
-
+        $params['fields'] = implode(',', $fields);
         $internal = array('latestDateCovered' => $data['latestDateCovered']);
-        $count = 0;
-        if(isset($data['ids'])){
-            foreach($data['ids'] as $salesforceId)
-            {
-                $data = $this->getApiHelper()->getSalesForceLeadById($salesforceId,$params);
-                $data['internal'] = $internal;
-                if($data){
-                    $this->getMauticLead($data,true,null,null);
-                    $count++;
-                }
-            }
+        foreach ($data['ids'] as $salesforceId) {
+            $data = $this->getApiHelper()->getSalesForceLeadById($salesforceId, $params);
+            $data['internal'] = $internal;
+            $this->getMauticLead($data, true, null, null);
         }
-        return $count;
     }
-
     /**
      * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
      * @param array                                             $data
