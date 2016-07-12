@@ -30,7 +30,7 @@ class PointsChangeLogRepository extends CommonRepository
     public function getLeadTimelineEvents($leadId, array $options = array())
     {
         $query = $this->createQueryBuilder('lp')
-            ->select('lp.eventName, lp.actionName, lp.dateAdded, lp.type, lp.delta')
+            ->select('lp.eventName, lp.actionName, lp.dateAdded, lp.type, lp.delta','lp.id')
             ->where('lp.lead = ' . $leadId);
 
         if (!empty($options['ipIds'])) {

@@ -77,10 +77,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                $this->getApiHelper()->createLead($mappedData);
+                $salesForceLeadData = $this->getApiHelper()->createLead($mappedData, $lead);
                 return true;
             }
-        } catch (\Exception $e) {
+          } catch (\Exception $e) {
             $this->logIntegrationError($e);
         }
         return false;
@@ -179,5 +179,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
 
         return $helper;
+    }
+
+    public function getLeadData($activityType, $lead){
+        return array();
     }
 }

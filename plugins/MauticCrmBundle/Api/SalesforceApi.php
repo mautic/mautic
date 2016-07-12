@@ -1,6 +1,7 @@
 <?php
 namespace MauticPlugin\MauticCrmBundle\Api;
 
+use Mautic\LeadBundle\MauticLeadBundle;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
 class SalesforceApi extends CrmApi
@@ -18,7 +19,7 @@ class SalesforceApi extends CrmApi
         $request_url = sprintf($this->integration->getApiUrl() . '/%s/%s', $object, $operation);
         $response = $this->integration->makeRequest($request_url, $elementData, $method, $this->requestSettings);
 
-        if (!empty($response['errors'])) {
+      if (!empty($response['errors'])) {
             throw new ApiErrorException(implode(', ', $response['errors']));
         } elseif (is_array($response)) {
             $errors = array();
@@ -60,9 +61,47 @@ class SalesforceApi extends CrmApi
      *
      * @return mixed
      */
-    public function createLead(array $data)
+    public function createLead(array $data, $lead)
     {
-        return $this->request('', $data, 'POST');
+        $createdLeadData =  $this->request('', $data, 'POST');
+        //todo: check if push activities is selected in config
+        $this->createLeadActivity($createdLeadData, $lead);
+
+        return $createdLeadData;
+    }
+
+    public function createLeadActivity(array $salesForceLeadData, $lead)
+    {
+        $mActivityObjectName = 'Event';
+
+        // get lead's point activity
+        $pointsRepo = $this->integration->getLeadData('points', $lead);
+        if(!empty($pointsRepo))
+        {
+            $deltaType = '';
+            foreach ($pointsRepo as $pointActivity)
+            {
+                if($pointActivity['delta']>0)
+                {
+                    $deltaType = 'added';
+                }
+                else
+                {
+                    $deltaType = 'subtracted';
+                }
+
+                $activityData = array(
+                    'ActivityDate'   => $pointActivity['dateAdded']->format('c'),
+                    'Description'    => $pointActivity['type'].":".$pointActivity['eventName']." ".$deltaType." ".$pointActivity['actionName'],
+                    'WhoId'          => $salesForceLeadData['id'],
+                    'Subject'        => 'Mautic TimeLine Activity',
+                    'DurationInMinutes' => 0,
+                    'ActivityDateTime' =>$pointActivity['dateAdded']->format('c')
+                );
+                //todo: log posted activities so that they don't get sent over again
+                $this->request('', $activityData, 'POST', false, $mActivityObjectName);
+            }
+        }
     }
 
     /**

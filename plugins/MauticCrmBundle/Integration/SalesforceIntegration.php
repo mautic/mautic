@@ -275,7 +275,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         foreach ($keys as $key){
             if(strstr($key,'__'.$object)){
                 $newKey = str_replace('__'.$object,'',$key);
-                $leadFields[$object][$newKey] = $fields['fields'][$key];
+                $leadFields[$object][$newKey] = $fields['leadFields'][$key];
             }
         }
 
@@ -336,7 +336,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                $this->getApiHelper()->createLead($mappedData[$object]);
+                $this->getApiHelper()->createLead($mappedData[$object], $lead);
                 return true;
             }
         } catch (\Exception $e) {
@@ -469,5 +469,17 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         return $lead;
+    }
+
+    public function getLeadData($activityType, $lead){
+        $leadModel = $this->factory->getModel('lead');
+        switch ($activityType){
+            case 'points':
+                $pointsRepo = $leadModel->getPointLogRepository();
+                $pointsActivity = $pointsRepo->getLeadTimelineEvents($lead->getId());
+                return $pointsActivity;
+                break;
+        }
+
     }
 }
