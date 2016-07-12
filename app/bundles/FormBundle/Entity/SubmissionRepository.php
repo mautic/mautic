@@ -31,9 +31,9 @@ class SubmissionRepository extends CommonRepository
         $results['submission_id'] = $entity->getId();
         $form                     = $entity->getForm();
         $results['form_id']       = $form->getId();
-        $tableName                = MAUTIC_TABLE_PREFIX . 'form_results_' . $form->getId() . '_' . $form->getAlias();
+
         if (!empty($results)) {
-            $this->_em->getConnection()->insert($tableName, $results);
+            $this->_em->getConnection()->insert($this->getResultsTableName($form->getId(), $form->getAlias()), $results);
         }
     }
 
@@ -43,7 +43,6 @@ class SubmissionRepository extends CommonRepository
     public function getEntities($args = array())
     {
         $form  = $args['form'];
-        $table = MAUTIC_TABLE_PREFIX . 'form_results_' . $form->getId() . '_' . $form->getAlias();
 
         //DBAL
 
@@ -69,7 +68,7 @@ class SubmissionRepository extends CommonRepository
 
         $dq = $this->_em->getConnection()->createQueryBuilder();
         $dq->select('count(r.submission_id) as count')
-            ->from($table, 'r')
+            ->from($this->getResultsTableName($form->getId(), $form->getAlias()), 'r')
             ->innerJoin('r', MAUTIC_TABLE_PREFIX . 'form_submissions', 's', 'r.submission_id = s.id')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX . 'ip_addresses', 'i', 's.ip_id = i.id')
         ->where('r.form_id = ' . $form->getId());
@@ -157,12 +156,11 @@ class SubmissionRepository extends CommonRepository
 
         if ($entity != null) {
             $form      = $entity->getForm();
-            $tableName = MAUTIC_TABLE_PREFIX . 'form_results_' . $form->getId() . '_' . $form->getAlias();
 
             //use DBAL to get entity fields
             $q = $this->_em->getConnection()->createQueryBuilder();
             $q->select('*')
-                ->from($tableName, 'r')
+                ->from($this->getResultsTableName($form->getId(), $form->getAlias()), 'r')
                 ->where('r.submission_id = :id')
                 ->setParameter('id', $id);
             $results = $q->execute()->fetchAll();
@@ -225,7 +223,7 @@ class SubmissionRepository extends CommonRepository
         }
 
         if (!empty($options['leadId'])) {
-            $query->andWhere('fs.lead_id = ' . (int)$options['leadId']);
+            $query->andWhere('fs.lead_id = ' . (int) $options['leadId']);
         }
 
         if (!empty($options['id'])) {
@@ -423,12 +421,10 @@ class SubmissionRepository extends CommonRepository
      */
     public function compareValue($lead, $form, $formAlias, $field, $value, $operatorExpr)
     {
-        $tableName = MAUTIC_TABLE_PREFIX . 'form_results_' . $form . '_' . $formAlias;
-
         //use DBAL to get entity fields
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.id')
-            ->from($tableName, 'r')
+            ->from($this->getResultsTableName($form, $formAlias), 'r')
             ->leftJoin('r', MAUTIC_TABLE_PREFIX . 'form_submissions', 's', 's.id = r.submission_id')
             ->where(
                 $q->expr()->andX(
@@ -444,5 +440,18 @@ class SubmissionRepository extends CommonRepository
         $result = $q->execute()->fetch();
 
         return !empty($result['id']);
+    }
+
+    /**
+     * Compile and return the form result table name
+     *
+     * @param  integer $formId
+     * @param  string  $formAlias
+     *
+     * @return string
+     */
+    public function getResultsTableName($formId, $formAlias)
+    {
+        return MAUTIC_TABLE_PREFIX . 'form_results_' . $formId . '_' . $formAlias;
     }
 }
