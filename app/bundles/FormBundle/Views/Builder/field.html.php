@@ -177,7 +177,7 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
             <div role="tabpanel" class="tab-pane" id="progressive-profiling">
                 <div class="row">
                     <?php echo $view['form']->rowIfExists($form, 'showWhenValueExists', $template); ?>
-                    <?php echo $view['form']->rowIfExists($form, 'showAfterXsubmission', $template); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'showAfterXSubmissions', $template); ?>
                 </div>
             </div>
         </div>

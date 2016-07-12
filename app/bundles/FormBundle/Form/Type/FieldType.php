@@ -327,14 +327,14 @@ class FieldType extends AbstractType
         );
 
         $builder->add(
-            'showAfterXsubmission',
+            'showAfterXSubmissions',
             'text',
             array(
-                'label'      => 'mautic.form.field.form.show.after.x.submission',
+                'label'      => 'mautic.form.field.form.show.after.x.submissions',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array(
                     'class'     => 'form-control',
-                    'tooltip'   => 'mautic.form.field.help.show.after.x.submission',
+                    'tooltip'   => 'mautic.form.field.help.show.after.x.submissions',
                 ),
                 'required'   => false
             )

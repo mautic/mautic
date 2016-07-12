@@ -319,7 +319,7 @@ class FormModel extends CommonFormModel
      */
     public function getContent(Form $form, $withScript = true, $useCache = true)
     {
-        if ($useCache) {
+        if ($useCache && !$form->usesProgressiveProfiling()) {
             $cachedHtml = $form->getCachedHtml();
         }
 
@@ -353,17 +353,19 @@ class FormModel extends CommonFormModel
 
         $html = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:form.html.php',
-            array(
+            [
                 'form'  => $entity,
                 'theme' => $theme,
-            )
+            ]
         );
 
-        $entity->setCachedHtml($html);
+        if (!$entity->usesProgressiveProfiling()) {
+            $entity->setCachedHtml($html);
 
-        if ($persist) {
-            //bypass model function as events aren't needed for this
-            $this->getRepository()->saveEntity($entity);
+            if ($persist) {
+                //bypass model function as events aren't needed for this
+                $this->getRepository()->saveEntity($entity);
+            }
         }
 
         return $html;

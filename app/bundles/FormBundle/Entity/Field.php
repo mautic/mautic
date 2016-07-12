@@ -127,6 +127,16 @@ class Field
     private $sessionId;
 
     /**
+     * @var boolean
+     */
+    private $showWhenValueExists;
+
+    /**
+     * @var integer
+     */
+    private $showAfterXSubmissions;
+
+    /**
      * Reset properties on clone
      */
     public function __clone()
@@ -210,6 +220,10 @@ class Field
         $builder->addNullableField('leadField', 'string', 'lead_field');
 
         $builder->addNullableField('saveResult', 'boolean', 'save_result');
+
+        $builder->addNullableField('showWhenValueExists', 'boolean', 'show_when_value_exists');
+
+        $builder->addNullableField('showAfterXSubmissions', 'integer', 'show_after_x_submissions');
     }
 
     /**
@@ -750,5 +764,37 @@ class Field
     public function setSaveResult($saveResult)
     {
         $this->saveResult = $saveResult;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getShowWhenValueExists()
+    {
+        return $this->showWhenValueExists;
+    }
+
+    /**
+     * @param boolean $showWhenValueExists
+     */
+    public function setShowWhenValueExists($showWhenValueExists)
+    {
+        $this->showWhenValueExists = $showWhenValueExists;
+    }
+
+    /**
+     * @return integer
+     */
+    public function getShowAfterXSubmissions()
+    {
+        return $this->showAfterXSubmissions;
+    }
+
+    /**
+     * @param integer $showAfterXSubmissions
+     */
+    public function setShowAfterXSubmissions($showAfterXSubmissions)
+    {
+        $this->showAfterXSubmissions = $showAfterXSubmissions;
     }
 }
