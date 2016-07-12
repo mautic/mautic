@@ -10,6 +10,21 @@
 ini_set('display_errors', 'Off');
 date_default_timezone_set('UTC');
 
+define('MAUTIC_MINIMUM_PHP', '5.6.19');
+define('MAUTIC_MAXIMUM_PHP', '7.0.999');
+
+// Are we running the minimum version?
+if (version_compare(PHP_VERSION, MAUTIC_MINIMUM_PHP, 'lt')) {
+    echo 'Your server does not meet the minimum PHP requirements. Mautic requires PHP version '.MAUTIC_MINIMUM_PHP.' while your server has '.PHP_VERSION.'. Please contact your host to update your PHP installation.'."\n";
+    exit;
+}
+
+// Are we running a version newer than what Mautic supports?
+if (version_compare(PHP_VERSION, MAUTIC_MAXIMUM_PHP, 'gt')) {
+    echo 'Mautic does not support PHP version '.PHP_VERSION.' at this time. To use Mautic, you will need to downgrade to an earlier version.'."\n";
+    exit;
+}
+
 $standalone = (int) getVar('standalone', 0);
 $task       = getVar('task');
 
