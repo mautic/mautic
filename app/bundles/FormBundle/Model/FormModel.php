@@ -14,7 +14,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
@@ -62,11 +61,6 @@ class FormModel extends CommonFormModel
     protected $leadModel;
 
     /**
-     * @var SubmissionModel
-     */
-    protected $submissionModel;
-
-    /**
      * FormModel constructor.
      *
      * @param ActionModel $formActionModel
@@ -78,8 +72,7 @@ class FormModel extends CommonFormModel
         SchemaHelperFactory $schemaHelperFactory,
         ActionModel $formActionModel,
         FieldModel $formFieldModel,
-        LeadModel $leadModel,
-        SubmissionModel $submissionModel
+        LeadModel $leadModel
     )
     {
         $this->request = $requestStack->getCurrentRequest();
@@ -88,7 +81,6 @@ class FormModel extends CommonFormModel
         $this->formActionModel = $formActionModel;
         $this->formFieldModel = $formFieldModel;
         $this->leadModel = $leadModel;
-        $this->submissionModel = $submissionModel;
     }
 
     /**
@@ -368,21 +360,20 @@ class FormModel extends CommonFormModel
     {
         //generate cached HTML
         $theme = $entity->getTemplate();
+        $submissions = null;
 
         if (!empty($theme)) {
             $theme .= '|';
         }
 
-        $html = $this->templatingHelper->getTemplating()->render(
-            $theme.'MauticFormBundle:Builder:form.html.php',
-            [
-                'form'  => $entity,
-                'theme' => $theme,
-                'lead'  => $this->leadModel->getCurrentLead()
-            ]
-        );
-
-        if (!$entity->usesProgressiveProfiling()) {
+        if ($entity->usesProgressiveProfiling()) {
+            $submissions = $this->getRepository()->getFormResults(
+                $entity,
+                [
+                    'leadId' => $this->leadModel->getCurrentLead()->getId()
+                ]
+            );
+        } else {
             $entity->setCachedHtml($html);
 
             if ($persist) {
@@ -390,6 +381,15 @@ class FormModel extends CommonFormModel
                 $this->getRepository()->saveEntity($entity);
             }
         }
+
+        $html = $this->templatingHelper->getTemplating()->render(
+            $theme.'MauticFormBundle:Builder:form.html.php',
+            [
+                'form'        => $entity,
+                'theme'       => $theme,
+                'submissions' => $submissions
+            ]
+        );
 
         return $html;
     }

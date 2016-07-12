@@ -213,8 +213,7 @@ return [
                     'mautic.schema.helper.factory',
                     'mautic.form.model.action',
                     'mautic.form.model.field',
-                    'mautic.lead.model.lead',
-                    'mautic.form.model.submission'
+                    'mautic.lead.model.lead'
                 ]
             ],
             'mautic.form.model.submission' => [
