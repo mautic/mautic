@@ -44,8 +44,10 @@ if (!isset($shortenLinkText)) {
                                         <?php $item = str_replace(array('http://', 'https://'), '', $item); ?>
                                         <?php echo $view['assets']->shortenText($item['value'], $shortenLinkText); ?>
                                     </a>
-                                <?php else: ?>
+                                <?php elseif(isset($item['value'])): ?>
                                     <?php echo $item['value']; ?>
+                                <?php elseif(is_string($item)): ?>
+                                    <?php echo $item; ?>
                                 <?php endif; ?>
                             </td>
                         <?php endforeach; ?>

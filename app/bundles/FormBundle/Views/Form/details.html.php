@@ -302,7 +302,7 @@ $isStandalone = $activeForm->isStandalone();
                 <div class="modal-body">
                     <p><?php echo $view['translator']->trans('mautic.form.form.help.automaticcopy'); ?></p>
                     <h3><?php echo $view['translator']->trans('mautic.form.form.help.automaticcopy.js'); ?></h3>
-                    <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;script type="text/javascript" src="<?php echo $view['router']->path(
+                    <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;script type="text/javascript" src="<?php echo $view['router']->url(
                             'mautic_form_generateform',
                             array('id' => $activeForm->getId()),
                             true
@@ -310,7 +310,7 @@ $isStandalone = $activeForm->isStandalone();
                     <h3 class="pt-lg"><?php echo $view['translator']->trans(
                             'mautic.form.form.help.automaticcopy.iframe'
                         ); ?></h3>
-                    <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;iframe src="<?php echo $view['router']->path(
+                    <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;iframe src="<?php echo $view['router']->url(
                             'mautic_form_preview',
                             array('id' => $activeForm->getId()),
                             true
