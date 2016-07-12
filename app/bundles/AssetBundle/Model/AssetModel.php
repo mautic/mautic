@@ -233,7 +233,10 @@ class AssetModel extends FormModel
 
         $download->setCode($code);
         $download->setIpAddress($ipAddress);
-        $download->setReferer($request->server->get('HTTP_REFERER'));
+
+        if (isset($request->server)) {
+            $download->setReferer($request->server->get('HTTP_REFERER'));
+        }
 
         // Dispatch event
         if ($this->dispatcher->hasListeners(AssetEvents::ASSET_ON_LOAD)) {
