@@ -113,6 +113,13 @@ return [
             'mautic.core.dashboard.subscriber'    => [
                 'class' => 'Mautic\CoreBundle\EventListener\DashboardSubscriber',
             ],
+            'mautic.core.maintenance.subscriber'    => [
+                'class' => 'Mautic\CoreBundle\EventListener\MaintenanceSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'doctrine.dbal.default_connection'
+                ]
+            ],
         ],
         'forms'   => [
             'mautic.form.type.spacer'                                         => [
