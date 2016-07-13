@@ -34,8 +34,6 @@ Mautic.launchBuilder = function (formName, actionName) {
     // Disable the close button until everything is loaded
     mQuery('.btn-close-builder').prop('disabled', true);
 
-    var froalaDefaultHtmlCount = 69;
-
     // Load the theme from the custom HTML textarea
     var themeHtml = mQuery('textarea.builder-html').val();
 

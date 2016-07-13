@@ -593,6 +593,7 @@ var Mautic = {
                         if (textarea.hasClass('editor-basic-fullpage')) {
                             options.fullPage = true;
                             options.htmlAllowedTags = ['.*'];
+                            options.htmlAllowedAttrs = ['.*'];
                             options.htmlRemoveTags = [];
                             options.lineBreakerTags = [];
                         }

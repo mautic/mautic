@@ -50,12 +50,13 @@ Mautic.fixFroalaPageOutput = function() {
         mQuery('form[name="page"]').on('before.submit.ajaxform', function() {
             // update textarea from Froala's CodeMirror view on save
             textarea.froalaEditor('events.trigger', 'form.submit');
-
             var editorHtmlString = textarea.val();
-            Mautic.buildBuilderIframe(editorHtmlString, 'helper-iframe-for-html-manipulation');
+            var doc = Mautic.buildBuilderIframe(editorHtmlString, 'helper-iframe-for-html-manipulation');
             var editorHtml = mQuery('iframe#helper-iframe-for-html-manipulation').contents();
             editorHtml = Mautic.clearFroalaStyles(editorHtml);
-            textarea.val(editorHtml.find('html').get(0).outerHTML);
+            mQuery(doc).on('load', function(){
+                textarea.val(editorHtml.find('html').get(0).outerHTML);
+            });
         });
     }
 }
