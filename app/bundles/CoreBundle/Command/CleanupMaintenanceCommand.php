@@ -69,8 +69,9 @@ EOT
         $translator = $this->getContainer()->get('translator');
         $translator->setLocale($this->getContainer()->getParameter('mautic.locale', 'en_US'));
 
-        $daysOld = $input->getOption('days-old');
-        $dryRun  = $input->getOption('dry-run');
+        $daysOld       = $input->getOption('days-old');
+        $dryRun        = $input->getOption('dry-run');
+        $noInteraction = $input->getOption('no-interaction');
 
         if (empty($daysOld)) {
             // Safety catch; bail
@@ -78,10 +79,12 @@ EOT
             return 1;
         }
 
-        if (empty($dryRun)) {
+        if (empty($dryRun) && empty($noInteraction)) {
             /** @var \Symfony\Component\Console\Helper\SymfonyQuestionHelper $helper */
             $helper   = $this->getHelperSet()->get('question');
-            $question = new ConfirmationQuestion('<info>'.$translator->trans('mautic.maintenance.confirm_data_purge', ['%days%' => $daysOld]). "</info> ", false);
+            $question = new ConfirmationQuestion(
+                '<info>'.$translator->trans('mautic.maintenance.confirm_data_purge', ['%days%' => $daysOld])."</info> ", false
+            );
 
             if (!$helper->ask($input, $output, $question)) {
 
@@ -101,9 +104,8 @@ EOT
 
         $table = new Table($output);
         $table
-            ->setHeaders([$translator->trans('mautic.maintenance.header.key'),$translator->trans('mautic.maintenance.header.records_affected')])
-            ->setRows($rows)
-        ;
+            ->setHeaders([$translator->trans('mautic.maintenance.header.key'), $translator->trans('mautic.maintenance.header.records_affected')])
+            ->setRows($rows);
         $table->render();
 
         if ('dev' == MAUTIC_ENV) {
