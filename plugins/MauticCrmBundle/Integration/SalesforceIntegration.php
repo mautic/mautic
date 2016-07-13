@@ -248,7 +248,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 'label'       => 'mautic.plugins.salesforce.sandbox',
                 'label_attr'  => array('class' => 'control-label'),
                 'empty_value' => false,
-                'required'    => false
+                'required'    => false,
+                'attr'       => array(
+                    'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');'
+                ),
             ));
         }
     }
