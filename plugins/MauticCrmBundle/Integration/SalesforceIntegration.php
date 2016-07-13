@@ -87,7 +87,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         $config = $this->mergeConfigToFeatureSettings(array());
 
-        if(isset($config['sandbox']) and $config['sandbox'][0] === 'sandbox')
+        if(isset($config['sandbox'][0]) and $config['sandbox'][0] === 'sandbox')
         {
             return 'https://test.salesforce.com/services/oauth2/token';
         }
@@ -102,7 +102,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function getAuthenticationUrl()
     {
         $config = $this->mergeConfigToFeatureSettings(array());
-        if(isset($config['sandbox']) and $config['sandbox'][0] === 'sandbox')
+        if(isset($config['sandbox'][0]) and $config['sandbox'][0] === 'sandbox')
         {
             return 'https://test.salesforce.com/services/oauth2/authorize';
         }
@@ -218,11 +218,16 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fields = array_keys($this->getAvailableLeadFields());
         $params['fields'] = implode(',', $fields);
         $internal = array('latestDateCovered' => $data['latestDateCovered']);
+        $count=0;
         foreach ($data['ids'] as $salesforceId) {
             $data = $this->getApiHelper()->getSalesForceLeadById($salesforceId, $params);
             $data['internal'] = $internal;
-            $this->getMauticLead($data, true, null, null);
+            $lead = $this->getMauticLead($data, true, null, null);
+            if($lead){
+                $count++;
+            }
         }
+        return $count;
     }
     /**
      * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
