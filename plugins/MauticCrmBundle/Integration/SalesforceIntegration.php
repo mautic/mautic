@@ -192,7 +192,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     public function getFetchQuery($params){
-        
+
         $dateRange=$params;
         return $dateRange;
     }
@@ -215,8 +215,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $data = $this->getApiHelper()->getSalesForceLeadById($salesforceId,$params);
                 $data['internal'] = $internal;
                 if($data){
-                    $this->getMauticLead($data,true,null,null);
-                    $count++;
+                    if ($this->getMauticLead($data, true, null, null)) {
+                        $count++;
+                    }
                 }
             }
         }

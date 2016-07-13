@@ -588,7 +588,7 @@ abstract class AbstractIntegration
                 )
             );
         }
-        
+
         if ($method == 'GET' && !empty($parameters)) {
             $parameters = array_merge($settings['query'], $parameters);
             $query      = http_build_query($parameters);
@@ -686,7 +686,7 @@ abstract class AbstractIntegration
                 $event
             );
         }
-        
+
         if (!empty($settings['return_raw'])) {
 
             return $result;
@@ -930,7 +930,7 @@ abstract class AbstractIntegration
 
         $method = (!isset($settings['method'])) ? 'POST' : $settings['method'];
         $data   = $this->makeRequest($this->getAccessTokenUrl(), $parameters, $method, $settings);
-        
+
         return $this->extractAuthKeys($data);
 
     }
@@ -1332,7 +1332,7 @@ abstract class AbstractIntegration
 
         // Match that data with mapped lead fields
         $matchedFields = $this->populateMauticLeadData($data);
-       
+
         if (empty($matchedFields)) {
 
             return;
@@ -1397,7 +1397,13 @@ abstract class AbstractIntegration
 
         if ($persist) {
             // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
-            $leadModel->saveEntity($lead, false);
+            try {
+                $leadModel->saveEntity($lead, false);
+            } catch (\Exception $exception) {
+                $this->factory->getLogger()->addWarning($exception->getMessage());
+
+                return;
+            }
         }
 
         return $lead;
