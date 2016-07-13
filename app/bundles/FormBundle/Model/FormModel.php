@@ -371,7 +371,8 @@ class FormModel extends CommonFormModel
             $submissions = $this->getRepository()->getFormResults(
                 $entity,
                 [
-                    'leadId' => $lead->getId()
+                    'leadId' => $lead->getId(),
+                    'limit'  => 200
                 ]
             );
         } else {

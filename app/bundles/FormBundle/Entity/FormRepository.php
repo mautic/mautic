@@ -221,6 +221,10 @@ class FormRepository extends CommonRepository
             ->setParameter('id', $options['formId']);
         }
 
+        if (!empty($options['limit'])) {
+            $query->setMaxResults((int) $options['limit']);
+        }
+
         return $query->execute()->fetchAll();
     }
 
