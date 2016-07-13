@@ -12,6 +12,7 @@ namespace Mautic\FormBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class Field
@@ -801,25 +802,35 @@ class Field
     /**
      * Decide if the field should be displayed based on thr progressive profiling conditions
      *
-     * @param array|null $submissions
+     * @param  array|null $submissions
+     * @param  Lead       $lead
+     *
+     * @return boolean
      */
-    public function showForContact($submissions)
+    public function showForContact($submissions = null, Lead $lead = null)
     {
         // Hide the field if there is the submission count limit and hide it untill the limit is overcame
         if ($this->showAfterXSubmissions > 1 && $this->showAfterXSubmissions > count($submissions)) {
             return false;
         }
 
-        // Hide the field if there is the value condition and if we already know the value for this field
-        if ($submissions) {
-            if ($this->showWhenValueExists === false) {
+        if ($this->showWhenValueExists === false) {
+
+            // Hide the field if there is the value condition and if we already know the value for this field
+            if ($submissions) {
                 foreach ($submissions as $submission) {
                     if (!empty($submission[$this->alias])) {
                         return false;
                     }               
                 }
             }
+
+            // Hide the field if the value is already known from the lead profile
+            if ($lead !== null && $this->leadField && $lead->getFieldValue($this->leadField) !== null) {
+                return false;
+            }
         }
+
 
         return true;
     }

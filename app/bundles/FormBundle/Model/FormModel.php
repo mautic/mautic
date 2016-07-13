@@ -361,6 +361,7 @@ class FormModel extends CommonFormModel
         //generate cached HTML
         $theme = $entity->getTemplate();
         $submissions = null;
+        $lead = $this->leadModel->getCurrentLead();
 
         if (!empty($theme)) {
             $theme .= '|';
@@ -370,7 +371,7 @@ class FormModel extends CommonFormModel
             $submissions = $this->getRepository()->getFormResults(
                 $entity,
                 [
-                    'leadId' => $this->leadModel->getCurrentLead()->getId()
+                    'leadId' => $lead->getId()
                 ]
             );
         } else {
@@ -387,7 +388,8 @@ class FormModel extends CommonFormModel
             [
                 'form'        => $entity,
                 'theme'       => $theme,
-                'submissions' => $submissions
+                'submissions' => $submissions,
+                'lead'        => $lead
             ]
         );
 
