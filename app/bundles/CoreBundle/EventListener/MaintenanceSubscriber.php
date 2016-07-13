@@ -62,7 +62,7 @@ class MaintenanceSubscriber extends CommonSubscriber
             $rows = (int) $qb->select('count(*) as records')
                 ->from(MAUTIC_TABLE_PREFIX.'audit_log', 'log')
                 ->where(
-                    $qb->expr()->gte('log.date_added', ':date')
+                    $qb->expr()->lte('log.date_added', ':date')
                 )
                 ->execute()
                 ->fetchColumn();
