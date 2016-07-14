@@ -96,7 +96,6 @@ Mautic.emailOnLoad = function (container, response) {
     });
 
     Mautic.intiSelectTheme(mQuery('#emailform_template'));
-    Mautic.fixFroalaEmailOutput();
 
     var plaintext = mQuery('#emailform_plainText');
     Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
@@ -108,24 +107,6 @@ Mautic.emailOnUnload = function(id) {
     }
     mQuery('#emailform_customHtml').froalaEditor('popups.hideAll');
 };
-
-Mautic.fixFroalaEmailOutput = function() {
-    if (mQuery('form[name="emailform"]').length) {
-        var textarea = mQuery('textarea.builder-html');
-        mQuery('form[name="emailform"]').on('before.submit.ajaxform', function() {
-            // update textarea from Froala's CodeMirror view on save
-            textarea.froalaEditor('events.trigger', 'form.submit');
-
-            var editorHtmlString = textarea.val();
-            var doc = Mautic.buildBuilderIframe(editorHtmlString, 'helper-iframe-for-html-manipulation');
-            var editorHtml = mQuery('iframe#helper-iframe-for-html-manipulation').contents();
-            editorHtml = Mautic.clearFroalaStyles(editorHtml);
-            mQuery(doc).on('load', function() {
-                textarea.val(editorHtml.find('html').get(0).outerHTML);
-            });
-        });
-    }
-}
 
 Mautic.insertEmailBuilderToken = function(editorId, token) {
     var editor = Mautic.getEmailBuilderEditorInstances();

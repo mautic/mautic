@@ -1565,35 +1565,43 @@ var Mautic = {
         mQuery(form).off('submit.ajaxform');
         mQuery(form).on('submit.ajaxform', (function (e) {
             e.preventDefault();
-
-            mQuery(this).trigger('before.submit.ajaxform');
+            var form = mQuery(this);
 
             if (MauticVars.formSubmitInProgress) {
                 return false;
             } else {
-                var callback = mQuery(this).data('submit-callback');
-
-                // Allow a callback to do stuff before submit and abort if needed
-                if (callback && typeof Mautic[callback] == 'function') {
-                    if (!Mautic[callback]()) {
-
-                        return false;
-                    }
-                }
-
-                MauticVars.formSubmitInProgress = true;
-            }
-
-            Mautic.postForm(mQuery(this), function (response) {
-                if (response.inMain) {
-                    Mautic.processPageContent(response);
+                var callbackAsync = form.data('submit-callback-async');
+                if (callbackAsync && typeof Mautic[callbackAsync] == 'function') {
+                    Mautic[callbackAsync].apply(this, [form, function() {
+                        Mautic.postMauticForm(form);
+                    }]);
                 } else {
-                    Mautic.processModalContent(response, '#' + response.modalId);
+                    var callback = form.data('submit-callback');
+
+                    // Allow a callback to do stuff before submit and abort if needed
+                    if (callback && typeof Mautic[callback] == 'function') {
+                        if (!Mautic[callback]()) {
+                            return false;
+                        }
+                    }
+
+                    Mautic.postMauticForm(form);
                 }
-            });
+            }
 
             return false;
         }));
+    },
+
+    postMauticForm: function(form) {
+        MauticVars.formSubmitInProgress = true;
+        Mautic.postForm(form, function (response) {
+            if (response.inMain) {
+                Mautic.processPageContent(response);
+            } else {
+                Mautic.processModalContent(response, '#' + response.modalId);
+            }
+        });
     },
 
     /**
@@ -2502,7 +2510,6 @@ var Mautic = {
 
         if (isExtraButton) {
             mQuery(changedId).parents('.btn-group').find('.btn').removeClass('btn-success btn-danger').addClass('btn-default');
-            console.log(mQuery(changedId).parents('.btn-group').find('.btn-default'));
         } else {
             //change the other
             var otherButton = isYesButton ? '.btn-no' : '.btn-yes';
