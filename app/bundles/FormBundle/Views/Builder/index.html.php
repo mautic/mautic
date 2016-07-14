@@ -71,23 +71,22 @@ $isStandalone = $activeForm->isStandalone();
                                     </ul>
                                 </div>
                             </div>
-                            <?php
-                            foreach ($formFields as $field):
-                                if (!empty($field['isCustom'])):
+                            <?php foreach ($formFields as $field): ?>
+                                <?php if (!empty($field['isCustom'])):
                                     $params   = $field['customParameters'];
                                     $template = $params['template'];
                                 else:
                                     $template = 'MauticFormBundle:Field:' . $field['type'] . '.html.php';
-                                endif;
-                                echo $view->render($template, array(
-                                    'field'   => $field,
-                                    'inForm'  => true,
-                                    'id'      => $field['id'],
-                                    'deleted' => in_array($field['id'], $deletedFields),
-                                    'formId'  => $formId
-                                ));
-                            endforeach;
-                            ?>
+                                endif; ?>
+                                <?php echo $view->render('MauticFormBundle:Builder:fieldwrapper.html.php', [
+                                    'template' => $template,
+                                    'field'    => $field,
+                                    'inForm'   => true,
+                                    'id'       => $field['id'],
+                                    'deleted'  => in_array($field['id'], $deletedFields),
+                                    'formId'   => $formId
+                                ]); ?>
+                            <?php endforeach; ?>
                             <?php if (!count($formFields)): ?>
                             <div class="alert alert-info" id="form-field-placeholder">
                                 <p><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>

@@ -159,12 +159,13 @@ class FieldController extends CommonFormController
 
             $passthroughVars['fieldId']   = $keyId;
             $template                     = (!empty($customParams)) ? $customParams['template'] : 'MauticFormBundle:Field:' . $fieldType . '.html.php';
-            $passthroughVars['fieldHtml'] = $this->renderView($template, array(
-                'inForm' => true,
-                'field'  => $formField,
-                'id'     => $keyId,
-                'formId'  => $formId
-            ));
+            $passthroughVars['fieldHtml'] = $this->renderView('MauticFormBundle:Builder:fieldwrapper.html.php', [
+                'template' => $template,
+                'inForm'   => true,
+                'field'    => $formField,
+                'id'       => $keyId,
+                'formId'   => $formId
+            ]);
         }
 
         if ($closeModal) {
@@ -301,12 +302,13 @@ class FieldController extends CommonFormController
             $blank     = $entity->convertToArray();
             $formField = array_merge($blank, $formField);
 
-            $passthroughVars['fieldHtml'] = $this->renderView($template, array(
-                'inForm' => true,
-                'field'  => $formField,
-                'id'     => $objectId,
-                'formId'  => $formId
-            ));
+            $passthroughVars['fieldHtml'] = $this->renderView('MauticFormBundle:Builder:fieldwrapper.html.php', [
+                'template' => $template,
+                'inForm'   => true,
+                'field'    => $formField,
+                'id'       => $objectId,
+                'formId'   => $formId
+            ]);
 
             if ($closeModal) {
                 //just close the modal
