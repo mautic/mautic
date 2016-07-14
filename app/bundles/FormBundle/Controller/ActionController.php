@@ -328,7 +328,6 @@ class ActionController extends CommonFormController
                     'inForm'  => true,
                     'action'  => $formAction,
                     'id'      => $objectId,
-                    'deleted' => true,
                     'formId'  => $formId
                 ))
             );
@@ -400,7 +399,6 @@ class ActionController extends CommonFormController
                     'inForm'  => true,
                     'action'  => $formAction,
                     'id'      => $objectId,
-                    'deleted' => false,
                     'formId'  => $formId
                 ))
             );

@@ -26,10 +26,6 @@
     display: block;
 }
 
-#mauticforms_fields .mauticform-row.bg-danger:hover, #mauticforms_actions .mauticform-row.bg-danger:hover {
-    background-color: #f2d4d2;
-}
-
 #mauticforms_fields .form-buttons, #mauticforms_actions .form-buttons {
     float: right;
     margin-top: 8px;

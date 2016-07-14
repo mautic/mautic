@@ -106,11 +106,6 @@ if (isset($field['isRequired']) && $field['isRequired']) {
     $defaultContainerClass .= ' mauticform-required';
 }
 
-// Add container class
-if (!empty($deleted)) {
-    $defaultContainerClass .= ' bg-danger';
-}
-
 if (stripos($containerAttr, 'class=') === false) {
     $containerAttr .= ' class="'.$defaultContainerClass.'"';
 } else {

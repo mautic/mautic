@@ -13,7 +13,6 @@
     'field'   => $field,
     'inForm'  => true,
     'id'      => $field['id'],
-    'deleted' => isset($deleted) ? $deleted : false,
     'formId'  => $formId
 )); ?>
 <?php if ((isset($field['showWhenValueExists']) && $field['showWhenValueExists'] === false) || !empty($field['showAfterXSubmissions']) || !empty($field['leadField'])): ?>
