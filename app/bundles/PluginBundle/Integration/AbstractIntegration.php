@@ -576,6 +576,7 @@ abstract class AbstractIntegration
                 $settings['query'],
                 $parameters['append_to_query']
             );
+
             unset($parameters['append_to_query']);
         }
 
@@ -1377,7 +1378,10 @@ abstract class AbstractIntegration
         if (!isset($leadSocialCache[$this->getName()])) {
             $leadSocialCache[$this->getName()] = array();
         }
-        $leadSocialCache[$this->getName()] = array_merge($leadSocialCache[$this->getName()], $socialCache);
+
+        if (null !== $socialCache) {
+            $leadSocialCache[$this->getName()] = array_merge($leadSocialCache[$this->getName()], $socialCache);
+        }
 
         // Check for activity while here
         if (null !== $identifiers && in_array('public_activity', $this->getSupportedFeatures())) {
@@ -1576,6 +1580,7 @@ abstract class AbstractIntegration
     {
         $logger = $this->factory->getLogger();
         $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e->getMessage());
+        die(var_dump($e));
     }
 
     /**
