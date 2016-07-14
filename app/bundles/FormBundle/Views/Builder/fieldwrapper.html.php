@@ -20,15 +20,21 @@
     <div class="panel-footer">
     <?php if (!empty($field['leadField'])): ?>
         <i class="fa fa-user" aria-hidden="true"></i>
-        <span class="inline-spacer"><?php echo ucfirst($field['leadField']); ?></span>
+        <span class="inline-spacer">
+            <?php echo ucfirst($field['leadField']); ?>
+        </span>
     <?php endif; ?>
     <?php if (isset($field['showWhenValueExists']) && $field['showWhenValueExists'] === false): ?>
         <i class="fa fa-eye-slash" aria-hidden="true"></i>
-        <span class="inline-spacer">Hide if value exist</span>
+        <span class="inline-spacer">
+            <?php echo $view['translator']->trans('mautic.form.field.hide.if.value'); ?>
+        </span>
     <?php endif; ?>
     <?php if (!empty($field['showAfterXSubmissions'])): ?>
         <i class="fa fa-refresh" aria-hidden="true"></i>
-        <span class="inline-spacer">Show after <?php echo ucfirst($field['showAfterXSubmissions']); ?> submissions</span>
+        <span class="inline-spacer">
+            <?php echo $view['translator']->trans('mautic.form.field.hide.if.submission.count', ['%count%' => ucfirst($field['showAfterXSubmissions'])]); ?>
+        </span>
     <?php endif; ?>
     </div>
 <?php endif; ?>
