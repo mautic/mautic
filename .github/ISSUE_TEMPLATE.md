@@ -7,7 +7,7 @@ What type of report is this:
 | Enhancement?         |
 
 ## Description:
-
+The more details the better...
 
 ## If a bug:
 
@@ -19,7 +19,6 @@ What type of report is this:
 ### Steps to reproduce:
 1. 
 2. 
- 
  
 ### Log errors: 
 

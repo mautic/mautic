@@ -12,25 +12,23 @@ Please answer the following questions.
 
 **Note that all new features should have a related user and/or developer documentation PR in their respective repositories.** 
 
-### Required:
+### Required
+#### Description:
 
-#### Description
 
-
-#### Steps to test this PR
+#### Steps to test this PR:
 1. 
 2. 
 
-### As applicable:
-
-#### Steps to reproduce the bug
+### As applicable
+#### Steps to reproduce the bug:
 1. 
 2. 
 
-#### List deprecations along with the new alternative
+#### List deprecations along with the new alternative:
 1. 
 2. 
 
-#### List backwards compatibility breaks
+#### List backwards compatibility breaks:
 1. 
 2. 
