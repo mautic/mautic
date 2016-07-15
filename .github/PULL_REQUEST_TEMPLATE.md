@@ -20,16 +20,17 @@ Please answer the following questions.
 #### Steps to test this PR
 1. 
 2. 
-3.
 
 ### As applicable:
 
 #### Steps to reproduce the bug
 1. 
 2. 
-3.
 
 #### List deprecations along with the new alternative
-
+1. 
+2.
 
 #### List backwards compatibility breaks
+1. 
+2.
