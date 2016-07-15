@@ -543,80 +543,54 @@ var Mautic = {
             }
         }
 
-        mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage', 'editor-basic-fullpage'], function (index, editorClass) {
-            if (mQuery(container + ' textarea.' + editorClass).length) {
-                mQuery(container + ' textarea.' + editorClass).each(function () {
-                    var textarea = mQuery(this);
+        if (mQuery(container + ' textarea.editor').length) {
+            mQuery(container + ' textarea.editor').each(function () {
+                var textarea = mQuery(this);
 
-
-
-                    // init AtWho in a froala editor
-                    if (textarea.hasClass('editor-builder-tokens')) {
-                        textarea.on('froalaEditor.initialized', function (e, editor) {
-                            Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'), editor);
-                        });
-                    }
-
-                    textarea.on('froalaEditor.blur', function (e, editor) {
-                        editor.popups.hideAll();
+                // init AtWho in a froala editor
+                if (textarea.hasClass('editor-builder-tokens')) {
+                    textarea.on('froalaEditor.initialized', function (e, editor) {
+                        Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'), editor);
                     });
+                }
 
-                    // var settings = {};
-
-                    // if (editorClass != 'editor') {
-                    //     // Set the custom editor toolbar
-                    //     var toolbar = editorClass.replace('editor-', '').replace('-', '_');
-                    //     settings.toolbar = toolbar;
-                    // }
-
-                    // if (editorClass != 'editor' && editorClass != 'editor-basic') {
-                    //     // Do not strip classes and the like
-                    //     settings.allowedContent = true;
-                    // }
-
-                    // if (editorClass == 'editor-fullpage' || editorClass == 'editor-basic-fullpage') {
-                    //     // Allow full page editing and add tools to update html document
-                    //     settings.fullPage     = true;
-                    //     settings.extraPlugins = "sourcedialog,docprops,filemanager";
-                    // }
-
-                    var maxButtons = ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikeThrough', 'fontFamily', 'fontSize', 'color', 'paragraphFormat', 'align', 'orderedList', 'unorderedList', 'quote', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertImage','insertTable', 'html', 'fullscreen'];
-
-                    if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
-                        var options = {
-                            // Set custom buttons with separator between them.
-                            toolbarButtons: maxButtons,
-                            toolbarButtonsMD: maxButtons,
-                            heightMin: 300
-                        };
-
-                        if (textarea.hasClass('editor-basic-fullpage')) {
-                            options.fullPage = true;
-                            options.htmlAllowedTags = ['.*'];
-                            options.htmlAllowedAttrs = ['.*'];
-                            options.htmlRemoveTags = [];
-                            options.lineBreakerTags = [];
-                        }
-
-                        textarea.froalaEditor(mQuery.extend(options, Mautic.basicFroalaOptions));
-                    } else if (editorClass == 'editor') {
-                        //     settings.removePlugins = 'resize';
-
-                        textarea.froalaEditor(mQuery.extend({
-                            // Set custom buttons with separator between them.
-                            toolbarButtons: maxButtons,
-                            toolbarButtonsMD: maxButtons,
-                            toolbarButtonsSM: ['undo', 'redo' , '-', 'bold', 'italic', 'underline'],
-                            toolbarButtonsXS: ['undo', 'redo' , '-', 'bold', 'italic', 'underline'],
-                            heightMin: 100
-                        }, Mautic.basicFroalaOptions));
-
-                    } else {
-                        textarea.froalaEditor(Mautic.basicFroalaOptions);
-                    }
+                textarea.on('froalaEditor.blur', function (e, editor) {
+                    editor.popups.hideAll();
                 });
-            }
-        });
+
+                var maxButtons = ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikeThrough', 'fontFamily', 'fontSize', 'color', 'paragraphFormat', 'align', 'orderedList', 'unorderedList', 'quote', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertImage','insertTable', 'html', 'fullscreen'];
+                var minButtons = ['bold', 'italic', 'underline'];
+
+                if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
+                    var options = {
+                        // Set custom buttons with separator between them.
+                        toolbarButtons: maxButtons,
+                        toolbarButtonsMD: maxButtons,
+                        heightMin: 300
+                    };
+
+                    if (textarea.hasClass('editor-basic-fullpage')) {
+                        options.fullPage = true;
+                        options.htmlAllowedTags = ['.*'];
+                        options.htmlAllowedAttrs = ['.*'];
+                        options.htmlRemoveTags = [];
+                        options.lineBreakerTags = [];
+                    }
+
+                    textarea.froalaEditor(mQuery.extend(options, Mautic.basicFroalaOptions));
+                } else {
+                    textarea.froalaEditor(mQuery.extend({
+                        // Set custom buttons with separator between them.
+                        toolbarButtons: minButtons,
+                        toolbarButtonsMD: minButtons,
+                        toolbarButtonsSM: minButtons,
+                        toolbarButtonsXS: minButtons,
+                        heightMin: 100
+                    }, Mautic.basicFroalaOptions));
+
+                }
+            });
+        }
 
         //activate shuffles
         if (mQuery('.shuffle-grid').length) {
@@ -1003,10 +977,8 @@ var Mautic = {
                 MauticVars.modalsReset = {};
             }
 
-            mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage'], function (index, editorClass) {
-                mQuery(container + ' textarea.' + editorClass).each(function () {
-                    mQuery('textarea.'+editorClass).froalaEditor('destroy');
-                });
+            mQuery(container + ' textarea.editor').each(function () {
+                mQuery('textarea.'+editorClass).froalaEditor('destroy');
             });
 
             //turn off shuffle events
