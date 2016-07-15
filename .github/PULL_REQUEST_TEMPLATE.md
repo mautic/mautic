@@ -29,8 +29,8 @@ Please answer the following questions.
 
 #### List deprecations along with the new alternative
 1. 
-2.
+2. 
 
 #### List backwards compatibility breaks
 1. 
-2.
+2. 
