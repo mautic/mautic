@@ -70,3 +70,10 @@ textarea.form-html {
 .inline-spacer {
     padding-right: 20px;
 }
+
+#mauticforms_fields input[type="date"],
+#mauticforms_fields input[type="time"],
+#mauticforms_fields input[type="datetime-local"],
+#mauticforms_fields input[type="month"] {
+    line-height: inherit;
+}
