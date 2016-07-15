@@ -341,12 +341,12 @@ class FieldController extends CommonFormController
     {
         $session = $this->factory->getSession();
         $formId  = $this->request->query->get('formId');
-        $fields  = $session->get('mautic.form.'.$formId.'.fields.modified', array());
-        $delete  = $session->get('mautic.form.'.$formId.'.fields.deleted', array());
+        $fields  = $session->get('mautic.form.'.$formId.'.fields.modified', []);
+        $delete  = $session->get('mautic.form.'.$formId.'.fields.deleted', []);
 
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest() ||
-            !$this->factory->getSecurity()->isGranted(array('form:forms:editown', 'form:forms:editother', 'form:forms:create'), 'MATCH_ONE')
+            !$this->factory->getSecurity()->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
         ) {
             return $this->accessDenied();
         }
@@ -355,7 +355,7 @@ class FieldController extends CommonFormController
 
         if ($this->request->getMethod() == 'POST' && $formField !== null) {
             //set custom params from event if applicable
-            $customParams = (!empty($formField['isCustom'])) ? $formField['customParameters'] : array();
+            $customParams = (!empty($formField['isCustom'])) ? $formField['customParameters'] : [];
 
             //add the field to the delete list
             if (!in_array($objectId, $delete)) {
@@ -363,36 +363,15 @@ class FieldController extends CommonFormController
                 $session->set('mautic.form.'.$formId.'.fields.deleted', $delete);
             }
 
-            if (!empty($customParams)) {
-                $template = $customParams['template'];
-            } else {
-                $template = 'MauticFormBundle:Field:' . $formField['type'] . '.html.php';
-            }
-
-            //prevent undefined errors
-            $entity    = new Field();
-            $blank     = $entity->convertToArray();
-            $formField = array_merge($blank, $formField);
-
-            $dataArray = array(
+            $dataArray = [
                 'mauticContent' => 'formField',
                 'success'       => 1,
-                'target'        => '#mauticform_' . $objectId,
                 'route'         => false,
-                'fieldId'       => $objectId,
-                'fieldHtml'     => $this->renderView($template, array(
-                    'inForm'  => true,
-                    'field'   => $formField,
-                    'id'      => $objectId,
-                    'formId'  => $formId
-                ))
-            );
+            ];
         } else {
-            $dataArray = array('success' => 0);
+            $dataArray = ['success' => 0];
         }
 
-        $response = new JsonResponse($dataArray);
-
-        return $response;
+        return new JsonResponse($dataArray);
     }
 }

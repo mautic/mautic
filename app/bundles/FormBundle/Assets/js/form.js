@@ -52,6 +52,7 @@ Mautic.formOnLoad = function (container) {
     }
 
     Mautic.initHideItemButton('#mauticforms_fields');
+    Mautic.initHideItemButton('#mauticforms_actions');
 };
 
 Mautic.updateFormFields = function () {
@@ -219,13 +220,12 @@ Mautic.formActionOnLoad = function (container, response) {
         if (mQuery('#form-action-placeholder').length) {
             mQuery('#form-action-placeholder').remove();
         }
-
-        Mautic.initHideItemButton('#mauticforms_actions');
     }
 };
 
 Mautic.initHideItemButton = function(container) {
-    mQuery(container).find('button[data-hide-panel]').click(function() {
+    mQuery(container).find('[data-hide-panel]').click(function(e) {
+        e.preventDefault();
         mQuery(this).closest('.panel').hide('fast');
     });
 }

@@ -281,12 +281,12 @@ class ActionController extends CommonFormController
     {
         $session = $this->factory->getSession();
         $formId  = $this->request->query->get('formId');
-        $actions = $session->get('mautic.form.'.$formId.'.actions.modified', array());
-        $delete  = $session->get('mautic.form.'.$formId.'.actions.deleted', array());
+        $actions = $session->get('mautic.form.'.$formId.'.actions.modified', []);
+        $delete  = $session->get('mautic.form.'.$formId.'.actions.deleted', []);
 
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest() ||
-            !$this->factory->getSecurity()->isGranted(array('form:forms:editown', 'form:forms:editother', 'form:forms:create'), 'MATCH_ONE')
+            !$this->factory->getSecurity()->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
         ) {
             return $this->accessDenied();
         }
@@ -301,7 +301,7 @@ class ActionController extends CommonFormController
 
             //take note if this is a submit button or not
             if ($formAction['type'] == 'button') {
-                $submits    = $session->get('mautic.formactions.submits', array());
+                $submits    = $session->get('mautic.formactions.submits', []);
                 $properties = $formAction['properties'];
                 if ($properties['type'] == 'submit' && in_array($objectId, $submits)) {
                     $key = array_search($objectId, $submits);
@@ -310,33 +310,15 @@ class ActionController extends CommonFormController
                 }
             }
 
-            $template = (!empty($formAction['settings']['template'])) ? $formAction['settings']['template'] :
-                'MauticFormBundle:Action:generic.html.php';
-
-            //prevent undefined errors
-            $entity     = new Action();
-            $blank      = $entity->convertToArray();
-            $formAction = array_merge($blank, $formAction);
-
-            $dataArray = array(
+            $dataArray = [
                 'mauticContent' => 'formAction',
                 'success'       => 1,
-                'target'        => '#mauticform_' . $objectId,
-                'route'         => false,
-                'actionId'      => $objectId,
-                'actionHtml'    => $this->renderView($template, array(
-                    'inForm'  => true,
-                    'action'  => $formAction,
-                    'id'      => $objectId,
-                    'formId'  => $formId
-                ))
-            );
+                'route'         => false
+            ];
         } else {
-            $dataArray = array('success' => 0);
+            $dataArray = ['success' => 0];
         }
 
-        $response = new JsonResponse($dataArray);
-
-        return $response;
+        return new JsonResponse($dataArray);
     }
 }

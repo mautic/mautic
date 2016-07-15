@@ -23,9 +23,9 @@ if (empty($actionType)) {
         <i class="fa fa-pencil-square-o text-primary"></i>
     </button>
     <?php if (empty($disallowDelete)): ?>
-    <button type="button" data-hide-panel="true" data-toggle="ajax" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="<?php echo $view['router']->path($route, array('objectAction' => 'delete', 'objectId' => $id, 'formId' => $formId)); ?>" class="btn btn-default">
+    <a type="button" data-hide-panel="true" data-toggle="ajax" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="<?php echo $view['router']->path($route, array('objectAction' => 'delete', 'objectId' => $id, 'formId' => $formId)); ?>" class="btn btn-default">
         <i class="fa fa-trash-o text-danger"></i>
-    </button>
+    </a>
     <?php endif; ?>
     <button type="button" class="reorder-handle btn btn-default btn-nospin">
         <i class="fa fa-arrows"></i>
