@@ -681,7 +681,13 @@ class MailHelper
     public function getMessageInstance()
     {
         try {
-            $message = ($this->tokenizationSupported) ? MauticMessage::newInstance() : \Swift_Message::newInstance();
+            $message = (
+              $this->tokenizationSupported
+              ||
+              $transport instanceof \Swift_Transport_AbstractSmtpTransport
+            )
+              ? MauticMessage::newInstance()
+              : \Swift_Message::newInstance();
 
             return $message;
         } catch (\Exception $e) {

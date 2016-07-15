@@ -289,10 +289,11 @@ class AjaxController extends CommonAjaxController
                     $translator = $this->factory->getTranslator();
 
                     if ($settings['send_test'] == 'true') {
-                        $message = new \Swift_Message(
-                            $translator->trans('mautic.email.config.mailer.transport.test_send.subject'),
-                            $translator->trans('mautic.email.config.mailer.transport.test_send.body')
-                        );
+                        /** @var \Swift_Message $message */
+                        $message = \Swift_DependencyContainer::getInstance()->lookup('message.message');
+                        $message = $message
+                            ->setSubject($translator->trans('mautic.email.config.mailer.transport.test_send.subject'))
+                            ->setBody($translator->trans('mautic.email.config.mailer.transport.test_send.body'));
 
                         $user = $this->factory->getUser();
 
