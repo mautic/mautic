@@ -3165,7 +3165,9 @@ var Mautic = {
                         Mautic.renderBarChart(canvas)
                     } else if (canvas.hasClass('simple-bar-chart')) {
                         Mautic.renderSimpleBarChart(canvas)
-                    }
+                    } else if (canvas.hasClass('horizontal-bar-chart')) {
+                    Mautic.renderHorizontalBarChart(canvas)
+                }
                 }
                 canvas.addClass('chart-rendered');
             });
@@ -3245,6 +3247,39 @@ var Mautic = {
         var data = mQuery.parseJSON(canvas.text());
         var chart = new Chart(canvas, {
             type: 'bar',
+            data: data,
+            options: {
+                scales: {
+                    xAxes: [{
+                        stacked: false,
+                        ticks: {fontSize: 9},
+                        gridLines: {display:false}
+                    }],
+                    yAxes: [{
+                        display: false,
+                        stacked: false,
+                        ticks: {beginAtZero: true, display: false},
+                        gridLines: {display:false}
+                    }],
+                    display: false,
+                },
+                legend: {
+                    display: false
+                }
+            }
+        });
+        Mautic.chartObjects.push(chart);
+    },
+
+    /**
+     * Render the chart.js simple bar chart
+     *
+     * @param mQuery element canvas
+     */
+    renderHorizontalBarChart: function(canvas) {
+        var data = mQuery.parseJSON(canvas.text());
+        var chart = new Chart(canvas, {
+            type: 'horizontalBar',
             data: data,
             options: {
                 scales: {

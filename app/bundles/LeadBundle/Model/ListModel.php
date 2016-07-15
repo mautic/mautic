@@ -1240,21 +1240,20 @@ class ListModel extends FormModel
             $percentage = $result['leads'];
             $data['labels'][]=substr($result['device'],0,12);
             $data['values'][]=$result['leads'];
-
-        }
+            $data['backgroundColor'][]='rgba(220,220,220,0.5)';
+         }
         $data['xAxes'][] =array('display' => true);
         $data['yAxes'][] =array('display' => true);
 
         $baseData = array(
-            'label' => $this->translator->trans('mautic.lead.leads'),
-            'data'  => $data['values'],
+            'label'             => $data['labels'],
+            'data'              => $data['values']
         );
 
         $chart     = new BarChart($data['labels']);
 
         $datasetId = count($data['values']);
-        $datasets[] = array_merge($baseData, $chart->generateColors(3));
-
+        $datasets[] = array_merge($baseData, $chart->generateColors(2));
         $chartData = array(
             'labels' => $data['labels'],
             'datasets' => $datasets,
