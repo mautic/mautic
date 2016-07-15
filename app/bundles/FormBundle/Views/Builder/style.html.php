@@ -28,4 +28,6 @@
     .mauticform-radiogrp-row {}
     .mauticform-radiogrp-label { font-weight: normal; }
     .mauticform-radiogrp-radio {}
+    .mauticform-button-wrapper .btn-default {color: #5d6c7c;background-color: #ffffff;border-color: #dddddd;}
+    .mauticform-button-wrapper .btn {display: inline-block;margin-bottom: 0;font-weight: 600;text-align: center;vertical-align: middle;cursor: pointer;background-image: none;border: 1px solid transparent;white-space: nowrap;padding: 6px 12px;font-size: 13px;line-height: 1.3856;border-radius: 3px;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;}
 </style>

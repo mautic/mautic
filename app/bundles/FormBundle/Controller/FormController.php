@@ -416,7 +416,7 @@ class FormController extends CommonFormController
             $modifiedFields[$keyId]['showLabel']       = 1;
             $modifiedFields[$keyId]['type']            = 'button';
             $modifiedFields[$keyId]['id']              = $keyId;
-            $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-primary"';
+            $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-default"';
             $modifiedFields[$keyId]['formId']          = $sessionId;
             unset($modifiedFields[$keyId]['form']);
             $session->set('mautic.form.'.$sessionId.'.fields.modified', $modifiedFields);

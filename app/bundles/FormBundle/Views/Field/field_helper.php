@@ -58,7 +58,7 @@ if (!empty($properties['placeholder'])) {
 // Label and input
 if (!empty($inForm)) {
     $labelAttr .= ' class="'.$defaultLabelClass.'"';
-    $inputAttr .= ' disabled="disabled" class="'.$defaultInputClass.$defaultInputFormClass.'"';
+    $inputAttr .= ' disabled="disabled" class="'.$defaultInputClass.$defaultInputFormClass.' btn btn-default"';
 
 } else {
     if ($field['labelAttributes'])
