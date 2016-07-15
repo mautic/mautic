@@ -978,7 +978,7 @@ var Mautic = {
             }
 
             mQuery(container + ' textarea.editor').each(function () {
-                mQuery('textarea.'+editorClass).froalaEditor('destroy');
+                mQuery('textarea.editor').froalaEditor('destroy');
             });
 
             //turn off shuffle events
