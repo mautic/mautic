@@ -18,7 +18,7 @@ What type of report is this:
 
 ### Steps to reproduce:
 1. 
-2.
+2. 
  
  
 ### Log errors: 
