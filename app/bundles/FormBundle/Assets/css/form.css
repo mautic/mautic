@@ -33,10 +33,11 @@
     margin-top: 8px;
 }
 
-#mauticforms_fields input, #mauticforms_fields textarea {
+#mauticforms_fields input, #mauticforms_fields textarea, #mauticforms_fields select {
     background-color: #fff;
     box-shadow: 0px 0px 0px #fff inset;
     padding: 0.5em 0.5em;
+    width: 50%;
 }
 
 .mauticform-row {
