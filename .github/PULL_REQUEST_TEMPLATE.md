@@ -1,7 +1,5 @@
 Please answer the following questions. 
 
-_Note that all new features should have a related user and/or developer documentation PR in their respective repositories._ 
-
 | Q                                      | A
 | -------------------------------------- | ---
 | Bug fix?                               | 
@@ -12,24 +10,26 @@ _Note that all new features should have a related user and/or developer document
 | BC breaks?                             | 
 | Deprecations?                          |  
 
-## Required:
+**Note that all new features should have a related user and/or developer documentation PR in their respective repositories.** 
 
-### Description
+### Required:
+
+#### Description
 
 
-### Steps to test this PR
+#### Steps to test this PR
 1. 
 2. 
 3.
 
-## As applicable:
+### As applicable:
 
-## Steps to reproduce the bug
+#### Steps to reproduce the bug
 1. 
 2. 
 3.
 
-## List deprecations along with the new alternative
+#### List deprecations along with the new alternative
 
 
-## List backwards compatibility breaks
+#### List backwards compatibility breaks
