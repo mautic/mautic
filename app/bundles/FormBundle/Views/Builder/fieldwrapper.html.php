@@ -8,7 +8,7 @@
  */
 
 ?>
-<div class="panel">
+<div class="panel" data-sortable-id="mauticform_<?php echo $field['id']; ?>">
 <?php echo $view->render($template, array(
     'field'   => $field,
     'inForm'  => true,
