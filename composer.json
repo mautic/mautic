@@ -95,7 +95,9 @@
         "twilio/sdk": "^4.10",
 
         "stack/run": "^1.0",
-        "stack/builder": "^1.0"
+        "stack/builder": "^1.0",
+
+        "piwik/device-detector": "3.7.0"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~2.8",

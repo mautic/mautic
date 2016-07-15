@@ -149,6 +149,31 @@ class Hit
     private $query = array();
 
     /**
+     * @var array
+     */
+    private $clientInfo = array();
+
+    /**
+     * @var string
+     */
+    private $device;
+
+    /**
+     * @var array
+     */
+    private $deviceOs;
+
+    /**
+     * @var string
+     */
+    private $deviceBrand;
+
+    /**
+     * @var string
+     */
+    private $deviceModel;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -258,6 +283,28 @@ class Hit
             ->build();
 
         $builder->addNullableField('query', 'array');
+
+        $builder->createField('clientInfo', 'array')
+            ->columnName('client_info')
+            ->nullable()
+            ->build();
+
+        $builder->addNullableField('device', 'string');
+
+        $builder->createField('deviceOs', 'array')
+            ->columnName('device_os')
+            ->nullable()
+            ->build();
+
+        $builder->createField('deviceBrand', 'string')
+            ->columnName('device_brand')
+            ->nullable()
+            ->build();
+
+        $builder->createField('deviceModel', 'string')
+            ->columnName('device_model')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -849,6 +896,106 @@ class Hit
     public function setQuery($query)
     {
         $this->query = $query;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getClientInfo()
+    {
+        return $this->clientInfo;
+    }
+
+    /**
+     * @param array $clientInfo
+     *
+     * @return Hit
+     */
+    public function setClientInfo($clientInfo)
+    {
+        $this->clientInfo = $clientInfo;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDevice()
+    {
+        return $this->device;
+    }
+
+    /**
+     * @param string $device
+     *
+     * @return Hit
+     */
+    public function setDevice($device)
+    {
+        $this->device = $device;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceBrand()
+    {
+        return $this->deviceBrand;
+    }
+
+    /**
+     * @param string $deviceBrand
+     *
+     * @return Hit
+     */
+    public function setDeviceBrand($deviceBrand)
+    {
+        $this->deviceBrand = $deviceBrand;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceModel()
+    {
+        return $this->deviceModel;
+    }
+
+    /**
+     * @param string $device
+     *
+     * @return Hit
+     */
+    public function setDeviceModel($deviceModel)
+    {
+        $this->deviceModel = $deviceModel;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDeviceOs()
+    {
+        return $this->deviceOs;
+    }
+
+    /**
+     * @param array $deviceOs
+     *
+     * @return Hit
+     */
+    public function setDeviceOs($deviceOs)
+    {
+        $this->deviceOs = $deviceOs;
 
         return $this;
     }

@@ -33,6 +33,8 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Doctrine\DBAL\Query\QueryBuilder;
+use DeviceDetector\DeviceDetector;
+use DeviceDetector\Parser\Device\DeviceParserAbstract;
 
 /**
  * Class PageModel
@@ -735,6 +737,16 @@ class PageModel extends FormModel
             }
             $hit->setBrowserLanguages($languages);
         }
+        //device granularity
+        $dd = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
+
+        $dd->parse();
+
+        $hit->setClientInfo($dd->getClient());
+        $hit->setDevice($dd->getDeviceName());
+        $hit->setDeviceBrand($dd->getBrand());
+        $hit->setDeviceModel($dd->getModel());
+        $hit->setDeviceOs($dd->getOs());
 
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {

@@ -1195,4 +1195,74 @@ class ListModel extends FormModel
 
         return $chartData;
     }
+    /**
+     * Get bar chart data of hits
+     *
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $dateFormat
+     * @param array    $filter
+     *
+     * @return array
+     */
+    public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array())
+    {
+        $data['values'] = array();
+        $data['labels'] = array();
+
+        $q = $this->em->getConnection()->createQueryBuilder();
+
+        $q->select('count(l.id) as leads, h.device as device')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 't')
+            ->join('t', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id')
+            ->join('t', MAUTIC_TABLE_PREFIX.'page_hits','h', 'h.lead_id=l.id')
+            ->orderBy('device', 'DESC')
+            ->andWhere($q->expr()->gte('t.date_added', ':date_from'))
+            ->setParameter('date_from', $dateFrom->format('Y-m-d'))
+            ->andWhere($q->expr()->lte('t.date_added', ':date_to'))
+            ->setParameter('date_to', $dateTo->format('Y-m-d'." 23:59:59"));
+
+        if(isset($filter['leadlist_id']['value'])){
+            $q->andWhere($q->expr()->eq('t.leadlist_id', ':leadlistid'))->setParameter('leadlistid', $filter['leadlist_id']['value']);
+        }
+
+        $q->groupBy('h.device');
+
+        if (!empty($options['canViewOthers'])) {
+            $q->andWhere('l.created_by = :userId')
+                ->setParameter('userId', $this->factory->getUser()->getId());
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        foreach($results as $result){
+            $percentage = $result['leads'];
+            $data['labels'][]=substr($result['device'],0,12);
+            $data['values'][]=$result['leads'];
+
+        }
+        $data['xAxes'][] =array('display' => true);
+        $data['yAxes'][] =array('display' => true);
+
+        $baseData = array(
+            'label' => $this->translator->trans('mautic.lead.leads'),
+            'data'  => $data['values'],
+        );
+
+        $chart     = new BarChart($data['labels']);
+
+        $datasetId = count($data['values']);
+        $datasets[] = array_merge($baseData, $chart->generateColors(3));
+
+        $chartData = array(
+            'labels' => $data['labels'],
+            'datasets' => $datasets,
+            'options' => array(
+                'xAxes' => $data['xAxes'],
+                'yAxes' => $data['yAxes']
+            ));
+
+        return $chartData;
+    }
 }
