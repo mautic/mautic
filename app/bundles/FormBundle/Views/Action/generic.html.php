@@ -9,7 +9,7 @@
 
 ?>
 
-<div class="mauticform-row" id="mauticform_action_<?php echo $id; ?>">
+<div class="mauticform-row panel" id="mauticform_action_<?php echo $id; ?>">
     <?php
     if (!empty($inForm))
         echo $view->render('MauticFormBundle:Builder:actions.html.php', array(

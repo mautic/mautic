@@ -40,11 +40,7 @@ Mautic.formOnLoad = function (container) {
             }
         });
 
-        mQuery('#mauticforms_actions .mauticform-row').on('mouseover.mauticformactions', function() {
-            mQuery(this).find('.form-buttons').removeClass('hide');
-        }).on('mouseout.mauticformactions', function() {
-            mQuery(this).find('.form-buttons').addClass('hide');
-        }).on('dblclick.mauticformactions', function(event) {
+        mQuery('#mauticforms_actions .mauticform-row').on('dblclick.mauticformactions', function(event) {
             event.preventDefault();
             mQuery(this).find('.btn-edit').first().click();
         });
@@ -203,14 +199,10 @@ Mautic.formActionOnLoad = function (container, response) {
             Mautic.ajaxifyModal(this, event);
         });
 
-        Mautic.initHideItemButton(fieldId);
+        Mautic.initHideItemButton(actionId);
 
         mQuery('#mauticforms_actions .mauticform-row').off(".mauticform");
-        mQuery('#mauticforms_actions .mauticform-row').on('mouseover.mauticformactions', function() {
-            mQuery(this).find('.form-buttons').removeClass('hide');
-        }).on('mouseout.mauticformactions', function() {
-            mQuery(this).find('.form-buttons').addClass('hide');
-        }).on('dblclick.mauticformactions', function(event) {
+        mQuery('#mauticforms_actions .mauticform-row').on('dblclick.mauticformactions', function(event) {
             event.preventDefault();
             mQuery(this).find('.btn-edit').first().click();
         });

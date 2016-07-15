@@ -4,15 +4,12 @@
     font-weight: bold;
 }
 
-#mauticforms_fields .mauticform-row {
+#mauticforms_fields .mauticform-row, #mauticforms_actions .mauticform-row {
     padding: 10px;
-    margin-bottom: 0 !important;
 }
 
-#mauticforms_actions .mauticform-row {
-    padding: 20px;
+#mauticforms_fields .mauticform-row {
     margin-bottom: 0 !important;
-    border: 1px solid #ecf0f1;
 }
 
 #mauticforms_actions .mauticform-row .action-label {
@@ -26,7 +23,12 @@
     display: block;
 }
 
-#mauticforms_fields .form-buttons, #mauticforms_actions .form-buttons {
+#mauticforms_actions .form-buttons {
+    float: right;
+    margin-top: 3px;
+}
+
+#mauticforms_fields .form-buttons {
     float: right;
     margin-top: 8px;
 }
