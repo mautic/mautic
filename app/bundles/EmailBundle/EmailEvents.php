@@ -138,6 +138,34 @@ final class EmailEvents
     const EMAIL_RESEND = 'mautic.on_email_resend';
 
     /**
+     * @todo Description of EMAIL_MAILER_PRE_SEND_PROCESS.
+     *
+     * @var string
+     */
+    const EMAIL_MAILER_PRE_SEND_PROCESS = 'tdm.swiftmailer.mailer.pre_send_process';
+
+    /**
+     * @todo Description of EMAIL_MAILER_PRE_SEND_CLEANUP.
+     *
+     * @var string
+     */
+    const EMAIL_MAILER_PRE_SEND_CLEANUP = 'tdm.swiftmailer.mailer.pre_send_cleanup';
+
+    /**
+     * @todo Description of EMAIL_TRANSPORT_PRE_SEND_PROCESS.
+     *
+     * @var string
+     */
+    const EMAIL_TRANSPORT_PRE_SEND_PROCESS = 'tdm.swiftmailer.transport.pre_send_process';
+
+    /**
+     * @todo Description of EMAIL_TRANSPORT_PRE_SEND_CLEANUP.
+     *
+     * @var string
+     */
+    const EMAIL_TRANSPORT_PRE_SEND_CLEANUP = 'tdm.swiftmailer.transport.post_send_cleanup';
+
+    /**
      * The mautic.email.on_campaign_trigger_action event is fired when the campaign action triggers.
      *
      * The event listener receives a
