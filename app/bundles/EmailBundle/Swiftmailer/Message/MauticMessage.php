@@ -9,7 +9,9 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Message;
 
-class MauticMessage extends \Swift_Message
+use TDM\SwiftMailerEventBundle\Model\MessageMetadataInterface;
+
+class MauticMessage extends \Swift_Message implements MessageMetadataInterface
 {
 
     /**
@@ -47,20 +49,59 @@ class MauticMessage extends \Swift_Message
     }
 
     /**
+     * @param $email
+     * @param $key
+     * @param $value
+     */
+    public function setMetadata($email, $key, $value)
+    {
+        $this->metadata[$email][$key] = $value;
+    }
+
+    /**
+     * Check whether there is metadata.
+     *
+     * @return array
+     */
+    public function hasMetadata($email, $key = null)
+    {
+        return (
+            !empty($this->metadata[$email])
+            &&
+            is_array($this->metadata[$email])
+            &&
+            (is_null($key) || isset($this->metadata[$email][$key]))
+        );
+    }
+
+    /**
      * Get the metadata
      *
      * @return array
      */
-    public function getMetadata()
+    public function getMetadata($email = null, $key = null)
     {
-        return $this->metadata;
+        if (is_null($email)) {
+            return $this->metadata;
+        }
+        elseif (is_null($key)) {
+            return $this->metadata[$email];
+        }
+        else {
+            return $this->metadata[$email][$key];
+        }
     }
 
     /**
      * Clears the metadata
      */
-    public function clearMetadata() {
-        $this->metadata = array();
+    public function clearMetadata($email = null) {
+        if (!is_null($email)) {
+            unset($this->metadata[$email]);
+        }
+        else {
+            $this->metadata = array();
+        }
     }
 
     /**
