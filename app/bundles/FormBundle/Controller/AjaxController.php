@@ -12,6 +12,7 @@ namespace Mautic\FormBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class AjaxController
@@ -89,5 +90,20 @@ class AjaxController extends CommonAjaxController
         $dataArray['success']  = 1;
 
         return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Ajax submit for forms
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function submitAction()
+    {
+        $response = $this->forwardWithPost('MauticFormBundle:Public:submit', $this->request->request->all());
+        $message = $this->get('session')->get('mautic.emailbundle.message', ['message' => '', 'type' => '']);
+        $success = (!in_array($response->getStatusCode(), [404, 500]) && $message['type'] !== 'error');
+        $data = array_merge($message, ['success' => $success]);
+
+        return $this->sendJsonResponse($data);
     }
 }

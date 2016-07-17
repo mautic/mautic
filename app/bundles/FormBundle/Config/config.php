@@ -78,6 +78,14 @@ return [
                 'defaults'   => [
                     'id' => '0'
                 ]
+            ],
+            'mautic_form_embed' => [
+                'path' => '/form/embed/{id}',
+                'controller' => 'MauticFormBundle:Public:embed'
+            ],
+            'mautic_form_postresults_ajax' => [
+                'path' => '/form/submit/ajax',
+                'controller' => 'MauticFormBundle:Ajax:submit'
             ]
         ]
     ],

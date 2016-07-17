@@ -330,4 +330,26 @@ class PublicController extends CommonFormController
         $response->headers->set('Content-Type', 'text/javascript');
         return $response;
     }
+    
+    public function embedAction()
+    {
+        $formId = InputHelper::int($this->request->get('id'));
+        $model = $this->getModel('form');
+        $form = $model->getEntity($formId);
+        
+        if ($form !== null) {
+            $status = $form->getPublishStatus();
+            if ($status === 'published') {
+                if ($this->request->get('video')) {
+                    return $this->render('MauticFormBundle:Public:videoembed.html.php', ['form' => $form]);
+                }
+
+                $content = $model->getContent($form, false, true);
+
+                return new Response($content);
+            }
+        }
+        
+        return new Response('', Response::HTTP_NOT_FOUND);
+    }
 }
