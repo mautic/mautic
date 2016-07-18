@@ -29,9 +29,17 @@ return [
                     'objectModel' => ''
                 ]
             ],
-            'mautic_core_file_action' => [
+            'mautic_core_file_action'   => [
                 'path'       => '/file/{objectAction}/{objectId}',
                 'controller' => 'MauticCoreBundle:File:execute'
+            ],
+            'mautic_themes_index'       => [
+                'path'       => '/themes',
+                'controller' => 'MauticCoreBundle:Theme:index',
+            ],
+            'mautic_themes_action'      => [
+                'path'       => '/themes/{objectAction}/{objectId}',
+                'controller' => 'MauticCoreBundle:Theme:leads',
             ]
         ],
         'public' => [
@@ -75,11 +83,12 @@ return [
             ],
         ],
         'admin'   => [
-            'priority' => -1000,
-            'items'    => [
-                'name'     => 'admin',
-                'children' => [],
-            ],
+            'mautic.theme.menu.index' => [
+                'route'           => 'mautic_themes_index',
+                'iconClass'       => 'fa-newspaper-o',
+                'id'              => 'mautic_themes_index',
+                'access'          => 'admin'
+            ]
         ],
         'extra'   => [
             'priority' => -1000,
