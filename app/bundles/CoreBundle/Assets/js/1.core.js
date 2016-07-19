@@ -3253,15 +3253,19 @@ var Mautic = {
                     xAxes: [{
                         stacked: false,
                         ticks: {fontSize: 9},
-                        gridLines: {display:false}
+                        gridLines: {display:false},
+                        barPercentage: 35,
+
                     }],
                     yAxes: [{
                         display: false,
                         stacked: false,
                         ticks: {beginAtZero: true, display: false},
-                        gridLines: {display:false}
+                        gridLines: {display:false},
+
                     }],
                     display: false,
+
                 },
                 legend: {
                     display: false
@@ -3284,17 +3288,19 @@ var Mautic = {
             options: {
                 scales: {
                     xAxes: [{
+                        display: true,
                         stacked: false,
-                        ticks: {fontSize: 9},
-                        gridLines: {display:false}
+                        gridLines: {display:false},
+                        ticks: {beginAtZero: true,display: true, fontSize: 8, stepSize: 5}
                     }],
                     yAxes: [{
-                        display: false,
                         stacked: false,
-                        ticks: {beginAtZero: true, display: false},
-                        gridLines: {display:false}
+                        ticks: {beginAtZero: true, display: true, fontSize: 9},
+                        gridLines: {display:false},
+                        barPercentage: 8,
+                        categorySpacing: 1
                     }],
-                    display: false,
+                    display: true
                 },
                 legend: {
                     display: false

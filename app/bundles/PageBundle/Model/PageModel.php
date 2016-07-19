@@ -1092,6 +1092,52 @@ class PageModel extends FormModel
     }
 
     /**
+     * Get bar chart data of hits
+     *
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $dateFormat
+     * @param array    $filter
+     *
+     * @return array
+     */
+    public function getDeviceGranularityData(\DateTime $dateFrom, \DateTime $dateTo, $filters = array(), $canViewOthers = true)
+    {
+        $data['values'] = array();
+        $data['labels'] = array();
+
+        $q = $this->em->getConnection()->createQueryBuilder();
+
+        $q->select('count(h.id) as count, h.device as device')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
+            ->orderBy('device', 'DESC')
+            ->andWhere($q->expr()->gte('h.date_hit', ':date_from'))
+            ->setParameter('date_from', $dateFrom->format('Y-m-d'))
+            ->andWhere($q->expr()->lte('h.date_hit', ':date_to'))
+            ->setParameter('date_to', $dateTo->format('Y-m-d'." 23:59:59"));
+        $q->groupBy('h.device');
+
+        if (!empty($options['canViewOthers'])) {
+            $q->andWhere('l.created_by = :userId')
+                ->setParameter('userId', $this->user->getId());
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        $chart     = new PieChart($data['labels']);
+
+        foreach($results as $result){
+            $label=substr(empty($result['device'])?  $this->translator->trans('mautic.core.unknown'): $result['device'],0,12);
+
+            // $data['backgroundColor'][]='rgba(220,220,220,0.5)';
+            $chart->setDataset($label,  $result['count']);
+        }
+
+        return $chart->render();
+    }
+
+    /**
      * Get a list of popular (by hits) pages
      *
      * @param integer   $limit

@@ -11,6 +11,7 @@ namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use DateInterval;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -1067,7 +1068,7 @@ class ListModel extends FormModel
         }
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('ll.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
         }
 
         $results = $q->execute()->fetchAll();
@@ -1084,7 +1085,7 @@ class ListModel extends FormModel
 
             if (!empty($options['canViewOthers'])) {
                 $qAll->andWhere('ll.created_by = :userId')
-                    ->setParameter('userId', $this->factory->getUser()->getId());
+                    ->setParameter('userId', $this->user->getId());
             }
 
             $resultsAll = $qAll->execute()->fetchAll();
@@ -1095,20 +1096,25 @@ class ListModel extends FormModel
 
     public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true, $listName){
 
+        $dateTo->add(new \DateInterval('PT23H59M59S'));
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         if (!$canViewOthers) {
-            $filter['owner_id'] = $this->factory->getUser()->getId();
+            $filter['owner_id'] = $this->user->getId();
         }
 
         if(isset($filter['flag'])){
             unset($filter['flag']);
         }
+
+        $this->factory->getLogger()->addError(print_r($filter,true));
         $allLists=$query->getCountQuery('lead_lists_leads', 'lead_id', 'date_added', null);
-        $lists = $query->getCountQuery('lead_lists_leads', 'lead_id', 'date_added', $filter);
+
+        $lists = $query->count('lead_lists_leads', 'leadlist_id', 'date_added', $filter,null);
+
         $all = $query->fetchCount($allLists);
-        $identified = $query->fetchCount($lists);
+        $identified = $lists;
         
         $chart->setDataset($listName, $identified);
 
@@ -1161,7 +1167,7 @@ class ListModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('s.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
         }
 
         $results = $q->execute()->fetchAll();
@@ -1231,22 +1237,22 @@ class ListModel extends FormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('l.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
         }
 
         $results = $q->execute()->fetchAll();
 
         foreach($results as $result){
             $percentage = $result['leads'];
-            $data['labels'][]=substr($result['device'],0,12);
+            $data['labels'][]=substr(empty($result['device'])?  $this->translator->trans('mautic.core.unknown'): $result['device'],0,12);
             $data['values'][]=$result['leads'];
-            $data['backgroundColor'][]='rgba(220,220,220,0.5)';
+           // $data['backgroundColor'][]='rgba(220,220,220,0.5)';
          }
         $data['xAxes'][] =array('display' => true);
         $data['yAxes'][] =array('display' => true);
 
         $baseData = array(
-            'label'             => $data['labels'],
+            'label'             => $this->translator->trans('mautic.core.device'),
             'data'              => $data['values']
         );
 
@@ -1254,6 +1260,7 @@ class ListModel extends FormModel
 
         $datasetId = count($data['values']);
         $datasets[] = array_merge($baseData, $chart->generateColors(2));
+
         $chartData = array(
             'labels' => $data['labels'],
             'datasets' => $datasets,
@@ -1261,7 +1268,6 @@ class ListModel extends FormModel
                 'xAxes' => $data['xAxes'],
                 'yAxes' => $data['yAxes']
             ));
-
         return $chartData;
     }
 }

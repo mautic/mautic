@@ -89,7 +89,7 @@ class ChartQuery extends AbstractChart
 
                 // Special case: Lead list filter
                 if ($column === 'leadlist_id') {
-                    $query->join('t', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.lead_id = ' . $value['list_column_name']);
+                    $query->join('t', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.lead_id = ' . $value['list_column_name'] . ' and lll.leadlist_id=t.'.$column);
                     $query->andWhere('lll.leadlist_id = :' . $valId);
                     $query->setParameter($valId, $value['value']);
                 }
