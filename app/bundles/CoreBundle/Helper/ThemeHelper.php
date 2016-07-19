@@ -325,4 +325,65 @@ class ThemeHelper
 
         return $this->themeHelpers[$theme];
     }
+
+    /**
+     * Install a theme from a zip package
+     *
+     * @param string $zipFile path
+     * 
+     * @return boolean
+     * 
+     * @throws MauticException\FileNotFoundException
+     * @throws Exception
+     */
+    public function install($zipFile) {
+
+        if (file_exists($zipFile) === false) {
+            throw new MauticException\FileNotFoundException();
+        }
+
+        if (class_exists('ZipArchive') === false) {
+            throw new \Exception('mautic.core.ziparchive.not.installed');
+        }
+
+        $zipper  = new \ZipArchive();
+        $archive = $zipper->open($zipFile);
+
+        if ($archive !== true) {
+            // Get the exact error
+            switch ($archive) {
+                case \ZipArchive::ER_EXISTS:
+                    $error = 'mautic.core.update.archive_file_exists';
+                    break;
+                case \ZipArchive::ER_INCONS:
+                case \ZipArchive::ER_INVAL:
+                case \ZipArchive::ER_MEMORY:
+                    $error = 'mautic.core.update.archive_zip_corrupt';
+                    break;
+                case \ZipArchive::ER_NOENT:
+                    $error = 'mautic.core.update.archive_no_such_file';
+                    break;
+                case \ZipArchive::ER_NOZIP:
+                    $error = 'mautic.core.update.archive_not_valid_zip';
+                    break;
+                case \ZipArchive::ER_READ:
+                case \ZipArchive::ER_SEEK:
+                case \ZipArchive::ER_OPEN:
+                default:
+                    $error = 'mautic.core.update.archive_could_not_open';
+                    break;
+            }
+
+            throw new \Exception($error);
+        } else {
+            // Extract the archive file now
+            if (!$zipper->extractTo($this->pathsHelper->getSystemPath('themes', true))) {
+                throw new \Exception('mautic.core.update.error_extracting_package');
+            } else {
+                $zipper->close();
+                unlink($zipFile);
+                return true;
+            }
+        }
+    }
 }

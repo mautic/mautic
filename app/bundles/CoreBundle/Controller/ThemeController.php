@@ -11,6 +11,7 @@ namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Form\FormError;
 
 /**
  * Class ThemeController
@@ -40,17 +41,26 @@ class ThemeController extends FormController
             return $this->accessDenied();
         }
 
-        $themes = $themeHelper->getInstalledThemes('all', true);
-
-        $action = $this->generateUrl('mautic_themes_action', ['objectAction' => 'install']);
+        $dir    = $this->factory->getSystemPath('themes', true);
+        $action = $this->generateUrl('mautic_themes_index');
         $form   = $this->get('form.factory')->create('theme_upload', [], ['action' => $action]);
 
         if ($this->request->getMethod() == 'POST') {
             if (isset($form) && !$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     $fileData = $form['file']->getData();
+                    $fileName = $fileData->getClientOriginalName();
                     if (!empty($fileData)) {
-                        $fileData->move($directories['user'], $fileData->getClientOriginalName());
+                        try {
+                            $fileData->move($dir, $fileName);
+                            $themeHelper->install($dir.'/'.$fileName);
+                        } catch (\Exception $e) {
+                            $form->addError(
+                                new FormError(
+                                    $this->factory->getTranslator()->trans($e->getMessage(), [], 'validators')
+                                )
+                            );
+                        }
                     } else {
                         $form->addError(
                             new FormError(
@@ -64,7 +74,7 @@ class ThemeController extends FormController
 
         return $this->delegateView([
             'viewParameters'  => [
-                'items'       => $themes,
+                'items'       => $themeHelper->getInstalledThemes('all', true),
                 'form'        => $form->createView(),
                 'permissions' => $permissions,
                 'security'    => $this->factory->getSecurity()

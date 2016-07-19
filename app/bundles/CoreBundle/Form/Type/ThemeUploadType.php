@@ -24,7 +24,6 @@ class ThemeUploadType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->add('file', 'file', [
-            'label' => 'mautic.lead.import.file',
             'attr'  => [
                 'accept' => '.zip',
                 'class'  => 'form-control'
@@ -39,9 +38,9 @@ class ThemeUploadType extends AbstractType
             'attr'  => [
                 'class'   => 'btn btn-primary',
                 'icon'    => 'fa fa-upload',
-                'onclick' => "mQuery(this).prop('disabled', true); mQuery('form[name=\'dashboard_upload\']').submit();"
+                'onclick' => "mQuery(this).prop('disabled', true); mQuery('form[name=\'theme_upload\']').submit();"
             ],
-            'label' => 'mautic.lead.import.upload'
+            'label' => 'mautic.core.theme.install'
         ]);
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);

@@ -88,10 +88,6 @@ class CorePermissions
         static $classes = array();
         if (empty($classes)) {
             foreach ($this->getBundles() as $bundle) {
-                if ($bundle['base'] == "Core") {
-                    continue;
-                } //do not include this file
-
                 $object = $this->getPermissionObject($bundle['base'], false);
                 if (!empty($object)) {
                     $classes[strtolower($bundle['base'])] = $object;
