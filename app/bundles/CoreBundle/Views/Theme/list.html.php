@@ -25,14 +25,18 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                 ]);
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                    'text'     => 'mautic.core.category',
+                    'text'     => 'mautic.core.author',
+                ]);
+
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
+                    'text'     => 'mautic.core.features',
                 ]);
                 ?>
             </tr>
             </thead>
             <tbody>
             <?php foreach ($items as $k => $item): ?>
-                <?php if(!empty($item['config']['onlyForBc'])) continue; ?>
+                <?php if(!empty($item['config']['onlyForBC'])) continue; ?>
                 <tr>
                     <td>
                         <?php
@@ -65,6 +69,19 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                                 data-toggle="ajax">
                                 <?php echo $item['name']; ?> (<?php echo $item['key']; ?>)
                             </a>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                        <?php if (isset($item['config']['authorUrl'])) : ?>
+                            <a href="<?php echo $view['router']->path('mautic_themes_action',
+                                ["objectAction" => "view", "objectId" => $item['key']]); ?>"
+                                data-toggle="ajax">
+                                <?php echo $item['config']['author']; ?>
+                            </a>
+                        <?php elseif(isset($item['config']['author'])) : ?>
+                            <?php echo $item['config']['author']; ?>
+                        <?php endif; ?>
                         </div>
                     </td>
                     <td class="visible-md visible-lg">
