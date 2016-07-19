@@ -39,7 +39,7 @@ return [
             ],
             'mautic_themes_action'      => [
                 'path'       => '/themes/{objectAction}/{objectId}',
-                'controller' => 'MauticCoreBundle:Theme:leads',
+                'controller' => 'MauticCoreBundle:Theme:execute',
             ]
         ],
         'public' => [

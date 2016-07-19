@@ -94,6 +94,20 @@ class ThemeHelper
 
     /**
      * @param $theme
+     *
+     * @return boolean
+     */
+    public function exists($theme)
+    {
+        $root    = $this->pathsHelper->getSystemPath('themes', true) . '/';
+        $dirName = $this->getDirectoryName($theme);
+        $fs      = new Filesystem();
+
+        return $fs->exists($root.$dirName);
+    }
+
+    /**
+     * @param $theme
      * @param $newName
      *
      * @throws MauticException\FileExistsException
@@ -101,7 +115,7 @@ class ThemeHelper
      */
     public function copy($theme, $newName)
     {
-        $root      = $this->pathsHelper->getSystemPath('themes_root') . '/';
+        $root      = $this->pathsHelper->getSystemPath('themes', true) . '/';
         $themes    = $this->getInstalledThemes();
 
         //check to make sure the theme exists
@@ -131,7 +145,7 @@ class ThemeHelper
      */
     public function rename($theme, $newName)
     {
-        $root      = $this->pathsHelper->getSystemPath('themes_root') . '/';
+        $root      = $this->pathsHelper->getSystemPath('themes', true) . '/';
         $themes    = $this->getInstalledThemes();
 
         //check to make sure the theme exists
@@ -159,7 +173,7 @@ class ThemeHelper
      */
     public function delete($theme)
     {
-        $root      = $this->pathsHelper->getSystemPath('themes_root') . '/';
+        $root      = $this->pathsHelper->getSystemPath('themes', true) . '/';
         $themes    = $this->getInstalledThemes();
 
         //check to make sure the theme exists
@@ -168,7 +182,7 @@ class ThemeHelper
         }
 
         $fs = new Filesystem();
-        $fs->remove($root . $theme);
+        $fs->remove($root.$theme);
     }
 
     /**

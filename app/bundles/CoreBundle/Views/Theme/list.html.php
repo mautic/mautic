@@ -46,14 +46,14 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                             'templateButtons' => [
                                 'delete'     => $permissions['core:themes:delete'],
                             ],
-                            'routeBase'  => 'asset',
-                            'langVar'    => 'asset.asset',
+                            'routeBase'  => 'themes',
+                            'langVar'    => 'core.theme',
                             'customButtons' => [
                                 [
                                     'attr' => [
                                         'data-toggle' => 'ajaxmodal',
                                         'data-target' => '#ThemePreviewModal',
-                                        'href' => $view['router']->path('mautic_asset_action', ['objectAction' => 'preview', 'objectId' => $item['key']])
+                                        'href' => $view['router']->path('mautic_themes_action', ['objectAction' => 'preview', 'objectId' => $item['key']])
                                     ],
                                     'btnText'   => $view['translator']->trans('mautic.asset.asset.preview'),
                                     'iconClass' => 'fa fa-image'
