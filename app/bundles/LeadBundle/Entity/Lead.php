@@ -924,6 +924,7 @@ class Lead extends FormEntity
      */
     public function setSocialCache($cache)
     {
+        array_walk_recursive($cache, array($this, 'encodeItems'));
         $this->socialCache = $cache;
     }
 
@@ -1296,5 +1297,13 @@ class Lead extends FormEntity
                 $this->changes['dateIdentified'] = ['', $this->dateIdentified];
             }
         }
+    }
+
+    /*
+     * UTF-8 Encode social cache
+     */
+    private function encodeItems(&$item, $key)
+    {
+        $item = utf8_encode($item);
     }
 }
