@@ -237,7 +237,9 @@ class Email extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('emails')
-            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\EmailRepository');
+            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\EmailRepository')
+            ->addLifecycleEvent('cleanUrlsInContent', 'preUpdate')
+            ->addLifecycleEvent('cleanUrlsInContent', 'prePersist');
 
         $builder->addIdColumns();
 
@@ -1222,4 +1224,39 @@ class Email extends FormEntity
     {
         return $this->assetAttachments;
     }
+
+    /**
+     * Lifecycle callback to clean URLs in the content
+     */
+    public function cleanUrlsInContent()
+    {
+        $this->plainText  = $this->decodeAmpersands($this->plainText);
+        $this->customHtml = $this->decodeAmpersands($this->customHtml);
+    }
+
+    /**
+     * Check all links in content and decode &amp;
+     * This even works with double encoded ampersands
+     *
+     * @param $content
+     *
+     * @return mixed
+     */
+    private function decodeAmpersands($content)
+    {
+        if (preg_match_all('/((https?|ftps?):\/\/)([a-zA-Z0-9-\.{}]*[a-zA-Z0-9=}]*)(\??)([^\s\"\]]+)?/i', $content, $matches)) {
+            foreach ($matches[0] as $url) {
+                $newUrl = $url;
+
+                while (strpos($newUrl, '&amp;') !== false) {
+                    $newUrl = str_replace('&amp;', '&', $newUrl);
+                }
+
+                $content = str_replace($url, $newUrl, $content);
+            }
+        }
+
+        return $content;
+    }
+
 }
