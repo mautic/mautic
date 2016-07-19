@@ -42,9 +42,30 @@ class ThemeController extends FormController
 
         $themes = $themeHelper->getInstalledThemes('all', true);
 
+        $action = $this->generateUrl('mautic_themes_action', ['objectAction' => 'install']);
+        $form   = $this->get('form.factory')->create('theme_upload', [], ['action' => $action]);
+
+        if ($this->request->getMethod() == 'POST') {
+            if (isset($form) && !$cancelled = $this->isFormCancelled($form)) {
+                if ($this->isFormValid($form)) {
+                    $fileData = $form['file']->getData();
+                    if (!empty($fileData)) {
+                        $fileData->move($directories['user'], $fileData->getClientOriginalName());
+                    } else {
+                        $form->addError(
+                            new FormError(
+                                $this->factory->getTranslator()->trans('mautic.dashboard.upload.filenotfound', [], 'validators')
+                            )
+                        );
+                    }
+                }
+            }
+        }
+
         return $this->delegateView([
             'viewParameters'  => [
                 'items'       => $themes,
+                'form'        => $form->createView(),
                 'permissions' => $permissions,
                 'security'    => $this->factory->getSecurity()
             ],

@@ -10,20 +10,7 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'theme');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.core.themes'));
-
-$view['slots']->set(
-    'actions',
-    $view->render(
-        'MauticCoreBundle:Helper:page_actions.html.php',
-        array(
-            'templateButtons' => array(
-                'new' => $permissions['core:themes:create']
-            ),
-            'routeBase'       => 'themes',
-            'langVar'         => 'core.theme'
-        )
-    )
-);
+$view['slots']->set('actions', $view->render('MauticCoreBundle:Theme:form.html.php', ['form' => $form]));
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">

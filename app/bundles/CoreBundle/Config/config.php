@@ -205,6 +205,10 @@ return [
                 'class'     => 'Mautic\CoreBundle\Form\Type\SlotButtonType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'slot_button'
+            ],
+            'mautic.form.type.theme.upload'        => [
+                'class'     => 'Mautic\CoreBundle\Form\Type\ThemeUploadType',
+                'alias'     => 'theme_upload'
             ]
         ],
         'helpers' => [
