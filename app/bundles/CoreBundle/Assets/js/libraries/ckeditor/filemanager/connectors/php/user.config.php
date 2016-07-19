@@ -102,5 +102,11 @@ if ($authenticated) {
         $userDir = substr($userDir, 1);
     }
 
+    //Check if user directory exists. If not, create it
+    $fullDir = $docRoot . '/' . $userDir;
+    if (!file_exists($fullDir)) {
+        mkdir($fullDir, 0755);
+    }
+
     $fm->setFileRoot($userDir, $docRoot);
 }

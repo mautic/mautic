@@ -138,7 +138,12 @@ class CoreSubscriber extends CommonSubscriber
         //set a couple variables used by filemanager
         $session->set('mautic.docroot', $event->getRequest()->server->get('DOCUMENT_ROOT'));
         $session->set('mautic.basepath', $event->getRequest()->getBasePath());
-        $session->set('mautic.imagepath', $this->factory->getParameter('image_path'));
+        //If user is not an admin, restrict directory access to his own directory
+        $imagePath = $this->factory->getParameter('image_path');
+        if (!empty($user) && !$user->isAdmin()) {
+            $imagePath .= '/' . $user->getId();
+        }
+        $session->set('mautic.imagepath', $imagePath);
     }
 
     /**
