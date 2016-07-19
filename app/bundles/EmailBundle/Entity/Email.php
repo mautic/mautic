@@ -1230,8 +1230,8 @@ class Email extends FormEntity
      */
     public function cleanUrlsInContent()
     {
-        $this->plainText  = $this->decodeAmpersands($this->plainText);
-        $this->customHtml = $this->decodeAmpersands($this->customHtml);
+        $this->decodeAmpersands($this->plainText);
+        $this->decodeAmpersands($this->customHtml);
     }
 
     /**
@@ -1239,10 +1239,8 @@ class Email extends FormEntity
      * This even works with double encoded ampersands
      *
      * @param $content
-     *
-     * @return mixed
      */
-    private function decodeAmpersands($content)
+    private function decodeAmpersands(&$content)
     {
         if (preg_match_all('/((https?|ftps?):\/\/)([a-zA-Z0-9-\.{}]*[a-zA-Z0-9=}]*)(\??)([^\s\"\]]+)?/i', $content, $matches)) {
             foreach ($matches[0] as $url) {
@@ -1255,8 +1253,5 @@ class Email extends FormEntity
                 $content = str_replace($url, $newUrl, $content);
             }
         }
-
-        return $content;
     }
-
 }
