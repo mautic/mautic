@@ -220,7 +220,7 @@ class Stat
 
         $builder->addNullableField('openDetails', 'array', 'open_details');
 
-        $builder->createOneToMany('openDevice', 'EmailStatDevice')
+        $builder->createOneToMany('openDevice', 'StatDevice')
             ->orphanRemoval()
             ->setOrderBy(['dateAdded' => 'DESC'])
             ->mappedBy('lead')

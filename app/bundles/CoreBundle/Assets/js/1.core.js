@@ -3233,7 +3233,13 @@ var Mautic = {
         var chart = new Chart(canvas, {
             type: 'bar',
             data: data,
-            options: {}
+            options: {
+                scales: {
+                    xAxes: [{
+                        barPercentage: 35
+                    }]
+                }
+            }
         });
         Mautic.chartObjects.push(chart);
     },

@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
@@ -34,6 +35,8 @@ use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use DeviceDetector\DeviceDetector;
+use DeviceDetector\Parser\Device\DeviceParserAbstract;
 
 /**
  * Class EmailModel
@@ -446,6 +449,36 @@ class EmailModel extends FormModel
         if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_OPEN)) {
             $event = new EmailOpenEvent($stat, $request, $firstTime);
             $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_OPEN, $event);
+            //device granularity
+            $dd = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
+
+            $dd->parse();
+
+            $emailOpenDevice = new StatDevice();
+
+            $emailOpenDevice->setDateOpened($readDateTime->toUtcString());
+            $emailOpenDevice->setIpAddress($ipAddress);
+            $emailOpenDevice->setStat($stat);
+            $emailOpenDevice->setClientInfo($dd->getClient());
+            $emailOpenDevice->setDevice($dd->getDeviceName());
+            $emailOpenDevice->setDeviceBrand($dd->getBrand());
+            $emailOpenDevice->setDeviceModel($dd->getModel());
+            $emailOpenDevice->setDeviceOs($dd->getOs());
+
+            try {
+                $this->em->persist($emailOpenDevice);
+                $this->em->flush($emailOpenDevice);
+            } catch (\Exception $exception) {
+                if (MAUTIC_ENV === 'dev') {
+
+                    throw $exception;
+                } else {
+                    $this->logger->addError(
+                        $exception->getMessage(),
+                        array('exception' => $exception)
+                    );
+                }
+            }
         }
 
         if ($email) {

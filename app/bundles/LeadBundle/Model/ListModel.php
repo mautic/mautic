@@ -1108,7 +1108,6 @@ class ListModel extends FormModel
             unset($filter['flag']);
         }
 
-        $this->factory->getLogger()->addError(print_r($filter,true));
         $allLists=$query->getCountQuery('lead_lists_leads', 'lead_id', 'date_added', null);
 
         $lists = $query->count('lead_lists_leads', 'leadlist_id', 'date_added', $filter,null);
