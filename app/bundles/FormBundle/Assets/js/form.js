@@ -8,7 +8,6 @@ Mautic.formOnLoad = function (container) {
         //make the fields sortable
         mQuery('#mauticforms_fields').sortable({
             items: '.panel',
-            handle: '.reorder-handle',
             cancel: '',
             stop: function(i) {
                 mQuery.ajax({
@@ -29,7 +28,6 @@ Mautic.formOnLoad = function (container) {
         //make the fields sortable
         mQuery('#mauticforms_actions').sortable({
             items: '.panel',
-            handle: '.reorder-handle',
             cancel: '',
             stop: function(i) {
                 mQuery.ajax({

@@ -10,12 +10,6 @@
 if (empty($route)) {
     $route = 'mautic_formfield_action';
 }
-
-if (empty($actionType)) {
-    $actionType = '';
-} else {
-    $actionType .= '_';
-}
 ?>
 
 <div class="form-buttons btn-group" role="group" aria-label="Field options">
@@ -27,7 +21,4 @@ if (empty($actionType)) {
         <i class="fa fa-trash-o text-danger"></i>
     </a>
     <?php endif; ?>
-    <button type="button" class="reorder-handle btn btn-default btn-nospin">
-        <i class="fa fa-arrows"></i>
-    </button>
 </div>
