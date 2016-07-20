@@ -375,13 +375,6 @@ class FormModel extends CommonFormModel
                     'limit'  => 200
                 ]
             );
-        } else {
-            $entity->setCachedHtml($html);
-
-            if ($persist) {
-                //bypass model function as events aren't needed for this
-                $this->getRepository()->saveEntity($entity);
-            }
         }
 
         $html = $this->templatingHelper->getTemplating()->render(
@@ -393,6 +386,15 @@ class FormModel extends CommonFormModel
                 'lead'        => $lead
             ]
         );
+
+        if (!$entity->usesProgressiveProfiling()) {
+            $entity->setCachedHtml($html);
+
+            if ($persist) {
+                //bypass model function as events aren't needed for this
+                $this->getRepository()->saveEntity($entity);
+            }
+        }
 
         return $html;
     }

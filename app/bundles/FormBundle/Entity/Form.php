@@ -791,7 +791,7 @@ class Form extends FormEntity
         }
 
         foreach ($this->fields->toArray() as $field) {
-            if ($field->getShowWhenValueExists() === true || $field->getShowAfterXSubmissions() > 0) {
+            if ($field->getShowWhenValueExists() === false || $field->getShowAfterXSubmissions() > 0) {
                 $this->usesProgressiveProfiling = true;
                 return true;
             }
