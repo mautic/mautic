@@ -11,24 +11,24 @@ $utmTags = $event['extra']['utmtags'];
 
 <dl class="dl-horizontal">
 <?php if (!empty($utmTags['utm_campaign'])): ?>
-<dt><?php echo $view['translator']->trans('mautic.lead.timeline.event.utmcampaign'); ?></dt>
+<dt><?php echo $view['translator']->trans('mautic.lead.timeline.event.utmcampaign'); ?>:</dt>
 <dd><?php echo $utmTags['utm_campaign']; ?></dd>
 <?php endif; ?>
 <?php if (!empty($utmTags['utm_content'])): ?>
-<dt><?php echo $view['translator']->trans('mautic.lead.timeline.event.utmcontent'); ?></dt>
+<dt><?php echo $view['translator']->trans('mautic.lead.timeline.event.utmcontent'); ?>:</dt>
    <dd><?php echo $utmTags['utm_content']; ?></dd>
 <?php endif; ?>
 <?php if (!empty($utmTags['utm_medium'])): ?>
-<dt><?php echo $view['translator']->trans('mautic.lead.timeline.event.utmmedium'); ?></dt>
+<dt><?php echo $view['translator']->trans('mautic.lead.timeline.event.utmmedium'); ?>:</dt>
 <dd><?php echo $utmTags['utm_medium']; ?></dd>
 <?php endif; ?>
 
 <?php if (!empty($utmTags['utm_source'])): ?>
-<dt><?php echo $view['translator']->trans('mautic.lead.timeline.event.umtsource'); ?></dt>
+<dt><?php echo $view['translator']->trans('mautic.lead.timeline.event.umtsource'); ?>:</dt>
 <dd><?php echo $utmTags['utm_source']; ?></dd>
 <?php endif; ?>
 <?php if (!empty($utmTags['utm_term'])): ?>
-<dt><?php echo $view['translator']->trans('mautic.lead.timeline.event.utmterm'); ?></dt>
+<dt><?php echo $view['translator']->trans('mautic.lead.timeline.event.utmterm'); ?>:</dt>
 <dd><?php echo $utmTags['utm_term']; ?></dd>
 <?php endif; ?>
 <?php
