@@ -23,13 +23,14 @@ if ($tmpl == 'index') {
         )); ?>
     <?php endforeach; ?>
 </ul>
+<?php if ($totalNotes = count($notes)): ?>
 <div class="notes-pagination">
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        'totalItems'      => count($notes),
+        'totalItems'      => $totalNotes,
         'target'          => '#notes-container',
         'page'            => $page,
         'limit'           => $limit,
-        'baseUrl'         => $view['router']->path('mautic_contactnote_index', array('leadId' => $lead->getId(), 'page' => $page)),
-        'sessionVar'      => 'leadnote'
+        'baseUrl'         => $view['router']->path('mautic_contactnote_index', array('leadId' => $lead->getId(), 'page' => $page))
     )); ?>
 </div>
+<?php endif; ?>
