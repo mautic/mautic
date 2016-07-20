@@ -126,6 +126,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @return string
+     */
+    public function getQueryUrl()
+    {
+        return sprintf('%s/services/data/v32.0',$this->keys['instance_url']);
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param bool $inAuthorization
