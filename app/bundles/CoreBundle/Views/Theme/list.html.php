@@ -81,11 +81,7 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                     </td>
                     <td>
                         <div>
-                            <a href="<?php echo $view['router']->path('mautic_themes_action',
-                                ["objectAction" => "view", "objectId" => $item['key']]); ?>"
-                                data-toggle="ajax">
-                                <?php echo $item['name']; ?> (<?php echo $item['key']; ?>)
-                            </a>
+                            <?php echo $item['name']; ?> (<?php echo $item['key']; ?>)
                         </div>
                     </td>
                     <td>
