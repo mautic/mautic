@@ -37,6 +37,8 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
             <tbody>
             <?php foreach ($items as $k => $item): ?>
                 <?php if(!empty($item['config']['onlyForBC'])) continue; ?>
+                <?php $thumbnailUrl = $view['assets']->getUrl('themes/'.$k.'/thumbnail.png'); ?>
+                <?php $hasThumbnail = file_exists($item['dir'].'/thumbnail.png'); ?>
                 <tr>
                     <td>
                         <?php
@@ -48,19 +50,34 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                             ],
                             'routeBase'  => 'themes',
                             'langVar'    => 'core.theme',
-                            'customButtons' => [
+                            'customButtons' => $hasThumbnail ? [
                                 [
                                     'attr' => [
-                                        'data-toggle' => 'ajaxmodal',
-                                        'data-target' => '#ThemePreviewModal',
-                                        'href' => $view['router']->path('mautic_themes_action', ['objectAction' => 'preview', 'objectId' => $item['key']])
+                                        'data-toggle' => 'modal',
+                                        'data-target' => '#theme-'.$k
                                     ],
                                     'btnText'   => $view['translator']->trans('mautic.asset.asset.preview'),
                                     'iconClass' => 'fa fa-image'
                                 ]
-                            ]
+                            ] : []
                         ]);
                         ?>
+                        <?php if ($hasThumbnail) : ?>
+                            <!-- Modal -->
+                            <div class="modal fade" id="theme-<?php echo $k; ?>" tabindex="-1" role="dialog" aria-labelledby="<?php echo $k; ?>">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title" id="<?php echo $k; ?>"><?php echo $item['name']; ?></h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div style="background-image: url(<?php echo $thumbnailUrl ?>);background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 600px"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     </td>
                     <td>
                         <div>
@@ -103,8 +120,3 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
 <?php else: ?>
     <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', ['tip' => 'mautic.theme.noresults.tip']); ?>
 <?php endif; ?>
-
-<?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', [
-    'id'     => 'ThemePreviewModal',
-    'header' => false
-]);
