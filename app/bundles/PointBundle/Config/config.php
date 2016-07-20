@@ -82,7 +82,11 @@ return array(
                 'class' => 'Mautic\PointBundle\EventListener\PointSubscriber'
             ),
             'mautic.point.leadbundle.subscriber' => array(
-                'class' => 'Mautic\PointBundle\EventListener\LeadSubscriber'
+                'class' => 'Mautic\PointBundle\EventListener\LeadSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.point.model.trigger'
+                ]
             ),
             'mautic.point.search.subscriber'     => array(
                 'class' => 'Mautic\PointBundle\EventListener\SearchSubscriber'
