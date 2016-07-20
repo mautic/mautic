@@ -360,38 +360,27 @@ class ThemeHelper
             throw new \Exception('mautic.core.ziparchive.not.installed');
         }
 
-        $zipper  = new \ZipArchive();
-        $archive = $zipper->open($zipFile);
+        $themeName = basename($zipFile, '.zip');
+        $zipper    = new \ZipArchive();
+        $archive   = $zipper->open($zipFile);
 
         if ($archive !== true) {
-            // Get the exact error
-            switch ($archive) {
-                case \ZipArchive::ER_EXISTS:
-                    $error = 'mautic.core.update.archive_file_exists';
-                    break;
-                case \ZipArchive::ER_INCONS:
-                case \ZipArchive::ER_INVAL:
-                case \ZipArchive::ER_MEMORY:
-                    $error = 'mautic.core.update.archive_zip_corrupt';
-                    break;
-                case \ZipArchive::ER_NOENT:
-                    $error = 'mautic.core.update.archive_no_such_file';
-                    break;
-                case \ZipArchive::ER_NOZIP:
-                    $error = 'mautic.core.update.archive_not_valid_zip';
-                    break;
-                case \ZipArchive::ER_READ:
-                case \ZipArchive::ER_SEEK:
-                case \ZipArchive::ER_OPEN:
-                default:
-                    $error = 'mautic.core.update.archive_could_not_open';
-                    break;
+            throw new \Exception($this->getExtractError($archive));
+        } else {
+            $containsConfig = false;
+            for ($i = 0; $i < $zipper->numFiles; $i++) {
+                $entry = $zipper->getNameIndex($i);
+                if ($entry == 'config.json') {
+                    $containsConfig = true;
+                }
+            }
+            
+            if (!$containsConfig) {
+                throw new \Exception('mautic.core.theme.missing.config');
             }
 
-            throw new \Exception($error);
-        } else {
             // Extract the archive file now
-            if (!$zipper->extractTo($this->pathsHelper->getSystemPath('themes', true))) {
+            if (!$zipper->extractTo($this->pathsHelper->getSystemPath('themes', true).'/'.$themeName)) {
                 throw new \Exception('mautic.core.update.error_extracting_package');
             } else {
                 $zipper->close();
@@ -399,5 +388,39 @@ class ThemeHelper
                 return true;
             }
         }
+    }
+
+    /**
+     * Get the error message from the zip archive
+     *
+     * @param ZipArchive $archive
+     * 
+     * @return string
+     */
+    public function getExtractError($archive) {
+        switch ($archive) {
+            case \ZipArchive::ER_EXISTS:
+                $error = 'mautic.core.update.archive_file_exists';
+                break;
+            case \ZipArchive::ER_INCONS:
+            case \ZipArchive::ER_INVAL:
+            case \ZipArchive::ER_MEMORY:
+                $error = 'mautic.core.update.archive_zip_corrupt';
+                break;
+            case \ZipArchive::ER_NOENT:
+                $error = 'mautic.core.update.archive_no_such_file';
+                break;
+            case \ZipArchive::ER_NOZIP:
+                $error = 'mautic.core.update.archive_not_valid_zip';
+                break;
+            case \ZipArchive::ER_READ:
+            case \ZipArchive::ER_SEEK:
+            case \ZipArchive::ER_OPEN:
+            default:
+                $error = 'mautic.core.update.archive_could_not_open';
+                break;
+        }
+
+        return $error;
     }
 }
