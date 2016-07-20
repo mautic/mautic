@@ -67,6 +67,11 @@ class CommonSubscriber implements EventSubscriberInterface
     protected $em;
 
     /**
+     * @var \Symfony\Bundle\FrameworkBundle\Routing\Router
+     */
+    protected $router;
+
+    /**
      * @param MauticFactory $factory
      */
     public function __construct (MauticFactory $factory)
@@ -80,6 +85,7 @@ class CommonSubscriber implements EventSubscriberInterface
         $this->dispatcher  = $factory->getDispatcher();
         $this->translator  = $factory->getTranslator();
         $this->em          = $factory->getEntityManager();
+        $this->router      = $factory->getRouter();
 
         $this->init();
     }
