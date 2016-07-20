@@ -73,7 +73,7 @@ class ThemeController extends FormController
 
         return $this->delegateView([
             'viewParameters'  => [
-                'items'       => $themeHelper->getInstalledThemes('all', true),
+                'items'       => $themeHelper->getInstalledThemes('all', true, true),
                 'form'        => $form->createView(),
                 'permissions' => $permissions,
                 'security'    => $this->factory->getSecurity()
@@ -130,8 +130,7 @@ class ThemeController extends FormController
      */
     public function deleteAction ($themeName)
     {
-        $flashes   = [];
-
+        $flashes        = [];
         $postActionVars = [
             'returnUrl'       => $this->generateUrl('mautic_themes_index'),
             'contentTemplate' => 'MauticCoreBundle:theme:index',
@@ -142,38 +141,7 @@ class ThemeController extends FormController
         ];
 
         if ($this->request->getMethod() == 'POST') {
-            $themeHelper = $this->container->get('mautic.helper.theme');
-
-            if (!$themeHelper->exists($themeName)) {
-                $flashes[] = [
-                    'type'    => 'error',
-                    'msg'     => 'mautic.core.theme.error.notfound',
-                    'msgVars' => ['%theme%' => $themeName]
-                ];
-            } elseif (!$this->factory->getSecurity()->isGranted('core:themes:delete')) {
-                return $this->accessDenied();
-            } else {
-
-                try {
-                    $theme = $themeHelper->getTheme($themeName);
-                    $themeHelper->delete($themeName);
-                } catch (\Exception $e) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.core.error.delete.error',
-                        'msgVars' => ['%error%' => $e->getMessage()]
-                    ];
-                }
-
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.core.notice.deleted',
-                    'msgVars' => [
-                        '%name%' => $theme->getName(),
-                        '%id%'   => $themeName
-                    ]
-                ];
-            }
+            $flashes = $this->deleteTheme($themeName);
         }
 
         return $this->postActionRedirect(
@@ -184,72 +152,72 @@ class ThemeController extends FormController
     }
 
     /**
-     * Deletes a group of entities
+     * Deletes a group of themes
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function batchDeleteAction ()
     {
-        // $page      = $this->factory->getSession()->get('mautic.asset.page', 1);
-        // $returnUrl = $this->generateUrl('mautic_asset_index', ['page' => $page]);
-        // $flashes   = [];
+        $flashes        = [];
+        $postActionVars = [
+            'returnUrl'       => $this->generateUrl('mautic_themes_index'),
+            'contentTemplate' => 'MauticCoreBundle:Theme:index',
+            'passthroughVars' => [
+                'activeLink'    => 'mautic_themes_index',
+                'mauticContent' => 'theme'
+            ]
+        ];
 
-        // $postActionVars = [
-        //     'returnUrl'       => $returnUrl,
-        //     'viewParameters'  => ['page' => $page],
-        //     'contentTemplate' => 'MauticAssetBundle:Asset:index',
-        //     'passthroughVars' => [
-        //         'activeLink'    => 'mautic_asset_index',
-        //         'mauticContent' => 'asset'
-        //     ]
-        // ];
+        if ($this->request->getMethod() == 'POST') {
+            $themeNames = json_decode($this->request->query->get('ids', '{}'));
 
-        // if ($this->request->getMethod() == 'POST') {
-        //     /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-        //     $model     = $this->getModel('asset');
-        //     $ids       = json_decode($this->request->query->get('ids', '{}'));
-        //     $deleteIds = [];
+            foreach ($themeNames as $themeName) {
+                $flashes = $this->deleteTheme($themeName);
+            }
+        }
 
-        //     // Loop over the IDs to perform access checks pre-delete
-        //     foreach ($ids as $objectId) {
-        //         $entity = $model->getEntity($objectId);
+        return $this->postActionRedirect(
+            array_merge($postActionVars, [
+                'flashes' => $flashes
+            ])
+        );
+    }
 
-        //         if ($entity === null) {
-        //             $flashes[] = [
-        //                 'type'    => 'error',
-        //                 'msg'     => 'mautic.asset.asset.error.notfound',
-        //                 'msgVars' => ['%id%' => $objectId]
-        //             ];
-        //         } elseif (!$this->factory->getSecurity()->hasEntityAccess(
-        //             'asset:assets:deleteown', 'asset:assets:deleteother', $entity->getCreatedBy()
-        //         )
-        //         ) {
-        //             $flashes[] = $this->accessDenied(true);
-        //         } elseif ($model->isLocked($entity)) {
-        //             $flashes[] = $this->isLocked($postActionVars, $entity, 'asset', true);
-        //         } else {
-        //             $deleteIds[] = $objectId;
-        //         }
-        //     }
+    public function deleteTheme($themeName) {
+        $flashes     = [];
+        $themeHelper = $this->container->get('mautic.helper.theme');
 
-        //     // Delete everything we are able to
-        //     if (!empty($deleteIds)) {
-        //         $entities = $model->deleteEntities($deleteIds);
+        if (!$themeHelper->exists($themeName)) {
+            $flashes[] = [
+                'type'    => 'error',
+                'msg'     => 'mautic.core.theme.error.notfound',
+                'msgVars' => ['%theme%' => $themeName]
+            ];
+        } elseif (!$this->factory->getSecurity()->isGranted('core:themes:delete')) {
+            return $this->accessDenied();
+        } else {
 
-        //         $flashes[] = [
-        //             'type'    => 'notice',
-        //             'msg'     => 'mautic.asset.asset.notice.batch_deleted',
-        //             'msgVars' => [
-        //                 '%count%' => count($entities)
-        //             ]
-        //         ];
-        //     }
-        // } //else don't do anything
+            try {
+                $theme = $themeHelper->getTheme($themeName);
+                $themeHelper->delete($themeName);
+            } catch (\Exception $e) {
+                $flashes[] = [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.core.error.delete.error',
+                    'msgVars' => ['%error%' => $e->getMessage()]
+                ];
+            }
 
-        // return $this->postActionRedirect(
-        //     array_merge($postActionVars, [
-        //         'flashes' => $flashes
-        //     ])
-        // );
+            $flashes[] = [
+                'type'    => 'notice',
+                'msg'     => 'mautic.core.notice.deleted',
+                'msgVars' => [
+                    '%name%' => $theme->getName(),
+                    '%id%'   => $themeName
+                ]
+            ];
+        }
+
+        return $flashes;
     }
 }

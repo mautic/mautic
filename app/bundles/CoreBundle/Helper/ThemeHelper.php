@@ -249,9 +249,9 @@ class ThemeHelper
      * 
      * @return mixed
      */
-    public function getInstalledThemes($specificFeature = 'all', $extended = false)
+    public function getInstalledThemes($specificFeature = 'all', $extended = false, $ignoreCache = false)
     {
-        if (empty($this->themes[$specificFeature])) {
+        if (empty($this->themes[$specificFeature]) || $ignoreCache === true) {
             $dir = $this->pathsHelper->getSystemPath('themes', true);
             $addTheme = false;
 

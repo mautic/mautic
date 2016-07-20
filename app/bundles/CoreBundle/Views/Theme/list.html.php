@@ -11,7 +11,7 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
 ?>
 <?php if (count($items)): ?>
     <div class="table-responsive">
-        <table class="table table-hover table-striped table-bordered core-list" id="themeTable">
+        <table class="table table-hover table-striped table-bordered theme-list" id="themeTable">
             <thead>
             <tr>
                 <?php
