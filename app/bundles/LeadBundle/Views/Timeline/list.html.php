@@ -65,7 +65,7 @@ $baseUrl = $view['router']->path(
             <?php
             $counter += 1; // prevent 0
             $icon       = (isset($event['icon'])) ? $event['icon'] : 'fa-history';
-            $eventLabel = (isset($event['eventLabel'])) ? $event['eventLabel'] : '';
+            $eventLabel = (isset($event['eventLabel'])) ? $event['eventLabel'] : $event['eventType'];
             if (is_array($eventLabel)):
                 $linkType   = empty($eventLabel['isExternal']) ? 'data-toggle="ajax"' : 'target="_new"';
                 $eventLabel = "<a href=\"{$eventLabel['href']}\" $linkType>{$eventLabel['label']}</a>";
