@@ -81,16 +81,22 @@ class LeadSubscriber extends CommonSubscriber
 
             // Add the downloads to the event array
             foreach ($downloads['results'] as $download) {
+                $asset = $this->model->getEntity($download['asset_id']);
                 $event->addEvent(
                     [
-                        'event'      => $eventTypeKey,
-                        'eventLabel' => [
+                        'event'           => $eventTypeKey,
+                        'eventLabel'      => [
                             'label' => $download['title'],
                             'href'  => $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $download['asset_id']])
                         ],
-                        'eventType'  => $eventTypeName,
-                        'timestamp'  => $download['dateDownload'],
-                        'icon'       => 'fa-download'
+                        'extra'           => [
+                            'asset'            => $asset,
+                            'assetDownloadUrl' => $this->model->generateUrl($asset)
+                        ],
+                        'eventType'       => $eventTypeName,
+                        'timestamp'       => $download['dateDownload'],
+                        'icon'            => 'fa-download',
+                        'contentTemplate' => 'MauticAssetBundle:SubscribedEvents\Timeline:index.html.php'
                     ]
                 );
             }
