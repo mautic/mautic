@@ -132,7 +132,7 @@ Mautic.formFieldOnLoad = function (container, response) {
             var newField = true;
         }
         //activate new stuff
-        mQuery(fieldId + " a[data-toggle='ajax']").click(function (event) {
+        mQuery(fieldId + " [data-toggle='ajax']").click(function (event) {
             event.preventDefault();
             return Mautic.ajaxifyLink(this, event);
         });
@@ -140,9 +140,8 @@ Mautic.formFieldOnLoad = function (container, response) {
         mQuery(fieldId + " *[data-toggle='tooltip']").tooltip({html: true});
 
         //initialize ajax'd modals
-        mQuery(fieldId + " a[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
+        mQuery(fieldId + " [data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
             event.preventDefault();
-
             Mautic.ajaxifyModal(this, event);
         });
 
@@ -184,7 +183,7 @@ Mautic.formActionOnLoad = function (container, response) {
             var newField = true;
         }
         //activate new stuff
-        mQuery(actionId + " a[data-toggle='ajax']").click(function (event) {
+        mQuery(actionId + " [data-toggle='ajax']").click(function (event) {
             event.preventDefault();
             return Mautic.ajaxifyLink(this, event);
         });
@@ -192,7 +191,7 @@ Mautic.formActionOnLoad = function (container, response) {
         mQuery(actionId + " *[data-toggle='tooltip']").tooltip({html: true});
 
         //initialize ajax'd modals
-        mQuery(actionId + " a[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
+        mQuery(actionId + " [data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
             event.preventDefault();
 
             Mautic.ajaxifyModal(this, event);
