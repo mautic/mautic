@@ -354,6 +354,15 @@ class FieldController extends CommonFormController
         $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : null;
 
         if ($this->request->getMethod() == 'POST' && $formField !== null) {
+
+            $usedLeadFields = $session->get('mautic.form.'.$formId.'.fields.leadfields');
+
+            // Allow to select the lead field from the delete field again
+            if (!empty($formField['leadField']) && ($unusedLeadField = array_search($formField['leadField'], $usedLeadFields)) !== false) {
+                unset($usedLeadFields[$unusedLeadField]);
+                $session->set('mautic.form.'.$formId.'.fields.leadfields', $usedLeadFields);
+            }
+
             //set custom params from event if applicable
             $customParams = (!empty($formField['isCustom'])) ? $formField['customParameters'] : [];
 
