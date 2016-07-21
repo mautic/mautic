@@ -169,7 +169,7 @@ class StageRepository extends CommonRepository
     }
 
     /**
-     * Get a list of lists
+     * Get a list of stages
      *
      * @param string $name
      *
@@ -177,8 +177,6 @@ class StageRepository extends CommonRepository
      */
     public function getStageByName($stageName)
     {
-        static $stages = array();
-
         if (!$stageName) {
             return false;
         }
@@ -190,11 +188,17 @@ class StageRepository extends CommonRepository
             ->andWhere($q->expr()->eq('s.isPublished', ':true'))
             ->setParameter('true', true, 'boolean');
         $q->andWhere(
-            $q->expr()->like('s.name', $stageName)
+            $q->expr()->eq('s.name', $stageName)
         );
 
-        $results = $q->getQuery()->getArrayResult();
+        $result = $q->getQuery()->getResult();
 
-        return $results;
+        if($result)
+        {
+            $key = array_keys($result);
+            return $result[$key[0]];
+        }
+
+        return null;
     }
 }
