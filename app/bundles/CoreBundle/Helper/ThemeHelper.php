@@ -361,6 +361,7 @@ class ThemeHelper
         }
 
         $themeName = basename($zipFile, '.zip');
+        $themePath = $this->pathsHelper->getSystemPath('themes', true).'/'.$themeName;
         $zipper    = new \ZipArchive();
         $archive   = $zipper->open($zipFile);
 
@@ -368,19 +369,29 @@ class ThemeHelper
             throw new \Exception($this->getExtractError($archive));
         } else {
             $containsConfig = false;
+            $allowedExtensions = ['', 'json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif'];
+            $allowedFiles = [];
             for ($i = 0; $i < $zipper->numFiles; $i++) {
-                $entry = $zipper->getNameIndex($i);
+                $entry     = $zipper->getNameIndex($i);
+                $extension = pathinfo($entry, PATHINFO_EXTENSION);
+
+                // Check if the config.json exists in the zip file at the root level
                 if ($entry == 'config.json') {
                     $containsConfig = true;
                 }
+                
+                // Filter out dangerous files like .php
+                if (in_array(strtolower($extension), $allowedExtensions)) {
+                    $allowedFiles[] = $entry;
+                }
             }
-            
+
             if (!$containsConfig) {
                 throw new \Exception('mautic.core.theme.missing.config');
             }
 
             // Extract the archive file now
-            if (!$zipper->extractTo($this->pathsHelper->getSystemPath('themes', true).'/'.$themeName)) {
+            if (!$zipper->extractTo($themePath, $allowedFiles)) {
                 throw new \Exception('mautic.core.update.error_extracting_package');
             } else {
                 $zipper->close();
