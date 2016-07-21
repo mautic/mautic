@@ -42,19 +42,22 @@ if ($item = ((isset($event['extra'])) ? $event['extra']['stat'] : false)): ?>
     if (isset($item['openDetails']['bounces'])):
         unset($item['openDetails']['bounces']);
     endif;
+    ?>
 
-    if (!empty($item['openDetails'])):
-        $counter = 1;
+    <?php if (!empty($item['openDetails'])): ?>
+    <h6 class="mt-lg mb-sm"><strong><?php echo $view['translator']->trans('mautic.email.timeline.open_details'); ?></strong></h6>
+    <?php
+    $counter = 1;
         foreach ($item['openDetails'] as $detail):
             if (empty($showMore) && $counter > 5):
                 $showMore = true;
 
                 echo '<div style="display:none">';
             endif;
-            $counter++;
             ?>
-            <hr/>
+            <?php if ($counter > 1): ?><hr/><?php endif; ?>
             <strong><?php echo $view['date']->toText($detail['datetime'], 'UTC'); ?></strong><br/><?php echo $detail['useragent']; ?>
+            <?php $counter++; ?>
         <?php endforeach; ?>
         <?php
 
