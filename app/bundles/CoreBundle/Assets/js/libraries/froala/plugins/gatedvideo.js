@@ -112,7 +112,7 @@
       editor.popups.setContainer('gatedvideo.edit', $(editor.opts.scrollableContainer));
       editor.popups.refresh('gatedvideo.edit');
 
-      var $video_obj = $current_video.find('gatedVideo');
+      var $video_obj = $current_video.find('video');
       var left = $video_obj.offset().left + $video_obj.outerWidth() / 2;
       var top = $video_obj.offset().top + $video_obj.outerHeight();
 
