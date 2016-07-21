@@ -116,25 +116,13 @@ class VideoModel extends FormModel
         $hit->setGuid($guid);
         $hit->setDateHit(new \Datetime());
 
+        $hit->setDuration($request->get('duration'));
+        $hit->setUrl($request->get('url'));
         $hit->setTimeWatched($request->get('total_watched'));
 
         //check for existing IP
         $ipAddress = $this->ipLookupHelper->getIpAddress();
         $hit->setIpAddress($ipAddress);
-
-        $pageURL = 'http';
-        if ($request->server->get('HTTPS') == 'on') {
-            $pageURL .= 's';
-        }
-        $pageURL .= '://';
-        if ($request->server->get('SERVER_PORT') != '80') {
-            $pageURL .= $request->server->get('SERVER_NAME') . ':' . $request->server->get('SERVER_PORT') .
-                $request->server->get('REQUEST_URI');
-        } else {
-            $pageURL .= $request->server->get('SERVER_NAME') . $request->server->get('REQUEST_URI');
-        }
-
-        $hit->setUrl($pageURL);
 
         // Store query array
         $query = $request->query->all();

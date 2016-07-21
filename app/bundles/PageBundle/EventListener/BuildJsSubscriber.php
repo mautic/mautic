@@ -135,7 +135,9 @@ MauticJS.processGatedVideos = function () {
         var viewId = mediaPlayers[i].views.length;
         var view = {
             guid: MauticJS.guid(),
-            locked: false
+            locked: false,
+            duration: mediaPlayers[i].mediaElement.duration,
+            url: mediaPlayers[i].mediaElement.src
         };
         
         // Find the first id of the view that is not locked and update the time
@@ -180,6 +182,7 @@ MauticJS.processGatedVideos = function () {
                 mediaPlayers[i].inPoster = false;
                 mediaPlayers[i].success  = false;
                 mediaPlayers[i].views    = [];
+                mediaPlayers[i].mediaElement = mediaElement;
                 
                 var iframes = document.getElementById(node.id).parentElement.getElementsByTagName('iframe');
                 

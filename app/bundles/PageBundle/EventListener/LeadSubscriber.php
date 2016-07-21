@@ -167,6 +167,13 @@ class LeadSubscriber extends CommonSubscriber
         $lead    = $event->getLead();
         $options = ['ipIds' => [], 'filters' => $filters];
 
+        /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
+        /*
+        foreach ($lead->getIpAddresses() as $ip) {
+            $options['ipIds'][] = $ip->getId();
+        }
+        */
+
         /** @var \Mautic\PageBundle\Entity\VideoHitRepository $hitRepository */
         $hitRepository = $this->factory->getEntityManager()->getRepository('MauticPageBundle:VideoHit');
 

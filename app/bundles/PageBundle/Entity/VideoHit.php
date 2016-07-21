@@ -48,6 +48,11 @@ class VideoHit
     private $timeWatched;
 
     /**
+     * @var int
+     */
+    private $duration;
+
+    /**
      * @var Redirect
      */
     private $redirect;
@@ -101,11 +106,6 @@ class VideoHit
      * @var
      */
     private $url;
-
-    /**
-     * @var string
-     */
-    private $urlTitle;
 
     /**
      * @var string
@@ -198,11 +198,6 @@ class VideoHit
             ->nullable()
             ->build();
 
-        $builder->createField('urlTitle', 'string')
-            ->columnName('url_title')
-            ->nullable()
-            ->build();
-
         $builder->createField('userAgent', 'text')
             ->columnName('user_agent')
             ->nullable()
@@ -238,6 +233,11 @@ class VideoHit
 
         $builder->createField('timeWatched', 'integer')
             ->columnName('time_watched')
+            ->nullable()
+            ->build();
+
+        $builder->createField('duration', 'integer')
+            ->columnName('duration')
             ->nullable()
             ->build();
 
@@ -527,30 +527,6 @@ class VideoHit
     }
 
     /**
-     * Set url title
-     *
-     * @param string $urlTitle
-     *
-     * @return VideoHit
-     */
-    public function setUrlTitle($urlTitle)
-    {
-        $this->urlTitle = $urlTitle;
-
-        return $this;
-    }
-
-    /**
-     * Get url title
-     *
-     * @return string
-     */
-    public function getUrlTitle()
-    {
-        return $this->urlTitle;
-    }
-
-    /**
      * Set userAgent
      *
      * @param string $userAgent
@@ -806,6 +782,26 @@ class VideoHit
     public function setGuid($guid)
     {
         $this->guid = $guid;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDuration()
+    {
+        return $this->duration;
+    }
+
+    /**
+     * @param int $duration
+     *
+     * @return VideoHit
+     */
+    public function setDuration($duration)
+    {
+        $this->duration = $duration;
 
         return $this;
     }
