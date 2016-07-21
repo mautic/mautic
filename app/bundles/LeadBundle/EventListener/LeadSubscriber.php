@@ -9,10 +9,12 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
 
@@ -23,6 +25,8 @@ use Mautic\LeadBundle\LeadEvents;
  */
 class LeadSubscriber extends CommonSubscriber
 {
+    use ChannelTrait;
+
     /**
      * @var AuditLogModel
      */
@@ -284,7 +288,8 @@ class LeadSubscriber extends CommonSubscriber
             'lead.create'       => 'mautic.lead.event.create',
             'lead.identified'   => 'mautic.lead.event.identified',
             'lead.ipadded'      => 'mautic.lead.event.ipadded',
-            'lead.utmtagsadded' => 'mautic.lead.event.utmtagsadded'
+            'lead.utmtagsadded' => 'mautic.lead.event.utmtagsadded',
+            'lead.donotcontact' => 'mautic.lead.event.donotcontact'
         ];
 
         $filters = $event->getEventFilters();
@@ -314,6 +319,10 @@ class LeadSubscriber extends CommonSubscriber
                 case 'lead.utmtagsadded':
                     $this->addTimelineUtmEntries($event, $type, $name);
                     break;
+
+                case 'lead.donotcontact':
+                    $this->addTimelineDoNotContactEntries($event, $type, $name);
+                    break;
             }
         }
     }
@@ -326,7 +335,7 @@ class LeadSubscriber extends CommonSubscriber
     protected function addTimelineIpAddressEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         $lead = $event->getLead();
-        $rows  = $this->auditLogModel->getRepository()->getLeadIpLogs($lead, $event->getQueryOptions());
+        $rows = $this->auditLogModel->getRepository()->getLeadIpLogs($lead, $event->getQueryOptions());
 
         if (!$event->isEngagementCount()) {
             // Add to counter
@@ -480,6 +489,86 @@ class LeadSubscriber extends CommonSubscriber
             }
         } else {
             // Purposively not including this in engagements graph as the engagement is counted by the page hit
+        }
+    }
+
+    /**
+     * @param Events\LeadTimelineEvent $event
+     * @param                          $eventTypeKey
+     * @param                          $eventTypeName
+     */
+    protected function addTimelineDoNotContactEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    {
+        $lead = $event->getLead();
+
+        /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
+        $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
+
+        /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
+        $rows = $dncRepo->getTimelineStats($lead->getId(), $event->getQueryOptions());
+
+        // Add to counter
+        $event->addToCounter($eventTypeKey, $rows);
+
+        if (!$event->isEngagementCount()) {
+            foreach ($rows['results'] as $row) {
+                switch ($row['reason']) {
+                    case DoNotContact::UNSUBSCRIBED:
+                        $row['reason'] = $this->translator->trans('mautic.lead.event.donotcontact_unsubscribed');
+                        break;
+                    case DoNotContact::BOUNCED:
+                        $row['reason'] = $this->translator->trans('mautic.lead.event.donotcontact_bounced');
+                        break;
+                    case DoNotContact::MANUAL:
+                        $row['reason'] = $this->translator->trans('mautic.lead.event.donotcontact_manual');
+                        break;
+                }
+
+                $template = 'MauticLeadBundle:SubscribedEvents\Timeline:donotcontact.html.php';
+                $icon     = 'fa-ban';
+
+                if (!empty($row['channel'])) {
+                    if ($channelModel = $this->getChannelModel($row['channel'])) {
+                        // Allow a custom template if applicable
+                        if (method_exists($channelModel, 'getDoNotContactLeadTimelineTemplate')) {
+                            $template = $channelModel->getDoNotContactLeadTimelineTemplate($row);
+                        }
+
+                        if (method_exists($channelModel, 'getDoNotContactLeadTimelineLabel')) {
+                            $eventTypeName = $channelModel->getDoNotContactLeadTimelineLabel($row);
+                        }
+
+                        if (method_exists($channelModel, 'getDoNotContactLeadTimelineIcon')) {
+                            $icon = $channelModel->getDoNotContactLeadTimelineIcon($row);
+                        }
+
+                        if (!empty($row['channel_id'])) {
+                            if ($item = $this->getChannelEntityName($row['channel'], $row['channel_id'], true)) {
+                                $row['itemName']  = $item['name'];
+                                $row['itemRoute'] = $item['url'];
+                            }
+                        }
+                    }
+                }
+
+                $event->addEvent(
+                    [
+                        'event'           => $eventTypeKey,
+                        'eventLabel'      => (isset($row['itemName'])) ?
+                            [
+                                'label' => ucfirst($row['channel']).' / '.$row['itemName'],
+                                'href'  => $row['itemRoute']
+                            ] : ucfirst($row['channel']),
+                        'eventType'       => $eventTypeName,
+                        'timestamp'       => $row['date_added'],
+                        'extra'           => [
+                            'dnc' => $row
+                        ],
+                        'contentTemplate' => $template,
+                        'icon'            => $icon
+                    ]
+                );
+            }
         }
     }
 }

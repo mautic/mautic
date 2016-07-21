@@ -8,22 +8,20 @@
  */
 namespace Mautic\PageBundle\EventListener;
 
+use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\LeadBundle\Entity\Attribution;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\LeadBundle\EventListener\Decorator\AttributionTrait;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Model\AttributionModel;
-use Mautic\PageBundle\Event\PageHitEvent;
-use Mautic\PageBundle\PageEvents;
 
 /**
  * Class LeadSubscriber
  */
 class LeadSubscriber extends CommonSubscriber
 {
+    use ChannelTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -57,7 +55,7 @@ class LeadSubscriber extends CommonSubscriber
 
         /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
         $hitRepository = $this->em->getRepository('MauticPageBundle:Hit');;
-        $hits          = $hitRepository->getLeadHits($lead->getId(), $event->getQueryOptions());
+        $hits = $hitRepository->getLeadHits($lead->getId(), $event->getQueryOptions());
 
         // Add to counter
         $event->addToCounter($eventTypeKey, $hits);
@@ -69,54 +67,28 @@ class LeadSubscriber extends CommonSubscriber
             // Add the hits to the event array
             foreach ($hits['results'] as $hit) {
                 $template = 'MauticPageBundle:SubscribedEvents\Timeline:index.html.php';
+                $icon     = 'fa-link';
 
-                if ($hit['source'] && $hit['sourceId']) {
-                    $sourceModel = false;
-                    try {
-                        $sourceModel = $this->factory->getModel($hit['source']);
-                    } catch (\Exception $exception) {
-                        // Try a plugin
-
-                        try {
-                            $sourceModel = $this->factory->getModel('plugin.'.$hit['source']);
-                        } catch (\Exception $exception) {
-                            // No model found
+                if (!empty($hit['source'])) {
+                    if ($channelModel = $this->getChannelModel($hit['source'])) {
+                        // Allow a custom template if applicable
+                        if (method_exists($channelModel, 'getPageHitLeadTimelineTemplate')) {
+                            $template = $channelModel->getPageHitLeadTimelineTemplate($hit);
                         }
-                    }
 
-                    if ($sourceModel) {
-                        try {
-                            $sourceEntity = $sourceModel->getEntity($hit['sourceId']);
-                            if (method_exists($sourceEntity, $sourceModel->getNameGetter())) {
-                                $hit['sourceName'] = $sourceEntity->{$sourceModel->getNameGetter()}();
-                            }
+                        if (method_exists($channelModel, 'getPageHitLeadTimelineLabel')) {
+                            $eventTypeName = $channelModel->getPageHitLeadTimelineLabel($hit);
+                        }
 
-                            $baseRouteName = str_replace('.', '_', $hit['source']);
-                            if (method_exists($sourceModel, 'getActionRouteBase')) {
-                                $baseRouteName = $sourceModel->getActionRouteBase();
-                            }
-                            $routeSourceName = 'mautic_'.$baseRouteName.'_action';
+                        if (method_exists($channelModel, 'getPageHitLeadTimelineIcon')) {
+                            $icon = $channelModel->getPageHitLeadTimelineIcon($hit);
+                        }
 
-                            if ($this->factory->getRouter()->getRouteCollection()->get($routeSourceName) !== null) {
-                                $hit['sourceRoute'] = $this->factory->getRouter()->generate(
-                                    $routeSourceName,
-                                    [
-                                        'objectAction' => 'view',
-                                        'objectId'     => $hit['sourceId']
-                                    ]
-                                );
+                        if (!empty($hit['sourceId'])) {
+                            if ($source = $this->getChannelEntityName($hit['source'], $hit['sourceId'], true)) {
+                                $hit['sourceName'] = $source['name'];
+                                $hit['sourceRoute'] = $source['url'];
                             }
-
-                            // Allow a custom template if applicable
-                            if (method_exists($sourceModel, 'getPageHitLeadTimelineTemplate')) {
-                                $template = $sourceModel->getPageHitLeadTimelineTemplate($hit);
-                            }
-
-                            if (method_exists($sourceModel, 'getPageHitLeadTimelineLabel')) {
-                                $eventTypeName = $sourceModel->getPageHitLeadTimelineLabel($hit);
-                            }
-                        } catch (\Exception $exception) {
-                            // Not found
                         }
                     }
                 }
@@ -144,7 +116,7 @@ class LeadSubscriber extends CommonSubscriber
                             'hit' => $hit
                         ],
                         'contentTemplate' => $template,
-                        'icon'            => 'fa-link'
+                        'icon'            => $icon
                     ]
                 );
             }

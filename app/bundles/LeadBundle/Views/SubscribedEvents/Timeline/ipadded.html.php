@@ -14,23 +14,14 @@ if (!is_object($ip)) {
     return;
 }
 
-$details   = $ip->getIpDetails();
-
-
+$details = $ip->getIpDetails();
 ?>
-<tr>
-    <td><span class="fa fa-location-arrow"></span></td>
-    <td><?php echo $ipAddress; ?></td>
-    <td><?php echo $event['eventLabel']; ?></td>
-    <td><?php echo $view['date']->toFullConcat($event['timestamp']); ?></td>
-</tr>
 
-<!--
-    <?php if (!empty($details['organization'])): ?>
-        <i class="fa fa-building"> <?php echo $details['organization']; ?></i><br />
-    <?php endif; ?>
+<?php if (!empty($details['organization'])): ?>
+    <i class="fa fa-building"> <?php echo $details['organization']; ?></i><br />
+<?php endif; ?>
 
-    <?php
+<?php
 $locations = [];
 if (!empty($details['city'])):
     $locations[] = $details['city'];
@@ -42,7 +33,3 @@ if (!empty($details['country'])):
     $locations[] = $details['country'];
 endif;
 $location = implode(', ', $locations);
-if (!empty($location)): ?>
-        <i class="fa fa-map-marker"></i> <?php echo $location; ?> </span>
-    <?php endif; ?>
--->
