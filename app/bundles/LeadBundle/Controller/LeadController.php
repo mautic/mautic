@@ -319,7 +319,7 @@ class LeadController extends FormController
             return $this->accessDenied();
         }
 
-        $filters = $this->factory->getSession()->get(
+        $filters = $this->get('session')->get(
             'mautic.lead.'.$lead->getId().'.timeline.filters',
             array(
                 'search'        => '',
@@ -351,7 +351,7 @@ class LeadController extends FormController
         }
 
         // Trigger the TIMELINE_ON_GENERATE event to fetch the timeline events from subscribed bundles
-        $dispatcher = $this->factory->getDispatcher();
+        $dispatcher = $this->get('event_dispatcher');
         $event      = new LeadTimelineEvent($lead, $filters);
         $dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
 
@@ -393,7 +393,7 @@ class LeadController extends FormController
         $upcomingEvents = $leadEventLogRepository->getUpcomingEvents(array('lead' => $lead, 'scheduled' => 1, 'eventType' => 'action'));
 
         $fields            = $lead->getFields();
-        $integrationHelper = $this->factory->getHelper('integration');
+        $integrationHelper = $this->get('mautic.helper.integration');
         $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
 

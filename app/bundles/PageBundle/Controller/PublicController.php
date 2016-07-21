@@ -14,9 +14,11 @@ use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\LeadBundle\EventListener\EmailSubscriber;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -491,5 +493,27 @@ class PublicController extends CommonFormController
         $parentVariant = $entity->getVariantParent();
         $title         = (!empty($parentVariant)) ? $parentVariant->getTitle() : $entity->getTitle();
         $slotsHelper->set('pageTitle', $title);
+    }
+
+    /**
+     * Track video views
+     */
+    public function hitVideoAction()
+    {
+        // Only track XMLHttpRequests, because the hit should only come from there
+        if ($this->request->isXmlHttpRequest()) {
+            /** @var VideoModel $model */
+            $model = $this->getModel('page.video');
+
+            try {
+                $model->hitVideo($this->request);
+            } catch (\Exception $e) {
+                return new JsonResponse(['success' => false]);
+            }
+
+            return new JsonResponse(['success' => true]);
+        }
+
+        return new Response();
     }
 }

@@ -234,11 +234,8 @@ class AjaxController extends CommonController
     {
         $dataArray = array('success' => 0);
         $name      = InputHelper::clean($request->request->get('model'));
-        if (strpos($name, '.') === false) {
-            $name = "$name.$name";
-        }
-        $id    = InputHelper::int($request->request->get('id'));
-        $model = $this->getModel($name);
+        $id        = InputHelper::int($request->request->get('id'));
+        $model     = $this->getModel($name);
 
         $post = $request->request->all();
         unset($post['model'], $post['id'], $post['action']);
