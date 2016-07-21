@@ -43,5 +43,24 @@ class Version20160719000000 extends AbstractMauticMigration
         $this->addSql("ALTER TABLE {$this->prefix}page_hits ADD COLUMN device_brand varchar(255) DEFAULT NULL");
         $this->addSql("ALTER TABLE {$this->prefix}page_hits ADD COLUMN device_os varchar(255) DEFAULT NULL");
         $this->addSql("ALTER TABLE {$this->prefix}page_hits ADD COLUMN device_model longtext DEFAULT NULL");
+
+        $sql = <<<SQL
+CREATE TABLE {$this->prefix}email_stats_device (
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`ip_id` int(11) NOT NULL,
+`stat_id` int(11) NOT NULL,
+`client_info` longtext,
+`device` varchar(255) DEFAULT NULL,
+`device_brand` varchar(255) DEFAULT NULL,
+`device_model` varchar(255) DEFAULT NULL,
+`device_os` longtext,
+`date_opened` datetime DEFAULT NULL,
+PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
+SQL;
+        $this->addSql($sql);
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats_device ADD CONSTRAINT ' . $this->generatePropertyName('email_stats_device', 'fk', array('ip_id')) . ' FOREIGN KEY (ip_id) REFERENCES ' . $this->prefix . 'ip_addresses (id)');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats_device ADD CONSTRAINT ' . $this->generatePropertyName('email_stats_device', 'fk', array('stat_id')) . ' FOREIGN KEY (stat_id) REFERENCES ' . $this->prefix . 'email_stats (id)');
+
     }
 }
