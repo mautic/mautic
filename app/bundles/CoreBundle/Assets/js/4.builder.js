@@ -471,7 +471,7 @@ Mautic.initSlotListeners = function() {
                 slot.froalaEditor('toolbar.hide');
             });
 
-            var buttons = ['bold', 'italic', 'fontSize', 'insertImage', 'insertLink', 'insertTable', 'undo', 'redo', '-', 'paragraphFormat', 'align', 'color', 'formatOL', 'formatUL', 'indent', 'outdent', 'token'];
+            var buttons = ['bold', 'italic', 'fontSize', 'insertImage', 'insertGatedVideo', 'insertLink', 'insertTable', 'undo', 'redo', '-', 'paragraphFormat', 'align', 'color', 'formatOL', 'formatUL', 'indent', 'outdent', 'token'];
 
             var inlineFroalaOptions = {
                 toolbarButtons: buttons,

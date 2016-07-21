@@ -136,8 +136,8 @@
       var by_url_layer = '';
       if (editor.opts.gatedVideoInsertButtons.indexOf('gatedVideoByURL') >= 0) {
         by_url_layer = '<div class="fr-gatedvideo-by-url-layer fr-layer fr-active" id="fr-gatedvideo-by-url-layer-' + editor.id + '">' +
-            '<div class="fr-input-line"><input type="text" name="url" placeholder="http://" tabIndex="1"></div>' +
-            '<div class="fr-input-line"><input type="text" name="gateTime" placeholder="' + editor.language.translate('Gate Time') + '" value="15" tabIndex="2"></div>' +
+            '<div class="fr-input-line"><input type="text" name="url" placeholder="Video URL" tabIndex="1"></div>' +
+            '<div class="fr-input-line"><input type="text" name="gateTime" placeholder="' + editor.language.translate('Gate Time (in seconds)') + '" value="15" tabIndex="2"></div>' +
             '<div class="fr-input-line"><label>' + editor.language.translate('Form') + '</label>' +
             '<select name="formId" tabIndex="3" style="width:100%"><option value="0">' + editor.language.translate('Please select a form.') + '</option>';
 
