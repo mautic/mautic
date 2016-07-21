@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\FormBundle\Entity\Form;
 
 /**
  * Class Field
@@ -804,11 +805,17 @@ class Field
      *
      * @param  array|null $submissions
      * @param  Lead       $lead
+     * @param  Form       $form
      *
      * @return boolean
      */
-    public function showForContact($submissions = null, Lead $lead = null)
+    public function showForContact($submissions = null, Lead $lead = null, Form $form = null)
     {
+        // Always show in the kiosk mode
+        if ($form !== null && $form->getInKioskMode() === true) {
+            return true;
+        }
+
         // Hide the field if there is the submission count limit and hide it untill the limit is overcame
         if ($this->showAfterXSubmissions > 0 && $this->showAfterXSubmissions > count($submissions)) {
             return false;
