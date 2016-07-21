@@ -87,9 +87,7 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                     <td>
                         <div>
                         <?php if (isset($item['config']['authorUrl'])) : ?>
-                            <a href="<?php echo $view['router']->path('mautic_themes_action',
-                                ["objectAction" => "view", "objectId" => $item['key']]); ?>"
-                                data-toggle="ajax">
+                            <a href="<?php echo $item['config']['authorUrl']; ?>" target="_blank">
                                 <?php echo $item['config']['author']; ?>
                             </a>
                         <?php elseif(isset($item['config']['author'])) : ?>
@@ -101,7 +99,7 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                         <?php if (!empty($item['config']['features'])) : ?>
                             <?php foreach ($item['config']['features'] as $feature) : ?>
                                 <span style="white-space: nowrap;">
-                                    <span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: #666;">
+                                    <span class="label label-default pa-4">
                                         <?php echo $feature; ?>
                                     </span>
                                 </span>
