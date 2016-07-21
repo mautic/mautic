@@ -108,9 +108,14 @@ trait LeadDetailsTrait
         }
 
         if (null == $orderBy) {
+            if (!$session->has('mautic.lead.'.$lead->getId().'.timeline.orderby')) {
+                $session->set('mautic.lead.'.$lead->getId().'.timeline.orderby', 'timestamp');
+                $session->set('mautic.lead.'.$lead->getId().'.timeline.orderbydir', 'DESC');
+            }
+
             $orderBy = [
-                $session->get('mautic.lead.'.$lead->getId().'.timeline.orderby', 'dateTime'),
-                $session->get('mautic.lead.'.$lead->getId().'.timeline.orderbydir', 'DESC')
+                $session->get('mautic.lead.'.$lead->getId().'.timeline.orderby'),
+                $session->get('mautic.lead.'.$lead->getId().'.timeline.orderbydir')
             ];
         }
         /** @var LeadModel $model */
