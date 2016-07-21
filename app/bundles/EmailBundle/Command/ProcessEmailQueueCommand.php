@@ -11,6 +11,7 @@ namespace Mautic\EmailBundle\Command;
 
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\QueueEmailEvent;
+use Mautic\CoreBundle\Console\Output\ConsoleDatetimeOutput;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -54,6 +55,8 @@ EOT
         $env        =  (!empty($options['env'])) ? $options['env'] : 'dev';
         $container  = $this->getContainer();
         $dispatcher = $container->get('event_dispatcher');
+
+        $output = new ConsoleDatetimeOutput();
 
         $skipClear  = $input->getOption('do-not-clear');
         $quiet      = $input->getOption('quiet');

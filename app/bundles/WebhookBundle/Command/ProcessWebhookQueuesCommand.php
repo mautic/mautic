@@ -18,6 +18,7 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Mautic\WebhookBundle\Model\WebhookModel;
+use Mautic\CoreBundle\Console\Output\ConsoleDatetimeOutput;
 
 /**
  * CLI Command to process queued webhook payloads
@@ -49,6 +50,8 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->factory = $this->getContainer()->get('mautic.factory');
+
+        $output = new ConsoleDatetimeOutput();
 
         $queueMode = $this->factory->getParameter('queue_mode');
 
