@@ -9,6 +9,8 @@
 
 namespace Mautic\LeadBundle\Helper;
 
+use Symfony\Component\Form\Extension\Core\Type\LocaleType;
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class FormFieldHelper
@@ -209,5 +211,15 @@ class FormFieldHelper
         }
 
         return $timezones;
+    }
+
+    /**
+     * Get locale choices
+     *
+     * @return array
+     */
+    static function getLocaleChoices()
+    {
+        return Intl::getLocaleBundle()->getLocaleNames();
     }
 }

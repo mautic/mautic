@@ -10,6 +10,8 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -62,62 +64,84 @@ class CampaignEventLeadFieldValueType extends AbstractType
 
         // function to add 'template' choice field dynamically
         $func = function (FormEvent $e) use ($ff, $fieldModel) {
-            $data    = $e->getData();
-            $form    = $e->getForm();
+            $data = $e->getData();
+            $form = $e->getForm();
 
             $fieldValues = null;
-            $fieldType = null;
-            $choiceTypes = array('boolean', 'country', 'region', 'lookup', 'timezone', 'select', 'radio');
+            $fieldType   = null;
+            $choiceTypes = ['boolean', 'locale', 'country', 'region', 'lookup', 'timezone', 'select', 'radio'];
 
             if (isset($data['field'])) {
-                $field = $fieldModel->getRepository()->findOneBy(array('alias' => $data['field']));
-                
+                $field = $fieldModel->getRepository()->findOneBy(['alias' => $data['field']]);
+
                 if ($field) {
                     $properties = $field->getProperties();
-                    $fieldType = $field->getType();
+                    $fieldType  = $field->getType();
                     if (!empty($properties['list'])) {
                         // Lookup/Select options
                         $fieldValues = explode('|', $properties['list']);
                         $fieldValues = array_combine($fieldValues, $fieldValues);
                     } elseif (!empty($properties) && $fieldType == 'boolean') {
                         // Boolean options
-                        $fieldValues = array(
+                        $fieldValues = [
                             0 => $properties['no'],
                             1 => $properties['yes']
-                        );
-                    } elseif (!empty($properties)) {
-                        // fallback
-                        $fieldValues = $properties;
+                        ];
+                    } else {
+                        switch ($fieldType) {
+                            case 'country':
+                                $fieldValues = FormFieldHelper::getCountryChoices();
+                                break;
+                            case 'region':
+                                $fieldValues = FormFieldHelper::getRegionChoices();
+                                break;
+                            case 'timezone':
+                                $fieldValues = FormFieldHelper::getTimezonesChoices();
+                                break;
+                            case 'locale':
+                                $fieldValues = FormFieldHelper::getLocaleChoices();
+                                break;
+                            default:
+                                if (!empty($properties)) {
+                                    $fieldValues = $properties;
+                                }
+                        }
                     }
                 }
             }
 
-
             // Display selectbox for a field with choices, textbox for others
             if (!empty($fieldValues) && in_array($fieldType, $choiceTypes)) {
-                $form->add('value', 'choice', array(
-                    'choices'    => $fieldValues,
-                    'label'      => 'mautic.form.field.form.value',
-                    'label_attr' => array('class' => 'control-label'),
-                    'attr'       => array(
-                        'class'   => 'form-control not-chosen'
-                    )
-                ));
+                $form->add(
+                    'value',
+                    'choice',
+                    [
+                        'choices'    => $fieldValues,
+                        'label'      => 'mautic.form.field.form.value',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class' => 'form-control'
+                        ]
+                    ]
+                );
             } else {
-                $form->add('value', 'text', array(
-                    'label'      => 'mautic.form.field.form.value',
-                    'label_attr' => array('class' => 'control-label'),
-                    'attr'       => array(
-                        'class'   => 'form-control'
-                    )
-                ));
+                $form->add(
+                    'value',
+                    'text',
+                    [
+                        'label'      => 'mautic.form.field.form.value',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class' => 'form-control'
+                        ]
+                    ]
+                );
             }
-
         };
 
         // Register the function above as EventListener on PreSet and PreBind
         $builder->addEventListener(FormEvents::PRE_SET_DATA, $func);
-        $builder->addEventListener(FormEvents::PRE_BIND, $func);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, $func);
     }
 
     /**
