@@ -43,6 +43,14 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                     <td>
                         <?php
                         $item['id'] = $item['key'];
+                        $previewButton = $hasThumbnail ? [
+                            'attr' => [
+                                'data-toggle' => 'modal',
+                                'data-target' => '#theme-'.$k
+                            ],
+                            'btnText'   => $view['translator']->trans('mautic.asset.asset.preview'),
+                            'iconClass' => 'fa fa-image'
+                        ] : [];
                         echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', [
                             'item'       => $item,
                             'templateButtons' => [
@@ -50,16 +58,17 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                             ],
                             'routeBase'  => 'themes',
                             'langVar'    => 'core.theme',
-                            'customButtons' => $hasThumbnail ? [
+                            'customButtons' => [
                                 [
                                     'attr' => [
-                                        'data-toggle' => 'modal',
-                                        'data-target' => '#theme-'.$k
+                                        'href' => $view['router']->path('mautic_themes_action', ['objectAction' => 'download', 'objectId' => $k]),
+                                        'data-toggle' => '0'
                                     ],
-                                    'btnText'   => $view['translator']->trans('mautic.asset.asset.preview'),
-                                    'iconClass' => 'fa fa-image'
-                                ]
-                            ] : []
+                                    'btnText'   => $view['translator']->trans('mautic.core.download'),
+                                    'iconClass' => 'fa fa-download'
+                                ],
+                                $previewButton
+                            ]
                         ]);
                         ?>
                         <?php if ($hasThumbnail) : ?>

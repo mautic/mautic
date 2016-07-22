@@ -11,6 +11,7 @@ namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormError;
 
 /**
@@ -88,37 +89,71 @@ class ThemeController extends FormController
     }
 
     /**
-     * Clone an entity
+     * Download a theme
      *
-     * @param int $objectId
+     * @param string $themeName
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction ($objectId)
+    public function downloadAction($themeName)
     {
-        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-        // $model  = $this->getModel('asset');
-        // $entity = $model->getEntity($objectId);
+        $themeHelper = $this->container->get('mautic.helper.theme');
+        $flashes     = [];
+        $error       = false;
 
-        // if ($entity != null) {
-        //     if (!$this->factory->getSecurity()->isGranted('asset:assets:create') ||
-        //         !$this->factory->getSecurity()->hasEntityAccess(
-        //             'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()
-        //         )
-        //     ) {
-        //         return $this->accessDenied();
-        //     }
+        if (!$this->factory->getSecurity()->isGranted('core:themes:edit')) {
+            return $this->accessDenied();
+        }
 
-        //     $clone = clone $entity;
-        //     $clone->setDownloadCounts(0);
-        //     $clone->setUniqueDownloadCounts(0);
-        //     $clone->setRevision(0);
-        //     $clone->setIsPublished(false);
-        //     $model->saveEntity($clone);
-        //     $objectId = $clone->getId();
-        // }
+        if (!$themeHelper->exists($themeName)) {
+            $flashes[] = [
+                'type'    => 'error',
+                'msg'     => 'mautic.core.theme.error.notfound',
+                'msgVars' => ['%theme%' => $themeName]
+            ];
+            $error = true;
+        }
 
-        // return $this->editAction($objectId);
+        
+        try {
+            $zipPath = $themeHelper->zip($themeName);
+        } catch (\Exception $e) {
+            $flashes[] = [
+                'type'    => 'error',
+                'msg'     => $e->getMessage()
+            ];
+            $error = true;
+        }
+        
+        if (!$error && !$zipPath) {
+            $flashes[] = [
+                'type'    => 'error',
+                'msg'     => 'mautic.core.permission.issue'
+            ];
+            $error = true;
+        }
+
+        if ($error) {
+            return $this->postActionRedirect(
+                array_merge($this->getIndexPostActionVars(), [
+                    'flashes' => $flashes
+                ])
+            );
+        }
+
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/octet-stream');
+        $response->headers->set('Content-Length', filesize($zipPath));
+
+        $stream = $this->request->get('stream', 0);
+
+        if (!$stream) {
+            $response->headers->set('Content-Disposition', 'attachment;filename="'.$themeName.'.zip"');
+        }
+
+        $response->setContent(file_get_contents($zipPath));
+
+        return $response;
     }
 
     /**
@@ -130,22 +165,14 @@ class ThemeController extends FormController
      */
     public function deleteAction ($themeName)
     {
-        $flashes        = [];
-        $postActionVars = [
-            'returnUrl'       => $this->generateUrl('mautic_themes_index'),
-            'contentTemplate' => 'MauticCoreBundle:theme:index',
-            'passthroughVars' => [
-                'activeLink'    => 'mautic_themes_index',
-                'mauticContent' => 'theme'
-            ]
-        ];
+        $flashes = [];
 
         if ($this->request->getMethod() == 'POST') {
             $flashes = $this->deleteTheme($themeName);
         }
 
         return $this->postActionRedirect(
-            array_merge($postActionVars, [
+            array_merge($this->getIndexPostActionVars(), [
                 'flashes' => $flashes
             ])
         );
@@ -158,15 +185,7 @@ class ThemeController extends FormController
      */
     public function batchDeleteAction ()
     {
-        $flashes        = [];
-        $postActionVars = [
-            'returnUrl'       => $this->generateUrl('mautic_themes_index'),
-            'contentTemplate' => 'MauticCoreBundle:Theme:index',
-            'passthroughVars' => [
-                'activeLink'    => 'mautic_themes_index',
-                'mauticContent' => 'theme'
-            ]
-        ];
+        $flashes = [];
 
         if ($this->request->getMethod() == 'POST') {
             $themeNames = json_decode($this->request->query->get('ids', '{}'));
@@ -177,7 +196,7 @@ class ThemeController extends FormController
         }
 
         return $this->postActionRedirect(
-            array_merge($postActionVars, [
+            array_merge($this->getIndexPostActionVars(), [
                 'flashes' => $flashes
             ])
         );
@@ -219,5 +238,17 @@ class ThemeController extends FormController
         }
 
         return $flashes;
+    }
+
+    public function getIndexPostActionVars()
+    {
+        return [
+            'returnUrl'       => $this->generateUrl('mautic_themes_index'),
+            'contentTemplate' => 'MauticCoreBundle:theme:index',
+            'passthroughVars' => [
+                'activeLink'    => 'mautic_themes_index',
+                'mauticContent' => 'theme'
+            ]
+        ];
     }
 }

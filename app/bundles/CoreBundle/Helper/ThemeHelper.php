@@ -350,7 +350,8 @@ class ThemeHelper
      * @throws MauticException\FileNotFoundException
      * @throws Exception
      */
-    public function install($zipFile) {
+    public function install($zipFile)
+    {
 
         if (file_exists($zipFile) === false) {
             throw new MauticException\FileNotFoundException();
@@ -376,7 +377,7 @@ class ThemeHelper
                 $extension = pathinfo($entry, PATHINFO_EXTENSION);
 
                 // Check if the config.json exists in the zip file at the root level
-                if ($entry == 'config.json') {
+                if ($entry == 'config.json' || $entry == '/config.json') {
                     $containsConfig = true;
                 }
                 
@@ -408,7 +409,8 @@ class ThemeHelper
      * 
      * @return string
      */
-    public function getExtractError($archive) {
+    public function getExtractError($archive)
+    {
         switch ($archive) {
             case \ZipArchive::ER_EXISTS:
                 $error = 'mautic.core.update.archive_file_exists';
@@ -433,5 +435,40 @@ class ThemeHelper
         }
 
         return $error;
+    }
+
+    /**
+     * Creates a zip file from a theme and returns the path where it's stored
+     *
+     * @param string $themeName
+     * 
+     * @return string
+     * 
+     * @throws Exception
+     */
+    public function zip($themeName)
+    {
+        $themePath = $this->pathsHelper->getSystemPath('themes', true).'/'.$themeName;
+        $tmpPath   = $this->pathsHelper->getSystemPath('cache', true).'/tmp_'.$themeName.'.zip';
+        $zipper    = new \ZipArchive();
+        $finder    = new Finder();
+        $archive   = $zipper->open($tmpPath, \ZipArchive::CREATE);
+
+        $finder->files()->in($themePath);
+
+        if ($archive !== true) {
+            throw new \Exception($this->getExtractError($archive));
+        } else {
+            foreach ($finder as $file) {
+                $filePath = $file->getRealPath();
+                $localPath = str_replace($themePath.'/', '', $filePath);
+                $zipper->addFile($filePath, $localPath);
+            }
+            $zipper->close();
+
+            return $tmpPath;
+        }
+
+        return false;
     }
 }
