@@ -83,7 +83,15 @@ endif;
                     <img class="img img-responsive img-thumbnail w-44" src="<?php echo $view['gravatar']->getImage($item->getEmail(), '50'); ?>" />
                 </td>
                 <td>
-                    <div><?php echo $item->getName(true); ?></div>
+                    <div>
+                        <?php if ($permissions['edit']) : ?>
+                            <a href="<?php echo $view['router']->path('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajax">
+                                <?php echo $item->getName(true); ?>
+                            </a>
+                        <?php else : ?>
+                            <?php echo $item->getName(true); ?>
+                        <?php endif; ?>
+                    </div>
                     <div class="small"><em><?php echo $item->getPosition(); ?></em></div>
                 </td>
                 <td><?php echo $item->getUsername(); ?></td>
