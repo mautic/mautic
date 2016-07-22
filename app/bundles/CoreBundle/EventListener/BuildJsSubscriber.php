@@ -149,6 +149,16 @@ MauticJS.insertScript = function (scriptUrl) {
     firstScript.parentNode.insertBefore(scriptTag, firstScript);
 };
 
+MauticJS.insertStyle = function (styleUrl) {
+    var linksInHead = document.getElementsByTagName('head')[0].getElementsByTagName('link');
+    var lastLink    = linksInHead[linksInHead.length - 1];
+    var linkTag     = document.createElement('link');
+    linkTag.rel     = "stylesheet";
+    linkTag.type    = "text/css";
+    linkTag.href    = styleUrl;
+    lastLink.parentNode.insertBefore(linkTag, lastLink.nextSibling);
+};
+
 MauticJS.guid = function () {
     function s4() {
         return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);

@@ -154,7 +154,6 @@
 	margin: 0;
 	padding: 0;
 	bottom: 0;
-	left: 0;
 	background: url(../../../grav/mediaelement-master/build/background.png);
 	background: rgba(0, 0, 0, 0.7);
 	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(50,50,50,0.7)), to(rgba(0,0,0,0.7)));
@@ -165,6 +164,7 @@
 	background: linear-gradient(rgba(50,50,50,0.7), rgba(0,0,0,0.7));
 	height: 30px;
 	width: 100%;
+	left:-999999px;
 }
 .mejs-container .mejs-controls  div {
 	list-style-type: none;
@@ -998,3 +998,9 @@ div.mejs-speed-button {
 
 /* End: Skip Back */
 
+.mejs-poster {
+	text-align:center;
+	background: rgba(0,0,0,0.5);
+	z-index:1000;
+	color:white;
+}
