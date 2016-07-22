@@ -199,6 +199,18 @@ class InputHelper
     }
 
     /**
+     * Returns a satnitized string which can be used in a file system
+     *
+     * @param  $value
+     *
+     * @return string
+     */
+    public static function filename($value)
+    {
+        return preg_replace("/[^a-z0-9\.]/", "", $value);
+    }
+
+    /**
      * Returns raw value
      *
      * @param            $value

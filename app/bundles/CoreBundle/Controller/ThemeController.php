@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormError;
@@ -49,7 +50,8 @@ class ThemeController extends FormController
             if (isset($form) && !$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     $fileData = $form['file']->getData();
-                    $fileName = $fileData->getClientOriginalName();
+                    $fileName = InputHelper::filename($fileData->getClientOriginalName());
+
                     if (!empty($fileData)) {
                         try {
                             $fileData->move($dir, $fileName);
