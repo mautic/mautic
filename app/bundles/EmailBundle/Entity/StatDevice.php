@@ -78,7 +78,7 @@ class StatDevice
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('email_stats_device')
-            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatRepository');
+            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatDeviceRepository');
 
         $builder->addId();
 

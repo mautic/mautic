@@ -128,6 +128,14 @@ class EmailModel extends FormModel
     }
 
     /**
+     * @return \Mautic\EmailBundle\Entity\StatDeviceRepository
+     */
+    public function getStatDeviceRepository()
+    {
+        return $this->em->getRepository('MauticEmailBundle:StatDevice');
+    }
+
+    /**
      * @return \Mautic\EmailBundle\Entity\CopyRepository
      */
     public function getCopyRepository()
@@ -751,7 +759,61 @@ class EmailModel extends FormModel
 
         return $chart->render();
     }
+    /**
+     * Get a stats for email by list
+     *
+     * @param Email|int $email
+     * @param bool      $includeVariants
+     *
+     * @return array
+     */
+    public function getEmailDeviceStats($email, $includeVariants = false, $dateFrom = null, $dateTo = null)
+    {
+        if (!$email instanceof Email) {
+            $email = $this->getEntity($email);
+        }
 
+        if ($includeVariants && $email->isVariant()) {
+            $parent = $email->getVariantParent();
+            if ($parent) {
+                // $email is a variant of another
+                $children = $parent->getVariantChildren();
+                $emailIds = $children->getKeys();
+                $emailIds[] = $parent->getId();
+            } else {
+                $children = $email->getVariantChildren();
+                $emailIds = $children->getKeys();
+                $emailIds[] = $email->getId();
+            }
+        } else {
+            $emailIds = [$email->getId()];
+        }
+
+        $lists     = $email->getLists();
+        $listCount = count($lists);
+        $chart = new PieChart(array("label" => 'Devices'));
+
+        if ($listCount) {
+            foreach ($lists as $l) {
+                $statRepo = $this->getStatRepository();
+                $statIds = $statRepo->getOpenedStatIds($emailIds, $l->getId());
+
+                $results = $this->getStatDeviceRepository()->getDeviceStats($statIds[0], $dateFrom, $dateTo);
+
+
+                $this->factory->getLogger()->addError(print_r($results, true));
+
+                foreach ($results as $result) {
+                    $label = substr(empty($result['device']) ? $this->translator->trans('mautic.core.unknown') : $result['device'], 0, 12);
+
+                    $chart->setDataset($label, $result['count']);
+                }
+            }
+        }
+
+        return $chart->render();
+
+    }
     /**
      * @param           $email
      * @param bool      $includeVariants

@@ -239,6 +239,38 @@ class StatRepository extends CommonRepository
     }
 
     /**
+     * @param array|int $emailIds
+     *
+     * @return int
+     */
+    public function getOpenedStatIds($emailIds = null, $listId = null)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('s.id')
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
+
+        if ($emailIds) {
+            if (!is_array($emailIds)) {
+                $emailIds = array((int) $emailIds);
+            }
+            $q->where(
+                $q->expr()->in('s.email_id', $emailIds)
+            );
+        }
+
+        $q->andWhere('open_count > 0');
+
+        if ($listId) {
+            $q->andWhere('s.list_id = ' . (int) $listId);
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
      * Get a lead's email stat
      *
      * @param integer $leadId

@@ -33,7 +33,7 @@ some stats:
             </div>
             <?php endif; ?>
             <div class="panel">
-                <div class="panel-body box-layout">
+                <div class="panel-heading box-layout pt-15 pl-15 pb-10 pr-15 col-xs-6">
                     <div class="col-xs-4 va-m">
                         <h5 class="text-white dark-md fw-sb mb-xs">
                             <span class="fa fa-envelope"></span>
@@ -42,8 +42,13 @@ some stats:
                     </div>
                     <div class="col-xs-8 va-m" id="legend"></div>
                 </div>
-                <div class="pt-0 pl-15 pb-10 pr-15">
+                <div class=" panel-body box-layout">
+                <div class="pt-0 pl-15 pb-10 pr-15 col-xs-6">
                     <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $stats, 'chartType' => 'bar', 'chartHeight' => 300)); ?>
+                </div>
+                <div class="pt-0 pl-15 pb-10 pr-15 col-xs-6">
+                    <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $statsDevices, 'chartType' => 'pie', 'chartHeight' => 300)); ?>
+                </div>
                 </div>
             </div>
         </div>
