@@ -117,6 +117,8 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php echo $view['form']->row($form['isGlobal']); ?>
             <?php echo $view['form']->row($form['isPublished']); ?>
+            <?php echo $view['form']->row($form['frequency_number']); ?>
+            <?php echo $view['form']->row($form['frequency_time']); ?>
         </div>
     </div>
 </div>

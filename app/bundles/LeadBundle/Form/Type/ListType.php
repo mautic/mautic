@@ -165,7 +165,38 @@ class ListType extends AbstractType
                 )
             )->addModelTransformer($filterModalTransformer)
         );
-
+        $builder->add('frequency_number','choice',
+            array(
+                'choices'    => array(
+                    '1' => '1 time',
+                    '2' => '2 times',
+                    '3' => '3 times',
+                    '4' => '4 times'
+                ),
+                'label'      => 'mautic.lead.list.frequency.number',
+                'label_attr' => array('class' => 'control-label'),
+                'required'   => false,
+                'multiple'   => false,
+                'attr'       => array(
+                    'class' => 'form-control frequency'
+                )
+            ));
+        $builder->add('frequency_time','choice',
+            array(
+                'choices'    => array(
+                    'hour' => 'hour',
+                    'day' => 'day',
+                    'week' => 'week',
+                    'year' => 'year'
+                ),
+                'label'      => 'mautic.lead.list.frequency.times',
+                'label_attr' => array('class' => 'control-label'),
+                'required'   => false,
+                'multiple'   => false,
+                'attr'       => array(
+                    'class' => 'form-control frequency'
+                )
+            ));
         $builder->add('buttons', 'form_buttons');
 
         if (!empty($options["action"])) {
