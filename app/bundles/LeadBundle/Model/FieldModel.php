@@ -26,6 +26,119 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class FieldModel extends FormModel
 {
+    static public $coreFields   = [
+        // Listed according to $order for installation
+        'title'     => [
+            'type'       => 'lookup',
+            'properties' => ['list' => '|Mr|Mrs|Miss'],
+            'fixed'      => true,
+        ],
+        'firstname' => [
+            'fixed' => true,
+            'short' => true,
+        ],
+        'lastname'  => [
+            'fixed' => true,
+            'short' => true,
+        ],
+        'company'          => [
+            'fixed' => true,
+        ],
+        'position'         => [
+            'fixed' => true,
+        ],
+        'email'            => [
+            'type'   => 'email',
+            'unique' => true,
+            'fixed'  => true,
+            'short'  => true,
+        ],
+        'mobile'           => [
+            'type'     => 'tel',
+            'fixed'    => true,
+            'listable' => true,
+        ],
+        'phone'            => [
+            'type'     => 'tel',
+            'fixed'    => true,
+            'listable' => true,
+        ],
+        'fax'              => [
+            'type'     => 'tel',
+            'listable' => true,
+        ],
+        'address1'         => [
+            'fixed'    => true,
+            'listable' => true,
+        ],
+        'address2'         => [
+            'fixed'    => true,
+            'listable' => true,
+        ],
+        'city'             => [
+            'fixed' => true,
+        ],
+        'state'            => [
+            'type'  => 'region',
+            'fixed' => true,
+        ],
+        'zipcode'          => [
+            'fixed' => true,
+        ],
+        'country'          => [
+            'type'  => 'country',
+            'fixed' => true,
+        ],
+        'preferred_locale' => [
+            'type'     => 'locale',
+            'fixed'    => true,
+            'listable' => true,
+        ],
+        'attribution_date' => [
+            'type'     => 'datetime',
+            'fixed'    => true,
+            'listable' => true,
+        ],
+        'attribution'      => [
+            'type'       => 'number',
+            'properties' => ['roundmode' => 4, 'precision' => 2],
+            'fixed'      => true,
+            'listable'   => true,
+        ],
+        'website'          => [
+            'type'     => 'url',
+            'listable' => true,
+        ],
+        'facebook'   => [
+            'listable' => true,
+            'group' => 'social',
+        ],
+        'foursquare' => [
+            'listable' => true,
+            'group' => 'social',
+        ],
+        'googleplus' => [
+            'listable' => true,
+            'group' => 'social',
+        ],
+        'instagram'  => [
+            'listable' => true,
+            'group' => 'social',
+        ],
+        'linkedin'   => [
+            'listable' => true,
+            'group' => 'social',
+        ],
+        'skype'      => [
+            'listable' => true,
+            'group' => 'social',
+        ],
+        'twitter'    => [
+            'listable' => true,
+            'group' => 'social',
+        ],
+    ];
+
     /**
      * @var SchemaHelperFactory
      */
@@ -528,35 +641,6 @@ class FieldModel extends FormModel
             ];
         }
 
-        $schemaType = in_array(
-            $alias, [
-                'title',
-                'firstname',
-                'lastname',
-                'company',
-                'position',
-                'email',
-                'phone',
-                'mobile',
-                'fax',
-                'address1',
-                'address2',
-                'city',
-                'state',
-                'zipcode',
-                'country',
-                'website',
-                'twitter',
-                'facebook',
-                'googleplus',
-                'skype',
-                'linkedin',
-                'instagram',
-                'foursquare',
-            ]
-        ) ? 'string' : 'text';
-        $options    = ['notnull' => false];
-
         switch ($type) {
             case 'datetime':
             case 'date':
@@ -567,6 +651,7 @@ class FieldModel extends FormModel
             case 'number':
                 $schemaType = 'float';
                 break;
+            case 'locale':
             case 'country':
             case 'email':
             case 'lookup':
@@ -574,12 +659,15 @@ class FieldModel extends FormModel
             case 'tel':
                 $schemaType = 'string';
                 break;
+            default:
+                // Default type for known fields is string; otherwise text because it's not known
+                $schemaType = (isset(self::$coreFields[$alias])) ? 'string' : 'text';
         }
 
         return [
             'name'    => $alias,
             'type'    => $schemaType,
-            'options' => $options
+            'options' => ['notnull' => false]
         ];
     }
 }
