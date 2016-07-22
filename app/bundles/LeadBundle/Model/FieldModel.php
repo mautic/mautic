@@ -424,6 +424,13 @@ class FieldModel extends FormModel
             }
         }
 
+        // Add special tag field
+        if ($byGroup) {
+            $leadFields['Core']['tags'] = 'mautic.lead.field.tags';
+        } else {
+            $leadFields['tags'] = 'mautic.lead.field.tags';
+        }
+
         if ($alphabetical) {
             // Sort the groups
             uksort($leadFields, 'strnatcmp');

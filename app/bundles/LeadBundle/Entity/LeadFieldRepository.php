@@ -128,14 +128,38 @@ class LeadFieldRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('l.id')
-            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-            ->where(
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
+
+        if ($field === "tags") {
+            // Special tags field
+            if (($operatorExpr === "eq") || ($operatorExpr === "like")) {
+                $operatorExprTags="in";
+            } elseif (($operatorExpr === "neq") || ($operatorExpr === "notLike")) {
+                $operatorExprTags="notIn";
+            } else {
+                return false;
+            }
+
+            $q->join('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x', 'l.id = x.lead_id')
+                ->join('x', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id') 
+                ->where(
+                    $q->expr()->andX(
+                        $q->expr()->eq('l.id', ':lead'),
+                        $q->expr()->$operatorExpr('t.tag', ':value')
+                    )
+                );
+            
+        } else {
+            // Standard field
+            $q->where(
                 $q->expr()->andX(
                     $q->expr()->eq('l.id', ':lead'),
                     $q->expr()->$operatorExpr('l.' . $field, ':value')
                 )
-            )
-            ->setParameter('lead', (int) $lead)
+            );
+        }
+
+        $q->setParameter('lead', (int) $lead)
             ->setParameter('value', $value);
 
         $result = $q->execute()->fetch();
