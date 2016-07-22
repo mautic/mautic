@@ -11,14 +11,14 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'email');
 
 $variantParent = $email->getVariantParent();
-$subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.email.header.editvariant', array(
+$subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.email.header.editvariant', [
     '%name%' => $email->getName(),
     '%parent%' => $variantParent->getName()
-)) . '</span></div>' : '';
+]) . '</span></div>' : '';
 
 $header = ($email->getId()) ?
     $view['translator']->trans('mautic.email.header.edit',
-        array('%name%' => $email->getName())) :
+        ['%name%' => $email->getName()]) :
     $view['translator']->trans('mautic.email.header.new');
 
 $view['slots']->set("headerTitle", $header.$subheader);
@@ -53,11 +53,11 @@ if (!isset($attachmentSize)) {
                                 <?php echo $view['form']->row($form['template']); ?>
                             </div>
                         </div>
-                        <?php echo $view->render('MauticCoreBundle:Helper:theme_select.html.php', array(
+                        <?php echo $view->render('MauticCoreBundle:Helper:theme_select.html.php', [
                             'type'   => 'email',
                             'themes' => $themes,
                             'active' => $form['template']->vars['value']
-                        )); ?>
+                        ]); ?>
                     </div>
 
                     <div class="tab-pane fade bdr-w-0" id="advanced-container">
@@ -150,24 +150,24 @@ if (!isset($attachmentSize)) {
 </div>
 <?php echo $view['form']->end($form); ?>
 
-<?php echo $view->render('MauticCoreBundle:Helper:builder.html.php', array(
+<?php echo $view->render('MauticCoreBundle:Helper:builder.html.php', [
     'type'          => 'email',
     'sectionForm'   => $sectionForm,
     'builderAssets' => $builderAssets,
     'slots'         => $slots,
     'objectId'      => $email->getSessionId()
-)); ?>
+]); ?>
 
 <?php
 $type = $email->getEmailType();
 if (empty($type) || !empty($forceTypeSelection)):
     echo $view->render('MauticCoreBundle:Helper:form_selecttype.html.php',
-        array(
+        [
             'item'               => $email,
-            'mauticLang'         => array(
+            'mauticLang'         => [
                 'newListEmail' => 'mautic.email.type.list.header',
                 'newTemplateEmail'   => 'mautic.email.type.template.header'
-            ),
+            ],
             'typePrefix'         => 'email',
             'cancelUrl'          => 'mautic_email_index',
             'header'             => 'mautic.email.type.header',
@@ -179,5 +179,5 @@ if (empty($type) || !empty($forceTypeSelection)):
             'typeTwoIconClass'   => 'fa-pie-chart',
             'typeTwoDescription' => 'mautic.email.type.list.description',
             'typeTwoOnClick'     => "Mautic.selectEmailType('list');",
-        ));
+        ]);
 endif;
