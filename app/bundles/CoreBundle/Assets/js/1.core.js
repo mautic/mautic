@@ -575,6 +575,7 @@ var Mautic = {
                         options.htmlAllowedAttrs = ['.*'];
                         options.htmlRemoveTags = [];
                         options.lineBreakerTags = [];
+                        options.imageOutputSize = true;
                     }
 
                     textarea.froalaEditor(mQuery.extend(options, Mautic.basicFroalaOptions));
