@@ -109,5 +109,14 @@ return [
                 ],
             ],
         ],
+        'other' => [
+            'mautic.helper.dynamicContent' => [
+                'class'     => 'Mautic\DynamicContentBundle\Helper\DynamicContentHelper',
+                'arguments' => [
+                    'mautic.dynamicContent.model.dynamicContent',
+                    'mautic.campaign.model.event',
+                    'event_dispatcher'
+                ]
+            ],]
     ],
 ];
