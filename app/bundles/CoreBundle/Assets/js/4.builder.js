@@ -502,8 +502,11 @@ Mautic.initSlotListeners = function() {
             slot.froalaEditor(mQuery.extend(inlineFroalaOptions, Mautic.basicFroalaOptions));
             slot.froalaEditor('toolbar.hide');
         } else if (type === 'image') {
+            var image = slot.find('img');
+            // fix of badly destroyed image slot
+            image.removeAttr('data-froala.editor');
             // Init Froala editor
-            slot.find('img').froalaEditor(mQuery.extend({
+            image.froalaEditor(mQuery.extend({
                     linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
                     useClasses: false,
                     imageEditButtons: ['imageReplace', 'imageAlign', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
@@ -576,7 +579,9 @@ Mautic.initSlotListeners = function() {
             params.slot.froalaEditor('destroy');
             params.slot.find('.atwho-inserted').atwho('destroy');
         } else if (params.type === 'image') {
-            params.slot.find('img').froalaEditor('destroy');
+            var image = params.slot.find('img');
+            image.removeAttr('data-froala.editor');
+            image.froalaEditor('destroy');
         }
 
         // Remove Symfony toolbar
