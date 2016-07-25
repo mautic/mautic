@@ -120,16 +120,18 @@ MauticJS.processGatedVideos = function () {
     
     window.setInterval(function (e) {
         MauticJS.iterateCollection(mediaPlayers)(function(node, i){
-            MauticJS.iterateCollection(mediaPlayers[i].views)(function(nodeA, iA){
-                if (!node.views[iA].sent) {
-                    MauticJS.makeCORSRequest('POST', '{$mauticBaseUrl}video/hit', node.views[iA], function (data) {
-                        // Don't continue to send locked views that have already been sent
-                        if (data.success && node.views[iA].locked) {
-                            node.views[iA].sent = true;
-                        }
-                    });
-                }
-            });
+            if (mediaPlayers[i].views) {
+                MauticJS.iterateCollection(mediaPlayers[i].views)(function(nodeA, iA){
+                    if (!node.views[iA].sent) {
+                        MauticJS.makeCORSRequest('POST', '{$mauticBaseUrl}video/hit', node.views[iA], function (data) {
+                            // Don't continue to send locked views that have already been sent
+                            if (data.success && node.views[iA].locked) {
+                                node.views[iA].sent = true;
+                            }
+                        });
+                    }
+                });
+            }
         });
     }, 3000);
     
@@ -173,6 +175,14 @@ MauticJS.processGatedVideos = function () {
     };
     
     MauticJS.iterateCollection(videoElements)(function(node, i){
+        var playerFeatures = [];
+        var source   = node.getElementsByTagName('source')[0];
+        
+        if (source.type == 'video/mp4') {
+            node.dataset.mp4 = true;
+            playerFeatures = ['playpause','progress','current','duration','volume','fullscreen'];
+        }
+
         if (!node.id) {
             node.id = 'mautic-player-' + i;
         }
@@ -184,17 +194,22 @@ MauticJS.processGatedVideos = function () {
                 mediaPlayers[i].formHtml = data;
             });
             
-            mediaPlayers[i].player = new MediaElementPlayer('#' + node.id, {features:[], enableKeyboard: false, success: function (mediaElement, domElement) {
+            mediaPlayers[i].player = new MediaElementPlayer('#' + node.id, {features: playerFeatures, alwaysShowControls: true, enableKeyboard: false, success: function (mediaElement, domElement) {
                 mediaPlayers[i].inPoster = false;
                 mediaPlayers[i].success  = false;
                 mediaPlayers[i].views    = [];
                 mediaPlayers[i].mediaElement = mediaElement;
                 
-                var iframes = document.getElementById(node.id).parentElement.getElementsByTagName('iframe');
+                if (!node.dataset.mp4) {
+                    node.parentElement.parentElement.parentElement.className += ' no-controls';
+                }
+                var iframes = node.parentElement.getElementsByTagName('iframe');
                 
-                MauticJS.iterateCollection(iframes)(function(node, i) {
-                    node.setAttribute('tabindex', -1);
-                });
+                if (iframes) {
+                    MauticJS.iterateCollection(iframes)(function(node, i) {
+                        node.setAttribute('tabindex', -1);
+                    });
+                }
 
                 mediaElement.addEventListener('ended', function(e) {
                     MauticJS.endCurrentView(i);

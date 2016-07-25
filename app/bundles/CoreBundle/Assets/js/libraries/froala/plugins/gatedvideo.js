@@ -61,7 +61,12 @@
     {
       test_regex: /^.*(vimeo\.com\/)((channels\/[A-z]+\/)|(groups\/[A-z]+\/videos\/))?([0-9]+)/,
       provider: 'vimeo',
-      html: '<video width="640" height="360" data-form-id="{formId}" data-gate-time="{gateTime}"><source type="video/vimdeo" src="{url}"></video>'
+      html: '<video width="640" height="360" data-form-id="{formId}" data-gate-time="{gateTime}"><source type="video/vimeo" src="{url}"></video>'
+    },
+    {
+      test_regex: /.*/,
+      provider: 'mp4',
+      html: '<video width="640" height="360" data-form-id="{formId}" data-gate-time="{gateTime}"><source type="video/mp4" src="{url}"></video>'
     }
   ];
 

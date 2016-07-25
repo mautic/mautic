@@ -156,7 +156,12 @@ MauticJS.insertStyle = function (styleUrl) {
     linkTag.rel     = "stylesheet";
     linkTag.type    = "text/css";
     linkTag.href    = styleUrl;
-    lastLink.parentNode.insertBefore(linkTag, lastLink.nextSibling);
+    
+    if (lastLink) {
+        lastLink.parentNode.insertBefore(linkTag, lastLink.nextSibling);
+    } else {
+        document.getElementsByTagName('head')[0].appendChild(linkTag);
+    }
 };
 
 MauticJS.guid = function () {
