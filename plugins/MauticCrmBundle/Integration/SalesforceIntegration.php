@@ -223,14 +223,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function amendLeadDataBeforeMauticPopulate($data)
     {
-        $fields = array_keys($this->getAvailableLeadFields());
-        $params['fields'] = implode(',', $fields);
-        $internal = array('latestDateCovered' => $data['latestDateCovered']);
         $count=0;
-        foreach ($data['ids'] as $salesforceId) {
-            $data = $this->getApiHelper()->getSalesForceLeadById($salesforceId, $params);
-            $data['internal'] = $internal;
-            $lead = $this->getMauticLead($data, true, null, null);
+        foreach ($data['records'] as $record) {
+            $lead = $this->getMauticLead($record, true, null, null);
             if($lead){
                 $count++;
             }

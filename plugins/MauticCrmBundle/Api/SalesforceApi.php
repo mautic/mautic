@@ -104,8 +104,16 @@ class SalesforceApi extends CrmApi
                 $query['start'] = date('c',strtotime($organization['records'][0]['CreatedDate']." +1 hour"));
             }
         }
+        $fields = $this->integration->getAvailableLeadFields();
+        if($fields)
+        {
+            $fields = implode(", ",array_keys($fields));
+        }
 
-        return $this->request('updated/', $query);
+        $getLeadsQuery = "SELECT ".$fields." from Lead where LastModifiedDate>=".$query['start']." and LastModifiedDate<=".$query['end'];
+        $result = $this->request('query', array("q"=>$getLeadsQuery),'GET',false,null,$queryUrl);
+
+        return $result;
     }
 
     /**
