@@ -9,7 +9,6 @@
 
 namespace Mautic\UserBundle\EventListener;
 
-use Mautic\ApiBundle\Event\RouteEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\UserBundle\Event as Events;

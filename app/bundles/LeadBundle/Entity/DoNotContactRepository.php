@@ -17,6 +17,8 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class DoNotContactRepository extends CommonRepository
 {
+    use TimelineTrait;
+
     /**
      * Get a list of DNC entries based on channel and lead_id
      *
@@ -73,5 +75,26 @@ class DoNotContactRepository extends CommonRepository
         $results = $q->execute()->fetchAll();
 
         return (isset($results[0])) ? $results[0]['dnc_count'] : 0;
+    }
+
+    /**
+     * @param       $leadId
+     * @param array $options
+     */
+    public function getTimelineStats($leadId, array $options = [])
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $query->select('dnc.channel, dnc.channel_id, dnc.date_added, dnc.reason, dnc.comments')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
+            ->where($query->expr()->eq('dnc.lead_id', (int) $leadId));
+
+        if (isset($options['search']) && $options['search']) {
+            $query->andWhere(
+                $query->expr()->like('dc.channel', $query->expr()->literal('%' . $options['search'] . '%'))
+            );
+        }
+
+        return $this->getTimelineResults($query, $options, 'dnc.channel', 'dnc.date_added', [], ['date_added']);
     }
 }

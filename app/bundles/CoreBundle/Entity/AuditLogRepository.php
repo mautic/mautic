@@ -9,11 +9,17 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\TimelineTrait;
+
 /**
  * AuditLogRepository
  */
 class AuditLogRepository extends CommonRepository
 {
+    use TimelineTrait;
+
     /**
      * Get array of objects which belongs to the object
      *
@@ -57,5 +63,35 @@ class AuditLogRepository extends CommonRepository
             ->setMaxResults($limit);
 
         return $query->getQuery()->getArrayResult();
+    }
+
+    /**
+     * @param Lead  $lead
+     * @param array $options
+     *
+     * @return array
+     */
+    public function getLeadIpLogs(Lead $lead, array $options = [])
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        // Just a check to ensure reused IDs (happens with innodb) doesn't infect data
+        $dt = new DateTimeHelper($lead->getDateAdded(), 'Y-m-d H:i:s', 'local');
+
+        $qb
+            ->select('l.date_added, l.ip_address')
+            ->from(MAUTIC_TABLE_PREFIX.'audit_log', 'l')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('l.bundle', $qb->expr()->literal('lead')),
+                    $qb->expr()->eq('l.object', $qb->expr()->literal('lead')),
+                    $qb->expr()->eq('l.action', $qb->expr()->literal('ipadded')),
+                    $qb->expr()->eq('l.object_id', $lead->getId()),
+                    $qb->expr()->gte('l.date_added', $qb->expr()->literal($dt->getUtcTimestamp()))
+                )
+            )
+            ->groupBy('l.ip_address');
+
+        return $this->getTimelineResults($qb, $options, 'l.ip_address', 'l.date_added', [], ['date_added']);
     }
 }

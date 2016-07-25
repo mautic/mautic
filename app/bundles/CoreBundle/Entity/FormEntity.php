@@ -79,6 +79,11 @@ class FormEntity extends CommonEntity
     protected $changes = array();
 
     /**
+     * @var
+     */
+    public $deletedId;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
