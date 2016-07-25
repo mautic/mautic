@@ -33,6 +33,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('field', 'leadfields_choices', array(
+            'with_tags'     => true,
             'label'         => 'mautic.lead.campaign.event.field',
             'label_attr'    => array('class' => 'control-label'),
             'multiple'      => false,
