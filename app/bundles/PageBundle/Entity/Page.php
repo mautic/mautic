@@ -14,19 +14,21 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\TranslationEntityInterface;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
+
 /**
  * Class Page
  *
  * @package Mautic\PageBundle\Entity
  */
-class Page extends FormEntity
+class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface
 {
-
     /**
      * @var int
      */
@@ -279,7 +281,7 @@ class Page extends FormEntity
                 if ($translationParent !== null) {
                     $parentsVariantParent = $translationParent->getVariantParent();
                     if ($parentsVariantParent !== null) {
-                        $context->buildViolation('mautic.page.translationparent.notallowed')
+                        $context->buildViolation('mautic.core.translation_parent.not_allowed')
                             ->atPath('translationParent')
                             ->addViolation();
                     }
@@ -748,10 +750,10 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function addTranslationChild (Page $translationChildren)
+    public function addTranslationChild (TranslationEntityInterface $child)
     {
-        if (!$this->translationChildren->contains($translationChildren)) {
-            $this->translationChildren[] = $translationChildren;
+        if (!$this->translationChildren->contains($child)) {
+            $this->translationChildren[] = $child;
         }
 
         return $this;
@@ -762,9 +764,9 @@ class Page extends FormEntity
      *
      * @param Page $translationChildren
      */
-    public function removeTranslationChild (Page $translationChildren)
+    public function removeTranslationChild (TranslationEntityInterface $child)
     {
-        $this->translationChildren->removeElement($translationChildren);
+        $this->translationChildren->removeElement($child);
     }
 
     /**
@@ -784,10 +786,10 @@ class Page extends FormEntity
      *
      * @return Page
      */
-    public function setTranslationParent (Page $translationParent = null)
+    public function setTranslationParent (TranslationEntityInterface $parent = null)
     {
-        $this->isChanged('translationParent', $translationParent);
-        $this->translationParent = $translationParent;
+        $this->isChanged('translationParent', $parent);
+        $this->translationParent = $parent;
 
         return $this;
     }
@@ -812,29 +814,29 @@ class Page extends FormEntity
     }
 
     /**
-     * Add variantChildren
+     * Add variant
      *
-     * @param Page $variantChildren
+     * @param Page $child
      *
      * @return Page
      */
-    public function addVariantChild (Page $variantChildren)
+    public function addVariantChild (VariantEntityInterface $child)
     {
-        if (!$this->variantChildren->contains($variantChildren)) {
-            $this->variantChildren[] = $variantChildren;
+        if (!$this->variantChildren->contains($child)) {
+            $this->variantChildren[] = $child;
         }
 
         return $this;
     }
 
     /**
-     * Remove variantChildren
+     * Remove variant
      *
-     * @param Page $variantChildren
+     * @param Page VariantEntityInterface
      */
-    public function removeVariantChild (Page $variantChildren)
+    public function removeVariantChild (VariantEntityInterface $child)
     {
-        $this->variantChildren->removeElement($variantChildren);
+        $this->variantChildren->removeElement(VariantEntityInterface);
     }
 
     /**
@@ -850,14 +852,14 @@ class Page extends FormEntity
     /**
      * Set variantParent
      *
-     * @param Page $variantParent
+     * @param Page $parent
      *
      * @return Page
      */
-    public function setVariantParent (Page $variantParent = null)
+    public function setVariantParent (VariantEntityInterface $parent = null)
     {
-        $this->isChanged('variantParent', $variantParent);
-        $this->variantParent = $variantParent;
+        $this->isChanged('variantParent', $parent);
+        $this->variantParent = $parent;
 
         return $this;
     }

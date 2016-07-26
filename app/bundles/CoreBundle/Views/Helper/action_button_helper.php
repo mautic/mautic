@@ -56,6 +56,16 @@ if (!isset($langVar) && isset($routeBase)) {
     $langVar = $routeBase;
 }
 
+// Set index and action routes
+if (isset($route) && !isset($actionRoute)) {
+    $actionRoute = $route;
+} elseif (!isset($actionRoute)) {
+    $actionRoute = 'mautic_'.$routeBase.'_action';
+}
+if (!isset($indexRoute)) {
+    $indexRoute = 'mautic_'.$routeBase.'_index';
+}
+
 //Set a default button type (group or dropdown)
 if (!isset($groupType)) {
     $groupType = 'group';

@@ -196,10 +196,6 @@ return [
             ]
         ],
         'helpers' => [
-            'mautic.helper.menu'               => [
-            ]
-        ],
-        'helpers' => [
             'mautic.helper.template.menu'      => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\MenuHelper',
                 'arguments' => ['knp_menu.helper'],
