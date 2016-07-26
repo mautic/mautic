@@ -578,6 +578,10 @@ var Mautic = {
                         options.lineBreakerTags = [];
                     }
 
+                    textarea.on('froalaEditor.focus', function (e, editor) {
+                        Mautic.showChangeThemeWarning = true;
+                    });
+
                     textarea.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, options));
                 } else {
                     textarea.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, {
@@ -3369,23 +3373,29 @@ var Mautic = {
         }
     },
 
-    froalaEmptyContent: '<!DOCTYPE html><html><head><title></title></head><body></body></html>',
-
     intiSelectTheme: function(themeField) {
         var customHtml = mQuery('textarea.builder-html');
+        var isNew = Mautic.isNewEntity('#page_sessionId, #emailform_sessionId');
+        Mautic.showChangeThemeWarning = true;
+
+        if (isNew) {
+            Mautic.showChangeThemeWarning = false;
+        }
+
         if (customHtml.length) {
 
-            if (!customHtml.val().length || customHtml.val() === Mautic.froalaEmptyContent) {
+            if (!customHtml.val().length) {
                 Mautic.setThemeHtml(themeField.val());
             }
 
             mQuery('[data-theme]').click(function(e) {
                 e.preventDefault();
                 var currentLink = mQuery(this);
-
-                if (customHtml.val().length && customHtml.val() !== Mautic.froalaEmptyContent) {
+                
+                if (Mautic.showChangeThemeWarning && customHtml.val().length) {
                     if (confirm('You will lose the current content if you switch the theme.')) {
                         customHtml.val('');
+                        Mautic.showChangeThemeWarning = false;
                     } else {
                         return;
                     }
@@ -3414,5 +3424,19 @@ var Mautic = {
             textarea.val(themeHtml);
             textarea.froalaEditor('html.set', themeHtml);
         });
+    },
+
+
+    /**
+     * Check if the the entity ID is temporary (for new entities)
+     *
+     * @param string idInputSelector
+     */
+    isNewEntity: function(idInputSelector) {
+        id = mQuery(idInputSelector);
+        if (id.length) {
+            return id.val().match("^new_");
+        }
+        return null;
     }
 };

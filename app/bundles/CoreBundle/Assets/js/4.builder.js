@@ -6,6 +6,7 @@
 Mautic.launchBuilder = function (formName, actionName) {
     Mautic.builderMode     = (mQuery('#' + formName + '_template').val() == '') ? 'custom' : 'template';
     Mautic.builderFormName = formName;
+    Mautic.showChangeThemeWarning = true;
 
     mQuery('body').css('overflow-y', 'hidden');
 
