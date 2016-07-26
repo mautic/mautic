@@ -24,12 +24,12 @@ trait TranslationModelTrait
      *
      *
      * @param TranslationEntityInterface $entity
-     * @param Lead                       $lead
+     * @param Lead|null                  $lead
      * @param Request|null               $request
      *
      * @return array[$parentEntity, TranslationEntityInterface $entity]
      */
-    public function getTranslatedEntity(TranslationEntityInterface $entity, Lead $lead, Request $request = null)
+    public function getTranslatedEntity(TranslationEntityInterface $entity, Lead $lead = null, Request $request = null)
     {
         $translationParent   = $entity->getTranslationParent();
         $translationChildren = $entity->getTranslationChildren()->toArray();
@@ -42,7 +42,7 @@ trait TranslationModelTrait
             }
 
             // Generate a list of translations
-            $translations = [$translationParent->getLanguage()];
+            $translations = [$translationParent->getId() => $translationParent->getLanguage()];
             foreach ($translationChildren as $c) {
                 $translations[$c->getId()] = $c->getLanguage();
             }
@@ -58,8 +58,9 @@ trait TranslationModelTrait
             }
 
             // Get the contact's preferred language if defined
-            $languageList = [];
-            if ($leadPreference = $lead->getPreferredLocale()) {
+            $languageList   = [];
+            $leadPreference = null;
+            if ($lead && $leadPreference = $lead->getPreferredLocale()) {
                 $languageList[$leadPreference] = $leadPreference;
             }
 
@@ -85,16 +86,17 @@ trait TranslationModelTrait
                 }
             }
 
-            $matchFound    = false;
-            $preferredCore = false;
+            $matchFound     = false;
+            $preferredCore  = false;
+            $chosenLanguage = null;
             foreach ($languageList as $language) {
                 $core = $this->getTranslationLocaleCore($language);
                 if (isset($translationList[$core])) {
                     // Does the dialect exist?
                     if (isset($translationList[$core][$language])) {
                         // We have a match
-                        $matchFound = $translationList[$core][$language];
-
+                        $matchFound     = $translationList[$core][$language];
+                        $chosenLanguage = $language;
                         break;
                     } elseif (!$preferredCore) {
                         // This will be the fallback if no matches are found
@@ -108,11 +110,18 @@ trait TranslationModelTrait
                 $entity = ($matchFound == $translationParent->getId()) ? $translationParent : $translationChildren[$matchFound];
             } elseif ($preferredCore) {
                 // Return the best matching language
-                $bestMatch = array_values($translationList[$core])[0];
-                $entity    = ($bestMatch == $translationParent->getId()) ? $translationParent : $translationChildren[$bestMatch];
+                $bestMatch      = array_values($translationList[$preferredCore])[0];
+                $entity         = ($bestMatch == $translationParent->getId()) ? $translationParent : $translationChildren[$bestMatch];
+                $chosenLanguage = $preferredCore;
             }
         }
 
+        // Save the preferred language to the lead's profile
+        if (!$leadPreference && $chosenLanguage) {
+            $lead->addUpdatedField('preferred_locale', $chosenLanguage);
+        }
+
+        // Return the translation parent and translated entity
         return [$translationParent, $entity];
     }
 

@@ -11,12 +11,11 @@ namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
-use Mautic\LeadBundle\EventListener\EmailSubscriber;
 use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PageBundle\Entity\Page;
-use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -36,19 +35,21 @@ class PublicController extends CommonFormController
      */
     public function indexAction($slug, Request $request)
     {
-        //find the page
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model    = $this->getModel('page.page');
         $security = $this->factory->getSecurity();
         $entity   = $model->getEntityBySlugs($slug);
 
         if (!empty($entity)) {
-            $published = $entity->isPublished();
+            $userAccess = $security->hasEntityAccess('page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy());
+            $published  = $entity->isPublished();
 
-            //make sure the page is published or deny access if not
-            if ((!$published) && (!$security->hasEntityAccess('page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()))) {
-                //If the page has a redirect type, handle it
+            // Make sure the page is published or deny access if not
+            if (!$published && !$userAccess) {
+                // If the page has a redirect type, handle it
                 if ($entity->getRedirectType() != null) {
+                    $model->hitPage($entity, $this->request, $entity->getRedirectType());
+
                     return $this->redirect($entity->getRedirectUrl(), $entity->getRedirectType());
                 } else {
                     $model->hitPage($entity, $this->request, 401);
@@ -57,41 +58,63 @@ class PublicController extends CommonFormController
                 }
             }
 
-            if ($request->attributes->has('ignore_mismatch')) {
-                //make sure URLs match up
+            $lead  = null;
+            $query = null;
+            if (!$userAccess) {
+                /** @var LeadModel $leadModel */
+                $leadModel = $this->getModel('lead');
+                // Extract the lead from the request so it can be used to determine language if applicable
+                $query = $model->getHitQuery($this->request, $entity);
+                $lead  = $leadModel->getContactFromRequest($query);
+            }
+
+            // Correct the URL if it doesn't match up
+            if (!$request->attributes->get('ignore_mismatch', 0)) {
+                // Make sure URLs match up
                 $url        = $model->generateUrl($entity, false);
                 $requestUri = $this->request->getRequestUri();
 
-                //remove query
+                // Remove query when comparing
                 $query = $this->request->getQueryString();
                 if (!empty($query)) {
                     $requestUri = str_replace("?{$query}", '', $url);
                 }
 
-                //redirect if they don't match
+                // Redirect if they don't match
                 if ($requestUri != $url) {
-                    $model->hitPage($entity, $this->request, 301);
+                    $model->hitPage($entity, $this->request, 301, $lead, $query);
 
                     return $this->redirect($url, 301);
                 }
             }
 
-            //check for variants
+            // Check for a translation
+            list($translationParent, $translatedEntity) = $model->getTranslatedEntity($entity, $lead, $this->request);
+
+            if ($translationParent && $translatedEntity->getId() !== $entity->getId()) {
+                if (!$this->request->get('ntrd', 0)) {
+                    $url = $model->generateUrl($translatedEntity, false);
+                    $model->hitPage($entity, $this->request, 302, $lead, $query);
+
+                    return $this->redirect($url, 302);
+                }
+            }
+
+            // Check for variants
             $parentVariant   = $entity->getVariantParent();
             $childrenVariant = $entity->getVariantChildren();
 
-            $userAccess = $security->hasEntityAccess('page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy());
-
-            //is this a variant of another? If so, the parent URL should be used unless a user is logged in and previewing
+            // Is this a variant of another? If so, the parent URL should be used unless a user is logged in and previewing
             if ($parentVariant && !$userAccess) {
-                $model->hitPage($entity, $this->request, 301);
+                $model->hitPage($entity, $this->request, 301, $lead, $query);
                 $url = $model->generateUrl($parentVariant, false);
 
                 return $this->redirect($url, 301);
             }
 
+            // Determine what page to display
             if (!$userAccess) {
-                //check to see if a variant should be shown versus the parent but ignore if a user is previewing
+                // Check to see if a variant should be shown versus the parent but ignore if a user is previewing
                 if (count($childrenVariant)) {
 
                     $variants      = [];
@@ -138,7 +161,7 @@ class PublicController extends CommonFormController
                             $useId        = array_search($greatestDiff, $byWeight);
 
                             //set the cookie - 14 days
-                            $this->factory->getHelper('cookie')->setCookie('mautic_page_'.$entity->getId(), $useId, 3600 * 24 * 14);
+                            $this->get('mautic.helper.cookie')->setCookie('mautic_page_'.$entity->getId(), $useId, 3600 * 24 * 14);
 
                             if ($useId != $entity->getId()) {
                                 $entity = $childrenVariant[$useId];
@@ -147,102 +170,18 @@ class PublicController extends CommonFormController
                     }
                 }
             }
-            //let's check for preferred languages if we have a multi-language group of pages
-            $translationParent   = $entity->getTranslationParent();
-            $translationChildren = $entity->getTranslationChildren();
-            if ($translationParent || count($translationChildren)) {
-                $session = $this->factory->getSession();
-                if ($translationParent) {
-                    $translationChildren = $translationParent->getTranslationChildren();
-                } else {
-                    $translationParent = $entity;
-                }
 
-                //check to see if this group has already been redirected
-                $doNotRedirect = $session->get('mautic.page.'.$translationParent->getId().'.donotredirect', false);
-
-                if (empty($doNotRedirect)) {
-                    $session->set('mautic.page.'.$translationParent->getId().'.donotredirect', 1);
-
-                    //generate a list of translations
-                    $langs = [$translationParent->getLanguage()];
-                    foreach ($translationChildren as $c) {
-                        $langs[$c->getId()] = $c->getLanguage();
-                    }
-
-                    //loop through the translations to ensure there is a generic option for each
-                    //dialect (i.e en if en_US is present)
-                    $pageLangs = [];
-                    $pageIds   = [];
-                    foreach ($langs as $id => $l) {
-                        $pageIds[]   = $id;
-                        $pageLangs[] = $l;
-                        if (strpos($l, '_') !== false) {
-                            $base = substr($l, 0, 2);
-                            if (!in_array($base, $pageLangs)) {
-                                $pageLangs[] = $base;
-                                $pageIds[]   = $id;
-                            }
-                        }
-                    }
-
-                    //get the browser preferred languages
-                    $browserLangs = $this->request->server->get('HTTP_ACCEPT_LANGUAGE');
-                    if (!empty($browserLangs)) {
-                        $langs = explode(',', $browserLangs);
-                        if (!empty($langs)) {
-                            foreach ($langs as $k => $l) {
-                                if ($pos = strpos($l, ';q=') !== false) {
-                                    //remove weights
-                                    $l = substr($l, 0, ($pos + 1));
-                                }
-                                //change - to _
-                                $langs[$k] = str_replace('-', '_', $l);
-                            }
-                        }
-
-                        //loop through the browser languages to ensure there is a generic option for each
-                        //dialect (i.e en if en_US is present)
-                        $userLangs = [];
-                        foreach ($langs as $k => $l) {
-                            $userLangs[] = $l;
-
-                            if (strpos($l, '_') !== false) {
-                                $base = substr($l, 0, 2);
-                                if (!in_array($base, $langs) && !in_array($base, $userLangs)) {
-                                    $userLangs[] = $base;
-                                }
-                            }
-                        }
-
-                        //get translations in order of browser preference
-                        $matches = array_intersect($userLangs, $pageLangs);
-                        if (!empty($matches)) {
-                            $preferred = reset($matches);
-                            $key       = array_search($preferred, $pageLangs);
-                            $pageId    = $pageIds[$key];
-
-                            //redirect if not already on the correct page
-                            if ($pageId && $pageId != $entity->getId()) {
-                                $page = ($pageId == $translationParent->getId()) ? $translationParent : $translationChildren[$pageId];
-                                if ($page !== null) {
-                                    $url = $model->generateUrl($page, false);
-                                    $model->hitPage($entity, $this->request, 302);
-
-                                    return $this->redirect($url, 302);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
+            // Generate contents
             $analytics = $this->factory->getHelper('template.analytics')->getCode();
 
             $BCcontent = $entity->getContent();
-            $content = $entity->getCustomHtml();
+            $content   = $entity->getCustomHtml();
             // This condition remains so the Mautic v1 themes would display the content
             if (empty($content) && !empty($BCcontent)) {
+                /**
+                 * @deprecated  BC support to be removed in 3.0
+                 */
+
                 $template = $entity->getTemplate();
                 //all the checks pass so display the content
                 $slots   = $this->factory->getTheme($template)->getSlots('page');
@@ -279,7 +218,7 @@ class PublicController extends CommonFormController
             $this->factory->getDispatcher()->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
             $content = $event->getContent();
 
-            $model->hitPage($entity, $this->request, 200);
+            $model->hitPage($entity, $this->request, 200, $lead, $query);
 
             return new Response($content);
         }
@@ -301,14 +240,14 @@ class PublicController extends CommonFormController
         $model  = $this->getModel('page');
         $entity = $model->getEntity($id);
 
-        if ($entity === null || !$entity->isPublished(false)) {
+        if ($entity === null) {
             $this->notFound();
         }
 
         $analytics = $this->factory->getHelper('template.analytics')->getCode();
 
         $BCcontent = $entity->getContent();
-        $content = $entity->getCustomHtml();
+        $content   = $entity->getCustomHtml();
         if (empty($content) && !empty($BCcontent)) {
             $template = $entity->getTemplate();
             //all the checks pass so display the content
@@ -412,6 +351,8 @@ class PublicController extends CommonFormController
 
     /**
      * PreProcess page slots for public view.
+     *
+     * @deprecated - to be removed in 3.0
      *
      * @param array $slots
      * @param Page  $entity

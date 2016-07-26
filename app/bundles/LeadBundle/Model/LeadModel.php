@@ -34,7 +34,6 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\PointBundle\Model\TriggerModel;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -376,10 +375,12 @@ class LeadModel extends FormModel
             // Lead is new or they haven't been populated so let's build the fields now
             static $fields;
             if (empty($fields)) {
-                $fields = $this->leadFieldModel->getEntities(array(
-                    'filter'         => array('isPublished' => true),
-                    'hydration_mode' => 'HYDRATE_ARRAY'
-                ));
+                $fields = $this->leadFieldModel->getEntities(
+                    [
+                        'filter'         => ['isPublished' => true],
+                        'hydration_mode' => 'HYDRATE_ARRAY'
+                    ]
+                );
                 $fields = $this->organizeFieldsByGroup($fields);
             }
             $fieldValues = $fields;
@@ -667,6 +668,98 @@ class LeadModel extends FormModel
         }
 
         return ($returnTracking) ? array($this->currentLead, $trackingId, $generated) : $this->currentLead;
+    }
+
+    /**
+     * Get the lead from request (ct/clickthrough) and handles auto merging of lead data from request parameters
+     *
+     * @deprecated - here till all lead methods are converted to contact methods; preferably use getContactFromRequest instead
+     *
+     * @param array $queryFields
+     */
+    public function getLeadFromRequest(array $queryFields =  [])
+    {
+        return $this->getContactFromRequest($queryFields);
+    }
+
+    /**
+     * Get the contat from request (ct/clickthrough) and handles auto merging of contact data from request parameters
+     *
+     * @param array $queryFields
+     */
+    public function getContactFromRequest($queryFields = [])
+    {
+        // Check for a lead requested through clickthrough query parameter
+        if (isset($queryFields['ct'])) {
+            $clickthrough = $queryFields['ct'];
+        } elseif ($clickthrough = $this->request->get('ct', [])) {
+            $clickthrough = $this->decodeArrayFromUrl($clickthrough);
+        }
+
+        if (is_array($clickthrough) && !empty($clickthrough['lead'])) {
+            $lead = $this->getEntity($clickthrough['lead']);
+            if ($lead !== null) {
+                $this->setLeadCookie($clickthrough['lead']);
+                $this->setCurrentLead($lead);
+            }
+        }
+
+        // No lead defined in ct so get the currently tracked lead
+        if (empty($lead)) {
+            $lead = $this->getCurrentLead();
+        }
+
+        // Update lead fields if some data were sent in the URL query
+        $availableLeadFields = $this->leadFieldModel->getFieldList(
+            false,
+            false,
+            [
+                'isPublished'         => true,
+                'isPubliclyUpdatable' => true
+            ]
+        );
+
+        $uniqueLeadFields    = $this->leadFieldModel->getUniqueIdentiferFields();
+        $uniqueLeadFieldData = [];
+        $inQuery             = array_intersect_key($queryFields, $availableLeadFields);
+        foreach ($inQuery as $k => $v) {
+            if (empty($queryFields[$k])) {
+                unset($inQuery[$k]);
+            }
+
+            if (array_key_exists($k, $uniqueLeadFields)) {
+                $uniqueLeadFieldData[$k] = $v;
+            }
+        }
+
+        if (count($inQuery)) {
+            // Check for leads using unique identifier
+            if (count($uniqueLeadFieldData)) {
+                $existingLeads = $this->getRepository()->getLeadsByUniqueFields(
+                    $uniqueLeadFieldData,
+                    $lead->getId()
+                );
+                if (!empty($existingLeads)) {
+                    $lead = $this->mergeLeads($lead, $existingLeads[0]);
+                }
+
+                $leadIpAddresses = $lead->getIpAddresses();
+                $ipAddress       = $this->ipLookupHelper->getIpAddress();
+                if (!$leadIpAddresses->contains($ipAddress)) {
+                    $lead->addIpAddress($ipAddress);
+                }
+
+                $this->setCurrentLead($lead);
+            }
+
+            $this->setFieldValues($lead, $inQuery);
+        }
+
+        if (isset($queryFields['tags'])) {
+            $this->modifyTags($lead, $queryFields['tags']);
+        }
+
+        return $lead;
     }
 
     /**
@@ -1324,9 +1417,12 @@ class LeadModel extends FormModel
      * @param      $tags
      * @param      $removeTags
      * @param      $persist
+     *
+     * @param bool True if tags modified
      */
     public function modifyTags(Lead $lead, $tags, array $removeTags = null, $persist = true)
     {
+        $tagsModified = false;
         $leadTags = $lead->getTags();
 
         if ($leadTags) {
@@ -1349,7 +1445,9 @@ class LeadModel extends FormModel
                 $tag = substr($tag, 1);
 
                 if (array_key_exists($tag, $foundTags) && $leadTags->contains($foundTags[$tag])) {
+                    $tagsModified = true;
                     $lead->removeTag($foundTags[$tag]);
+
                     $this->logger->debug('LEAD: Removed ' . $tag);
                 }
             } else {
@@ -1359,9 +1457,12 @@ class LeadModel extends FormModel
                     $newTag = new Tag();
                     $newTag->setTag($tag);
                     $lead->addTag($newTag);
+                    $tagsModified = true;
+
                     $this->logger->debug('LEAD: Added ' . $tag);
                 } elseif (!$leadTags->contains($foundTags[$tag])) {
                     $lead->addTag($foundTags[$tag]);
+                    $tagsModified = true;
 
                     $this->logger->debug('LEAD: Added ' . $tag);
                 }
@@ -1369,7 +1470,6 @@ class LeadModel extends FormModel
         }
 
         if (!empty($removeTags)) {
-
             $this->logger->debug('CONTACT: Removing '.implode(', ', $removeTags).' for contact ID# '.$lead->getId());
 
             array_walk($removeTags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
@@ -1381,6 +1481,8 @@ class LeadModel extends FormModel
                 // Tag to be removed
                 if (array_key_exists($tag, $foundRemoveTags) && $leadTags->contains($foundRemoveTags[$tag])) {
                     $lead->removeTag($foundRemoveTags[$tag]);
+                    $tagsModified = true;
+
                     $this->logger->debug('LEAD: Removed '.$tag);
                 }
             }
@@ -1389,6 +1491,8 @@ class LeadModel extends FormModel
         if ($persist) {
             $this->saveEntity($lead);
         }
+
+        return $tagsModified;
     }
 
     /**
