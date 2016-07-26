@@ -87,7 +87,7 @@ if ($security->isGranted('lead:leads:editown')) {
             'data-toggle' => 'ajaxmodal',
             'data-target' => '#MauticSharedModal',
             'data-header' => $view['translator']->trans(
-                'mautic.lead.lead.header.contactFrequency',
+                'mautic.lead.lead.header.contact.frequency',
                 array('%name%' => $lead->getPrimaryIdentifier())
             ),
             'data-footer' => 'false',
