@@ -337,6 +337,17 @@ class SalesforceIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 $createdLeadData = $this->getApiHelper()->createLead($mappedData[$object], $lead);
+                if ($createdLeadData['id']){
+                    $log = array(
+                        "bundle"    => "plugin",
+                        "object"    => "lead",
+                        "objectId"  => $lead->getId(),
+                        "action"    => "Create New Lead",
+                        "details"   => array('salesforceid' => $createdLeadData['id']),
+                        "ipAddress" => $this->factory->getIpAddressFromRequest()
+                    );
+                    $this->factory->getModel('core.auditLog')->writeToLog($log);
+                }
                 return true;
             }
         } catch (\Exception $e) {
@@ -471,7 +482,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $lead;
     }
 
-    public function getLeadData($activityType, $lead, \DateTime $startDate = null, \DateTime $endDate = null){
+    public function getLeadData(\DateTime $startDate = null, \DateTime $endDate = null){
         $leadModel = $this->factory->getModel('lead');
 
         $baseURL = $this->factory->getRequest()->getHttpHost();
@@ -502,7 +513,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $activity;
     }
 
-    public function createLeadActivity(){
+    public function createLeadActivity(\DateTime $startDate = null, \DateTime $endDate = null){
         $this->getApiHelper()->createLeadActivity($createdLeadData, $lead);
     }
 }
