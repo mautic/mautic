@@ -262,19 +262,26 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $internal = array('latestDateCovered' => $data['latestDateCovered']);
         $count = 0;
 
-        if(isset($data['ids'])){
-            foreach($data['ids'] as $salesforceId)
+        if(isset($data['records'])){
+            foreach($data['records'] as $record)
             {
-                $data = $this->getApiHelper()->getSalesForceLeadById($salesforceId,$leadFields[$object],$object);
-
-                foreach ($data as $key=>$item){
+                foreach ($record as $key=>$item){
                     $dataObject[$key."__".$object] = $item;
                 }
 
                 $dataObject["internal__".$object] = $internal;
 
                 if($dataObject){
-                    $this->getMauticLead($dataObject,true,null,null);
+                    $lead =$this->getMauticLead($dataObject,true,null,null);
+                    $log = array(
+                        "bundle"    => "plugin",
+                        "object"    => "lead",
+                        "objectId"  => $lead->getId(),
+                        "action"    => "Create New Lead",
+                        "details"   => array('salesforceid' => $record['id']),
+                        "ipAddress" => $this->factory->getIpAddressFromRequest()
+                    );
+                    $this->factory->getModel('core.auditLog')->writeToLog($log);
                     $count++;
                 }
                 unset($data);
@@ -445,7 +452,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $config = $this->mergeConfigToFeatureSettings(array());
         // Match that data with mapped lead fields
         $matchedFields = $this->populateMauticLeadData($data, $config);
-
+       
         if (empty($matchedFields)) {
 
             return;
@@ -548,6 +555,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     public function createLeadActivity(\DateTime $startDate = null, \DateTime $endDate = null){
-        $this->getApiHelper()->createLeadActivity($createdLeadData, $lead);
+     //   $this->getApiHelper()->createLeadActivity($createdLeadData, $lead);
     }
 }
