@@ -65,17 +65,17 @@ class SalesforceApi extends CrmApi
     {
         $createdLeadData =  $this->request('', $data, 'POST');
         //todo: check if push activities is selected in config
-        $this->createLeadActivity($createdLeadData, $lead);
 
         return $createdLeadData;
     }
 
     public function createLeadActivity(array $salesForceLeadData, $lead)
     {
-        $mActivityObjectName = 'Event';
+        $mActivityObjectName = 'Mautic_timeline__c';
 
         // get lead's point activity
         $pointsRepo = $this->integration->getLeadData('points', $lead);
+        $leadUrl = $pointsRepo['leadUrl'];
         if(!empty($pointsRepo))
         {
             $deltaType = '';
@@ -91,12 +91,12 @@ class SalesforceApi extends CrmApi
                 }
 
                 $activityData = array(
-                    'ActivityDate'   => $pointActivity['dateAdded']->format('c'),
-                    'Description'    => $pointActivity['type'].":".$pointActivity['eventName']." ".$deltaType." ".$pointActivity['actionName'],
-                    'WhoId'          => $salesForceLeadData['id'],
-                    'Subject'        => 'Mautic TimeLine Activity',
-                    'DurationInMinutes' => 0,
-                    'ActivityDateTime' =>$pointActivity['dateAdded']->format('c')
+                    'ActivityDate__c'   => $pointActivity['dateAdded']->format('c'),
+                    'Description__c'    => $pointActivity['type'].":".$pointActivity['eventName']." ".$deltaType." ".$pointActivity['actionName'],
+                    'WhoId__c'          => $salesForceLeadData['id'],
+                    'Name'           => 'Mautic TimeLine Activity',
+                    'MauticLead__c'     => $lead->getId(),
+                    'Mautic_url__c'     => $leadUrl
                 );
                 //todo: log posted activities so that they don't get sent over again
                 $this->request('', $activityData, 'POST', false, $mActivityObjectName);

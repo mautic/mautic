@@ -336,7 +336,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                $this->getApiHelper()->createLead($mappedData[$object], $lead);
+                $createdLeadData = $this->getApiHelper()->createLead($mappedData[$object], $lead);
                 return true;
             }
         } catch (\Exception $e) {
@@ -471,15 +471,38 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $lead;
     }
 
-    public function getLeadData($activityType, $lead){
+    public function getLeadData($activityType, $lead, \DateTime $startDate = null, \DateTime $endDate = null){
         $leadModel = $this->factory->getModel('lead');
-        switch ($activityType){
-            case 'points':
-                $pointsRepo = $leadModel->getPointLogRepository();
-                $pointsActivity = $pointsRepo->getLeadTimelineEvents($lead->getId());
-                return $pointsActivity;
-                break;
-        }
 
+        $baseURL = $this->factory->getRequest()->getHttpHost();
+        $activity['leadUrl'] = $baseURL.$this->factory->getRouter()->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $lead->getId()));
+
+        $pointsRepo = $leadModel->getPointLogRepository();
+        $activity['points'] = $pointsRepo->getLeadTimelineEvents($lead->getId());
+
+        $emailModel = $this->factory->getModel('email');
+        $emailRepo = $emailModel->getStatRepository();
+        $activity['emails'] = $emailRepo->getLeadStatsByDate($lead->getId(), $startDate, $endDate);
+
+        $formSubmissionModel = $this->factory->getModel('email');
+
+        /** @var \Mautic\FormBundle\Entity\SubmissionRepository $submissionRepository */
+        $submissionRepo = $formSubmissionModel->getRepository();
+        $activity['forms'] = array();
+        $i=0;
+        foreach ($submissionRepo as $row) {
+            $submission = $submissionRepo->getEntity($row['id']);
+            // Convert to local from UTC
+            $activity['forms'][$i]['eventName'] = $this->translator->trans('mautic.form.event.submitted');
+            $activity['forms'][$i]['actionName'] = $submission->getForm()->getName();
+
+            $dtHelper = $this->factory->getDate($row['dateSubmitted'], 'Y-m-d H:i:s', 'UTC');
+            $activity['forms'][$i]['dateAdded'] = $dtHelper->getLocalDateTime();
+        }
+        return $activity;
+    }
+
+    public function createLeadActivity(){
+        $this->getApiHelper()->createLeadActivity($createdLeadData, $lead);
     }
 }

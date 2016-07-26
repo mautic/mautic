@@ -77,7 +77,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                $salesForceLeadData = $this->getApiHelper()->createLead($mappedData, $lead);
+                $LeadData = $this->getApiHelper()->createLead($mappedData, $lead);
+
                 return true;
             }
           } catch (\Exception $e) {
