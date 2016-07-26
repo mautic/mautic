@@ -578,16 +578,15 @@ var Mautic = {
                         options.lineBreakerTags = [];
                     }
 
-                    textarea.froalaEditor(mQuery.extend(options, Mautic.basicFroalaOptions));
+                    textarea.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, options));
                 } else {
-                    textarea.froalaEditor(mQuery.extend({
-                        // Set custom buttons with separator between them.
+                    textarea.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, {
                         toolbarButtons: minButtons,
                         toolbarButtonsMD: minButtons,
                         toolbarButtonsSM: minButtons,
                         toolbarButtonsXS: minButtons,
                         heightMin: 100
-                    }, Mautic.basicFroalaOptions));
+                    }));
 
                 }
             });
