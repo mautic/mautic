@@ -314,6 +314,10 @@ return [
                 'class'     => 'Mautic\LeadBundle\Form\Type\MergeType',
                 'alias'     => 'lead_merge'
             ],
+            'mautic.form.type.lead_contact_frequency_rules'               => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\ContactFrequencyType',
+                'alias'     => 'lead_contact_frequency_rules'
+            ],
             'mautic.form.type.campaignevent_lead_field_value'  => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadFieldValueType',
                 'arguments' => 'mautic.factory',

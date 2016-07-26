@@ -21,6 +21,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class MailHelper
@@ -1807,5 +1808,30 @@ class MailHelper
             $value = isset($content[$slot]) ? $content[$slot] : "";
             $slotsHelper->set($slot, $value);
         }
+    }
+
+    /**
+     * @param Lead $lead
+     */
+    public function applyFrequencyRules(Lead $lead)
+    {
+        $frequencyRule = $lead->getFrequencyRules();
+        if(!empty($frequencyRule)){
+            $now = new \DateTime();
+            $frequencyTime = new \DateInterval('PT'.$frequencyRule['frequency_time']);
+            $now->sub($frequencyTime);
+
+            /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
+            $emailModel = $this->factory->getModel('email');
+
+            $statRepo = $emailModel->getStatRepository();
+            $sentQuery = $statRepo->getLeadStats($lead->getId(), array('fromDate' => $now));
+            if(!empty($sentQuery) and $sentQuery['dateSent'] and $sentQuery['dateSent']<$frequencyRule['frequency_number'])
+            {
+                return true;
+            }
+            return false;
+        }
+        return true;
     }
 }

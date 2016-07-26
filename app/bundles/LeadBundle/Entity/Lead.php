@@ -158,6 +158,11 @@ class Lead extends FormEntity
     private $utmtags;
 
     /**
+     * @var ArrayCollection
+     */
+    private $frequencyRules;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -168,6 +173,7 @@ class Lead extends FormEntity
         $this->pointsChangeLog = new ArrayCollection();
         $this->tags            = new ArrayCollection();
         $this->stageChangeLog  = new ArrayCollection();
+        $this->frequencyRules  = new ArrayCollection();
     }
 
     /**
@@ -301,6 +307,11 @@ class Lead extends FormEntity
             ->mappedBy('lead')
             ->cascadeAll()
             ->fetchExtraLazy()
+            ->build();
+
+        $builder->createField('frequencyRules', 'array')
+            ->columnName('frequency_rules')
+            ->nullable()
             ->build();
     }
 
@@ -1259,6 +1270,29 @@ class Lead extends FormEntity
         return $this->stage;
     }
 
+    /**
+     * Set stage
+     *
+     * @param array $frequencyRules
+     *
+     * @return frequencyRules
+     */
+    public function setFrequencyRules(array $frequencyRules)
+    {
+        $this->frequencyRules = $frequencyRules;
+
+        return $this;
+    }
+
+    /**
+     * Get stage
+     *
+     * @return array
+     */
+    public function getFrequencyRules()
+    {
+        return $this->frequencyRules;
+    }
     /**
      * Get attribution value
      *

@@ -795,7 +795,7 @@ class LeadController extends FormController
         $this->request->files->remove('lead');
     }
 
-/**
+    /**
      * Generates merge form and action
      *
      * @param            $objectId
@@ -979,6 +979,109 @@ class LeadController extends FormController
         );
     }
 
+    /**
+     * Generates contact frequency rules form and action
+     *
+     * @param            $objectId
+     *
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function contactFrequencyAction ($objectId)
+    {
+        $model = $this->getModel('lead');
+        $lead  = $model->getEntity($objectId);
+
+        if ($lead != null
+            && $this->factory->getSecurity()->hasEntityAccess(
+                'lead:leads:editown',
+                'lead:leads:editother', $lead->getOwner()
+            )
+        ) {
+            $frequencyRules = $lead->getFrequencyRules();
+            $this->factory->getLogger()->addError(print_r($frequencyRules,true));
+            $action = $this->generateUrl('mautic_contact_action', array('objectAction' => 'contactFrequency', 'objectId' => $lead->getId()));
+
+            $form = $this->get('form.factory')->create(
+                'lead_contact_frequency_rules',
+                array(),
+                array(
+                    'action' => $action,
+                    'data' => $frequencyRules
+                )
+            );
+            if ($this->request->getMethod() == 'POST') {
+                if (!$this->isFormCancelled($form)) {
+                    if ($valid = $this->isFormValid($form)) {
+                        $model = $this->getModel('lead.lead');
+                        $entity = $model->getEntity($objectId);
+                        $data = $form->getData();
+                        $this->factory->getLogger()->addError(print_r($data, true));
+                        $valid = true;
+                        if ($entity === null) {
+                            $flashes[] = array(
+                                'type' => 'error',
+                                'msg' => 'mautic.lead.lead.error.notfound',
+                                'msgVars' => array('%id%' => $objectId)
+                            );
+                        } else {
+                            $entity->setFrequencyRules($data);
+                            $model->saveEntity($entity);
+
+                            $identifier = $this->get('translator')->trans($entity->getPrimaryIdentifier());
+                            $flashes[] = array(
+                                'type' => 'notice',
+                                'msg' => 'mautic.lead.list.frequency.rules.msg',
+                                'msgVars' => array(
+                                    '%name%' => $identifier,
+                                    '%id%' => $objectId
+                                )
+                            );
+                        }
+                    }
+                }
+                if ($valid) {
+
+                    $viewParameters = array(
+                        'objectId'     => $lead->getId(),
+                        'objectAction' => 'view',
+                    );
+
+                    return $this->postActionRedirect(
+                        array(
+                            'returnUrl'       => $this->generateUrl('mautic_contact_action', $viewParameters),
+                            'viewParameters'  => $viewParameters,
+                            'contentTemplate' => 'MauticLeadBundle:Lead:view',
+                            'passthroughVars' => array(
+                                'closeModal' => 1
+                            )
+                        )
+                    );
+                }
+            }
+            $tmpl = $this->request->get('tmpl', 'index');
+            return $this->delegateView(
+                array(
+                    'viewParameters'   => array(
+                        'tmpl'         => $tmpl,
+                        'action'       => $action,
+                        'form'         => $form->createView(),
+                        'currentRoute' => $this->generateUrl(
+                            'mautic_contact_action',
+                            array(
+                                'objectAction' => 'contactFrequency',
+                                'objectId'     => $lead->getId()
+                            )
+                        ),
+                    ),
+                    'contentTemplate' => 'MauticLeadBundle:Lead:frequency.html.php',
+                    'passthroughVars' => array(
+                        'route'  => false,
+                        'target' => ($tmpl == 'update') ? '.lead-merge-options' : null
+                    )
+                )
+            );
+        }
+    }
     /**
      * Deletes the entity
      *
@@ -2083,8 +2186,6 @@ class LeadController extends FormController
             $model = $this->getModel('lead');
             $data  = $this->request->request->get('lead_batch_stage', array(), true);
             $ids   = json_decode($data['ids'], true);
-
-            $this->factory->getLogger()->addError(print_r($ids,true));
 
             $entities  = array();
             if (is_array($ids)) {

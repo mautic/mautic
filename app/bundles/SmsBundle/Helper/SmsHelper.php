@@ -14,7 +14,9 @@ use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\SmsBundle\Model\SmsModel;
 
 class SmsHelper
 {
@@ -34,16 +36,23 @@ class SmsHelper
     protected $phoneNumberHelper;
 
     /**
+     * @var SmsModel
+     */
+    protected $smsModel;
+
+    /**
      * SmsHelper constructor.
      * 
      * @param EntityManager $em
      * @param LeadModel $leadModel
      */
-    public function __construct(EntityManager $em, LeadModel $leadModel, PhoneNumberHelper $phoneNumberHelper)
+    public function __construct(EntityManager $em, LeadModel $leadModel, PhoneNumberHelper $phoneNumberHelper, SmsModel $smsModel)
     {
         $this->em = $em;
         $this->leadModel = $leadModel;
         $this->phoneNumberHelper = $phoneNumberHelper;
+        $this->smsModel = $smsModel;
+
     }
 
     public function unsubscribe($number)
@@ -83,5 +92,24 @@ class SmsHelper
         }
 
         return $this->leadModel->addDncForLead($lead, 'sms', null, DoNotContact::UNSUBSCRIBED);
+    }
+
+    public function applyFrequencyRules(Lead $lead)
+    {
+        $frequencyRule = $lead->getFrequencyRules();
+        if(!empty($frequencyRule)){
+            $now = new \DateTime();
+            $frequencyTime = new \DateInterval('PT'.$frequencyRule['frequency_time']);
+            $now->sub($frequencyTime);
+
+            $statRepo = $this->smsModel->getStatRepository();
+            $sentQuery = $statRepo->getLeadStats($lead->getId(), array('fromDate' => $now));
+            if(!empty($sentQuery) and $sentQuery['dateSent'] and $sentQuery['dateSent']<$frequencyRule['frequency_number'])
+            {
+                return true;
+            }
+            return false;
+        }
+        return true;
     }
 }
