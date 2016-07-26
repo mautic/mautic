@@ -125,51 +125,6 @@ Mautic.fixFroalaEmailOutput = function() {
     }
 }
 
-Mautic.insertEmailBuilderToken = function(editorId, token) {
-    var editor = Mautic.getEmailBuilderEditorInstances();
-    editor[instance].insertText(token);
-};
-
-Mautic.getEmailAbTestWinnerForm = function(abKey) {
-    if (abKey && mQuery(abKey).val() && mQuery(abKey).closest('.form-group').hasClass('has-error')) {
-        mQuery(abKey).closest('.form-group').removeClass('has-error');
-        if (mQuery(abKey).next().hasClass('help-block')) {
-            mQuery(abKey).next().remove();
-        }
-    }
-
-    Mautic.activateLabelLoadingIndicator('emailform_variantSettings_winnerCriteria');
-    var emailId = mQuery('#emailform_sessionId').val();
-
-    var query = "action=email:getAbTestForm&abKey=" + mQuery(abKey).val() + "&emailId=" + emailId;
-
-    mQuery.ajax({
-        url: mauticAjaxUrl,
-        type: "POST",
-        data: query,
-        dataType: "json",
-        success: function (response) {
-            if (typeof response.html != 'undefined') {
-                if (mQuery('#emailform_variantSettings_properties').length) {
-                    mQuery('#emailform_variantSettings_properties').replaceWith(response.html);
-                } else {
-                    mQuery('#emailform_variantSettings').append(response.html);
-                }
-
-                if (response.html != '') {
-                    Mautic.onPageLoad('#emailform_variantSettings_properties', response);
-                }
-            }
-        },
-        error: function (request, textStatus, errorThrown) {
-            Mautic.processAjaxError(request, textStatus, errorThrown);
-        },
-        complete: function() {
-            Mautic.removeLabelLoadingIndicator();
-        }
-    });
-};
-
 Mautic.loadNewEmailWindow = function(options) {
     if (options.windowUrl) {
         Mautic.startModalLoadingBar();

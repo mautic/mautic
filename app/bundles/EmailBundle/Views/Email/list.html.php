@@ -94,7 +94,7 @@ if (count($items)):
                         <a href="<?php echo $view['router']->path('mautic_email_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
                             <?php echo $item->getName(); ?>
                             <?php if ($hasVariants): ?>
-                            <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.email.icon_tooltip.abtest'); ?>"><i class="fa fa-fw fa-sitemap"></i></span>
+                            <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.icon_tooltip.ab_test'); ?>"><i class="fa fa-fw fa-sitemap"></i></span>
                             <?php endif; ?>
                             <?php if ($type == 'list'): ?>
                             <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.email.icon_tooltip.list_email'); ?>"><i class="fa fa-fw fa-pie-chart"></i></span>

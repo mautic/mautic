@@ -15,6 +15,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -29,7 +30,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  *
  * @package Mautic\EmailBundle\Entity
  */
-class Email extends FormEntity
+class Email extends FormEntity implements VariantEntityInterface
 {
 
     /**
@@ -835,10 +836,10 @@ class Email extends FormEntity
      *
      * @return Email
      */
-    public function addVariantChild (Email $variantChildren)
+    public function addVariantChild (VariantEntityInterface $child)
     {
-        if (!$this->variantChildren->contains($variantChildren)) {
-            $this->variantChildren[] = $variantChildren;
+        if (!$this->variantChildren->contains($child)) {
+            $this->variantChildren[] = $child;
         }
 
         return $this;
@@ -849,9 +850,9 @@ class Email extends FormEntity
      *
      * @param \Mautic\EmailBundle\Entity\Email $variantChildren
      */
-    public function removeVariantChild (Email $variantChildren)
+    public function removeVariantChild (VariantEntityInterface $child)
     {
-        $this->variantChildren->removeElement($variantChildren);
+        $this->variantChildren->removeElement($child);
     }
 
     /**
@@ -867,14 +868,14 @@ class Email extends FormEntity
     /**
      * Set variantParent
      *
-     * @param \Mautic\EmailBundle\Entity\Email $variantParent
+     * @param \Mautic\EmailBundle\Entity\Email $parent
      *
      * @return Email
      */
-    public function setVariantParent (Email $variantParent = null)
+    public function setVariantParent (VariantEntityInterface $parent = null)
     {
-        $this->isChanged('variantParent', $variantParent);
-        $this->variantParent = $variantParent;
+        $this->isChanged('variantParent', $parent);
+        $this->variantParent = $parent;
 
         return $this;
     }
@@ -887,6 +888,14 @@ class Email extends FormEntity
     public function getVariantParent ()
     {
         return $this->variantParent;
+    }
+
+    /**
+     * Remove variant parent
+     */
+    public function removeVariantParent()
+    {
+        $this->setVariantParent(null);
     }
 
     /**

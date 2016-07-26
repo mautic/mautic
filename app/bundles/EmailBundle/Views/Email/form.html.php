@@ -11,7 +11,7 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'email');
 
 $variantParent = $email->getVariantParent();
-$subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.email.header.editvariant', array(
+$subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.core.variant.child_of', array(
     '%name%' => $email->getName(),
     '%parent%' => $variantParent->getName()
 )) . '</span></div>' : '';
