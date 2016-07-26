@@ -81,11 +81,9 @@ class FetchLeadsCommand extends ContainerAwareCommand
         if(!$startDate){
             $startDate= date('c', strtotime("-".$interval));
         }
-
         if(!$endDate){
             $endDate= date('c');
         }
-
         if ($integration && $startDate && $endDate) {
             /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
             $integrationHelper = $factory->getHelper('integration');
@@ -112,7 +110,6 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 }
             }
         }
-
         return 0;
     }
 }

@@ -87,6 +87,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getAccessTokenUrl()
     {
+        $config = $this->mergeConfigToFeatureSettings(array());
+
+        if(isset($config['sandbox'][0]) and $config['sandbox'][0] === 'sandbox')
+        {
+            return 'https://test.salesforce.com/services/oauth2/token';
+        }
         return 'https://login.salesforce.com/services/oauth2/token';
     }
 
@@ -97,6 +103,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getAuthenticationUrl()
     {
+        $config = $this->mergeConfigToFeatureSettings(array());
+        if(isset($config['sandbox'][0]) and $config['sandbox'][0] === 'sandbox')
+        {
+            return 'https://test.salesforce.com/services/oauth2/authorize';
+        }
         return 'https://login.salesforce.com/services/oauth2/authorize';
     }
 
@@ -114,6 +125,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function getApiUrl()
     {
         return sprintf('%s/services/data/v32.0/sobjects',$this->keys['instance_url']);
+    }
+
+    /**
+     * @return string
+     */
+    public function getQueryUrl()
+    {
+        return sprintf('%s/services/data/v32.0',$this->keys['instance_url']);
     }
 
     /**
@@ -264,25 +283,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $count;
     }
     /**
-     * @param array  $fields
-     * @param array  $keys
-     * @param string $object
-     */
-    public function cleanSalesForceData($fields, $keys, $object){
-
-        $leadFields = array();
-
-        foreach ($keys as $key){
-            if(strstr($key,'__'.$object)){
-                $newKey = str_replace('__'.$object,'',$key);
-                $leadFields[$object][$newKey] = $fields['leadFields'][$key];
-            }
-        }
-
-        return $leadFields;
-    }
-
-    /**
      * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
      * @param array                                             $data
      * @param string                                            $formArea
@@ -292,10 +292,26 @@ class SalesforceIntegration extends CrmAbstractIntegration
         if ($formArea == 'features') {
             $name = strtolower($this->getName());
 
+            $builder->add('sandbox', 'choice', array(
+                'choices'     => array(
+                    'sandbox'    => 'mautic.salesforce.integration.form.feature.sandbox'
+                ),
+                'expanded'    => true,
+                'multiple'    => true,
+                'label'       => 'mautic.plugins.salesforce.sandbox',
+                'label_attr'  => array('class' => 'control-label'),
+                'empty_value' => false,
+                'required'    => false,
+                'attr'       => array(
+                    'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');'
+                ),
+            ));
+
             $builder->add('objects', 'choice' , array(
                 'choices'     => array(
                     'Lead'    => 'Lead',
-                    'Contact' => 'Contact'
+                    'Contact' => 'Contact',
+                    'Activity'=> 'Activity'
                 ),
                 'expanded'    => true,
                 'multiple'    => true,
@@ -307,9 +323,27 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'class'   => 'form-control not-chosen'
                 )
             ));
-
         }
     }
+
+    /**
+     * @param array  $fields
+     * @param array  $keys
+     * @param string $object
+     */
+    public function cleanSalesForceData($fields, $keys, $object){
+    $leadFields = array();
+
+        foreach ($keys as $key){
+            if(strstr($key,'__'.$object)){
+                $newKey = str_replace('__'.$object,'',$key);
+                $leadFields[$object][$newKey] = $fields['leadFields'][$key];
+            }
+        }
+
+        return $leadFields;
+    }
+
     /**
      * @param $lead
      */
