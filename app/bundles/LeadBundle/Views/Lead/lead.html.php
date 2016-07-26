@@ -96,8 +96,8 @@ if ($security->isGranted('lead:leads:editown')) {
                 array("objectId" => $lead->getId(), "objectAction" => "contactFrequency")
             )
         ),
-        'btnText'   => $view['translator']->trans('mautic.campaign.contactFrequency'),
-        'iconClass' => 'fa fa-clock-o'
+        'btnText'   => $view['translator']->trans('mautic.lead.contact.frequency'),
+        'iconClass' => 'fa fa-signal'
     );
 }
 //View Contact Frequency button
