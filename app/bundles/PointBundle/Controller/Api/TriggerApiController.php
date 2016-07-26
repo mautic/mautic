@@ -25,7 +25,7 @@ class TriggerApiController extends CommonApiController
     {
         parent::initialize($event);
         $this->model            = $this->getModel('point.trigger');
-        $this->entityClass      = 'Mautic\PointBundle\Entity\Point';
+        $this->entityClass      = 'Mautic\PointBundle\Entity\Trigger';
         $this->entityNameOne    = 'trigger';
         $this->entityNameMulti  = 'triggers';
         $this->permissionBase   = 'point:triggers';

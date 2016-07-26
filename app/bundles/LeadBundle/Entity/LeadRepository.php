@@ -478,7 +478,8 @@ class LeadRepository extends CommonRepository
         //DBAL
         $dq = $this->_em->getConnection()->createQueryBuilder();
         $dq->select('count(l.id) as count')
-            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+            ->leftJoin('l', MAUTIC_TABLE_PREFIX . 'users', 'u', 'u.id = l.owner_id');
         $this->buildWhereClause($dq, $args);
 
         //get a total count
@@ -681,20 +682,20 @@ class LeadRepository extends CommonRepository
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.isunowned'):
-                $expr = $q->expr()->$xFunc(
+                $expr = $q->expr()->orX(
                     $q->expr()->$eqFunc("l.owner_id", 0),
                     $q->expr()->$nullFunc("l.owner_id")
                 );
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.owner'):
-                $expr = $q->expr()->$xFunc(
-                    $q->expr()->$likeFunc('LOWER(u.firstName)', ':'.$unique),
-                    $q->expr()->$likeFunc('LOWER(u.lastName)', ':'.$unique)
+                $expr = $q->expr()->orX(
+                    $q->expr()->$likeFunc('LOWER(u.first_name)', ':'.$unique),
+                    $q->expr()->$likeFunc('LOWER(u.last_name)', ':'.$unique)
                 );
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
-                $expr = $q->expr()->$xFunc(
+                $expr = $q->expr()->orX(
                     $q->expr()->$likeFunc('LOWER(l.firstname)', ":$unique"),
                     $q->expr()->$likeFunc('LOWER(l.lastname)', ":$unique")
                 );

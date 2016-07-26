@@ -1162,7 +1162,7 @@ class Email extends FormEntity
      *
      * @return $this
      */
-    public function setUnsubscribeForm (Form $unsubscribeForm)
+    public function setUnsubscribeForm (Form $unsubscribeForm = null)
     {
         $this->unsubscribeForm = $unsubscribeForm;
 

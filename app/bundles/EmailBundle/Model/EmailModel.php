@@ -1312,6 +1312,29 @@ class EmailModel extends FormModel
     }
 
     /**
+     * Remove a Lead's EMAIL DNC entry.
+     *
+     * @param string $email
+     */
+    public function removeDoNotContact($email)
+    {
+        /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
+        $leadRepo = $this->em->getRepository('MauticLeadBundle:Lead');
+        $leadId   = (array) $leadRepo->getLeadByEmail($email, true);
+
+        /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
+        $leads = [];
+
+        foreach ($leadId as $lead) {
+            $leads[] = $leadRepo->getEntity($lead['id']);
+        }
+
+        foreach ($leads as $lead) {
+            $this->leadModel->removeDncForLead($lead, 'email');
+        }
+    }
+
+    /**
      * @param           $email
      * @param string    $reason
      * @param string    $comments

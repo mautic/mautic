@@ -168,7 +168,7 @@ Mautic.destroySlots = function() {
 };
 
 Mautic.clearFroalaStyles = function(content) {
-    mQuery.each(content.find('td, th, table'), function() {
+    mQuery.each(content.find('td, th, table, strong'), function() {
         var td = mQuery(this);
         if (td.attr('fr-original-class')) {
             td.attr('class', td.attr('fr-original-class'));
@@ -183,6 +183,12 @@ Mautic.clearFroalaStyles = function(content) {
         }
     });
     content.find('link[href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css"]').remove();
+
+    // fix Mautc's tokens in the strong tag
+    content.find('strong[contenteditable="false"]').removeAttr('style');
+
+    // data-atwho-at-query causes not working tokens
+    content.find('[data-atwho-at-query]').removeAttr('data-atwho-at-query');
     return content;
 }
 
@@ -265,13 +271,15 @@ Mautic.initSections = function() {
             }
         });
 
-        sectionForm.find('.minicolors-panel').on('click', function() {
-            var field = mQuery(this).parent().find('input');
+        parent.mQuery('body').on('change.minicolors', function(e, hex) {
+            var field = mQuery(e.target);
+            var focussedSectionWrapper = mQuery('[data-section-focus]').parent();
+            var focussedSection = focussedSectionWrapper.find('[data-section]');
 
-            if (section.length && field.attr('id') === 'builder_section_content-background-color') {
-                Mautic.sectionBackgroundChanged(section, field.val());
+            if (focussedSection.length && field.attr('id') === 'builder_section_content-background-color') {
+                Mautic.sectionBackgroundChanged(focussedSection, field.val());
             } else if (field.attr('id') === 'builder_section_wrapper-background-color') {
-                Mautic.sectionBackgroundChanged(sectionWrapper, field.val());
+                Mautic.sectionBackgroundChanged(focussedSectionWrapper, field.val());
             }
         });
     });
@@ -381,7 +389,7 @@ Mautic.initSlotListeners = function() {
         slotToolbar.appendTo(handle);
         slot.hover(function() {
             deleteLink.click(function(e) {
-                slot.trigger('slot:destroy', {slot, type});
+                slot.trigger('slot:destroy', {slot: slot, type: type});
                 mQuery.each(Mautic.builderSlots, function(i, slotParams) {
                     if (slotParams.slot.is(slot)) {
                         Mautic.builderSlots.splice(i, 1);
@@ -551,7 +559,6 @@ Mautic.initSlotListeners = function() {
         if (params.type === 'text') {
             params.slot.froalaEditor('destroy');
             params.slot.find('.atwho-inserted').atwho('destroy');
-            params.slot.find('[data-atwho-at-query]').removeAttr('data-atwho-at-query');
         } else if (params.type === 'image') {
             params.slot.find('img').froalaEditor('destroy');
         }

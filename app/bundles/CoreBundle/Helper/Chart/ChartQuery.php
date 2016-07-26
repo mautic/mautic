@@ -123,7 +123,6 @@ class ChartQuery extends AbstractChart
         // Check if the date filters have already been applied
         if ($parameters = $query->getParameters()) {
             if (array_key_exists('dateTo', $parameters) || array_key_exists('dateFrom', $parameters)) {
-
                 return;
             }
         }
@@ -156,7 +155,6 @@ class ChartQuery extends AbstractChart
                     $query->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
                 }
             }
-
         }
     }
 
@@ -296,7 +294,7 @@ class ChartQuery extends AbstractChart
                      * PHP DateTime cannot parse the Y W (ex 2016 09)
                      * format, so we transform it into d-M-Y.
                      */
-                    if ($this->unit === 'W' && $this->isMysql()) {
+                    if ($this->unit === 'W' && isset($item['date'])) {
                         list($year, $week) = explode(' ', $item['date']);
                         $newDate = new \DateTime();
                         $newDate->setISODate($year, $week);
@@ -306,6 +304,7 @@ class ChartQuery extends AbstractChart
 
                     // Data from the database will always in UTC
                     $itemDate = new \DateTime($item['date'], $utcTz);
+                    $itemDate->setTimezone($previousDate->getTimezone());
 
                     if (!in_array($this->unit, array('H', 'i', 's'))) {
                         // Hours do not matter so let's reset to 00:00:00 for date comparison

@@ -82,7 +82,7 @@ MauticJS.notification = {
     }
 };
 
-MauticJS.documentReady('MauticJS.notification.init');
+MauticJS.documentReady(MauticJS.notification.init);
 JS;
 
         $event->appendJs($js, 'Mautic Notification JS');

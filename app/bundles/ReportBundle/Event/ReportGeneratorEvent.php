@@ -219,6 +219,16 @@ class ReportGeneratorEvent extends AbstractReportEvent
         if ($tablePrefix) {
             $tablePrefix  .= ".";
         }
+
+        if (empty($this->options['dateFrom'])) {
+            $this->options['dateFrom'] = new \DateTime();
+            $this->options['dateFrom']->modify('-30 days');
+        }
+
+        if (empty($this->options['dateTo'])) {
+            $this->options['dateTo'] = new \DateTime();
+        }
+
         if ($dateOnly) {
             $queryBuilder->andWhere('DATE('.$tablePrefix.$dateColumn.') BETWEEN :dateFrom AND :dateTo');
             $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d'));

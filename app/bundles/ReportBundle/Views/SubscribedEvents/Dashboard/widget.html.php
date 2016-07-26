@@ -7,14 +7,28 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-echo $view->render(
-    'MauticCoreBundle:Helper:chart.html.php',
-    [
-        'chartData'   => $chartData,
-        'chartType'   => $chartType,
-        'chartHeight' => $chartHeight
-    ]
-);
+if (isset($chartData['data'])) {
+    $chartData = $chartData['data'];
+}
+
+if ($chartType === 'table') {
+    echo $view->render(
+        'MauticCoreBundle:Helper:table.html.php',
+        [
+            'headItems'   => isset($chartData[0]) ? array_keys($chartData[0]) : [],
+            'bodyItems'   => $chartData
+        ]
+    );
+} else {
+    echo $view->render(
+        'MauticCoreBundle:Helper:chart.html.php',
+        [
+            'chartData'   => $chartData,
+            'chartType'   => $chartType,
+            'chartHeight' => $chartHeight
+        ]
+    );
+}
 ?>
 
 <div class="pull-right mr-md mb-md">
