@@ -93,7 +93,7 @@ class LeadImportType extends AbstractType
                 'class' => 'form-control',
             ),
             'choices_as_values' => true,
-            'choices'     => $encoding,
+            'choices'     => $encodingList,
             'data'        => $default,
             'constraints' => $constraints
         ));
