@@ -46,7 +46,7 @@ SQL;
         $this->addSql($sql);
 
         $this->addSql("ALTER TABLE {$this->prefix}leads ADD COLUMN preferred_locale VARCHAR(255) DEFAULT NULL");
-        $this->addSql("CREATE INDEX {$this->prefix}preferred_locale ON {$this->prefix}leads (preferred_locale)");
+        $this->addSql("CREATE INDEX {$this->prefix}preferred_locale_search ON {$this->prefix}leads (preferred_locale)");
 
         // Change type for a few fields to correct a bug that wouldn't allow editing some fixed fields
         $this->addSql("UPDATE {$this->prefix}lead_fields SET type = 'text' WHERE alias IN ('company', 'city', 'zipcode')");
