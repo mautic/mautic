@@ -688,7 +688,7 @@ class LeadListRepository extends CommonRepository
                         $key = $string;
                         $isRelative = true;
                     }
-                    
+
                     if ($isRelative) {
                         if ($requiresBetween) {
                             $startWith = ($isTimestamp) ? $dtHelper->toUtcString('Y-m-d H:i:s') : $dtHelper->toUtcString('Y-m-d');
@@ -805,7 +805,7 @@ class LeadListRepository extends CommonRepository
 
                 case 'leadlist':
                 case 'tags':
-                case 'lead_email_received':
+                case 'lead_email_read':
 
                     // Special handling of lead lists and tags
                     $func = in_array($func, array('eq', 'in')) ? 'EXISTS' : 'NOT EXISTS';
@@ -842,7 +842,7 @@ class LeadListRepository extends CommonRepository
                             $table  = 'lead_tags_xref';
                             $column = 'tag_id';
                             break;
-                        case 'lead_email_received':
+                        case 'lead_email_read':
                             $table  = 'email_stats';
                             $column = 'email_id';
 

@@ -304,10 +304,10 @@ class ListModel extends FormModel
                 ),
                 'operators'  => 'multiselect'
             ),
-            'lead_email_received'       => array(
-                'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received'),
+            'lead_email_read'       => array(
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_read'),
                 'properties' => array(
-                    'type' => 'lead_email_received'
+                    'type' => 'lead_email_read'
                 ),
                 'operators'  => array(
                     'include' => array(

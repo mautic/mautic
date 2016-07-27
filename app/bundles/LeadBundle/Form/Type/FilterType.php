@@ -109,7 +109,7 @@ class FilterType extends AbstractType
                     $customOptions['multiple'] = true;
                     $type                      = 'choice';
                     break;
-                case 'lead_email_received':
+                case 'lead_email_read':
                     if (!isset($data['filter'])) {
                         $data['filter'] = array();
                     } elseif (!is_array($data['filter'])) {

@@ -26,7 +26,7 @@ $templates = array(
     'timezones' => 'timezone-template',
     'select'    => 'select-template',
     'lists'     => 'leadlist-template',
-    'emails'    => 'lead_email_received-template',
+    'emails'    => 'lead_email_read-template',
     'tags'      => 'tags-template',
     'stage'      => 'stage-template'
 );
