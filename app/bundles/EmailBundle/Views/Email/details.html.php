@@ -23,32 +23,23 @@ $variantContent = $view->render(
 );
 $showVariants    = !empty(trim($variantContent));
 
-$emailType = $email->getEmailType();
-$edit      = $view['security']->hasEntityAccess(
-    $permissions['email:emails:editown'],
-    $permissions['email:emails:editother'],
-    $email->getCreatedBy()
+$translationContent = $view->render(
+    'MauticCoreBundle:Translation:index.html.php',
+    [
+        'activeEntity' => $email,
+        'translations' => $translations,
+        'model'        => 'email',
+        'actionRoute'  => 'mautic_email_action',
+    ]
 );
+$showTranslations   = !empty(trim($translationContent));
 
+$emailType = $email->getEmailType();
 if (empty($emailType)) {
     $emailType = 'template';
 }
 
 $customButtons = [];
-
-if (!$showVariants && $edit && $permissions['email:emails:create']) {
-    $customButtons[] = [
-        'attr'      => [
-            'data-toggle' => 'ajax',
-            'href'        => $view['router']->path(
-                'mautic_email_action',
-                ["objectAction" => 'abtest', 'objectId' => $email->getId()]
-            ),
-        ],
-        'iconClass' => 'fa fa-sitemap',
-        'btnText'   => $view['translator']->trans('mautic.core.form.ab_test'),
-    ];
-}
 
 if ($emailType == 'list') {
     $customButtons[] = [
@@ -76,6 +67,9 @@ $customButtons[] = [
     'btnText'   => 'mautic.email.send.example',
 ];
 
+// Only show A/B test button if not already a translation of an a/b test
+$allowAbTest = $email->isTranslation(true) && $translations['parent']->isVariant(true) ? false : true;
+
 $view['slots']->set(
     'actions',
     $view->render(
@@ -83,8 +77,13 @@ $view['slots']->set(
         [
             'item'             => $email,
             'templateButtons'  => [
-                'edit'   => $edit,
-                'clone'  => (!$showVariants && $edit && $permissions['email:emails:create']),
+                'edit'   => $view['security']->hasEntityAccess(
+                    $permissions['email:emails:editown'],
+                    $permissions['email:emails:editother'],
+                    $email->getCreatedBy()
+                ),
+                'clone'  => $permissions['email:emails:create'],
+                'abtest' => ($allowAbTest && $permissions['email:emails:create']),
                 'delete' => $view['security']->hasEntityAccess(
                     $permissions['email:emails:deleteown'],
                     $permissions['email:emails:deleteother'],
@@ -116,11 +115,23 @@ $view['slots']->set(
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
                     <div class="col-xs-10">
-                        <div><?php echo \Mautic\CoreBundle\Helper\EmojiHelper::toHtml(
-                                $email->getSubject(),
-                                'short'
-                            ); ?></div>
-                        <div class="text-muted"><?php echo $email->getDescription(); ?></div>
+                        <div>
+                            <?php echo \Mautic\CoreBundle\Helper\EmojiHelper::toHtml($email->getSubject(), 'short'); ?>
+                        </div>
+                        <?php if ($email->isVariant(true)): ?>
+                        <div class="small">
+                            <a href="<?php echo $view['router']->path('mautic_email_action', ['objectAction' => 'view', 'objectId' => $variants['parent']->getId()]); ?>" data-toggle="ajax">
+                                <?php echo $view['translator']->trans('mautic.core.variant_of', ['%parent%' => $variants['parent']->getName()]); ?>
+                            </a>
+                        </div>
+                        <?php endif; ?>
+                        <?php if ($email->isTranslation(true)): ?>
+                        <div class="small">
+                            <a href="<?php echo $view['router']->path('mautic_email_action', ['objectAction' => 'view', 'objectId' => $translations['parent']->getId()]); ?>" data-toggle="ajax">
+                                <?php echo $view['translator']->trans('mautic.core.translation_of', ['%parent%' => $translations['parent']->getName()]); ?>
+                            </a>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -195,13 +206,14 @@ $view['slots']->set(
             <!--/ email detail collapseable toggler -->
 
             <?php echo $view->render(
-                'MauticEmailBundle:Email:'.$emailType.'_graph.html.php',
+                'MauticEmailBundle:Email:graph.html.php',
                 [
                     'stats'         => $stats,
+                    'emailType'     => $emailType,
                     'email'         => $email,
-                    'showVariants'  => $showVariants,
-                    'isVariant'     => $showVariants,
-                    'dateRangeForm' => $dateRangeForm,
+                    'isVariant'     => ($showTranslations || $showVariants),
+                    'showAllStats'  => $showAllStats,
+                    'dateRangeForm' => $dateRangeForm
                 ]
             ); ?>
 
@@ -216,6 +228,13 @@ $view['slots']->set(
                     <li>
                         <a href="#variants-container" role="tab" data-toggle="tab">
                             <?php echo $view['translator']->trans('mautic.core.variants'); ?>
+                        </a>
+                    </li>
+                <?php endif; ?>
+                <?php if ($showTranslations): ?>
+                    <li>
+                        <a href="#translation-container" role="tab" data-toggle="tab">
+                            <?php echo $view['translator']->trans('mautic.core.translations'); ?>
                         </a>
                     </li>
                 <?php endif; ?>
@@ -236,6 +255,14 @@ $view['slots']->set(
                 </div>
                 <!--/ #variants-container -->
             <?php endif; ?>
+
+            <!-- #translation-container -->
+            <?php if ($showTranslations): ?>
+                <div class="tab-pane bdr-w-0" id="translation-container">
+                    <?php echo $translationContent; ?>
+                </div>
+            <?php endif; ?>
+            <!--/ #translation-container -->
         </div>
     </div>
     <!--/ left section -->
@@ -267,16 +294,3 @@ $view['slots']->set(
     <!--/ right section -->
     <input name="entityId" id="entityId" type="hidden" value="<?php echo $email->getId(); ?>"/>
 </div>
-<!--/ end: box layout -->
-<?php echo $view->render(
-    'MauticCoreBundle:Helper:modal.html.php',
-    [
-        'id'     => 'abStatsModal',
-        'header' => false,
-        'body'   => (isset($abTestResults['supportTemplate'])) ? $view->render(
-            $abTestResults['supportTemplate'],
-            ['results' => $abTestResults, 'variants' => $variants]
-        ) : $view['translator']->trans('mautic.email.abtest.noresults'),
-        'size'   => 'lg',
-    ]
-); ?>

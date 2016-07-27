@@ -11,7 +11,7 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'email');
 
 $variantParent = $email->getVariantParent();
-$subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.core.variant.child_of', array(
+$subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.core.variant_of', array(
     '%name%' => $email->getName(),
     '%parent%' => $variantParent->getName()
 )) . '</span></div>' : '';
@@ -28,7 +28,6 @@ $emailType = $form['emailType']->vars['data'];
 if (!isset($attachmentSize)) {
     $attachmentSize = 0;
 }
-
 ?>
 
 <?php echo $view['form']->start($form); ?>
@@ -133,6 +132,15 @@ if (!isset($attachmentSize)) {
             </div>
             <?php echo $view['form']->row($form['category']); ?>
             <?php echo $view['form']->row($form['language']); ?>
+            <div id="segmentTranslationParent"<?php echo ($emailType == 'template') ? ' class="hide"' : ''; ?>>
+                <?php echo $view['form']->row($form['segmentTranslationParent']); ?>
+            </div>
+            <div id="templateTranslationParent"<?php echo ($emailType == 'list') ? ' class="hide"' : ''; ?>>
+                <?php echo $view['form']->row($form['templateTranslationParent']); ?>
+            </div>
+            <?php endif; ?>
+
+            <?php if (!$isVariant): ?>
             <div id="publishStatus"<?php echo ($emailType == 'list') ? ' class="hide"' : ''; ?>>
                 <?php echo $view['form']->row($form['isPublished']); ?>
                 <?php echo $view['form']->row($form['publishUp']); ?>

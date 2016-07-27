@@ -11,6 +11,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
 /**
  * DoNotContactRepository
@@ -33,14 +34,15 @@ class DoNotContactRepository extends CommonRepository
     }
 
     /**
-     * @param string    $channel
-     * @param array|int $ids
-     * @param int       $reason
-     * @param int       $listId
+     * @param null            $channel
+     * @param null            $ids
+     * @param null            $reason
+     * @param null            $listId
+     * @param ChartQuery|null $chartQuery
      *
-     * @return int
+     * @return array|int
      */
-    public function getCount($channel = null, $ids = null, $reason = null, $listId)
+    public function getCount($channel = null, $ids = null, $reason = null, $listId = null, ChartQuery $chartQuery = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -67,12 +69,32 @@ class DoNotContactRepository extends CommonRepository
         }
 
         if ($listId) {
-            $q->leftJoin('dnc', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'cs', 'cs.lead_id = dnc.lead_id')
-                ->andWhere('cs.leadlist_id = :list_id')
-                ->setParameter('list_id', $listId);
+            $q->leftJoin('dnc', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'cs', 'cs.lead_id = dnc.lead_id');
+
+            if (true === $listId) {
+                $q->addSelect('cs.leadlist_id')
+                    ->groupBy('cs.leadlist_id');
+            } else {
+                $q->andWhere('cs.leadlist_id = :list_id')
+                    ->setParameter('list_id', $listId);
+            }
+        }
+
+        if ($chartQuery) {
+            $chartQuery->applyDateFilters($q, 'date_added', 'dnc');
         }
 
         $results = $q->execute()->fetchAll();
+
+        if (true === $listId) {
+            // Return list group of counts
+            $byList = [];
+            foreach ($results as $result) {
+                $byList[$result['leadlist_id']] = $result['dnc_count'];
+            }
+
+            return $byList;
+        }
 
         return (isset($results[0])) ? $results[0]['dnc_count'] : 0;
     }
