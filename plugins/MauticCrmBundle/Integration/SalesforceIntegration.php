@@ -93,6 +93,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         {
             return 'https://test.salesforce.com/services/oauth2/token';
         }
+
         return 'https://login.salesforce.com/services/oauth2/token';
     }
 
@@ -104,10 +105,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function getAuthenticationUrl()
     {
         $config = $this->mergeConfigToFeatureSettings(array());
+
         if(isset($config['sandbox'][0]) and $config['sandbox'][0] === 'sandbox')
         {
             return 'https://test.salesforce.com/services/oauth2/authorize';
         }
+
         return 'https://login.salesforce.com/services/oauth2/authorize';
     }
 
@@ -124,7 +127,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getApiUrl()
     {
-        return sprintf('%s/services/data/v32.0/sobjects',$this->keys['instance_url']);
+        return sprintf('%s/services/data/v34.0/sobjects',$this->keys['instance_url']);
     }
 
     /**
@@ -132,7 +135,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getQueryUrl()
     {
-        return sprintf('%s/services/data/v32.0',$this->keys['instance_url']);
+        return sprintf('%s/services/data/v34.0',$this->keys['instance_url']);
     }
 
     /**
@@ -263,6 +266,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $count = 0;
 
         if(isset($data['records'])){
+
             foreach($data['records'] as $record)
             {
                 foreach ($record as $key=>$item){
@@ -277,11 +281,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         "bundle"    => "plugin",
                         "object"    => "lead",
                         "objectId"  => $lead->getId(),
-                        "action"    => "Create New Lead",
-                        "details"   => array('salesforceid' => $record['id']),
+                        "action"    => "Salesforce pull",
+                        "details"   => array('salesforceid' => $record['Id']),
                         "ipAddress" => $this->factory->getIpAddressFromRequest()
                     );
+
                     $this->factory->getModel('core.auditLog')->writeToLog($log);
+
                     $count++;
                 }
                 unset($data);
@@ -383,10 +389,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         "bundle"    => "plugin",
                         "object"    => "lead",
                         "objectId"  => $lead->getId(),
-                        "action"    => "Create New Lead",
+                        "action"    => "Salesforce push",
                         "details"   => array('salesforceid' => $createdLeadData['id']),
                         "ipAddress" => $this->factory->getIpAddressFromRequest()
                     );
+                    $this->factory->getLogger()->addError(print_r($log,true));
                     $this->factory->getModel('core.auditLog')->writeToLog($log);
                 }
                 return true;
@@ -426,6 +433,43 @@ class SalesforceIntegration extends CrmAbstractIntegration
         } catch (\Exception $e) {
             $this->logIntegrationError($e);
         }
+
+        return $executed;
+    }
+
+    public function pushLeadActivity($params = array())
+    {
+        $executed = null;
+
+        $query = $this->getFetchQuery($params);
+
+        $logRepository= $this->factory->getModel('core.auditLog')->getRepository();
+
+        $salesForceIds =   $logRepository->getDetailsByAction('lead', 'plugin', '%Salesforce%');
+
+        $startDate = new \DateTime($query['start']);
+        $endDate = new \DateTime($query['end']);
+
+       // try {
+            if ($this->isAuthorized()) {
+
+                if(!empty($salesForceIds)){
+                    foreach ($salesForceIds as $ids)
+                    {
+
+                        $salesForceLeadData[$ids['details']['salesforceid']]= $this->getLeadData($startDate,$endDate,$ids['objectId']);
+                        $salesForceLeadData[$ids['details']['salesforceid']]['id']=$ids['details']['salesforceid'];
+                        $salesForceLeadData[$ids['details']['salesforceid']]['leadId']=$ids['objectId'];
+                    }
+                    //print_r($salesForceLeadData);
+                    $result = $this->getApiHelper()->createLeadActivity($salesForceLeadData);
+                }
+
+                return $executed;
+            }
+      /*  } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+        }*/
 
         return $executed;
     }
@@ -523,38 +567,50 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $lead;
     }
 
-    public function getLeadData(\DateTime $startDate = null, \DateTime $endDate = null){
+    public function getLeadData(\DateTime $startDate = null, \DateTime $endDate = null, $leadId)
+    {
         $leadModel = $this->factory->getModel('lead');
 
         $baseURL = $this->factory->getRequest()->getHttpHost();
-        $activity['leadUrl'] = $baseURL.$this->factory->getRouter()->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $lead->getId()));
+        $activity['leadUrl'] = $baseURL.$this->factory->getRouter()->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $leadId));
 
         $pointsRepo = $leadModel->getPointLogRepository();
-        $activity['points'] = $pointsRepo->getLeadTimelineEvents($lead->getId());
+        $activity['records'] = $pointsRepo->getLeadTimelineEvents($leadId);
 
         $emailModel = $this->factory->getModel('email');
         $emailRepo = $emailModel->getStatRepository();
-        $activity['emails'] = $emailRepo->getLeadStatsByDate($lead->getId(), $startDate, $endDate);
+        $emails = $emailRepo->getLeadStatsByDate($leadId, $startDate, $endDate);
 
-        $formSubmissionModel = $this->factory->getModel('email');
+        $i=count($activity['activities']);
+
+        foreach ($emails as $row) {
+
+            // Convert to local from UTC
+            $activity['records'][$i]['eventName'] = $this->factory->getTranslator()->trans('mautic.email.sent');
+            $activity['records'][$i]['actionName'] = $this->factory->getTranslator()->trans('mautic.email.form.internal.name').': '.$row['name'];
+            $activity['records'][$i]['dateAdded'] = $row['dateSent'];
+            $activity['records'][$i]['subject'] = $row['subject'];
+            $activity['records'][$i]['id'] = 'emailStat'.$row['email_id'];
+            $i++;
+        }
+
+        $formSubmissionModel = $this->factory->getModel('form.submission');
 
         /** @var \Mautic\FormBundle\Entity\SubmissionRepository $submissionRepository */
         $submissionRepo = $formSubmissionModel->getRepository();
-        $activity['forms'] = array();
-        $i=0;
-        foreach ($submissionRepo as $row) {
+        $submissions = $submissionRepo->getSubmissions(array ('leadId' => $leadId, 'fromDate' => $startDate, 'toDate' => $endDate));
+
+        foreach ($submissions as $row) {
             $submission = $submissionRepo->getEntity($row['id']);
             // Convert to local from UTC
-            $activity['forms'][$i]['eventName'] = $this->translator->trans('mautic.form.event.submitted');
-            $activity['forms'][$i]['actionName'] = $submission->getForm()->getName();
+            $activity['records'][$i]['eventName'] = $this->factory->getTranslator()->trans('mautic.form.event.submitted');
+            $activity['records'][$i]['actionName'] = $submission->getForm()->getName();
 
             $dtHelper = $this->factory->getDate($row['dateSubmitted'], 'Y-m-d H:i:s', 'UTC');
-            $activity['forms'][$i]['dateAdded'] = $dtHelper->getLocalDateTime();
+            $activity['records'][$i]['dateAdded'] = $dtHelper->getLocalDateTime();
+            $activity['records'][$i]['id'] = 'formSubmission'.$row['id'];
+            $i++;
         }
         return $activity;
-    }
-
-    public function createLeadActivity(\DateTime $startDate = null, \DateTime $endDate = null){
-     //   $this->getApiHelper()->createLeadActivity($createdLeadData, $lead);
     }
 }

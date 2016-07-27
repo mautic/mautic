@@ -185,4 +185,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     public function getLeadData(\DateTime $startDate = null, \DateTime $endDate = null){
         return array();
     }
+
+    public function pushLeadActivity($params = array())
+    {
+
+    }
 }

@@ -88,38 +88,58 @@ class SalesforceApi extends CrmApi
         return $createdLeadData;
     }
 
-    public function createLeadActivity(array $salesForceLeadData, $lead)
+    public function createLeadActivity(array $activity)
     {
         $mActivityObjectName = 'Mautic_timeline__c';
 
-        // get lead's point activity
-        $pointsRepo = $this->integration->getLeadData('points', $lead);
-        $leadUrl = $pointsRepo['leadUrl'];
-        if(!empty($pointsRepo))
+        if(!empty($activity))
         {
-            $deltaType = '';
-            foreach ($pointsRepo as $pointActivity)
+            foreach ($activity as $key => $records)
             {
-                if($pointActivity['delta']>0)
-                {
-                    $deltaType = 'added';
-                }
-                else
-                {
-                    $deltaType = 'subtracted';
-                }
+                $type = '';
 
-                $activityData = array(
-                    'ActivityDate__c'   => $pointActivity['dateAdded']->format('c'),
-                    'Description__c'    => $pointActivity['type'].":".$pointActivity['eventName']." ".$deltaType." ".$pointActivity['actionName'],
-                    'WhoId__c'          => $salesForceLeadData['id'],
-                    'Name'           => 'Mautic TimeLine Activity',
-                    'MauticLead__c'     => $lead->getId(),
-                    'Mautic_url__c'     => $leadUrl
-                );
-                //todo: log posted activities so that they don't get sent over again
-                $this->request('', $activityData, 'POST', false, $mActivityObjectName);
+                foreach ($records['records'] as $record){
+
+                    if(isset($record['delta']) and $record['delta']>0)
+                    {
+                        $subject = 'added';
+                        $type = $record['type'];
+                    }
+                    else
+                    {
+                        $subject = 'subtracted';
+
+                    }
+
+                    if(isset($record['subject']))
+                    {
+                        $subject = $record['subject'];
+                        $type = "Action";
+                    }
+                    else
+                    {
+                        $subject = ", Form name:";
+                        $type = "Action";
+                    }
+                    $activityData['records'][]= array(
+                        'attributes' => array(
+                            'type' => $mActivityObjectName,
+                            'referenceId' => $record['id']
+                        ),
+                        'ActivityDate__c'   => $record['dateAdded']->format('c'),
+                        'Description__c'    => $type.": ".$record['eventName']." ".$subject." ".$record['actionName'],
+                        'WhoId__c'          => $records['id'],
+                        'Name'           => 'Mautic TimeLine Activity',
+                        'MauticLead__c'     => $records['leadId'],
+                        'Mautic_url__c'     => $records['leadUrl']
+                    );
+                }
             }
+
+            //todo: log posted activities so that they don't get sent over again
+            $queryUrl = $this->integration->getQueryUrl();
+            $this->request('composite/tree/'.$mActivityObjectName, $activityData, 'POST', false, null,$queryUrl);
+
         }
     }
 

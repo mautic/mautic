@@ -238,6 +238,11 @@ class SubmissionRepository extends CommonRepository
             ->setParameter('fromDate', $options['fromDate']->format('Y-m-d H:i:s'));
         }
 
+        if (!empty($options['toDate'])) {
+            $query->andWhere($query->expr()->lte('fs.date_submitted', ':toDate'))
+                ->setParameter('toDate', $options['toDate']->format('Y-m-d H:i:s'));
+        }
+
         if (isset($options['filters']['search']) && $options['filters']['search']) {
             $query->leftJoin('fs', MAUTIC_TABLE_PREFIX . 'forms', 'f', 'f.id = fs.form_id')
                 ->andWhere($query->expr()->orX(

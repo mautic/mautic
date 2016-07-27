@@ -92,7 +92,7 @@ class PushLeadActivityCommand extends ContainerAwareCommand
 
             $integrationObject = $integrationHelper->getIntegrationObject($integration);
 
-            if ($integrationObject !== null && method_exists($integrationObject, 'getLeads')) {
+            if ($integrationObject !== null && method_exists($integrationObject, 'pushLeadActivity')) {
 
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', array('%integration%' => $integration)).'</info>');
 
@@ -100,11 +100,9 @@ class PushLeadActivityCommand extends ContainerAwareCommand
                 $params['end']=$endDate;
 
                 $processed = 0;
-                $processed = intval($integrationObject->getLeads($params));
+                $processed = intval($integrationObject->pushLeadActivity($params));
 
                 $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
-
-                $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.events_executed', array('%events%' => $processed)).'</comment>'."\n");
 
             }
         }

@@ -312,14 +312,14 @@ class StatRepository extends CommonRepository
             //make sure the date is UTC
             $dt = new DateTimeHelper($startDate);
             $query->andWhere(
-                $query->expr()->gte('e.date_sent', $query->expr()->literal($dt->toUtcString()))
+                $query->expr()->gte('s.dateSent', $query->expr()->literal($dt->toUtcString()))
             );
         }
         if ($endDate !== null) {
             //make sure the date is UTC
             $dt = new DateTimeHelper($endDate);
             $query->andWhere(
-                $query->expr()->gte('e.date_sent', $query->expr()->literal($dt->toUtcString()))
+                $query->expr()->lte('s.dateSent', $query->expr()->literal($dt->toUtcString()))
             );
         }
         $stats = $query->getQuery()->getArrayResult();
