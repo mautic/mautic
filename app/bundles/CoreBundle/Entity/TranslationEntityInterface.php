@@ -59,6 +59,22 @@ interface TranslationEntityInterface
     public function removeTranslationChild(TranslationEntityInterface $child);
 
     /**
+     * Get array with entities for this translation
+     *
+     * If $onlyChildren, then return just $children; otherwise [$parent, $children]
+     *
+     * @return array
+     */
+    public function getTranslations($onlyChildren = false);
+
+    /**
+     * @param bool $isChild True to return if the item is a translation of a parent
+     *
+     * @return bool
+     */
+    public function isTranslation($isChild = false);
+
+    /**
      * Get the language
      *
      * @return mixed

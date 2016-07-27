@@ -71,4 +71,18 @@ interface VariantEntityInterface
      * @return \DateTime
      */
     public function getVariantStartDate();
+
+    /**
+     * Get all entities for variant parent/children
+     *
+     * @return array[$parent, $children]
+     */
+    public function getVariants();
+
+    /**
+     * @param bool $isChild True to return if the item is a variant of a parent
+     *
+     * @return bool
+     */
+    public function isVariant($isChild = false);
 }

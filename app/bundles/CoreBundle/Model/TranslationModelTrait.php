@@ -9,6 +9,7 @@
 namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
+use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -31,10 +32,9 @@ trait TranslationModelTrait
      */
     public function getTranslatedEntity(TranslationEntityInterface $entity, Lead $lead = null, Request $request = null)
     {
-        $translationParent   = $entity->getTranslationParent();
-        $translationChildren = $entity->getTranslationChildren()->toArray();
+        list($translationParent, $translationChildren) = $entity->getTranslations();
 
-        if ($translationParent || count($translationChildren)) {
+        if (count($translationChildren)) {
             if ($translationParent) {
                 $translationChildren = $translationParent->getTranslationChildren();
             } else {
@@ -94,7 +94,7 @@ trait TranslationModelTrait
                 if (isset($translationList[$core])) {
                     // Does the dialect exist?
                     if (isset($translationList[$core][$language])) {
-                        // We have a match
+                        // There's a match
                         $matchFound     = $translationList[$core][$language];
                         $chosenLanguage = $language;
                         break;
@@ -110,7 +110,7 @@ trait TranslationModelTrait
                 $entity = ($matchFound == $translationParent->getId()) ? $translationParent : $translationChildren[$matchFound];
             } elseif ($preferredCore) {
                 // Return the best matching language
-                $bestMatch      = array_values($translationList[$preferredCore])[0];
+                $bestMatch      = array_keys($translationList[$preferredCore])[0];
                 $entity         = ($bestMatch == $translationParent->getId()) ? $translationParent : $translationChildren[$bestMatch];
                 $chosenLanguage = $preferredCore;
             }
@@ -126,11 +126,24 @@ trait TranslationModelTrait
     }
 
     /**
+     * Run post saving a translation aware entity
+     *
+     * @param TranslationEntityInterface $entity
+     */
+    public function postTranslationEntitySave(TranslationEntityInterface $entity)
+    {
+        // If parent, add this entity as a child of the parent so that it populates the list in the tab (due to Doctrine hanging on to entities in memory)
+        if ($translationParent = $entity->getTranslationParent()) {
+            $translationParent->addTranslationChild($entity);
+        }
+    }
+
+    /**
      * @param $locale
      *
      * @return string
      */
-    private function getTranslationLocaleCore($locale)
+    protected function getTranslationLocaleCore($locale)
     {
         if (strpos($locale, '_') !== false) {
             $locale = substr($locale, 0, 2);
