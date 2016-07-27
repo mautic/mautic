@@ -62,8 +62,8 @@ class BuilderSubscriber extends CommonSubscriber
      */
     public function onEmailDisplay(EmailSendEvent $event)
     {
-        $content = $event->getContent();
+        $content = $this->dynamicContentHelper->replaceTokensInContent($event->getContent(), $event->getLead());
 
-        preg_match_all('', $content, $matches, PREG_SET_ORDER);
+        $event->setContent($content);
     }
 }

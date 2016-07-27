@@ -50,12 +50,12 @@ class DynamicContentHelper
     }
 
     /**
-     * @param      $slot
-     * @param Lead $lead
+     * @param            $slot
+     * @param Lead|array $lead
      *
      * @return string
      */
-    public function getDynamicContentForLead($slot, Lead $lead)
+    public function getDynamicContentForLead($slot, $lead)
     {
         $response = $this->campaignEventModel->triggerEvent('dwc.decision', $slot, 'dwc.decision.' . $slot);
         $content  = '';
@@ -78,6 +78,33 @@ class DynamicContentHelper
                     $content = $tokenEvent->getContent();
                 }
             }
+        }
+
+        return $content;
+    }
+
+    /**
+     * @param string $content
+     * @param Lead|array   $lead
+     *
+     * @return string Content with the {content} tokens replaced with dynamic content
+     */
+    public function replaceTokensInContent($content, $lead)
+    {
+        // Find all dynamic content tags
+        preg_match_all('/{(content)=(\w+)(?:\/}|}(?:([^{]*(?:{(?!\/\1})[^{]*)*){\/\1})?)/is', $content, $matches, PREG_SET_ORDER);
+
+        foreach ($matches as $match) {
+            $slot = $match[2];
+            $defaultContent = $match[3];
+
+            $dwcContent = $this->getDynamicContentForLead($slot, $lead);
+
+            if (!$dwcContent) {
+                $dwcContent = $defaultContent;
+            }
+
+            $content = str_replace($matches[0], '<div class="mautic-slot">' . $dwcContent . '</div>', $content);
         }
 
         return $content;
