@@ -2414,14 +2414,6 @@ ul.line-legend li {
 .table-responsive-force > .table {
   margin-bottom: 0;
 }
-.table-responsive-force > .table > thead > tr > th,
-.table-responsive-force > .table > tbody > tr > th,
-.table-responsive-force > .table > tfoot > tr > th,
-.table-responsive-force > .table > thead > tr > td,
-.table-responsive-force > .table > tbody > tr > td,
-.table-responsive-force > .table > tfoot > tr > td {
-  white-space: nowrap;
-}
 .table-responsive-force > .table-bordered {
   border: 0;
 }
@@ -4547,4 +4539,11 @@ body.noscroll {
 .CodeMirror {
   border: 1px solid #d5d5d5;
   border-radius: 3px;
+}
+table.table > tbody > tr > td {
+  max-width: 500px;
+  -ms-word-break: break-all;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
