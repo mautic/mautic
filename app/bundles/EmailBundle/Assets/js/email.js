@@ -87,12 +87,18 @@ Mautic.emailOnLoad = function (container, response) {
         Mautic.activateSearchAutocomplete('list-search', 'email');
     }
 
+    var textarea = mQuery('#emailform_customHtml');
+
     mQuery(document).on('shown.bs.tab', function (e) {
-        mQuery('#emailform_customHtml').froalaEditor('popups.hideAll');
+        textarea.froalaEditor('popups.hideAll');
+    });
+
+    mQuery('a[href="#source-container"]').on('shown.bs.tab', function (e) {
+        textarea.froalaEditor('html.set', textarea.val());
     });
 
     mQuery('.btn-builder').on('click', function (e) {
-        mQuery('#emailform_customHtml').froalaEditor('popups.hideAll');
+        textarea.froalaEditor('popups.hideAll');
     });
 
     Mautic.intiSelectTheme(mQuery('#emailform_template'));

@@ -28,12 +28,18 @@ Mautic.pageOnLoad = function (container) {
         });
     }
 
+    var textarea = mQuery('#page_customHtml');
+
     mQuery(document).on('shown.bs.tab', function (e) {
-        mQuery('#page_customHtml').froalaEditor('popups.hideAll');
+        textarea.froalaEditor('popups.hideAll');
+    });
+
+    mQuery('a[href="#source-container"]').on('shown.bs.tab', function (e) {
+        textarea.froalaEditor('html.set', textarea.val());
     });
 
     mQuery('.btn-builder').on('click', function (e) {
-        mQuery('#page_customHtml').froalaEditor('popups.hideAll');
+        textarea.froalaEditor('popups.hideAll');
     });
 
     Mautic.intiSelectTheme(mQuery('#page_template'));
