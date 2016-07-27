@@ -8,6 +8,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Mautic\DynamicContentBundle\EventListener\BuilderSubscriber;
+
 return [
     'menu' => [
         'main' => [
@@ -65,6 +67,13 @@ return [
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token'
                 ]
+            ],
+            'mautic.dynamicContent.token.subscriber' => [
+                'class' => BuilderSubscriber::class,
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.helper.dynamicContent'
+                ]
             ]
         ],
         'forms' => [
@@ -105,5 +114,14 @@ return [
                 ],
             ],
         ],
+        'other' => [
+            'mautic.helper.dynamicContent' => [
+                'class'     => 'Mautic\DynamicContentBundle\Helper\DynamicContentHelper',
+                'arguments' => [
+                    'mautic.dynamicContent.model.dynamicContent',
+                    'mautic.campaign.model.event',
+                    'event_dispatcher'
+                ]
+            ],]
     ],
 ];

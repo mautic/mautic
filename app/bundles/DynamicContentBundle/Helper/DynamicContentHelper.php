@@ -1,0 +1,85 @@
+<?php
+/**
+ * @copyright   2016 Mautic Contributors. All rights reserved.
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+namespace Mautic\DynamicContentBundle\Helper;
+
+use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CoreBundle\Event\TokenReplacementEvent;
+use Mautic\DynamicContentBundle\DynamicContentEvents;
+use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Model\DynamicContentModel;
+use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+
+class DynamicContentHelper
+{
+    /**
+     * @var EventModel
+     */
+    protected $campaignEventModel;
+
+    /**
+     * @var ContainerAwareEventDispatcher
+     */
+    protected $dispatcher;
+
+    /**
+     * @var DynamicContentModel
+     */
+    protected $dynamicContentModel;
+
+    /**
+     * DynamicContentHelper constructor.
+     *
+     * @param DynamicContentModel           $dynamicContentModel
+     * @param EventModel                    $campaignEventModel
+     * @param ContainerAwareEventDispatcher $dispatcher
+     */
+    public function __construct(DynamicContentModel $dynamicContentModel, EventModel $campaignEventModel, ContainerAwareEventDispatcher $dispatcher)
+    {
+        $this->dynamicContentModel = $dynamicContentModel;
+        $this->campaignEventModel  = $campaignEventModel;
+        $this->dispatcher          = $dispatcher;
+    }
+
+    /**
+     * @param      $slot
+     * @param Lead $lead
+     *
+     * @return string
+     */
+    public function getDynamicContentForLead($slot, Lead $lead)
+    {
+        $response = $this->campaignEventModel->triggerEvent('dwc.decision', $slot, 'dwc.decision.' . $slot);
+        $content  = '';
+
+        if (is_array($response) && !empty($response['action']['dwc.push_content'])) {
+            $content = array_shift($response['action']['dwc.push_content']);
+        } else {
+            $data = $this->dynamicContentModel->getSlotContentForLead($slot, $lead);
+
+            if (!empty($data)) {
+                $content = $data['content'];
+                $dwc = $this->dynamicContentModel->getEntity($data['id']);
+
+                if ($dwc instanceof DynamicContent) {
+                    $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
+
+                    $tokenEvent = new TokenReplacementEvent($content, $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
+                    $this->dispatcher->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
+
+                    $content = $tokenEvent->getContent();
+                }
+            }
+        }
+
+        return $content;
+    }
+}
