@@ -38,19 +38,8 @@ $translationContent = $view->render(
 );
 $showTranslations   = !empty(trim($translationContent));
 
-if ((empty($variants['parent']) || ($variants['parent']->getId() == $activePage->getId())) && $permissions['page:pages:create']) {
-    $customButtons[] = [
-        'attr'      => [
-            'data-toggle' => 'ajax',
-            'href'        => $view['router']->path(
-                'mautic_page_action',
-                ["objectAction" => 'abtest', 'objectId' => $activePage->getId()]
-            ),
-        ],
-        'iconClass' => 'fa fa-sitemap',
-        'btnText'   => $view['translator']->trans('mautic.core.form.ab_test'),
-    ];
-}
+// Only show A/B test button if not already a translation of an a/b test
+$allowAbTest = $activePage->isTranslation(true) && $translations['parent']->isVariant() ? false : true;
 
 $view['slots']->set(
     'actions',
@@ -65,12 +54,13 @@ $view['slots']->set(
                     $permissions['page:pages:editother'],
                     $activePage->getCreatedBy()
                 ),
-                'clone'  => $view['security']->hasEntityAccess(
-                    $permissions['page:pages:editown'],
-                    $permissions['page:pages:editother'],
+                'abtest' => $allowAbTest && $permissions['page:pages:create'],
+                'clone'  => $permissions['page:pages:create'],
+                'delete' => $view['security']->hasEntityAccess(
+                    $permissions['page:pages:deleteown'],
+                    $permissions['page:pages:deleteown'],
                     $activePage->getCreatedBy()
                 ),
-                'delete' => $permissions['page:pages:create'],
                 'close'  => $view['security']->hasEntityAccess(
                     $permissions['page:pages:viewown'],
                     $permissions['page:pages:viewother'],
@@ -97,6 +87,20 @@ $view['slots']->set(
                 <div class="box-layout">
                     <div class="col-xs-10">
                         <div class="text-muted"><?php echo $activePage->getMetaDescription(); ?></div>
+                        <?php if ($activePage->isVariant(true)): ?>
+                            <div class="small">
+                                <a href="<?php echo $view['router']->path('mautic_page_action', ['objectAction' => 'view', 'objectId' => $variants['parent']->getId()]); ?>" data-toggle="ajax">
+                                    <?php echo $view['translator']->trans('mautic.core.variant_of', ['%parent%' => $variants['parent']->getName()]); ?>
+                                </a>
+                            </div>
+                        <?php endif; ?>
+                        <?php if ($activePage->isTranslation(true)): ?>
+                        <div class="small">
+                            <a href="<?php echo $view['router']->path('mautic_page_action', ['objectAction' => 'view', 'objectId' => $translations['parent']->getId()]); ?>" data-toggle="ajax">
+                                <?php echo $view['translator']->trans('mautic.core.translation_of', ['%parent%' => $translations['parent']->getName()]); ?>
+                            </a>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -191,14 +195,14 @@ $view['slots']->set(
             <?php endif; ?>
             <!-- #translation-container -->
             <?php if ($showTranslations): ?>
-            <div class="tab-pane <?php echo ($showVariants) ? '' : 'active '; ?>fade in bdr-w-0" id="translation-container">
+            <div class="tab-pane <?php echo ($showVariants) ? '' : 'active '; ?> bdr-w-0" id="translation-container">
                 <?php echo $translationContent; ?>
             </div>
             <?php endif; ?>
             <!--/ #translation-container -->
         </div>
         <!--/ end: tab-content -->
-    <?php elseif ((empty($variants['parent']) || ($variants['parent']->getId() == $activePage->getId())) && $permissions['page:pages:create']): ?>
+        <?php elseif ($allowAbTest): ?>
         <div class="pa-md">
             <div class="text-center" style="height: 100%; width: 100%; ">
                 <h3 style="padding: 30px;">

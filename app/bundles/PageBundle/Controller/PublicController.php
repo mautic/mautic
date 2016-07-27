@@ -38,6 +38,7 @@ class PublicController extends CommonFormController
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model    = $this->getModel('page.page');
         $security = $this->factory->getSecurity();
+        /** @var Page $entity */
         $entity   = $model->getEntityBySlugs($slug);
 
         if (!empty($entity)) {
@@ -88,46 +89,43 @@ class PublicController extends CommonFormController
                 }
             }
 
-            // Check for a translation
-            list($translationParent, $translatedEntity) = $model->getTranslatedEntity($entity, $lead, $this->request);
-
-            if ($translationParent && $translatedEntity->getId() !== $entity->getId()) {
-                if (!$this->request->get('ntrd', 0)) {
-                    $url = $model->generateUrl($translatedEntity, false);
-                    $model->hitPage($entity, $this->request, 302, $lead, $query);
-
-                    return $this->redirect($url, 302);
-                }
-            }
-
             // Check for variants
-            $parentVariant   = $entity->getVariantParent();
-            $childrenVariant = $entity->getVariantChildren();
+            list($parentVariant, $childrenVariants) = $model->getVariants($entity);
 
             // Is this a variant of another? If so, the parent URL should be used unless a user is logged in and previewing
-            if ($parentVariant && !$userAccess) {
+            if ($parentVariant != $entity && !$userAccess) {
                 $model->hitPage($entity, $this->request, 301, $lead, $query);
                 $url = $model->generateUrl($parentVariant, false);
 
                 return $this->redirect($url, 301);
             }
 
-            // Determine what page to display
+            // First determine the A/B test to display if applicable
             if (!$userAccess) {
                 // Check to see if a variant should be shown versus the parent but ignore if a user is previewing
-                if (count($childrenVariant)) {
+                if (count($childrenVariants)) {
 
                     $variants      = [];
                     $variantWeight = 0;
                     $totalHits     = $entity->getVariantHits();
-                    foreach ($childrenVariant as $id => $child) {
+                    foreach ($childrenVariants as $id => $child) {
                         if ($child->isPublished()) {
                             $variantSettings = $child->getVariantSettings();
                             $variants[$id]   = [
                                 'weight' => ($variantSettings['weight'] / 100),
-                                'hits'   => $child->getVariantHits()
+                                'hits'   => $child->getVariantHits(),
                             ];
                             $variantWeight += $variantSettings['weight'];
+
+                            // Count translations for this variant as well
+                            $translations = $child->getTranslations(true);
+                            /** @var Page $translation */
+                            foreach ($translations as $translation) {
+                                if ($translation->isPublished()) {
+                                    $variants[$id]['hits'] += (int) $translation->getVariantHits();
+                                }
+                            }
+
                             $totalHits += $variants[$id]['hits'];
                         }
                     }
@@ -140,15 +138,25 @@ class PublicController extends CommonFormController
                             if (isset($variants[$variantCookie])) {
                                 //if not the parent, show the specific variant already displayed to the visitor
                                 if ($variantCookie !== $entity->getId()) {
-                                    $entity = $childrenVariant[$variantCookie];
+                                    $entity = $childrenVariants[$variantCookie];
                                 } //otherwise proceed with displaying parent
                             }
                         } else {
-                            //add parent weight
+                            // Add parent weight
                             $variants[$entity->getId()] = [
                                 'weight' => ((100 - $variantWeight) / 100),
-                                'hits'   => $entity->getVariantHits()
+                                'hits'   => $entity->getVariantHits(),
                             ];
+
+                            // Count translations for the parent as well
+                            $translations = $entity->getTranslations(true);
+                            /** @var Page $translation */
+                            foreach ($translations as $translation) {
+                                if ($translation->isPublished()) {
+                                    $variants[$entity->getId()]['hits'] += (int) $translation->getVariantHits();
+                                }
+                            }
+                            $totalHits += $variants[$id]['hits'];
 
                             //determine variant to show
                             $byWeight = [];
@@ -164,8 +172,22 @@ class PublicController extends CommonFormController
                             $this->get('mautic.helper.cookie')->setCookie('mautic_page_'.$entity->getId(), $useId, 3600 * 24 * 14);
 
                             if ($useId != $entity->getId()) {
-                                $entity = $childrenVariant[$useId];
+                                $entity = $childrenVariants[$useId];
                             }
+                        }
+                    }
+                }
+
+                // Now show the translation for the page or a/b test - only fetch a translation if a slug was not used
+                if ($entity->isTranslation() && empty($entity->languageSlug)) {
+                    list($translationParent, $translatedEntity) = $model->getTranslatedEntity($entity, $lead, $this->request);
+
+                    if ($translationParent && $translatedEntity !== $entity) {
+                        if (!$this->request->get('ntrd', 0)) {
+                            $url = $model->generateUrl($translatedEntity, false);
+                            $model->hitPage($entity, $this->request, 302, $lead, $query);
+
+                            return $this->redirect($url, 302);
                         }
                     }
                 }
@@ -203,7 +225,7 @@ class PublicController extends CommonFormController
                         'content'  => $content,
                         'page'     => $entity,
                         'template' => $template,
-                        'public'   => true
+                        'public'   => true,
                     ]
                 );
 
@@ -386,7 +408,7 @@ class PublicController extends CommonFormController
                         'interval'         => 5000,
                         'pause'            => 'hover',
                         'wrap'             => true,
-                        'keyboard'         => true
+                        'keyboard'         => true,
                     ];
                 }
 
@@ -396,13 +418,13 @@ class PublicController extends CommonFormController
                         [
                             'order'            => 0,
                             'background-image' => $assetsHelper->getUrl('media/images/mautic_logo_lb200.png'),
-                            'captionheader'    => 'Caption 1'
+                            'captionheader'    => 'Caption 1',
                         ],
                         [
                             'order'            => 1,
                             'background-image' => $assetsHelper->getUrl('media/images/mautic_logo_db200.png'),
-                            'captionheader'    => 'Caption 2'
-                        ]
+                            'captionheader'    => 'Caption 2',
+                        ],
                     ];
                 }
 

@@ -11,7 +11,7 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'page');
 
 $variantParent = $activePage->getVariantParent();
-$subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.core.variant.child_of', array(
+$subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.core.variant_of', array(
     '%name%' => $activePage->getTitle(),
     '%parent%' => $variantParent->getTitle()
 )) . '</span></div>' : '';

@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
+use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -40,6 +41,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 class PageModel extends FormModel
 {
     use TranslationModelTrait;
+    use VariantModelTrait;
 
     /**
      * @var bool
@@ -166,24 +168,24 @@ class PageModel extends FormModel
      */
     public function saveEntity ($entity, $unlock = true)
     {
-        $translationParent = $entity->getTranslationParent();
+        $pageIds = $entity->getRelatedEntityIds();
 
         if (empty($this->inConversion)) {
             $alias = $entity->getAlias();
             if (empty($alias)) {
-                $alias = ($translationParent) ? $translationParent->getAlias() : $entity->getTitle();
+                $alias = $entity->getTitle();
             }
             $alias = $this->cleanAlias($alias, '', false, '-');
 
             //make sure alias is not already taken
             $repo      = $this->getRepository();
             $testAlias = $alias;
-            $count     = $repo->checkUniqueAlias($testAlias, ($translationParent) ? $translationParent : $entity);
-            $aliasTag  = $count;
+            $count     = $repo->checkPageUniqueAlias($testAlias, $pageIds);
+            $aliasTag  = 1;
 
             while ($count) {
                 $testAlias = $alias . $aliasTag;
-                $count     = $repo->checkUniqueAlias($testAlias, ($translationParent) ? $translationParent : $entity);
+                $count     = $repo->checkPageUniqueAlias($testAlias, $pageIds);
                 $aliasTag++;
             }
             if ($testAlias != $alias) {
@@ -192,9 +194,7 @@ class PageModel extends FormModel
             $entity->setAlias($alias);
         }
 
-        $now = new DateTimeHelper();
-
-        //set the author for new pages
+        // Set the author for new pages
         $isNew = $entity->isNew();
         if (!$isNew) {
             //increase the revision
@@ -203,37 +203,14 @@ class PageModel extends FormModel
             $entity->setRevision($revision);
         }
 
-        // Reset the variant hit and start date if there are any changes and if this is an A/B test
-        // Do it here in addition to the blanket resetVariants call so that it's available to the event listeners
-        $changes = $entity->getChanges();
-        $parent  = $entity->getVariantParent();
-
-        if ($parent !== null && !empty($changes) && empty($this->inConversion)) {
-            $entity->setVariantHits(0);
-            $entity->setVariantStartDate($now->getDateTime());
-        }
+        // Reset a/b test if applicable
+        $variantStartDate = new \DateTime();
+        $resetVariants    = $this->preVariantSaveEntity($entity, ['setVariantHits'], $variantStartDate);
 
         parent::saveEntity($entity, $unlock);
 
-        // If parent, add this entity as a child of the parent so that it populates the list in the tab (due to Doctrine hanging on to entities in memory)
-        if ($parent) {
-            $parent->addVariantChild($entity);
-        }
-        if ($translationParent) {
-            $translationParent->addTranslationChild($entity);
-        }
-
-        // Reset associated variants if applicable due to changes
-        if ($entity->isVariant() && !empty($changes) && empty($this->inConversion)) {
-            $dateString = $now->toUtcString();
-            $parentId = (!empty($parent)) ? $parent->getId() : $entity->getId();
-            $this->getRepository()->resetVariants($parentId, $dateString);
-
-            //if the parent was changed, then that parent/children must also be reset
-            if (isset($changes['variantParent'])) {
-                $this->getRepository()->resetVariants($changes['variantParent'][0], $dateString);
-            }
-        }
+        $this->postVariantSaveEntity($entity, $resetVariants, $pageIds, $variantStartDate);
+        $this->postTranslationEntitySave($entity);
     }
 
     /**
@@ -783,139 +760,6 @@ class PageModel extends FormModel
     public function getBounces (Page $page)
     {
         return $this->getHitRepository()->getBounces($page->getId());
-    }
-
-    /**
-     * Get the variant parent/children
-     *
-     * @param Page $page
-     *
-     * @return array
-     */
-    public function getVariants (Page $page)
-    {
-        $parent = $page->getVariantParent();
-
-        if (!empty($parent)) {
-            $children = $parent->getVariantChildren();
-        } else {
-            $parent   = $page;
-            $children = $page->getVariantChildren();
-        }
-
-        if (empty($children)) {
-            $children = array();
-        }
-
-        return array($parent, $children);
-    }
-
-    /**
-     * Get translation parent/children
-     *
-     * @param Page $page
-     *
-     * @return array
-     */
-    public function getTranslations (Page $page)
-    {
-        $parent = $page->getTranslationParent();
-
-        if (!empty($parent)) {
-            $children = $parent->getTranslationChildren();
-        } else {
-            $parent   = $page;
-            $children = $page->getTranslationChildren();
-        }
-
-        if (empty($children)) {
-            $children = false;
-        }
-
-        return array($parent, $children);
-    }
-
-    /**
-     * Converts a variant to the main page and the main page a variant
-     *
-     * @param Page $page
-     */
-    public function convertVariant (Page $page)
-    {
-        //let saveEntities() know it does not need to set variant start dates
-        $this->inConversion = true;
-
-        list($parent, $children) = $this->getVariants($page);
-
-        $save = array();
-
-        //set this page as the parent for the original parent and children
-        if ($parent) {
-            if ($parent->getId() != $page->getId()) {
-                $parent->setIsPublished(false);
-                $page->addVariantChild($parent);
-                $parent->setVariantParent($page);
-            }
-
-            $parent->setVariantStartDate(null);
-            $parent->setVariantHits(0);
-
-            foreach ($children as $child) {
-                //capture child before it's removed from collection
-                $save[] = $child;
-
-                $parent->removeVariantChild($child);
-            }
-        }
-
-        if (count($save)) {
-            foreach ($save as $child) {
-                if ($child->getId() != $page->getId()) {
-                    $child->setIsPublished(false);
-                    $page->addVariantChild($child);
-                    $child->setVariantParent($page);
-                } else {
-                    $child->removeVariantParent();
-                }
-
-                $child->setVariantHits(0);
-                $child->setVariantStartDate(null);
-            }
-        }
-
-        $save[] = $parent;
-        $save[] = $page;
-
-        //save the entities
-        $this->saveEntities($save, false);
-    }
-
-    /**
-     * Delete an entity
-     *
-     * @param object $entity
-     *
-     * @return void
-     */
-    public function deleteEntity($entity)
-    {
-        $this->getRepository()->nullParents($entity->getId());
-
-        return parent::deleteEntity($entity);
-    }
-
-    /**
-     * Delete an array of entities
-     *
-     * @param array $ids
-     *
-     * @return array
-     */
-    public function deleteEntities($ids)
-    {
-        $this->getRepository()->nullParents($ids);
-
-        return parent::deleteEntities($ids);
     }
 
     /**
