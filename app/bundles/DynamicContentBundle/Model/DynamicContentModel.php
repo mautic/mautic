@@ -13,6 +13,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
@@ -24,6 +25,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class DynamicContentModel extends FormModel
 {
+    use VariantModelTrait;
     /**
      * {@inheritdoc}
      *
@@ -49,7 +51,7 @@ class DynamicContentModel extends FormModel
 
     /**
      * Here just so PHPStorm calms down about type hinting.
-     * 
+     *
      * @param null $id
      *
      * @return null|DynamicContent
@@ -66,9 +68,9 @@ class DynamicContentModel extends FormModel
      * @param       $formFactory
      * @param null  $action
      * @param array $options
-     * 
+     *
      * @return mixed
-     * 
+     *
      * @throws \InvalidArgumentException
      */
     public function createForm($entity, $formFactory, $action = null, $options = [])
@@ -82,31 +84,6 @@ class DynamicContentModel extends FormModel
         }
 
         return $formFactory->create('dwc', $entity, $options);
-    }
-
-    /**
-     * Get the variant parent/children.
-     *
-     * @param DynamicContent $entity
-     *
-     * @return array
-     */
-    public function getVariants(DynamicContent $entity)
-    {
-        $parent = $entity->getVariantParent();
-
-        if (!empty($parent)) {
-            $children = $parent->getVariantChildren();
-        } else {
-            $parent = $entity;
-            $children = $entity->getVariantChildren();
-        }
-
-        if (empty($children)) {
-            $children = [];
-        }
-
-        return [$parent, $children];
     }
 
     /**
@@ -125,20 +102,20 @@ class DynamicContentModel extends FormModel
                 'slot' => ':slot',
                 'date_added' => $qb->expr()->literal((new \DateTime())->format('Y-m-d H:i:s'))
             ])->setParameter('slot', $slot);
-        
+
         $qb->execute();
     }
 
     /**
      * @param      $slot
      * @param Lead $lead
-     * 
+     *
      * @return DynamicContent
      */
     public function getSlotContentForLead($slot, Lead $lead)
     {
         $qb = $this->em->getConnection()->createQueryBuilder();
-        
+
         $qb->select('dc.id, dc.content')
             ->from(MAUTIC_TABLE_PREFIX.'dynamic_content', 'dc')
             ->leftJoin('dc', MAUTIC_TABLE_PREFIX.'dynamic_content_lead_data', 'dcld', 'dcld.dynamic_content_id = dc.id')

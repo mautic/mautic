@@ -71,10 +71,6 @@ return [
             'mautic.form.type.dwc' => [
                 'class' => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentType',
                 'arguments' => [
-                    'translator',
-                    'mautic.security',
-                    'mautic.dynamicContent.model.dynamicContent',
-                    'request_stack',
                     'doctrine.orm.entity_manager',
                 ],
                 'alias' => 'dwc',
