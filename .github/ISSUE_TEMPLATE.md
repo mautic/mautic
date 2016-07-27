@@ -1,25 +1,24 @@
 What type of report is this:
 
-| Q                    | A
-| -------------------- | ---
-| Bug report?          | 
-| Feature request?     | 
-| Enhancement?         |
+| Q  | A
+| ---| ---
+| Bug report? | 
+| Feature request? | 
+| Enhancement? | 
 
 ## Description:
-
+The more details the better...
 
 ## If a bug:
 
-| Q                 | A
-| ----------------- | ---
-| Mautic version    | 
-| PHP version       | 
+| Q   | A
+| --- | ---
+| Mautic version | 
+| PHP version | 
 
 ### Steps to reproduce:
 1. 
 2. 
- 
  
 ### Log errors: 
 
