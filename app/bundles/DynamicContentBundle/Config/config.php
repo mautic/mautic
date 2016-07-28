@@ -88,7 +88,6 @@ return [
                 'class' => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentSendType',
                 'arguments' => [
                     'router',
-                    'request_stack',
                 ],
                 'alias' => 'dwcsend_list',
             ],
@@ -96,7 +95,6 @@ return [
                 'class' => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentDecisionType',
                 'arguments' => [
                     'router',
-                    'request_stack',
                 ],
                 'alias' => 'dwcdecision_list',
             ],

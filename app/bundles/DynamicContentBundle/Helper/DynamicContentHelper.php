@@ -7,6 +7,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\DynamicContentBundle\Helper;
 
 use Mautic\CampaignBundle\Model\EventModel;
@@ -16,7 +17,7 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DynamicContentHelper
 {
@@ -40,9 +41,9 @@ class DynamicContentHelper
      *
      * @param DynamicContentModel           $dynamicContentModel
      * @param EventModel                    $campaignEventModel
-     * @param ContainerAwareEventDispatcher $dispatcher
+     * @param EventDispatcherInterface      $dispatcher
      */
-    public function __construct(DynamicContentModel $dynamicContentModel, EventModel $campaignEventModel, ContainerAwareEventDispatcher $dispatcher)
+    public function __construct(DynamicContentModel $dynamicContentModel, EventModel $campaignEventModel, EventDispatcherInterface $dispatcher)
     {
         $this->dynamicContentModel = $dynamicContentModel;
         $this->campaignEventModel  = $campaignEventModel;
@@ -67,9 +68,16 @@ class DynamicContentHelper
 
             if (!empty($data)) {
                 $content = $data['content'];
-                $dwc = $this->dynamicContentModel->getEntity($data['id']);
-
+                $dwc     = $this->dynamicContentModel->getEntity($data['id']);
                 if ($dwc instanceof DynamicContent) {
+                    // Determine a translation based on contact's preferred locale
+                    /** @var DynamicContent $translation */
+                    list($ignore, $translation) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
+                    if ($translation !== $dwc) {
+                        // Use translated version of content
+                        $dwc     = $translation;
+                        $content = $dwc->getContent();
+                    }
                     $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
 
                     $tokenEvent = new TokenReplacementEvent($content, $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);

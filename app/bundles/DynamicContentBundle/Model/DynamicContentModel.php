@@ -13,6 +13,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -26,6 +27,8 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class DynamicContentModel extends FormModel
 {
     use VariantModelTrait;
+    use TranslationModelTrait;
+
     /**
      * {@inheritdoc}
      *
@@ -47,6 +50,19 @@ class DynamicContentModel extends FormModel
     public function getStatRepository()
     {
         return $this->em->getRepository('MauticDynamicContentBundle:Stat');
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param object $entity
+     * @param bool   $unlock
+     */
+    public function saveEntity($entity, $unlock = true)
+    {
+        parent::saveEntity($entity, $unlock);
+
+        $this->postTranslationEntitySave($entity);
     }
 
     /**

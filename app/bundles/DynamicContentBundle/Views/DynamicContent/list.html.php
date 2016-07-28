@@ -49,9 +49,7 @@ if ($tmpl == 'index') {
                 </tr>
                 </thead>
                 <tbody>
-                <?php foreach ($items as $item):
-                    $variantChildren = $item->getVariantChildren();
-                    ?>
+                <?php foreach ($items as $item): ?>
                     <tr>
                         <td>
                             <?php
@@ -62,7 +60,7 @@ if ($tmpl == 'index') {
                                     'clone' => $permissions['dynamicContent:dynamicContents:create'],
                                     'delete' => $view['security']->hasEntityAccess($permissions['dynamicContent:dynamicContents:deleteown'], $permissions['dynamicContent:dynamicContents:deleteother'], $item->getCreatedBy()),
                                 ],
-                                'routeBase' => 'dynamicContent',
+                                'routeBase'  => 'dynamicContent',
                                 'nameGetter' => 'getName',
                             ]);
                             ?>

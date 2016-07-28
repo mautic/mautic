@@ -25,12 +25,12 @@ trait TranslationModelTrait
      *
      *
      * @param TranslationEntityInterface $entity
-     * @param Lead|null                  $lead
+     * @param Lead|array|null            $lead
      * @param Request|null               $request
      *
      * @return array[$parentEntity, TranslationEntityInterface $entity]
      */
-    public function getTranslatedEntity(TranslationEntityInterface $entity, Lead $lead = null, Request $request = null)
+    public function getTranslatedEntity(TranslationEntityInterface $entity, $lead = null, Request $request = null)
     {
         list($translationParent, $translationChildren) = $entity->getTranslations();
 
@@ -60,8 +60,12 @@ trait TranslationModelTrait
             // Get the contact's preferred language if defined
             $languageList   = [];
             $leadPreference = null;
-            if ($lead && $leadPreference = $lead->getPreferredLocale()) {
-                $languageList[$leadPreference] = $leadPreference;
+            if ($lead) {
+                if ($lead instanceof Lead) {
+                    $languageList[$leadPreference] = $lead->getPreferredLocale();
+                } elseif (is_array($lead) && isset($lead['preferred_locale'])) {
+                    $languageList[$leadPreference] = $lead['preferred_locale'];
+                }
             }
 
             // Check request for language
@@ -110,14 +114,14 @@ trait TranslationModelTrait
                 $entity = ($matchFound == $translationParent->getId()) ? $translationParent : $translationChildren[$matchFound];
             } elseif ($preferredCore) {
                 // Return the best matching language
-                $bestMatch      = array_keys($translationList[$preferredCore])[0];
+                $bestMatch      = array_values($translationList[$preferredCore])[0];
                 $entity         = ($bestMatch == $translationParent->getId()) ? $translationParent : $translationChildren[$bestMatch];
                 $chosenLanguage = $preferredCore;
             }
         }
 
         // Save the preferred language to the lead's profile
-        if (!$leadPreference && $chosenLanguage) {
+        if (!$leadPreference && $chosenLanguage && $lead instanceof Lead) {
             $lead->addUpdatedField('preferred_locale', $chosenLanguage);
         }
 

@@ -133,13 +133,15 @@ class CampaignSubscriber extends CommonSubscriber
         $slot         = $this->session->get('dwc.slot_name.lead.'.$lead->getId());
 
         $dwc = $this->dynamicContentModel->getRepository()->getEntity($eventConfig['dynamicContent']);
-        
+
         if ($dwc instanceof DynamicContent) {
+            // Use translation if available
+            list($ignore, $dwc) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
 
             if ($slot) {
                 $this->dynamicContentModel->setSlotContentForLead($dwc, $lead, $slot);
             }
-            
+
             $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
 
             $tokenEvent = new TokenReplacementEvent($dwc->getContent(), $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);

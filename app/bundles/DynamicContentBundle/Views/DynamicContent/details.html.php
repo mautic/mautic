@@ -72,6 +72,20 @@ $view['slots']->set(
                 <div class="box-layout">
                     <div class="col-xs-10">
                         <div class="text-muted"><?php echo $entity->getDescription(); ?></div>
+                        <?php if ($entity->isVariant(true)): ?>
+                            <div class="small">
+                                <a href="<?php echo $view['router']->path('mautic_dynamicContent_action', ['objectAction' => 'view', 'objectId' => $variants['parent']->getId()]); ?>" data-toggle="ajax">
+                                    <?php echo $view['translator']->trans('mautic.core.variant_of', ['%parent%' => $variants['parent']->getName()]); ?>
+                                </a>
+                            </div>
+                        <?php endif; ?>
+                        <?php if ($entity->isTranslation(true)): ?>
+                            <div class="small">
+                                <a href="<?php echo $view['router']->path('mautic_dynamicContent_action', ['objectAction' => 'view', 'objectId' => $translations['parent']->getId()]); ?>" data-toggle="ajax">
+                                    <?php echo $view['translator']->trans('mautic.core.translation_of', ['%parent%' => $translations['parent']->getName()]); ?>
+                                </a>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
