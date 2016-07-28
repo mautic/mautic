@@ -295,9 +295,14 @@ class AjaxController extends CommonAjaxController
                         );
 
                         $user = $this->factory->getUser();
+                        $userFullName=trim($user->getFirstName().' '.$user->getLastName());
 
                         $message->setFrom(array($settings['from_email'] => $settings['from_name']));
-                        $message->setTo(array($user->getEmail() => $user->getFirstName().' '.$user->getLastName()));
+                        if ($userFullName) {
+                            $message->setTo(array($user->getEmail() => $user->getFirstName().' '.$user->getLastName()));
+                        } else {
+                            $message->setTo(array($user->getEmail()));
+                        }
 
                         $mailer->send($message);
                     }
