@@ -1029,19 +1029,27 @@ Mautic.initUniqueIdentifierFields = function() {
     if (uniqueFields.length) {
         uniqueFields.on('change', function() {
             var input = mQuery(this);
-            var request = {field: input.data('unique-identifier'), value: input.val()};
+            var request = {
+                field: input.data('unique-identifier'),
+                value: input.val(),
+                ignore: mQuery('#lead_unlockId').val()
+            };
             Mautic.ajaxActionRequest('lead:getLeadIdsByFieldValue', request, function(response) {
-                var warning = mQuery('<div/>').text(response.existsMessage);
                 if (response.items !== 'undefined' && response.items.length) {
+                    var warning = mQuery('<div/>').text(response.existsMessage);
                     mQuery.each(response.items, function(i, item) {
+                        if (i > 0) {
+                            warning.append(mQuery('<span>, </span>'));
+                        }
+
                         var link = mQuery('<a/>')
                             .attr('href', item.link)
                             .attr('target', '_blank')
                             .text(item.name+' ('+item.id+')');
                         warning.append(link);
                     });
+                    warning.appendTo(input.parent());
                 }
-                warning.appendTo(input.parent());
             });
         });
     }
