@@ -92,7 +92,7 @@ class DynamicContentHelper
     public function replaceTokensInContent($content, $lead)
     {
         // Find all dynamic content tags
-        preg_match_all('/{(content)=(\w+)(?:\/}|}(?:([^{]*(?:{(?!\/\1})[^{]*)*){\/\1})?)/is', $content, $matches, PREG_SET_ORDER);
+        preg_match_all('/{(dynamiccontent)=(\w+)(?:\/}|}(?:([^{]*(?:{(?!\/\1})[^{]*)*){\/\1})?)/is', $content, $matches, PREG_SET_ORDER);
 
         foreach ($matches as $match) {
             $slot = $match[2];
@@ -104,7 +104,7 @@ class DynamicContentHelper
                 $dwcContent = $defaultContent;
             }
 
-            $content = str_replace($matches[0], '<div class="mautic-slot">' . $dwcContent . '</div>', $content);
+            $content = str_replace($matches[0], $dwcContent, $content);
         }
 
         return $content;

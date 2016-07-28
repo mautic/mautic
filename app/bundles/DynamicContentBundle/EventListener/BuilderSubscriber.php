@@ -54,13 +54,13 @@ class BuilderSubscriber extends CommonSubscriber
      */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
-        $event->addToken('{content=slot_name}', $this->translator->trans('mautic.dynamicContent.dynamicContent'));
+        $event->addToken('{dynamiccontent=slot_name}', $this->translator->trans('mautic.dynamicContent.dynamicContent'));
     }
 
     /**
      * @param EmailSendEvent $event
      */
-    public function onEmailDisplay(EmailSendEvent $event)
+    public function onEmailGenerate(EmailSendEvent $event)
     {
         $content = $this->dynamicContentHelper->replaceTokensInContent($event->getContent(), $event->getLead());
 
