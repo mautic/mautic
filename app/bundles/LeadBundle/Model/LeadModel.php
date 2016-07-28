@@ -654,6 +654,10 @@ class LeadModel extends FormModel
 
                     $fields = $this->getLeadDetails($lead);
                     $lead->setFields($fields);
+
+                    if (MAUTIC_ENV == 'dev') {
+                        header('X-Mautic-Contact-Created: '.$leadId);
+                    }
                 }
             }
 
@@ -689,6 +693,8 @@ class LeadModel extends FormModel
      */
     public function getContactFromRequest($queryFields = [])
     {
+        $lead = null;
+
         // Check for a lead requested through clickthrough query parameter
         if (isset($queryFields['ct'])) {
             $clickthrough = $queryFields['ct'];
@@ -698,18 +704,15 @@ class LeadModel extends FormModel
 
         if (is_array($clickthrough) && !empty($clickthrough['lead'])) {
             $lead = $this->getEntity($clickthrough['lead']);
-            if ($lead !== null) {
-                $this->setLeadCookie($clickthrough['lead']);
-                $this->setCurrentLead($lead);
-            }
         }
 
-        // No lead defined in ct so get the currently tracked lead
-        if (empty($lead)) {
-            $lead = $this->getCurrentLead();
+        // First determine if this request is already tracked as a specific lead
+        list($trackingId, $generated) = $this->getTrackingCookie();
+        if ($leadId = $this->request->cookies->get($trackingId)) {
+            $lead = $this->getEntity($leadId);
         }
 
-        // Update lead fields if some data were sent in the URL query
+        // Search for lead by request and/or update lead fields if some data were sent in the URL query
         $availableLeadFields = $this->leadFieldModel->getFieldList(
             false,
             false,
@@ -735,29 +738,33 @@ class LeadModel extends FormModel
         if (count($inQuery)) {
             // Check for leads using unique identifier
             if (count($uniqueLeadFieldData)) {
-                $existingLeads = $this->getRepository()->getLeadsByUniqueFields(
-                    $uniqueLeadFieldData,
-                    $lead->getId()
-                );
+                $existingLeads = $this->getRepository()->getLeadsByUniqueFields($uniqueLeadFieldData, ($lead) ? $lead->getId() : null);
+
                 if (!empty($existingLeads)) {
-                    $lead = $this->mergeLeads($lead, $existingLeads[0]);
+                    // Merge with existing lead or use the one found
+                    $lead = ($lead) ? $this->mergeLeads($lead, $existingLeads[0]) : $existingLeads[0];
                 }
-
-                $leadIpAddresses = $lead->getIpAddresses();
-                $ipAddress       = $this->ipLookupHelper->getIpAddress();
-                if (!$leadIpAddresses->contains($ipAddress)) {
-                    $lead->addIpAddress($ipAddress);
-                }
-
-                $this->setCurrentLead($lead);
             }
-
-            $this->setFieldValues($lead, $inQuery);
         }
+
+        if (empty($lead)) {
+            // No lead found so generate one
+            $lead = $this->getCurrentLead();
+        }
+
+        $leadIpAddresses = $lead->getIpAddresses();
+        $ipAddress       = $this->ipLookupHelper->getIpAddress();
+        if (!$leadIpAddresses->contains($ipAddress)) {
+            $lead->addIpAddress($ipAddress);
+        }
+
+        $this->setFieldValues($lead, $inQuery);
 
         if (isset($queryFields['tags'])) {
             $this->modifyTags($lead, $queryFields['tags']);
         }
+
+        $this->setCurrentLead($lead);
 
         return $lead;
     }
@@ -769,6 +776,10 @@ class LeadModel extends FormModel
      */
     public function setCurrentLead(Lead $lead)
     {
+        if (MAUTIC_ENV == 'dev' && !\headers_sent()) {
+            header('X-Mautic-Contact-Set: '.$lead->getId());
+        }
+
         if ($this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
             // Overwrite system current lead
             $this->systemCurrentLead = $lead;
@@ -776,7 +787,7 @@ class LeadModel extends FormModel
             return;
         }
 
-        $oldLead = (is_null($this->currentLead)) ? $this->getCurrentLead() : $this->currentLead;
+        $oldLead = (is_null($this->currentLead)) ? null : $this->currentLead;
 
         $fields = $lead->getFields();
         if (empty($fields)) {
@@ -789,16 +800,18 @@ class LeadModel extends FormModel
         $this->currentLead->setLastActive(new \DateTime());
 
         // Update tracking cookies if the lead is different
-        if ($oldLead->getId() != $lead->getId()) {
+        if (!$oldLead || $oldLead->getId() != $lead->getId()) {
 
             list($newTrackingId, $oldTrackingId) = $this->getTrackingCookie(true);
 
             //set the tracking cookies
             $this->setLeadCookie($lead->getId());
 
-            if ($this->dispatcher->hasListeners(LeadEvents::CURRENT_LEAD_CHANGED)) {
-                $event = new LeadChangeEvent($oldLead, $oldTrackingId, $lead, $newTrackingId);
-                $this->dispatcher->dispatch(LeadEvents::CURRENT_LEAD_CHANGED, $event);
+            if ($oldTrackingId && $oldLead) {
+                if ($this->dispatcher->hasListeners(LeadEvents::CURRENT_LEAD_CHANGED)) {
+                    $event = new LeadChangeEvent($oldLead, $oldTrackingId, $lead, $newTrackingId);
+                    $this->dispatcher->dispatch(LeadEvents::CURRENT_LEAD_CHANGED, $event);
+                }
             }
         }
     }
