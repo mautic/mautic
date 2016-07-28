@@ -116,7 +116,11 @@ class LeadType extends AbstractType
             $required    = $field['isRequired'];
             $alias       = $field['alias'];
             $group       = $field['group'];
-            $isUnique    = $field['isUniqueIdentifer'];
+
+            if ($field['isUniqueIdentifer']) {
+                $attr['data-unique-identifier'] = $field['alias'];
+            }
+
             $value       = (isset($fieldValues[$group][$alias]['value'])) ?
                 $fieldValues[$group][$alias]['value'] : $field['defaultValue'];
             $constraints = [];

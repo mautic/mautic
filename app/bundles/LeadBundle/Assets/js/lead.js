@@ -109,6 +109,8 @@ Mautic.leadOnLoad = function (container) {
     mQuery(document).on('shown.bs.tab', 'a#load-lead-map', function (e) {
         mQuery('#place-container svg').resize();
     });
+
+    Mautic.initUniqueIdentifierFields();
 };
 
 Mautic.leadOnUnload = function(id) {
@@ -1021,3 +1023,26 @@ Mautic.displayUniqueIdentifierWarning = function (el) {
         mQuery('.unique-identifier-warning').fadeIn('fast');
     }
 };
+
+Mautic.initUniqueIdentifierFields = function() {
+    var uniqueFields = mQuery('[data-unique-identifier]');
+    if (uniqueFields.length) {
+        uniqueFields.on('change', function() {
+            var input = mQuery(this);
+            var request = {field: input.data('unique-identifier'), value: input.val()};
+            Mautic.ajaxActionRequest('lead:getLeadIdsByFieldValue', request, function(response) {
+                var warning = mQuery('<div/>').text(response.existsMessage);
+                if (response.items !== 'undefined' && response.items.length) {
+                    mQuery.each(response.items, function(i, item) {
+                        var link = mQuery('<a/>')
+                            .attr('href', item.link)
+                            .attr('target', '_blank')
+                            .text(item.name+' ('+item.id+')');
+                        warning.append(link);
+                    });
+                }
+                warning.appendTo(input.parent());
+            });
+        });
+    }
+}
