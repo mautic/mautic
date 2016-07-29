@@ -9,6 +9,7 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'page');
+$isExisting = $activePage->getId();
 
 $variantParent = $activePage->getVariantParent();
 $subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.page.header.editvariant', array(
@@ -16,7 +17,7 @@ $subheader = ($variantParent) ? '<div><span class="small">' . $view['translator'
     '%parent%' => $variantParent->getTitle()
 )) . '</span></div>' : '';
 
-$header = ($activePage->getId()) ?
+$header = $isExisting ?
     $view['translator']->trans('mautic.page.header.edit',
         array('%name%' => $activePage->getTitle())) :
     $view['translator']->trans('mautic.page.header.new');
@@ -35,13 +36,13 @@ $template = $form['template']->vars['data'];
             <div class="col-xs-12">
                 <!-- tabs controls -->
                 <ul class="bg-auto nav nav-tabs pr-md pl-md">
-                    <li class="active"><a href="#theme-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.page.page'); ?></a></li>
-                    <li class=""><a href="#source-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.content'); ?></a></li>
+                    <li <?php echo !$isExisting ? "class='active'" : ""; ?>><a href="#theme-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.form.theme'); ?></a></li>
+                    <li <?php echo $isExisting ? "class='active'" : ""; ?>><a href="#source-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.content'); ?></a></li>
                 </ul>
 
                 <!--/ tabs controls -->
                 <div class="tab-content pa-md">
-                    <div class="tab-pane fade in active bdr-w-0" id="theme-container">
+                    <div class="tab-pane fade <?php echo !$isExisting ? "in active" : ""; ?> bdr-w-0" id="theme-container">
                         <div class="row">
                             <div class="col-md-12">
                                 <?php echo $view['form']->row($form['template']); ?>
@@ -55,7 +56,7 @@ $template = $form['template']->vars['data'];
                         )); ?>
                     </div>
 
-                    <div class="tab-pane fade bdr-w-0" id="source-container">
+                    <div class="tab-pane fade <?php echo $isExisting ? "in active" : ""; ?> bdr-w-0" id="source-container">
                         <div class="row">
                             <div class="col-md-12" id="customHtmlContainer" style="min-height: 325px;">
                                 <?php echo $view['form']->row($form['customHtml']); ?>
