@@ -17,6 +17,15 @@ namespace Mautic\NotificationBundle;
  */
 final class NotificationEvents
 {
+    /**
+     * The mautic.notification_token_replacement event is thrown right before the content is returned.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundle\Event\TokenReplacementEvent instance.
+     *
+     * @var string
+     */
+    const TOKEN_REPLACEMENT = 'mautic.notification_token_replacement';
 
     /**
      * The mautic.notification_on_click event is thrown when an email is opened

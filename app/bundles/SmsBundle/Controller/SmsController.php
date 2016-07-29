@@ -278,6 +278,18 @@ class SmsController extends FormController
         // Audit Log
         $logs = $this->getModel('core.auditLog')->getLogForObject('sms', $sms->getId(), $sms->getDateAdded());
 
+        // Init the date range filter form
+        $dateRangeValues = $this->request->get('daterange', []);
+        $action          = $this->generateUrl('mautic_notification_action', ['objectAction' => 'view', 'objectId' => $objectId]);
+        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+        $entityViews     = $model->getHitsLineChartData(
+            null,
+            new \DateTime($dateRangeForm->get('date_from')->getData()),
+            new \DateTime($dateRangeForm->get('date_to')->getData()),
+            null,
+            ['sms_id' => $sms->getId(), 'flag' => 'total_and_unique']
+        );
+
         // Get click through stats
         $trackableLinks = $model->getSmsClickStats($sms->getId());
 
@@ -292,7 +304,6 @@ class SmsController extends FormController
                 ),
                 'viewParameters'  => array(
                     'sms'         => $sms,
-                    'stats'       => array(), // @todo
                     'trackables'  => $trackableLinks,
                     'logs'        => $logs,
                     'permissions' => $security->isGranted(
@@ -309,7 +320,9 @@ class SmsController extends FormController
                         ),
                         "RETURN_ARRAY"
                     ),
-                    'security'    => $security
+                    'security'      => $security,
+                    'entityViews'   => $entityViews,
+                    'dateRangeForm' => $dateRangeForm->createView()
                 ),
                 'contentTemplate' => 'MauticSmsBundle:Sms:details.html.php',
                 'passthroughVars' => array(

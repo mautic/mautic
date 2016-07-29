@@ -28,6 +28,15 @@ return [
             ],
             'mautic.core.js.subscriber'           => [
                 'class' => 'Mautic\NotificationBundle\EventListener\BuildJsSubscriber'
+            ],
+            'mautic.notification.notificationbundle.subscriber' => [
+                'class' => 'Mautic\NotificationBundle\EventListener\NotificationSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.page.model.trackable',
+                    'mautic.page.helper.token',
+                    'mautic.asset.helper.token'
+                ]
             ]
         ],
         'forms' => [

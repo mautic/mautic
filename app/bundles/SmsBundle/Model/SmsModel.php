@@ -9,7 +9,11 @@
 
 namespace Mautic\SmsBundle\Model;
 
+use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\Stat;
@@ -145,6 +149,22 @@ class SmsModel extends FormModel
     }
 
     /**
+     * @param Sms    $sms
+     * @param Lead           $lead
+     * @param string         $source
+     */
+    public function createStatEntry(Sms $sms, Lead $lead, $source = null)
+    {
+        $stat = new Stat();
+        $stat->setDateSent(new \DateTime());
+        $stat->setLead($lead);
+        $stat->setSms($sms);
+        $stat->setSource($source);
+
+        $this->getStatRepository()->saveEntity($stat);
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param $action
@@ -189,6 +209,68 @@ class SmsModel extends FormModel
         } else {
             return null;
         }
+    }
+
+    /**
+     * Joins the page table and limits created_by to currently logged in user
+     *
+     * @param QueryBuilder $q
+     */
+    public function limitQueryToCreator(QueryBuilder &$q)
+    {
+        $q->join('t', MAUTIC_TABLE_PREFIX.'sms_messages', 's', 's.id = t.sms_id')
+            ->andWhere('s.created_by = :userId')
+            ->setParameter('userId', $this->user->getId());
+    }
+
+    /**
+     * Get line chart data of hits
+     *
+     * @param char      $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param string    $dateFormat
+     * @param array     $filter
+     * @param boolean   $canViewOthers
+     *
+     * @return array
+     */
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
+    {
+        $flag = null;
+
+        if (isset($filter['flag'])) {
+            $flag = $filter['flag'];
+            unset($filter['flag']);
+        }
+
+        $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+
+        if (!$flag || $flag === 'total_and_unique') {
+            $q = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->translator->trans('mautic.notification.show.total.views'), $data);
+        }
+
+        if ($flag === 'unique' || $flag === 'total_and_unique') {
+            $q = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
+            $q->groupBy('t.lead_id, t.date_sent');
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->translator->trans('mautic.sms.show.unique.views'), $data);
+        }
+
+        return $chart->render();
     }
 
     /**

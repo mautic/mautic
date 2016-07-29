@@ -18,6 +18,16 @@ namespace Mautic\SmsBundle;
 final class SmsEvents
 {
     /**
+     * The mautic.sms_token_replacement event is thrown right before the content is returned.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundle\Event\TokenReplacementEvent instance.
+     *
+     * @var string
+     */
+    const TOKEN_REPLACEMENT = 'mautic.sms_token_replacement';
+
+    /**
      * The mautic.sms_on_send event is thrown when a sms is sent
      *
      * The event listener receives a

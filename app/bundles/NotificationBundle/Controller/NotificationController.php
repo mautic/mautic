@@ -277,6 +277,18 @@ class NotificationController extends FormController
         // Audit Log
         $logs = $this->getModel('core.auditLog')->getLogForObject('notification', $notification->getId(), $notification->getDateAdded());
 
+        // Init the date range filter form
+        $dateRangeValues = $this->request->get('daterange', []);
+        $action          = $this->generateUrl('mautic_notification_action', ['objectAction' => 'view', 'objectId' => $objectId]);
+        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+        $entityViews     = $model->getHitsLineChartData(
+            null,
+            new \DateTime($dateRangeForm->get('date_from')->getData()),
+            new \DateTime($dateRangeForm->get('date_to')->getData()),
+            null,
+            ['notification_id' => $notification->getId(), 'flag' => 'total_and_unique']
+        );
+
         // Get click through stats
         $trackableLinks = $model->getNotificationClickStats($notification->getId());
 
@@ -291,7 +303,6 @@ class NotificationController extends FormController
                 ),
                 'viewParameters'  => array(
                     'notification'   => $notification,
-                    'stats'          => array(), // @todo
                     'trackables'     => $trackableLinks,
                     'logs'           => $logs,
                     'permissions'    => $security->isGranted(
@@ -308,7 +319,9 @@ class NotificationController extends FormController
                         ),
                         "RETURN_ARRAY"
                     ),
-                    'security'       => $security
+                    'security'       => $security,
+                    'entityViews'    => $entityViews,
+                    'dateRangeForm'  => $dateRangeForm->createView()
                 ),
                 'contentTemplate' => 'MauticNotificationBundle:Notification:details.html.php',
                 'passthroughVars' => array(

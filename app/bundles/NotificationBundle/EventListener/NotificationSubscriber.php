@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\SmsBundle\EventListener;
+namespace Mautic\NotiicBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\PageBundle\Entity\Trackable;
@@ -18,22 +18,17 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
-use Mautic\SmsBundle\Event\SmsEvent;
-use Mautic\SmsBundle\Event\SmsSendEvent;
-use Mautic\SmsBundle\SmsEvents;
+use Mautic\NotificationBundle\Event\NotificationEvent;
+use Mautic\NotificationBundle\Event\NotificationSendEvent;
+use Mautic\NotificationBundle\NotificationEvents;
 
 /**
  * Class CampaignSubscriber
  *
  * @package MauticSmsBundle
  */
-class SmsSubscriber extends CommonSubscriber
+class NotificationSubscriber extends CommonSubscriber
 {
-    /**
-     * @var string
-     */
-    protected $urlRegEx = '/https?\:\/\/([a-zA-Z0-9\-\.]+\.[a-zA-Z]+(\.[a-zA-Z])?)(\/\S*)?/i';
-
     /**
      * @var TrackableModel
      */
@@ -72,36 +67,22 @@ class SmsSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            SmsEvents::SMS_ON_SEND => ['onSmsSend', 0],
-            SmsEvents::SMS_POST_SAVE    => ['onPostSave', 0],
-            SmsEvents::SMS_POST_DELETE  => ['onDelete', 0],
-            SmsEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0]
+            NotificationEvents::NOTIFICATION_ON_SEND => ['onSend', 0],
+            NotificationEvents::NOTIFICATION_POST_SAVE    => ['onPostSave', 0],
+            NotificationEvents::NOTIFICATION_POST_DELETE  => ['onDelete', 0],
+            NotificationEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0]
         ];
     }
 
     /**
-     * @param SmsSendEvent $event
+     * @param NotificationSendEvent $event
      */
-    public function onSmsSend(SmsSendEvent $event)
+    public function onSend(NotificationSendEvent $event)
     {
         $content = $event->getContent();
         $tokens = array();
         /** @var \Mautic\SmsBundle\Api\AbstractSmsApi $smsApi */
         $smsApi = $this->factory->getKernel()->getContainer()->get('mautic.sms.api');
-
-        if ($this->contentHasLinks($content)) {
-            preg_match_all($this->urlRegEx, $content, $matches);
-
-            foreach ($matches[0] as $url) {
-                $tokens[$url] = $smsApi->convertToTrackedUrl(
-                    $url,
-                    array(
-                        'sms'  => $event->getSmsId(),
-                        'lead' => $event->getLead()->getId()
-                    )
-                );
-            }
-        }
 
         $content = str_ireplace(array_keys($tokens), array_values($tokens), $content);
 
@@ -109,29 +90,17 @@ class SmsSubscriber extends CommonSubscriber
     }
 
     /**
-     * Check string for links
-     *
-     * @param string $content
-     *
-     * @return bool
-     */
-    protected function contentHasLinks($content)
-    {
-        return preg_match($this->urlRegEx, $content);
-    }
-
-    /**
      * Add an entry to the audit log
      *
-     * @param SmsEvent $event
+     * @param NotificationEvent $event
      */
-    public function onPostSave(SmsEvent $event)
+    public function onPostSave(NotificationEvent $event)
     {
-        $entity = $event->getSms();
+        $entity = $event->getNotification();
         if ($details = $event->getChanges()) {
             $log = [
-                "bundle"    => "sms",
-                "object"    => "sms",
+                "bundle"    => "notification",
+                "object"    => "notification",
                 "objectId"  => $entity->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details
@@ -143,14 +112,14 @@ class SmsSubscriber extends CommonSubscriber
     /**
      * Add a delete entry to the audit log
      *
-     * @param SmsEvent $event
+     * @param NotificationEvent $event
      */
-    public function onDelete(SmsEvent $event)
+    public function onDelete(NotificationEvent $event)
     {
-        $entity = $event->getSms();
+        $entity = $event->getNotification();
         $log = [
-            "bundle"     => "sms",
-            "object"     => "sms",
+            "bundle"     => "notification",
+            "object"     => "notification",
             "objectId"   => $entity->getId(),
             "action"     => "delete",
             "details"    => ['name' => $entity->getName()]
@@ -178,8 +147,8 @@ class SmsSubscriber extends CommonSubscriber
             list($content, $trackables) = $this->trackableModel->parseContentForTrackables(
                 $content,
                 $tokens,
-                'sms',
-                $clickthrough['sms_id']
+                'notification',
+                $clickthrough['notification_id']
             );
 
             /**

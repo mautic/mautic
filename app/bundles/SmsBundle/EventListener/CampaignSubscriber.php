@@ -131,6 +131,7 @@ class CampaignSubscriber extends CommonSubscriber
             return $event->setResult(false);
         }
 
+        $this->smsModel->createStatEntry($sms, $lead);
         $this->smsModel->getRepository()->upCount($smsId);
         
         $event->setResult(

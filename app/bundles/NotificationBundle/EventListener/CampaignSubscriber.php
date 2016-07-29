@@ -148,6 +148,9 @@ class CampaignSubscriber extends CommonSubscriber
             return $event->setResult(false);
         }
 
+        $this->notificationModel->createStatEntry($notification, $lead);
+        $this->notificationModel->getRepository()->upCount($notificationId);
+
         $result = [
             'status' => 'mautic.notification.timeline.status.delivered',
             'type' => 'mautic.notification.notification',

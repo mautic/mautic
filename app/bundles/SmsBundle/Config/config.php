@@ -23,7 +23,13 @@ return [
                 'class' => 'Mautic\SmsBundle\EventListener\ConfigSubscriber'
             ],
             'mautic.sms.smsbundle.subscriber' => [
-                'class' => 'Mautic\SmsBundle\EventListener\SmsSubscriber'
+                'class' => 'Mautic\SmsBundle\EventListener\SmsSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.page.model.trackable',
+                    'mautic.page.helper.token',
+                    'mautic.asset.helper.token'
+                ]
             ]
         ],
         'forms' => [

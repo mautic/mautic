@@ -222,8 +222,8 @@ class DynamicContentModel extends FormModel
      */
     public function limitQueryToCreator(QueryBuilder &$q)
     {
-        $q->join('t', MAUTIC_TABLE_PREFIX.'pages', 'p', 'p.id = t.page_id')
-            ->andWhere('p.created_by = :userId')
+        $q->join('t', MAUTIC_TABLE_PREFIX.'dynamic_content', 'd', 'd.id = t.dynamic_content_id')
+            ->andWhere('d.created_by = :userId')
             ->setParameter('userId', $this->user->getId());
     }
 
