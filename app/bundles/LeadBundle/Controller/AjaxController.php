@@ -69,14 +69,14 @@ class AjaxController extends CommonAjaxController
                         "id"    => $r['id']
                     );
                 }
-            } 
+            }
             elseif ($field == "hit_url") {
                 $dataArray[] = array(
                     'value' => ''
                 );
             } else {
                 $results = $this->getModel('lead.field')->getLookupResults($field, $filter);
-                foreach ($results as $r) { 
+                foreach ($results as $r) {
                     $dataArray[] = array('value' => $r[$field]);
                 }
             }
@@ -331,7 +331,7 @@ class AjaxController extends CommonAjaxController
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
             /** @var \Mautic\LeadBundle\Entity\DoNotContact $dnc */
-            $dnc = $this->getEntityManager()->getRepository('MauticLeadBundle:DoNotContact')->findOneBy(
+            $dnc = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:DoNotContact')->findOneBy(
                 array(
                     'id' => $dncId
                 )
