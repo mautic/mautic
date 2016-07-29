@@ -337,7 +337,7 @@ class CommonApiController extends FOSRestController implements MauticController
 
         foreach ($form->all() as $child) {
             if (!$child->isValid()) {
-                $errors[$child->getName()] = $this->getErrorMessages($child);
+                $errors[$child->getName()] = $this->getFormErrorMessages($child);
             }
         }
 
