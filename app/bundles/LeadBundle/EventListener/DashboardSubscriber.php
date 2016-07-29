@@ -389,7 +389,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 // Build table rows with links
                 if ($leads) {
                     foreach ($leads as &$lead) {
-                        $leadUrl = $this->factory->getRouter()->generate('mautic_lead_action', array('objectAction' => 'view', 'objectId' => $lead['id']));
+                        $leadUrl = $this->factory->getRouter()->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $lead['id']));
                         $row = array(
                             array(
                                 'value' => $lead['name'],
