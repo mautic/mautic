@@ -143,6 +143,8 @@ class CampaignSubscriber extends CommonSubscriber
             $url
         );
 
+        $event->setChannel('notification', $notification->getId());
+
         // If for some reason the call failed, tell mautic to try again by return false
         if ($response->code !== 200) {
             return $event->setResult(false);
@@ -156,7 +158,7 @@ class CampaignSubscriber extends CommonSubscriber
             'heading' => $notification->getHeading(),
             'content' => $notification->getMessage()
         ];
-        
+
         $event->setResult($result);
     }
 }

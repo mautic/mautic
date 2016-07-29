@@ -220,17 +220,18 @@ class EventModel extends CommonFormModel
     /**
      * Triggers an event
      *
-     * @param       $type
-     * @param mixed $eventDetails
-     * @param mixed $typeId
+     * @param      $type
+     * @param null $eventDetails
+     * @param null $channel
+     * @param null $channelId
      *
-     * @return bool|mixed
+     * @return array|bool
      */
-    public function triggerEvent($type, $eventDetails = null, $typeId = null)
+    public function triggerEvent($type, $eventDetails = null, $channel = null, $channelId = null)
     {
         static $leadCampaigns = array(), $eventList = array(), $availableEventSettings = array(), $leadsEvents = array(), $examinedEvents = array();
 
-        $this->logger->debug('CAMPAIGN: Campaign triggered for event type '.$type.'('.$typeId.')');
+        $this->logger->debug('CAMPAIGN: Campaign triggered for event type '.$type.'('.$channel.' / '.$channelId.')');
 
         // Skip the anonymous check to force actions to fire for subsequent triggers
         $systemTriggered = defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED');
@@ -399,9 +400,10 @@ class EventModel extends CommonFormModel
                         $this->logger->debug('CAMPAIGN: Decision ID# '.$event['id'].' successfully executed and logged.');
 
                         //a child of this event was triggered or scheduled so make not of the triggering event in the log
-                        $this->getRepository()->saveEntity(
-                            $this->getLogEntity($event['id'], $campaigns[$campaignId], $lead, null, $systemTriggered)
-                        );
+                        $log = $this->getLogEntity($event['id'], $campaigns[$campaignId], $lead, null, $systemTriggered);
+                        $log->setChannel($channel)
+                            ->setChannelId($channelId);
+                        $this->getRepository()->saveEntity($log);
                     } else {
                         $this->logger->debug('CAMPAIGN: Decision not logged');
                     }
@@ -928,15 +930,15 @@ class EventModel extends CommonFormModel
                     if ($this->triggeredResponses !== false) {
                         $eventTypeKey = $event['eventType'];
                         $typeKey      = $event['type'];
-                        
+
                         if (!array_key_exists($eventTypeKey, $this->triggeredResponses) || !is_array($this->triggeredResponses[$eventTypeKey])) {
                             $this->triggeredResponses[$eventTypeKey] = [];
                         }
-                        
+
                         if (!array_key_exists($typeKey, $this->triggeredResponses[$eventTypeKey]) || !is_array($this->triggeredResponses[$eventTypeKey][$typeKey])) {
                             $this->triggeredResponses[$eventTypeKey][$typeKey] = [];
                         }
-                        
+
                         $this->triggeredResponses[$eventTypeKey][$typeKey][$event['id']] = $response;
                     }
 

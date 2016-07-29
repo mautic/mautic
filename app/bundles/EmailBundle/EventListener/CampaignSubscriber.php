@@ -99,7 +99,7 @@ class CampaignSubscriber extends CommonSubscriber
 
         if ($email !== null)
         {
-            $this->factory->getModel('campaign.event')->triggerEvent('email.open', $email, 'email.open' . $email->getId());
+            $this->factory->getModel('campaign.event')->triggerEvent('email.open', $email, 'email', $email->getId());
         }
     }
 
@@ -142,6 +142,8 @@ class CampaignSubscriber extends CommonSubscriber
                 $options   = ['source' => ['campaign', $eventDetails['campaign']['id']]];
                 $emailSent = $this->emailModel->sendEmail($email, $leadCredentials, $options);
             }
+
+            $event->setChannel('email', $emailId);
         }
 
         return $event->setResult($emailSent);
