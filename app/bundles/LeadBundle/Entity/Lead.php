@@ -672,7 +672,7 @@ class Lead extends FormEntity
      *
      * @param $points
      */
-    public function subtractToPoints($points)
+    public function subtractFromPoints($points)
     {
         $newPoints = $this->points - $points;
         $this->setPoints($newPoints);

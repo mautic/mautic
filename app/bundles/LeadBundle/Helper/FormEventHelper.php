@@ -49,7 +49,7 @@ class FormEventHelper
                 $lead->addToPoints($config['points']);
                 break;
             case 'minus':
-                $lead->subtractToPoints($config['points']);
+                $lead->subtractFromPoints($config['points']);
                 break;
             case 'times':
                 $lead->multiplyPoints($config['points']);
