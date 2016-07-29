@@ -88,6 +88,16 @@ $container->loadFromExtension(
                 'mautic_plugin_auth' => true,
                 'stateless'          => true
             ),
+            'saml' => array(
+                'pattern'     => "^/saml/",
+                'light_saml_sp'     => array(
+                  //  'provider'          => 'mautic.user.provider',
+                    'user_creator'      => 'mautic.security.saml.user_creator',
+                    'login_path'        => '/saml/login',
+                    'check_path'        => '/saml/login_check'
+                ),
+                'context'           => 'mautic'
+            ),
             'main'                 => array(
                 'pattern'     => "^/s/",
                 'simple_form' => array(
@@ -121,6 +131,31 @@ $container->loadFromExtension(
         ),
         'access_control' => array(
             array('path' => '^/api', 'roles' => 'IS_AUTHENTICATED_FULLY')
+        )
+    )
+);
+$container->loadFromExtension(
+    'light_saml_symfony_bridge', array(
+
+        'own' => array(
+            'entity_id' => '%mautic.site_url%',
+            'credentials' => array(
+                   array('certificate' => '%kernel.root_dir%/../vendor/lightsaml/lightsaml/web/sp/saml.crt',
+                       'key'           => '%kernel.root_dir%/../vendor/lightsaml/lightsaml/web/sp/saml.key',
+                        'password'      => ''
+                       )
+            )
+        ),
+        'party' => array(
+          'idp' =>array(
+              'files' =>array(
+                  '%kernel.root_dir%/../vendor/lightsaml/lightsaml/web/sp/openidp.feide.no.xml',
+                  '%kernel.root_dir%/../vendor/lightsaml/lightsaml/web/sp/testshib-providers.xml'
+              )
+          )
+        ),
+        'store' => array(
+            'id_state' => 'mautic.security.saml.id_store'
         )
     )
 );

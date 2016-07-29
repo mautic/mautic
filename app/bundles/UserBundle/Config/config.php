@@ -115,6 +115,9 @@ return array(
             ),
             'mautic.user.search.subscriber' => array(
                 'class'     => 'Mautic\UserBundle\EventListener\SearchSubscriber'
+            ),
+            'mautic.user.config.subscriber' => array(
+                'class'     => 'Mautic\UserBundle\EventListener\ConfigSubscriber'
             )
         ),
         'forms'  => array(
@@ -158,6 +161,10 @@ return array(
                 'class'     => 'Mautic\UserBundle\Form\Type\RoleListType',
                 'arguments' => 'mautic.user.model.role',
                 'alias'     => 'role_list'
+            ),
+            'mautic.form.type.saml_config'      => array(
+                'class'     => 'Mautic\UserBundle\Form\Type\ConfigType',
+                'alias'     => 'saml_config'
             )
         ),
         'other'  => array(
@@ -238,7 +245,22 @@ return array(
                     'event_dispatcher',
                     'mautic.helper.user'
                 ]
+            ),
+            'mautic.security.saml.id_store'         => array(
+                'class'     => 'Mautic\UserBundle\Security\Store\IdStore',
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'lightsaml.system.time_provider'
+                ]
+            ),
+            'mautic.security.saml.user_creator'         => array(
+                'class'     => 'Mautic\UserBundle\Security\User\UserCreator',
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'lightsaml_sp.username_mapper.simple'
+                ]
             )
+
         ),
         'models' =>  array(
             'mautic.user.model.role' => array(
@@ -251,5 +273,13 @@ return array(
                 )
             )
         )
-    )
+    ),
+    'parameters' => [
+        'saml_enabled'            => 'no',
+        'idp_entity_id'              => '',
+        'idp_entity_id' => '',
+        'idp_login_url' => '',
+        'idp_logout_url' => '',
+        'idp_ceritificate' => ''
+    ]
 );

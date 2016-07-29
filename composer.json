@@ -95,7 +95,8 @@
         "twilio/sdk": "^4.10",
 
         "stack/run": "^1.0",
-        "stack/builder": "^1.0"
+        "stack/builder": "^1.0",
+        "lightsaml/sp-bundle": "~1.0.2"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~2.8",
