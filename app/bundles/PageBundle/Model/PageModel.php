@@ -433,8 +433,8 @@ class PageModel extends FormModel
         // Get lead if required
         if (null == $lead) {
             $lead = $this->leadModel->getContactFromRequest($query);
-            $this->leadModel->saveEntity($lead);
         }
+        $this->leadModel->saveEntity($lead);
 
         // Set info from request
         $hit->setQuery($query);
