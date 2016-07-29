@@ -1669,7 +1669,7 @@ var Mautic = {
 
         var target = mQuery(el).attr('data-target');
 
-        var route = mQuery(el).attr('href');
+        var route = (mQuery(el).data('href')) ? mQuery(el).data('href') : mQuery(el).attr('href');
         if (route.indexOf('javascript') >= 0) {
             return false;
         }
