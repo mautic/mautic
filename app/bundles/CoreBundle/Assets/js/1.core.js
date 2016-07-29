@@ -580,7 +580,8 @@ var Mautic = {
                     //     settings.extraPlugins = "sourcedialog,docprops,filemanager";
                     // }
 
-                    var maxButtons = ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikeThrough', 'fontFamily', 'fontSize', 'color', 'paragraphFormat', 'align', 'orderedList', 'unorderedList', 'quote', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertImage','insertTable', 'html', 'fullscreen'];
+                    var maxButtons = ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting','insertLink', 'insertImage','insertTable', 'html', 'fullscreen'];
+                    var minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
 
                     if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
                         var options = {
@@ -603,15 +604,16 @@ var Mautic = {
 
                         textarea.froalaEditor(mQuery.extend({
                             // Set custom buttons with separator between them.
-                            toolbarButtons: maxButtons,
-                            toolbarButtonsMD: maxButtons,
-                            toolbarButtonsSM: ['undo', 'redo' , '-', 'bold', 'italic', 'underline'],
-                            toolbarButtonsXS: ['undo', 'redo' , '-', 'bold', 'italic', 'underline'],
+                            toolbarButtons: minButtons,
                             heightMin: 100
                         }, Mautic.basicFroalaOptions));
 
                     } else {
-                        textarea.froalaEditor(Mautic.basicFroalaOptions);
+                        textarea.froalaEditor(mQuery.extend({
+                            toolbarButtons: minButtons,
+                            heightMin: 100
+                        }, Mautic.basicFroalaOptions));
+
                     }
                 });
             }
