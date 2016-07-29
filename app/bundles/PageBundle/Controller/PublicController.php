@@ -90,7 +90,7 @@ class PublicController extends CommonFormController
             }
 
             // Check for variants
-            list($parentVariant, $childrenVariants) = $model->getVariants($entity);
+            list($parentVariant, $childrenVariants) = $entity->getVariants();
 
             // Is this a variant of another? If so, the parent URL should be used unless a user is logged in and previewing
             if ($parentVariant != $entity && !$userAccess) {

@@ -181,7 +181,7 @@ class PageController extends FormController
         }
 
         //get A/B test information
-        list($parent, $children) = $model->getVariants($activePage);
+        list($parent, $children) = $activePage->getVariants();
         $properties   = array();
         $variantError = false;
         $weight       = 0;

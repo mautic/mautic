@@ -124,13 +124,15 @@ class DynamicContentModel extends FormModel
 
     /**
      * @param      $slot
-     * @param Lead $lead
+     * @param Lead|array $lead
      *
      * @return DynamicContent
      */
-    public function getSlotContentForLead($slot, Lead $lead)
+    public function getSlotContentForLead($slot, $lead)
     {
         $qb = $this->em->getConnection()->createQueryBuilder();
+
+        $id = $lead instanceof Lead ? $lead->getId() : $lead['id'];
 
         $qb->select('dc.id, dc.content')
             ->from(MAUTIC_TABLE_PREFIX.'dynamic_content', 'dc')
@@ -138,7 +140,7 @@ class DynamicContentModel extends FormModel
             ->andWhere($qb->expr()->eq('dcld.slot', ':slot'))
             ->andWhere($qb->expr()->eq('dcld.lead_id', ':lead_id'))
             ->setParameter('slot', $slot)
-            ->setParameter('lead_id', $lead->getId())
+            ->setParameter('lead_id', $id)
             ->orderBy('dcld.date_added', 'DESC')
             ->addOrderBy('dcld.id', 'DESC');
 
@@ -147,11 +149,15 @@ class DynamicContentModel extends FormModel
 
     /**
      * @param DynamicContent $dynamicContent
-     * @param Lead           $lead
+     * @param Lead|array     $lead
      * @param string         $source
      */
-    public function createStatEntry(DynamicContent $dynamicContent, Lead $lead, $source = null)
+    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null)
     {
+        if (is_array($lead)) {
+            $lead = $this->em->getReference('MauticLeadBundle:Lead', $lead['id']);
+        }
+
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());
         $stat->setLead($lead);
