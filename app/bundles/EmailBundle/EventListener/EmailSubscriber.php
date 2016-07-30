@@ -15,6 +15,10 @@ use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
+use TDM\SwiftMailerEventBundle\Events\MailerSendEvent;
+use TDM\SwiftMailerEventBundle\Events\TransportSendEvent;
+use TDM\SwiftMailerEventBundle\Model\SmtpTransport;
 
 /**
  * Class EmailSubscriber
@@ -23,6 +27,8 @@ use Mautic\EmailBundle\EmailEvents;
  */
 class EmailSubscriber extends CommonSubscriber
 {
+
+    private $storedValues = array();
 
     /**
      * @return array
@@ -35,7 +41,11 @@ class EmailSubscriber extends CommonSubscriber
             EmailEvents::EMAIL_FAILED       => array('onEmailFailed', 0),
             EmailEvents::EMAIL_ON_SEND      => array('onEmailSend', 0),
             EmailEvents::EMAIL_RESEND       => array('onEmailResend', 0),
-            EmailEvents::EMAIL_PARSE        => array('onEmailParse', 0)
+            EmailEvents::EMAIL_PARSE        => array('onEmailParse', 0),
+            EmailEvents::EMAIL_MAILER_PRE_SEND_PROCESS => array('onEmailMailerPreSendProcess', 0),
+            EmailEvents::EMAIL_MAILER_PRE_SEND_CLEANUP => array('onEmailMailerPreSendCleanup', 0),
+            EmailEvents::EMAIL_TRANSPORT_PRE_SEND_PROCESS => array('onEmailTransportPreSendProcess', 0),
+            EmailEvents::EMAIL_TRANSPORT_PRE_SEND_CLEANUP => array('onEmailTransportPreSendCleanup', 0),
         );
     }
 
@@ -173,5 +183,132 @@ class EmailSubscriber extends CommonSubscriber
                 $messageHelper->analyzeMessage($message, $isBounce, $isUnsubscribe);
             }
         }
+    }
+
+    public function onEmailMailerPreSendProcess(MailerSendEvent $event) {
+        /** @var MauticMessage $message */
+        $message = $event->getMessage();
+        if (!$message instanceof MauticMessage) {
+            return;
+        }
+
+        // Get lead.
+        $to = $message->getTo();
+        $to = is_array($to) ? key($to) : $to;
+        $leads = $this->factory->getModel('lead.lead')
+            ->getRepository()
+            ->getLeadsByFieldValue('email', $to);
+        if (
+            /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+            !$lead = reset($leads)
+        ) {
+            throw new \Exception("No lead with such email: $to");
+        }
+
+        // Get owner.
+        if (!$owner = $lead->getOwner()) {
+            // Then default transport used - no change needed.
+            return;
+        }
+
+        // Get sender email and match SMTP credentials.
+        switch ($owner->getEmail()) {
+            case 'info@example.com':
+            default:
+                $message->setMetadata($to, 'AuthMode', 'login');
+                $message->setMetadata($to, 'Encryption', 'ssl');
+                $message->setMetadata($to, 'Host', 'smtp.example.com');
+                $message->setMetadata($to, 'Password', 'secretPassword');
+                $message->setMetadata($to, 'Port', 465);
+                $message->setMetadata($to, 'UserName', 'info@example.com');
+                $message->setFrom(array(
+                    'info@example.com' => 'Example',
+                ));
+                break;
+        }
+    }
+
+    public function onEmailMailerPreSendCleanup(MailerSendEvent $event) {
+        /** @var MauticMessage $message */
+        $message = $event->getMessage();
+        if (!$message instanceof MauticMessage) {
+            return;
+        }
+        // Remove any data you don't want to be serialized here.
+        // For our purposes, we don't need to remove anything now.
+    }
+
+    public function onEmailTransportPreSendProcess(TransportSendEvent $event) {
+        /** @var MauticMessage $message */
+        $message = $event->getMessage();
+        if (!$message instanceof MauticMessage) {
+            return;
+        }
+
+        $transport = $event->getTransport();
+        if (!$transport instanceof SmtpTransport) {
+            return;
+        }
+
+        $to = $message->getTo();
+        $to = is_array($to) ? key($to) : $to;
+        // Make sure all settings are added to message.
+        $metadata = $message->getMetadata();
+        foreach (array('AuthMode', 'Encryption', 'Host', 'Password', 'Port', 'UserName') as $settingName) {
+            if (empty($metadata[$to][$settingName])) {
+                return;
+            }
+        }
+
+        // Clear the stored values.
+        $this->storedValues = array();
+
+        // Make a copy of the existing values.
+        $this->storedValues['AuthMode'] = $transport->getAuthMode();
+        $this->storedValues['Encryption'] = $transport->getEncryption();
+        $this->storedValues['Host'] = $transport->getHost();
+        $this->storedValues['Password'] = $transport->getPassword();
+        $this->storedValues['Port'] = $transport->getPort();
+        $this->storedValues['UserName'] = $transport->getUsername();
+
+        // Change the values to the settings.
+        $transport->setAuthMode($metadata[$to]['AuthMode']);
+        $transport->setEncryption($metadata[$to]['Encryption']);
+        $transport->setHost($metadata[$to]['Host']);
+        $transport->setPassword($metadata[$to]['Password']);
+        $transport->setPort($metadata[$to]['Port']);
+        $transport->setUsername($metadata[$to]['UserName']);
+
+        // Restart (stop and start) the transport so it uses the new values
+        // and connects to new server
+        $transport->stop();
+        $transport->start();
+    }
+
+    public function onEmailTransportPreSendCleanup(TransportSendEvent $event) {
+        $transport = $event->getTransport();
+        if (!$transport instanceof SmtpTransport) {
+            return;
+        }
+
+        // Make sure all settings are available.
+        foreach (array('AuthMode', 'Encryption', 'Host', 'Password', 'Port', 'UserName') as $settingName) {
+            if (!array_key_exists($settingName, $this->storedValues)) {
+                return;
+            }
+        }
+
+        // Reset the transport values.
+        $transport->setAuthMode($this->storedValues['AuthMode']);
+        $transport->setEncryption($this->storedValues['Encryption']);
+        $transport->setHost($this->storedValues['Host']);
+        $transport->setPassword($this->storedValues['Password']);
+        $transport->setPort($this->storedValues['Port']);
+        $transport->setUsername($this->storedValues['UserName']);
+
+        // Restarttop (stop and start) the transport so it uses the new values
+        // and connects to new server
+        $transport->stop();
+        $transport->start();
     }
 }

@@ -457,7 +457,9 @@ class UserController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     $subject = InputHelper::clean($form->get('msg_subject')->getData());
                     $body    = InputHelper::clean($form->get('msg_body')->getData());
-                    $message = \Swift_Message::newInstance()
+                    /** @var \Swift_Message $message */
+                    $message = \Swift_DependencyContainer::getInstance()->lookup('message.message');
+                    $message = $message
                         ->setSubject($subject)
                         ->setFrom($currentUser->getEmail(), $currentUser->getName())
                         ->setTo($user->getEmail(), $user->getName())

@@ -175,7 +175,9 @@ class AppKernel extends Kernel
             new Mautic\SmsBundle\MauticSmsBundle(),
             new Mautic\StageBundle\MauticStageBundle(),
             new Mautic\UserBundle\MauticUserBundle(),
-            new Mautic\WebhookBundle\MauticWebhookBundle()
+            new Mautic\WebhookBundle\MauticWebhookBundle(),
+            // Other
+            new TDM\SwiftMailerEventBundle\TDMSwiftMailerEventBundle(),
         ];
 
         //dynamically register Mautic Plugin Bundles

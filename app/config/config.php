@@ -315,6 +315,10 @@ $container->setParameter(
     'JMS\Serializer\Naming\IdenticalPropertyNamingStrategy'
 );
 
+$container->loadFromExtension('tdm_swift_mailer_event', array(
+    'message'     => '\Mautic\EmailBundle\Swiftmailer\Message\MauticMessage',
+));
+
 // Monolog formatter
 $container->register('mautic.monolog.fulltrace.formatter', 'Monolog\Formatter\LineFormatter')
     ->addMethodCall('includeStacktraces', array(true));
