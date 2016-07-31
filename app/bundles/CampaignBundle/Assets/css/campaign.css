@@ -4,8 +4,8 @@
 
 .btn-close-campaign-builder {
     position: fixed;
-    top: 1em;
-    right: 1em;
+    top: 15px;
+    right: 30px;
     z-index: 1040;
 }
 
@@ -23,14 +23,20 @@
 }
 
 #CampaignEventPanel {
-    width: 300px;
-    height: 62px;
     position: absolute;
-    padding: 15px;
+    padding: 10px 20px;
     background-color: #ededed;
     border: 1px solid #cdcdcd;
     border-radius: 4px;
-    z-index:1060;
+    z-index:1035;
+}
+
+#CampaignEventPanelLists .disabled-result {
+    display: none;
+}
+
+#CampaignEventPanelGroups .panel-body {
+    height: 150px;
 }
 
 ._jsPlumb_endpoint {
