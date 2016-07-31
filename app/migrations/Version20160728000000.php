@@ -31,6 +31,6 @@ class Version20160728000000 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->addSql("ALTER TABLE {$this->prefix}campaign_lead_event_log ADD channel VARCHAR(255) NOT NULL, ADD channel_id INT DEFAULT NULL;");
+        $this->addSql("ALTER TABLE {$this->prefix}campaign_lead_event_log ADD channel VARCHAR(255) DEFAULT NULL, ADD channel_id INT DEFAULT NULL;");
     }
 }

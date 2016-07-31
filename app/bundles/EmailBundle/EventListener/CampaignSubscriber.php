@@ -83,7 +83,7 @@ class CampaignSubscriber extends CommonSubscriber
             'description'     => 'mautic.email.campaign.event.send_descr',
             'eventName'       => EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION,
             'formType'        => 'emailsend_list',
-            'formTypeOptions' => ['update_select' => 'campaignevent_properties_email'],
+            'formTypeOptions' => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
             'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList'
         ];
         $event->addAction('email.send', $action);
@@ -98,8 +98,7 @@ class CampaignSubscriber extends CommonSubscriber
     {
         $email = $event->getEmail();
 
-        if ($email !== null)
-        {
+        if ($email !== null) {
             $this->factory->getModel('campaign.event')->triggerEvent('email.open', $email, 'email', $email->getId());
         }
     }
@@ -134,14 +133,27 @@ class CampaignSubscriber extends CommonSubscriber
         $leadCredentials = ($lead instanceof Lead) ? $lead->getProfileFields() : $lead;
 
         if (!empty($leadCredentials['email'])) {
-            $emailId = (int) $event->getConfig()['email'];
+            $config  = $event->getConfig();
+            $emailId = (int) $config['email'];
 
             $email = $this->emailModel->getEntity($emailId);
 
             if ($email != null && $email->isPublished()) {
+                // Determine if this email is transactional/marketing
+                $type = (isset($config['email_type'])) ? $config['email_type'] : 'transactional';
+                if ('marketing' == $type) {
+                    // Determine if this lead has received the email before
+                    $stats = $this->emailModel->getStatRepository()->findContactEmailStats($leadCredentials['id'], $emailId);
+
+                    if (count($stats)) {
+                        // Already sent
+                        return $event->setResult(true);
+                    }
+                }
+
                 $eventDetails = $event->getEventDetails();
-                $options   = ['source' => ['campaign', $eventDetails['campaign']['id']]];
-                $emailSent = $this->emailModel->sendEmail($email, $leadCredentials, $options);
+                $options      = ['source' => ['campaign', $eventDetails['campaign']['id']]];
+                $emailSent    = $this->emailModel->sendEmail($email, $leadCredentials, $options);
             }
 
             $event->setChannel('email', $emailId);
