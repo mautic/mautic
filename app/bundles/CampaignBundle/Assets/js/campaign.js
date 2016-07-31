@@ -667,6 +667,11 @@ Mautic.campaignBeforeDropCallback = function(params) {
     var sourceEndpoint = Mautic.campaignBuilderGetEndpointDetails(params.connection.endpoints[0]);
     var targetEndpoint = Mautic.campaignBuilderGetEndpointDetails(params.dropEndpoint);
 
+    if (!Mautic.campaignBuilderValidateConnection(sourceEndpoint, targetEndpoint.event)){
+
+        return false;
+    }
+
     if ('top' == targetEndpoint.anchorName) {
         //ensure two events aren't looping
         var sourceConnections = Mautic.campaignBuilderInstance.select({
@@ -1123,36 +1128,8 @@ Mautic.campaignBuilderRegisterAnchors = function(names, el) {
             var selectId = (epDetails.eventType == 'decision') ? '#ActionList': '#DecisionList';
             mQuery(selectId+' option').each(function() {
                 var optionVal = mQuery(this).val();
-                var option = this;
-                if (typeof Mautic.campaignBuilderConnectionRestrictions[epDetails.eventType] !== 'undefined') {
-                    if (typeof Mautic.campaignBuilderConnectionRestrictions[epDetails.eventType]) {
-                        if (typeof Mautic.campaignBuilderConnectionRestrictions[epDetails.eventType][optionVal] !== 'undefined') {
-                            if (mQuery.inArray(epDetails.event, Mautic.campaignBuilderConnectionRestrictions[epDetails.eventType][optionVal]) === -1) {
-                                // Disable this one
-                                mQuery(option).prop('disabled', true);
-                            }
-                        }
-                    }
-                }
-
-                if (typeof Mautic.campaignBuilderConnectionRestrictions['anchors'][epDetails.eventType] !== 'undefined') {
-                    if (typeof Mautic.campaignBuilderConnectionRestrictions['anchors'][epDetails.eventType][optionVal]) {
-                        mQuery(Mautic.campaignBuilderConnectionRestrictions['anchors'][epDetails.eventType][optionVal]).each(function(key, anchor) {
-                            switch (anchor) {
-                              case 'inaction':
-                                  anchor = 'no';
-                                  break;
-                              case 'action':
-                                  anchor = 'yes';
-                                  break;
-                            }
-
-                            if (anchor == epDetails.anchorName) {
-                                // Disable this one
-                                mQuery(option).prop('disabled', true);
-                            }
-                        });
-                    }
+                if (!Mautic.campaignBuilderValidateConnection(epDetails, optionVal)){
+                    mQuery(this).prop('disabled', true);
                 }
             });
             mQuery(selectId).trigger('chosen:updated');
@@ -1273,3 +1250,47 @@ Mautic.campaignBuilderPrepareNewSource = function () {
     });
     mQuery('#SourceList').trigger('chosen:open');
 };
+
+/**
+ *
+ * @param epDetails
+ * @param optionVal
+ * @returns {boolean}
+ */
+Mautic.campaignBuilderValidateConnection = function (epDetails, checkEvent) {
+    var valid = true;
+    if (typeof Mautic.campaignBuilderConnectionRestrictions[epDetails.eventType] !== 'undefined') {
+        if (typeof Mautic.campaignBuilderConnectionRestrictions[epDetails.eventType]) {
+            if (typeof Mautic.campaignBuilderConnectionRestrictions[epDetails.eventType][checkEvent] !== 'undefined') {
+                if (mQuery.inArray(epDetails.event, Mautic.campaignBuilderConnectionRestrictions[epDetails.eventType][checkEvent]) === -1) {
+                    // Disable this one
+                    valid = false;
+                }
+            }
+        }
+    }
+
+    if (typeof Mautic.campaignBuilderConnectionRestrictions['anchors'][epDetails.eventType] !== 'undefined') {
+        if (typeof Mautic.campaignBuilderConnectionRestrictions['anchors'][epDetails.eventType][checkEvent]) {
+            mQuery(Mautic.campaignBuilderConnectionRestrictions['anchors'][epDetails.eventType][checkEvent]).each(function(key, anchor) {
+                switch (anchor) {
+                    case 'inaction':
+                        anchor = 'no';
+                        break;
+                    case 'action':
+                        anchor = 'yes';
+                        break;
+                }
+
+                if (anchor == epDetails.anchorName) {
+                    // Disable this one
+                    valid = false;
+
+                    return false;
+                }
+            });
+        }
+    }
+
+    return valid;
+}
