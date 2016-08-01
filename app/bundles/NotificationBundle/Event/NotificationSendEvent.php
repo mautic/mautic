@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\NotificationBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -14,9 +14,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class NotificationSendEvent
- *
- * @package Mautic\NotificationBundle\Event
+ * Class NotificationSendEvent.
  */
 class NotificationSendEvent extends CommonEvent
 {
@@ -43,12 +41,12 @@ class NotificationSendEvent extends CommonEvent
     /**
      * @var array
      */
-    private $tokens = array();
+    private $tokens = [];
 
     /**
-     * @param array      $args
+     * @param array $args
      */
-    public function __construct($args = array())
+    public function __construct($args = [])
     {
         if (isset($args['content'])) {
             $this->content = $args['content'];
@@ -72,7 +70,7 @@ class NotificationSendEvent extends CommonEvent
     }
 
     /**
-     * Returns the Email entity
+     * Returns the Email entity.
      *
      * @return Email
      */
@@ -82,7 +80,7 @@ class NotificationSendEvent extends CommonEvent
     }
 
     /**
-     * Get email content
+     * Get email content.
      *
      * @param $replaceTokens
      *
@@ -93,7 +91,6 @@ class NotificationSendEvent extends CommonEvent
         if ($this->helper !== null) {
             $content = $this->helper->getBody();
         } else {
-
             $content = $this->content;
         }
 
@@ -101,7 +98,7 @@ class NotificationSendEvent extends CommonEvent
     }
 
     /**
-     * Set email content
+     * Set email content.
      *
      * @param $content
      */
@@ -115,17 +112,15 @@ class NotificationSendEvent extends CommonEvent
     }
 
     /**
-     * Get email content
+     * Get email content.
      *
      * @return array
      */
     public function getPlainText()
     {
         if ($this->helper !== null) {
-
             return $this->helper->getPlainText();
         } else {
-
             return $this->plainText;
         }
     }
@@ -148,10 +143,8 @@ class NotificationSendEvent extends CommonEvent
     public function getSubject()
     {
         if ($this->helper !== null) {
-
             return $this->helper->getSubject();
         } else {
-
             return $this->subject;
         }
     }
@@ -171,7 +164,7 @@ class NotificationSendEvent extends CommonEvent
     }
 
     /**
-     * Get the MailHelper object
+     * Get the MailHelper object.
      *
      * @return MailHelper
      */
@@ -222,7 +215,7 @@ class NotificationSendEvent extends CommonEvent
     }
 
     /**
-     * Get token array
+     * Get token array.
      *
      * @return array
      */

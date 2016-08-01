@@ -1,13 +1,13 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-namespace Mautic\NotiicBundle\EventListener;
+namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\PageBundle\Entity\Trackable;
@@ -23,9 +23,7 @@ use Mautic\NotificationBundle\Event\NotificationSendEvent;
 use Mautic\NotificationBundle\NotificationEvents;
 
 /**
- * Class CampaignSubscriber
- *
- * @package MauticSmsBundle
+ * Class NotificationSubscriber.
  */
 class NotificationSubscriber extends CommonSubscriber
 {
@@ -68,9 +66,9 @@ class NotificationSubscriber extends CommonSubscriber
     {
         return [
             NotificationEvents::NOTIFICATION_ON_SEND => ['onSend', 0],
-            NotificationEvents::NOTIFICATION_POST_SAVE    => ['onPostSave', 0],
-            NotificationEvents::NOTIFICATION_POST_DELETE  => ['onDelete', 0],
-            NotificationEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0]
+            NotificationEvents::NOTIFICATION_POST_SAVE => ['onPostSave', 0],
+            NotificationEvents::NOTIFICATION_POST_DELETE => ['onDelete', 0],
+            NotificationEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
         ];
     }
 
@@ -80,7 +78,7 @@ class NotificationSubscriber extends CommonSubscriber
     public function onSend(NotificationSendEvent $event)
     {
         $content = $event->getContent();
-        $tokens = array();
+        $tokens = [];
         /** @var \Mautic\SmsBundle\Api\AbstractSmsApi $smsApi */
         $smsApi = $this->factory->getKernel()->getContainer()->get('mautic.sms.api');
 
@@ -90,7 +88,7 @@ class NotificationSubscriber extends CommonSubscriber
     }
 
     /**
-     * Add an entry to the audit log
+     * Add an entry to the audit log.
      *
      * @param NotificationEvent $event
      */
@@ -99,18 +97,18 @@ class NotificationSubscriber extends CommonSubscriber
         $entity = $event->getNotification();
         if ($details = $event->getChanges()) {
             $log = [
-                "bundle"    => "notification",
-                "object"    => "notification",
-                "objectId"  => $entity->getId(),
-                "action"    => ($event->isNew()) ? "create" : "update",
-                "details"   => $details
+                'bundle' => 'notification',
+                'object' => 'notification',
+                'objectId' => $entity->getId(),
+                'action' => ($event->isNew()) ? 'create' : 'update',
+                'details' => $details,
             ];
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
     }
 
     /**
-     * Add a delete entry to the audit log
+     * Add a delete entry to the audit log.
      *
      * @param NotificationEvent $event
      */
@@ -118,11 +116,11 @@ class NotificationSubscriber extends CommonSubscriber
     {
         $entity = $event->getNotification();
         $log = [
-            "bundle"     => "notification",
-            "object"     => "notification",
-            "objectId"   => $entity->getId(),
-            "action"     => "delete",
-            "details"    => ['name' => $entity->getName()]
+            'bundle' => 'notification',
+            'object' => 'notification',
+            'objectId' => $entity->getId(),
+            'action' => 'delete',
+            'details' => ['name' => $entity->getName()],
         ];
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
@@ -152,7 +150,7 @@ class NotificationSubscriber extends CommonSubscriber
             );
 
             /**
-             * @var string $token
+             * @var string
              * @var Trackable $trackable
              */
             foreach ($trackables as $token => $trackable) {

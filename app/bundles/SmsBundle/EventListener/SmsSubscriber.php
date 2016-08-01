@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
@@ -23,9 +23,7 @@ use Mautic\SmsBundle\Event\SmsSendEvent;
 use Mautic\SmsBundle\SmsEvents;
 
 /**
- * Class CampaignSubscriber
- *
- * @package MauticSmsBundle
+ * Class CampaignSubscriber.
  */
 class SmsSubscriber extends CommonSubscriber
 {
@@ -73,9 +71,9 @@ class SmsSubscriber extends CommonSubscriber
     {
         return [
             SmsEvents::SMS_ON_SEND => ['onSmsSend', 0],
-            SmsEvents::SMS_POST_SAVE    => ['onPostSave', 0],
-            SmsEvents::SMS_POST_DELETE  => ['onDelete', 0],
-            SmsEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0]
+            SmsEvents::SMS_POST_SAVE => ['onPostSave', 0],
+            SmsEvents::SMS_POST_DELETE => ['onDelete', 0],
+            SmsEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
         ];
     }
 
@@ -85,7 +83,7 @@ class SmsSubscriber extends CommonSubscriber
     public function onSmsSend(SmsSendEvent $event)
     {
         $content = $event->getContent();
-        $tokens = array();
+        $tokens = [];
         /** @var \Mautic\SmsBundle\Api\AbstractSmsApi $smsApi */
         $smsApi = $this->factory->getKernel()->getContainer()->get('mautic.sms.api');
 
@@ -95,10 +93,10 @@ class SmsSubscriber extends CommonSubscriber
             foreach ($matches[0] as $url) {
                 $tokens[$url] = $smsApi->convertToTrackedUrl(
                     $url,
-                    array(
-                        'sms'  => $event->getSmsId(),
-                        'lead' => $event->getLead()->getId()
-                    )
+                    [
+                        'sms' => $event->getSmsId(),
+                        'lead' => $event->getLead()->getId(),
+                    ]
                 );
             }
         }
@@ -109,7 +107,7 @@ class SmsSubscriber extends CommonSubscriber
     }
 
     /**
-     * Check string for links
+     * Check string for links.
      *
      * @param string $content
      *
@@ -121,7 +119,7 @@ class SmsSubscriber extends CommonSubscriber
     }
 
     /**
-     * Add an entry to the audit log
+     * Add an entry to the audit log.
      *
      * @param SmsEvent $event
      */
@@ -130,18 +128,18 @@ class SmsSubscriber extends CommonSubscriber
         $entity = $event->getSms();
         if ($details = $event->getChanges()) {
             $log = [
-                "bundle"    => "sms",
-                "object"    => "sms",
-                "objectId"  => $entity->getId(),
-                "action"    => ($event->isNew()) ? "create" : "update",
-                "details"   => $details
+                'bundle' => 'sms',
+                'object' => 'sms',
+                'objectId' => $entity->getId(),
+                'action' => ($event->isNew()) ? 'create' : 'update',
+                'details' => $details,
             ];
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
     }
 
     /**
-     * Add a delete entry to the audit log
+     * Add a delete entry to the audit log.
      *
      * @param SmsEvent $event
      */
@@ -149,11 +147,11 @@ class SmsSubscriber extends CommonSubscriber
     {
         $entity = $event->getSms();
         $log = [
-            "bundle"     => "sms",
-            "object"     => "sms",
-            "objectId"   => $entity->getId(),
-            "action"     => "delete",
-            "details"    => ['name' => $entity->getName()]
+            'bundle' => 'sms',
+            'object' => 'sms',
+            'objectId' => $entity->getId(),
+            'action' => 'delete',
+            'details' => ['name' => $entity->getName()],
         ];
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
@@ -183,7 +181,7 @@ class SmsSubscriber extends CommonSubscriber
             );
 
             /**
-             * @var string $token
+             * @var string
              * @var Trackable $trackable
              */
             foreach ($trackables as $token => $trackable) {

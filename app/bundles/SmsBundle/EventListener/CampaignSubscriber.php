@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
@@ -22,9 +22,7 @@ use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\SmsEvents;
 
 /**
- * Class CampaignSubscriber
- *
- * @package MauticSmsBundle
+ * Class CampaignSubscriber.
  */
 class CampaignSubscriber extends CommonSubscriber
 {
@@ -46,16 +44,16 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * CampaignSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param LeadModel $leadModel
-     * @param SmsModel $smsModel
+     * @param MauticFactory  $factory
+     * @param LeadModel      $leadModel
+     * @param SmsModel       $smsModel
      * @param AbstractSmsApi $smsApi
      */
     public function __construct(MauticFactory $factory, LeadModel $leadModel, SmsModel $smsModel, AbstractSmsApi $smsApi)
     {
         $this->leadModel = $leadModel;
-        $this->smsModel  = $smsModel;
-        $this->smsApi    = $smsApi;
+        $this->smsModel = $smsModel;
+        $this->smsApi = $smsApi;
 
         parent::__construct($factory);
     }
@@ -67,7 +65,7 @@ class CampaignSubscriber extends CommonSubscriber
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],
-            SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0]
+            SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0],
         ];
     }
 
@@ -80,13 +78,13 @@ class CampaignSubscriber extends CommonSubscriber
             $event->addAction(
                 'sms.send_text_sms',
                 [
-                    'label'            => 'mautic.campaign.sms.send_text_sms',
-                    'description'      => 'mautic.campaign.sms.send_text_sms.tooltip',
-                    'eventName'        => SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-                    'formType'         => 'smssend_list',
-                    'formTypeOptions'  => ['update_select' => 'campaignevent_properties_sms'],
-                    'formTheme'        => 'MauticSmsBundle:FormTheme\SmsSendList',
-                    'timelineTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.php'
+                    'label' => 'mautic.campaign.sms.send_text_sms',
+                    'description' => 'mautic.campaign.sms.send_text_sms.tooltip',
+                    'eventName' => SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                    'formType' => 'smssend_list',
+                    'formTypeOptions' => ['update_select' => 'campaignevent_properties_sms'],
+                    'formTheme' => 'MauticSmsBundle:FormTheme\SmsSendList',
+                    'timelineTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.php',
                 ]
             );
         }
@@ -114,7 +112,7 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         $smsId = (int) $event->getConfig()['sms'];
-        $sms   = $this->smsModel->getEntity($smsId);
+        $sms = $this->smsModel->getEntity($smsId);
 
         if ($sms->getId() !== $smsId) {
             return $event->setFailed('mautic.sms.campaign.failed.missing_entity');
@@ -133,14 +131,14 @@ class CampaignSubscriber extends CommonSubscriber
 
         $this->smsModel->createStatEntry($sms, $lead);
         $this->smsModel->getRepository()->upCount($smsId);
-        
+
         $event->setResult(
             [
-                'type'    => 'mautic.sms.sms',
-                'status'  => 'mautic.sms.timeline.status.delivered',
-                'id'      => $sms->getId(),
-                'name'    => $sms->getName(),
-                'content' => $smsEvent->getContent()
+                'type' => 'mautic.sms.sms',
+                'status' => 'mautic.sms.timeline.status.delivered',
+                'id' => $sms->getId(),
+                'name' => $sms->getName(),
+                'content' => $smsEvent->getContent(),
             ]
         );
     }

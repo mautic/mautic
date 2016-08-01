@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
@@ -21,9 +21,7 @@ use Mautic\NotificationBundle\Model\NotificationModel;
 use Mautic\NotificationBundle\NotificationEvents;
 
 /**
- * Class CampaignSubscriber
- *
- * @package MauticNotificationBundle
+ * Class CampaignSubscriber.
  */
 class CampaignSubscriber extends CommonSubscriber
 {
@@ -45,9 +43,9 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * CampaignSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param LeadModel $leadModel
-     * @param NotificationModel $notificationModel
+     * @param MauticFactory           $factory
+     * @param LeadModel               $leadModel
+     * @param NotificationModel       $notificationModel
      * @param AbstractNotificationApi $notificationApi
      */
     public function __construct(
@@ -55,8 +53,7 @@ class CampaignSubscriber extends CommonSubscriber
         LeadModel $leadModel,
         NotificationModel $notificationModel,
         AbstractNotificationApi $notificationApi
-    )
-    {
+    ) {
         $this->leadModel = $leadModel;
         $this->notificationModel = $notificationModel;
         $this->notificationApi = $notificationApi;
@@ -71,7 +68,7 @@ class CampaignSubscriber extends CommonSubscriber
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],
-            NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0]
+            NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0],
         ];
     }
 
@@ -81,13 +78,13 @@ class CampaignSubscriber extends CommonSubscriber
             $event->addAction(
                 'notification.send_notification',
                 [
-                    'label'           => 'mautic.notification.campaign.send_notification',
-                    'description'     => 'mautic.notification.campaign.send_notification.tooltip',
-                    'eventName'       => NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-                    'formType'        => 'notificationsend_list',
+                    'label' => 'mautic.notification.campaign.send_notification',
+                    'description' => 'mautic.notification.campaign.send_notification.tooltip',
+                    'eventName' => NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                    'formType' => 'notificationsend_list',
                     'formTypeOptions' => ['update_select' => 'campaignevent_properties_notification'],
-                    'formTheme'       => 'MauticNotificationBundle:FormTheme\NotificationSendList',
-                    'timelineTemplate'=> 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php'
+                    'formTheme' => 'MauticNotificationBundle:FormTheme\NotificationSendList',
+                    'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php',
 
                 ]
             );
@@ -109,7 +106,7 @@ class CampaignSubscriber extends CommonSubscriber
         /** @var \Mautic\NotificationBundle\Entity\PushID[] $pushIDs */
         $pushIDs = $lead->getPushIDs();
 
-        $playerID = array();
+        $playerID = [];
 
         foreach ($pushIDs as $pushID) {
             $playerID[] = $pushID->getPushID();
@@ -132,7 +129,7 @@ class CampaignSubscriber extends CommonSubscriber
             $notification->getUrl(),
             [
                 'notification' => $notification->getId(),
-                'lead' => $lead->getId()
+                'lead' => $lead->getId(),
             ]
         );
 
@@ -157,9 +154,9 @@ class CampaignSubscriber extends CommonSubscriber
             'id' => $notification->getId(),
             'name' => $notification->getName(),
             'heading' => $notification->getHeading(),
-            'content' => $notification->getMessage()
+            'content' => $notification->getMessage(),
         ];
-        
+
         $event->setResult($result);
     }
 }

@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\SmsBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -18,7 +18,6 @@ use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Event\SmsEvent;
-use Mautic\SmsBundle\Event\SmsClickEvent;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -26,7 +25,6 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 /**
  * Class SmsModel
  * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\FormModel
  */
 class SmsModel extends FormModel
 {
@@ -72,7 +70,7 @@ class SmsModel extends FormModel
     }
 
     /**
-     * Save an array of entities
+     * Save an array of entities.
      *
      * @param  $entities
      * @param  $unlock
@@ -90,13 +88,13 @@ class SmsModel extends FormModel
             $this->setTimestamps($entity, $isNew, $unlock);
 
             if ($dispatchEvent = $entity instanceof Sms) {
-                $event = $this->dispatchEvent("pre_save", $entity, $isNew);
+                $event = $this->dispatchEvent('pre_save', $entity, $isNew);
             }
 
             $this->getRepository()->saveEntity($entity, false);
 
             if ($dispatchEvent) {
-                $this->dispatchEvent("post_save", $entity, $isNew, $event);
+                $this->dispatchEvent('post_save', $entity, $isNew, $event);
             }
 
             if ((($k + 1) % $batchSize) === 0) {
@@ -115,13 +113,14 @@ class SmsModel extends FormModel
      * @param array $options
      *
      * @return mixed
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm ($entity, $formFactory, $action = null, $options = array())
+    public function createForm($entity, $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Sms) {
-            throw new MethodNotAllowedHttpException(array('Sms'));
+            throw new MethodNotAllowedHttpException(['Sms']);
         }
         if (!empty($action)) {
             $options['action'] = $action;
@@ -131,7 +130,7 @@ class SmsModel extends FormModel
     }
 
     /**
-     * Get a specific entity or generate a new one if id is empty
+     * Get a specific entity or generate a new one if id is empty.
      *
      * @param $id
      *
@@ -140,7 +139,7 @@ class SmsModel extends FormModel
     public function getEntity($id = null)
     {
         if ($id === null) {
-            $entity = new Sms;
+            $entity = new Sms();
         } else {
             $entity = parent::getEntity($id);
         }
@@ -150,8 +149,8 @@ class SmsModel extends FormModel
 
     /**
      * @param Sms    $sms
-     * @param Lead           $lead
-     * @param string         $source
+     * @param Lead   $lead
+     * @param string $source
      */
     public function createStatEntry(Sms $sms, Lead $lead, $source = null)
     {
@@ -177,24 +176,24 @@ class SmsModel extends FormModel
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
         if (!$entity instanceof Sms) {
-            throw new MethodNotAllowedHttpException(array('Sms'));
+            throw new MethodNotAllowedHttpException(['Sms']);
         }
 
         switch ($action) {
-            case "pre_save":
+            case 'pre_save':
                 $name = SmsEvents::SMS_PRE_SAVE;
                 break;
-            case "post_save":
+            case 'post_save':
                 $name = SmsEvents::SMS_POST_SAVE;
                 break;
-            case "pre_delete":
+            case 'pre_delete':
                 $name = SmsEvents::SMS_PRE_DELETE;
                 break;
-            case "post_delete":
-                $name = SmsEvents::SMS_POST_DELgetETE;
+            case 'post_delete':
+                $name = SmsEvents::SMS_POST_DELETE;
                 break;
             default:
-                return null;
+                return;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -207,12 +206,12 @@ class SmsModel extends FormModel
 
             return $event;
         } else {
-            return null;
+            return;
         }
     }
 
     /**
-     * Joins the page table and limits created_by to currently logged in user
+     * Joins the page table and limits created_by to currently logged in user.
      *
      * @param QueryBuilder $q
      */
@@ -224,18 +223,18 @@ class SmsModel extends FormModel
     }
 
     /**
-     * Get line chart data of hits
+     * Get line chart data of hits.
      *
-     * @param char      $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat
      * @param array     $filter
-     * @param boolean   $canViewOthers
+     * @param bool      $canViewOthers
      *
      * @return array
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
     {
         $flag = null;
 
@@ -255,19 +254,7 @@ class SmsModel extends FormModel
             }
 
             $data = $query->loadAndBuildTimeData($q);
-            $chart->setDataset($this->translator->trans('mautic.notification.show.total.views'), $data);
-        }
-
-        if ($flag === 'unique' || $flag === 'total_and_unique') {
-            $q = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
-            $q->groupBy('t.lead_id, t.date_sent');
-
-            if (!$canViewOthers) {
-                $this->limitQueryToCreator($q);
-            }
-
-            $data = $query->loadAndBuildTimeData($q);
-            $chart->setDataset($this->translator->trans('mautic.sms.show.unique.views'), $data);
+            $chart->setDataset($this->translator->trans('mautic.sms.show.total.sent'), $data);
         }
 
         return $chart->render();
@@ -284,7 +271,7 @@ class SmsModel extends FormModel
     }
 
     /**
-     * Search for an sms stat by sms and lead IDs
+     * Search for an sms stat by sms and lead IDs.
      *
      * @param $smsId
      * @param $leadId
@@ -294,16 +281,16 @@ class SmsModel extends FormModel
     public function getSmsStatByLeadId($smsId, $leadId)
     {
         return $this->getStatRepository()->findBy(
-            array(
+            [
                 'sms' => (int) $smsId,
-                'lead'  => (int) $leadId
-            ),
-            array('dateSent' => 'DESC')
+                'lead' => (int) $leadId,
+            ],
+            ['dateSent' => 'DESC']
         );
     }
 
     /**
-     * Get an array of tracked links
+     * Get an array of tracked links.
      *
      * @param $smsId
      *

@@ -1,32 +1,51 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'sms');
-$view['slots']->set("headerTitle", $sms->getName());
+$view['slots']->set('headerTitle', $sms->getName());
 
-$smsType    = $sms->getSmsType();
+$smsType = $sms->getSmsType();
 if (empty($smsType)) {
     $smsType = 'template';
 }
 
-$customButtons = array();
+$customButtons = [];
 
-$edit = $view['security']->hasEntityAccess($permissions['sms:smses:editown'], $permissions['sms:smses:editother'], $sms->getCreatedBy());
-$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
-    'item'       => $sms,
-    'templateButtons' => array(
-        'delete'     => $view['security']->hasEntityAccess($permissions['sms:smses:deleteown'], $permissions['sms:smses:deleteother'], $sms->getCreatedBy())
-    ),
-    'routeBase'  => 'sms',
-    'preCustomButtons' => $customButtons
-)));
+$view['slots']->set(
+    'actions',
+    $view->render(
+        'MauticCoreBundle:Helper:page_actions.html.php',
+        [
+            'item' => $sms,
+            'customButtons' => (isset($customButtons)) ? $customButtons : [],
+            'templateButtons' => [
+                'edit' => $view['security']->hasEntityAccess(
+                    $permissions['sms:smses:editown'],
+                    $permissions['sms:smses:editother'],
+                    $sms->getCreatedBy()
+                ),
+                'delete' => $permissions['sms:smses:create'],
+                'close' => $view['security']->hasEntityAccess(
+                    $permissions['sms:smses:viewown'],
+                    $permissions['sms:smses:viewother'],
+                    $sms->getCreatedBy()
+                ),
+            ],
+            'routeBase' => 'sms',
+        ]
+    )
+);
+$view['slots']->set(
+    'publishStatus',
+    $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $sms])
+);
 ?>
 
 <!-- start: box layout -->
@@ -42,7 +61,6 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             </div>
             <!--/ sms detail collapseable toggler -->
 
-
             <!-- some stats -->
             <div class="pa-md">
                 <div class="row">
@@ -52,7 +70,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                 <div class="col-md-3 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
                                         <span class="fa fa-line-chart"></span>
-                                        <?php echo $view['translator']->trans('mautic.sms.views'); ?>
+                                        <?php echo $view['translator']->trans('mautic.sms.sent'); ?>
                                     </h5>
                                 </div>
                                 <div class="col-md-9 va-m">
@@ -75,6 +93,11 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                         <?php echo $view['translator']->trans('mautic.trackable.click_counts'); ?>
                     </a>
                 </li>
+                <li class="">
+                    <a href="#contacts-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.lead.leads'); ?>
+                    </a>
+                </li>
             </ul>
             <!--/ tabs controls -->
         </div>
@@ -82,16 +105,21 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
             <div class="tab-pane active bdr-w-0" id="clicks-container">
-                <?php echo $view->render('MauticPageBundle:Trackable:click_counts.html.php', array('trackables' => $trackables )); ?>
+                <?php echo $view->render('MauticPageBundle:Trackable:click_counts.html.php', ['trackables' => $trackables]); ?>
+            </div>
+
+            <div class="tab-pane fade in bdr-w-0 page-list" id="contacts-container">
+                <?php echo $contacts; ?>
             </div>
         </div>
+        <!-- end: tab-content -->
     </div>
     <!--/ left section -->
 
     <!-- right section -->
     <div class="col-md-3 bg-white bdr-l height-auto">
         <!-- activity feed -->
-        <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', array('logs' => $logs)); ?>
+        <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]); ?>
     </div>
     <!--/ right section -->
     <input name="entityId" id="entityId" type="hidden" value="<?php echo $sms->getId(); ?>" />

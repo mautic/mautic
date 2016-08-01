@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'notification');
 
@@ -14,10 +14,10 @@ $notificationType = $form['notificationType']->vars['data'];
 
 $header = ($notification->getId()) ?
     $view['translator']->trans('mautic.notification.header.edit',
-        array('%name%' => $notification->getName())) :
+        ['%name%' => $notification->getName()]) :
     $view['translator']->trans('mautic.notification.header.new');
 
-$view['slots']->set("headerTitle", $header);
+$view['slots']->set('headerTitle', $header);
 
 if (!isset($attachmentSize)) {
     $attachmentSize = 0;
@@ -71,24 +71,24 @@ if (!isset($attachmentSize)) {
 
 <?php
 $type = $notification->getNotificationType();
-if (empty($type) || ! empty($forceTypeSelection)):
+if (empty($type) || !empty($forceTypeSelection)):
     echo $view->render('MauticCoreBundle:Helper:form_selecttype.html.php',
-        array(
-            'item'               => $notification,
-            'mauticLang'         => array(
-                'newListNotification'     => 'mautic.notification.type.list.header',
-                'newTemplateNotification' => 'mautic.notification.type.template.header'
-            ),
-            'typePrefix'         => 'notification',
-            'cancelUrl'          => 'mautic_notification_index',
-            'header'             => 'mautic.notification.type.header',
-            'typeOneHeader'      => 'mautic.notification.type.template.header',
-            'typeOneIconClass'   => 'fa-cube',
+        [
+            'item' => $notification,
+            'mauticLang' => [
+                'newListNotification' => 'mautic.notification.type.list.header',
+                'newTemplateNotification' => 'mautic.notification.type.template.header',
+            ],
+            'typePrefix' => 'notification',
+            'cancelUrl' => 'mautic_notification_index',
+            'header' => 'mautic.notification.type.header',
+            'typeOneHeader' => 'mautic.notification.type.template.header',
+            'typeOneIconClass' => 'fa-cube',
             'typeOneDescription' => 'mautic.notification.type.template.description',
-            'typeOneOnClick'     => "Mautic.selectNotificationType('template');",
-            'typeTwoHeader'      => 'mautic.notification.type.list.header',
-            'typeTwoIconClass'   => 'fa-list',
+            'typeOneOnClick' => "Mautic.selectNotificationType('template');",
+            'typeTwoHeader' => 'mautic.notification.type.list.header',
+            'typeTwoIconClass' => 'fa-list',
             'typeTwoDescription' => 'mautic.notification.type.list.description',
-            'typeTwoOnClick'     => "Mautic.selectNotificationType('list');",
-        ));
+            'typeTwoOnClick' => "Mautic.selectNotificationType('list');",
+        ]);
 endif;

@@ -1,22 +1,19 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\NotificationBundle\Entity;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * Class StatRepository
- *
- * @package Mautic\NotificationBundle\Entity
+ * Class StatRepository.
  */
 class StatRepository extends CommonRepository
 {
@@ -24,6 +21,7 @@ class StatRepository extends CommonRepository
      * @param $trackingHash
      *
      * @return mixed
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -53,7 +51,7 @@ class StatRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX . 'push_notification_stats', 's')
+            ->from(MAUTIC_TABLE_PREFIX.'push_notification_stats', 's')
             ->where('s.notification_id = :notification')
             ->setParameter('notification', $notificationId);
 
@@ -65,7 +63,7 @@ class StatRepository extends CommonRepository
         $result = $q->execute()->fetchAll();
 
         //index by lead
-        $stats = array();
+        $stats = [];
         foreach ($result as $r) {
             $stats[$r['lead_id']] = $r['lead_id'];
         }
@@ -86,11 +84,11 @@ class StatRepository extends CommonRepository
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $q->select('count(s.id) as sent_count')
-            ->from(MAUTIC_TABLE_PREFIX . 'push_notification_stats', 's');
+            ->from(MAUTIC_TABLE_PREFIX.'push_notification_stats', 's');
 
         if ($notificationIds) {
             if (!is_array($notificationIds)) {
-                $notificationIds = array((int) $notificationIds);
+                $notificationIds = [(int) $notificationIds];
             }
             $q->where(
                 $q->expr()->in('s.notification_id', $notificationIds)
@@ -98,7 +96,7 @@ class StatRepository extends CommonRepository
         }
 
         if ($listId) {
-            $q->andWhere('s.list_id = ' . (int) $listId);
+            $q->andWhere('s.list_id = '.(int) $listId);
         }
 
         $q->andWhere('s.is_failed = :false')
@@ -120,11 +118,11 @@ class StatRepository extends CommonRepository
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $q->select('count(s.id) as read_count')
-            ->from(MAUTIC_TABLE_PREFIX . 'push_notification_stats', 's');
+            ->from(MAUTIC_TABLE_PREFIX.'push_notification_stats', 's');
 
         if ($emailIds) {
             if (!is_array($emailIds)) {
-                $emailIds = array((int) $emailIds);
+                $emailIds = [(int) $emailIds];
             }
             $q->where(
                 $q->expr()->in('s.notification_id', $emailIds)
@@ -132,7 +130,7 @@ class StatRepository extends CommonRepository
         }
 
         if ($listId) {
-            $q->andWhere('s.list_id = ' . (int) $listId);
+            $q->andWhere('s.list_id = '.(int) $listId);
         }
 
         $q->andWhere('is_read = :true')
@@ -150,11 +148,11 @@ class StatRepository extends CommonRepository
      */
     public function getClickedRates($notificationIds, \DateTime $fromDate = null)
     {
-        $inIds = (!is_array($notificationIds)) ? array($notificationIds) : $notificationIds;
+        $inIds = (!is_array($notificationIds)) ? [$notificationIds] : $notificationIds;
 
         $sq = $this->_em->getConnection()->createQueryBuilder();
         $sq->select('e.email_id, count(e.id) as the_count')
-            ->from(MAUTIC_TABLE_PREFIX . 'push_notification_stats', 'e')
+            ->from(MAUTIC_TABLE_PREFIX.'push_notification_stats', 'e')
             ->where(
                 $sq->expr()->in('e.notification_id', $inIds)
             );
@@ -171,13 +169,13 @@ class StatRepository extends CommonRepository
         //get a total number of sent emails first
         $totalCounts = $sq->execute()->fetchAll();
 
-        $return  = array();
+        $return = [];
         foreach ($inIds as $id) {
-            $return[$id] = array(
+            $return[$id] = [
                 'totalCount' => 0,
-                'readCount'  => 0,
-                'readRate'   => 0
-            );
+                'readCount' => 0,
+                'readRate' => 0,
+            ];
         }
 
         foreach ($totalCounts as $t) {
@@ -193,7 +191,7 @@ class StatRepository extends CommonRepository
 
         foreach ($readCounts as $r) {
             $return[$r['notification_id']]['readCount'] = (int) $r['the_count'];
-            $return[$r['notification_id']]['readRate']  = ($return[$r['notification_id']]['totalCount']) ?
+            $return[$r['notification_id']]['readRate'] = ($return[$r['notification_id']]['totalCount']) ?
                 round(($r['the_count'] / $return[$r['notification_id']]['totalCount']) * 100, 2) :
                 0;
         }
@@ -202,16 +200,17 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * Get a lead's email stat
+     * Get a lead's email stat.
      *
-     * @param integer $leadId
-     * @param array   $options
+     * @param int   $leadId
+     * @param array $options
      *
      * @return array
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadStats($leadId, array $options = array())
+    public function getLeadStats($leadId, array $options = [])
     {
         $query = $this->createQueryBuilder('s');
 
@@ -225,12 +224,12 @@ class StatRepository extends CommonRepository
             )->setParameter('false', false, 'boolean');
 
         if (!empty($options['ipIds'])) {
-            $query->orWhere('s.ipAddress IN (' . implode(',', $options['ipIds']) . ')');
+            $query->orWhere('s.ipAddress IN ('.implode(',', $options['ipIds']).')');
         }
 
         if (isset($options['filters']['search']) && $options['filters']['search']) {
             $query->andWhere(
-                $query->expr()->like('e.title', $query->expr()->literal('%' . $options['filters']['search'] . '%'))
+                $query->expr()->like('e.title', $query->expr()->literal('%'.$options['filters']['search'].'%'))
             );
         }
 
@@ -249,11 +248,12 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * Get pie graph data for Sent, Read and Failed email count
+     * Get pie graph data for Sent, Read and Failed email count.
      *
      * @param QueryBuilder $query
      *
      * @return array
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -264,21 +264,22 @@ class StatRepository extends CommonRepository
             ->setFirstResult($offset);
 
         $results = $query->execute()->fetchAll();
+
         return $results;
     }
 
     /**
-     * Get sent counts based grouped by email Id
+     * Get sent counts based grouped by email Id.
      *
      * @param array $emailIds
      *
      * @return array
      */
-    public function getSentCounts($emailIds = array(), \DateTime $fromDate = null)
+    public function getSentCounts($emailIds = [], \DateTime $fromDate = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('e.email_id, count(e.id) as sentcount')
-            ->from(MAUTIC_TABLE_PREFIX . 'push_notification_stats', 'e')
+            ->from(MAUTIC_TABLE_PREFIX.'push_notification_stats', 'e')
             ->where(
                 $q->expr()->in('e.notification_id', $emailIds)
             );
@@ -295,7 +296,7 @@ class StatRepository extends CommonRepository
         //get a total number of sent emails first
         $results = $q->execute()->fetchAll();
 
-        $counts = array();
+        $counts = [];
 
         foreach ($results as $r) {
             $counts[$r['notification_id']] = $r['sentcount'];
@@ -305,7 +306,7 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * Updates lead ID (e.g. after a lead merge)
+     * Updates lead ID (e.g. after a lead merge).
      *
      * @param $fromLeadId
      * @param $toLeadId
@@ -313,20 +314,20 @@ class StatRepository extends CommonRepository
     public function updateLead($fromLeadId, $toLeadId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX . 'push_notification_stats')
+        $q->update(MAUTIC_TABLE_PREFIX.'push_notification_stats')
             ->set('notification_id', (int) $toLeadId)
-            ->where('notification_id = ' . (int) $fromLeadId)
+            ->where('notification_id = '.(int) $fromLeadId)
             ->execute();
     }
 
     /**
-     * Delete a stat
+     * Delete a stat.
      *
      * @param $id
      */
     public function deleteStat($id)
     {
-        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX . 'push_notification_stats', array('id' => (int) $id));
+        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'push_notification_stats', ['id' => (int) $id]);
     }
 
     /**
@@ -337,13 +338,14 @@ class StatRepository extends CommonRepository
      * @param $state
      *
      * @return mixed
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function getNotificationStats($notificationIds, $fromDate, $state)
     {
         if (!is_array($notificationIds)) {
-            $notificationIds = array((int) $notificationIds);
+            $notificationIds = [(int) $notificationIds];
         }
 
         // Load points for selected period
@@ -382,5 +384,55 @@ class StatRepository extends CommonRepository
     public function getTableAlias()
     {
         return 's';
+    }
+
+    /**
+     * Get leads for a specific sms.
+     *
+     * @param $args
+     *
+     * @return array
+     */
+    public function getLeadsWithFields($args)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->select('DISTINCT(t.lead_id)')
+            ->from(MAUTIC_TABLE_PREFIX.'push_notification_stats', 't')
+            ->leftJoin('t', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id')
+            ->where('t.notification_id = :notification_id')
+            ->setParameter('notification_id', $args['notification_id']);
+
+        //get a total count
+        $results = $qb->execute()->fetchAll();
+
+        $ids = [];
+
+        foreach ($results as $result) {
+            $ids[] = $result['lead_id'];
+        }
+
+        if (empty($ids)) {
+            return (!empty($args['withTotalCount'])) ? ['count' => 0, 'results' => []] : [];
+        }
+
+        //now get the actual paginated results
+        $this->buildOrderByClause($qb, $args);
+        $this->buildLimiterClauses($qb, $args);
+
+        $qb->resetQueryPart('select')
+            ->resetQueryPart('from')
+            ->resetQueryPart('where')
+            ->resetQueryPart('join')
+            ->select('l.*')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->where('l.id IN ('.implode(',', $ids).')');
+
+        $contacts = $qb->execute()->fetchAll();
+
+        return (!empty($args['withTotalCount'])) ?
+            [
+                'count' => count($results),
+                'results' => $contacts,
+            ] : $contacts;
     }
 }
