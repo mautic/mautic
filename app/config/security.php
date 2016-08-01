@@ -88,8 +88,18 @@ $container->loadFromExtension(
                 'mautic_plugin_auth' => true,
                 'stateless'          => true
             ),
+            'saml_login'                => array(
+                'pattern'   => '^/saml/login$',
+                'anonymous' => true,
+                'context'   => 'mautic'
+            ),
+            'saml_discovery'                => array(
+                'pattern'   => '^/saml/discovery$',
+                'anonymous' => true,
+                'context'   => 'mautic'
+            ),
             'saml' => array(
-                'pattern'     => "^/saml/",
+                'pattern'     => '^/saml/',
                 'light_saml_sp'     => array(
                     'user_creator'      => 'mautic.security.saml.user_creator',
                     'login_path'        => '/saml/login',
