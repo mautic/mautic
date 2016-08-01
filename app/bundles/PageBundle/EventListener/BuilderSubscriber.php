@@ -186,8 +186,8 @@ class BuilderSubscriber extends CommonSubscriber
             $content = str_ireplace($this->titleRegex, $page->getTitle(), $content);
         }
 
-        if (strpos($content, $this->titleRegex) !== false) {
-            $content = str_ireplace($this->titleRegex, $page->getMetaDescription(), $content);
+        if (strpos($content, $this->descriptionRegex) !== false) {
+            $content = str_ireplace($this->descriptionRegex, $page->getMetaDescription(), $content);
         }
 
         $clickThrough = ['source' => ['page', $page->getId()]];
