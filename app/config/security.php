@@ -91,7 +91,6 @@ $container->loadFromExtension(
             'saml' => array(
                 'pattern'     => "^/saml/",
                 'light_saml_sp'     => array(
-                  //  'provider'          => 'mautic.user.provider',
                     'user_creator'      => 'mautic.security.saml.user_creator',
                     'login_path'        => '/saml/login',
                     'check_path'        => '/saml/login_check'

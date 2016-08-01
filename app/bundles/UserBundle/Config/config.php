@@ -65,6 +65,7 @@ return array(
                 'controller' => 'MauticUserBundle:Profile:index'
             ),
         ),
+
         'api'  => array(
             'mautic_api_getusers'        => array(
                 'path'       => '/users',

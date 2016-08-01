@@ -78,13 +78,14 @@ class ConfigType extends AbstractType
         );
         $builder->add(
             'idp_ceritificate',
-            'text',
+            'textarea',
             array(
                 'label'       => 'mautic.user.config.form.saml.idp.certificate',
                 'label_attr'  => array('class' => 'control-label'),
                 'attr'        => array(
                     'class' => 'form-control',
-                    'tooltip' => 'mautic.user.config.form.saml.idp.certificate.tooltip'
+                    'tooltip' => 'mautic.user.config.form.saml.idp.certificate.tooltip',
+                    'rows' => 10,
                 )
             )
         );
