@@ -98,7 +98,6 @@
 
         "stack/run": "^1.0",
         "stack/builder": "^1.0",
-
         "piwik/device-detector": "~3.7.0",
         "php-http/guzzle6-adapter": "^1.1",
         "sparkpost/sparkpost": "~2.0.3",
@@ -106,7 +105,8 @@
         "sonata-project/exporter": "^1.7",
         "lightsaml/sp-bundle": "~1.0.3",
         "symfony/expression-language": "~2.8",
-        "egeloen/ordered-form-bundle": "^3.0"
+        "egeloen/ordered-form-bundle": "^3.0",
+        "php-amqplib/rabbitmq-bundle": "^1.10"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~2.8",
