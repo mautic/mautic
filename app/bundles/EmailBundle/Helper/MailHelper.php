@@ -1816,22 +1816,37 @@ class MailHelper
     public function applyFrequencyRules(Lead $lead)
     {
         $frequencyRule = $lead->getFrequencyRules();
-        if(!empty($frequencyRule)){
-            $now = new \DateTime();
-            $frequencyTime = new \DateInterval('PT'.$frequencyRule['frequency_time']);
-            $now->sub($frequencyTime);
 
-            /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
-            $emailModel = $this->factory->getModel('email');
+        /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
+        $emailModel = $this->factory->getModel('email');
 
-            $statRepo = $emailModel->getStatRepository();
-            $sentQuery = $statRepo->getLeadStats($lead->getId(), array('fromDate' => $now));
-            if(!empty($sentQuery) and $sentQuery['dateSent'] and $sentQuery['dateSent']<$frequencyRule['frequency_number'])
-            {
-                return true;
-            }
-            return false;
+        $statRepo = $emailModel->getStatRepository();
+
+        $now = new \DateTime();
+        $channels = $frequencyRule['channels'];
+
+        if(!empty($frequencyRule) and in_array('email', $channels,true))
+        {
+            $frequencyTime = new \DateInterval('P'.$frequencyRule['frequency_time']);
+            $frequencyNumber = $frequencyRule['frequency_number'];
         }
-        return true;
+        elseif($this->factory->getParameter('frequency_number') > 0)
+        {
+            $frequencyTime = new \DateInterval('P'.$frequencyRule['frequency_time']);
+            $frequencyNumber = $this->factory->getParameter('frequency_number');
+        }
+
+        $now->sub($frequencyTime);
+        $sentQuery = $statRepo->getLeadStats($lead->getId(), array('fromDate' => $now));
+
+        if(!empty($sentQuery) and count($sentQuery) < $frequencyNumber)
+        {
+            return true;
+        }
+        elseif (empty($sentQuery))
+        {
+            return true;
+        }
+        return false;
     }
 }

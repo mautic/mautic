@@ -141,7 +141,7 @@ class CampaignSubscriber extends CommonSubscriber
                 $eventDetails = $event->getEventDetails();
                 $options   = ['source' => ['campaign', $eventDetails['campaign']['id']]];
                 /** @var \Mautic\EmailBundle\Helper\MailHelper $emailHelper */
-                $emailHelper = $this->factory->getHelper('email.email');
+                $emailHelper = $this->factory->getHelper('mailer');
                 if($emailHelper->applyFrequencyRules($lead))
                 {
                     $emailSent = $this->emailModel->sendEmail($email, $leadCredentials, $options);

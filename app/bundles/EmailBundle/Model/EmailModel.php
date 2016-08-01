@@ -1023,10 +1023,15 @@ class EmailModel extends FormModel
                 $dnc = $emailRepo->getDoNotEmailList();
             }
 
-            //weed out do not contacts
+
             if (!empty($dnc)) {
                 foreach ($sendTo as $k => $lead) {
+                    //weed out do not contacts
                     if (in_array(strtolower($lead['email']), $dnc)) {
+                        unset($sendTo[$k]);
+                    }
+                    //apply frequency rules
+                    if($this->mailHelper->applyFrequencyRules($lead)){
                         unset($sendTo[$k]);
                     }
                 }

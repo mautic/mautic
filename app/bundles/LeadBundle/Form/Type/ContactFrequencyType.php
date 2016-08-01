@@ -53,18 +53,12 @@ class ContactFrequencyType extends AbstractType
                 )
             )
         );
-        $builder->add('frequency_number','choice',
+        $builder->add('frequency_number','number',
             array(
-                'choices'    => array(
-                    '1' => '1 time',
-                    '2' => '2 times',
-                    '3' => '3 times',
-                    '4' => '4 times'
-                ),
+                'precision'  => 0,
                 'label'      => 'mautic.lead.list.frequency.number',
                 'label_attr' => array('class' => 'control-label'),
                 'required'   => false,
-                'multiple'   => false,
                 'attr'       => array(
                     'class' => 'form-control frequency'
                 )
@@ -72,7 +66,6 @@ class ContactFrequencyType extends AbstractType
         $builder->add('frequency_time','choice',
             array(
                 'choices'    => array(
-                    '1H' => 'hour',
                     '1D' => 'day',
                     '1W' => 'week',
                     '1M' => 'month'

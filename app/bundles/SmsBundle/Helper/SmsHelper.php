@@ -97,19 +97,32 @@ class SmsHelper
     public function applyFrequencyRules(Lead $lead)
     {
         $frequencyRule = $lead->getFrequencyRules();
-        if(!empty($frequencyRule)){
-            $now = new \DateTime();
-            $frequencyTime = new \DateInterval('PT'.$frequencyRule['frequency_time']);
-            $now->sub($frequencyTime);
+        $statRepo = $this->smsModel->getStatRepository();
+        $now = new \DateTime();
+        $channels = $frequencyRule['channels'];
 
-            $statRepo = $this->smsModel->getStatRepository();
-            $sentQuery = $statRepo->getLeadStats($lead->getId(), array('fromDate' => $now));
-            if(!empty($sentQuery) and $sentQuery['dateSent'] and $sentQuery['dateSent']<$frequencyRule['frequency_number'])
-            {
-                return true;
-            }
-            return false;
+        if(!empty($frequencyRule) and in_array('sms', $channels,true))
+        {
+            $frequencyTime = new \DateInterval('P'.$frequencyRule['frequency_time']);
+            $frequencyNumber = $frequencyRule['frequency_number'];
         }
-        return true;
+        elseif($this->factory->getParameter('sms_frequency_number') > 0)
+        {
+            $frequencyTime = new \DateInterval('P'.$frequencyRule['sms_frequency_time']);
+            $frequencyNumber = $this->factory->getParameter('sms_frequency_number');
+        }
+
+        $now->sub($frequencyTime);
+        $sentQuery = $statRepo->getLeadStats($lead->getId(), array('fromDate' => $now));
+
+        if(!empty($sentQuery) and count($sentQuery) < $frequencyNumber)
+        {
+            return true;
+        }
+        elseif (empty($sentQuery))
+        {
+            return true;
+        }
+        return false;
     }
 }
