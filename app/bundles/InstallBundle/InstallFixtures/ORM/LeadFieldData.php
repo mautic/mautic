@@ -85,9 +85,10 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
         $indexHelper = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('index', 'leads');
 
         foreach ($indexesToAdd as $name) {
-            $type         = (isset($fields[$name]['type'])) ? $fields[$name]['type'] : 'text';
-            $indexOptions = ($type == 'text') ? ['where' => "($name(767))"] : [];
-            $indexHelper->addIndex([$name], MAUTIC_TABLE_PREFIX.$name.'_search', $indexOptions);
+            $type = (isset($fields[$name]['type'])) ? $fields[$name]['type'] : 'text';
+            if ('textarea' != $type) {
+                $indexHelper->addIndex([$name], MAUTIC_TABLE_PREFIX.$name.'_search');
+            }
         }
 
         // Add an attribution index
