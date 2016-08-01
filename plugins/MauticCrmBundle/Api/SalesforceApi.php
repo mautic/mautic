@@ -108,7 +108,6 @@ class SalesforceApi extends CrmApi
                     else
                     {
                         $subject = 'subtracted';
-
                     }
 
                     if(isset($record['subject']))
@@ -124,22 +123,59 @@ class SalesforceApi extends CrmApi
                     $activityData['records'][]= array(
                         'attributes' => array(
                             'type' => $mActivityObjectName,
-                            'referenceId' => $record['id']
+                            'referenceId' => $record['id'].'-'.$records['id']
                         ),
                         'ActivityDate__c'   => $record['dateAdded']->format('c'),
                         'Description__c'    => $type.": ".$record['eventName']." ".$subject." ".$record['actionName'],
                         'WhoId__c'          => $records['id'],
-                        'Name'           => 'Mautic TimeLine Activity',
+                        'Name'           => 'Mautic '.$record['eventName'].' Activity',
                         'MauticLead__c'     => $records['leadId'],
                         'Mautic_url__c'     => $records['leadUrl']
                     );
+
                 }
             }
 
             //todo: log posted activities so that they don't get sent over again
             $queryUrl = $this->integration->getQueryUrl();
-            $this->request('composite/tree/'.$mActivityObjectName, $activityData, 'POST', false, null,$queryUrl);
+            $results = $this->request('composite/tree/'.$mActivityObjectName, $activityData, 'POST', false, null,$queryUrl);
+            $newRecordData = array();
 
+            if($results['hasErrors'])
+            {
+                foreach ($results['results'] as $result)
+                {
+                   if($result['errors'][0]['statusCode'] == 'CANNOT_UPDATE_CONVERTED_LEAD')
+                   {
+                       $references = explode("-",$result['referenceId']);
+                       $SF_leadIds[]= $references[1];
+
+                   }
+
+                   $leadIds = implode("','", $SF_leadIds);
+                   $query = "select Id, ConvertedContactId from Lead where id in ('".$leadIds."')";
+
+                   $contacts = $this->request('query', array("q"=>$query),'GET',false,null,$queryUrl);
+
+                   foreach($contacts['records'] as $contact)
+                   {
+                       foreach($activityData['records'] as $key =>$record)
+                       {
+                           if($record['WhoId__c'] == $contact['Id'])
+                           {
+                               unset($record['WhoId__c']);
+                               $record['contact_id__c'] = $contact['ConvertedContactId'];
+                               $newRecordData['records'][]= $record;
+                               unset($activityData['records'][$key]);
+                           }
+                       }
+
+                   }
+                }
+                $results = $this->request('composite/tree/'.$mActivityObjectName, $newRecordData, 'POST', false, null,$queryUrl);
+
+            }
+            return $results;
         }
     }
 

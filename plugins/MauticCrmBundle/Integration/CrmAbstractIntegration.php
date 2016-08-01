@@ -182,7 +182,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         return $helper;
     }
 
-    public function getLeadData(\DateTime $startDate = null, \DateTime $endDate = null){
+    public function getLeadData(\DateTime $startDate = null, \DateTime $endDate = null, $leadId){
         return array();
     }
 

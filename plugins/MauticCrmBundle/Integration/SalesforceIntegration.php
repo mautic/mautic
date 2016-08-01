@@ -393,7 +393,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         "details"   => array('salesforceid' => $createdLeadData['id']),
                         "ipAddress" => $this->factory->getIpAddressFromRequest()
                     );
-                    $this->factory->getLogger()->addError(print_r($log,true));
+
                     $this->factory->getModel('core.auditLog')->writeToLog($log);
                 }
                 return true;
@@ -450,9 +450,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $startDate = new \DateTime($query['start']);
         $endDate = new \DateTime($query['end']);
 
-       // try {
+        try {
             if ($this->isAuthorized()) {
-
                 if(!empty($salesForceIds)){
                     foreach ($salesForceIds as $ids)
                     {
@@ -461,15 +460,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $salesForceLeadData[$ids['details']['salesforceid']]['id']=$ids['details']['salesforceid'];
                         $salesForceLeadData[$ids['details']['salesforceid']]['leadId']=$ids['objectId'];
                     }
-                    //print_r($salesForceLeadData);
+
                     $result = $this->getApiHelper()->createLeadActivity($salesForceLeadData);
                 }
 
                 return $executed;
             }
-      /*  } catch (\Exception $e) {
+       } catch (\Exception $e) {
             $this->logIntegrationError($e);
-        }*/
+        }
 
         return $executed;
     }
