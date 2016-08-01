@@ -408,7 +408,10 @@ class FieldType extends AbstractType
             'isShortVisible',
             'yesno_button_group',
             [
-                'label' => 'mautic.lead.field.form.isshortvisible'
+                'label' => 'mautic.lead.field.form.isshortvisible',
+                'attr'  => [
+                    'tooltip' => 'mautic.lead.field.form.isshortvisible.tooltip'
+                ],
             ]
         );
 
