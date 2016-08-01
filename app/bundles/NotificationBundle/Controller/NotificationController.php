@@ -307,7 +307,7 @@ class NotificationController extends FormController
                 'security' => $security,
                 'entityViews' => $entityViews,
                 'contacts' => $this->forward(
-                    'MauticSmsBundle:Sms:contacts',
+                    'MauticNotificationBundle:Notification:contacts',
                     [
                         'objectId' => $notification->getId(),
                         'page' => $this->get('session')->get('mautic.notification.contact.page', 1),
@@ -834,7 +834,7 @@ class NotificationController extends FormController
      */
     public function contactsAction($objectId, $page = 1)
     {
-        if (!$this->get('mautic.security')->isGranted('sms:smses:view')) {
+        if (!$this->get('mautic.security')->isGranted('notification:notifications:view')) {
             return $this->accessDenied();
         }
 
@@ -843,18 +843,18 @@ class NotificationController extends FormController
         }
 
         //set limits
-        $limit = $this->get('session')->get('mautic.sms.contact.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $this->get('session')->get('mautic.notification.contact.limit', $this->factory->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
-        $search = $this->request->get('search', $this->get('session')->get('mautic.sms.contact.filter', ''));
-        $this->get('session')->set('mautic.sms.contact.filter', $search);
+        $search = $this->request->get('search', $this->get('session')->get('mautic.notification.contact.filter', ''));
+        $this->get('session')->set('mautic.notification.contact.filter', $search);
 
         $filter = ['string' => $search, 'force' => []];
-        $orderBy = $this->get('session')->get('mautic.sms.contact.orderby', 'l.id');
-        $orderByDir = $this->get('session')->get('mautic.sms.contact.orderbydir', 'DESC');
+        $orderBy = $this->get('session')->get('mautic.notification.contact.orderby', 'l.id');
+        $orderByDir = $this->get('session')->get('mautic.notification.contact.orderbydir', 'DESC');
 
         // We need the EmailRepository to check if a lead is flagged as do not contact
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
@@ -903,7 +903,7 @@ class NotificationController extends FormController
                 'page' => $page,
                 'items' => $contacts['results'],
                 'totalItems' => $contacts['count'],
-                'tmpl' => 'smscontacts',
+                'tmpl' => 'notificationcontacts',
                 'indexMode' => 'grid',
                 'link' => 'mautic_notification_contacts',
                 'sessionVar' => 'notification.contact',

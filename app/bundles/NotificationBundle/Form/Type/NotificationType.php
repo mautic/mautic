@@ -182,24 +182,12 @@ class NotificationType extends AbstractType
         $builder->add('buttons', 'form_buttons');
         $builder->add('notificationType', 'hidden');
 
-        $customButtons = [
-            [
-                'name' => 'builder',
-                'label' => 'mautic.core.builder',
-                'attr' => [
-                    'class' => 'btn btn-default btn-dnd btn-nospin text-primary btn-builder',
-                    'icon' => 'fa fa-cube',
-                    'onclick' => "Mautic.launchBuilder('notificationform', 'notification');",
-                ],
-            ],
-        ];
         if (!empty($options['update_select'])) {
             $builder->add(
                 'buttons',
                 'form_buttons',
                 [
                     'apply_text' => false,
-                    'pre_extra_buttons' => $customButtons,
                 ]
             );
             $builder->add(
@@ -213,10 +201,7 @@ class NotificationType extends AbstractType
         } else {
             $builder->add(
                 'buttons',
-                'form_buttons',
-                [
-                    'pre_extra_buttons' => $customButtons,
-                ]
+                'form_buttons'
             );
         }
 
