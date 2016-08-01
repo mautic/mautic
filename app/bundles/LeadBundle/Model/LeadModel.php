@@ -943,7 +943,7 @@ class LeadModel extends FormModel
      *
      * @return array
      */
-    public function getTrackingCookie($forceRegeneration = false)
+    public function getTrackingCookie($forceRegeneration = false, $cookies)
     {
         static $trackingId = false, $generated = false;
 
@@ -961,7 +961,7 @@ class LeadModel extends FormModel
 
         if (empty($trackingId)) {
             //check for the tracking cookie
-            $trackingId = $this->request->cookies->get('mautic_session_id');
+            $trackingId = $cookies->get('mautic_session_id');
             $generated  = false;
             if (empty($trackingId)) {
                 $trackingId = hash('sha1', uniqid(mt_rand()));

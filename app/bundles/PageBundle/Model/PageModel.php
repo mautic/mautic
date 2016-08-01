@@ -462,7 +462,8 @@ class PageModel extends FormModel
         }
 
         // Store tracking ID
-        list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie();
+        list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie(false, $request->cookies);
+
         $hit->setTrackingId($trackingId);
         $hit->setLead($lead);
 

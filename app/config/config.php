@@ -148,6 +148,9 @@ $container->setParameter('mautic.ip_lookup_services', $ipLookupServices);
 $loader->import('parameters.php');
 $container->loadFromExtension('mautic_core');
 
+// load rabbitmq parameters
+$loader->import('rabbitmq.yml');
+
 // Set template engines
 $engines = ['php', 'twig'];
 

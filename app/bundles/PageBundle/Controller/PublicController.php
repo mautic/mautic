@@ -348,12 +348,9 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction()
     {
-        //Create page entry
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model = $this->getModel('page');
-        $model->hitPage(null, $this->request);
-
-        return TrackingPixelHelper::getResponse($this->request);
+        $msg = array('request' => $this->request);
+        $this->get('old_sound_rabbit_mq.task_name_producer')->publish(serialize($msg));
+        return new Response("ok", Response::HTTP_OK);
     }
 
     /**

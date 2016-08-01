@@ -151,6 +151,7 @@ class AppKernel extends Kernel
             new FOS\RestBundle\FOSRestBundle(),
             new JMS\SerializerBundle\JMSSerializerBundle(),
             new Oneup\UploaderBundle\OneupUploaderBundle(),
+            new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
             new Symfony\Bundle\TwigBundle\TwigBundle(),
             new Debril\RssAtomBundle\DebrilRssAtomBundle(),
             // Mautic Bundles
