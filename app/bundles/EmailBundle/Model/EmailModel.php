@@ -791,17 +791,18 @@ class EmailModel extends FormModel
 
         $lists     = $email->getLists();
         $listCount = count($lists);
-        $chart = new PieChart(array("label" => 'Devices'));
+        $chart = new BarChart(array('Devices'));
 
         if ($listCount) {
             foreach ($lists as $l) {
                 $statRepo = $this->getStatRepository();
                 $statIds = $statRepo->getOpenedStatIds($emailIds, $l->getId());
+                $results = array();
 
-                $results = $this->getStatDeviceRepository()->getDeviceStats($statIds[0], $dateFrom, $dateTo);
-
-
-                $this->factory->getLogger()->addError(print_r($results, true));
+                if(!empty($statIds))
+                {
+                    $results = $this->getStatDeviceRepository()->getDeviceStats($statIds[0], $dateFrom, $dateTo);
+                }
 
                 foreach ($results as $result) {
                     $label = substr(empty($result['device']) ? $this->translator->trans('mautic.core.unknown') : $result['device'], 0, 12);
