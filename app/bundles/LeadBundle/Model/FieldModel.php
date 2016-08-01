@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Monolog\Logger;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -32,6 +33,11 @@ class FieldModel extends FormModel
     protected $schemaHelperFactory;
 
     /**
+     * @var Logger
+     */
+    protected $logger;
+
+    /**
      * FieldModel constructor.
      *
      * @param SchemaHelperFactory $schemaHelperFactory
@@ -39,6 +45,14 @@ class FieldModel extends FormModel
     public function __construct(SchemaHelperFactory $schemaHelperFactory)
     {
         $this->schemaHelperFactory = $schemaHelperFactory;
+    }
+
+    /**
+     * @param Logger $logger
+     */
+    public function setLogger(Logger $logger)
+    {
+        $this->logger = $logger;
     }
 
     /**
@@ -156,33 +170,35 @@ class FieldModel extends FormModel
             //create the field as its own column in the leads table
             $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', 'leads');
             if ($isNew || (!$isNew && !$leadsSchema->checkColumnExists($alias))) {
+                $schemaDefinition = self::getSchemaDefinition($alias, $entity->getType(), $isUnique);
                 $leadsSchema->addColumn(
-                    self::getSchemaDefinition($alias, $entity->getType(), $isUnique)
+                    $schemaDefinition
                 );
                 $leadsSchema->executeChanges();
 
-                if ($isUnique) {
-                    // Get list of current uniques
-                    $uniqueIdentifierFields = $this->getUniqueIdentifierFields();
-
-                    // Always use email
-                    $indexColumns   = array('email');
-                    $indexColumns   = array_merge($indexColumns, array_keys($uniqueIdentifierFields));
-                    $indexColumns[] = $alias;
-
-                    // Only use three to prevent max key length errors
-                    $indexColumns = array_slice($indexColumns, 0, 3);
-
+                // Update the unique_identifier_search index and add an index for this field
+                /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
+                $modifySchema = $this->schemaHelperFactory->getSchemaHelper('index', 'leads');
+                if ('string' == $schemaDefinition['type']) {
                     try {
-                        // Update the unique_identifier_search index
-                        /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
-                        $modifySchema = $this->schemaHelperFactory->getSchemaHelper('index', 'leads');
+                        $modifySchema->addIndex([$alias], $alias.'_search');
                         $modifySchema->allowColumn($alias);
-                        $modifySchema->addIndex($indexColumns, 'unique_identifier_search');
-                        $modifySchema->addIndex(array($alias), 'lead_field'.$alias.'_search');
+                        if ($isUnique) {
+                            // Get list of current uniques
+                            $uniqueIdentifierFields = $this->getUniqueIdentifierFields();
+
+                            // Always use email
+                            $indexColumns   = ['email'];
+                            $indexColumns   = array_merge($indexColumns, array_keys($uniqueIdentifierFields));
+                            $indexColumns[] = $alias;
+
+                            // Only use three to prevent max key length errors
+                            $indexColumns = array_slice($indexColumns, 0, 3);
+                            $modifySchema->addIndex($indexColumns, 'unique_identifier_search');
+                        }
                         $modifySchema->executeChanges();
                     } catch (\Exception $e) {
-                        error_log($e);
+                        $this->logger->addWarning($e->getMessage());
                     }
                 }
             }
@@ -528,35 +544,6 @@ class FieldModel extends FormModel
             ];
         }
 
-        $schemaType = in_array(
-            $alias, [
-                'title',
-                'firstname',
-                'lastname',
-                'company',
-                'position',
-                'email',
-                'phone',
-                'mobile',
-                'fax',
-                'address1',
-                'address2',
-                'city',
-                'state',
-                'zipcode',
-                'country',
-                'website',
-                'twitter',
-                'facebook',
-                'googleplus',
-                'skype',
-                'linkedin',
-                'instagram',
-                'foursquare',
-            ]
-        ) ? 'string' : 'text';
-        $options    = ['notnull' => false];
-
         switch ($type) {
             case 'datetime':
             case 'date':
@@ -572,14 +559,17 @@ class FieldModel extends FormModel
             case 'lookup':
             case 'region':
             case 'tel':
+            case 'text':
                 $schemaType = 'string';
                 break;
+            default:
+                $schemaType = 'text';
         }
 
         return [
             'name'    => $alias,
             'type'    => $schemaType,
-            'options' => $options
+            'options' => ['notnull' => false]
         ];
     }
 }
