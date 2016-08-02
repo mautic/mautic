@@ -608,7 +608,11 @@ class LeadModel extends FormModel
             return $this->systemCurrentLead;
         }
 
+        if ($this->request) {
+            $this->logger->addDebug("LEAD: Tracking session for ".$this->request->getMethod()." ".$this->request->getRequestUri());
+        }
         list($trackingId, $generated) = $this->getTrackingCookie();
+        $this->logger->addDebug("LEAD: Tracking ID for this contact is {$trackingId} (".(int) $generated.")");
 
         if (empty($this->currentLead)) {
             $leadId = $this->request->cookies->get($trackingId);
@@ -622,6 +626,7 @@ class LeadModel extends FormModel
                     //just create a tracking cookie for the newest lead
                     $lead   = $leads[0];
                     $leadId = $lead->getId();
+                    $this->logger->addDebug("LEAD: Existing lead found with ID# $leadId.");
                 } else {
                     //let's create a lead
                     $lead = new Lead();
@@ -633,6 +638,7 @@ class LeadModel extends FormModel
 
                     $this->saveEntity($lead, false);
                     $leadId = $lead->getId();
+                    $this->logger->addDebug("LEAD: New lead created with ID# $leadId.");
                 }
 
                 $fields = $this->getLeadDetails($lead);
@@ -655,9 +661,9 @@ class LeadModel extends FormModel
                     $fields = $this->getLeadDetails($lead);
                     $lead->setFields($fields);
 
-                    if (MAUTIC_ENV == 'dev') {
-                        header('X-Mautic-Contact-Created: '.$leadId);
-                    }
+                    $this->logger->addDebug("LEAD: New lead created with ID# $leadId.");
+                } else {
+                    $this->logger->addDebug("LEAD: Existing lead found with ID# $leadId.");
                 }
             }
 
@@ -704,12 +710,15 @@ class LeadModel extends FormModel
 
         if (is_array($clickthrough) && !empty($clickthrough['lead'])) {
             $lead = $this->getEntity($clickthrough['lead']);
+            $this->logger->addDebug("LEAD: Contact ID# {$clickthrough['lead']} tracked through clickthrough query.");
         }
 
         // First determine if this request is already tracked as a specific lead
         list($trackingId, $generated) = $this->getTrackingCookie();
         if ($leadId = $this->request->cookies->get($trackingId)) {
-            $lead = $this->getEntity($leadId);
+            if ($lead = $this->getEntity($leadId)) {
+                $this->logger->addDebug("LEAD: Contact ID# {$leadId} tracked through tracking ID ($trackingId}.");
+            }
         }
 
         // Search for lead by request and/or update lead fields if some data were sent in the URL query
@@ -741,6 +750,7 @@ class LeadModel extends FormModel
                 $existingLeads = $this->getRepository()->getLeadsByUniqueFields($uniqueLeadFieldData, ($lead) ? $lead->getId() : null);
 
                 if (!empty($existingLeads)) {
+                    $this->logger->addDebug("LEAD: Existing contact ID# {$existingLeads[0]->getId()} found through query identifiers.");
                     // Merge with existing lead or use the one found
                     $lead = ($lead) ? $this->mergeLeads($lead, $existingLeads[0]) : $existingLeads[0];
                 }
@@ -776,9 +786,7 @@ class LeadModel extends FormModel
      */
     public function setCurrentLead(Lead $lead)
     {
-        if (MAUTIC_ENV == 'dev' && !\headers_sent()) {
-            header('X-Mautic-Contact-Set: '.$lead->getId());
-        }
+        $this->logger->addDebug("LEAD: {$lead->getId()} set as current lead.");
 
         if ($this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
             // Overwrite system current lead
@@ -800,9 +808,9 @@ class LeadModel extends FormModel
         $this->currentLead->setLastActive(new \DateTime());
 
         // Update tracking cookies if the lead is different
-        if (!$oldLead || $oldLead->getId() != $lead->getId()) {
-
+        if ($oldLead && $oldLead->getId() != $lead->getId()) {
             list($newTrackingId, $oldTrackingId) = $this->getTrackingCookie(true);
+            $this->logger->addDebug("LEAD: Tracking code changed from $oldTrackingId for contact ID# {$oldLead->getId()} to $newTrackingId for contact ID# {$lead->getId()}");
 
             //set the tracking cookies
             $this->setLeadCookie($lead->getId());
@@ -813,6 +821,9 @@ class LeadModel extends FormModel
                     $this->dispatcher->dispatch(LeadEvents::CURRENT_LEAD_CHANGED, $event);
                 }
             }
+        } elseif (!$oldLead) {
+            // New lead, set the tracking cookie
+            $this->setLeadCookie($lead->getId(), true);
         }
     }
 
@@ -894,11 +905,12 @@ class LeadModel extends FormModel
     {
         // Remove the old if set
         $oldTrackingId = $this->request->cookies->get('mautic_session_id');
-        if (!empty($oldTrackingId)) {
+        list($trackingId, $generated) = $this->getTrackingCookie();
+
+        if ($generated && $oldTrackingId) {
             $this->cookieHelper->setCookie($oldTrackingId, null, -3600);
         }
 
-        list($trackingId, $generated) = $this->getTrackingCookie();
         $this->cookieHelper->setCookie($trackingId, $leadId);
     }
 
