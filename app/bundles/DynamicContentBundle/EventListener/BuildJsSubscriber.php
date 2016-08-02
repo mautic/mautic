@@ -33,9 +33,9 @@ class BuildJsSubscriber extends CommonSubscriber
      * Adds the MauticJS definition and core
      * JS functions for use in Bundles. This
      * must retain top priority of 1000
-     * 
+     *
      * @param BuildJsEvent $event
-     * 
+     *
      * @return void
      */
     public function onBuildJs(BuildJsEvent $event)
@@ -45,20 +45,34 @@ class BuildJsSubscriber extends CommonSubscriber
 
         $js = <<<JS
 MauticJS.replaceDynamicContent = function () {
-    var dynamicContentSlots = document.querySelectorAll('.mautic-slot');
+    // Only fetch once a tracking pixel has been loaded
+    var maxChecks   = 3000; // Keep it from indefinitely checking in case the pixel was never embedded
+    var checkPixel = setInterval(function() {
+        if (maxChecks > 0 && !MauticJS.isPixelLoaded()) {
+            // Try again
+            maxChecks--;
+            return;
+        }
 
-    if (dynamicContentSlots.length) {
-        MauticJS.iterateCollection(dynamicContentSlots)(function(node, i) {
-            var slotName = node.dataset.slotName;
-            var url = '{$dwcUrl}'.replace('slotNamePlaceholder', slotName);
-
-            MauticJS.makeCORSRequest('GET', url, {}, function(response, xhr) {
-                if (response.length) {
-                    node.innerHTML = response;
-                }
-            });
-        });
-    }
+        clearInterval(checkPixel);
+        // Wait a few microseconds to allow cookies to populate
+        setTimeout(function() {
+            var dynamicContentSlots = document.querySelectorAll('.mautic-slot');
+        
+            if (dynamicContentSlots.length) {
+                MauticJS.iterateCollection(dynamicContentSlots)(function(node, i) {
+                    var slotName = node.dataset.slotName;
+                    var url = '{$dwcUrl}'.replace('slotNamePlaceholder', slotName);
+        
+                    MauticJS.makeCORSRequest('GET', url, {}, function(response, xhr) {
+                        if (response.length) {
+                            node.innerHTML = response;
+                        }
+                    });
+                });
+            }
+        }, 400);
+    }, 1);
 };
 
 MauticJS.documentReady(MauticJS.replaceDynamicContent);

@@ -32,9 +32,9 @@ class BuildJsSubscriber extends CommonSubscriber
      * Adds the MauticJS definition and core
      * JS functions for use in Bundles. This
      * must retain top priority of 1000
-     * 
+     *
      * @param BuildJsEvent $event
-     * 
+     *
      * @return void
      */
     public function onBuildJs(BuildJsEvent $event)
@@ -135,6 +135,30 @@ MauticJS.parseTextToJSON = function(maybeJSON) {
     }
 
     return response;
+};
+
+MauticJS.isPixelLoaded = function() {
+    if (typeof MauticJS.trackingPixel !== 'undefined') {
+        return /co/.test(MauticJS.trackingPixel);
+    } else {
+        // Check the DOM for the tracking pixel
+        if (typeof MauticJS.domTrackingPixel == 'undefined') {
+            MauticJS.domTrackingPixel = null;
+            var imgs = Array.prototype.slice.apply(document.getElementsByTagName('img'));
+            for (var i = 0; i < imgs.length; i++) {
+                if (imgs[i].src.indexOf('img.gif') !== -1) {
+                    MauticJS.domTrackingPixel = imgs[i];
+                }
+            }
+        }
+        
+        if (MauticJS.domTrackingPixel) {
+            
+            return /co/.test(MauticJS.domTrackingPixel);
+        }
+    }
+                
+    return false;
 };
 
 if (typeof window[window.MauticTrackingObject] === 'undefined') {
