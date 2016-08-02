@@ -27,7 +27,6 @@ class Consumer implements ConsumerInterface
       $request = $message['request'];
       $this->model->hitPage(null, $request);
       echo "End processing " . PHP_EOL;
-      echo TrackingPixelHelper::getResponse($request);
-      return true;
+      return (TrackingPixelHelper::getResponse($request)->getStatusCode() == Response::HTTP_OK);
    }
 }
