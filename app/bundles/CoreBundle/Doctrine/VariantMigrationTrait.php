@@ -25,29 +25,30 @@ trait VariantMigrationTrait
      */
     protected function addVariantSchema(Schema $schema, $tableName)
     {
-        $fkName  = $this->generatePropertyName($tableName, 'fk', ['variant_parent_id']);
-        $idxName = $this->generatePropertyName($tableName, 'idx', ['variant_parent_id']);
-        $table   = $schema->getTable($this->prefix.$tableName);
+        $fkName    = $this->generatePropertyName($tableName, 'fk', ['variant_parent_id']);
+        $idxName   = $this->generatePropertyName($tableName, 'idx', ['variant_parent_id']);
+        $tableName = "{$this->prefix}$tableName";
+        $table     = $schema->getTable($tableName);
 
         if (!$table->hasColumn('variant_parent_id')) {
-            $this->addSql("ALTER TABLE {$this->prefix}$tableName ADD variant_parent_id INT DEFAULT NULL");
+            $this->addSql("ALTER TABLE $tableName ADD variant_parent_id INT DEFAULT NULL");
             $this->addSql(
-                "ALTER TABLE {$this->prefix}$tableName ADD CONSTRAINT ".$fkName
-                ." FOREIGN KEY (variant_parent_id) REFERENCES {$this->prefix}$tableName (id) ON DELETE CASCADE"
+                "ALTER TABLE $tableName ADD CONSTRAINT ".$fkName
+                ." FOREIGN KEY (variant_parent_id) REFERENCES $tableName (id) ON DELETE CASCADE"
             );
-            $this->addSql( "CREATE INDEX $idxName ON {$this->prefix}$tableName (variant_parent_id)");
+            $this->addSql("CREATE INDEX $idxName ON $tableName (variant_parent_id)");
         } else {
             // Drop and recreate the parent FK to ensure DELETE CASCADE
             if ($table->hasForeignKey($fkName)) {
-                $this->addSql("ALTER TABLE {$this->prefix}$tableName DROP FOREIGN KEY $fkName");
+                $this->addSql("ALTER TABLE $tableName DROP FOREIGN KEY $fkName");
             }
             $this->addSql(
-                "ALTER TABLE {$this->prefix}$tableName ADD CONSTRAINT ".$fkName
-                ." FOREIGN KEY (variant_parent_id) REFERENCES {$this->prefix}$tableName (id) ON DELETE CASCADE"
+                "ALTER TABLE $tableName ADD CONSTRAINT ".$fkName
+                ." FOREIGN KEY (variant_parent_id) REFERENCES $tableName (id) ON DELETE CASCADE"
             );
 
             if (!$table->hasIndex($idxName)) {
-                $this->addSql( "CREATE INDEX $idxName ON {$this->prefix}$tableName (variant_parent_id)");
+                $this->addSql("CREATE INDEX $idxName ON $tableName (variant_parent_id)");
             }
         }
 
