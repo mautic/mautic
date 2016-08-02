@@ -1195,8 +1195,7 @@ class LeadModel extends FormModel
 
             $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($data[$fields['stage']]);
 
-            if(empty($stage))
-            {
+            if (empty($stage)) {
                 $stage = new Stage();
                 $stage->setName($data[$fields['stage']]);
             }

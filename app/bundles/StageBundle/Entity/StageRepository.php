@@ -193,8 +193,7 @@ class StageRepository extends CommonRepository
 
         $result = $q->getQuery()->getResult();
 
-        if($result)
-        {
+        if ($result) {
             $key = array_keys($result);
             return $result[$key[0]];
         }
