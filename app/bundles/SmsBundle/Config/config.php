@@ -69,10 +69,11 @@ return [
             'mautic.sms.api' => [
                 'class' => 'Mautic\SmsBundle\Api\TwilioApi',
                 'arguments' => [
-                    'monolog.logger.mautic',
+                    'mautic.page.model.trackable',
                     'mautic.twilio.service',
                     'mautic.helper.phone_number',
                     '%mautic.sms_sending_phone_number%',
+                    'monolog.logger.mautic',
                 ],
                 'alias' => 'sms_api',
             ],
