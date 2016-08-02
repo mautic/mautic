@@ -1581,11 +1581,11 @@ class LeadController extends FormController
     }
 
     public function exportCurrentListAction(){
-    	$formatter = $this->factory->getHelper('template.formatter');
-    	$date      = $this->factory->getDate()->toLocalString();
-    	$name      = str_replace(' ', '_', $date) . '_' . InputHelper::alphanum('export_lead', false, '-');
+        $formatter = $this->factory->getHelper('template.formatter');
+        $date      = $this->factory->getDate()->toLocalString();
+        $name      = str_replace(' ', '_', $date) . '_' . InputHelper::alphanum('export_lead', false, '-');
 
-    	 $permissions = $this->factory->getSecurity()->isGranted(
+        $permissions = $this->factory->getSecurity()->isGranted(
             array(
                 'lead:leads:viewown',
                 'lead:leads:viewother',
@@ -1634,38 +1634,39 @@ class LeadController extends FormController
 
         $this->factory->getLogger(true)->info("leads : ".count($leads));
 
-    	$response = new StreamedResponse(function () use ($leads, $formatter) {
-    		$handle = fopen('php://output', 'r+');
-    		$header = array('lead_id', 'lead_name', 'lead_email', 'lead_company', 'lead_phone', 'lead_website', 'lead_location', 'lead_point', 'date_identified');
-    		fputcsv($handle, $header);
+        $response = new StreamedResponse(function () use ($leads, $formatter) {
+            $handle = fopen('php://output', 'r+');
+            $header = array('lead_id', 'lead_name', 'lead_email', 'lead_company', 'lead_phone', 'lead_website', 'lead_location', 'lead_point', 'date_identified');
+            fputcsv($handle, $header);
 
-    		// Build the data rows
-    		for($i=0;$i<count($leads);$i++) {
-    			$row = array();
-    			$row[] = $leads[$i]['id'];
-    			$row[] = $formatter->_($leads[$i]['lastname'], 'string', true);
-    			$row[] = $formatter->_($leads[$i]['email'], 'email', true);
-    			$row[] = $formatter->_($leads[$i]['company'], 'string', true);
-    			$row[] = $formatter->_($leads[$i]['phone'], 'string', true);
-    			$row[] = $formatter->_($leads[$i]['website'], 'url', true);
-    			$row[] = $formatter->_($leads[$i]['country'], 'string', true);
-    			$row[] = $formatter->_($leads[$i]['points'], 'int', true);
-    			$row[] = $formatter->_($leads[$i]['date_identified'], 'date', true);
+            // Build the data rows
+            for($i=0; $i<count($leads); $i += 1) {
+                $row = array();
+                $row[] = $leads[$i]['id'];
+                $row[] = $formatter->_($leads[$i]['lastname'], 'string', true);
+                $row[] = $formatter->_($leads[$i]['email'], 'email', true);
+                $row[] = $formatter->_($leads[$i]['company'], 'string', true);
+                $row[] = $formatter->_($leads[$i]['phone'], 'string', true);
+                $row[] = $formatter->_($leads[$i]['website'], 'url', true);
+                $row[] = $formatter->_($leads[$i]['country'], 'string', true);
+                $row[] = $formatter->_($leads[$i]['points'], 'int', true);
+                $row[] = $formatter->_($leads[$i]['date_identified'], 'date', true);
 
-    			fputcsv($handle, $row);
-    		}
-    		//free memory
-    		unset($lead);
-    		fclose($handle);
-    	});
+                fputcsv($handle, $row);
+            }
+            //free memory
+            unset($lead);
+            fclose($handle);
+        });
 
-    	$response->headers->set('Content-Type', 'application/force-download');
-    	$response->headers->set('Content-Type', 'application/octet-stream');
-    	$response->headers->set('Content-Disposition', 'attachment; filename="' . $name . '.csv"');
-    	$response->headers->set('Expires', 0);
-    	$response->headers->set('Cache-Control', 'must-revalidate');
-    	$response->headers->set('Pragma', 'public');
-    	return $response;
+        $response->headers->set('Content-Type', 'application/force-download');
+        $response->headers->set('Content-Type', 'application/octet-stream');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $name . '.csv"');
+        $response->headers->set('Expires', 0);
+        $response->headers->set('Cache-Control', 'must-revalidate');
+        $response->headers->set('Pragma', 'public');
+
+        return $response;
     }
 
     /**
