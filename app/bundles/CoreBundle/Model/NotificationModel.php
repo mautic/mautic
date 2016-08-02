@@ -9,6 +9,9 @@
 
 namespace Mautic\CoreBundle\Model;
 
+use Debril\RssAtomBundle\Protocol\FeedReader;
+use Debril\RssAtomBundle\Protocol\Parser\FeedContent;
+use Debril\RssAtomBundle\Protocol\Parser\Item;
 use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -42,15 +45,21 @@ class NotificationModel extends FormModel
     protected $updateHelper;
 
     /**
+     * @var FeedReader
+     */
+    protected $rssReader;
+
+    /**
      * NotificationModel constructor.
      *
      * @param PathsHelper $pathsHelper
      * @param UpdateHelper $updateHelper
      */
-    public function __construct(PathsHelper $pathsHelper, UpdateHelper $updateHelper)
+    public function __construct(PathsHelper $pathsHelper, UpdateHelper $updateHelper, FeedReader $rssReader)
     {
         $this->pathsHelper = $pathsHelper;
         $this->updateHelper = $updateHelper;
+        $this->rssReader = $rssReader;
     }
 
     /**
@@ -82,10 +91,10 @@ class NotificationModel extends FormModel
     /**
      * Write a notification
      *
-     * @param           $message    Message of the notification
-     * @param           $type       Optional $type to ID the source of the notification
+     * @param string    $message    Message of the notification
+     * @param string    $type       Optional $type to ID the source of the notification
      * @param bool|true $isRead     Add unread indicator
-     * @param           $header     Header for message
+     * @param string    $header     Header for message
      * @param string    $iconClass  Font Awesome CSS class for the icon (e.g. fa-eye)
      * @param \DateTime $datetime   Date the item was created
      * @param User|null $user       User object; defaults to current user
@@ -200,6 +209,8 @@ class NotificationModel extends FormModel
             return array(array(), false, '');
         }
 
+        $this->updateUpstreamNotifications();
+
         $notifications = $this->getNotifications($afterId);
 
         $showNewIndicator = false;
@@ -253,5 +264,26 @@ class NotificationModel extends FormModel
         }
 
         return array($notifications, $showNewIndicator, array('isNew' => $newUpdate, 'message' => $updateMessage));
+    }
+
+    public function updateUpstreamNotifications()
+    {
+        $qb = $this->getRepository()->createQueryBuilder('n')
+            ->where('n.type = :type')
+            ->setParameter('type', 'upstream')
+            ->setMaxResults(1);
+
+        /** @var Notification $result */
+        $result = $qb->getQuery()->getOneOrNullResult();
+        $lastDate = $result === null ? null : $result->getDateAdded();
+
+        /** @var FeedContent $feed */
+        $feed = $this->rssReader->getFeedContent('https://mautic.com/?feed=rss2', $lastDate);
+
+        /** @var Item $item */
+        foreach ($feed->getItems() as $item)
+        {
+            $this->addNotification($item->getLink(), 'upstream', false, null, 'fa-info-circle');
+        }
     }
 }
