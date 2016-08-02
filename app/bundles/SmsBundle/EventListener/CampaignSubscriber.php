@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\SmsBundle\Api\AbstractSmsApi;
 use Mautic\SmsBundle\Event\SmsSendEvent;
@@ -46,9 +47,9 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * CampaignSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param LeadModel $leadModel
-     * @param SmsModel $smsModel
+     * @param MauticFactory  $factory
+     * @param LeadModel      $leadModel
+     * @param SmsModel       $smsModel
      * @param AbstractSmsApi $smsApi
      */
     public function __construct(MauticFactory $factory, LeadModel $leadModel, SmsModel $smsModel, AbstractSmsApi $smsApi)
@@ -66,7 +67,7 @@ class CampaignSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],
+            CampaignEvents::CAMPAIGN_ON_BUILD     => ['onCampaignBuild', 0],
             SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0]
         ];
     }
@@ -100,6 +101,7 @@ class CampaignSubscriber extends CommonSubscriber
         $lead = $event->getLead();
 
         if ($this->leadModel->isContactable($lead, 'sms') !== DoNotContact::IS_CONTACTABLE) {
+
             return $event->setFailed('mautic.sms.campaign.failed.not_contactable');
         }
 
@@ -110,6 +112,7 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         if (empty($leadPhoneNumber)) {
+
             return $event->setFailed('mautic.sms.campaign.failed.missing_number');
         }
 
@@ -117,10 +120,14 @@ class CampaignSubscriber extends CommonSubscriber
         $sms   = $this->smsModel->getEntity($smsId);
 
         if ($sms->getId() !== $smsId) {
+
             return $event->setFailed('mautic.sms.campaign.failed.missing_entity');
         }
 
-        $smsEvent = new SmsSendEvent($sms->getMessage(), $lead);
+        // Replace contact fields
+        $message = TokenHelper::findLeadTokens($sms->getMessage(), $lead->getProfileFields(), true);
+
+        $smsEvent = new SmsSendEvent($message, $lead);
         $smsEvent->setSmsId($smsId);
 
         $this->dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $smsEvent);
@@ -128,11 +135,12 @@ class CampaignSubscriber extends CommonSubscriber
 
         // If there was a problem sending at this point, it's an API problem and should be requeued
         if ($metadata === false) {
+
             return $event->setResult(false);
         }
 
         $this->smsModel->getRepository()->upCount($smsId);
-        
+
         $event->setResult(
             [
                 'type'    => 'mautic.sms.sms',
