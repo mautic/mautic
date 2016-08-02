@@ -13,6 +13,7 @@ use Debril\RssAtomBundle\Protocol\FeedReader;
 use Debril\RssAtomBundle\Protocol\Parser\FeedContent;
 use Debril\RssAtomBundle\Protocol\Parser\Item;
 use Mautic\CoreBundle\Entity\Notification;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UpdateHelper;
@@ -50,16 +51,24 @@ class NotificationModel extends FormModel
     protected $rssReader;
 
     /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
      * NotificationModel constructor.
      *
-     * @param PathsHelper $pathsHelper
-     * @param UpdateHelper $updateHelper
+     * @param PathsHelper          $pathsHelper
+     * @param UpdateHelper         $updateHelper
+     * @param FeedReader           $rssReader
+     * @param CoreParametersHelper $coreParametersHelper
      */
-    public function __construct(PathsHelper $pathsHelper, UpdateHelper $updateHelper, FeedReader $rssReader)
+    public function __construct(PathsHelper $pathsHelper, UpdateHelper $updateHelper, FeedReader $rssReader, CoreParametersHelper $coreParametersHelper)
     {
         $this->pathsHelper = $pathsHelper;
         $this->updateHelper = $updateHelper;
         $this->rssReader = $rssReader;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -266,8 +275,17 @@ class NotificationModel extends FormModel
         return array($notifications, $showNewIndicator, array('isNew' => $newUpdate, 'message' => $updateMessage));
     }
 
+    /**
+     * Fetch upstream notifications via RSS
+     */
     public function updateUpstreamNotifications()
     {
+        $url = $this->coreParametersHelper->getParameter('rss_notification_url');
+
+        if (empty($url)) {
+            return;
+        }
+
         $qb = $this->getRepository()->createQueryBuilder('n')
             ->where('n.type = :type')
             ->setParameter('type', 'upstream')
@@ -278,12 +296,12 @@ class NotificationModel extends FormModel
         $lastDate = $result === null ? null : $result->getDateAdded();
 
         /** @var FeedContent $feed */
-        $feed = $this->rssReader->getFeedContent('https://mautic.com/?feed=rss2', $lastDate);
+        $feed = $this->rssReader->getFeedContent($url, $lastDate);
 
         /** @var Item $item */
         foreach ($feed->getItems() as $item)
         {
-            $this->addNotification($item->getLink(), 'upstream', false, null, 'fa-info-circle');
+            $this->addNotification($item->getDescription(), 'upstream', false, null, 'fa-bullhorn');
         }
     }
 }
