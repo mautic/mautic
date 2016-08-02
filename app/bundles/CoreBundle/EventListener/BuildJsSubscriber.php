@@ -137,33 +137,51 @@ MauticJS.parseTextToJSON = function(maybeJSON) {
     return response;
 };
 
-MauticJS.isPixelLoaded = function() {
-    if (typeof MauticJS.trackingPixel !== 'undefined') {
-        return /co/.test(MauticJS.trackingPixel);
+MauticJS.pixelLoaded = function(f) {
+    if (!/in/.test(document.readyState)) {
+        setTimeout('MauticJS.pixelLoaded(' + f + ')', 9)
     } else {
+        // Only fetch once a tracking pixel has been loaded
+        var maxChecks  = 3000; // Keep it from indefinitely checking in case the pixel was never embedded
+        var checkPixel = setInterval(function() {
+            if (maxChecks > 0 && !MauticJS.isPixelLoaded()) {
+                // Try again
+                maxChecks--;
+                return;
+            }
+    
+            clearInterval(checkPixel);
+            // Either the pixel is loaded or the tests failed so initiate function anyway
+            f();
+        }, 1);
+    }
+};
+
+MauticJS.isPixelLoaded = function() {
+    if (typeof MauticJS.trackingPixel === 'undefined') {
         // Check the DOM for the tracking pixel
-        if (typeof MauticJS.domTrackingPixel == 'undefined') {
-            MauticJS.domTrackingPixel = null;
-            var imgs = Array.prototype.slice.apply(document.getElementsByTagName('img'));
-            for (var i = 0; i < imgs.length; i++) {
-                if (imgs[i].src.indexOf('img.gif') !== -1) {
-                    MauticJS.domTrackingPixel = imgs[i];
-                }
+        MauticJS.trackingPixel = null;
+        var imgs = Array.prototype.slice.apply(document.getElementsByTagName('img'));
+        for (var i = 0; i < imgs.length; i++) {
+            if (imgs[i].src.indexOf('mtracking.gif') !== -1) {
+                MauticJS.trackingPixel = imgs[i];
+                break;
             }
         }
-        
-        if (MauticJS.domTrackingPixel) {
-            
-            return /co/.test(MauticJS.domTrackingPixel);
+        if (MauticJS.trackingPixel === null) {
+            console.log('Mautic tracking is not initiated correctly. Follow the documentation.');
         }
     }
-                
+
+    if (MauticJS.trackingPixel && MauticJS.trackingPixel.complete && MauticJS.trackingPixel.naturalWidth !== 0) {
+        // All the browsers should be covered by this - image is loaded
+        return true;
+    }
+
     return false;
 };
 
-if (typeof window[window.MauticTrackingObject] === 'undefined') {
-    console.log('Mautic tracking is not initiated correctly. Follow the documentation.');
-} else {
+if (typeof window[window.MauticTrackingObject] !== 'undefined') {
     MauticJS.input = window[window.MauticTrackingObject];
     MauticJS.inputQueue = MauticJS.input.q;
 

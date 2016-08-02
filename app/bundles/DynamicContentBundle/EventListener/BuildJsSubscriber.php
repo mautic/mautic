@@ -45,37 +45,23 @@ class BuildJsSubscriber extends CommonSubscriber
 
         $js = <<<JS
 MauticJS.replaceDynamicContent = function () {
-    // Only fetch once a tracking pixel has been loaded
-    var maxChecks   = 3000; // Keep it from indefinitely checking in case the pixel was never embedded
-    var checkPixel = setInterval(function() {
-        if (maxChecks > 0 && !MauticJS.isPixelLoaded()) {
-            // Try again
-            maxChecks--;
-            return;
-        }
+    var dynamicContentSlots = document.querySelectorAll('.mautic-slot');
 
-        clearInterval(checkPixel);
-        // Wait a few microseconds to allow cookies to populate
-        setTimeout(function() {
-            var dynamicContentSlots = document.querySelectorAll('.mautic-slot');
-        
-            if (dynamicContentSlots.length) {
-                MauticJS.iterateCollection(dynamicContentSlots)(function(node, i) {
-                    var slotName = node.dataset.slotName;
-                    var url = '{$dwcUrl}'.replace('slotNamePlaceholder', slotName);
-        
-                    MauticJS.makeCORSRequest('GET', url, {}, function(response, xhr) {
-                        if (response.length) {
-                            node.innerHTML = response;
-                        }
-                    });
-                });
-            }
-        }, 400);
-    }, 1);
+    if (dynamicContentSlots.length) {
+        MauticJS.iterateCollection(dynamicContentSlots)(function(node, i) {
+            var slotName = node.dataset.slotName;
+            var url = '{$dwcUrl}'.replace('slotNamePlaceholder', slotName);
+
+            MauticJS.makeCORSRequest('GET', url, {}, function(response, xhr) {
+                if (response.length) {
+                    node.innerHTML = response;
+                }
+            });
+        });
+    }
 };
 
-MauticJS.documentReady(MauticJS.replaceDynamicContent);
+MauticJS.pixelLoaded(MauticJS.replaceDynamicContent);
 JS;
         $event->appendJs($js, 'Mautic Dynamic Content');
     }
