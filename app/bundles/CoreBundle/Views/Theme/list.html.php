@@ -109,7 +109,7 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                             <?php foreach ($item['config']['features'] as $feature) : ?>
                                 <span style="white-space: nowrap;">
                                     <span class="label label-default pa-4">
-                                        <?php echo $feature; ?>
+                                        <?php echo $view['translator']->trans('mautic.core.theme.feature.'.$feature); ?>
                                     </span>
                                 </span>
                             <?php endforeach; ?>
