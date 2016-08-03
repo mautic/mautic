@@ -1580,7 +1580,6 @@ abstract class AbstractIntegration
     {
         $logger = $this->factory->getLogger();
         $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e->getMessage());
-        die(var_dump($e));
     }
 
     /**
