@@ -11,7 +11,6 @@ namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use DateInterval;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -1104,20 +1103,20 @@ class ListModel extends FormModel
             $filter['owner_id'] = $this->user->getId();
         }
 
-        if(isset($filter['flag'])){
+        if (isset($filter['flag'])) {
             unset($filter['flag']);
         }
 
-        $allLists=$query->getCountQuery('lead_lists_leads', 'lead_id', 'date_added', null);
+        $allLists = $query->getCountQuery('lead_lists_leads', 'lead_id', 'date_added', null);
 
-        $lists = $query->count('lead_lists_leads', 'leadlist_id', 'date_added', $filter,null);
+        $lists = $query->count('lead_lists_leads', 'leadlist_id', 'date_added', $filter, null);
 
-        $all = $query->fetchCount($allLists);
+        $all        = $query->fetchCount($allLists);
         $identified = $lists;
-        
+
         $chart->setDataset($listName, $identified);
 
-        if(isset($filter['leadlist_id']['value'])) {
+        if (isset($filter['leadlist_id']['value'])) {
             $chart->setDataset(
                 $this->translator->trans('mautic.lead.lifecycle.graph.pie.all.lists'),
                 $all
@@ -1221,15 +1220,18 @@ class ListModel extends FormModel
         $q->select('count(l.id) as leads, h.device as device')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 't')
             ->join('t', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id')
-            ->join('t', MAUTIC_TABLE_PREFIX.'page_hits','h', 'h.lead_id=l.id')
+            ->join('t', MAUTIC_TABLE_PREFIX.'page_hits', 'h', 'h.lead_id=l.id')
             ->orderBy('device', 'DESC')
             ->andWhere($q->expr()->gte('t.date_added', ':date_from'))
             ->setParameter('date_from', $dateFrom->format('Y-m-d'))
             ->andWhere($q->expr()->lte('t.date_added', ':date_to'))
             ->setParameter('date_to', $dateTo->format('Y-m-d'." 23:59:59"));
 
-        if(isset($filter['leadlist_id']['value'])){
-            $q->andWhere($q->expr()->eq('t.leadlist_id', ':leadlistid'))->setParameter('leadlistid', $filter['leadlist_id']['value']);
+        if (isset($filter['leadlist_id']['value'])) {
+            $q->andWhere($q->expr()->eq('t.leadlist_id', ':leadlistid'))->setParameter(
+                'leadlistid',
+                $filter['leadlist_id']['value']
+            );
         }
 
         $q->groupBy('h.device');
@@ -1241,32 +1243,32 @@ class ListModel extends FormModel
 
         $results = $q->execute()->fetchAll();
 
-        foreach($results as $result){
-            $percentage = $result['leads'];
-            $data['labels'][]=substr(empty($result['device'])?  $this->translator->trans('mautic.core.unknown'): $result['device'],0,12);
-            $data['values'][]=$result['leads'];
-           // $data['backgroundColor'][]='rgba(220,220,220,0.5)';
-         }
-        $data['xAxes'][] =array('display' => true);
-        $data['yAxes'][] =array('display' => true);
+        foreach ($results as $result) {
+            $data['labels'][] = substr( empty($result['device']) ? $this->translator->trans('mautic.core.unknown') : $result['device'], 0, 12 );
+            $data['values'][] = $result['leads'];
+        }
+
+        $data['xAxes'][] = array('display' => true);
+        $data['yAxes'][] = array('display' => true);
 
         $baseData = array(
-            'label'             => $this->translator->trans('mautic.core.device'),
-            'data'              => $data['values']
+            'label' => $this->translator->trans('mautic.core.device'),
+            'data'  => $data['values']
         );
 
-        $chart     = new BarChart($data['labels']);
+        $chart = new BarChart($data['labels']);
 
-        $datasetId = count($data['values']);
         $datasets[] = array_merge($baseData, $chart->generateColors(2));
 
         $chartData = array(
-            'labels' => $data['labels'],
+            'labels'   => $data['labels'],
             'datasets' => $datasets,
-            'options' => array(
+            'options'  => array(
                 'xAxes' => $data['xAxes'],
                 'yAxes' => $data['yAxes']
-            ));
+            )
+        );
+
         return $chartData;
     }
 }

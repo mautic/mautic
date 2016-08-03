@@ -3166,8 +3166,8 @@ var Mautic = {
                     } else if (canvas.hasClass('simple-bar-chart')) {
                         Mautic.renderSimpleBarChart(canvas)
                     } else if (canvas.hasClass('horizontal-bar-chart')) {
-                    Mautic.renderHorizontalBarChart(canvas)
-                }
+                        Mautic.renderHorizontalBarChart(canvas)
+                    }
                 }
                 canvas.addClass('chart-rendered');
             });
@@ -3260,18 +3260,15 @@ var Mautic = {
                         stacked: false,
                         ticks: {fontSize: 9},
                         gridLines: {display:false},
-                        barPercentage: 35,
-
+                        barPercentage: 35
                     }],
                     yAxes: [{
                         display: false,
                         stacked: false,
                         ticks: {beginAtZero: true, display: false},
-                        gridLines: {display:false},
-
+                        gridLines: {display:false}
                     }],
-                    display: false,
-
+                    display: false
                 },
                 legend: {
                     display: false
