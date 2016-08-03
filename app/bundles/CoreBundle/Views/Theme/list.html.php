@@ -43,19 +43,20 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                     <td>
                         <?php
                         $item['id'] = $item['key'];
-                        $previewButton = $hasThumbnail ? [
+                        $previewButtonSettings = [
                             'attr' => [
                                 'data-toggle' => 'modal',
                                 'data-target' => '#theme-'.$k
                             ],
                             'btnText'   => $view['translator']->trans('mautic.asset.asset.preview'),
                             'iconClass' => 'fa fa-image'
-                        ] : [];
+                        ];
+                        $previewButton = $hasThumbnail ? $previewButtonSettings : [];
+                        $deleteButton = ['delete' => $permissions['core:themes:delete']];
+                        $templateButtons = !in_array($k, $defaultThemes) ? $deleteButton : [];
                         echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', [
                             'item'       => $item,
-                            'templateButtons' => [
-                                'delete'     => $permissions['core:themes:delete'],
-                            ],
+                            'templateButtons' => $templateButtons,
                             'routeBase'  => 'themes',
                             'langVar'    => 'core.theme',
                             'customButtons' => [

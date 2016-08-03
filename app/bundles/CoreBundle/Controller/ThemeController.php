@@ -20,16 +20,18 @@ use Symfony\Component\Form\FormError;
  */
 class ThemeController extends FormController
 {
+    /**
+     * Default themes which cannot be deleted
+     *
+     * @var array
+     */
+    protected $defaultThemes = ['sunday', 'skyline', 'oxygen', 'goldstar', 'neopolitan', 'blank'];
 
     /**
-     * @param int $page
-     *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function indexAction()
     {
-        $themeHelper = $this->container->get('mautic.helper.theme');
-
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted([
             'core:themes:view',
@@ -42,9 +44,10 @@ class ThemeController extends FormController
             return $this->accessDenied();
         }
 
-        $dir    = $this->factory->getSystemPath('themes', true);
-        $action = $this->generateUrl('mautic_themes_index');
-        $form   = $this->get('form.factory')->create('theme_upload', [], ['action' => $action]);
+        $themeHelper   = $this->container->get('mautic.helper.theme');
+        $dir           = $this->factory->getSystemPath('themes', true);
+        $action        = $this->generateUrl('mautic_themes_index');
+        $form          = $this->get('form.factory')->create('theme_upload', [], ['action' => $action]);
 
         if ($this->request->getMethod() == 'POST') {
             if (isset($form) && !$cancelled = $this->isFormCancelled($form)) {
@@ -77,10 +80,11 @@ class ThemeController extends FormController
 
         return $this->delegateView([
             'viewParameters'  => [
-                'items'       => $themeHelper->getInstalledThemes('all', true, true),
-                'form'        => $form->createView(),
-                'permissions' => $permissions,
-                'security'    => $this->factory->getSecurity()
+                'items'         => $themeHelper->getInstalledThemes('all', true, true),
+                'defaultThemes' => $this->defaultThemes,
+                'form'          => $form->createView(),
+                'permissions'   => $permissions,
+                'security'      => $this->factory->getSecurity()
             ],
             'contentTemplate' => 'MauticCoreBundle:Theme:list.html.php',
             'passthroughVars' => [
@@ -205,6 +209,11 @@ class ThemeController extends FormController
         );
     }
 
+    /**
+     * Deletes a theme
+     *
+     * @return array
+     */
     public function deleteTheme($themeName) {
         $flashes     = [];
         $themeHelper = $this->container->get('mautic.helper.theme');
@@ -217,6 +226,12 @@ class ThemeController extends FormController
             ];
         } elseif (!$this->factory->getSecurity()->isGranted('core:themes:delete')) {
             return $this->accessDenied();
+        } elseif (in_array($themeName, $this->defaultThemes)) {
+            $flashes[] = [
+                'type'    => 'error',
+                'msg'     => 'mautic.core.theme.cannot.be.removed',
+                'msgVars' => ['%theme%' => $themeName]
+            ];
         } else {
 
             try {
@@ -243,6 +258,11 @@ class ThemeController extends FormController
         return $flashes;
     }
 
+    /**
+     * A helper method to keep the code DRY
+     *
+     * @return array
+     */
     public function getIndexPostActionVars()
     {
         return [
