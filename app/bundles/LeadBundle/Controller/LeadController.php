@@ -998,7 +998,7 @@ class LeadController extends FormController
             )
         ) {
             $frequencyRules = $lead->getFrequencyRules();
-            $this->factory->getLogger()->addError(print_r($frequencyRules,true));
+
             $action = $this->generateUrl('mautic_contact_action', array('objectAction' => 'contactFrequency', 'objectId' => $lead->getId()));
 
             $form = $this->get('form.factory')->create(
@@ -1015,7 +1015,7 @@ class LeadController extends FormController
                         $model = $this->getModel('lead.lead');
                         $entity = $model->getEntity($objectId);
                         $data = $form->getData();
-                        $this->factory->getLogger()->addError(print_r($data, true));
+
                         $valid = true;
                         if ($entity === null) {
                             $flashes[] = array(

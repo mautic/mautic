@@ -61,16 +61,6 @@ class LeadList extends FormEntity
     private $leads;
 
     /**
-     * @var int
-     */
-    private $frequencyNumber;
-
-    /**
-     * @var string
-     */
-    private $frequencyTime;
-
-    /**
      * Construct
      */
     public function __construct()
@@ -291,52 +281,6 @@ class LeadList extends FormEntity
     public function getAlias()
     {
         return $this->alias;
-    }
-    /**
-     * Set alias
-     *
-     * @param string $alias
-     * @return LeadList
-     */
-    public function setFrequencyTime($frequencyTime)
-    {
-        $this->isChanged('frequencyTime', $frequencyTime);
-        $this->frequencyTime = $frequencyTime;
-
-        return $this;
-    }
-
-    /**
-     * Get alias
-     *
-     * @return string
-     */
-    public function getFrequencyTime()
-    {
-        return $this->frequencyTime;
-    }
-    /**
-     * Set alias
-     *
-     * @param string $alias
-     * @return LeadList
-     */
-    public function setFrequencyNumber($frequencyNumber)
-    {
-        $this->isChanged('frequencyNumber', $frequencyNumber);
-        $this->frequencyNumber = (int)$frequencyNumber;
-
-        return $this;
-    }
-
-    /**
-     * Get alias
-     *
-     * @return string
-     */
-    public function getFrequencyNumber()
-    {
-        return $this->frequencyNumber;
     }
 
     /**
