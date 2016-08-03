@@ -173,6 +173,11 @@ class LeadTimelineEvent extends Event
      */
     public function getEvents()
     {
+        if (empty($this->events)) {
+
+            return [];
+        }
+
         $events = call_user_func_array('array_merge', $this->events);
 
         foreach ($events as &$e) {
