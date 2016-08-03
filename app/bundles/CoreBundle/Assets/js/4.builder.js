@@ -6,6 +6,7 @@
 Mautic.launchBuilder = function (formName, actionName) {
     Mautic.builderMode     = (mQuery('#' + formName + '_template').val() == '') ? 'custom' : 'template';
     Mautic.builderFormName = formName;
+    Mautic.showChangeThemeWarning = true;
 
     mQuery('body').css('overflow-y', 'hidden');
 
@@ -34,8 +35,6 @@ Mautic.launchBuilder = function (formName, actionName) {
     // Disable the close button until everything is loaded
     mQuery('.btn-close-builder').prop('disabled', true);
 
-    var froalaDefaultHtmlCount = 69;
-
     // Load the theme from the custom HTML textarea
     var themeHtml = mQuery('textarea.builder-html').val();
 
@@ -43,16 +42,13 @@ Mautic.launchBuilder = function (formName, actionName) {
     var assets = Mautic.htmlspecialchars_decode(mQuery('[data-builder-assets]').html());
     themeHtml = themeHtml.replace('</head>', assets+'</head>');
 
-    var doc = Mautic.buildBuilderIframe(themeHtml, 'builder-template-content');
-
-    mQuery(doc).ready(function(){
+    Mautic.buildBuilderIframe(themeHtml, 'builder-template-content', function() {
         mQuery('#builder-overlay').addClass('hide');
         mQuery('.btn-close-builder').prop('disabled', false);
     });
 };
 
-Mautic.buildBuilderIframe = function(themeHtml, id) {
-
+Mautic.buildBuilderIframe = function(themeHtml, id, onLoadCallback) {
     if (mQuery('iframe#'+id).length) {
         var builder = mQuery('iframe#'+id);
     } else {
@@ -68,14 +64,18 @@ Mautic.buildBuilderIframe = function(themeHtml, id) {
         }).appendTo('.builder-content');
     }
 
+    builder.on('load', function() {
+        if (typeof onLoadCallback === 'function') {
+            onLoadCallback();
+        }
+    });
+
     // Build the iframe with the theme HTML in it
     var iframe = document.getElementById(id);
     var doc = iframe.contentDocument || iframe.contentWindow.document;
     doc.open();
     doc.write(themeHtml);
     doc.close();
-
-    return doc;
 };
 
 Mautic.htmlspecialchars_decode = function(encodedHtml) {
@@ -167,19 +167,36 @@ Mautic.destroySlots = function() {
     htmlTags[0].removeAttribute('class');
 };
 
+Mautic.clearThemeHtmlBeforeSave = function(form, callback) {
+    var form = mQuery(form);
+    var textarea = form.find('textarea.builder-html');
+
+    // update textarea from Froala's CodeMirror view on save
+    textarea.froalaEditor('events.trigger', 'form.submit');
+
+    // Return the styles added by Froala to its original state
+    var editorHtmlString = textarea.val();
+    Mautic.buildBuilderIframe(editorHtmlString, 'helper-iframe-for-html-manipulation', function() {
+        var editorHtml = mQuery('iframe#helper-iframe-for-html-manipulation').contents();
+        editorHtml = Mautic.clearFroalaStyles(editorHtml);
+        textarea.val(editorHtml.find('html').get(0).outerHTML);
+        callback();
+    });
+}
+
 Mautic.clearFroalaStyles = function(content) {
-    mQuery.each(content.find('td, th, table, strong'), function() {
-        var td = mQuery(this);
-        if (td.attr('fr-original-class')) {
-            td.attr('class', td.attr('fr-original-class'));
-            td.removeAttr('fr-original-class');
+    mQuery.each(content.find('td, th, table, [fr-original-class], [fr-original-style]'), function() {
+        var el = mQuery(this);
+        if (el.attr('fr-original-class')) {
+            el.attr('class', el.attr('fr-original-class'));
+            el.removeAttr('fr-original-class');
         }
-        if (td.attr('fr-original-style')) {
-            td.attr('style', td.attr('fr-original-style'));
-            td.removeAttr('fr-original-style');
+        if (el.attr('fr-original-style')) {
+            el.attr('style', el.attr('fr-original-style'));
+            el.removeAttr('fr-original-style');
         }
-        if (td.css('border') === '1px solid rgb(221, 221, 221)') {
-            td.css('border', '');
+        if (el.css('border') === '1px solid rgb(221, 221, 221)') {
+            el.css('border', '');
         }
     });
     content.find('link[href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css"]').remove();
@@ -483,16 +500,18 @@ Mautic.initSlotListeners = function() {
                 imageEditButtons: ['imageReplace', 'imageAlign', 'imageRemove', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
             };
 
-            slot.froalaEditor(mQuery.extend(inlineFroalaOptions, Mautic.basicFroalaOptions));
+            slot.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, inlineFroalaOptions));
             slot.froalaEditor('toolbar.hide');
         } else if (type === 'image') {
+            var image = slot.find('img');
+            // fix of badly destroyed image slot
+            image.removeAttr('data-froala.editor');
             // Init Froala editor
-            slot.find('img').froalaEditor(mQuery.extend({
+            image.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, {
                     linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
                     useClasses: false,
                     imageEditButtons: ['imageReplace', 'imageAlign', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
-                },
-                Mautic.basicFroalaOptions
+                }
             ));
         } else if (type === 'button') {
             slot.find('a').click(function(e) {
@@ -560,7 +579,9 @@ Mautic.initSlotListeners = function() {
             params.slot.froalaEditor('destroy');
             params.slot.find('.atwho-inserted').atwho('destroy');
         } else if (params.type === 'image') {
-            params.slot.find('img').froalaEditor('destroy');
+            var image = params.slot.find('img');
+            image.removeAttr('data-froala.editor');
+            image.froalaEditor('destroy');
         }
 
         // Remove Symfony toolbar

@@ -11,22 +11,25 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'page');
 
 $variantParent = $activePage->getVariantParent();
-$subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.page.header.editvariant', array(
+$subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.page.header.editvariant', [
     '%name%' => $activePage->getTitle(),
     '%parent%' => $variantParent->getTitle()
-)) . '</span></div>' : '';
+]) . '</span></div>' : '';
 
 $header = ($activePage->getId()) ?
     $view['translator']->trans('mautic.page.header.edit',
-        array('%name%' => $activePage->getTitle())) :
+        ['%name%' => $activePage->getTitle()]) :
     $view['translator']->trans('mautic.page.header.new');
 
 $view['slots']->set("headerTitle", $header.$subheader);
 
 $template = $form['template']->vars['data'];
+
+$attr = $form->vars['attr'];
+$attr['data-submit-callback-async'] = "clearThemeHtmlBeforeSave";
 ?>
 
-<?php echo $view['form']->start($form); ?>
+<?php echo $view['form']->start($form, ['attr' => $attr]); ?>
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- container -->
@@ -48,11 +51,11 @@ $template = $form['template']->vars['data'];
                             </div>
                         </div>
 
-                        <?php echo $view->render('MauticCoreBundle:Helper:theme_select.html.php', array(
+                        <?php echo $view->render('MauticCoreBundle:Helper:theme_select.html.php', [
                             'type'   => 'page',
                             'themes' => $themes,
                             'active' => $form['template']->vars['value']
-                        )); ?>
+                        ]); ?>
                     </div>
 
                     <div class="tab-pane fade bdr-w-0" id="source-container">
@@ -106,10 +109,10 @@ $template = $form['template']->vars['data'];
 </div>
 <?php echo $view['form']->end($form); ?>
 
-<?php echo $view->render('MauticCoreBundle:Helper:builder.html.php', array(
+<?php echo $view->render('MauticCoreBundle:Helper:builder.html.php', [
     'type'          => 'page',
     'sectionForm'   => $sectionForm,
     'builderAssets' => $builderAssets,
     'slots'         => $slots,
     'objectId'      => $activePage->getSessionId()
-)); ?>
+]); ?>
