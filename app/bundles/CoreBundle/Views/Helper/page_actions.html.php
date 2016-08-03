@@ -24,6 +24,8 @@ echo '<div class="std-toolbar btn-group">';
 
 foreach ($templateButtons as $action => $enabled) {
 
+    if (!$enabled) continue;
+
     $btnClass = 'btn btn-default';
 
     switch ($action) {
