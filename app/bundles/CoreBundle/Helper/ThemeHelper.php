@@ -352,7 +352,6 @@ class ThemeHelper
      */
     public function install($zipFile)
     {
-
         if (file_exists($zipFile) === false) {
             throw new MauticException\FileNotFoundException();
         }
@@ -370,7 +369,7 @@ class ThemeHelper
             throw new \Exception($this->getExtractError($archive));
         } else {
             $containsConfig = false;
-            $allowedExtensions = ['', 'json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif'];
+            $allowedExtensions = ['', 'json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'tiff'];
             $allowedFiles = [];
             for ($i = 0; $i < $zipper->numFiles; $i++) {
                 $entry     = $zipper->getNameIndex($i);
