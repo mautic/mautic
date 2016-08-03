@@ -294,14 +294,14 @@ class AjaxController extends CommonAjaxController
                             $translator->trans('mautic.email.config.mailer.transport.test_send.body')
                         );
 
-                        $user = $this->factory->getUser();
-                        $userFullName=trim($user->getFirstName().' '.$user->getLastName());
+                        $user         = $this->factory->getUser();
+                        $userFullName = trim($user->getFirstName().' '.$user->getLastName());
 
-                        $message->setFrom(array($settings['from_email'] => $settings['from_name']));
+                        $message->setFrom([$settings['from_email'] => $settings['from_name']]);
                         if ($userFullName) {
-                            $message->setTo(array($user->getEmail() => $user->getFirstName().' '.$user->getLastName()));
+                            $message->setTo([$user->getEmail() => $user->getFirstName().' '.$user->getLastName()]);
                         } else {
-                            $message->setTo(array($user->getEmail()));
+                            $message->setTo([$user->getEmail()]);
                         }
 
                         $mailer->send($message);
@@ -311,7 +311,7 @@ class AjaxController extends CommonAjaxController
                     $dataArray['message'] = $translator->trans('mautic.core.success');
 
                 } catch (\Exception $e) {
-                    $dataArray['message'] = $e->getMessage() . '<br />' . $logger->dump();
+                    $dataArray['message'] = $e->getMessage().'<br />'.$logger->dump();
                 }
             }
         }

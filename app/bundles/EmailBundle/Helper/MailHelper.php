@@ -926,9 +926,9 @@ class MailHelper
     {
         if (!is_array($addresses)) {
             if (($name !== null) && (trim($name))) {
-                $addresses = array($addresses => trim($name));
+                $addresses = [$addresses => trim($name)];
             } else {
-                $addresses = array($addresses);
+                $addresses = [$addresses];
             }
         }
 
