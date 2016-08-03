@@ -925,7 +925,11 @@ class MailHelper
     public function setTo($addresses, $name = null)
     {
         if (!is_array($addresses)) {
-            $addresses = array($addresses => $name);
+            if (($name !== null) && (trim($name))) {
+                $addresses = [$addresses => trim($name)];
+            } else {
+                $addresses = [$addresses];
+            }
         }
 
         $this->checkBatchMaxRecipients(count($addresses));
