@@ -16,9 +16,9 @@ use Mautic\CoreBundle\Doctrine\TranslationMigrationTrait;
 use Mautic\CoreBundle\Doctrine\VariantMigrationTrait;
 
 /**
- * Class Version20160726000000
+ * Class Version20160726000001
  */
-class Version20160726000000 extends AbstractMauticMigration
+class Version20160726000001 extends AbstractMauticMigration
 {
     use TranslationMigrationTrait;
     use VariantMigrationTrait;
