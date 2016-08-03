@@ -47,6 +47,13 @@ class GenerateMigrationsCommand extends AbstractCommand
 
     private static $_template =
             '<?php
+/**
+ * @package     Mautic
+ * @copyright   <year> Mautic Contributors. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.org
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
 
 namespace Mautic\Migrations;
 
@@ -115,7 +122,7 @@ EOT
 
     protected function generateMigration(InputInterface $input, $version, $up = null, $down = null)
     {
-        $code = str_replace('<version>', $version, self::$_template);
+        $code = str_replace(['<version>', '<year>'], [$version, date('Y')], self::$_template);
         $code = preg_replace('/^ +$/m', '', $code);
         $dir = MAUTIC_ROOT_DIR.'/app/migrations';
         $path = $dir . '/Version' . $version . '.php';
