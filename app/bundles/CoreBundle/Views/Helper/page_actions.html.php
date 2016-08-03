@@ -27,6 +27,8 @@ foreach ($templateButtons as $action => $enabled) {
         continue;
     }
 
+    if (!$enabled) continue;
+
     $btnClass = 'btn btn-default';
 
     switch ($action) {

@@ -46,6 +46,6 @@ class DynamicContentApiController extends CommonController
         $lead    = $this->getModel('lead')->getCurrentLead();
         $content = $this->get('mautic.helper.dynamicContent')->getDynamicContentForLead($objectAlias, $lead);
         
-        return empty($content) ? new Response('', Response::HTTP_NOT_FOUND) : new Response($content);
+        return empty($content) ? new Response('', Response::HTTP_NO_CONTENT) : new Response($content);
     }
 }
