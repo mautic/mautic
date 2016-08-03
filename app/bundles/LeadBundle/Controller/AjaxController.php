@@ -64,8 +64,7 @@ class AjaxController extends CommonAjaxController
         if ($field && $value) {
             $repo        = $this->getModel('lead.lead')->getRepository();
             $leads       = $repo->getLeadsByFieldValue($field, $value, $ignore);
-            $messageArgs = ['%field%' => $field, '%value%' => $value];
-            $dataArray['existsMessage'] = $this->factory->getTranslator()->trans('mautic.lead.exists.by.field', $messageArgs).': ';
+            $dataArray['existsMessage'] = $this->factory->getTranslator()->trans('mautic.lead.exists.by.field').': ';
 
             foreach ($leads as $lead) {
                 $fields = $repo->getFieldValues($lead->getId());
