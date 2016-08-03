@@ -136,6 +136,13 @@ $template = '<div class="col-md-6">{content}</div>';
         </div>
         <?php endif; ?>
 
+        <?php if (isset($fields['dev_hosts'])): ?>
+            <hr class="text-muted" />
+            <div class="row">
+                <?php echo $view['form']->rowIfExists($fields, 'dev_hosts', $template); ?>
+            </div>
+        <?php endif; ?>
+
         <?php if (isset($fields['transifex_username'])): ?>
         <hr class="text-muted" />
         <div class="row">
