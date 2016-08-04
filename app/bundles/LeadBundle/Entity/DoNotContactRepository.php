@@ -91,7 +91,7 @@ class DoNotContactRepository extends CommonRepository
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
-                $query->expr()->like('dc.channel', $query->expr()->literal('%' . $options['search'] . '%'))
+                $query->expr()->like('dnc.channel', $query->expr()->literal('%' . $options['search'] . '%'))
             );
         }
 
