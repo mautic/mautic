@@ -1186,10 +1186,10 @@ class CampaignController extends FormController
     private function setSessionSources($id, $sources)
     {
         $session = $this->factory->getSession();
-        foreach ($sources as $type => &$typeSources) {
+        foreach ($sources as $type => $typeSources) {
             if (!empty($typeSources)) {
-                $typeSources = array_keys($typeSources);
-                $typeSources = array_combine($typeSources, $typeSources);
+                $typeSources    = array_keys($typeSources);
+                $sources[$type] = array_combine($typeSources, $typeSources);
             }
         }
 
