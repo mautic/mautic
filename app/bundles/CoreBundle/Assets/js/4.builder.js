@@ -423,6 +423,15 @@ Mautic.initSlotListeners = function() {
             // Trigger the slot:change event
             slot.trigger('slot:selected', slot);
 
+            // Destroy previously initiated minicolors
+            var minicolors = parent.mQuery('#slot-form-container .minicolors');
+            if (minicolors.length) {
+                parent.mQuery('#slot-form-container input[data-toggle="color"]').each(function() {
+                    mQuery(this).minicolors('destroy');
+                });
+                parent.mQuery('#slot-form-container').off('change.minicolors');
+            }
+
             // Update form in the Customize tab to the form of the focused slot type
             var focusType = mQuery(this).attr('data-slot');
             var focusForm = mQuery(parent.mQuery('script[data-slot-type-form="'+focusType+'"]').html());
@@ -563,7 +572,6 @@ Mautic.initSlotListeners = function() {
     Mautic.builderContents.on('slot:change', function(event, params) {
         // Change some slot styles when the values are changed in the slot edit form
         var fieldParam = params.field.attr('data-slot-param');
-        
         if (fieldParam === 'padding-top' || fieldParam === 'padding-bottom') {
             params.slot.css(fieldParam, params.field.val() + 'px');
         } else if (fieldParam === 'href') {
