@@ -11,6 +11,7 @@ namespace MauticPlugin\MauticOutlookBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends CommonFormController
@@ -36,14 +37,10 @@ class PublicController extends CommonFormController
 
                 // generate signature
                 $salt = $keys['secret'];
-
-                // add MD5 prefix
                 if (strpos($salt, '$1$') === FALSE)
-                    $salt = '$1$'.$salt;
-
+                    $salt = '$1$'.$salt; // add MD5 prefix
                 $cr = crypt(urlencode($query['d']), $salt);
-
-                $mySig = hash('crc32b', $cr); // this hash is used in c#
+                $mySig = hash('crc32b', $cr); // this hash type is used in c#
 
                 // compare signatures
                 if (hash_equals($mySig, $query['sig'])) {
@@ -61,60 +58,86 @@ class PublicController extends CommonFormController
                     /** @var \Mautic\EmailBundle\Model\EmailModel $model */
                     $model = $this->getModel('email');
 
-                    $idHash = hash('crc32', $query['body']);
-                    $idHash = substr($idHash.$idHash, 0, 13); // 13 bytes length
+                    // email is a semicolon delimited list of emails
+                    $emails = explode(';', $query['email']);
+                    $repo = $this->getModel('lead')->getRepository();
 
-                    $stat = $model->getEmailStatus($idHash);
-
-                    // sytat doesn't exist, create one
-                    if ($stat === null) {
-
-                        // email is a semicolon delimited list of emails
-                        $emails = explode(';', $query['email']);
-
-                        $lead = null;
-                        $to = '';
-
-                        foreach ($emails as $email) {
-                            $lead = $this->getModel('lead')->getRepository()->getLeadByEmail($email);
-                            if ($lead !== null) {
-                                $to = $email;
-                                break;
-                            }
+                    foreach ($emails as $email) {
+                        $lead = $repo->getLeadByEmail($email);
+                        if ($lead === null) {
+                            $lead = $this->createLead($email, $repo);
                         }
 
-                        if ($lead !== null) {
-                            $mailer = $this->factory->getMailer();
+                        if ($lead === null) continue; // lead was not created
 
-                            // To lead
-                            $mailer->addTo($to);
+                        $idHash = hash('crc32', $email.$query['body']);
+                        $idHash = substr($idHash.$idHash, 0, 13); // 13 bytes length
 
-                            // sanitize variables to prevent malicious content
-                            $from = filter_var($query['from'], FILTER_SANITIZE_EMAIL);
-                            $mailer->setFrom($from, '');
+                        $stat = $model->getEmailStatus($idHash);
 
-                            // Set Content
-                            $body = filter_var($query['body'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
-                            $mailer->setBody($body);
-                            $mailer->parsePlainText($body);
-
-                            // Set lead
-                            $mailer->setLead($lead);
-                            $mailer->setIdHash($idHash);
-
-                            $subject = filter_var($query['subject'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
-                            $mailer->setSubject($subject);
-                            $mailer->createEmailStat();
+                        // stat doesn't exist, create one
+                        if ($stat === null) {
+                            $this->addStat($lead, $email, $query, $idHash);
                         }
 
+                        $model->hitEmail($idHash, $this->request); // add email event
                     }
-
-                    $model->hitEmail($idHash, $this->request);
                 }
             }
         }
 
-        return TrackingPixelHelper::getResponse($this->request);
+        return TrackingPixelHelper::getResponse($this->request); // send gif
+    }
+
+    /**
+     * @param $lead
+     * @param $email
+     * @param $query
+     * @param $idHash
+     */
+    public function addStat($lead, $email, $query, $idHash)
+    {
+        if ($lead !== null) {
+            $mailer = $this->factory->getMailer();
+
+            // To lead
+            $mailer->addTo($email);
+
+            // sanitize variables to prevent malicious content
+            $from = filter_var($query['from'], FILTER_SANITIZE_EMAIL);
+            $mailer->setFrom($from, '');
+
+            // Set Content
+            $body = filter_var($query['body'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
+            $mailer->setBody($body);
+            $mailer->parsePlainText($body);
+
+            // Set lead
+            $mailer->setLead($lead);
+            $mailer->setIdHash($idHash);
+
+            $subject = filter_var($query['subject'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
+            $mailer->setSubject($subject);
+            $mailer->createEmailStat();
+        }
+    }
+
+    /**
+     * @param $email
+     * @param $repo
+     * @return mixed
+     */
+    public function createLead($email, $repo)
+    {
+        $model = $this->getModel('lead.lead');
+        $lead  = $model->getEntity();
+        // set custom field values
+        $data = ['email'=>$email];
+        $model->setFieldValues($lead, $data, true);
+        // create lead
+        $model->saveEntity($lead);
+        // return entity
+        return $repo->getLeadByEmail($email);
     }
 
 }
