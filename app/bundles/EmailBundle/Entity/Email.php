@@ -358,7 +358,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             )
         );
 
-        $metadata->addConstraint(new Callback(array(
+        $metadata->addConstraint(new Callback([
             'callback' => function (Email $email, ExecutionContextInterface $context) {
                 $type = $email->getEmailType();
                 $translationParent = $email->getTranslationParent();
@@ -367,25 +367,21 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     $validator  = $context->getValidator();
                     $violations = $validator->validate(
                         $email->getLists(),
-                        array(
-                            new LeadListAccess(
-                                array(
-                                    'message' => 'mautic.lead.lists.required'
-                                )
-                            ),
+                        [
+                            new LeadListAccess(),
                             new NotBlank(
-                                array(
+                                [
                                     'message' => 'mautic.lead.lists.required'
-                                )
+                                ]
                             )
-                        )
+                        ]
                     );
-
                     if (count($violations) > 0) {
-                        $string = (string) $violations;
-                        $context->buildViolation($string)
-                            ->atPath('lists')
-                            ->addViolation();
+                        foreach ($violations as $violation) {
+                            $context->buildViolation($violation->getMessage())
+                                ->atPath('lists')
+                                ->addViolation();
+                        }
                     }
                 }
 
@@ -407,7 +403,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     }
                 }
             }
-        )));
+        ]));
     }
 
     /**

@@ -24,7 +24,7 @@ class FormFieldTextType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $editor = ($options['editor']) ? ' editor-basic' : '';
+        $editor = ($options['editor']) ? ' editor editor-basic' : '';
 
         $builder->add('text', 'textarea', array(
             'label'      => 'mautic.form.field.type.freetext',

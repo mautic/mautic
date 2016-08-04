@@ -87,16 +87,21 @@ Mautic.emailOnLoad = function (container, response) {
         Mautic.activateSearchAutocomplete('list-search', 'email');
     }
 
+    var textarea = mQuery('#emailform_customHtml');
+
     mQuery(document).on('shown.bs.tab', function (e) {
-        mQuery('#emailform_customHtml').froalaEditor('popups.hideAll');
+        textarea.froalaEditor('popups.hideAll');
+    });
+
+    mQuery('a[href="#source-container"]').on('shown.bs.tab', function (e) {
+        textarea.froalaEditor('html.set', textarea.val());
     });
 
     mQuery('.btn-builder').on('click', function (e) {
-        mQuery('#emailform_customHtml').froalaEditor('popups.hideAll');
+        textarea.froalaEditor('popups.hideAll');
     });
 
     Mautic.intiSelectTheme(mQuery('#emailform_template'));
-    Mautic.fixFroalaEmailOutput();
 
     var plaintext = mQuery('#emailform_plainText');
     Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
@@ -109,21 +114,50 @@ Mautic.emailOnUnload = function(id) {
     mQuery('#emailform_customHtml').froalaEditor('popups.hideAll');
 };
 
-Mautic.fixFroalaEmailOutput = function() {
-    if (mQuery('form[name="emailform"]').length) {
-        var textarea = mQuery('textarea.builder-html');
-        mQuery('form[name="emailform"]').on('before.submit.ajaxform', function() {
-            // update textarea from Froala's CodeMirror view on save
-            textarea.froalaEditor('events.trigger', 'form.submit');
+Mautic.insertEmailBuilderToken = function(editorId, token) {
+    var editor = Mautic.getEmailBuilderEditorInstances();
+    editor[instance].insertText(token);
+};
 
-            var editorHtmlString = textarea.val();
-            Mautic.buildBuilderIframe(editorHtmlString, 'helper-iframe-for-html-manipulation');
-            var editorHtml = mQuery('iframe#helper-iframe-for-html-manipulation').contents();
-            editorHtml = Mautic.clearFroalaStyles(editorHtml);
-            textarea.val(editorHtml.find('html').get(0).outerHTML);
-        });
+Mautic.getEmailAbTestWinnerForm = function(abKey) {
+    if (abKey && mQuery(abKey).val() && mQuery(abKey).closest('.form-group').hasClass('has-error')) {
+        mQuery(abKey).closest('.form-group').removeClass('has-error');
+        if (mQuery(abKey).next().hasClass('help-block')) {
+            mQuery(abKey).next().remove();
+        }
     }
-}
+
+    Mautic.activateLabelLoadingIndicator('emailform_variantSettings_winnerCriteria');
+    var emailId = mQuery('#emailform_sessionId').val();
+
+    var query = "action=email:getAbTestForm&abKey=" + mQuery(abKey).val() + "&emailId=" + emailId;
+
+    mQuery.ajax({
+        url: mauticAjaxUrl,
+        type: "POST",
+        data: query,
+        dataType: "json",
+        success: function (response) {
+            if (typeof response.html != 'undefined') {
+                if (mQuery('#emailform_variantSettings_properties').length) {
+                    mQuery('#emailform_variantSettings_properties').replaceWith(response.html);
+                } else {
+                    mQuery('#emailform_variantSettings').append(response.html);
+                }
+
+                if (response.html != '') {
+                    Mautic.onPageLoad('#emailform_variantSettings_properties', response);
+                }
+            }
+        },
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+        },
+        complete: function() {
+            Mautic.removeLabelLoadingIndicator();
+        }
+    });
+};
 
 Mautic.loadNewEmailWindow = function(options) {
     if (options.windowUrl) {

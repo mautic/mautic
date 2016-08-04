@@ -39,14 +39,18 @@ class DynamicFiltersType extends AbstractType
                 'required'   => false
             ];
 
-            switch ($definition['type']){
+            switch ($definition['type']) {
                 case 'bool':
                 case 'boolean':
-                    $type = 'yesno_button_group';
-                    $args['choice_list'] = new ChoiceList(
-                        array(false, true, ''),
-                        array('mautic.core.form.no', 'mautic.core.form.yes', 'mautic.core.form.reset')
-                    );
+                    $type = 'button_group';
+                    $args['choices_as_values'] = true;
+                    $args['choices'] = [
+                        [
+                            'mautic.core.form.no'    => false,
+                            'mautic.core.form.yes'   => true,
+                            'mautic.core.form.reset' => ''
+                        ]
+                    ];
 
                     if (isset($options['data'][$definition['alias']])) {
                         $args['data'] = ((int) $options['data'][$definition['alias']] == 1);

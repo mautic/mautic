@@ -338,7 +338,7 @@ class AjaxController extends CommonAjaxController
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
             /** @var \Mautic\LeadBundle\Entity\DoNotContact $dnc */
-            $dnc = $this->getEntityManager()->getRepository('MauticLeadBundle:DoNotContact')->findOneBy(
+            $dnc = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->findOneBy(
                 [
                     'id' => $dncId
                 ]
