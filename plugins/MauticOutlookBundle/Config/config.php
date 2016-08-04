@@ -20,5 +20,21 @@ return array(
                 'controller' => 'MauticOutlookBundle:Public:trackingImage'
             ]
         ]
+    ),
+
+    'services'    => array(
+        'events' => array(
+            'mautic.outlook.formbundle.subscriber' => array(
+                'class' => 'MauticPlugin\MauticOutlookBundle\EventListener\FormSubscriber'
+            )
+        ),
+        'forms'  => array(
+            'mautic.form.type.fieldslist.selectidentifier'  => array(
+                'class' => 'MauticPlugin\MauticOutlookBundle\Form\Type\FormFieldsType',
+                'arguments' => 'mautic.factory',
+                'alias' => 'formfields_list'
+            )
+        )
     )
+
 );

@@ -10,15 +10,7 @@
 namespace MauticPlugin\MauticOutlookBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\CoreBundle\Helper\EmojiHelper;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
-use Mautic\EmailBundle\Helper\MailHelper;
-use Mautic\EmailBundle\Entity\Email;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
-use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceCallbackTransport;
-use Mautic\EmailBundle\EmailEvents;
-use Mautic\EmailBundle\Event\EmailSendEvent;
-use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends CommonFormController
@@ -29,72 +21,96 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction()
     {
+        $logger = $this->factory->getLogger();
+
         // if additional data were sent with the tracking pixel
         if ($this->request->server->get('QUERY_STRING')) {
             parse_str($this->request->server->get('QUERY_STRING'), $query);
 
             // URL attr 'd' is encoded so let's decode it first.
-            if (isset($query['d'])) {
-                // parse_str auto urldecodes
-                $b64 = base64_decode($query['d']);
-                $gz = gzdecode($b64);
-                parse_str($gz, $query);
-            }
+            if (isset($query['d'], $query['sig'])) {
+                // get secret from Outlook plugin settings
+                $integrationHelper = $this->factory->getHelper('integration');
+                $outlookIntegration = $integrationHelper->getIntegrationObject('Outlook');
+                $keys = $outlookIntegration->getDecryptedApiKeys();
 
-            if (!empty($query) && isset($query['email']) && isset($query['subject']) && isset($query['body'])) {
+                // generate signature
+                $salt = $keys['secret'];
 
-                /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-                $model = $this->getModel('email');
+                // add MD5 prefix
+                if (strpos($salt, '$1$') === FALSE)
+                    $salt = '$1$'.$salt;
 
-                $idHash = hash('crc32', $query['body']);
-                $idHash = substr($idHash . $idHash, 0, 13); // 13 bytes length
+                $cr = crypt(urlencode($query['d']), $salt);
 
-                $stat = $model->getEmailStatus($idHash);
+                $mySig = hash('crc32b', $cr); // this hash is used in c#
 
-                // sytat doesn't exist, create one
-                if ($stat === null) {
-
-                    // email is a semicolon delimited list of emails
-                    $emails = explode(';', $query['email']);
-
-                    $lead = null;
-                    $to = '';
-
-                    foreach ($emails as $email) {
-                        $lead = $this->getModel('lead')->getRepository()->getLeadByEmail($email);
-                        if ($lead !== null) {
-                            $to = $email;
-                            break;
-                        }
-                    }
-
-                    if ($lead !== null) {
-                        $mailer = $this->factory->getMailer();
-
-                        // To lead
-                        $mailer->addTo($to);
-
-                        $mailer->setFrom($query['from'], '');
-
-                        // Set Content
-                        BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($query['body']);
-                        $mailer->setBody($query['body']);
-                        $mailer->parsePlainText($query['body']);
-
-                        // Set lead
-                        $mailer->setLead($lead);
-                        $mailer->setIdHash($idHash);
-
-                        $mailer->setSubject($query['subject']);
-
-                        // Ensure safe emoji for notification
-                        $subject = EmojiHelper::toHtml($query['subject']);
-                        $mailer->createEmailStat();
-                    }
-
+                // compare signatures
+                if (hash_equals($mySig, $query['sig'])) {
+                    // decode and parse query variables
+                    $b64 = base64_decode($query['d']);
+                    $gz = gzdecode($b64);
+                    parse_str($gz, $query);
+                } else {
+                    // signatures don't match: stop
+                    unset($query);
                 }
 
-                $model->hitEmail($idHash, $this->request);
+                if (!empty($query) && isset($query['email'], $query['subject'], $query['body'])) {
+
+                    /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+                    $model = $this->getModel('email');
+
+                    $idHash = hash('crc32', $query['body']);
+                    $idHash = substr($idHash.$idHash, 0, 13); // 13 bytes length
+
+                    $stat = $model->getEmailStatus($idHash);
+
+                    // sytat doesn't exist, create one
+                    if ($stat === null) {
+
+                        // email is a semicolon delimited list of emails
+                        $emails = explode(';', $query['email']);
+
+                        $lead = null;
+                        $to = '';
+
+                        foreach ($emails as $email) {
+                            $lead = $this->getModel('lead')->getRepository()->getLeadByEmail($email);
+                            if ($lead !== null) {
+                                $to = $email;
+                                break;
+                            }
+                        }
+
+                        if ($lead !== null) {
+                            $mailer = $this->factory->getMailer();
+
+                            // To lead
+                            $mailer->addTo($to);
+
+                            // sanitize variables to prevent malicious content
+                            $from = filter_var($query['from'], FILTER_SANITIZE_EMAIL);
+                            $mailer->setFrom($from, '');
+
+                            // Set Content
+                            $body = filter_var($query['body'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
+                            $mailer->setBody($body);
+                            $mailer->parsePlainText($body);
+
+                            // Set lead
+                            $mailer->setLead($lead);
+                            $mailer->setIdHash($idHash);
+
+                            $subject = filter_var($query['subject'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
+                            $mailer->setSubject($subject);
+                            $mailer->createEmailStat();
+                        }
+
+                    }
+
+                    $model->hitEmail($idHash, $this->request);
+                }
             }
         }
 
