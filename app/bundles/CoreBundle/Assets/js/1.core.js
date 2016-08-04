@@ -559,8 +559,8 @@ var Mautic = {
                     editor.popups.hideAll();
                 });
 
-                var maxButtons = ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikeThrough', 'fontFamily', 'fontSize', 'color', 'paragraphFormat', 'align', 'orderedList', 'unorderedList', 'quote', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertImage','insertTable', 'html', 'fullscreen'];
-                var minButtons = ['bold', 'italic', 'underline'];
+                var maxButtons = ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting','insertLink', 'insertImage','insertTable', 'html', 'fullscreen'];
+                var minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
 
                 if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
                     var options = {
@@ -582,19 +582,25 @@ var Mautic = {
                         Mautic.showChangeThemeWarning = true;
                     });
 
-                    textarea.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, options));
-                } else {
-                    textarea.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, {
-                        toolbarButtons: minButtons,
-                        toolbarButtonsMD: minButtons,
-                        toolbarButtonsSM: minButtons,
-                        toolbarButtonsXS: minButtons,
-                        heightMin: 100
-                    }));
+                    textarea.froalaEditor(mQuery.extend(options, Mautic.basicFroalaOptions));
+                } else if (editorClass == 'editor') {
 
-                }
-            });
-        }
+                        textarea.froalaEditor(mQuery.extend({
+                            // Set custom buttons with separator between them.
+                            toolbarButtons: minButtons,
+                            heightMin: 100
+                        }, Mautic.basicFroalaOptions));
+
+                    } else {
+                        textarea.froalaEditor(mQuery.extend({
+                            toolbarButtons: minButtons,
+                            heightMin: 100
+                        }, Mautic.basicFroalaOptions));
+
+                    }
+                });
+            }
+        });
 
         //activate shuffles
         if (mQuery('.shuffle-grid').length) {
@@ -3391,7 +3397,7 @@ var Mautic = {
             mQuery('[data-theme]').click(function(e) {
                 e.preventDefault();
                 var currentLink = mQuery(this);
-                
+
                 if (Mautic.showChangeThemeWarning && customHtml.val().length) {
                     if (confirm('You will lose the current content if you switch the theme.')) {
                         customHtml.val('');
