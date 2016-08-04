@@ -663,6 +663,12 @@ Mautic.launchCampaignEditor = function() {
     }
 };
 
+/**
+ * Validate a connection before it can be made
+ *
+ * @param params
+ * @returns {boolean}
+ */
 Mautic.campaignBeforeDropCallback = function(params) {
     var sourceEndpoint = Mautic.campaignBuilderGetEndpointDetails(params.connection.endpoints[0]);
     var targetEndpoint = Mautic.campaignBuilderGetEndpointDetails(params.dropEndpoint);
@@ -746,6 +752,9 @@ Mautic.campaignToggleTimeframes = function() {
     }
 };
 
+/**
+ * Close campaign builder
+ */
 Mautic.closeCampaignBuilder = function() {
     var builderCss = {
         margin: "0",
@@ -823,6 +832,10 @@ Mautic.closeCampaignBuilder = function() {
     });
 };
 
+/**
+ * Submit the campaign event form
+ * @param e
+ */
 Mautic.submitCampaignEvent = function(e) {
     e.preventDefault();
 
@@ -833,6 +846,10 @@ Mautic.submitCampaignEvent = function(e) {
     mQuery('form[name="campaignevent"]').submit();
 };
 
+/**
+ * Submit source form
+ * @param e
+ */
 Mautic.submitCampaignSource = function(e) {
     e.preventDefault();
 
@@ -842,7 +859,15 @@ Mautic.submitCampaignSource = function(e) {
     mQuery('form[name="campaign_leadsource"]').submit();
 };
 
-    Mautic.campaignBuilderRegisterEndpoint = function (name, color, isTarget, connectorColor) {
+/**
+ * Register an endpoint with JsPlumb
+ *
+ * @param name
+ * @param color
+ * @param isTarget
+ * @param connectorColor
+ */
+Mautic.campaignBuilderRegisterEndpoint = function (name, color, isTarget, connectorColor) {
     var isSource = true;
     if (typeof isTarget == 'undefined') {
         isTarget = false;
@@ -872,6 +897,12 @@ Mautic.submitCampaignSource = function(e) {
     }
 };
 
+/**
+ * Register an anchor with JsPlumb
+ *
+ * @param names
+ * @param el
+ */
 Mautic.campaignBuilderRegisterAnchors = function(names, el) {
     var id = mQuery(el).attr('id');
 
@@ -1124,7 +1155,7 @@ Mautic.campaignBuilderRegisterAnchors = function(names, el) {
             Mautic.campaignBuilderUpdateEventList(allowedEvents, false, 'groups');
 
             // Disable the list items not allowed
-            mQuery('.campaign-event-selector option').prop('disabled', false);
+            mQuery('.campaign-event-selector:not(#SourceList) option').prop('disabled', false);
             var selectId = (epDetails.eventType == 'decision') ? '#ActionList': '#DecisionList';
             mQuery(selectId+' option').each(function() {
                 var optionVal = mQuery(this).val();
@@ -1137,6 +1168,12 @@ Mautic.campaignBuilderRegisterAnchors = function(names, el) {
     });
 };
 
+/**
+ * Extract information about an event/endpoint from element
+ *
+ * @param el
+ * @returns {{left: Number, top: Number}}
+ */
 Mautic.campaignBuilderGetEventPosition = function(el) {
     return {
         'left': parseInt(mQuery(el).css('left')),
@@ -1144,6 +1181,15 @@ Mautic.campaignBuilderGetEventPosition = function(el) {
     }
 };
 
+/**
+ * Update the event select list
+ *
+ * @param groups
+ * @param hidden
+ * @param view
+ * @param active
+ * @param forcePosition
+ */
 Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, forcePosition) {
     var groupsEnabled = 0;
     var inGroupsView = ('groups' == view);
@@ -1236,6 +1282,9 @@ Mautic.campaignBuilderGetEndpointDetails = function(endpoint) {
     };
 };
 
+/**
+ * Display new source when required
+ */
 Mautic.campaignBuilderPrepareNewSource = function () {
     var newSourcePos = {
         left: mQuery(window).width()/2 - 100,
