@@ -29,7 +29,8 @@ class ConsoleDatetimeOutput extends ConsoleOutput implements ConsoleOutputInterf
      * @param string $message
      * @param bool $newline
      */
-    protected function doWrite($message, $newline) {
+    protected function doWrite($message, $newline)
+    {
         $date = (new \DateTime())->format('Y-m-d H:i:s');
 
         if ($message != "") {
