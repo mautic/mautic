@@ -51,6 +51,7 @@ class EmailSendType extends AbstractType
                     'onchange' => 'Mautic.disabledEmailAction()'
                 ],
                 'multiple'    => false,
+                'required'    => true,
                 'constraints' => [
                     new NotBlank(
                         ['message' => 'mautic.email.chooseemail.notblank']
