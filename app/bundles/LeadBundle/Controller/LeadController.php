@@ -1307,7 +1307,7 @@ class LeadController extends FormController
 
                         while ($batchSize && !$file->eof()) {
                             $data = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
-                            array_walk($data, create_function('&$val', '$val = trim($val); $val = mb_convert_encoding($val, "UTF-8", "'.$config['encoding'].'" );'));
+                            array_walk($data, create_function('&$val', '$val = trim($val);'));
 
                             if ($lineNumber === 0) {
                                 $lineNumber++;
