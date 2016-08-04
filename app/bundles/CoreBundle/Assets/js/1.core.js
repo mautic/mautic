@@ -559,7 +559,7 @@ var Mautic = {
                     editor.popups.hideAll();
                 });
 
-                var maxButtons = ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting','insertLink', 'insertImage','insertTable', 'html', 'fullscreen'];
+                var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'];
                 var minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
 
                 if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
@@ -583,24 +583,15 @@ var Mautic = {
                     });
 
                     textarea.froalaEditor(mQuery.extend(options, Mautic.basicFroalaOptions));
-                } else if (editorClass == 'editor') {
-
-                        textarea.froalaEditor(mQuery.extend({
-                            // Set custom buttons with separator between them.
-                            toolbarButtons: minButtons,
-                            heightMin: 100
-                        }, Mautic.basicFroalaOptions));
-
-                    } else {
-                        textarea.froalaEditor(mQuery.extend({
-                            toolbarButtons: minButtons,
-                            heightMin: 100
-                        }, Mautic.basicFroalaOptions));
-
-                    }
-                });
-            }
-        });
+                } else {
+                    textarea.froalaEditor(mQuery.extend({
+                        // Set custom buttons with separator between them.
+                        toolbarButtons: minButtons,
+                        heightMin: 100
+                    }, Mautic.basicFroalaOptions));
+                }
+            });
+        }
 
         //activate shuffles
         if (mQuery('.shuffle-grid').length) {
