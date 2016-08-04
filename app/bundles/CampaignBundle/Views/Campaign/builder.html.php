@@ -208,38 +208,43 @@
         $labels = [];
 
         foreach ($canvasSettings['connections'] as $connection):
-        if (isset($labels[$connection['targetId']]) || !isset($campaignEvents[$connection['targetId']])) {
+        if (isset($campaignEvents[$connection['targetId']])):
+            $targetEvent = $campaignEvents[$connection['targetId']];
+        elseif (isset($campaignSources[$connection['targetId']])):
+            $targetEvent = $campaignSources[$connection['targetId']];
+        else:
             continue;
-        }
-
-        $targetEvent = $campaignEvents[$connection['targetId']];
-        $labelText = '';
-        if (isset($targetEvent['triggerMode'])):
-            if ($targetEvent['triggerMode'] == 'interval'):
-                $labelText = $view['translator']->trans(
-                    'mautic.campaign.connection.trigger.interval.label'.($targetEvent['decisionPath'] == 'no' ? '_inaction' : ''),
-                    [
-                        '%number%' => $targetEvent['triggerInterval'],
-                        '%unit%'   => $view['translator']->transChoice(
-                            'mautic.campaign.event.intervalunit.'.$targetEvent['triggerIntervalUnit'],
-                            $targetEvent['triggerInterval']
-                        ),
-                    ]
-                );
-            elseif ($targetEvent['triggerMode'] == 'date'):
-                $labelText = $view['translator']->trans(
-                    'mautic.campaign.connection.trigger.date.label'.($targetEvent['decisionPath'] == 'no' ? '_inaction' : ''),
-                    [
-                        '%full%' => $view['date']->toFull($targetEvent['triggerDate']),
-                        '%time%' => $view['date']->toTime($targetEvent['triggerDate']),
-                        '%date%' => $view['date']->toShort($targetEvent['triggerDate']),
-                    ]
-                );
-            endif;
         endif;
-        $labels[$connection['targetId']] = $labelText;
+
+        if (isset($labels[$connection['targetId']])):
+            $labelText = '';
+            if (isset($targetEvent['triggerMode'])):
+                if ($targetEvent['triggerMode'] == 'interval'):
+                    $labelText = $view['translator']->trans(
+                        'mautic.campaign.connection.trigger.interval.label'.($targetEvent['decisionPath'] == 'no' ? '_inaction' : ''),
+                        [
+                            '%number%' => $targetEvent['triggerInterval'],
+                            '%unit%'   => $view['translator']->transChoice(
+                                'mautic.campaign.event.intervalunit.'.$targetEvent['triggerIntervalUnit'],
+                                $targetEvent['triggerInterval']
+                            ),
+                        ]
+                    );
+                elseif ($targetEvent['triggerMode'] == 'date'):
+                    $labelText = $view['translator']->trans(
+                        'mautic.campaign.connection.trigger.date.label'.($targetEvent['decisionPath'] == 'no' ? '_inaction' : ''),
+                        [
+                            '%full%' => $view['date']->toFull($targetEvent['triggerDate']),
+                            '%time%' => $view['date']->toTime($targetEvent['triggerDate']),
+                            '%date%' => $view['date']->toShort($targetEvent['triggerDate']),
+                        ]
+                    );
+                endif;
+            endif;
+            $labels[$connection['targetId']] = $labelText;
         ?>
         Mautic.campaignBuilderLabels["CampaignEvent_<?php echo $connection['targetId']; ?>"] = "<?php echo $labelText; ?>";
+        <?php endif; ?>
         Mautic.campaignBuilderInstance.connect({
             uuids: [
                 "<?php echo "CampaignEvent_{$connection['sourceId']}_{$connection['anchors']['source']}"; ?>",
