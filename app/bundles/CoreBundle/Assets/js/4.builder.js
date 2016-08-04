@@ -280,7 +280,6 @@ Mautic.initSections = function() {
         // Handle color change events
         sectionForm.on('keyup paste change touchmove', function(e) {
             var field = mQuery(e.target);
-
             if (section.length && field.attr('id') === 'builder_section_content-background-color') {
                 Mautic.sectionBackgroundChanged(section, field.val());
             } else if (field.attr('id') === 'builder_section_wrapper-background-color') {
@@ -288,11 +287,10 @@ Mautic.initSections = function() {
             }
         });
 
-        parent.mQuery('body').on('change.minicolors', function(e, hex) {
+        parent.mQuery('#section-form-container').on('change.minicolors', function(e, hex) {
             var field = mQuery(e.target);
             var focussedSectionWrapper = mQuery('[data-section-focus]').parent();
             var focussedSection = focussedSectionWrapper.find('[data-section]');
-
             if (focussedSection.length && field.attr('id') === 'builder_section_content-background-color') {
                 Mautic.sectionBackgroundChanged(focussedSection, field.val());
             } else if (field.attr('id') === 'builder_section_wrapper-background-color') {
@@ -425,6 +423,15 @@ Mautic.initSlotListeners = function() {
             // Trigger the slot:change event
             slot.trigger('slot:selected', slot);
 
+            // Destroy previously initiated minicolors
+            var minicolors = parent.mQuery('#slot-form-container .minicolors');
+            if (minicolors.length) {
+                parent.mQuery('#slot-form-container input[data-toggle="color"]').each(function() {
+                    mQuery(this).minicolors('destroy');
+                });
+                parent.mQuery('#slot-form-container').off('change.minicolors');
+            }
+
             // Update form in the Customize tab to the form of the focused slot type
             var focusType = mQuery(this).attr('data-slot');
             var focusForm = mQuery(parent.mQuery('script[data-slot-type-form="'+focusType+'"]').html());
@@ -467,6 +474,16 @@ Mautic.initSlotListeners = function() {
             // Initialize the color picker
             focusForm.find('input[data-toggle="color"]').each(function() {
                 parent.Mautic.activateColorPicker(this);
+            });
+
+            parent.mQuery('#slot-form-container').on('change.minicolors', function(e, hex) {
+                var field = mQuery(e.target);
+
+                // Store the slot settings as attributes
+                slot.attr('data-param-'+field.attr('data-slot-param'), field.val());
+
+                // Trigger the slot:change event
+                slot.trigger('slot:change', {slot: slot, field: field});
             });
         });
 
@@ -571,6 +588,11 @@ Mautic.initSlotListeners = function() {
                 {padding: '15px 20px', fontSize: '18px'}
             ];
             params.slot.find('a').css(values[params.field.val()]);
+        } else if (fieldParam === 'background-color') {
+            params.slot.find('a').css(fieldParam, '#'+params.field.val());
+            params.slot.find('a').attr('background', '#'+params.field.val());
+        } else if (fieldParam === 'color') {
+            params.slot.find('a').css(fieldParam, '#'+params.field.val());
         }
     });
 
