@@ -990,14 +990,15 @@ class LeadController extends FormController
     {
         $model = $this->getModel('lead');
         $lead  = $model->getEntity($objectId);
+        $data = array();
+        if ($lead != null && $this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
+            $frequencyRules = $model->getFrequencyRule($lead);
 
-        if ($lead != null
-            && $this->factory->getSecurity()->hasEntityAccess(
-                'lead:leads:editown',
-                'lead:leads:editother', $lead->getOwner()
-            )
-        ) {
-            $frequencyRules = $lead->getFrequencyRules();
+            foreach ($frequencyRules as $frequencyRule){
+                $data['channels'][]=$frequencyRule['channel'];
+                $data['frequency_number']=$frequencyRule['frequency_number'];
+                $data['frequency_time']=$frequencyRule['frequency_time'];
+            }
 
             $action = $this->generateUrl('mautic_contact_action', array('objectAction' => 'contactFrequency', 'objectId' => $lead->getId()));
 
@@ -1006,7 +1007,7 @@ class LeadController extends FormController
                 array(),
                 array(
                     'action' => $action,
-                    'data' => $frequencyRules
+                    'data' => $data
                 )
             );
             if ($this->request->getMethod() == 'POST') {
@@ -1014,8 +1015,8 @@ class LeadController extends FormController
                     if ($valid = $this->isFormValid($form)) {
                         $model = $this->getModel('lead.lead');
                         $entity = $model->getEntity($objectId);
-                        $data = $form->getData();
-
+                        $formdata = $form->getData();
+                        $this->factory->getLogger()->addError(print_r($data,true));
                         $valid = true;
                         if ($entity === null) {
                             $flashes[] = array(
@@ -1024,18 +1025,7 @@ class LeadController extends FormController
                                 'msgVars' => array('%id%' => $objectId)
                             );
                         } else {
-                            $entity->setFrequencyRules($data);
-                            $model->saveEntity($entity);
-
-                            $identifier = $this->get('translator')->trans($entity->getPrimaryIdentifier());
-                            $flashes[] = array(
-                                'type' => 'notice',
-                                'msg' => 'mautic.lead.list.frequency.rules.msg',
-                                'msgVars' => array(
-                                    '%name%' => $identifier,
-                                    '%id%' => $objectId
-                                )
-                            );
+                            $model->setFrequencyRules($entity,$formdata['channels'], $formdata['frequency_time'], $formdata['frequency_number']);
                         }
                     }
                 }
@@ -1076,7 +1066,7 @@ class LeadController extends FormController
                     'contentTemplate' => 'MauticLeadBundle:Lead:frequency.html.php',
                     'passthroughVars' => array(
                         'route'  => false,
-                        'target' => ($tmpl == 'update') ? '.lead-merge-options' : null
+                        'target' => ($tmpl == 'update') ? '.lead-frequency-options' : null
                     )
                 )
             );

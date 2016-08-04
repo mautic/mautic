@@ -854,7 +854,11 @@ class EmailModel extends FormModel
                 // Only retrieve the difference between what has already been sent and the limit
                 $limit -= $leadCount;
             }
+            /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
+            $frequencyRulesRepo = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
 
+            $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', null, $list->getId());
+            $leads = array_diff($dontSendTo,$leads);
             $listErrors = $this->sendEmail($email, $leads, $options);
 
             if (!empty($listErrors)) {
@@ -1028,10 +1032,6 @@ class EmailModel extends FormModel
                 foreach ($sendTo as $k => $lead) {
                     //weed out do not contacts
                     if (in_array(strtolower($lead['email']), $dnc)) {
-                        unset($sendTo[$k]);
-                    }
-                    //apply frequency rules
-                    if($this->mailHelper->applyFrequencyRules($lead)){
                         unset($sendTo[$k]);
                     }
                 }

@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -185,6 +186,16 @@ class LeadModel extends FormModel
     public function getUtmTagRepository()
     {
         return $this->em->getRepository('MauticLeadBundle:UtmTag');
+    }
+
+    /**
+     * Get the frequency rules repository
+     *
+     * @return \Mautic\LeadBundle\Entity\FrequencyRuleRepository
+     */
+    public function getFrequencyRuleRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:FrequencyRule');
     }
 
     /**
@@ -1089,6 +1100,67 @@ class LeadModel extends FormModel
         }
 
         return false;
+    }
+    /**
+     * @param Lead $lead
+     * @param string $channel
+     *
+     * @return mixed
+     *
+     */
+    public function getFrequencyRule(Lead $lead, $channel=null)
+    {
+        if (is_array($channel)) {
+            $channel = key($channel);
+        }
+
+        /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRuleRepo */
+        $frequencyRuleRepo = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
+
+        $frequencyRules = $frequencyRuleRepo->getFrequencyRules($channel, $lead->getId());
+
+        if (empty($frequencyRules)) {
+            return false;
+        }
+
+        return $frequencyRules;
+    }
+    /**
+     * Set frequency rules for lead per channel
+     *
+     * @param Lead         $lead
+     * @param string|array $channel  If an array with an ID, use the structure ['email' => 123]
+     * @param bool         $persist
+     *
+     * @return boolean Returns true.
+     */
+    public function setFrequencyRules(Lead $lead, $channel, $frequencyTime = null, $frequencyNumber = null)
+    {
+        foreach ($channel as $ch){
+            $frequencyRules = $this->getFrequencyRule($lead, $ch);
+
+            // If they don't have a DNC entry yet
+            if (!$frequencyRules) {
+                $frequencyRule = new FrequencyRule();
+            }
+            else {
+                /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRuleRepo */
+                $frequencyRuleRepo = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
+                $frequencyRule = $frequencyRuleRepo->getEntity($frequencyRules[0]['id']);
+            }
+
+            $frequencyRule->setChannel($ch);
+            $frequencyRule->setLead($lead);
+            $frequencyRule->setDateAdded(new \DateTime);
+            $frequencyRule->setFrequencyNumber($frequencyNumber);
+            $frequencyRule->setFrequencyTime($frequencyTime);
+
+            $lead->setFrequencyRules($frequencyRule);
+
+            $this->saveEntity($lead);
+        }
+
+        return true;
     }
 
     /**

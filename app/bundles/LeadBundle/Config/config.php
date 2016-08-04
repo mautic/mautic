@@ -390,7 +390,7 @@ return [
             ],
             'mautic.lead.model.note' => [
                 'class' => 'Mautic\LeadBundle\Model\NoteModel'
-            ],
+            ]
         ]
     ]
 ];

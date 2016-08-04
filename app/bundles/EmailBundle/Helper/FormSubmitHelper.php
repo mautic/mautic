@@ -54,16 +54,12 @@ class FormSubmitHelper
 
 				$currentLead = array_merge($currentLead, $leadFields);
 			}
-            /** @var \Mautic\EmailBundle\Helper\MailHelper $emailHelper */
-            $emailHelper = $factory->getHelper('email.email');
 
-            $frequencyRules = $emailHelper->applyFrequencyRules($lead);
-
-			if (isset($properties['user_id']) && $properties['user_id'] && $frequencyRules === true) {
+			if (isset($properties['user_id']) && $properties['user_id']) {
 				// User email
 				$emailModel->sendEmailToUser($email, $properties['user_id'], $currentLead, $tokens);
 			} elseif (isset($currentLead)) {
-		    	if (isset($leadFields['email'])  && $frequencyRules === true) {
+		    	if (isset($leadFields['email'])) {
 					$options = array(
 						'source' 	   => array('form', $form->getId()),
 						'tokens' 	   => $tokens,

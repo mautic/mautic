@@ -60,22 +60,22 @@ class ContactFrequencyType extends AbstractType
                 'label_attr' => array('class' => 'control-label'),
                 'required'   => false,
                 'attr'       => array(
-                    'class' => 'form-control frequency'
+                    'class' => 'form-widget frequency'
                 )
             ));
         $builder->add('frequency_time','choice',
             array(
                 'choices'    => array(
-                    '1D' => 'day',
-                    '1W' => 'week',
-                    '1M' => 'month'
+                    '1 DAY' => 'day',
+                    '1 WEEK' => 'week',
+                    '1 MONTH' => 'month'
                 ),
                 'label'      => 'mautic.lead.list.frequency.times',
                 'label_attr' => array('class' => 'control-label'),
                 'required'   => false,
                 'multiple'   => false,
                 'attr'       => array(
-                    'class' => 'form-control frequency'
+                    'class' => 'form-control'
                 )
             ));
 
