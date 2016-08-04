@@ -925,6 +925,16 @@ Mautic.campaignBuilderRegisterAnchors = function(names, el) {
                 return;
             }
 
+            console.log(mQuery('#SourceList option[value=""]:enabled').length);
+            // If this is a leadsourceleft or leadsourceright anchor - ensure there are source options available before allowing to add a new
+            if (epDetails.anchorName == 'leadsourceleft' || epDetails.anchorName == 'leadsourceright') {
+                if (mQuery('#SourceList option:enabled').length === 1) {
+                    // Accounts for empty option
+
+                    return;
+                }
+            }
+
             // Set color style
             endpoint.setPaintStyle(
                 {
@@ -980,6 +990,15 @@ Mautic.campaignBuilderRegisterAnchors = function(names, el) {
                 // Don't do anything for top anchors
 
                 return;
+            }
+
+            // If this is a leadsourceleft or leadsourceright anchor - ensure there are source options available before allowing to add a new
+            if (epDetails.anchorName == 'leadsourceleft' || epDetails.anchorName == 'leadsourceright') {
+                if (mQuery('#SourceList option:enabled').length === 1) {
+                    // Accounts for empty option
+
+                    return;
+                }
             }
 
             // Note the anchor so it can be auto attached after the event is created
