@@ -55,6 +55,12 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.impor
                             <?php echo $view['form']->widget($form['escape']); ?>
                             <?php echo $view['form']->errors($form['escape']); ?>
                         </div>
+
+                        <div class="col-xs-12">
+                            <?php echo $view['form']->label($form['encoding']); ?>
+                            <?php echo $view['form']->widget($form['encoding']); ?>
+                            <?php echo $view['form']->errors($form['encoding']); ?>
+                        </div>
                     </div>
                     <?php echo $view['form']->end($form); ?>
                 </div>
