@@ -88,14 +88,6 @@ class LeadList extends FormEntity
             ->columnName('is_global')
             ->build();
 
-        $builder->createField('frequencyNumber', 'integer')
-            ->columnName('frequency_number')
-            ->build();
-
-        $builder->createField('frequencyTime', 'string')
-            ->columnName('frequency_time')
-            ->build();
-
         $builder->createOneToMany('leads', 'ListLead')
             ->setIndexBy('id')
             ->mappedBy('list')
