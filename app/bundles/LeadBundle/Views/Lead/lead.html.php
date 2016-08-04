@@ -365,23 +365,6 @@ $view['slots']->set(
                     <div class="collapse<?php echo ($avatarPanelState == 'expanded') ? ' in' : ''; ?>"
                          id="lead-avatar-block">
                         <img class="img-responsive" src="<?php echo $img; ?>" alt="<?php echo $leadName; ?> "/>
-                        <div class="pa-sm">
-                            <?php if ($leadActualName && $leadCompany): ?>
-                                <h2>
-                                    <div>
-                                        <?php echo $leadName; ?>
-                                    </div>
-                                    <div class="mt-xs span-block small">
-                                        <?php echo $leadCompany; ?>
-                                    </div>
-                                </h2>
-                            <?php elseif ($leadActualName || $leadCompany): ?>
-                                <h2>
-                                    <?php echo ($leadActualName) ? $leadActualName : $leadCompany; ?>
-                                </h2>
-                            <?php endif; ?>
-                        </div>
-                        <hr/>
                     </div>
                 </div>
 

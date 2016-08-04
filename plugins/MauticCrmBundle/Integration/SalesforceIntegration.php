@@ -85,6 +85,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getAccessTokenUrl()
     {
+        $config = $this->mergeConfigToFeatureSettings(array());
+
+        if(isset($config['sandbox'][0]) and $config['sandbox'][0] === 'sandbox')
+        {
+            return 'https://test.salesforce.com/services/oauth2/token';
+        }
         return 'https://login.salesforce.com/services/oauth2/token';
     }
 
@@ -95,6 +101,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getAuthenticationUrl()
     {
+        $config = $this->mergeConfigToFeatureSettings(array());
+        if(isset($config['sandbox'][0]) and $config['sandbox'][0] === 'sandbox')
+        {
+            return 'https://test.salesforce.com/services/oauth2/authorize';
+        }
         return 'https://login.salesforce.com/services/oauth2/authorize';
     }
 
@@ -112,6 +123,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function getApiUrl()
     {
         return sprintf('%s/services/data/v32.0/sobjects',$this->keys['instance_url']);
+    }
+
+    /**
+     * @return string
+     */
+    public function getQueryUrl()
+    {
+        return sprintf('%s/services/data/v32.0',$this->keys['instance_url']);
     }
 
     /**
@@ -204,23 +223,40 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function amendLeadDataBeforeMauticPopulate($data)
     {
-        $fields = array_keys($this->getAvailableLeadFields());
-        $params['fields']=implode(',',$fields);
-
-        $internal = array('latestDateCovered' => $data['latestDateCovered']);
-        $count = 0;
-        if(isset($data['ids'])){
-            foreach($data['ids'] as $salesforceId)
-            {
-                $data = $this->getApiHelper()->getSalesForceLeadById($salesforceId,$params);
-                $data['internal'] = $internal;
-                if($data){
-                    $this->getMauticLead($data,true,null,null);
-                    $count++;
-                }
+        $count=0;
+        foreach ($data['records'] as $record) {
+            $lead = $this->getMauticLead($record, true, null, null);
+            if($lead){
+                $count++;
             }
         }
         return $count;
+    }
+    /**
+     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
+     * @param array                                             $data
+     * @param string                                            $formArea
+     */
+    public function appendToForm(&$builder, $data, $formArea)
+    {
+        if ($formArea == 'features') {
+            $name = strtolower($this->getName());
+
+            $builder->add('sandbox', 'choice', array(
+                'choices'     => array(
+                    'sandbox'    => 'mautic.salesforce.integration.form.feature.sandbox'
+                ),
+                'expanded'    => true,
+                'multiple'    => true,
+                'label'       => 'mautic.plugins.salesforce.sandbox',
+                'label_attr'  => array('class' => 'control-label'),
+                'empty_value' => false,
+                'required'    => false,
+                'attr'       => array(
+                    'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');'
+                ),
+            ));
+        }
     }
 
 }
