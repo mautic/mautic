@@ -23,14 +23,15 @@ class DynamicContentDecisionType extends DynamicContentSendType
             'dwc_slot_name',
             'text',
             [
-                'label' => 'mautic.dynamicContent.send.slot_name',
-                'label_attr' => ['class' => 'control-label'],
-                'attr' => [
-                    'class' => 'form-control',
+                'label'       => 'mautic.dynamicContent.send.slot_name',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'   => 'form-control',
                     'tooltip' => 'mautic.dynamicContent.send.slot_name.tooltip',
                 ],
+                'required'    => true,
                 'constraints' => [
-                    new NotBlank(['message' => 'mautic.dynamicContent.slot_name.notblank']),
+                    new NotBlank(['message' => 'mautic.core.value.required']),
                 ],
             ]
         );
@@ -41,16 +42,17 @@ class DynamicContentDecisionType extends DynamicContentSendType
             'dynamicContent',
             'dwc_list',
             [
-                'label' => 'mautic.dynamicContent.send.selectDynamicContents.default',
-                'label_attr' => ['class' => 'control-label'],
-                'attr' => [
-                    'class' => 'form-control',
-                    'tooltip' => 'mautic.dynamicContent.choose.dynamicContents',
+                'label'       => 'mautic.dynamicContent.send.selectDynamicContents.default',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.dynamicContent.choose.dynamicContents',
                     'onchange' => 'Mautic.disabledDynamicContentAction()',
                 ],
-                'multiple' => false,
+                'multiple'    => false,
+                'required'    => true,
                 'constraints' => [
-                    new NotBlank(['message' => 'mautic.dynamicContent.choosedynamicContent.notblank']),
+                    new NotBlank(['message' => 'mautic.core.value.required']),
                 ],
             ]
         );
