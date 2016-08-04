@@ -96,7 +96,7 @@ class EmailType extends AbstractType
                 'label'      => 'mautic.email.form.body',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array(
-                    'class'                => 'form-control editor-basic-fullpage editor-builder-tokens',
+                    'class'                => 'form-control editor editor-basic-fullpage editor-builder-tokens',
                     'data-token-callback'  => 'email:getBuilderTokens',
                     'data-token-activator' => '{'
                 )

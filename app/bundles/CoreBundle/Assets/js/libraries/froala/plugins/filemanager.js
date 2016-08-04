@@ -10,6 +10,7 @@ var FroalaEditorForFileManagerCurrentImage = null;
 // This method is called by the Filemanager after an image is selected
 function SetUrl( url, width, height, alt ) {
     if (typeof FroalaEditorForFileManagerCurrentImage !== 'undefined' && 
+        FroalaEditorForFileManagerCurrentImage !== null && 
         FroalaEditorForFileManagerCurrentImage.length && 
         FroalaEditorForFileManagerCurrentImage.prop('tagName') === 'IMG') {
         // Copy additional image attributes.
