@@ -24,7 +24,7 @@ $view['slots']->set("headerTitle", $header);
     <div class="col-md-9 bg-auto height-auto bdr-r">
         <div class="pa-md">
             <?php if ($entity->getId() && $entity->isPublished()): ?>
-                <div class="alert alert-danger"><h4><?php echo $view['translator']->trans('mautic.campaign.modify.warning'); ?></h4></div>
+                <div class="alert alert-danger"><p><?php echo $view['translator']->trans('mautic.campaign.modify.warning'); ?></p></div>
             <?php endif; ?>
 
             <div class="row">

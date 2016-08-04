@@ -75,7 +75,7 @@ class AjaxController extends CommonController
                 $parts     = explode(":", $action);
                 $namespace = 'Mautic';
                 $isPlugin  = false;
-                
+
                 if (count($parts) == 3 && $parts['0'] == 'plugin') {
                     $namespace = 'MauticPlugin';
                     array_shift($parts);
@@ -445,7 +445,7 @@ class AjaxController extends CommonController
             // the cache is cleared by upgrade.php
             /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
             $cookieHelper = $this->factory->getHelper('cookie');
-            $cookieHelper->delete('mautic_update');
+            $cookieHelper->deleteCookie('mautic_update');
         } else {
             // Extract the archive file now
             if (!$zipper->extractTo(dirname($this->container->getParameter('kernel.root_dir')).'/upgrade')) {

@@ -28,36 +28,25 @@ Mautic.pageOnLoad = function (container) {
         });
     }
 
+    var textarea = mQuery('#page_customHtml');
+
     mQuery(document).on('shown.bs.tab', function (e) {
-        mQuery('#page_customHtml').froalaEditor('popups.hideAll');
+        textarea.froalaEditor('popups.hideAll');
+    });
+
+    mQuery('a[href="#source-container"]').on('shown.bs.tab', function (e) {
+        textarea.froalaEditor('html.set', textarea.val());
     });
 
     mQuery('.btn-builder').on('click', function (e) {
-        mQuery('#page_customHtml').froalaEditor('popups.hideAll');
+        textarea.froalaEditor('popups.hideAll');
     });
 
     Mautic.intiSelectTheme(mQuery('#page_template'));
-    Mautic.fixFroalaPageOutput();
 };
 
 Mautic.pageOnUnload = function (id) {
     mQuery('#page_customHtml').froalaEditor('popups.hideAll');
-}
-
-Mautic.fixFroalaPageOutput = function() {
-    if (mQuery('form[name="page"]').length) {
-        var textarea = mQuery('textarea.builder-html');
-        mQuery('form[name="page"]').on('before.submit.ajaxform', function() {
-            // update textarea from Froala's CodeMirror view on save
-            textarea.froalaEditor('events.trigger', 'form.submit');
-
-            var editorHtmlString = textarea.val();
-            Mautic.buildBuilderIframe(editorHtmlString, 'helper-iframe-for-html-manipulation');
-            var editorHtml = mQuery('iframe#helper-iframe-for-html-manipulation').contents();
-            editorHtml = Mautic.clearFroalaStyles(editorHtml);
-            textarea.val(editorHtml.find('html').get(0).outerHTML);
-        });
-    }
 }
 
 Mautic.getPageAbTestWinnerForm = function(abKey) {
