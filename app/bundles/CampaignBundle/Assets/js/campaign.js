@@ -309,10 +309,18 @@ Mautic.campaignSourceOnLoad = function (container, response) {
         mQuery(eventId + " *[data-toggle='tooltip']").tooltip({html: true});
         if (autoConnect) {
             // Connect into last anchor clicked
+            if (Mautic.campaignBuilderAnchorClicked.search('left') !== -1) {
+                var source = domEventId + '_leadsourceright';
+                var target = Mautic.campaignBuilderAnchorClicked;
+            } else {
+                var source = Mautic.campaignBuilderAnchorClicked;
+                var target = domEventId + '_leadsourceleft';
+            }
+
             Mautic.campaignBuilderInstance.connect({
                 uuids: [
-                    Mautic.campaignBuilderAnchorClicked,
-                    domEventId + (Mautic.campaignBuilderAnchorClicked.search('left') !== -1 ? '_leadsourceright' : '_leadsourceleft')
+                    source,
+                    target
                 ]
             });
         }
@@ -576,7 +584,7 @@ Mautic.launchCampaignEditor = function() {
         Mautic.campaignBuilderRegisterEndpoint('yes', Mautic.campaignBuilderAnchorDefaultColor, false, '#00b49c');
         Mautic.campaignBuilderRegisterEndpoint('no', Mautic.campaignBuilderAnchorDefaultColor, false, '#f86b4f');
         Mautic.campaignBuilderRegisterEndpoint('leadSource', Mautic.campaignBuilderAnchorDefaultColor);
-        Mautic.campaignBuilderRegisterEndpoint('leadSourceLeft', Mautic.campaignBuilderAnchorDefaultColor, false, '#fdb933');
+        Mautic.campaignBuilderRegisterEndpoint('leadSourceLeft', Mautic.campaignBuilderAnchorDefaultColor, true, '#fdb933');
         Mautic.campaignBuilderRegisterEndpoint('leadSourceRight', Mautic.campaignBuilderAnchorDefaultColor, false, '#fdb933');
 
         Mautic.campaignDragOptions = {
@@ -678,11 +686,12 @@ Mautic.campaignBeforeDropCallback = function(params) {
         return false;
     }
 
-    if ('top' == targetEndpoint.anchorName) {
+    if (mQuery.inArray(targetEndpoint.anchorName, ['top', 'leadsourceleft', 'leadsourceright'])) {
         //ensure two events aren't looping
         var sourceConnections = Mautic.campaignBuilderInstance.select({
             source: params.targetId
         });
+
         var loopDetected = false;
         sourceConnections.each(function (conn) {
 
@@ -692,10 +701,6 @@ Mautic.campaignBeforeDropCallback = function(params) {
                 return false;
             }
         });
-
-        if (loopDetected) {
-            return false;
-        }
     }
 
     //ensure that the connections are not looping back into the same event
@@ -869,11 +874,16 @@ Mautic.submitCampaignSource = function(e) {
  */
 Mautic.campaignBuilderRegisterEndpoint = function (name, color, isTarget, connectorColor) {
     var isSource = true;
-    if (typeof isTarget == 'undefined') {
-        isTarget = false;
-    }
-    if (isTarget) {
-        isSource = false;
+    if (isTarget === null) {
+        // Both are allowed
+        isTarget = true;
+    } else {
+        if (typeof isTarget == 'undefined') {
+            isTarget = false;
+        }
+        if (isTarget) {
+            isSource = false;
+        }
     }
 
     if (!connectorColor) {
@@ -925,7 +935,6 @@ Mautic.campaignBuilderRegisterAnchors = function(names, el) {
                 return;
             }
 
-            console.log(mQuery('#SourceList option[value=""]:enabled').length);
             // If this is a leadsourceleft or leadsourceright anchor - ensure there are source options available before allowing to add a new
             if (epDetails.anchorName == 'leadsourceleft' || epDetails.anchorName == 'leadsourceright') {
                 if (mQuery('#SourceList option:enabled').length === 1) {
