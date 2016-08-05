@@ -14,6 +14,7 @@ use Debril\RssAtomBundle\Protocol\Parser\FeedContent;
 use Debril\RssAtomBundle\Protocol\Parser\Item;
 use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UpdateHelper;
@@ -63,11 +64,15 @@ class NotificationModel extends FormModel
      * @param FeedReader           $rssReader
      * @param CoreParametersHelper $coreParametersHelper
      */
-    public function __construct(PathsHelper $pathsHelper, UpdateHelper $updateHelper, FeedReader $rssReader, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->pathsHelper = $pathsHelper;
-        $this->updateHelper = $updateHelper;
-        $this->rssReader = $rssReader;
+    public function __construct(
+        PathsHelper $pathsHelper,
+        UpdateHelper $updateHelper,
+        FeedReader $rssReader,
+        CoreParametersHelper $coreParametersHelper
+    ) {
+        $this->pathsHelper          = $pathsHelper;
+        $this->updateHelper         = $updateHelper;
+        $this->rssReader            = $rssReader;
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
@@ -90,7 +95,7 @@ class NotificationModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @return \Mautic\CoreBundle\Entity\AuditLogRepository
+     * @return \Mautic\CoreBundle\Entity\NotificationRepository
      */
     public function getRepository()
     {
@@ -100,18 +105,18 @@ class NotificationModel extends FormModel
     /**
      * Write a notification
      *
-     * @param string    $message    Message of the notification
-     * @param string    $type       Optional $type to ID the source of the notification
-     * @param bool|true $isRead     Add unread indicator
-     * @param string    $header     Header for message
-     * @param string    $iconClass  Font Awesome CSS class for the icon (e.g. fa-eye)
-     * @param \DateTime $datetime   Date the item was created
-     * @param User|null $user       User object; defaults to current user
+     * @param string    $message   Message of the notification
+     * @param string    $type      Optional $type to ID the source of the notification
+     * @param bool|true $isRead    Add unread indicator
+     * @param string    $header    Header for message
+     * @param string    $iconClass Font Awesome CSS class for the icon (e.g. fa-eye)
+     * @param \DateTime $datetime  Date the item was created
+     * @param User|null $user      User object; defaults to current user
      */
     public function addNotification(
         $message,
         $type = null,
-        $isRead = true,
+        $isRead = false,
         $header = null,
         $iconClass = null,
         \DateTime $datetime = null,
@@ -129,8 +134,8 @@ class NotificationModel extends FormModel
         $notification = new Notification();
         $notification->setType($type);
         $notification->setIsRead($isRead);
-        $notification->setHeader(InputHelper::html($header));
-        $notification->setMessage(InputHelper::html($message));
+        $notification->setHeader(EmojiHelper::toHtml(InputHelper::html($header)));
+        $notification->setMessage(EmojiHelper::toHtml(InputHelper::html($message)));
         $notification->setIconClass($iconClass);
         $notification->setUser($user);
         if ($datetime == null) {
@@ -138,53 +143,6 @@ class NotificationModel extends FormModel
         }
         $notification->setDateAdded($datetime);
         $this->saveEntity($notification);
-    }
-
-    /**
-     * @param null $afterId
-     * @param null $key
-     *
-     * @return array|\Doctrine\ORM\Tools\Pagination\Paginator
-     */
-    public function getNotifications($afterId = null, $key = null)
-    {
-        if ($this->user->getId()) {
-            $filter = array(
-                'force' => array(
-                    array(
-                        'column' => 'n.user',
-                        'expr'   => 'eq',
-                        'value'  => $this->user
-                    )
-                )
-            );
-
-            if ($key != null) {
-                $filter['force'][] = array(
-                    'column' => 'n.key',
-                    'expr'   => 'eq',
-                    'value'  => $key
-                );
-            }
-
-            if ($afterId != null) {
-                $filter['force'][] = array(
-                    'column' => 'n.id',
-                    'expr'   => 'gt',
-                    'value'  => (int) $afterId
-                );
-            }
-
-            $args = array(
-                'filter'           => $filter,
-                'ignore_paginator' => true,
-                'hydration_mode'   => 'HYDRATE_ARRAY'
-            );
-
-            return $this->getEntities($args);
-        }
-
-        return array();
     }
 
     /**
@@ -212,15 +170,15 @@ class NotificationModel extends FormModel
      *
      * @return array
      */
-    public function getNotificationContent($afterId = null)
+    public function getNotificationContent($afterId = null, $includeRead = false)
     {
         if ($this->user->isGuest) {
-            return array(array(), false, '');
+            return [[], false, ''];
         }
 
         $this->updateUpstreamNotifications();
 
-        $notifications = $this->getNotifications($afterId);
+        $notifications = $this->getRepository()->getNotifications($afterId, null, $includeRead);
 
         $showNewIndicator = false;
 
@@ -237,7 +195,7 @@ class NotificationModel extends FormModel
         $newUpdate     = false;
 
         if (!$this->disableUpdates && $this->user->isAdmin()) {
-            $updateData = array();
+            $updateData = [];
             $cacheFile  = $this->pathsHelper->getSystemPath('cache').'/lastUpdateCheck.txt';
 
             //check to see when we last checked for an update
@@ -246,7 +204,7 @@ class NotificationModel extends FormModel
             if (time() - $lastChecked > 3600) {
                 $this->session->set('mautic.update.checked', time());
 
-                $updateData   = $this->updateHelper->fetchData();
+                $updateData = $this->updateHelper->fetchData();
             } elseif (file_exists($cacheFile)) {
                 $updateData = json_decode(file_get_contents($cacheFile), true);
             }
@@ -255,12 +213,12 @@ class NotificationModel extends FormModel
             if (isset($updateData['version'])) {
                 $announcement = $this->translator->trans(
                     'mautic.core.updater.update.announcement_link',
-                    array('%announcement%' => $updateData['announcement'])
+                    ['%announcement%' => $updateData['announcement']]
                 );
 
                 $updateMessage = $this->translator->trans(
                     $updateData['message'],
-                    array('%version%' => $updateData['version'], '%announcement%' => $announcement)
+                    ['%version%' => $updateData['version'], '%announcement%' => $announcement]
                 );
 
                 $alreadyNotified = $this->session->get('mautic.update.notified');
@@ -272,7 +230,7 @@ class NotificationModel extends FormModel
             }
         }
 
-        return array($notifications, $showNewIndicator, array('isNew' => $newUpdate, 'message' => $updateMessage));
+        return [$notifications, $showNewIndicator, ['isNew' => $newUpdate, 'message' => $updateMessage]];
     }
 
     /**
@@ -283,25 +241,25 @@ class NotificationModel extends FormModel
         $url = $this->coreParametersHelper->getParameter('rss_notification_url');
 
         if (empty($url)) {
+
             return;
         }
 
-        $qb = $this->getRepository()->createQueryBuilder('n')
-            ->where('n.type = :type')
-            ->setParameter('type', 'upstream')
-            ->setMaxResults(1);
-
-        /** @var Notification $result */
-        $result = $qb->getQuery()->getOneOrNullResult();
-        $lastDate = $result === null ? null : $result->getDateAdded();
+        $lastDate = $this->getRepository()->getUpstreamLastDate();
 
         /** @var FeedContent $feed */
         $feed = $this->rssReader->getFeedContent($url, $lastDate);
 
         /** @var Item $item */
-        foreach ($feed->getItems() as $item)
-        {
-            $this->addNotification($item->getDescription(), 'upstream', false, null, 'fa-bullhorn');
+        foreach ($feed->getItems() as $item) {
+            $description = $item->getDescription();
+            if (mb_strlen(strip_tags($description)) > 300) {
+                $description  = mb_substr(strip_tags($description), 0, 300);
+                $description .= "... <a href=\"".$item->getLink()."\" target=\"_blank\">".$this->translator->trans('mautic.core.notification.read_more')."</a>";
+            }
+            $header = $item->getTitle();
+
+            $this->addNotification($description, 'upstream', false, ($header) ? $header : null, 'fa-bullhorn');
         }
     }
 }
