@@ -215,11 +215,8 @@ class Field
         $builder->addNullableField('leadField', 'string', 'lead_field');
 
         $builder->addNullableField('saveResult', 'boolean', 'save_result');
-        
-        $builder->createField('isAutoFill', 'boolean')
-            ->columnName('is_auto_fill')
-            ->nullable()
-            ->build();
+
+        $builder->addNullableField('isAutoFill', 'boolean', 'is_auto_fill');
     }
 
     /**
@@ -762,7 +759,7 @@ class Field
     {
         $this->saveResult = $saveResult;
     }
-    
+
     /**
      * @return bool
      */

@@ -30,23 +30,16 @@ class Version20160114000000 extends AbstractMauticMigration
         // Test to see if this migration has already been applied
         $formTable = $schema->getTable($this->prefix . 'form_fields');
         if ($formTable->hasColumn('is_auto_fill')) {
+
             throw new SkipMigrationException('Schema includes this migration');
         }
-    }
-    
-    /**
-     * @param Schema $schema
-     */
-    public function mysqlUp(Schema $schema)
-    {
-        $this->addSql('ALTER TABLE ' . $this->prefix.'form_fields ADD COLUMN is_auto_fill TINYINT(1) NOT NULL DEFAULT 0');
     }
 
     /**
      * @param Schema $schema
      */
-    public function postgresqlUp(Schema $schema)
+    public function up(Schema $schema)
     {
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ADD COLUMN is_auto_fill BOOLEAN NOT NULL DEFAULT 0');
+        $this->addSql('ALTER TABLE ' . $this->prefix.'form_fields ADD COLUMN is_auto_fill TINYINT(1) DEFAULT NULL');
     }
 }
