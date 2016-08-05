@@ -616,6 +616,7 @@ class EmailController extends FormController
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model   = $this->getModel('email');
         $method  = $this->request->getMethod();
+
         $entity  = $model->getEntity($objectId);
         $session = $this->factory->getSession();
         $page    = $this->factory->getSession()->get('mautic.email.page', 1);
