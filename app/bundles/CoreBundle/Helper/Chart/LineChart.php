@@ -19,7 +19,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartInterface;
  */
 class LineChart extends AbstractChart implements ChartInterface
 {
-        /**
+    /**
      * Configurable date format
      *
      * @var string
@@ -32,15 +32,17 @@ class LineChart extends AbstractChart implements ChartInterface
      *
      * @var array
      */
-    protected $labelFormats = array(
+    protected $labelFormats = [
         's' => 'H:i:s',
         'i' => 'H:i',
         'H' => 'M j ga',
-        'd' => 'M j, y', 'D' => 'M j, y', // ('D' is BC. Can be removed when all charts use this class)
+        'd' => 'M j, y',
+        'D' => 'M j, y', // ('D' is BC. Can be removed when all charts use this class)
         'W' => '\W\e\e\k W', // (Week is escaped here so it's not interpreted when creating labels)
-        'm' => 'M Y', 'M' => 'M Y', // ('M' is BC. Can be removed when all charts use this class)
+        'm' => 'M Y',
+        'M' => 'M Y', // ('M' is BC. Can be removed when all charts use this class)
         'Y' => 'Y',
-    );
+    ];
 
     /**
      * Defines the basic chart values, generates the time axe labels from it
@@ -52,10 +54,12 @@ class LineChart extends AbstractChart implements ChartInterface
      */
     public function __construct($unit = null, $dateFrom = null, $dateTo = null, $dateFormat = null)
     {
+        $this->unit       = (null === $unit) ? $this->getTimeUnitFromDateRange($dateFrom, $dateTo) : $unit;
+        $this->isTimeUnit = (in_array($this->unit, ['H', 'i', 's']));
         $this->setDateRange($dateFrom, $dateTo);
-        $this->unit  = !$unit ? $this->getTimeUnitFromDateRange() : $unit;
+
         $this->dateFormat = $dateFormat;
-        $this->amount = $this->countAmountFromDateRange();
+        $this->amount     = $this->countAmountFromDateRange();
         $this->generateTimeLabels($this->amount);
         $this->addOneUnitMinusOneSec($this->dateTo);
     }
@@ -63,11 +67,12 @@ class LineChart extends AbstractChart implements ChartInterface
     /**
      * Render chart data
      */
-    public function render() {
-        return array(
+    public function render()
+    {
+        return [
             'labels'   => $this->labels,
             'datasets' => $this->datasets
-        );
+        ];
     }
 
     /**
@@ -82,11 +87,11 @@ class LineChart extends AbstractChart implements ChartInterface
     {
         $datasetId = count($this->datasets);
 
-        $baseData = array(
+        $baseData = [
             'label' => $label,
             'data'  => $data,
-        );
-        
+        ];
+
         $this->datasets[] = array_merge($baseData, $this->generateColors($datasetId));
 
         return $this;
@@ -95,12 +100,12 @@ class LineChart extends AbstractChart implements ChartInterface
     /**
      * Generate array of labels from the form data
      *
-     * @param  integer  $amount
+     * @param  integer $amount
      */
     public function generateTimeLabels($amount)
     {
         if (!isset($this->labelFormats[$this->unit])) {
-            throw new \UnexpectedValueException('Date/Time unit "' . $this->unit . '" is not available for a label.');
+            throw new \UnexpectedValueException('Date/Time unit "'.$this->unit.'" is not available for a label.');
         }
 
         $date    = clone $this->dateFrom;
@@ -109,7 +114,7 @@ class LineChart extends AbstractChart implements ChartInterface
 
         for ($i = 0; $i < $amount; $i++) {
             $this->labels[] = $date->format($format);
-            
+
             // Special case for months because PHP behaves weird with February
             if ($this->unit === 'm') {
                 $date->modify('first day of next month');
@@ -117,14 +122,14 @@ class LineChart extends AbstractChart implements ChartInterface
                 $date->add($oneUnit);
             }
         }
-        
+
         $this->labels = $this->labels;
     }
 
     /**
      * Generate unique color for the dataset
      *
-     * @param  integer  $datasetId
+     * @param  integer $datasetId
      *
      * @return array
      */
@@ -132,11 +137,11 @@ class LineChart extends AbstractChart implements ChartInterface
     {
         $color = $this->configureColorHelper($datasetId);
 
-        return array(
+        return [
             'backgroundColor'           => $color->toRgba(0.1),
             'borderColor'               => $color->toRgba(0.8),
             'pointHoverBackgroundColor' => $color->toRgba(0.75),
             'pointHoverBorderColor'     => $color->toRgba(1)
-        );
+        ];
     }
 }

@@ -10,6 +10,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Entity\TimelineTrait;
 use Mautic\UserBundle\Entity\User;
 use Doctrine\ORM\EntityRepository;
 
@@ -18,6 +19,8 @@ use Doctrine\ORM\EntityRepository;
  */
 class LeadEventLogRepository extends EntityRepository
 {
+    use TimelineTrait;
+
     /**
      * @var User
      */
@@ -47,47 +50,47 @@ class LeadEventLogRepository extends EntityRepository
      */
     public function getLeadLogs($leadId, array $options = array())
     {
-        $query = $this->createQueryBuilder('ll')
-            ->select('IDENTITY(ll.event) AS event_id,
-                    IDENTITY(e.campaign) AS campaign_id,
-                    ll.dateTriggered,
+        $query = $this->getEntityManager()
+            ->getConnection()
+            ->createQueryBuilder()
+            ->select('ll.event_id,
+                    ll.campaign_id,
+                    ll.date_triggered as dateTriggered,
                     e.name AS event_name,
                     e.description AS event_description,
                     c.name AS campaign_name,
                     c.description AS campaign_description,
                     ll.metadata,
                     e.type,
-                    ll.isScheduled,
-                    ll.triggerDate
+                    ll.is_scheduled as isScheduled,
+                    ll.trigger_date as triggerDate
                     '
             )
-            ->leftJoin('MauticCampaignBundle:Event', 'e', 'WITH', 'e.id = ll.event')
-            ->leftJoin('MauticCampaignBundle:Campaign', 'c', 'WITH', 'c.id = e.campaign')
-            ->where('ll.lead = ' . (int) $leadId)
-            ->andWhere('e.eventType = :eventType')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
+            ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
+            ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
+            ->where('ll.lead_id = ' . (int) $leadId)
+            ->andWhere('e.event_type = :eventType')
+            ->andWhere('ll.metadata NOT LIKE \'%{s:6:"failed";i:1%\'')
             ->setParameter('eventType', 'action');
 
-        if (!empty($options['ipIds'])) {
-            $query->orWhere('ll.ipAddress IN (' . implode(',', $options['ipIds']) . ')');
-        }
-
-        if (isset($options['filters']['search']) && $options['filters']['search']) {
+        if (isset($options['search']) && $options['search']) {
             $query->andWhere($query->expr()->orX(
-                $query->expr()->like('e.name', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
-                $query->expr()->like('e.description', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
-                $query->expr()->like('c.name', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
-                $query->expr()->like('c.description', $query->expr()->literal('%' . $options['filters']['search'] . '%'))
+                $query->expr()->like('e.name', $query->expr()->literal('%' . $options['search'] . '%')),
+                $query->expr()->like('e.description', $query->expr()->literal('%' . $options['search'] . '%')),
+                $query->expr()->like('c.name', $query->expr()->literal('%' . $options['search'] . '%')),
+                $query->expr()->like('c.description', $query->expr()->literal('%' . $options['search'] . '%'))
             ));
         }
 
         if (isset($options['scheduledState'])) {
             $query->andWhere(
-                $query->expr()->eq('ll.isScheduled', ':scheduled')
+                $query->expr()->eq('ll.is_scheduled', ':scheduled')
             )
                 ->setParameter('scheduled', $options['scheduledState'], 'boolean');
         }
 
-        return $query->getQuery()->getArrayResult();
+        return $this->getTimelineResults($query, $options, 'e.name', 'll.date_triggered', ['metadata'], ['dateTriggered', 'triggerDate']);
     }
 
     /**

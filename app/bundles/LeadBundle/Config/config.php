@@ -51,6 +51,13 @@ return [
                     'leadId' => '\d+'
                 ]
             ],
+            'mautic_contacttimeline_action'       => [
+                'path'         => '/contacts/timeline/{leadId}/{page}',
+                'controller'   => 'MauticLeadBundle:Timeline:index',
+                'requirements' => [
+                    'leadId' => '\d+'
+                ]
+            ],
             'mautic_contact_action'           => [
                 'path'       => '/contacts/{objectAction}/{objectId}',
                 'controller' => 'MauticLeadBundle:Lead:execute'
@@ -157,7 +164,11 @@ return [
     'services' => [
         'events'  => [
             'mautic.lead.subscriber'                => [
-                'class' => 'Mautic\LeadBundle\EventListener\LeadSubscriber'
+                'class'     => 'Mautic\LeadBundle\EventListener\LeadSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.core.model.auditlog'
+                ]
             ],
             'mautic.lead.emailbundle.subscriber'    => [
                 'class' => 'Mautic\LeadBundle\EventListener\EmailSubscriber'

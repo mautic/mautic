@@ -74,6 +74,16 @@ class FormEntity extends CommonEntity
     private $checkedOutByUser;
 
     /**
+     * @var array
+     */
+    protected $changes = array();
+
+    /**
+     * @var
+     */
+    public $deletedId;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
