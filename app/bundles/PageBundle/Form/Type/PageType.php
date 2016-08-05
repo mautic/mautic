@@ -94,7 +94,7 @@ class PageType extends AbstractType
                 'label'      => 'mautic.page.form.customhtml',
                 'required'   => false,
                 'attr'       => array(
-                    'class'                => 'form-control editor-basic-fullpage editor-builder-tokens builder-html',
+                    'class'                => 'form-control editor editor-basic-fullpage editor-builder-tokens builder-html',
                     'data-token-callback'  => 'page:getBuilderTokens',
                     'data-token-activator' => '{'
                 )

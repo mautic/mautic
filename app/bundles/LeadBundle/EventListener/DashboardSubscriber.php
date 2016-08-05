@@ -58,7 +58,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     );
 
     /**
-     * Set a widget detail when needed 
+     * Set a widget detail when needed
      *
      * @param WidgetDetailEvent $event
      *
@@ -68,7 +68,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('form:forms:viewother');
-        
+
         if ($event->getType() == 'created.leads.in.time') {
             $widget = $event->getWidget();
             $params = $widget->getParams();
@@ -170,9 +170,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'bodyItems'   => $items,
                     'raw'         => $lists
                 ));
-               
+
             }
-            
+
             $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
             $event->stopPropagation();
             return;
@@ -318,7 +318,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'raw'         => $owners
                 ));
             }
-            
+
             $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
             $event->stopPropagation();
             return;
@@ -373,7 +373,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'raw'         => $creators
                 ));
             }
-            
+
             $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
             $event->stopPropagation();
             return;
@@ -397,7 +397,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 // Build table rows with links
                 if ($leads) {
                     foreach ($leads as &$lead) {
-                        $leadUrl = $this->factory->getRouter()->generate('mautic_lead_action', array('objectAction' => 'view', 'objectId' => $lead['id']));
+                        $leadUrl = $this->factory->getRouter()->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $lead['id']));
                         $row = array(
                             array(
                                 'value' => $lead['name'],
@@ -417,7 +417,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'raw'         => $leads
                 ));
             }
-            
+
             $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
             $event->stopPropagation();
             return;

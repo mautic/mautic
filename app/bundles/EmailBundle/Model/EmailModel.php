@@ -1396,7 +1396,7 @@ class EmailModel extends FormModel
      * @param string $reason
      * @param bool   $flush
      */
-    public function setDoNotContact(Stat $stat, $comments, $reason = 'bounced', $flush = true)
+    public function setDoNotContact(Stat $stat, $comments, $reason = DoNotContact::BOUNCED, $flush = true)
     {
         $lead = $stat->getLead();
 

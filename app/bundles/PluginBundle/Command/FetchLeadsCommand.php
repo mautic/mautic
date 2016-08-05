@@ -49,12 +49,6 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 'Set end date for updated values.'
             )
             ->addOption(
-                '--sf-object',
-                '-sf',
-                InputOption::VALUE_OPTIONAL,
-                'Send the object name Lead - will import leads to mautic contacts, Contact will import contacts to mautic contacts.'
-            )
-            ->addOption(
                 '--time-interval',
                 '-ti',
                 InputOption::VALUE_OPTIONAL,
@@ -75,12 +69,10 @@ class FetchLeadsCommand extends ContainerAwareCommand
         /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
         $factory = $container->get('mautic.factory');
 
-
         $translator     = $factory->getTranslator();
         $integration    = $input->getOption('integration');
         $startDate      = $input->getOption('start-date');
         $endDate        = $input->getOption('end-date');
-        $object         = $input->getOption('sf-object');
         $interval       = $input->getOption('time-interval');
 
         if(!$interval){
@@ -89,11 +81,9 @@ class FetchLeadsCommand extends ContainerAwareCommand
         if(!$startDate){
             $startDate= date('c', strtotime("-".$interval));
         }
-
         if(!$endDate){
             $endDate= date('c');
         }
-
         if ($integration && $startDate && $endDate) {
             /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
             $integrationHelper = $factory->getHelper('integration');
@@ -106,7 +96,6 @@ class FetchLeadsCommand extends ContainerAwareCommand
 
                 $params['start']=$startDate;
                 $params['end']=$endDate;
-                $params['object']=$object;
 
                 if(strtotime($startDate) > strtotime('-30 days')) {
                     $processed = 0;
@@ -119,10 +108,8 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 else{
                     $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
                 }
-               
             }
         }
-
         return 0;
     }
 }

@@ -143,7 +143,7 @@ $template = '<div class="col-md-6">{content}</div>';
             <?php echo $view['form']->rowIfExists($fields, 'transifex_password', $template); ?>
         </div>
         <?php endif; ?>
-        
+
         <?php if (isset($fields['link_shortener_url'])): ?>
         <hr class="text-muted" />
         <div class="row">

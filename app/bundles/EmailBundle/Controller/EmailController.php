@@ -640,8 +640,8 @@ class EmailController extends FormController
                 )
             );
         } elseif (!$this->factory->getSecurity()->hasEntityAccess(
-            'email:emails:viewown',
-            'email:emails:viewother',
+            'email:emails:editown',
+            'email:emails:editother',
             $entity->getCreatedBy()
         )
         ) {
