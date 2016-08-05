@@ -16,6 +16,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
 {
+    use ConfigAwareTrait;
+
     const PRIORITY = 1000;
 
     /**
@@ -56,16 +58,9 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
     public function __construct(HttpKernelInterface $app)
     {
         $this->app = $app;
-
-        $localConfig = __DIR__.'/../config/local.php';
-
-        if (file_exists($localConfig)) {
-            /** @var array $parameters */
-            include $localConfig;
-
-            $this->restrictCORSDomains = array_key_exists('cors_restrict_domains', $parameters) ? (bool) $parameters['cors_restrict_domains'] : true;
-            $this->validCORSDomains = array_key_exists('cors_valid_domains', $parameters) ? (array) $parameters['cors_valid_domains'] : [];
-        }
+        $this->config = $this->getConfig();
+        $this->restrictCORSDomains = array_key_exists('cors_restrict_domains', $this->config) ? (bool) $this->config['cors_restrict_domains'] : true;
+        $this->validCORSDomains = array_key_exists('cors_valid_domains', $this->config) ? (array) $this->config['cors_valid_domains'] : [];
     }
 
     /**

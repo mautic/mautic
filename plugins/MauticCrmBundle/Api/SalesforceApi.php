@@ -2,6 +2,7 @@
 namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 
 class SalesforceApi extends CrmApi
 {
@@ -10,9 +11,29 @@ class SalesforceApi extends CrmApi
         'encode_parameters' => 'json'
     );
 
-    public function request($operation, $elementData = array(), $method = 'GET', $retry = false)
+    public function __construct(CrmAbstractIntegration $integration)
     {
-        $request_url = sprintf($this->integration->getApiUrl() . '/%s/%s', $this->object, $operation);
+        parent::__construct($integration);
+
+        $this->requestSettings['curl_options'] = array(
+            CURLOPT_SSLVERSION => defined('CURL_SSLVERSION_TLSv1_1') ? CURL_SSLVERSION_TLSv1_1 : CURL_SSLVERSION_TLSv1_1
+        );
+    }
+
+    public function request($operation, $elementData = array(), $method = 'GET', $retry = false, $object = null, $queryUrl = null)
+    {
+        if(!$object){
+            $object = $this->object;
+        }
+
+        if(!$queryUrl){
+            $queryUrl = $this->integration->getApiUrl();
+            $request_url = sprintf($queryUrl . '/%s/%s', $object, $operation);
+        }
+        else{
+            $request_url = sprintf($queryUrl . '/%s', $operation);
+        }
+
 
         $response = $this->integration->makeRequest($request_url, $elementData, $method, $this->requestSettings);
 
@@ -72,7 +93,27 @@ class SalesforceApi extends CrmApi
      */
     public function getLeads($query)
     {
-        return $this->request('updated/', $query);
+        //find out if start date is not our of range for org
+        if ($query['start'])
+        {
+            $queryUrl = $this->integration->getQueryUrl();
+            $organization = $this->request('query', array("q"=>"SELECT CreatedDate from Organization"),'GET',false,null,$queryUrl);
+
+            if(strtotime($query['start']) < strtotime($organization['records'][0]['CreatedDate']))
+            {
+                $query['start'] = date('c',strtotime($organization['records'][0]['CreatedDate']." +1 hour"));
+            }
+        }
+        $fields = $this->integration->getAvailableLeadFields();
+        if($fields)
+        {
+            $fields = implode(", ",array_keys($fields));
+        }
+
+        $getLeadsQuery = "SELECT ".$fields." from Lead where LastModifiedDate>=".$query['start']." and LastModifiedDate<=".$query['end'];
+        $result = $this->request('query', array("q"=>$getLeadsQuery),'GET',false,null,$queryUrl);
+
+        return $result;
     }
 
     /**

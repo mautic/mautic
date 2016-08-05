@@ -686,7 +686,6 @@ abstract class AbstractIntegration
                 $event
             );
         }
-        
         if (!empty($settings['return_raw'])) {
 
             return $result;
@@ -951,7 +950,6 @@ abstract class AbstractIntegration
             $entity = new Integration();
             $entity->setName($this->getName());
         }
-
         // Prepare the keys for extraction such as renaming, setting expiry, etc
         $data = $this->prepareResponseForExtraction($data);
 

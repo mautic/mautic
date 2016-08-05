@@ -14,16 +14,15 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Form\Type\TagListType;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\CoreBundle\CoreEvents;
-use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -1491,6 +1490,8 @@ class LeadController extends FormController
 
                             $fileData = $form['file']->getData();
                             if (!empty($fileData)) {
+                                $errorMessage = null;
+                                $errorParameters = array();
                                 try {
                                     $fileData->move($cacheDir, $fileName);
 
@@ -1530,15 +1531,27 @@ class LeadController extends FormController
                                             return $this->importAction(0, true);
                                         }
                                     }
+                                } catch (FileException $e) {
+                                    if (strpos($e->getMessage(), 'upload_max_filesize') !== false) {
+                                        $errorMessage = 'mautic.lead.import.filetoolarge';
+                                        $errorParameters = array(
+                                            '%upload_max_filesize%' => ini_get('upload_max_filesize')
+                                        );
+                                    } else {
+                                        $errorMessage = 'mautic.lead.import.filenotreadable';
+                                    }
                                 } catch (\Exception $e) {
+                                    $errorMessage = 'mautic.lead.import.filenotreadable';
+                                } finally {
+                                    if (!is_null($errorMessage)) {
+                                        $form->addError(
+                                            new FormError(
+                                                $this->factory->getTranslator()->trans($errorMessage, $errorParameters, 'validators')
+                                            )
+                                        );
+                                    }
                                 }
                             }
-
-                            $form->addError(
-                                new FormError(
-                                    $this->factory->getTranslator()->trans('mautic.lead.import.filenotreadable', array(), 'validators')
-                                )
-                            );
                         }
                         break;
                     case 2:
