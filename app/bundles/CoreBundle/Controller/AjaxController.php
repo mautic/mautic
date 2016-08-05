@@ -75,7 +75,7 @@ class AjaxController extends CommonController
                 $parts     = explode(":", $action);
                 $namespace = 'Mautic';
                 $isPlugin  = false;
-                
+
                 if (count($parts) == 3 && $parts['0'] == 'plugin') {
                     $namespace = 'MauticPlugin';
                     array_shift($parts);
@@ -671,21 +671,6 @@ class AjaxController extends CommonController
 
             $model->setOnlineStatus($status);
         }
-
-        return $this->sendJsonResponse(array('success' => 1));
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
-    protected function markNotificationsReadAction(Request $request)
-    {
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model = $this->getModel('core.notification');
-
-        $model->markAllRead();
 
         return $this->sendJsonResponse(array('success' => 1));
     }
