@@ -13,7 +13,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\EmailBundle\Entity\StatDevice;
+use Mautic\LeadBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
@@ -125,14 +125,6 @@ class EmailModel extends FormModel
     public function getStatRepository()
     {
         return $this->em->getRepository('MauticEmailBundle:Stat');
-    }
-
-    /**
-     * @return \Mautic\EmailBundle\Entity\StatDeviceRepository
-     */
-    public function getStatDeviceRepository()
-    {
-        return $this->em->getRepository('MauticEmailBundle:StatDevice');
     }
 
     /**
@@ -466,7 +458,9 @@ class EmailModel extends FormModel
 
             $emailOpenDevice->setDateOpened($readDateTime->toUtcString());
             $emailOpenDevice->setIpAddress($ipAddress);
-            $emailOpenDevice->setStat($stat);
+            $emailOpenDevice->setStat($stat->getId());
+            $emailOpenDevice->setChannel('Email');
+            $emailOpenDevice->setChannelId($email->getId());
             $emailOpenDevice->setClientInfo($dd->getClient());
             $emailOpenDevice->setDevice($dd->getDeviceName());
             $emailOpenDevice->setDeviceBrand($dd->getBrand());
@@ -801,13 +795,19 @@ class EmailModel extends FormModel
 
                 if(!empty($statIds))
                 {
-                    $results = $this->getStatDeviceRepository()->getDeviceStats($statIds[0], $dateFrom, $dateTo);
+                    $results = $this->leadModel->getStatDeviceRepository()->getDeviceStats($statIds[0],$l->getId(), $dateFrom, $dateTo, 'Email', $emailIds[0]);
                 }
-
+                $key = 0;
                 foreach ($results as $result) {
-                    $label = substr(empty($result['device']) ? $this->translator->trans('mautic.core.unknown') : $result['device'], 0, 12);
-
-                    $chart->setDataset($label, $result['count']);
+                    $label = substr(empty($result['device']) ? $this->translator->trans('mautic.core.no.info') : $result['device'], 0, 12);
+                    $chart->setDataset(
+                        $label,
+                        [
+                            $result['count']
+                        ],
+                        $key
+                    );
+                    $key++;
                 }
             }
         }

@@ -28,6 +28,7 @@ use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\LeadBundle\Entity\StatDevice;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
@@ -737,16 +738,27 @@ class PageModel extends FormModel
             }
             $hit->setBrowserLanguages($languages);
         }
+
         //device granularity
         $dd = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
 
         $dd->parse();
 
-        $hit->setClientInfo($dd->getClient());
-        $hit->setDevice($dd->getDeviceName());
-        $hit->setDeviceBrand($dd->getBrand());
-        $hit->setDeviceModel($dd->getModel());
-        $hit->setDeviceOs($dd->getOs());
+        $deviceStat = new StatDevice();
+
+        $deviceStat->setChannel('Hit');
+        $deviceStat->setDateOpened($hit->getDateHit());
+        $deviceStat->setClientInfo($dd->getClient());
+        $deviceStat->setDevice($dd->getDeviceName());
+        $deviceStat->setDeviceBrand($dd->getBrand());
+        $deviceStat->setDeviceModel($dd->getModel());
+        $deviceStat->setDeviceOs($dd->getOs());
+        $deviceStat->setIpAddress($ipAddress);
+        if (!empty($deviceStat)) {
+            $this->em->getRepository('MauticLeadBundle:StatDevice')->saveEntities($deviceStat);
+        }
+
+        $hit->setDeviceStat($deviceStat);
 
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
@@ -1109,26 +1121,21 @@ class PageModel extends FormModel
 
         $q = $this->em->getConnection()->createQueryBuilder();
 
-        $q->select('count(h.id) as count, h.device as device')
-            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
+        $q->select('count(ds.id) as count, ds.device as device')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_stats_devices', 'ds')
             ->orderBy('device', 'DESC')
-            ->andWhere($q->expr()->gte('h.date_hit', ':date_from'))
+            ->andWhere($q->expr()->gte('ds.date_opened', ':date_from'))
             ->setParameter('date_from', $dateFrom->format('Y-m-d'))
-            ->andWhere($q->expr()->lte('h.date_hit', ':date_to'))
+            ->andWhere($q->expr()->lte('ds.date_opened', ':date_to'))
             ->setParameter('date_to', $dateTo->format('Y-m-d'." 23:59:59"));
-        $q->groupBy('h.device');
-
-        if (!empty($options['canViewOthers'])) {
-            $q->andWhere('l.created_by = :userId')
-                ->setParameter('userId', $this->user->getId());
-        }
+        $q->groupBy('ds.device');
 
         $results = $q->execute()->fetchAll();
 
         $chart     = new PieChart($data['labels']);
 
         foreach($results as $result){
-            $label=substr(empty($result['device'])?  $this->translator->trans('mautic.core.unknown'): $result['device'],0,12);
+            $label=substr(empty($result['device'])?  $this->translator->trans('mautic.core.no.info'): $result['device'],0,12);
 
             // $data['backgroundColor'][]='rgba(220,220,220,0.5)';
             $chart->setDataset($label,  $result['count']);

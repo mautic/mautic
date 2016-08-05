@@ -89,11 +89,9 @@ $query = $event['extra']['hit']['query'];
                         </dd>
                     <?php endif; ?>
                     <dt><?php echo $view['translator']->trans('mautic.core.timeline.device.os'); ?></dt>
-                    <?php if (isset($event['extra']['hit']['deviceOs']) and !empty($event['extra']['hit']['deviceOs'])): ?>
+                    <?php if (isset($event['extra']['hit']['deviceOsName']) and !empty($event['extra']['hit']['deviceOsName'])): ?>
                         <dd class="ellipsis">
-                            <?php
-                            foreach ($event['extra']['hit']['deviceOs'] as $deviceOs)
-                                echo $deviceOs; ?>
+                            <?php echo $event['extra']['hit']['deviceOsName']; ?>
                         </dd>
                     <?php endif; ?>
                     <?php if (isset($event['extra']['hit']['deviceBrand']) and !empty($event['extra']['hit']['deviceBrand'])): ?>

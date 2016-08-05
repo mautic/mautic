@@ -125,11 +125,6 @@ class Stat
     private $openDetails = array();
 
     /**
-     * @var array
-     */
-    private $openDevice = array();
-
-    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -220,12 +215,6 @@ class Stat
 
         $builder->addNullableField('openDetails', 'array', 'open_details');
 
-        $builder->createOneToMany('openDevice', 'StatDevice')
-            ->orphanRemoval()
-            ->setOrderBy(['dateAdded' => 'DESC'])
-            ->mappedBy('lead')
-            ->fetchExtraLazy()
-            ->build();
     }
 
     /**

@@ -188,6 +188,16 @@ class LeadModel extends FormModel
     }
 
     /**
+     * Get the tags repository
+     *
+     * @return \Mautic\LeadBundle\Entity\StatDeviceRepository
+     */
+    public function getStatDeviceRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:StatDevice');
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string

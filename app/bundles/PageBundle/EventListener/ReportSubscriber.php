@@ -385,7 +385,7 @@ class ReportSubscriber extends CommonSubscriber
                     $chart = new PieChart();
 
                     foreach ($data as $device) {
-                        $label = substr(empty($device['device'])?  $this->translator->trans('mautic.core.unknown'): $device['device'],0,12);
+                        $label = substr(empty($device['device'])?  $this->translator->trans('mautic.core.no.info'): $device['device'],0,12);
                         $chart->setDataset($label, $device['the_count']);
                     }
 

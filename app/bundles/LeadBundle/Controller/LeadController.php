@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\StatDevice;
 use Mautic\LeadBundle\Form\Type\TagListType;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;

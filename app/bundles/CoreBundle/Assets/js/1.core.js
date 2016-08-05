@@ -3303,7 +3303,7 @@ var Mautic = {
                         barPercentage: 8,
                         categorySpacing: 1
                     }],
-                    display: true
+                    display: false
                 },
                 legend: {
                     display: false

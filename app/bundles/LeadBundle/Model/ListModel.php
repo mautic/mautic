@@ -1244,7 +1244,7 @@ class ListModel extends FormModel
         $results = $q->execute()->fetchAll();
 
         foreach ($results as $result) {
-            $data['labels'][] = substr( empty($result['device']) ? $this->translator->trans('mautic.core.unknown') : $result['device'], 0, 12 );
+            $data['labels'][] = substr( empty($result['device']) ? $this->translator->trans('mautic.core.no.info') : $result['device'], 0, 12 );
             $data['values'][] = $result['leads'];
         }
 

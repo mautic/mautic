@@ -38,29 +38,29 @@ class Version20160719000000 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->addSql("ALTER TABLE {$this->prefix}page_hits ADD COLUMN client_info longtext DEFAULT NULL");
-        $this->addSql("ALTER TABLE {$this->prefix}page_hits ADD COLUMN device varchar(255) DEFAULT NULL");
-        $this->addSql("ALTER TABLE {$this->prefix}page_hits ADD COLUMN device_brand varchar(255) DEFAULT NULL");
-        $this->addSql("ALTER TABLE {$this->prefix}page_hits ADD COLUMN device_os varchar(255) DEFAULT NULL");
-        $this->addSql("ALTER TABLE {$this->prefix}page_hits ADD COLUMN device_model longtext DEFAULT NULL");
+        $this->addSql("ALTER TABLE {$this->prefix}page_hits ADD COLUMN devicestat_id int DEFAULT NULL");
 
         $sql = <<<SQL
-CREATE TABLE {$this->prefix}email_stats_device (
-`id` int(11) NOT NULL AUTO_INCREMENT,
-`ip_id` int(11) NOT NULL,
-`stat_id` int(11) NOT NULL,
-`client_info` longtext,
-`device` varchar(255) DEFAULT NULL,
-`device_brand` varchar(255) DEFAULT NULL,
-`device_model` varchar(255) DEFAULT NULL,
-`device_os` longtext,
+CREATE TABLE {$this->prefix}lead_stats_devices (
+`id` int (11) NOT NULL AUTO_INCREMENT,
+`ip_id` int( 11) NOT NULL,
+`stat_id` int (11) NOT NULL,
+`channel` VARCHAR (255) NOT NULL,
+`channel_id` int (11) NOT NULL,
+`client_info` longtext NOT NULL,
+`device` VARCHAR (255) DEFAULT NULL,
+`device_brand` VARCHAR (255) DEFAULT NULL,
+`device_model` VARCHAR (255) DEFAULT NULL,
+`device_os_name` VARCHAR (255) DEFAULT NULL,
+`device_os_shortname` VARCHAR (255) DEFAULT NULL,
+`device_os_version` VARCHAR (255) DEFAULT NULL,
+`device_os_platform` VARCHAR (255) DEFAULT NULL,
 `date_opened` datetime DEFAULT NULL,
 PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
 SQL;
         $this->addSql($sql);
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats_device ADD CONSTRAINT ' . $this->generatePropertyName('email_stats_device', 'fk', array('ip_id')) . ' FOREIGN KEY (ip_id) REFERENCES ' . $this->prefix . 'ip_addresses (id)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats_device ADD CONSTRAINT ' . $this->generatePropertyName('email_stats_device', 'fk', array('stat_id')) . ' FOREIGN KEY (stat_id) REFERENCES ' . $this->prefix . 'email_stats (id)');
-
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_stats_devices ADD CONSTRAINT ' . $this->generatePropertyName('lead_stats_devices', 'fk', array('ip_id')) . ' FOREIGN KEY (ip_id) REFERENCES ' . $this->prefix . 'ip_addresses (id)');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_hits ADD CONSTRAINT ' . $this->generatePropertyName('lead_devicestat_id', 'fk', array('devicestat_id')) . ' FOREIGN KEY (devicestat_id) REFERENCES ' . $this->prefix . 'lead_stats_devices (id)');
     }
 }

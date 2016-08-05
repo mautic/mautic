@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Entity;
+namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -26,7 +26,7 @@ class StatDeviceRepository extends CommonRepository
      *
      * @return array
      */
-    public function getDeviceStats($statIds, $listId= null,  \DateTime $fromDate = null, \DateTime $toDate = null)
+    public function getDeviceStats($statIds, $listId= null,  \DateTime $fromDate = null, \DateTime $toDate = null, $channel = null, $channelId = null)
     {
         $inIds = (!is_array($statIds)) ? array($statIds) : $statIds;
 
@@ -36,7 +36,7 @@ class StatDeviceRepository extends CommonRepository
         }
         $sq = $this->_em->getConnection()->createQueryBuilder();
         $sq->select('count(es.id) as count, es.device as device')
-            ->from(MAUTIC_TABLE_PREFIX.'email_stats_device', 'es');
+            ->from(MAUTIC_TABLE_PREFIX.'lead_stats_devices', 'es');
         if ($statIds) {
             if (!is_array($statIds)) {
                 $statIds = array((int) $statIds);
@@ -46,7 +46,20 @@ class StatDeviceRepository extends CommonRepository
             );
         }
 
+        if ($channel) {
+            $sq->where(
+                $sq->expr()->eq('es.channel', $channel)
+            );
+        }
 
+        if ($channelId) {
+            if (!is_array($channelId)) {
+                $channelId = array((int) $channelId);
+            }
+            $sq->where(
+                $sq->expr()->in('es.channel_id', $channelId)
+            );
+        }
 
         if ($fromDate !== null) {
             //make sure the date is UTC

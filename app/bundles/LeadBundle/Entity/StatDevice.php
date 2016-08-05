@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Entity;
+namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
@@ -19,7 +19,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 /**
  * Class StatDevice
  *
- * @package Mautic\EmailBundle\Entity
+ * @package Mautic\LeadBundle\Entity
  */
 class StatDevice
 {
@@ -30,9 +30,19 @@ class StatDevice
     private $id;
 
     /**
-     * @var \Mautic\EmailBundle\Entity\Email
+     * @var integer
      */
     private $stat;
+
+    /**
+     * @var string
+     */
+    private $channel;
+
+    /**
+     * @var integer
+     */
+    private $channelId;
 
     /**
      * @var \Mautic\CoreBundle\Entity\IpAddress
@@ -55,9 +65,24 @@ class StatDevice
     private $device;
 
     /**
-     * @var array
+     * @var string
      */
-    private $deviceOs;
+    private $deviceOsName;
+
+    /**
+     * @var string
+     */
+    private $deviceOsShortName;
+
+    /**
+     * @var string
+     */
+    private $deviceOsVersion;
+
+    /**
+     * @var string
+     */
+    private $deviceOsPlatform;
 
     /**
      * @var string
@@ -77,13 +102,21 @@ class StatDevice
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('email_stats_device')
-            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatDeviceRepository');
+        $builder->setTable('lead_stats_devices')
+            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\StatDeviceRepository');
 
         $builder->addId();
 
-        $builder->createManyToOne('stat', 'Mautic\EmailBundle\Entity\Stat')
-            ->addJoinColumn('stat_id', 'id', true, false, 'SET NULL')
+        $builder->createField('stat', 'integer')
+            ->columnName('stat_id')
+            ->nullable()
+            ->build();
+
+        $builder->addNullableField('channel', 'string');
+
+        $builder->createField('channelId', 'integer')
+            ->columnName('channel_id')
+            ->nullable()
             ->build();
 
         $builder->addIpAddress(true);
@@ -98,8 +131,23 @@ class StatDevice
 
         $builder->addNullableField('device', 'string');
 
-        $builder->createField('deviceOs', 'array')
-            ->columnName('device_os')
+        $builder->createField('deviceOsName', 'string')
+            ->columnName('device_os_name')
+            ->nullable()
+            ->build();
+
+        $builder->createField('deviceOsShortName', 'string')
+            ->columnName('device_os_shortname')
+            ->nullable()
+            ->build();
+
+        $builder->createField('deviceOsVersion', 'string')
+            ->columnName('device_os_version')
+            ->nullable()
+            ->build();
+
+        $builder->createField('deviceOsPlatform', 'string')
+            ->columnName('device_os_platform')
             ->nullable()
             ->build();
 
@@ -130,9 +178,14 @@ class StatDevice
                     'device',
                     'deviceBrand',
                     'deviceModel',
-                    'deviceOs',
+                    'deviceOsName',
+                    'deviceOsShortName',
+                    'deviceOsVersion',
+                    'deviceOsPlatform',
                     'ipAddress',
-                    'stat'
+                    'stat',
+                    'channel',
+                    'channelId'
                 )
             )
             ->build();
@@ -163,7 +216,7 @@ class StatDevice
     }
 
     /**
-     * @return Lead
+     * @return integer
      */
     public function getStat ()
     {
@@ -171,11 +224,43 @@ class StatDevice
     }
 
     /**
-     * @param mixed $stat
+     * @param integer $stat
      */
-    public function setStat (Stat $stat = null)
+    public function setStat ($stat = null)
     {
         $this->stat = $stat;
+    }
+
+    /**
+     * @return string
+     */
+    public function getChannel ()
+    {
+        return $this->channel;
+    }
+
+    /**
+     * @param string $channel
+     */
+    public function setChannel ($channel = null)
+    {
+        $this->channel = $channel;
+    }
+
+    /**
+     * @return integer
+     */
+    public function getChannelId ()
+    {
+        return $this->channelId;
+    }
+
+    /**
+     * @param integer $channelId
+     */
+    public function setChannelId ($channelId = null)
+    {
+        $this->channelId = $channelId;
     }
 
     /**
@@ -252,7 +337,7 @@ class StatDevice
 
 
     /**
-     * @param mixed $emailAddress
+     * @param mixed $deviceModel
      */
     public function setDeviceModel ($deviceModel)
     {
@@ -260,18 +345,21 @@ class StatDevice
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getDeviceOs ()
     {
-        return $this->deviceOs;
+        return $this->deviceOsName;
     }
 
     /**
-     * @param mixed $viewedInBrowser
+     * @param mixed $deviceOs
      */
     public function setDeviceOs ($deviceOs)
     {
-        $this->deviceOs = $deviceOs;
+        $this->deviceOsName = $deviceOs['name'];
+        $this->deviceOsShortName = $deviceOs['short_name'];
+        $this->deviceOsVersion = $deviceOs['version'];
+        $this->deviceOsPlatform = $deviceOs['platform'];
     }
 }

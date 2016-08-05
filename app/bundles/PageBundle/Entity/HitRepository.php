@@ -72,7 +72,7 @@ class HitRepository extends CommonRepository
     public function getLeadHits($leadId, array $options = array())
     {
         $query = $this->createQueryBuilder('h');
-        $query->select('IDENTITY(h.page) AS page_id, h.userAgent, h.dateHit, h.dateLeft, h.referer, h.source, h.sourceId, h.url, h.urlTitle, h.query, h.clientInfo, h.device, h.deviceOs, h.deviceBrand, h.deviceModel')
+        $query->select('IDENTITY(h.page) AS page_id, h.userAgent, h.dateHit, h.dateLeft, h.referer, h.source, h.sourceId, h.url, h.urlTitle, h.query, ds.clientInfo, ds.device, ds.deviceOsName, ds.deviceBrand, ds.deviceModel')
             ->where('h.lead = ' . (int) $leadId);
 
         if (!empty($options['ipIds'])) {
@@ -83,6 +83,8 @@ class HitRepository extends CommonRepository
             $query->leftJoin('h.page', 'p')
                 ->andWhere($query->expr()->like('p.title', $query->expr()->literal('%' . $options['filters']['search'] . '%')));
         }
+
+        $query->leftjoin('h.deviceStat', 'ds');
 
         if (isset($options['url']) && $options['url']) {
             $query->andWhere($query->expr()->eq('h.url', $query->expr()->literal($options['url'])));

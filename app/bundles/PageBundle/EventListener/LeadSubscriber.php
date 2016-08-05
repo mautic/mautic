@@ -73,6 +73,7 @@ class LeadSubscriber extends CommonSubscriber
 
         // Add the hits to the event array
         foreach ($hits as $hit) {
+
             $template   = 'MauticPageBundle:SubscribedEvents\Timeline:index.html.php';
             $eventLabel = $eventTypeName;
 
