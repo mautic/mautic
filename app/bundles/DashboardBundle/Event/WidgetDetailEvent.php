@@ -220,6 +220,7 @@ class WidgetDetailEvent extends CommonEvent
             'params' => $params,
             'width'  => $this->getWidget()->getWidth(),
             'height' => $this->getWidget()->getHeight(),
+            'locale' => $this->translator->getLocale()
         );
 
         return $this->uniqueId = $this->getType().'_'.substr(md5(json_encode($uniqueSettings)), 0, 16);
