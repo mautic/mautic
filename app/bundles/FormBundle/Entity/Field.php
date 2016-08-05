@@ -119,6 +119,11 @@ class Field
     private $saveResult = true;
 
     /**
+     * @var bool
+     */
+    private $isAutoFill = false;
+
+    /**
      * @var array
      */
     private $changes;
@@ -223,6 +228,8 @@ class Field
 
         $builder->addNullableField('saveResult', 'boolean', 'save_result');
 
+        $builder->addNullableField('isAutoFill', 'boolean', 'is_auto_fill');
+
         $builder->addNullableField('showWhenValueExists', 'boolean', 'show_when_value_exists');
 
         $builder->addNullableField('showAfterXSubmissions', 'integer', 'show_after_x_submissions');
@@ -253,7 +260,8 @@ class Field
                     'inputAttributes',
                     'containerAttributes',
                     'leadField',
-                    'saveResult'
+                    'saveResult',
+                    'isAutoFill'
                 )
             )
             ->build();
@@ -769,6 +777,22 @@ class Field
     }
 
     /**
+     * @return bool
+     */
+    public function getIsAutoFill()
+    {
+        return $this->isAutoFill;
+    }
+
+    /**
+     * @param mixed $isAutoFill
+     */
+    public function setIsAutoFill($isAutoFill)
+    {
+        $this->isAutoFill = $isAutoFill;
+    }
+
+    /**
      * @return boolean
      */
     public function getShowWhenValueExists()
@@ -828,7 +852,7 @@ class Field
                 foreach ($submissions as $submission) {
                     if (!empty($submission[$this->alias])) {
                         return false;
-                    }               
+                    }
                 }
             }
 
