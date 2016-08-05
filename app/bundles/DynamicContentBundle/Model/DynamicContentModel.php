@@ -30,6 +30,16 @@ class DynamicContentModel extends FormModel
     use TranslationModelTrait;
 
     /**
+     * Retrieve the permissions base
+     *
+     * @return string
+     */
+    public function getPermissionBase()
+    {
+        return 'dynamicContent:dynamicContents';
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return DynamicContentRepository

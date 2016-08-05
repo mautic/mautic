@@ -53,10 +53,10 @@ class LeadType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('lead.lead', $options));
 
         if (!$options['isShortForm']) {
-            $imageChoices = array(
+            $imageChoices = [
                 'gravatar' => 'Gravatar',
                 'custom'   => 'mautic.lead.lead.field.custom_avatar'
-            );
+            ];
 
             $cache = $options['data']->getSocialCache();
             if (count($cache)) {
@@ -68,60 +68,65 @@ class LeadType extends AbstractType
             $builder->add(
                 'preferred_profile_image',
                 'choice',
-                array(
+                [
                     'choices'    => $imageChoices,
                     'label'      => 'mautic.lead.lead.field.preferred_profile',
-                    'label_attr' => array('class' => 'control-label'),
+                    'label_attr' => ['class' => 'control-label'],
                     'required'   => true,
                     'multiple'   => false,
-                    'attr'       => array(
+                    'attr'       => [
                         'class' => 'form-control'
-                    )
-                )
+                    ]
+                ]
             );
 
             $builder->add(
                 'custom_avatar',
                 'file',
-                array(
+                [
                     'label'      => false,
-                    'label_attr' => array('class' => 'control-label'),
+                    'label_attr' => ['class' => 'control-label'],
                     'required'   => false,
-                    'attr'       => array(
+                    'attr'       => [
                         'class' => 'form-control'
-                    ),
+                    ],
                     'mapped'     => false,
-                    'constraints' => array(
+                    'constraints' => [
                         new File(
-                            array(
-                                'mimeTypes' => array(
+                            [
+                                'mimeTypes' => [
                                     'image/gif',
                                     'image/jpeg',
                                     'image/png'
-                                ),
+                                ],
                                 'mimeTypesMessage' => 'mautic.lead.avatar.types_invalid'
-                            )
+                            ]
                         )
-                    )
-                )
+                    ]
+                ]
             );
         }
 
-        $fieldValues = (!empty($options['data'])) ? $options['data']->getFields() : array('filter' => array('isVisible' => true));
+        $fieldValues = (!empty($options['data'])) ? $options['data']->getFields() : ['filter' => ['isVisible' => true]];
         foreach ($options['fields'] as $field) {
             if ($field['isPublished'] === false) continue;
-            $attr        = array('class' => 'form-control');
+            $attr        = ['class' => 'form-control'];
             $properties  = $field['properties'];
             $type        = $field['type'];
             $required    = $field['isRequired'];
             $alias       = $field['alias'];
             $group       = $field['group'];
+
+            if ($field['isUniqueIdentifer']) {
+                $attr['data-unique-identifier'] = $field['alias'];
+            }
+
             $value       = (isset($fieldValues[$group][$alias]['value'])) ?
                 $fieldValues[$group][$alias]['value'] : $field['defaultValue'];
-            $constraints = array();
+            $constraints = [];
             if ($required) {
                 $constraints[] = new NotBlank(
-                    array('message' => 'mautic.lead.customfield.notblank')
+                    ['message' => 'mautic.lead.customfield.notblank']
                 );
             }
 
@@ -229,6 +234,7 @@ class LeadType extends AbstractType
                 case 'country':
                 case 'region':
                 case 'timezone':
+                case 'locale':
                     switch ($type) {
                         case 'country':
                             $choices = FormFieldHelper::getCountryChoices();
@@ -294,15 +300,15 @@ class LeadType extends AbstractType
         $builder->add(
         'tags',
             'lead_tag',
-            array(
+            [
                 'by_reference' => false,
-                'attr'         => array(
+                'attr'         => [
                     'data-placeholder'      => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
                     'data-no-results-text'  => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
                     'data-allow-add'        => 'true',
                     'onchange'              => 'Mautic.createLeadTag(this)'
-                )
-            )
+                ]
+            ]
         );
 
         $transformer = new IdToEntityModelTransformer(
@@ -314,15 +320,15 @@ class LeadType extends AbstractType
             $builder->create(
                 'owner',
                 'user_list',
-                array(
+                [
                     'label'      => 'mautic.lead.lead.field.owner',
-                    'label_attr' => array('class' => 'control-label'),
-                    'attr'       => array(
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
                         'class' => 'form-control'
-                    ),
+                    ],
                     'required'   => false,
                     'multiple'   => false
-                )
+                ]
             )
             ->addModelTransformer($transformer)
         );
@@ -336,15 +342,15 @@ class LeadType extends AbstractType
             $builder->create(
                 'stage',
                 'stage_list',
-                array(
+                [
                     'label'      => 'mautic.lead.lead.field.stage',
-                    'label_attr' => array('class' => 'control-label'),
-                    'attr'       => array(
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
                         'class' => 'form-control'
-                    ),
+                    ],
                     'required'   => false,
                     'multiple'   => false
-                )
+                ]
             )
                 ->addModelTransformer($transformer)
         );
@@ -355,10 +361,10 @@ class LeadType extends AbstractType
             $builder->add(
                 'buttons',
                 'form_buttons',
-                array(
+                [
                     'apply_text' => false,
                     'save_text'  => 'mautic.core.form.save'
-                )
+                ]
             );
         }
 
@@ -373,13 +379,13 @@ class LeadType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'data_class'  => 'Mautic\LeadBundle\Entity\Lead',
                 'isShortForm' => false
-            )
+            ]
         );
 
-        $resolver->setRequired(array('fields', 'isShortForm'));
+        $resolver->setRequired(['fields', 'isShortForm']);
     }
 
     /**
