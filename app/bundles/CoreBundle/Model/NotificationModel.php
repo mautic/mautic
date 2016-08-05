@@ -178,7 +178,8 @@ class NotificationModel extends FormModel
 
         $this->updateUpstreamNotifications();
 
-        $notifications = $this->getRepository()->getNotifications($afterId, null, $includeRead);
+        $userId        = ($this->user) ? $this->user->getId() : 0;
+        $notifications = $this->getRepository()->getNotifications($userId, $afterId, $includeRead);
 
         $showNewIndicator = false;
 
@@ -254,8 +255,10 @@ class NotificationModel extends FormModel
         foreach ($feed->getItems() as $item) {
             $description = $item->getDescription();
             if (mb_strlen(strip_tags($description)) > 300) {
-                $description  = mb_substr(strip_tags($description), 0, 300);
-                $description .= "... <a href=\"".$item->getLink()."\" target=\"_blank\">".$this->translator->trans('mautic.core.notification.read_more')."</a>";
+                $description = mb_substr(strip_tags($description), 0, 300);
+                $description .= "... <a href=\"".$item->getLink()."\" target=\"_blank\">".$this->translator->trans(
+                        'mautic.core.notification.read_more'
+                    )."</a>";
             }
             $header = $item->getTitle();
 

@@ -97,13 +97,9 @@ class NotificationRepository extends CommonRepository
     {
         $qb = $this->createQueryBuilder('n');
 
-        $expr = $qb->expr()->andX();
-
-        if ($userId) {
-            $expr->add(
-                $qb->expr()->eq('IDENTITY(n.user)', $userId)
-            );
-        }
+        $expr = $qb->expr()->andX(
+            $qb->expr()->eq('IDENTITY(n.user)', $userId)
+        );
 
         if ($afterId) {
             $expr->add(
@@ -124,9 +120,7 @@ class NotificationRepository extends CommonRepository
             $qb->setParameter('type', $type);
         }
 
-        if ($expr->count()) {
-            $qb->where($expr);
-        }
+        $qb->where($expr);
 
         return $qb->getQuery()->getArrayResult();
     }
