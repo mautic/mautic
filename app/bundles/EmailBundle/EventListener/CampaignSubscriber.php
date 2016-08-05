@@ -131,6 +131,9 @@ class CampaignSubscriber extends CommonSubscriber
         $emailSent       = false;
         $lead            = $event->getLead();
         $leadCredentials = ($lead instanceof Lead) ? $lead->getProfileFields() : $lead;
+        $leadCredentials['owner_id'] = (
+            ($lead instanceof Lead) && ($owner = $lead->getOwner())
+        ) ? $owner->getId() : 0;
 
         if (!empty($leadCredentials['email'])) {
             $emailId = (int) $event->getConfig()['email'];
