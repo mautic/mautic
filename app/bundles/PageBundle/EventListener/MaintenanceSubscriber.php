@@ -53,12 +53,18 @@ class MaintenanceSubscriber extends CommonSubscriber
      */
     public function onDataCleanup (MaintenanceEvent $event)
     {
+        $this->cleanData($event, 'page_hits');
+        $this->cleanData($event, 'lead_utmtags');
+    }
+
+    private function cleanData(MaintenanceEvent $event, $table)
+    {
         $qb = $this->db->createQueryBuilder()
             ->setParameter('date', $event->getDate()->format('Y-m-d H:i:s'));
 
         if ($event->isDryRun()) {
             $rows = $qb->select('count(*) as records')
-                ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
+                ->from(MAUTIC_TABLE_PREFIX.$table, 'h')
                 ->join('h', MAUTIC_TABLE_PREFIX.'leads', 'l', 'h.lead_id = l.id')
                 ->where(
                     $qb->expr()->andX(
@@ -79,7 +85,7 @@ class MaintenanceSubscriber extends CommonSubscriber
                     )
                 );
 
-            $rows = $qb->delete(MAUTIC_TABLE_PREFIX.'page_hits')
+            $rows = $qb->delete(MAUTIC_TABLE_PREFIX.$table)
                 ->where(
                     $qb->expr()->in(
                         'lead_id',
@@ -89,6 +95,6 @@ class MaintenanceSubscriber extends CommonSubscriber
                 ->execute();
         }
 
-        $event->setStat($this->translator->trans('mautic.maintenance.visitor_page_hits'), $rows, $qb->getSQL(), $qb->getParameters());
+        $event->setStat($this->translator->trans('mautic.maintenance.'.$table), $rows, $qb->getSQL(), $qb->getParameters());
     }
 }

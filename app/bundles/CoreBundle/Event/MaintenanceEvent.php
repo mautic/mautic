@@ -98,6 +98,8 @@ class MaintenanceEvent extends Event
      */
     public function getStats()
     {
+        ksort($this->stats, SORT_NATURAL);
+
         return $this->stats;
     }
 

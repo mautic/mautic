@@ -55,25 +55,37 @@ class MaintenanceSubscriber extends CommonSubscriber
      */
     public function onDataCleanup (MaintenanceEvent $event)
     {
+        $this->cleanupData($event, 'audit_log');
+        $this->cleanupData($event, 'notifications');
+    }
+
+    /**
+     * @param $isDryRun
+     * @param $date
+     *
+     * @return int
+     */
+    private function cleanupData (MaintenanceEvent $event, $table)
+    {
         $qb = $this->db->createQueryBuilder()
             ->setParameter('date', $event->getDate()->format('Y-m-d H:i:s'));
 
         if ($event->isDryRun()) {
             $rows = (int) $qb->select('count(*) as records')
-                ->from(MAUTIC_TABLE_PREFIX.'audit_log', 'log')
+                ->from(MAUTIC_TABLE_PREFIX.$table, 'log')
                 ->where(
                     $qb->expr()->lte('log.date_added', ':date')
                 )
                 ->execute()
                 ->fetchColumn();
         } else {
-            $rows = (int) $qb->delete(MAUTIC_TABLE_PREFIX.'audit_log')
+            $rows = (int) $qb->delete(MAUTIC_TABLE_PREFIX.$table)
                 ->where(
                     $qb->expr()->lte('date_added', ':date')
                 )
                 ->execute();
         }
 
-        $event->setStat($this->translator->trans('mautic.maintenance.audit_log'), $rows, $qb->getSQL(), $qb->getParameters());
+        $event->setStat($this->translator->trans('mautic.maintenance.'.$table), $rows, $qb->getSQL(), $qb->getParameters());
     }
 }
