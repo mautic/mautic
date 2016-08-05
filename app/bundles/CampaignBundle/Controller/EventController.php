@@ -27,7 +27,7 @@ class EventController extends CommonFormController
         $success = 0;
         $valid   = $cancelled = false;
         $method  = $this->request->getMethod();
-        $session = $this->factory->getSession();
+        $session = $this->get('session');
         if ($method == 'POST') {
             $event                = $this->request->request->get('campaignevent');
             $type                 = $event['type'];
@@ -56,7 +56,7 @@ class EventController extends CommonFormController
         //ajax only for form fields
         if (!$type
             || !$this->request->isXmlHttpRequest()
-            || !$this->factory->getSecurity()->isGranted(
+            || !$this->get('mautic.security')->isGranted(
                 [
                     'campaign:campaigns:edit',
                     'campaign:campaigns:create'
@@ -210,7 +210,7 @@ class EventController extends CommonFormController
      */
     public function editAction($objectId)
     {
-        $session        = $this->factory->getSession();
+        $session        = $this->get('session');
         $method         = $this->request->getMethod();
         $campaignId     = ($method == "POST")
             ? $this->request->request->get('campaignevent[campaignId]', '', true)
@@ -246,7 +246,7 @@ class EventController extends CommonFormController
 
             //ajax only for form fields
             if (!$type || !$this->request->isXmlHttpRequest()
-                || !$this->factory->getSecurity()->isGranted(
+                || !$this->get('mautic.security')->isGranted(
                     [
                         'campaign:campaigns:edit',
                         'campaign:campaigns:create'
@@ -404,13 +404,13 @@ class EventController extends CommonFormController
     public function deleteAction($objectId)
     {
         $campaignId     = $this->request->query->get('campaignId');
-        $session        = $this->factory->getSession();
+        $session        = $this->get('session');
         $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified', []);
         $deletedEvents  = $session->get('mautic.campaign.'.$campaignId.'.events.deleted', []);
 
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest()
-            || !$this->factory->getSecurity()->isGranted(
+            || !$this->get('mautic.security')->isGranted(
                 [
                     'campaign:campaigns:edit',
                     'campaign:campaigns:create'
@@ -460,13 +460,13 @@ class EventController extends CommonFormController
     public function undeleteAction($objectId)
     {
         $campaignId     = $this->request->query->get('campaignId');
-        $session        = $this->factory->getSession();
+        $session        = $this->get('session');
         $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified', []);
         $deletedEvents  = $session->get('mautic.campaign.'.$campaignId.'.events.deleted', []);
 
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest()
-            || !$this->factory->getSecurity()->isGranted(
+            || !$this->get('mautic.security')->isGranted(
                 [
                     'campaign:campaigns:edit',
                     'campaign:campaigns:create'
