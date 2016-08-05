@@ -66,9 +66,9 @@ class ContactFrequencyType extends AbstractType
         $builder->add('frequency_time','choice',
             array(
                 'choices'    => array(
-                    '1 DAY' => 'day',
-                    '1 WEEK' => 'week',
-                    '1 MONTH' => 'month'
+                    'DAY' => 'day',
+                    'WEEK' => 'week',
+                    'MONTH' => 'month'
                 ),
                 'label'      => 'mautic.lead.list.frequency.times',
                 'label_attr' => array('class' => 'control-label'),
