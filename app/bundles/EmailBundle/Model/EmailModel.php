@@ -28,6 +28,7 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -78,6 +79,11 @@ class EmailModel extends FormModel
     protected $userModel;
 
     /**
+     * @var Mixed
+     */
+    protected $coreParameters;
+
+    /**
      * EmailModel constructor.
      *
      * @param IpLookupHelper $ipLookupHelper
@@ -95,7 +101,8 @@ class EmailModel extends FormModel
         MailHelper $mailHelper,
         LeadModel $leadModel,
         TrackableModel $pageTrackableModel,
-        UserModel $userModel
+        UserModel $userModel,
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->ipLookupHelper     = $ipLookupHelper;
         $this->themeHelper        = $themeHelper;
@@ -104,6 +111,7 @@ class EmailModel extends FormModel
         $this->leadModel          = $leadModel;
         $this->pageTrackableModel = $pageTrackableModel;
         $this->userModel          = $userModel;
+        $this->coreParameters    = $coreParametersHelper;
     }
 
     /**
@@ -854,11 +862,7 @@ class EmailModel extends FormModel
                 // Only retrieve the difference between what has already been sent and the limit
                 $limit -= $leadCount;
             }
-            /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
-            $frequencyRulesRepo = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
 
-            $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', null, $list->getId());
-            $leads = array_diff($dontSendTo,$leads);
             $listErrors = $this->sendEmail($email, $leads, $options);
 
             if (!empty($listErrors)) {
@@ -1010,12 +1014,19 @@ class EmailModel extends FormModel
             $emailSettings = $this->getEmailSettings($email);
         }
 
-        if (!$allowResends) {
-            static $sent = [];
-            if (!isset($sent[$email->getId()])) {
-                $sent[$email->getId()] = $statRepo->getSentStats($email->getId(), $listId);
-            }
-            $sendTo = array_diff_key($leads, $sent[$email->getId()]);
+        $defaultFrequencyNumber = $this->coreParameters->getParameter('email_frequency_number');
+        $defaultFrequencyTime = $this->coreParameters->getParameter('email_frequency_time');
+
+        /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
+        $frequencyRulesRepo = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
+
+        $leadIds = array_keys($leads);
+        $leadIds = implode("','", $leadIds);
+
+        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', "'".$leadIds."'", $listId, $defaultFrequencyNumber, $defaultFrequencyTime);
+
+        if (!empty($dontSendTo)) {
+            $sendTo = array_diff_key($leads, $dontSendTo);
         } else {
             $sendTo = $leads;
         }

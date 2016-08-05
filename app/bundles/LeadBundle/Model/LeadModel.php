@@ -1120,7 +1120,7 @@ class LeadModel extends FormModel
         $frequencyRules = $frequencyRuleRepo->getFrequencyRules($channel, $lead->getId());
 
         if (empty($frequencyRules)) {
-            return false;
+            return array();
         }
 
         return $frequencyRules;
@@ -1136,32 +1136,28 @@ class LeadModel extends FormModel
      */
     public function setFrequencyRules(Lead $lead, $channel, $frequencyTime = null, $frequencyNumber = null)
     {
+        // One query to get all the lead's current frequency rules and go ahead and create entities for them
+        $frequencyRules = $lead->getFrequencyRules()->toArray();
+        $entities = [];
         foreach ($channel as $ch){
-            $frequencyRules = $this->getFrequencyRule($lead, $ch);
-
-            // If they don't have a DNC entry yet
-            if (!$frequencyRules) {
-                $frequencyRule = new FrequencyRule();
-            }
-            else {
-                /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRuleRepo */
-                $frequencyRuleRepo = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
-                $frequencyRule = $frequencyRuleRepo->getEntity($frequencyRules[0]['id']);
-            }
-
+            $frequencyRule = (isset($frequencyRules[$ch])) ? $frequencyRules[$ch] : new FrequencyRule();
             $frequencyRule->setChannel($ch);
             $frequencyRule->setLead($lead);
             $frequencyRule->setDateAdded(new \DateTime);
             $frequencyRule->setFrequencyNumber($frequencyNumber);
             $frequencyRule->setFrequencyTime($frequencyTime);
+            $frequencyRule->setLead($lead);
 
-            $lead->setFrequencyRules($frequencyRule);
+            $entities[] = $frequencyRule;
+        }
 
-            $this->saveEntity($lead);
+        if (!empty($entities)) {
+            $this->em->getRepository('MauticLeadBundle:FrequencyRule')->saveEntities($entities);
         }
 
         return true;
     }
+
 
     /**
      * @param      $fields

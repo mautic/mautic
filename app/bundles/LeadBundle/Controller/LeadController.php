@@ -1013,24 +1013,11 @@ class LeadController extends FormController
             if ($this->request->getMethod() == 'POST') {
                 if (!$this->isFormCancelled($form)) {
                     if ($valid = $this->isFormValid($form)) {
-                        $model = $this->getModel('lead.lead');
-                        $entity = $model->getEntity($objectId);
                         $formdata = $form->getData();
-                        $this->factory->getLogger()->addError(print_r($data,true));
-                        $valid = true;
-                        if ($entity === null) {
-                            $flashes[] = array(
-                                'type' => 'error',
-                                'msg' => 'mautic.lead.lead.error.notfound',
-                                'msgVars' => array('%id%' => $objectId)
-                            );
-                        } else {
-                            $model->setFrequencyRules($entity,$formdata['channels'], $formdata['frequency_time'], $formdata['frequency_number']);
-                        }
+                        $model->setFrequencyRules($lead,$formdata['channels'], $formdata['frequency_time'], $formdata['frequency_number']);
                     }
                 }
                 if ($valid) {
-
                     $viewParameters = array(
                         'objectId'     => $lead->getId(),
                         'objectAction' => 'view',
@@ -1072,6 +1059,7 @@ class LeadController extends FormController
             );
         }
     }
+
     /**
      * Deletes the entity
      *

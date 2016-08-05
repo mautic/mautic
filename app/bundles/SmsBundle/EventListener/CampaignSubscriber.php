@@ -134,11 +134,20 @@ class CampaignSubscriber extends CommonSubscriber
 
         $metadata = false;
 
-        if($this->smsHelper->applyFrequencyRules($lead))
-        {
+        $defaultFrequencyNumber = $this->factory->getParameter('sms_frequency_number');
+        $defaultFrequencyTime = $this->factory->getParameter('sms_frequency_time');
+
+        /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
+        $frequencyRulesRepo = $this->leadModel->getFrequencyRuleRepository();
+
+        $leadIds = $lead->getId();
+
+        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', "'".$leadIds."'", null, $defaultFrequencyNumber, $defaultFrequencyTime);
+
+
+        if (!empty($dontSendTo) and $dontSendTo[0]['lead_id'] != $lead->getId()) {
             $metadata = $this->smsApi->sendSms($leadPhoneNumber, $smsEvent->getContent());
         }
-
 
         // If there was a problem sending at this point, it's an API problem and should be requeued
         if ($metadata === false) {

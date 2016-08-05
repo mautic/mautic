@@ -557,7 +557,7 @@ class ConfigType extends AbstractType
                 'required'   => false
             )
         );
-        $builder->add('frequency_number','number',
+        $builder->add('email_frequency_number','number',
             array(
                 'precision'  => 0,
                 'label'      => 'mautic.lead.list.frequency.number',
@@ -567,12 +567,12 @@ class ConfigType extends AbstractType
                     'class' => 'form-control frequency'
                 )
             ));
-        $builder->add('frequency_time','choice',
+        $builder->add('email_frequency_time','choice',
             array(
                 'choices'    => array(
-                    '1D' => 'day',
-                    '1W' => 'week',
-                    '1M' => 'month'
+                    'DAY' => 'day',
+                    'WEEK' => 'week',
+                    'MONTH' => 'month'
                 ),
                 'label'      => 'mautic.lead.list.frequency.times',
                 'label_attr' => array('class' => 'control-label'),

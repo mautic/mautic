@@ -257,7 +257,8 @@ return [
                     'mautic.helper.mailer',
                     'mautic.lead.model.lead',
                     'mautic.page.model.trackable',
-                    'mautic.user.model.user'
+                    'mautic.user.model.user',
+                    'mautic.helper.core_parameters'
                 ]
             ]
         ]
@@ -288,6 +289,8 @@ return [
         'resubscribe_message'          => null,
         'monitored_email'              => [],
         'mailer_is_owner'              => false,
-        'default_signature_text'       => null
+        'default_signature_text'       => null,
+        'email_frequency_number'             => 1,
+        'email_frequency_time'               => 'DAY'
     ]
 ];

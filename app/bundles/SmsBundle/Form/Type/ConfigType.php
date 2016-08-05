@@ -110,9 +110,9 @@ class ConfigType extends AbstractType
         $builder->add('sms_frequency_time','choice',
             array(
                 'choices'    => array(
-                    '1D' => 'day',
-                    '1W' => 'week',
-                    '1M' => 'month'
+                    'DAY' => 'day',
+                    'WEEK' => 'week',
+                    'MONTH' => 'month'
                 ),
                 'label'      => 'mautic.lead.list.frequency.times',
                 'label_attr' => array('class' => 'control-label'),
