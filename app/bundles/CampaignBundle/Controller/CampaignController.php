@@ -218,9 +218,6 @@ class CampaignController extends FormController
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
         $model = $this->getModel('campaign');
 
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $pageModel = $this->getModel('page');
-
         $security = $this->get('mautic.security');
         $entity   = $model->getEntity($objectId);
 
@@ -234,7 +231,6 @@ class CampaignController extends FormController
             ],
             "RETURN_ARRAY"
         );
-
 
         if ($entity === null) {
             //set the return URL
@@ -259,6 +255,7 @@ class CampaignController extends FormController
                 ]
             );
         } elseif (!$permissions['campaign:campaigns:view']) {
+
             return $this->accessDenied();
         }
 
@@ -267,15 +264,21 @@ class CampaignController extends FormController
         $action          = $this->generateUrl('mautic_campaign_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
 
-        $eventLogRepo     = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
-        $events           = $model->getEventRepository()->getCampaignEvents($entity->getId());
-        $leadCount        = $model->getRepository()->getCampaignLeadCount($entity->getId());
+        $eventLogRepo = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+        $events       = $model->getEventRepository()->getCampaignEvents($entity->getId());
+        $leadCount    = $model->getRepository()->getCampaignLeadCount($entity->getId());
 
         $campaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), true);
 
-        foreach ($events as &$event) {
-            $event['logCount'] = (isset($campaignLogCounts[$event['id']])) ? (int) $campaignLogCounts[$event['id']] : 0;
-            $event['percent']  = ($leadCount) ? round($event['logCount'] / $leadCount * 100) : 0;
+        $sortedEvents = [
+            'decision'  => [],
+            'action'    => [],
+            'condition' => []
+        ];
+        foreach ($events as $event) {
+            $event['logCount']                   = (isset($campaignLogCounts[$event['id']])) ? (int) $campaignLogCounts[$event['id']] : 0;
+            $event['percent']                    = ($leadCount) ? round($event['logCount'] / $leadCount * 100) : 0;
+            $sortedEvents[$event['eventType']][] = $event;
         }
 
         $stats = $model->getCampaignMetricsLineChartData(
@@ -297,7 +300,8 @@ class CampaignController extends FormController
                     'security'      => $security,
                     'logs'          => $logs,
                     'stats'         => $stats,
-                    'events'        => $events,
+                    'events'        => $sortedEvents,
+                    'sources'       => $model->getLeadSources($entity),
                     'dateRangeForm' => $dateRangeForm->createView(),
                     'campaignLeads' => $this->forward(
                         'MauticCampaignBundle:Campaign:leads',
