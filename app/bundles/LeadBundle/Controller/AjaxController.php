@@ -55,6 +55,50 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
+    protected function getLeadIdsByFieldValueAction(Request $request)
+    {
+        $field     = InputHelper::clean($request->request->get('field'));
+        $value     = InputHelper::clean($request->request->get('value'));
+        $ignore    = (int) $request->request->get('ignore');
+        $dataArray = ['items' => []];
+
+        if ($field && $value) {
+            $repo        = $this->getModel('lead.lead')->getRepository();
+            $leads       = $repo->getLeadsByFieldValue($field, $value, $ignore);
+            $dataArray['existsMessage'] = $this->factory->getTranslator()->trans('mautic.lead.exists.by.field').': ';
+
+            foreach ($leads as $lead) {
+                $fields = $repo->getFieldValues($lead->getId());
+                $lead->setFields($fields);
+                $name = $lead->getName();
+
+                if (!$name) {
+                    $name = $lead->getEmail();
+                }
+
+                if (!$name) {
+                    $name = $this->factory->getTranslator()->trans('mautic.lead.lead.anonymous');
+                }
+
+                $leadLink = $this->generateUrl('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $lead->getId()]);
+
+                $dataArray['items'][] = [
+                    'name' => $name,
+                    'id'   => $lead->getId(),
+                    'link' => $leadLink
+                ];
+            }
+        }
+        
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     protected function fieldListAction (Request $request)
     {
         $dataArray = array('success' => 0);

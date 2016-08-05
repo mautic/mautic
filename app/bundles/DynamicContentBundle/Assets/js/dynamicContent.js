@@ -83,7 +83,7 @@ Mautic.dynamicContentOnLoad = function (container, response) {
 
         window.close();
     } else if (mQuery(container + ' #list-search').length) {
-        Mautic.activateSearchAutocomplete('list-search', 'dwc');
+        Mautic.activateSearchAutocomplete('list-search', 'dynamicContent');
     }
 };
 
