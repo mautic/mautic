@@ -173,6 +173,11 @@ class LeadTimelineEvent extends Event
      */
     public function getEvents()
     {
+        if (empty($this->events)) {
+
+            return [];
+        }
+
         $events = call_user_func_array('array_merge', $this->events);
 
         foreach ($events as &$e) {
@@ -230,6 +235,11 @@ class LeadTimelineEvent extends Event
      */
     public function getMaxPage()
     {
+        if (!$this->totalEvents) {
+
+            return 1;
+        }
+
         // Find the type that has the largest number of total records
         $largest = max($this->totalEvents);
 

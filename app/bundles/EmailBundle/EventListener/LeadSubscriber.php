@@ -91,11 +91,15 @@ class LeadSubscriber extends CommonSubscriber
                     $label = $stat['email_name'];
                 }
 
-                $eventName = [
-                    'label'      => $label,
-                    'href'       => $this->router->generate('mautic_email_webview', ['idHash' => $stat['idHash']]),
-                    'isExternal' => true
-                ];
+                if (!empty($stat['idHash'])) {
+                    $eventName = [
+                        'label'      => $label,
+                        'href'       => $this->router->generate('mautic_email_webview', ['idHash' => $stat['idHash']]),
+                        'isExternal' => true
+                    ];
+                } else {
+                    $eventName = $label;
+                }
 
                 $event->addEvent(
                     [

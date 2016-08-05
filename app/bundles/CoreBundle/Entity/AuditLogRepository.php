@@ -73,25 +73,30 @@ class AuditLogRepository extends CommonRepository
      */
     public function getLeadIpLogs(Lead $lead, array $options = [])
     {
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb  = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $sqb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         // Just a check to ensure reused IDs (happens with innodb) doesn't infect data
         $dt = new DateTimeHelper($lead->getDateAdded(), 'Y-m-d H:i:s', 'local');
 
-        $qb
-            ->select('l.date_added, l.ip_address')
+        $sqb
+            ->select('MAX(l.date_added) as date_added, l.ip_address')
             ->from(MAUTIC_TABLE_PREFIX.'audit_log', 'l')
             ->where(
-                $qb->expr()->andX(
-                    $qb->expr()->eq('l.bundle', $qb->expr()->literal('lead')),
-                    $qb->expr()->eq('l.object', $qb->expr()->literal('lead')),
-                    $qb->expr()->eq('l.action', $qb->expr()->literal('ipadded')),
-                    $qb->expr()->eq('l.object_id', $lead->getId()),
-                    $qb->expr()->gte('l.date_added', $qb->expr()->literal($dt->getUtcTimestamp()))
+                $sqb->expr()->andX(
+                    $sqb->expr()->eq('l.bundle', $sqb->expr()->literal('lead')),
+                    $sqb->expr()->eq('l.object', $sqb->expr()->literal('lead')),
+                    $sqb->expr()->eq('l.action', $sqb->expr()->literal('ipadded')),
+                    $sqb->expr()->eq('l.object_id', $lead->getId()),
+                    $sqb->expr()->gte('l.date_added', $sqb->expr()->literal($dt->getUtcTimestamp()))
                 )
             )
             ->groupBy('l.ip_address');
 
-        return $this->getTimelineResults($qb, $options, 'l.ip_address', 'l.date_added', [], ['date_added']);
+        $qb
+            ->select('ip.date_added, ip.ip_address')
+            ->from(sprintf('(%s)', $sqb->getSQL()), 'ip');
+
+        return $this->getTimelineResults($qb, $options, 'ip.ip_address', 'ip.date_added', [], ['date_added']);
     }
 }

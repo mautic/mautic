@@ -357,7 +357,7 @@ class LeadSubscriber extends CommonSubscriber
                         'eventLabel'      => $row['ip_address'],
                         'eventType'       => $eventTypeName,
                         'eventPriority'   => -1, // Usually an IP is added after another event
-                        'timestamp'       => $row['dateAdded'],
+                        'timestamp'       => $row['date_added'],
                         'extra'           => [
                             'ipDetails' => $ipAddresses[$row['ip_address']]
                         ],
