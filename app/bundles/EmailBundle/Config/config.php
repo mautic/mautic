@@ -234,27 +234,18 @@ return [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'methodCalls'  => [
-                    'setUsername' => array('%mautic.mailer_user%'),
-                    'setPassword' => array('%mautic.mailer_password%')
-                ]
-            ],
-            'mautic.transport.sparkpost'          => [
-                'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport',
-                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-                'methodCalls'  => [
-                    // Should be able to set api key here.
-                    'setApiKey'        => array('%mautic.mailer_api_key%'),
-                    'setMauticFactory' => array('mautic.factory')
+                    'setUsername' => ['%mautic.mailer_user%'],
+                    'setPassword' => ['%mautic.mailer_password%']
                 ]
             ],
             'mautic.transport.postmark'          => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\PostmarkTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'methodCalls'  => [
-                    'setUsername' => array('%mautic.mailer_user%'),
-                    'setPassword' => array('%mautic.mailer_password%')
+                    'setUsername' => ['%mautic.mailer_user%'],
+                    'setPassword' => ['%mautic.mailer_password%']
                 ]
-            ]
+            ],
         ],
         'models' => [
             'mautic.email.model.email' => [
@@ -272,7 +263,7 @@ return [
         ]
     ],
     'parameters' => [
-        'mailer_api_key' => null, // Api key from mail delivery provider.
+        'mailer_api_key'               => null, // Api key from mail delivery provider.
         'mailer_from_name'             => 'Mautic',
         'mailer_from_email'            => 'email@yoursite.com',
         'mailer_return_path'           => null,
