@@ -126,11 +126,6 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                         <?php echo $view['form']->row($form['leadField']); ?>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <?php echo $view['form']->row($form['isAutoFill']); ?>
-                    </div>
-                </div>
             </div>
             <?php endif; ?>
 
@@ -187,6 +182,7 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                 <div class="row">
                     <?php echo $view['form']->rowIfExists($form, 'showWhenValueExists', $template); ?>
                     <?php echo $view['form']->rowIfExists($form, 'showAfterXSubmissions', $template); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'isAutoFill', $template); ?>
                 </div>
             </div>
             <?php endif; ?>

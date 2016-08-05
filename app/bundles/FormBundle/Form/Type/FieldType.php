@@ -41,7 +41,7 @@ class FieldType extends AbstractType
         $addContainerAttributes =
         $addLeadFieldList =
         $addSaveResult =
-        $addBehaviorFields = 
+        $addBehaviorFields =
         $addIsRequired = true;
 
         if (!empty($options['customParameters'])) {
@@ -345,6 +345,20 @@ class FieldType extends AbstractType
                     'required'   => false
                 ]
             );
+
+            $isAutoFillValue = (!isset($options['data']['isAutoFill'])) ? false : (boolean) $options['data']['isAutoFill'];
+            $builder->add(
+                'isAutoFill',
+                'yesno_button_group',
+                array(
+                    'label'     => 'mautic.form.field.form.auto_fill',
+                    'data'      => $isAutoFillValue,
+                    'attr'      => array(
+                        'class'   => 'auto-fill-data',
+                        'tooltip' => 'mautic.form.field.help.auto_fill'
+                    )
+                )
+            );
         }
 
         if ($addLeadFieldList) {
@@ -385,20 +399,6 @@ class FieldType extends AbstractType
                     'required'   => false,
                     'data'       => $data
                 ]
-            );
-
-            $isAutoFillValue = (!isset($options['data']['isAutoFill'])) ? false : (boolean) $options['data']['isAutoFill'];
-            $builder->add(
-                'isAutoFill',
-                'yesno_button_group',
-                array(
-                    'label'     => 'mautic.form.field.form.auto_fill',
-                    'data'      => $isAutoFillValue,
-                    'attr'      => array(
-                        'class'   => 'auto-fill-data',
-                        'tooltip' => 'mautic.form.field.help.auto_fill'
-                    )
-                )
             );
         }
 
