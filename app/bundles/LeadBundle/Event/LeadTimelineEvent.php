@@ -235,6 +235,11 @@ class LeadTimelineEvent extends Event
      */
     public function getMaxPage()
     {
+        if (!$this->totalEvents) {
+
+            return 1;
+        }
+
         // Find the type that has the largest number of total records
         $largest = max($this->totalEvents);
 
