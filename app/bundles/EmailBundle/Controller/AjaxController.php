@@ -18,6 +18,7 @@ use Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\MandrillTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\PostmarkTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport;
+use Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport;
 
 /**
  * Class AjaxController
@@ -264,6 +265,9 @@ class AjaxController extends CommonAjaxController
                 case 'mautic.transport.amazon':
                     $mailer = new AmazonTransport($settings['amazon_region']);
                     break;
+                case 'mautic.transport.sparkpost':
+                    $mailer = new SparkpostTransport($settings['api_key']);
+                    break;
                 default:
                     if ($this->container->has($transport)) {
                         $mailer = $this->container->get($transport);
@@ -275,11 +279,13 @@ class AjaxController extends CommonAjaxController
             }
 
             if (!empty($mailer)) {
-                if (empty($settings['password'])) {
-                    $settings['password'] = $this->factory->getParameter('mailer_password');
+                if (method_exists($mailer, "setUsername") && method_exists($mailer, "setPasssword")){
+                    if (empty($settings['password'])) {
+                        $settings['password'] = $this->factory->getParameter('mailer_password');
+                    }
+                    $mailer->setUsername($settings['user']);
+                    $mailer->setPassword($settings['password']);
                 }
-                $mailer->setUsername($settings['user']);
-                $mailer->setPassword($settings['password']);
 
                 $logger = new \Swift_Plugins_Loggers_ArrayLogger();
                 $mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($logger));
@@ -315,7 +321,6 @@ class AjaxController extends CommonAjaxController
                 }
             }
         }
-
         return $this->sendJsonResponse($dataArray);
     }
 

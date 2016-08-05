@@ -1055,6 +1055,8 @@ abstract class AbstractIntegration
                 }
                 break;
             case 'key':
+                $valid = isset($this->keys['api_key']);
+                break;
             case 'rest':
                 $valid = isset($this->keys[$authTokenKey]);
                 break;
