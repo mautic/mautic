@@ -25,6 +25,16 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class DynamicContentModel extends FormModel
 {
     /**
+     * Retrieve the permissions base
+     *
+     * @return string
+     */
+    public function getPermissionBase()
+    {
+        return 'dynamicContent:dynamicContents';
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return DynamicContentRepository

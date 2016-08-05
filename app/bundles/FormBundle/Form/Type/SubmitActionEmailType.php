@@ -60,7 +60,7 @@ class SubmitActionEmailType extends AbstractType
         $builder->add('message', 'textarea', array(
             'label'      => 'mautic.form.action.sendemail.message',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control editor-basic'),
+            'attr'       => array('class' => 'form-control editor editor-basic'),
             'required'   => false,
             'data'       => $message
         ));
