@@ -82,8 +82,12 @@ class BuildJsSubscriber extends CommonSubscriber
             var img = new Image();
 
             if (typeof pageview[3] === 'object') {
-                if (typeof pageview[3]['onload'] === 'function') {
-                    img.onload = pageview[3]['onload'];
+                var events = ['onabort', 'onerror', 'onload'];
+                for (var i = 0; i < events.length; i++) {
+                    var e = events[i];
+                    if (typeof pageview[3][e] === 'function') {
+                        img[e] = pageview[3][e];
+                    }
                 }
             }
 
