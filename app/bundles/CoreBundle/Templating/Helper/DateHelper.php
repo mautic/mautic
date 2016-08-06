@@ -146,10 +146,11 @@ class DateHelper extends Helper
      * @param        $datetime
      * @param string $timezone
      * @param string $fromFormat
+     * @param bool   $forceDateForNonText If true, return as full date/time rather than "29 days ago"
      *
      * @return string
      */
-    public function toText($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toText($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s', $forceDateForNonText = false)
     {
         if (empty($datetime)) {
             return '';
@@ -166,7 +167,7 @@ class DateHelper extends Helper
         } else {
             $interval = $this->helper->getDiff('now', null, true);
 
-            if ($interval->invert) {
+            if ($interval->invert && !$forceDateForNonText) {
                 // In the past
                 return $this->translator->trans('mautic.core.date.ago', array('%days%' => $interval->days));
             } else {

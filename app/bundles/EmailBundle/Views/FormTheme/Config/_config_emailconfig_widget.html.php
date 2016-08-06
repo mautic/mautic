@@ -84,8 +84,8 @@ $template = '<div class="col-md-6">{content}</div>';
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_clear_timeout', $template); ?>
             </div>
             <div class="row">
-               <?php echo $view['form']->rowIfExists($fields, 'frequency_number',$template); ?>
-                <?php echo $view['form']->rowIfExists($fields, 'frequency_time',$template); ?>
+               <?php echo $view['form']->rowIfExists($fields, 'email_frequency_number',$template); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'email_frequency_time',$template); ?>
             </div>
         </div>
     </div>

@@ -26,8 +26,7 @@ class Version20160726000000 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        $table = $schema->getTable(MAUTIC_TABLE_PREFIX.'lead_frequencyrules');
-        if ($table->hasColumn('channel')) {
+        if ($schema->hasTable(MAUTIC_TABLE_PREFIX.'lead_frequencyrules')) {
 
             throw new SkipMigrationException('Schema includes this migration');
         }

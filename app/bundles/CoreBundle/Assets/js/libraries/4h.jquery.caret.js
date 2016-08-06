@@ -14,7 +14,7 @@
   }
 }(this, function ($) {
 
-//@ sourceMappingURL=jquery.caret.map
+//# sourceMappingURL=jquery.caret.map
 /*
   Implement Github like autocomplete mentions
   http://ichord.github.com/At.js
