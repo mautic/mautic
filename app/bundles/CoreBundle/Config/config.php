@@ -101,9 +101,6 @@ return [
             'mautic.core.subscriber'              => [
                 'class' => 'Mautic\CoreBundle\EventListener\CoreSubscriber',
             ],
-            'mautic.core.auditlog.subscriber'     => [
-                'class' => 'Mautic\CoreBundle\EventListener\AuditLogSubscriber',
-            ],
             'mautic.core.configbundle.subscriber' => [
                 'class' => 'Mautic\CoreBundle\EventListener\ConfigSubscriber',
             ],

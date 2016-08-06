@@ -24,14 +24,12 @@ use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
-use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\StatDevice;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use DeviceDetector\DeviceDetector;
@@ -418,15 +416,12 @@ class PageModel extends FormModel
         $hit = new Hit();
         $hit->setDateHit(new \Datetime());
 
-        $utmTags = new UtmTag();
-        $utmTags->setDateAdded(new \Datetime());
-
         //check for existing IP
         $ipAddress = $this->ipLookupHelper->getIpAddress();
         $hit->setIpAddress($ipAddress);
 
         //check for any clickthrough info
-        $clickthrough = $request->get('ct', array());
+        $clickthrough = $request->get('ct', []);
         if (!empty($clickthrough)) {
             $clickthrough = $this->decodeArrayFromUrl($clickthrough);
 
@@ -489,7 +484,6 @@ class PageModel extends FormModel
                                 $query['page_referrer'] = urldecode($query['page_referrer']);
                             }
                             $hit->setReferer($query['page_referrer']);
-                            $utmTags->setReferer($query['page_referrer']);
                         }
 
                         if (isset($query['page_language'])) {
@@ -510,14 +504,14 @@ class PageModel extends FormModel
                         $availableLeadFields = $this->leadFieldModel->getFieldList(
                             false,
                             false,
-                            array(
+                            [
                                 'isPublished'         => true,
                                 'isPubliclyUpdatable' => true
-                            )
+                            ]
                         );
 
                         $uniqueLeadFields    = $this->leadFieldModel->getUniqueIdentiferFields();
-                        $uniqueLeadFieldData = array();
+                        $uniqueLeadFieldData = [];
                         $inQuery             = array_intersect_key($query, $availableLeadFields);
                         foreach ($inQuery as $k => $v) {
                             if (empty($query[$k])) {
@@ -536,6 +530,7 @@ class PageModel extends FormModel
                                     $uniqueLeadFieldData,
                                     $lead->getId()
                                 );
+
                                 if (!empty($existingLeads)) {
                                     $lead = $this->leadModel->mergeLeads($lead, $existingLeads[0]);
                                 }
@@ -602,28 +597,25 @@ class PageModel extends FormModel
                 }
                 $pageURL .= '://';
                 if ($request->server->get('SERVER_PORT') != '80') {
-                    $pageURL .= $request->server->get('SERVER_NAME') . ':' . $request->server->get('SERVER_PORT') .
+                    $pageURL .= $request->server->get('SERVER_NAME').':'.$request->server->get('SERVER_PORT').
                         $request->server->get('REQUEST_URI');
                 } else {
-                    $pageURL .= $request->server->get('SERVER_NAME') . $request->server->get('REQUEST_URI');
+                    $pageURL .= $request->server->get('SERVER_NAME').$request->server->get('REQUEST_URI');
                 }
             }
         }
 
         $hit->setUrl($pageURL);
-        $utmTags->setUrl($pageURL);
 
         // Store query array
         $query = $request->query->all();
         unset($query['d']);
         $hit->setQuery($query);
-        $utmTags->setQuery($query);
 
         list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie();
 
         $hit->setTrackingId($trackingId);
         $hit->setLead($lead);
-        $utmTags->setLead($lead);
 
         $isUnique = $trackingNewlyGenerated;
         if (!$trackingNewlyGenerated) {
@@ -649,7 +641,7 @@ class PageModel extends FormModel
                 } catch (\Exception $exception) {
                     $this->logger->addError(
                         $exception->getMessage(),
-                        array('exception' => $exception)
+                        ['exception' => $exception]
                     );
                 }
             } elseif ($page instanceof Redirect) {
@@ -661,8 +653,8 @@ class PageModel extends FormModel
 
                     // If this is a trackable, up the trackable counts as well
                     if (!empty($clickthrough['channel'])) {
-                        $channelId      = reset($clickthrough['channel']);
-                        $channel        = key($clickthrough['channel']);
+                        $channelId = reset($clickthrough['channel']);
+                        $channel   = key($clickthrough['channel']);
 
                         $this->pageTrackableModel->getRepository()->upHitCount($page->getId(), $channel, $channelId, 1, $isUnique);
                     }
@@ -673,7 +665,7 @@ class PageModel extends FormModel
                     } else {
                         $this->logger->addError(
                             $exception->getMessage(),
-                            array('exception' => $exception)
+                            ['exception' => $exception]
                         );
                     }
                 }
@@ -694,37 +686,51 @@ class PageModel extends FormModel
             $hit->setReferer($request->server->get('HTTP_REFERER'));
         }
 
-        if (!$utmTags->getReferer()) {
-            $utmTags->setReferer($request->server->get('HTTP_REFERER'));
-        }
-
         $hit->setUserAgent($request->server->get('HTTP_USER_AGENT'));
-        $utmTags->setUserAgent($request->server->get('HTTP_USER_AGENT'));
-
         $hit->setRemoteHost($request->server->get('REMOTE_HOST'));
-        $utmTags->setRemoteHost($request->server->get('REMOTE_HOST'));
 
-        if (key_exists('utm_campaign',$query)){
-            $utmTags->setUtmCampaign($query['utm_campaign']);
-        }
+        if ($isUnique) {
+            // Add UTM tags entry if a UTM tag exist
+            $queryHasUtmTags = false;
+            foreach ($query as $key => $value) {
+                if (strpos($key, 'utm_') !== false) {
+                    $queryHasUtmTags = true;
+                    break;
+                }
+            }
 
-        if (key_exists('utm_term',$query)){
-            $utmTags->setUtmTerm($query['utm_term']);
-        }
-        if (key_exists('utm_content',$query)){
-            $utmTags->setUtmConent($query['utm_content']);
-        }
-        if (key_exists('utm_medium',$query)){
-            $utmTags->setUtmMedium($query['utm_medium']);
-        }
-        if (key_exists('utm_source',$query)){
-            $utmTags->setUtmSource($query['utm_source']);
-        }
+            if ($queryHasUtmTags) {
+                $utmTags = new UtmTag();
+                $utmTags->setDateAdded($hit->getDateHit());
+                $utmTags->setUrl($hit->getUrl());
+                $utmTags->setReferer($hit->getReferer());
+                $utmTags->setQuery($hit->getQuery());
+                $utmTags->setUserAgent($hit->getUserAgent());
+                $utmTags->setRemoteHost($hit->getRemoteHost());
+                $utmTags->setLead($lead);
 
-        $repo = $this->em->getRepository('MauticLeadBundle:UtmTag');
-        $repo->saveEntity($utmTags);
+                if (key_exists('utm_campaign', $query)) {
+                    $utmTags->setUtmCampaign($query['utm_campaign']);
+                }
+                if (key_exists('utm_term', $query)) {
+                    $utmTags->setUtmTerm($query['utm_term']);
+                }
+                if (key_exists('utm_content', $query)) {
+                    $utmTags->setUtmConent($query['utm_content']);
+                }
+                if (key_exists('utm_medium', $query)) {
+                    $utmTags->setUtmMedium($query['utm_medium']);
+                }
+                if (key_exists('utm_source', $query)) {
+                    $utmTags->setUtmSource($query['utm_source']);
+                }
 
-        $this->leadModel->setUtmTags($lead, $utmTags);
+                $repo = $this->em->getRepository('MauticLeadBundle:UtmTag');
+                $repo->saveEntity($utmTags);
+
+                $this->leadModel->setUtmTags($lead, $utmTags);
+            }
+        }
 
         //get a list of the languages the user prefers
         $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');
@@ -754,6 +760,8 @@ class PageModel extends FormModel
         $deviceStat->setDeviceModel($dd->getModel());
         $deviceStat->setDeviceOs($dd->getOs());
         $deviceStat->setIpAddress($ipAddress);
+        $deviceStat->setLead($lead);
+
         if (!empty($deviceStat)) {
             $this->em->getRepository('MauticLeadBundle:StatDevice')->saveEntities($deviceStat);
         }
@@ -771,7 +779,7 @@ class PageModel extends FormModel
             } else {
                 $this->logger->addError(
                     $exception->getMessage(),
-                    array('exception' => $exception)
+                    ['exception' => $exception]
                 );
             }
         }

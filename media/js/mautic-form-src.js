@@ -390,7 +390,7 @@
                             window.location = response.redirect;
                         } else if (response.validationErrors) {
                             for (var field in response.validationErrors) {
-                                this.markError('mauticform_' + field, false, response.validationErrors[field]);
+                                this.markError('mauticform_' + formId + '_' + field, false, response.validationErrors[field]);
                             }
                         } else if (response.errorMessage) {
                             this.setMessage(response.errorMessage, 'error');
@@ -468,7 +468,7 @@
             window.addEventListener('message', function(event) {
                 if (Core.debug()) console.log(event);
 
-                if(event.origin !== MauticDomain) return;
+                if (event.origin !== MauticDomain) return;
 
                 try {
                     var response = JSON.parse(event.data);

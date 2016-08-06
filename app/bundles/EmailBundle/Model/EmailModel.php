@@ -465,6 +465,7 @@ class EmailModel extends FormModel
             $emailOpenDevice->setDeviceBrand($dd->getBrand());
             $emailOpenDevice->setDeviceModel($dd->getModel());
             $emailOpenDevice->setDeviceOs($dd->getOs());
+            $emailOpenDevice->setLead($lead);
 
             try {
                 $this->em->persist($emailOpenDevice);

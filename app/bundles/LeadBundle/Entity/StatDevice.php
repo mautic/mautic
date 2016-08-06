@@ -374,4 +374,24 @@ class StatDevice
         $this->deviceOsVersion = $deviceOs['version'];
         $this->deviceOsPlatform = $deviceOs['platform'];
     }
+
+    /**
+     * @return Lead
+     */
+    public function getLead()
+    {
+        return $this->lead;
+    }
+
+    /**
+     * @param Lead $lead
+     *
+     * @return Hit
+     */
+    public function setLead(Lead $lead)
+    {
+        $this->lead = $lead;
+
+        return $this;
+    }
 }
