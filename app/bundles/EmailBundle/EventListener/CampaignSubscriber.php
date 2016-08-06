@@ -140,7 +140,12 @@ class CampaignSubscriber extends CommonSubscriber
             if ($email != null && $email->isPublished()) {
                 $eventDetails = $event->getEventDetails();
                 $options   = ['source' => ['campaign', $eventDetails['campaign']['id']]];
-                $emailSent = $this->emailModel->sendEmail($email, $leadCredentials, $options);
+                /** @var \Mautic\EmailBundle\Helper\MailHelper $emailHelper */
+                $emailHelper = $this->factory->getHelper('mailer');
+                if($emailHelper->applyFrequencyRules($lead))
+                {
+                    $emailSent = $this->emailModel->sendEmail($email, $leadCredentials, $options);
+                }
             }
         }
 
