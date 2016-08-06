@@ -35,6 +35,12 @@ class StatDevice
     private $stat;
 
     /**
+     * @var \Mautic\LeadBundle\Entity\Lead
+     */
+    private $lead;
+
+
+    /**
      * @var string
      */
     private $channel;
@@ -103,9 +109,15 @@ class StatDevice
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_stats_devices')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\StatDeviceRepository');
+            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\StatDeviceRepository')
+            ->addIndex(['date_opened'], 'date_opened_search')
+            ->addIndex(['stat_id'], 'stat_search')
+            ->addIndex(['channel', 'channel_id'], 'channel_search')
+            ->addIndex(['device'], 'device_search');;
 
         $builder->addId();
+
+        $builder->addLead(false, 'CASCADE');
 
         $builder->createField('stat', 'integer')
             ->columnName('stat_id')

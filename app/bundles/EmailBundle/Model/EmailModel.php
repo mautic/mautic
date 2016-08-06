@@ -36,7 +36,6 @@ use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use DeviceDetector\DeviceDetector;
-use DeviceDetector\Parser\Device\DeviceParserAbstract;
 
 /**
  * Class EmailModel

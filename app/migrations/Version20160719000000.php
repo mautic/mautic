@@ -26,9 +26,7 @@ class Version20160719000000 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        $table = $schema->getTable(MAUTIC_TABLE_PREFIX . 'page_hits');
-        if ($table->hasColumn('client_info')) {
-
+        if ($schema->hasTable($this->prefix.'lead_stats_devices')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -43,6 +41,7 @@ class Version20160719000000 extends AbstractMauticMigration
         $sql = <<<SQL
 CREATE TABLE {$this->prefix}lead_stats_devices (
 `id` int (11) NOT NULL AUTO_INCREMENT,
+`lead_id` int (11) NOT NULL,
 `ip_id` int( 11) NOT NULL,
 `stat_id` int (11) NOT NULL,
 `channel` VARCHAR (255) NOT NULL,
@@ -61,6 +60,7 @@ PRIMARY KEY (`id`)
 SQL;
         $this->addSql($sql);
         $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_stats_devices ADD CONSTRAINT ' . $this->generatePropertyName('lead_stats_devices', 'fk', array('ip_id')) . ' FOREIGN KEY (ip_id) REFERENCES ' . $this->prefix . 'ip_addresses (id)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_hits ADD CONSTRAINT ' . $this->generatePropertyName('lead_devicestat_id', 'fk', array('devicestat_id')) . ' FOREIGN KEY (devicestat_id) REFERENCES ' . $this->prefix . 'lead_stats_devices (id)');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_hits ADD CONSTRAINT ' . $this->generatePropertyName('page_hits', 'fk', array('devicestat_id')) . ' FOREIGN KEY (devicestat_id) REFERENCES ' . $this->prefix . 'lead_stats_devices (id)');
+        $this->addSql('ALTER TABLE ' . $this->prefix . 'page_hits CREATE UNIQUE INDEX ' .$this->generatePropertyName('page_hits', 'uniq', ['devicestat_id']));
     }
 }
