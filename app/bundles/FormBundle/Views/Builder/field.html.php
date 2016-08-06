@@ -182,6 +182,7 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                 <div class="row">
                     <?php echo $view['form']->rowIfExists($form, 'showWhenValueExists', $template); ?>
                     <?php echo $view['form']->rowIfExists($form, 'showAfterXSubmissions', $template); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'isAutoFill', $template); ?>
                 </div>
             </div>
             <?php endif; ?>

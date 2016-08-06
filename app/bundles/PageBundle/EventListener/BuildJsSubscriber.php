@@ -79,7 +79,15 @@ class BuildJsSubscriber extends CommonSubscriber
                 }
             }
 
-            m.trackingPixel = (new Image()).src = m.pageTrackingUrl + '?' + m.serialize(params);
+            var img = new Image();
+
+            if (typeof pageview[3] === 'object') {
+                if (typeof pageview[3]['onload'] === 'function') {
+                    img.onload = pageview[3]['onload'];
+                }
+            }
+
+            m.trackingPixel = img.src = m.pageTrackingUrl + '?' + m.serialize(params);
         });
 
         

@@ -73,6 +73,6 @@ class DynamicContentApiController extends CommonController
             }
         }
         
-        return empty($content) ? new Response('', Response::HTTP_NOT_FOUND) : new Response($content);
+        return empty($content) ? new Response('', Response::HTTP_NO_CONTENT) : new Response($content);
     }
 }
