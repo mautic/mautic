@@ -130,12 +130,12 @@ class VideoHit
     /**
      * @var string
      */
-    private $source;
+    private $channel;
 
     /**
      * @var integer
      */
-    private $sourceId;
+    private $channelId;
 
     /**
      * @var array
@@ -151,7 +151,9 @@ class VideoHit
 
         $builder->setTable('video_hits')
             ->setCustomRepositoryClass('Mautic\PageBundle\Entity\VideoHitRepository')
-            ->addIndex(['date_hit'], 'video_date_hit');
+            ->addIndex(['date_hit'], 'video_date_hit')
+            ->addIndex(['channel', 'channel_id'], 'video_channel_search')
+            ->addIndex(['guid', 'lead_id'], 'video_guid_lead_search');
 
         $builder->addId();
 
@@ -222,12 +224,12 @@ class VideoHit
             ->nullable()
             ->build();
 
-        $builder->createField('source', 'string')
+        $builder->createField('channel', 'string')
             ->nullable()
             ->build();
 
-        $builder->createField('sourceId', 'integer')
-            ->columnName('source_id')
+        $builder->createField('channelId', 'integer')
+            ->columnName('channel_id')
             ->nullable()
             ->build();
 
@@ -669,19 +671,19 @@ class VideoHit
     /**
      * @return string
      */
-    public function getSource()
+    public function getChannel()
     {
-        return $this->source;
+        return $this->channel;
     }
 
     /**
-     * @param string $source
+     * @param string $channel
      *
      * @return VideoHit
      */
-    public function setSource($source)
+    public function setChannel($channel)
     {
-        $this->source = $source;
+        $this->channel = $channel;
 
         return $this;
     }
@@ -689,19 +691,19 @@ class VideoHit
     /**
      * @return integer
      */
-    public function getSourceId()
+    public function getChannelId()
     {
-        return $this->sourceId;
+        return $this->channelId;
     }
 
     /**
-     * @param integer $sourceId
+     * @param integer $channelId
      *
      * @return VideoHit
      */
-    public function setSourceId($sourceId)
+    public function setChannelId($channelId)
     {
-        $this->sourceId = (int) $sourceId;
+        $this->channelId = (int) $channelId;
 
         return $this;
     }

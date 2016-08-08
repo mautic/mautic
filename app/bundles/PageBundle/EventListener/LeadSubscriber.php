@@ -138,29 +138,21 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeName = $this->translator->trans('mautic.page.event.videohit');
         $event->addEventType($eventTypeKey, $eventTypeName);
 
-        $filters = $event->getEventFilters();
-
         if (!$event->isApplicable($eventTypeKey)) {
             return;
         }
 
-        $lead    = $event->getLead();
-        $options = ['ipIds' => [], 'filters' => $filters];
-
-        /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
-        /*
-        foreach ($lead->getIpAddresses() as $ip) {
-            $options['ipIds'][] = $ip->getId();
-        }
-        */
-
         /** @var \Mautic\PageBundle\Entity\VideoHitRepository $hitRepository */
         $hitRepository = $this->factory->getEntityManager()->getRepository('MauticPageBundle:VideoHit');
 
-        $hits = $hitRepository->getLeadHits($lead->getId(), $options);
+        $hits = $hitRepository->getTimelineStats($event->getLead()->getId(), $event->getQueryOptions());
+
+        if (!array_key_exists('results', $hits)) {
+            return;
+        }
 
         // Add the hits to the event array
-        foreach ($hits as $hit) {
+        foreach ($hits['results'] as $hit) {
             $template   = 'MauticPageBundle:SubscribedEvents\Timeline:videohit.html.php';
             $eventLabel = $eventTypeName;
 
@@ -168,7 +160,8 @@ class LeadSubscriber extends CommonSubscriber
                 [
                     'event'           => $eventTypeKey,
                     'eventLabel'      => $eventLabel,
-                    'timestamp'       => $hit['dateHit'],
+                    'eventType'       => $eventTypeName,
+                    'timestamp'       => $hit['date_hit'],
                     'extra'           => [
                         'hit'  => $hit
                     ],
