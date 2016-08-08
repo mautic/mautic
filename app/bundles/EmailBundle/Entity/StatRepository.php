@@ -447,7 +447,7 @@ class StatRepository extends CommonRepository
     public function deleteStat($id)
     {
         $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats', array('id' => (int) $id));
-        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'lead_stats_devices', array('stat_id' => (int) $id, 'channel' => 'Email'));
+        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats_devices', array('stat_id' => (int) $id));
     }
 
     /**

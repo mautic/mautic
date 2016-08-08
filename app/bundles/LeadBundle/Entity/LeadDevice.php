@@ -270,4 +270,21 @@ class LeadDevice
 
         return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getDateOpen ()
+    {
+        return $this->dateAdded;
+    }
+
+    /**
+     * @param mixed $dateOpen
+     */
+    public function setDateOpen ($dateOpen)
+    {
+        $this->dateAdded = $dateOpen;
+    }
+
 }

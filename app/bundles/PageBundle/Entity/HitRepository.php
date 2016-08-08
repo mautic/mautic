@@ -82,7 +82,7 @@ class HitRepository extends CommonRepository
             $query->andWhere($query->expr()->like('p.title', $query->expr()->literal('%' . $options['search'] . '%')));
         }
 
-        $query->leftjoin('h',MAUTIC_TABLE_PREFIX.'lead_stats_devices', 'ds', 'ds.id = h.devicestat_id');
+        $query->leftjoin('h',MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id = h.device_id');
 
         if (isset($options['url']) && $options['url']) {
             $query->andWhere($query->expr()->eq('h.url', $query->expr()->literal($options['url'])));
