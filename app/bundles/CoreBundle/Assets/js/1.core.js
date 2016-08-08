@@ -1651,7 +1651,7 @@ var Mautic = {
 
         var target = mQuery(el).attr('data-target');
 
-        var route = mQuery(el).attr('href');
+        var route = (mQuery(el).attr('data-href')) ? mQuery(el).attr('data-href') : mQuery(el).attr('href');
         if (route.indexOf('javascript') >= 0) {
             return false;
         }
@@ -1666,7 +1666,14 @@ var Mautic = {
         var header = mQuery(el).attr('data-header');
         var footer = mQuery(el).attr('data-footer');
 
-        Mautic.loadAjaxModal(target, route, method, header, footer);
+        var preventDismissal = mQuery(el).attr('data-prevent-dismiss');
+        if (preventDismissal) {
+            // Reset
+            mQuery(el).removeAttr('data-prevent-dismiss');
+        }
+
+
+        Mautic.loadAjaxModal(target, route, method, header, footer, preventDismissal);
     },
 
     /**
@@ -1677,7 +1684,7 @@ var Mautic = {
      * @param header
      * @param footer
      */
-    loadAjaxModal: function (target, route, method, header, footer) {
+    loadAjaxModal: function (target, route, method, header, footer, preventDismissal) {
 
         //show the modal
         if (mQuery(target + ' .loading-placeholder').length) {
@@ -1718,6 +1725,29 @@ var Mautic = {
                 delete Mautic.modalContentXhr[target];
             }
         });
+
+        // Check if dismissal is allowed
+        if (typeof mQuery(target).data('bs.modal') !== 'undefined' && typeof mQuery(target).data('bs.modal').options !== 'undefined') {
+            if (preventDismissal) {
+                mQuery(target).data('bs.modal').options.keyboard = false;
+                mQuery(target).data('bs.modal').options.backdrop = 'static';
+            } else {
+                mQuery(target).data('bs.modal').options.keyboard = true;
+                mQuery(target).data('bs.modal').options.backdrop = true;
+            }
+        } else {
+            if (preventDismissal) {
+                mQuery(target).modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+            } else {
+                mQuery(target).modal({
+                    backdrop: true,
+                    keyboard: true
+                });
+            }
+        }
 
         mQuery(target).modal('show');
 
