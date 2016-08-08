@@ -147,28 +147,28 @@ class LeadSubscriber extends CommonSubscriber
 
         $hits = $hitRepository->getTimelineStats($event->getLead()->getId(), $event->getQueryOptions());
 
-        if (!array_key_exists('results', $hits)) {
-            return;
-        }
+        $event->addToCounter($eventTypeKey, $hits);
 
-        // Add the hits to the event array
-        foreach ($hits['results'] as $hit) {
-            $template   = 'MauticPageBundle:SubscribedEvents\Timeline:videohit.html.php';
-            $eventLabel = $eventTypeName;
+        if (!$event->isEngagementCount()) {
+            // Add the hits to the event array
+            foreach ($hits['results'] as $hit) {
+                $template   = 'MauticPageBundle:SubscribedEvents\Timeline:videohit.html.php';
+                $eventLabel = $eventTypeName;
 
-            $event->addEvent(
-                [
-                    'event'           => $eventTypeKey,
-                    'eventLabel'      => $eventLabel,
-                    'eventType'       => $eventTypeName,
-                    'timestamp'       => $hit['date_hit'],
-                    'extra'           => [
-                        'hit'  => $hit
-                    ],
-                    'contentTemplate' => $template,
-                    'icon'            => 'fa-video-camera'
-                ]
-            );
+                $event->addEvent(
+                    [
+                        'event'           => $eventTypeKey,
+                        'eventLabel'      => $eventLabel,
+                        'eventType'       => $eventTypeName,
+                        'timestamp'       => $hit['date_hit'],
+                        'extra'           => [
+                            'hit' => $hit
+                        ],
+                        'contentTemplate' => $template,
+                        'icon'            => 'fa-video-camera'
+                    ]
+                );
+            }
         }
     }
 
