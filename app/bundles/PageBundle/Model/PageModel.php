@@ -32,7 +32,6 @@ use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
-use Mautic\PageBundle\Service\Rabbitmq;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
@@ -462,10 +461,10 @@ class PageModel extends FormModel
             $hit->setUrlTitle($query['page_title']);
         }
 
-        if ($page instanceof Queue){
-          list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie();
+        if ($page instanceof Queue) {
+            list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie();
         } else {
-          list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookieForQueue($request->cookies);
+            list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookieForQueue($request->cookies);
         }
 
         $hit->setTrackingId($trackingId);
@@ -580,9 +579,11 @@ class PageModel extends FormModel
                 if (key_exists('utm_source', $query)) {
                     $utmTags->setUtmSource($query['utm_source']);
                 }
+            }
+        }
 
         if (!$this->em->isOpen()) {
-          $this->em = $this->em->create(
+            $this->em = $this->em->create(
               $this->em->getConnection(),
               $this->em->getConfiguration()
           );
