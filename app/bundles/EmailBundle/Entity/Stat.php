@@ -214,7 +214,6 @@ class Stat
         $builder->addNullableField('lastOpened', 'datetime', 'last_opened');
 
         $builder->addNullableField('openDetails', 'array', 'open_details');
-
     }
 
     /**

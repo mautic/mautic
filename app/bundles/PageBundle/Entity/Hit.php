@@ -148,9 +148,10 @@ class Hit
      */
     private $query = array();
     /**
-     * @var array
+     * @var \Mautic\LeadBundle\Entity\LeadDevice
      */
-    private $deviceStat = array();
+    private $device;
+
     /**
      * @param ORM\ClassMetadata $metadata
      */
@@ -262,8 +263,8 @@ class Hit
 
         $builder->addNullableField('query', 'array');
 
-        $builder->createOneToOne('deviceStat', 'Mautic\LeadBundle\Entity\StatDevice')
-            ->addJoinColumn('devicestat_id', 'id', true, false, 'SET NULL')
+        $builder->createOneToOne('device', 'Mautic\LeadBundle\Entity\LeadDevice')
+            ->addJoinColumn('device_id', 'id', true, false, 'SET NULL')
             ->cascadePersist()
             ->build();
     }
@@ -870,13 +871,13 @@ class Hit
     }
 
     /**
-     * @param array $deviceStat
+     * @param array $device
      *
      * @return Hit
      */
-    public function setDeviceStat($deviceStat)
+    public function setDeviceStat($device)
     {
-        $this->deviceStat = $deviceStat;
+        $this->device = $device;
 
         return $this;
     }

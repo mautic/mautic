@@ -13,7 +13,8 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\LeadBundle\Entity\StatDevice;
+use Mautic\LeadBundle\Entity\LeadDevice;
+use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
@@ -133,6 +134,15 @@ class EmailModel extends FormModel
     {
         return $this->em->getRepository('MauticEmailBundle:Copy');
     }
+
+    /**
+    * @return \Mautic\EmailBundle\Entity\CopyRepository
+    */
+    public function getStatDeviceRepository()
+    {
+        return $this->em->getRepository('MauticEmailBundle:StatDevice');
+    }
+
 
     /**
      * {@inheritdoc}
@@ -452,20 +462,18 @@ class EmailModel extends FormModel
             $dd = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
 
             $dd->parse();
+            $deviceRepo = $this->leadModel->getDeviceRepository();
+            $emailOpenDevice = $deviceRepo->getDevice(null, $lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
 
-            $emailOpenDevice = new StatDevice();
+            if (empty($emailOpenDevice)) {
+                $emailOpenDevice = new LeadDevice();
 
-            $emailOpenDevice->setDateOpened($readDateTime->toUtcString());
-            $emailOpenDevice->setIpAddress($ipAddress);
-            $emailOpenDevice->setStat($stat->getId());
-            $emailOpenDevice->setChannel('Email');
-            $emailOpenDevice->setChannelId($email->getId());
-            $emailOpenDevice->setClientInfo($dd->getClient());
-            $emailOpenDevice->setDevice($dd->getDeviceName());
-            $emailOpenDevice->setDeviceBrand($dd->getBrand());
-            $emailOpenDevice->setDeviceModel($dd->getModel());
-            $emailOpenDevice->setDeviceOs($dd->getOs());
-            $emailOpenDevice->setLead($lead);
+                $emailOpenDevice->setClientInfo($dd->getClient());
+                $emailOpenDevice->setDevice($dd->getDeviceName());
+                $emailOpenDevice->setDeviceBrand($dd->getBrand());
+                $emailOpenDevice->setDeviceModel($dd->getModel());
+                $emailOpenDevice->setDeviceOs($dd->getOs());
+                $emailOpenDevice->setLead($lead);
 
             try {
                 $this->em->persist($emailOpenDevice);
@@ -473,22 +481,42 @@ class EmailModel extends FormModel
             } catch (\Exception $exception) {
                 if (MAUTIC_ENV === 'dev') {
 
-                    throw $exception;
-                } else {
-                    $this->logger->addError(
-                        $exception->getMessage(),
-                        array('exception' => $exception)
-                    );
+                        throw $exception;
+                    } else {
+                        $this->logger->addError(
+                            $exception->getMessage(),
+                            array('exception' => $exception)
+                        );
+                    }
                 }
+            } else {
+                $emailOpenDevice = $deviceRepo->getEntity($emailOpenDevice['id']);
+
             }
+
         }
 
         if ($email) {
             $this->em->persist($email);
+            $this->em->flush($email);
+        }
+
+
+        if (isset($emailOpenDevice) and is_object($emailOpenDevice)) {
+            $emailOpenStat = new StatDevice();
+            $emailOpenStat->setIpAddress($ipAddress);
+
+            $emailOpenStat->setDevice($emailOpenDevice);
+
+            $emailOpenStat->setDateOpened($readDateTime->toUtcString());
+            $emailOpenStat->setStat($stat);
+
+            $this->em->persist($emailOpenStat);
+            $this->em->flush($emailOpenDevice);
         }
 
         $this->em->persist($stat);
-        $this->em->flush();
+
     }
 
     /**
@@ -795,7 +823,7 @@ class EmailModel extends FormModel
 
                 if(!empty($statIds))
                 {
-                    $results = $this->leadModel->getStatDeviceRepository()->getDeviceStats($statIds[0],$l->getId(), $dateFrom, $dateTo, 'Email', $emailIds[0]);
+                    $results = $this->getStatDeviceRepository()->getDeviceStats($statIds[0],$l->getId(), $dateFrom, $dateTo, 'Email', $emailIds[0]);
                 }
                 $key = 0;
                 foreach ($results as $result) {

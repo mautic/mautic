@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -27,13 +28,11 @@ use Mautic\PageBundle\PageEvents;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
-use Mautic\LeadBundle\Entity\StatDevice;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use DeviceDetector\DeviceDetector;
-use DeviceDetector\Parser\Device\DeviceParserAbstract;
 
 /**
  * Class PageModel
@@ -750,23 +749,26 @@ class PageModel extends FormModel
 
         $dd->parse();
 
-        $deviceStat = new StatDevice();
+        $deviceRepo = $this->leadModel->getDeviceRepository();
+        $device = $deviceRepo->getDevice(null, $lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
 
-        $deviceStat->setChannel('Hit');
-        $deviceStat->setDateOpened($hit->getDateHit());
-        $deviceStat->setClientInfo($dd->getClient());
-        $deviceStat->setDevice($dd->getDeviceName());
-        $deviceStat->setDeviceBrand($dd->getBrand());
-        $deviceStat->setDeviceModel($dd->getModel());
-        $deviceStat->setDeviceOs($dd->getOs());
-        $deviceStat->setIpAddress($ipAddress);
-        $deviceStat->setLead($lead);
+        if (empty($device)) {
 
-        if (!empty($deviceStat)) {
-            $this->em->getRepository('MauticLeadBundle:StatDevice')->saveEntities($deviceStat);
+            $device = new LeadDevice();
+
+            $device->setClientInfo($dd->getClient());
+            $device->setDevice($dd->getDeviceName());
+            $device->setDeviceBrand($dd->getBrand());
+            $device->setDeviceModel($dd->getModel());
+            $device->setDeviceOs($dd->getOs());
+            $device->setLead($lead);
+
+            $this->em->persist($device);
+        } else {
+            $device = $deviceRepo->getEntity($device['id']);
         }
-
-        $hit->setDeviceStat($deviceStat);
+        $this->logger->addError(print_r($device->getId(),true));
+        $hit->setDeviceStat($device);
 
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
@@ -1129,12 +1131,13 @@ class PageModel extends FormModel
 
         $q = $this->em->getConnection()->createQueryBuilder();
 
-        $q->select('count(ds.id) as count, ds.device as device')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_stats_devices', 'ds')
+        $q->select('count(h.id) as count, ds.device as device')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
+            ->join('h', MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id=h.device_id')
             ->orderBy('device', 'DESC')
-            ->andWhere($q->expr()->gte('ds.date_opened', ':date_from'))
+            ->andWhere($q->expr()->gte('h.date_hit', ':date_from'))
             ->setParameter('date_from', $dateFrom->format('Y-m-d'))
-            ->andWhere($q->expr()->lte('ds.date_opened', ':date_to'))
+            ->andWhere($q->expr()->lte('h.date_hit', ':date_to'))
             ->setParameter('date_to', $dateTo->format('Y-m-d'." 23:59:59"));
         $q->groupBy('ds.device');
 

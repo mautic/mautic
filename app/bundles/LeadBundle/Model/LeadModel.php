@@ -193,9 +193,9 @@ class LeadModel extends FormModel
      *
      * @return \Mautic\LeadBundle\Entity\StatDeviceRepository
      */
-    public function getStatDeviceRepository()
+    public function getDeviceRepository()
     {
-        return $this->em->getRepository('MauticLeadBundle:StatDevice');
+        return $this->em->getRepository('MauticLeadBundle:LeadDevice');
     }
 
     /**
