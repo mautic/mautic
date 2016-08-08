@@ -29,7 +29,7 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     array(
                         'sessionVar' => 'stage',
-                        'orderBy'    => 'p.name',
+                        'orderBy'    => 's.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-stage-name',
                         'default'    => true
@@ -50,7 +50,7 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     array(
                         'sessionVar' => 'stage',
-                        'orderBy'    => 'p.id',
+                        'orderBy'    => 's.id',
                         'text'       => 'mautic.core.id',
                         'class'      => 'visible-md visible-lg col-stage-id'
                     )

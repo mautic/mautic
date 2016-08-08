@@ -13,6 +13,7 @@ namespace Mautic\DynamicContentBundle\Entity;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
  * Class StatRepository
@@ -21,6 +22,8 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class StatRepository extends CommonRepository
 {
+    use TimelineTrait;
+
     /**
      * @param      $dynamicContentId
      *
@@ -124,19 +127,20 @@ class StatRepository extends CommonRepository
      */
     public function getLeadStats($leadId, array $options = [])
     {
-        $query = $this->createQueryBuilder('s');
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $query->select('IDENTITY(s.dynamicContent) AS dynamic_content_id, s.id, s.dateSent, dc.name, s.sentDetails')
-            ->leftJoin('MauticDynamicContentBundle:DynamicContent', 'dc', 'WITH', 'dc.id = s.dynamicContent')
-            ->where($query->expr()->eq('IDENTITY(s.lead)', $leadId));
+        $query->select('dc.id AS dynamic_content_id, s.id, s.date_sent as dateSent, dc.name, s.sent_details as sentDetails')
+            ->from(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', 's')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'dynamic_content', 'dc', 'dc.id = s.dynamic_content_id')
+            ->where($query->expr()->eq('s.lead_id', (int) $leadId));
 
-        if (isset($options['filters']['search']) && $options['filters']['search']) {
+        if (isset($options['search']) && $options['search']) {
             $query->andWhere(
-                $query->expr()->like('dc.name', $query->expr()->literal('%' . $options['filters']['search'] . '%'))
+                $query->expr()->like('dc.name', $query->expr()->literal('%' . $options['search'] . '%'))
             );
         }
-        
-        return $query->getQuery()->getArrayResult();
+
+        return $this->getTimelineResults($query, $options, 'dc.name', 's.date_sent', ['sentDetails'], ['dateSent'] );
     }
 
     /**

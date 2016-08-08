@@ -12,12 +12,14 @@ namespace Mautic\FormBundle\Entity;
 use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
  * IpAddressRepository
  */
 class SubmissionRepository extends CommonRepository
 {
+    use TimelineTrait;
 
     /**
      * {@inheritdoc}
@@ -216,16 +218,13 @@ class SubmissionRepository extends CommonRepository
      */
     public function getSubmissions(array $options = array())
     {
-        $query = $this->_em->getConnection()->createQueryBuilder();
-        $query->select('fs.id, fs.form_id, fs.page_id, fs.date_submitted AS "dateSubmitted"')
-            ->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs');
-
-        if (!empty($options['ipIds'])) {
-            $query->where('fs.ip_id IN (' . implode(',', $options['ipIds']) . ')');
-        }
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->select('fs.id, f.name, fs.form_id, fs.page_id, fs.date_submitted AS "dateSubmitted"')
+            ->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs')
+            ->leftJoin('fs', MAUTIC_TABLE_PREFIX . 'forms', 'f', 'f.id = fs.form_id');
 
         if (!empty($options['leadId'])) {
-            $query->andWhere('fs.lead_id = ' . (int)$options['leadId']);
+            $query->andWhere('fs.lead_id = ' . (int) $options['leadId']);
         }
 
         if (!empty($options['id'])) {
@@ -233,20 +232,13 @@ class SubmissionRepository extends CommonRepository
             ->setParameter('id', $options['id']);
         }
 
-        if (!empty($options['fromDate'])) {
-            $query->andWhere($query->expr()->gte('fs.date_submitted', ':fromDate'))
-            ->setParameter('fromDate', $options['fromDate']->format('Y-m-d H:i:s'));
+        if (isset($options['search']) && $options['search']) {
+            $query->andWhere(
+                $query->expr()->like('f.name', $query->expr()->literal('%' . $options['search'] . '%'))
+            );
         }
 
-        if (isset($options['filters']['search']) && $options['filters']['search']) {
-            $query->leftJoin('fs', MAUTIC_TABLE_PREFIX . 'forms', 'f', 'f.id = fs.form_id')
-                ->andWhere($query->expr()->orX(
-                    $query->expr()->like('f.name', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
-                    $query->expr()->like('f.description', $query->expr()->literal('%' . $options['filters']['search'] . '%'))
-            ));
-        }
-
-        return $query->execute()->fetchAll();
+        return $this->getTimelineResults($query, $options, 'f.name', 'fs.date_submitted', [], ['dateSubmitted']);
     }
 
     /**

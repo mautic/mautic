@@ -101,9 +101,6 @@ return [
             'mautic.core.subscriber'              => [
                 'class' => 'Mautic\CoreBundle\EventListener\CoreSubscriber',
             ],
-            'mautic.core.auditlog.subscriber'     => [
-                'class' => 'Mautic\CoreBundle\EventListener\AuditLogSubscriber',
-            ],
             'mautic.core.configbundle.subscriber' => [
                 'class' => 'Mautic\CoreBundle\EventListener\ConfigSubscriber',
             ],
@@ -112,6 +109,13 @@ return [
             ],
             'mautic.core.dashboard.subscriber'    => [
                 'class' => 'Mautic\CoreBundle\EventListener\DashboardSubscriber',
+            ],
+            'mautic.core.maintenance.subscriber'    => [
+                'class' => 'Mautic\CoreBundle\EventListener\MaintenanceSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'doctrine.dbal.default_connection'
+                ]
             ],
         ],
         'forms'   => [
@@ -652,6 +656,7 @@ return [
         'db_server_version'              => '5.5',
         'locale'                         => 'en_US',
         'secret_key'                     => '',
+        'dev_hosts'                      => null,
         'trusted_hosts'                  => null,
         'trusted_proxies'                => null,
         'rememberme_key'                 => hash('sha1', uniqid(mt_rand())),
