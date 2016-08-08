@@ -10,6 +10,7 @@
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PluginBundle\Entity\IntegrationEntity;
 
 /**
  * Class SalesforceIntegration
@@ -258,10 +259,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $params['fields']=implode(',',$fields);
 
-        $fields = array_keys($params['fields']);
-
-        $leadFields = $this->cleanSalesForceData($params,$fields, $object);
-
         $internal = array('latestDateCovered' => $data['latestDateCovered']);
         $count = 0;
 
@@ -277,16 +274,22 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                 if($dataObject){
                     $lead =$this->getMauticLead($dataObject,true,null,null);
-                    $log = array(
-                        "bundle"    => "plugin",
-                        "object"    => "lead",
-                        "objectId"  => $lead->getId(),
-                        "action"    => "Salesforce pull",
-                        "details"   => array('salesforceid' => $record['Id']),
-                        "ipAddress" => $this->factory->getIpAddressFromRequest()
-                    );
+                    $integrationEntityRepo = $this->factory->getEntityManager()->getRepository('MauticPluginBundle:IntegrationEntity');
+                    $integrationId = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'leads', $lead->getId());
 
-                    $this->factory->getModel('core.auditLog')->writeToLog($log);
+                    if ($integrationId == null) {
+                        $integrationEntity = new IntegrationEntity();
+                        $integrationEntity->setDateAdded(new \DateTime());
+                        $integrationEntity->setIntegration('Salesforce');
+                        $integrationEntity->setIntegrationEntity($object);
+                        $integrationEntity->setIntegrationEntityId($record['Id']);
+                        $integrationEntity->setInternalEntity('Lead');
+                        $integrationEntity->setInternalEntityId($lead->getId());
+                    } else {
+                        $integrationEntity =  $integrationEntityRepo->getEntity($integrationId);
+                    }
+                    $integrationEntity->setLastSyncDate(new \DateTime());
+                    $this->factory->getEntityManager()->flush($integrationEntity);
 
                     $count++;
                 }
@@ -384,17 +387,25 @@ class SalesforceIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 $createdLeadData = $this->getApiHelper()->createLead($mappedData[$object], $lead);
-                if ($createdLeadData['id']){
-                    $log = array(
-                        "bundle"    => "plugin",
-                        "object"    => "lead",
-                        "objectId"  => $lead->getId(),
-                        "action"    => "Salesforce push",
-                        "details"   => array('salesforceid' => $createdLeadData['id']),
-                        "ipAddress" => $this->factory->getIpAddressFromRequest()
-                    );
+                if ($createdLeadData['Id']){
 
-                    $this->factory->getModel('core.auditLog')->writeToLog($log);
+                    $integrationEntityRepo = $this->factory->getEntityManager()->getRepository('MauticPluginBundle:IntegrationEntity');
+                    $integrationId = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'leads', $lead->getId());
+
+                    if (empty($integrationId)) {
+                        $integrationEntity = new IntegrationEntity();
+                        $integrationEntity->setDateAdded(new \DateTime());
+                        $integrationEntity->setIntegration('Salesforce');
+                        $integrationEntity->setIntegrationEntity($object);
+                        $integrationEntity->setIntegrationEntityId($createdLeadData['Id']);
+                        $integrationEntity->setInternalEntity('Lead');
+                        $integrationEntity->setInternalEntityId($lead->getId());
+                    } else {
+                        $integrationEntity =  $integrationEntityRepo->getEntity($integrationId[0]['integration_entity_id']);
+                    }
+                    $integrationEntity->setLastSyncDate(new \DateTime());
+                    $this->factory->getEntityManager()->flush($integrationEntity);
+
                 }
                 return true;
             }
@@ -443,9 +454,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $query = $this->getFetchQuery($params);
 
-        $logRepository= $this->factory->getModel('core.auditLog')->getRepository();
-
-        $salesForceIds =   $logRepository->getDetailsByAction('lead', 'plugin', '%Salesforce%');
+        $integrationEntityRepo = $this->factory->getEntityManager()->getRepository('MauticPluginBundle:IntegrationEntity');
+        $salesForceIds = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'Lead', 'leads');
 
         $startDate = new \DateTime($query['start']);
         $endDate = new \DateTime($query['end']);

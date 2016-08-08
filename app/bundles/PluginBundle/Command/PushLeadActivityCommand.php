@@ -50,7 +50,7 @@ class PushLeadActivityCommand extends ContainerAwareCommand
             )
             ->addOption(
                 '--time-interval',
-                '-ti',
+                '-d',
                 InputOption::VALUE_OPTIONAL,
                 'Send time interval to check updates on Salesforce, it should be a correct php formatted time interval in the past eg:(-10 minutes)'
             )
@@ -94,7 +94,7 @@ class PushLeadActivityCommand extends ContainerAwareCommand
 
             if ($integrationObject !== null && method_exists($integrationObject, 'pushLeadActivity')) {
 
-                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', array('%integration%' => $integration)).'</info>');
+                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.push.leads.activity', array('%integration%' => $integration)).'</info>');
 
                 $params['start']=$startDate;
                 $params['end']=$endDate;
