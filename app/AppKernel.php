@@ -151,6 +151,7 @@ class AppKernel extends Kernel
             new Oneup\UploaderBundle\OneupUploaderBundle(),
             new Symfony\Bundle\TwigBundle\TwigBundle(),
             new Debril\RssAtomBundle\DebrilRssAtomBundle(),
+            new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
             // Mautic Bundles
             new Mautic\ApiBundle\MauticApiBundle(),
             new Mautic\AssetBundle\MauticAssetBundle(),
