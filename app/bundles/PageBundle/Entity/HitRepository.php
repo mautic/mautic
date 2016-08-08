@@ -88,7 +88,7 @@ class HitRepository extends CommonRepository
             $query->andWhere($query->expr()->eq('h.url', $query->expr()->literal($options['url'])));
         }
 
-        return $this->getTimelineResults($query, $options, 'p.title', 'h.date_hit', ['query'], ['dateHit', 'dateLeft'],'device', 'deviceBrand','deviceOsName', 'deviceModel');
+        return $this->getTimelineResults($query, $options, 'p.title', 'h.date_hit', ['query'], ['dateHit', 'dateLeft']);
     }
 
     /**
