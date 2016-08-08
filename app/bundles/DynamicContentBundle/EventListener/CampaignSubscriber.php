@@ -74,26 +74,28 @@ class CampaignSubscriber extends CommonSubscriber
         $event->addAction(
             'dwc.push_content',
             [
-                'label' => 'mautic.dynamicContent.campaign.send_dwc',
-                'description' => 'mautic.dynamicContent.campaign.send_dwc.tooltip',
-                'eventName' => DynamicContentEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-                'formType' => 'dwcsend_list',
-                'formTypeOptions' => ['update_select' => 'campaignevent_properties_dynamicContent'],
-                'formTheme' => 'MauticDynamicContentBundle:FormTheme\DynamicContentPushList',
-                'timelineTemplate' => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
-                'hideTriggerMode' => true,
+                'label'               => 'mautic.dynamicContent.campaign.send_dwc',
+                'description'         => 'mautic.dynamicContent.campaign.send_dwc.tooltip',
+                'eventName'           => DynamicContentEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                'formType'            => 'dwcsend_list',
+                'formTypeOptions'     => ['update_select' => 'campaignevent_properties_dynamicContent'],
+                'formTheme'           => 'MauticDynamicContentBundle:FormTheme\DynamicContentPushList',
+                'timelineTemplate'    => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
+                'hideTriggerMode'     => true,
+                'associatedDecisions' => ['dwc.decision'],
+                'anchorRestrictions'  => ['decision.inaction']
             ]
         );
 
         $event->addLeadDecision(
             'dwc.decision',
             [
-                'label' => 'mautic.dynamicContent.campaign.decision_dwc',
-                'description' => 'mautic.dynamicContent.campaign.decision_dwc.tooltip',
-                'eventName' => DynamicContentEvents::ON_CAMPAIGN_TRIGGER_DECISION,
-                'formType' => 'dwcdecision_list',
+                'label'           => 'mautic.dynamicContent.campaign.decision_dwc',
+                'description'     => 'mautic.dynamicContent.campaign.decision_dwc.tooltip',
+                'eventName'       => DynamicContentEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+                'formType'        => 'dwcdecision_list',
                 'formTypeOptions' => ['update_select' => 'campaignevent_properties_dynamicContent'],
-                'formTheme' => 'MauticDynamicContentBundle:FormTheme\DynamicContentDecisionList',
+                'formTheme'       => 'MauticDynamicContentBundle:FormTheme\DynamicContentDecisionList',
 
             ]
         );
@@ -150,7 +152,11 @@ class CampaignSubscriber extends CommonSubscriber
             $content = $tokenEvent->getContent();
 
             $event->stopPropagation();
-            return $event->setResult($content);
+
+            $result = $event->setResult($content);
+            $event->setChannel('dynamicContent', $dwc->getId());
+
+            return $result;
         }
     }
 }

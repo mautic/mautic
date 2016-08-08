@@ -27,10 +27,15 @@ trait ConfigAwareTrait
         /** @var array $paths  */
         include $root . '/config/paths.php';
 
-        /** @var $parameters */
-        include str_replace('%kernel.root_dir%', $root, $paths['local_config']);
+        $localParameters = [];
+        $localConfig     = str_replace('%kernel.root_dir%', $root, $paths['local_config']);
 
-        $localParameters = $parameters;
+        if (file_exists($localConfig)) {
+            /** @var $parameters */
+            include $localConfig;
+
+            $localParameters = $parameters;
+        }
 
         //check for parameter overrides
         if (file_exists($root.'/config/parameters_local.php')) {

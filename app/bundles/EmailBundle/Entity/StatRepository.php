@@ -485,4 +485,18 @@ class StatRepository extends CommonRepository
     {
         return 's';
     }
+
+    /**
+     * @param $leadId
+     * @param $emailId
+     *
+     * @return array
+     */
+    public function findContactEmailStats($leadId, $emailId)
+    {
+        return $this->createQueryBuilder('s')
+            ->where("IDENTITY(s.lead) = ".(int)$leadId." AND IDENTITY(s.email) = ".(int)$emailId)
+            ->getQuery()
+            ->getResult();
+    }
 }

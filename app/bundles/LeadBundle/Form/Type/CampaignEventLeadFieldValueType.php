@@ -16,6 +16,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class CampaignEventLeadFieldValueType
@@ -34,31 +35,45 @@ class CampaignEventLeadFieldValueType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('field', 'leadfields_choices', array(
-            'label'         => 'mautic.lead.campaign.event.field',
-            'label_attr'    => array('class' => 'control-label'),
-            'multiple'      => false,
-            'empty_value'   => 'mautic.core.select',
-            'attr'          => array(
-                'class'     => 'form-control',
-                'tooltip'   => 'mautic.lead.campaign.event.field_descr',
-                'onchange'  => 'Mautic.updateLeadFieldValues(this)'
-            )
-        ));
+        $builder->add(
+            'field',
+            'leadfields_choices',
+            [
+                'label'       => 'mautic.lead.campaign.event.field',
+                'label_attr'  => ['class' => 'control-label'],
+                'multiple'    => false,
+                'empty_value' => 'mautic.core.select',
+                'attr'        => [
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.lead.campaign.event.field_descr',
+                    'onchange' => 'Mautic.updateLeadFieldValues(this)'
+                ],
+                'required'    => true,
+                'constraints' => [
+                    new NotBlank(
+                        ['message' => 'mautic.core.value.required']
+                    )
+                ]
+            ]
+        );
 
-        $leadModel   = $this->factory->getModel('lead.lead');
-        $fieldModel  = $this->factory->getModel('lead.field');
-        $operators   = $leadModel->getFilterExpressionFunctions();
-        $choices     = array();
+        $leadModel  = $this->factory->getModel('lead.lead');
+        $fieldModel = $this->factory->getModel('lead.field');
+        $operators  = $leadModel->getFilterExpressionFunctions();
+        $choices    = [];
 
 
         foreach ($operators as $key => $operator) {
             $choices[$key] = $operator['label'];
         }
 
-        $builder->add('operator', 'choice', array(
-            'choices'  => $choices,
-        ));
+        $builder->add(
+            'operator',
+            'choice',
+            [
+                'choices' => $choices,
+            ]
+        );
 
         $ff = $builder->getFormFactory();
 
@@ -121,6 +136,12 @@ class CampaignEventLeadFieldValueType extends AbstractType
                         'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
                             'class' => 'form-control'
+                        ],
+                        'required'    => true,
+                        'constraints' => [
+                            new NotBlank(
+                                ['message' => 'mautic.core.value.required']
+                            )
                         ]
                     ]
                 );
@@ -133,6 +154,12 @@ class CampaignEventLeadFieldValueType extends AbstractType
                         'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
                             'class' => 'form-control'
+                        ],
+                        'required'    => true,
+                        'constraints' => [
+                            new NotBlank(
+                                ['message' => 'mautic.core.value.required']
+                            )
                         ]
                     ]
                 );
