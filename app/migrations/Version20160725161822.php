@@ -52,8 +52,8 @@ CREATE TABLE {$this->prefix}video_hits (
 	remote_host VARCHAR(255) DEFAULT NULL,
 	page_language VARCHAR(255) DEFAULT NULL,
 	browser_languages LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)',
-	source VARCHAR(255) DEFAULT NULL,
-	source_id INT DEFAULT NULL,
+	channel VARCHAR(255) DEFAULT NULL,
+	channel_id INT DEFAULT NULL,
 	query LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)',
 	time_watched INT DEFAULT NULL,
 	duration INT DEFAULT NULL,
@@ -67,5 +67,8 @@ SQL;
         $this->addSql($sql);
         $this->addSql("ALTER TABLE {$this->prefix}video_hits ADD CONSTRAINT {$leadFK} FOREIGN KEY (lead_id) REFERENCES {$this->prefix}leads (id) ON DELETE SET NULL;");
         $this->addSql("ALTER TABLE {$this->prefix}video_hits ADD CONSTRAINT {$ipFK} FOREIGN KEY (ip_id) REFERENCES {$this->prefix}ip_addresses (id);");
+
+        $this->addSql('CREATE INDEX mtc_video_channel_search ON mtc_video_hits (channel, channel_id);');
+        $this->addSql('CREATE INDEX mtc_video_guid_lead_search ON mtc_video_hits (guid, lead_id);');
     }
 }
