@@ -512,10 +512,11 @@ class EmailModel extends FormModel
             $emailOpenStat->setStat($stat);
 
             $this->em->persist($emailOpenStat);
-            $this->em->flush($emailOpenDevice);
+            $this->em->flush($emailOpenStat);
         }
 
         $this->em->persist($stat);
+        $this->em->flush();
 
     }
 
