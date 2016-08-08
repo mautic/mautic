@@ -140,7 +140,7 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         $this->smsModel->getRepository()->upCount($smsId);
-
+        $event->setChannel('sms', $sms->getId());
         $event->setResult(
             [
                 'type'    => 'mautic.sms.sms',

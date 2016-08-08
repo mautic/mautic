@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class LeadListAccess extends Constraint
 {
-    public $message = 'Either no list was selected or you do not have access to one of the lists that was selected.';
+    public $message = 'mautic.lead.lists.failed';
 
     public function validatedBy()
     {

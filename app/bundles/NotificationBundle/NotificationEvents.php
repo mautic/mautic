@@ -86,5 +86,5 @@ final class NotificationEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.email.on_campaign_trigger_action';
+    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.notification.on_campaign_trigger_action';
 }
