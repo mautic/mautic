@@ -20,6 +20,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
     {
         $this
             ->setName('mautic:segments:update')
+            ->setAliases(['mautic:segments:rebuild'])
             ->setDescription('Update contacts in smart segments based on new contact data.')
             ->addOption('--batch-limit', '-b', InputOption::VALUE_OPTIONAL, 'Set batch size of contacts to process per round. Defaults to 300.', 300)
             ->addOption(

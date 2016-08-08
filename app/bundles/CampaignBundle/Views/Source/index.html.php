@@ -9,7 +9,7 @@
 
 ?>
 <?php if (empty($update)): ?>
-<div id="CampaignEvent_<?php echo $sourceType; ?>" class="draggable list-campaign-source list-campaign-leadsource">
+<div id="CampaignEvent_<?php echo $sourceType; ?>" data-type="source" class="draggable list-campaign-source list-campaign-leadsource">
 <?php endif; ?>
     <div class="campaign-event-content">
         <div><span class="campaign-event-name ellipsis"><i class="mr-sm fa fa-<?php echo ($sourceType == 'lists') ? 'list': 'pencil-square-o'; ?>"></i><?php echo $names; ?></span></div>
