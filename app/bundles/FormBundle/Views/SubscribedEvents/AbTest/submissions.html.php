@@ -18,6 +18,7 @@ if ($support['data']) {
 }
 
 ?>
+
 <div class="panel ovf-h bg-auto bg-light-xs abtest-bar-chart">
     <div class="panel-body box-layout">
         <div class="col-xs-8 va-m">
@@ -40,7 +41,7 @@ if ($support['data']) {
     mQuery(document).ready(function() {
         mQuery('#abStatsModal').on('shown.bs.modal', function (event) {
             var canvas = document.getElementById("abtest-bar-chart");
-            var barData = mQuery.parseJSON('<?php echo json_encode($chart->render()); ?>');
+            var barData = mQuery.parseJSON('<?php echo str_replace('\'', '\\\'', json_encode($chart->render())); ?>');
             var barGraph = new Chart(canvas, {type: 'bar', data: barData});
         });
     });

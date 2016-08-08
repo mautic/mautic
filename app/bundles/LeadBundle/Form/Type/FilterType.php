@@ -232,7 +232,10 @@ class FilterType extends AbstractType
                     }
 
                     if ($fieldType == 'select') {
-                        array_unshift($choices, array('' => ''));
+                        // array_unshift cannot be used because numeric values get lost as keys
+                        $choices = array_reverse($choices, true);
+                        $choices[''] = '';
+                        $choices = array_reverse($choices, true);
                     }
 
                     $customOptions['choices'] = $choices;

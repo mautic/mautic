@@ -19,6 +19,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\FormEvents;
+use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -540,6 +541,8 @@ class FormModel extends CommonFormModel
      */
     public function populateValuesWithGetParameters(Form $form, &$formHtml)
     {
+        $fieldHelper = new FormFieldHelper($this->translator);
+        $request  = $this->factory->getRequest();
         $formName = $form->generateFormName();
 
         $fields = $form->getFields()->toArray();
@@ -549,47 +552,32 @@ class FormModel extends CommonFormModel
             if ($this->request->query->has($alias)) {
                 $value = $this->request->query->get($alias);
 
-                switch ($f->getType()) {
-                    case 'text':
-                    case 'email':
-                    case 'hidden':
-                        if (preg_match('/<input(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)value="(.*?)"(.*?)\/>/i', $formHtml, $match)) {
-                            $replace  = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'value="'.urldecode($value).'"'.$match[4].'/>';
-                            $formHtml = str_replace($match[0], $replace, $formHtml);
-                        }
-                        break;
-                    case 'textarea':
-                        if (preg_match('/<textarea(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)>(.*?)<\/textarea>/i', $formHtml, $match)) {
-                            $replace  = '<textarea'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'>'.urldecode($value).'</textarea>';
-                            $formHtml = str_replace($match[0], $replace, $formHtml);
-                        }
-                        break;
-                    case 'checkboxgrp':
-                        if (!is_array($value)) {
-                            $value = array($value);
-                        }
-                        foreach ($value as $val) {
-                            $val = urldecode($val);
-                            if (preg_match(
-                                '/<input(.*?)id="mauticform_checkboxgrp_checkbox(.*?)"(.*?)value="'.$val.'"(.*?)\/>/i',
-                                $formHtml,
-                                $match
-                            )) {
-                                $replace  = '<input'.$match[1].'id="mauticform_checkboxgrp_checkbox'.$match[2].'"'.$match[3].'value="'.$val.'"'
-                                    .$match[4].' checked />';
-                                $formHtml = str_replace($match[0], $replace, $formHtml);
-                            }
-                        }
-                        break;
-                    case 'radiogrp':
-                        $value = urldecode($value);
-                        if (preg_match('/<input(.*?)id="mauticform_radiogrp_radio(.*?)"(.*?)value="'.$value.'"(.*?)\/>/i', $formHtml, $match)) {
-                            $replace  = '<input'.$match[1].'id="mauticform_radiogrp_radio'.$match[2].'"'.$match[3].'value="'.$value.'"'.$match[4]
-                                .' checked />';
-                            $formHtml = str_replace($match[0], $replace, $formHtml);
-                        }
-                        break;
-                }
+                $fieldHelper->populateField($f, $value, $formName, $formHtml);
+            }
+        }
+    }
+
+    public function populateValuesWithLead(Form $form, &$formHtml)
+    {
+        $fieldHelper = new FormFieldHelper($this->translator);
+
+        $formName = $form->generateFormName();
+
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $lead = $this->factory->getModel('lead')->getCurrentLead();
+
+        $fields = $form->getFields();
+        /** @var \Mautic\FormBundle\Entity\Field $f */
+        foreach ($fields as $f) {
+            $leadField = $f->getLeadField();
+            $isAutoFill = $f->getIsAutoFill();
+
+            if (isset($leadField) && $isAutoFill) {
+                $value = $lead->getFieldValue($leadField);
+                
+		        if (!empty($value)) {
+		            $fieldHelper->populateField($f, $value, $formName, $formHtml);
+		        }
             }
         }
     }
