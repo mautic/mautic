@@ -659,6 +659,26 @@ class AssetsHelper
     }
 
     /**
+     * @return array
+     *
+     * @internal
+     */
+    public function getAssets()
+    {
+        return $this->assets;
+    }
+
+    /**
+     * @param $assets
+     *
+     * @internal
+     */
+    public function setAssets($assets)
+    {
+        $this->assets = $assets;
+    }
+
+    /**
      * Clear all the assets
      */
     public function clear()

@@ -135,7 +135,7 @@
       var video_buttons = '';
       if (editor.opts.gatedVideoInsertButtons.length > 1) {
         video_buttons = '<div class="fr-buttons">' + editor.button.buildList(editor.opts.gatedVideoInsertButtons) + '</div>';
-    }
+      }
 
       // Video by url layer.
       var by_url_layer = '';
