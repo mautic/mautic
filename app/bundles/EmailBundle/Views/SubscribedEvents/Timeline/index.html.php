@@ -29,7 +29,14 @@ if (!empty($item['storedSubject'])) {
 	    <?php if (isset($event['extra'])) : ?>
 	        <div class="panel-footer">
 	            <p>
-	            <?php if (empty($item['dateRead'])) : ?>
+                <?php if (!empty($item['isFailed'])) : ?>
+                    <?php echo $view['translator']->trans('mautic.email.timeline.event.failed'); ?>
+                    <?php if (isset($item['openDetails']['bounces'])): ?>
+                        <span class="label label-warning" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.email.timeline.event.bounced'); ?>">
+                            <?php echo $view['translator']->trans('mautic.email.timeline.event.bounced'); ?>
+                        </span>
+                    <?php endif; ?>
+                <?php elseif (empty($item['dateRead'])) : ?>
 	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.not.read'); ?>
 	            <?php else : ?>
 	            	<?php echo $view['translator']->trans('mautic.email.timeline.event.' . $event['extra']['type'], array('%date%' => $view['date']->toFull($item['dateRead']), '%interval%' => $view['date']->formatRange($item['timeToRead']), '%sent%' => $view['date']->toFull($item['dateSent']))); ?>

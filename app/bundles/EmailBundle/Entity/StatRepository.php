@@ -257,10 +257,8 @@ class StatRepository extends CommonRepository
             ->leftJoin('MauticLeadBundle:LeadList', 'l', 'WITH', 'l.id = s.list')
             ->leftJoin('MauticEmailBundle:Copy', 'ec', 'WITH', 'ec.id = s.storedCopy')
             ->where(
-                $query->expr()->andX(
-                    $query->expr()->eq('IDENTITY(s.lead)', $leadId),
-                    $query->expr()->eq('s.isFailed', ':false'))
-            )->setParameter('false', false, 'boolean');
+                    $query->expr()->eq('IDENTITY(s.lead)', $leadId)
+            );
 
         if (!empty($options['ipIds'])) {
             $query->orWhere('s.ipAddress IN (' . implode(',', $options['ipIds']) . ')');
