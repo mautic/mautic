@@ -89,7 +89,7 @@ class ThemeHelper
      */
     private function getDirectoryName($newName)
     {
-        return InputHelper::alphanum($newName, true);
+        return InputHelper::filename($newName, true);
     }
 
     /**

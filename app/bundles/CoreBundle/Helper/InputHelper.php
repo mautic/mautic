@@ -207,7 +207,8 @@ class InputHelper
      */
     public static function filename($value)
     {
-        return preg_replace("/[^a-z0-9\.]/", "", $value);
+        $value = str_replace(' ', '_', $value);
+        return preg_replace("/[^a-z0-9\.\_]/", "", strtolower($value));
     }
 
     /**
