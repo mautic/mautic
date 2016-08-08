@@ -446,7 +446,7 @@ class FormEntity extends CommonEntity
         $status = 'published';
         if (method_exists($this, 'getPublishUp')) {
             $up = $this->getPublishUp();
-            if (!empty($up) && $current <= $up) {
+            if (!empty($up) && $current < $up) {
                 $status = 'pending';
             }
         }
