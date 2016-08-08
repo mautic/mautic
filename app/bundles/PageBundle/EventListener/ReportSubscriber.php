@@ -379,8 +379,9 @@ class ReportSubscriber extends CommonSubscriber
                     );
                     break;
                 case 'mautic.page.graph.pie.devices':
-                    $queryBuilder->select('ph.device, COUNT(distinct(ph.id)) as the_count')
-                        ->groupBy('ph.device');
+                    $queryBuilder->select('ds.device, COUNT(distinct(ph.id)) as the_count')
+                        ->join('ph',MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id = ph.device_id')
+                        ->groupBy('ds.device');
                     $data  = $queryBuilder->execute()->fetchAll();
                     $chart = new PieChart();
 

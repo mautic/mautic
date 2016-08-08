@@ -1125,7 +1125,7 @@ class ListModel extends FormModel
 
         return $chart->render(false);
     }
-    
+
     /**
      * Get bar chart data of hits
      *
@@ -1143,7 +1143,7 @@ class ListModel extends FormModel
         $data['labels'] = array();
 
         $q = $this->em->getConnection()->createQueryBuilder();
-        
+
         $q->select('count(l.id) as leads, s.name as stage')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 't')
             ->join('t', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id')
@@ -1217,11 +1217,12 @@ class ListModel extends FormModel
 
         $q = $this->em->getConnection()->createQueryBuilder();
 
-        $q->select('count(l.id) as leads, h.device as device')
+        $q->select('count(l.id) as leads, ds.device')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 't')
             ->join('t', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id')
             ->join('t', MAUTIC_TABLE_PREFIX.'page_hits', 'h', 'h.lead_id=l.id')
-            ->orderBy('device', 'DESC')
+            ->join('h',MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id = h.device_id')
+            ->orderBy('ds.device', 'DESC')
             ->andWhere($q->expr()->gte('t.date_added', ':date_from'))
             ->setParameter('date_from', $dateFrom->format('Y-m-d'))
             ->andWhere($q->expr()->lte('t.date_added', ':date_to'))
@@ -1234,7 +1235,7 @@ class ListModel extends FormModel
             );
         }
 
-        $q->groupBy('h.device');
+        $q->groupBy('ds.device');
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('l.created_by = :userId')
