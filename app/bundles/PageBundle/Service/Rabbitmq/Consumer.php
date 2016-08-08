@@ -9,6 +9,9 @@ use PhpAmqpLib\Message\AMQPMessage;
 use Mautic\PageBundle\Model\PageModel;
 use Monolog\Logger;
 
+// Simple class to know that we are calling it from the queue
+class Queue {}
+
 class Consumer implements ConsumerInterface
 {
    private $model;
@@ -22,11 +25,11 @@ class Consumer implements ConsumerInterface
 
    public function execute(AMQPMessage $msg)
    {
-     echo "Begin processing " . PHP_EOL;
+      echo "Begin processing " . PHP_EOL;
       $message = unserialize($msg->body);
       $request = $message['request'];
-      $this->model->hitPage(null, $request);
+      $this->model->hitPage(new Queue, $request);
       echo "End processing " . PHP_EOL;
-      return (TrackingPixelHelper::getResponse($request)->getStatusCode() == Response::HTTP_OK);
+      return true;
    }
 }

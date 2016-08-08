@@ -32,6 +32,7 @@ use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
+use Mautic\PageBundle\Service\Rabbitmq;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
@@ -461,8 +462,11 @@ class PageModel extends FormModel
             $hit->setUrlTitle($query['page_title']);
         }
 
-        // Store tracking ID
-        list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie(false, $request->cookies);
+        if ($page instanceof Queue){
+          list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie();
+        } else {
+          list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookieForQueue($request->cookies);
+        }
 
         $hit->setTrackingId($trackingId);
         $hit->setLead($lead);
@@ -577,12 +581,15 @@ class PageModel extends FormModel
                     $utmTags->setUtmSource($query['utm_source']);
                 }
 
-                $repo = $this->em->getRepository('MauticLeadBundle:UtmTag');
-                $repo->saveEntity($utmTags);
-
-                $this->leadModel->setUtmTags($lead, $utmTags);
-            }
+        if (!$this->em->isOpen()) {
+          $this->em = $this->em->create(
+              $this->em->getConnection(),
+              $this->em->getConfiguration()
+          );
         }
+        $this->em->persist($lead);
+        $this->leadModel->setUtmTags($lead, $utmTags);
+
         //get a list of the languages the user prefers
         $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');
         if (!empty($browserLanguages)) {

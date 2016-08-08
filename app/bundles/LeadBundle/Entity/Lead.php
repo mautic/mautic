@@ -297,7 +297,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $builder->createOneToMany('utmtags', 'Mautic\LeadBundle\Entity\UtmTag')
             ->orphanRemoval()
             ->mappedBy('lead')
-            ->cascadePersist()
             ->cascadeAll()
             ->fetchExtraLazy()
             ->build();

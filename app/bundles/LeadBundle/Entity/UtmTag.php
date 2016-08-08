@@ -96,7 +96,7 @@ class UtmTag
 
         $builder->addDateAdded();
 
-        $builder->addLead(false, 'CASCADE', false, 'utmtags');
+        $builder->addLead(false, 'CASCADE_ALL', false, 'utmtags');
 
         $builder->addNullableField('query', 'array');
 
