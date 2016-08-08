@@ -32,24 +32,33 @@ class CampaignEventLeadFieldValueType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('field', 'leadfields_choices', array(
-            'with_tags'     => true,
-            'label'         => 'mautic.lead.campaign.event.field',
-            'label_attr'    => array('class' => 'control-label'),
-            'multiple'      => false,
-            'empty_value'   => 'mautic.core.select',
-            'attr'          => array(
-                'class'     => 'form-control',
-                'tooltip'   => 'mautic.lead.campaign.event.field_descr',
-                'onchange'  => 'Mautic.updateLeadFieldValues(this)'
-            )
-        ));
+        $builder->add(
+            'field',
+            'leadfields_choices',
+            [
+                'label'       => 'mautic.lead.campaign.event.field',
+                'label_attr'  => ['class' => 'control-label'],
+                'multiple'    => false,
+                'with_tags'   => true,
+                'empty_value' => 'mautic.core.select',
+                'attr'        => [
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.lead.campaign.event.field_descr',
+                    'onchange' => 'Mautic.updateLeadFieldValues(this)'
+                ],
+                'required'    => true,
+                'constraints' => [
+                    new NotBlank(
+                        ['message' => 'mautic.core.value.required']
+                    )
+                ]
+            ]
+        );
 
-        $leadModel   = $this->factory->getModel('lead.lead');
-        $fieldModel  = $this->factory->getModel('lead.field');
-        $operators   = $leadModel->getFilterExpressionFunctions();
-        $choices     = array();
-
+        $leadModel  = $this->factory->getModel('lead.lead');
+        $fieldModel = $this->factory->getModel('lead.field');
+        $operators  = $leadModel->getFilterExpressionFunctions();
+        $choices    = [];
 
         foreach ($operators as $key => $operator) {
             $choices[$key] = $operator['label'];
