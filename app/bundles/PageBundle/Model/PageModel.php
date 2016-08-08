@@ -768,7 +768,7 @@ class PageModel extends FormModel
         } else {
             $device = $deviceRepo->getEntity($device['id']);
         }
-        $this->logger->addError(print_r($device->getId(),true));
+
         $hit->setDeviceStat($device);
 
         // Wrap in a try/catch to prevent deadlock errors on busy servers

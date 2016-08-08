@@ -106,7 +106,7 @@ class LeadSubscriber extends CommonSubscriber
                         'isExternal' => true
                     ];
                 }
-                $this->factory->getLogger()->addError(print_r($hit,true));
+
                 $event->addEvent(
                     [
                         'event'           => $eventTypeKey,
