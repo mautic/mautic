@@ -15,7 +15,6 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\SmsBundle\Api\AbstractSmsApi;
 use Mautic\SmsBundle\Event\SmsSendEvent;
@@ -124,10 +123,7 @@ class CampaignSubscriber extends CommonSubscriber
             return $event->setFailed('mautic.sms.campaign.failed.missing_entity');
         }
 
-        // Replace contact fields
-        $message = TokenHelper::findLeadTokens($sms->getMessage(), $lead->getProfileFields(), true);
-
-        $smsEvent = new SmsSendEvent($message, $lead);
+        $smsEvent = new SmsSendEvent($sms->getMessage(), $lead);
         $smsEvent->setSmsId($smsId);
 
         $this->dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $smsEvent);
@@ -135,7 +131,6 @@ class CampaignSubscriber extends CommonSubscriber
 
         // If there was a problem sending at this point, it's an API problem and should be requeued
         if ($metadata === false) {
-
             return $event->setResult(false);
         }
 
