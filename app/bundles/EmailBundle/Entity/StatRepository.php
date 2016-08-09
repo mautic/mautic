@@ -260,8 +260,7 @@ class StatRepository extends CommonRepository
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 's.list_id = l.id')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'email_copies', 'ec', 's.copy_id = ec.id')
             ->where(                 
-                    $query->expr()->eq('s.lead_id', (int) $leadId)
-                )
+                $query->expr()->eq('s.lead_id', (int) $leadId)
             );
 
         if (isset($options['state'])) {
