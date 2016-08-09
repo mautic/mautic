@@ -3449,7 +3449,9 @@ var Mautic = {
 
         if (customHtml.length) {
 
-            if (!customHtml.val().length) {
+            var emptyFroalaContent = '<!DOCTYPE html><html><head><title></title></head><body></body></html>';
+
+            if (!customHtml.val().length || customHtml.val() === emptyFroalaContent) {
                 Mautic.setThemeHtml(themeField.val());
             }
 
@@ -3472,7 +3474,7 @@ var Mautic = {
                 // Load the theme HTML to the source textarea
                 Mautic.setThemeHtml(currentLink.attr('data-theme'));
 
-                // Manipulate classes to achieve the theme selection illustion
+                // Manipulate classes to achieve the theme selection illusion
                 mQuery('.theme-list .panel').removeClass('theme-selected');
                 currentLink.closest('.panel').addClass('theme-selected');
                 mQuery('.theme-list .select-theme-selected').addClass('hide');
