@@ -16,6 +16,14 @@ namespace Mautic\PluginBundle;
  */
 final class PluginEvents
 {
+    /**
+     * The mautic.plugin_on_integration_config_save event is dispatched when an integration's configuration is saved
+     *
+     * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationEvent instance.
+     *
+     * @var string
+     */
+    const PLUGIN_ON_INTEGRATION_CONFIG_SAVE = 'mautic.plugin_on_integration_config_save';
 
     /**
      * The mautic.plugin_on_integration_keys_encrypt event is dispatched prior to encrypting keys to be stored into the database.

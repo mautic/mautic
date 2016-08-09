@@ -3178,6 +3178,8 @@ var Mautic = {
                         Mautic.renderBarChart(canvas)
                     } else if (canvas.hasClass('simple-bar-chart')) {
                         Mautic.renderSimpleBarChart(canvas)
+                    } else if (canvas.hasClass('horizontal-bar-chart')) {
+                        Mautic.renderHorizontalBarChart(canvas)
                     }
                 }
                 canvas.addClass('chart-rendered');
@@ -3244,7 +3246,13 @@ var Mautic = {
         var chart = new Chart(canvas, {
             type: 'bar',
             data: data,
-            options: {}
+            options: {
+                scales: {
+                    xAxes: [{
+                        barPercentage: 35
+                    }]
+                }
+            }
         });
         Mautic.chartObjects.push(chart);
     },
@@ -3264,7 +3272,8 @@ var Mautic = {
                     xAxes: [{
                         stacked: false,
                         ticks: {fontSize: 9},
-                        gridLines: {display:false}
+                        gridLines: {display:false},
+                        barPercentage: 35
                     }],
                     yAxes: [{
                         display: false,
@@ -3272,7 +3281,42 @@ var Mautic = {
                         ticks: {beginAtZero: true, display: false},
                         gridLines: {display:false}
                     }],
-                    display: false,
+                    display: false
+                },
+                legend: {
+                    display: false
+                }
+            }
+        });
+        Mautic.chartObjects.push(chart);
+    },
+
+    /**
+     * Render the chart.js simple bar chart
+     *
+     * @param mQuery element canvas
+     */
+    renderHorizontalBarChart: function(canvas) {
+        var data = mQuery.parseJSON(canvas.text());
+        var chart = new Chart(canvas, {
+            type: 'horizontalBar',
+            data: data,
+            options: {
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        stacked: false,
+                        gridLines: {display:false},
+                        ticks: {beginAtZero: true,display: true, fontSize: 8, stepSize: 5}
+                    }],
+                    yAxes: [{
+                        stacked: false,
+                        ticks: {beginAtZero: true, display: true, fontSize: 9},
+                        gridLines: {display:false},
+                        barPercentage: 8,
+                        categorySpacing: 1
+                    }],
+                    display: false
                 },
                 legend: {
                     display: false

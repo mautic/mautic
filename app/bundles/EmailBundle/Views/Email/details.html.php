@@ -209,6 +209,7 @@ $view['slots']->set(
                 'MauticEmailBundle:Email:graph.html.php',
                 [
                     'stats'         => $stats,
+                    'statsDevices'  => $statsDevices,
                     'emailType'     => $emailType,
                     'email'         => $email,
                     'isVariant'     => ($showTranslations || $showVariants),

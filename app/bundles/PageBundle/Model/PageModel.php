@@ -13,6 +13,8 @@ use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\LeadDevice;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\LeadBundle\Entity\Lead;
@@ -34,6 +36,7 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Doctrine\DBAL\Query\QueryBuilder;
+use DeviceDetector\DeviceDetector;
 
 /**
  * Class PageModel
@@ -582,6 +585,33 @@ class PageModel extends FormModel
             $hit->setBrowserLanguages($languages);
         }
 
+        //device granularity
+        $dd = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
+
+        $dd->parse();
+
+        $deviceRepo = $this->leadModel->getDeviceRepository();
+        $device = $deviceRepo->getDevice(null, $lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
+
+        if (empty($device)) {
+
+            $device = new LeadDevice();
+
+            $device->setClientInfo($dd->getClient());
+            $device->setDevice($dd->getDeviceName());
+            $device->setDeviceBrand($dd->getBrand());
+            $device->setDeviceModel($dd->getModel());
+            $device->setDeviceOs($dd->getOs());
+            $device->setDateOpen($hit->getDateHit());
+            $device->setLead($lead);
+
+            $this->em->persist($device);
+        } else {
+            $device = $deviceRepo->getEntity($device['id']);
+        }
+
+        $hit->setDeviceStat($device);
+
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
             $this->em->persist($hit);
@@ -880,6 +910,48 @@ class PageModel extends FormModel
 
             $data = $query->fetchCountDateDiff($q);
             $chart->setDataset($time['label'], $data);
+        }
+
+        return $chart->render();
+    }
+
+    /**
+     * Get bar chart data of hits
+     *
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $dateFormat
+     * @param array    $filter
+     *
+     * @return array
+     */
+    public function getDeviceGranularityData(\DateTime $dateFrom, \DateTime $dateTo, $filters = array(), $canViewOthers = true)
+    {
+        $data['values'] = array();
+        $data['labels'] = array();
+
+        $q = $this->em->getConnection()->createQueryBuilder();
+
+        $q->select('count(h.id) as count, ds.device as device')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
+            ->join('h', MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id=h.device_id')
+            ->orderBy('device', 'DESC')
+            ->andWhere($q->expr()->gte('h.date_hit', ':date_from'))
+            ->setParameter('date_from', $dateFrom->format('Y-m-d'))
+            ->andWhere($q->expr()->lte('h.date_hit', ':date_to'))
+            ->setParameter('date_to', $dateTo->format('Y-m-d'." 23:59:59"));
+        $q->groupBy('ds.device');
+
+        $results = $q->execute()->fetchAll();
+
+        $chart     = new PieChart($data['labels']);
+
+        foreach($results as $result){
+            $label=substr(empty($result['device'])?  $this->translator->trans('mautic.core.no.info'): $result['device'],0,12);
+
+            // $data['backgroundColor'][]='rgba(220,220,220,0.5)';
+            $chart->setDataset($label,  $result['count']);
         }
 
         return $chart->render();

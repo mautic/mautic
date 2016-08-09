@@ -11,6 +11,8 @@ namespace Mautic\PluginBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -43,6 +45,19 @@ class DetailsType extends AbstractType
             'data'                => $decryptedKeys,
             'integration_object'  => $options['integration_object']
         ));
+
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use($keys, $decryptedKeys, $options) {
+            $data = $event->getData();
+            $form = $event->getForm();
+
+            $form->add('apiKeys', 'integration_keys', array(
+                'label'               => false,
+                'integration_keys'    => $keys,
+                'data'                => $decryptedKeys,
+                'integration_object'  => $options['integration_object'],
+                'is_published'        => (int) $data['isPublished']
+            ));
+        });
 
         if (!empty($formSettings['requires_authorization'])) {
             $disabled     = false;

@@ -377,6 +377,12 @@ class EmailController extends FormController
                 new \DateTime($dateRangeForm->get('date_from')->getData()),
                 new \DateTime($dateRangeForm->get('date_to')->getData())
             );
+            $statsDevices = $model->getEmailDeviceStats(
+                $email,
+                $variant,
+                new \DateTime($dateRangeForm->get('date_from')->getData()),
+                new \DateTime($dateRangeForm->get('date_to')->getData())
+            );
         } else {
             $stats = $model->getEmailListStats(
                 $email,
@@ -384,6 +390,7 @@ class EmailController extends FormController
                 new \DateTime($dateRangeForm->get('date_from')->getData()),
                 new \DateTime($dateRangeForm->get('date_to')->getData())
             );
+            $statsDevices = $model->getEmailDeviceStats($email, $variant);
         }
 
         // Audit Log
@@ -404,6 +411,7 @@ class EmailController extends FormController
                 'viewParameters'  => [
                     'email'         => $email,
                     'stats'         => $stats,
+                    'statsDevices'  => $statsDevices,
                     'showAllStats'  => $includeVariants,
                     'trackables'    => $trackableLinks,
                     'pending'       => $model->getPendingLeads($email, null, true),
