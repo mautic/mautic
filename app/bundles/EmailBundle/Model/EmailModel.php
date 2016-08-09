@@ -13,6 +13,8 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\LeadDevice;
+use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
@@ -34,6 +36,7 @@ use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use DeviceDetector\DeviceDetector;
 
 /**
  * Class EmailModel
@@ -131,6 +134,15 @@ class EmailModel extends FormModel
     {
         return $this->em->getRepository('MauticEmailBundle:Copy');
     }
+
+    /**
+    * @return \Mautic\EmailBundle\Entity\CopyRepository
+    */
+    public function getStatDeviceRepository()
+    {
+        return $this->em->getRepository('MauticEmailBundle:StatDevice');
+    }
+
 
     /**
      * {@inheritdoc}
@@ -427,14 +439,66 @@ class EmailModel extends FormModel
         if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_OPEN)) {
             $event = new EmailOpenEvent($stat, $request, $firstTime);
             $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_OPEN, $event);
+            //device granularity
+            $dd = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
+
+            $dd->parse();
+            $deviceRepo = $this->leadModel->getDeviceRepository();
+            $emailOpenDevice = $deviceRepo->getDevice(null, $lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
+
+            if (empty($emailOpenDevice)) {
+                $emailOpenDevice = new LeadDevice();
+
+                $emailOpenDevice->setClientInfo($dd->getClient());
+                $emailOpenDevice->setDevice($dd->getDeviceName());
+                $emailOpenDevice->setDeviceBrand($dd->getBrand());
+                $emailOpenDevice->setDeviceModel($dd->getModel());
+                $emailOpenDevice->setDeviceOs($dd->getOs());
+                $emailOpenDevice->setLead($lead);
+
+            try {
+                $this->em->persist($emailOpenDevice);
+                $this->em->flush($emailOpenDevice);
+            } catch (\Exception $exception) {
+                if (MAUTIC_ENV === 'dev') {
+
+                        throw $exception;
+                    } else {
+                        $this->logger->addError(
+                            $exception->getMessage(),
+                            array('exception' => $exception)
+                        );
+                    }
+                }
+            } else {
+                $emailOpenDevice = $deviceRepo->getEntity($emailOpenDevice['id']);
+
+            }
+
         }
 
         if ($email) {
             $this->em->persist($email);
+            $this->em->flush($email);
+        }
+
+
+        if (isset($emailOpenDevice) and is_object($emailOpenDevice)) {
+            $emailOpenStat = new StatDevice();
+            $emailOpenStat->setIpAddress($ipAddress);
+
+            $emailOpenStat->setDevice($emailOpenDevice);
+
+            $emailOpenStat->setDateOpened($readDateTime->toUtcString());
+            $emailOpenStat->setStat($stat);
+
+            $this->em->persist($emailOpenStat);
+            $this->em->flush($emailOpenStat);
         }
 
         $this->em->persist($stat);
         $this->em->flush();
+
     }
 
     /**
@@ -699,7 +763,68 @@ class EmailModel extends FormModel
 
         return $chart->render();
     }
+    /**
+     * Get a stats for email by list
+     *
+     * @param Email|int $email
+     * @param bool      $includeVariants
+     *
+     * @return array
+     */
+    public function getEmailDeviceStats($email, $includeVariants = false, $dateFrom = null, $dateTo = null)
+    {
+        if (!$email instanceof Email) {
+            $email = $this->getEntity($email);
+        }
 
+        if ($includeVariants && $email->isVariant()) {
+            $parent = $email->getVariantParent();
+            if ($parent) {
+                // $email is a variant of another
+                $children = $parent->getVariantChildren();
+                $emailIds = $children->getKeys();
+                $emailIds[] = $parent->getId();
+            } else {
+                $children = $email->getVariantChildren();
+                $emailIds = $children->getKeys();
+                $emailIds[] = $email->getId();
+            }
+        } else {
+            $emailIds = [$email->getId()];
+        }
+
+        $lists     = $email->getLists();
+        $listCount = count($lists);
+        $chart = new BarChart(array('Devices'));
+
+        if ($listCount) {
+            foreach ($lists as $l) {
+                $statRepo = $this->getStatRepository();
+                $statIds = $statRepo->getOpenedStatIds($emailIds, $l->getId());
+                $results = array();
+
+                if(!empty($statIds))
+                {
+                    $results = $this->getStatDeviceRepository()->getDeviceStats($statIds[0],$l->getId(), $dateFrom, $dateTo, 'Email', $emailIds[0]);
+                }
+                $key = 0;
+                foreach ($results as $result) {
+                    $label = substr(empty($result['device']) ? $this->translator->trans('mautic.core.no.info') : $result['device'], 0, 12);
+                    $chart->setDataset(
+                        $label,
+                        [
+                            $result['count']
+                        ],
+                        $key
+                    );
+                    $key++;
+                }
+            }
+        }
+
+        return $chart->render();
+
+    }
     /**
      * @param           $email
      * @param bool      $includeVariants
