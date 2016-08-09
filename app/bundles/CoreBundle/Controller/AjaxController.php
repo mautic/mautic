@@ -680,21 +680,6 @@ class AjaxController extends CommonController
      *
      * @return JsonResponse
      */
-    protected function markNotificationsReadAction(Request $request)
-    {
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model = $this->getModel('core.notification');
-
-        $model->markAllRead();
-
-        return $this->sendJsonResponse(array('success' => 1));
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
     protected function clearNotificationAction(Request $request)
     {
         $id = InputHelper::int($request->get('id', 0));
