@@ -1127,16 +1127,18 @@ class EmailModel extends FormModel
         $frequencyRulesRepo = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
 
         $leadIds = array_keys($leads);
-        $leadIds = implode("','", $leadIds);
+        $leadIds = implode(",", $leadIds);
 
-        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', "'".$leadIds."'", $listId, $defaultFrequencyNumber, $defaultFrequencyTime);
+        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', $leadIds, $listId, $defaultFrequencyNumber, $defaultFrequencyTime);
 
         if (!empty($dontSendTo)) {
-            $sendTo = array_diff_key($leads, $dontSendTo);
-        } else {
-            $sendTo = $leads;
+            foreach ($dontSendTo as $frequencyRuleMet)
+            {
+                unset($leads[$frequencyRuleMet['lead_id']]);
+            }
         }
-
+        $sendTo = $leads;
+        
         if (!$ignoreDNC) {
             //get the list of do not contacts
             static $dnc;
