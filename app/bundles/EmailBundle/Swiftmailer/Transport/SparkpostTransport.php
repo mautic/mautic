@@ -11,6 +11,7 @@
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use SparkPost\APIResponseException;
 
 use SparkPost\SparkPost;
@@ -247,17 +248,18 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         $payload = $request->request->all();
 
         $rows = [
-            'bounced'      => [
+            DoNotContact::BOUNCED => [
                 'hashIds' => [],
                 'emails'  => []
             ],
-            'unsubscribed' => [
+            DoNotContact::UNSUBSCRIBED => [
                 'hashIds' => [],
                 'emails'  => []
             ]
         ];
 
         foreach ($payload as $msys) {
+            $msys = $msys['msys'];
             if (isset($msys['message_event'])) {
                 $event = $msys['message_event'];
             } elseif (isset($msys['unsubscribe_event'])) {
@@ -285,19 +287,19 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
                 case 'bounce':
                     // Only parse hard bounces - https://support.sparkpost.com/customer/portal/articles/1929896-bounce-classification-codes
                     if (in_array((int) $event['bounce_class'], [10, 30, 50, 51, 52, 53, 54, 90])) {
-                        $rows['bounce']['emails'][$hashId] = $event['raw_reason'];
+                        $rows[DoNotContact::BOUNCED]['hashIds'][$hashId] = $event['raw_reason'];
                     }
                     break;
                 case 'spam_complaint':
-                    $rows['bounce']['hashIds'][$hashId] = $event['fbtype'];
+                    $rows[DoNotContact::BOUNCED]['hashIds'][$hashId] = $event['fbtype'];
                     break;
                 case 'out_of_band':
                 case 'policy_rejection':
-                    $rows['bounce']['hashIds'][$hashId] = $event['raw_reason'];
+                    $rows[DoNotContact::BOUNCED]['hashIds'][$hashId] = $event['raw_reason'];
                     break;
                 case 'list_unsubscribe':
                 case 'link_unsubscribe':
-                    $rows['unsubscribe']['hashIds'][$hashId] = 'unsubscribed';
+                    $rows[DoNotContact::UNSUBSCRIBED]['hashIds'][$hashId] = 'unsubscribed';
                     break;
             }
         }
