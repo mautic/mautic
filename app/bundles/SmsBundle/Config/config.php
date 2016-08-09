@@ -128,7 +128,7 @@ return [
         'sms_username' => null,
         'sms_password' => null,
         'sms_sending_phone_number' => null,
-        'sms_frequency_number' => 1,
-        'sms_frequency_time' => 'DAY'
+        'sms_frequency_number' => null,
+        'sms_frequency_time' => null
     ]
 ];
