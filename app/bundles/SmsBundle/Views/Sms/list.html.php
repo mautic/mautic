@@ -39,7 +39,7 @@ if (count($items)):
             ]);
             ?>
 
-            <th class="visible-sm visible-md visible-lg col-sms-stats"><?php echo $view['translator']->trans('mautic.sms.thead.stats'); ?></th>
+            <th class="visible-sm visible-md visible-lg col-sms-stats"><?php echo $view['translator']->trans('mautic.core.stats'); ?></th>
 
             <?php
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [

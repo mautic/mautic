@@ -70,7 +70,7 @@ $view['slots']->set(
                                 <div class="col-md-3 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
                                         <span class="fa fa-line-chart"></span>
-                                        <?php echo $view['translator']->trans('mautic.sms.sent'); ?>
+                                        <?php echo $view['translator']->trans('mautic.core.stats'); ?>
                                     </h5>
                                 </div>
                                 <div class="col-md-9 va-m">
