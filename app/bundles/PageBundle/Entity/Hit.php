@@ -263,7 +263,7 @@ class Hit
 
         $builder->addNullableField('query', 'array');
 
-        $builder->createOneToOne('device', 'Mautic\LeadBundle\Entity\LeadDevice')
+        $builder->createManyToOne('device', 'Mautic\LeadBundle\Entity\LeadDevice')
             ->addJoinColumn('device_id', 'id', true, false, 'SET NULL')
             ->cascadePersist()
             ->build();
