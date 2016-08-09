@@ -194,7 +194,6 @@ class EmailModel extends FormModel
         }
 
         if (!$this->updatingTranslationChildren) {
-            //set the author for new pages
             if (!$entity->isNew()) {
                 //increase the revision
                 $revision = $entity->getRevision();
