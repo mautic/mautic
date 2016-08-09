@@ -67,7 +67,10 @@ class Notification
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('notifications')
-            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\NotificationRepository');
+            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\NotificationRepository')
+            ->addIndex(['is_read'], 'notification_read_status')
+            ->addIndex(['type'], 'notification_type')
+            ->addIndex(['is_read', 'user_id'], 'notification_user_read_status');
 
         $builder->addId();
 
