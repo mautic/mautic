@@ -28,7 +28,7 @@ class FrequencyRuleRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $q->select('es.lead_id')
+        $q->select('es.lead_id, fr.frequency_time, fr.frequency_number')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
             ->join('es', MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr','es.lead_id = fr.lead_id' );
 
@@ -53,7 +53,7 @@ class FrequencyRuleRepository extends CommonRepository
             $q->andWhere('es.lead_id in (:lead_ids)')
                 ->setParameter('lead_ids', $leadIds);
         }
-        $q->groupBy('email_address');
+        $q->groupBy('es.lead_id, fr.frequency_time, fr.frequency_number');
         $q->having('(count(es.email_address) < fr.frequency_number and fr.frequency_number is not null) or (count(es.email_address< :defaultNumber))')
             ->setParameter('defaultNumber', $defaultFrequencyNumber);
 
