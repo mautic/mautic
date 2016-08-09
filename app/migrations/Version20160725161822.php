@@ -68,7 +68,7 @@ SQL;
         $this->addSql("ALTER TABLE {$this->prefix}video_hits ADD CONSTRAINT {$leadFK} FOREIGN KEY (lead_id) REFERENCES {$this->prefix}leads (id) ON DELETE SET NULL;");
         $this->addSql("ALTER TABLE {$this->prefix}video_hits ADD CONSTRAINT {$ipFK} FOREIGN KEY (ip_id) REFERENCES {$this->prefix}ip_addresses (id);");
 
-        $this->addSql('CREATE INDEX mtc_video_channel_search ON mtc_video_hits (channel, channel_id);');
-        $this->addSql('CREATE INDEX mtc_video_guid_lead_search ON mtc_video_hits (guid, lead_id);');
+        $this->addSql("CREATE INDEX {$this->prefix}video_channel_search ON {$this->prefix}video_hits (channel, channel_id)");
+        $this->addSql("CREATE INDEX {$this->prefix}video_guid_lead_search ON {$this->prefix}video_hits (guid, lead_id)");
     }
 }
