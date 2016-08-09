@@ -410,13 +410,14 @@ class FormController extends CommonFormController
             $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
             $field = new Field();
 
-            $modifiedFields[$keyId]              = $field->convertToArray();
-            $modifiedFields[$keyId]['label']     = $this->factory->getTranslator()->trans('mautic.core.form.submit');
-            $modifiedFields[$keyId]['alias']     = 'submit';
-            $modifiedFields[$keyId]['showLabel'] = 1;
-            $modifiedFields[$keyId]['type']      = 'button';
-            $modifiedFields[$keyId]['id']        = $keyId;
-            $modifiedFields[$keyId]['formId']    = $sessionId;
+            $modifiedFields[$keyId]                    = $field->convertToArray();
+            $modifiedFields[$keyId]['label']           = $this->factory->getTranslator()->trans('mautic.core.form.submit');
+            $modifiedFields[$keyId]['alias']           = 'submit';
+            $modifiedFields[$keyId]['showLabel']       = 1;
+            $modifiedFields[$keyId]['type']            = 'button';
+            $modifiedFields[$keyId]['id']              = $keyId;
+            $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-default"';
+            $modifiedFields[$keyId]['formId']          = $sessionId;
             unset($modifiedFields[$keyId]['form']);
             $session->set('mautic.form.'.$sessionId.'.fields.modified', $modifiedFields);
         }
