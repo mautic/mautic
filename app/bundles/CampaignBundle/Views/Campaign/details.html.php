@@ -201,6 +201,7 @@ switch (true) {
             <!--/ #events-container -->
             <div class="tab-pane fade in bdr-w-0 page-list" id="leads-container">
                 <?php echo $campaignLeads; ?>
+                <div class="clearfix"></div>
             </div>
         </div>
         <!--/ end: tab-content -->

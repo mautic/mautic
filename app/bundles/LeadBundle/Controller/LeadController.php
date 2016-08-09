@@ -182,7 +182,8 @@ class LeadController extends FormController
                     'inSingleList'     => $inSingleList,
                     'noContactList'    => $emailRepo->getDoNotEmailList(),
                     'maxLeadId'        => $maxLeadId,
-                    'anonymousShowing' => $anonymousShowing
+                    'anonymousShowing' => $anonymousShowing,
+                    'showCheckbox'     => true,
                 ],
                 'contentTemplate' => "MauticLeadBundle:Lead:{$indexMode}.html.php",
                 'passthroughVars' => [

@@ -28,7 +28,7 @@ return array(
             ),
             'mautic_campaign_contacts'       => array(
                 'path'       => '/campaigns/view/{objectId}/contact/{page}',
-                'controller' => 'MauticCampaignBundle:Campaign:leads',
+                'controller' => 'MauticCampaignBundle:Campaign:contacts',
             )
         ),
         'api'  => array(
