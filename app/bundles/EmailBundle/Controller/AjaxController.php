@@ -265,12 +265,13 @@ class AjaxController extends CommonAjaxController
                 case 'mautic.transport.amazon':
                     $mailer = new AmazonTransport($settings['amazon_region']);
                     break;
-                case 'mautic.transport.sparkpost':
-                    $mailer = new SparkpostTransport($settings['api_key']);
-                    break;
                 default:
                     if ($this->container->has($transport)) {
                         $mailer = $this->container->get($transport);
+                    }
+
+                    if ('mautic.transport.sparkpost' == $transport) {
+                        $mailer->setApiKey($settings['api_key']);
                     }
             }
 

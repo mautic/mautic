@@ -246,6 +246,14 @@ return [
                     'setPassword' => ['%mautic.mailer_password%']
                 ]
             ],
+            'mautic.transport.sparkpost'          => [
+                'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport',
+                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
+                'arguments'    => ['%mautic.mailer_api_key%'],
+                'methodCalls'  => [
+                    'setMauticFactory' => ['mautic.factory']
+                ]
+            ],
         ],
         'models' => [
             'mautic.email.model.email' => [
