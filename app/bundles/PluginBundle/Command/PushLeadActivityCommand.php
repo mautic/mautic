@@ -50,7 +50,7 @@ class PushLeadActivityCommand extends ContainerAwareCommand
             )
             ->addOption(
                 '--time-interval',
-                '-d',
+                '-a',
                 InputOption::VALUE_OPTIONAL,
                 'Send time interval to check updates on Salesforce, it should be a correct php formatted time interval in the past eg:(-10 minutes)'
             )

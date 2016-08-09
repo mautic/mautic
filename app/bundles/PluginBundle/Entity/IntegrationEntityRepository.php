@@ -20,12 +20,12 @@ class IntegrationEntityRepository extends CommonRepository
     public function getIntegrationsEntityId($integration, $integrationEntity, $internalEntity, $internalEntityId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
-            ->select('i.integration_entity_id')
+            ->select('i.integration_entity_id, i.id, i.internal_entity_id')
             ->from(MAUTIC_TABLE_PREFIX . 'integration_entity', 'i');
 
-        $q->where('l.integration = :integration')
-            ->andWhere('l.integration_entity = :integrationEntity')
-            ->andWhere('l.internal_entity = :internalEntity')
+        $q->where('i.integration = :integration')
+            ->andWhere('i.integration_entity = :integrationEntity')
+            ->andWhere('i.internal_entity = :internalEntity')
 
             ->setParameter('integration', $integration)
             ->setParameter('integrationEntity', $integrationEntity)
@@ -33,7 +33,7 @@ class IntegrationEntityRepository extends CommonRepository
 
 
         if ($internalEntityId) {
-            $q->andWhere('l.internal_entity_id = :internalEntityId')
+            $q->andWhere('i.internal_entity_id = :internalEntityId')
                 ->setParameter('internalEntityId', $internalEntityId);
         }
 

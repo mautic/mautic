@@ -35,7 +35,6 @@ class SalesforceApi extends CrmApi
             $request_url = sprintf($queryUrl . '/%s', $operation);
         }
 
-
         $response = $this->integration->makeRequest($request_url, $elementData, $method, $this->requestSettings);
 
         if (!empty($response['errors'])) {
@@ -88,9 +87,9 @@ class SalesforceApi extends CrmApi
         return $createdLeadData;
     }
 
-    public function createLeadActivity(array $activity)
+    public function createLeadActivity(array $activity, $object)
     {
-        $mActivityObjectName = 'Mautic_timeline__c';
+        $mActivityObjectName = 'mautic__timeline__c';
 
         if(!empty($activity))
         {
@@ -98,7 +97,7 @@ class SalesforceApi extends CrmApi
             {
                 $type = '';
 
-                foreach ($records['records'] as $record){
+                foreach ($records['records'] as $key => $record){
 
                     if(isset($record['delta']) and $record['delta']>0)
                     {
@@ -120,62 +119,84 @@ class SalesforceApi extends CrmApi
                         $subject = ", Form name:";
                         $type = "Action";
                     }
-                    $activityData['records'][]= array(
+
+                    $activityData['records'][$key]= array(
                         'attributes' => array(
                             'type' => $mActivityObjectName,
                             'referenceId' => $record['id'].'-'.$records['id']
                         ),
-                        'ActivityDate__c'   => $record['dateAdded']->format('c'),
-                        'Description__c'    => $type.": ".$record['eventName']." ".$subject." ".$record['actionName'],
-                        'WhoId__c'          => $records['id'],
+                        'mautic__ActivityDate__c'   => $record['dateAdded']->format('c'),
+                        'mautic__Description__c'    => $type.": ".$record['eventName']." ".$subject." ".$record['actionName'],
+
                         'Name'           => 'Mautic '.$record['eventName'].' Activity',
-                        'MauticLead__c'     => $records['leadId'],
-                        'Mautic_url__c'     => $records['leadUrl']
+                        'mautic__Mautic_url__c'     => $records['leadUrl']
                     );
 
+                    if ($object === 'Lead') {
+                        $activityData['records'][$key]['mautic__WhoId__c' ] = $records['id'];
+                    } elseif ($object === 'Contact')
+                    {
+                        $activityData['records'][$key]['mautic__contact_id__c' ] = $records['id'];
+                    }
                 }
             }
+            if (!empty($activityData)) {
+                //todo: log posted activities so that they don't get sent over again
+                $queryUrl      = $this->integration->getQueryUrl();
+                $results       = $this->request(
+                    'composite/tree/'.$mActivityObjectName,
+                    $activityData,
+                    'POST',
+                    false,
+                    null,
+                    $queryUrl
+                );
 
-            //todo: log posted activities so that they don't get sent over again
-            $queryUrl = $this->integration->getQueryUrl();
-            $results = $this->request('composite/tree/'.$mActivityObjectName, $activityData, 'POST', false, null,$queryUrl);
-            $newRecordData = array();
+                $newRecordData = array();
 
-            if($results['hasErrors'])
-            {
-                foreach ($results['results'] as $result)
-                {
-                   if($result['errors'][0]['statusCode'] == 'CANNOT_UPDATE_CONVERTED_LEAD')
-                   {
-                       $references = explode("-",$result['referenceId']);
-                       $SF_leadIds[]= $references[1];
+                if ($results['hasErrors']) {
+                    foreach ($results['results'] as $result) {
+                        if ($result['errors'][0]['statusCode'] == 'CANNOT_UPDATE_CONVERTED_LEAD') {
+                            $references   = explode("-", $result['referenceId']);
+                            $SF_leadIds[] = $references[1];
 
-                   }
 
-                   $leadIds = implode("','", $SF_leadIds);
-                   $query = "select Id, ConvertedContactId from Lead where id in ('".$leadIds."')";
 
-                   $contacts = $this->request('query', array("q"=>$query),'GET',false,null,$queryUrl);
+                        $leadIds = implode("','", $SF_leadIds);
+                        $query   = "select Id, ConvertedContactId from ".$object." where id in ('".$leadIds."')";
 
-                   foreach($contacts['records'] as $contact)
-                   {
-                       foreach($activityData['records'] as $key =>$record)
-                       {
-                           if($record['WhoId__c'] == $contact['Id'])
-                           {
-                               unset($record['WhoId__c']);
-                               $record['contact_id__c'] = $contact['ConvertedContactId'];
-                               $newRecordData['records'][]= $record;
-                               unset($activityData['records'][$key]);
-                           }
-                       }
+                        $contacts = $this->request('query', array("q" => $query), 'GET', false, null, $queryUrl);
 
-                   }
+                        foreach ($contacts['records'] as $contact) {
+                            foreach ($activityData['records'] as $key => $record) {
+                                if ($record['mautic__WhoId__c'] == $contact['Id']) {
+                                    unset($record['mautic__WhoId__c']);
+                                    $record['mautic__contact_id__c'] = $contact['ConvertedContactId'];
+                                    $newRecordData['records'][]      = $record;
+                                    unset($activityData['records'][$key]);
+                                }
+                            }
+
+                        }
+
+                    }
+                    }
+                    if (!empty($newRecordData)) {
+                        $results = $this->request(
+                            'composite/tree/'.$mActivityObjectName,
+                            $newRecordData,
+                            'POST',
+                            false,
+                            null,
+                            $queryUrl
+                        );
+                    }
                 }
-                $results = $this->request('composite/tree/'.$mActivityObjectName, $newRecordData, 'POST', false, null,$queryUrl);
 
+                return $results;
             }
-            return $results;
+
+            return array();
         }
     }
 

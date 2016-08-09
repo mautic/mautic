@@ -2084,8 +2084,6 @@ class LeadController extends FormController
             $data  = $this->request->request->get('lead_batch_stage', array(), true);
             $ids   = json_decode($data['ids'], true);
 
-            $this->factory->getLogger()->addError(print_r($ids,true));
-
             $entities  = array();
             if (is_array($ids)) {
                 $entities = $model->getEntities(

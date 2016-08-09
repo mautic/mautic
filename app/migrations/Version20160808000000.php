@@ -4,18 +4,18 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
-
+use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-class Version20160806000000 extends AbstractMigration
+class Version20160808000000 extends AbstractMauticMigration
 {
     /**
      * @param Schema $schema
      */
-    public function up(Schema $schema)
+    public function preUp(Schema $schema)
     {
-        if ($schema->getTable($this->prefix.'integration_entity')) {
+        if ($schema->hasTable($this->prefix.'integration_entity')) {
 
             throw new SkipMigrationException('Schema includes this migration');
         }
@@ -24,14 +24,14 @@ class Version20160806000000 extends AbstractMigration
     /**
      * @param Schema $schema
      */
-    public function down(Schema $schema)
+    public function up(Schema $schema)
     {
         $sql = <<<SQL
 CREATE TABLE {$this->prefix}integration_entity (
 	id INT AUTO_INCREMENT NOT NULL,
 	integration VARCHAR(255) DEFAULT NULL,
 	integration_entity VARCHAR(255) DEFAULT NULL,
-	integration_entity_id INT DEFAULT NULL,
+	integration_entity_id VARCHAR(255) DEFAULT NULL,
 	date_added DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)',
 	last_sync_date DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)',
 	internal_entity VARCHAR(255) DEFAULT NULL,

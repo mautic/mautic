@@ -275,7 +275,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 if($dataObject){
                     $lead =$this->getMauticLead($dataObject,true,null,null);
                     $integrationEntityRepo = $this->factory->getEntityManager()->getRepository('MauticPluginBundle:IntegrationEntity');
-                    $integrationId = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'leads', $lead->getId());
+                    $integrationId = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'lead', $lead->getId());
 
                     if ($integrationId == null) {
                         $integrationEntity = new IntegrationEntity();
@@ -283,13 +283,18 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $integrationEntity->setIntegration('Salesforce');
                         $integrationEntity->setIntegrationEntity($object);
                         $integrationEntity->setIntegrationEntityId($record['Id']);
-                        $integrationEntity->setInternalEntity('Lead');
+                        $integrationEntity->setInternalEntity('lead');
                         $integrationEntity->setInternalEntityId($lead->getId());
+                        $this->factory->getEntityManager()->persist($integrationEntity);
+                        $this->factory->getEntityManager()->flush($integrationEntity);
                     } else {
-                        $integrationEntity =  $integrationEntityRepo->getEntity($integrationId);
+
+                        $integrationEntity =  $integrationEntityRepo->getEntity($integrationId[0]['id']);
+                        $integrationEntity->setLastSyncDate(new \DateTime());
+                        $this->factory->getEntityManager()->persist($integrationEntity);
+                        $this->factory->getEntityManager()->flush($integrationEntity);
+
                     }
-                    $integrationEntity->setLastSyncDate(new \DateTime());
-                    $this->factory->getEntityManager()->flush($integrationEntity);
 
                     $count++;
                 }
@@ -401,9 +406,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $integrationEntity->setInternalEntity('Lead');
                         $integrationEntity->setInternalEntityId($lead->getId());
                     } else {
-                        $integrationEntity =  $integrationEntityRepo->getEntity($integrationId[0]['integration_entity_id']);
+                        $integrationEntity =  $integrationEntityRepo->getEntity($integrationId[0]['id']);
                     }
                     $integrationEntity->setLastSyncDate(new \DateTime());
+                    $this->factory->getEntityManager()->persist($integrationEntity);
                     $this->factory->getEntityManager()->flush($integrationEntity);
 
                 }
@@ -454,32 +460,46 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $query = $this->getFetchQuery($params);
 
-        $integrationEntityRepo = $this->factory->getEntityManager()->getRepository('MauticPluginBundle:IntegrationEntity');
-        $salesForceIds = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'Lead', 'leads');
+        $config = $this->mergeConfigToFeatureSettings(array());
 
-        $startDate = new \DateTime($query['start']);
-        $endDate = new \DateTime($query['end']);
+        $salesForceObjects[] = "Lead";
 
-        try {
-            if ($this->isAuthorized()) {
-                if(!empty($salesForceIds)){
-                    foreach ($salesForceIds as $ids)
-                    {
-
-                        $salesForceLeadData[$ids['details']['salesforceid']]= $this->getLeadData($startDate,$endDate,$ids['objectId']);
-                        $salesForceLeadData[$ids['details']['salesforceid']]['id']=$ids['details']['salesforceid'];
-                        $salesForceLeadData[$ids['details']['salesforceid']]['leadId']=$ids['objectId'];
-                    }
-
-                    $result = $this->getApiHelper()->createLeadActivity($salesForceLeadData);
-                }
-
-                return $executed;
-            }
-       } catch (\Exception $e) {
-            $this->logIntegrationError($e);
+        if(isset($config['objects'])){
+            $salesForceObjects = $config['objects'];
         }
 
+        foreach ($salesForceObjects as $object) {
+            $integrationEntityRepo = $this->factory->getEntityManager()->getRepository(
+                'MauticPluginBundle:IntegrationEntity'
+            );
+            $salesForceIds         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'lead');
+
+            $startDate = new \DateTime($query['start']);
+            $endDate   = new \DateTime($query['end']);
+            try {
+                if ($this->isAuthorized()) {
+                    if (!empty($salesForceIds)) {
+
+                        foreach ($salesForceIds as $ids) {
+
+                            $salesForceLeadData[$ids['integration_entity_id']]           = $this->getLeadData(
+                                $startDate,
+                                $endDate,
+                                $ids['internal_entity_id']
+                            );
+                            $salesForceLeadData[$ids['integration_entity_id']]['id']     = $ids['integration_entity_id'];
+                            $salesForceLeadData[$ids['integration_entity_id']]['leadId'] = $ids['internal_entity_id'];
+                        }
+
+                        $result = $this->getApiHelper()->createLeadActivity($salesForceLeadData, $object);
+                    }
+
+                    return $executed;
+                }
+            } catch (\Exception $e) {
+                $this->logIntegrationError($e);
+            }
+        }
         return $executed;
     }
 
@@ -580,7 +600,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         $leadModel = $this->factory->getModel('lead');
 
-        $baseURL = $this->factory->getRequest()->getHttpHost();
+        $baseURL = $this->factory->getParameter('site_url');
+
         $activity['leadUrl'] = $baseURL.$this->factory->getRouter()->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $leadId));
 
         $pointsRepo = $leadModel->getPointLogRepository();

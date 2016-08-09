@@ -36,7 +36,7 @@ class IntegrationEntity extends CommonEntity
     private $integrationEntity;
 
     /**
-     * @var int
+     * @var string
      */
     private $integrationEntityId;
 
@@ -84,12 +84,12 @@ class IntegrationEntity extends CommonEntity
 
         $builder->addDateAdded();
 
-        $builder->addNullableField('integration', 'array');
+        $builder->addNullableField('integration', 'string');
 
         $builder->createField('integrationEntity', 'string')
-            ->columnName('inegration_entity')
+            ->columnName('integration_entity')
             ->build();
-        $builder->createField('integrationEntity', 'integer')
+        $builder->createField('integrationEntityId', 'string')
             ->columnName('integration_entity_id')
             ->build();
         $builder->createField('internalEntity', 'string')
@@ -222,7 +222,7 @@ class IntegrationEntity extends CommonEntity
      */
     public function setInternal ($internal)
     {
-        $this->author = $internal;
+        $this->internal = $internal;
     }
 
     /**
