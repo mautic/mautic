@@ -79,6 +79,11 @@ class FormEntity extends CommonEntity
     protected $changes = array();
 
     /**
+     * @var
+     */
+    public $deletedId;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -194,41 +199,6 @@ class FormEntity extends CommonEntity
         }
 
         return $this->getIsPublished();
-    }
-
-    /**
-     * @param string $prop
-     * @param mixed  $val
-     */
-    protected function isChanged($prop, $val)
-    {
-        $getter  = "get" . ucfirst($prop);
-        $current = $this->$getter();
-        if ($prop == 'category') {
-            $currentId = ($current) ? $current->getId() : '';
-            $newId     = ($val) ? $val->getId() : null;
-            if ($currentId != $newId) {
-                $this->changes[$prop] = array($currentId, $newId);
-            }
-        } elseif ($current != $val) {
-            $this->changes[$prop] = array($current, $val);
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public function getChanges()
-    {
-        return $this->changes;
-    }
-
-    /**
-     * Reset changes
-     */
-    public function resetChanges()
-    {
-        $this->changes = array();
     }
 
     /**
@@ -441,7 +411,7 @@ class FormEntity extends CommonEntity
         $status = 'published';
         if (method_exists($this, 'getPublishUp')) {
             $up = $this->getPublishUp();
-            if (!empty($up) && $current <= $up) {
+            if (!empty($up) && $current < $up) {
                 $status = 'pending';
             }
         }

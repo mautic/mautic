@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -24,15 +25,14 @@ use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
-use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Doctrine\DBAL\Query\QueryBuilder;
+use DeviceDetector\DeviceDetector;
 
 /**
  * Class PageModel
@@ -415,15 +415,12 @@ class PageModel extends FormModel
         $hit = new Hit();
         $hit->setDateHit(new \Datetime());
 
-        $utmTags = new UtmTag();
-        $utmTags->setDateAdded(new \Datetime());
-
         //check for existing IP
         $ipAddress = $this->ipLookupHelper->getIpAddress();
         $hit->setIpAddress($ipAddress);
 
         //check for any clickthrough info
-        $clickthrough = $request->get('ct', array());
+        $clickthrough = $request->get('ct', []);
         if (!empty($clickthrough)) {
             $clickthrough = $this->decodeArrayFromUrl($clickthrough);
 
@@ -486,7 +483,6 @@ class PageModel extends FormModel
                                 $query['page_referrer'] = urldecode($query['page_referrer']);
                             }
                             $hit->setReferer($query['page_referrer']);
-                            $utmTags->setReferer($query['page_referrer']);
                         }
 
                         if (isset($query['page_language'])) {
@@ -507,14 +503,14 @@ class PageModel extends FormModel
                         $availableLeadFields = $this->leadFieldModel->getFieldList(
                             false,
                             false,
-                            array(
+                            [
                                 'isPublished'         => true,
                                 'isPubliclyUpdatable' => true
-                            )
+                            ]
                         );
 
                         $uniqueLeadFields    = $this->leadFieldModel->getUniqueIdentiferFields();
-                        $uniqueLeadFieldData = array();
+                        $uniqueLeadFieldData = [];
                         $inQuery             = array_intersect_key($query, $availableLeadFields);
                         foreach ($inQuery as $k => $v) {
                             if (empty($query[$k])) {
@@ -533,6 +529,7 @@ class PageModel extends FormModel
                                     $uniqueLeadFieldData,
                                     $lead->getId()
                                 );
+
                                 if (!empty($existingLeads)) {
                                     $lead = $this->leadModel->mergeLeads($lead, $existingLeads[0]);
                                 }
@@ -599,28 +596,25 @@ class PageModel extends FormModel
                 }
                 $pageURL .= '://';
                 if ($request->server->get('SERVER_PORT') != '80') {
-                    $pageURL .= $request->server->get('SERVER_NAME') . ':' . $request->server->get('SERVER_PORT') .
+                    $pageURL .= $request->server->get('SERVER_NAME').':'.$request->server->get('SERVER_PORT').
                         $request->server->get('REQUEST_URI');
                 } else {
-                    $pageURL .= $request->server->get('SERVER_NAME') . $request->server->get('REQUEST_URI');
+                    $pageURL .= $request->server->get('SERVER_NAME').$request->server->get('REQUEST_URI');
                 }
             }
         }
 
         $hit->setUrl($pageURL);
-        $utmTags->setUrl($pageURL);
 
         // Store query array
         $query = $request->query->all();
         unset($query['d']);
         $hit->setQuery($query);
-        $utmTags->setQuery($query);
 
         list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie();
 
         $hit->setTrackingId($trackingId);
         $hit->setLead($lead);
-        $utmTags->setLead($lead);
 
         $isUnique = $trackingNewlyGenerated;
         if (!$trackingNewlyGenerated) {
@@ -646,7 +640,7 @@ class PageModel extends FormModel
                 } catch (\Exception $exception) {
                     $this->logger->addError(
                         $exception->getMessage(),
-                        array('exception' => $exception)
+                        ['exception' => $exception]
                     );
                 }
             } elseif ($page instanceof Redirect) {
@@ -658,8 +652,8 @@ class PageModel extends FormModel
 
                     // If this is a trackable, up the trackable counts as well
                     if (!empty($clickthrough['channel'])) {
-                        $channelId      = reset($clickthrough['channel']);
-                        $channel        = key($clickthrough['channel']);
+                        $channelId = reset($clickthrough['channel']);
+                        $channel   = key($clickthrough['channel']);
 
                         $this->pageTrackableModel->getRepository()->upHitCount($page->getId(), $channel, $channelId, 1, $isUnique);
                     }
@@ -670,7 +664,7 @@ class PageModel extends FormModel
                     } else {
                         $this->logger->addError(
                             $exception->getMessage(),
-                            array('exception' => $exception)
+                            ['exception' => $exception]
                         );
                     }
                 }
@@ -691,37 +685,51 @@ class PageModel extends FormModel
             $hit->setReferer($request->server->get('HTTP_REFERER'));
         }
 
-        if (!$utmTags->getReferer()) {
-            $utmTags->setReferer($request->server->get('HTTP_REFERER'));
-        }
-
         $hit->setUserAgent($request->server->get('HTTP_USER_AGENT'));
-        $utmTags->setUserAgent($request->server->get('HTTP_USER_AGENT'));
-
         $hit->setRemoteHost($request->server->get('REMOTE_HOST'));
-        $utmTags->setRemoteHost($request->server->get('REMOTE_HOST'));
 
-        if (key_exists('utm_campaign',$query)){
-            $utmTags->setUtmCampaign($query['utm_campaign']);
-        }
+        if ($isUnique) {
+            // Add UTM tags entry if a UTM tag exist
+            $queryHasUtmTags = false;
+            foreach ($query as $key => $value) {
+                if (strpos($key, 'utm_') !== false) {
+                    $queryHasUtmTags = true;
+                    break;
+                }
+            }
 
-        if (key_exists('utm_term',$query)){
-            $utmTags->setUtmTerm($query['utm_term']);
-        }
-        if (key_exists('utm_content',$query)){
-            $utmTags->setUtmConent($query['utm_content']);
-        }
-        if (key_exists('utm_medium',$query)){
-            $utmTags->setUtmMedium($query['utm_medium']);
-        }
-        if (key_exists('utm_source',$query)){
-            $utmTags->setUtmSource($query['utm_source']);
-        }
+            if ($queryHasUtmTags) {
+                $utmTags = new UtmTag();
+                $utmTags->setDateAdded($hit->getDateHit());
+                $utmTags->setUrl($hit->getUrl());
+                $utmTags->setReferer($hit->getReferer());
+                $utmTags->setQuery($hit->getQuery());
+                $utmTags->setUserAgent($hit->getUserAgent());
+                $utmTags->setRemoteHost($hit->getRemoteHost());
+                $utmTags->setLead($lead);
 
-        $repo = $this->em->getRepository('MauticLeadBundle:UtmTag');
-        $repo->saveEntity($utmTags);
+                if (key_exists('utm_campaign', $query)) {
+                    $utmTags->setUtmCampaign($query['utm_campaign']);
+                }
+                if (key_exists('utm_term', $query)) {
+                    $utmTags->setUtmTerm($query['utm_term']);
+                }
+                if (key_exists('utm_content', $query)) {
+                    $utmTags->setUtmConent($query['utm_content']);
+                }
+                if (key_exists('utm_medium', $query)) {
+                    $utmTags->setUtmMedium($query['utm_medium']);
+                }
+                if (key_exists('utm_source', $query)) {
+                    $utmTags->setUtmSource($query['utm_source']);
+                }
 
-        $this->leadModel->setUtmTags($lead, $utmTags);
+                $repo = $this->em->getRepository('MauticLeadBundle:UtmTag');
+                $repo->saveEntity($utmTags);
+
+                $this->leadModel->setUtmTags($lead, $utmTags);
+            }
+        }
 
         //get a list of the languages the user prefers
         $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');
@@ -736,6 +744,33 @@ class PageModel extends FormModel
             $hit->setBrowserLanguages($languages);
         }
 
+        //device granularity
+        $dd = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
+
+        $dd->parse();
+
+        $deviceRepo = $this->leadModel->getDeviceRepository();
+        $device = $deviceRepo->getDevice(null, $lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
+
+        if (empty($device)) {
+
+            $device = new LeadDevice();
+
+            $device->setClientInfo($dd->getClient());
+            $device->setDevice($dd->getDeviceName());
+            $device->setDeviceBrand($dd->getBrand());
+            $device->setDeviceModel($dd->getModel());
+            $device->setDeviceOs($dd->getOs());
+            $device->setDateOpen($hit->getDateHit());
+            $device->setLead($lead);
+
+            $this->em->persist($device);
+        } else {
+            $device = $deviceRepo->getEntity($device['id']);
+        }
+
+        $hit->setDeviceStat($device);
+
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
             $this->em->persist($hit);
@@ -747,7 +782,7 @@ class PageModel extends FormModel
             } else {
                 $this->logger->addError(
                     $exception->getMessage(),
-                    array('exception' => $exception)
+                    ['exception' => $exception]
                 );
             }
         }
@@ -1074,6 +1109,48 @@ class PageModel extends FormModel
 
             $data = $query->fetchCountDateDiff($q);
             $chart->setDataset($time['label'], $data);
+        }
+
+        return $chart->render();
+    }
+
+    /**
+     * Get bar chart data of hits
+     *
+     * @param char     $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $dateFormat
+     * @param array    $filter
+     *
+     * @return array
+     */
+    public function getDeviceGranularityData(\DateTime $dateFrom, \DateTime $dateTo, $filters = array(), $canViewOthers = true)
+    {
+        $data['values'] = array();
+        $data['labels'] = array();
+
+        $q = $this->em->getConnection()->createQueryBuilder();
+
+        $q->select('count(h.id) as count, ds.device as device')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
+            ->join('h', MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id=h.device_id')
+            ->orderBy('device', 'DESC')
+            ->andWhere($q->expr()->gte('h.date_hit', ':date_from'))
+            ->setParameter('date_from', $dateFrom->format('Y-m-d'))
+            ->andWhere($q->expr()->lte('h.date_hit', ':date_to'))
+            ->setParameter('date_to', $dateTo->format('Y-m-d'." 23:59:59"));
+        $q->groupBy('ds.device');
+
+        $results = $q->execute()->fetchAll();
+
+        $chart     = new PieChart($data['labels']);
+
+        foreach($results as $result){
+            $label=substr(empty($result['device'])?  $this->translator->trans('mautic.core.no.info'): $result['device'],0,12);
+
+            // $data['backgroundColor'][]='rgba(220,220,220,0.5)';
+            $chart->setDataset($label,  $result['count']);
         }
 
         return $chart->render();

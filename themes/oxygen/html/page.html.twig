@@ -1,4 +1,4 @@
-{% extends ":oxygen:base.html.twig" %}
+{% extends ":"~template~":base.html.twig" %}
 
 {% block content %}
 <div data-section-wrapper align="center" valign="top" width="100%" style="background-color: #f7f7f7;font-family: Helvetica, Arial, sans-serif;font-size: 14px;color: #777777;text-align: center;line-height: 21px;border-collapse: collapse;padding: 20px 0 30px;" class="content-padding">
@@ -24,7 +24,7 @@
                         <tr>
                             <td class="mini-block" data-slot-container style="font-family: Helvetica, Arial, sans-serif;font-size: 14px;color: #777777;text-align: center;line-height: 21px;border-collapse: collapse;background-color: #ffffff;width: 498px;border: 1px solid #cccccc;border-radius: 5px;padding: 45px 75px;">
                                 <div class="user-img" data-slot="text" style="text-align: center;border-radius: 100px;color: #ff6f6f;font-weight: 700;">
-                                    <a href="" style="color: #ff6f6f;font-weight: bold;text-decoration: none !important;"><img class="user-img" src="{{ getAssetUrl('themes/oxygen/img/profile_pic.jpg', null, null, true) }}" alt="user img" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;border: 1px solid #cccccc;text-align: center;border-radius: 5px;color: #ff6f6f;font-weight: 700;width: 130px;"></a>
+                                    <a href="" style="color: #ff6f6f;font-weight: bold;text-decoration: none !important;"><img class="user-img" src="{{ getAssetUrl('themes/'~template~'/img/profile_pic.jpg', null, null, true) }}" alt="user img" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;border: 1px solid #cccccc;text-align: center;border-radius: 5px;color: #ff6f6f;font-weight: 700;width: 130px;"></a>
                                     <br><a href="" style="color: #ff6f6f;font-weight: bold;text-decoration: none !important;">@JaneDoe</a>
                                 </div>
                                 <div class="user-msg" data-slot="text" style="padding: 10px 0;font-size: 14px;text-align: center;font-style: italic;">
@@ -64,18 +64,18 @@
                                 <table cellspacing="0" cellpadding="0" width="100%" style="border-collapse:separate !important;">
                                     <tr>
                                         <td class="mini-img" style="font-family: Helvetica, Arial, sans-serif;font-size: 14px;color: #777777;text-align: center;line-height: 21px;border-collapse: collapse;padding: 3px;width: 130px;">
-                                            <img src="{{ getAssetUrl('themes/oxygen/img/bracelet.jpg', null, null, true) }}" alt="product" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;border-radius: 3px;width: 130px;">
+                                            <img src="{{ getAssetUrl('themes/'~template~'/img/bracelet.jpg', null, null, true) }}" alt="product" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;border-radius: 3px;width: 130px;">
                                         </td>
                                         <td class="mini-img" style="font-family: Helvetica, Arial, sans-serif;font-size: 14px;color: #777777;text-align: center;line-height: 21px;border-collapse: collapse;padding: 3px;width: 130px;">
-                                            <img src="{{ getAssetUrl('themes/oxygen/img/hat.jpg', null, null, true) }}" alt="product" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;border-radius: 3px;width: 130px;">
+                                            <img src="{{ getAssetUrl('themes/'~template~'/img/hat.jpg', null, null, true) }}" alt="product" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;border-radius: 3px;width: 130px;">
                                         </td>
                                     </tr>
                                     <tr>
                                         <td class="mini-img" style="font-family: Helvetica, Arial, sans-serif;font-size: 14px;color: #777777;text-align: center;line-height: 21px;border-collapse: collapse;padding: 3px;width: 130px;">
-                                            <img src="{{ getAssetUrl('themes/oxygen/img/jacket.jpg', null, null, true) }}" alt="product" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;border-radius: 3px;width: 130px;">
+                                            <img src="{{ getAssetUrl('themes/'~template~'/img/jacket.jpg', null, null, true) }}" alt="product" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;border-radius: 3px;width: 130px;">
                                         </td>
                                         <td class="mini-img" style="font-family: Helvetica, Arial, sans-serif;font-size: 14px;color: #777777;text-align: center;line-height: 21px;border-collapse: collapse;padding: 3px;width: 130px;">
-                                            <img src="{{ getAssetUrl('themes/oxygen/img/ear_ring.jpg', null, null, true) }}" alt="product" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;border-radius: 3px;width: 130px;">
+                                            <img src="{{ getAssetUrl('themes/'~template~'/img/ear_ring.jpg', null, null, true) }}" alt="product" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;border-radius: 3px;width: 130px;">
                                         </td>
                                     </tr>
                                 </table>
@@ -84,18 +84,18 @@
                                 <table cellspacing="0" cellpadding="0" width="100%" style="border-collapse:separate !important;">
                                     <tr>
                                         <td class="mini-img" style="font-family: Helvetica, Arial, sans-serif;font-size: 14px;color: #777777;text-align: center;line-height: 21px;border-collapse: collapse;padding: 3px;width: 130px;">
-                                            <img src="{{ getAssetUrl('themes/oxygen/img/shoes.jpg', null, null, true) }}" alt="product" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;border-radius: 3px;width: 130px;">
+                                            <img src="{{ getAssetUrl('themes/'~template~'/img/shoes.jpg', null, null, true) }}" alt="product" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;border-radius: 3px;width: 130px;">
                                         </td>
                                         <td class="mini-img" style="font-family: Helvetica, Arial, sans-serif;font-size: 14px;color: #777777;text-align: center;line-height: 21px;border-collapse: collapse;padding: 3px;width: 130px;">
-                                            <img src="{{ getAssetUrl('themes/oxygen/img/ear_ring.jpg', null, null, true) }}" alt="product" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;border-radius: 3px;width: 130px;">
+                                            <img src="{{ getAssetUrl('themes/'~template~'/img/ear_ring.jpg', null, null, true) }}" alt="product" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;border-radius: 3px;width: 130px;">
                                         </td>
                                     </tr>
                                     <tr>
                                         <td class="mini-img" style="font-family: Helvetica, Arial, sans-serif;font-size: 14px;color: #777777;text-align: center;line-height: 21px;border-collapse: collapse;padding: 3px;width: 130px;">
-                                            <img src="{{ getAssetUrl('themes/oxygen/img/jacket.jpg', null, null, true) }}" alt="product" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;border-radius: 3px;width: 130px;">
+                                            <img src="{{ getAssetUrl('themes/'~template~'/img/jacket.jpg', null, null, true) }}" alt="product" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;border-radius: 3px;width: 130px;">
                                         </td>
                                         <td class="mini-img" style="font-family: Helvetica, Arial, sans-serif;font-size: 14px;color: #777777;text-align: center;line-height: 21px;border-collapse: collapse;padding: 3px;width: 130px;">
-                                            <img src="{{ getAssetUrl('themes/oxygen/img/bracelet.jpg', null, null, true) }}" alt="product" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;border-radius: 3px;width: 130px;">
+                                            <img src="{{ getAssetUrl('themes/'~template~'/img/bracelet.jpg', null, null, true) }}" alt="product" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;border-radius: 3px;width: 130px;">
                                         </td>
                                     </tr>
                                 </table>

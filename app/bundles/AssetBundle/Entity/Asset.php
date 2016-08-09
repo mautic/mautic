@@ -886,7 +886,8 @@ class Asset extends FormEntity
      */
     public function getFileType()
     {
-        if (!empty($this->extension)) {
+        if (!empty($this->extension) && empty($this->changes['originalFileName'])) {
+
             return $this->extension;
         }
 
