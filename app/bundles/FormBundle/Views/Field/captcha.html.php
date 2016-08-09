@@ -9,14 +9,13 @@
 
 echo $view->render(
     'MauticFormBundle:Field:text.html.php',
-    array(
+    [
         'field'    => $field,
         'inForm'   => (isset($inForm)) ? $inForm : false,
         'type'     => 'text',
         'id'       => $id,
-        'deleted'  => (!empty($deleted)) ? true : false,
         'required' => true,
         'formId'   => (isset($formId)) ? $formId : 0,
         'formName'  => (isset($formName)) ? $formName : ''
-    )
+    ]
 );

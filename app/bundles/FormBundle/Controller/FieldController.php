@@ -159,12 +159,13 @@ class FieldController extends CommonFormController
 
             $passthroughVars['fieldId']   = $keyId;
             $template                     = (!empty($customParams)) ? $customParams['template'] : 'MauticFormBundle:Field:' . $fieldType . '.html.php';
-            $passthroughVars['fieldHtml'] = $this->renderView($template, array(
-                'inForm' => true,
-                'field'  => $formField,
-                'id'     => $keyId,
-                'formId'  => $formId
-            ));
+            $passthroughVars['fieldHtml'] = $this->renderView('MauticFormBundle:Builder:fieldwrapper.html.php', [
+                'template' => $template,
+                'inForm'   => true,
+                'field'    => $formField,
+                'id'       => $keyId,
+                'formId'   => $formId
+            ]);
         }
 
         if ($closeModal) {
@@ -301,12 +302,13 @@ class FieldController extends CommonFormController
             $blank     = $entity->convertToArray();
             $formField = array_merge($blank, $formField);
 
-            $passthroughVars['fieldHtml'] = $this->renderView($template, array(
-                'inForm' => true,
-                'field'  => $formField,
-                'id'     => $objectId,
-                'formId'  => $formId
-            ));
+            $passthroughVars['fieldHtml'] = $this->renderView('MauticFormBundle:Builder:fieldwrapper.html.php', [
+                'template' => $template,
+                'inForm'   => true,
+                'field'    => $formField,
+                'id'       => $objectId,
+                'formId'   => $formId
+            ]);
 
             if ($closeModal) {
                 //just close the modal
@@ -339,12 +341,12 @@ class FieldController extends CommonFormController
     {
         $session = $this->factory->getSession();
         $formId  = $this->request->query->get('formId');
-        $fields  = $session->get('mautic.form.'.$formId.'.fields.modified', array());
-        $delete  = $session->get('mautic.form.'.$formId.'.fields.deleted', array());
+        $fields  = $session->get('mautic.form.'.$formId.'.fields.modified', []);
+        $delete  = $session->get('mautic.form.'.$formId.'.fields.deleted', []);
 
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest() ||
-            !$this->factory->getSecurity()->isGranted(array('form:forms:editown', 'form:forms:editother', 'form:forms:create'), 'MATCH_ONE')
+            !$this->factory->getSecurity()->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
         ) {
             return $this->accessDenied();
         }
@@ -352,8 +354,17 @@ class FieldController extends CommonFormController
         $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : null;
 
         if ($this->request->getMethod() == 'POST' && $formField !== null) {
+
+            $usedLeadFields = $session->get('mautic.form.'.$formId.'.fields.leadfields');
+
+            // Allow to select the lead field from the delete field again
+            if (!empty($formField['leadField']) && ($unusedLeadField = array_search($formField['leadField'], $usedLeadFields)) !== false) {
+                unset($usedLeadFields[$unusedLeadField]);
+                $session->set('mautic.form.'.$formId.'.fields.leadfields', $usedLeadFields);
+            }
+
             //set custom params from event if applicable
-            $customParams = (!empty($formField['isCustom'])) ? $formField['customParameters'] : array();
+            $customParams = (!empty($formField['isCustom'])) ? $formField['customParameters'] : [];
 
             //add the field to the delete list
             if (!in_array($objectId, $delete)) {
@@ -361,105 +372,15 @@ class FieldController extends CommonFormController
                 $session->set('mautic.form.'.$formId.'.fields.deleted', $delete);
             }
 
-            if (!empty($customParams)) {
-                $template = $customParams['template'];
-            } else {
-                $template = 'MauticFormBundle:Field:' . $formField['type'] . '.html.php';
-            }
-
-            //prevent undefined errors
-            $entity    = new Field();
-            $blank     = $entity->convertToArray();
-            $formField = array_merge($blank, $formField);
-
-            $dataArray = array(
+            $dataArray = [
                 'mauticContent' => 'formField',
                 'success'       => 1,
-                'target'        => '#mauticform_' . $objectId,
                 'route'         => false,
-                'fieldId'       => $objectId,
-                'fieldHtml'     => $this->renderView($template, array(
-                    'inForm'  => true,
-                    'field'   => $formField,
-                    'id'      => $objectId,
-                    'deleted' => true,
-                    'formId'  => $formId
-                ))
-            );
+            ];
         } else {
-            $dataArray = array('success' => 0);
+            $dataArray = ['success' => 0];
         }
 
-        $response = new JsonResponse($dataArray);
-
-        return $response;
-    }
-
-    /**
-     * Undeletes the entity
-     *
-     * @param int $objectId
-     *
-     * @return JsonResponse
-     */
-    public function undeleteAction ($objectId)
-    {
-        $session = $this->factory->getSession();
-        $formId  = $this->request->query->get('formId');
-        $fields  = $session->get('mautic.form.'.$formId.'.fields.modified', array());
-        $delete  = $session->get('mautic.form.'.$formId.'.fields.deleted', array());
-
-        //ajax only for form fields
-        if (!$this->request->isXmlHttpRequest() ||
-            !$this->factory->getSecurity()->isGranted(array('form:forms:editown', 'form:forms:editother', 'form:forms:create'), 'MATCH_ONE')
-        ) {
-            return $this->accessDenied();
-        }
-
-        $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : null;
-
-        if ($this->request->getMethod() == 'POST' && $formField !== null) {
-            //set custom params from event if applicable
-            $customParams = (!empty($formField['isCustom'])) ? $formField['customParameters'] : array();
-
-            //add the field to the delete list
-            if (in_array($objectId, $delete)) {
-                $key = array_search($objectId, $delete);
-                unset($delete[$key]);
-                $session->set('mautic.form.'.$formId.'.fields.deleted', $delete);
-            }
-
-            if (!empty($customParams)) {
-                $template = $customParams['template'];
-            } else {
-                $template = 'MauticFormBundle:Field:' . $formField['type'] . '.html.php';
-            }
-
-            //prevent undefined errors
-            $entity    = new Field();
-            $blank     = $entity->convertToArray();
-            $formField = array_merge($blank, $formField);
-
-            $dataArray = array(
-                'mauticContent' => 'formField',
-                'success'       => 1,
-                'target'        => '#mauticform_' . $objectId,
-                'route'         => false,
-                'fieldId'       => $objectId,
-                'fieldHtml'     => $this->renderView($template, array(
-                    'inForm'  => true,
-                    'field'   => $formField,
-                    'id'      => $objectId,
-                    'deleted' => false,
-                    'formId'  => $formId
-                ))
-            );
-        } else {
-            $dataArray = array('success' => 0);
-        }
-
-        $response = new JsonResponse($dataArray);
-
-        return $response;
+        return new JsonResponse($dataArray);
     }
 }
