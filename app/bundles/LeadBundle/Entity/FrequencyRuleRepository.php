@@ -28,7 +28,7 @@ class FrequencyRuleRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $q->select('es.lead_id, fr.frequency_time, fr.frequency_number')
+        $q->select('es.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
             ->join('es', MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr','es.lead_id = fr.lead_id' );
 
