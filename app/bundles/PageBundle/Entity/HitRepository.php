@@ -12,12 +12,14 @@ namespace Mautic\PageBundle\Entity;
 use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
  * Class HitRepository
  */
 class HitRepository extends CommonRepository
 {
+    use TimelineTrait;
 
     /**
      * Determine if the page hit is a unique
@@ -66,29 +68,27 @@ class HitRepository extends CommonRepository
      * @param array   $options
      *
      * @return array
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function getLeadHits($leadId, array $options = array())
     {
-        $query = $this->createQueryBuilder('h');
-        $query->select('IDENTITY(h.page) AS page_id, h.userAgent, h.dateHit, h.dateLeft, h.referer, h.source, h.sourceId, h.url, h.urlTitle, h.query')
-            ->where('h.lead = ' . (int) $leadId);
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        if (!empty($options['ipIds'])) {
-            $query->orWhere('h.ipAddress IN (' . implode(',', $options['ipIds']) . ')');
+        $query->select('h.page_id, h.user_agent as userAgent, h.date_hit as dateHit, h.date_left as dateLeft, h.referer, h.source, h.source_id as sourceId, h.url, h.url_title as urlTitle, h.query, ds.client_info as clientInfo, ds.device, ds.device_os_name as deviceOsName, ds.device_brand as deviceBrand, ds.device_model as deviceModel')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
+            ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id')
+            ->where('h.lead_id = ' . (int) $leadId);
+
+        if (isset($options['search']) && $options['search']) {
+            $query->andWhere($query->expr()->like('p.title', $query->expr()->literal('%' . $options['search'] . '%')));
         }
 
-        if (isset($options['filters']['search']) && $options['filters']['search']) {
-            $query->leftJoin('h.page', 'p')
-                ->andWhere($query->expr()->like('p.title', $query->expr()->literal('%' . $options['filters']['search'] . '%')));
-        }
+        $query->leftjoin('h',MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id = h.device_id');
 
         if (isset($options['url']) && $options['url']) {
             $query->andWhere($query->expr()->eq('h.url', $query->expr()->literal($options['url'])));
         }
 
-        return $query->getQuery()->getArrayResult();
+        return $this->getTimelineResults($query, $options, 'p.title', 'h.date_hit', ['query'], ['dateHit', 'dateLeft']);
     }
 
     /**

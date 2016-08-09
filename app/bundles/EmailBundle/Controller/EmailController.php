@@ -369,8 +369,15 @@ class EmailController extends FormController
                 new \DateTime($dateRangeForm->get('date_from')->getData()),
                 new \DateTime($dateRangeForm->get('date_to')->getData())
             );
+            $statsDevices = $model->getEmailDeviceStats(
+                $email,
+                $variant,
+                new \DateTime($dateRangeForm->get('date_from')->getData()),
+                new \DateTime($dateRangeForm->get('date_to')->getData())
+            );
         } else {
             $stats = $model->getEmailListStats($email, $variant);
+            $statsDevices = $model->getEmailDeviceStats($email, $variant);
         }
 
         // Audit Log
@@ -391,6 +398,7 @@ class EmailController extends FormController
                 'viewParameters'  => array(
                     'email'          => $email,
                     'stats'          => $stats,
+                    'statsDevices'   => $statsDevices,
                     'trackables'     => $trackableLinks,
                     'pending'        => $model->getPendingLeads($email, null, true),
                     'logs'           => $logs,
@@ -598,6 +606,7 @@ class EmailController extends FormController
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $this->getModel('email');
         $method  = $this->request->getMethod();
+
         $entity  = $model->getEntity($objectId);
         $session = $this->factory->getSession();
         $page    = $this->factory->getSession()->get('mautic.email.page', 1);
@@ -632,8 +641,8 @@ class EmailController extends FormController
                 )
             );
         } elseif (!$this->factory->getSecurity()->hasEntityAccess(
-            'email:emails:viewown',
-            'email:emails:viewother',
+            'email:emails:editown',
+            'email:emails:editother',
             $entity->getCreatedBy()
         )
         ) {
@@ -723,6 +732,7 @@ class EmailController extends FormController
                     'objectAction' => 'view',
                     'objectId'     => $entity->getId()
                 );
+
                 return $this->postActionRedirect(
                     array_merge(
                         $postActionVars,

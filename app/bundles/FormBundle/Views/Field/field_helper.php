@@ -57,6 +57,9 @@ if (!empty($properties['placeholder'])) {
 
 // Label and input
 if (!empty($inForm)) {
+    if ($field['type'] == 'button') {
+        $defaultInputFormClass = ' btn btn-default';
+    }
     $labelAttr .= ' class="'.$defaultLabelClass.'"';
     $inputAttr .= ' disabled="disabled" class="'.$defaultInputClass.$defaultInputFormClass.'"';
 
@@ -104,11 +107,6 @@ if (isset($field['isRequired']) && $field['isRequired']) {
 } elseif (!empty($required)) {
     // Forced to be required
     $defaultContainerClass .= ' mauticform-required';
-}
-
-// Add container class
-if (!empty($deleted)) {
-    $defaultContainerClass .= ' bg-danger';
 }
 
 if (stripos($containerAttr, 'class=') === false) {

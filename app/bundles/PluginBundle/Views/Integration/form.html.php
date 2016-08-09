@@ -8,14 +8,14 @@
  */
 if (!$hasSupportedFeatures = (isset($form['supportedFeatures']) && count($form['supportedFeatures']))) {
     if (isset($form['supportedFeatures'])) {
-        $form['supportedFeatures']->isRendered();
+        $form['supportedFeatures']->setRendered();
     }
 }
 
 $hasFields = (isset($form['featureSettings']) && count($form['featureSettings']['leadFields']));
 if (!$hasFeatureSettings = (isset($form['featureSettings']) && (($hasFields && count($form['featureSettings']) > 1) || (!$hasFields && count($form['featureSettings']))))) {
     if (isset($form['featureSettings'])) {
-        $form['featureSettings']->isRendered();
+        $form['featureSettings']->setRendered();
     }
 }
 
@@ -33,7 +33,7 @@ unset($form['featureSettings']['leadFields']);
 <ul class="nav nav-tabs pr-md pl-md">
     <li class="active" id="details-tab"><a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.details'); ?></a></li>
     <?php if ($hasSupportedFeatures || $hasFeatureSettings): ?>
-    <li class="" id="features-tab"><a href="#features-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.features'); ?></a></li>
+        <li class="" id="features-tab"><a href="#features-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.features'); ?></a></li>
     <?php endif; ?>
     <?php if ($hasFields): ?>
         <li class="<?php echo $fieldTabClass; ?>" id="fields-tab"><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.plugin.integration.tab.fieldmapping'); ?></a></li>
@@ -58,25 +58,25 @@ unset($form['featureSettings']['leadFields']);
             </div>
         <?php endif; ?>
         <?php if (isset($form['authButton'])): ?>
-        <div class="row">
-            <div class="col-xs-12 text-center">
-                <?php
-                $attr = $form['authButton']->vars['attr'];
-                $attr['class'] = 'btn btn-success btn-lg';
-                echo $view['form']->widget($form['authButton'], array('attr' => $attr));
-                ?>
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    <?php
+                    $attr = $form['authButton']->vars['attr'];
+                    $attr['class'] = 'btn btn-success btn-lg';
+                    echo $view['form']->widget($form['authButton'], array('attr' => $attr));
+                    ?>
+                </div>
             </div>
-        </div>
         <?php endif; ?>
     </div>
 
     <?php if ($hasSupportedFeatures || $hasFeatureSettings): ?>
         <div class="tab-pane fade bdr-w-0" id="features-container">
             <?php if ($hasSupportedFeatures): ?>
-            <?php echo $view['form']->row($form['supportedFeatures'], ['formSettings' => $formSettings, 'formNotes' => $formNotes]); ?>
+                <?php echo $view['form']->row($form['supportedFeatures'], ['formSettings' => $formSettings, 'formNotes' => $formNotes]); ?>
             <?php endif; ?>
             <?php if ($hasFeatureSettings): ?>
-            <?php echo $view['form']->row($form['featureSettings'], ['formSettings' => $formSettings, 'formNotes' => $formNotes]); ?>
+                <?php echo $view['form']->row($form['featureSettings'], ['formSettings' => $formSettings, 'formNotes' => $formNotes]); ?>
             <?php endif; ?>
         </div>
     <?php endif; ?>

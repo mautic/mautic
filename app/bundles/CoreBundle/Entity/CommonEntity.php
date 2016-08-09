@@ -13,6 +13,11 @@ namespace Mautic\CoreBundle\Entity;
 class CommonEntity
 {
     /**
+     * @var array
+     */
+    protected $changes = [];
+
+    /**
      * Wrapper function for isProperty methods
      *
      * @param string $name
@@ -22,13 +27,13 @@ class CommonEntity
      */
     public function __call($name, $arguments)
     {
-        if (strpos($name, 'is') === 0 && method_exists($this, 'get' . ucfirst($name))) {
-            return $this->{'get' . ucfirst($name)}();
+        if (strpos($name, 'is') === 0 && method_exists($this, 'get'.ucfirst($name))) {
+            return $this->{'get'.ucfirst($name)}();
         } elseif ($name == 'getName' && method_exists($this, 'getTitle')) {
             return $this->getTitle();
         }
 
-        throw new \InvalidArgumentException('Method ' . $name . ' not exists');
+        throw new \InvalidArgumentException('Method '.$name.' not exists');
     }
 
     /**
@@ -38,9 +43,44 @@ class CommonEntity
     {
         $string = get_called_class();
         if (method_exists($this, 'getId')) {
-            $string .= " with ID #" . $this->getId();
+            $string .= " with ID #".$this->getId();
         }
 
         return $string;
+    }
+
+    /**
+     * @param string $prop
+     * @param mixed  $val
+     */
+    protected function isChanged($prop, $val)
+    {
+        $getter  = "get".ucfirst($prop);
+        $current = $this->$getter();
+        if ($prop == 'category') {
+            $currentId = ($current) ? $current->getId() : '';
+            $newId     = ($val) ? $val->getId() : null;
+            if ($currentId != $newId) {
+                $this->changes[$prop] = [$currentId, $newId];
+            }
+        } elseif ($current != $val) {
+            $this->changes[$prop] = [$current, $val];
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getChanges()
+    {
+        return $this->changes;
+    }
+
+    /**
+     * Reset changes
+     */
+    public function resetChanges()
+    {
+        $this->changes = [];
     }
 }
