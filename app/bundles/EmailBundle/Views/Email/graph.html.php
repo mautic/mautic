@@ -56,11 +56,15 @@ $actionRoute = $view['router']->path('mautic_email_action',
                     </div>
                     <div class="col-xs-8 va-m">
                         <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', array('dateRangeForm' => $dateRangeForm, 'class' => 'pull-right')); ?>
-
                     </div>
                 </div>
-                <div class="pt-0 pl-15 pb-10 pr-15">
-                    <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $stats, 'chartType' => $type, 'chartHeight' => 300)); ?>
+                <div class="row">
+                    <div class="pt-0 pl-15 pb-10 pr-15 col-xs-6">
+                        <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $stats, 'chartType' => $type, 'chartHeight' => 300)); ?>
+                    </div>
+                    <div class="pt-0 pl-15 pb-10 pr-15 col-xs-6">
+                        <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $statsDevices, 'chartType' => 'horizontal-bar', 'chartHeight' => 300)); ?>
+                    </div>
                 </div>
             </div>
         </div>

@@ -59,19 +59,17 @@ class StatDevice
 
         $builder->setTable('email_stats_devices')
             ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatDeviceRepository')
-            ->addIndex(['date_opened'], 'date_opened_search')
-            ->addIndex(['stat_id'], 'stat_search')
-            ->addIndex(['device'], 'device_search');;
+            ->addIndex(['date_opened'], 'date_opened_search');
 
         $builder->addId();
 
         $builder->createManyToOne('device', 'Mautic\LeadBundle\Entity\LeadDevice')
-            ->addJoinColumn('device_id', 'id', true, false, 'SET NULL')
+            ->addJoinColumn('device_id', 'id', true, false, 'CASCADE')
             ->build();
 
         $builder->createManyToOne('stat', 'Stat')
-            ->addJoinColumn('stat_id', 'id', true, false, 'SET NULL')
-            ->build();;
+            ->addJoinColumn('stat_id', 'id', true, false, 'CASCADE')
+            ->build();
 
         $builder->addIpAddress(true);
 

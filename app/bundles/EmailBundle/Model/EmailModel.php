@@ -146,7 +146,7 @@ class EmailModel extends FormModel
     }
 
     /**
-    * @return \Mautic\EmailBundle\Entity\CopyRepository
+    * @return \Mautic\EmailBundle\Entity\StatDeviceRepository
     */
     public function getStatDeviceRepository()
     {
@@ -604,7 +604,6 @@ class EmailModel extends FormModel
         $emailIds = ($includeVariants && ($email->isVariant() || $email->isTranslation())) ? $email->getRelatedEntityIds() : [$email->getId()];
 
         $lists     = $email->getLists();
-        $listIds   = $lists->getKeys();
         $listCount = count($lists);
         $combined  = [0, 0, 0, 0, 0, 0];
 
@@ -658,7 +657,7 @@ class EmailModel extends FormModel
                 $bouncedCount = isset($bouncedCounts[$l->getId()]) ? $bouncedCounts[$l->getId()] : 0;
                 $combined[5] += $bouncedCount;
 
-                    $chart->setDataset(
+                $chart->setDataset(
                     $l->getName(),
                     [
                         $sentCount,
@@ -699,54 +698,96 @@ class EmailModel extends FormModel
             $email = $this->getEntity($email);
         }
 
-        if ($includeVariants && $email->isVariant()) {
-            $parent = $email->getVariantParent();
-            if ($parent) {
-                // $email is a variant of another
-                $children = $parent->getVariantChildren();
-                $emailIds = $children->getKeys();
-                $emailIds[] = $parent->getId();
+        $emailIds  = ($includeVariants) ? $email->getRelatedEntityIds() : [$email->getId()];
+        $templateEmail = 'template' === $email->getEmailType();
+        $results = $this->getStatDeviceRepository()->getDeviceStats($emailIds, $dateFrom, $dateTo);
+
+        // Organize by list_id (if a segment email) and/or device
+        $stats   = [];
+        $devices = [];
+        foreach ($results as $result) {
+            if (empty($result['device'])) {
+                $result['device'] = $this->translator->trans('mautic.core.unknown');
             } else {
-                $children = $email->getVariantChildren();
-                $emailIds = $children->getKeys();
-                $emailIds[] = $email->getId();
+                $result['device'] = mb_substr($result['device'], 0, 12);
             }
-        } else {
-            $emailIds = [$email->getId()];
+            $devices[$result['device']] = $result['device'];
+
+            if ($templateEmail) {
+                // List doesn't matter
+                $stats[$result['device']] = $result['count'];
+            } elseif (null !== $result['list_id']) {
+                if (!isset($stats[$result['list_id']])) {
+                    $stats[$result['list_id']] = [];
+                }
+
+                if (!isset($stats[$result['list_id']][$result['device']])) {
+                    $stats[$result['list_id']][$result['device']] = (int) $result['count'];
+                } else {
+                    $stats[$result['list_id']][$result['device']] += (int) $result['count'];
+                }
+            }
         }
 
-        $lists     = $email->getLists();
-        $listCount = count($lists);
-        $chart = new BarChart(array('Devices'));
-
-        if ($listCount) {
+        $listCount = 0;
+        if (!$templateEmail) {
+            $lists     = $email->getLists();
+            $listNames = [];
             foreach ($lists as $l) {
-                $statRepo = $this->getStatRepository();
-                $statIds = $statRepo->getOpenedStatIds($emailIds, $l->getId());
-                $results = array();
+                $listNames[$l->getId()] = $l->getName();
+            }
+            $listCount = count($listNames);
+        }
 
-                if(!empty($statIds))
-                {
-                    $results = $this->getStatDeviceRepository()->getDeviceStats($statIds[0],$l->getId(), $dateFrom, $dateTo, 'Email', $emailIds[0]);
+        natcasesort($devices);
+        $chart = new BarChart(array_values($devices));
+
+        if ($templateEmail) {
+            // Populate the data
+            $chart->setDataset(
+                null,
+                array_values($stats),
+                0
+            );
+        } else {
+            $combined = [];
+            $key   = ($listCount > 1) ? 1 : 0;
+            foreach ($listNames as $id => $name) {
+                // Fill in missing devices
+                $listStats = [];
+                foreach ($devices as $device) {
+                    $listStat    = (!isset($stats[$id][$device])) ? 0 : $stats[$id][$device];
+                    $listStats[] = $listStat;
+
+                    if (!isset($combined[$device])) {
+                        $combined[$device] = 0;
+                    }
+
+                    $combined[$device] += $listStat;
                 }
-                $key = 0;
-                foreach ($results as $result) {
-                    $label = substr(empty($result['device']) ? $this->translator->trans('mautic.core.no.info') : $result['device'], 0, 12);
-                    $chart->setDataset(
-                        $label,
-                        [
-                            $result['count']
-                        ],
-                        $key
-                    );
-                    $key++;
-                }
+
+                // Populate the data
+                $chart->setDataset(
+                    $name,
+                    $listStats,
+                    $key
+                );
+
+                $key++;
+            }
+
+            if ($listCount > 1) {
+                $chart->setDataset(
+                    $this->translator->trans('mautic.email.lists.combined'),
+                    array_values($combined),
+                    0
+                );
             }
         }
 
         return $chart->render();
-
     }
+
     /**
      * @param           $email
      * @param bool      $includeVariants
