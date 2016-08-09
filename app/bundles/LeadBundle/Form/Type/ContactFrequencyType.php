@@ -58,9 +58,16 @@ class ContactFrequencyType extends AbstractType
                 'precision'  => 0,
                 'label'      => 'mautic.lead.list.frequency.number',
                 'label_attr' => array('class' => 'control-label'),
-                'required'   => false,
+                'required'   => true,
                 'attr'       => array(
-                    'class' => 'form-widget frequency'
+                    'class' => 'form-control frequency'
+                ),
+                'constraints' => array(
+                    new NotBlank(
+                        array(
+                            'message' => 'mautic.core.value.required'
+                        )
+                    )
                 )
             ));
         $builder->add('frequency_time','choice',
@@ -72,10 +79,17 @@ class ContactFrequencyType extends AbstractType
                 ),
                 'label'      => 'mautic.lead.list.frequency.times',
                 'label_attr' => array('class' => 'control-label'),
-                'required'   => false,
+                'required'   => true,
                 'multiple'   => false,
                 'attr'       => array(
                     'class' => 'form-control'
+                ),
+                'constraints' => array(
+                    new NotBlank(
+                        array(
+                            'message' => 'mautic.core.value.required'
+                        )
+                    )
                 )
             ));
 
