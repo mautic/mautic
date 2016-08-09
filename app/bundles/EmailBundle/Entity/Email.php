@@ -237,7 +237,9 @@ class Email extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('emails')
-            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\EmailRepository');
+            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\EmailRepository')
+            ->addLifecycleEvent('cleanUrlsInContent', 'preUpdate')
+            ->addLifecycleEvent('cleanUrlsInContent', 'prePersist');
 
         $builder->addIdColumns();
 
@@ -403,32 +405,28 @@ class Email extends FormEntity
             )
         );
 
-        $metadata->addConstraint(new Callback(array(
+        $metadata->addConstraint(new Callback([
             'callback' => function (Email $email, ExecutionContextInterface $context) {
                 $type = $email->getEmailType();
                 if ($type == 'list') {
                     $validator  = $context->getValidator();
                     $violations = $validator->validate(
                         $email->getLists(),
-                        array(
-                            new LeadListAccess(
-                                array(
-                                    'message' => 'mautic.lead.lists.required'
-                                )
-                            ),
+                        [
+                            new LeadListAccess(),
                             new NotBlank(
-                                array(
+                                [
                                     'message' => 'mautic.lead.lists.required'
-                                )
+                                ]
                             )
-                        )
+                        ]
                     );
-
                     if (count($violations) > 0) {
-                        $string = (string) $violations;
-                        $context->buildViolation($string)
-                            ->atPath('lists')
-                            ->addViolation();
+                        foreach ($violations as $violation) {
+                            $context->buildViolation($violation->getMessage())
+                                ->atPath('lists')
+                                ->addViolation();
+                        }
                     }
                 }
 
@@ -450,7 +448,7 @@ class Email extends FormEntity
                     }
                 }
             }
-        )));
+        ]));
     }
 
     /**
@@ -1221,5 +1219,35 @@ class Email extends FormEntity
     public function getAssetAttachments()
     {
         return $this->assetAttachments;
+    }
+
+    /**
+     * Lifecycle callback to clean URLs in the content
+     */
+    public function cleanUrlsInContent()
+    {
+        $this->decodeAmpersands($this->plainText);
+        $this->decodeAmpersands($this->customHtml);
+    }
+
+    /**
+     * Check all links in content and decode &amp;
+     * This even works with double encoded ampersands
+     *
+     * @param $content
+     */
+    private function decodeAmpersands(&$content)
+    {
+        if (preg_match_all('/((https?|ftps?):\/\/)([a-zA-Z0-9-\.{}]*[a-zA-Z0-9=}]*)(\??)([^\s\"\]]+)?/i', $content, $matches)) {
+            foreach ($matches[0] as $url) {
+                $newUrl = $url;
+
+                while (strpos($newUrl, '&amp;') !== false) {
+                    $newUrl = str_replace('&amp;', '&', $newUrl);
+                }
+
+                $content = str_replace($url, $newUrl, $content);
+            }
+        }
     }
 }

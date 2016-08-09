@@ -714,13 +714,12 @@ class Lead extends FormEntity
      */
     public function addPointsChangeLogEntry($type, $name, $action, $pointsDelta, IpAddress $ip)
     {
-        if ($pointsDelta <= 0) {
-            // No need to record this
-
+        if ($pointsDelta === 0) {
+            // No need to record a null delta
             return;
         }
 
-        //create a new points change event
+        // Create a new points change event
         $event = new PointsChangeLog();
         $event->setType($type);
         $event->setEventName($name);

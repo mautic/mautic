@@ -52,9 +52,9 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * CampaignSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param LeadModel $leadModel
-     * @param SmsModel $smsModel
+     * @param MauticFactory  $factory
+     * @param LeadModel      $leadModel
+     * @param SmsModel       $smsModel
      * @param AbstractSmsApi $smsApi
      */
     public function __construct(MauticFactory $factory, LeadModel $leadModel, SmsModel $smsModel, AbstractSmsApi $smsApi, SmsHelper $smsHelper)
@@ -73,7 +73,7 @@ class CampaignSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],
+            CampaignEvents::CAMPAIGN_ON_BUILD     => ['onCampaignBuild', 0],
             SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0]
         ];
     }
@@ -147,7 +147,7 @@ class CampaignSubscriber extends CommonSubscriber
 
 
         $this->smsModel->getRepository()->upCount($smsId);
-        
+        $event->setChannel('sms', $sms->getId());
         $event->setResult(
             [
                 'type'    => 'mautic.sms.sms',

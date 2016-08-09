@@ -130,21 +130,34 @@ class StatRepository extends CommonRepository
                 $query->expr()->eq('IDENTITY(s.lead)', $leadId)
             );
 
-        if (!empty($options['ipIds'])) {
-            $query->orWhere('s.ipAddress IN (' . implode(',', $options['ipIds']) . ')');
-        }
-
-        if (isset($options['filters']['search']) && $options['filters']['search']) {
+        if (isset($options['search']) && $options['search']) {
             $query->andWhere(
-                $query->expr()->like('e.title', $query->expr()->literal('%' . $options['filters']['search'] . '%'))
+                $query->expr()->like('e.title', $query->expr()->literal('%' . $options['search'] . '%'))
             );
         }
 
-        if (isset($options['fromDate']) && $options['fromDate']) {
-            $dt = new DateTimeHelper($options['fromDate']);
-            $query->andWhere(
-                $query->expr()->gte('s.dateSent', $query->expr()->literal($dt->toUtcString()))
-            );
+        if (isset($options['order'])) {
+            list ($orderBy, $orderByDir) = $options['order'];
+
+            switch ($orderBy) {
+                case 'eventLabel':
+                    $orderBy = 'e.title';
+                    break;
+                case 'timestamp':
+                default:
+                    $orderBy = 's.dateSent';
+                    break;
+            }
+
+            $query->orderBy($orderBy, $orderByDir);
+        }
+
+        if (!empty($options['limit'])) {
+            $query->setMaxResults($options['limit']);
+
+            if (!empty($options['start'])) {
+                $query->setFirstResult($options['start']);
+            }
         }
 
         $stats = $query->getQuery()->getArrayResult();
