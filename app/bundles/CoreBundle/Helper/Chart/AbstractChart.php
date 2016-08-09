@@ -60,6 +60,13 @@ abstract class AbstractChart
     protected $unit;
 
     /**
+     * True if unit is H, i, or s
+     *
+     * @var bool
+     */
+    protected $isTimeUnit = false;
+
+    /**
      * amount of items
      *
      * @var integer
@@ -131,9 +138,9 @@ abstract class AbstractChart
             $this->dateTo->modify('+1 day');
         }
 
-        // Adjust dateTo to be end of day or to current hour if today
+        // If today, adjust dateTo to be end of today if unit is not time based or to the current hour if it is
         $now = new \DateTime();
-        if ($now->format('Y-m-d') == $this->dateTo->format('Y-m-d')) {
+        if ($now->format('Y-m-d') == $this->dateTo->format('Y-m-d') && $this->isTimeUnit) {
             $this->dateTo = $now;
         } else {
             $this->dateTo->setTime(23, 59, 59);
@@ -193,11 +200,14 @@ abstract class AbstractChart
     /**
      * Returns appropriate time unit from a date range so the line/bar charts won't be too full/empty
      *
+     * @param $dateFrom
+     * @param $dateTo
+     *
      * @return string
      */
-    public function getTimeUnitFromDateRange()
+    public function getTimeUnitFromDateRange($dateFrom, $dateTo)
     {
-        $diff = $this->dateTo->diff($this->dateFrom)->format('%a');
+        $diff = $dateTo->diff($dateFrom)->format('%a');
         $unit = 'd';
 
         if ($diff <= 1) $unit = 'H';

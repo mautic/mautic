@@ -1,5 +1,5 @@
 //LeadBundle
-Mautic.leadOnLoad = function (container) {
+Mautic.leadOnLoad = function (container, response) {
     Mautic.addKeyboardShortcut('a', 'Quick add a New Contact', function(e) {
         if(mQuery('a.quickadd').length) {
             mQuery('a.quickadd').click();
@@ -53,6 +53,20 @@ Mautic.leadOnLoad = function (container) {
             e.preventDefault();
             Mautic.refreshLeadTimeline(timelineForm);
         });
+
+        var toggleTimelineDetails = function (el) {
+            var activateDetailsState = mQuery(el).hasClass('active');
+
+            if (activateDetailsState) {
+                mQuery('#timeline-details-'+detailsId).addClass('hide');
+                mQuery(el).removeClass('active');
+            } else {
+                mQuery('#timeline-details-'+detailsId).removeClass('hide');
+                mQuery(el).addClass('active');
+            }
+        };
+
+        Mautic.leadTimelineOnLoad(container, response);
     }
 
     //Note type filters
@@ -111,6 +125,48 @@ Mautic.leadOnLoad = function (container) {
     });
 
     Mautic.initUniqueIdentifierFields();
+};
+
+Mautic.leadTimelineOnLoad = function (container, response) {
+    mQuery("#contact-timeline a[data-activate-details='all']").on('click', function() {
+        if (mQuery(this).find('span').first().hasClass('fa-level-down')) {
+            mQuery("#contact-timeline a[data-activate-details!='all']").each(function () {
+                var detailsId = mQuery(this).data('activate-details');
+                if (detailsId && mQuery('#timeline-details-'+detailsId).length) {
+                    mQuery('#timeline-details-' + detailsId).removeClass('hide');
+                    mQuery(this).addClass('active');
+                }
+            });
+            mQuery(this).find('span').first().removeClass('fa-level-down').addClass('fa-level-up');
+        } else {
+            mQuery("#contact-timeline a[data-activate-details!='all']").each(function () {
+                var detailsId = mQuery(this).data('activate-details');
+                if (detailsId && mQuery('#timeline-details-'+detailsId).length) {
+                    mQuery('#timeline-details-' + detailsId).addClass('hide');
+                    mQuery(this).removeClass('active');
+                }
+            });
+            mQuery(this).find('span').first().removeClass('fa-level-up').addClass('fa-level-down');
+        }
+    });
+    mQuery("#contact-timeline a[data-activate-details!='all']").on('click', function() {
+        var detailsId = mQuery(this).data('activate-details');
+        if (detailsId && mQuery('#timeline-details-'+detailsId).length) {
+            var activateDetailsState = mQuery(this).hasClass('active');
+
+            if (activateDetailsState) {
+                mQuery('#timeline-details-'+detailsId).addClass('hide');
+                mQuery(this).removeClass('active');
+            } else {
+                mQuery('#timeline-details-'+detailsId).removeClass('hide');
+                mQuery(this).addClass('active');
+            }
+        }
+    });
+
+    if (response && typeof response.timelineCount != 'undefined') {
+        mQuery('#TimelineCount').html(response.timelineCount);
+    }
 };
 
 Mautic.leadOnUnload = function(id) {
@@ -589,23 +645,10 @@ Mautic.clearLeadSocialProfile = function(network, leadId, event) {
 };
 
 Mautic.refreshLeadTimeline = function(form) {
-    var formData = form.serialize()
-    mQuery.ajax({
-        showLoadingBar: true,
-        url: mauticAjaxUrl,
-        type: "POST",
-        data: "action=lead:updateTimeline&" + formData,
-        dataType: "json",
-        success: function (response) {
-            if (response.success) {
-                Mautic.stopPageLoadingBar();
-                mQuery('#timeline-container').html(response.timeline);
-                mQuery('#HistoryCount').html(response.historyCount);
-            }
-        },
-        error: function (request, textStatus, errorThrown) {
-            Mautic.processAjaxError(request, textStatus, errorThrown);
-        }
+    Mautic.postForm(mQuery(form), function (response) {
+        response.target = '#timeline-table';
+        mQuery('#TimelineCount').html(response.timelineCount);
+        Mautic.processPageContent(response);
     });
 };
 

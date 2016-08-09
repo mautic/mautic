@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Mautic\DashboardBundle\Entity\Widget;
+use Symfony\Component\Form\FormError;
 
 /**
  * Class DashboardController

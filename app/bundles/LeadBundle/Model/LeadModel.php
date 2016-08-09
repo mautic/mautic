@@ -28,6 +28,7 @@ use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
+use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -185,6 +186,16 @@ class LeadModel extends FormModel
     public function getUtmTagRepository()
     {
         return $this->em->getRepository('MauticLeadBundle:UtmTag');
+    }
+
+    /**
+     * Get the tags repository
+     *
+     * @return \Mautic\LeadBundle\Entity\StatDeviceRepository
+     */
+    public function getDeviceRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:LeadDevice');
     }
 
     /**
@@ -1721,5 +1732,51 @@ class LeadModel extends FormModel
         }
 
         return $results;
+    }
+
+    /**
+     * Get timeline/engagement data
+     *
+     * @param Lead $lead
+     * @param int  $page
+     * @param null $filters
+     */
+    public function getEngagements(Lead $lead, $filters = null, array $orderBy = null, $page = 1, $limit = 25)
+    {
+        $event = $this->dispatcher->dispatch(
+            LeadEvents::TIMELINE_ON_GENERATE,
+            new LeadTimelineEvent($lead, $filters, $orderBy, $page, $limit)
+        );
+
+        return [
+            'events'   => $event->getEvents(),
+            'filters'  => $filters,
+            'order'    => $orderBy,
+            'types'    => $event->getEventTypes(),
+            'total'    => $event->getEventCounter()['total'],
+            'page'     => $page,
+            'limit'    => $limit,
+            'maxPages' => $event->getMaxPage()
+        ];
+    }
+
+    /**
+     * Get engagement counts by time unit
+     *
+     * @param Lead           $lead
+     * @param \DateTime|null $dateFrom
+     * @param \DateTime|null $dateTo
+     * @param string         $unit      Y, m, d, etc
+     *
+     * @return array|int
+     */
+    public function getEngagementCount(Lead $lead, \DateTime $dateFrom = null, \DateTime $dateTo = null, $unit = 'm', ChartQuery $chartQuery = null)
+    {
+        $event = new LeadTimelineEvent($lead);
+        $event->setCountOnly($dateFrom, $dateTo, $unit, $chartQuery);
+
+        $this->dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
+
+        return $event->getEventCounter();
     }
 }

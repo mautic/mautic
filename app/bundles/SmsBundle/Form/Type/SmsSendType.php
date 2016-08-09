@@ -50,6 +50,7 @@ class SmsSendType extends AbstractType
                 'onchange'=> 'Mautic.disabledSmsAction()'
             ),
             'multiple'    => false,
+            'required'    => true,
             'constraints' => array(
                 new NotBlank(
                     array('message' => 'mautic.sms.choosesms.notblank')

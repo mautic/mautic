@@ -17,6 +17,8 @@ use Doctrine\ORM\Query;
  */
 class StagesChangeLogRepository extends CommonRepository
 {
+    use TimelineTrait;
+
     /**
      * Get a lead's stage log
      *
@@ -24,23 +26,22 @@ class StagesChangeLogRepository extends CommonRepository
      * @param array   $options
      *
      * @return array
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function getLeadTimelineEvents($leadId, array $options = array())
     {
-        $query = $this->createQueryBuilder('ls')
-            ->select('ls.eventName, ls.actionName, ls.dateAdded')
-            ->where('ls.lead = ' . $leadId);
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->from(MAUTIC_TABLE_PREFIX.'lead_stages_change_log', 'ls')
+            ->select('ls.event_name as eventName, ls.action_name as actionName, ls.date_added as dateAdded')
+            ->where('ls.lead_id = ' . (int) $leadId);
 
-        if (isset($options['filters']['search']) && $options['filters']['search']) {
+        if (isset($options['search']) && $options['search']) {
             $query->andWhere($query->expr()->orX(
-                $query->expr()->like('ls.eventName', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
-                $query->expr()->like('ls.actionName', $query->expr()->literal('%' . $options['filters']['search'] . '%'))
+                $query->expr()->like('ls.event_name', $query->expr()->literal('%' . $options['search'] . '%')),
+                $query->expr()->like('ls.action_name', $query->expr()->literal('%' . $options['search'] . '%'))
             ));
         }
 
-        return $query->getQuery()->getArrayResult();
+        return $this->getTimelineResults($query, $options, 'ls.event_name', 'ls.date_added', [], ['dateAdded']);
     }
 
     /**

@@ -68,9 +68,9 @@ class CommonController extends Controller implements MauticController
 
     /**
      * Check if a security level is granted
-     * 
+     *
      * @param $level
-     * 
+     *
      * @return bool
      */
     protected function accessGranted($level)
@@ -81,7 +81,7 @@ class CommonController extends Controller implements MauticController
     /**
      * Override this method in your controller
      * for easy access to the permissions
-     * 
+     *
      * @return array
      */
     protected function getPermissions()
@@ -438,13 +438,13 @@ class CommonController extends Controller implements MauticController
      */
     protected function setListFilters()
     {
-        $session = $this->factory->getSession();
+        $session = $this->get('session');
         $name    = InputHelper::clean($this->request->query->get('name'));
 
         if (!empty($name)) {
             if ($this->request->query->has('orderby')) {
                 $orderBy = InputHelper::clean($this->request->query->get('orderby'), true);
-                $dir     = $this->get('session')->get("mautic.$name.orderbydir", 'ASC');
+                $dir     = $session->get("mautic.$name.orderbydir", 'ASC');
                 $dir     = ($dir == 'ASC') ? 'DESC' : 'ASC';
                 $session->set("mautic.$name.orderby", $orderBy);
                 $session->set("mautic.$name.orderbydir", $dir);
@@ -571,7 +571,7 @@ class CommonController extends Controller implements MauticController
      * @param string $domain
      * @param bool   $addNotification
      */
-    public function addFlash($message, $messageVars = array(), $type = 'notice', $domain = 'flashes', $addNotification = true)
+    public function addFlash($message, $messageVars = array(), $type = 'notice', $domain = 'flashes', $addNotification = false)
     {
         if ($domain == null) {
             $domain = 'flashes';
