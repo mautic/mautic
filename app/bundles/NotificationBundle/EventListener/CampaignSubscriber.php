@@ -10,6 +10,7 @@
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\CampaignEvents;
@@ -17,6 +18,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\NotificationBundle\Api\AbstractNotificationApi;
+use Mautic\NotificationBundle\Event\NotificationSendEvent;
 use Mautic\NotificationBundle\Model\NotificationModel;
 use Mautic\NotificationBundle\NotificationEvents;
 
@@ -72,10 +74,13 @@ class CampaignSubscriber extends CommonSubscriber
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    /**
+     * @param CampaignBuilderEvent $sendEvent
+     */
+    public function onCampaignBuild(CampaignBuilderEvent $sendEvent)
     {
         if ($this->factory->getParameter('notification_enabled')) {
-            $event->addAction(
+            $sendEvent->addAction(
                 'notification.send_notification',
                 [
                     'label'            => 'mautic.notification.campaign.send_notification',
@@ -91,14 +96,14 @@ class CampaignSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param CampaignExecutionEvent $event
+     * @param CampaignExecutionEvent $sendEvent
      */
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $sendEvent)
     {
-        $lead = $event->getLead();
+        $lead = $sendEvent->getLead();
 
         if ($this->leadModel->isContactable($lead, 'notification') !== DoNotContact::IS_CONTACTABLE) {
-            return $event->setFailed('mautic.notification.campaign.failed.not_contactable');
+            return $sendEvent->setFailed('mautic.notification.campaign.failed.not_contactable');
         }
 
         // If lead has subscribed on multiple devices, get all of them.
@@ -112,16 +117,16 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         if (empty($playerID)) {
-            return $event->setFailed('mautic.notification.campaign.failed.not_subscribed');
+            return $sendEvent->setFailed('mautic.notification.campaign.failed.not_subscribed');
         }
 
-        $notificationId = (int) $event->getConfig()['notification'];
+        $notificationId = (int) $sendEvent->getConfig()['notification'];
 
         /** @var \Mautic\NotificationBundle\Entity\Notification $notification */
         $notification = $this->notificationModel->getEntity($notificationId);
 
         if ($notification->getId() !== $notificationId) {
-            return $event->setFailed('mautic.notification.campaign.failed.missing_entity');
+            return $sendEvent->setFailed('mautic.notification.campaign.failed.missing_entity');
         }
 
         $url = $this->notificationApi->convertToTrackedUrl(
@@ -132,18 +137,33 @@ class CampaignSubscriber extends CommonSubscriber
             ]
         );
 
+        $tokenEvent = $this->dispatcher->dispatch(
+            NotificationEvents::TOKEN_REPLACEMENT,
+            new TokenReplacementEvent(
+                $notification->getMessage(),
+                $lead,
+                ['channel' => ['notification', $notification->getId()]]
+            )
+        );
+
+        $sendEvent = $this->dispatcher->dispatch(
+            NotificationEvents::NOTIFICATION_ON_SEND,
+            new NotificationSendEvent($tokenEvent->getContent(), $notification->getHeading(), $lead)
+        );
+
         $response = $this->notificationApi->sendNotification(
             $playerID,
-            $notification->getMessage(),
-            $notification->getHeading(),
+            $sendEvent->getMessage(),
+            $sendEvent->getHeading(),
             $url
         );
 
-        $event->setChannel('notification', $notification->getId());
+        $sendEvent->setChannel('notification', $notification->getId());
 
         // If for some reason the call failed, tell mautic to try again by return false
         if ($response->code !== 200) {
-            return $event->setResult(false);
+
+            return $sendEvent->setResult(false);
         }
 
         $this->notificationModel->createStatEntry($notification, $lead);
@@ -154,10 +174,10 @@ class CampaignSubscriber extends CommonSubscriber
             'type'    => 'mautic.notification.notification',
             'id'      => $notification->getId(),
             'name'    => $notification->getName(),
-            'heading' => $notification->getHeading(),
-            'content' => $notification->getMessage(),
+            'heading' => $sendEvent->getHeading(),
+            'content' => $sendEvent->getMessage(),
         ];
 
-        $event->setResult($result);
+        $sendEvent->setResult($result);
     }
 }

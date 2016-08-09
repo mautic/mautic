@@ -65,26 +65,10 @@ class NotificationSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            NotificationEvents::NOTIFICATION_ON_SEND => ['onSend', 0],
             NotificationEvents::NOTIFICATION_POST_SAVE => ['onPostSave', 0],
             NotificationEvents::NOTIFICATION_POST_DELETE => ['onDelete', 0],
             NotificationEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
         ];
-    }
-
-    /**
-     * @param NotificationSendEvent $event
-     */
-    public function onSend(NotificationSendEvent $event)
-    {
-        $content = $event->getContent();
-        $tokens = [];
-        /** @var \Mautic\SmsBundle\Api\AbstractSmsApi $smsApi */
-        $smsApi = $this->factory->getKernel()->getContainer()->get('mautic.sms.api');
-
-        $content = str_ireplace(array_keys($tokens), array_values($tokens), $content);
-
-        $event->setContent($content);
     }
 
     /**
@@ -131,8 +115,8 @@ class NotificationSubscriber extends CommonSubscriber
     public function onTokenReplacement(TokenReplacementEvent $event)
     {
         /** @var Lead $lead */
-        $lead = $event->getLead();
-        $content = $event->getContent();
+        $lead         = $event->getLead();
+        $content      = $event->getContent();
         $clickthrough = $event->getClickthrough();
 
         if ($content) {
@@ -146,7 +130,7 @@ class NotificationSubscriber extends CommonSubscriber
                 $content,
                 $tokens,
                 'notification',
-                $clickthrough['notification_id']
+                $clickthrough['channel'][1]
             );
 
             /**

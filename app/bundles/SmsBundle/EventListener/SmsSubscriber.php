@@ -162,8 +162,8 @@ class SmsSubscriber extends CommonSubscriber
     public function onTokenReplacement(TokenReplacementEvent $event)
     {
         /** @var Lead $lead */
-        $lead = $event->getLead();
-        $content = $event->getContent();
+        $lead         = $event->getLead();
+        $content      = $event->getContent();
         $clickthrough = $event->getClickthrough();
 
         if ($content) {
@@ -177,7 +177,7 @@ class SmsSubscriber extends CommonSubscriber
                 $content,
                 $tokens,
                 'sms',
-                $clickthrough['sms_id']
+                $clickthrough['channel'][1]
             );
 
             /**
