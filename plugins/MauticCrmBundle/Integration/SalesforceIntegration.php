@@ -262,10 +262,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $internal = array('latestDateCovered' => $data['latestDateCovered']);
         $count = 0;
 
-        if(isset($data['records'])){
+        if(isset($data['records']) and $object !== 'Activity'){
 
             foreach($data['records'] as $record)
             {
+                $integrationEntities = array();
+
                 foreach ($record as $key=>$item){
                     $dataObject[$key."__".$object] = $item;
                 }
@@ -285,19 +287,18 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $integrationEntity->setIntegrationEntityId($record['Id']);
                         $integrationEntity->setInternalEntity('lead');
                         $integrationEntity->setInternalEntityId($lead->getId());
-                        $this->factory->getEntityManager()->persist($integrationEntity);
-                        $this->factory->getEntityManager()->flush($integrationEntity);
+                        $integrationEntities[] = $integrationEntity;
                     } else {
 
                         $integrationEntity =  $integrationEntityRepo->getEntity($integrationId[0]['id']);
                         $integrationEntity->setLastSyncDate(new \DateTime());
-                        $this->factory->getEntityManager()->persist($integrationEntity);
-                        $this->factory->getEntityManager()->flush($integrationEntity);
-
+                        $integrationEntities[] = $integrationEntity;
                     }
-
                     $count++;
                 }
+
+                $this->factory->getEntityManager()->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
+
                 unset($data);
             }
         }
@@ -472,10 +473,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $integrationEntityRepo = $this->factory->getEntityManager()->getRepository(
                 'MauticPluginBundle:IntegrationEntity'
             );
-            $salesForceIds         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'lead');
-
             $startDate = new \DateTime($query['start']);
             $endDate   = new \DateTime($query['end']);
+
+            $salesForceIds         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'lead', null, $startDate->format('Y-m-d H:m:s'), $endDate->format('Y-m-d H:m:s'));
+
             try {
                 if ($this->isAuthorized()) {
                     if (!empty($salesForceIds)) {
