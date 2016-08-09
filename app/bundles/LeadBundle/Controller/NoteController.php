@@ -356,6 +356,7 @@ class NoteController extends FormController
      *
      * @param     $objectAction
      * @param int $objectId
+     * @param int $leadId
      *
      * @return Response
      */

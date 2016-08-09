@@ -31,7 +31,7 @@ if ($tmpl == 'index') {
         'page'            => $page,
         'limit'           => $limit,
         'sessionVar'      => 'lead.'.$lead->getId().'.note',
-        'baseUrl'         => $view['router']->path('mautic_contactnote_index', array('leadId' => $lead->getId(), 'page' => $page))
+        'baseUrl'         => $view['router']->path('mautic_contactnote_index', array('leadId' => $lead->getId()))
     )); ?>
 </div>
 <?php endif; ?>
