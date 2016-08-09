@@ -30,6 +30,7 @@ if ($tmpl == 'index') {
         'target'          => '#notes-container',
         'page'            => $page,
         'limit'           => $limit,
+        'sessionVar'      => 'note',
         'baseUrl'         => $view['router']->path('mautic_contactnote_index', array('leadId' => $lead->getId(), 'page' => $page))
     )); ?>
 </div>
