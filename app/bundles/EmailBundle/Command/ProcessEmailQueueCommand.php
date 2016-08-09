@@ -38,6 +38,7 @@ class ProcessEmailQueueCommand extends ContainerAwareCommand
             ->addOption('--do-not-clear', null, InputOption::VALUE_NONE, 'By default, failed messages older than the --recover-timeout setting will be attempted one more time then deleted if it fails again.  If this is set, sending of failed messages will continue to be attempted.')
             ->addOption('--recover-timeout', null, InputOption::VALUE_OPTIONAL, 'Sets the amount of time in seconds before attempting to resend failed messages.  Defaults to value set in config.')
             ->addOption('--clear-timeout', null, InputOption::VALUE_OPTIONAL, 'Sets the amount of time in seconds before deleting failed messages.  Defaults to value set in config.')
+            ->addOption('--force', null, InputOption::VALUE_NONE, 'Avoid checking for already running process')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command is used to process the application's e-mail queue
 
@@ -59,15 +60,18 @@ EOT
         $skipClear  = $input->getOption('do-not-clear');
         $quiet      = $input->getOption('quiet');
         $timeout    = $input->getOption('clear-timeout');
+        $force      = $input->getOption('force');
 
         $factory    = $container->get('mautic.factory');
         $queueMode  = $factory->getParameter('mailer_spool_type');
 
-        $lockHandler = new LockHandler('mautic:emails:send');
-        if (!$lockHandler->lock()) {
-            $output->writeln('Process already running.');
+        if (! $force) {
+            $lockHandler = new LockHandler('mautic:emails:send');
+            if (!$lockHandler->lock()) {
+                $output->writeln('Process already running.');
 
-            return 0;
+                return 0;
+            }
         }
 
         if ($queueMode != 'file') {
@@ -175,7 +179,9 @@ EOT
         $input = new ArrayInput($commandArgs);
         $returnCode = $command->run($input, $output);
 
-        $lockHandler->release();
+        if (! $force) {
+            $lockHandler->release();
+        }
 
         if ($returnCode !== 0) {
             return $returnCode;
