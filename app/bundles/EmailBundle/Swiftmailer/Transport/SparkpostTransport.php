@@ -159,13 +159,16 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         foreach ($message['recipients']['to'] as $to) {
             $recipient = [
                 'address'           => $to,
-                'substitution_data' => []
+                'substitution_data' => [],
+                'metadata'          => []
             ];
 
             if (isset($metadata[$to['email']])) {
                 foreach ($metadata[$to['email']]['tokens'] as $token => $value) {
                     $recipient['substitution_data'][$mergeVars[$token]] = $value;
                 }
+                unset($metadata[$to['email']]['tokens']);
+                $recipient['substitution_data']['metadata'] = $metadata[$to['email']];
             }
 
             $recipients[] = $recipient;
@@ -241,6 +244,64 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      */
     public function handleCallbackResponse(Request $request, MauticFactory $factory)
     {
-        $factory->getLogger()->addError(print_r($request->request, true));
+        $payload = $request->request->all();
+
+        $rows = [
+            'bounced'      => [
+                'hashIds' => [],
+                'emails'  => []
+            ],
+            'unsubscribed' => [
+                'hashIds' => [],
+                'emails'  => []
+            ]
+        ];
+
+        foreach ($payload as $msys) {
+            if (isset($msys['message_event'])) {
+                $event = $msys['message_event'];
+            } elseif (isset($msys['unsubscribe_event'])) {
+                $event = $msys['unsubscribe_event'];
+            } else {
+
+                continue;
+            }
+
+            // Process events sent from Mautic
+            if (!isset($event['rcpt_meta']['hashId'])) {
+
+                continue;
+            }
+
+            if ('to' !== $event['rcpt_type']) {
+                // Ignore cc/bcc
+
+                continue;
+            }
+
+            $hashId = $event['rcpt_meta']['hashId'];
+
+            switch ($event['type']) {
+                case 'bounce':
+                    // Only parse hard bounces - https://support.sparkpost.com/customer/portal/articles/1929896-bounce-classification-codes
+                    if (in_array((int) $event['bounce_class'], [10, 30, 50, 51, 52, 53, 54, 90])) {
+                        $rows['bounce']['emails'][$hashId] = $event['raw_reason'];
+                    }
+                    break;
+                case 'spam_complaint':
+                    $rows['bounce']['hashIds'][$hashId] = $event['fbtype'];
+                    break;
+                case 'out_of_band':
+                case 'policy_rejection':
+                    $rows['bounce']['hashIds'][$hashId] = $event['raw_reason'];
+                    break;
+                case 'list_unsubscribe':
+                case 'link_unsubscribe':
+                    $rows['unsubscribe']['hashIds'][$hashId] = 'unsubscribed';
+                    break;
+            }
+        }
+
+        return $rows;
     }
 }

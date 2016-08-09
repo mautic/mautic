@@ -408,7 +408,8 @@ class ConfigType extends AbstractType
                     'tooltip'      => 'mautic.email.config.mailer.apikey.tooltop',
                     'autocomplete' => 'off',
                     'placeholder'  => 'mautic.email.config.mailer.apikey.placeholder'
-                ]
+                ],
+                'required' => false,
             ]
         );
 
