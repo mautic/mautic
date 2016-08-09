@@ -142,7 +142,7 @@ class CampaignSubscriber extends CommonSubscriber
 
         $leadIds = $lead->getId();
 
-        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', "'".$leadIds."'", null, $defaultFrequencyNumber, $defaultFrequencyTime);
+        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', $leadIds, null, $defaultFrequencyNumber, $defaultFrequencyTime);
 
 
         if (!empty($dontSendTo) and $dontSendTo[0]['lead_id'] != $lead->getId()) {
