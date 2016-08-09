@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Filesystem\LockHandler;
 
 /**
  * CLI command to process the e-mail queue
@@ -61,6 +62,13 @@ EOT
 
         $factory    = $container->get('mautic.factory');
         $queueMode  = $factory->getParameter('mailer_spool_type');
+
+        $lockHandler = new LockHandler('mautic:emails:send');
+        if (!$lockHandler->lock()) {
+            $output->writeln('Process already running.');
+
+            return 0;
+        }
 
         if ($queueMode != 'file') {
             $output->writeln('Mautic is not set to queue email.');
@@ -166,6 +174,8 @@ EOT
         }
         $input = new ArrayInput($commandArgs);
         $returnCode = $command->run($input, $output);
+
+        $lockHandler->release();
 
         if ($returnCode !== 0) {
             return $returnCode;
