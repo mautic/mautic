@@ -14,6 +14,8 @@ use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\StatDevice;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -2102,7 +2104,7 @@ class LeadController extends FormController
             $data  = $this->request->request->get('lead_batch_stage', [], true);
             $ids   = json_decode($data['ids'], true);
 
-            $entities  = [];
+            $entities = [];
             if (is_array($ids)) {
                 $entities = $model->getEntities(
                     [

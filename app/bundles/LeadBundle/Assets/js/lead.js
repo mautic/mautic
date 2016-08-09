@@ -128,7 +128,7 @@ Mautic.leadOnLoad = function (container, response) {
 };
 
 Mautic.leadTimelineOnLoad = function (container, response) {
-    mQuery("#contact-timeline a[data-activate-details='all'").on('click', function() {
+    mQuery("#contact-timeline a[data-activate-details='all']").on('click', function() {
         if (mQuery(this).find('span').first().hasClass('fa-level-down')) {
             mQuery("#contact-timeline a[data-activate-details!='all']").each(function () {
                 var detailsId = mQuery(this).data('activate-details');

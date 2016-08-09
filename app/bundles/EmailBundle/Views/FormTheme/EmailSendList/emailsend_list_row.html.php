@@ -9,12 +9,21 @@
 ?>
 
 <div class="row">
-    <div class="col-xs-8">
+    <div class="col-xs-<?php echo isset($form['email_type']) ? 7 : 12; ?>">
         <?php echo $view['form']->row($form['email']); ?>
     </div>
-    <div class="col-xs-4 mt-lg">
+    <?php if (isset($form['email_type'])): ?>
+        <div class="col-xs-5">
+            <?php echo $view['form']->row($form['email_type']); ?>
+        </div>
+    <?php endif; ?>
+</div>
+<div class="row">
+    <div class="col-xs-12 mt-lg">
         <div class="mt-3">
             <?php echo $view['form']->row($form['newEmailButton']); ?>
+            <?php echo $view['form']->row($form['editEmailButton']); ?>
+            <?php echo $view['form']->row($form['previewEmailButton']); ?>
         </div>
     </div>
 </div>

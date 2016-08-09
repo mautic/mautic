@@ -23,17 +23,17 @@ class CampaignBuilderEvent extends Event
     /**
      * @var array
      */
-    private $leadDecisions   = array();
+    private $leadDecisions = [];
 
     /**
      * @var array
      */
-    private $leadConditions  = array();
+    private $leadConditions = [];
 
     /**
      * @var array
      */
-    private $actions      = array();
+    private $actions = [];
 
     /**
      * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
@@ -43,7 +43,7 @@ class CampaignBuilderEvent extends Event
     /**
      * @param \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator
      */
-    public function __construct ($translator)
+    public function __construct($translator)
     {
         $this->translator = $translator;
     }
@@ -52,15 +52,17 @@ class CampaignBuilderEvent extends Event
      * Add an lead decision to the list of available .
      *
      * @param string $key     - a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
-     * @param array  $action - can contain the following keys:
+     * @param array  $action  - can contain the following keys:
      *                        'label'       => (required) what to display in the list
      *                        'description' => (optional) short description of event
      *                        'formType'    => (optional) name of the form type SERVICE for the action
      *                        'formTypeOptions' => (optional) array of options to pass to the formType service
      *                        'formTheme'   => (optional) form theme
      *                        'eventName'   => (optional) The event name to fire when this event is triggered.
+     *                        'associatedActions' => (optional) Array of action types to limit what this decision can be associated with
+     *                        'anchorRestrictions' => (optional) Array of event anchors this event should not be allowed to connect to
      */
-    public function addLeadDecision ($key, array $action)
+    public function addLeadDecision($key, array $action)
     {
         if (array_key_exists($key, $this->leadDecisions)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another contact action. Please use a different key.");
@@ -68,8 +70,8 @@ class CampaignBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            array('label'),
-            array('callback'),
+            ['label'],
+            ['callback'],
             $action
         );
 
@@ -84,15 +86,20 @@ class CampaignBuilderEvent extends Event
      *
      * @return array
      */
-    public function getLeadDecisions ()
+    public function getLeadDecisions()
     {
         static $sorted = false;
 
         if (empty($sorted)) {
-            uasort($this->leadDecisions, function ($a, $b) {
-                return strnatcasecmp(
-                    $a['label'], $b['label']);
-            });
+            uasort(
+                $this->leadDecisions,
+                function ($a, $b) {
+                    return strnatcasecmp(
+                        $a['label'],
+                        $b['label']
+                    );
+                }
+            );
             $sorted = true;
         }
 
@@ -102,23 +109,23 @@ class CampaignBuilderEvent extends Event
     /**
      * Add an lead condition to the list of available conditions.
      *
-     * @param string $key     - a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
-     * @param array  $condition - can contain the following keys:
-     *                        'label'       => (required) what to display in the list
-     *                        'description' => (optional) short description of event
-     *                        'formType'    => (optional) name of the form type SERVICE for the action
-     *                        'formTypeOptions' => (optional) array of options to pass to the formType service
-     *                        'formTheme'   => (optional) form theme
-     *                        'callback'    => (optional) callback function that will be passed when the event is triggered
-     *                            The callback function should return a bool to determine if the trigger's actions
-     *                            should be executed.  For example, only trigger actions for specific entities.
-     *                            it can can receive the following arguments by name (via ReflectionMethod::invokeArgs())
+     * @param string $key           - a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
+     * @param array  $condition     - can contain the following keys:
+     *                              'label'       => (required) what to display in the list
+     *                              'description' => (optional) short description of event
+     *                              'formType'    => (optional) name of the form type SERVICE for the action
+     *                              'formTypeOptions' => (optional) array of options to pass to the formType service
+     *                              'formTheme'   => (optional) form theme
+     *                              'callback'    => (optional) callback function that will be passed when the event is triggered
+     *                              The callback function should return a bool to determine if the trigger's actions
+     *                              should be executed.  For example, only trigger actions for specific entities.
+     *                              it can can receive the following arguments by name (via ReflectionMethod::invokeArgs())
      *                              mixed $eventDetails Whatever the bundle passes when triggering the event
      *                              Mautic\CoreBundle\Factory\MauticFactory $factory
      *                              Mautic\LeadBundle\Entity\Lead $lead
      *                              array $event
      */
-    public function addLeadCondition ($key, array $event)
+    public function addLeadCondition($key, array $event)
     {
         if (array_key_exists($key, $this->leadConditions)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another contact action. Please use a different key.");
@@ -126,8 +133,8 @@ class CampaignBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            array('label'),
-            array('callback'),
+            ['label'],
+            ['callback'],
             $event
         );
 
@@ -142,15 +149,20 @@ class CampaignBuilderEvent extends Event
      *
      * @return array
      */
-    public function getLeadConditions ()
+    public function getLeadConditions()
     {
         static $sorted = false;
 
         if (empty($sorted)) {
-            uasort($this->leadConditions, function ($a, $b) {
-                return strnatcasecmp(
-                    $a['label'], $b['label']);
-            });
+            uasort(
+                $this->leadConditions,
+                function ($a, $b) {
+                    return strnatcasecmp(
+                        $a['label'],
+                        $b['label']
+                    );
+                }
+            );
             $sorted = true;
         }
 
@@ -160,7 +172,7 @@ class CampaignBuilderEvent extends Event
     /**
      * Add an action to the list of available .
      *
-     * @param string $key     - a unique identifier; it is recommended that it be namespaced i.e. lead.action
+     * @param string $key    - a unique identifier; it is recommended that it be namespaced i.e. lead.action
      * @param array  $action - can contain the following keys:
      *                       'label'            => (required) what to display in the list
      *                       'description'      => (optional) short description of event
@@ -169,8 +181,10 @@ class CampaignBuilderEvent extends Event
      *                       'formTheme'        => (optional) form theme
      *                       'timelineTemplate' => (optional) custom template for the lead timeline
      *                       'eventName'        => (required) The event to fire when this event is triggered.
+     *                       'associatedDecisions' => (optional) Array of decision types to limit what this action can be associated with
+     *                       'anchorRestrictions' => (optional) Array of event anchors this event should not be allowed to connect to
      */
-    public function addAction ($key, array $action)
+    public function addAction($key, array $action)
     {
         if (array_key_exists($key, $this->actions)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another action. Please use a different key.");
@@ -178,8 +192,8 @@ class CampaignBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            array('label'),
-            array(),
+            ['label'],
+            [],
             $action
         );
 
@@ -195,15 +209,20 @@ class CampaignBuilderEvent extends Event
      *
      * @return array
      */
-    public function getActions ()
+    public function getActions()
     {
         static $sorted = false;
 
         if (empty($sorted)) {
-            uasort($this->actions, function ($a, $b) {
-                return strnatcasecmp(
-                    $a['label'], $b['label']);
-            });
+            uasort(
+                $this->actions,
+                function ($a, $b) {
+                    return strnatcasecmp(
+                        $a['label'],
+                        $b['label']
+                    );
+                }
+            );
             $sorted = true;
         }
 
@@ -213,7 +232,7 @@ class CampaignBuilderEvent extends Event
     /**
      * @param array $component
      */
-    private function verifyComponent (array $keys, array $methods, array $component)
+    private function verifyComponent(array $keys, array $methods, array $component)
     {
         foreach ($keys as $k) {
             if (!array_key_exists($k, $component)) {
@@ -223,7 +242,9 @@ class CampaignBuilderEvent extends Event
 
         foreach ($methods as $m) {
             if (isset($component[$m]) && !is_callable($component[$m], true)) {
-                throw new InvalidArgumentException($component[$m] . ' is not callable.  Please ensure that it exists and that it is a fully qualified namespace.');
+                throw new InvalidArgumentException(
+                    $component[$m].' is not callable.  Please ensure that it exists and that it is a fully qualified namespace.'
+                );
             }
         }
     }

@@ -71,23 +71,23 @@ $isStandalone = $activeForm->isStandalone();
                                     </ul>
                                 </div>
                             </div>
-                            <?php
-                            foreach ($formFields as $field):
-                                if (!empty($field['isCustom'])):
-                                    $params   = $field['customParameters'];
-                                    $template = $params['template'];
-                                else:
-                                    $template = 'MauticFormBundle:Field:' . $field['type'] . '.html.php';
-                                endif;
-                                echo $view->render($template, array(
-                                    'field'   => $field,
-                                    'inForm'  => true,
-                                    'id'      => $field['id'],
-                                    'deleted' => in_array($field['id'], $deletedFields),
-                                    'formId'  => $formId
-                                ));
-                            endforeach;
-                            ?>
+                            <?php foreach ($formFields as $field): ?>
+                                <?php if (!in_array($field['id'], $deletedFields)) : ?>
+                                    <?php if (!empty($field['isCustom'])):
+                                        $params   = $field['customParameters'];
+                                        $template = $params['template'];
+                                    else:
+                                        $template = 'MauticFormBundle:Field:' . $field['type'] . '.html.php';
+                                    endif; ?>
+                                    <?php echo $view->render('MauticFormBundle:Builder:fieldwrapper.html.php', [
+                                        'template' => $template,
+                                        'field'    => $field,
+                                        'inForm'   => true,
+                                        'id'       => $field['id'],
+                                        'formId'   => $formId
+                                    ]); ?>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
                             <?php if (!count($formFields)): ?>
                             <div class="alert alert-info" id="form-field-placeholder">
                                 <p><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
@@ -122,19 +122,18 @@ $isStandalone = $activeForm->isStandalone();
                                     </ul>
                                 </div>
                             </div>
-                            <?php
-                            foreach ($formActions as $action):
-                                $template = (isset($action['settings']['template'])) ? $action['settings']['template'] :
-                                    'MauticFormBundle:Action:generic.html.php';
-                                echo $view->render($template, array(
-                                    'action'  => $action,
-                                    'inForm'  => true,
-                                    'id'      => $action['id'],
-                                    'deleted' => in_array($action['id'], $deletedActions),
-                                    'formId'  => $formId
-                                ));
-                            endforeach;
-                            ?>
+                            <?php foreach ($formActions as $action): ?>
+                                <?php if (!in_array($action['id'], $deletedActions)) : ?>
+                                    <?php $template = (isset($action['settings']['template'])) ? $action['settings']['template'] :
+                                        'MauticFormBundle:Action:generic.html.php';
+                                    echo $view->render($template, array(
+                                        'action'  => $action,
+                                        'inForm'  => true,
+                                        'id'      => $action['id'],
+                                        'formId'  => $formId
+                                    )); ?>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
                             <?php if (!count($formActions)): ?>
                                 <div class="alert alert-info" id="form-action-placeholder">
                                     <p><?php echo $view['translator']->trans('mautic.form.form.addaction'); ?></p>

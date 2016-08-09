@@ -240,6 +240,38 @@ class StatRepository extends CommonRepository
     }
 
     /**
+     * @param array|int $emailIds
+     *
+     * @return int
+     */
+    public function getOpenedStatIds($emailIds = null, $listId = null)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('s.id')
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
+
+        if ($emailIds) {
+            if (!is_array($emailIds)) {
+                $emailIds = array((int) $emailIds);
+            }
+            $q->where(
+                $q->expr()->in('s.email_id', $emailIds)
+            );
+        }
+
+        $q->andWhere('open_count > 0');
+
+        if ($listId) {
+            $q->andWhere('s.list_id = ' . (int) $listId);
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
      * Get a lead's email stat
      *
      * @param integer $leadId
@@ -423,6 +455,7 @@ class StatRepository extends CommonRepository
     public function deleteStat($id)
     {
         $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats', array('id' => (int) $id));
+        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats_devices', array('stat_id' => (int) $id));
     }
 
     /**
@@ -431,5 +464,19 @@ class StatRepository extends CommonRepository
     public function getTableAlias()
     {
         return 's';
+    }
+
+    /**
+     * @param $leadId
+     * @param $emailId
+     *
+     * @return array
+     */
+    public function findContactEmailStats($leadId, $emailId)
+    {
+        return $this->createQueryBuilder('s')
+            ->where("IDENTITY(s.lead) = ".(int)$leadId." AND IDENTITY(s.email) = ".(int)$emailId)
+            ->getQuery()
+            ->getResult();
     }
 }
