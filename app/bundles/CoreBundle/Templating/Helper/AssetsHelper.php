@@ -142,23 +142,24 @@ class AssetsHelper
      * @param string $script
      * @param string $location
      * @param boolean $async
+     * @param string  $name
      *
      * @return void
      */
-    public function addScript($script, $location = 'head', $async = false)
+    public function addScript($script, $location = 'head', $async = false, $name = null)
     {
         $assets     =& $this->assets;
-        $addScripts = function ($s) use ($location, &$assets, $async) {
+        $addScripts = function ($s) use ($location, &$assets, $async, $name) {
             if ($location == 'head') {
                 //special place for these so that declarations and scripts can be mingled
-                $assets['headDeclarations'][] = array('script' => array($s, $async));
+                $assets['headDeclarations'][$name] = array('script' => array($s, $async));
             } else {
                 if (!isset($assets['scripts'][$location])) {
                     $assets['scripts'][$location] = array();
                 }
 
                 if (!in_array($s, $assets['scripts'][$location])) {
-                    $assets['scripts'][$location][] = array($s, $async);
+                    $assets['scripts'][$location][$name] = array($s, $async);
                 }
             }
         };
