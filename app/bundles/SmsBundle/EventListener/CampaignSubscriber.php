@@ -10,6 +10,7 @@
 namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\CampaignEvents;
@@ -52,8 +53,8 @@ class CampaignSubscriber extends CommonSubscriber
     public function __construct(MauticFactory $factory, LeadModel $leadModel, SmsModel $smsModel, AbstractSmsApi $smsApi)
     {
         $this->leadModel = $leadModel;
-        $this->smsModel = $smsModel;
-        $this->smsApi = $smsApi;
+        $this->smsModel  = $smsModel;
+        $this->smsApi    = $smsApi;
 
         parent::__construct($factory);
     }
@@ -78,12 +79,12 @@ class CampaignSubscriber extends CommonSubscriber
             $event->addAction(
                 'sms.send_text_sms',
                 [
-                    'label' => 'mautic.campaign.sms.send_text_sms',
-                    'description' => 'mautic.campaign.sms.send_text_sms.tooltip',
-                    'eventName' => SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-                    'formType' => 'smssend_list',
-                    'formTypeOptions' => ['update_select' => 'campaignevent_properties_sms'],
-                    'formTheme' => 'MauticSmsBundle:FormTheme\SmsSendList',
+                    'label'            => 'mautic.campaign.sms.send_text_sms',
+                    'description'      => 'mautic.campaign.sms.send_text_sms.tooltip',
+                    'eventName'        => SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                    'formType'         => 'smssend_list',
+                    'formTypeOptions'  => ['update_select' => 'campaignevent_properties_sms'],
+                    'formTheme'        => 'MauticSmsBundle:FormTheme\SmsSendList',
                     'timelineTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.php',
                 ]
             );
@@ -98,6 +99,7 @@ class CampaignSubscriber extends CommonSubscriber
         $lead = $event->getLead();
 
         if ($this->leadModel->isContactable($lead, 'sms') !== DoNotContact::IS_CONTACTABLE) {
+
             return $event->setFailed('mautic.sms.campaign.failed.not_contactable');
         }
 
@@ -108,37 +110,49 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         if (empty($leadPhoneNumber)) {
+
             return $event->setFailed('mautic.sms.campaign.failed.missing_number');
         }
 
         $smsId = (int) $event->getConfig()['sms'];
-        $sms = $this->smsModel->getEntity($smsId);
+        $sms   = $this->smsModel->getEntity($smsId);
 
         if ($sms->getId() !== $smsId) {
+
             return $event->setFailed('mautic.sms.campaign.failed.missing_entity');
         }
 
         $smsEvent = new SmsSendEvent($sms->getMessage(), $lead);
         $smsEvent->setSmsId($smsId);
-
         $this->dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $smsEvent);
-        $metadata = $this->smsApi->sendSms($leadPhoneNumber, $smsEvent->getContent());
+
+        $tokenEvent = $this->dispatcher->dispatch(
+            SmsEvents::TOKEN_REPLACEMENT,
+            new TokenReplacementEvent(
+                $smsEvent->getContent(),
+                $lead,
+                ['channel' => ['sms', $sms->getId()]]
+            )
+        );
+
+        $metadata = $this->smsApi->sendSms($leadPhoneNumber, $tokenEvent->getContent());
 
         // If there was a problem sending at this point, it's an API problem and should be requeued
         if ($metadata === false) {
+
             return $event->setResult(false);
         }
 
         $this->smsModel->createStatEntry($sms, $lead);
         $this->smsModel->getRepository()->upCount($smsId);
-
+        $event->setChannel('sms', $sms->getId());
         $event->setResult(
             [
-                'type' => 'mautic.sms.sms',
-                'status' => 'mautic.sms.timeline.status.delivered',
-                'id' => $sms->getId(),
-                'name' => $sms->getName(),
-                'content' => $smsEvent->getContent(),
+                'type'    => 'mautic.sms.sms',
+                'status'  => 'mautic.sms.timeline.status.delivered',
+                'id'      => $sms->getId(),
+                'name'    => $sms->getName(),
+                'content' => $tokenEvent->getContent(),
             ]
         );
     }

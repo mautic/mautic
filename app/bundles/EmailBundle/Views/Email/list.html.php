@@ -38,7 +38,7 @@ if (count($items)):
             ));
             ?>
 
-            <th class="visible-sm visible-md visible-lg col-email-stats"><?php echo $view['translator']->trans('mautic.email.thead.stats'); ?></th>
+            <th class="visible-sm visible-md visible-lg col-email-stats"><?php echo $view['translator']->trans('mautic.core.stats'); ?></th>
 
             <?php
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(

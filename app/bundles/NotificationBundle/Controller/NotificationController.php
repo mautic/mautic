@@ -11,13 +11,15 @@ namespace Mautic\NotificationBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\NotificationBundle\Entity\StatRepository;
+use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\NotificationBundle\Entity\Notification;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class NotificationController extends FormController
 {
+    use EntityContactsTrait;
+
     /**
      * @param int $page
      *
@@ -834,88 +836,14 @@ class NotificationController extends FormController
      */
     public function contactsAction($objectId, $page = 1)
     {
-        if (!$this->get('mautic.security')->isGranted('notification:notifications:view')) {
-            return $this->accessDenied();
-        }
-
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
-
-        //set limits
-        $limit = $this->get('session')->get('mautic.notification.contact.limit', $this->factory->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
-
-        $search = $this->request->get('search', $this->get('session')->get('mautic.notification.contact.filter', ''));
-        $this->get('session')->set('mautic.notification.contact.filter', $search);
-
-        $filter = ['string' => $search, 'force' => []];
-        $orderBy = $this->get('session')->get('mautic.notification.contact.orderby', 'l.id');
-        $orderByDir = $this->get('session')->get('mautic.notification.contact.orderbydir', 'DESC');
-
-        // We need the EmailRepository to check if a lead is flagged as do not contact
-        /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
-        $emailRepo = $this->getModel('email')->getRepository();
-
-        /** @var StatRepository $statRepo */
-        $statRepo = $this->getModel('notification')->getStatRepository();
-        $contacts = $statRepo->getLeadsWithFields([
-            'notification_id' => $objectId,
-            'withTotalCount' => true,
-            'start' => $start,
-            'limit' => $limit,
-            'filter' => $filter,
-            'orderBy' => $orderBy,
-            'orderByDir' => $orderByDir,
-        ]);
-
-        $count = $contacts['count'];
-        if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
-            if ($count === 1) {
-                $lastPage = 1;
-            } else {
-                $lastPage = (ceil($count / $limit)) ?: 1;
-            }
-            $this->get('session')->set('mautic.notification.contact.page', $lastPage);
-            $returnUrl = $this->generateUrl('mautic_notification_contacts', ['objectId' => $objectId, 'page' => $lastPage]);
-
-            return $this->postActionRedirect([
-                'returnUrl' => $returnUrl,
-                'viewParameters' => ['page' => $lastPage, 'objectId' => $objectId],
-                'contentTemplate' => 'MauticNotificationBundle:Notification:contacts.html.php',
-                'passthroughVars' => [
-                    'mauticContent' => 'notificationContacts',
-                ],
-            ]);
-        }
-
-        $triggerModel = $this->getModel('point.trigger');
-        foreach ($contacts['results'] as &$l) {
-            $l['color'] = $triggerModel->getColorForLeadPoints($l['points']);
-        }
-
-        return $this->delegateView([
-            'viewParameters' => [
-                'page' => $page,
-                'items' => $contacts['results'],
-                'totalItems' => $contacts['count'],
-                'tmpl' => 'notificationcontacts',
-                'indexMode' => 'grid',
-                'link' => 'mautic_notification_contacts',
-                'sessionVar' => 'notification.contact',
-                'limit' => $limit,
-                'objectId' => $objectId,
-                'noContactList' => $emailRepo->getDoNotEmailList(),
-            ],
-            'contentTemplate' => 'MauticNotificationBundle:Notification:contacts.html.php',
-            'passthroughVars' => [
-                'mauticContent' => 'notificationContacts',
-                'route' => false,
-            ],
-        ]);
+        return $this->generateContactsGrid(
+            $objectId,
+            $page,
+            'notification:notifications:view',
+            'notification',
+            'push_notification_stats',
+            'notification',
+            'notification_id'
+        );
     }
 }

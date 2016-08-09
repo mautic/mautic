@@ -93,9 +93,10 @@ $formId = $form->getId();
                     <?php endif; ?>
                 </td>
                 <td><?php echo $item['ipAddress']['ipAddress']; ?></td>
-                <?php foreach($item['results'] as $r):?>
-                    <td>
-                        <?php if ($r['type'] == 'textarea') : ?>
+                <?php foreach($item['results'] as $r): ?>
+                    <?php $isTextarea = $r['type'] === 'textarea'; ?>
+                    <td <?php echo $isTextarea ? 'class="long-text"' : ''; ?>>
+                        <?php if ($isTextarea) : ?>
                             <?php echo nl2br(html_entity_decode($r['value'])); ?>
                         <?php else : ?>
                             <?php echo $r['value']; ?>

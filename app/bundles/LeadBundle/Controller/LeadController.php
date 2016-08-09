@@ -14,6 +14,8 @@ use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\StatDevice;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -182,7 +184,8 @@ class LeadController extends FormController
                     'inSingleList'     => $inSingleList,
                     'noContactList'    => $emailRepo->getDoNotEmailList(),
                     'maxLeadId'        => $maxLeadId,
-                    'anonymousShowing' => $anonymousShowing
+                    'anonymousShowing' => $anonymousShowing,
+                    'showCheckbox'     => true,
                 ],
                 'contentTemplate' => "MauticLeadBundle:Lead:{$indexMode}.html.php",
                 'passthroughVars' => [
@@ -2020,8 +2023,6 @@ class LeadController extends FormController
             $model = $this->getModel('lead');
             $data  = $this->request->request->get('lead_batch_stage', [], true);
             $ids   = json_decode($data['ids'], true);
-
-            $this->get('monolog.logger.mautic')->addError(print_r($ids, true));
 
             $entities = [];
             if (is_array($ids)) {

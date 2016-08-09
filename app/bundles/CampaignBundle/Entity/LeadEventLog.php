@@ -71,6 +71,16 @@ class LeadEventLog
     private $nonActionPathTaken = false;
 
     /**
+     * @var string
+     */
+    private $channel;
+
+    /**
+     * @var
+     */
+    private $channelId;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -118,6 +128,10 @@ class LeadEventLog
         $builder->createField('metadata', 'array')
             ->nullable()
             ->build();
+
+
+        $builder->addNullableField('channel', 'string');
+        $builder->addNamedField('channelId', 'integer', 'channel_id', true);
 
         $builder->addNullableField('nonActionPathTaken', 'boolean', 'non_action_path_taken');
     }
@@ -285,5 +299,45 @@ class LeadEventLog
         }
 
         $this->metadata = $metadata;
+    }
+
+    /**
+     * @return string
+     */
+    public function getChannel()
+    {
+        return $this->channel;
+    }
+
+    /**
+     * @param string $channel
+     *
+     * @return LeadEventLog
+     */
+    public function setChannel($channel)
+    {
+        $this->channel = $channel;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getChannelId()
+    {
+        return $this->channelId;
+    }
+
+    /**
+     * @param mixed $channelId
+     *
+     * @return LeadEventLog
+     */
+    public function setChannelId($channelId)
+    {
+        $this->channelId = $channelId;
+
+        return $this;
     }
 }

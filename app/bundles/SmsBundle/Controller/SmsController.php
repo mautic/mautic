@@ -11,6 +11,7 @@ namespace Mautic\SmsBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\SmsBundle\Entity\StatRepository;
 use Mautic\SmsBundle\Entity\Sms;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,6 +19,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SmsController extends FormController
 {
+    use EntityContactsTrait;
+
     /**
      * @param int $page
      *
@@ -819,88 +822,15 @@ class SmsController extends FormController
      */
     public function contactsAction($objectId, $page = 1)
     {
-        if (!$this->get('mautic.security')->isGranted('sms:smses:view')) {
-            return $this->accessDenied();
-        }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
-
-        //set limits
-        $limit = $this->get('session')->get('mautic.sms.contact.limit', $this->factory->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
-
-        $search = $this->request->get('search', $this->get('session')->get('mautic.sms.contact.filter', ''));
-        $this->get('session')->set('mautic.sms.contact.filter', $search);
-
-        $filter = ['string' => $search, 'force' => []];
-        $orderBy = $this->get('session')->get('mautic.sms.contact.orderby', 'l.id');
-        $orderByDir = $this->get('session')->get('mautic.sms.contact.orderbydir', 'DESC');
-
-        // We need the EmailRepository to check if a lead is flagged as do not contact
-        /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
-        $emailRepo = $this->getModel('email')->getRepository();
-
-        /** @var StatRepository $smsStatRepo */
-        $smsStatRepo = $this->getModel('sms')->getStatRepository();
-        $contacts = $smsStatRepo->getLeadsWithFields([
-            'sms_id' => $objectId,
-            'withTotalCount' => true,
-            'start' => $start,
-            'limit' => $limit,
-            'filter' => $filter,
-            'orderBy' => $orderBy,
-            'orderByDir' => $orderByDir,
-        ]);
-
-        $count = $contacts['count'];
-        if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
-            if ($count === 1) {
-                $lastPage = 1;
-            } else {
-                $lastPage = (ceil($count / $limit)) ?: 1;
-            }
-            $this->get('session')->set('mautic.sms.contact.page', $lastPage);
-            $returnUrl = $this->generateUrl('mautic_sms_contacts', ['objectId' => $objectId, 'page' => $lastPage]);
-
-            return $this->postActionRedirect([
-                'returnUrl' => $returnUrl,
-                'viewParameters' => ['page' => $lastPage, 'objectId' => $objectId],
-                'contentTemplate' => 'MauticSmsBundle:Sms:contacts.html.php',
-                'passthroughVars' => [
-                    'mauticContent' => 'smsContacts',
-                ],
-            ]);
-        }
-
-        $triggerModel = $this->getModel('point.trigger');
-        foreach ($contacts['results'] as &$l) {
-            $l['color'] = $triggerModel->getColorForLeadPoints($l['points']);
-        }
-
-        return $this->delegateView([
-            'viewParameters' => [
-                'page' => $page,
-                'items' => $contacts['results'],
-                'totalItems' => $contacts['count'],
-                'tmpl' => 'smscontacts',
-                'indexMode' => 'grid',
-                'link' => 'mautic_sms_contacts',
-                'sessionVar' => 'sms.contact',
-                'limit' => $limit,
-                'objectId' => $objectId,
-                'noContactList' => $emailRepo->getDoNotEmailList(),
-            ],
-            'contentTemplate' => 'MauticSmsBundle:Sms:contacts.html.php',
-            'passthroughVars' => [
-                'mauticContent' => 'smsContacts',
-                'route' => false,
-            ],
-        ]);
+        return $this->generateContactsGrid(
+            $objectId,
+            $page,
+            'sms:smses:view',
+            'sms',
+            'sms_message_stats',
+            'sms',
+            'sms_id'
+        );
     }
 }

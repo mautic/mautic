@@ -46,7 +46,7 @@ class EventHelper
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel  = $factory->getModel('lead');
         $lead       = $leadModel->getCurrentLead();
-        $factory->getLogger()->addError(print_r($config,true));
+
         $queryReferer = array();
 
         parse_str($factory->getRequest()->server->get('QUERY_STRING'), $query);

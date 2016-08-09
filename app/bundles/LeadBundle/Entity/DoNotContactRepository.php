@@ -97,4 +97,38 @@ class DoNotContactRepository extends CommonRepository
 
         return $this->getTimelineResults($query, $options, 'dnc.channel', 'dnc.date_added', [], ['date_added']);
     }
+
+    /**
+     * @param      $channel
+     * @param null $contacts Array of contacts to filter by
+     *
+     * @return array
+     */
+    public function getChannelList($channel, $contacts = null)
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', 'dnc')
+            ->leftJoin('dnc', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = dnc.lead_id')
+            ->where('dnc.channel = :channel')
+            ->setParameter('channel', $channel);
+
+        if ($contacts) {
+            $q->andWhere(
+                $q->expr()->in('l.id', $contacts)
+            );
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        $dnc = array();
+
+        foreach ($results as $r) {
+            $dnc[] = $r['id'];
+        }
+
+        unset($results);
+
+        return $dnc;
+    }
 }

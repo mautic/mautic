@@ -26,16 +26,6 @@ final class NotificationEvents
     const TOKEN_REPLACEMENT = 'mautic.notification_token_replacement';
 
     /**
-     * The mautic.notification_on_click event is thrown when an email is opened.
-     *
-     * The event listener receives a
-     * Mautic\NotificationBundle\Event\NotificationClickEvent instance.
-     *
-     * @var string
-     */
-    const NOTIFICATION_ON_CLICK = 'mautic.notification_on_click';
-
-    /**
      * The mautic.notification_on_send event is thrown when a notification is sent.
      *
      * The event listener receives a

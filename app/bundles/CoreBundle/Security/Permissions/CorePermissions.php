@@ -88,10 +88,6 @@ class CorePermissions
         static $classes = array();
         if (empty($classes)) {
             foreach ($this->getBundles() as $bundle) {
-                if ($bundle['base'] == "Core") {
-                    continue;
-                } //do not include this file
-
                 $object = $this->getPermissionObject($bundle['base'], false);
                 if (!empty($object)) {
                     $classes[strtolower($bundle['base'])] = $object;
@@ -133,7 +129,10 @@ class CorePermissions
                     $bundleName = 'Mautic' . $bundleName;
                 }
 
-                if (array_key_exists($bundleName, $checkBundles)) {
+                if ($bundle == 'Core') {
+                    $className = $checkBundles[$bundleName]['namespace'] . "\\Security\\Permissions\\SystemPermissions";
+                    $exists    = class_exists($className);
+                } elseif (array_key_exists($bundleName, $checkBundles)) {
                     $className = $checkBundles[$bundleName]['namespace'] . "\\Security\\Permissions\\{$bundle}Permissions";
                     $exists    = class_exists($className);
                 } else {

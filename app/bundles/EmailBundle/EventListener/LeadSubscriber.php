@@ -87,8 +87,10 @@ class LeadSubscriber extends CommonSubscriber
             foreach ($stats['results'] as $stat) {
                 if (!empty($stat['storedSubject'])) {
                     $label = $this->translator->trans('mautic.email.timeline.event.custom_email').': '.$stat['storedSubject'];
-                } else {
+                } elseif (!empty($stat['email_name'])) {
                     $label = $stat['email_name'];
+                } else {
+                    $label = $this->translator->trans('mautic.email.timeline.event.custom_email');
                 }
 
                 if (!empty($stat['idHash'])) {
@@ -106,7 +108,7 @@ class LeadSubscriber extends CommonSubscriber
                         'event'           => $eventTypeKey,
                         'eventLabel'      => $eventName,
                         'eventType'       => $eventTypeName,
-                        'timestamp'       => $stat['dateRead'],
+                        'timestamp'       => $stat['date'.ucfirst($state)],
                         'extra'           => [
                             'stat' => $stat,
                             'type' => $state

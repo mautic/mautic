@@ -32,12 +32,11 @@ $count   = 0;
 $firstId = 'mauticform_' . $containerType . '_' . $type . '_'.$field['alias'].'_'.\Mautic\CoreBundle\Helper\InputHelper::alphanum($list[0]);
 
 $formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
-    array(
-        'deleted'  => (!empty($deleted)) ? $deleted : false,
+    [
         'id'       => $id,
         'formId'   => $formId,
         'formName' => $formName
-    )) : '';
+    ]) : '';
 
 $label = (!$field['showLabel']) ? '' : <<<HTML
 
@@ -49,7 +48,7 @@ $help = (empty($field['helpMessage'])) ? '' : <<<HTML
                 <span class="mauticform-helpmessage">{$field['helpMessage']}</span>
 HTML;
 
-$options = array();
+$options = [];
 foreach ($list as $l):
 
 $id               = $field['alias'].'_'.\Mautic\CoreBundle\Helper\InputHelper::alphanum($l);
