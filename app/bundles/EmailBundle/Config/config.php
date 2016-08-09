@@ -290,7 +290,7 @@ return [
         'monitored_email'              => [],
         'mailer_is_owner'              => false,
         'default_signature_text'       => null,
-        'email_frequency_number'             => null,
-        'email_frequency_time'               => null
+        'email_frequency_number'       => 1,
+        'email_frequency_time'         => 'DAY'
     ]
 ];
