@@ -43,7 +43,7 @@ class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMiddleware
         $this->allowedIps = ['127.0.0.1', 'fe80::1', '::1'];
 
         $parameters = $this->getConfig();
-        if (array_key_exists('dev_hosts', $parameters)) {
+        if (array_key_exists('dev_hosts', $parameters) && is_array($parameters['dev_hosts'])) {
             $this->allowedIps = array_merge($this->allowedIps, $parameters['dev_hosts']);
         }
 
