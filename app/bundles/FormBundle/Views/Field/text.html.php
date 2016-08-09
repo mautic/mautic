@@ -12,11 +12,10 @@ $defaultInputClass = (isset($inputClass)) ? $inputClass : 'input';
 include __DIR__.'/field_helper.php';
 
 $formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
-    array(
-        'deleted' => (!empty($deleted)) ? $deleted : false,
+    [
         'id'      => $id,
         'formId'  => $formId
-    )) : '';
+    ]) : '';
 
 
 $label = (!$field['showLabel']) ? '' : <<<HTML

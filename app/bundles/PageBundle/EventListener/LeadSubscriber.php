@@ -109,6 +109,7 @@ class LeadSubscriber extends CommonSubscriber
                         'isExternal' => true
                     ];
                 }
+
                 $event->addEvent(
                     [
                         'event'           => $eventTypeKey,

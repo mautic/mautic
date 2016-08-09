@@ -188,6 +188,7 @@ $view['slots']->set(
                 'MauticEmailBundle:Email:'.$emailType.'_graph.html.php',
                 array(
                     'stats'        => $stats,
+                    'statsDevices' => $statsDevices,
                     'email'        => $email,
                     'showVariants' => $showVariants,
                     'isVariant'    => $isVariant,

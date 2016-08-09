@@ -9,13 +9,12 @@
 
 echo $view->render(
     'MauticFormBundle:Field:group.html.php',
-    array(
+    [
         'field'   => $field,
         'inForm'  => (isset($inForm)) ? $inForm : false,
         'id'      => $id,
-        'deleted' => (!empty($deleted)) ? true : false,
         'formId'  => (isset($formId)) ? $formId : 0,
         'type'    => 'checkbox',
         'formName'  => (isset($formName)) ? $formName : ''
-    )
+    ]
 );

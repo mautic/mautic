@@ -20,14 +20,16 @@ $fields   = $form->getFields();
         <div class="mauticform-innerform">
 <?php
 foreach ($fields as $f):
-    if ($f->isCustom()):
-        $params = $f->getCustomParameters();
-        $template = $params['template'];
-    else:
-        $template = 'MauticFormBundle:Field:' . $f->getType() . '.html.php';
-    endif;
+    if ($f->showForContact($submissions, $lead, $form)):
+        if ($f->isCustom()):
+            $params = $f->getCustomParameters();
+            $template = $params['template'];
+        else:
+            $template = 'MauticFormBundle:Field:' . $f->getType() . '.html.php';
+        endif;
 
-    echo $view->render($theme.$template, array('field' => $f->convertToArray(), 'id' => $f->getAlias(), 'formName' => $formName));
+        echo $view->render($theme.$template, array('field' => $f->convertToArray(), 'id' => $f->getAlias(), 'formName' => $formName));
+    endif;
 endforeach;
 ?>
 

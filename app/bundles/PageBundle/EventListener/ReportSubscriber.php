@@ -180,6 +180,10 @@ class ReportSubscriber extends CommonSubscriber
                         'label' => 'mautic.report.field.source_id',
                         'type'  => 'int'
                     ],
+                    $hitPrefix.'device'         => [
+                        'label' => 'mautic.page.report.hits.device',
+                        'type'  => 'string'
+                    ],
                     $redirectHit.'url'             => [
                         'label' => 'mautic.page.report.hits.redirect_url',
                         'type'  => 'url'
@@ -213,6 +217,7 @@ class ReportSubscriber extends CommonSubscriber
                 $event->addGraph($context, 'line', 'mautic.page.graph.line.time.on.site');
                 $event->addGraph($context, 'pie', 'mautic.page.graph.pie.time.on.site', ['translate' => false]);
                 $event->addGraph($context, 'pie', 'mautic.page.graph.pie.new.vs.returning');
+                $event->addGraph($context, 'pie', 'mautic.page.graph.pie.devices');
                 $event->addGraph($context, 'pie', 'mautic.page.graph.pie.languages', ['translate' => false]);
                 $event->addGraph($context, 'table', 'mautic.page.table.referrers');
                 $event->addGraph($context, 'table', 'mautic.page.table.most.visited');
@@ -373,7 +378,27 @@ class ReportSubscriber extends CommonSubscriber
                         ]
                     );
                     break;
+                case 'mautic.page.graph.pie.devices':
+                    $queryBuilder->select('ds.device, COUNT(distinct(ph.id)) as the_count')
+                        ->join('ph',MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id = ph.device_id')
+                        ->groupBy('ds.device');
+                    $data  = $queryBuilder->execute()->fetchAll();
+                    $chart = new PieChart();
 
+                    foreach ($data as $device) {
+                        $label = substr(empty($device['device'])?  $this->translator->trans('mautic.core.no.info'): $device['device'],0,12);
+                        $chart->setDataset($label, $device['the_count']);
+                    }
+
+                    $event->setGraph(
+                        $g,
+                        [
+                            'data'      => $chart->render(),
+                            'name'      => $g,
+                            'iconClass' => 'fa-globe'
+                        ]
+                    );
+                    break;
                 case 'mautic.page.table.referrers':
                     $limit                  = 10;
                     $offset                 = 0;
