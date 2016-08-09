@@ -37,7 +37,7 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * CampaignSubscriber constructor.
-     * 
+     *
      * @param MauticFactory $factory
      * @param FormModel $formModel
      * @param SubmissionModel $formSubmissionModel
@@ -46,7 +46,7 @@ class CampaignSubscriber extends CommonSubscriber
     {
         $this->formModel = $formModel;
         $this->formSubmissionModel = $formSubmissionModel;
-        
+
         parent::__construct($factory);
     }
 
@@ -98,7 +98,7 @@ class CampaignSubscriber extends CommonSubscriber
     public function onFormSubmit(SubmissionEvent $event)
     {
         $form = $event->getSubmission()->getForm();
-        $this->factory->getModel('campaign.event')->triggerEvent('form.submit', $form, 'form.submit' . $form->getId());
+        $this->factory->getModel('campaign.event')->triggerEvent('form.submit', $form, 'form', $form->getId());
     }
 
     /**
@@ -107,7 +107,7 @@ class CampaignSubscriber extends CommonSubscriber
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
     {
         $eventDetails = $event->getEventDetails();
-        
+
         if ($eventDetails === null) {
             return $event->setResult(true);
         }
@@ -128,7 +128,7 @@ class CampaignSubscriber extends CommonSubscriber
     public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
     {
         $lead = $event->getLead();
-        
+
         if (!$lead || !$lead->getId()) {
             return $event->setResult(false);
         }
@@ -148,7 +148,9 @@ class CampaignSubscriber extends CommonSubscriber
             $event->getConfig()['value'],
             $operators[$event->getConfig()['operator']]['expr']
         );
-        
+
+        $event->setChannel('form', $form->getId());
+
         return $event->setResult($result);
     }
 }

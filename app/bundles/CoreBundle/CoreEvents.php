@@ -94,4 +94,13 @@ final class CoreEvents
      * @var string
      */
     const BUILD_MAUTIC_JS = 'mautic.build_embeddable_js';
+
+    /**
+     * The mautic.maintenance_cleanup_data event is dispatched to purge old data
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\MaintenanceEvent instance.
+     *
+     * @var string
+     */
+    const MAINTENANCE_CLEANUP_DATA = 'mautic.maintenance_cleanup_data';
 }

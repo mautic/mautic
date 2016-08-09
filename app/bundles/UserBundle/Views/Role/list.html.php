@@ -68,7 +68,7 @@ endif;
                 </td>
                 <td>
                     <?php if ($permissions['edit']) : ?>
-                    <a href="<?php echo $view['router']->path('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajax">
+                    <a href="<?php echo $view['router']->path('mautic_role_action', array('objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajax">
                         <?php echo $item->getName(); ?>
                     </a>
                     <?php else : ?>

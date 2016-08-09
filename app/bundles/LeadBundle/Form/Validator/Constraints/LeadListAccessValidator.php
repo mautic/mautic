@@ -36,21 +36,18 @@ class LeadListAccessValidator extends ConstraintValidator
         $listModel = $this->factory->getModel('lead.list');
         $lists     = $listModel->getUserLists();
 
-        if (!count($value)) {
-            $this->context->addViolation(
-                $constraint->message,
-                array('%string%' => '')
-            );
-        }
-
-        foreach ($value as $l) {
-            if (!isset($lists[$l->getId()])) {
-                $this->context->addViolation(
-                    $constraint->message,
-                    array('%string%' => $l->getName())
-                );
-                break;
+        if (count($value)) {
+            foreach ($value as $l) {
+                if (!isset($lists[$l->getId()])) {
+                    $this->context->addViolation(
+                        $constraint->message,
+                        array('%string%' => $l->getName())
+                    );
+                    break;
+                }
             }
+        } else {
+            $this->context->addViolation($constraint->message);
         }
     }
 }

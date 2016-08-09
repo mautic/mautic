@@ -612,7 +612,7 @@ class ReportSubscriber extends CommonSubscriber
             'display_name' => 'mautic.lead.report.points.table',
             'columns'      => array_merge($columns, $pointColumns, $event->getIpColumn())
         ];
-        $event->addTable('lead.pointlog', $data, 'leads');
+        $event->addTable('lead.pointlog', $data, 'contacts');
 
         // Register graphs
         $context = 'lead.pointlog';

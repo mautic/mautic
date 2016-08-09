@@ -91,6 +91,10 @@ class EmailSendEvent extends CommonEvent
             $this->subject = $args['subject'];
         }
 
+        if (!$this->subject && isset($args['email']) && $args['email'] instanceof Email) {
+            $this->subject = $args['email']->getSubject();
+        }
+
         if (isset($args['idHash'])) {
             $this->idHash = $args['idHash'];
         }

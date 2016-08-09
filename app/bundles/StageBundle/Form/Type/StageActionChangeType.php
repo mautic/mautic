@@ -45,9 +45,10 @@ class StageActionChangeType extends AbstractType
                 'tooltip' => 'mautic.stage.choose.stage_descr',
             ),
             'multiple'    => false,
+            'required'    => true,
             'constraints' => array(
                 new NotBlank(
-                    array('message' => 'mautic.email.choosestage.notblank')
+                    array('message' => 'mautic.core.value.required')
                 )
             )
         ));
