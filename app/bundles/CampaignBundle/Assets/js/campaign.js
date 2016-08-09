@@ -1184,14 +1184,21 @@ Mautic.campaignBuilderRegisterAnchors = function(names, el) {
 
             // Disable the list items not allowed
             mQuery('.campaign-event-selector:not(#SourceList) option').prop('disabled', false);
-            var selectId = (epDetails.eventType == 'decision') ? '#ActionList': '#DecisionList';
-            mQuery(selectId+' option').each(function() {
-                var optionVal = mQuery(this).val();
-                if (!Mautic.campaignBuilderValidateConnection(epDetails, optionVal)){
-                    mQuery(this).prop('disabled', true);
-                }
+            if ('source' == epDetails.eventType) {
+                var checkSelects = ['#ActionList', '#DecisionList'];
+            } else {
+                var checkSelects = [(epDetails.eventType == 'decision') ? '#ActionList': '#DecisionList'];
+            }
+
+            mQuery.each(checkSelects, function(key, selectId) {
+                mQuery(selectId + ' option').each(function () {
+                    var optionVal = mQuery(this).val();
+                    if (!Mautic.campaignBuilderValidateConnection(epDetails, optionVal)) {
+                        mQuery(this).prop('disabled', true);
+                    }
+                });
+                mQuery(selectId).trigger('chosen:updated');
             });
-            mQuery(selectId).trigger('chosen:updated');
         });
     });
 };
@@ -1336,13 +1343,25 @@ Mautic.campaignBuilderPrepareNewSource = function () {
  */
 Mautic.campaignBuilderValidateConnection = function (epDetails, checkEvent) {
     var valid = true;
+
+    if ('source' == epDetails.eventType) {
+        // If this is a source, do not show action/decisions that have type restrictions
+        if (typeof Mautic.campaignBuilderConnectionRestrictions['action'] !== 'undefined' && typeof Mautic.campaignBuilderConnectionRestrictions['action'][checkEvent] !== 'undefined') {
+
+            return false;
+        }
+
+        if (typeof Mautic.campaignBuilderConnectionRestrictions['decision'] !== 'undefined' && typeof Mautic.campaignBuilderConnectionRestrictions['decision'][checkEvent] !== 'undefined') {
+
+            return false;
+        }
+    }
+
     if (typeof Mautic.campaignBuilderConnectionRestrictions[epDetails.eventType] !== 'undefined') {
-        if (typeof Mautic.campaignBuilderConnectionRestrictions[epDetails.eventType]) {
-            if (typeof Mautic.campaignBuilderConnectionRestrictions[epDetails.eventType][checkEvent] !== 'undefined') {
-                if (mQuery.inArray(epDetails.event, Mautic.campaignBuilderConnectionRestrictions[epDetails.eventType][checkEvent]) === -1) {
-                    // Disable this one
-                    valid = false;
-                }
+        if (typeof Mautic.campaignBuilderConnectionRestrictions[epDetails.eventType][checkEvent] !== 'undefined') {
+            if (mQuery.inArray(epDetails.event, Mautic.campaignBuilderConnectionRestrictions[epDetails.eventType][checkEvent]) === -1) {
+                // Disable this one
+                valid = false;
             }
         }
     }
