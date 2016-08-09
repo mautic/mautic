@@ -69,7 +69,7 @@ class StatDevice
 
         $builder->createManyToOne('stat', 'Stat')
             ->addJoinColumn('stat_id', 'id', true, false, 'CASCADE')
-            ->build();
+            ->build();;
 
         $builder->addIpAddress(true);
 

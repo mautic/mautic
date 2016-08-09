@@ -88,7 +88,13 @@ class LeadDevice
         $builder->setTable('lead_devices')
             ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadDeviceRepository')
             ->addIndex(['date_added'], 'date_added_search')
-            ->addIndex(['device'], 'device_search');;
+            ->addIndex(['device'], 'device_search')
+            ->addIndex(['device_os_name'], 'device_os_name_search')
+            ->addIndex(['device_os_shortname'], 'device_os_shortname_search')
+            ->addIndex(['device_os_version'], 'device_os_version_search')
+            ->addIndex(['device_os_platform'], 'device_os_platform_search')
+            ->addIndex(['device_brand'], 'device_brand_search')
+            ->addIndex(['device_model'], 'device_model_search');
 
         $builder->addId();
 
