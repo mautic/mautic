@@ -16,13 +16,14 @@ use SparkPost\APIResponseException;
 use SparkPost\SparkPost;
 use GuzzleHttp\Client;
 use Ivory\HttpAdapter\Guzzle6HttpAdapter;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class SparkpostTransport
  * The referrence class for this was provided by
  *
  */
-class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_Transport, InterfaceTokenTransport
+class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_Transport, InterfaceTokenTransport, InterfaceCallbackTransport
 {
     /**
      * @var string|null
@@ -218,5 +219,28 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
     {
         return (count($message->getTo()) + count($message->getCc()) + count($message->getBcc()) + $toBeAdded);
+    }
+
+    /**
+     * Returns a "transport" string to match the URL path /mailer/{transport}/callback
+     *
+     * @return mixed
+     */
+    public function getCallbackPath()
+    {
+        return 'sparkpost';
+    }
+
+    /**
+     * Handle response
+     *
+     * @param Request $request
+     * @param MauticFactory $factory
+     *
+     * @return array array('bounces' => array('hashID' => 'reason', ...));
+     */
+    public function handleCallbackResponse(Request $request, MauticFactory $factory)
+    {
+        $factory->getLogger()->addError(print_r($request->request, true));
     }
 }
