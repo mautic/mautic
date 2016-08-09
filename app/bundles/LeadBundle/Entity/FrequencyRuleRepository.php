@@ -68,7 +68,7 @@ class FrequencyRuleRepository extends CommonRepository
             $q->having('(count(es.email_address) < fr.frequency_number and fr.frequency_number is not null) or (count(es.email_address< :defaultNumber))')
                 ->setParameter('defaultNumber', $defaultFrequencyNumber);
         } else {
-            $q->having('(count(es.email_address) < fr.frequency_number and fr.frequency_number is not null)');
+            $q->having('(count(es.email_address) < fr.frequency_number)');
         }
 
         $results = $q->execute()->fetchAll();
