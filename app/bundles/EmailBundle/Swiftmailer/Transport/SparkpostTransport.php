@@ -168,7 +168,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
                     $recipient['substitution_data'][$mergeVars[$token]] = $value;
                 }
                 unset($metadata[$to['email']]['tokens']);
-                $recipient['substitution_data']['metadata'] = $metadata[$to['email']];
+                $recipient['metadata'] = $metadata[$to['email']];
             }
 
             $recipients[] = $recipient;
@@ -273,7 +273,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
                 continue;
             }
 
-            if ('to' !== $event['rcpt_type']) {
+            if (isset($event['rcpt_type']) && 'to' !== $event['rcpt_type']) {
                 // Ignore cc/bcc
 
                 continue;
