@@ -75,12 +75,12 @@ class CampaignSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param CampaignBuilderEvent $sendEvent
+     * @param CampaignBuilderEvent $event
      */
-    public function onCampaignBuild(CampaignBuilderEvent $sendEvent)
+    public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         if ($this->factory->getParameter('notification_enabled')) {
-            $sendEvent->addAction(
+            $event->addAction(
                 'notification.send_notification',
                 [
                     'label'            => 'mautic.notification.campaign.send_notification',
@@ -96,14 +96,15 @@ class CampaignSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param CampaignExecutionEvent $sendEvent
+     * @param CampaignExecutionEvent $event
      */
-    public function onCampaignTriggerAction(CampaignExecutionEvent $sendEvent)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
-        $lead = $sendEvent->getLead();
+        $lead = $event->getLead();
 
         if ($this->leadModel->isContactable($lead, 'notification') !== DoNotContact::IS_CONTACTABLE) {
-            return $sendEvent->setFailed('mautic.notification.campaign.failed.not_contactable');
+
+            return $event->setFailed('mautic.notification.campaign.failed.not_contactable');
         }
 
         // If lead has subscribed on multiple devices, get all of them.
@@ -117,25 +118,29 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         if (empty($playerID)) {
-            return $sendEvent->setFailed('mautic.notification.campaign.failed.not_subscribed');
+
+            return $event->setFailed('mautic.notification.campaign.failed.not_subscribed');
         }
 
-        $notificationId = (int) $sendEvent->getConfig()['notification'];
+        $notificationId = (int) $event->getConfig()['notification'];
 
         /** @var \Mautic\NotificationBundle\Entity\Notification $notification */
         $notification = $this->notificationModel->getEntity($notificationId);
 
         if ($notification->getId() !== $notificationId) {
-            return $sendEvent->setFailed('mautic.notification.campaign.failed.missing_entity');
+
+            return $event->setFailed('mautic.notification.campaign.failed.missing_entity');
         }
 
-        $url = $this->notificationApi->convertToTrackedUrl(
-            $notification->getUrl(),
-            [
-                'notification' => $notification->getId(),
-                'lead'         => $lead->getId()
-            ]
-        );
+        if ($url = $notification->getUrl()) {
+            $url = $this->notificationApi->convertToTrackedUrl(
+                $url,
+                [
+                    'notification' => $notification->getId(),
+                    'lead'         => $lead->getId()
+                ]
+            );
+        }
 
         $tokenEvent = $this->dispatcher->dispatch(
             NotificationEvents::TOKEN_REPLACEMENT,
@@ -158,12 +163,12 @@ class CampaignSubscriber extends CommonSubscriber
             $url
         );
 
-        $sendEvent->setChannel('notification', $notification->getId());
+        $event->setChannel('notification', $notification->getId());
 
         // If for some reason the call failed, tell mautic to try again by return false
         if ($response->code !== 200) {
 
-            return $sendEvent->setResult(false);
+            return $event->setResult(false);
         }
 
         $this->notificationModel->createStatEntry($notification, $lead);
@@ -174,10 +179,10 @@ class CampaignSubscriber extends CommonSubscriber
             'type'    => 'mautic.notification.notification',
             'id'      => $notification->getId(),
             'name'    => $notification->getName(),
-            'heading' => $sendEvent->getHeading(),
-            'content' => $sendEvent->getMessage(),
+            'heading' => $event->getHeading(),
+            'content' => $event->getMessage(),
         ];
 
-        $sendEvent->setResult($result);
+        $event->setResult($result);
     }
 }

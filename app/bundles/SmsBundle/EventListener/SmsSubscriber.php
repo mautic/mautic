@@ -19,7 +19,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\SmsBundle\Event\SmsEvent;
-use Mautic\SmsBundle\Event\SmsSendEvent;
 use Mautic\SmsBundle\SmsEvents;
 
 /**
@@ -27,11 +26,6 @@ use Mautic\SmsBundle\SmsEvents;
  */
 class SmsSubscriber extends CommonSubscriber
 {
-    /**
-     * @var string
-     */
-    protected $urlRegEx = '/https?\:\/\/([a-zA-Z0-9\-\.]+\.[a-zA-Z]+(\.[a-zA-Z])?)(\/\S*)?/i';
-
     /**
      * @var TrackableModel
      */
@@ -55,10 +49,14 @@ class SmsSubscriber extends CommonSubscriber
      * @param PageTokenHelper  $pageTokenHelper
      * @param AssetTokenHelper $assetTokenHelper
      */
-    public function __construct(MauticFactory $factory, TrackableModel $trackableModel, PageTokenHelper $pageTokenHelper, AssetTokenHelper $assetTokenHelper)
-    {
-        $this->trackableModel = $trackableModel;
-        $this->pageTokenHelper = $pageTokenHelper;
+    public function __construct(
+        MauticFactory $factory,
+        TrackableModel $trackableModel,
+        PageTokenHelper $pageTokenHelper,
+        AssetTokenHelper $assetTokenHelper
+    ) {
+        $this->trackableModel   = $trackableModel;
+        $this->pageTokenHelper  = $pageTokenHelper;
         $this->assetTokenHelper = $assetTokenHelper;
 
         parent::__construct($factory);
@@ -70,52 +68,10 @@ class SmsSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            SmsEvents::SMS_ON_SEND => ['onSmsSend', 0],
-            SmsEvents::SMS_POST_SAVE => ['onPostSave', 0],
-            SmsEvents::SMS_POST_DELETE => ['onDelete', 0],
+            SmsEvents::SMS_POST_SAVE     => ['onPostSave', 0],
+            SmsEvents::SMS_POST_DELETE   => ['onDelete', 0],
             SmsEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
         ];
-    }
-
-    /**
-     * @param SmsSendEvent $event
-     */
-    public function onSmsSend(SmsSendEvent $event)
-    {
-        $content = $event->getContent();
-        $tokens = [];
-        /** @var \Mautic\SmsBundle\Api\AbstractSmsApi $smsApi */
-        $smsApi = $this->factory->getKernel()->getContainer()->get('mautic.sms.api');
-
-        if ($this->contentHasLinks($content)) {
-            preg_match_all($this->urlRegEx, $content, $matches);
-
-            foreach ($matches[0] as $url) {
-                $tokens[$url] = $smsApi->convertToTrackedUrl(
-                    $url,
-                    [
-                        'sms' => $event->getSmsId(),
-                        'lead' => $event->getLead()->getId(),
-                    ]
-                );
-            }
-        }
-
-        $content = str_ireplace(array_keys($tokens), array_values($tokens), $content);
-
-        $event->setContent($content);
-    }
-
-    /**
-     * Check string for links.
-     *
-     * @param string $content
-     *
-     * @return bool
-     */
-    protected function contentHasLinks($content)
-    {
-        return preg_match($this->urlRegEx, $content);
     }
 
     /**
@@ -128,11 +84,11 @@ class SmsSubscriber extends CommonSubscriber
         $entity = $event->getSms();
         if ($details = $event->getChanges()) {
             $log = [
-                'bundle' => 'sms',
-                'object' => 'sms',
+                'bundle'   => 'sms',
+                'object'   => 'sms',
                 'objectId' => $entity->getId(),
-                'action' => ($event->isNew()) ? 'create' : 'update',
-                'details' => $details,
+                'action'   => ($event->isNew()) ? 'create' : 'update',
+                'details'  => $details,
             ];
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
@@ -146,12 +102,12 @@ class SmsSubscriber extends CommonSubscriber
     public function onDelete(SmsEvent $event)
     {
         $entity = $event->getSms();
-        $log = [
-            'bundle' => 'sms',
-            'object' => 'sms',
+        $log    = [
+            'bundle'   => 'sms',
+            'object'   => 'sms',
             'objectId' => $entity->getId(),
-            'action' => 'delete',
-            'details' => ['name' => $entity->getName()],
+            'action'   => 'delete',
+            'details'  => ['name' => $entity->getName()],
         ];
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
