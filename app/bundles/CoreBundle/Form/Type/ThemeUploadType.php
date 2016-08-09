@@ -1,21 +1,21 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-namespace Mautic\DashboardBundle\Form\Type;
+namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 /**
- * Class UploadType
+ * Class ThemeUploadType
  *
- * @package Mautic\DashboardBundle\Form\Type
+ * @package Mautic\CoreBundle\Form\Type
  */
-class UploadType extends AbstractType
+class ThemeUploadType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
@@ -24,9 +24,8 @@ class UploadType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->add('file', 'file', [
-            'label' => 'mautic.lead.import.file',
             'attr'  => [
-                'accept' => '.json',
+                'accept' => '.zip',
                 'class'  => 'form-control'
             ]
         ]);
@@ -39,9 +38,9 @@ class UploadType extends AbstractType
             'attr'  => [
                 'class'   => 'btn btn-primary',
                 'icon'    => 'fa fa-upload',
-                'onclick' => "mQuery(this).prop('disabled', true); mQuery('form[name=\'dashboard_upload\']').submit();"
+                'onclick' => "mQuery(this).prop('disabled', true); mQuery('form[name=\'theme_upload\']').submit();"
             ],
-            'label' => 'mautic.lead.import.upload'
+            'label' => 'mautic.core.theme.install'
         ]);
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
@@ -52,6 +51,6 @@ class UploadType extends AbstractType
      */
     public function getName ()
     {
-        return "dashboard_upload";
+        return "theme_upload";
     }
 }

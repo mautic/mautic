@@ -89,7 +89,21 @@ class ThemeHelper
      */
     private function getDirectoryName($newName)
     {
-        return InputHelper::alphanum($newName, true);
+        return InputHelper::filename($newName, true);
+    }
+
+    /**
+     * @param $theme
+     *
+     * @return boolean
+     */
+    public function exists($theme)
+    {
+        $root    = $this->pathsHelper->getSystemPath('themes', true) . '/';
+        $dirName = $this->getDirectoryName($theme);
+        $fs      = new Filesystem();
+
+        return $fs->exists($root.$dirName);
     }
 
     /**
@@ -101,7 +115,7 @@ class ThemeHelper
      */
     public function copy($theme, $newName)
     {
-        $root      = $this->pathsHelper->getSystemPath('themes_root') . '/';
+        $root      = $this->pathsHelper->getSystemPath('themes', true) . '/';
         $themes    = $this->getInstalledThemes();
 
         //check to make sure the theme exists
@@ -131,7 +145,7 @@ class ThemeHelper
      */
     public function rename($theme, $newName)
     {
-        $root      = $this->pathsHelper->getSystemPath('themes_root') . '/';
+        $root      = $this->pathsHelper->getSystemPath('themes', true) . '/';
         $themes    = $this->getInstalledThemes();
 
         //check to make sure the theme exists
@@ -159,7 +173,7 @@ class ThemeHelper
      */
     public function delete($theme)
     {
-        $root      = $this->pathsHelper->getSystemPath('themes_root') . '/';
+        $root      = $this->pathsHelper->getSystemPath('themes', true) . '/';
         $themes    = $this->getInstalledThemes();
 
         //check to make sure the theme exists
@@ -168,7 +182,7 @@ class ThemeHelper
         }
 
         $fs = new Filesystem();
-        $fs->remove($root . $theme);
+        $fs->remove($root.$theme);
     }
 
     /**
@@ -235,9 +249,9 @@ class ThemeHelper
      * 
      * @return mixed
      */
-    public function getInstalledThemes($specificFeature = 'all', $extended = false)
+    public function getInstalledThemes($specificFeature = 'all', $extended = false, $ignoreCache = false)
     {
-        if (empty($this->themes[$specificFeature])) {
+        if (empty($this->themes[$specificFeature]) || $ignoreCache === true) {
             $dir = $this->pathsHelper->getSystemPath('themes', true);
             $addTheme = false;
 
@@ -324,5 +338,136 @@ class ThemeHelper
         }
 
         return $this->themeHelpers[$theme];
+    }
+
+    /**
+     * Install a theme from a zip package
+     *
+     * @param string $zipFile path
+     * 
+     * @return boolean
+     * 
+     * @throws MauticException\FileNotFoundException
+     * @throws Exception
+     */
+    public function install($zipFile)
+    {
+        if (file_exists($zipFile) === false) {
+            throw new MauticException\FileNotFoundException();
+        }
+
+        if (class_exists('ZipArchive') === false) {
+            throw new \Exception('mautic.core.ziparchive.not.installed');
+        }
+
+        $themeName = basename($zipFile, '.zip');
+        $themePath = $this->pathsHelper->getSystemPath('themes', true).'/'.$themeName;
+        $zipper    = new \ZipArchive();
+        $archive   = $zipper->open($zipFile);
+
+        if ($archive !== true) {
+            throw new \Exception($this->getExtractError($archive));
+        } else {
+            $containsConfig = false;
+            $allowedExtensions = ['', 'json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'tiff'];
+            $allowedFiles = [];
+            for ($i = 0; $i < $zipper->numFiles; $i++) {
+                $entry     = $zipper->getNameIndex($i);
+                $extension = pathinfo($entry, PATHINFO_EXTENSION);
+
+                // Check if the config.json exists in the zip file at the root level
+                if ($entry == 'config.json' || $entry == '/config.json') {
+                    $containsConfig = true;
+                }
+                
+                // Filter out dangerous files like .php
+                if (in_array(strtolower($extension), $allowedExtensions)) {
+                    $allowedFiles[] = $entry;
+                }
+            }
+
+            if (!$containsConfig) {
+                throw new \Exception('mautic.core.theme.missing.config');
+            }
+
+            // Extract the archive file now
+            if (!$zipper->extractTo($themePath, $allowedFiles)) {
+                throw new \Exception('mautic.core.update.error_extracting_package');
+            } else {
+                $zipper->close();
+                unlink($zipFile);
+                return true;
+            }
+        }
+    }
+
+    /**
+     * Get the error message from the zip archive
+     *
+     * @param ZipArchive $archive
+     * 
+     * @return string
+     */
+    public function getExtractError($archive)
+    {
+        switch ($archive) {
+            case \ZipArchive::ER_EXISTS:
+                $error = 'mautic.core.update.archive_file_exists';
+                break;
+            case \ZipArchive::ER_INCONS:
+            case \ZipArchive::ER_INVAL:
+            case \ZipArchive::ER_MEMORY:
+                $error = 'mautic.core.update.archive_zip_corrupt';
+                break;
+            case \ZipArchive::ER_NOENT:
+                $error = 'mautic.core.update.archive_no_such_file';
+                break;
+            case \ZipArchive::ER_NOZIP:
+                $error = 'mautic.core.update.archive_not_valid_zip';
+                break;
+            case \ZipArchive::ER_READ:
+            case \ZipArchive::ER_SEEK:
+            case \ZipArchive::ER_OPEN:
+            default:
+                $error = 'mautic.core.update.archive_could_not_open';
+                break;
+        }
+
+        return $error;
+    }
+
+    /**
+     * Creates a zip file from a theme and returns the path where it's stored
+     *
+     * @param string $themeName
+     * 
+     * @return string
+     * 
+     * @throws Exception
+     */
+    public function zip($themeName)
+    {
+        $themePath = $this->pathsHelper->getSystemPath('themes', true).'/'.$themeName;
+        $tmpPath   = $this->pathsHelper->getSystemPath('cache', true).'/tmp_'.$themeName.'.zip';
+        $zipper    = new \ZipArchive();
+        $finder    = new Finder();
+        $archive   = $zipper->open($tmpPath, \ZipArchive::CREATE);
+
+        $finder->files()->in($themePath);
+
+        if ($archive !== true) {
+            throw new \Exception($this->getExtractError($archive));
+        } else {
+            foreach ($finder as $file) {
+                $filePath = $file->getRealPath();
+                $localPath = str_replace($themePath.'/', '', $filePath);
+                $zipper->addFile($filePath, $localPath);
+            }
+            $zipper->close();
+
+            return $tmpPath;
+        }
+
+        return false;
     }
 }

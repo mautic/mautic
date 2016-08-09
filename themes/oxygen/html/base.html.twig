@@ -5,7 +5,7 @@
         <title>{pagetitle}</title>
         <meta name="description" content="{pagemetadescription}">
         {% endif %}
-        <link rel="stylesheet" href="{{ getAssetUrl('themes/oxygen/css/oxygen.css') }}" type="text/css" />
+        <link rel="stylesheet" href="{{ getAssetUrl('themes/'~template~'/css/oxygen.css') }}" type="text/css" />
     </head>
     <body>
         {{ outputScripts('bodyOpen') }}
