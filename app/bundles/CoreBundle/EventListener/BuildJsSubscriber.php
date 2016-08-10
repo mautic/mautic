@@ -32,9 +32,9 @@ class BuildJsSubscriber extends CommonSubscriber
      * Adds the MauticJS definition and core
      * JS functions for use in Bundles. This
      * must retain top priority of 1000
-     * 
+     *
      * @param BuildJsEvent $event
-     * 
+     *
      * @return void
      */
     public function onBuildJs(BuildJsEvent $event)
@@ -178,15 +178,57 @@ MauticJS.guid = function () {
     return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 };
 
+MauticJS.pixelLoaded = function(f) {
+    if (!/in/.test(document.readyState)) {
+        setTimeout('MauticJS.pixelLoaded(' + f + ')', 9)
+    } else {
+        // Only fetch once a tracking pixel has been loaded
+        var maxChecks  = 3000; // Keep it from indefinitely checking in case the pixel was never embedded
+        var checkPixel = setInterval(function() {
+            if (maxChecks > 0 && !MauticJS.isPixelLoaded()) {
+                // Try again
+                maxChecks--;
+                return;
+            }
+    
+            clearInterval(checkPixel);
+            // Either the pixel is loaded or the tests failed so initiate function anyway
+            f();
+        }, 1);
+    }
+};
+
+MauticJS.isPixelLoaded = function() {
+    if (typeof MauticJS.trackingPixel === 'undefined') {
+        // Check the DOM for the tracking pixel
+        MauticJS.trackingPixel = null;
+        var imgs = Array.prototype.slice.apply(document.getElementsByTagName('img'));
+        for (var i = 0; i < imgs.length; i++) {
+            if (imgs[i].src.indexOf('mtracking.gif') !== -1) {
+                MauticJS.trackingPixel = imgs[i];
+                break;
+            }
+        }
+        if (MauticJS.trackingPixel === null) {
+            console.log('Mautic tracking is not initiated correctly. Follow the documentation.');
+        }
+    }
+
+    if (MauticJS.trackingPixel && MauticJS.trackingPixel.complete && MauticJS.trackingPixel.naturalWidth !== 0) {
+        // All the browsers should be covered by this - image is loaded
+        return true;
+    }
+
+    return false;
+};
+
 function s4() {
   return Math.floor((1 + Math.random()) * 0x10000)
     .toString(16)
     .substring(1);
 }
 
-if (typeof window[window.MauticTrackingObject] === 'undefined') {
-    console.log('Mautic tracking is not initiated correctly. Follow the documentation.');
-} else {
+if (typeof window[window.MauticTrackingObject] !== 'undefined') {
     MauticJS.input = window[window.MauticTrackingObject];
     MauticJS.inputQueue = MauticJS.input.q;
 

@@ -49,20 +49,18 @@ if ($tmpl == 'index') {
                 </tr>
                 </thead>
                 <tbody>
-                <?php foreach ($items as $item):
-                    $variantChildren = $item->getVariantChildren();
-                    ?>
+                <?php foreach ($items as $item): ?>
                     <tr>
                         <td>
                             <?php
                             echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', [
                                 'item' => $item,
                                 'templateButtons' => [
-                                    'edit' => $security->hasEntityAccess($permissions['dynamicContent:dynamicContents:editown'], $permissions['dynamicContent:dynamicContents:editother'], $item->getCreatedBy()),
+                                    'edit' => $view['security']->hasEntityAccess($permissions['dynamicContent:dynamicContents:editown'], $permissions['dynamicContent:dynamicContents:editother'], $item->getCreatedBy()),
                                     'clone' => $permissions['dynamicContent:dynamicContents:create'],
-                                    'delete' => $security->hasEntityAccess($permissions['dynamicContent:dynamicContents:deleteown'], $permissions['dynamicContent:dynamicContents:deleteother'], $item->getCreatedBy()),
+                                    'delete' => $view['security']->hasEntityAccess($permissions['dynamicContent:dynamicContents:deleteown'], $permissions['dynamicContent:dynamicContents:deleteother'], $item->getCreatedBy()),
                                 ],
-                                'routeBase' => 'dynamicContent',
+                                'routeBase'  => 'dynamicContent',
                                 'nameGetter' => 'getName',
                             ]);
                             ?>
@@ -72,12 +70,21 @@ if ($tmpl == 'index') {
                             <a href="<?php echo $view['router']->generate('mautic_dynamicContent_action', ['objectAction' => 'view', 'objectId' => $item->getId()]); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                                 <?php
-                                $hasVariants = count($variantChildren);
-                                if ($hasVariants): ?>
+                                $hasVariants     = $item->isVariant();
+                                $hasTranslations = $item->isTranslation();
+
+                                if ($hasVariants || $hasTranslations): ?>
                                     <span>
                                 <?php if ($hasVariants): ?>
-                                        <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.dynamicContent.icon_tooltip.variants'); ?>"><i class="fa fa-fw fa-sitemap"></i></span>
+                                    <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.icon_tooltip.ab_test'); ?>">
+                                            <i class="fa fa-fw fa-sitemap"></i>
+                                        </span>
                                 <?php endif; ?>
+                                        <?php if ($hasTranslations): ?>
+                                            <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.icon_tooltip.translation'); ?>">
+                                            <i class="fa fa-fw fa-language"></i>
+                                        </span>
+                                        <?php endif; ?>
                                  </span>
                                 <?php endif; ?>
                             </a>
