@@ -194,7 +194,8 @@ MauticJS.processGatedVideos = function () {
         if (!node.id) {
             node.id = 'mautic-player-' + i;
         }
-        
+       
+        var cookieName = 'mautic-player-'+i+'-'+node.dataset.formId;
         if (node.dataset.formId) {
             mediaPlayers[i] = [];
             
@@ -233,7 +234,7 @@ MauticJS.processGatedVideos = function () {
                     
                     MauticJS.addVideoView(i, currentTime);
 
-                    if (currentTime >= node.dataset.gateTime && mediaPlayers[i].inPoster === false && mediaPlayers[i].success === false) {
+                    if (document.cookie.indexOf(cookieName) == -1 && currentTime >= node.dataset.gateTime && mediaPlayers[i].inPoster === false && mediaPlayers[i].success === false) {
                         if (document.activeElement.tagName == 'IFRAME') {
                             window.mejs.previousActiveElement = document.activeElement;
                             document.activeElement.blur();
@@ -261,6 +262,9 @@ MauticJS.processGatedVideos = function () {
                                             mediaPlayers[i].player.play();
                                             window.mejs.previousActiveElement.focus();
                                         }
+                                        
+                                        // Set a cookie to prevent showing the same form again
+                                        document.cookie = cookieName+"=true; max-age=" + 60 * 60 * 24 * 7; 
                                     } 
                                     
                                     if (data.message) {
