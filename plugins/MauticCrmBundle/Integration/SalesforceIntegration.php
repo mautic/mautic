@@ -170,14 +170,19 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         $salesFields = array();
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
+        $salesForceobjects = array();
 
         if(isset($settings['feature_settings']['objects'])) {
-            $sfObject = $settings['feature_settings']['objects'];
+            $salesForceobjects = $settings['feature_settings']['objects'];
         }
 
         try {
             if ($this->isAuthorized()) {
-                if (isset($sfObject) and $sfObject !== 'Activity') {
+                if(!empty($salesForceobjects) and is_array($salesForceobjects)){
+                foreach ($salesForceobjects as $sfObject){
+                    if (isset($sfObject) and $sfObject == 'Activity') {
+                        continue;
+                    }
                     $leadObject[$sfObject]  = $this->getApiHelper()->getLeadFields($sfObject);
                     if (!empty($leadObject) && isset($leadObject[$sfObject]['fields'])) {
 
@@ -193,6 +198,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             );
                         }
                     }
+                }
                 }else{
                     $leadObject  = $this->getApiHelper()->getLeadFields('Lead');
                     if (!empty($leadObject) && isset($leadObject['fields'])) {
@@ -251,7 +257,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function amendLeadDataBeforeMauticPopulate($data, $object)
     {
-        $settings['feature_settings']['objects']=$object;
+        $settings['feature_settings']['objects'][]=$object;
         $fields = array_keys($this->getAvailableLeadFields($settings));
 
         $params['fields']=implode(',',$fields);
