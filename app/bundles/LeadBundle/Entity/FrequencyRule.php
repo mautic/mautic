@@ -60,17 +60,21 @@ class FrequencyRule
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_frequencyrules')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\FrequencyRuleRepository');
+            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\FrequencyRuleRepository')
+            ->addIndex(['channel'], 'channel_frequency');
 
         $builder->addId();
 
-        $builder->addLead(true, 'CASCADE', false, 'frequencyRules');
+        $builder->addLead(false, 'CASCADE', false, 'frequencyRules');
 
         $builder->addDateAdded();
 
-        $builder->addNamedField('frequencyNumber', 'smallint', 'frequency_number', true);
+        $builder->addNamedField('frequencyNumber', 'smallint', 'frequency_number');
 
-        $builder->addNamedField('frequencyTime', 'string', 'frequency_time', true);
+        $builder->createField('frequencyTime', 'string')
+            ->columnName('frequency_time')
+            ->length(25)
+            ->build();
 
         $builder->createField('channel', 'string')
             ->build();
