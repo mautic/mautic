@@ -500,6 +500,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
             } catch (\Exception $e) {
                 $this->logIntegrationError($e);
+                throw $e;
             }
         }
         return $executed;
