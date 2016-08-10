@@ -425,22 +425,23 @@ class EmailModel extends FormModel
         if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_OPEN)) {
             $event = new EmailOpenEvent($stat, $request, $firstTime);
             $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_OPEN, $event);
-            //device granularity
-            $dd = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
+        }
 
-            $dd->parse();
-            $deviceRepo = $this->leadModel->getDeviceRepository();
-            $emailOpenDevice = $deviceRepo->getDevice(null, $lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
+        //device granularity
+        $dd = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
+        $dd->parse();
+        $deviceRepo      = $this->leadModel->getDeviceRepository();
+        $emailOpenDevice = $deviceRepo->getDevice(null, $lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
 
-            if (empty($emailOpenDevice)) {
-                $emailOpenDevice = new LeadDevice();
-
-                $emailOpenDevice->setClientInfo($dd->getClient());
-                $emailOpenDevice->setDevice($dd->getDeviceName());
-                $emailOpenDevice->setDeviceBrand($dd->getBrand());
-                $emailOpenDevice->setDeviceModel($dd->getModel());
-                $emailOpenDevice->setDeviceOs($dd->getOs());
-                $emailOpenDevice->setLead($lead);
+        if (empty($emailOpenDevice)) {
+            $emailOpenDevice = new LeadDevice();
+            $emailOpenDevice->setClientInfo($dd->getClient());
+            $emailOpenDevice->setDevice($dd->getDeviceName());
+            $emailOpenDevice->setDeviceBrand($dd->getBrand());
+            $emailOpenDevice->setDeviceModel($dd->getModel());
+            $emailOpenDevice->setDeviceOs($dd->getOs());
+            $emailOpenDevice->setDateOpen($readDateTime->toUtcString());
+            $emailOpenDevice->setLead($lead);
 
             try {
                 $this->em->persist($emailOpenDevice);
@@ -448,19 +449,16 @@ class EmailModel extends FormModel
             } catch (\Exception $exception) {
                 if (MAUTIC_ENV === 'dev') {
 
-                        throw $exception;
-                    } else {
-                        $this->logger->addError(
-                            $exception->getMessage(),
-                            array('exception' => $exception)
-                        );
-                    }
+                    throw $exception;
+                } else {
+                    $this->logger->addError(
+                        $exception->getMessage(),
+                        ['exception' => $exception]
+                    );
                 }
-            } else {
-                $emailOpenDevice = $deviceRepo->getEntity($emailOpenDevice['id']);
-
             }
-
+        } else {
+            $emailOpenDevice = $deviceRepo->getEntity($emailOpenDevice['id']);
         }
 
         if ($email) {
@@ -468,13 +466,10 @@ class EmailModel extends FormModel
             $this->em->flush($email);
         }
 
-
         if (isset($emailOpenDevice) and is_object($emailOpenDevice)) {
             $emailOpenStat = new StatDevice();
             $emailOpenStat->setIpAddress($ipAddress);
-
             $emailOpenStat->setDevice($emailOpenDevice);
-
             $emailOpenStat->setDateOpened($readDateTime->toUtcString());
             $emailOpenStat->setStat($stat);
 
@@ -484,7 +479,6 @@ class EmailModel extends FormModel
 
         $this->em->persist($stat);
         $this->em->flush();
-
     }
 
     /**
