@@ -425,7 +425,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param $lead
      */
-    public function getLeads($params = array())
+    public function getLeads($params = array(), $query = null)
     {
         $executed = null;
 
@@ -437,14 +437,19 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $salesForceObjects = $config['objects'];
         }
 
-        $query = $this->getFetchQuery($params);
+        if (empty($query)) {
+            $query = $this->getFetchQuery($params);
+        }
 
         try {
             if ($this->isAuthorized()) {
                 foreach ($salesForceObjects as $object){
                     $result = $this->getApiHelper()->getLeads($query, $object);
-
                     $executed+= $this->amendLeadDataBeforeMauticPopulate($result, $object);
+                    if (isset($result['nextRecordsUrl'])) {
+                        $query = $result['nextRecordsUrl'];
+                        $this->getLeads($params, $query);
+                    }
                 }
                 return $executed;
             }
