@@ -168,8 +168,17 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
                 foreach ($metadata[$to['email']]['tokens'] as $token => $value) {
                     $recipient['substitution_data'][$mergeVars[$token]] = $value;
                 }
+
                 unset($metadata[$to['email']]['tokens']);
                 $recipient['metadata'] = $metadata[$to['email']];
+            }
+
+            // Apparently Sparkpost doesn't like empty substitution_data or metadata
+            if (empty($recipient['substitution_data'])) {
+                unset($recipient['substitution_data']);
+            }
+            if (empty($recipient['metadata'])) {
+                unset($recipient['metadata']);
             }
 
             $recipients[] = $recipient;
