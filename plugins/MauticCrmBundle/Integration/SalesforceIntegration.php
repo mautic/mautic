@@ -623,7 +623,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $emailRepo = $emailModel->getStatRepository();
         $emails = $emailRepo->getLeadStatsByDate($leadId, $startDate, $endDate);
 
-        $i=count($activity['activities']);
+        if (isset($activity['activities'])) {
+            $i=count($activity['activities']);
+        }
 
         foreach ($emails as $row) {
 
