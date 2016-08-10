@@ -1415,8 +1415,8 @@ class LeadController extends FormController
 
                             $fileData = $form['file']->getData();
                             if (!empty($fileData)) {
-                                $errorMessage = null;
-                                $errorParameters = array();
+                                $errorMessage    = null;
+                                $errorParameters = [];
                                 try {
                                     $fileData->move($cacheDir, $fileName);
 
@@ -1471,7 +1471,7 @@ class LeadController extends FormController
                                     if (!is_null($errorMessage)) {
                                         $form->addError(
                                             new FormError(
-                                                $this->get('translator')->getTranslator()->trans($errorMessage, $errorParameters, 'validators')
+                                                $this->get('translator')->trans($errorMessage, $errorParameters, 'validators')
                                             )
                                         );
                                     }

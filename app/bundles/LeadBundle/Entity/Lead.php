@@ -590,6 +590,26 @@ class Lead extends FormEntity
     }
 
     /**
+     * Get preferred locale
+     *
+     * @return string
+     */
+    public function getPreferredLocale()
+    {
+        if (isset($this->updatedFields['preferred_locale'])) {
+
+            return $this->updatedFields['preferred_locale'];
+        }
+
+        if (!empty($this->fields['core']['preferred_locale']['value'])) {
+
+            return $this->fields['core']['preferred_locale']['value'];
+        }
+
+        return '';
+    }
+
+    /**
      * Get lead field value
      *
      * @param      $field

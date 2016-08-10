@@ -28,7 +28,8 @@ $templates = array(
     'lists'     => 'leadlist-template',
     'emails'    => 'lead_email_received-template',
     'tags'      => 'tags-template',
-    'stage'      => 'stage-template'
+    'stage'     => 'stage-template',
+    'locales'   => 'locale-template'
 );
 
 $mainErrors   = ($view['form']->containsErrors($form, array('filters'))) ? 'class="text-danger"' : '';

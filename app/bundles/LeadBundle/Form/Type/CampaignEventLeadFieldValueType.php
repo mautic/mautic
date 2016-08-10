@@ -10,6 +10,8 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -82,7 +84,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
 
             $fieldValues = null;
             $fieldType   = null;
-            $choiceTypes = ['boolean', 'country', 'region', 'lookup', 'timezone', 'select', 'radio'];
+            $choiceTypes = ['boolean', 'locale', 'country', 'region', 'lookup', 'timezone', 'select', 'radio'];
 
             if (isset($data['field'])) {
                 $field = $fieldModel->getRepository()->findOneBy(['alias' => $data['field']]);
@@ -100,13 +102,28 @@ class CampaignEventLeadFieldValueType extends AbstractType
                             0 => $properties['no'],
                             1 => $properties['yes']
                         ];
-                    } elseif (!empty($properties)) {
-                        // fallback
-                        $fieldValues = $properties;
+                    } else {
+                        switch ($fieldType) {
+                            case 'country':
+                                $fieldValues = FormFieldHelper::getCountryChoices();
+                                break;
+                            case 'region':
+                                $fieldValues = FormFieldHelper::getRegionChoices();
+                                break;
+                            case 'timezone':
+                                $fieldValues = FormFieldHelper::getTimezonesChoices();
+                                break;
+                            case 'locale':
+                                $fieldValues = FormFieldHelper::getLocaleChoices();
+                                break;
+                            default:
+                                if (!empty($properties)) {
+                                    $fieldValues = $properties;
+                                }
+                        }
                     }
                 }
             }
-
 
             // Display selectbox for a field with choices, textbox for others
             if (!empty($fieldValues) && in_array($fieldType, $choiceTypes)) {
@@ -114,11 +131,11 @@ class CampaignEventLeadFieldValueType extends AbstractType
                     'value',
                     'choice',
                     [
-                        'choices'     => $fieldValues,
-                        'label'       => 'mautic.form.field.form.value',
-                        'label_attr'  => ['class' => 'control-label'],
-                        'attr'        => [
-                            'class' => 'form-control not-chosen'
+                        'choices'    => $fieldValues,
+                        'label'      => 'mautic.form.field.form.value',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class' => 'form-control'
                         ],
                         'required'    => true,
                         'constraints' => [
@@ -133,9 +150,9 @@ class CampaignEventLeadFieldValueType extends AbstractType
                     'value',
                     'text',
                     [
-                        'label'       => 'mautic.form.field.form.value',
-                        'label_attr'  => ['class' => 'control-label'],
-                        'attr'        => [
+                        'label'      => 'mautic.form.field.form.value',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
                             'class' => 'form-control'
                         ],
                         'required'    => true,
@@ -147,7 +164,6 @@ class CampaignEventLeadFieldValueType extends AbstractType
                     ]
                 );
             }
-
         };
 
         // Register the function above as EventListener on PreSet and PreBind

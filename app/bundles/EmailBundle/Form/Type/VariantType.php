@@ -39,11 +39,11 @@ class VariantType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->add('weight', 'integer', array(
-            'label'      => 'mautic.email.form.trafficweight',
+            'label'      => 'mautic.core.ab_test.form.traffic_weight',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class'   => 'form-control',
-                'tooltip' => 'mautic.email.form.trafficweight.help'
+                'tooltip' => 'mautic.core.ab_test.form.traffic_weight.help'
             ),
             'constraints' => array(
                 new NotBlank(
@@ -59,11 +59,11 @@ class VariantType extends AbstractType
             $choices  = $abTestWinnerCriteria['choices'];
 
             $builder->add('winnerCriteria', 'choice', array(
-                'label'      => 'mautic.email.form.abtestwinner',
+                'label'      => 'mautic.core.ab_test.form.winner',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array(
                     'class'    => 'form-control',
-                    'onchange' => 'Mautic.getEmailAbTestWinnerForm(this);'
+                    'onchange' => 'Mautic.getAbTestWinnerForm(\'email\', \'emailform\', this);'
                 ),
                 'expanded'   => false,
                 'multiple'   => false,
@@ -71,7 +71,7 @@ class VariantType extends AbstractType
                 'empty_value' => 'mautic.core.form.chooseone',
                 'constraints' => array(
                     new NotBlank(
-                        array('message' => 'mautic.email.variant.winnercriteria.notblank')
+                        array('message' => 'mautic.core.ab_test.winner_criteria.not_blank')
                     )
                 )
             ));
