@@ -476,7 +476,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $startDate = new \DateTime($query['start']);
             $endDate   = new \DateTime($query['end']);
 
-            $salesForceIds         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'lead', null, $startDate->format('Y-m-d H:m:s'), $endDate->format('Y-m-d H:m:s'));
+            $salesForceIds         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'lead', null, $startDate->format('Y-m-d H:m:s'), $endDate->format('Y-m-d H:m:s'), true);
 
             try {
                 if ($this->isAuthorized()) {

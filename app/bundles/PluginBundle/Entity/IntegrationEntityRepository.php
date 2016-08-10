@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class IntegrationEntityRepository extends CommonRepository
 {
 
-    public function getIntegrationsEntityId($integration, $integrationEntity, $internalEntity, $internalEntityId = null, $startDate =  null, $endDate =  null)
+    public function getIntegrationsEntityId($integration, $integrationEntity, $internalEntity, $internalEntityId = null, $startDate =  null, $endDate =  null, $push = false)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('i.integration_entity_id, i.id, i.internal_entity_id')
@@ -30,18 +30,21 @@ class IntegrationEntityRepository extends CommonRepository
             ->setParameter('integration', $integration)
             ->setParameter('integrationEntity', $integrationEntity)
             ->setParameter('internalEntity', $internalEntity);
-
+        if ($push) {
+            $q->join('i', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.last_active >= :startDate')
+                ->setParameter('startDate', $startDate);
+        }
 
         if ($internalEntityId) {
             $q->andWhere('i.internal_entity_id = :internalEntityId')
                 ->setParameter('internalEntityId', $internalEntityId);
         }
 
-        if ($startDate) {
+        if ($startDate and !$push) {
             $q->andWhere('i.last_sync_date >= :startDate')
                 ->setParameter('startDate', $startDate);
         }
-        if ($endDate) {
+        if ($endDate and !$push) {
             $q->andWhere('i.last_sync_date <= :endDate')
                 ->setParameter('endDate', $endDate);
         }
