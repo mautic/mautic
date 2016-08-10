@@ -225,7 +225,8 @@ return [
                     'mautic.helper.templating',
                     'mautic.schema.helper.factory',
                     'mautic.form.model.action',
-                    'mautic.form.model.field'
+                    'mautic.form.model.field',
+                    'mautic.lead.model.lead'
                 ]
             ],
             'mautic.form.model.submission' => [

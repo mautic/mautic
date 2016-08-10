@@ -134,7 +134,14 @@ return [
             ],
             'mautic.page.js.subscriber'           => [
                 'class' => 'Mautic\PageBundle\EventListener\BuildJsSubscriber'
-            ]
+            ],
+            'mautic.page.maintenance.subscriber'    => [
+                'class' => 'Mautic\PageBundle\EventListener\MaintenanceSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'doctrine.dbal.default_connection'
+                ]
+            ],
         ],
         'forms'  => [
             'mautic.form.type.page'                     => [

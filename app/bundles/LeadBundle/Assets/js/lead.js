@@ -363,7 +363,7 @@ Mautic.addLeadListFilter = function (elId) {
 
     var prototype = mQuery('.available-filters').data('prototype');
     var fieldType = mQuery(filterId).data('field-type');
-    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'boolean', 'select', 'country', 'timezone', 'region', 'stage']) != -1);
+    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale']) != -1);
 
     prototype = prototype.replace(/__name__/g, filterNum);
     prototype = prototype.replace(/__label__/g, label);
@@ -1020,6 +1020,10 @@ Mautic.updateLeadFieldValues = function (field) {
                 'value': valueField.attr('value')
             };
 
+            if (mQuery('#campaignevent_properties_value_chosen').length) {
+                mQuery('#campaignevent_properties_value').chosen('destroy');
+            }
+
             if (!mQuery.isEmptyObject(response.options)) {
                 var newValueField = mQuery('<select/>')
                     .attr('class', valueFieldAttrs['class'])
@@ -1034,6 +1038,8 @@ Mautic.updateLeadFieldValues = function (field) {
                     newValueField.append(option);
                 });
                 valueField.replaceWith(newValueField);
+
+                Mautic.activateChosenSelect(newValueField);
             } else {
                 var newValueField = mQuery('<input/>')
                     .attr('type', 'text')
@@ -1042,6 +1048,7 @@ Mautic.updateLeadFieldValues = function (field) {
                     .attr('name', valueFieldAttrs['name'])
                     .attr('autocomplete', valueFieldAttrs['autocomplete'])
                     .attr('value', valueFieldAttrs['value']);
+
                 valueField.replaceWith(newValueField);
             }
         }

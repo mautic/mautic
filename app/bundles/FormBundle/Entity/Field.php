@@ -12,6 +12,8 @@ namespace Mautic\FormBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\FormBundle\Entity\Form;
 
 /**
  * Class Field
@@ -132,6 +134,16 @@ class Field
     private $sessionId;
 
     /**
+     * @var boolean
+     */
+    private $showWhenValueExists;
+
+    /**
+     * @var integer
+     */
+    private $showAfterXSubmissions;
+
+    /**
      * Reset properties on clone
      */
     public function __clone()
@@ -217,6 +229,10 @@ class Field
         $builder->addNullableField('saveResult', 'boolean', 'save_result');
 
         $builder->addNullableField('isAutoFill', 'boolean', 'is_auto_fill');
+
+        $builder->addNullableField('showWhenValueExists', 'boolean', 'show_when_value_exists');
+
+        $builder->addNullableField('showAfterXSubmissions', 'integer', 'show_after_x_submissions');
     }
 
     /**
@@ -774,5 +790,79 @@ class Field
     public function setIsAutoFill($isAutoFill)
     {
         $this->isAutoFill = $isAutoFill;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getShowWhenValueExists()
+    {
+        return $this->showWhenValueExists;
+    }
+
+    /**
+     * @param boolean $showWhenValueExists
+     */
+    public function setShowWhenValueExists($showWhenValueExists)
+    {
+        $this->showWhenValueExists = $showWhenValueExists;
+    }
+
+    /**
+     * @return integer
+     */
+    public function getShowAfterXSubmissions()
+    {
+        return $this->showAfterXSubmissions;
+    }
+
+    /**
+     * @param integer $showAfterXSubmissions
+     */
+    public function setShowAfterXSubmissions($showAfterXSubmissions)
+    {
+        $this->showAfterXSubmissions = $showAfterXSubmissions;
+    }
+
+    /**
+     * Decide if the field should be displayed based on thr progressive profiling conditions
+     *
+     * @param  array|null $submissions
+     * @param  Lead       $lead
+     * @param  Form       $form
+     *
+     * @return boolean
+     */
+    public function showForContact($submissions = null, Lead $lead = null, Form $form = null)
+    {
+        // Always show in the kiosk mode
+        if ($form !== null && $form->getInKioskMode() === true) {
+            return true;
+        }
+
+        // Hide the field if there is the submission count limit and hide it untill the limit is overcame
+        if ($this->showAfterXSubmissions > 0 && $this->showAfterXSubmissions > count($submissions)) {
+            return false;
+        }
+
+        if ($this->showWhenValueExists === false) {
+
+            // Hide the field if there is the value condition and if we already know the value for this field
+            if ($submissions) {
+                foreach ($submissions as $submission) {
+                    if (!empty($submission[$this->alias])) {
+                        return false;
+                    }
+                }
+            }
+
+            // Hide the field if the value is already known from the lead profile
+            if ($lead !== null && $this->leadField && $lead->getFieldValue($this->leadField) !== null) {
+                return false;
+            }
+        }
+
+
+        return true;
     }
 }
