@@ -1051,7 +1051,6 @@ class EmailModel extends FormModel
         $customHeaders    = (isset($options['customHeaders'])) ? $options['customHeaders'] : [];
 
         if (!$email->getId()) {
-
             return false;
         }
 
@@ -1071,12 +1070,6 @@ class EmailModel extends FormModel
             $emailSettings = $this->getEmailSettings($email);
         }
 
-        if (!$allowResends) {
-            static $sent = [];
-            if (!isset($sent[$email->getId()])) {
-                // Include all variants
-                $variantIds = array_keys($emailSettings);
-                $sent[$email->getId()] = $statRepo->getSentStats($variantIds, $listId);
         $defaultFrequencyNumber = $this->coreParameters->getParameter('email_frequency_number');
         $defaultFrequencyTime = $this->coreParameters->getParameter('email_frequency_time');
 
