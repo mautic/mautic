@@ -30,14 +30,15 @@ class ListType extends AbstractType
 {
 
     private $translator;
-    private $fieldChoices = array();
-    private $timezoneChoices = array();
-    private $countryChoices = array();
-    private $regionChoices = array();
-    private $listChoices = array();
-    private $emailChoices = array();
-    private $tagChoices = array();
-    private $stageChoices = array();
+    private $fieldChoices = [];
+    private $timezoneChoices = [];
+    private $countryChoices = [];
+    private $regionChoices = [];
+    private $listChoices = [];
+    private $emailChoices = [];
+    private $tagChoices = [];
+    private $stageChoices = [];
+    private $localeChoices = [];
 
     /**
      * @param MauticFactory $factory
@@ -54,9 +55,10 @@ class ListType extends AbstractType
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
         $this->countryChoices  = FormFieldHelper::getCountryChoices();
         $this->regionChoices   = FormFieldHelper::getRegionChoices();
+        $this->localeChoices   = FormFieldHelper::getLocaleChoices();
 
         // Segments
-        $lists                 = $listModel->getUserLists();
+        $lists = $listModel->getUserLists();
         foreach ($lists as $list) {
             $this->listChoices[$list['id']] = $list['name'];
         }
@@ -90,51 +92,51 @@ class ListType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html')));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('lead.list', $options));
 
         $builder->add(
             'name',
             'text',
-            array(
+            [
                 'label'      => 'mautic.core.name',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
-            )
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control']
+            ]
         );
 
         $builder->add(
             'alias',
             'text',
-            array(
+            [
                 'label'      => 'mautic.core.alias',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'   => 'form-control',
                     'length'  => 25,
                     'tooltip' => 'mautic.lead.list.help.alias'
-                ),
+                ],
                 'required'   => false
-            )
+            ]
         );
 
         $builder->add(
             'description',
             'textarea',
-            array(
+            [
                 'label'      => 'mautic.core.description',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control editor'),
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control editor'],
                 'required'   => false
-            )
+            ]
         );
 
         $builder->add(
             'isGlobal',
             'yesno_button_group',
-            array(
+            [
                 'label' => 'mautic.lead.list.form.isglobal'
-            )
+            ]
         );
 
         $builder->add('isPublished', 'yesno_button_group');
@@ -144,9 +146,9 @@ class ListType extends AbstractType
             $builder->create(
                 'filters',
                 'collection',
-                array(
+                [
                     'type'           => 'leadlist_filter',
-                    'options'        => array(
+                    'options'        => [
                         'label'     => false,
                         'timezones' => $this->timezoneChoices,
                         'countries' => $this->countryChoices,
@@ -156,13 +158,13 @@ class ListType extends AbstractType
                         'emails'    => $this->emailChoices,
                         'tags'      => $this->tagChoices,
                         'stage'     => $this->stageChoices
-                    ),
+                    ],
                     'error_bubbling' => false,
                     'mapped'         => true,
                     'allow_add'      => true,
                     'allow_delete'   => true,
                     'label'          => false
-                )
+                ]
             )->addModelTransformer($filterModalTransformer)
         );
 
@@ -179,9 +181,9 @@ class ListType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'data_class' => 'Mautic\LeadBundle\Entity\LeadList'
-            )
+            ]
         );
     }
 
@@ -198,6 +200,7 @@ class ListType extends AbstractType
         $view->vars['emails']    = $this->emailChoices;
         $view->vars['tags']      = $this->tagChoices;
         $view->vars['stage']     = $this->stageChoices;
+        $view->vars['locales']   = $this->localeChoices;
     }
 
     /**

@@ -13,6 +13,8 @@ $view['slots']->set('mauticContent', 'email');
 $variantParent = $email->getVariantParent();
 $isExisting = $email->getId();
 
+$isExisting = $email->getId();
+
 $subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.email.header.editvariant', [
     '%name%' => $email->getName(),
     '%parent%' => $variantParent->getName()
@@ -140,6 +142,15 @@ $attr['data-submit-callback-async'] = "clearThemeHtmlBeforeSave";
             </div>
             <?php echo $view['form']->row($form['category']); ?>
             <?php echo $view['form']->row($form['language']); ?>
+            <div id="segmentTranslationParent"<?php echo ($emailType == 'template') ? ' class="hide"' : ''; ?>>
+                <?php echo $view['form']->row($form['segmentTranslationParent']); ?>
+            </div>
+            <div id="templateTranslationParent"<?php echo ($emailType == 'list') ? ' class="hide"' : ''; ?>>
+                <?php echo $view['form']->row($form['templateTranslationParent']); ?>
+            </div>
+            <?php endif; ?>
+
+            <?php if (!$isVariant): ?>
             <div id="publishStatus"<?php echo ($emailType == 'list') ? ' class="hide"' : ''; ?>>
                 <?php echo $view['form']->row($form['isPublished']); ?>
                 <?php echo $view['form']->row($form['publishUp']); ?>

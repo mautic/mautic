@@ -41,54 +41,18 @@ class PageRepository extends CommonRepository
      *
      * @return mixed
      */
-    public function checkUniqueAlias($alias, $entity = null)
+    public function checkPageUniqueAlias($alias, $ignoreIds = [])
     {
         $q = $this->createQueryBuilder('e')
             ->select('count(e.id) as alias_count')
             ->where('e.alias = :alias');
         $q->setParameter('alias', $alias);
 
-        if (!empty($entity)) {
-            $parent   = $entity->getTranslationParent();
-            $children = $entity->getTranslationChildren();
-            if ($parent || count($children)) {
-                //allow same alias among language group
-                $ids = array();
-
-                if (!empty($parent)) {
-                    $children = $parent->getTranslationChildren();
-                    $ids[] = $parent->getId();
-                }
-
-                foreach ($children as $child) {
-                    if ($child->getId() != $entity->getId()) {
-                        $ids[] = $child->getId();
-                    }
-                }
-                $q->andWhere($q->expr()->notIn('e.id', $ids));
-            }
-            $parent   = $entity->getVariantParent();
-            $children = $entity->getVariantChildren();
-            if ($parent || count($children)) {
-                //allow same alias among language group
-                $ids = array();
-
-                if (!empty($parent)) {
-                    $children = $parent->getVariantChildren();
-                    $ids[] = $parent->getId();
-                }
-
-                foreach ($children as $child) {
-                    if ($child->getId() != $entity->getId()) {
-                        $ids[] = $child->getId();
-                    }
-                }
-                $q->andWhere($q->expr()->notIn('e.id', $ids));
-            }
-            if ($entity->getId()) {
-                $q->andWhere('e.id != :id');
-                $q->setParameter('id', $entity->getId());
-            }
+        if (!empty($ignoreIds)) {
+            $q->andWhere(
+                $q->expr()->notIn('e.id', ':ignoreIds')
+            )
+                ->setParameter('ignoreIds', $ignoreIds);
         }
 
         $results = $q->getQuery()->getSingleResult();
@@ -124,8 +88,6 @@ class PageRepository extends CommonRepository
         if ($topLevel == 'translation') {
             //only get top level pages
             $q->andWhere($q->expr()->isNull('p.translationParent'));
-            //translations cannot be assigned to a/b tests
-            $q->andWhere($q->expr()->isNull('p.variantParent'));
         } elseif ($topLevel == 'variant') {
             $q->andWhere($q->expr()->isNull('p.variantParent'));
         }
@@ -264,51 +226,22 @@ class PageRepository extends CommonRepository
     /**
      * Resets variant_start_date and variant_hits
      *
-     * @param $variantParentId
+     * @param $relatedIds
      * @param $date
      */
-    public function resetVariants($variantParentId, $date)
+    public function resetVariants($relatedIds, $date)
     {
+        if (!is_array($relatedIds)) {
+            $relatedIds = [(int) $relatedIds];
+        }
+
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->update(MAUTIC_TABLE_PREFIX . 'pages')
             ->set('variant_hits', 0)
             ->set('variant_start_date', ':date')
             ->setParameter('date', $date)
             ->where(
-                $qb->expr()->orX(
-                    $qb->expr()->eq('id', (int) $variantParentId),
-                    $qb->expr()->eq('variant_parent_id', (int) $variantParentId)
-                )
-            )
-            ->execute();
-    }
-
-    /**
-     * Null variant and translation parent
-     *
-     * @param $ids
-     */
-    public function nullParents($ids)
-    {
-        if (!is_array($ids)) {
-            $ids = array($ids);
-        }
-
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $qb->update(MAUTIC_TABLE_PREFIX . 'pages')
-            ->set('variant_parent_id', ':null')
-            ->setParameter('null', null)
-            ->where(
-                $qb->expr()->in('variant_parent_id', $ids)
-            )
-            ->execute();
-
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $qb->update(MAUTIC_TABLE_PREFIX . 'pages')
-            ->set('translation_parent_id', ':null')
-            ->setParameter('null', null)
-            ->where(
-                $qb->expr()->in('translation_parent_id', $ids)
+                $qb->expr()->in('id', $relatedIds)
             )
             ->execute();
     }

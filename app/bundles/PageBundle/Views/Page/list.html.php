@@ -54,19 +54,15 @@ $view->extend('MauticPageBundle:Page:index.html.php');
                 </thead>
                 <tbody>
                 <?php foreach ($items as $item): ?>
-                    <?php
-                    $variantChildren     = $item->getVariantChildren();
-                    $translationChildren = $item->getTranslationChildren();
-                    ?>
                     <tr>
                         <td>
                             <?php
                             echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                                 'item'      => $item,
                                 'templateButtons' => array(
-                                    'edit'      => $security->hasEntityAccess($permissions['page:pages:editown'], $permissions['page:pages:editother'], $item->getCreatedBy()),
+                                    'edit'      => $view['security']->hasEntityAccess($permissions['page:pages:editown'], $permissions['page:pages:editother'], $item->getCreatedBy()),
                                     'clone'     => $permissions['page:pages:create'],
-                                    'delete'    => $security->hasEntityAccess($permissions['page:pages:deleteown'], $permissions['page:pages:deleteother'], $item->getCreatedBy()),
+                                    'delete'    => $view['security']->hasEntityAccess($permissions['page:pages:deleteown'], $permissions['page:pages:deleteother'], $item->getCreatedBy()),
                                 ),
                                 'routeBase' => 'page',
                                 'nameGetter' => 'getTitle'
@@ -78,15 +74,20 @@ $view->extend('MauticPageBundle:Page:index.html.php');
                             <a href="<?php echo $view['router']->path('mautic_page_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
                                 <?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)
                                 <?php
-                                $hasVariants   = count($variantChildren);
-                                $hasTranslations = count($translationChildren);
+                                $hasVariants     = $item->isVariant();
+                                $hasTranslations = $item->isTranslation();
+
                                 if ($hasVariants || $hasTranslations): ?>
                                     <span>
                                 <?php if ($hasVariants): ?>
-                                        <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.page.icon_tooltip.abtest'); ?>"><i class="fa fa-fw fa-sitemap"></i></span>
+                                        <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.icon_tooltip.ab_test'); ?>">
+                                            <i class="fa fa-fw fa-sitemap"></i>
+                                        </span>
                                 <?php endif; ?>
                                         <?php if ($hasTranslations): ?>
-                                        <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.page.icon_tooltip.translation'); ?>"><i class="fa fa-fw fa-language"></i></span>
+                                        <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.icon_tooltip.translation'); ?>">
+                                            <i class="fa fa-fw fa-language"></i>
+                                        </span>
                                         <?php endif; ?>
                                  </span>
                                 <?php endif; ?>

@@ -332,6 +332,10 @@ return [
                 'class'     => 'Mautic\LeadBundle\Form\Type\MergeType',
                 'alias'     => 'lead_merge'
             ],
+            'mautic.form.type.lead_contact_frequency_rules'               => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\ContactFrequencyType',
+                'alias'     => 'lead_contact_frequency_rules'
+            ],
             'mautic.form.type.campaignevent_lead_field_value'  => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadFieldValueType',
                 'arguments' => 'mautic.factory',
@@ -356,6 +360,7 @@ return [
             'mautic.lead.doctrine.subscriber'       => [
                 'class'     => 'Mautic\LeadBundle\EventListener\DoctrineSubscriber',
                 'tag'       => 'doctrine.event_subscriber',
+                'arguments' => 'monolog.logger.mautic'
             ],
             'mautic.validator.leadlistaccess' => [
                 'class'     => 'Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator',
@@ -404,7 +409,7 @@ return [
             ],
             'mautic.lead.model.note' => [
                 'class' => 'Mautic\LeadBundle\Model\NoteModel'
-            ],
+            ]
         ]
     ]
 ];

@@ -9,9 +9,9 @@
  */
 namespace Mautic\SmsBundle\Api;
 
+use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use Monolog\Logger;
@@ -39,7 +39,8 @@ class TwilioApi extends AbstractSmsApi
      * @param TrackableModel    $pageTrackableModel
      * @param \Services_Twilio  $client
      * @param PhoneNumberHelper $phoneNumberHelper
-     * @param string            $sendingPhoneNumber
+     * @param                   $sendingPhoneNumber
+     * @param Logger            $logger
      */
     public function __construct(TrackableModel $pageTrackableModel, \Services_Twilio $client, PhoneNumberHelper $phoneNumberHelper, $sendingPhoneNumber, Logger $logger)
     {
@@ -60,7 +61,7 @@ class TwilioApi extends AbstractSmsApi
      */
     protected function sanitizeNumber($number)
     {
-        $util = PhoneNumberUtil::getInstance();
+        $util   = PhoneNumberUtil::getInstance();
         $parsed = $util->parse($number, 'US');
 
         return $util->format($parsed, PhoneNumberFormat::E164);
@@ -70,11 +71,12 @@ class TwilioApi extends AbstractSmsApi
      * @param string $number
      * @param string $content
      *
-     * @return array
+     * @return boolean
      */
     public function sendSms($number, $content)
     {
         if ($number === null) {
+
             return false;
         }
 
@@ -87,7 +89,14 @@ class TwilioApi extends AbstractSmsApi
 
             return true;
         } catch (\Services_Twilio_RestException $e) {
-            $this->factory->getLogger()->addError(
+            $this->logger->addError(
+                $e->getMessage(),
+                ['exception' => $e]
+            );
+
+            return false;
+        } catch (NumberParseException $e) {
+            $this->logger->addError(
                 $e->getMessage(),
                 ['exception' => $e]
             );

@@ -18,7 +18,8 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.sms.model.sms',
                     'mautic.sms.api',
-                ],
+                    'mautic.helper.sms'
+                ]
             ],
             'mautic.sms.configbundle.subscriber' => [
                 'class' => 'Mautic\SmsBundle\EventListener\ConfigSubscriber',
@@ -61,6 +62,8 @@ return [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.lead',
                     'mautic.helper.phone_number',
+                    'mautic.sms.model.sms',
+                    '%mautic.sms_frequency_number%'
                 ],
                 'alias' => 'sms_helper',
             ],
@@ -138,5 +141,7 @@ return [
         'sms_username' => null,
         'sms_password' => null,
         'sms_sending_phone_number' => null,
-    ],
+        'sms_frequency_number' => null,
+        'sms_frequency_time' => null
+    ]
 ];

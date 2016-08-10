@@ -18,8 +18,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'item'            => $item,
     'templateButtons' => array(
         'edit'   => $view['security']->hasEntityAccess($permissions['webhook:webhooks:editown'], $permissions['webhook:webhooks:editother'], $item->getCreatedBy()),
-        'clone'  => $view['security']->hasEntityAccess($permissions['webhook:webhooks:editown'], $permissions['webhook:webhooks:editother'], $item->getCreatedBy()),
-        'delete' => $permissions['webhook:webhooks:create'],
+        'clone'  => $permissions['webhook:webhooks:create'],
+        'delete' => $view['security']->hasEntityAccess($permissions['webhook:webhooks:deleteown'], $permissions['webhook:webhooks:deleteown'], $item->getCreatedBy()),
     ),
     'routeBase' => 'webhook'
 )));

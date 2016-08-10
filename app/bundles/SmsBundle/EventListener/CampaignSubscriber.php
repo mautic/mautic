@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\SmsBundle\Api\AbstractSmsApi;
 use Mautic\SmsBundle\Event\SmsSendEvent;
+use Mautic\SmsBundle\Helper\SmsHelper;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\SmsEvents;
 
@@ -43,6 +44,11 @@ class CampaignSubscriber extends CommonSubscriber
     protected $smsApi;
 
     /**
+     * @var smsHelper
+     */
+    protected $smsHelper;
+
+    /**
      * CampaignSubscriber constructor.
      *
      * @param MauticFactory  $factory
@@ -50,11 +56,12 @@ class CampaignSubscriber extends CommonSubscriber
      * @param SmsModel       $smsModel
      * @param AbstractSmsApi $smsApi
      */
-    public function __construct(MauticFactory $factory, LeadModel $leadModel, SmsModel $smsModel, AbstractSmsApi $smsApi)
+    public function __construct(MauticFactory $factory, LeadModel $leadModel, SmsModel $smsModel, AbstractSmsApi $smsApi, SmsHelper $smsHelper)
     {
         $this->leadModel = $leadModel;
         $this->smsModel  = $smsModel;
         $this->smsApi    = $smsApi;
+        $this->smsHelper = $smsHelper;
 
         parent::__construct($factory);
     }
@@ -136,6 +143,21 @@ class CampaignSubscriber extends CommonSubscriber
         );
 
         $metadata = $this->smsApi->sendSms($leadPhoneNumber, $tokenEvent->getContent());
+
+        $defaultFrequencyNumber = $this->factory->getParameter('sms_frequency_number');
+        $defaultFrequencyTime = $this->factory->getParameter('sms_frequency_time');
+
+        /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
+        $frequencyRulesRepo = $this->leadModel->getFrequencyRuleRepository();
+
+        $leadIds = $lead->getId();
+
+        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('sms', $leadIds, null, $defaultFrequencyNumber, $defaultFrequencyTime);
+
+
+        if (!empty($dontSendTo) and $dontSendTo[0]['lead_id'] != $lead->getId()) {
+            $metadata = $this->smsApi->sendSms($leadPhoneNumber, $smsEvent->getContent());
+        }
 
         // If there was a problem sending at this point, it's an API problem and should be requeued
         if ($metadata === false) {
