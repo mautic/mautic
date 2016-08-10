@@ -88,20 +88,27 @@ class IntegrationEntity extends CommonEntity
 
         $builder->createField('integrationEntity', 'string')
             ->columnName('integration_entity')
+            ->nullable()
             ->build();
         $builder->createField('integrationEntityId', 'string')
             ->columnName('integration_entity_id')
+            ->nullable()
             ->build();
         $builder->createField('internalEntity', 'string')
             ->columnName('internal_entity')
+            ->nullable()
             ->build();
         $builder->createField('internalEntityId', 'integer')
             ->columnName('internal_entity_id')
+            ->nullable()
             ->build();
 
         $builder->createField('lastSyncDate', 'datetime')
             ->columnName('last_sync_date')
+            ->nullable()
             ->build();
+
+        $builder->addNullableField('internal', 'array');
     }
 
     /**
