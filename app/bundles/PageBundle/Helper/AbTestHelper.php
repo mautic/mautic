@@ -23,61 +23,52 @@ class AbTestHelper
      *
      * @param MauticFactory $factory
      * @param Page          $parent
-     * @param               $children
      *
      * @return array
      */
-    public static function determineBounceTestWinner($factory, $parent, $children)
+    public static function determineBounceTestWinner($factory, $parent)
     {
         //find the hits that did not go any further
-        $repo = $factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
-
-        $pageIds = array($parent->getId());
-
-        foreach ($children as $c) {
-            if ($c->isPublished()) {
-                $id              = $c->getId();
-                $pageIds[]       = $id;
-            }
-        }
-
+        $repo      = $factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+        $pageIds   = $parent->getRelatedEntityIds();
         $startDate = $parent->getVariantStartDate();
+
         if ($startDate != null && !empty($pageIds)) {
             //get their bounce rates
-            $counts     = $repo->getBounces($pageIds, $startDate);
+            $counts = $repo->getBounces($pageIds, $startDate);
             if ($counts) {
                 //let's arrange by rate
-                $rates             = array();
-                $support['data']   = array();
-                $support['labels'] = array();
+                $rates             = [];
+                $support['data']   = [];
+                $support['labels'] = [];
                 $bounceLabel       = $factory->getTranslator()->trans('mautic.page.abtest.label.bounces');
 
                 foreach ($counts as $pid => $stats) {
                     $rates[$pid]                     = $stats['rate'];
                     $support['data'][$bounceLabel][] = $rates[$pid];
-                    $support['labels'][]             = $pid . ':' . $stats['title'];
+                    $support['labels'][]             = $pid.':'.$stats['title'];
                 }
 
                 $max                   = max($rates);
                 $support['step_width'] = (ceil($max / 10) * 10);
 
                 //get the page ids with the greatest average dwell time
-                $winners = ($max > 0) ? array_keys($rates, $max) : array();
+                $winners = ($max > 0) ? array_keys($rates, $max) : [];
 
-                return array(
+                return [
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'page.bouncerate',
                     'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php'
-                );
+                ];
             }
         }
 
-        return array(
-            'winners' => array(),
-            'support' => array(),
+        return [
+            'winners' => [],
+            'support' => [],
             'basedOn' => 'page.bouncerate'
-        );
+        ];
     }
 
     /**
@@ -89,35 +80,29 @@ class AbTestHelper
      *
      * @return array
      */
-    public static function determineDwellTimeTestWinner($factory, $parent, $children)
+    public static function determineDwellTimeTestWinner($factory, $parent)
     {
         //find the hits that did not go any further
-        $repo = $factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
-
-        $pageIds  = array($parent->getId());
-
-        foreach ($children as $c) {
-            $pageIds[] = $c->getId();
-        }
-
+        $repo      = $factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+        $pageIds   = $parent->getRelatedEntityIds();
         $startDate = $parent->getVariantStartDate();
 
         if ($startDate != null && !empty($pageIds)) {
             //get their bounce rates
-            $counts = $repo->getDwellTimesForPages($pageIds, array('fromDate' => $startDate));
+            $counts     = $repo->getDwellTimesForPages($pageIds, ['fromDate' => $startDate]);
             $translator = $factory->getTranslator();
-            $support = array();
+            $support    = [];
 
             if ($counts) {
                 //in order to get a fair grade, we have to compare the averages here since a page that is only shown
                 //25% of the time will have a significantly lower sum than a page shown 75% of the time
-                $avgs              = array();
-                $support['data']   = array();
-                $support['labels'] = array();
+                $avgs              = [];
+                $support['data']   = [];
+                $support['labels'] = [];
                 foreach ($counts as $pid => $stats) {
-                    $avgs[$pid] = $stats['average'];
+                    $avgs[$pid]                                                                          = $stats['average'];
                     $support['data'][$translator->trans('mautic.page.abtest.label.dewlltime.average')][] = $stats['average'];
-                    $support['labels'][] = $pid . ':' . $stats['title'];
+                    $support['labels'][]                                                                 = $pid.':'.$stats['title'];
                 }
 
                 //set max for scales
@@ -125,21 +110,21 @@ class AbTestHelper
                 $support['step_width'] = (ceil($max / 10) * 10);
 
                 //get the page ids with the greatest average dwell time
-                $winners = ($max > 0) ? array_keys($avgs, $max) : array();
+                $winners = ($max > 0) ? array_keys($avgs, $max) : [];
 
-                return array(
+                return [
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'page.dwelltime',
                     'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php'
-                );
+                ];
             }
         }
 
-        return array(
-            'winners' => array(),
-            'support' => array(),
+        return [
+            'winners' => [],
+            'support' => [],
             'basedOn' => 'page.dwelltime'
-        );
+        ];
     }
 }

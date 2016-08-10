@@ -15,6 +15,9 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\CoreBundle\Model\TranslationModelTrait;
+use Mautic\CoreBundle\Model\VariantModelTrait;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -30,6 +33,7 @@ use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use DeviceDetector\DeviceDetector;
@@ -39,6 +43,9 @@ use DeviceDetector\DeviceDetector;
  */
 class PageModel extends FormModel
 {
+    use TranslationModelTrait;
+    use VariantModelTrait;
+
     /**
      * @var bool
      */
@@ -164,6 +171,8 @@ class PageModel extends FormModel
      */
     public function saveEntity ($entity, $unlock = true)
     {
+        $pageIds = $entity->getRelatedEntityIds();
+
         if (empty($this->inConversion)) {
             $alias = $entity->getAlias();
             if (empty($alias)) {
@@ -174,12 +183,12 @@ class PageModel extends FormModel
             //make sure alias is not already taken
             $repo      = $this->getRepository();
             $testAlias = $alias;
-            $count     = $repo->checkUniqueAlias($testAlias, $entity);
-            $aliasTag  = $count;
+            $count     = $repo->checkPageUniqueAlias($testAlias, $pageIds);
+            $aliasTag  = 1;
 
             while ($count) {
                 $testAlias = $alias . $aliasTag;
-                $count     = $repo->checkUniqueAlias($testAlias, $entity);
+                $count     = $repo->checkPageUniqueAlias($testAlias, $pageIds);
                 $aliasTag++;
             }
             if ($testAlias != $alias) {
@@ -188,9 +197,7 @@ class PageModel extends FormModel
             $entity->setAlias($alias);
         }
 
-        $now = new DateTimeHelper();
-
-        //set the author for new pages
+        // Set the author for new pages
         $isNew = $entity->isNew();
         if (!$isNew) {
             //increase the revision
@@ -199,37 +206,14 @@ class PageModel extends FormModel
             $entity->setRevision($revision);
         }
 
-        // Reset the variant hit and start date if there are any changes and if this is an A/B test
-        // Do it here in addition to the blanket resetVariants call so that it's available to the event listeners
-        $changes = $entity->getChanges();
-        $parent  = $entity->getVariantParent();
-
-        if ($parent !== null && !empty($changes) && empty($this->inConversion)) {
-            $entity->setVariantHits(0);
-            $entity->setVariantStartDate($now->getDateTime());
-        }
+        // Reset a/b test if applicable
+        $variantStartDate = new \DateTime();
+        $resetVariants    = $this->preVariantSaveEntity($entity, ['setVariantHits'], $variantStartDate);
 
         parent::saveEntity($entity, $unlock);
 
-        // If parent, add this entity as a child of the parent so that it populates the list in the tab (due to Doctrine hanging on to entities in memory)
-        if ($parent) {
-            $parent->addVariantChild($entity);
-        }
-        if ($translationParent = $entity->getTranslationParent()) {
-            $translationParent->addTranslationChild($entity);
-        }
-
-        // Reset associated variants if applicable due to changes
-        if ($entity->isVariant() && !empty($changes) && empty($this->inConversion)) {
-            $dateString = $now->toUtcString();
-            $parentId = (!empty($parent)) ? $parent->getId() : $entity->getId();
-            $this->getRepository()->resetVariants($parentId, $dateString);
-
-            //if the parent was changed, then that parent/children must also be reset
-            if (isset($changes['variantParent'])) {
-                $this->getRepository()->resetVariants($changes['variantParent'][0], $dateString);
-            }
-        }
+        $this->postVariantSaveEntity($entity, $resetVariants, $pageIds, $variantStartDate);
+        $this->postTranslationEntitySave($entity);
     }
 
     /**
@@ -398,43 +382,48 @@ class PageModel extends FormModel
     }
 
     /**
-     * @param        $page
-     * @param        $request
-     * @param string $code
+     * Record page hit
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @param           $page
+     * @param Request   $request
+     * @param string    $code
+     * @param Lead|null $lead
+     * @param array     $query
+     *
      * @throws \Exception
      */
-    public function hitPage($page, $request, $code = '200')
+    public function hitPage($page, Request $request, $code = '200', Lead $lead = null, $query = [])
     {
-        //don't skew results with in-house hits
+        // Don't skew results with user hits
         if (!$this->security->isAnonymous()) {
+
             return;
+        }
+
+        // Process the query
+        if (empty($query)) {
+            $query = $this->getHitQuery($request, $page);
         }
 
         $hit = new Hit();
         $hit->setDateHit(new \Datetime());
 
-        //check for existing IP
+        // Check for existing IP
         $ipAddress = $this->ipLookupHelper->getIpAddress();
         $hit->setIpAddress($ipAddress);
 
-        //check for any clickthrough info
-        $clickthrough = $request->get('ct', []);
-        if (!empty($clickthrough)) {
-            $clickthrough = $this->decodeArrayFromUrl($clickthrough);
-
-            if (!empty($clickthrough['lead'])) {
-                $lead = $this->leadModel->getEntity($clickthrough['lead']);
-                if ($lead !== null) {
-                    $this->leadModel->setLeadCookie($clickthrough['lead']);
-                    $leadClickthrough = true;
-
-                    $this->leadModel->setCurrentLead($lead);
-                }
+        // Check for any clickthrough info
+        $clickthrough = [];
+        if (!empty($query['ct'])) {
+            $clickthrough = $query['ct'];
+            if (!is_array($clickthrough)) {
+                $clickthrough = $this->decodeArrayFromUrl($clickthrough);
             }
 
-            if (!empty($clickthrough['source'])) {
+            if (!empty($clickthrough['channel'])) {
+                $hit->setSource($clickthrough['channel'][0]);
+                $hit->setSourceId($clickthrough['channel'][1]);
+            } elseif (!empty($clickthrough['source'])) {
                 $hit->setSource($clickthrough['source'][0]);
                 $hit->setSourceId($clickthrough['source'][1]);
             }
@@ -444,175 +433,27 @@ class PageModel extends FormModel
             }
         }
 
-        if (empty($leadClickthrough)) {
-            $lead = $this->leadModel->getCurrentLead();
+        // Get lead if required
+        if (null == $lead) {
+            $lead = $this->leadModel->getContactFromRequest($query);
         }
+        $this->leadModel->saveEntity($lead);
 
-        if ($page instanceof Redirect) {
-            //use the configured redirect URL
-            $pageURL = $page->getUrl();
-        } else {
-            //use current URL
-
-            // Tracking pixel is used
-            if (strpos($request->server->get('REQUEST_URI'), '/mtracking.gif') !== false) {
-                $pageURL = $request->server->get('HTTP_REFERER');
-
-                // if additional data were sent with the tracking pixel
-                if ($request->server->get('QUERY_STRING')) {
-                    parse_str($request->server->get('QUERY_STRING'), $query);
-
-                    // URL attr 'd' is encoded so let's decode it first.
-                    $decoded = false;
-                    if (isset($query['d'])) {
-                        // parse_str auto urldecodes
-                        $query   = unserialize(base64_decode($query['d']));
-                        $decoded = true;
-                    }
-
-                    if (!empty($query)) {
-                        if (isset($query['page_url'])) {
-                            $pageURL = $query['page_url'];
-                            if (!$decoded) {
-                                $pageURL = urldecode($pageURL);
-                            }
-                        }
-
-                        if (isset($query['page_referrer'])) {
-                            if (!$decoded) {
-                                $query['page_referrer'] = urldecode($query['page_referrer']);
-                            }
-                            $hit->setReferer($query['page_referrer']);
-                        }
-
-                        if (isset($query['page_language'])) {
-                            if (!$decoded) {
-                                $query['page_language'] = urldecode($query['page_language']);
-                            }
-                            $hit->setPageLanguage($query['page_language']);
-                        }
-
-                        if (isset($query['page_title'])) {
-                            if (!$decoded) {
-                                $query['page_title'] = urldecode($query['page_title']);
-                            }
-                            $hit->setUrlTitle($query['page_title']);
-                        }
-
-                        // Update lead fields if some data were sent in the URL query
-                        $availableLeadFields = $this->leadFieldModel->getFieldList(
-                            false,
-                            false,
-                            [
-                                'isPublished'         => true,
-                                'isPubliclyUpdatable' => true
-                            ]
-                        );
-
-                        $uniqueLeadFields    = $this->leadFieldModel->getUniqueIdentiferFields();
-                        $uniqueLeadFieldData = [];
-                        $inQuery             = array_intersect_key($query, $availableLeadFields);
-                        foreach ($inQuery as $k => $v) {
-                            if (empty($query[$k])) {
-                                unset($inQuery[$k]);
-                            }
-
-                            if (array_key_exists($k, $uniqueLeadFields)) {
-                                $uniqueLeadFieldData[$k] = $v;
-                            }
-                        }
-
-                        $persistLead = false;
-                        if (count($inQuery)) {
-                            if (count($uniqueLeadFieldData)) {
-                                $existingLeads = $this->em->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields(
-                                    $uniqueLeadFieldData,
-                                    $lead->getId()
-                                );
-
-                                if (!empty($existingLeads)) {
-                                    $lead = $this->leadModel->mergeLeads($lead, $existingLeads[0]);
-                                }
-                                $leadIpAddresses = $lead->getIpAddresses();
-
-                                if (!$leadIpAddresses->contains($ipAddress)) {
-                                    $lead->addIpAddress($ipAddress);
-                                }
-
-                                $this->leadModel->setCurrentLead($lead);
-                            }
-
-                            $this->leadModel->setFieldValues($lead, $inQuery);
-
-                            $persistLead = true;
-                        }
-
-                        if (isset($query['tags'])) {
-                            if (!$decoded) {
-                                $query['tags'] = urldecode($query['tags']);
-                            }
-
-                            $leadTags = $lead->getTags();
-
-                            $tags = explode(',', $query['tags']);
-                            array_walk($tags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
-
-                            // See which tags already exist
-                            $foundTags = $this->leadModel->getTagRepository()->getTagsByName($tags);
-                            foreach ($tags as $tag) {
-                                if (strpos($tag, '-') === 0) {
-                                    // Tag to be removed
-                                    $tag = substr($tag, 1);
-
-                                    if (array_key_exists($tag, $foundTags) && $leadTags->contains($foundTags[$tag])) {
-                                        $lead->removeTag($foundTags[$tag]);
-                                        $persistLead = true;
-                                    }
-                                } else {
-                                    // Tag to be added
-                                    if (!array_key_exists($tag, $foundTags)) {
-                                        // New tag
-                                        $newTag = new Tag();
-                                        $newTag->setTag($tag);
-                                        $lead->addTag($newTag);
-                                        $persistLead = true;
-                                    } elseif (!$leadTags->contains($foundTags[$tag])) {
-                                        $lead->addTag($foundTags[$tag]);
-                                        $persistLead = true;
-                                    }
-                                }
-                            }
-                        }
-
-                        if ($persistLead) {
-                            $this->leadModel->saveEntity($lead);
-                        }
-                    }
-                }
-            } else {
-                $pageURL = 'http';
-                if ($request->server->get('HTTPS') == 'on') {
-                    $pageURL .= 's';
-                }
-                $pageURL .= '://';
-                if ($request->server->get('SERVER_PORT') != '80') {
-                    $pageURL .= $request->server->get('SERVER_NAME').':'.$request->server->get('SERVER_PORT').
-                        $request->server->get('REQUEST_URI');
-                } else {
-                    $pageURL .= $request->server->get('SERVER_NAME').$request->server->get('REQUEST_URI');
-                }
-            }
-        }
-
-        $hit->setUrl($pageURL);
-
-        // Store query array
-        $query = $request->query->all();
-        unset($query['d']);
+        // Set info from request
         $hit->setQuery($query);
+        $hit->setUrl((isset($query['page_url'])) ? $query['page_url'] : $request->getRequestUri());
+        if (isset($query['page_referrer'])) {
+            $hit->setReferer($query['page_referrer']);
+        }
+        if (isset($query['page_language'])) {
+            $hit->setPageLanguage($query['page_language']);
+        }
+        if (isset($query['page_title'])) {
+            $hit->setUrlTitle($query['page_title']);
+        }
 
+        // Store tracking ID
         list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie();
-
         $hit->setTrackingId($trackingId);
         $hit->setLead($lead);
 
@@ -797,6 +638,100 @@ class PageModel extends FormModel
     }
 
     /**
+     * @param Request            $request
+     * @param null|Redirect|Page $page
+     *
+     * @return array
+     */
+    public function getHitQuery(Request $request, $page =  null)
+    {
+        if ($page instanceof Redirect) {
+            //use the configured redirect URL
+            $pageURL = $page->getUrl();
+        } else {
+            //use current URL
+
+            // Tracking pixel is used
+            if (strpos($request->server->get('REQUEST_URI'), '/mtracking.gif') !== false) {
+                $pageURL = $request->server->get('HTTP_REFERER');
+
+                // if additional data were sent with the tracking pixel
+                if ($request->server->get('QUERY_STRING')) {
+                    parse_str($request->server->get('QUERY_STRING'), $query);
+
+                    // URL attr 'd' is encoded so let's decode it first.
+                    $decoded = false;
+                    if (isset($query['d'])) {
+                        // parse_str auto urldecodes
+                        $query   = unserialize(base64_decode($query['d']));
+                        $decoded = true;
+                        unset($query['d']);
+                    }
+
+                    if (!empty($query)) {
+                        if (isset($query['page_url'])) {
+                            $pageURL = $query['page_url'];
+                            if (!$decoded) {
+                                $pageURL = urldecode($pageURL);
+                            }
+                        }
+
+                        if (isset($query['page_referrer'])) {
+                            if (!$decoded) {
+                                $query['page_referrer'] = urldecode($query['page_referrer']);
+                            }
+                        }
+
+                        if (isset($query['page_language'])) {
+                            if (!$decoded) {
+                                $query['page_language'] = urldecode($query['page_language']);
+                            }
+                        }
+
+                        if (isset($query['page_title'])) {
+                            if (!$decoded) {
+                                $query['page_title'] = urldecode($query['page_title']);
+                            }
+                        }
+
+                        if (isset($query['tags'])) {
+                            if (!$decoded) {
+                                $query['tags'] = urldecode($query['tags']);
+                            }
+                        }
+                    }
+                }
+            } else {
+                $pageURL = 'http';
+                if ($request->server->get('HTTPS') == 'on') {
+                    $pageURL .= 's';
+                }
+                $pageURL .= '://';
+                if ($request->server->get('SERVER_PORT') != '80') {
+                    $pageURL .= $request->server->get('SERVER_NAME').':'.$request->server->get('SERVER_PORT').
+                        $request->server->get('REQUEST_URI');
+                } else {
+                    $pageURL .= $request->server->get('SERVER_NAME').$request->server->get('REQUEST_URI');
+                }
+            }
+        }
+
+        if (!isset($query)) {
+            $query = $request->query->all();
+        }
+
+        // Set generated page url
+        $query['page_url'] = $pageURL;
+
+        // Process clickthrough if applicable
+        if (!empty($query['ct'])) {
+            $query['ct'] = $this->decodeArrayFromUrl($query['ct']);
+        }
+
+        return $query;
+    }
+
+    /**
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD
      *
      * @param null|Page    $page
@@ -855,140 +790,6 @@ class PageModel extends FormModel
     public function getBounces (Page $page)
     {
         return $this->getHitRepository()->getBounces($page->getId());
-    }
-
-    /**
-     * Get the variant parent/children
-     *
-     * @param Page $page
-     *
-     * @return array
-     */
-    public function getVariants (Page $page)
-    {
-        $parent = $page->getVariantParent();
-
-        if (!empty($parent)) {
-            $children = $parent->getVariantChildren();
-        } else {
-            $parent   = $page;
-            $children = $page->getVariantChildren();
-        }
-
-        if (empty($children)) {
-            $children = array();
-        }
-
-        return array($parent, $children);
-    }
-
-    /**
-     * Get translation parent/children
-     *
-     * @param Page $page
-     *
-     * @return array
-     */
-    public function getTranslations (Page $page)
-    {
-        $parent = $page->getTranslationParent();
-
-        if (!empty($parent)) {
-            $children = $parent->getTranslationChildren();
-        } else {
-            $parent   = $page;
-            $children = $page->getTranslationChildren();
-        }
-
-        if (empty($children)) {
-            $children = false;
-        }
-
-        return array($parent, $children);
-    }
-
-    /**
-     * Converts a variant to the main page and the main page a variant
-     *
-     * @param Page $page
-     */
-    public function convertVariant (Page $page)
-    {
-        //let saveEntities() know it does not need to set variant start dates
-        $this->inConversion = true;
-
-        list($parent, $children) = $this->getVariants($page);
-
-        $save = array();
-
-        //set this page as the parent for the original parent and children
-        if ($parent) {
-            if ($parent->getId() != $page->getId()) {
-                $parent->setIsPublished(false);
-                $page->addVariantChild($parent);
-                $parent->setVariantParent($page);
-            }
-
-            $parent->setVariantStartDate(null);
-            $parent->setVariantHits(0);
-
-            foreach ($children as $child) {
-                //capture child before it's removed from collection
-                $save[] = $child;
-
-                $parent->removeVariantChild($child);
-            }
-        }
-
-        if (count($save)) {
-            foreach ($save as $child) {
-                if ($child->getId() != $page->getId()) {
-                    $child->setIsPublished(false);
-                    $page->addVariantChild($child);
-                    $child->setVariantParent($page);
-                } else {
-                    $child->removeVariantParent();
-                }
-
-                $child->setVariantHits(0);
-                $child->setVariantStartDate(null);
-            }
-        }
-
-        $save[] = $parent;
-        $save[] = $page;
-
-        //save the entities
-        $this->saveEntities($save, false);
-    }
-
-
-    /**
-     * Delete an entity
-     *
-     * @param object $entity
-     *
-     * @return void
-     */
-    public function deleteEntity($entity)
-    {
-        $this->getRepository()->nullParents($entity->getId());
-
-        return parent::deleteEntity($entity);
-    }
-
-    /**
-     * Delete an array of entities
-     *
-     * @param array $ids
-     *
-     * @return array
-     */
-    public function deleteEntities($ids)
-    {
-        $this->getRepository()->nullParents($ids);
-
-        return parent::deleteEntities($ids);
     }
 
     /**
