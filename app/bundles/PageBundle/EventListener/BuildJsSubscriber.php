@@ -114,8 +114,9 @@ JS;
     {
         $formSubmitUrl = $this->factory->getRouter()->generate('mautic_form_postresults_ajax', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $mauticBaseUrl = $this->factory->getRouter()->generate('mautic_base_index', [], UrlGeneratorInterface::ABSOLUTE_URL);
-        $mediaElementCss = str_replace('index_dev.php/', '', $mauticBaseUrl) . 'media/css/mediaelementplayer.css';
-        $jQueryUrl = str_replace(['index.php', 'index_dev.php'], '', $mauticBaseUrl) . '/app/bundles/CoreBundle/Assets/js/libraries/2.jquery.js';
+        $assetBaseUrl  = str_replace(['index.php/', 'index_dev.php/'], '', $mauticBaseUrl);
+        $mediaElementCss = $assetBaseUrl . 'media/css/mediaelementplayer.css';
+        $jQueryUrl = $assetBaseUrl . 'app/bundles/CoreBundle/Assets/js/libraries/2.jquery.js';
 
         $mediaElementJs = <<<'JS'
 /*!

@@ -20,6 +20,7 @@ use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Class PublicController
@@ -238,7 +239,7 @@ class PublicController extends CommonFormController
                 }
             }
 
-            $this->get('templating.helper.assets')->addScript($this->get('router')->generate('mautic_js'), 'onPageDisplay_headClose', true, 'mautic_js');
+            $this->get('templating.helper.assets')->addScript($this->get('router')->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL), 'onPageDisplay_headClose', true, 'mautic_js');
 
             $event = new PageDisplayEvent($content, $entity);
             $this->factory->getDispatcher()->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
