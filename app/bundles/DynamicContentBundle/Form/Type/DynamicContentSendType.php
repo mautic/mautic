@@ -9,7 +9,6 @@
  */
 namespace Mautic\DynamicContentBundle\Form\Type;
 
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -27,20 +26,13 @@ class DynamicContentSendType extends AbstractType
     protected $router;
 
     /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
-     */
-    protected $request;
-
-    /**
      * DynamicContentSendType constructor.
      *
      * @param RouterInterface   $router
-     * @param RequestStack|null $requestStack
      */
-    public function __construct(RouterInterface $router, RequestStack $requestStack)
+    public function __construct(RouterInterface $router)
     {
-        $this->router  = $router;
-        $this->request = $requestStack->getCurrentRequest();
+        $this->router = $router;
     }
 
     /**
@@ -65,7 +57,6 @@ class DynamicContentSendType extends AbstractType
                 'constraints'   => [
                     new NotBlank(['message' => 'mautic.core.value.required']),
                 ],
-                'variantParent' => $this->request->get('variantParent', 0),
             ]
         );
 

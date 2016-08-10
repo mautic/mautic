@@ -65,16 +65,12 @@ return [
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token'
                 ]
-            ]
+            ],
         ],
         'forms' => [
             'mautic.form.type.dwc' => [
                 'class' => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentType',
                 'arguments' => [
-                    'translator',
-                    'mautic.security',
-                    'mautic.dynamicContent.model.dynamicContent',
-                    'request_stack',
                     'doctrine.orm.entity_manager',
                 ],
                 'alias' => 'dwc',
@@ -83,7 +79,6 @@ return [
                 'class' => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentSendType',
                 'arguments' => [
                     'router',
-                    'request_stack',
                 ],
                 'alias' => 'dwcsend_list',
             ],
@@ -91,7 +86,6 @@ return [
                 'class' => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentDecisionType',
                 'arguments' => [
                     'router',
-                    'request_stack',
                 ],
                 'alias' => 'dwcdecision_list',
             ],
@@ -109,5 +103,14 @@ return [
                 ],
             ],
         ],
+        'other' => [
+            'mautic.helper.dynamicContent' => [
+                'class'     => 'Mautic\DynamicContentBundle\Helper\DynamicContentHelper',
+                'arguments' => [
+                    'mautic.dynamicContent.model.dynamicContent',
+                    'mautic.campaign.model.event',
+                    'event_dispatcher'
+                ]
+            ],]
     ],
 ];
