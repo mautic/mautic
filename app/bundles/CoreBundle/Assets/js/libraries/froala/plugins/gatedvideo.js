@@ -224,7 +224,7 @@
       editor.events.focus(true);
       editor.selection.restore();
 
-      editor.html.insert('<span contenteditable="false" draggable="true" class="fr-jiv fr-gatedvideo fr-dv' + (editor.opts.gatedVideoDefaultDisplay[0]) + (editor.opts.gatedVideoDefaultAlign != 'center' ? ' fr-fv' + editor.opts.gatedVideoDefaultAlign[0] : '') + '">' + embedded_code + '</span>', false, editor.opts.gatedVideoSplitHTML);
+      editor.html.insert('<div data-slot="text" class="fr-element fr-view" dir="auto" contenteditable="true" spellcheck="true"><span contenteditable="false" draggable="true" class="fr-jiv fr-gatedvideo fr-dv' + (editor.opts.gatedVideoDefaultDisplay[0]) + (editor.opts.gatedVideoDefaultAlign != 'center' ? ' fr-fv' + editor.opts.gatedVideoDefaultAlign[0] : '') + '">' + embedded_code + '</span></div>', false, editor.opts.gatedVideoSplitHTML);
 
       editor.popups.hide('gatedvideo.insert');
 
