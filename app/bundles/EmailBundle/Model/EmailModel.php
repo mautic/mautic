@@ -451,7 +451,7 @@ class EmailModel extends FormModel
 
                     throw $exception;
                 } else {
-                    $this->logger->addError(
+                    $this->factory->getLogger()->addError(
                         $exception->getMessage(),
                         ['exception' => $exception]
                     );
