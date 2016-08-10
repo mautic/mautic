@@ -999,7 +999,7 @@ div.mejs-speed-button {
 
 .mejs-poster {
 	text-align: center;
-	background: rgba(0,0,0,0.5);
+	background: rgba(0,0,0,0.75);
 	z-index: 1000;
 	color: white;
 }
@@ -1007,4 +1007,17 @@ div.mejs-speed-button {
 .no-controls .mejs-controls,
 .no-controls .mejs-overlay-play {
 	display: none !important;
+}
+
+.mejs-poster {
+	overflow:hidden;
+}
+
+.mautic-gated-video-style .mauticform-error,
+.mautic-gated-video-style .mauticform-message {
+	display:none;
+}
+
+.mautic-gated-video-style .mauticform-row {
+	margin-bottom:13px;
 }

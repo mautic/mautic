@@ -110,24 +110,24 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param array|int $emailIds
+     * @param array|int $notificationIds
      * @param int       $listId
      *
      * @return int
      */
-    public function getReadCount($emailIds = null, $listId = null)
+    public function getReadCount($notificationIds = null, $listId = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $q->select('count(s.id) as read_count')
             ->from(MAUTIC_TABLE_PREFIX . 'push_notification_stats', 's');
 
-        if ($emailIds) {
-            if (!is_array($emailIds)) {
-                $emailIds = array((int) $emailIds);
+        if ($notificationIds) {
+            if (!is_array($notificationIds)) {
+                $notificationIds = array((int) $notificationIds);
             }
             $q->where(
-                $q->expr()->in('s.notification_id', $emailIds)
+                $q->expr()->in('s.notification_id', $notificationIds)
             );
         }
 
@@ -140,65 +140,6 @@ class StatRepository extends CommonRepository
         $results = $q->execute()->fetchAll();
 
         return (isset($results[0])) ? $results[0]['read_count'] : 0;
-    }
-
-    /**
-     * @param           $notificationIds
-     * @param \DateTime $fromDate
-     *
-     * @return array
-     */
-    public function getClickedRates($notificationIds, \DateTime $fromDate = null)
-    {
-        $inIds = (!is_array($notificationIds)) ? array($notificationIds) : $notificationIds;
-
-        $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('e.email_id, count(e.id) as the_count')
-            ->from(MAUTIC_TABLE_PREFIX . 'push_notification_stats', 'e')
-            ->where(
-                $sq->expr()->in('e.notification_id', $inIds)
-            );
-
-        if ($fromDate !== null) {
-            //make sure the date is UTC
-            $dt = new DateTimeHelper($fromDate);
-            $sq->andWhere(
-                $sq->expr()->gte('e.date_sent', $sq->expr()->literal($dt->toUtcString()))
-            );
-        }
-        $sq->groupBy('e.notification_id');
-
-        //get a total number of sent emails first
-        $totalCounts = $sq->execute()->fetchAll();
-
-        $return  = array();
-        foreach ($inIds as $id) {
-            $return[$id] = array(
-                'totalCount' => 0,
-                'readCount'  => 0,
-                'readRate'   => 0
-            );
-        }
-
-        foreach ($totalCounts as $t) {
-            if ($t['notification_id'] != null) {
-                $return[$t['notification_id']]['totalCount'] = (int) $t['the_count'];
-            }
-        }
-
-        //now get a read count
-        $sq->andWhere('e.is_read = :true')
-            ->setParameter('true', true, 'boolean');
-        $readCounts = $sq->execute()->fetchAll();
-
-        foreach ($readCounts as $r) {
-            $return[$r['notification_id']]['readCount'] = (int) $r['the_count'];
-            $return[$r['notification_id']]['readRate']  = ($return[$r['notification_id']]['totalCount']) ?
-                round(($r['the_count'] / $return[$r['notification_id']]['totalCount']) * 100, 2) :
-                0;
-        }
-
-        return (!is_array($notificationIds)) ? $return[$notificationIds] : $return;
     }
 
     /**

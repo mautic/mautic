@@ -239,7 +239,7 @@ class PublicController extends CommonFormController
                 }
             }
 
-            $this->get('templating.helper.assets')->addScript('/mtc.js', 'onPageDisplay_headClose');
+            $this->get('templating.helper.assets')->addScript($this->get('router')->generate('mautic_js'), 'onPageDisplay_headClose', true, 'mautic_js');
 
             $event = new PageDisplayEvent($content, $entity);
             $this->factory->getDispatcher()->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);

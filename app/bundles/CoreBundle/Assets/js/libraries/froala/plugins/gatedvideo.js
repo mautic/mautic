@@ -52,7 +52,7 @@
     gatedVideoMove: true
   });
 
-  $.FE.VIDEO_PROVIDERS = [
+  $.FE.GATED_VIDEO_PROVIDERS = [
     {
       test_regex: /^.*((youtu.be)|(youtube.com))\/((v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))?\??v?=?([^#\&\?]*).*/,
       provider: 'youtube',
@@ -75,8 +75,8 @@
   $.FE.PLUGINS.gatedVideo = function (editor) {
     var $overlay;
     var $handler;
-    var $video_resizer;
-    var $current_video;
+    var $gated_video_resizer;
+    var $current_gated_video;
 
     /**
      * Refresh the image insert popup.
@@ -117,11 +117,11 @@
       editor.popups.setContainer('gatedvideo.edit', $(editor.opts.scrollableContainer));
       editor.popups.refresh('gatedvideo.edit');
 
-      var $video_obj = $current_video.find('video');
-      var left = $video_obj.offset().left + $video_obj.outerWidth() / 2;
-      var top = $video_obj.offset().top + $video_obj.outerHeight();
+      var $gated_video_obj = $current_gated_video.find('video');
+      var left = $gated_video_obj.offset().left + $gated_video_obj.outerWidth() / 2;
+      var top = $gated_video_obj.offset().top + $gated_video_obj.outerHeight();
 
-      editor.popups.show('gatedvideo.edit', left, top, $video_obj.outerHeight());
+      editor.popups.show('gatedvideo.edit', left, top, $gated_video_obj.outerHeight());
     }
 
     function _initInsertPopup (delayed) {
@@ -135,7 +135,7 @@
       var video_buttons = '';
       if (editor.opts.gatedVideoInsertButtons.length > 1) {
         video_buttons = '<div class="fr-buttons">' + editor.button.buildList(editor.opts.gatedVideoInsertButtons) + '</div>';
-    }
+      }
 
       // Video by url layer.
       var by_url_layer = '';
@@ -173,7 +173,7 @@
 
       var left;
       var top;
-      if (!$current_video && !editor.opts.toolbarInline) {
+      if (!$current_gated_video && !editor.opts.toolbarInline) {
         var $btn = editor.$tb.find('.fr-command[data-cmd="insertGatedVideo"]');
         left = $btn.offset().left + $btn.outerWidth() / 2;
         top = $btn.offset().top + (editor.opts.toolbarBottom ? 10 : $btn.outerHeight() - 10);
@@ -228,12 +228,12 @@
 
       editor.popups.hide('gatedvideo.insert');
 
-      var $video = editor.$el.find('.fr-jiv');
-      $video.removeClass('fr-jiv');
+      var $gated_video = editor.$el.find('.fr-jiv');
+      $gated_video.removeClass('fr-jiv');
 
-      $video.toggleClass('fr-draggable', editor.opts.gatedVideoMove);
+      $gated_video.toggleClass('fr-draggable', editor.opts.gatedVideoMove);
 
-      editor.events.trigger('gatedvideo.inserted', [$video]);
+      editor.events.trigger('gatedvideo.inserted', [$gated_video]);
     }
 
     /**
@@ -256,8 +256,8 @@
 
       var video = null;
       if (editor.helpers.isURL(link)) {
-        for (var i = 0; i < $.FE.VIDEO_PROVIDERS.length; i++) {
-          var vp = $.FE.VIDEO_PROVIDERS[i];
+        for (var i = 0; i < $.FE.GATED_VIDEO_PROVIDERS.length; i++) {
+          var vp = $.FE.GATED_VIDEO_PROVIDERS[i];
           if (vp.test_regex.test(link)) {
             video = link.replace(vp.url_regex, vp.url_text);
             video = vp.html.replace('{url}', video).replace('{formId}', formId).replace('{gateTime}', gateTime);
@@ -296,7 +296,7 @@
      */
     function _handlerMousedown (e) {
       // Check if resizer belongs to current instance.
-      if (!editor.core.sameInstance($video_resizer)) return true;
+      if (!editor.core.sameInstance($gated_video_resizer)) return true;
 
       e.preventDefault();
       e.stopPropagation();
@@ -324,7 +324,7 @@
      */
     function _handlerMousemove (e) {
       // Check if resizer belongs to current instance.
-      if (!editor.core.sameInstance($video_resizer)) return true;
+      if (!editor.core.sameInstance($gated_video_resizer)) return true;
 
       if ($handler) {
         e.preventDefault()
@@ -345,10 +345,10 @@
         var diff_x = c_x - s_x;
         var diff_y = c_y - s_y;
 
-        var $video_obj = $current_video.find('video');
+        var $gated_video_obj = $current_gated_video.find('video');
 
-        var width = $video_obj.width();
-        var height = $video_obj.height();
+        var width = $gated_video_obj.width();
+        var height = $gated_video_obj.height();
         if ($handler.hasClass('fr-hnw') || $handler.hasClass('fr-hsw')) {
           diff_x = 0 - diff_x;
         }
@@ -357,10 +357,10 @@
           diff_y = 0 - diff_y;
         }
 
-        $video_obj.css('width', width + diff_x);
-        $video_obj.css('height', height + diff_y);
-        $video_obj.removeAttr('width');
-        $video_obj.removeAttr('height');
+        $gated_video_obj.css('width', width + diff_x);
+        $gated_video_obj.css('height', height + diff_y);
+        $gated_video_obj.attr('width', width + diff_x);
+        $gated_video_obj.attr('height', height + diff_y);
 
         _repositionResizer();
       }
@@ -371,9 +371,9 @@
      */
     function _handlerMouseup (e) {
       // Check if resizer belongs to current instance.
-      if (!editor.core.sameInstance($video_resizer)) return true;
+      if (!editor.core.sameInstance($gated_video_resizer)) return true;
 
-      if ($handler && $current_video) {
+      if ($handler && $current_gated_video) {
         if (e) e.stopPropagation();
         $handler = null;
         $overlay.hide();
@@ -398,39 +398,36 @@
       var doc;
 
       // No shared video resizer.
-      if (!editor.shared.$video_resizer) {
+      if (!editor.shared.$gated_video_resizer) {
         // Create shared video resizer.
-        editor.shared.$video_resizer = $('<div class="fr-gatedvideo-resizer"></div>');
-        $video_resizer = editor.shared.$video_resizer;
+        editor.shared.$gated_video_resizer = $('<div class="fr-gatedvideo-resizer"></div>');
+        $gated_video_resizer = editor.shared.$gated_video_resizer;
 
         // Bind mousedown event shared.
-        editor.events.$on($video_resizer, 'mousedown', function (e) {
+        editor.events.$on($gated_video_resizer, 'mousedown', function (e) {
           e.stopPropagation();
         }, true);
 
-        // video resize is enabled.
-        if (editor.opts.gatedVideoResize) {
-          $video_resizer.append(_getHandler('nw') + _getHandler('ne') + _getHandler('sw') + _getHandler('se'));
+        $gated_video_resizer.append(_getHandler('nw') + _getHandler('ne') + _getHandler('sw') + _getHandler('se'));
 
-          // Add video resizer overlay and set it.
-          editor.shared.$vid_overlay = $('<div class="fr-gatedvideo-overlay"></div>');
-          $overlay = editor.shared.$vid_overlay;
-          doc = $video_resizer.get(0).ownerDocument;
-          $(doc).find('body').append($overlay);
-        }
+        // Add video resizer overlay and set it.
+        editor.shared.$gated_vid_overlay = $('<div class="fr-gatedvideo-overlay"></div>');
+        $overlay = editor.shared.$gated_vid_overlay;
+        doc = $gated_video_resizer.get(0).ownerDocument;
+        $(doc).find('body').append($overlay);
       } else {
-        $video_resizer = editor.shared.$video_resizer;
-        $overlay = editor.shared.$vid_overlay;
+        $gated_video_resizer = editor.shared.$gated_video_resizer;
+        $overlay = editor.shared.$gated_vid_overlay;
 
         editor.events.on('destroy', function () {
-          $video_resizer.removeClass('fr-active').appendTo($('body'));
+          $gated_video_resizer.removeClass('fr-active').appendTo($('body'));
         }, true);
       }
 
       // Shared destroy.
       editor.events.on('shared.destroy', function () {
-        $video_resizer.html('').removeData().remove();
-        $video_resizer = null;
+        $gated_video_resizer.html('').removeData().remove();
+        $gated_video_resizer = null;
 
         if (editor.opts.gatedVideoResize) {
           $overlay.remove();
@@ -447,9 +444,9 @@
 
       // video resize is enabled.
       if (editor.opts.gatedVideoResize) {
-        doc = $video_resizer.get(0).ownerDocument;
+        doc = $gated_video_resizer.get(0).ownerDocument;
 
-        editor.events.$on($video_resizer, editor._mousedown, '.fr-handler', _handlerMousedown);
+        editor.events.$on($gated_video_resizer, editor._mousedown, '.fr-handler', _handlerMousedown);
         editor.events.$on($(doc), editor._mousemove, _handlerMousemove);
         editor.events.$on($(doc.defaultView || doc.parentWindow), editor._mouseup, _handlerMouseup);
 
@@ -461,18 +458,18 @@
      * Reposition resizer.
      */
     function _repositionResizer () {
-      if (!$video_resizer) _initResizer();
+      if (!$gated_video_resizer) _initResizer();
 
-      (editor.$wp || $(editor.opts.scrollableContainer)).append($video_resizer);
-      $video_resizer.data('instance', editor);
+      (editor.$wp || $(editor.opts.scrollableContainer)).append($gated_video_resizer);
+      $gated_video_resizer.data('instance', editor);
 
-      var $video_obj = $current_video.find('iframe, embed, video');
+      var $gated_video_obj = $current_gated_video.find('video');
 
-      $video_resizer
-        .css('top', (editor.opts.iframe ? $video_obj.offset().top - 1 : $video_obj.offset().top - editor.$wp.offset().top - 1) + editor.$wp.scrollTop())
-        .css('left', (editor.opts.iframe ? $video_obj.offset().left - 1 : $video_obj.offset().left - editor.$wp.offset().left - 1) + editor.$wp.scrollLeft())
-        .css('width', $video_obj.outerWidth())
-        .css('height', $video_obj.height())
+      $gated_video_resizer
+        .css('top', (editor.opts.iframe ? $gated_video_obj.offset().top - 1 : $gated_video_obj.offset().top - editor.$wp.offset().top - 1) + editor.$wp.scrollTop())
+        .css('left', (editor.opts.iframe ? $gated_video_obj.offset().left - 1 : $gated_video_obj.offset().left - editor.$wp.offset().left - 1) + editor.$wp.scrollLeft())
+        .css('width', $gated_video_obj.outerWidth())
+        .css('height', $gated_video_obj.height())
         .addClass('fr-active')
     }
 
@@ -508,7 +505,7 @@
         editor.events.enableBlur();
       }
 
-      $current_video = $(this);
+      $current_gated_video = $(this);
       $(this).addClass('fr-active');
 
       if (editor.opts.iframe) {
@@ -528,29 +525,30 @@
      * Exit edit.
      */
     function _exitEdit (force_exit) {
-      if ($current_video && (_canExit() || force_exit === true)) {
-        $video_resizer.removeClass('fr-active');
+      if ($current_gated_video && (_canExit() || force_exit === true)) {
+        $gated_video_resizer.removeClass('fr-active');
 
         editor.toolbar.enable();
 
-        $current_video.removeClass('fr-active');
-        $current_video = null;
+        $current_gated_video.removeClass('fr-active');
+
+        $current_gated_video = null;
 
         _unmarkExit();
       }
     }
 
-    editor.shared.vid_exit_flag = false;
+    editor.shared.gated_vid_exit_flag = false;
     function _markExit () {
-      editor.shared.vid_exit_flag = true;
+      editor.shared.gated_vid_exit_flag = true;
     }
 
     function _unmarkExit () {
-      editor.shared.vid_exit_flag = false;
+      editor.shared.gated_vid_exit_flag = false;
     }
 
     function _canExit () {
-      return editor.shared.vid_exit_flag;
+      return editor.shared.gated_vid_exit_flag;
     }
 
     /**
@@ -591,7 +589,7 @@
       var $popup = editor.popups.create('gatedvideo.edit', template);
 
       editor.events.$on(editor.$wp, 'scroll.gatedVideo-edit', function () {
-        if ($current_video && editor.popups.isVisible('gatedvideo.edit')) {
+        if ($current_gated_video && editor.popups.isVisible('gatedvideo.edit')) {
           _showEditPopup();
         }
       });
@@ -603,11 +601,11 @@
      * Refresh the size popup.
      */
     function _refreshSizePopup () {
-      if ($current_video) {
+      if ($current_gated_video) {
         var $popup = editor.popups.get('gatedvideo.size');
-        var $video_obj = $current_video.find('iframe, embed, video')
-        $popup.find('input[name="width"]').val($video_obj.get(0).style.width || $video_obj.attr('width')).trigger('change');
-        $popup.find('input[name="height"]').val($video_obj.get(0).style.height || $video_obj.attr('height')).trigger('change');
+        var $gated_video_obj = $current_gated_video.find('video')
+        $popup.find('input[name="width"]').val($gated_video_obj.get(0).style.width || $gated_video_obj.attr('width')).trigger('change');
+        $popup.find('input[name="height"]').val($gated_video_obj.get(0).style.height || $gated_video_obj.attr('height')).trigger('change');
       }
     }
 
@@ -620,11 +618,11 @@
 
       editor.popups.refresh('gatedvideo.size');
       editor.popups.setContainer('gatedvideo.size', $(editor.opts.scrollableContainer));
-      var $video_obj = $current_video.find('iframe, embed, video')
-      var left = $video_obj.offset().left + $video_obj.width() / 2;
-      var top = $video_obj.offset().top + $video_obj.height();
+      var $gated_video_obj = $current_gated_video.find('video')
+      var left = $gated_video_obj.offset().left + $gated_video_obj.width() / 2;
+      var top = $gated_video_obj.offset().top + $gated_video_obj.height();
 
-      editor.popups.show('gatedvideo.size', left, top, $video_obj.height());
+      editor.popups.show('gatedvideo.size', left, top, $gated_video_obj.height());
     }
 
     /**
@@ -643,7 +641,7 @@
 
       // Size layer.
       var size_layer = '';
-      size_layer = '<div class="fr-gatedvideo-size-layer fr-layer fr-active" id="fr-gatedvideo-size-layer-' + editor.id + '"><div class="fr-gatedvideo-group"><div class="fr-input-line"><input type="text" name="width" placeholder="' + editor.language.translate('Width') + '" tabIndex="1"></div><div class="fr-input-line"><input type="text" name="height" placeholder="' + editor.language.translate('Height') + '" tabIndex="1"></div></div><div class="fr-action-buttons"><button type="button" class="fr-command fr-submit" data-cmd="videoSetSize" tabIndex="2">' + editor.language.translate('Update') + '</button></div></div>';
+      size_layer = '<div class="fr-gatedvideo-size-layer fr-layer fr-active" id="fr-gatedvideo-size-layer-' + editor.id + '"><div class="fr-gatedvideo-group"><div class="fr-input-line"><input type="text" name="width" placeholder="' + editor.language.translate('Width') + '" tabIndex="1"></div><div class="fr-input-line"><input type="text" name="height" placeholder="' + editor.language.translate('Height') + '" tabIndex="1"></div></div><div class="fr-action-buttons"><button type="button" class="fr-command fr-submit" data-cmd="gatedVideoSetSize" tabIndex="2">' + editor.language.translate('Update') + '</button></div></div>';
 
       var template = {
         buttons: video_buttons,
@@ -654,7 +652,7 @@
       var $popup = editor.popups.create('gatedvideo.size', template);
 
       editor.events.$on(editor.$wp, 'scroll', function () {
-        if ($current_video && editor.popups.isVisible('gatedvideo.size')) {
+        if ($current_gated_video && editor.popups.isVisible('gatedvideo.size')) {
           showSizePopup();
         }
       });
@@ -666,12 +664,12 @@
      * Align image.
      */
     function align (val) {
-      $current_video.removeClass('fr-fvr fr-fvl');
+      $current_gated_video.removeClass('fr-fvr fr-fvl');
       if (val == 'left') {
-        $current_video.addClass('fr-fvl');
+        $current_gated_video.addClass('fr-fvl');
       }
       else if (val == 'right') {
-        $current_video.addClass('fr-fvr');
+        $current_gated_video.addClass('fr-fvr');
       }
 
       _repositionResizer();
@@ -682,12 +680,12 @@
      * Refresh the align icon.
      */
     function refreshAlign ($btn) {
-      if (!$current_video) return false;
+      if (!$current_gated_video) return false;
 
-      if ($current_video.hasClass('fr-fvl')) {
+      if ($current_gated_video.hasClass('fr-fvl')) {
         $btn.find('> *:first').replaceWith(editor.icon.create('align-left'));
       }
-      else if ($current_video.hasClass('fr-fvr')) {
+      else if ($current_gated_video.hasClass('fr-fvr')) {
         $btn.find('> *:first').replaceWith(editor.icon.create('align-right'));
       }
       else {
@@ -700,10 +698,10 @@
      */
     function refreshAlignOnShow ($btn, $dropdown) {
       var alignment = 'justify';
-      if ($current_video.hasClass('fr-fvl')) {
+      if ($current_gated_video.hasClass('fr-fvl')) {
         alignment = 'left';
       }
-      else if ($current_video.hasClass('fr-fvr')) {
+      else if ($current_gated_video.hasClass('fr-fvr')) {
         alignment = 'right';
       }
 
@@ -714,12 +712,12 @@
      * Align image.
      */
     function display (val) {
-      $current_video.removeClass('fr-dvi fr-dvb');
+      $current_gated_video.removeClass('fr-dvi fr-dvb');
       if (val == 'inline') {
-        $current_video.addClass('fr-dvi');
+        $current_gated_video.addClass('fr-dvi');
       }
       else if (val == 'block') {
-        $current_video.addClass('fr-dvb');
+        $current_gated_video.addClass('fr-dvb');
       }
 
       _repositionResizer();
@@ -731,7 +729,7 @@
      */
     function refreshDisplayOnShow ($btn, $dropdown) {
       var d = 'block';
-      if ($current_video.hasClass('fr-dvi')) {
+      if ($current_gated_video.hasClass('fr-dvi')) {
         d = 'inline';
       }
 
@@ -742,19 +740,19 @@
      * Remove current selected video.
      */
     function remove () {
-      if ($current_video) {
-        if (editor.events.trigger('gatedvideo.beforeRemove', [$current_video]) !== false) {
-          var $video = $current_video;
+      if ($current_gated_video) {
+        if (editor.events.trigger('gatedvideo.beforeRemove', [$current_gated_video]) !== false) {
+          var $gated_video = $current_gated_video;
           editor.popups.hideAll();
           _exitEdit(true);
 
-          editor.selection.setBefore($video.get(0)) || editor.selection.setAfter($video.get(0));
-          $video.remove();
+          editor.selection.setBefore($gated_video.get(0)) || editor.selection.setAfter($gated_video.get(0));
+          $gated_video.remove();
           editor.selection.restore();
 
           editor.html.fillEmptyBlocks();
 
-          editor.events.trigger('gatedvideo.removed', [$video]);
+          editor.events.trigger('gatedvideo.removed', [$gated_video]);
         }
       }
     }
@@ -762,44 +760,44 @@
     /**
      * Convert style to classes.
      */
-    function _convertStyleToClasses ($video) {
-      if (!$video.hasClass('fr-dvi') && !$video.hasClass('fr-dvb')) {
-        var flt = $video.css('float');
-        $video.css('float', 'none');
-        if ($video.css('display') == 'block') {
-          $video.css('float', flt);
-          if (parseInt($video.css('margin-left'), 10) === 0 && ($video.attr('style') || '').indexOf('margin-right: auto') >= 0) {
-            $video.addClass('fr-fvl');
+    function _convertStyleToClasses ($gated_video) {
+      if (!$gated_video.hasClass('fr-dvi') && !$gated_video.hasClass('fr-dvb')) {
+        var flt = $gated_video.css('float');
+        $gated_video.css('float', 'none');
+        if ($gated_video.css('display') == 'block') {
+          $gated_video.css('float', flt);
+          if (parseInt($gated_video.css('margin-left'), 10) === 0 && ($gated_video.attr('style') || '').indexOf('margin-right: auto') >= 0) {
+            $gated_video.addClass('fr-fvl');
           }
-          else if (parseInt($video.css('margin-right'), 10) === 0 && ($video.attr('style') || '').indexOf('margin-left: auto') >= 0) {
-            $video.addClass('fr-fvr');
+          else if (parseInt($gated_video.css('margin-right'), 10) === 0 && ($gated_video.attr('style') || '').indexOf('margin-left: auto') >= 0) {
+            $gated_video.addClass('fr-fvr');
           }
 
-          $video.addClass('fr-dvb');
+          $gated_video.addClass('fr-dvb');
         }
         else {
-          $video.css('float', flt);
-          if ($video.css('float') == 'left') {
-            $video.addClass('fr-fvl');
+          $gated_video.css('float', flt);
+          if ($gated_video.css('float') == 'left') {
+            $gated_video.addClass('fr-fvl');
           }
-          else if ($video.css('float') == 'right') {
-            $video.addClass('fr-fvr');
+          else if ($gated_video.css('float') == 'right') {
+            $gated_video.addClass('fr-fvr');
           }
 
-          $video.addClass('fr-dvi');
+          $gated_video.addClass('fr-dvi');
         }
 
-        $video.css('margin', '');
-        $video.css('float', '');
-        $video.css('display', '');
-        $video.css('z-index', '');
-        $video.css('position', '');
-        $video.css('overflow', '');
-        $video.css('vertical-align', '');
+        $gated_video.css('margin', '');
+        $gated_video.css('float', '');
+        $gated_video.css('display', '');
+        $gated_video.css('z-index', '');
+        $gated_video.css('position', '');
+        $gated_video.css('overflow', '');
+        $gated_video.css('vertical-align', '');
       }
 
       if (!editor.opts.gatedVideoTextNear) {
-        $video.removeClass('fr-dvi').addClass('fr-dvb');
+        $gated_video.removeClass('fr-dvi').addClass('fr-dvb');
       }
     }
 
@@ -820,8 +818,8 @@
         if ($(this).parents('span.fr-gatedvideo').length > 0) return false;
 
         var link = $(this).attr('src');
-        for (var i = 0; i < $.FE.VIDEO_PROVIDERS.length; i++) {
-          var vp = $.FE.VIDEO_PROVIDERS[i];
+        for (var i = 0; i < $.FE.GATED_VIDEO_PROVIDERS.length; i++) {
+          var vp = $.FE.GATED_VIDEO_PROVIDERS[i];
           if (vp.test_regex.test(link)) {
             return true;
           }
@@ -862,19 +860,19 @@
 
       editor.events.on('keydown', function (e) {
         var key_code = e.which;
-        if ($current_video && (key_code == $.FE.KEYCODE.BACKSPACE || key_code == $.FE.KEYCODE.DELETE)) {
+        if ($current_gated_video && (key_code == $.FE.KEYCODE.BACKSPACE || key_code == $.FE.KEYCODE.DELETE)) {
           e.preventDefault();
           remove();
           return false;
         }
 
-        if ($current_video && key_code == $.FE.KEYCODE.ESC) {
+        if ($current_gated_video && key_code == $.FE.KEYCODE.ESC) {
           _exitEdit(true);
           e.preventDefault();
           return false;
         }
 
-        if ($current_video && !editor.keys.ctrlKey(e)) {
+        if ($current_gated_video && !editor.keys.ctrlKey(e)) {
           e.preventDefault();
           return false;
         }
@@ -893,8 +891,8 @@
      * Get back to the video main popup.
      */
     function back () {
-      if ($current_video) {
-        $current_video.trigger('click');
+      if ($current_gated_video) {
+        $current_gated_video.trigger('click');
       }
       else {
         editor.events.disableBlur();
@@ -910,24 +908,28 @@
      * Set size based on the current video size.
      */
     function setSize (width, height) {
-      if ($current_video) {
+      if ($current_gated_video) {
         var $popup = editor.popups.get('gatedvideo.size');
-        var $video_obj = $current_video.find('iframe, embed, video');
-        $video_obj.css('width', width || $popup.find('input[name="width"]').val());
-        $video_obj.css('height', height || $popup.find('input[name="height"]').val());
+        var $gated_video_obj = $current_gated_video.find('video');
+        $gated_video_obj.css('width', width || $popup.find('input[name="width"]').val());
+        $gated_video_obj.css('height', height || $popup.find('input[name="height"]').val());
 
-        if ($video_obj.get(0).style.width) $video_obj.removeAttr('width');
-        if ($video_obj.get(0).style.height) $video_obj.removeAttr('height');
+        if ($gated_video_obj.get(0).style.width) {
+          $gated_video_obj.attr('width', $gated_video_obj.get(0).style.width);
+        }
+        if ($gated_video_obj.get(0).style.height) {
+          $gated_video_obj.attr('height', $gated_video_obj.get(0).style.height);
+        }
 
         $popup.find('input').blur();
         setTimeout(function () {
-          $current_video.trigger('click');
+          $current_gated_video.trigger('click');
         }, editor.helpers.isAndroid() ? 50 : 0);
       }
     }
 
     function get () {
-      return $current_video;
+      return $current_gated_video;
     }
 
     return {
@@ -1036,7 +1038,7 @@
       var options =  $.FE.COMMANDS.gatedVideoAlign.options;
       for (var val in options) {
         if (options.hasOwnProperty(val)) {
-          c += '<li><a class="fr-command fr-title" data-cmd="videoAlign" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.icon.create('align-' + val) + '</a></li>';
+          c += '<li><a class="fr-command fr-title" data-cmd="gatedVideoAlign" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.icon.create('align-' + val) + '</a></li>';
         }
       }
       c += '</ul>';
@@ -1085,8 +1087,8 @@
       this.gatedVideo.back();
     },
     refresh: function ($btn) {
-      var $current_video = this.gatedVideo.get();
-      if (!$current_video && !this.opts.toolbarInline) {
+      var $current_gated_video = this.gatedVideo.get();
+      if (!$current_gated_video && !this.opts.toolbarInline) {
         $btn.addClass('fr-hidden');
         $btn.next('.fr-separator').addClass('fr-hidden');
       }

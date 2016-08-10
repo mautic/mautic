@@ -142,11 +142,17 @@ MauticJS.parseTextToJSON = function(maybeJSON) {
 };
 
 MauticJS.insertScript = function (scriptUrl) {
-    var firstScript = document.getElementsByTagName('script')[0];
-    var scriptTag = document.createElement('script');
-    scriptTag.async = 1;
-    scriptTag.src = scriptUrl;
-    firstScript.parentNode.insertBefore(scriptTag, firstScript);
+    var scriptsInHead = document.getElementsByTagName('head')[0].getElementsByTagName('script');
+    var lastScript    = scriptsInHead[scriptsInHead.length - 1];
+    var scriptTag     = document.createElement('script');
+    scriptTag.async   = 1;
+    scriptTag.src     = scriptUrl;
+    
+    if (lastScript) {
+        lastScript.parentNode.insertBefore(scriptTag, lastScript);
+    } else {
+        document.getElementsByTagName('head')[0].appendChild(scriptTag);
+    }
 };
 
 MauticJS.insertStyle = function (styleUrl) {
