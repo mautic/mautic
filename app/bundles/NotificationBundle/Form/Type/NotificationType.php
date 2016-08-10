@@ -142,28 +142,8 @@ class NotificationType extends AbstractType
             'category',
             'category',
             [
-                'bundle' => 'email',
+                'bundle' => 'notification',
             ]
-        );
-
-        //add lead lists
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticLeadBundle:LeadList', 'id', true);
-        $builder->add(
-            $builder->create(
-                'lists',
-                'leadlist_choices',
-                [
-                    'label' => 'mautic.notification.form.list',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr' => [
-                        'class' => 'form-control',
-                    ],
-                    'multiple' => true,
-                    'expanded' => false,
-                    'required' => true,
-                ]
-            )
-                ->addModelTransformer($transformer)
         );
 
         $builder->add(
@@ -180,7 +160,6 @@ class NotificationType extends AbstractType
         );
 
         $builder->add('buttons', 'form_buttons');
-        $builder->add('notificationType', 'hidden');
 
         if (!empty($options['update_select'])) {
             $builder->add(

@@ -10,8 +10,6 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'notification');
 
-$notificationType = $form['notificationType']->vars['data'];
-
 $header = ($notification->getId()) ?
     $view['translator']->trans('mautic.notification.header.edit',
         ['%name%' => $notification->getName()]) :
@@ -19,9 +17,6 @@ $header = ($notification->getId()) ?
 
 $view['slots']->set('headerTitle', $header);
 
-if (!isset($attachmentSize)) {
-    $attachmentSize = 0;
-}
 ?>
 
 <?php echo $view['form']->start($form); ?>
@@ -50,17 +45,12 @@ if (!isset($attachmentSize)) {
     </div>
     <div class="col-md-3 bg-white height-auto bdr-l">
         <div class="pr-lg pl-lg pt-md pb-md">
-            <div id="leadList"<?php echo ($notificationType == 'template') ? ' class="hide"' : ''; ?>>
-                <?php echo $view['form']->row($form['lists']); ?>
-            </div>
             <?php echo $view['form']->row($form['category']); ?>
             <?php echo $view['form']->row($form['language']); ?>
             <div class="hide">
-                <div id="publishStatus"<?php echo ($notificationType == 'list') ? ' class="hide"' : ''; ?>>
-                    <?php echo $view['form']->row($form['isPublished']); ?>
-                    <?php echo $view['form']->row($form['publishUp']); ?>
-                    <?php echo $view['form']->row($form['publishDown']); ?>
-                </div>
+                <?php echo $view['form']->row($form['isPublished']); ?>
+                <?php echo $view['form']->row($form['publishUp']); ?>
+                <?php echo $view['form']->row($form['publishDown']); ?>
 
                 <?php echo $view['form']->rest($form); ?>
             </div>
@@ -68,27 +58,3 @@ if (!isset($attachmentSize)) {
     </div>
 </div>
 <?php echo $view['form']->end($form); ?>
-
-<?php
-$type = $notification->getNotificationType();
-if (empty($type) || !empty($forceTypeSelection)):
-    echo $view->render('MauticCoreBundle:Helper:form_selecttype.html.php',
-        [
-            'item' => $notification,
-            'mauticLang' => [
-                'newListNotification' => 'mautic.notification.type.list.header',
-                'newTemplateNotification' => 'mautic.notification.type.template.header',
-            ],
-            'typePrefix' => 'notification',
-            'cancelUrl' => 'mautic_notification_index',
-            'header' => 'mautic.notification.type.header',
-            'typeOneHeader' => 'mautic.notification.type.template.header',
-            'typeOneIconClass' => 'fa-cube',
-            'typeOneDescription' => 'mautic.notification.type.template.description',
-            'typeOneOnClick' => "Mautic.selectNotificationType('template');",
-            'typeTwoHeader' => 'mautic.notification.type.list.header',
-            'typeTwoIconClass' => 'fa-list',
-            'typeTwoDescription' => 'mautic.notification.type.list.description',
-            'typeTwoOnClick' => "Mautic.selectNotificationType('list');",
-        ]);
-endif;
