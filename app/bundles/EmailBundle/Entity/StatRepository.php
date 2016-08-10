@@ -385,6 +385,14 @@ class StatRepository extends CommonRepository
             );
         }
 
+        if (isset($options['fromDate']) && $options['fromDate']) {
+            $dt = new DateTimeHelper($options['fromDate']);
+            $query->andWhere(
+                $query->expr()->gte('s.date_sent', $query->expr()->literal($dt->toUtcString()))
+            );
+        }
+
+
         $timeToReadParser = function (&$stat) {
             $dateSent = new DateTimeHelper($stat['dateSent']);
             if (!empty($stat['dateSent']) && !empty($stat['dateRead'])) {

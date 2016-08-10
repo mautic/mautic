@@ -88,6 +88,22 @@ $template = '<div class="col-md-6">{content}</div>';
     </div>
 <?php endif; ?>
 
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.frequency_rules'); ?></h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <?php echo $view['form']->row($fields['email_frequency_number']); ?>
+            </div>
+            <div class="col-md-12">
+                <?php echo $view['form']->row($fields['email_frequency_time']); ?>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php if (isset($fields['monitored_email'])): ?>
     <div class="panel panel-primary">
         <div class="panel-heading">

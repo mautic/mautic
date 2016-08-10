@@ -160,6 +160,13 @@ class StatRepository extends CommonRepository
             }
         }
 
+        if (isset($options['fromDate']) && $options['fromDate']) {
+            $dt = new DateTimeHelper($options['fromDate']);
+            $query->andWhere(
+                $query->expr()->gte('s.dateSent', $query->expr()->literal($dt->toUtcString()))
+            );
+        }
+
         $stats = $query->getQuery()->getArrayResult();
 
         return $stats;
