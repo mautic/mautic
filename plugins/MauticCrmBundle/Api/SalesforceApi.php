@@ -23,15 +23,14 @@ class SalesforceApi extends CrmApi
 
     public function request($operation, $elementData = array(), $method = 'GET', $retry = false, $object = null, $queryUrl = null)
     {
-        if(!$object){
+        if (!$object) {
             $object = $this->object;
         }
 
         if(!$queryUrl){
             $queryUrl = $this->integration->getApiUrl();
             $request_url = sprintf($queryUrl . '/%s/%s', $object, $operation);
-        }
-        else{
+        } else{
             $request_url = sprintf($queryUrl . '/%s', $operation);
         }
 
@@ -51,7 +50,6 @@ class SalesforceApi extends CrmApi
                             return $this->request($operation, $elementData, $method, true);
                         }
                     }
-
                     $errors[] = $r['message'];
                 }
             }
@@ -91,31 +89,22 @@ class SalesforceApi extends CrmApi
     {
         $mActivityObjectName = 'mautic__timeline__c';
 
-        if(!empty($activity))
-        {
-            foreach ($activity as $key => $records)
-            {
+        if (!empty($activity)) {
+            foreach ($activity as $key => $records) {
                 $type = '';
 
-                foreach ($records['records'] as $key => $record){
-
-                    if(isset($record['delta']) and $record['delta']>0)
-                    {
+                foreach ($records['records'] as $key => $record) {
+                    if (isset($record['delta']) and $record['delta']>0) {
                         $subject = 'added';
                         $type = $record['type'];
-                    }
-                    else
-                    {
+                    } else  {
                         $subject = 'subtracted';
                     }
 
-                    if(isset($record['subject']))
-                    {
+                    if (isset($record['subject'])) {
                         $subject = $record['subject'];
                         $type = "Action";
-                    }
-                    else
-                    {
+                    } else {
                         $subject = ", Form name:";
                         $type = "Action";
                     }
@@ -134,8 +123,7 @@ class SalesforceApi extends CrmApi
 
                     if ($object === 'Lead') {
                         $activityData['records'][$key]['mautic__WhoId__c' ] = $records['id'];
-                    } elseif ($object === 'Contact')
-                    {
+                    } elseif ($object === 'Contact') {
                         $activityData['records'][$key]['mautic__contact_id__c' ] = $records['id'];
                     }
                 }
@@ -160,26 +148,23 @@ class SalesforceApi extends CrmApi
                             $references   = explode("-", $result['referenceId']);
                             $SF_leadIds[] = $references[1];
 
+                            $leadIds = implode("','", $SF_leadIds);
+                            $query   = "select Id, ConvertedContactId from ".$object." where id in ('".$leadIds."')";
 
+                            $contacts = $this->request('query', array("q" => $query), 'GET', false, null, $queryUrl);
 
-                        $leadIds = implode("','", $SF_leadIds);
-                        $query   = "select Id, ConvertedContactId from ".$object." where id in ('".$leadIds."')";
-
-                        $contacts = $this->request('query', array("q" => $query), 'GET', false, null, $queryUrl);
-
-                        foreach ($contacts['records'] as $contact) {
-                            foreach ($activityData['records'] as $key => $record) {
-                                if ($record['mautic__WhoId__c'] == $contact['Id']) {
-                                    unset($record['mautic__WhoId__c']);
-                                    $record['mautic__contact_id__c'] = $contact['ConvertedContactId'];
-                                    $newRecordData['records'][]      = $record;
-                                    unset($activityData['records'][$key]);
+                            foreach ($contacts['records'] as $contact) {
+                                foreach ($activityData['records'] as $key => $record) {
+                                    if ($record['mautic__WhoId__c'] == $contact['Id']) {
+                                        unset($record['mautic__WhoId__c']);
+                                        $record['mautic__contact_id__c'] = $contact['ConvertedContactId'];
+                                        $newRecordData['records'][]      = $record;
+                                        unset($activityData['records'][$key]);
+                                    }
                                 }
+
                             }
-
                         }
-
-                    }
                     }
                     if (!empty($newRecordData)) {
                         $results = $this->request(
@@ -210,26 +195,24 @@ class SalesforceApi extends CrmApi
     public function getLeads($query, $object)
     {
         //find out if start date is not our of range for org
-        if ($query['start'])
-        {
+        if ($query['start']) {
             $queryUrl = $this->integration->getQueryUrl();
             $organization = $this->request('query', array("q"=>"SELECT CreatedDate from Organization"),'GET',false,null,$queryUrl);
 
-            if(strtotime($query['start']) < strtotime($organization['records'][0]['CreatedDate']))
-            {
+            if (strtotime($query['start']) < strtotime($organization['records'][0]['CreatedDate'])) {
                 $query['start'] = date('c',strtotime($organization['records'][0]['CreatedDate']." +1 hour"));
             }
         }
+
         $fields = $this->integration->getAvailableLeadFields();
         $fields['id']=array('id' => array());
+        $result = array();
 
-        if($fields)
-        {
+        if (!empty($fields)) {
             $fields = implode(", ",array_keys($fields));
+            $getLeadsQuery = "SELECT ".$fields." from Lead where LastModifiedDate>=".$query['start']." and LastModifiedDate<=".$query['end'];
+            $result = $this->request('query', array("q"=>$getLeadsQuery),'GET',false,null,$queryUrl);
         }
-
-        $getLeadsQuery = "SELECT ".$fields." from Lead where LastModifiedDate>=".$query['start']." and LastModifiedDate<=".$query['end'];
-        $result = $this->request('query', array("q"=>$getLeadsQuery),'GET',false,null,$queryUrl);
 
         return $result;
     }
