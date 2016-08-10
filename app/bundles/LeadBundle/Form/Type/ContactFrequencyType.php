@@ -11,6 +11,8 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -31,82 +33,98 @@ class ContactFrequencyType extends AbstractType
         $builder->add(
             'channels',
             'choice',
-            array(
-                'choices'     => array(
-                    'sms' =>'SMS',
-                    'email' => 'Email'
-                ),
+            [
+                'choices'     => [
+                    'sms'   => 'mautic.sms.sms',
+                    'email' => 'mautic.email.email'
+                ],
                 'label'       => 'mautic.lead.contact.channels',
-                'label_attr'  => array('class' => 'control-label'),
+                'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => true,
                 'empty_value' => '',
-                'attr'        => array(
-                    'class' => 'form-control',
+                'attr'        => [
+                    'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.merge.select.modal.tooltip'
-                ),
-                'constraints' => array(
-                    new NotBlank(
-                        array(
-                            'message' => 'mautic.core.value.required'
-                        )
-                    )
-                )
-            )
+                ],
+                'required' => false,
+            ]
         );
-        $builder->add('frequency_number','number',
-            array(
-                'precision'  => 0,
-                'label'      => 'mautic.lead.list.frequency.number',
-                'label_attr' => array('class' => 'control-label'),
-                'required'   => true,
-                'attr'       => array(
-                    'class' => 'form-control frequency'
-                ),
-                'constraints' => array(
+
+        $formModifier = function(FormEvent $event) {
+            $form = $event->getForm();
+            $data = $event->getData();
+
+            $constraints = [];
+            if (!empty($data['channels'])) {
+                $constraints = [
                     new NotBlank(
-                        array(
+                        [
                             'message' => 'mautic.core.value.required'
-                        )
+                        ]
                     )
-                )
-            ));
-        $builder->add('frequency_time','choice',
-            array(
-                'choices'    => array(
-                    'DAY' => 'day',
-                    'WEEK' => 'week',
-                    'MONTH' => 'month'
-                ),
-                'label'      => 'mautic.lead.list.frequency.times',
-                'label_attr' => array('class' => 'control-label'),
-                'required'   => true,
-                'multiple'   => false,
-                'attr'       => array(
-                    'class' => 'form-control'
-                ),
-                'constraints' => array(
-                    new NotBlank(
-                        array(
-                            'message' => 'mautic.core.value.required'
-                        )
-                    )
-                )
-            ));
+                ];
+            };
+
+            $form->add(
+                'frequency_number',
+                'number',
+                [
+                    'precision'   => 0,
+                    'label'       => 'mautic.lead.list.frequency.number',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'required'    => true,
+                    'attr'        => [
+                        'class' => 'form-control frequency'
+                    ],
+                    'constraints' => $constraints,
+                    'required'    => false,
+                ]
+            );
+
+            $form->add(
+                'frequency_time',
+                'choice',
+                [
+                    'choices'     => [
+                        'DAY'   => 'day',
+                        'WEEK'  => 'week',
+                        'MONTH' => 'month'
+                    ],
+                    'label'       => 'mautic.lead.list.frequency.times',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'multiple'    => false,
+                    'attr'        => [
+                        'class' => 'form-control'
+                    ],
+                    'constraints' => $constraints,
+                    'required'    => false,
+                ]
+            );
+        };
+
+        // Before submit
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            $formModifier
+        );
+
+        // After submit
+        $builder->addEventListener(
+            FormEvents::PRE_SET_DATA,
+            $formModifier
+        );
 
         $builder->add(
             'buttons',
             'form_buttons',
-            array(
+            [
                 'apply_text'     => false,
                 'save_text'      => 'mautic.core.form.save',
                 'cancel_onclick' => 'javascript:void(0);',
-                'cancel_attr'    => array(
+                'cancel_attr'    => [
                     'data-dismiss' => 'modal'
-                ),
-                'attr'       => array(
-                    'class' => 'modal-form-buttons'
-                )
-            )
+                ],
+            ]
         );
 
         if (!empty($options["action"])) {

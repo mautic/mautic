@@ -308,6 +308,7 @@ class Lead extends FormEntity
             ->cascadeAll()
             ->fetchExtraLazy()
             ->build();
+
         $builder->createOneToMany('frequencyRules', 'Mautic\LeadBundle\Entity\FrequencyRule')
             ->orphanRemoval()
             ->setIndexBy('channel')
