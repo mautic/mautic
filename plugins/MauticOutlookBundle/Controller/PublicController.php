@@ -78,9 +78,9 @@ class PublicController extends CommonFormController
                         // stat doesn't exist, create one
                         if ($stat === null) {
                             $this->addStat($lead, $email, $query, $idHash);
+                        } else { // Prevent marking the email as read on creation
+                            $model->hitEmail($idHash, $this->request); // add email event
                         }
-
-                        $model->hitEmail($idHash, $this->request); // add email event
                     }
                 }
             }
