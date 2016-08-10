@@ -10,7 +10,6 @@
 namespace Mautic\SmsBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
@@ -114,33 +113,13 @@ class SmsType extends AbstractType
         );
 
         //add category
-        // $builder->add(
-        //     'category',
-        //     'category',
-        //     array(
-        //         'bundle' => 'email'
-        //     )
-        // );
-
-        //add lead lists
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticLeadBundle:LeadList', 'id', true);
         $builder->add(
-            $builder->create(
-                'lists',
-                'leadlist_choices',
-                [
-                    'label' => 'mautic.sms.form.list',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr' => [
-                        'class' => 'form-control',
-                    ],
-                    'multiple' => true,
-                    'expanded' => false,
-                    'required' => true,
-                ]
-            )
-                ->addModelTransformer($transformer)
-        );
+             'category',
+             'category',
+             array(
+                 'bundle' => 'sms'
+             )
+         );
 
         $builder->add(
             'language',
@@ -156,7 +135,6 @@ class SmsType extends AbstractType
         );
 
         $builder->add('buttons', 'form_buttons');
-        $builder->add('smsType', 'hidden');
 
         if (!empty($options['update_select'])) {
             $builder->add(

@@ -110,7 +110,6 @@ $view['slots']->set(
 
             <div class="tab-pane fade in bdr-w-0 page-list" id="contacts-container">
                 <?php echo $contacts; ?>
-                <div class="clearfix"></div>
             </div>
         </div>
         <!-- end: tab-content -->

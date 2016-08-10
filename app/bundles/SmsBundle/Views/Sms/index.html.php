@@ -11,6 +11,19 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'sms');
 $view['slots']->set('headerTitle', $view['translator']->trans('mautic.sms.smses'));
 
+$view['slots']->set(
+    'actions',
+    $view->render(
+        'MauticCoreBundle:Helper:page_actions.html.php',
+        array(
+            'templateButtons' => array(
+                'new' => $permissions['sms:smses:create']
+            ),
+            'routeBase'       => 'sms'
+        )
+    )
+);
+
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
