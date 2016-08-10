@@ -301,6 +301,7 @@ MauticJS.processGatedVideos = function (videoElements) {
                         mediaPlayers[i].poster.innerHTML = mediaPlayers[i].formHtml;
                         mediaPlayers[i].poster.style.display = 'block';
                         mediaPlayers[i].form = mediaPlayers[i].poster.getElementsByTagName('form')[0];
+                        mediaPlayers[i].form.className += ' mautic-gated-video-style';
                         
                         mediaPlayers[i].form.addEventListener('submit', function (e) {
                             e.preventDefault();

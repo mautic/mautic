@@ -150,6 +150,9 @@ class AssetsHelper
     {
         $assets     =& $this->assets;
         $addScripts = function ($s) use ($location, &$assets, $async, $name) {
+
+            $name = $name ?: 'script_'.hash('sha1', uniqid(mt_rand()));
+
             if ($location == 'head') {
                 //special place for these so that declarations and scripts can be mingled
                 $assets['headDeclarations'][$name] = array('script' => array($s, $async));
@@ -508,7 +511,7 @@ class AssetsHelper
             $plugins . 'quote.js?v' . $this->version,
             $plugins . 'table.js?v' . $this->version,
             $plugins . 'url.js?v' . $this->version,
-            $plugins . 'video.js?v' . $this->version,
+            //$plugins . 'video.js?v' . $this->version,
             $plugins . 'gatedvideo.js?v' . $this->version,
             $plugins . 'token.js?v' . $this->version
         );

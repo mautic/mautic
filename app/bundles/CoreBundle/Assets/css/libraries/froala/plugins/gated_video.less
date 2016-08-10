@@ -1,12 +1,12 @@
-html body .fr-gatedvideo {
+.fr-gatedvideo {
     position:relative;
     display:block;
     min-height:140px;
 }
-html body .fr-gatedvideo video {
+.fr-gatedvideo video {
     background-color:rgba(67, 83, 147, .5);
 }
-html body .fr-gatedvideo:after {
+.fr-gatedvideo:after {
     content:"";
     position:absolute;
     background-repeat:no-repeat;
@@ -25,12 +25,12 @@ html body .fr-gatedvideo:after {
  * Copyright 2014-2016 Froala Labs
  */
 
-html body .clearfix::after {
+.clearfix::after {
     clear: both;
     display: block;
     content: "";
 }
-html body .fr-element .fr-gatedvideo {
+.fr-element .fr-gatedvideo {
     user-select: none;
     -o-user-select: none;
     -moz-user-select: none;
@@ -38,7 +38,7 @@ html body .fr-element .fr-gatedvideo {
     -webkit-user-select: none;
     -ms-user-select: none;
 }
-html body .fr-element .fr-gatedvideo::after {
+.fr-element .fr-gatedvideo::after {
     position: absolute;
     content: '';
     z-index: 1;
@@ -50,18 +50,18 @@ html body .fr-element .fr-gatedvideo::after {
     display: block;
     background: rgba(0, 0, 0, 0);
 }
-html body .fr-element .fr-gatedvideo.fr-active > * {
+.fr-element .fr-gatedvideo.fr-active > * {
     z-index: 2;
     position: relative;
 }
-html body .fr-element .fr-gatedvideo > * {
+.fr-element .fr-gatedvideo > * {
     -webkit-box-sizing: content-box;
     -moz-box-sizing: content-box;
     box-sizing: content-box;
     max-width: 100%;
     border: none;
 }
-html body .fr-box .fr-gatedvideo-resizer {
+.fr-box .fr-gatedvideo-resizer {
     position: absolute;
     border: solid 1px #1e88e5;
     display: none;
@@ -72,10 +72,10 @@ html body .fr-box .fr-gatedvideo-resizer {
     -webkit-user-select: none;
     -ms-user-select: none;
 }
-html body .fr-box .fr-gatedvideo-resizer.fr-active {
+.fr-box .fr-gatedvideo-resizer.fr-active {
     display: block;
 }
-html body .fr-box .fr-gatedvideo-resizer .fr-handler {
+.fr-box .fr-gatedvideo-resizer .fr-handler {
     display: block;
     position: absolute;
     background: #1e88e5;
@@ -85,67 +85,68 @@ html body .fr-box .fr-gatedvideo-resizer .fr-handler {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-html body .fr-box .fr-gatedvideo-resizer .fr-handler.fr-hnw {
+.fr-box .fr-gatedvideo-resizer .fr-handler.fr-hnw {
     cursor: nw-resize;
 }
-html body .fr-box .fr-gatedvideo-resizer .fr-handler.fr-hne {
+.fr-box .fr-gatedvideo-resizer .fr-handler.fr-hne {
     cursor: ne-resize;
 }
-html body .fr-box .fr-gatedvideo-resizer .fr-handler.fr-hsw {
+.fr-box .fr-gatedvideo-resizer .fr-handler.fr-hsw {
     cursor: sw-resize;
 }
-html body .fr-box .fr-gatedvideo-resizer .fr-handler.fr-hse {
+.fr-box .fr-gatedvideo-resizer .fr-handler.fr-hse {
     cursor: se-resize;
 }
-html body .fr-box .fr-gatedvideo-resizer .fr-handler {
+.fr-box .fr-gatedvideo-resizer .fr-handler {
     width: 12px;
     height: 12px;
 }
-html body .fr-box .fr-gatedvideo-resizer .fr-handler.fr-hnw {
+.fr-box .fr-gatedvideo-resizer .fr-handler.fr-hnw {
     left: -6px;
     top: -6px;
 }
-html body .fr-box .fr-gatedvideo-resizer .fr-handler.fr-hne {
+.fr-box .fr-gatedvideo-resizer .fr-handler.fr-hne {
     right: -6px;
     top: -6px;
 }
-html body .fr-box .fr-gatedvideo-resizer .fr-handler.fr-hsw {
+.fr-box .fr-gatedvideo-resizer .fr-handler.fr-hsw {
     left: -6px;
     bottom: -6px;
 }
-html body .fr-box .fr-gatedvideo-resizer .fr-handler.fr-hse {
+.fr-box .fr-gatedvideo-resizer .fr-handler.fr-hse {
     right: -6px;
     bottom: -6px;
 }
 @media (min-width: 1200px) {
-    html body .fr-box .fr-gatedvideo-resizer .fr-handler {
+    .fr-box .fr-gatedvideo-resizer .fr-handler {
         width: 10px;
         height: 10px;
     }
-    html body .fr-box .fr-gatedvideo-resizer .fr-handler.fr-hnw {
+    .fr-box .fr-gatedvideo-resizer .fr-handler.fr-hnw {
         left: -5px;
         top: -5px;
     }
-    html body .fr-box .fr-gatedvideo-resizer .fr-handler.fr-hne {
+    .fr-box .fr-gatedvideo-resizer .fr-handler.fr-hne {
         right: -5px;
         top: -5px;
     }
-    html body .fr-box .fr-gatedvideo-resizer .fr-handler.fr-hsw {
+    .fr-box .fr-gatedvideo-resizer .fr-handler.fr-hsw {
         left: -5px;
         bottom: -5px;
     }
-    html body .fr-box .fr-gatedvideo-resizer .fr-handler.fr-hse {
+    .fr-box .fr-gatedvideo-resizer .fr-handler.fr-hse {
         right: -5px;
         bottom: -5px;
     }
 }
-html body .fr-gatedvideo-size-layer .fr-gatedvideo-group .fr-input-line {
+.fr-gatedvideo-size-layer .fr-gatedvideo-group .fr-input-line {
+    width: calc(50% - 5px);
     display: inline-block;
 }
-html body .fr-gatedvideo-size-layer .fr-gatedvideo-group .fr-input-line + .fr-input-line {
+.fr-gatedvideo-size-layer .fr-gatedvideo-group .fr-input-line + .fr-input-line {
     margin-left: 10px;
 }
-html body .fr-gatedvideo-overlay {
+.fr-gatedvideo-overlay {
     position: fixed;
     top: 0;
     left: 0;
