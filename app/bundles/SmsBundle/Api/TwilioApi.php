@@ -9,14 +9,11 @@
 
 namespace Mautic\SmsBundle\Api;
 
-use Joomla\Http\Response;
+use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\SmsBundle\Exception\MissingUsernameException;
-use Mautic\SmsBundle\Exception\MissingPasswordException;
 
 class TwilioApi extends AbstractSmsApi
 {
@@ -31,14 +28,14 @@ class TwilioApi extends AbstractSmsApi
     protected $sendingPhoneNumber;
 
     /**
-     * @param MauticFactory $factory
+     * @param MauticFactory    $factory
      * @param \Services_Twilio $client
-     * @param string $sendingPhoneNumber
+     * @param string           $sendingPhoneNumber
      */
     public function __construct(MauticFactory $factory, \Services_Twilio $client, PhoneNumberHelper $phoneNumberHelper, $sendingPhoneNumber)
     {
         $this->client = $client;
-        
+
         if ($sendingPhoneNumber) {
             $this->sendingPhoneNumber = $phoneNumberHelper->format($sendingPhoneNumber);
         }
@@ -53,7 +50,7 @@ class TwilioApi extends AbstractSmsApi
      */
     protected function sanitizeNumber($number)
     {
-        $util = PhoneNumberUtil::getInstance();
+        $util   = PhoneNumberUtil::getInstance();
         $parsed = $util->parse($number, 'US');
 
         return $util->format($parsed, PhoneNumberFormat::E164);
@@ -68,11 +65,11 @@ class TwilioApi extends AbstractSmsApi
     public function sendSms($number, $content)
     {
         if ($number === null) {
+
             return false;
         }
 
-        try
-        {
+        try {
             $this->client->account->messages->sendMessage(
                 $this->sendingPhoneNumber,
                 $this->sanitizeNumber($number),
@@ -83,7 +80,14 @@ class TwilioApi extends AbstractSmsApi
         } catch (\Services_Twilio_RestException $e) {
             $this->factory->getLogger()->addError(
                 $e->getMessage(),
-                array('exception' => $e)
+                ['exception' => $e]
+            );
+
+            return false;
+        } catch (NumberParseException $e) {
+            $this->factory->getLogger()->addError(
+                $e->getMessage(),
+                ['exception' => $e]
             );
 
             return false;

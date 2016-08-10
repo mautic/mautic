@@ -107,6 +107,7 @@ class CampaignSubscriber extends CommonSubscriber
         $lead = $event->getLead();
 
         if ($this->leadModel->isContactable($lead, 'sms') !== DoNotContact::IS_CONTACTABLE) {
+
             return $event->setFailed('mautic.sms.campaign.failed.not_contactable');
         }
 
@@ -117,6 +118,7 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         if (empty($leadPhoneNumber)) {
+
             return $event->setFailed('mautic.sms.campaign.failed.missing_number');
         }
 
@@ -124,6 +126,7 @@ class CampaignSubscriber extends CommonSubscriber
         $sms   = $this->smsModel->getEntity($smsId);
 
         if ($sms->getId() !== $smsId) {
+
             return $event->setFailed('mautic.sms.campaign.failed.missing_entity');
         }
 
