@@ -14,12 +14,28 @@ use Doctrine\DBAL\Types\StringType;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
 use Mautic\LeadBundle\Model\FieldModel;
+use Monolog\Logger;
 
 /**
  * Class DoctrineSubscriber
  */
 class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
 {
+    /**
+     * @var Logger
+     */
+    protected $logger;
+
+    /**
+     * DoctrineSubscriber constructor.
+     *
+     * @param Logger $logger
+     */
+    public function __construct(Logger $logger)
+    {
+        $this->logger = $logger;
+    }
+
     /**
      * @return array
      */
@@ -62,8 +78,9 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                 $columnDef = FieldModel::getSchemaDefinition($f['alias'], $f['type'], !empty($f['is_unique']));
                 $table->addColumn($columnDef['name'], $columnDef['type'], $columnDef['options']);
 
-                $indexOptions = ($columnDef['type'] == 'text') ? ['where' => "({$columnDef['name']}(767))"] : [];
-                $table->addIndex(array($f['alias']), MAUTIC_TABLE_PREFIX.$f['alias'].'_search', $indexOptions);
+                if ('text' != $columnDef['type']) {
+                    $table->addIndex([$columnDef['name']], MAUTIC_TABLE_PREFIX.$f['alias'].'_search');
+                }
             }
 
             // Only allow indexes for string types
@@ -90,7 +107,7 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
 
         } catch (\Exception $e) {
             //table doesn't exist or something bad happened so oh well
-            error_log($e->getMessage());
+            $this->logger->addError('SCHEMA ERROR: '.$e->getMessage());
         }
     }
 }

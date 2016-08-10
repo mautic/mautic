@@ -1460,6 +1460,8 @@ var Mautic = {
      * @param form
      */
     ajaxifyForm: function (formName) {
+        Mautic.initializeFormFieldVisibilitySwitcher(formName);
+
         //prevent enter submitting form and instead jump to next line
         var form = 'form[name="' + formName + '"]';
         mQuery(form + ' input, ' + form + ' select').off('keydown.ajaxform');
@@ -2817,18 +2819,12 @@ var Mautic = {
     /**
      * Marks notifications as read and clears unread indicators
      */
-    markNotificationsRead: function () {
+    showNotifications: function () {
         mQuery("#notificationsDropdown").unbind('hide.bs.dropdown');
         mQuery('#notificationsDropdown').on('hidden.bs.dropdown', function () {
             if (!mQuery('#newNotificationIndicator').hasClass('hide')) {
                 mQuery('#notifications .is-unread').remove();
                 mQuery('#newNotificationIndicator').addClass('hide');
-
-                mQuery.ajax({
-                    url: mauticAjaxUrl,
-                    type: "GET",
-                    data: "action=markNotificationsRead"
-                });
             }
         });
     },
@@ -3444,6 +3440,11 @@ var Mautic = {
         }
     },
 
+    /**
+     * Initialize theme selection
+     *
+     * @param themeField
+     */
     intiSelectTheme: function(themeField) {
         var customHtml = mQuery('textarea.builder-html');
         var isNew = Mautic.isNewEntity('#page_sessionId, #emailform_sessionId');
@@ -3455,7 +3456,9 @@ var Mautic = {
 
         if (customHtml.length) {
 
-            if (!customHtml.val().length) {
+            var emptyFroalaContent = '<!DOCTYPE html><html><head><title></title></head><body></body></html>';
+
+            if (!customHtml.val().length || customHtml.val() === emptyFroalaContent) {
                 Mautic.setThemeHtml(themeField.val());
             }
 
@@ -3478,7 +3481,7 @@ var Mautic = {
                 // Load the theme HTML to the source textarea
                 Mautic.setThemeHtml(currentLink.attr('data-theme'));
 
-                // Manipulate classes to achieve the theme selection illustion
+                // Manipulate classes to achieve the theme selection illusion
                 mQuery('.theme-list .panel').removeClass('theme-selected');
                 currentLink.closest('.panel').addClass('theme-selected');
                 mQuery('.theme-list .select-theme-selected').addClass('hide');
@@ -3489,11 +3492,95 @@ var Mautic = {
         }
     },
 
+    /**
+     * Set theme's HTML
+     *
+     * @param theme
+     */
     setThemeHtml: function(theme) {
         mQuery.get(mQuery('#builder_url').val()+'?template=' + theme, function(themeHtml) {
             var textarea = mQuery('textarea.builder-html');
             textarea.val(themeHtml);
             textarea.froalaEditor('html.set', themeHtml);
+        });
+    },
+
+    /**
+     * Initialize form field visibility switcher
+     *
+     * @param formName
+     */
+    initializeFormFieldVisibilitySwitcher: function (formName)
+    {
+        Mautic.switchFormFieldVisibilty(formName);
+
+        mQuery('form[name="'+formName+'"]').change(function() {
+            Mautic.switchFormFieldVisibilty(formName);
+        });
+    },
+
+    /**
+     * Switch form field visibility based on selected values
+     */
+    switchFormFieldVisibilty: function (formName) {
+        var form   = mQuery('form[name="'+formName+'"]');
+        var fields = {};
+
+        // find all fields to show
+        form.find('[data-show-on]').each(function(index, el) {
+            var field = mQuery(el);
+            var showOn = jQuery.parseJSON(field.attr('data-show-on'));
+
+            mQuery.each(showOn, function(fieldId, condition) {
+                if (typeof fields[field.attr('id')] == 'undefined' || fields[field.attr('id')] !== true) {
+                    if (mQuery('#' + fieldId).is(':checkbox') || mQuery('#' + fieldId).is(':radio')) {
+                        if ((condition == 'checked' && mQuery('#' + fieldId).is(':checked')) || (condition == '' && !mQuery('#' + fieldId).is(':checked'))) {
+                            fields[field.attr('id')] = true;
+                        } else {
+                            fields[field.attr('id')] = false;
+                        }
+                    } else {
+                        var sourceFieldVal = mQuery('#' + fieldId).val();
+                        if (mQuery.inArray(sourceFieldVal, condition) === -1) {
+                            fields[field.attr('id')] = false;
+                        } else {
+                            fields[field.attr('id')] = true;
+                        }
+                    }
+                }
+            });
+        });
+
+        // find all fields to hide
+        form.find('[data-hide-on]').each(function(index, el) {
+            var field  = mQuery(el);
+            var hideOn = jQuery.parseJSON(field.attr('data-hide-on'));
+            mQuery.each(hideOn, function(fieldId, condition) {
+                if (mQuery('#' + fieldId).is(':checkbox') || mQuery('#' + fieldId).is(':radio')) {
+                    if ((condition == 'checked' && mQuery('#' + fieldId).is(':checked')) || (condition == '' && !mQuery('#' + fieldId).is(':checked'))) {
+                        fields[field.attr('id')] = false;
+                    } else {
+                        fields[field.attr('id')] = true;
+                    }
+                } else {
+                    var sourceFieldVal = mQuery('#' + fieldId).val();
+                    if (mQuery.inArray(sourceFieldVal, condition) !== -1) {
+                        fields[field.attr('id')] = false;
+                    } else if (typeof fields[field.attr('id')] == 'undefined') {
+                        fields[field.attr('id')] = true;
+                    }
+                }
+            });
+        });
+
+        // show/hide according to conditions
+        mQuery.each(fields, function(fieldId, show) {
+            var fieldContainer = mQuery('#' + fieldId).closest('[class*="col-"]');;
+            if (show) {
+                fieldContainer.fadeIn();
+            } else {
+                fieldContainer.fadeOut();
+            }
         });
     },
 

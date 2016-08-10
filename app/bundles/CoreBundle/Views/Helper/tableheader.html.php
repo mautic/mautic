@@ -20,7 +20,7 @@ if (!empty($checkall)):
         </label>
     </div>
 </th>
-<?php elseif (empty($seesionVar)) : ?>
+<?php elseif (empty($sessionVar)) : ?>
 <th<?php echo (!empty($class)) ? ' class="' . $class . '"': ""; ?>>
     <span><?php echo $view['translator']->trans($text); ?></span>
 </th>
