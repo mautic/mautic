@@ -1112,6 +1112,7 @@ class LeadModel extends FormModel
 
         return false;
     }
+
     /**
      * @param Lead $lead
      * @param string $channel
@@ -1119,7 +1120,7 @@ class LeadModel extends FormModel
      * @return mixed
      *
      */
-    public function getFrequencyRule(Lead $lead, $channel=null)
+    public function getFrequencyRule(Lead $lead, $channel = null)
     {
         if (is_array($channel)) {
             $channel = key($channel);
@@ -1127,15 +1128,15 @@ class LeadModel extends FormModel
 
         /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRuleRepo */
         $frequencyRuleRepo = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
-
-        $frequencyRules = $frequencyRuleRepo->getFrequencyRules($channel, $lead->getId());
+        $frequencyRules    = $frequencyRuleRepo->getFrequencyRules($channel, $lead->getId());
 
         if (empty($frequencyRules)) {
-            return array();
+            return [];
         }
 
         return $frequencyRules;
     }
+
     /**
      * Set frequency rules for lead per channel
      *
@@ -1149,8 +1150,8 @@ class LeadModel extends FormModel
     {
         // One query to get all the lead's current frequency rules and go ahead and create entities for them
         $frequencyRules = $lead->getFrequencyRules()->toArray();
-        $entities = [];
-        foreach ($channel as $ch){
+        $entities       = [];
+        foreach ($channel as $ch) {
             $frequencyRule = (isset($frequencyRules[$ch])) ? $frequencyRules[$ch] : new FrequencyRule();
             $frequencyRule->setChannel($ch);
             $frequencyRule->setLead($lead);
@@ -1159,11 +1160,17 @@ class LeadModel extends FormModel
             $frequencyRule->setFrequencyTime($frequencyTime);
             $frequencyRule->setLead($lead);
 
-            $entities[] = $frequencyRule;
+            $entities[$ch] = $frequencyRule;
         }
 
         if (!empty($entities)) {
             $this->em->getRepository('MauticLeadBundle:FrequencyRule')->saveEntities($entities);
+        }
+
+        // Delete channels that were removed
+        $deleted = array_diff_key($frequencyRules, $entities);
+        if (!empty($deleted)) {
+            $this->em->getRepository('MauticLeadBundle:FrequencyRule')->deleteEntities($deleted);
         }
 
         return true;
