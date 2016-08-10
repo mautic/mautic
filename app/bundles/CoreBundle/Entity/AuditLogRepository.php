@@ -65,23 +65,6 @@ class AuditLogRepository extends CommonRepository
         return $query->getQuery()->getArrayResult();
     }
 
-    public function getDetailsByAction($object = null, $bundle = null, $action = null)
-    {
-        $query = $this->createQueryBuilder('al')
-            ->select('DISTINCT al.objectId, al.details')
-            ->where('al.bundle = :bundle')
-            ->andWhere('al.object = :object')
-            ->setParameter('bundle', $bundle)
-            ->setParameter('object', $object);
-
-        $query->andWhere(
-            $query->expr()->like('al.action', ':action'))
-            ->setParameter('action', $action);
-
-        return $query->getQuery()->getArrayResult();
-
-    }
-
     /**
      * @param Lead  $lead
      * @param array $options
