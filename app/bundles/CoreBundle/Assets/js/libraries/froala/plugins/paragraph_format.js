@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.3.3 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -240,11 +240,6 @@
   }
 
   // Register the font size command.
-  $.FE.RegisterShortcut($.FE.KEYCODE.ZERO, 'paragraphFormat', 'N', '0', false, true);
-  $.FE.RegisterShortcut($.FE.KEYCODE.ONE, 'paragraphFormat', 'H1', '1', false, true);
-  $.FE.RegisterShortcut($.FE.KEYCODE.TWO, 'paragraphFormat', 'H2', '2', false, true);
-  $.FE.RegisterShortcut($.FE.KEYCODE.THREE, 'paragraphFormat', 'H3', '3', false, true);
-  $.FE.RegisterShortcut($.FE.KEYCODE.FOUR, 'paragraphFormat', 'H4', '4', false, true);
   $.FE.RegisterCommand('paragraphFormat', {
     type: 'dropdown',
     displaySelection: function (editor) {
