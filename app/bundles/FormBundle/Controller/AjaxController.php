@@ -99,10 +99,22 @@ class AjaxController extends CommonAjaxController
      */
     public function submitAction()
     {
-        $response = $this->forwardWithPost('MauticFormBundle:Public:submit', $this->request->request->all());
-        $message = $this->get('session')->get('mautic.emailbundle.message', ['message' => '', 'type' => '']);
-        $success = (!in_array($response->getStatusCode(), [404, 500]) && $message['type'] !== 'error');
-        $data = array_merge($message, ['success' => $success]);
+        $response = $this->forwardWithPost('MauticFormBundle:Public:submit', $this->request->request->all(), [], ['ajax' => true]);
+        $responseData = json_decode($response->getContent(), true);
+        $success = (!in_array($response->getStatusCode(), [404, 500]) && empty($responseData['errorMessage'])
+            && empty($responseData['validationErrors']));
+
+        $message = '';
+        $type    = '';
+        if (isset($responseData['successMessage'])) {
+            $message = $responseData['successMessage'];
+            $type    = 'notice';
+        } elseif (isset($responseData['errorMessage'])) {
+            $message = $responseData['errorMessage'];
+            $type    = 'error';
+        }
+
+        $data = array_merge($responseData, ['message' => $message, 'type' => $type, 'success' => $success]);
 
         return $this->sendJsonResponse($data);
     }

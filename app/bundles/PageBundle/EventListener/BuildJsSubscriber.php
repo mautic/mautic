@@ -256,22 +256,33 @@ MauticJS.processGatedVideos = function () {
                                 function (data) {
                                     if (data.success) {
                                         mediaPlayers[i].success = true;
-                                        if (data.message) {
-                                            // Place the poster position just above center
-                                            var position = parseInt(mediaPlayers[i].poster.style.height) / 1.4;
-                                            mediaPlayers[i].poster.innerHTML = '<p style="padding:20px;padding-top:' + position + 'px;" class="mautic-response">' + data.message + '</p>';
-                                            setTimeout(function(){
-                                                mediaPlayers[i].poster.style.display = 'none';
-                                                mediaPlayers[i].player.play();
-                                                if (window.mejs.previousActiveElement && window.mejs.previousActiveElement.tagName == 'IFRAME') {
-                                                    window.mejs.previousActiveElement.focus();
-                                                }
-                                            }, 3000);
-                                        } else {
+                                        if (!data.message) {
                                             mediaPlayers[i].poster.style.display = 'none';
                                             mediaPlayers[i].player.play();
                                             window.mejs.previousActiveElement.focus();
                                         }
+                                    } 
+                                    
+                                    if (data.message) {
+                                        // Place the poster position just above center
+                                        var position = parseInt(mediaPlayers[i].poster.style.height) / 1.4;
+                                        mediaPlayers[i].poster.innerHTML = '<p style="padding:20px;padding-top:' + position + 'px;" class="mautic-response">' + data.message + '</p>';
+                                        setTimeout(function(){
+                                            mediaPlayers[i].poster.style.display = 'none';
+                                            mediaPlayers[i].player.play();
+                                            if (window.mejs.previousActiveElement && window.mejs.previousActiveElement.tagName == 'IFRAME') {
+                                                window.mejs.previousActiveElement.focus();
+                                            }
+                                        }, 3000);
+                                    } else if (data.validationErrors) {
+                                        // Reset validation errors
+                                        jQuery('#mauticform_'+data.formName+' .mauticform-errormsg').css('display', 'none');
+                                        // Display validation errors
+                                        jQuery.each(data.validationErrors, function (field, message) {
+                                            if (jQuery('#mauticform_'+data.formName+'_'+field+' .mauticform-errormsg')) {
+                                                jQuery('#mauticform_'+data.formName+'_'+field+' .mauticform-errormsg').css('display', 'block');
+                                            }
+                                        });
                                     }
                                 }
                             );
