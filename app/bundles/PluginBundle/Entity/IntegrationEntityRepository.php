@@ -31,7 +31,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->setParameter('integrationEntity', $integrationEntity)
             ->setParameter('internalEntity', $internalEntity);
         if ($push) {
-            $q->join('i', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.last_active >= :startDate')
+            $q->join('i', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = i.internal_entity_id and l.last_active >= :startDate')
                 ->setParameter('startDate', $startDate);
         }
 
