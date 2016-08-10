@@ -42,7 +42,7 @@ class FrequencyRuleRepository extends CommonRepository
                 ->andWhere('cs.leadlist_id = :list_id')
                 ->setParameter('list_id', $listId);
         }
-        if ($defaultFrequencyNumber != null) {
+        if (!empty($defaultFrequencyTime)) {
             $q->andWhere('es.date_sent >= case fr.frequency_time 
                     when \'MONTH\' then DATE_SUB(NOW(),INTERVAL 1 MONTH) 
                     when \'DAY\' then DATE_SUB(NOW(),INTERVAL 1 DAY) 
