@@ -250,7 +250,8 @@ MauticJS.processGatedVideos = function (videoElements) {
         if (!node.id) {
             node.id = 'mautic-player-' + i;
         }
-        
+       
+        var cookieName = 'mautic-player-'+i+'-'+node.dataset.formId;
         if (node.dataset.formId) {
             mediaPlayers[i] = [];
             
@@ -289,7 +290,7 @@ MauticJS.processGatedVideos = function (videoElements) {
                     
                     MauticJS.addVideoView(i, currentTime);
 
-                    if (currentTime >= node.dataset.gateTime && mediaPlayers[i].inPoster === false && mediaPlayers[i].success === false) {
+                    if (document.cookie.indexOf(cookieName) == -1 && currentTime >= node.dataset.gateTime && mediaPlayers[i].inPoster === false && mediaPlayers[i].success === false) {
                         if (document.activeElement.tagName == 'IFRAME') {
                             window.mejs.previousActiveElement = document.activeElement;
                             document.activeElement.blur();
@@ -313,22 +314,36 @@ MauticJS.processGatedVideos = function (videoElements) {
                                 function (data) {
                                     if (data.success) {
                                         mediaPlayers[i].success = true;
-                                        if (data.message) {
-                                            // Place the poster position just above center
-                                            var position = parseInt(mediaPlayers[i].poster.style.height) / 1.4;
-                                            mediaPlayers[i].poster.innerHTML = '<p style="padding:20px;padding-top:' + position + 'px;" class="mautic-response">' + data.message + '</p>';
-                                            setTimeout(function(){
-                                                mediaPlayers[i].poster.style.display = 'none';
-                                                mediaPlayers[i].player.play();
-                                                if (window.mejs.previousActiveElement && window.mejs.previousActiveElement.tagName == 'IFRAME') {
-                                                    window.mejs.previousActiveElement.focus();
-                                                }
-                                            }, 3000);
-                                        } else {
+                                        if (!data.message) {
                                             mediaPlayers[i].poster.style.display = 'none';
                                             mediaPlayers[i].player.play();
                                             window.mejs.previousActiveElement.focus();
                                         }
+                                        
+                                        // Set a cookie to prevent showing the same form again
+                                        document.cookie = cookieName+"=true; max-age=" + 60 * 60 * 24 * 7; 
+                                    } 
+                                    
+                                    if (data.message) {
+                                        // Place the poster position just above center
+                                        var position = parseInt(mediaPlayers[i].poster.style.height) / 1.4;
+                                        mediaPlayers[i].poster.innerHTML = '<p style="padding:20px;padding-top:' + position + 'px;" class="mautic-response">' + data.message + '</p>';
+                                        setTimeout(function(){
+                                            mediaPlayers[i].poster.style.display = 'none';
+                                            mediaPlayers[i].player.play();
+                                            if (window.mejs.previousActiveElement && window.mejs.previousActiveElement.tagName == 'IFRAME') {
+                                                window.mejs.previousActiveElement.focus();
+                                            }
+                                        }, 3000);
+                                    } else if (data.validationErrors) {
+                                        // Reset validation errors
+                                        jQuery('#mauticform_'+data.formName+' .mauticform-errormsg').css('display', 'none');
+                                        // Display validation errors
+                                        jQuery.each(data.validationErrors, function (field, message) {
+                                            if (jQuery('#mauticform_'+data.formName+'_'+field+' .mauticform-errormsg')) {
+                                                jQuery('#mauticform_'+data.formName+'_'+field+' .mauticform-errormsg').css('display', 'block');
+                                            }
+                                        });
                                     }
                                 }
                             );
