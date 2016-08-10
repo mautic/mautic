@@ -1502,7 +1502,7 @@ class EmailModel extends FormModel
                         $reason = $this->translator->trans('mautic.email.bounce.reason.'.$reason);
                     }
 
-                    $this->setDoNotContact($s, $reason, $type, ($count === $batch));
+                    $this->setDoNotContact($s, $reason, $type);
 
                     $s->setIsFailed(true);
                     $this->em->persist($s);

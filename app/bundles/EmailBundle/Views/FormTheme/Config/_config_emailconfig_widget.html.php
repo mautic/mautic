@@ -63,6 +63,7 @@ $template = '<div class="col-md-6">{content}</div>';
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_user', $template); ?>
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_password', $template); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_api_key', $template); ?>
             </div>
 
             <?php if (isset($fields['mailer_transport'])): ?>
