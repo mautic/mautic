@@ -180,6 +180,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
             if ($this->isAuthorized()) {
                 if(!empty($salesForceobjects)){
                 foreach ($salesForceobjects as $sfObject){
+                    if ($sfObject === 'Activity') {
+                        continue;
+                    }
                     $leadObject[$sfObject]  = $this->getApiHelper()->getLeadFields($sfObject);
                     if (!empty($leadObject) && isset($leadObject[$sfObject]['fields'])) {
 
@@ -338,11 +341,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 'expanded'    => true,
                 'multiple'    => true,
                 'label'       => 'mautic.plugins.salesforce.choose.objects.to.pull.from',
-                'label_attr'  => array('class' => 'control-label'),
+                'label_attr'  => array('class' => ''),
                 'empty_value' => false,
                 'required'    => false,
                 'attr'        => array(
-                    'class'   => 'form-control not-chosen'
+                    'class'   => 'not-chosen'
                 )
             ));
         }
@@ -444,11 +447,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 foreach ($salesForceObjects as $object){
-                    $result = $this->getApiHelper()->getLeads($query, $object);
-                    $executed+= $this->amendLeadDataBeforeMauticPopulate($result, $object);
-                    if (isset($result['nextRecordsUrl'])) {
-                        $query = $result['nextRecordsUrl'];
-                        $this->getLeads($params, $query);
+                    if ($object !== 'Activity') {
+                        $result = $this->getApiHelper()->getLeads($query, $object);
+                        $executed += $this->amendLeadDataBeforeMauticPopulate($result, $object);
+                        if (isset($result['nextRecordsUrl'])) {
+                            $query = $result['nextRecordsUrl'];
+                            $this->getLeads($params, $query);
+                        }
                     }
                 }
                 return $executed;

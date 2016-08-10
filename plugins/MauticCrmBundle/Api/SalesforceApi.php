@@ -210,7 +210,7 @@ class SalesforceApi extends CrmApi
 
         if (!empty($fields) and isset($query['start'])) {
             $fields = implode(", ",array_keys($fields));
-            $getLeadsQuery = "SELECT ".$fields." from Lead where LastModifiedDate>=".$query['start']." and LastModifiedDate<=".$query['end'];
+            $getLeadsQuery = "SELECT ".$fields." from ".$object." where LastModifiedDate>=".$query['start']." and LastModifiedDate<=".$query['end'];
             $result = $this->request('query', array("q"=>$getLeadsQuery),'GET',false,null,$queryUrl);
         } else {
             $result = $this->request('query/'.$query, array(),'GET',false,null,$queryUrl);
