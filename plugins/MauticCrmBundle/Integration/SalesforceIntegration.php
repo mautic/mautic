@@ -261,8 +261,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fields = array_keys($this->getAvailableLeadFields($settings));
 
         $params['fields']=implode(',',$fields);
-
-        $internal = array('latestDateCovered' => $data['latestDateCovered']);
+        
         $count = 0;
 
         if(isset($data['records']) and $object !== 'Activity'){
