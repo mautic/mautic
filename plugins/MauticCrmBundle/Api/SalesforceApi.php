@@ -203,8 +203,9 @@ class SalesforceApi extends CrmApi
                 $query['start'] = date('c',strtotime($organization['records'][0]['CreatedDate']." +1 hour"));
             }
         }
+        $settings['feature_settings']['objects']=$object;
 
-        $fields = $this->integration->getAvailableLeadFields();
+        $fields = $this->integration->getAvailableLeadFields($settings);
         $fields['id']=array('id' => array());
         $result = array();
 

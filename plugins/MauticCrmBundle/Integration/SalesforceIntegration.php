@@ -170,19 +170,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         $salesFields = array();
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
-        $salesForceobjects = array();
 
         if(isset($settings['feature_settings']['objects'])) {
-            $salesForceobjects = $settings['feature_settings']['objects'];
+            $sfObject = $settings['feature_settings']['objects'];
         }
 
         try {
             if ($this->isAuthorized()) {
-                if(!empty($salesForceobjects)){
-                foreach ($salesForceobjects as $sfObject){
-                    if ($sfObject === 'Activity') {
-                        continue;
-                    }
+                if (isset($sfObject) and $sfObject !== 'Activity') {
                     $leadObject[$sfObject]  = $this->getApiHelper()->getLeadFields($sfObject);
                     if (!empty($leadObject) && isset($leadObject[$sfObject]['fields'])) {
 
@@ -198,7 +193,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             );
                         }
                     }
-                }
                 }else{
                     $leadObject  = $this->getApiHelper()->getLeadFields('Lead');
                     if (!empty($leadObject) && isset($leadObject['fields'])) {
@@ -587,7 +581,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $this->getPublicActivity($identifiers, $leadSocialCache[$this->getName()]);
         }
 
-        $lead->setSocialCache($leadSocialCache);
+        if (!empty($socialCache)) {
+            $lead->setSocialCache($leadSocialCache);
+        }
 
         // Update the internal info integration object that has updated the record
         if(isset($data['internal'])){
