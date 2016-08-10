@@ -246,8 +246,16 @@ return [
                     'setPassword' => ['%mautic.mailer_password%']
                 ]
             ],
+            'mautic.transport.sparkpost'          => [
+                'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport',
+                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
+                'arguments'    => ['%mautic.mailer_api_key%'],
+                'methodCalls'  => [
+                    'setMauticFactory' => ['mautic.factory']
+                ]
+            ],
         ],
-        'models' =>  [
+        'models' => [
             'mautic.email.model.email' => [
                 'class' => 'Mautic\EmailBundle\Model\EmailModel',
                 'arguments' => [
@@ -257,12 +265,14 @@ return [
                     'mautic.helper.mailer',
                     'mautic.lead.model.lead',
                     'mautic.page.model.trackable',
-                    'mautic.user.model.user'
+                    'mautic.user.model.user',
+                    'mautic.helper.core_parameters'
                 ]
             ]
         ]
     ],
     'parameters' => [
+        'mailer_api_key'               => null, // Api key from mail delivery provider.
         'mailer_from_name'             => 'Mautic',
         'mailer_from_email'            => 'email@yoursite.com',
         'mailer_return_path'           => null,
@@ -288,6 +298,8 @@ return [
         'resubscribe_message'          => null,
         'monitored_email'              => [],
         'mailer_is_owner'              => false,
-        'default_signature_text'       => null
+        'default_signature_text'       => null,
+        'email_frequency_number'       => null,
+        'email_frequency_time'         => null
     ]
 ];

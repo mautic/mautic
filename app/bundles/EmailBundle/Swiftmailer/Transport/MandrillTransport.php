@@ -11,6 +11,7 @@ namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -402,11 +403,11 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
         $mandrillEvents = $request->request->get('mandrill_events');
         $mandrillEvents = json_decode($mandrillEvents, true);
         $rows           = array(
-            'bounced' => array(
+            DoNotContact::BOUNCED => array(
                 'hashIds' => array(),
                 'emails'  => array()
             ),
-            'unsubscribed' => array(
+            DoNotContact::UNSUBSCRIBED => array(
                 'hashIds' => array(),
                 'emails'  => array()
             )
@@ -417,7 +418,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
                 $isBounce      = in_array($event['event'], array('hard_bounce', 'soft_bounce', 'reject', 'spam', 'invalid'));
                 $isUnsubscribe = ('unsub' === $event['event']);
                 if ($isBounce || $isUnsubscribe) {
-                    $type = ($isBounce) ? 'bounced' : 'unsubscribed';
+                    $type = ($isBounce) ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
 
                     if (!empty($event['msg']['diag'])) {
                         $reason = $event['msg']['diag'];

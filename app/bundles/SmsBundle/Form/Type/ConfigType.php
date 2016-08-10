@@ -97,6 +97,31 @@ class ConfigType extends AbstractType
                 )
             );
         };
+        $builder->add('sms_frequency_number','number',
+            array(
+                'precision'  => 0,
+                'label'      => 'mautic.sms.list.frequency.number',
+                'label_attr' => array('class' => 'control-label'),
+                'required'   => false,
+                'attr'       => array(
+                    'class' => 'form-control frequency'
+                )
+            ));
+        $builder->add('sms_frequency_time','choice',
+            array(
+                'choices'    => array(
+                    'DAY' => 'day',
+                    'WEEK' => 'week',
+                    'MONTH' => 'month'
+                ),
+                'label'      => 'mautic.lead.list.frequency.times',
+                'label_attr' => array('class' => 'control-label'),
+                'required'   => false,
+                'multiple'   => false,
+                'attr'       => array(
+                    'class' => 'form-control frequency'
+                )
+            ));
 
         // Before submit
         $builder->addEventListener(

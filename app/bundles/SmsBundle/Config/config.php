@@ -16,7 +16,8 @@ return [
                     'mautic.factory',
                     'mautic.lead.model.lead',
                     'mautic.sms.model.sms',
-                    'mautic.sms.api'
+                    'mautic.sms.api',
+                    'mautic.helper.sms'
                 ]
             ],
             'mautic.sms.configbundle.subscriber' => [
@@ -53,7 +54,8 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.lead',
-                    'mautic.helper.phone_number'
+                    'mautic.helper.phone_number',
+                    'mautic.sms.model.sms'
                 ],
                 'alias'     => 'sms_helper'
             ]
@@ -125,6 +127,8 @@ return [
         'sms_enabled' => false,
         'sms_username' => null,
         'sms_password' => null,
-        'sms_sending_phone_number' => null
+        'sms_sending_phone_number' => null,
+        'sms_frequency_number' => null,
+        'sms_frequency_time' => null
     ]
 ];
