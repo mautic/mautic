@@ -195,7 +195,7 @@ class SalesforceApi extends CrmApi
     public function getLeads($query, $object)
     {
         //find out if start date is not our of range for org
-        if ($query['start']) {
+        if (isset($query['start'])) {
             $queryUrl = $this->integration->getQueryUrl();
             $organization = $this->request('query', array("q"=>"SELECT CreatedDate from Organization"),'GET',false,null,$queryUrl);
 
@@ -208,10 +208,12 @@ class SalesforceApi extends CrmApi
         $fields['id']=array('id' => array());
         $result = array();
 
-        if (!empty($fields)) {
+        if (!empty($fields) and isset($query['start'])) {
             $fields = implode(", ",array_keys($fields));
             $getLeadsQuery = "SELECT ".$fields." from Lead where LastModifiedDate>=".$query['start']." and LastModifiedDate<=".$query['end'];
             $result = $this->request('query', array("q"=>$getLeadsQuery),'GET',false,null,$queryUrl);
+        } else {
+            $result = $this->request('query/'.$query, array(),'GET',false,null,$queryUrl);
         }
 
         return $result;
