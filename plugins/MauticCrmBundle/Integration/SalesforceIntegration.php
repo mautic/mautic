@@ -261,7 +261,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fields = array_keys($this->getAvailableLeadFields($settings));
 
         $params['fields']=implode(',',$fields);
-        
+
         $count = 0;
 
         if(isset($data['records']) and $object !== 'Activity'){
@@ -273,8 +273,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 foreach ($record as $key=>$item){
                     $dataObject[$key."__".$object] = $item;
                 }
-
-                $dataObject["internal__".$object] = $internal;
 
                 if($dataObject){
                     $lead =$this->getMauticLead($dataObject,true,null,null);
