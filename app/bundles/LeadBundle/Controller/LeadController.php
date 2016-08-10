@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\StatDevice;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -906,16 +907,17 @@ class LeadController extends FormController
      */
     public function contactFrequencyAction ($objectId)
     {
+        /** @var LeadModel $model */
         $model = $this->getModel('lead');
         $lead  = $model->getEntity($objectId);
         $data = [];
         if ($lead != null && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
             $frequencyRules = $model->getFrequencyRule($lead);
 
-            foreach ($frequencyRules as $frequencyRule){
-                $data['channels'][]=$frequencyRule['channel'];
-                $data['frequency_number']=$frequencyRule['frequency_number'];
-                $data['frequency_time']=$frequencyRule['frequency_time'];
+            foreach ($frequencyRules as $frequencyRule) {
+                $data['channels'][]       = $frequencyRule['channel'];
+                $data['frequency_number'] = $frequencyRule['frequency_number'];
+                $data['frequency_time']   = $frequencyRule['frequency_time'];
             }
 
             $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'contactFrequency', 'objectId' => $lead->getId()]);
@@ -932,9 +934,10 @@ class LeadController extends FormController
                 if (!$this->isFormCancelled($form)) {
                     if ($valid = $this->isFormValid($form)) {
                         $formdata = $form->getData();
-                        $model->setFrequencyRules($lead,$formdata['channels'], $formdata['frequency_time'], $formdata['frequency_number']);
+                        $model->setFrequencyRules($lead, $formdata['channels'], $formdata['frequency_time'], $formdata['frequency_number']);
                     }
                 }
+
                 if ($valid) {
                     $viewParameters = [
                         'objectId'     => $lead->getId(),

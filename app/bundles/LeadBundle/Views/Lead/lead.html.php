@@ -91,7 +91,6 @@ if ($edit) {
                 'mautic.lead.lead.header.contact.frequency',
                 ['%name%' => $lead->getPrimaryIdentifier()]
             ),
-            'data-footer' => 'false',
             'href'        => $view['router']->path(
                 'mautic_contact_action',
                 ["objectId" => $lead->getId(), "objectAction" => "contactFrequency"]
