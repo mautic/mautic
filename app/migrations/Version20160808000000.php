@@ -32,12 +32,16 @@ CREATE TABLE {$this->prefix}integration_entity (
 	integration VARCHAR(255) DEFAULT NULL,
 	integration_entity VARCHAR(255) DEFAULT NULL,
 	integration_entity_id VARCHAR(255) DEFAULT NULL,
-	date_added DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)',
+	date_added DATETIME NOT NULL COMMENT '(DC2Type:datetime)',
 	last_sync_date DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)',
 	internal_entity VARCHAR(255) DEFAULT NULL,
 	internal_entity_id INT DEFAULT NULL,
 	internal LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)',
-	PRIMARY KEY(id)
+	PRIMARY KEY(id),
+	INDEX {$this->prefix}integration_external_entity (integration, integration_entity, integration_entity_id),
+    INDEX {$this->prefix}integration_internal_entity (integration, internal_entity, internal_entity_id),
+    INDEX {$this->prefix}integration_entity_match (integration, internal_entity, integration_entity),
+    INDEX {$this->prefix}integration_last_sync_date (integration, last_sync_date)
 ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
 SQL;
         $this->addSql($sql);

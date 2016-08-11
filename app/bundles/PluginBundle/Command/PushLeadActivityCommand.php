@@ -99,10 +99,9 @@ class PushLeadActivityCommand extends ContainerAwareCommand
                 $params['start']=$startDate;
                 $params['end']=$endDate;
 
-                $processed = 0;
                 $processed = intval($integrationObject->pushLeadActivity($params));
 
-                $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
+                $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.push.leads.events_executed', array('%events%' => $processed)).'</comment>'."\n");
 
             }
         }

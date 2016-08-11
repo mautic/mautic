@@ -229,15 +229,6 @@ class SubmissionRepository extends CommonRepository
             $query->andWhere($query->expr()->eq('fs.form_id', ':id'))
             ->setParameter('id', $options['id']);
         }
-        if (!empty($options['fromDate'])) {
-            $query->andWhere($query->expr()->gte('fs.date_submitted', ':fromDate'))
-                ->setParameter('fromDate', $options['fromDate']->format('Y-m-d H:i:s'));
-        }
-
-        if (!empty($options['toDate'])) {
-            $query->andWhere($query->expr()->lte('fs.date_submitted', ':toDate'))
-                ->setParameter('toDate', $options['toDate']->format('Y-m-d H:i:s'));
-        }
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
@@ -454,5 +445,13 @@ class SubmissionRepository extends CommonRepository
     public function getResultsTableName($formId, $formAlias)
     {
         return MAUTIC_TABLE_PREFIX . 'form_results_' . $formId . '_' . $formAlias;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return "fs";
     }
 }

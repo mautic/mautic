@@ -284,19 +284,31 @@ class StatRepository extends CommonRepository
     public function getLeadStats($leadId, array $options = array())
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $query->select(
-        's.email_id, s.id, s.date_read as dateRead, s.date_sent as dateSent,e.subject, e.name as email_name, s.is_read as isRead, s.is_failed as isFailed, s.viewed_in_browser as viewedInBrowser, s.retry_count as retryCount, s.list_id, l.name as list_name, s.tracking_hash as idHash, s.open_details as openDetails, ec.subject as storedSubject'
-        )
-            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
+        $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'emails', 'e', 's.email_id = e.id')
-            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 's.list_id = l.id')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'email_copies', 'ec', 's.copy_id = ec.id')
             ->where(
                 $query->expr()->andX(
-                    $query->expr()->eq('s.lead_id', (int) $leadId),
                     $query->expr()->eq('s.is_failed', 0)
                 )
             );
+
+        if ($leadId) {
+            $query->andWhere(
+                $query->expr()->eq('s.lead_id', (int) $leadId)
+            );
+        }
+
+        if (!empty($options['basic_select'])) {
+            $query->select(
+                's.email_id, s.id, s.date_read as dateRead, s.date_sent as dateSent, e.subject, e.name as email_name, s.is_read as isRead, s.is_failed as isFailed, ec.subject as storedSubject'
+            );
+        } else {
+            $query->select(
+                's.email_id, s.id, s.date_read as dateRead, s.date_sent as dateSent,e.subject, e.name as email_name, s.is_read as isRead, s.is_failed as isFailed, s.viewed_in_browser as viewedInBrowser, s.retry_count as retryCount, s.list_id, l.name as list_name, s.tracking_hash as idHash, s.open_details as openDetails, ec.subject as storedSubject'
+            )
+                ->leftJoin('s', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 's.list_id = l.id');
+        }
 
         if (isset($options['state'])) {
             $state = $options['state'];
@@ -343,46 +355,7 @@ class StatRepository extends CommonRepository
             $timeToReadParser
         );
     }
-    /**
-     * Get a lead's email stat
-     *
-     * @param integer $leadId
-     * @param array   $options
-     *
-     * @return array
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    public function getLeadStatsByDate($leadId, \DateTime $startDate = null, \DateTime $endDate = null)
-    {
-        $query = $this->createQueryBuilder('s');
 
-        $query->select('IDENTITY(s.email) AS email_id,  s.dateSent, e.name, e.subject')
-            ->leftJoin('MauticEmailBundle:Email', 'e', 'WITH', 'e.id = s.email')
-            ->where(
-                $query->expr()->andX(
-                    $query->expr()->eq('IDENTITY(s.lead)', $leadId),
-                    $query->expr()->eq('s.isFailed', ':false'))
-            )->setParameter('false', false, 'boolean');
-
-        if ($startDate !== null) {
-            //make sure the date is UTC
-            $dt = new DateTimeHelper($startDate);
-            $query->andWhere(
-                $query->expr()->gte('s.dateSent', $query->expr()->literal($dt->toUtcString()))
-            );
-        }
-        if ($endDate !== null) {
-            //make sure the date is UTC
-            $dt = new DateTimeHelper($endDate);
-            $query->andWhere(
-                $query->expr()->lte('s.dateSent', $query->expr()->literal($dt->toUtcString()))
-            );
-        }
-        $stats = $query->getQuery()->getArrayResult();
-
-        return $stats;
-    }
     /**
      * Get counts for Sent, Read and Failed emails
      *

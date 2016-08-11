@@ -21,6 +21,17 @@ class SalesforceApi extends CrmApi
         );
     }
 
+    /**
+     * @param        $operation
+     * @param array  $elementData
+     * @param string $method
+     * @param bool   $retry
+     * @param null   $object
+     * @param null   $queryUrl
+     *
+     * @return mixed|string
+     * @throws ApiErrorException
+     */
     public function request($operation, $elementData = array(), $method = 'GET', $retry = false, $object = null, $queryUrl = null)
     {
         if (!$object) {
@@ -85,53 +96,46 @@ class SalesforceApi extends CrmApi
         return $createdLeadData;
     }
 
+    /**
+     * @param array $activity
+     * @param       $object
+     *
+     * @return array|mixed|string
+     */
     public function createLeadActivity(array $activity, $object)
     {
-        $mActivityObjectName = 'mautic__timeline__c';
+        $config = $this->integration->getIntegrationSettings()->getFeatureSettings();
+
+        $namespace           = (!empty($config['namespace'])) ? $config['namespace'].'__' : '';
+        $mActivityObjectName = $namespace.'mautic_timeline__c';
 
         if (!empty($activity)) {
-            foreach ($activity as $key => $records) {
-                $type = '';
-
+            foreach ($activity as $sfId => $records) {
                 foreach ($records['records'] as $key => $record) {
-                    if (isset($record['delta']) and $record['delta']>0) {
-                        $subject = 'added';
-                        $type = $record['type'];
-                    } else  {
-                        $subject = 'subtracted';
-                    }
-
-                    if (isset($record['subject'])) {
-                        $subject = $record['subject'];
-                        $type = "Action";
-                    } else {
-                        $subject = ", Form name:";
-                        $type = "Action";
-                    }
-
-                    $activityData['records'][$key]= array(
-                        'attributes' => array(
-                            'type' => $mActivityObjectName,
-                            'referenceId' => $record['id'].'-'.$records['id']
-                        ),
-                        'mautic__ActivityDate__c'   => $record['dateAdded']->format('c'),
-                        'mautic__Description__c'    => $type.": ".$record['eventName']." ".$subject." ".$record['actionName'],
-
-                        'Name'           => 'Mautic '.$record['eventName'].' Activity',
-                        'mautic__Mautic_url__c'     => $records['leadUrl']
-                    );
+                    $activityData['records'][$key] = [
+                        'attributes'                 => [
+                            'type'        => $mActivityObjectName,
+                            'referenceId' => $record['id'].'-'.$sfId
+                        ],
+                        $namespace.'ActivityDate__c' => $record['dateAdded']->format('c'),
+                        $namespace.'Description__c'  => $record['description'],
+                        'Name'                       => $record['name'],
+                        $namespace.'Mautic_url__c'   => $records['leadUrl'],
+                        $namespace.'ReferenceId__c'  => $record['id'].'-'.$sfId
+                    ];
 
                     if ($object === 'Lead') {
-                        $activityData['records'][$key]['mautic__WhoId__c' ] = $records['id'];
+                        $activityData['records'][$key][$namespace.'WhoId__c'] = $sfId;
                     } elseif ($object === 'Contact') {
-                        $activityData['records'][$key]['mautic__contact_id__c' ] = $records['id'];
+                        $activityData['records'][$key][$namespace.'contact_id__c'] = $sfId;
                     }
                 }
             }
+
             if (!empty($activityData)) {
                 //todo: log posted activities so that they don't get sent over again
-                $queryUrl      = $this->integration->getQueryUrl();
-                $results       = $this->request(
+                $queryUrl = $this->integration->getQueryUrl();
+                $results  = $this->request(
                     'composite/tree/'.$mActivityObjectName,
                     $activityData,
                     'POST',
@@ -140,8 +144,7 @@ class SalesforceApi extends CrmApi
                     $queryUrl
                 );
 
-                $newRecordData = array();
-
+                $newRecordData = [];
                 if ($results['hasErrors']) {
                     foreach ($results['results'] as $result) {
                         if ($result['errors'][0]['statusCode'] == 'CANNOT_UPDATE_CONVERTED_LEAD') {
@@ -151,14 +154,14 @@ class SalesforceApi extends CrmApi
                             $leadIds = implode("','", $SF_leadIds);
                             $query   = "select Id, ConvertedContactId from ".$object." where id in ('".$leadIds."')";
 
-                            $contacts = $this->request('query', array("q" => $query), 'GET', false, null, $queryUrl);
+                            $contacts = $this->request('query', ["q" => $query], 'GET', false, null, $queryUrl);
 
                             foreach ($contacts['records'] as $contact) {
                                 foreach ($activityData['records'] as $key => $record) {
-                                    if ($record['mautic__WhoId__c'] == $contact['Id']) {
-                                        unset($record['mautic__WhoId__c']);
-                                        $record['mautic__contact_id__c'] = $contact['ConvertedContactId'];
-                                        $newRecordData['records'][]      = $record;
+                                    if ($record[$namespace.'WhoId__c'] == $contact['Id']) {
+                                        unset($record[$namespace.'WhoId__c']);
+                                        $record[$namespace.'contact_id__c'] = $contact['ConvertedContactId'];
+                                        $newRecordData['records'][]         = $record;
                                         unset($activityData['records'][$key]);
                                     }
                                 }
@@ -181,7 +184,7 @@ class SalesforceApi extends CrmApi
                 return $results;
             }
 
-            return array();
+            return [];
         }
     }
 

@@ -17,7 +17,20 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class IntegrationEntityRepository extends CommonRepository
 {
 
-    public function getIntegrationsEntityId($integration, $integrationEntity, $internalEntity, $internalEntityId = null, $startDate =  null, $endDate =  null, $push = false)
+    /**
+     * @param      $integration
+     * @param      $integrationEntity
+     * @param      $internalEntity
+     * @param null $internalEntityId
+     * @param null $startDate
+     * @param null $endDate
+     * @param bool $push
+     * @param int  $start
+     * @param int  $limit
+     *
+     * @return array
+     */
+    public function getIntegrationsEntityId($integration, $integrationEntity, $internalEntity, $internalEntityId = null, $startDate =  null, $endDate =  null, $push = false, $start = 0, $limit = 0)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('i.integration_entity_id, i.id, i.internal_entity_id')
@@ -48,6 +61,14 @@ class IntegrationEntityRepository extends CommonRepository
             $q->andWhere('i.last_sync_date <= :endDate')
                 ->setParameter('endDate', $endDate);
         }
+
+        if ($start) {
+            $q->setFirstResult((int) $start);
+        }
+        if ($limit) {
+            $q->setMaxResults((int) $limit);
+        }
+
         $results = $q->execute()->fetchAll();
 
         return $results;
