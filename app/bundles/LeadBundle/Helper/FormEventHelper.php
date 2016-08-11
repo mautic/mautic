@@ -44,22 +44,7 @@ class FormEventHelper
 
         $oldPoints = $lead->getPoints();
 
-        switch ($config['operator']) {
-            case 'plus':
-                $lead->addToPoints($config['points']);
-                break;
-            case 'minus':
-                $lead->subtractFromPoints($config['points']);
-                break;
-            case 'times':
-                $lead->multiplyPoints($config['points']);
-                break;
-            case 'divide':
-                $lead->dividePoints($config['points']);
-                break;
-            default:
-                throw new \UnexpectedValueException('Invalid operator');
-        }
+        $lead->adjustPoints($config['points'], $config['operator']);
 
         $newPoints = $lead->getPoints();
 

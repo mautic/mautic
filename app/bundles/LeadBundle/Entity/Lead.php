@@ -657,47 +657,31 @@ class Lead extends FormEntity
     }
 
     /**
-     * Add from current points
+     * @param integer $points
+     * @param string  $operator
      *
-     * @param $points
+     * @return Lead
      */
-    public function addToPoints($points)
+    public function adjustPoints($points, $operator='plus')
     {
-        $newPoints = $this->points + $points;
-        $this->setPoints($newPoints);
-    }
+        switch ($operator) {
+            case 'plus':
+                $this->points += $points;
+                break;
+            case 'minus':
+                $this->points -= $points;
+                break;
+            case 'times':
+                $this->points *= $points;
+                break;
+            case 'divide':
+                $this->points /= $points;
+                break;
+            default:
+                throw new \UnexpectedValueException('Invalid operator');
+        }
 
-    /**
-     * Subtract from current points
-     *
-     * @param $points
-     */
-    public function subtractFromPoints($points)
-    {
-        $newPoints = $this->points - $points;
-        $this->setPoints($newPoints);
-    }
-
-    /**
-     * Multipy current points
-     *
-     * @param $points
-     */
-    public function multiplyPoints($points)
-    {
-        $newPoints = $this->points * $points;
-        $this->setPoints($newPoints);
-    }
-
-    /**
-     * Divide current points
-     *
-     * @param $points
-     */
-    public function dividePoints($points)
-    {
-        $newPoints = $this->points / $points;
-        $this->setPoints($newPoints);
+        return $this;
     }
 
     /**
