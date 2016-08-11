@@ -960,7 +960,11 @@ class MailHelper
         $this->checkBatchMaxRecipients();
 
         try {
-            $this->message->addTo($address, $name);
+            if (($name !== null) && (trim($name))) {
+                $this->message->addTo($address, $name);
+            } else {
+                $this->message->addTo($address);
+            }
             $this->queuedRecipients[$address] = $name;
 
             return true;
@@ -984,7 +988,11 @@ class MailHelper
         $this->checkBatchMaxRecipients(count($addresses), 'cc');
 
         try {
-            $this->message->setCc($addresses, $name);
+            if (($name !== null) && (trim($name))) {            
+                $this->message->setCc($addresses, $name);
+            } else {
+                $this->message->setCc($addresses);
+            }
 
             return true;
         } catch (\Exception $e) {
@@ -1007,7 +1015,11 @@ class MailHelper
         $this->checkBatchMaxRecipients(1, 'cc');
 
         try {
-            $this->message->addCc($address, $name);
+            if (($name !== null) && (trim($name))) {            
+                $this->message->addCc($address, $name);
+            } else {
+                $this->message->addCc($address);
+            }
 
             return true;
         } catch (\Exception $e) {
@@ -1030,7 +1042,11 @@ class MailHelper
         $this->checkBatchMaxRecipients(count($addresses), 'bcc');
 
         try {
-            $this->message->setBcc($addresses, $name);
+            if (($name !== null) && (trim($name))) {            
+                $this->message->setBcc($addresses, $name);
+            } else {
+                $this->message->setBcc($addresses);
+            }            
 
             return true;
         } catch (\Exception $e) {
@@ -1053,7 +1069,11 @@ class MailHelper
         $this->checkBatchMaxRecipients(1, 'bcc');
 
         try {
-            $this->message->addBcc($address, $name);
+            if (($name !== null) && (trim($name))) {                    
+                $this->message->addBcc($address, $name);
+            } else {
+                $this->message->addBcc($address, $name);
+            }
 
             return true;
         } catch (\Exception $e) {
