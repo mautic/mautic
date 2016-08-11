@@ -504,6 +504,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $query  = $this->getFetchQuery($params);
         $config = $this->mergeConfigToFeatureSettings([]);
+
         /** @var SalesforceApi $apiHelper */
         $apiHelper = $this->getApiHelper();
 
@@ -568,7 +569,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             }
                         }
 
-                        if (!empty($salesForceIds)) {
+                        if (!empty($salesForceLeadData)) {
                             $apiHelper->createLeadActivity($salesForceLeadData, $object);
                         }
 
@@ -589,7 +590,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
             } catch (\Exception $e) {
                 $this->logIntegrationError($e);
-                throw $e;
             }
         }
 
@@ -695,7 +695,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $leadIds = (!is_array($leadId)) ? [$leadId] : $leadId;
 
         $leadActivity = [];
-        $options      = ['leadIds' => $leadIds, 'fromDate' => $startDate, 'toDate' => $endDate];
+        $options      = ['leadIds' => $leadIds, 'basic_select' => true, 'fromDate' => $startDate, 'toDate' => $endDate];
 
         /** @var LeadModel $leadModel */
         $leadModel      = $this->factory->getModel('lead');
@@ -713,7 +713,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         /** @var EmailModel $emailModel */
         $emailModel = $this->factory->getModel('email');
         $emailRepo  = $emailModel->getStatRepository();
-        $results    = $emailRepo->getLeadStats($options);
+        $results    = $emailRepo->getLeadStats(null, $options);
         $emailStats = [];
         foreach ($results as $result) {
             if (!isset($emailStats[$result['lead_id']])) {
@@ -786,7 +786,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $activity[$i]['name']        = $translator->trans('mautic.salesforce.activity.email').": $name";
                     $activity[$i]['description'] = $translator->trans('mautic.email.sent').": $name";
                     $activity[$i]['dateAdded']   = $row['dateSent'];
-                    $activity[$i]['id']          = 'emailStat'.$row['email_id'];
+                    $activity[$i]['id']          = 'emailStat'.$row['id'];
                     $i++;
                 }
             }

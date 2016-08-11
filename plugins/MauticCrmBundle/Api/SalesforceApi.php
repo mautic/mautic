@@ -110,23 +110,24 @@ class SalesforceApi extends CrmApi
         $mActivityObjectName = $namespace.'mautic_timeline__c';
 
         if (!empty($activity)) {
-            foreach ($activity as $key => $records) {
+            foreach ($activity as $sfId => $records) {
                 foreach ($records['records'] as $key => $record) {
                     $activityData['records'][$key] = [
                         'attributes'                 => [
                             'type'        => $mActivityObjectName,
-                            'referenceId' => $record['id'].'-'.$records['id']
+                            'referenceId' => $record['id'].'-'.$sfId
                         ],
                         $namespace.'ActivityDate__c' => $record['dateAdded']->format('c'),
                         $namespace.'Description__c'  => $record['description'],
                         'Name'                       => $record['name'],
-                        $namespace.'Mautic_url__c'   => $records['leadUrl']
+                        $namespace.'Mautic_url__c'   => $records['leadUrl'],
+                        $namespace.'ReferenceId__c'  => $record['id'].'-'.$sfId
                     ];
 
                     if ($object === 'Lead') {
-                        $activityData['records'][$key][$namespace.'WhoId__c'] = $records['id'];
+                        $activityData['records'][$key][$namespace.'WhoId__c'] = $sfId;
                     } elseif ($object === 'Contact') {
-                        $activityData['records'][$key][$namespace.'contact_id__c'] = $records['id'];
+                        $activityData['records'][$key][$namespace.'contact_id__c'] = $sfId;
                     }
                 }
             }
@@ -144,7 +145,6 @@ class SalesforceApi extends CrmApi
                 );
 
                 $newRecordData = [];
-
                 if ($results['hasErrors']) {
                     foreach ($results['results'] as $result) {
                         if ($result['errors'][0]['statusCode'] == 'CANNOT_UPDATE_CONVERTED_LEAD') {
