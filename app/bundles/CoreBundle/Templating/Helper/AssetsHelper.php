@@ -625,7 +625,7 @@ class AssetsHelper
     public function setFactory(MauticFactory $factory)
     {
         $this->factory = $factory;
-        $this->version = $factory->getVersion();
+        $this->version = substr(hash('sha1', $this->factory->getParameter('secret_key').$this->factory->getVersion()), 0, 8);
     }
 
     /**

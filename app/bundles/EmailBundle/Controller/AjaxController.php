@@ -237,7 +237,7 @@ class AjaxController extends CommonAjaxController
             }
 
             if (!empty($mailer)) {
-                if (method_exists($mailer, "setUsername") && method_exists($mailer, "setPasssword")){
+                if (is_callable([$mailer, 'setUsername']) && is_callable([$mailer, 'setPassword'])){
                     if (empty($settings['password'])) {
                         $settings['password'] = $this->factory->getParameter('mailer_password');
                     }
