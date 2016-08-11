@@ -216,10 +216,6 @@ return [
             ]
         ],
         'helpers' => [
-            'mautic.helper.menu'               => [
-            ]
-        ],
-        'helpers' => [
             'mautic.helper.template.menu'      => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\MenuHelper',
                 'arguments' => ['knp_menu.helper'],
@@ -592,6 +588,8 @@ return [
                 'arguments'   => [
                     'mautic.helper.paths',
                     'mautic.helper.update',
+                    'debril.reader',
+                    'mautic.helper.core_parameters'
                 ],
                 'methodCalls' => [
                     'setDisableUpdates' => [
@@ -699,6 +697,7 @@ return [
         'batch_sleep_time'               => 1,
         'batch_campaign_sleep_time'      => false,
         'cors_restrict_domains'          => true,
-        'cors_valid_domains'             => []
+        'cors_valid_domains'             => [],
+        'rss_notification_url'           => 'https://mautic.com/?feed=rss2&tag=notification'
     ]
 ];

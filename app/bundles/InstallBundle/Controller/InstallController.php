@@ -181,6 +181,7 @@ class InstallController extends CommonController
                                 $complete = true;
                             } catch (\Exception $exception) {
                                 $this->addFlash('mautic.installer.error.adding.fixtures', ['%exception%' => $exception->getMessage()], 'error');
+
                                 return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1]));
                             }
                             break;

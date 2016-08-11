@@ -33,9 +33,9 @@ class BuildJsSubscriber extends CommonSubscriber
      * Adds the MauticJS definition and core
      * JS functions for use in Bundles. This
      * must retain top priority of 1000
-     * 
+     *
      * @param BuildJsEvent $event
-     * 
+     *
      * @return void
      */
     public function onBuildJs(BuildJsEvent $event)
@@ -61,7 +61,7 @@ MauticJS.replaceDynamicContent = function () {
     }
 };
 
-MauticJS.documentReady(MauticJS.replaceDynamicContent);
+MauticJS.pixelLoaded(MauticJS.replaceDynamicContent);
 JS;
         $event->appendJs($js, 'Mautic Dynamic Content');
     }

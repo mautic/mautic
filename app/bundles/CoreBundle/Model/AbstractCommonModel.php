@@ -43,7 +43,7 @@ abstract class AbstractCommonModel
 
     /**
      * @deprecated 2.0; to be removed in 3.0
-     *             
+     *
      * @var MauticFactory
      */
     protected $factory;
@@ -310,26 +310,22 @@ abstract class AbstractCommonModel
             return false;
         }
 
+        $entity = false;
         if (strpos($idSlug, ':') !== false) {
             $parts = explode(':', $idSlug);
             if (count($parts) == 2) {
                 $entity = $this->getEntity($parts[0]);
-
-                if (!empty($entity)) {
-
-                    return $entity;
-                }
             }
         } else {
             $entity = $this->getRepository()->findOneBySlugs($idSlug, $category, $lang);
-
-            if (!empty($entity)) {
-
-                return $entity;
-            }
         }
 
-        return false;
+        if ($entity && $lang) {
+            // Set the slug used to fetch the entity
+            $entity->languageSlug = $lang;
+        }
+
+        return $entity;
     }
 
     /**

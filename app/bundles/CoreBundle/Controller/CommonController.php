@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Templating\DelegatingEngine;
 
 /**
@@ -118,6 +119,24 @@ class CommonController extends Controller implements MauticController
         }
 
         throw new \InvalidArgumentException($containerKey . ' is not a registered container key.');
+    }
+    
+    /**
+     * Forwards the request to another controller and include the POST.
+     *
+     * @param string $controller The controller name (a string like BlogBundle:Post:index)
+     * @param array  $request    An array of request parameters
+     * @param array  $path       An array of path parameters
+     * @param array  $query      An array of query parameters
+     *
+     * @return Response A Response instance
+     */
+    public function forwardWithPost($controller, array $request = [], array $path = [], array $query = [])
+    {
+        $path['_controller'] = $controller;
+        $subRequest = $this->container->get('request_stack')->getCurrentRequest()->duplicate($query, $request, $path);
+
+        return $this->container->get('http_kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }
 
     /**
@@ -571,7 +590,7 @@ class CommonController extends Controller implements MauticController
      * @param string $domain
      * @param bool   $addNotification
      */
-    public function addFlash($message, $messageVars = array(), $type = 'notice', $domain = 'flashes', $addNotification = true)
+    public function addFlash($message, $messageVars = array(), $type = 'notice', $domain = 'flashes', $addNotification = false)
     {
         if ($domain == null) {
             $domain = 'flashes';

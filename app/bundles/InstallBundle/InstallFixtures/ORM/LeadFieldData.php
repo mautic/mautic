@@ -24,7 +24,6 @@ use Mautic\LeadBundle\Entity\LeadField;
  */
 class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
-
     /**
      * @var ContainerInterface
      */
@@ -43,134 +42,41 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
      */
     public function load(ObjectManager $manager)
     {
-        $translator = $this->container->get('translator');
-
+        $fields       = FieldModel::$coreFields;
+        $translator   = $this->container->get('translator');
         $indexesToAdd = [];
-        $textfields = [
-            'title',
-            'firstname',
-            'lastname',
-            'company',
-            'position',
-            'email',
-            'phone',
-            'mobile',
-            'fax',
-            'address1',
-            'address2',
-            'city',
-            'state',
-            'zipcode',
-            'country',
-            'website',
-            'twitter',
-            'facebook',
-            'googleplus',
-            'skype',
-            'linkedin',
-            'instagram',
-            'foursquare',
-            'attribution',
-            'attribution_date'
-        ];
 
         /** @var ColumnSchemaHelper $leadsSchema */
         $leadsSchema = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('column', 'leads');
 
-        foreach ($textfields as $key => $name) {
+        $order = 1;
+        foreach ($fields as $alias => $field) {
+            $type = isset($field['type']) ? $field['type'] : 'text';
+
             $entity = new LeadField();
-            $entity->setLabel($translator->trans('mautic.lead.field.'.$name, [], 'fixtures'));
-            if (in_array($name, ['title', 'company', 'city', 'zipcode'])) {
-                $type = 'lookup';
-            } elseif ($name == 'country') {
-                $type = 'country';
-            } elseif ($name == 'state') {
-                $type = 'region';
-            } elseif (in_array($name, ['phone', 'mobile', 'fax'])) {
-                $type = 'tel';
-            } elseif ($name == 'website') {
-                $type = 'url';
-            } elseif ($name == 'email') {
-                $type = 'email';
-                $entity->setIsUniqueIdentifer(true);
-            } elseif ($name == 'attribution_date') {
-                $type = 'datetime';
-            } elseif ($name == 'attribution') {
-                $type = 'number';
-                $entity->setProperties(["roundmode" => 4, "precision" => 2]);
-            } else {
-                $type = 'text';
-            }
-
-            if ($name == 'title') {
-                $entity->setProperties(["list" => "|Mr|Mrs|Miss"]);
-            }
+            $entity->setLabel($translator->trans('mautic.lead.field.'.$alias, [], 'fixtures'));
+            $entity->setGroup(isset($field['group']) ? $field['group'] : 'core');
+            $entity->setOrder($order);
+            $entity->setAlias($alias);
             $entity->setType($type);
-            $fixed = in_array(
-                $name,
-                [
-                    'attribution',
-                    'attribution_date',
-                    'title',
-                    'firstname',
-                    'lastname',
-                    'position',
-                    'company',
-                    'email',
-                    'phone',
-                    'mobile',
-                    'address1',
-                    'address2',
-                    'country',
-                    'city',
-                    'state',
-                    'zipcode'
-                ]
-            ) ? true : false;
-            $entity->setIsFixed($fixed);
-
-            $entity->setOrder(($key + 1));
-            $entity->setAlias($name);
-            $listable = in_array(
-                $name,
-                [
-                    'attribution',
-                    'attribution_date',
-                    'address1',
-                    'address2',
-                    'fax',
-                    'phone',
-                    'mobile',
-                    'fax',
-                    'twitter',
-                    'facebook',
-                    'googleplus',
-                    'skype',
-                    'linkedin',
-                    'foursquare',
-                    'instagram',
-                    'website'
-                ]
-            ) ? false : true;
-            $entity->setIsListable($listable);
-
-            $shortVisible = in_array($name, ['firstname', 'lastname', 'email']) ? true : false;
-            $entity->setIsShortVisible($shortVisible);
-
-            $group = (in_array($name, ['twitter', 'facebook', 'googleplus', 'skype', 'linkedin', 'instagram', 'foursquare'])) ? 'social' : 'core';
-            $entity->setGroup($group);
+            $entity->setIsUniqueIdentifer(!empty($field['unique']));
+            $entity->setProperties(isset($field['properties']) ? $field['properties'] : []);
+            $entity->setIsFixed(!empty($field['fixed']));
+            $entity->setIsListable(!empty($field['listable']));
+            $entity->setIsShortVisible(!empty($field['short']));
 
             $manager->persist($entity);
             $manager->flush();
 
             //add the column to the leads table
             $leadsSchema->addColumn(
-                FieldModel::getSchemaDefinition($name, $type, $entity->getIsUniqueIdentifier())
+                FieldModel::getSchemaDefinition($alias, $type, $entity->getIsUniqueIdentifier())
             );
 
-            $indexesToAdd[] = $name;
+            $indexesToAdd[] = $alias;
 
-            $this->addReference('leadfield-'.$name, $entity);
+            $this->addReference('leadfield-'.$alias, $entity);
+            $order++;
         }
 
         $leadsSchema->executeChanges();
@@ -179,12 +85,14 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
         $indexHelper = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('index', 'leads');
 
         foreach ($indexesToAdd as $name) {
-            $indexHelper->addIndex([$name], MAUTIC_TABLE_PREFIX.$name.'_search', ['where' => "({$name}(767))"] );
+            $type = (isset($fields[$name]['type'])) ? $fields[$name]['type'] : 'text';
+            if ('textarea' != $type) {
+                $indexHelper->addIndex([$name], MAUTIC_TABLE_PREFIX.$name.'_search');
+            }
         }
 
         // Add an attribution index
         $indexHelper->addIndex(['attribution', 'attribution_date'], MAUTIC_TABLE_PREFIX.'_contact_attribution');
-
         $indexHelper->executeChanges();
     }
 

@@ -1,21 +1,19 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\SmsBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class SmsSendEvent
- *
- * @package Mautic\SmsBundle\Event
+ * Class SmsSendEvent.
  */
 class SmsSendEvent extends CommonEvent
 {
@@ -36,7 +34,7 @@ class SmsSendEvent extends CommonEvent
 
     /**
      * @param string $content
-     * @param Lead $lead
+     * @param Lead   $lead
      */
     public function __construct($content, Lead $lead)
     {
