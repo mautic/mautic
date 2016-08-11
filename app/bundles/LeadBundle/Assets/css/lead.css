@@ -142,12 +142,6 @@ ul.tag-cloud li {
     overflow: visible!important;
     height: 53px;
 }
-<<<<<<< Temporary merge branch 1
-.frequency{
-    width: 30px;
-    float: left;
-=======
-
 .timeline-icon {
     width: 50px;
     text-align: center;
@@ -163,7 +157,6 @@ ul.tag-cloud li {
     word-wrap: break-word;
     -ms-word-break: break-all;
     word-break: break-all;
-    word-break: break-word;
     -ms-hyphens: auto;
     -moz-hyphens: auto;
     -webkit-hyphens: auto;
