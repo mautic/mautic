@@ -652,19 +652,19 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $leadModel->setFieldValues($lead, $matchedFields, false, false);
 
-        // Update the social cache
-        $leadSocialCache = $lead->getSocialCache();
-        if (!isset($leadSocialCache[$this->getName()])) {
-            $leadSocialCache[$this->getName()] = [];
-        }
-        $leadSocialCache[$this->getName()] = array_merge($leadSocialCache[$this->getName()], $socialCache);
-
-        // Check for activity while here
-        if (null !== $identifiers && in_array('public_activity', $this->getSupportedFeatures())) {
-            $this->getPublicActivity($identifiers, $leadSocialCache[$this->getName()]);
-        }
-
         if (!empty($socialCache)) {
+            // Update the social cache
+            $leadSocialCache = $lead->getSocialCache();
+            if (!isset($leadSocialCache[$this->getName()])) {
+                $leadSocialCache[$this->getName()] = [];
+            }
+            $leadSocialCache[$this->getName()] = array_merge($leadSocialCache[$this->getName()], $socialCache);
+
+            // Check for activity while here
+            if (null !== $identifiers && in_array('public_activity', $this->getSupportedFeatures())) {
+                $this->getPublicActivity($identifiers, $leadSocialCache[$this->getName()]);
+            }
+            
             $lead->setSocialCache($leadSocialCache);
         }
 
