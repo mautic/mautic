@@ -98,7 +98,7 @@ class NotificationRepository extends CommonRepository
         $qb = $this->createQueryBuilder('n');
 
         $expr = $qb->expr()->andX(
-            $qb->expr()->eq('IDENTITY(n.user)', $userId)
+            $qb->expr()->eq('IDENTITY(n.user)', (int) $userId)
         );
 
         if ($afterId) {
