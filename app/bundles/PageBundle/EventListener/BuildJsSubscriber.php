@@ -112,11 +112,12 @@ JS;
 
     public function onBuildJsForVideo(BuildJsEvent $event)
     {
-        $formSubmitUrl = $this->factory->getRouter()->generate('mautic_form_postresults_ajax', [], UrlGeneratorInterface::ABSOLUTE_URL);
-        $mauticBaseUrl = $this->factory->getRouter()->generate('mautic_base_index', [], UrlGeneratorInterface::ABSOLUTE_URL);
-        $assetBaseUrl  = str_replace(['index.php/', 'index_dev.php/'], '', $mauticBaseUrl);
-        $mediaElementCss = $assetBaseUrl . 'media/css/mediaelementplayer.css';
-        $jQueryUrl = $assetBaseUrl . 'app/bundles/CoreBundle/Assets/js/libraries/2.jquery.js';
+        $router = $this->factory->getRouter();
+        $assetsHelper = $this->factory->getHelper('template.assets');
+        $formSubmitUrl = $router->generate('mautic_form_postresults_ajax', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $mauticBaseUrl = $router->generate('mautic_base_index', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $mediaElementCss = $assetsHelper->getUrl('media/css/mediaelementplayer.css', null, null, true);
+        $jQueryUrl = $assetsHelper->getUrl('app/bundles/CoreBundle/Assets/js/libraries/2.jquery.js', null, null, true);
 
         $mediaElementJs = <<<'JS'
 /*!
