@@ -16,7 +16,7 @@ use SparkPost\APIResponseException;
 
 use SparkPost\SparkPost;
 use GuzzleHttp\Client;
-use Ivory\HttpAdapter\Guzzle6HttpAdapter;
+use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -44,7 +44,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     public function __construct($apiKey)
     {
         $this->setApiKey($apiKey);
-        $this->getDispatcher();
     }
 
     /**
@@ -74,7 +73,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         if ($this->apiKey === null) {
             throw new \Swift_TransportException('Cannot create instance of \SparkPost\SparkPost while API key is NULL');
         }
-        $httpAdapter = new Guzzle6HttpAdapter(new Client());
+        $httpAdapter = new GuzzleAdapter(new Client());
         $sparky      = new SparkPost($httpAdapter, ['key' => $this->apiKey]);
 
         return $sparky;
@@ -88,6 +87,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      */
     public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
     {
+        $sendCount = 0;
         if ($event = $this->getDispatcher()->createSendEvent($this, $message)) {
             $this->getDispatcher()->dispatchEvent($event, 'beforeSendPerformed');
             if ($event->bubbleCancelled()) {
@@ -99,10 +99,15 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         try {
             $sparkPost        = $this->createSparkPost();
             $sparkPostMessage = $this->getSparkPostMessage($message);
-            $response         = $sparkPost->transmission->send($sparkPostMessage);
-            $sendCount        = $response['results']['total_accepted_recipients'];
-        } catch (APIResponseException $e) {
-            $this->throwException($e->getAPIMessage());
+            $response         = $sparkPost->transmissions->post($sparkPostMessage);
+
+            $response = $response->wait();
+            if (200 == (int) $response->getStatusCode()) {
+                $results   = $response->getBody();
+                $sendCount = $results['results']['total_accepted_recipients'];
+            }
+        } catch (\Exception $e) {
+            $this->throwException($e->getMessage());
         }
 
         if ($event) {
@@ -193,18 +198,26 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         }
 
         $sparkPostMessage = [
-            'html'           => $message['html'],
-            'text'           => $message['text'],
-            'from'           => (!empty($message['from']['name'])) ? $message['from']['name'].' <'.$message['from']['email'].'>'
-                : $message['from']['email'],
-            'subject'        => $message['subject'],
+            'content' => [
+                'html'           => $message['html'],
+                'text'           => $message['text'],
+                'from'           => (!empty($message['from']['name'])) ? $message['from']['name'].' <'.$message['from']['email'].'>'
+                    : $message['from']['email'],
+                'subject'        => $message['subject'],
+            ],
             'recipients'     => $recipients,
-            'cc'             => array_values($message['recipients']['cc']),
-            'bcc'            => array_values($message['recipients']['bcc']),
             'headers'        => $message['headers'],
             'inline_css'     => $inlineCss,
             'tags'           => $tags
         ];
+
+        if (!empty($message['recipients']['cc'])) {
+            $sparkPostMessage['cc'] = array_values($message['recipients']['cc']);
+        }
+
+        if (!empty($message['recipients']['bcc'])) {
+            $sparkPostMessage['bcc'] = array_values($message['recipients']['bcc']);
+        }
 
         if (!empty($message['attachments'])) {
 
