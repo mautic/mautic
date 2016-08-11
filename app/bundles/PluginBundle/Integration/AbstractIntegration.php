@@ -1580,8 +1580,8 @@ abstract class AbstractIntegration
     }
 
     /**
-    * @param \Exception $e
-    */
+     * @param \Exception $e
+     */
     public function logIntegrationError(\Exception $e)
     {
         $logger = $this->factory->getLogger();
