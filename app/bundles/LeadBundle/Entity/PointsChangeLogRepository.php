@@ -31,8 +31,11 @@ class PointsChangeLogRepository extends CommonRepository
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp')
-            ->select('lp.event_name as eventName, lp.action_name as actionName, lp.date_added as dateAdded, lp.type, lp.delta')
-            ->where('lp.lead_id = ' . (int) $leadId);
+            ->select('lp.event_name as eventName, lp.action_name as actionName, lp.date_added as dateAdded, lp.type, lp.delta, lp.id');
+
+        if (null !== $leadId) {
+            $query->where('lp.lead_id = ' . (int) $leadId);
+        }
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere($query->expr()->orX(
@@ -115,5 +118,13 @@ class PointsChangeLogRepository extends CommonRepository
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = ' . (int) $fromLeadId)
             ->execute();
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return 'lp';
     }
 }

@@ -45,6 +45,7 @@ class AjaxController extends CommonAjaxController
     {
         $integration = $request->request->get('integration');
         $settings    = $request->request->get('settings');
+
         $dataArray   = array('success' => 0);
 
         if (!empty($integration) && !empty($settings)) {
