@@ -59,6 +59,14 @@ abstract class AbstractIntegration
     }
 
     /**
+     * @return \Mautic\CoreBundle\Translation\Translator
+     */
+    public function getTranslator()
+    {
+        return $this->factory->getTranslator();
+    }
+
+    /**
      * Called on construct
      */
     public function init()
@@ -1572,12 +1580,16 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param \Exception $e
-     */
+    * @param \Exception $e
+    */
     public function logIntegrationError(\Exception $e)
     {
         $logger = $this->factory->getLogger();
-        $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e->getMessage());
+        if ('dev' == MAUTIC_ENV) {
+            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e);
+        } else {
+            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e->getMessage());
+        }
     }
 
     /**

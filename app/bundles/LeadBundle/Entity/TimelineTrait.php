@@ -50,6 +50,26 @@ trait TimelineTrait
             return $data;
         }
 
+        if (!empty($options['fromDate']) && !empty($options['toDate'])) {
+            $query->andWhere($timestampColumn.' BETWEEN :dateFrom AND :dateTo')
+                ->setParameter('dateFrom', $options['fromDate']->format('Y-m-d H:i:s'))
+                ->setParameter('dateTo', $options['toDate']->format('Y-m-d H:i:s'));
+        } elseif (!empty($options['fromDate'])) {
+            $query->andWhere($query->expr()->gte('fs.date_submitted', ':dateFrom'))
+                ->setParameter('dateFrom', $options['fromDate']->format('Y-m-d H:i:s'));
+        } elseif (!empty($options['toDate'])) {
+            $query->andWhere($query->expr()->lte('fs.date_submitted', ':dateTo'))
+                ->setParameter('dateTo', $options['toDate']->format('Y-m-d H:i:s'));
+        }
+
+        if (isset($options['leadIds'])) {
+            $leadColumn = $this->getTableAlias().'.lead_id';
+            $query->addSelect($leadColumn);
+            $query->andWhere(
+                $query->expr()->in($leadColumn, $options['leadIds'])
+            );
+        }
+
         if (isset($options['order'])) {
             list ($orderBy, $orderByDir) = $options['order'];
 

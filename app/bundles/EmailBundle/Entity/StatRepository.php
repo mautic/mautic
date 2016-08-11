@@ -343,46 +343,7 @@ class StatRepository extends CommonRepository
             $timeToReadParser
         );
     }
-    /**
-     * Get a lead's email stat
-     *
-     * @param integer $leadId
-     * @param array   $options
-     *
-     * @return array
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    public function getLeadStatsByDate($leadId, \DateTime $startDate = null, \DateTime $endDate = null)
-    {
-        $query = $this->createQueryBuilder('s');
 
-        $query->select('IDENTITY(s.email) AS email_id,  s.dateSent, e.name, e.subject')
-            ->leftJoin('MauticEmailBundle:Email', 'e', 'WITH', 'e.id = s.email')
-            ->where(
-                $query->expr()->andX(
-                    $query->expr()->eq('IDENTITY(s.lead)', $leadId),
-                    $query->expr()->eq('s.isFailed', ':false'))
-            )->setParameter('false', false, 'boolean');
-
-        if ($startDate !== null) {
-            //make sure the date is UTC
-            $dt = new DateTimeHelper($startDate);
-            $query->andWhere(
-                $query->expr()->gte('s.dateSent', $query->expr()->literal($dt->toUtcString()))
-            );
-        }
-        if ($endDate !== null) {
-            //make sure the date is UTC
-            $dt = new DateTimeHelper($endDate);
-            $query->andWhere(
-                $query->expr()->lte('s.dateSent', $query->expr()->literal($dt->toUtcString()))
-            );
-        }
-        $stats = $query->getQuery()->getArrayResult();
-
-        return $stats;
-    }
     /**
      * Get counts for Sent, Read and Failed emails
      *
