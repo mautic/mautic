@@ -1368,12 +1368,6 @@ abstract class AbstractIntegration
 
             if (!empty($existingLeads)) {
                 $lead = array_shift($existingLeads);
-                // Update remaining leads
-                if (count($existingLeads)) {
-                    foreach ($existingLeads as $existingLead) {
-                        $existingLead->setLastActive(new \DateTime());
-                    }
-                }
             }
         }
 
@@ -1402,8 +1396,6 @@ abstract class AbstractIntegration
             $internalInfo[$this->getName()] = $data['internal'];
             $lead->setInternal($internalInfo);
         }
-
-        $lead->setLastActive(new \DateTime());
 
         if ($persist) {
             // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
