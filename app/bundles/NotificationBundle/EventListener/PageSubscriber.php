@@ -45,7 +45,7 @@ class PageSubscriber extends CommonSubscriber
         /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
         $assetsHelper = $this->factory->getHelper('template.assets');
 
-        $assetsHelper->addScript($router->generate('mautic_js'), 'onPageDisplay_headClose', true);
+        $assetsHelper->addScript($router->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL), 'onPageDisplay_headClose', true, 'mautic_js');
         $assetsHelper->addScript('https://cdn.onesignal.com/sdks/OneSignalSDK.js', 'onPageDisplay_headClose');
 
         $manifestUrl = $router->generate('mautic_onesignal_manifest');
