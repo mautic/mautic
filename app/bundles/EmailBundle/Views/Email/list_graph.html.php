@@ -47,6 +47,7 @@ some stats:
                     <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $stats, 'chartType' => 'bar', 'chartHeight' => 300)); ?>
                 </div>
                 <div class="pt-0 pl-15 pb-10 pr-15 col-xs-6">
+                    <div style="text-align: center;"><?php echo $view['translator']->trans('mautic.core.devices'); ?></div>
                     <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $statsDevices, 'chartType' => 'horizontal-bar', 'chartHeight' => 240)); ?>
                 </div>
                 </div>

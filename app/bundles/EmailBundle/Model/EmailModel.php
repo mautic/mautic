@@ -805,24 +805,39 @@ class EmailModel extends FormModel
 
                 if(!empty($statIds))
                 {
-                    $results = $this->getStatDeviceRepository()->getDeviceStats($statIds[0],$l->getId(), $dateFrom, $dateTo, 'Email', $emailIds[0]);
+                    $this->getStatDeviceRepository()->setCurrentUser($this->user);
+                    $results = $this->getStatDeviceRepository()->getDeviceStats($statIds[0], $dateFrom, $dateTo);
                 }
-                $key = 0;
+
                 foreach ($results as $result) {
-                    $label = substr(empty($result['device']) ? $this->translator->trans('mautic.core.no.info') : $result['device'], 0, 12);
-                    $chart->setDataset(
-                        $label,
-                        [
-                            $result['count']
-                        ],
-                        $key
-                    );
-                    $key++;
+                    $data['labels'][] = substr( empty($result['device']) ? $this->translator->trans('mautic.core.no.info') : $result['device'], 0, 12 );
+                    $data['values'][] = $result['count'];
                 }
+
+                $data['xAxes'][] = array('display' => true);
+                $data['yAxes'][] = array('display' => true);
+
+                $baseData = array(
+                    'label' => $this->translator->trans('mautic.core.device'),
+                    'data'  => $data['values']
+                );
+
+                $chart = new BarChart($data['labels']);
+
+                $datasets[] = array_merge($baseData, $chart->generateColors(2));
+
+                $chartData = array(
+                    'labels'   => $data['labels'],
+                    'datasets' => $datasets,
+                    'options'  => array(
+                        'xAxes' => $data['xAxes'],
+                        'yAxes' => $data['yAxes']
+                    )
+                );
             }
         }
 
-        return $chart->render();
+        return $chartData;
 
     }
     /**
@@ -1742,6 +1757,36 @@ class EmailModel extends FormModel
         $chart->setDataset($this->translator->trans('mautic.email.graph.pie.ignored.read.failed.ignored'), ($sent - $read));
         $chart->setDataset($this->translator->trans('mautic.email.graph.pie.ignored.read.failed.read'), $read);
         $chart->setDataset($this->translator->trans('mautic.email.graph.pie.ignored.read.failed.failed'), $failed);
+
+        return $chart->render();
+    }
+
+    /**
+     * Get pie chart data of ignored vs opened emails
+     *
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     * @param boolean $canViewOthers
+     *
+     * @return array
+     */
+    public function getDeviceGranularityPieChartData($dateFrom, $dateTo, $canViewOthers = true)
+    {
+        $chart = new PieChart();
+
+        $this->getStatDeviceRepository()->setCurrentUser($this->user);
+
+        $deviceStats = $this->getStatDeviceRepository()->getDeviceStats(
+            null,
+            $dateFrom,
+            $dateTo,
+            $canViewOthers
+        );
+
+        foreach ($deviceStats as $device){
+            $chart->setDataset($device['device'], $device['count']);
+        }
 
         return $chart->render();
     }

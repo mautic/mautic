@@ -9,7 +9,6 @@
 
 namespace Mautic\EmailBundle\Entity;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
@@ -26,16 +25,10 @@ class StatDeviceRepository extends CommonRepository
      *
      * @return array
      */
-    public function getDeviceStats($statIds, \DateTime $fromDate = null, \DateTime $toDate = null)
+    public function getDeviceStats($statIds, \DateTime $fromDate = null, \DateTime $toDate = null, $canViewOthers = false)
     {
-        $inIds = (!is_array($statIds)) ? array($statIds) : $statIds;
-
-        if(empty($inIds))
-        {
-            return array();
-        }
         $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('count(es.id) as count, d.device_name as device')
+        $sq->select('count(es.id) as count, d.device as device')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats_devices', 'es')
             ->join('es',MAUTIC_TABLE_PREFIX.'lead_devices','d','d.id=es.device_id');
         if ($statIds) {
@@ -46,7 +39,11 @@ class StatDeviceRepository extends CommonRepository
                 $sq->expr()->in('es.stat_id', $statIds)
             );
         }
-
+        if (!$canViewOthers) {
+            $sq->join('es', MAUTIC_TABLE_PREFIX.'email_stats', 'em', 'em.id=es.stat_id')
+                ->join('es', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id=em.email_id and e.created_by  = :userId')
+            ->setParameter('userId', $this->currentUser->getId());
+        }
         if ($fromDate !== null) {
             //make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
@@ -62,7 +59,8 @@ class StatDeviceRepository extends CommonRepository
             );
         }
 
-        $sq->groupBy('d.device_name');
+        $sq->groupBy('d.device, es.stat_id');
+
 
         //get a total number of sent emails first
         $totalCounts = $sq->execute()->fetchAll();
