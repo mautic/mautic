@@ -446,4 +446,12 @@ class SubmissionRepository extends CommonRepository
     {
         return MAUTIC_TABLE_PREFIX . 'form_results_' . $formId . '_' . $formAlias;
     }
+
+    /**
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return "fs";
+    }
 }

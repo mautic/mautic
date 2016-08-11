@@ -16,9 +16,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * Class FetchLeadsCommand
+ * Class PushLeadActivityCommand
  */
-class FetchLeadsCommand extends ContainerAwareCommand
+class PushLeadActivityCommand extends ContainerAwareCommand
 {
     /**
      * {@inheritdoc}
@@ -26,19 +26,19 @@ class FetchLeadsCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:integration:fetchleads')
+            ->setName('mautic:integration:pushleadactivity')
             ->setAliases(
                 array(
-                    'mautic:integration:fetchleads',
-                    'mautic:fetchleads:integration'
+                    'mautic:integration:pushactivity',
+                    'mautic:pushactivity:integration'
                 )
             )
-            ->setDescription('Fetch leads from integration.')
+            ->setDescription('Push lead activity to integration.')
             ->addOption(
                 '--integration',
                 '-i',
                 InputOption::VALUE_REQUIRED,
-                'Fetch leads from integration. Integration must be enabled and authorised.',
+                'Integration name. Integration must be enabled and authorised.',
                 null
             )
             ->addOption('--start-date', '-d', InputOption::VALUE_REQUIRED, 'Set start date for updated values.')
@@ -81,34 +81,31 @@ class FetchLeadsCommand extends ContainerAwareCommand
         if(!$startDate){
             $startDate= date('c', strtotime("-".$interval));
         }
+
         if(!$endDate){
             $endDate= date('c');
         }
+
         if ($integration && $startDate && $endDate) {
             /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
             $integrationHelper = $factory->getHelper('integration');
 
             $integrationObject = $integrationHelper->getIntegrationObject($integration);
 
-            if ($integrationObject !== null && method_exists($integrationObject, 'getLeads')) {
+            if ($integrationObject !== null && method_exists($integrationObject, 'pushLeadActivity')) {
 
-                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', array('%integration%' => $integration)).'</info>');
+                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.push.leads.activity', array('%integration%' => $integration)).'</info>');
 
                 $params['start']=$startDate;
                 $params['end']=$endDate;
 
-                if(strtotime($startDate) > strtotime('-30 days')) {
-                    $processed = intval($integrationObject->getLeads($params));
+                $processed = intval($integrationObject->pushLeadActivity($params));
 
-                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
+                $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.push.leads.events_executed', array('%events%' => $processed)).'</comment>'."\n");
 
-                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.events_executed', array('%events%' => $processed)).'</comment>'."\n");
-                }
-                else{
-                    $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
-                }
             }
         }
+
         return 0;
     }
 }
