@@ -1747,6 +1747,33 @@ class EmailModel extends FormModel
     }
 
     /**
+     * Get pie chart data of ignored vs opened emails
+     *
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     * @param boolean $canViewOthers
+     *
+     * @return array
+     */
+    public function getDeviceGranularityPieChartData($dateFrom, $dateTo, $canViewOthers = true)
+    {
+        $chart = new PieChart();
+
+        $deviceStats = $this->getStatDeviceRepository()->getDeviceStats(
+            null,
+            $dateFrom,
+            $dateTo
+        );
+
+        foreach ($deviceStats as $device){
+            $chart->setDataset($device['device'], $device['count']);
+        }
+
+        return $chart->render();
+    }
+
+    /**
      * Get a list of emails in a date range, grouped by a stat date count
      *
      * @param integer   $limit
