@@ -78,7 +78,11 @@ class IntegrationEntity extends CommonEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('integration_entity')
-            ->setCustomRepositoryClass('Mautic\PluginBundle\Entity\IntegrationEntityRepository');
+            ->setCustomRepositoryClass('Mautic\PluginBundle\Entity\IntegrationEntityRepository')
+            ->addIndex(['integration', 'integration_entity', 'integration_entity_id'], 'integration_external_entity')
+            ->addIndex(['integration', 'internal_entity', 'internal_entity_id'], 'integration_internal_entity')
+            ->addIndex(['integration', 'internal_entity', 'integration_entity'], 'integration_entity_match')
+            ->addIndex(['integration', 'last_sync_date'], 'integration_last_sync_date');
 
         $builder->addId();
 
