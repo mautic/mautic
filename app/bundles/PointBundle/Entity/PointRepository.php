@@ -98,7 +98,35 @@ class PointRepository extends CommonRepository
 
         return $return;
     }
+    /**
+     * @param int    $leadId
+     *
+     * @return array
+     */
+    public function getCompletedLeadActionsByLeadId($leadId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->select('p.*')
+            ->from(MAUTIC_TABLE_PREFIX . 'point_lead_action_log', 'x')
+            ->innerJoin('x', MAUTIC_TABLE_PREFIX . 'points', 'p', 'x.point_id = p.id');
 
+        //make sure the published up and down dates are good
+        $q->where(
+            $q->expr()->andX(
+                $q->expr()->eq('x.lead_id', (int) $leadId)
+            )
+        );
+
+        $results = $q->execute()->fetchAll();
+
+        $return = array();
+
+        foreach ($results as $r) {
+            $return[$r['id']] = $r;
+        }
+
+        return $return;
+    }
     /**
      * {@inheritdoc}
      */

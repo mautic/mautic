@@ -103,6 +103,10 @@ class CoreSubscriber extends CommonSubscriber
      */
     public function onKernelRequestAddGlobalJS(GetResponseEvent $event)
     {
+        if (defined('MAUTIC_INSTALLER')) {
+            return;
+        }
+
         $list = $this->factory->getEntityManager()->getRepository('MauticFormBundle:Form')->getSimpleList();
 
         $mauticForms = json_encode($list, JSON_FORCE_OBJECT | JSON_PRETTY_PRINT);

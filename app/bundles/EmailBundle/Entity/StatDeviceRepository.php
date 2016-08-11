@@ -28,20 +28,22 @@ class StatDeviceRepository extends CommonRepository
      */
     public function getDeviceStats($emailIds, \DateTime $fromDate = null, \DateTime $toDate = null)
     {
-        if (!is_array($emailIds)) {
-            $emailIds = [(int) $emailIds];
-        }
-
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $qb->select('count(es.id) as count, d.device as device, es.list_id')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats_devices', 'ed')
             ->join('ed',MAUTIC_TABLE_PREFIX.'lead_devices','d','d.id = ed.device_id')
-            ->join('ed',MAUTIC_TABLE_PREFIX.'email_stats','es','es.id = ed.stat_id')
-            ->where(
+            ->join('ed',MAUTIC_TABLE_PREFIX.'email_stats','es','es.id = ed.stat_id');
+        if ($emailIds != null) {
+            if (!is_array($emailIds)) {
+                $emailIds = [(int) $emailIds];
+            }
+            $qb ->where(
                 $qb->expr()->in('es.email_id', $emailIds)
-            )
-            ->groupBy('es.list_id, d.device');
+            );
+        }
+
+            $qb->groupBy('es.list_id, d.device');
 
         if ($fromDate !== null) {
             //make sure the date is UTC
