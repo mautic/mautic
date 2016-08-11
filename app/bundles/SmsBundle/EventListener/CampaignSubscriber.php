@@ -1,15 +1,16 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\CampaignEvents;
@@ -23,9 +24,7 @@ use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\SmsEvents;
 
 /**
- * Class CampaignSubscriber
- *
- * @package MauticSmsBundle
+ * Class CampaignSubscriber.
  */
 class CampaignSubscriber extends CommonSubscriber
 {
@@ -93,7 +92,7 @@ class CampaignSubscriber extends CommonSubscriber
                     'formType'         => 'smssend_list',
                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_sms'],
                     'formTheme'        => 'MauticSmsBundle:FormTheme\SmsSendList',
-                    'timelineTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.php'
+                    'timelineTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.php',
                 ]
             );
         }
@@ -132,10 +131,18 @@ class CampaignSubscriber extends CommonSubscriber
 
         $smsEvent = new SmsSendEvent($sms->getMessage(), $lead);
         $smsEvent->setSmsId($smsId);
-
         $this->dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $smsEvent);
 
-        $metadata = false;
+        $tokenEvent = $this->dispatcher->dispatch(
+            SmsEvents::TOKEN_REPLACEMENT,
+            new TokenReplacementEvent(
+                $smsEvent->getContent(),
+                $lead,
+                ['channel' => ['sms', $sms->getId()]]
+            )
+        );
+
+        $metadata = $this->smsApi->sendSms($leadPhoneNumber, $tokenEvent->getContent());
 
         $defaultFrequencyNumber = $this->factory->getParameter('sms_frequency_number');
         $defaultFrequencyTime = $this->factory->getParameter('sms_frequency_time');
@@ -145,7 +152,7 @@ class CampaignSubscriber extends CommonSubscriber
 
         $leadIds = $lead->getId();
 
-        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', $leadIds, null, $defaultFrequencyNumber, $defaultFrequencyTime);
+        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('sms', $leadIds, null, $defaultFrequencyNumber, $defaultFrequencyTime);
 
 
         if (!empty($dontSendTo) and $dontSendTo[0]['lead_id'] != $lead->getId()) {
@@ -154,10 +161,11 @@ class CampaignSubscriber extends CommonSubscriber
 
         // If there was a problem sending at this point, it's an API problem and should be requeued
         if ($metadata === false) {
+
             return $event->setResult(false);
         }
 
-
+        $this->smsModel->createStatEntry($sms, $lead);
         $this->smsModel->getRepository()->upCount($smsId);
         $event->setChannel('sms', $sms->getId());
         $event->setResult(
@@ -166,7 +174,7 @@ class CampaignSubscriber extends CommonSubscriber
                 'status'  => 'mautic.sms.timeline.status.delivered',
                 'id'      => $sms->getId(),
                 'name'    => $sms->getName(),
-                'content' => $smsEvent->getContent()
+                'content' => $tokenEvent->getContent(),
             ]
         );
     }

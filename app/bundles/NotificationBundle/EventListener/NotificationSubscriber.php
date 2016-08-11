@@ -7,7 +7,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-namespace Mautic\SmsBundle\EventListener;
+namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\PageBundle\Entity\Trackable;
@@ -18,13 +18,14 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
-use Mautic\SmsBundle\Event\SmsEvent;
-use Mautic\SmsBundle\SmsEvents;
+use Mautic\NotificationBundle\Event\NotificationEvent;
+use Mautic\NotificationBundle\Event\NotificationSendEvent;
+use Mautic\NotificationBundle\NotificationEvents;
 
 /**
- * Class CampaignSubscriber.
+ * Class NotificationSubscriber.
  */
-class SmsSubscriber extends CommonSubscriber
+class NotificationSubscriber extends CommonSubscriber
 {
     /**
      * @var TrackableModel
@@ -49,14 +50,10 @@ class SmsSubscriber extends CommonSubscriber
      * @param PageTokenHelper  $pageTokenHelper
      * @param AssetTokenHelper $assetTokenHelper
      */
-    public function __construct(
-        MauticFactory $factory,
-        TrackableModel $trackableModel,
-        PageTokenHelper $pageTokenHelper,
-        AssetTokenHelper $assetTokenHelper
-    ) {
-        $this->trackableModel   = $trackableModel;
-        $this->pageTokenHelper  = $pageTokenHelper;
+    public function __construct(MauticFactory $factory, TrackableModel $trackableModel, PageTokenHelper $pageTokenHelper, AssetTokenHelper $assetTokenHelper)
+    {
+        $this->trackableModel = $trackableModel;
+        $this->pageTokenHelper = $pageTokenHelper;
         $this->assetTokenHelper = $assetTokenHelper;
 
         parent::__construct($factory);
@@ -68,27 +65,27 @@ class SmsSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            SmsEvents::SMS_POST_SAVE     => ['onPostSave', 0],
-            SmsEvents::SMS_POST_DELETE   => ['onDelete', 0],
-            SmsEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
+            NotificationEvents::NOTIFICATION_POST_SAVE => ['onPostSave', 0],
+            NotificationEvents::NOTIFICATION_POST_DELETE => ['onDelete', 0],
+            NotificationEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
         ];
     }
 
     /**
      * Add an entry to the audit log.
      *
-     * @param SmsEvent $event
+     * @param NotificationEvent $event
      */
-    public function onPostSave(SmsEvent $event)
+    public function onPostSave(NotificationEvent $event)
     {
-        $entity = $event->getSms();
+        $entity = $event->getNotification();
         if ($details = $event->getChanges()) {
             $log = [
-                'bundle'   => 'sms',
-                'object'   => 'sms',
+                'bundle' => 'notification',
+                'object' => 'notification',
                 'objectId' => $entity->getId(),
-                'action'   => ($event->isNew()) ? 'create' : 'update',
-                'details'  => $details,
+                'action' => ($event->isNew()) ? 'create' : 'update',
+                'details' => $details,
             ];
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
@@ -97,17 +94,17 @@ class SmsSubscriber extends CommonSubscriber
     /**
      * Add a delete entry to the audit log.
      *
-     * @param SmsEvent $event
+     * @param NotificationEvent $event
      */
-    public function onDelete(SmsEvent $event)
+    public function onDelete(NotificationEvent $event)
     {
-        $entity = $event->getSms();
-        $log    = [
-            'bundle'   => 'sms',
-            'object'   => 'sms',
+        $entity = $event->getNotification();
+        $log = [
+            'bundle' => 'notification',
+            'object' => 'notification',
             'objectId' => $entity->getId(),
-            'action'   => 'delete',
-            'details'  => ['name' => $entity->getName()],
+            'action' => 'delete',
+            'details' => ['name' => $entity->getName()],
         ];
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
@@ -132,7 +129,7 @@ class SmsSubscriber extends CommonSubscriber
             list($content, $trackables) = $this->trackableModel->parseContentForTrackables(
                 $content,
                 $tokens,
-                'sms',
+                'notification',
                 $clickthrough['channel'][1]
             );
 
