@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title></title>
+    <title>{subject}</title>
     <!-- Designed by https://github.com/kaytcat -->
     <!-- Header image designed by Freepik.com -->
 
@@ -138,7 +138,7 @@
                 <tr>
                     <td data-slot-container style="text-align: center;font-family: Arial, sans-serif;border-collapse: collapse;">
                         <div data-slot="image">
-                            <img class="w320" width="311" height="83" src="{{ getAssetUrl('themes/sunday/img/logo.gif', null, null, true) }}" alt="company logo" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;border: none;">
+                            <img class="w320" width="311" height="83" src="{{ getAssetUrl('themes/'~template~'/img/logo.gif', null, null, true) }}" alt="company logo" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;border: none;">
                         </div>
                     </td>
                 </tr>
@@ -174,7 +174,7 @@
                             <tr>
                                 <td data-slot-container style="font-family: Arial, sans-serif;border-collapse: collapse;">
                                     <div data-slot="image">
-                                        <img src="{{ getAssetUrl('themes/sunday/img/workplace.gif', null, null, true) }}" style="max-width: 100%;display: block;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;">
+                                        <img src="{{ getAssetUrl('themes/'~template~'/img/workplace.gif', null, null, true) }}" style="max-width: 100%;display: block;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;">
                                     </div>
                                 </td>
                             </tr>
@@ -196,10 +196,10 @@
                                 <td width="230" class="mobile-hide" style="font-family: Arial, sans-serif;border-collapse: collapse;">
                                     <table cellspacing="0" cellpadding="0" class="force-full-width" style="border-collapse: collapse !important;width: 100% !important;">
                                         <tr>
-                                            <td background="{{ getAssetUrl('themes/sunday/img/robbonwide.gif', null, null, true) }}" width="230" height="113" valign="top" style="background-repeat: no-repeat;font-family: Arial, sans-serif;border-collapse: collapse;">
+                                            <td background="{{ getAssetUrl('themes/'~template~'/img/robbonwide.gif', null, null, true) }}" width="230" height="113" valign="top" style="background-repeat: no-repeat;font-family: Arial, sans-serif;border-collapse: collapse;">
                                                 <!--[if gte mso 9]>
                                                 <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:230px;height:113px;">
-                                                    <v:fill type="frame" src="{{ getAssetUrl('themes/sunday/img/robbonwide.gif', null, null, true) }}" color="#ffffff" />
+                                                    <v:fill type="frame" src="{{ getAssetUrl('themes/'~template~'/img/robbonwide.gif', null, null, true) }}" color="#ffffff" />
                                                     <v:textbox inset="0,0,0,0">
                                                 <![endif]-->
                                                 <div>
@@ -277,9 +277,9 @@
                                 <div data-slot="text">
                                     <br>
                                     <br>
-                                    <img width="62" height="56" img src="{{ getAssetUrl('themes/sunday/img/gplus.gif', null, null, true) }}" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;">
-                                    <img width="68" height="56" src="{{ getAssetUrl('themes/sunday/img/facebook.gif', null, null, true) }}" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;">
-                                    <img width="61" height="56" src="{{ getAssetUrl('themes/sunday/img/twitter.gif', null, null, true) }}" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;">
+                                    <img width="62" height="56" img src="{{ getAssetUrl('themes/'~template~'/img/gplus.gif', null, null, true) }}" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;">
+                                    <img width="68" height="56" src="{{ getAssetUrl('themes/'~template~'/img/facebook.gif', null, null, true) }}" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;">
+                                    <img width="61" height="56" src="{{ getAssetUrl('themes/'~template~'/img/twitter.gif', null, null, true) }}" style="max-width: 600px;outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;">
                                     <br>
                                     <br>
                                 </div>
@@ -295,7 +295,7 @@
                             <tr>
                                 <td data-slot-container style="color: #27aa90;font-size: 14px;text-align: center;font-family: Arial, sans-serif;border-collapse: collapse;">
                                     <div data-slot="text">
-                                        <a href="{webview_url}‍" style="color: #27aa90;text-decoration: none;">View in browser</a> | <a href="#" style="color: #27aa90;text-decoration: none;">Contact</a> | <a href="{unsubscribe_url}" style="color: #27aa90;text-decoration: none;">Unsubscribe</a>
+                                        <a href="{webview_url}" style="color: #27aa90;text-decoration: none;">View in browser</a> | <a href="#" style="color: #27aa90;text-decoration: none;">Contact</a> | <a href="{unsubscribe_url}" style="color: #27aa90;text-decoration: none;">Unsubscribe</a>
                                     </div>
                                 </td>
                             </tr>

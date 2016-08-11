@@ -173,109 +173,159 @@ class FieldType extends AbstractType
             $data = $event->getData();
             $type = (is_array($data)) ? (isset($data['type']) ? $data['type'] : null) : $data->getType();
 
-            if ($type == 'select' || $type == 'lookup') {
-                if (is_array($data) && isset($data['properties'])) {
-                    $properties = $data['properties'];
-                } else {
-                    $properties = $data->getProperties();
-                }
+            switch ($type) {
+                case 'select':
+                case 'lookup':
+                    if (is_array($data) && isset($data['properties'])) {
+                        $properties = $data['properties'];
+                    } else {
+                        $properties = $data->getProperties();
+                    }
 
-                if (isset($properties['list']) && is_string($properties['list'])) {
-                    $properties['list'] = array_map('trim', explode('|', $properties['list']));
-                }
+                    if (isset($properties['list']) && is_string($properties['list'])) {
+                        $properties['list'] = array_map('trim', explode('|', $properties['list']));
+                    }
 
-                $form->add(
-                    'properties',
-                    'sortablelist',
-                    [
-                        'required' => false,
-                        'label'    => 'mautic.lead.field.form.properties.select',
-                        'data'     => $properties
-                    ]
-                );
-            } elseif ($type == 'boolean') {
-                if (is_array($data)) {
-                    $value    = isset($data['defaultValue']) ? $data['defaultValue'] : false;
-                    $yesLabel = !empty($data['properties']['yes']) ? $data['properties']['yes'] : 'matuic.core.form.yes';
-                    $noLabel  = !empty($data['properties']['no']) ? $data['properties']['no'] : 'matuic.core.form.no';
-                } else {
-                    $value    = $data->getDefaultValue();
-                    $props    = $data->getProperties();
-                    $yesLabel = !empty($props['yes']) ? $props['yes'] : 'matuic.core.form.yes';
-                    $noLabel  = !empty($props['no']) ? $props['no'] : 'matuic.core.form.no';
-                }
+                    $form->add(
+                        'properties',
+                        'sortablelist',
+                        [
+                            'required' => false,
+                            'label'    => 'mautic.lead.field.form.properties.select',
+                            'data'     => $properties
+                        ]
+                    );
+                    break;
+                case 'country':
+                case 'locale':
+                case 'timezone':
+                case 'region':
+                case 'country':
+                case 'region':
+                case 'timezone':
+                    switch ($type) {
+                        case 'country':
+                            $choices = FormFieldHelper::getCountryChoices();
+                            break;
+                        case 'region':
+                            $choices = FormFieldHelper::getRegionChoices();
+                            break;
+                        case 'timezone':
+                            $choices = FormFieldHelper::getTimezonesChoices();
+                            break;
+                        case 'locale':
+                            $choices = FormFieldHelper::getLocaleChoices();
+                            break;
+                    }
 
-                $form->add(
-                    'defaultValue',
-                    'yesno_button_group',
-                    [
-                        'label'       => 'mautic.core.defaultvalue',
-                        'label_attr'  => ['class' => 'control-label'],
-                        'attr'        => ['class' => 'form-control'],
-                        'required'    => false,
-                        'data'        => !empty($value),
-                        'choice_list' => new ChoiceList(
-                            [false, true],
-                            [$noLabel, $yesLabel]
-                        )
-                    ]
-                );
-            } elseif (in_array($type, ['datetime', 'date', 'time'])) {
-                $constraints = [];
-                if ($type === 'datetime') {
-                    $constraints = [
-                        new Assert\Callback(
-                            function ($object, ExecutionContextInterface $context) {
-                                if (!empty($object)&& \DateTime::createFromFormat('Y-m-d H:i', $object) === false) {
-                                    $context->buildViolation('mautic.lead.datetime.invalid')->addViolation();
-                                }
-                            }
-                        )
-                    ];
-                } elseif ($type === 'date') {
-                    $constraints = [
-                        new Assert\Callback(
-                            function ($object, ExecutionContextInterface $context) {
-                                if (!empty($object)) {
-                                    $validator = $context->getValidator();
-                                    $violations = $validator->validateValue($object, new Assert\Date());
+                    $form->add(
+                        'defaultValue',
+                        'choice',
+                        [
+                            'choices'     => $choices,
+                            'label'       => 'mautic.core.defaultvalue',
+                            'label_attr'  => ['class' => 'control-label'],
+                            'attr'        => ['class' => 'form-control'],
+                            'required'    => false,
+                            'data'        => !empty($value),
+                        ]
+                    );
+                    break;
+                case 'boolean':
+                    if (is_array($data)) {
+                        $value    = isset($data['defaultValue']) ? $data['defaultValue'] : false;
+                        $yesLabel = !empty($data['properties']['yes']) ? $data['properties']['yes'] : 'matuic.core.form.yes';
+                        $noLabel  = !empty($data['properties']['no']) ? $data['properties']['no'] : 'matuic.core.form.no';
+                    } else {
+                        $value    = $data->getDefaultValue();
+                        $props    = $data->getProperties();
+                        $yesLabel = !empty($props['yes']) ? $props['yes'] : 'matuic.core.form.yes';
+                        $noLabel  = !empty($props['no']) ? $props['no'] : 'matuic.core.form.no';
+                    }
 
-                                    if (count($violations) > 0) {
-                                        $context->buildViolation('mautic.lead.date.invalid')->addViolation();
+                    $form->add(
+                        'defaultValue',
+                        'yesno_button_group',
+                        [
+                            'label'       => 'mautic.core.defaultvalue',
+                            'label_attr'  => ['class' => 'control-label'],
+                            'attr'        => ['class' => 'form-control'],
+                            'required'    => false,
+                            'data'        => !empty($value),
+                            'choice_list' => new ChoiceList(
+                                [false, true],
+                                [$noLabel, $yesLabel]
+                            )
+                        ]
+                    );
+                    break;
+                case 'datetime':
+                case 'date':
+                case 'time':
+                    $constraints = [];
+                    switch ($type) {
+                        case 'datetime':
+                            $constraints = [
+                                new Assert\Callback(
+                                    function ($object, ExecutionContextInterface $context) {
+                                        if (!empty($object) && \DateTime::createFromFormat('Y-m-d H:i', $object) === false) {
+                                            $context->buildViolation('mautic.lead.datetime.invalid')->addViolation();
+                                        }
                                     }
-                                }
-                            }
-                        )
-                    ];
-                } elseif ($type === 'time') {
-                    $constraints = [
-                        new Assert\Callback(
-                            function ($object, ExecutionContextInterface $context) {
-                                if (!empty($object)) {
-                                    $validator = $context->getValidator();
-                                    $violations = $validator->validateValue($object, new Assert\Regex(['pattern' => '/(2[0-3]|[01][0-9]):([0-5][0-9])/']));
+                                )
+                            ];
+                            break;
+                        case 'date':
+                            $constraints = [
+                                new Assert\Callback(
+                                    function ($object, ExecutionContextInterface $context) {
+                                        if (!empty($object)) {
+                                            $validator  = $context->getValidator();
+                                            $violations = $validator->validateValue($object, new Assert\Date());
 
-                                    if (count($violations) > 0) {
-                                        $context->buildViolation('mautic.lead.time.invalid')->addViolation();
+                                            if (count($violations) > 0) {
+                                                $context->buildViolation('mautic.lead.date.invalid')->addViolation();
+                                            }
+                                        }
                                     }
-                                }
-                            }
-                        )
-                    ];
-                }
+                                )
+                            ];
+                            break;
+                        case 'time':
+                            $constraints = [
+                                new Assert\Callback(
+                                    function ($object, ExecutionContextInterface $context) {
+                                        if (!empty($object)) {
+                                            $validator  = $context->getValidator();
+                                            $violations = $validator->validateValue(
+                                                $object,
+                                                new Assert\Regex(['pattern' => '/(2[0-3]|[01][0-9]):([0-5][0-9])/'])
+                                            );
 
-                $form->add(
-                    'defaultValue',
-                    'text',
-                    [
-                        'label'       => 'mautic.core.defaultvalue',
-                        'label_attr'  => ['class' => 'control-label'],
-                        'attr'        => ['class' => 'form-control'],
-                        'required'    => false,
-                        'constraints' => $constraints
-                    ]
-                );
+                                            if (count($violations) > 0) {
+                                                $context->buildViolation('mautic.lead.time.invalid')->addViolation();
+                                            }
+                                        }
+                                    }
+                                )
+                            ];
+                            break;
+                    }
+
+                    $form->add(
+                        'defaultValue',
+                        'text',
+                        [
+                            'label'       => 'mautic.core.defaultvalue',
+                            'label_attr'  => ['class' => 'control-label'],
+                            'attr'        => ['class' => 'form-control'],
+                            'required'    => false,
+                            'constraints' => $constraints
+                        ]
+                    );
+                break;
             }
+
         };
 
         $builder->addEventListener(
@@ -358,7 +408,10 @@ class FieldType extends AbstractType
             'isShortVisible',
             'yesno_button_group',
             [
-                'label' => 'mautic.lead.field.form.isshortvisible'
+                'label' => 'mautic.lead.field.form.isshortvisible',
+                'attr'  => [
+                    'tooltip' => 'mautic.lead.field.form.isshortvisible.tooltip'
+                ],
             ]
         );
 

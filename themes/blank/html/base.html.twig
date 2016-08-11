@@ -2,8 +2,8 @@
 <html>
     <head>
         {% if page is defined %}
-            <title>{{ page.getTitle() }}</title>
-            <meta name="description" content="{{ page.metaDescription }}">
+        <title>{pagetitle}</title>
+        <meta name="description" content="{pagemetadescription}">
         {% endif %}
         {{ outputHeadDeclarations() }}
     </head>

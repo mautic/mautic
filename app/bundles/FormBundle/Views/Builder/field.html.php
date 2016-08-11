@@ -11,6 +11,7 @@ $toggleTemplate = '<div class="col-md-3">{content}</div>';
 $properties     = (isset($form['properties'])) ? $form['properties'] : array();
 
 $showAttributes = isset($form['labelAttributes']) || isset($form['inputAttributes']) || isset($form['containerAttributes']) || isset($properties['labelAttributes']);
+$showBehavior   = isset($form['showWhenValueExists']) || isset($properties['showWhenValueExists']);
 
 $placeholder    = '';
 if (isset($properties['placeholder'])):
@@ -95,6 +96,14 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                 </a>
             </li>
             <?php endif; ?>
+
+            <?php if ($showBehavior): ?>
+            <li role="progressive-profiling">
+                <a href="#progressive-profiling" aria-controls="progressive-profiling" role="tab" data-toggle="tab">
+                    <?php echo $view['translator']->trans('mautic.form.field.section.progressive.profiling'); ?>
+                </a>
+            </li>
+            <?php endif; ?>
         </ul>
 
         <!-- Tab panes -->
@@ -164,6 +173,16 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                     <?php echo $view['form']->rowIfExists($form, 'inputAttributes', $template); ?>
                     <?php echo $view['form']->rowIfExists($form, 'containerAttributes', $template); ?>
                     <?php echo $customAttributes; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <?php if ($showBehavior): ?>
+            <div role="tabpanel" class="tab-pane" id="progressive-profiling">
+                <div class="row">
+                    <?php echo $view['form']->rowIfExists($form, 'showWhenValueExists', $template); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'showAfterXSubmissions', $template); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'isAutoFill', $template); ?>
                 </div>
             </div>
             <?php endif; ?>

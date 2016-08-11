@@ -13,16 +13,19 @@ if ($tmpl == 'index')
 <div class="pa-md bg-auto">
     <?php if (count($items)): ?>
     <div class="row shuffle-grid">
-        <?php echo $view->render('MauticLeadBundle:Lead:grid_cards.html.php', array(
-            'items'         => $items,
-            'security'      => $security,
-            'currentList'   => $currentList,
-            'permissions'   => $permissions,
-            'noContactList' => $noContactList
-        )); ?>
+        <?php
+        foreach ($items as $item):
+        echo $view->render('MauticLeadBundle:Lead:grid_card.html.php', array(
+            'contact'       => $item,
+            'showCheckbox'  => !empty($showCheckbox), // default is false
+            'noContactList' => (isset($noContactList)) ? $noContactList : []
+        ));
+        endforeach;
+        ?>
     </div>
     <?php else: ?>
         <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php'); ?>
+        <div class="clearfix"></div>
     <?php endif; ?>
 </div>
 <?php if (count($items)): ?>
@@ -30,12 +33,12 @@ if ($tmpl == 'index')
         <?php
         $link = (isset($link))? $link : 'mautic_contact_index';
         echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-            "totalItems"      => $totalItems,
-            "page"            => $page,
-            "limit"           => $limit,
-            "menuLinkId"      => $link,
-            "baseUrl"         => (isset($objectId)) ? $view['router']->path($link, array('objectId' => $objectId)) : $view['router']->path($link),
-            "tmpl"            => (!in_array($tmpl, array('grid', 'index'))) ? $tmpl : $indexMode,
+            'totalItems'      => $totalItems,
+            'page'            => $page,
+            'limit'           => $limit,
+            'menuLinkId'      => $link,
+            'baseUrl'         => (isset($objectId)) ? $view['router']->path($link, array('objectId' => $objectId)) : $view['router']->path($link),
+            'tmpl'            => (!in_array($tmpl, array('grid', 'index'))) ? $tmpl : $indexMode,
             'sessionVar'      => (isset($sessionVar)) ? $sessionVar : 'lead',
             'target'          => (isset($target)) ? $target : '.page-list'
         ));

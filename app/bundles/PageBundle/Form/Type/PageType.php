@@ -94,7 +94,7 @@ class PageType extends AbstractType
                 'label'      => 'mautic.page.form.customhtml',
                 'required'   => false,
                 'attr'       => array(
-                    'class'                => 'form-control editor-basic-fullpage editor-builder-tokens builder-html',
+                    'class'                => 'form-control editor editor-basic-fullpage editor-builder-tokens builder-html',
                     'data-token-callback'  => 'page:getBuilderTokens',
                     'data-token-activator' => '{'
                 )
@@ -178,15 +178,15 @@ class PageType extends AbstractType
                 'translationParent',
                 'page_list',
                 array(
-                    'label'       => 'mautic.page.form.translationparent',
+                    'label'       => 'mautic.core.form.translation_parent',
                     'label_attr'  => array('class' => 'control-label'),
                     'attr'        => array(
                         'class'   => 'form-control',
-                        'tooltip' => 'mautic.page.form.translationparent.help'
+                        'tooltip' => 'mautic.core.form.translation_parent.help'
                     ),
                     'required'    => false,
                     'multiple'    => false,
-                    'empty_value' => 'mautic.page.form.translationparent.empty',
+                    'empty_value' => 'mautic.core.form.translation_parent.empty',
                     'top_level'   => 'translation',
                     'ignore_ids'  => array((int) $options['data']->getId())
                 )

@@ -17,70 +17,68 @@ if (isset($preCustomButtons) or isset($customButtons) or isset($postCustomButton
     $groupType   = 'button-dropdown';
 }
 
-
 include 'action_button_helper.php';
 
 echo '<div class="std-toolbar btn-group">';
 
 foreach ($templateButtons as $action => $enabled) {
+    if (!$enabled) {
+
+        continue;
+    }
+
+    if (!$enabled) continue;
 
     $btnClass = 'btn btn-default';
 
     switch ($action) {
         case 'clone':
         case 'abtest':
+            $actionQuery = [
+                'objectId' => ('abtest' == $action && method_exists($item, 'getVariantParent') && $item->getVariantParent()) ? $item->getVariantParent()->getId() : $item->getId()
+            ];
             $icon = ($action == 'clone') ? 'copy' : 'sitemap';
-            echo '<a class="'.$btnClass.'" href="'.$view['router']->path(
-                    'mautic_'.$routeBase.'_action',
-                    array_merge(array("objectAction" => $action), $query)
-                ).'" data-toggle="ajax"'.$menuLink.">\n";
-            echo '  <i class="fa fa-'.$icon.'"></i> <span class="hidden-xs hidden-sm">'.$view['translator']->trans(
-                    'mautic.core.form.'.$action
-                )."</span>\n";
+            echo '<a class="'.$btnClass.'" href="'.$view['router']->path($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query))
+                .'" data-toggle="ajax"'.$menuLink.">\n";
+            echo '  <i class="fa fa-'.$icon.'"></i> <span class="hidden-xs hidden-sm">'.$view['translator']->trans('mautic.core.form.'.$action)
+                ."</span>\n";
             echo "</a>\n";
             break;
         case 'close':
             $icon = 'remove';
-            echo '<a class="'.$btnClass.'" href="'.$view['router']->path('mautic_'.$routeBase.'_index')
+            echo '<a class="'.$btnClass.'" href="'.$view['router']->path($indexRoute)
                 .'" data-toggle="'.$editMode.'"'.$editAttr.$menuLink.">\n";
-            echo '  <i class="fa fa-'.$icon.'"></i> <span class="hidden-xs hidden-sm">'.$view['translator']->trans(
-                    'mautic.core.form.'.$action
-                )."</span>\n";
+            echo '  <i class="fa fa-'.$icon.'"></i> <span class="hidden-xs hidden-sm">'.$view['translator']->trans('mautic.core.form.'.$action)
+                ."</span>\n";
             echo "</a>\n";
             break;
         case 'new':
         case'edit':
-            if ($action == 'new') {
-                $icon = 'plus';
-            } else {
-                $icon              = 'pencil-square-o';
-                $query['objectId'] = $item->getId();
-            }
-            echo '<a class="'.$btnClass.'" href="'.$view['router']->path(
-                    'mautic_'.$routeBase.'_action',
-                    array_merge(array("objectAction" => $action), $query)
-                ).'" data-toggle="'.$editMode.'"'.$editAttr.$menuLink.">\n";
-            echo '  <i class="fa fa-'.$icon.'"></i> <span class="hidden-xs hidden-sm">'.$view['translator']->trans(
-                    'mautic.core.form.'.$action
-                )."</span>\n";
+            $actionQuery = ('edit' == $action) ? ['objectId' => $item->getId()] : [];
+            $icon        = ('edit' == $action) ? 'pencil-square-o' : 'plus';
+            echo '<a class="'.$btnClass.'" href="'.$view['router']->path($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query))
+                .'" data-toggle="'.$editMode.'"'.$editAttr.$menuLink.">\n";
+            echo '  <i class="fa fa-'.$icon.'"></i> <span class="hidden-xs hidden-sm">'.$view['translator']->trans('mautic.core.form.'.$action)
+                ."</span>\n";
             echo "</a>\n";
             break;
         case 'delete':
+
             echo $view->render(
                 'MauticCoreBundle:Helper:confirm.html.php',
-                array(
+                [
                     'message'       => $view["translator"]->trans(
                         "mautic.".$langVar.".form.confirmdelete",
-                        array("%name%" => $item->$nameGetter()." (".$item->getId().")")
+                        ["%name%" => $item->$nameGetter()." (".$item->getId().")"]
                     ),
                     'confirmAction' => $view['router']->path(
-                        'mautic_'.$routeBase.'_action',
-                        array_merge(array("objectAction" => "delete", "objectId" => $item->getId()), $query)
+                        $actionRoute,
+                        array_merge(['objectAction' => 'delete', 'objectId' => $item->getId()], $query)
                     ),
                     'template'      => 'delete',
                     'btnTextClass'  => 'hidden-xs hidden-sm',
-                    'btnClass'      => $btnClass
-                )
+                    'btnClass'      => $btnClass,
+                ]
             );
             break;
     }

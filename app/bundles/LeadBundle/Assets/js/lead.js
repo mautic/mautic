@@ -1,5 +1,5 @@
 //LeadBundle
-Mautic.leadOnLoad = function (container) {
+Mautic.leadOnLoad = function (container, response) {
     Mautic.addKeyboardShortcut('a', 'Quick add a New Contact', function(e) {
         if(mQuery('a.quickadd').length) {
             mQuery('a.quickadd').click();
@@ -53,6 +53,20 @@ Mautic.leadOnLoad = function (container) {
             e.preventDefault();
             Mautic.refreshLeadTimeline(timelineForm);
         });
+
+        var toggleTimelineDetails = function (el) {
+            var activateDetailsState = mQuery(el).hasClass('active');
+
+            if (activateDetailsState) {
+                mQuery('#timeline-details-'+detailsId).addClass('hide');
+                mQuery(el).removeClass('active');
+            } else {
+                mQuery('#timeline-details-'+detailsId).removeClass('hide');
+                mQuery(el).addClass('active');
+            }
+        };
+
+        Mautic.leadTimelineOnLoad(container, response);
     }
 
     //Note type filters
@@ -109,6 +123,50 @@ Mautic.leadOnLoad = function (container) {
     mQuery(document).on('shown.bs.tab', 'a#load-lead-map', function (e) {
         mQuery('#place-container svg').resize();
     });
+
+    Mautic.initUniqueIdentifierFields();
+};
+
+Mautic.leadTimelineOnLoad = function (container, response) {
+    mQuery("#contact-timeline a[data-activate-details='all']").on('click', function() {
+        if (mQuery(this).find('span').first().hasClass('fa-level-down')) {
+            mQuery("#contact-timeline a[data-activate-details!='all']").each(function () {
+                var detailsId = mQuery(this).data('activate-details');
+                if (detailsId && mQuery('#timeline-details-'+detailsId).length) {
+                    mQuery('#timeline-details-' + detailsId).removeClass('hide');
+                    mQuery(this).addClass('active');
+                }
+            });
+            mQuery(this).find('span').first().removeClass('fa-level-down').addClass('fa-level-up');
+        } else {
+            mQuery("#contact-timeline a[data-activate-details!='all']").each(function () {
+                var detailsId = mQuery(this).data('activate-details');
+                if (detailsId && mQuery('#timeline-details-'+detailsId).length) {
+                    mQuery('#timeline-details-' + detailsId).addClass('hide');
+                    mQuery(this).removeClass('active');
+                }
+            });
+            mQuery(this).find('span').first().removeClass('fa-level-up').addClass('fa-level-down');
+        }
+    });
+    mQuery("#contact-timeline a[data-activate-details!='all']").on('click', function() {
+        var detailsId = mQuery(this).data('activate-details');
+        if (detailsId && mQuery('#timeline-details-'+detailsId).length) {
+            var activateDetailsState = mQuery(this).hasClass('active');
+
+            if (activateDetailsState) {
+                mQuery('#timeline-details-'+detailsId).addClass('hide');
+                mQuery(this).removeClass('active');
+            } else {
+                mQuery('#timeline-details-'+detailsId).removeClass('hide');
+                mQuery(this).addClass('active');
+            }
+        }
+    });
+
+    if (response && typeof response.timelineCount != 'undefined') {
+        mQuery('#TimelineCount').html(response.timelineCount);
+    }
 };
 
 Mautic.leadOnUnload = function(id) {
@@ -305,7 +363,7 @@ Mautic.addLeadListFilter = function (elId) {
 
     var prototype = mQuery('.available-filters').data('prototype');
     var fieldType = mQuery(filterId).data('field-type');
-    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'boolean', 'select', 'country', 'timezone', 'region', 'stage']) != -1);
+    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale']) != -1);
 
     prototype = prototype.replace(/__name__/g, filterNum);
     prototype = prototype.replace(/__label__/g, label);
@@ -587,23 +645,10 @@ Mautic.clearLeadSocialProfile = function(network, leadId, event) {
 };
 
 Mautic.refreshLeadTimeline = function(form) {
-    var formData = form.serialize()
-    mQuery.ajax({
-        showLoadingBar: true,
-        url: mauticAjaxUrl,
-        type: "POST",
-        data: "action=lead:updateTimeline&" + formData,
-        dataType: "json",
-        success: function (response) {
-            if (response.success) {
-                Mautic.stopPageLoadingBar();
-                mQuery('#timeline-container').html(response.timeline);
-                mQuery('#HistoryCount').html(response.historyCount);
-            }
-        },
-        error: function (request, textStatus, errorThrown) {
-            Mautic.processAjaxError(request, textStatus, errorThrown);
-        }
+    Mautic.postForm(mQuery(form), function (response) {
+        response.target = '#timeline-table';
+        mQuery('#TimelineCount').html(response.timelineCount);
+        Mautic.processPageContent(response);
     });
 };
 
@@ -975,6 +1020,10 @@ Mautic.updateLeadFieldValues = function (field) {
                 'value': valueField.attr('value')
             };
 
+            if (mQuery('#campaignevent_properties_value_chosen').length) {
+                mQuery('#campaignevent_properties_value').chosen('destroy');
+            }
+
             if (!mQuery.isEmptyObject(response.options)) {
                 var newValueField = mQuery('<select/>')
                     .attr('class', valueFieldAttrs['class'])
@@ -989,6 +1038,8 @@ Mautic.updateLeadFieldValues = function (field) {
                     newValueField.append(option);
                 });
                 valueField.replaceWith(newValueField);
+
+                Mautic.activateChosenSelect(newValueField);
             } else {
                 var newValueField = mQuery('<input/>')
                     .attr('type', 'text')
@@ -997,6 +1048,7 @@ Mautic.updateLeadFieldValues = function (field) {
                     .attr('name', valueFieldAttrs['name'])
                     .attr('autocomplete', valueFieldAttrs['autocomplete'])
                     .attr('value', valueFieldAttrs['value']);
+
                 valueField.replaceWith(newValueField);
             }
         }
@@ -1021,3 +1073,34 @@ Mautic.displayUniqueIdentifierWarning = function (el) {
         mQuery('.unique-identifier-warning').fadeIn('fast');
     }
 };
+
+Mautic.initUniqueIdentifierFields = function() {
+    var uniqueFields = mQuery('[data-unique-identifier]');
+    if (uniqueFields.length) {
+        uniqueFields.on('change', function() {
+            var input = mQuery(this);
+            var request = {
+                field: input.data('unique-identifier'),
+                value: input.val(),
+                ignore: mQuery('#lead_unlockId').val()
+            };
+            Mautic.ajaxActionRequest('lead:getLeadIdsByFieldValue', request, function(response) {
+                if (response.items !== 'undefined' && response.items.length) {
+                    var warning = mQuery('<div/>').text(response.existsMessage);
+                    mQuery.each(response.items, function(i, item) {
+                        if (i > 0) {
+                            warning.append(mQuery('<span>, </span>'));
+                        }
+
+                        var link = mQuery('<a/>')
+                            .attr('href', item.link)
+                            .attr('target', '_blank')
+                            .text(item.name+' ('+item.id+')');
+                        warning.append(link);
+                    });
+                    warning.appendTo(input.parent());
+                }
+            });
+        });
+    }
+}

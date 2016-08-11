@@ -43,36 +43,9 @@ class DynamicContentApiController extends CommonController
 
     public function getAction($objectAlias)
     {
-        /** @var EventModel $campaignEventModel */
-        $campaignEventModel = $this->getModel('campaign.event');
-
-        $response = $campaignEventModel->triggerEvent('dwc.decision', $objectAlias, 'dwc.decision.' . $objectAlias);
-        $content  = null;
-        $lead     = $this->getModel('lead')->getCurrentLead();
-
-        if (is_array($response) && !empty($response['action']['dwc.push_content'])) {
-            $content = array_shift($response['action']['dwc.push_content']);
-        } else {
-            /** @var DynamicContentModel $dwcModel */
-            $dwcModel = $this->getModel('dynamicContent');
-
-            $data = $dwcModel->getSlotContentForLead($objectAlias, $lead);
-
-            if (!empty($data)) {
-                $content = $data['content'];
-                $dwc = $dwcModel->getEntity($data['id']);
-
-                if ($dwc instanceof DynamicContent) {
-                    $dwcModel->createStatEntry($dwc, $lead, $objectAlias);
-
-                    $tokenEvent = new TokenReplacementEvent($content, $lead, ['slot' => $objectAlias, 'dynamic_content_id' => $dwc->getId()]);
-                    $this->factory->getDispatcher()->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
-                    
-                    $content = $tokenEvent->getContent();
-                }
-            }
-        }
+        $lead    = $this->getModel('lead')->getCurrentLead();
+        $content = $this->get('mautic.helper.dynamicContent')->getDynamicContentForLead($objectAlias, $lead);
         
-        return empty($content) ? new Response('', Response::HTTP_NOT_FOUND) : new Response($content);
+        return empty($content) ? new Response('', Response::HTTP_NO_CONTENT) : new Response($content);
     }
 }

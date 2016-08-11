@@ -78,6 +78,14 @@ return [
                 'defaults'   => [
                     'id' => '0'
                 ]
+            ],
+            'mautic_form_embed' => [
+                'path' => '/form/embed/{id}',
+                'controller' => 'MauticFormBundle:Public:embed'
+            ],
+            'mautic_form_postresults_ajax' => [
+                'path' => '/form/submit/ajax',
+                'controller' => 'MauticFormBundle:Ajax:submit'
             ]
         ]
     ],
@@ -125,7 +133,12 @@ return [
                 'class' => 'Mautic\FormBundle\EventListener\CalendarSubscriber'
             ],
             'mautic.form.leadbundle.subscriber'     => [
-                'class'       => 'Mautic\FormBundle\EventListener\LeadSubscriber',
+                'class' => 'Mautic\FormBundle\EventListener\LeadSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.form.model.form',
+                    'mautic.page.model.page'
+                ]
             ],
             'mautic.form.emailbundle.subscriber'    => [
                 'class' => 'Mautic\FormBundle\EventListener\EmailSubscriber'
@@ -212,7 +225,8 @@ return [
                     'mautic.helper.templating',
                     'mautic.schema.helper.factory',
                     'mautic.form.model.action',
-                    'mautic.form.model.field'
+                    'mautic.form.model.field',
+                    'mautic.lead.model.lead'
                 ]
             ],
             'mautic.form.model.submission' => [

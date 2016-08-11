@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\SmsBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -15,9 +15,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class SmsListType
- *
- * @package Mautic\SmsBundle\Form\Type
+ * Class SmsListType.
  */
 class SmsListType extends AbstractType
 {
@@ -30,7 +28,7 @@ class SmsListType extends AbstractType
     public function __construct(MauticFactory $factory)
     {
         $this->viewOther = $factory->getSecurity()->isGranted('sms:smses:viewother');
-        $this->repo      = $factory->getModel('sms')->getRepository();
+        $this->repo = $factory->getModel('sms')->getRepository();
 
         $this->repo->setCurrentUser($factory->getUser());
     }
@@ -41,20 +39,20 @@ class SmsListType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $viewOther = $this->viewOther;
-        $repo      = $this->repo;
+        $repo = $this->repo;
 
         $resolver->setDefaults(
-            array(
-                'choices'     => function (Options $options) use ($repo, $viewOther) {
+            [
+                'choices' => function (Options $options) use ($repo, $viewOther) {
                     static $choices;
 
                     if (is_array($choices)) {
                         return $choices;
                     }
 
-                    $choices = array();
+                    $choices = [];
 
-                    $smses  = $repo->getSmsList('', 0, 0, $viewOther, $options['sms_type']);
+                    $smses = $repo->getSmsList('', 0, 0, $viewOther, $options['sms_type']);
                     foreach ($smses as $sms) {
                         $choices[$sms['language']][$sms['id']] = $sms['name'];
                     }
@@ -64,27 +62,28 @@ class SmsListType extends AbstractType
 
                     return $choices;
                 },
-                'expanded'    => false,
-                'multiple'    => true,
-                'required'    => false,
+                'expanded' => false,
+                'multiple' => true,
+                'required' => false,
                 'empty_value' => function (Options $options) {
                     return (empty($options['choices'])) ? 'mautic.sms.no.smses.note' : 'mautic.core.form.chooseone';
                 },
-                'sms_type'  => 'template',
-                'disabled'    => function (Options $options) {
-                    return (empty($options['choices']));
+                'sms_type' => 'template',
+                'disabled' => function (Options $options) {
+                    return empty($options['choices']);
                 },
-            )
+            ]
         );
 
-        $resolver->setOptional(array('sms_type'));
+        $resolver->setOptional(['sms_type']);
     }
 
     /**
      * @return string
      */
-    public function getName() {
-        return "sms_list";
+    public function getName()
+    {
+        return 'sms_list';
     }
 
     /**

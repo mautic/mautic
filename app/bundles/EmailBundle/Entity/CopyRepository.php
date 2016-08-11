@@ -28,7 +28,8 @@ class CopyRepository extends CommonRepository
         $db = $this->getEntityManager()->getConnection();
 
         try {
-            $body = EmojiHelper::toShort($body);
+            $body    = EmojiHelper::toShort($body);
+            $subject = EmojiHelper::toShort($subject);
             $db->insert(
                 MAUTIC_TABLE_PREFIX.'email_copies',
                 [

@@ -10,8 +10,8 @@
 namespace MauticPlugin\MauticSocialBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
 /**
@@ -20,6 +20,8 @@ use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
 class MonitoringController extends FormController
 {
+    use EntityContactsTrait;
+
     /*
      * @param int $page
      */
@@ -469,7 +471,7 @@ class MonitoringController extends FormController
                     'security'         => $security,
                     'leadStats'        => $chart->render(),
                     'monitorLeads'     => $this->forward(
-                        'MauticSocialBundle:Monitoring:leads',
+                        'MauticSocialBundle:Monitoring:contacts',
                         [
                             'objectId'   => $monitoringEntity->getId(),
                             'page'       => $page,
@@ -637,91 +639,16 @@ class MonitoringController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function leadsAction($objectId, $page = 1)
+    public function contactsAction($objectId, $page = 1)
     {
-        $session = $this->get('session');
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
-
-        //set limits
-        $limit = $session->get('mautic.social.monitor.lead.limit', $this->container->getParameter('mautic.default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
-
-        $search = $this->request->get('search', $session->get('mautic.social.monitor.lead.filter', ''));
-        $session->set('mautic.campaign.lead.filter', $search);
-
-        $orderBy    = $session->get('mautic.social.monitor.lead.orderby', 'l.date_added');
-        $orderByDir = $session->get('mautic.social.monitor.lead.orderbydir', 'ASC');
-        $filter     = ['string' => $search, 'force' => []];
-
-        /** @var \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitoringLeadRepo */
-        $monitoringLeadRepo = $this->getDoctrine()->getManager()->getRepository('MauticSocialBundle:Lead');
-
-        $leads = $monitoringLeadRepo->getLeadsWithFields(
-            [
-                'monitor_id'     => $objectId,
-                'withTotalCount' => true,
-                'start'          => $start,
-                'limit'          => $limit,
-                'filter'         => $filter,
-                'orderBy'        => $orderBy,
-                'orderByDir'     => $orderByDir
-            ]
-        );
-
-        // We need the EmailRepository to check if a lead is flagged as do not contact
-        /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
-        $emailRepo = $this->getModel('email')->getRepository();
-
-        $count = $leads['count'];
-
-        if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
-            if ($count === 1) {
-                $lastPage = 1;
-            } else {
-                $lastPage = (floor($limit / $count)) ?: 1;
-            }
-            $session->set('mautic.social.monitor.lead.page', $lastPage);
-            $returnUrl = $this->generateUrl('mautic_social_leads', ['objectId' => $objectId, 'page' => $lastPage]);
-
-            return $this->postActionRedirect(
-                [
-                    'returnUrl'       => $returnUrl,
-                    'viewParameters'  => ['page' => $lastPage, 'objectId' => $objectId],
-                    'contentTemplate' => 'MauticLeadBundle:Lead:grid.html.php',
-                    'passthroughVars' => [
-                        'mauticContent' => 'monitorLeads'
-                    ]
-                ]
-            );
-        }
-
-
-        return $this->delegateView(
-            [
-                'viewParameters'  => [
-                    'page'          => $page,
-                    'items'         => $leads['results'],
-                    'totalItems'    => $leads['count'],
-                    'tmpl'          => 'monitorleads',
-                    'indexMode'     => 'grid',
-                    'link'          => 'mautic_social_leads',
-                    'sessionVar'    => 'social.monitor.lead',
-                    'limit'         => $limit,
-                    'objectId'      => $objectId,
-                    'noContactList' => $emailRepo->getDoNotEmailList()
-                ],
-                'contentTemplate' => 'MauticSocialBundle:Monitoring:leads.html.php',
-                'passthroughVars' => [
-                    'mauticContent' => 'monitorLeads',
-                    'route'         => false
-                ]
-            ]
+        return $this->generateContactsGrid(
+            $objectId,
+            $page,
+            'plugin:mauticSocial:monitoring:view',
+            'social',
+            'monitoring_leads',
+            null, // @todo - implement when individual social channels are supported by the plugin
+            'monitor_id'
         );
     }
 
