@@ -104,26 +104,29 @@ class SalesforceApi extends CrmApi
      */
     public function createLeadActivity(array $activity, $object)
     {
-        $mActivityObjectName = 'mautic_timeline__c';
+        $config = $this->integration->getIntegrationSettings()->getFeatureSettings();
+
+        $namespace           = (!empty($config['namespace'])) ? $config['namespace'].'__' : '';
+        $mActivityObjectName = $namespace.'mautic_timeline__c';
 
         if (!empty($activity)) {
             foreach ($activity as $key => $records) {
                 foreach ($records['records'] as $key => $record) {
                     $activityData['records'][$key] = [
-                        'attributes'              => [
+                        'attributes'                 => [
                             'type'        => $mActivityObjectName,
                             'referenceId' => $record['id'].'-'.$records['id']
                         ],
-                        'mautic__ActivityDate__c' => $record['dateAdded']->format('c'),
-                        'mautic__Description__c'  => $record['description'],
-                        'Name'                    => $record['name'],
-                        'mautic__Mautic_url__c'   => $records['leadUrl']
+                        $namespace.'ActivityDate__c' => $record['dateAdded']->format('c'),
+                        $namespace.'Description__c'  => $record['description'],
+                        'Name'                       => $record['name'],
+                        $namespace.'Mautic_url__c'   => $records['leadUrl']
                     ];
 
                     if ($object === 'Lead') {
-                        $activityData['records'][$key]['mautic__WhoId__c'] = $records['id'];
+                        $activityData['records'][$key][$namespace.'WhoId__c'] = $records['id'];
                     } elseif ($object === 'Contact') {
-                        $activityData['records'][$key]['mautic__contact_id__c'] = $records['id'];
+                        $activityData['records'][$key][$namespace.'contact_id__c'] = $records['id'];
                     }
                 }
             }
@@ -155,10 +158,10 @@ class SalesforceApi extends CrmApi
 
                             foreach ($contacts['records'] as $contact) {
                                 foreach ($activityData['records'] as $key => $record) {
-                                    if ($record['mautic__WhoId__c'] == $contact['Id']) {
-                                        unset($record['mautic__WhoId__c']);
-                                        $record['mautic__contact_id__c'] = $contact['ConvertedContactId'];
-                                        $newRecordData['records'][]      = $record;
+                                    if ($record[$namespace.'WhoId__c'] == $contact['Id']) {
+                                        unset($record[$namespace.'WhoId__c']);
+                                        $record[$namespace.'contact_id__c'] = $contact['ConvertedContactId'];
+                                        $newRecordData['records'][]         = $record;
                                         unset($activityData['records'][$key]);
                                     }
                                 }
