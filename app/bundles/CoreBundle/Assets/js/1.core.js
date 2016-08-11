@@ -286,7 +286,8 @@ var Mautic = {
             useClasses: false,
             imageOutputSize: true,
             htmlAllowedTags: ['a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base', 'bdi', 'bdo', 'blockquote', 'br', 'button', 'canvas', 'caption', 'cite', 'code', 'col', 'colgroup', 'datalist', 'dd', 'del', 'details', 'dfn', 'dialog', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'i', 'iframe', 'img', 'input', 'ins', 'kbd', 'keygen', 'label', 'legend', 'li', 'link', 'main', 'map', 'mark', 'menu', 'menuitem', 'meter', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'option', 'output', 'p', 'param', 'pre', 'progress', 'queue', 'rp', 'rt', 'ruby', 's', 'samp', 'script', 'style', 'section', 'select', 'small', 'source', 'span', 'strike', 'strong', 'sub', 'summary', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'time', 'title', 'tr', 'track', 'u', 'ul', 'var', 'video', 'wbr', 'center'],
-            htmlAllowedAttrs: ['data-atwho-at-query', 'data-section', 'data-section-wrapper', 'accept', 'accept-charset', 'accesskey', 'action', 'align', 'alt', 'async', 'autocomplete', 'autofocus', 'autoplay', 'autosave', 'background', 'bgcolor', 'border', 'charset', 'cellpadding', 'cellspacing', 'checked', 'cite', 'class', 'color', 'cols', 'colspan', 'content', 'contenteditable', 'contextmenu', 'controls', 'coords', 'data', 'data-.*', 'datetime', 'default', 'defer', 'dir', 'dirname', 'disabled', 'download', 'draggable', 'dropzone', 'enctype', 'for', 'form', 'formaction', 'headers', 'height', 'hidden', 'high', 'href', 'hreflang', 'http-equiv', 'icon', 'id', 'ismap', 'itemprop', 'keytype', 'kind', 'label', 'lang', 'language', 'list', 'loop', 'low', 'max', 'maxlength', 'media', 'method', 'min', 'multiple', 'name', 'novalidate', 'open', 'optimum', 'pattern', 'ping', 'placeholder', 'poster', 'preload', 'pubdate', 'radiogroup', 'readonly', 'rel', 'required', 'reversed', 'rows', 'rowspan', 'sandbox', 'scope', 'scoped', 'scrolling', 'seamless', 'selected', 'shape', 'size', 'sizes', 'span', 'src', 'srcdoc', 'srclang', 'srcset', 'start', 'step', 'summary', 'spellcheck', 'style', 'tabindex', 'target', 'title', 'type', 'translate', 'usemap', 'value', 'valign', 'width', 'wrap', 'contenteditable']
+            htmlAllowedAttrs: ['data-atwho-at-query', 'data-section', 'data-section-wrapper', 'accept', 'accept-charset', 'accesskey', 'action', 'align', 'alt', 'async', 'autocomplete', 'autofocus', 'autoplay', 'autosave', 'background', 'bgcolor', 'border', 'charset', 'cellpadding', 'cellspacing', 'checked', 'cite', 'class', 'color', 'cols', 'colspan', 'content', 'contenteditable', 'contextmenu', 'controls', 'coords', 'data', 'data-.*', 'datetime', 'default', 'defer', 'dir', 'dirname', 'disabled', 'download', 'draggable', 'dropzone', 'enctype', 'for', 'form', 'formaction', 'headers', 'height', 'hidden', 'high', 'href', 'hreflang', 'http-equiv', 'icon', 'id', 'ismap', 'itemprop', 'keytype', 'kind', 'label', 'lang', 'language', 'list', 'loop', 'low', 'max', 'maxlength', 'media', 'method', 'min', 'multiple', 'name', 'novalidate', 'open', 'optimum', 'pattern', 'ping', 'placeholder', 'poster', 'preload', 'pubdate', 'radiogroup', 'readonly', 'rel', 'required', 'reversed', 'rows', 'rowspan', 'sandbox', 'scope', 'scoped', 'scrolling', 'seamless', 'selected', 'shape', 'size', 'sizes', 'span', 'src', 'srcdoc', 'srclang', 'srcset', 'start', 'step', 'summary', 'spellcheck', 'style', 'tabindex', 'target', 'title', 'type', 'translate', 'usemap', 'value', 'valign', 'width', 'wrap', 'contenteditable'],
+            iframeStyleFiles: [mauticBasePath + '/app/bundles/CoreBundle/Assets/css/libraries/froala/plugins/gated_video.css']
         };
 
         // Set the Froala license key
@@ -559,8 +560,9 @@ var Mautic = {
                     editor.popups.hideAll();
                 });
 
-                var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'];
+                var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
                 var minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
+
 
                 if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
                     var options = {
@@ -1460,6 +1462,8 @@ var Mautic = {
      * @param form
      */
     ajaxifyForm: function (formName) {
+        Mautic.initializeFormFieldVisibilitySwitcher(formName);
+
         //prevent enter submitting form and instead jump to next line
         var form = 'form[name="' + formName + '"]';
         mQuery(form + ' input, ' + form + ' select').off('keydown.ajaxform');
@@ -2817,18 +2821,12 @@ var Mautic = {
     /**
      * Marks notifications as read and clears unread indicators
      */
-    markNotificationsRead: function () {
+    showNotifications: function () {
         mQuery("#notificationsDropdown").unbind('hide.bs.dropdown');
         mQuery('#notificationsDropdown').on('hidden.bs.dropdown', function () {
             if (!mQuery('#newNotificationIndicator').hasClass('hide')) {
                 mQuery('#notifications .is-unread').remove();
                 mQuery('#newNotificationIndicator').addClass('hide');
-
-                mQuery.ajax({
-                    url: mauticAjaxUrl,
-                    type: "GET",
-                    data: "action=markNotificationsRead"
-                });
             }
         });
     },
@@ -3318,6 +3316,21 @@ var Mautic = {
                 },
                 legend: {
                     display: false
+                },
+                tooltips: {
+                    mode: 'single',
+                    bodyFontSize: 9,
+                    bodySpacing: 0,
+                    callbacks: {
+                        title: function(tooltipItems, data) {
+                            // Title doesn't make sense for scatter since we format the data as a point
+                            return '';
+                        },
+                        label: function(tooltipItem, data) {
+                            return  tooltipItem.xLabel + ': ' + tooltipItem.yLabel;
+                        }
+                    }
+
                 }
             }
         });
@@ -3444,6 +3457,11 @@ var Mautic = {
         }
     },
 
+    /**
+     * Initialize theme selection
+     *
+     * @param themeField
+     */
     intiSelectTheme: function(themeField) {
         var customHtml = mQuery('textarea.builder-html');
         var isNew = Mautic.isNewEntity('#page_sessionId, #emailform_sessionId');
@@ -3455,7 +3473,9 @@ var Mautic = {
 
         if (customHtml.length) {
 
-            if (!customHtml.val().length) {
+            var emptyFroalaContent = '<!DOCTYPE html><html><head><title></title></head><body></body></html>';
+
+            if (!customHtml.val().length || customHtml.val() === emptyFroalaContent) {
                 Mautic.setThemeHtml(themeField.val());
             }
 
@@ -3478,7 +3498,7 @@ var Mautic = {
                 // Load the theme HTML to the source textarea
                 Mautic.setThemeHtml(currentLink.attr('data-theme'));
 
-                // Manipulate classes to achieve the theme selection illustion
+                // Manipulate classes to achieve the theme selection illusion
                 mQuery('.theme-list .panel').removeClass('theme-selected');
                 currentLink.closest('.panel').addClass('theme-selected');
                 mQuery('.theme-list .select-theme-selected').addClass('hide');
@@ -3489,11 +3509,95 @@ var Mautic = {
         }
     },
 
+    /**
+     * Set theme's HTML
+     *
+     * @param theme
+     */
     setThemeHtml: function(theme) {
         mQuery.get(mQuery('#builder_url').val()+'?template=' + theme, function(themeHtml) {
             var textarea = mQuery('textarea.builder-html');
             textarea.val(themeHtml);
             textarea.froalaEditor('html.set', themeHtml);
+        });
+    },
+
+    /**
+     * Initialize form field visibility switcher
+     *
+     * @param formName
+     */
+    initializeFormFieldVisibilitySwitcher: function (formName)
+    {
+        Mautic.switchFormFieldVisibilty(formName);
+
+        mQuery('form[name="'+formName+'"]').change(function() {
+            Mautic.switchFormFieldVisibilty(formName);
+        });
+    },
+
+    /**
+     * Switch form field visibility based on selected values
+     */
+    switchFormFieldVisibilty: function (formName) {
+        var form   = mQuery('form[name="'+formName+'"]');
+        var fields = {};
+
+        // find all fields to show
+        form.find('[data-show-on]').each(function(index, el) {
+            var field = mQuery(el);
+            var showOn = jQuery.parseJSON(field.attr('data-show-on'));
+
+            mQuery.each(showOn, function(fieldId, condition) {
+                if (typeof fields[field.attr('id')] == 'undefined' || fields[field.attr('id')] !== true) {
+                    if (mQuery('#' + fieldId).is(':checkbox') || mQuery('#' + fieldId).is(':radio')) {
+                        if ((condition == 'checked' && mQuery('#' + fieldId).is(':checked')) || (condition == '' && !mQuery('#' + fieldId).is(':checked'))) {
+                            fields[field.attr('id')] = true;
+                        } else {
+                            fields[field.attr('id')] = false;
+                        }
+                    } else {
+                        var sourceFieldVal = mQuery('#' + fieldId).val();
+                        if (mQuery.inArray(sourceFieldVal, condition) === -1) {
+                            fields[field.attr('id')] = false;
+                        } else {
+                            fields[field.attr('id')] = true;
+                        }
+                    }
+                }
+            });
+        });
+
+        // find all fields to hide
+        form.find('[data-hide-on]').each(function(index, el) {
+            var field  = mQuery(el);
+            var hideOn = jQuery.parseJSON(field.attr('data-hide-on'));
+            mQuery.each(hideOn, function(fieldId, condition) {
+                if (mQuery('#' + fieldId).is(':checkbox') || mQuery('#' + fieldId).is(':radio')) {
+                    if ((condition == 'checked' && mQuery('#' + fieldId).is(':checked')) || (condition == '' && !mQuery('#' + fieldId).is(':checked'))) {
+                        fields[field.attr('id')] = false;
+                    } else {
+                        fields[field.attr('id')] = true;
+                    }
+                } else {
+                    var sourceFieldVal = mQuery('#' + fieldId).val();
+                    if (mQuery.inArray(sourceFieldVal, condition) !== -1) {
+                        fields[field.attr('id')] = false;
+                    } else if (typeof fields[field.attr('id')] == 'undefined') {
+                        fields[field.attr('id')] = true;
+                    }
+                }
+            });
+        });
+
+        // show/hide according to conditions
+        mQuery.each(fields, function(fieldId, show) {
+            var fieldContainer = mQuery('#' + fieldId).closest('[class*="col-"]');;
+            if (show) {
+                fieldContainer.fadeIn();
+            } else {
+                fieldContainer.fadeOut();
+            }
         });
     },
 

@@ -142,6 +142,11 @@ ul.tag-cloud li {
     overflow: visible!important;
     height: 53px;
 }
+<<<<<<< Temporary merge branch 1
+.frequency{
+    width: 30px;
+    float: left;
+=======
 
 .timeline-icon {
     width: 50px;
@@ -181,4 +186,8 @@ ul.tag-cloud li {
 
 #contact-timeline tr.timeline-details img {
     max-height: 200px;
+}
+.frequency{
+    width: 45px;
+
 }

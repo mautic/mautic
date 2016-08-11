@@ -9,7 +9,7 @@
 ?>
 
 <li class="dropdown dropdown-custom" id="notificationsDropdown">
-    <a href="javascript: void(0);" onclick="Mautic.markNotificationsRead();" class="dropdown-toggle dropdown-notification" data-toggle="dropdown">
+    <a href="javascript: void(0);" onclick="Mautic.showNotifications();" class="dropdown-toggle dropdown-notification" data-toggle="dropdown">
         <?php $hideClass = (!empty($updateMessage['isNew']) || !empty($showNewIndicator)) ? '' : ' hide'; ?>
         <span class="label label-danger<?php echo $hideClass; ?>" id="newNotificationIndicator"><i class="fa fa-asterisk"></i></span>
         <span class="fa fa-bell fs-16"></span>

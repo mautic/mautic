@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -22,9 +22,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Class Notification
- *
- * @package Mautic\NotificationBundle\Entity
+ * Class Notification.
  */
 class Notification extends FormEntity
 {
@@ -108,10 +106,10 @@ class Notification extends FormEntity
      */
     public function __clone()
     {
-        $this->id               = null;
-        $this->stats            = new ArrayCollection();
-        $this->sentCount        = 0;
-        $this->readCount        = 0;
+        $this->id = null;
+        $this->stats = new ArrayCollection();
+        $this->sentCount = 0;
+        $this->readCount = 0;
 
         parent::__clone();
     }
@@ -119,14 +117,14 @@ class Notification extends FormEntity
     /**
      * Notification constructor.
      */
-    public function __construct ()
+    public function __construct()
     {
         $this->lists = new ArrayCollection();
         $this->stats = new ArrayCollection();
     }
 
     /**
-     * Clear stats
+     * Clear stats.
      */
     public function clearStats()
     {
@@ -136,7 +134,7 @@ class Notification extends FormEntity
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -195,36 +193,36 @@ class Notification extends FormEntity
     /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata (ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint(
             'name',
             new NotBlank(
-                array(
-                    'message' => 'mautic.core.name.required'
-                )
+                [
+                    'message' => 'mautic.core.name.required',
+                ]
             )
         );
 
-        $metadata->addConstraint(new Callback(array(
+        $metadata->addConstraint(new Callback([
             'callback' => function (Notification $notification, ExecutionContextInterface $context) {
                 $type = $notification->getNotificationType();
                 if ($type == 'list') {
-                    $validator  = $context->getValidator();
+                    $validator = $context->getValidator();
                     $violations = $validator->validate(
                         $notification->getLists(),
-                        array(
+                        [
                             new LeadListAccess(
-                                array(
-                                    'message' => 'mautic.lead.lists.required'
-                                )
+                                [
+                                    'message' => 'mautic.lead.lists.required',
+                                ]
                             ),
                             new NotBlank(
-                                array(
-                                    'message' => 'mautic.lead.lists.required'
-                                )
-                            )
-                        )
+                                [
+                                    'message' => 'mautic.lead.lists.required',
+                                ]
+                            ),
+                        ]
                     );
 
                     if (count($violations) > 0) {
@@ -234,12 +232,12 @@ class Notification extends FormEntity
                             ->addViolation();
                     }
                 }
-            }
-        )));
+            },
+        ]));
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -247,23 +245,23 @@ class Notification extends FormEntity
     {
         $metadata->setGroupPrefix('notification')
             ->addListProperties(
-                array(
+                [
                     'id',
                     'name',
                     'heading',
                     'message',
                     'url',
                     'language',
-                    'category'
-                )
+                    'category',
+                ]
             )
             ->addProperties(
-                array(
+                [
                     'publishUp',
                     'publishDown',
                     'readCount',
-                    'sentCount'
-                )
+                    'sentCount',
+                ]
             )
             ->build();
     }
@@ -274,14 +272,14 @@ class Notification extends FormEntity
      */
     protected function isChanged($prop, $val)
     {
-        $getter  = "get" . ucfirst($prop);
+        $getter = 'get'.ucfirst($prop);
         $current = $this->$getter();
 
         if ($prop == 'category' || $prop == 'list') {
             $currentId = ($current) ? $current->getId() : '';
-            $newId     = ($val) ? $val->getId() : null;
+            $newId = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
-                $this->changes[$prop] = array($currentId, $newId);
+                $this->changes[$prop] = [$currentId, $newId];
             }
         } else {
             parent::isChanged($prop, $val);
@@ -303,6 +301,7 @@ class Notification extends FormEntity
      */
     public function setName($name)
     {
+        $this->isChanged('name', $name);
         $this->name = $name;
 
         return $this;
@@ -321,13 +320,14 @@ class Notification extends FormEntity
      */
     public function setDescription($description)
     {
+        $this->isChanged('description', $description);
         $this->description = $description;
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -368,6 +368,7 @@ class Notification extends FormEntity
      */
     public function setHeading($heading)
     {
+        $this->isChanged('heading', $heading);
         $this->heading = $heading;
     }
 
@@ -384,6 +385,7 @@ class Notification extends FormEntity
      */
     public function setMessage($message)
     {
+        $this->isChanged('message', $message);
         $this->message = $message;
     }
 
@@ -400,6 +402,7 @@ class Notification extends FormEntity
      */
     public function setUrl($url)
     {
+        $this->isChanged('url', $url);
         $this->url = $url;
     }
 
@@ -515,9 +518,10 @@ class Notification extends FormEntity
     }
 
     /**
-     * Add list
+     * Add list.
      *
      * @param LeadList $list
+     *
      * @return Notification
      */
     public function addList(LeadList $list)
@@ -528,7 +532,7 @@ class Notification extends FormEntity
     }
 
     /**
-     * Remove list
+     * Remove list.
      *
      * @param LeadList $list
      */
@@ -558,6 +562,7 @@ class Notification extends FormEntity
      */
     public function setNotificationType($notificationType)
     {
+        $this->isChanged('notificationType', $notificationType);
         $this->notificationType = $notificationType;
     }
 }

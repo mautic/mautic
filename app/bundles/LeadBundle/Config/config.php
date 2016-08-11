@@ -360,6 +360,7 @@ return [
             'mautic.lead.doctrine.subscriber'       => [
                 'class'     => 'Mautic\LeadBundle\EventListener\DoctrineSubscriber',
                 'tag'       => 'doctrine.event_subscriber',
+                'arguments' => 'monolog.logger.mautic'
             ],
             'mautic.validator.leadlistaccess' => [
                 'class'     => 'Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator',
@@ -408,7 +409,7 @@ return [
             ],
             'mautic.lead.model.note' => [
                 'class' => 'Mautic\LeadBundle\Model\NoteModel'
-            ],
+            ]
         ]
     ]
 ];
