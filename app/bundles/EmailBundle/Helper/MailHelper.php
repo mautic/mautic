@@ -1072,7 +1072,7 @@ class MailHelper
             if (($name !== null) && (trim($name))) {                    
                 $this->message->addBcc($address, $name);
             } else {
-                $this->message->addBcc($address, $name);
+                $this->message->addBcc($address);
             }
 
             return true;
