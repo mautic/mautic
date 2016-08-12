@@ -562,6 +562,11 @@ var Mautic = {
                 var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
                 var minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
 
+                if (textarea.hasClass('editor-email')) {
+                    maxButtons = mQuery.grep(maxButtons, function(value) {
+                        return value != 'insertGatedVideo';
+                    });
+                }
 
                 if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
                     var options = {
