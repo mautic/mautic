@@ -122,7 +122,7 @@ class EmailModel extends FormModel
         LeadModel $leadModel,
         TrackableModel $pageTrackableModel,
         UserModel $userModel,
-        LoggerInterface $logger
+        LoggerInterface $logger,
         CoreParametersHelper $coreParametersHelper
     ) {
         $this->ipLookupHelper     = $ipLookupHelper;
