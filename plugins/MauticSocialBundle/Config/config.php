@@ -23,9 +23,9 @@ return [
                 'path'       => '/monitoring/{objectAction}/{objectId}',
                 'controller' => 'MauticSocialBundle:Monitoring:execute',
             ],
-            'mautic_social_leads'  => [
-                'path'       => '/monitoring/view/{objectId}/leads/{page}',
-                'controller' => 'MauticSocialBundle:Monitoring:leads',
+            'mautic_social_contacts'  => [
+                'path'       => '/monitoring/view/{objectId}/contacts/{page}',
+                'controller' => 'MauticSocialBundle:Monitoring:contacts',
             ],
         ],
     ],

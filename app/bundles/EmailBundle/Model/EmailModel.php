@@ -32,6 +32,7 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -92,6 +93,12 @@ class EmailModel extends FormModel
     protected $logger;
 
     /**
+     * @var Mixed
+     */
+    protected $coreParameters;
+
+
+    /**
      * @var bool
      */
     protected $updatingTranslationChildren = false;
@@ -116,6 +123,7 @@ class EmailModel extends FormModel
         TrackableModel $pageTrackableModel,
         UserModel $userModel,
         LoggerInterface $logger
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->ipLookupHelper     = $ipLookupHelper;
         $this->themeHelper        = $themeHelper;
@@ -125,6 +133,7 @@ class EmailModel extends FormModel
         $this->pageTrackableModel = $pageTrackableModel;
         $this->userModel          = $userModel;
         $this->logger             = $logger;
+        $this->coreParameters     = $coreParametersHelper;
     }
 
     /**
@@ -1051,7 +1060,6 @@ class EmailModel extends FormModel
         $customHeaders    = (isset($options['customHeaders'])) ? $options['customHeaders'] : [];
 
         if (!$email->getId()) {
-
             return false;
         }
 
@@ -1071,17 +1079,24 @@ class EmailModel extends FormModel
             $emailSettings = $this->getEmailSettings($email);
         }
 
-        if (!$allowResends) {
-            static $sent = [];
-            if (!isset($sent[$email->getId()])) {
-                // Include all variants
-                $variantIds = array_keys($emailSettings);
-                $sent[$email->getId()] = $statRepo->getSentStats($variantIds, $listId);
+        $defaultFrequencyNumber = $this->coreParameters->getParameter('email_frequency_number');
+        $defaultFrequencyTime = $this->coreParameters->getParameter('email_frequency_time');
+
+        /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
+        $frequencyRulesRepo = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
+
+        $leadIds = array_keys($leads);
+        $leadIds = implode(",", $leadIds);
+
+        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', $leadIds, $listId, $defaultFrequencyNumber, $defaultFrequencyTime);
+
+        if (!empty($dontSendTo)) {
+            foreach ($dontSendTo as $frequencyRuleMet)
+            {
+                unset($leads[$frequencyRuleMet['lead_id']]);
             }
-            $sendTo = array_diff_key($leads, $sent[$email->getId()]);
-        } else {
-            $sendTo = $leads;
         }
+        $sendTo = $leads;
 
         if (!$ignoreDNC) {
             //get the list of do not contacts
@@ -1090,9 +1105,10 @@ class EmailModel extends FormModel
                 $dnc = $emailRepo->getDoNotEmailList();
             }
 
-            //weed out do not contacts
+
             if (!empty($dnc)) {
                 foreach ($sendTo as $k => $lead) {
+                    //weed out do not contacts
                     if (in_array(strtolower($lead['email']), $dnc)) {
                         unset($sendTo[$k]);
                     }
@@ -1510,7 +1526,7 @@ class EmailModel extends FormModel
                         $reason = $this->translator->trans('mautic.email.bounce.reason.'.$reason);
                     }
 
-                    $this->setDoNotContact($s, $reason, $type, ($count === $batch));
+                    $this->setDoNotContact($s, $reason, $type);
 
                     $s->setIsFailed(true);
                     $this->em->persist($s);
@@ -1735,6 +1751,33 @@ class EmailModel extends FormModel
         $chart->setDataset($this->translator->trans('mautic.email.graph.pie.ignored.read.failed.ignored'), ($sent - $read));
         $chart->setDataset($this->translator->trans('mautic.email.graph.pie.ignored.read.failed.read'), $read);
         $chart->setDataset($this->translator->trans('mautic.email.graph.pie.ignored.read.failed.failed'), $failed);
+
+        return $chart->render();
+    }
+
+    /**
+     * Get pie chart data of ignored vs opened emails
+     *
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     * @param boolean $canViewOthers
+     *
+     * @return array
+     */
+    public function getDeviceGranularityPieChartData($dateFrom, $dateTo, $canViewOthers = true)
+    {
+        $chart = new PieChart();
+
+        $deviceStats = $this->getStatDeviceRepository()->getDeviceStats(
+            null,
+            $dateFrom,
+            $dateTo
+        );
+
+        foreach ($deviceStats as $device){
+            $chart->setDataset($device['device'], $device['count']);
+        }
 
         return $chart->render();
     }

@@ -19,6 +19,7 @@ use Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\MandrillTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\PostmarkTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport;
+use Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport;
 
 /**
  * Class AjaxController
@@ -225,6 +226,10 @@ class AjaxController extends CommonAjaxController
                     if ($this->container->has($transport)) {
                         $mailer = $this->container->get($transport);
                     }
+
+                    if ('mautic.transport.sparkpost' == $transport) {
+                        $mailer->setApiKey($settings['api_key']);
+                    }
             }
 
             if (method_exists($mailer, 'setMauticFactory')) {
@@ -232,11 +237,13 @@ class AjaxController extends CommonAjaxController
             }
 
             if (!empty($mailer)) {
-                if (empty($settings['password'])) {
-                    $settings['password'] = $this->factory->getParameter('mailer_password');
+                if (is_callable([$mailer, 'setUsername']) && is_callable([$mailer, 'setPassword'])){
+                    if (empty($settings['password'])) {
+                        $settings['password'] = $this->factory->getParameter('mailer_password');
+                    }
+                    $mailer->setUsername($settings['user']);
+                    $mailer->setPassword($settings['password']);
                 }
-                $mailer->setUsername($settings['user']);
-                $mailer->setPassword($settings['password']);
 
                 $logger = new \Swift_Plugins_Loggers_ArrayLogger();
                 $mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($logger));
@@ -272,7 +279,6 @@ class AjaxController extends CommonAjaxController
                 }
             }
         }
-
         return $this->sendJsonResponse($dataArray);
     }
 

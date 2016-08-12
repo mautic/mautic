@@ -21,6 +21,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class MailHelper
@@ -1811,5 +1812,45 @@ class MailHelper
             $value = isset($content[$slot]) ? $content[$slot] : "";
             $slotsHelper->set($slot, $value);
         }
+    }
+
+    /**
+     * @param Lead $lead
+     */
+    public function applyFrequencyRules(Lead $lead)
+    {
+        $frequencyRule = $lead->getFrequencyRules();
+
+        /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
+        $emailModel = $this->factory->getModel('email');
+
+        $statRepo = $emailModel->getStatRepository();
+
+        $now = new \DateTime();
+        $channels = $frequencyRule['channels'];
+
+        if(!empty($frequencyRule) and in_array('email', $channels,true))
+        {
+            $frequencyTime = new \DateInterval('P'.$frequencyRule['frequency_time']);
+            $frequencyNumber = $frequencyRule['frequency_number'];
+        }
+        elseif($this->factory->getParameter('frequency_number') > 0)
+        {
+            $frequencyTime = new \DateInterval('P'.$frequencyRule['frequency_time']);
+            $frequencyNumber = $this->factory->getParameter('frequency_number');
+        }
+
+        $now->sub($frequencyTime);
+        $sentQuery = $statRepo->getLeadStats($lead->getId(), array('fromDate' => $now));
+
+        if(!empty($sentQuery) and count($sentQuery) < $frequencyNumber)
+        {
+            return true;
+        }
+        elseif (empty($sentQuery))
+        {
+            return true;
+        }
+        return false;
     }
 }
