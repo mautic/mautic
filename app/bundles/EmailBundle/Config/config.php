@@ -257,7 +257,8 @@ return [
                     'mautic.helper.mailer',
                     'mautic.lead.model.lead',
                     'mautic.page.model.trackable',
-                    'mautic.user.model.user'
+                    'mautic.user.model.user',
+                    'monolog.logger.mautic'
                 ]
             ]
         ]
