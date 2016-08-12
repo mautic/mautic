@@ -702,10 +702,11 @@ class CommonRepository extends EntityRepository
      * @param null $alias
      * @param bool $setNowParameter
      * @param bool $setTrueParameter
+     * @param bool $allowNullForPublishedUp  Allow entities without a published up date
      *
      * @return mixed
      */
-    public function getPublishedByDateExpression($q, $alias = null, $setNowParameter = true, $setTrueParameter = true)
+    public function getPublishedByDateExpression($q, $alias = null, $setNowParameter = true, $setTrueParameter = true, $allowNullForPublishedUp = true)
     {
         $isORM = ($q instanceof QueryBuilder);
 
@@ -739,14 +740,26 @@ class CommonRepository extends EntityRepository
         $expr = $q->expr()->andX(
             $q->expr()->eq("$alias.$pub", ':true'),
             $q->expr()->orX(
-                $q->expr()->isNull("$alias.$pubUp"),
-                $q->expr()->lte("$alias.$pubUp", ':now')
-            ),
-            $q->expr()->orX(
                 $q->expr()->isNull("$alias.$pubDown"),
                 $q->expr()->gte("$alias.$pubDown", ':now')
             )
         );
+
+        if ($allowNullForPublishedUp) {
+            $expr->add(
+                $q->expr()->orX(
+                    $q->expr()->isNull("$alias.$pubUp"),
+                    $q->expr()->lte("$alias.$pubUp", ':now')
+                )
+            );
+        } else {
+            $expr->add(
+                $q->expr()->andX(
+                    $q->expr()->isNotNull("$alias.$pubUp"),
+                    $q->expr()->lte("$alias.$pubUp", ':now')
+                )
+            );
+        }
 
         return $expr;
     }
