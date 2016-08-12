@@ -188,11 +188,6 @@ class EmailModel extends FormModel
 
         // Ensure that list emails are published
         if ($entity->getEmailType() == 'list') {
-            $entity->setIsPublished(true);
-            $entity->setPublishDown(null);
-            $entity->setPublishUp(null);
-
-
             // Ensure that this email has the same lists assigned as the translated parent if applicable
             /** @var Email $translationParent */
             if ($translationParent = $entity->getTranslationParent()) {
@@ -1270,7 +1265,15 @@ class EmailModel extends FormModel
                         // Queue full so flush then try again
                         $flushQueue(false);
 
-                        $mailer->addTo($contact['email'], $contact['firstname'].' '.$contact['lastname']);
+                        if (!$mailer->addTo($contact['email'], $contact['firstname'].' '.$contact['lastname'])) {
+                            // Clear the errors so it doesn't stop the next send
+                            $mailer->clearErrors();
+
+                            // Bad email so note and continue
+                            $errors[$contact['id']] = $contact['email'];
+
+                            continue;
+                        }
                     }
 
                     //queue or send the message
@@ -1301,6 +1304,17 @@ class EmailModel extends FormModel
 
         // Persist stats
         $statRepo->saveEntities($saveEntities);
+
+        // Update bad emails as bounces
+        if (count($errors)) {
+            foreach ($errors as $contactId => $contactEmail) {
+                $this->leadModel->addDncForLead(
+                    $this->em->getReference('MauticLeadBundle:Lead', $contactId),
+                    ['email' => $email->getId()],
+                    $this->translator->trans('mautic.email.bounce.reason.bad_email')
+                );
+            }
+        }
 
         // Update sent counts
         foreach ($emailSentCounts as $emailId => $count) {
@@ -1452,7 +1466,7 @@ class EmailModel extends FormModel
      * @param bool|true $flush
      * @param int|null  $leadId
      */
-    public function setEmailDoNotContact($email, $reason = 'bounced', $comments = '', $flush = true, $leadId = null)
+    public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, $comments = '', $flush = true, $leadId = null)
     {
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
         $leadRepo = $this->em->getRepository('MauticLeadBundle:Lead');
