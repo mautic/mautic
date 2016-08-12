@@ -12,6 +12,7 @@ namespace Mautic\FormBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class AjaxController
@@ -89,5 +90,32 @@ class AjaxController extends CommonAjaxController
         $dataArray['success']  = 1;
 
         return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Ajax submit for forms
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function submitAction()
+    {
+        $response = $this->forwardWithPost('MauticFormBundle:Public:submit', $this->request->request->all(), [], ['ajax' => true]);
+        $responseData = json_decode($response->getContent(), true);
+        $success = (!in_array($response->getStatusCode(), [404, 500]) && empty($responseData['errorMessage'])
+            && empty($responseData['validationErrors']));
+
+        $message = '';
+        $type    = '';
+        if (isset($responseData['successMessage'])) {
+            $message = $responseData['successMessage'];
+            $type    = 'notice';
+        } elseif (isset($responseData['errorMessage'])) {
+            $message = $responseData['errorMessage'];
+            $type    = 'error';
+        }
+
+        $data = array_merge($responseData, ['message' => $message, 'type' => $type, 'success' => $success]);
+
+        return $this->sendJsonResponse($data);
     }
 }

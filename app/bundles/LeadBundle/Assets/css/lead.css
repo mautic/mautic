@@ -142,3 +142,45 @@ ul.tag-cloud li {
     overflow: visible!important;
     height: 53px;
 }
+.timeline-icon {
+    width: 50px;
+    text-align: center;
+}
+
+.timeline-featured td, .timeline-featured th {
+    background: rgba(78, 94, 158, 0.1 );
+    border-right: 1px solid rgba(78, 94, 158, 0.1) !important;
+}
+
+#contact-timeline td {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    -ms-word-break: break-all;
+    word-break: break-all;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+}
+
+#contact-timeline .dl-horizontal dt {
+    width: auto;
+    text-align: left;
+    margin-right: 10px;
+}
+
+#contact-timeline .dl-horizontal dd {
+    margin-left: 0px;
+}
+
+#contact-timeline tr.timeline-row-highlighted {
+    background-color: #fafafa;
+}
+
+#contact-timeline tr.timeline-details img {
+    max-height: 200px;
+}
+.frequency{
+    width: 45px;
+
+}

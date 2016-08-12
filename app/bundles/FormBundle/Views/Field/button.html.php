@@ -13,13 +13,12 @@ include __DIR__ . '/field_helper.php';
 $buttonType = (isset($properties['type'])) ? $properties['type'] : 'submit';
 
 $formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
-    array(
-        'deleted'        => false,
+    [
         'id'             => $id,
         'formId'         => $formId,
         'formName'       => $formName,
-        'disallowDelete' => true)
-    ) : '';
+        'disallowDelete' => true
+    ]) : '';
 
 
 

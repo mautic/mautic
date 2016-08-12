@@ -9,9 +9,10 @@
 
 namespace Mautic\EmailBundle\Entity;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
  * Class StatRepository
@@ -20,6 +21,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class StatRepository extends CommonRepository
 {
+    use TimelineTrait;
 
     /**
      * @param $trackingHash
@@ -49,13 +51,18 @@ class StatRepository extends CommonRepository
      *
      * @return array
      */
-    public function getSentStats($emailId, $listId = null)
+    public function getSentStats($emailIds, $listId = null)
     {
+        if (!is_array($emailIds)) {
+            $emailIds = [(int) $emailIds];
+        }
+
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
-            ->where('s.email_id = :email')
-            ->setParameter('email', $emailId);
+            ->where(
+                $q->expr()->in('s.email_id', $emailIds)
+            );
 
         if ($listId) {
             $q->andWhere('s.list_id = :list')
@@ -76,12 +83,13 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param int|array $emailIds
-     * @param int       $listId
+     * @param null            $emailIds
+     * @param null            $listId
+     * @param ChartQuery|null $chartQuery
      *
-     * @return int
+     * @return array|int
      */
-    public function getSentCount($emailIds = null, $listId = null)
+    public function getSentCount($emailIds = null, $listId = null, ChartQuery $chartQuery = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -97,25 +105,43 @@ class StatRepository extends CommonRepository
             );
         }
 
-        if ($listId) {
+        if (true === $listId) {
+            $q->addSelect('s.list_id')
+                ->groupBy('s.list_id');
+        } elseif ($listId) {
             $q->andWhere('s.list_id = ' . (int) $listId);
         }
 
         $q->andWhere('s.is_failed = :false')
             ->setParameter('false', false, 'boolean');
 
+        if ($chartQuery) {
+            $chartQuery->applyDateFilters($q, 'date_sent', 's');
+        }
+
         $results = $q->execute()->fetchAll();
+
+        if (true === $listId) {
+            // Return list group of counts
+            $byList = [];
+            foreach ($results as $result) {
+                $byList[$result['list_id']] = $result['sent_count'];
+            }
+
+            return $byList;
+        }
 
         return (isset($results[0])) ? $results[0]['sent_count'] : 0;
     }
 
     /**
-     * @param array|int $emailIds
-     * @param int       $listId
+     * @param null            $emailIds
+     * @param null            $listId
+     * @param ChartQuery|null $chartQuery
      *
-     * @return int
+     * @return array|int
      */
-    public function getReadCount($emailIds = null, $listId = null)
+    public function getReadCount($emailIds = null, $listId = null, ChartQuery $chartQuery = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -131,13 +157,31 @@ class StatRepository extends CommonRepository
             );
         }
 
-        if ($listId) {
+        if (true === $listId) {
+            $q->addSelect('s.list_id')
+                ->groupBy('s.list_id');
+        } elseif ($listId) {
             $q->andWhere('s.list_id = ' . (int) $listId);
         }
 
         $q->andWhere('is_read = :true')
             ->setParameter('true', true, 'boolean');
+
+        if ($chartQuery) {
+            $chartQuery->applyDateFilters($q, 'date_sent', 's');
+        }
+
         $results = $q->execute()->fetchAll();
+
+        if (true === $listId) {
+            // Return list group of counts
+            $byList = [];
+            foreach ($results as $result) {
+                $byList[$result['list_id']] = $result['read_count'];
+            }
+
+            return $byList;
+        }
 
         return (isset($results[0])) ? $results[0]['read_count'] : 0;
     }
@@ -205,12 +249,13 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param array|int $emailIds
-     * @param int       $listId
+     * @param null            $emailIds
+     * @param null            $listId
+     * @param ChartQuery|null $chartQuery
      *
-     * @return int
+     * @return array|int
      */
-    public function getFailedCount($emailIds = null, $listId = null)
+    public function getFailedCount($emailIds = null, $listId = null, ChartQuery $chartQuery = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -226,16 +271,65 @@ class StatRepository extends CommonRepository
             );
         }
 
-        if ($listId) {
+        if (true === $listId) {
+            $q->addSelect('s.list_id')
+                ->groupBy('s.list_id');
+        } elseif ($listId) {
             $q->andWhere('s.list_id = ' . (int) $listId);
         }
 
         $q->andWhere('is_failed = :true')
             ->setParameter('true', true, 'boolean');
 
+        if ($chartQuery) {
+            $chartQuery->applyDateFilters($q, 'date_sent', 's');
+        }
+
         $results = $q->execute()->fetchAll();
 
+        if (true === $listId) {
+            // Return list group of counts
+            $byList = [];
+            foreach ($results as $result) {
+                $byList[$result['list_id']] = $result['failed_count'];
+            }
+
+            return $byList;
+        }
+
         return (isset($results[0])) ? $results[0]['failed_count'] : 0;
+    }
+
+    /**
+     * @param array|int $emailIds
+     *
+     * @return int
+     */
+    public function getOpenedStatIds($emailIds = null, $listId = null)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('s.id')
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
+
+        if ($emailIds) {
+            if (!is_array($emailIds)) {
+                $emailIds = array((int) $emailIds);
+            }
+            $q->where(
+                $q->expr()->in('s.email_id', $emailIds)
+            );
+        }
+
+        $q->andWhere('open_count > 0');
+
+        if ($listId) {
+            $q->andWhere('s.list_id = ' . (int) $listId);
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
     }
 
     /**
@@ -250,41 +344,85 @@ class StatRepository extends CommonRepository
      */
     public function getLeadStats($leadId, array $options = array())
     {
-        $query = $this->createQueryBuilder('s');
-
-        $query->select('IDENTITY(s.email) AS email_id, s.id, s.dateRead, s.dateSent, e.name, e.subject, s.isRead, s.isFailed, s.viewedInBrowser, s.retryCount, IDENTITY(s.list) AS list_id, l.name as list_name, s.trackingHash as idHash, s.openDetails, ec.subject as storedSubject')
-            ->leftJoin('MauticEmailBundle:Email', 'e', 'WITH', 'e.id = s.email')
-            ->leftJoin('MauticLeadBundle:LeadList', 'l', 'WITH', 'l.id = s.list')
-            ->leftJoin('MauticEmailBundle:Copy', 'ec', 'WITH', 'ec.id = s.storedCopy')
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'emails', 'e', 's.email_id = e.id')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'email_copies', 'ec', 's.copy_id = ec.id')
             ->where(
                 $query->expr()->andX(
-                    $query->expr()->eq('IDENTITY(s.lead)', $leadId),
-                    $query->expr()->eq('s.isFailed', ':false'))
-            )->setParameter('false', false, 'boolean');
+                    $query->expr()->eq('s.is_failed', 0)
+                )
+            );
 
-        if (!empty($options['ipIds'])) {
-            $query->orWhere('s.ipAddress IN (' . implode(',', $options['ipIds']) . ')');
+        if ($leadId) {
+            $query->andWhere(
+                $query->expr()->eq('s.lead_id', (int) $leadId)
+            );
         }
 
-        if (isset($options['filters']['search']) && $options['filters']['search']) {
-            $query->andWhere($query->expr()->orX(
-                $query->expr()->like('e.subject', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
-                $query->expr()->like('e.name', $query->expr()->literal('%' . $options['filters']['search'] . '%'))
-            ));
+        if (!empty($options['basic_select'])) {
+            $query->select(
+                's.email_id, s.id, s.date_read as dateRead, s.date_sent as dateSent, e.subject, e.name as email_name, s.is_read as isRead, s.is_failed as isFailed, ec.subject as storedSubject'
+            );
+        } else {
+            $query->select(
+                's.email_id, s.id, s.date_read as dateRead, s.date_sent as dateSent,e.subject, e.name as email_name, s.is_read as isRead, s.is_failed as isFailed, s.viewed_in_browser as viewedInBrowser, s.retry_count as retryCount, s.list_id, l.name as list_name, s.tracking_hash as idHash, s.open_details as openDetails, ec.subject as storedSubject'
+            )
+                ->leftJoin('s', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 's.list_id = l.id');
         }
 
-        $stats = $query->getQuery()->getArrayResult();
+        if (isset($options['state'])) {
+            $state = $options['state'];
+            if ('read' == $state) {
+                $query->andWhere(
+                    $query->expr()->eq('s.is_read', 1)
+                );
+            } elseif ('sent' == $state) {
+                // Get only those that have not been read yet
+                $query->andWhere(
+                    $query->expr()->eq('s.is_read', 0)
+                );
+            }
+        } else {
+            $state = 'sent';
+        }
 
-        foreach ($stats as &$stat) {
+        if (isset($options['search']) && $options['search']) {
+            $query->andWhere(
+                $query->expr()->orX(
+                    $query->expr()->like('ec.subject', $query->expr()->literal('%'.$options['search'].'%')),
+                    $query->expr()->like('e.subject', $query->expr()->literal('%'.$options['search'].'%')),
+                    $query->expr()->like('e.name', $query->expr()->literal('%'.$options['search'].'%'))
+                )
+            );
+        }
+
+        if (isset($options['fromDate']) && $options['fromDate']) {
+            $dt = new DateTimeHelper($options['fromDate']);
+            $query->andWhere(
+                $query->expr()->gte('s.date_sent', $query->expr()->literal($dt->toUtcString()))
+            );
+        }
+
+
+        $timeToReadParser = function (&$stat) {
             $dateSent = new DateTimeHelper($stat['dateSent']);
             if (!empty($stat['dateSent']) && !empty($stat['dateRead'])) {
                 $stat['timeToRead'] = $dateSent->getDiff($stat['dateRead']);
             } else {
                 $stat['timeToRead'] = false;
             }
-        }
+        };
 
-        return $stats;
+        return $this->getTimelineResults(
+            $query,
+            $options,
+            'storedSubject, e.subject',
+            's.date_'.$state,
+            ['openDetails'],
+            ['dateRead', 'dateSent'],
+            $timeToReadParser
+        );
     }
 
     /**
@@ -390,6 +528,7 @@ class StatRepository extends CommonRepository
     public function deleteStat($id)
     {
         $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats', array('id' => (int) $id));
+        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats_devices', array('stat_id' => (int) $id));
     }
 
     /**
@@ -398,5 +537,19 @@ class StatRepository extends CommonRepository
     public function getTableAlias()
     {
         return 's';
+    }
+
+    /**
+     * @param $leadId
+     * @param $emailId
+     *
+     * @return array
+     */
+    public function findContactEmailStats($leadId, $emailId)
+    {
+        return $this->createQueryBuilder('s')
+            ->where("IDENTITY(s.lead) = ".(int)$leadId." AND IDENTITY(s.email) = ".(int)$emailId)
+            ->getQuery()
+            ->getResult();
     }
 }

@@ -38,6 +38,8 @@ class BuilderSubscriber extends CommonSubscriber
     protected $pageTokenRegex = '{pagelink=(.*?)}';
     protected $langBarRegex = '{langbar}';
     protected $shareButtonsRegex = '{sharebuttons}';
+    protected $titleRegex = '{pagetitle}';
+    protected $descriptionRegex = '{pagemetadescription}';
     protected $emailIsInternalSend = false;
     protected $emailEntity = null;
 
@@ -119,6 +121,8 @@ class BuilderSubscriber extends CommonSubscriber
                     [
                         $this->langBarRegex      => $this->translator->trans('mautic.page.token.lang'),
                         $this->shareButtonsRegex => $this->translator->trans('mautic.page.token.share'),
+                        $this->titleRegex        => $this->translator->trans('mautic.core.title'),
+                        $this->descriptionRegex  => $this->translator->trans('mautic.page.form.metadescription'),
                     ]
                 )
             );
@@ -176,6 +180,14 @@ class BuilderSubscriber extends CommonSubscriber
         if (strpos($content, $this->shareButtonsRegex) !== false) {
             $buttons = $this->renderSocialShareButtons();
             $content = str_ireplace($this->shareButtonsRegex, $buttons, $content);
+        }
+
+        if (strpos($content, $this->titleRegex) !== false) {
+            $content = str_ireplace($this->titleRegex, $page->getTitle(), $content);
+        }
+
+        if (strpos($content, $this->descriptionRegex) !== false) {
+            $content = str_ireplace($this->descriptionRegex, $page->getMetaDescription(), $content);
         }
 
         $clickThrough = ['source' => ['page', $page->getId()]];
@@ -251,7 +263,8 @@ class BuilderSubscriber extends CommonSubscriber
                 }
                 $related[$parent->getId()] = [
                     "lang" => $trans,
-                    "url"  => $this->pageModel->generateUrl($parent, false)
+                    // Add ntrd to not auto redirect to another language
+                    "url"  => $this->pageModel->generateUrl($parent, false).'?ntrd=1'
                 ];
                 foreach ($children as $c) {
                     $lang  = $c->getLanguage();
@@ -261,7 +274,8 @@ class BuilderSubscriber extends CommonSubscriber
                     }
                     $related[$c->getId()] = [
                         "lang" => $trans,
-                        "url"  => $this->pageModel->generateUrl($c, false)
+                        // Add ntrd to not auto redirect to another language
+                        "url"  => $this->pageModel->generateUrl($c, false).'?ntrd=1'
                     ];
                 }
             }

@@ -284,6 +284,7 @@ var Mautic = {
             imageManagerLoadURL: mauticBaseUrl + 's/file/list',
             imageManagerDeleteURL: mauticBaseUrl + 's/file/delete',
             useClasses: false,
+            imageOutputSize: true,
             htmlAllowedTags: ['a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base', 'bdi', 'bdo', 'blockquote', 'br', 'button', 'canvas', 'caption', 'cite', 'code', 'col', 'colgroup', 'datalist', 'dd', 'del', 'details', 'dfn', 'dialog', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'i', 'iframe', 'img', 'input', 'ins', 'kbd', 'keygen', 'label', 'legend', 'li', 'link', 'main', 'map', 'mark', 'menu', 'menuitem', 'meter', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'option', 'output', 'p', 'param', 'pre', 'progress', 'queue', 'rp', 'rt', 'ruby', 's', 'samp', 'script', 'style', 'section', 'select', 'small', 'source', 'span', 'strike', 'strong', 'sub', 'summary', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'time', 'title', 'tr', 'track', 'u', 'ul', 'var', 'video', 'wbr', 'center'],
             htmlAllowedAttrs: ['data-atwho-at-query', 'data-section', 'data-section-wrapper', 'accept', 'accept-charset', 'accesskey', 'action', 'align', 'alt', 'async', 'autocomplete', 'autofocus', 'autoplay', 'autosave', 'background', 'bgcolor', 'border', 'charset', 'cellpadding', 'cellspacing', 'checked', 'cite', 'class', 'color', 'cols', 'colspan', 'content', 'contenteditable', 'contextmenu', 'controls', 'coords', 'data', 'data-.*', 'datetime', 'default', 'defer', 'dir', 'dirname', 'disabled', 'download', 'draggable', 'dropzone', 'enctype', 'for', 'form', 'formaction', 'headers', 'height', 'hidden', 'high', 'href', 'hreflang', 'http-equiv', 'icon', 'id', 'ismap', 'itemprop', 'keytype', 'kind', 'label', 'lang', 'language', 'list', 'loop', 'low', 'max', 'maxlength', 'media', 'method', 'min', 'multiple', 'name', 'novalidate', 'open', 'optimum', 'pattern', 'ping', 'placeholder', 'poster', 'preload', 'pubdate', 'radiogroup', 'readonly', 'rel', 'required', 'reversed', 'rows', 'rowspan', 'sandbox', 'scope', 'scoped', 'scrolling', 'seamless', 'selected', 'shape', 'size', 'sizes', 'span', 'src', 'srcdoc', 'srclang', 'srcset', 'start', 'step', 'summary', 'spellcheck', 'style', 'tabindex', 'target', 'title', 'type', 'translate', 'usemap', 'value', 'valign', 'width', 'wrap', 'contenteditable']
         };
@@ -543,79 +544,55 @@ var Mautic = {
             }
         }
 
-        mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage', 'editor-basic-fullpage'], function (index, editorClass) {
-            if (mQuery(container + ' textarea.' + editorClass).length) {
-                mQuery(container + ' textarea.' + editorClass).each(function () {
-                    var textarea = mQuery(this);
+        if (mQuery(container + ' textarea.editor').length) {
+            mQuery(container + ' textarea.editor').each(function () {
+                var textarea = mQuery(this);
+
+                // init AtWho in a froala editor
+                if (textarea.hasClass('editor-builder-tokens')) {
+                    textarea.on('froalaEditor.initialized', function (e, editor) {
+                        Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'), editor);
+                    });
+                }
+
+                textarea.on('froalaEditor.blur', function (e, editor) {
+                    editor.popups.hideAll();
+                });
+
+                var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
+                var minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
 
 
+                if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
+                    var options = {
+                        // Set custom buttons with separator between them.
+                        toolbarButtons: maxButtons,
+                        toolbarButtonsMD: maxButtons,
+                        heightMin: 300
+                    };
 
-                    // init AtWho in a froala editor
-                    if (textarea.hasClass('editor-builder-tokens')) {
-                        textarea.on('froalaEditor.initialized', function (e, editor) {
-                            Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'), editor);
-                        });
+                    if (textarea.hasClass('editor-basic-fullpage')) {
+                        options.fullPage = true;
+                        options.htmlAllowedTags = ['.*'];
+                        options.htmlAllowedAttrs = ['.*'];
+                        options.htmlRemoveTags = [];
+                        options.lineBreakerTags = [];
                     }
 
-                    textarea.on('froalaEditor.blur', function (e, editor) {
-                        editor.popups.hideAll();
+                    textarea.on('froalaEditor.focus', function (e, editor) {
+                        Mautic.showChangeThemeWarning = true;
                     });
 
-                    // var settings = {};
-
-                    // if (editorClass != 'editor') {
-                    //     // Set the custom editor toolbar
-                    //     var toolbar = editorClass.replace('editor-', '').replace('-', '_');
-                    //     settings.toolbar = toolbar;
-                    // }
-
-                    // if (editorClass != 'editor' && editorClass != 'editor-basic') {
-                    //     // Do not strip classes and the like
-                    //     settings.allowedContent = true;
-                    // }
-
-                    // if (editorClass == 'editor-fullpage' || editorClass == 'editor-basic-fullpage') {
-                    //     // Allow full page editing and add tools to update html document
-                    //     settings.fullPage     = true;
-                    //     settings.extraPlugins = "sourcedialog,docprops,filemanager";
-                    // }
-
-                    var maxButtons = ['undo', 'redo' , '|', 'bold', 'italic', 'underline', 'strikeThrough', 'fontFamily', 'fontSize', 'color', 'paragraphFormat', 'align', 'orderedList', 'unorderedList', 'quote', 'strikethrough', 'outdent', 'indent', 'clearFormatting','insertLink', 'insertImage','insertTable', 'html', 'fullscreen'];
-
-                    if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
-                        var options = {
-                            // Set custom buttons with separator between them.
-                            toolbarButtons: maxButtons,
-                            toolbarButtonsMD: maxButtons,
-                            heightMin: 300
-                        };
-
-                        if (textarea.hasClass('editor-basic-fullpage')) {
-                            options.fullPage = true;
-                            options.htmlAllowedTags = ['.*'];
-                            options.htmlRemoveTags = [];
-                            options.lineBreakerTags = [];
-                        }
-
-                        textarea.froalaEditor(mQuery.extend(options, Mautic.basicFroalaOptions));
-                    } else if (editorClass == 'editor') {
-                        //     settings.removePlugins = 'resize';
-
-                        textarea.froalaEditor(mQuery.extend({
-                            // Set custom buttons with separator between them.
-                            toolbarButtons: maxButtons,
-                            toolbarButtonsMD: maxButtons,
-                            toolbarButtonsSM: ['undo', 'redo' , '-', 'bold', 'italic', 'underline'],
-                            toolbarButtonsXS: ['undo', 'redo' , '-', 'bold', 'italic', 'underline'],
-                            heightMin: 100
-                        }, Mautic.basicFroalaOptions));
-
-                    } else {
-                        textarea.froalaEditor(Mautic.basicFroalaOptions);
-                    }
-                });
-            }
-        });
+                    textarea.froalaEditor(mQuery.extend(options, Mautic.basicFroalaOptions));
+                } else {
+                    textarea.froalaEditor(mQuery.extend({
+                        // Set custom buttons with separator between them.
+                        toolbarButtons: minButtons,
+                        heightMin: 100
+                    }, Mautic.basicFroalaOptions));
+                }
+            });
+        }
 
         //activate shuffles
         if (mQuery('.shuffle-grid').length) {
@@ -1002,10 +979,8 @@ var Mautic = {
                 MauticVars.modalsReset = {};
             }
 
-            mQuery.each(['editor', 'editor-basic', 'editor-advanced', 'editor-advanced-2rows', 'editor-fullpage'], function (index, editorClass) {
-                mQuery(container + ' textarea.' + editorClass).each(function () {
-                    mQuery('textarea.'+editorClass).froalaEditor('destroy');
-                });
+            mQuery(container + ' textarea.editor').each(function () {
+                mQuery('textarea.editor').froalaEditor('destroy');
             });
 
             //turn off shuffle events
@@ -1486,6 +1461,8 @@ var Mautic = {
      * @param form
      */
     ajaxifyForm: function (formName) {
+        Mautic.initializeFormFieldVisibilitySwitcher(formName);
+
         //prevent enter submitting form and instead jump to next line
         var form = 'form[name="' + formName + '"]';
         mQuery(form + ' input, ' + form + ' select').off('keydown.ajaxform');
@@ -1564,35 +1541,43 @@ var Mautic = {
         mQuery(form).off('submit.ajaxform');
         mQuery(form).on('submit.ajaxform', (function (e) {
             e.preventDefault();
-
-            mQuery(this).trigger('before.submit.ajaxform');
+            var form = mQuery(this);
 
             if (MauticVars.formSubmitInProgress) {
                 return false;
             } else {
-                var callback = mQuery(this).data('submit-callback');
-
-                // Allow a callback to do stuff before submit and abort if needed
-                if (callback && typeof Mautic[callback] == 'function') {
-                    if (!Mautic[callback]()) {
-
-                        return false;
-                    }
-                }
-
-                MauticVars.formSubmitInProgress = true;
-            }
-
-            Mautic.postForm(mQuery(this), function (response) {
-                if (response.inMain) {
-                    Mautic.processPageContent(response);
+                var callbackAsync = form.data('submit-callback-async');
+                if (callbackAsync && typeof Mautic[callbackAsync] == 'function') {
+                    Mautic[callbackAsync].apply(this, [form, function() {
+                        Mautic.postMauticForm(form);
+                    }]);
                 } else {
-                    Mautic.processModalContent(response, '#' + response.modalId);
+                    var callback = form.data('submit-callback');
+
+                    // Allow a callback to do stuff before submit and abort if needed
+                    if (callback && typeof Mautic[callback] == 'function') {
+                        if (!Mautic[callback]()) {
+                            return false;
+                        }
+                    }
+
+                    Mautic.postMauticForm(form);
                 }
-            });
+            }
 
             return false;
         }));
+    },
+
+    postMauticForm: function(form) {
+        MauticVars.formSubmitInProgress = true;
+        Mautic.postForm(form, function (response) {
+            if (response.inMain) {
+                Mautic.processPageContent(response);
+            } else {
+                Mautic.processModalContent(response, '#' + response.modalId);
+            }
+        });
     },
 
     /**
@@ -1669,7 +1654,7 @@ var Mautic = {
 
         var target = mQuery(el).attr('data-target');
 
-        var route = mQuery(el).attr('href');
+        var route = (mQuery(el).attr('data-href')) ? mQuery(el).attr('data-href') : mQuery(el).attr('href');
         if (route.indexOf('javascript') >= 0) {
             return false;
         }
@@ -1684,7 +1669,14 @@ var Mautic = {
         var header = mQuery(el).attr('data-header');
         var footer = mQuery(el).attr('data-footer');
 
-        Mautic.loadAjaxModal(target, route, method, header, footer);
+        var preventDismissal = mQuery(el).attr('data-prevent-dismiss');
+        if (preventDismissal) {
+            // Reset
+            mQuery(el).removeAttr('data-prevent-dismiss');
+        }
+
+
+        Mautic.loadAjaxModal(target, route, method, header, footer, preventDismissal);
     },
 
     /**
@@ -1695,7 +1687,7 @@ var Mautic = {
      * @param header
      * @param footer
      */
-    loadAjaxModal: function (target, route, method, header, footer) {
+    loadAjaxModal: function (target, route, method, header, footer, preventDismissal) {
 
         //show the modal
         if (mQuery(target + ' .loading-placeholder').length) {
@@ -1736,6 +1728,29 @@ var Mautic = {
                 delete Mautic.modalContentXhr[target];
             }
         });
+
+        // Check if dismissal is allowed
+        if (typeof mQuery(target).data('bs.modal') !== 'undefined' && typeof mQuery(target).data('bs.modal').options !== 'undefined') {
+            if (preventDismissal) {
+                mQuery(target).data('bs.modal').options.keyboard = false;
+                mQuery(target).data('bs.modal').options.backdrop = 'static';
+            } else {
+                mQuery(target).data('bs.modal').options.keyboard = true;
+                mQuery(target).data('bs.modal').options.backdrop = true;
+            }
+        } else {
+            if (preventDismissal) {
+                mQuery(target).modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+            } else {
+                mQuery(target).modal({
+                    backdrop: true,
+                    keyboard: true
+                });
+            }
+        }
 
         mQuery(target).modal('show');
 
@@ -2501,7 +2516,6 @@ var Mautic = {
 
         if (isExtraButton) {
             mQuery(changedId).parents('.btn-group').find('.btn').removeClass('btn-success btn-danger').addClass('btn-default');
-            console.log(mQuery(changedId).parents('.btn-group').find('.btn-default'));
         } else {
             //change the other
             var otherButton = isYesButton ? '.btn-no' : '.btn-yes';
@@ -2806,18 +2820,12 @@ var Mautic = {
     /**
      * Marks notifications as read and clears unread indicators
      */
-    markNotificationsRead: function () {
+    showNotifications: function () {
         mQuery("#notificationsDropdown").unbind('hide.bs.dropdown');
         mQuery('#notificationsDropdown').on('hidden.bs.dropdown', function () {
             if (!mQuery('#newNotificationIndicator').hasClass('hide')) {
                 mQuery('#notifications .is-unread').remove();
                 mQuery('#newNotificationIndicator').addClass('hide');
-
-                mQuery.ajax({
-                    url: mauticAjaxUrl,
-                    type: "GET",
-                    data: "action=markNotificationsRead"
-                });
             }
         });
     },
@@ -3165,6 +3173,8 @@ var Mautic = {
                         Mautic.renderBarChart(canvas)
                     } else if (canvas.hasClass('simple-bar-chart')) {
                         Mautic.renderSimpleBarChart(canvas)
+                    } else if (canvas.hasClass('horizontal-bar-chart')) {
+                        Mautic.renderHorizontalBarChart(canvas)
                     }
                 }
                 canvas.addClass('chart-rendered');
@@ -3231,7 +3241,13 @@ var Mautic = {
         var chart = new Chart(canvas, {
             type: 'bar',
             data: data,
-            options: {}
+            options: {
+                scales: {
+                    xAxes: [{
+                        barPercentage: 35
+                    }]
+                }
+            }
         });
         Mautic.chartObjects.push(chart);
     },
@@ -3251,7 +3267,8 @@ var Mautic = {
                     xAxes: [{
                         stacked: false,
                         ticks: {fontSize: 9},
-                        gridLines: {display:false}
+                        gridLines: {display:false},
+                        barPercentage: 35
                     }],
                     yAxes: [{
                         display: false,
@@ -3259,10 +3276,60 @@ var Mautic = {
                         ticks: {beginAtZero: true, display: false},
                         gridLines: {display:false}
                     }],
-                    display: false,
+                    display: false
                 },
                 legend: {
                     display: false
+                }
+            }
+        });
+        Mautic.chartObjects.push(chart);
+    },
+
+    /**
+     * Render the chart.js simple bar chart
+     *
+     * @param mQuery element canvas
+     */
+    renderHorizontalBarChart: function(canvas) {
+        var data = mQuery.parseJSON(canvas.text());
+        var chart = new Chart(canvas, {
+            type: 'horizontalBar',
+            data: data,
+            options: {
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        stacked: false,
+                        gridLines: {display:false},
+                        ticks: {beginAtZero: true,display: true, fontSize: 8, stepSize: 5}
+                    }],
+                    yAxes: [{
+                        stacked: false,
+                        ticks: {beginAtZero: true, display: true, fontSize: 9},
+                        gridLines: {display:false},
+                        barPercentage: 8,
+                        categorySpacing: 1
+                    }],
+                    display: false
+                },
+                legend: {
+                    display: false
+                },
+                tooltips: {
+                    mode: 'single',
+                    bodyFontSize: 9,
+                    bodySpacing: 0,
+                    callbacks: {
+                        title: function(tooltipItems, data) {
+                            // Title doesn't make sense for scatter since we format the data as a point
+                            return '';
+                        },
+                        label: function(tooltipItem, data) {
+                            return  tooltipItem.xLabel + ': ' + tooltipItem.yLabel;
+                        }
+                    }
+
                 }
             }
         });
@@ -3389,13 +3456,25 @@ var Mautic = {
         }
     },
 
-    froalaEmptyContent: '<!DOCTYPE html><html><head><title></title></head><body></body></html>',
-
+    /**
+     * Initialize theme selection
+     *
+     * @param themeField
+     */
     intiSelectTheme: function(themeField) {
         var customHtml = mQuery('textarea.builder-html');
+        var isNew = Mautic.isNewEntity('#page_sessionId, #emailform_sessionId');
+        Mautic.showChangeThemeWarning = true;
+
+        if (isNew) {
+            Mautic.showChangeThemeWarning = false;
+        }
+
         if (customHtml.length) {
 
-            if (!customHtml.val().length || customHtml.val() === Mautic.froalaEmptyContent) {
+            var emptyFroalaContent = '<!DOCTYPE html><html><head><title></title></head><body></body></html>';
+
+            if (!customHtml.val().length || customHtml.val() === emptyFroalaContent) {
                 Mautic.setThemeHtml(themeField.val());
             }
 
@@ -3403,9 +3482,10 @@ var Mautic = {
                 e.preventDefault();
                 var currentLink = mQuery(this);
 
-                if (customHtml.val().length && customHtml.val() !== Mautic.froalaEmptyContent) {
+                if (Mautic.showChangeThemeWarning && customHtml.val().length) {
                     if (confirm('You will lose the current content if you switch the theme.')) {
                         customHtml.val('');
+                        Mautic.showChangeThemeWarning = false;
                     } else {
                         return;
                     }
@@ -3417,7 +3497,7 @@ var Mautic = {
                 // Load the theme HTML to the source textarea
                 Mautic.setThemeHtml(currentLink.attr('data-theme'));
 
-                // Manipulate classes to achieve the theme selection illustion
+                // Manipulate classes to achieve the theme selection illusion
                 mQuery('.theme-list .panel').removeClass('theme-selected');
                 currentLink.closest('.panel').addClass('theme-selected');
                 mQuery('.theme-list .select-theme-selected').addClass('hide');
@@ -3428,11 +3508,109 @@ var Mautic = {
         }
     },
 
+    /**
+     * Set theme's HTML
+     *
+     * @param theme
+     */
     setThemeHtml: function(theme) {
         mQuery.get(mQuery('#builder_url').val()+'?template=' + theme, function(themeHtml) {
             var textarea = mQuery('textarea.builder-html');
             textarea.val(themeHtml);
             textarea.froalaEditor('html.set', themeHtml);
         });
+    },
+
+    /**
+     * Initialize form field visibility switcher
+     *
+     * @param formName
+     */
+    initializeFormFieldVisibilitySwitcher: function (formName)
+    {
+        Mautic.switchFormFieldVisibilty(formName);
+
+        mQuery('form[name="'+formName+'"]').change(function() {
+            Mautic.switchFormFieldVisibilty(formName);
+        });
+    },
+
+    /**
+     * Switch form field visibility based on selected values
+     */
+    switchFormFieldVisibilty: function (formName) {
+        var form   = mQuery('form[name="'+formName+'"]');
+        var fields = {};
+
+        // find all fields to show
+        form.find('[data-show-on]').each(function(index, el) {
+            var field = mQuery(el);
+            var showOn = jQuery.parseJSON(field.attr('data-show-on'));
+
+            mQuery.each(showOn, function(fieldId, condition) {
+                if (typeof fields[field.attr('id')] == 'undefined' || fields[field.attr('id')] !== true) {
+                    if (mQuery('#' + fieldId).is(':checkbox') || mQuery('#' + fieldId).is(':radio')) {
+                        if ((condition == 'checked' && mQuery('#' + fieldId).is(':checked')) || (condition == '' && !mQuery('#' + fieldId).is(':checked'))) {
+                            fields[field.attr('id')] = true;
+                        } else {
+                            fields[field.attr('id')] = false;
+                        }
+                    } else {
+                        var sourceFieldVal = mQuery('#' + fieldId).val();
+                        if (mQuery.inArray(sourceFieldVal, condition) === -1) {
+                            fields[field.attr('id')] = false;
+                        } else {
+                            fields[field.attr('id')] = true;
+                        }
+                    }
+                }
+            });
+        });
+
+        // find all fields to hide
+        form.find('[data-hide-on]').each(function(index, el) {
+            var field  = mQuery(el);
+            var hideOn = jQuery.parseJSON(field.attr('data-hide-on'));
+            mQuery.each(hideOn, function(fieldId, condition) {
+                if (mQuery('#' + fieldId).is(':checkbox') || mQuery('#' + fieldId).is(':radio')) {
+                    if ((condition == 'checked' && mQuery('#' + fieldId).is(':checked')) || (condition == '' && !mQuery('#' + fieldId).is(':checked'))) {
+                        fields[field.attr('id')] = false;
+                    } else {
+                        fields[field.attr('id')] = true;
+                    }
+                } else {
+                    var sourceFieldVal = mQuery('#' + fieldId).val();
+                    if (mQuery.inArray(sourceFieldVal, condition) !== -1) {
+                        fields[field.attr('id')] = false;
+                    } else if (typeof fields[field.attr('id')] == 'undefined') {
+                        fields[field.attr('id')] = true;
+                    }
+                }
+            });
+        });
+
+        // show/hide according to conditions
+        mQuery.each(fields, function(fieldId, show) {
+            var fieldContainer = mQuery('#' + fieldId).closest('[class*="col-"]');;
+            if (show) {
+                fieldContainer.fadeIn();
+            } else {
+                fieldContainer.fadeOut();
+            }
+        });
+    },
+
+
+    /**
+     * Check if the the entity ID is temporary (for new entities)
+     *
+     * @param string idInputSelector
+     */
+    isNewEntity: function(idInputSelector) {
+        id = mQuery(idInputSelector);
+        if (id.length) {
+            return id.val().match("^new_");
+        }
+        return null;
     }
 };

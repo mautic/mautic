@@ -77,6 +77,11 @@ class EventModel extends CommonFormModel
     protected $logger;
 
     /**
+     * @var mixed
+     */
+    protected $scheduleTimeForFailedEvents;
+
+    /**
      * @var MauticFactory
      */
     protected $factory;
@@ -92,12 +97,13 @@ class EventModel extends CommonFormModel
      */
     public function __construct(IpLookupHelper $ipLookupHelper, CoreParametersHelper $coreParametersHelper, LeadModel $leadModel, CampaignModel $campaignModel, MauticFactory $factory)
     {
-        $this->ipLookupHelper         = $ipLookupHelper;
-        $this->leadModel              = $leadModel;
-        $this->campaignModel          = $campaignModel;
-        $this->batchSleepTime         = $coreParametersHelper->getParameter('mautic.batch_sleep_time');
-        $this->batchCampaignSleepTime = $coreParametersHelper->getParameter('mautic.batch_campaign_sleep_time');
-        $this->factory                = $factory;
+        $this->ipLookupHelper              = $ipLookupHelper;
+        $this->leadModel                   = $leadModel;
+        $this->campaignModel               = $campaignModel;
+        $this->batchSleepTime              = $coreParametersHelper->getParameter('mautic.batch_sleep_time');
+        $this->batchCampaignSleepTime      = $coreParametersHelper->getParameter('mautic.batch_campaign_sleep_time');
+        $this->scheduleTimeForFailedEvents = $coreParametersHelper->getParameter('campaign_time_wait_on_event_false');
+        $this->factory                     = $factory;
     }
 
     /**
@@ -220,17 +226,18 @@ class EventModel extends CommonFormModel
     /**
      * Triggers an event
      *
-     * @param       $type
-     * @param mixed $eventDetails
-     * @param mixed $typeId
+     * @param      $type
+     * @param null $eventDetails
+     * @param null $channel
+     * @param null $channelId
      *
-     * @return bool|mixed
+     * @return array|bool
      */
-    public function triggerEvent($type, $eventDetails = null, $typeId = null)
+    public function triggerEvent($type, $eventDetails = null, $channel = null, $channelId = null)
     {
         static $leadCampaigns = array(), $eventList = array(), $availableEventSettings = array(), $leadsEvents = array(), $examinedEvents = array();
 
-        $this->logger->debug('CAMPAIGN: Campaign triggered for event type '.$type.'('.$typeId.')');
+        $this->logger->debug('CAMPAIGN: Campaign triggered for event type '.$type.'('.$channel.' / '.$channelId.')');
 
         // Skip the anonymous check to force actions to fire for subsequent triggers
         $systemTriggered = defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED');
@@ -399,9 +406,10 @@ class EventModel extends CommonFormModel
                         $this->logger->debug('CAMPAIGN: Decision ID# '.$event['id'].' successfully executed and logged.');
 
                         //a child of this event was triggered or scheduled so make not of the triggering event in the log
-                        $this->getRepository()->saveEntity(
-                            $this->getLogEntity($event['id'], $campaigns[$campaignId], $lead, null, $systemTriggered)
-                        );
+                        $log = $this->getLogEntity($event['id'], $campaigns[$campaignId], $lead, null, $systemTriggered);
+                        $log->setChannel($channel)
+                            ->setChannelId($channelId);
+                        $this->getRepository()->saveEntity($log);
                     } else {
                         $this->logger->debug('CAMPAIGN: Decision not logged');
                     }
@@ -645,6 +653,7 @@ class EventModel extends CommonFormModel
                                         false,
                                         null,
                                         null,
+                                        false,
                                         $evaluatedEventCount,
                                         $executedEventCount,
                                         $totalEventCount
@@ -755,9 +764,6 @@ class EventModel extends CommonFormModel
         &$executedEventCount = 0,
         &$totalEventCount = 0
     ) {
-
-        $eventWaitTimeOnResponseFalse =  $this->factory->getParameter('campaign_time_wait_on_event_false');
-
         $evaluatedEventCount++;
         $totalEventCount++;
 
@@ -772,7 +778,7 @@ class EventModel extends CommonFormModel
             $parentTriggeredDate = new \DateTime();
         }
 
-        $repo   = $this->getRepository();
+        $repo = $this->getRepository();
 
         if (isset($eventSettings[$event['eventType']][$event['type']])) {
             $thisEventSettings = $eventSettings[$event['eventType']][$event['type']];
@@ -831,16 +837,16 @@ class EventModel extends CommonFormModel
         if ($eventTriggerDate instanceof \DateTime) {
             $executedEventCount++;
 
-            //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
-            $this->logger->debug(
-                'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
-                .' has timing that is not appropriate and thus scheduled for '
-                .$eventTriggerDate->format('Y-m-d H:m:i T')
-            );
-
             $log->setIsScheduled(true);
             $log->setTriggerDate($eventTriggerDate);
             $repo->saveEntity($log);
+
+
+            //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
+            $this->logger->debug(
+                'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
+                .' has timing that is not appropriate and thus scheduled for '.$eventTriggerDate->format('Y-m-d H:m:i T')
+            );
 
             if ($this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_SCHEDULED)) {
                 $args = array(
@@ -857,14 +863,20 @@ class EventModel extends CommonFormModel
                 unset($scheduledEvent, $args);
             }
         } elseif ($eventTriggerDate) {
-            $wasScheduled = $log->getIsScheduled();
+            // If log already existed, assume it was scheduled in order to not force
+            // Doctrine to do a query to fetch the information
+            $wasScheduled = (!$logExists) ? $log->getIsScheduled() : true;
 
             $log->setIsScheduled(false);
-            $log->setTriggerDate(null);
             $log->setDateTriggered(new \DateTime());
 
             try {
+                // Save before executing event to ensure it's not picked up again
                 $repo->saveEntity($log);
+                $this->logger->debug(
+                    'CAMPAIGN: Created log for '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
+                    .' prior to execution.'
+                );
             } catch (EntityNotFoundException $exception) {
                 // The lead has been likely removed from this lead/list
                 $this->logger->debug(
@@ -897,15 +909,12 @@ class EventModel extends CommonFormModel
                 );
             } elseif ($response === false && $event['eventType'] == 'action') {
                 $result = false;
+                $debug = 'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId().' failed with a response of '.var_export($response, true);
 
                 // Something failed
-                if ($wasScheduled) {
-
+                if ($wasScheduled || !empty($this->scheduleTimeForFailedEvents)) {
                     $date = new \DateTime();
-
-                    if ($eventWaitTimeOnResponseFalse != '' && $eventWaitTimeOnResponseFalse != null) {
-                        $date->add(new \DateInterval($eventWaitTimeOnResponseFalse));
-                    }
+                    $date->add(new \DateInterval($this->scheduleTimeForFailedEvents));
 
                     // Reschedule
                     $log->setIsScheduled(true);
@@ -913,14 +922,14 @@ class EventModel extends CommonFormModel
                     $log->setDateTriggered(null);
 
                     $repo->saveEntity($log);
+                    $debug .= ' thus placed on hold '.$this->scheduleTimeForFailedEvents;
                 } else {
                     // Remove
+                    $debug .= ' thus deleted';
                     $repo->deleteEntity($log);
                 }
 
-                $this->logger->debug(
-                    'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId().' failed with a response of '
-                    .var_export($response, true) . " placed on hold ".$eventWaitTimeOnResponseFalse );
+                $this->logger->debug($debug);
             } else {
                 $executedEventCount++;
 
@@ -928,15 +937,15 @@ class EventModel extends CommonFormModel
                     if ($this->triggeredResponses !== false) {
                         $eventTypeKey = $event['eventType'];
                         $typeKey      = $event['type'];
-                        
+
                         if (!array_key_exists($eventTypeKey, $this->triggeredResponses) || !is_array($this->triggeredResponses[$eventTypeKey])) {
                             $this->triggeredResponses[$eventTypeKey] = [];
                         }
-                        
+
                         if (!array_key_exists($typeKey, $this->triggeredResponses[$eventTypeKey]) || !is_array($this->triggeredResponses[$eventTypeKey][$typeKey])) {
                             $this->triggeredResponses[$eventTypeKey][$typeKey] = [];
                         }
-                        
+
                         $this->triggeredResponses[$eventTypeKey][$typeKey][$event['id']] = $response;
                     }
 

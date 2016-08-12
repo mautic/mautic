@@ -25,13 +25,14 @@ $view['slots']->set("headerTitle", $header);
     <div class="col-md-9 bg-auto height-auto bdr-r">
 		<div class="pa-md">
 			<div class="form-group mb-0">
-			    <label class="control-label mb-xs"><?php echo $view['translator']->trans('mautic.core.name'); ?></label>
 			    <div class="row">
                     <div class="col-sm-6<?php echo (count($form['firstName']->vars['errors'])) ? ' has-error' : ''; ?>">
+                    	<label class="control-label mb-xs"><?php echo $view['form']->label($form['firstName']); ?></label>
 			            <?php echo $view['form']->widget($form['firstName'], array('attr' => array('placeholder' => $form['firstName']->vars['label']))); ?>
                         <?php echo $view['form']->errors($form['firstName']); ?>
 			        </div>
                     <div class="col-sm-6<?php echo (count($form['lastName']->vars['errors'])) ? ' has-error' : ''; ?>">
+                        <label class="control-label mb-xs"><?php echo $view['form']->label($form['lastName']); ?></label>
 			            <?php echo $view['form']->widget($form['lastName'], array('attr' => array('placeholder' => $form['lastName']->vars['label']))); ?>
                         <?php echo $view['form']->errors($form['lastName']); ?>
 			        </div>

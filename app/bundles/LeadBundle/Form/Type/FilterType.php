@@ -109,7 +109,7 @@ class FilterType extends AbstractType
                     $customOptions['multiple'] = true;
                     $type                      = 'choice';
                     break;
-                case 'lead_email_read':
+                case 'lead_email_received':
                     if (!isset($data['filter'])) {
                         $data['filter'] = array();
                     } elseif (!is_array($data['filter'])) {
@@ -232,7 +232,10 @@ class FilterType extends AbstractType
                     }
 
                     if ($fieldType == 'select') {
-                        array_unshift($choices, array('' => ''));
+                        // array_unshift cannot be used because numeric values get lost as keys
+                        $choices = array_reverse($choices, true);
+                        $choices[''] = '';
+                        $choices = array_reverse($choices, true);
                     }
 
                     $customOptions['choices'] = $choices;

@@ -12,6 +12,7 @@ namespace Mautic\FormBundle\Entity;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\FormBundle\Entity\Form;
 
 /**
  * FormRepository
@@ -188,6 +189,56 @@ class FormRepository extends CommonRepository
             $expr,
             $parameters
         );
+    }
+
+    /**
+     * Fetch the form results
+     *
+     * @param Form $form
+     * @param array $options
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getFormResults(Form $form, array $options = array())
+    {
+        $query = $this->_em->getConnection()->createQueryBuilder();
+
+        $query->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs')
+            ->select('fr.*')
+            ->leftJoin('fs', $this->getResultsTableName($form->getId(), $form->getAlias()), 'fr', 'fr.submission_id = fs.id')
+            ->where('fs.form_id = :formId')
+            ->setParameter('formId', $form->getId());
+
+
+        if (!empty($options['leadId'])) {
+            $query->andWhere('fs.lead_id = ' . (int) $options['leadId']);
+        }
+
+        if (!empty($options['formId'])) {
+            $query->andWhere($query->expr()->eq('fs.form_id', ':id'))
+            ->setParameter('id', $options['formId']);
+        }
+
+        if (!empty($options['limit'])) {
+            $query->setMaxResults((int) $options['limit']);
+        }
+
+        return $query->execute()->fetchAll();
+    }
+
+    /**
+     * Compile and return the form result table name
+     *
+     * @param  integer $formId
+     * @param  string  $formAlias
+     *
+     * @return string
+     */
+    public function getResultsTableName($formId, $formAlias)
+    {
+        return MAUTIC_TABLE_PREFIX . 'form_results_' . $formId . '_' . $formAlias;
     }
 
     /**

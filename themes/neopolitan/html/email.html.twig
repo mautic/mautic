@@ -3,6 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{subject}</title>
     <!-- Designed by https://github.com/kaytcat -->
     <!-- Robot header image designed by Freepik.com -->
 
@@ -115,7 +116,7 @@
                 <td style="font-family: 'Droid Sans', 'Helvetica Neue', 'Arial', 'sans-serif' !important;font-weight: 400;text-align: center;" data-slot-container>
                     <br>
                     <div data-slot="image">
-                        <img src="{{ getAssetUrl('themes/neopolitan/img/robomail.gif', null, null, true) }}" width="224" height="240" alt="robot picture">
+                        <img src="{{ getAssetUrl('themes/'~template~'/img/robomail.gif', null, null, true) }}" width="224" height="240" alt="robot picture">
                     </div>
                 </td>
             </tr>
@@ -249,9 +250,9 @@
                     <div data-slot="text">
                         <br>
                         <br>
-                        <img src="{{ getAssetUrl('themes/neopolitan/img/gplus.gif', null, null, true) }}" alt="google+">
-                        <img src="{{ getAssetUrl('themes/neopolitan/img/facebook.gif', null, null, true) }}" alt="facebook">
-                        <img src="{{ getAssetUrl('themes/neopolitan/img/twitter.gif', null, null, true) }}" alt="twitter">
+                        <img src="{{ getAssetUrl('themes/'~template~'/img/gplus.gif', null, null, true) }}" alt="google+">
+                        <img src="{{ getAssetUrl('themes/'~template~'/img/facebook.gif', null, null, true) }}" alt="facebook">
+                        <img src="{{ getAssetUrl('themes/'~template~'/img/twitter.gif', null, null, true) }}" alt="twitter">
                         <br>
                         <br>
                     </div>

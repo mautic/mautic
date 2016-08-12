@@ -74,6 +74,11 @@ class IndexSchemaHelper
         $this->sm     = $this->db->getSchemaManager();
     }
 
+    /**
+     * @param $name
+     *
+     * @throws SchemaException
+     */
     public function setName($name)
     {
         if (!$this->sm->tablesExist($this->prefix.$name)) {
@@ -138,12 +143,13 @@ class IndexSchemaHelper
     {
         $platform = $this->sm->getDatabasePlatform();
 
-        $sql = array();
+        $sql = [];
         if (count($this->changedIndexes)) {
             foreach ($this->changedIndexes as $index) {
                 $sql[] = $platform->getDropIndexSQL($index);
                 $sql[] = $platform->getCreateIndexSQL($index, $this->table);
             }
+
         }
 
         if (count($this->dropIndexes)) {
@@ -162,6 +168,9 @@ class IndexSchemaHelper
             foreach ($sql as $query) {
                 $this->db->executeUpdate($query);
             }
+            $this->changedIndexes = [];
+            $this->dropIndexes    = [];
+            $this->addedIndexes   = [];
         }
     }
 }

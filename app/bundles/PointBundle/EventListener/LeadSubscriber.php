@@ -10,29 +10,49 @@
 namespace Mautic\PointBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\PointBundle\Model\TriggerModel;
 
 /**
  * Class LeadSubscriber
  */
 class LeadSubscriber extends CommonSubscriber
 {
+    /**
+     * @var TriggerModel
+     */
+    protected $triggerModel;
+
+    /**
+     * LeadSubscriber constructor.
+     *
+     * @param MauticFactory $factory
+     * @param TriggerModel  $triggerModel
+     */
+    public function __construct(MauticFactory $factory, TriggerModel $triggerModel)
+    {
+        parent::__construct($factory);
+
+        $this->triggerModel = $triggerModel;
+    }
 
     /**
      * {@inheritdoc}
      */
     static public function getSubscribedEvents()
     {
-        return array(
-            LeadEvents::LEAD_POINTS_CHANGE   => array('onLeadPointsChange', 0),
-            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
-            LeadEvents::LEAD_POST_MERGE      => array('onLeadMerge', 0),
-            LeadEvents::LEAD_POST_SAVE       => array('onLeadSave', -1)
-        );
+        return [
+            LeadEvents::LEAD_POINTS_CHANGE   => ['onLeadPointsChange', 0],
+            LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
+            LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
+            LeadEvents::LEAD_POST_SAVE       => ['onLeadSave', -1],
+        ];
     }
 
     /**
@@ -42,9 +62,7 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadPointsChange(PointsChangeEvent $event)
     {
-        /** @var \Mautic\PointBundle\Model\TriggerModel */
-        $model = $this->factory->getModel('point.trigger');
-        $model->triggerEvents($event->getLead());
+        $this->triggerModel->triggerEvents($event->getLead());
     }
 
     /**
@@ -55,9 +73,7 @@ class LeadSubscriber extends CommonSubscriber
     public function onLeadSave(LeadEvent $event)
     {
         if ($event->isNew()) {
-            /** @var \Mautic\PointBundle\Model\TriggerModel */
-            $model = $this->factory->getModel('point.trigger');
-            $model->triggerEvents($event->getLead());
+            $this->triggerModel->triggerEvents($event->getLead());
         }
     }
 
@@ -69,43 +85,40 @@ class LeadSubscriber extends CommonSubscriber
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         // Set available event types
-        $eventTypeKey = 'point.gained';
+        $eventTypeKey  = 'point.gained';
         $eventTypeName = $this->translator->trans('mautic.point.event.gained');
         $event->addEventType($eventTypeKey, $eventTypeName);
 
-        $filters = $event->getEventFilters();
-
         if (!$event->isApplicable($eventTypeKey)) {
+
             return;
         }
 
-        $lead    = $event->getLead();
-        $options = array('ipIds' => array(), 'filters' => $filters);
-
-        /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
-        /*
-        foreach ($lead->getIpAddresses() as $ip) {
-            $options['ipIds'][] = $ip->getId();
-        }
-        */
+        $lead = $event->getLead();
 
         /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
-        $logRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');
+        $logRepository = $this->em->getRepository('MauticLeadBundle:PointsChangeLog');
+        $logs          = $logRepository->getLeadTimelineEvents($lead->getId(), $event->getQueryOptions());
 
-        $logs = $logRepository->getLeadTimelineEvents($lead->getId(), $options);
+        // Add to counter
+        $event->addToCounter($eventTypeKey, $logs);
 
-        // Add the logs to the event array
-        foreach ($logs as $log) {
-            $event->addEvent(array(
-                'event'           => $eventTypeKey,
-                'eventLabel'      => $eventTypeName,
-                'timestamp'       => $log['dateAdded'],
-                'extra'           => array(
-                    'log'           => $log
-                ),
-                'contentTemplate' => 'MauticPointBundle:SubscribedEvents\Timeline:index.html.php',
-                'icon'            => 'fa-calculator'
-            ));
+        if (!$event->isEngagementCount()) {
+            // Add the logs to the event array
+            foreach ($logs['results'] as $log) {
+                $event->addEvent(
+                    [
+                        'event'      => $eventTypeKey,
+                        'eventLabel' => $log['eventName'].' / '.$log['delta'],
+                        'eventType'  => $eventTypeName,
+                        'timestamp'  => $log['dateAdded'],
+                        'extra'      => [
+                            'log' => $log,
+                        ],
+                        'icon'       => 'fa-calculator'
+                    ]
+                );
+            }
         }
     }
 
@@ -114,13 +127,12 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadMerge(LeadMergeEvent $event)
     {
-        $em = $this->factory->getEntityManager();
-        $em->getRepository('MauticPointBundle:LeadPointLog')->updateLead(
+        $this->em->getRepository('MauticPointBundle:LeadPointLog')->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
 
-        $em->getRepository('MauticPointBundle:LeadTriggerLog')->updateLead(
+        $this->em->getRepository('MauticPointBundle:LeadTriggerLog')->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
