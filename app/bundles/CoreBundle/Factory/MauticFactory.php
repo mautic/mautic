@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 
 /**
  * Mautic's Factory
- * 
+ *
  * @deprecated 2.0 to be removed in 3.0
  */
 class MauticFactory
@@ -45,7 +45,7 @@ class MauticFactory
      * @var
      */
     private $entityManager = null;
-    
+
     /**
      * @param ContainerInterface $container
      */
@@ -60,31 +60,12 @@ class MauticFactory
      * @param $modelNameKey
      *
      * @return AbstractCommonModel
-     * 
+     *
      * @throws \InvalidArgumentException
      */
     public function getModel($modelNameKey)
     {
-        // Shortcut for models with the same name as the bundle
-        if (strpos($modelNameKey, '.') === false) {
-            $modelNameKey = "$modelNameKey.$modelNameKey";
-        }
-
-        $parts = explode('.', $modelNameKey);
-
-        if (count($parts) !== 2) {
-            throw new \InvalidArgumentException($modelNameKey . " is not a valid model key.");
-        }
-
-        list($bundle, $name) = $parts;
-
-        $containerKey = str_replace(array('%bundle%', '%name%'), array($bundle, $name), 'mautic.%bundle%.model.%name%');
-
-        if ($this->container->has($containerKey)) {
-            return $this->container->get($containerKey);
-        }
-        
-        throw new \InvalidArgumentException($containerKey . ' is not a registered container key.');
+        return $this->container->get('mautic.model.factory')->getModel($modelNameKey);
     }
 
     /**
