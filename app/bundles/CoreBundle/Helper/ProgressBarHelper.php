@@ -22,7 +22,7 @@ class ProgressBarHelper
      * @param OutputInterface $output
      * @param int             $maxCount
      *
-     + @return ProgressBar
+     * @return ProgressBar
      */
     public static function init(OutputInterface $output, $maxCount = 0)
     {
