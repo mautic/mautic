@@ -9,6 +9,8 @@
 
 namespace Mautic\LeadBundle\Helper;
 
+use Symfony\Component\Form\Extension\Core\Type\LocaleType;
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class FormFieldHelper
@@ -17,79 +19,82 @@ class FormFieldHelper
     /**
      * @var array
      */
-    static private $types = array(
-        'text'     => array(
-            'properties' => array()
-        ),
-        'textarea'     => array(
-            'properties' => array()
-        ),
-        'select'   => array(
-            'properties' => array(
-                'list' => array(
+    static private $types = [
+        'text'     => [
+            'properties' => []
+        ],
+        'textarea' => [
+            'properties' => []
+        ],
+        'select'   => [
+            'properties' => [
+                'list' => [
                     'required'  => true,
                     'error_msg' => 'mautic.lead.field.select.listmissing'
-                )
-            )
-        ),
-        'boolean'  => array(
-            'properties' => array(
-                'yes' => array(
+                ]
+            ]
+        ],
+        'boolean'  => [
+            'properties' => [
+                'yes' => [
                     'required'  => true,
                     'error_msg' => 'mautic.lead.field.boolean.yesmissing'
-                ),
-                'no'  => array(
+                ],
+                'no'  => [
                     'required'  => true,
                     'error_msg' => 'mautic.lead.field.boolean.nomissing'
-                )
-            )
-        ),
-        'lookup'   => array(
-            'properties' => array(
-                'list' => array()
-            )
-        ),
-        'date'     => array(
-            'properties' => array(
-                'format' => array()
-            )
-        ),
-        'datetime' => array(
-            'properties' => array(
-                'format' => array()
-            )
-        ),
-        'time'     => array(
-            'properties' => array()
-        ),
-        'timezone' => array(
-            'properties' => array()
-        ),
-        'email'    => array(
-            'properties' => array()
-        ),
-        'number'   => array(
-            'properties' => array(
-                'roundmode' => array(),
-                'precision' => array()
-            )
-        ),
-        'tel'      => array(
-            'properties' => array()
-        ),
-        'url'      => array(
-            'properties' => array()
-        ),
-        'country'  => array(
-            'properties' => array()
-        ),
-        'region'   => array(
-            'properties' => array()
-        ),
-        'timezone' => array(
-            'properties' => array()
-        )
-    );
+                ]
+            ]
+        ],
+        'lookup'   => [
+            'properties' => [
+                'list' => []
+            ]
+        ],
+        'date'     => [
+            'properties' => [
+                'format' => []
+            ]
+        ],
+        'datetime' => [
+            'properties' => [
+                'format' => []
+            ]
+        ],
+        'time'     => [
+            'properties' => []
+        ],
+        'timezone' => [
+            'properties' => []
+        ],
+        'email'    => [
+            'properties' => []
+        ],
+        'number'   => [
+            'properties' => [
+                'roundmode' => [],
+                'precision' => []
+            ]
+        ],
+        'tel'      => [
+            'properties' => []
+        ],
+        'url'      => [
+            'properties' => []
+        ],
+        'country'  => [
+            'properties' => []
+        ],
+        'region'   => [
+            'properties' => []
+        ],
+        'timezone' => [
+            'properties' => []
+        ],
+        'locale'   => [
+            'properties' => []
+        ]
+    ];
 
     private $translator;
 
@@ -98,7 +103,7 @@ class FormFieldHelper
      *
      * @param TranslatorInterface $translator
      */
-    public function setTranslator (TranslatorInterface $translator)
+    public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
@@ -106,9 +111,9 @@ class FormFieldHelper
     /**
      * @return array
      */
-    public function getChoiceList ()
+    public function getChoiceList()
     {
-        $choices = array();
+        $choices = [];
         foreach (self::$types as $v => $type) {
             $choices[$v] = $this->translator->transConditional("mautic.core.type.{$v}", "mautic.lead.field.type.{$v}");
         }
@@ -123,11 +128,11 @@ class FormFieldHelper
      *
      * @return bool
      */
-    static public function validateProperties ($type, &$properties)
+    static public function validateProperties($type, &$properties)
     {
         if (!array_key_exists($type, self::$types)) {
             //ensure the field type is supported
-            return array(false, 'mautic.lead.field.typenotrecognized');
+            return [false, 'mautic.lead.field.typenotrecognized'];
         }
 
         $fieldType = self::$types[$type];
@@ -138,19 +143,19 @@ class FormFieldHelper
 
             if (!empty($fieldType['properties'][$key]['required']) && empty($value)) {
                 //ensure requirements are met
-                return array(false, $fieldType['properties'][$key]['error_msg']);
+                return [false, $fieldType['properties'][$key]['error_msg']];
             }
         }
 
-        return array(true, '');
+        return [true, ''];
     }
 
     /**
      * @return array
      */
-    static public function getCountryChoices ()
+    static public function getCountryChoices()
     {
-        $countryJson = file_get_contents(__DIR__ . '/../../CoreBundle/Assets/json/countries.json');
+        $countryJson = file_get_contents(__DIR__.'/../../CoreBundle/Assets/json/countries.json');
         $countries   = json_decode($countryJson);
 
         $choices = array_combine($countries, $countries);
@@ -161,12 +166,12 @@ class FormFieldHelper
     /**
      * @return array
      */
-    static public function getRegionChoices ()
+    static public function getRegionChoices()
     {
-        $regionJson = file_get_contents(__DIR__ . '/../../CoreBundle/Assets/json/regions.json');
+        $regionJson = file_get_contents(__DIR__.'/../../CoreBundle/Assets/json/regions.json');
         $regions    = json_decode($regionJson);
 
-        $choices = array();
+        $choices = [];
         foreach ($regions as $country => &$regionGroup) {
             $choices[$country] = array_combine($regionGroup, $regionGroup);
         }
@@ -175,13 +180,46 @@ class FormFieldHelper
     }
 
     /**
+     * Symfony deprecated and changed Symfony\Component\Form\Extension\Core\Type\TimezoneType::getTimezones to private
+     * in 3.0 - so duplicated code here
+     *
      * @return array
      */
-    static public function getTimezonesChoices ()
+    static public function getTimezonesChoices()
     {
-        $tz        = new \Symfony\Component\Form\Extension\Core\Type\TimezoneType();
-        $timezones = $tz->getTimezones();
+        static $timezones;
+
+        if (null === $timezones) {
+            $timezones = [];
+
+            foreach (\DateTimeZone::listIdentifiers() as $timezone) {
+                $parts = explode('/', $timezone);
+
+                if (count($parts) > 2) {
+                    $region = $parts[0];
+                    $name   = $parts[1].' - '.$parts[2];
+                } elseif (count($parts) > 1) {
+                    $region = $parts[0];
+                    $name   = $parts[1];
+                } else {
+                    $region = 'Other';
+                    $name   = $parts[0];
+                }
+
+                $timezones[$region][str_replace('_', ' ', $name)] = $timezone;
+            }
+        }
 
         return $timezones;
+    }
+
+    /**
+     * Get locale choices
+     *
+     * @return array
+     */
+    static function getLocaleChoices()
+    {
+        return Intl::getLocaleBundle()->getLocaleNames();
     }
 }

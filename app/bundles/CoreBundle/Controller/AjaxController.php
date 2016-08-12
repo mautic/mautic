@@ -234,11 +234,8 @@ class AjaxController extends CommonController
     {
         $dataArray = array('success' => 0);
         $name      = InputHelper::clean($request->request->get('model'));
-        if (strpos($name, '.') === false) {
-            $name = "$name.$name";
-        }
-        $id    = InputHelper::int($request->request->get('id'));
-        $model = $this->getModel($name);
+        $id        = InputHelper::int($request->request->get('id'));
+        $model     = $this->getModel($name);
 
         $post = $request->request->all();
         unset($post['model'], $post['id'], $post['action']);
@@ -671,21 +668,6 @@ class AjaxController extends CommonController
 
             $model->setOnlineStatus($status);
         }
-
-        return $this->sendJsonResponse(array('success' => 1));
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
-    protected function markNotificationsReadAction(Request $request)
-    {
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model = $this->getModel('core.notification');
-
-        $model->markAllRead();
 
         return $this->sendJsonResponse(array('success' => 1));
     }

@@ -13,6 +13,10 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\TranslationModelTrait;
+use Mautic\CoreBundle\Model\VariantModelTrait;
+use Mautic\LeadBundle\Entity\LeadDevice;
+use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
@@ -28,12 +32,14 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use DeviceDetector\DeviceDetector;
 
 /**
  * Class EmailModel
@@ -42,6 +48,9 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class EmailModel extends FormModel
 {
+    use VariantModelTrait;
+    use TranslationModelTrait;
+
     /**
      * @var IpLookupHelper
      */
@@ -78,6 +87,16 @@ class EmailModel extends FormModel
     protected $userModel;
 
     /**
+     * @var Mixed
+     */
+    protected $coreParameters;
+
+    /**
+     * @var bool
+     */
+    protected $updatingTranslationChildren = false;
+
+    /**
      * EmailModel constructor.
      *
      * @param IpLookupHelper $ipLookupHelper
@@ -95,7 +114,8 @@ class EmailModel extends FormModel
         MailHelper $mailHelper,
         LeadModel $leadModel,
         TrackableModel $pageTrackableModel,
-        UserModel $userModel
+        UserModel $userModel,
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->ipLookupHelper     = $ipLookupHelper;
         $this->themeHelper        = $themeHelper;
@@ -104,6 +124,7 @@ class EmailModel extends FormModel
         $this->leadModel          = $leadModel;
         $this->pageTrackableModel = $pageTrackableModel;
         $this->userModel          = $userModel;
+        $this->coreParameters    = $coreParametersHelper;
     }
 
     /**
@@ -133,6 +154,15 @@ class EmailModel extends FormModel
     }
 
     /**
+    * @return \Mautic\EmailBundle\Entity\StatDeviceRepository
+    */
+    public function getStatDeviceRepository()
+    {
+        return $this->em->getRepository('MauticEmailBundle:StatDevice');
+    }
+
+
+    /**
      * {@inheritdoc}
      */
     public function getPermissionBase()
@@ -150,8 +180,6 @@ class EmailModel extends FormModel
      */
     public function saveEntity($entity, $unlock = true)
     {
-        $now = new DateTimeHelper();
-
         $type = $entity->getEmailType();
         if (empty($type)) {
             // Just in case JS failed
@@ -163,63 +191,50 @@ class EmailModel extends FormModel
             $entity->setIsPublished(true);
             $entity->setPublishDown(null);
             $entity->setPublishUp(null);
+
+
+            // Ensure that this email has the same lists assigned as the translated parent if applicable
+            /** @var Email $translationParent */
+            if ($translationParent = $entity->getTranslationParent()) {
+                $parentLists  = $translationParent->getLists()->toArray();
+                $entity->setLists($parentLists);
+            }
         }
 
-        //set the author for new pages
-        if (!$entity->isNew()) {
-            //increase the revision
-            $revision = $entity->getRevision();
-            $revision++;
-            $entity->setRevision($revision);
-        }
-
-        // Ensure links in template content don't have encoded ampersands
-        if ($entity->getTemplate()) {
-            $content = $entity->getContent();
-
-            foreach ($content as $key => $value) {
-                $content[$key] = $this->cleanUrlsInContent($value);
+        if (!$this->updatingTranslationChildren) {
+            if (!$entity->isNew()) {
+                //increase the revision
+                $revision = $entity->getRevision();
+                $revision++;
+                $entity->setRevision($revision);
             }
 
-            $entity->setContent($content);
+            // Reset a/b test if applicable
+            if ($isVariant = $entity->isVariant()) {
+                $variantStartDate = new \DateTime();
+                $resetVariants    = $this->preVariantSaveEntity($entity, ['setVariantSentCount', 'setVariantReadCount'], $variantStartDate);
+            }
+
+            parent::saveEntity($entity, $unlock);
+
+            if ($isVariant) {
+                $emailIds = $entity->getRelatedEntityIds();
+                $this->postVariantSaveEntity($entity, $resetVariants, $emailIds, $variantStartDate);
+            }
+
+            $this->postTranslationEntitySave($entity);
+
+            // Force translations for this entity to use the same segments
+            if ($entity->getEmailType() == 'list' && $entity->hasTranslations()) {
+                $translations = $entity->getTranslationChildren()->toArray();
+                $this->updatingTranslationChildren = true;
+                foreach ($translations as $translation) {
+                    $this->saveEntity($translation);
+                }
+                $this->updatingTranslationChildren = false;
+            }
         } else {
-            // Ensure links in HTML don't have encoded ampersands
-            $htmlContent = $this->cleanUrlsInContent($entity->getCustomHtml());
-            $entity->setCustomHtml($htmlContent);
-        }
-
-        // Ensure links in PLAIN TEXT don't have encoded ampersands
-        $plainContent = $this->cleanUrlsInContent($entity->getPlainText());
-        $entity->setPlainText($plainContent);
-
-        // Reset the variant hit and start date if there are any changes and if this is an A/B test
-        // Do it here in addition to the blanket resetVariants call so that it's available to the event listeners
-        $changes = $entity->getChanges();
-        $parent  = $entity->getVariantParent();
-
-        if ($parent !== null && !empty($changes) && empty($this->inConversion)) {
-            $entity->setVariantSentCount(0);
-            $entity->setVariantReadCount(0);
-            $entity->setVariantStartDate($now->getDateTime());
-        }
-
-        parent::saveEntity($entity, $unlock);
-
-        // If parent, add this entity as a child of the parent so that it populates the list in the tab (due to Doctrine hanging on to entities in memory)
-        if ($parent) {
-            $parent->addVariantChild($entity);
-        }
-
-        // Reset associated variants if applicable due to changes
-        if ($entity->isVariant() && !empty($changes) && empty($this->inConversion)) {
-            $dateString = $now->toUtcString();
-            $parentId   = (!empty($parent)) ? $parent->getId() : $entity->getId();
-            $this->getRepository()->resetVariants($parentId, $dateString);
-
-            //if the parent was changed, then that parent/children must also be reset
-            if (isset($changes['variantParent'])) {
-                $this->getRepository()->resetVariants($changes['variantParent'][0], $dateString);
-            }
+            parent::saveEntity($entity, false);
         }
     }
 
@@ -256,34 +271,6 @@ class EmailModel extends FormModel
             }
         }
         $this->em->flush();
-    }
-
-    /**
-     * Delete an entity
-     *
-     * @param object $entity
-     *
-     * @return void
-     */
-    public function deleteEntity($entity)
-    {
-        $this->getRepository()->nullVariantParent($entity->getId());
-
-        return parent::deleteEntity($entity);
-    }
-
-    /**
-     * Delete an array of entities
-     *
-     * @param array $ids
-     *
-     * @return array
-     */
-    public function deleteEntities($ids)
-    {
-        $this->getRepository()->nullVariantParent($ids);
-
-        return parent::deleteEntities($ids);
     }
 
     /**
@@ -435,7 +422,7 @@ class EmailModel extends FormModel
             [
                 'datetime'  => $readDateTime->toUtcString(),
                 'useragent' => $request->server->get('HTTP_USER_AGENT'),
-                'inBrowser' => $viaBrowser
+                'inBrowser' => $viaBrowser,
             ]
         );
 
@@ -448,8 +435,54 @@ class EmailModel extends FormModel
             $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_OPEN, $event);
         }
 
+        //device granularity
+        $dd = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
+        $dd->parse();
+        $deviceRepo      = $this->leadModel->getDeviceRepository();
+        $emailOpenDevice = $deviceRepo->getDevice(null, $lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
+
+        if (empty($emailOpenDevice)) {
+            $emailOpenDevice = new LeadDevice();
+            $emailOpenDevice->setClientInfo($dd->getClient());
+            $emailOpenDevice->setDevice($dd->getDeviceName());
+            $emailOpenDevice->setDeviceBrand($dd->getBrand());
+            $emailOpenDevice->setDeviceModel($dd->getModel());
+            $emailOpenDevice->setDeviceOs($dd->getOs());
+            $emailOpenDevice->setDateOpen($readDateTime->toUtcString());
+            $emailOpenDevice->setLead($lead);
+
+            try {
+                $this->em->persist($emailOpenDevice);
+                $this->em->flush($emailOpenDevice);
+            } catch (\Exception $exception) {
+                if (MAUTIC_ENV === 'dev') {
+
+                    throw $exception;
+                } else {
+                    $this->logger->addError(
+                        $exception->getMessage(),
+                        ['exception' => $exception]
+                    );
+                }
+            }
+        } else {
+            $emailOpenDevice = $deviceRepo->getEntity($emailOpenDevice['id']);
+        }
+
         if ($email) {
             $this->em->persist($email);
+            $this->em->flush($email);
+        }
+
+        if (isset($emailOpenDevice) and is_object($emailOpenDevice)) {
+            $emailOpenStat = new StatDevice();
+            $emailOpenStat->setIpAddress($ipAddress);
+            $emailOpenStat->setDevice($emailOpenDevice);
+            $emailOpenStat->setDateOpened($readDateTime->toUtcString());
+            $emailOpenStat->setStat($stat);
+
+            $this->em->persist($emailOpenStat);
+            $this->em->flush($emailOpenStat);
         }
 
         $this->em->persist($stat);
@@ -528,122 +561,29 @@ class EmailModel extends FormModel
         return $this->getStatRepository()->findBy(
             [
                 'email' => (int) $emailId,
-                'lead'  => (int) $leadId
+                'lead'  => (int) $leadId,
             ],
             ['dateSent' => 'DESC']
         );
     }
 
     /**
-     * Get the variant parent/children
-     *
-     * @param Email $email
-     *
-     * @return array
-     */
-    public function getVariants(Email $email)
-    {
-        $parent = $email->getVariantParent();
-
-        if (!empty($parent)) {
-            $children = $parent->getVariantChildren();
-        } else {
-            $parent   = $email;
-            $children = $email->getVariantChildren();
-        }
-
-        if (empty($children)) {
-            $children = [];
-        }
-
-        return [$parent, $children];
-    }
-
-
-    /**
-     * Converts a variant to the main page and the main page a variant
-     *
-     * @param Email $email
-     */
-    public function convertVariant(Email $email)
-    {
-        //let saveEntities() know it does not need to set variant start dates
-        $this->inConversion = true;
-
-        list($parent, $children) = $this->getVariants($email);
-
-        $save = [];
-
-        //set this email as the parent for the original parent and children
-        if ($parent) {
-            if ($parent->getId() != $email->getId()) {
-                $parent->setIsPublished(false);
-                $email->addVariantChild($parent);
-                $parent->setVariantParent($email);
-            }
-
-            $parent->setVariantStartDate(null);
-            $parent->setVariantSentCount(0);
-
-            foreach ($children as $child) {
-                //capture child before it's removed from collection
-                $save[] = $child;
-
-                $parent->removeVariantChild($child);
-            }
-        }
-
-        if (count($save)) {
-            foreach ($save as $child) {
-                if ($child->getId() != $email->getId()) {
-                    $child->setIsPublished(false);
-                    $email->addVariantChild($child);
-                    $child->setVariantParent($email);
-                } else {
-                    $child->removeVariantParent();
-                }
-
-                $child->setVariantSentCount(0);
-                $child->setVariantStartDate(null);
-            }
-        }
-
-        $save[] = $parent;
-        $save[] = $email;
-
-        //save the entities
-        $this->saveEntities($save, false);
-    }
-
-    /**
      * Get a stats for email by list
      *
-     * @param Email|int $email
-     * @param bool      $includeVariants
+     * @param                $email
+     * @param bool           $includeVariants
+     * @param \DateTime|null $dateFrom
+     * @param \DateTime|null $dateTo
      *
      * @return array
      */
-    public function getEmailListStats($email, $includeVariants = false)
+    public function getEmailListStats($email, $includeVariants = false, \DateTime $dateFrom = null, \DateTime $dateTo = null)
     {
         if (!$email instanceof Email) {
             $email = $this->getEntity($email);
         }
 
-        if ($includeVariants && $email->isVariant()) {
-            $parent = $email->getVariantParent();
-            if ($parent) {
-                // $email is a variant of another
-                $children   = $parent->getVariantChildren();
-                $emailIds   = $children->getKeys();
-                $emailIds[] = $parent->getId();
-            } else {
-                $children   = $email->getVariantChildren();
-                $emailIds   = $children->getKeys();
-                $emailIds[] = $email->getId();
-            }
-        } else {
-            $emailIds = [$email->getId()];
-        }
+        $emailIds = ($includeVariants && ($email->isVariant() || $email->isTranslation())) ? $email->getRelatedEntityIds() : [$email->getId()];
 
         $lists     = $email->getLists();
         $listCount = count($lists);
@@ -656,7 +596,7 @@ class EmailModel extends FormModel
                 $this->translator->trans('mautic.email.failed'),
                 $this->translator->trans('mautic.email.clicked'),
                 $this->translator->trans('mautic.email.unsubscribed'),
-                $this->translator->trans('mautic.email.bounced')
+                $this->translator->trans('mautic.email.bounced'),
             ]
         );
 
@@ -670,25 +610,33 @@ class EmailModel extends FormModel
             /** @var \Mautic\PageBundle\Entity\TrackableRepository $trackableRepo */
             $trackableRepo = $this->em->getRepository('MauticPageBundle:Trackable');
 
-            $key = ($listCount > 1) ? 1 : 0;
+            $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+            $key   = ($listCount > 1) ? 1 : 0;
+
+            $sentCounts         = $statRepo->getSentCount($emailIds, true, $query);
+            $readCounts         = $statRepo->getReadCount($emailIds, true, $query);
+            $failedCounts       = $statRepo->getFailedCount($emailIds, true, $query);
+            $clickCounts        = $trackableRepo->getCount('email', $emailIds, true, $query);
+            $unsubscribedCounts = $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, true, $query);
+            $bouncedCounts      = $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, true, $query);
 
             foreach ($lists as $l) {
-                $sentCount = $statRepo->getSentCount($emailIds, $l->getId());
+                $sentCount = isset($sentCounts[$l->getId()]) ? $sentCounts[$l->getId()] : 0;
                 $combined[0] += $sentCount;
 
-                $readCount = $statRepo->getReadCount($emailIds, $l->getId());
+                $readCount = isset($readCounts[$l->getId()]) ? $readCounts[$l->getId()] : 0;
                 $combined[1] += $readCount;
 
-                $failedCount = $statRepo->getFailedCount($emailIds, $l->getId());
+                $failedCount = isset($failedCounts[$l->getId()]) ? $failedCounts[$l->getId()] : 0;
                 $combined[2] += $failedCount;
 
-                $clickCount = $trackableRepo->getCount('email', $emailIds, $l->getId());
+                $clickCount = isset($clickCounts[$l->getId()]) ? $clickCounts[$l->getId()] : 0;
                 $combined[3] += $clickCount;
 
-                $unsubscribedCount = $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, $l->getId());
+                $unsubscribedCount = isset($unsubscribedCounts[$l->getId()]) ? $unsubscribedCounts[$l->getId()] : 0;
                 $combined[4] += $unsubscribedCount;
 
-                $bouncedCount = $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, $l->getId());
+                $bouncedCount = isset($bouncedCounts[$l->getId()]) ? $bouncedCounts[$l->getId()] : 0;
                 $combined[5] += $bouncedCount;
 
                 $chart->setDataset(
@@ -699,7 +647,7 @@ class EmailModel extends FormModel
                         $failedCount,
                         $clickCount,
                         $unsubscribedCount,
-                        $bouncedCount
+                        $bouncedCount,
                     ],
                     $key
                 );
@@ -714,6 +662,109 @@ class EmailModel extends FormModel
                 $combined,
                 0
             );
+        }
+
+        return $chart->render();
+    }
+    /**
+     * Get a stats for email by list
+     *
+     * @param Email|int $email
+     * @param bool      $includeVariants
+     *
+     * @return array
+     */
+    public function getEmailDeviceStats($email, $includeVariants = false, $dateFrom = null, $dateTo = null)
+    {
+        if (!$email instanceof Email) {
+            $email = $this->getEntity($email);
+        }
+
+        $emailIds  = ($includeVariants) ? $email->getRelatedEntityIds() : [$email->getId()];
+        $templateEmail = 'template' === $email->getEmailType();
+        $results = $this->getStatDeviceRepository()->getDeviceStats($emailIds, $dateFrom, $dateTo);
+
+        // Organize by list_id (if a segment email) and/or device
+        $stats   = [];
+        $devices = [];
+        foreach ($results as $result) {
+            if (empty($result['device'])) {
+                $result['device'] = $this->translator->trans('mautic.core.unknown');
+            } else {
+                $result['device'] = mb_substr($result['device'], 0, 12);
+            }
+            $devices[$result['device']] = $result['device'];
+
+            if ($templateEmail) {
+                // List doesn't matter
+                $stats[$result['device']] = $result['count'];
+            } elseif (null !== $result['list_id']) {
+                if (!isset($stats[$result['list_id']])) {
+                    $stats[$result['list_id']] = [];
+                }
+
+                if (!isset($stats[$result['list_id']][$result['device']])) {
+                    $stats[$result['list_id']][$result['device']] = (int) $result['count'];
+                } else {
+                    $stats[$result['list_id']][$result['device']] += (int) $result['count'];
+                }
+            }
+        }
+
+        $listCount = 0;
+        if (!$templateEmail) {
+            $lists     = $email->getLists();
+            $listNames = [];
+            foreach ($lists as $l) {
+                $listNames[$l->getId()] = $l->getName();
+            }
+            $listCount = count($listNames);
+        }
+
+        natcasesort($devices);
+        $chart = new BarChart(array_values($devices));
+
+        if ($templateEmail) {
+            // Populate the data
+            $chart->setDataset(
+                null,
+                array_values($stats),
+                0
+            );
+        } else {
+            $combined = [];
+            $key   = ($listCount > 1) ? 1 : 0;
+            foreach ($listNames as $id => $name) {
+                // Fill in missing devices
+                $listStats = [];
+                foreach ($devices as $device) {
+                    $listStat    = (!isset($stats[$id][$device])) ? 0 : $stats[$id][$device];
+                    $listStats[] = $listStat;
+
+                    if (!isset($combined[$device])) {
+                        $combined[$device] = 0;
+                    }
+
+                    $combined[$device] += $listStat;
+                }
+
+                // Populate the data
+                $chart->setDataset(
+                    $name,
+                    $listStats,
+                    $key
+                );
+
+                $key++;
+            }
+
+            if ($listCount > 1) {
+                $chart->setDataset(
+                    $this->translator->trans('mautic.email.lists.combined'),
+                    array_values($combined),
+                    0
+                );
+            }
         }
 
         return $chart->render();
@@ -734,25 +785,9 @@ class EmailModel extends FormModel
             $email = $this->getEntity($email);
         }
 
-        if ($includeVariants && $email->isVariant()) {
-            $parent = $email->getVariantParent();
-            if ($parent) {
-                // $email is a variant of another
-                $children   = $parent->getVariantChildren();
-                $emailIds   = $children->getKeys();
-                $emailIds[] = $parent->getId();
-            } else {
-                $children   = $email->getVariantChildren();
-                $emailIds   = $children->getKeys();
-                $emailIds[] = $email->getId();
-            }
-        } else {
-            $emailIds = [$email->getId()];
-        }
-
         $filter = [
-            'email_id' => $emailIds,
-            'flag'     => 'all'
+            'email_id' => ($includeVariants) ? $email->getRelatedEntityIds() : [$email->getId()],
+            'flag'     => 'all',
         ];
 
         return $this->getEmailsLineChartData($unit, $dateFrom, $dateTo, null, $filter);
@@ -783,27 +818,8 @@ class EmailModel extends FormModel
      */
     public function getPendingLeads(Email $email, $listId = null, $countOnly = false, $limit = null, $includeVariants = true)
     {
-        if ($includeVariants && $email->isVariant()) {
-            $parent = $email->getVariantParent();
-            if ($parent) {
-                // $email is a variant of another
-                $ids[] = $parent->getId();
-
-                $children   = $parent->getVariantChildren();
-                $variantIds = $children->getKeys();
-
-                // Remove $email from the array
-                $key = array_search($email->getId(), $variantIds);
-                unset($variantIds[$key]);
-            } else {
-                $children   = $email->getVariantChildren();
-                $variantIds = $children->getKeys();
-            }
-        } else {
-            $variantIds = null;
-        }
-
-        $total = $this->getRepository()->getEmailPendingLeads($email->getId(), $variantIds, $listId, $countOnly, $limit);
+        $variantIds = ($includeVariants) ? $email->getRelatedEntityIds() : null;
+        $total      = $this->getRepository()->getEmailPendingLeads($email->getId(), $variantIds, $listId, $countOnly, $limit);
 
         return $total;
     }
@@ -831,8 +847,8 @@ class EmailModel extends FormModel
             'emailSettings' => $emailSettings,
             'allowResends'  => false,
             'customHeaders' => [
-                'Precedence' => 'Bulk'
-            ]
+                'Precedence' => 'Bulk',
+            ],
         ];
 
         $failed      = [];
@@ -898,9 +914,33 @@ class EmailModel extends FormModel
                     'slots'        => $slots,
                     'sentCount'    => $email->getSentCount(),
                     'variantCount' => $email->getVariantSentCount(),
-                    'entity'       => $email
-                ]
+                    'isVariant'    => null !== $email->getVariantStartDate(),
+                    'entity'       => $email,
+                    'translations' => $email->getTranslations(true),
+                    'languages'    => ['default' => $email->getId()]
+                ],
             ];
+
+            if ($emailSettings[$email->getId()]['translations']) {
+                // Add in the sent counts for translations of this email
+                /** @var Email $translation */
+                foreach ($emailSettings[$email->getId()]['translations'] as $translation) {
+                    if ($translation->isPublished()) {
+                        $emailSettings[$email->getId()]['sentCount'] += $translation->getSentCount();
+                        $emailSettings[$email->getId()]['variantCount'] += $translation->getVariantSentCount();
+
+                        // Prevent empty key due to misconfiguration - pretty much ignored
+                        if (!$language = $translation->getLanguage()) {
+                            $language = 'unknown';
+                        }
+                        $core = $this->getTranslationLocaleCore($language);
+                        if (!isset($emailSettings[$email->getId()]['languages'][$core])) {
+                            $emailSettings[$email->getId()]['languages'][$core] = [];
+                        }
+                        $emailSettings[$email->getId()]['languages'][$core][$language] = $translation->getId();
+                    }
+                }
+            }
 
             if ($includeVariants) {
                 //get a list of variants for A/B testing
@@ -908,7 +948,7 @@ class EmailModel extends FormModel
 
                 if (count($childrenVariant)) {
                     $variantWeight = 0;
-                    $totalSent     = $email->getVariantSentCount();
+                    $totalSent     = $emailSettings[$email->getId()]['variantCount'];
 
                     foreach ($childrenVariant as $id => $child) {
                         if ($child->isPublished()) {
@@ -921,18 +961,42 @@ class EmailModel extends FormModel
                                     $useSlots         = $slots[$template];
                                 }
                             }
-                            $variantSettings = $child->getVariantSettings();
-
+                            $variantSettings                = $child->getVariantSettings();
                             $emailSettings[$child->getId()] = [
                                 'template'     => $child->getTemplate(),
                                 'slots'        => $useSlots,
                                 'sentCount'    => $child->getSentCount(),
                                 'variantCount' => $child->getVariantSentCount(),
+                                'isVariant'    => null !== $email->getVariantStartDate(),
                                 'weight'       => ($variantSettings['weight'] / 100),
-                                'entity'       => $child
+                                'entity'       => $child,
+                                'translations' => $child->getTranslations(true),
+                                'languages'    => ['default' => $child->getId()]
                             ];
 
                             $variantWeight += $variantSettings['weight'];
+
+                            if ($emailSettings[$child->getId()]['translations']) {
+                                // Add in the sent counts for translations of this email
+                                /** @var Email $translation */
+                                foreach ($emailSettings[$child->getId()]['translations'] as $translation) {
+                                    if ($translation->isPublished()) {
+                                        $emailSettings[$child->getId()]['sentCount'] += $translation->getSentCount();
+                                        $emailSettings[$child->getId()]['variantCount'] += $translation->getVariantSentCount();
+
+                                        // Prevent empty key due to misconfiguration - pretty much ignored
+                                        if (!$language = $translation->getLanguage()) {
+                                            $language = 'unknown';
+                                        }
+                                        $core = $this->getTranslationLocaleCore($language);
+                                        if (!isset($emailSettings[$child->getId()]['languages'][$core])) {
+                                            $emailSettings[$child->getId()]['languages'][$core] = [];
+                                        }
+                                        $emailSettings[$child->getId()]['languages'][$core][$language] = $translation->getId();
+                                    }
+                                }
+                            }
+
                             $totalSent += $emailSettings[$child->getId()]['sentCount'];
                         }
                     }
@@ -1006,15 +1070,24 @@ class EmailModel extends FormModel
             $emailSettings = $this->getEmailSettings($email);
         }
 
-        if (!$allowResends) {
-            static $sent = [];
-            if (!isset($sent[$email->getId()])) {
-                $sent[$email->getId()] = $statRepo->getSentStats($email->getId(), $listId);
+        $defaultFrequencyNumber = $this->coreParameters->getParameter('email_frequency_number');
+        $defaultFrequencyTime = $this->coreParameters->getParameter('email_frequency_time');
+
+        /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
+        $frequencyRulesRepo = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
+
+        $leadIds = array_keys($leads);
+        $leadIds = implode(",", $leadIds);
+
+        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', $leadIds, $listId, $defaultFrequencyNumber, $defaultFrequencyTime);
+
+        if (!empty($dontSendTo)) {
+            foreach ($dontSendTo as $frequencyRuleMet)
+            {
+                unset($leads[$frequencyRuleMet['lead_id']]);
             }
-            $sendTo = array_diff_key($leads, $sent[$email->getId()]);
-        } else {
-            $sendTo = $leads;
         }
+        $sendTo = $leads;
 
         if (!$ignoreDNC) {
             //get the list of do not contacts
@@ -1023,9 +1096,10 @@ class EmailModel extends FormModel
                 $dnc = $emailRepo->getDoNotEmailList();
             }
 
-            //weed out do not contacts
+
             if (!empty($dnc)) {
                 foreach ($sendTo as $k => $lead) {
+                    //weed out do not contacts
                     if (in_array(strtolower($lead['email']), $dnc)) {
                         unset($sendTo[$k]);
                     }
@@ -1038,11 +1112,9 @@ class EmailModel extends FormModel
 
         //noone to send to so bail
         if (empty($count)) {
+
             return $singleEmail ? true : [];
         }
-
-        //how many of this batch should go to which email
-        $batchCount = 0;
 
         $backup = reset($emailSettings);
         foreach ($emailSettings as $eid => &$details) {
@@ -1065,20 +1137,15 @@ class EmailModel extends FormModel
             $emailSettings[$backup['entity']->getId()] = $backup;
         }
 
-        //randomize the leads for statistic purposes
-        shuffle($sendTo);
-
-        //start at the beginning for this batch
-        $useEmail = reset($emailSettings);
-        $errors   = [];
         // Store stat entities
+        $errors   = [];
         $saveEntities    = [];
         $emailSentCounts = [];
 
+        // Setup the mailer
         $mailer = $this->mailHelper->getMailer(!$sendBatchMail);
 
-        $contentGenerated = false;
-
+        // Flushes the batch in case of using API mailers
         $flushQueue = function ($reset = true) use (&$mailer, &$saveEntities, &$errors, &$emailSentCounts, $sendBatchMail) {
 
             if ($sendBatchMail) {
@@ -1090,11 +1157,13 @@ class EmailModel extends FormModel
                     if (!empty($sendFailures['failures'])) {
                         // Prevent the stat from saving
                         foreach ($sendFailures['failures'] as $failedEmail) {
+                            /** @var Stat $stat */
+                            $stat = $saveEntities[$failedEmail];
                             // Add lead ID to list of failures
-                            $errors[$saveEntities[$failedEmail]->getLead()->getId()] = $failedEmail;
+                            $errors[$stat->getLead()->getId()] = $failedEmail;
 
                             // Down sent counts
-                            $emailId = $saveEntities[$failedEmail]->getEmail()->getId();
+                            $emailId = $stat->getEmail()->getId();
                             $emailSentCounts[$emailId]++;
 
                             // Delete the stat
@@ -1113,79 +1182,117 @@ class EmailModel extends FormModel
             return true;
         };
 
-        foreach ($sendTo as $lead) {
-            // Generate content
-            if ($useEmail['entity']->getId() !== $contentGenerated) {
+
+        // Randomize the contacts for statistic purposes
+        shuffle($sendTo);
+
+        // Organize the contacts according to the variant and translation they are to receive
+        $groupedContactsByEmail = [];
+        $offset = 0;
+        foreach ($emailSettings as $eid => $details) {
+            $groupedContactsByEmail[$eid] = [];
+            if ($details['limit']) {
+                // Take a chunk of contacts based on variant weights
+                if ($batchContacts = array_slice($sendTo, $offset, $details['limit'])) {
+                    $offset += $details['limit'];
+
+                    // Group contacts by preferred locale
+                    foreach ($batchContacts as $key => $contact) {
+                        if (!empty($contact['preferred_locale'])) {
+                            $locale     = $contact['preferred_locale'];
+                            $localeCore = $this->getTranslationLocaleCore($locale);
+
+                            if (isset($details['languages'][$localeCore])) {
+                                if (isset($details['languages'][$localeCore][$locale])) {
+                                    // Exact match
+                                    $translatedId                                  = $details['languages'][$localeCore][$locale];
+                                    $groupedContactsByEmail[$eid][$translatedId][] = $contact;
+                                } else {
+                                    // Grab the closest match
+                                    $bestMatch                                     = array_keys($details['languages'][$localeCore])[0];
+                                    $translatedId                                  = $details['languages'][$localeCore][$bestMatch];
+                                    $groupedContactsByEmail[$eid][$translatedId][] = $contact;
+                                }
+
+                                unset($batchContacts[$key]);
+                            }
+                        }
+                    }
+
+                    // If there are any contacts left over, assign them to the default
+                    if (count($batchContacts)) {
+                        $translatedId                                = $details['languages']['default'];
+                        $groupedContactsByEmail[$eid][$translatedId] = $batchContacts;
+                    }
+                }
+            }
+        }
+
+        foreach ($groupedContactsByEmail as $parentId => $translatedEmails) {
+            $useSettings = &$emailSettings[$parentId];
+            foreach ($translatedEmails as $translatedId => $contacts) {
+                $emailEntity = ($translatedId === $parentId) ? $useSettings['entity'] : $useSettings['translations'][$translatedId];
+
                 // Flush the mail queue if applicable
                 $flushQueue();
-
-                $contentGenerated = $useEmail['entity']->getId();
 
                 // Use batching/tokenization if supported
                 $mailer->useMailerTokenization();
                 $mailer->setSource($source);
-                $mailer->setEmail($useEmail['entity'], true, $useEmail['slots'], $assetAttachments);
+                $mailer->setEmail($emailEntity, true, $useSettings['slots'], $assetAttachments);
 
                 if (!empty($customHeaders)) {
                     $mailer->setCustomHeaders($customHeaders);
                 }
-            }
 
-            $idHash = uniqid();
+                foreach ($contacts as $contact) {
+                    $idHash = uniqid();
 
-            // Add tracking pixel token
-            if (!empty($tokens)) {
-                $mailer->setTokens($tokens);
-            }
+                    // Add tracking pixel token
+                    if (!empty($tokens)) {
+                        $mailer->setTokens($tokens);
+                    }
 
-            $mailer->setLead($lead);
-            $mailer->setIdHash($idHash);
+                    $mailer->setLead($contact);
+                    $mailer->setIdHash($idHash);
 
-            try {
-                if (!$mailer->addTo($lead['email'], $lead['firstname'].' '.$lead['lastname'])) {
-                    // Clear the errors so it doesn't stop the next send
-                    $mailer->clearErrors();
+                    try {
+                        if (!$mailer->addTo($contact['email'], $contact['firstname'].' '.$contact['lastname'])) {
+                            // Clear the errors so it doesn't stop the next send
+                            $mailer->clearErrors();
 
-                    // Bad email so note and continue
-                    $errors[$lead['id']] = $lead['email'];
+                            // Bad email so note and continue
+                            $errors[$contact['id']] = $contact['email'];
 
-                    continue;
+                            continue;
+                        }
+                    } catch (BatchQueueMaxException $e) {
+                        // Queue full so flush then try again
+                        $flushQueue(false);
+
+                        $mailer->addTo($contact['email'], $contact['firstname'].' '.$contact['lastname']);
+                    }
+
+                    //queue or send the message
+                    if (!$mailer->queue(true)) {
+                        $errors[$contact['id']] = $contact['email'];
+
+                        continue;
+                    }
+
+                    if (!$allowResends) {
+                        $sent[$parentId][$contact['id']] = $contact['id'];
+                    }
+
+                    //create a stat
+                    $saveEntities[$contact['email']] = $mailer->createEmailStat(false, null, $listId);
+
+                    // Up sent counts
+                    if (!isset($emailSentCounts[$translatedId])) {
+                        $emailSentCounts[$translatedId] = 0;
+                    }
+                    $emailSentCounts[$translatedId]++;
                 }
-            } catch (BatchQueueMaxException $e) {
-                // Queue full so flush then try again
-                $flushQueue(false);
-
-                $mailer->addTo($lead['email'], $lead['firstname'].' '.$lead['lastname']);
-            }
-
-            //queue or send the message
-            if (!$mailer->queue(true)) {
-                $errors[$lead['id']] = $lead['email'];
-
-                continue;
-            }
-
-            if (!$allowResends) {
-                $sent[$useEmail['entity']->getId()][$lead['id']] = $lead['id'];
-            }
-
-            //create a stat
-            $saveEntities[$lead['email']] = $mailer->createEmailStat(false, null, $listId);
-
-            // Up sent counts
-            $emailId = $useEmail['entity']->getId();
-            if (!isset($emailSentCounts[$emailId])) {
-                $emailSentCounts[$emailId] = 0;
-            }
-            $emailSentCounts[$emailId]++;
-
-            $batchCount++;
-            if ($batchCount >= $useEmail['limit']) {
-                unset($useEmail);
-
-                //use the next email
-                $batchCount = 0;
-                $useEmail   = next($emailSettings);
             }
         }
 
@@ -1197,12 +1304,16 @@ class EmailModel extends FormModel
 
         // Update sent counts
         foreach ($emailSentCounts as $emailId => $count) {
-            $isVariant = $emailSettings[$emailId]['entity']->getVariantStartDate();
-
-            try {
-                $this->getRepository()->upCount($emailId, 'sent', $count, !empty($isVariant));
-            } catch (\Exception $exception) {
-                error_log($exception);
+            // Retry a few times in case of deadlock errors
+            $strikes = 3;
+            while ($strikes >= 0) {
+                try {
+                    $this->getRepository()->upCount($emailId, 'sent', $count, $emailSettings[$emailId]['isVariant']);
+                    break;
+                } catch (\Exception $exception) {
+                    error_log($exception);
+                }
+                $strikes--;
             }
         }
 
@@ -1300,7 +1411,7 @@ class EmailModel extends FormModel
      * @param string $reason
      * @param bool   $flush
      */
-    public function setDoNotContact(Stat $stat, $comments, $reason = 'bounced', $flush = true)
+    public function setDoNotContact(Stat $stat, $comments, $reason = DoNotContact::BOUNCED, $flush = true)
     {
         $lead = $stat->getLead();
 
@@ -1392,10 +1503,10 @@ class EmailModel extends FormModel
                                 [
                                     'column' => $alias.'trackingHash',
                                     'expr'   => 'in',
-                                    'value'  => array_keys($entries['hashIds'])
-                                ]
-                            ]
-                        ]
+                                    'value'  => array_keys($entries['hashIds']),
+                                ],
+                            ],
+                        ],
                     ]
                 );
 
@@ -1406,7 +1517,7 @@ class EmailModel extends FormModel
                         $reason = $this->translator->trans('mautic.email.bounce.reason.'.$reason);
                     }
 
-                    $this->setDoNotContact($s, $reason, $type, ($count === $batch));
+                    $this->setDoNotContact($s, $reason, $type);
 
                     $s->setIsFailed(true);
                     $this->em->persist($s);
@@ -1636,6 +1747,33 @@ class EmailModel extends FormModel
     }
 
     /**
+     * Get pie chart data of ignored vs opened emails
+     *
+     * @param string  $dateFrom
+     * @param string  $dateTo
+     * @param array   $filters
+     * @param boolean $canViewOthers
+     *
+     * @return array
+     */
+    public function getDeviceGranularityPieChartData($dateFrom, $dateTo, $canViewOthers = true)
+    {
+        $chart = new PieChart();
+
+        $deviceStats = $this->getStatDeviceRepository()->getDeviceStats(
+            null,
+            $dateFrom,
+            $dateTo
+        );
+
+        foreach ($deviceStats as $device){
+            $chart->setDataset($device['device'], $device['count']);
+        }
+
+        return $chart->render();
+    }
+
+    /**
      * Get a list of emails in a date range, grouped by a stat date count
      *
      * @param integer   $limit
@@ -1728,35 +1866,10 @@ class EmailModel extends FormModel
                 'scheduled'     => 1,
                 'eventType'     => 'action',
                 'limit'         => $limit,
-                'canViewOthers' => $canViewOthers
+                'canViewOthers' => $canViewOthers,
             ]
         );
 
         return $upcomingEmails;
-    }
-
-    /**
-     * Check all links in content and remove &amp;
-     * This even works with double encoded ampersands
-     *
-     * @param string $content
-     *
-     * @return string
-     */
-    private function cleanUrlsInContent($content)
-    {
-        if (preg_match_all('/((https?|ftps?):\/\/)([a-zA-Z0-9-\.{}]*[a-zA-Z0-9=}]*)(\??)([^\s\"\]]+)?/i', $content, $matches)) {
-            foreach ($matches[0] as $url) {
-                $newUrl = $url;
-
-                while (strpos($newUrl, '&amp;') !== false) {
-                    $newUrl = str_replace('&amp;', '&', $newUrl);
-                }
-
-                $content = str_replace($url, $newUrl, $content);
-            }
-        }
-
-        return $content;
     }
 }

@@ -318,13 +318,45 @@ class CommonApiController extends FOSRestController implements MauticController
             $view = $this->view(array($this->entityNameOne => $entity), $statusCode, $headers);
             $this->setSerializationContext($view);
         } else {
-            $view = $this->view($this->getFormErrorMessages($form), Codes::HTTP_BAD_REQUEST);
+            $formErrors = $this->getFormErrorMessages($form);
+            $msg = $this->getFormErrorMessage($formErrors);
+            return $this->returnError($msg, Codes::HTTP_BAD_REQUEST, $formErrors);
         }
 
         return $this->handleView($view);
     }
 
-    public function getFormErrorMessages(\Symfony\Component\Form\Form $form) {
+    public function getFormErrorMessage(array $formErrors)
+    {
+        $msg = '';
+
+        if ($formErrors) {
+            foreach ($formErrors as $key => $error) {
+                if (!$error) {
+                    continue;
+                }
+
+                if ($msg) {
+                    $msg .= ', ';
+                }
+
+                if (is_string($key)) {
+                    $msg .= $key.': ';
+                }
+
+                if (is_array($error)) {
+                    $msg .= $this->getFormErrorMessage($error);
+                } else {
+                    $msg .= $error;
+                }
+            }
+        }
+
+        return $msg;
+    }
+
+    public function getFormErrorMessages(\Symfony\Component\Form\Form $form)
+    {
         $errors = [];
 
         foreach ($form->getErrors() as $key => $error) {
@@ -337,7 +369,7 @@ class CommonApiController extends FOSRestController implements MauticController
 
         foreach ($form->all() as $child) {
             if (!$child->isValid()) {
-                $errors[$child->getName()] = $this->getErrorMessages($child);
+                $errors[$child->getName()] = $this->getFormErrorMessages($child);
             }
         }
 
@@ -455,6 +487,31 @@ class CommonApiController extends FOSRestController implements MauticController
     }
 
     /**
+     * Returns an error
+     *
+     * @param string  $msg
+     * @param integer $code
+     * @param array   $details
+     *
+     * @return Response
+     */
+    protected function returnError($msg, $code, $details = [])
+    {
+        $view = $this->view(
+            [
+                'error' => [
+                    'code'    => $code,
+                    'message' => $this->get('translator')->trans($msg, array(), 'flashes'),
+                    'details' => $details
+                ]
+            ],
+            $code
+        );
+
+        return $this->handleView($view);
+    }
+
+    /**
      * Returns a 403 Access Denied
      *
      * @param string $msg
@@ -463,17 +520,7 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     protected function accessDenied($msg = 'mautic.core.error.accessdenied')
     {
-        $view = $this->view(
-            array(
-                'error' => array(
-                    'code'    => Codes::HTTP_FORBIDDEN,
-                    'message' => $this->get('translator')->trans($msg, array(), 'flashes')
-                )
-            ),
-            Codes::HTTP_FORBIDDEN
-        );
-
-        return $this->handleView($view);
+        return $this->returnError($msg, Codes::HTTP_FORBIDDEN);
     }
 
     /**
@@ -485,17 +532,7 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     protected function notFound($msg = 'mautic.core.error.notfound')
     {
-        $view = $this->view(
-            array(
-                'error' => array(
-                    'code'    => Codes::HTTP_NOT_FOUND,
-                    'message' => $this->get('translator')->trans($msg, array(), 'flashes')
-                )
-            ),
-            Codes::HTTP_NOT_FOUND
-        );
-
-        return $this->handleView($view);
+        return $this->returnError($msg, Codes::HTTP_NOT_FOUND);
     }
 
     /**
@@ -507,17 +544,7 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     protected function badRequest($msg = 'mautic.core.error.badrequest')
     {
-        $view = $this->view(
-            array(
-                'error' => array(
-                    'code'    => Codes::HTTP_BAD_REQUEST,
-                    'message' => $this->get('translator')->trans($msg, array(), 'flashes')
-                )
-            ),
-            Codes::HTTP_BAD_REQUEST
-        );
-
-        return $this->handleView($view);
+        return $this->returnError($msg, Codes::HTTP_BAD_REQUEST);
     }
 
     /**

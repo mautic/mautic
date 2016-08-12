@@ -40,7 +40,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'upcoming.emails' => array(),
         'most.sent.emails' => array(),
         'most.read.emails' => array(),
-        'created.emails' => array()
+        'created.emails' => array(),
+        'device.granularity.email' => array()
     );
 
     /**
@@ -284,6 +285,27 @@ class DashboardSubscriber extends MainDashboardSubscriber
             }
             
             $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->stopPropagation();
+        }
+        if ($event->getType() == 'device.granularity.email') {
+            $widget = $event->getWidget();
+            $params = $widget->getParams();
+
+            if (!$event->isCached()) {
+                $model = $this->factory->getModel('email');
+
+                $event->setTemplateData(array(
+                    'chartType'   => 'pie',
+                    'chartHeight' => $widget->getHeight() - 80,
+                    'chartData'   => $model->getDeviceGranularityPieChartData(
+                        $params['dateFrom'],
+                        $params['dateTo'],
+                        $canViewOthers
+                    )
+                ));
+            }
+
+            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
             $event->stopPropagation();
         }
     }

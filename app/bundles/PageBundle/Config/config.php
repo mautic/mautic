@@ -39,6 +39,10 @@ return [
             'mautic_page_preview' => [
                 'path'       => '/page/preview/{id}',
                 'controller' => 'MauticPageBundle:Public:preview'
+            ],
+            'mautic_gated_video_hit' => [
+                'path' => '/video/hit',
+                'controller' => 'MauticPageBundle:Public:hitVideo'
             ]
         ],
         'api'    => [
@@ -130,7 +134,14 @@ return [
             ],
             'mautic.page.js.subscriber'           => [
                 'class' => 'Mautic\PageBundle\EventListener\BuildJsSubscriber'
-            ]
+            ],
+            'mautic.page.maintenance.subscriber'    => [
+                'class' => 'Mautic\PageBundle\EventListener\MaintenanceSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'doctrine.dbal.default_connection'
+                ]
+            ],
         ],
         'forms'  => [
             'mautic.form.type.page'                     => [
@@ -217,6 +228,13 @@ return [
                 'class' => 'Mautic\PageBundle\Model\TrackableModel',
                 'arguments' => [
                     'mautic.page.model.redirect'
+                ]
+            ],
+            'mautic.page.model.video' => [
+                'class' => 'Mautic\PageBundle\Model\VideoModel',
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.helper.ip_lookup'
                 ]
             ]
         ],

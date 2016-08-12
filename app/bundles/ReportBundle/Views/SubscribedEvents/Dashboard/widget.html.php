@@ -29,6 +29,13 @@ if ($chartType === 'table') {
         ]
     );
 }
+
+if (is_array($dateFrom)) {
+    // Using cached data
+    $dateFrom = new \DateTime($dateFrom['date'], new \DateTimeZone($dateFrom['timezone']));
+    $dateTo   = new \DateTime($dateTo['date'], new \DateTimeZone($dateTo['timezone']));
+}
+
 ?>
 
 <div class="pull-right mr-md mb-md">

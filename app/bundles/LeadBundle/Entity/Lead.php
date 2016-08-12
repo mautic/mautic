@@ -158,6 +158,11 @@ class Lead extends FormEntity
     private $utmtags;
 
     /**
+     * @var \Mautic\LeadBundle\Entity\FrequencyRule
+     */
+    private $frequencyRules;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -168,6 +173,7 @@ class Lead extends FormEntity
         $this->pointsChangeLog = new ArrayCollection();
         $this->tags            = new ArrayCollection();
         $this->stageChangeLog  = new ArrayCollection();
+        $this->frequencyRules  = new ArrayCollection();
     }
 
     /**
@@ -302,6 +308,15 @@ class Lead extends FormEntity
             ->cascadeAll()
             ->fetchExtraLazy()
             ->build();
+
+        $builder->createOneToMany('frequencyRules', 'Mautic\LeadBundle\Entity\FrequencyRule')
+            ->orphanRemoval()
+            ->setIndexBy('channel')
+            ->setOrderBy(['dateAdded' => 'DESC'])
+            ->mappedBy('lead')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
     }
 
     /**
@@ -382,6 +397,18 @@ class Lead extends FormEntity
                     $this->changes['utmtags'] = ['utm_source', $val->getUtmSource()];
                 }
 
+            }
+        } elseif ($prop == 'frequencyRules') {
+
+            if ($val instanceof FrequencyRule) {
+                if ($val->getFrequencyTime()) {
+                    $this->changes['frequencyRules'] = ['frequency_time', $val->getFrequencyTime()];
+                }
+                if ($val->getFrequencyNumber()) {
+                    $this->changes['frequencyRules'] = ['frequency_number', $val->getFrequencyNumber()];
+                }
+            } else {
+                $this->changes['frequencyRules']['removed'][] = $val;
             }
         } elseif ($this->$getter() != $val) {
             $this->changes[$prop] = [$this->$getter(), $val];
@@ -557,6 +584,26 @@ class Lead extends FormEntity
         if (!empty($this->fields['core']['email']['value'])) {
 
             return $this->fields['core']['email']['value'];
+        }
+
+        return '';
+    }
+
+    /**
+     * Get preferred locale
+     *
+     * @return string
+     */
+    public function getPreferredLocale()
+    {
+        if (isset($this->updatedFields['preferred_locale'])) {
+
+            return $this->updatedFields['preferred_locale'];
+        }
+
+        if (!empty($this->fields['core']['preferred_locale']['value'])) {
+
+            return $this->fields['core']['preferred_locale']['value'];
         }
 
         return '';
@@ -1256,6 +1303,42 @@ class Lead extends FormEntity
     public function getStage()
     {
         return $this->stage;
+    }
+
+    /**
+     * Set stage
+     *
+     * @param FrequencyRule $frequencyRules
+     *
+     * @return frequencyRules
+     */
+    public function setFrequencyRules(FrequencyRule $frequencyRules)
+    {
+        $this->isChanged('frequencyRules', $frequencyRules);
+        $this->frequencyRules[$frequencyRules->getId()] = $frequencyRules;
+
+        return $this;
+    }
+
+    /**
+     * Get stage
+     *
+     * @return array
+     */
+    public function getFrequencyRules()
+    {
+        return $this->frequencyRules;
+    }
+
+    /**
+     * Remove frequencyRule
+     *
+     * @param Tag $tag
+     */
+    public function removeFrequencyRule(FrequencyRule $frequencyRule)
+    {
+        $this->isChanged('frequencyRule', $frequencyRule->getId());
+        $this->frequencyRules->removeElement($frequencyRule);
     }
 
     /**

@@ -17,6 +17,8 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class UtmTagRepository extends CommonRepository
 {
+    use TimelineTrait;
+
     /**
      * Get tag entities by lead
      *
@@ -24,27 +26,30 @@ class UtmTagRepository extends CommonRepository
      *
      * @return array
      */
-    public function getUtmTagsByLead(Lead $lead, $options = array())
+    public function getUtmTagsByLead(Lead $lead, $options = [])
     {
         if (empty($lead)) {
-            return array();
+
+            return [];
         }
 
-        $qb = $this->_em->createQueryBuilder()
-            ->select('ut')
-            ->from('MauticLeadBundle:UtmTag', 'ut');
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('*')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_utmtags', 'ut')
+            ->where(
+                'ut.lead_id = ' . $lead->getId()
+            );
 
-        $qb->where(
-            'ut.lead = ' . $lead->getId() . 'and (ut.utmCampaign is not null or ut.utmContent is not null or ut.utmMedium is not null or ut.utmSource is not null or ut.utmTerm is not null)'
-        );
+        if (isset($options['search']) && $options['search']) {
+            $qb->andWhere($qb->expr()->orX(
+                $qb->expr()->like('ut.utm_campaign', $qb->expr()->literal('%' . $options['search'] . '%')),
+                $qb->expr()->like('ut.utm_content', $qb->expr()->literal('%' . $options['search'] . '%')),
+                $qb->expr()->like('ut.utm_medium', $qb->expr()->literal('%' . $options['search'] . '%')),
+                $qb->expr()->like('ut.utm_source', $qb->expr()->literal('%' . $options['search'] . '%')),
+                $qb->expr()->like('ut.utm_term', $qb->expr()->literal('%' . $options['search'] . '%'))
+            ));
+        }
 
-        if (isset($options['filters']['search']) && $options['filters']['search']) {
-        $qb->andWhere($qb->expr()->orX(
-            $qb->expr()->like('ut.eventName', $qb->expr()->literal('%' . $options['filters']['search'] . '%')),
-            $qb->expr()->like('ut.actionName', $qb->expr()->literal('%' . $options['filters']['search'] . '%'))
-        ));
-    }
-        
-        return $qb->getQuery()->getArrayResult();
+        return $this->getTimelineResults($qb, $options, 'ut.utm_campaign', 'ut.date_added', ['query'], ['date_added']);
     }
 }

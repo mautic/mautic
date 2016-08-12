@@ -77,10 +77,11 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                $this->getApiHelper()->createLead($mappedData);
+                $LeadData = $this->getApiHelper()->createLead($mappedData, $lead);
+
                 return true;
             }
-        } catch (\Exception $e) {
+          } catch (\Exception $e) {
             $this->logIntegrationError($e);
         }
         return false;
@@ -135,7 +136,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @param $mappedData
      */
-    public function amendLeadDataBeforeMauticPopulate($data)
+    public function amendLeadDataBeforeMauticPopulate($data, $object )
     {
         return null;
     }
@@ -179,5 +180,14 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
 
         return $helper;
+    }
+
+    public function getLeadData(\DateTime $startDate = null, \DateTime $endDate = null, $leadId){
+        return array();
+    }
+
+    public function pushLeadActivity($params = array())
+    {
+
     }
 }

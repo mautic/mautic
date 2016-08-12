@@ -147,6 +147,10 @@ class Hit
      * @var array
      */
     private $query = array();
+    /**
+     * @var \Mautic\LeadBundle\Entity\LeadDevice
+     */
+    private $device;
 
     /**
      * @param ORM\ClassMetadata $metadata
@@ -258,6 +262,11 @@ class Hit
             ->build();
 
         $builder->addNullableField('query', 'array');
+
+        $builder->createManyToOne('device', 'Mautic\LeadBundle\Entity\LeadDevice')
+            ->addJoinColumn('device_id', 'id', true, false, 'SET NULL')
+            ->cascadePersist()
+            ->build();
     }
 
     /**
@@ -849,6 +858,26 @@ class Hit
     public function setQuery($query)
     {
         $this->query = $query;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDeviceStat()
+    {
+        return $this->deviceStat;
+    }
+
+    /**
+     * @param array $device
+     *
+     * @return Hit
+     */
+    public function setDeviceStat($device)
+    {
+        $this->device = $device;
 
         return $this;
     }

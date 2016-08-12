@@ -162,12 +162,12 @@ class DynamicContentRepository extends CommonRepository
      * @param int    $limit
      * @param int    $start
      * @param bool   $viewOther
-     * @param int    $variantParentId
+     * @param bool   $topLevel
      * @param array  $ignoreIds
      *
      * @return array
      */
-    public function getDynamicContentList($search = '', $limit = 10, $start = 0, $viewOther = false, $variantParentId = 0, $ignoreIds = [])
+    public function getDynamicContentList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = [])
     {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, name, language}');
@@ -182,10 +182,10 @@ class DynamicContentRepository extends CommonRepository
                 ->setParameter('id', $this->currentUser->getId());
         }
 
-        if ($variantParentId) {
-            $q->andWhere($q->expr()->eq('e.variantParent', ':variant_parent_id'))
-                ->setParameter('variant_parent_id', $variantParentId);
-        } else {
+        if ($topLevel == 'translation') {
+            //only get top level pages
+            $q->andWhere($q->expr()->isNull('e.translationParent'));
+        } elseif ($topLevel == 'variant') {
             $q->andWhere($q->expr()->isNull('e.variantParent'));
         }
 
@@ -223,13 +223,13 @@ class DynamicContentRepository extends CommonRepository
 
             if (isset($properties['dynamicContent'])) {
                 $dwc = $this->getEntity($properties['dynamicContent']);
-                
+
                 if ($dwc instanceof DynamicContent) {
                     return $dwc;
                 }
             }
         }
-        
+
         return false;
     }
 }
