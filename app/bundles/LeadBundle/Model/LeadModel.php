@@ -1160,18 +1160,20 @@ class LeadModel extends FormModel
     /**
      * Create a DNC entry for a lead
      *
-     * @param Lead         $lead
-     * @param string|array $channel  If an array with an ID, use the structure ['email' => 123]
-     * @param string       $comments
-     * @param int          $reason   Must be a class constant from the DoNotContact class.
-     * @param bool         $persist
+     * @param Lead          $lead
+     * @param string|array  $channel  If an array with an ID, use the structure ['email' => 123]
+     * @param string        $comments
+     * @param int           $reason   Must be a class constant from the DoNotContact class.
+     * @param bool          $persist
+     * @param bool          $checkCurrentStatus
      *
      * @return boolean If a DNC entry is added or updated, returns true. If a DNC is already present
      *                 and has the specified reason, nothing is done and this returns false.
      */
-    public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $persist = true)
+    public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $persist = true, $checkCurrentStatus = true)
     {
-        $isContactable = $this->isContactable($lead, $channel);
+        // if !$checkCurrentStatus, assume is contactable due to already being valided
+        $isContactable = ($checkCurrentStatus) ? $this->isContactable($lead, $channel) : DoNotContact::IS_CONTACTABLE;
 
         // If they don't have a DNC entry yet
         if ($isContactable === DoNotContact::IS_CONTACTABLE) {
@@ -1197,9 +1199,8 @@ class LeadModel extends FormModel
                 $this->saveEntity($lead);
             }
 
-            return true;
-        }
-        // Or if the given reason is different than the stated reason
+            return $dnc;
+        } // Or if the given reason is different than the stated reason
         elseif ($isContactable !== $reason) {
             /** @var DoNotContact $dnc */
             foreach ($lead->getDoNotContact() as $dnc) {
