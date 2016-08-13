@@ -94,7 +94,6 @@ class ChannelBroadcastEvent extends Event
     public function checkContext($channel)
     {
         if ($this->channel && $this->channel !== $channel) {
-            die(var_dump($this->channel));
             return false;
         }
 
