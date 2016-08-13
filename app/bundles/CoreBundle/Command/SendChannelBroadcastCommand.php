@@ -72,7 +72,7 @@ EOT
         $dispatcher = $this->getContainer()->get('event_dispatcher');
         $event      = $dispatcher->dispatch(
             CoreEvents::CHANNEL_BROADCAST,
-            new ChannelBroadcastEvent($input->getOption('channel'), $channelId)
+            new ChannelBroadcastEvent($input->getOption('channel'), $channelId, $output)
         );
 
         $results = $event->getResults();
@@ -82,11 +82,17 @@ EOT
             $rows[] = [$channel, $counts['success'], $counts['failed']];
         }
 
+        // Put a blank line after anything the event spits out
+        $output->writeln('');
+        $output->writeln('');
+
         $table = new Table($output);
         $table
             ->setHeaders([$translator->trans('mautic.core.channel'), $translator->trans('mautic.core.channel.broadcast_success_count'), $translator->trans('mautic.core.channel.broadcast_failed_count')])
             ->setRows($rows);
         $table->render();
+
+        $this->completeRun();
 
         return 0;
     }
