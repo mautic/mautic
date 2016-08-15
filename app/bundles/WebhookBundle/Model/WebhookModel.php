@@ -20,7 +20,6 @@ use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Event as Events;
 use Mautic\WebhookBundle\WebhookEvents;
 Use Mautic\WebhookBundle\Event\WebhookEvent;
-use Monolog\Logger;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
@@ -44,11 +43,6 @@ class WebhookModel extends FormModel
     protected $serializer;
 
     /**
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
      * WebhookModel constructor.
      *
      * @param CoreParametersHelper $coreParametersHelper
@@ -61,14 +55,6 @@ class WebhookModel extends FormModel
         $this->webhookLimit = $coreParametersHelper->getParameter('webhook_limit');
         $this->serializer   = $serializer;
         $this->logMax       = $coreParametersHelper->getParameter('webhook_log_max', 10);
-    }
-
-    /**
-     * @param Logger $logger
-     */
-    public function setLogger(Logger $logger)
-    {
-        $this->logger = $logger;
     }
 
     /**

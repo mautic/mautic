@@ -40,7 +40,6 @@ use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use DeviceDetector\DeviceDetector;
-use Psr\Log\LoggerInterface;
 
 /**
  * Class EmailModel
@@ -122,7 +121,6 @@ class EmailModel extends FormModel
         LeadModel $leadModel,
         TrackableModel $pageTrackableModel,
         UserModel $userModel,
-        LoggerInterface $logger,
         CoreParametersHelper $coreParametersHelper
     ) {
         $this->ipLookupHelper     = $ipLookupHelper;
@@ -132,7 +130,6 @@ class EmailModel extends FormModel
         $this->leadModel          = $leadModel;
         $this->pageTrackableModel = $pageTrackableModel;
         $this->userModel          = $userModel;
-        $this->logger             = $logger;
         $this->coreParameters     = $coreParametersHelper;
     }
 

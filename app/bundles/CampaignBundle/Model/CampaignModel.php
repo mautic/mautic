@@ -26,7 +26,6 @@ use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
-use Monolog\Logger;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -64,11 +63,6 @@ class CampaignModel extends CommonFormModel
     protected $formModel;
 
     /**
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
      * CampaignModel constructor.
      *
      * @param CoreParametersHelper $coreParametersHelper
@@ -83,14 +77,6 @@ class CampaignModel extends CommonFormModel
         $this->formModel = $formModel;
         $this->batchSleepTime = $coreParametersHelper->getParameter('mautic.batch_sleep_time');
         $this->batchCampaignSleepTime = $coreParametersHelper->getParameter('mautic.batch_campaign_sleep_time');
-    }
-
-    /**
-     * @param Logger $logger
-     */
-    public function setLogger(Logger $logger)
-    {
-        $this->logger = $logger;
     }
 
     /**

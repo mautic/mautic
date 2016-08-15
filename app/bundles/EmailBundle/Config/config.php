@@ -266,7 +266,6 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.page.model.trackable',
                     'mautic.user.model.user',
-                    'monolog.logger.mautic',
                     'mautic.helper.core_parameters'
                 ]
             ]
