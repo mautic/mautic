@@ -421,8 +421,15 @@ class PageModel extends FormModel
             }
 
             if (!empty($clickthrough['channel'])) {
-                $hit->setSource($clickthrough['channel'][0]);
-                $hit->setSourceId($clickthrough['channel'][1]);
+                if (count($clickthrough['channel']) === 1) {
+                    $channelId = reset($clickthrough['channel']);
+                    $channel   = key($clickthrough['channel']);
+                } else {
+                    $channel   = $clickthrough['channel'][0];
+                    $channelId = (int) $clickthrough['channel'][1];
+                }
+                $hit->setSource($channel);
+                $hit->setSourceId($channelId);
             } elseif (!empty($clickthrough['source'])) {
                 $hit->setSource($clickthrough['source'][0]);
                 $hit->setSourceId($clickthrough['source'][1]);
