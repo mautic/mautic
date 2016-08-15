@@ -116,7 +116,7 @@ class CampaignSubscriber extends CommonSubscriber
 
         // Check Landing Pages
         if ($pageHit instanceof Page) {
-            list($parent, $children)  = $this->pageModel->getVariants($pageHit);
+            list($parent, $children)  = $pageHit->getVariants();
             //use the parent (self or configured parent)
             $pageHitId = $parent->getId();
         } else {
