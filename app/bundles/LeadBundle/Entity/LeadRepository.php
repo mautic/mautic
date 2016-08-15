@@ -803,10 +803,8 @@ class LeadRepository extends CommonRepository
 
             case $this->translator->trans('mautic.lead.lead.searchcommand.duplicate'):
                     
-                //doing the thing here. 
-
                 $prateek = explode("+", $string);
-              
+
                 $imploder = array();
 
                 foreach ($prateek as $key => $value) {
@@ -814,31 +812,28 @@ class LeadRepository extends CommonRepository
                     if (!empty($list)) {
                         $imploder[] = (int) $list->getId();
                     }
-                    else 
+                    else
                         $imploder[] = 0;
                 }
                 
-
                 //logic. In query, Sum(manuall_removed should be less than the current)
-                $pluck = sizeof($imploder);
-                $pluck--; 
+                $pluck = sizeof($imploder) - 1;
 
+                $imploder = (string)(implode(",", $imploder));
 
-                $imploder = implode(",", $imploder);
-                
-                $return = array();
-                $rsm = new ResultSetMapping();
+                $sq = $this->_em->getConnection()->createQueryBuilder();
+                $sq -> select('lll.lead_id')
+                    -> from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
+                    -> where("lll.leadlist_id in ( ".$imploder." )")
+                    //-> where("lll.leadlist_id in ( :imploder )")
+                    -> groupBy('lll.lead_id')
+                    -> having('COUNT(lll.lead_id) > :counting AND SUM(lll.manually_removed) < :counting')
+                    -> setParameter('counting', $pluck)
+                    //-> setParameter('imploder', $imploder)
+                ;
 
+                $results = $sq->execute()->fetchAll();
 
-
-                $query_ps = "SELECT X.lead_id FROM (SELECT *, COUNT(lead_id) FROM ".MAUTIC_TABLE_PREFIX."lead_lists_leads WHERE leadlist_id IN (".$imploder.") GROUP BY lead_id  HAVING COUNT(lead_id) > ".$pluck." AND SUM(manually_removed) < ".$pluck.") AS X";
-                $stmt = $this->getEntityManager()
-                            ->getConnection()  
-                            ->prepare($query_ps);  
-                 
-                $stmt->execute();  
-                
-                $results = $stmt->fetchAll();
                 $leadIds = array();
                 foreach ($results as $row) {
                     $leadIds[] = $row['lead_id'];
