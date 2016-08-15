@@ -213,7 +213,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     if($list['id']){
                         $params['filter']['leadlist_id']=array(
                             'value' => $list['id'],
-                            'list_column_name' => 't.lead_id'
+                            'list_column_name' => 't.id'
                         );
                     }
                     else{
