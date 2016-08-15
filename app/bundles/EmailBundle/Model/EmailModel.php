@@ -91,7 +91,6 @@ class EmailModel extends FormModel
      */
     protected $coreParameters;
 
-
     /**
      * @var bool
      */
