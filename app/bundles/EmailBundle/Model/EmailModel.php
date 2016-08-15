@@ -87,11 +87,6 @@ class EmailModel extends FormModel
     protected $userModel;
 
     /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
      * @var Mixed
      */
     protected $coreParameters;
