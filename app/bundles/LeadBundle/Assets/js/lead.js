@@ -120,8 +120,17 @@ Mautic.leadOnLoad = function (container, response) {
         }
     }
 
+    var leadMap = [];
+
     mQuery(document).on('shown.bs.tab', 'a#load-lead-map', function (e) {
-        mQuery('#place-container svg').resize();
+        leadMap = Mautic.renderMap(mQuery('#place-container .vector-map'));
+    });
+
+    mQuery('a[data-toggle="tab"]').not('a#load-lead-map').on('shown.bs.tab', function (e) {
+        if (leadMap.length) {
+            Mautic.destroyMap(leadMap);
+            leadMap = [];
+        }
     });
 
     Mautic.initUniqueIdentifierFields();
