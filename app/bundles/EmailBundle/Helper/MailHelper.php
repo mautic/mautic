@@ -271,7 +271,7 @@ class MailHelper
             // properly populate metadata for this transport
 
             if ($result = $this->queue($dispatchSendEvent)) {
-            die(var_dump($result));
+
                 $result = $this->flushQueue();
             }
 
@@ -932,11 +932,8 @@ class MailHelper
     public function setTo($addresses, $name = null)
     {
         if (!is_array($addresses)) {
-            if (($name !== null) && (trim($name))) {
-                $addresses = [$addresses => trim($name)];
-            } else {
-                $addresses = [$addresses => null];
-            }
+            $name      = $this->cleanName($name);
+            $addresses = [$addresses => $name];
         }
 
         $this->checkBatchMaxRecipients(count($addresses));
@@ -966,6 +963,7 @@ class MailHelper
         $this->checkBatchMaxRecipients();
 
         try {
+            $name = $this->cleanName($name);
             $this->message->addTo($address, $name);
             $this->queuedRecipients[$address] = $name;
 
@@ -990,6 +988,7 @@ class MailHelper
         $this->checkBatchMaxRecipients(count($addresses), 'cc');
 
         try {
+            $name = $this->cleanName($name);
             $this->message->setCc($addresses, $name);
 
             return true;
@@ -1013,6 +1012,7 @@ class MailHelper
         $this->checkBatchMaxRecipients(1, 'cc');
 
         try {
+            $name = $this->cleanName($name);
             $this->message->addCc($address, $name);
 
             return true;
@@ -1036,6 +1036,7 @@ class MailHelper
         $this->checkBatchMaxRecipients(count($addresses), 'bcc');
 
         try {
+            $name = $this->cleanName($name);
             $this->message->setBcc($addresses, $name);
 
             return true;
@@ -1059,6 +1060,7 @@ class MailHelper
         $this->checkBatchMaxRecipients(1, 'bcc');
 
         try {
+            $name = $this->cleanName($name);
             $this->message->addBcc($address, $name);
 
             return true;
@@ -1100,6 +1102,7 @@ class MailHelper
     public function setReplyTo($addresses, $name = null)
     {
         try {
+            $name = $this->cleanName($name);
             $this->message->setReplyTo($addresses, $name);
         } catch (\Exception $e) {
             $this->logError($e);
@@ -1129,6 +1132,7 @@ class MailHelper
     public function setFrom($address, $name = null)
     {
         try {
+            $name = $this->cleanName($name);
             $this->message->setFrom($address, $name);
         } catch (\Exception $e) {
             $this->logError($e);
@@ -1856,5 +1860,26 @@ class MailHelper
             return true;
         }
         return false;
+    }
+
+    /**
+     * Clean the name - if empty, set as null to ensure pretty headers
+     *
+     * @param $name
+     *
+     * @return null|string
+     */
+    private function cleanName($name)
+    {
+        if (null !== $name) {
+            $name = trim($name);
+
+            // If empty, replace with null so that email clients do not show empty name because of To: '' <email@domain.com>
+            if (empty($name)) {
+                $name = null;
+            }
+        }
+
+        return $name;
     }
 }
