@@ -360,5 +360,6 @@ return [
         'default_signature_text'       => null,
         'email_frequency_number'       => null,
         'email_frequency_time'         => null,
-    ],
+        'track_mail_use_queue'         => false
+    ]
 ];
