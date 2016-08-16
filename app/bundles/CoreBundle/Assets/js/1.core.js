@@ -3341,7 +3341,6 @@ var Mautic = {
      * @param mQuery element scope
      */
     renderMaps: function(scope) {
-        if (!Mautic.mapObjects) Mautic.mapObjects = [];
         var maps = [];
 
         if (mQuery.type(scope) === 'string') {
@@ -3362,7 +3361,7 @@ var Mautic = {
     renderMap: function(wrapper) {
         // Map render causes a JS error on FF when the element is hidden
         if (wrapper.is(':visible')) {
-
+            if (!Mautic.mapObjects) Mautic.mapObjects = [];
             var data = wrapper.data('map-data');
             if (typeof data === 'undefined' || !data.length) {
                 try {
@@ -3431,6 +3430,7 @@ var Mautic = {
                     }
                 }
             });
+            wrapper.addClass('map-rendered');
             Mautic.mapObjects.push(wrapper);
             return wrapper;
         }
@@ -3440,10 +3440,13 @@ var Mautic = {
      * Destroy a jVector map
      */
     destroyMap: function(wrapper) {
-        var map = wrapper.vectorMap('get', 'mapObject');
-        map.removeAllMarkers();
-        map.remove();
-        wrapper.empty();
+        if (wrapper.hasClass('map-rendered')) {
+            var map = wrapper.vectorMap('get', 'mapObject');
+            map.removeAllMarkers();
+            map.remove();
+            wrapper.empty();
+            wrapper.removeClass('map-rendered');
+        }
     },
 
     /**
