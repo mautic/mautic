@@ -63,9 +63,8 @@ class FormSubmitHelper
         if ($config['copy_lead'] && !empty($leadEmail)) {
             // Send copy to lead
             $mailer->reset();
-
+            $mailer->setLead($lead->getProfileFields());
             $mailer->setTo($leadEmail);
-
             $mailer->setSubject($config['subject']);
             $mailer->addTokens($tokens);
             $mailer->setBody($config['message']);
