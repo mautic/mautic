@@ -515,16 +515,16 @@ class CommonRepository extends EntityRepository
         foreach ($commands as $k => $c) {
             if (is_array($c)) {
                 //subcommands
-                if (strtolower($this->translator->trans($k)) == $command) {
+                if ($this->translator->trans($k) == $command) {
                     foreach ($c as $subc) {
-                        if (strtolower($this->translator->trans($subc)) == $subcommand) {
+                        if ($this->translator->trans($subc) == $subcommand) {
                             return true;
                         }
                     }
                 }
-            } elseif (strtolower($this->translator->trans($c)) == $command) {
+            } elseif ($this->translator->trans($c) == $command) {
                 return true;
-            } elseif (strtolower($this->translator->trans($c)) == "{$command}:{$subcommand}") {
+            } elseif ($this->translator->trans($c) == "{$command}:{$subcommand}") {
                 $command    = "{$command}:{$subcommand}";
                 $subcommand = '';
 

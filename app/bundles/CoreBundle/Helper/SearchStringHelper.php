@@ -60,7 +60,7 @@ class SearchStringHelper
             self::$closingChars = $closingChars;
         }
 
-        $input = strtolower(trim(strip_tags($input)));
+        $input = trim(strip_tags($input));
 
         return self::splitUpSearchString($input);
     }
@@ -99,7 +99,7 @@ class SearchStringHelper
 
             if ($char == ':') {
                 //the string is a command
-                $command = strtolower(trim(substr($string, 0, -1)));
+                $command = trim(substr($string, 0, -1));
                 //does this have a negative?
                 if (strpos($command, '!') === 0) {
                     $filters->{$baseName}[$keyCount]->not = 1;
