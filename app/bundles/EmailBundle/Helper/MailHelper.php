@@ -120,16 +120,11 @@ class MailHelper
     protected $eventTokens   = array();
 
     /**
-     * Tells the mailer to use batching/tokenized emails if it's available
+     * Tells the helper that the transport supports tokenized emails (likely HTTP API)
      *
      * @var bool
      */
     protected $tokenizationEnabled = false;
-
-    /**
-     * @var bool
-     */
-    protected $tokenizationSupported = false;
 
     /**
      * @var array
@@ -236,7 +231,7 @@ class MailHelper
 
         // Check if batching is supported by the transport
         if ($this->factory->getParameter('mailer_spool_type') == 'memory' && $this->transport instanceof InterfaceTokenTransport) {
-            $this->tokenizationSupported = true;
+            $this->tokenizationEnabled = true;
         }
 
         // Set factory if supported
@@ -271,6 +266,18 @@ class MailHelper
      */
     public function send($dispatchSendEvent = false, $isQueueFlush = false, $useOwnerAsMailer = true)
     {
+        if ($this->tokenizationEnabled && !empty($this->queuedRecipients) && !$isQueueFlush) {
+            // This transport uses tokenization and queue()/flushQueue() was not used therefore use them in order
+            // properly populate metadata for this transport
+
+            if ($result = $this->queue($dispatchSendEvent)) {
+            die(var_dump($result));
+                $result = $this->flushQueue();
+            }
+
+            return $result;
+        }
+
         // Set from email
         if (!$isQueueFlush && $useOwnerAsMailer && $this->factory->getParameter('mailer_is_owner') && isset($this->lead['id'])) {
             if (!isset($this->lead['owner_id'])) {
@@ -562,7 +569,6 @@ class MailHelper
                 'charset'     => null
             );
 
-            $this->tokenizationEnabled = false;
             $this->plainTextSet        = false;
 
             $this->message = $this->getMessageInstance();
@@ -682,7 +688,7 @@ class MailHelper
     public function getMessageInstance()
     {
         try {
-            $message = ($this->tokenizationSupported) ? MauticMessage::newInstance() : \Swift_Message::newInstance();
+            $message = ($this->tokenizationEnabled) ? MauticMessage::newInstance() : \Swift_Message::newInstance();
 
             return $message;
         } catch (\Exception $e) {
@@ -929,7 +935,7 @@ class MailHelper
             if (($name !== null) && (trim($name))) {
                 $addresses = [$addresses => trim($name)];
             } else {
-                $addresses = [$addresses];
+                $addresses = [$addresses => null];
             }
         }
 
@@ -1428,17 +1434,15 @@ class MailHelper
     /**
      * Tell the mailer to use batching/tokenized emails if available.  It's up to the function calling to execute flushQueue to send the mail.
      *
+     * @deprecated 2.1.1 - to be removed in 3.0
+     *
      * @param bool $tokenizationEnabled
      *
      * @return bool Returns true if batching/tokenization is supported by the mailer
      */
     public function useMailerTokenization($tokenizationEnabled = true)
     {
-        if ($this->tokenizationSupported) {
-            $this->tokenizationEnabled = $tokenizationEnabled;
-        }
-
-        return $this->tokenizationSupported;
+        trigger_error('useMailerTokenization is no longer used as it is automatically handled based on what the transport supports.', E_DEPRECATED);
     }
 
     /**
