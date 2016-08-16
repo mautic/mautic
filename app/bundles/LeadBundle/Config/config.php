@@ -392,7 +392,8 @@ return [
                     'mautic.helper.paths',
                     'mautic.helper.integration',
                     'mautic.lead.model.field',
-                    'mautic.lead.model.list'
+                    'mautic.lead.model.list',
+                    'form.factory'
                 ]
             ],
             'mautic.lead.model.field' => [
