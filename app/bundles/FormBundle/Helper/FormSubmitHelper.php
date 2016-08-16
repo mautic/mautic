@@ -29,35 +29,36 @@ class FormSubmitHelper
             }
         }
 
-        $mailer = $factory->getMailer();
-        $emails = (!empty($config['to'])) ? array_fill_keys(explode(',', $config['to']), null) : array();
-
-        $mailer->setTo($emails);
-
         $leadEmail = $lead->getEmail();
+        $mailer    = $factory->getMailer();
+        $emails    = (!empty($config['to'])) ? array_fill_keys(explode(',', $config['to']), null) : [];
 
-        if (!empty($leadEmail)) {
-            // Reply to lead for user convenience
-            $mailer->setReplyTo($leadEmail);
+        if (!empty($emails)) {
+            $mailer->setTo($emails);
+
+            if (!empty($leadEmail)) {
+                // Reply to lead for user convenience
+                $mailer->setReplyTo($leadEmail);
+            }
+
+            if (!empty($config['cc'])) {
+                $emails = array_fill_keys(explode(',', $config['cc']), null);
+                $mailer->setCc($emails);
+            }
+
+            if (!empty($config['bcc'])) {
+                $emails = array_fill_keys(explode(',', $config['bcc']), null);
+                $mailer->setBcc($emails);
+            }
+
+            $mailer->setSubject($config['subject']);
+
+            $mailer->addTokens($tokens);
+            $mailer->setBody($config['message']);
+            $mailer->parsePlainText($config['message']);
+
+            $mailer->send(true);
         }
-
-        if (!empty($config['cc'])) {
-            $emails = array_fill_keys(explode(',', $config['cc']), null);
-            $mailer->setCc($emails);
-        }
-
-        if (!empty($config['bcc'])) {
-            $emails = array_fill_keys(explode(',', $config['bcc']), null);
-            $mailer->setBcc($emails);
-        }
-
-        $mailer->setSubject($config['subject']);
-
-        $mailer->setTokens($tokens);
-        $mailer->setBody($config['message']);
-        $mailer->parsePlainText($config['message']);
-
-        $mailer->send();
 
         if ($config['copy_lead'] && !empty($leadEmail)) {
             // Send copy to lead
@@ -66,11 +67,11 @@ class FormSubmitHelper
             $mailer->setTo($leadEmail);
 
             $mailer->setSubject($config['subject']);
-            $mailer->setTokens($tokens);
+            $mailer->addTokens($tokens);
             $mailer->setBody($config['message']);
             $mailer->parsePlainText($config['message']);
 
-            $mailer->send();
+            $mailer->send(true);
         }
     }
 }
