@@ -26,12 +26,19 @@ class LeadDeviceRepository extends CommonRepository
      *
      * @return array
      */
-    public function getDevice($statIds, $lead,  $deviceName = null, $deviceBrand = null, $deviceModel = null, \DateTime $fromDate = null, \DateTime $toDate = null)
-    {
-        $inIds = (!is_array($statIds)) ? array($statIds) : $statIds;
+    public function getDevice(
+        $statIds,
+        $lead,
+        $deviceName = null,
+        $deviceBrand = null,
+        $deviceModel = null,
+        \DateTime $fromDate = null,
+        \DateTime $toDate = null
+    ) {
+        $inIds = (!is_array($statIds)) ? [$statIds] : $statIds;
 
         if (empty($inIds)) {
-            return array();
+            return [];
         }
 
         $sq = $this->_em->getConnection()->createQueryBuilder();
@@ -39,7 +46,7 @@ class LeadDeviceRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
         if ($statIds) {
             if (!is_array($statIds)) {
-                $statIds = array((int) $statIds);
+                $statIds = [(int) $statIds];
             }
             $sq->where(
                 $sq->expr()->in('es.id', $statIds)
@@ -48,24 +55,30 @@ class LeadDeviceRepository extends CommonRepository
 
         if ($deviceName !== null) {
             $sq->where(
-                $sq->expr()->eq('es.device', $deviceName)
-            );
+                $sq->expr()->eq('es.device', ':device')
+            )
+                ->setParameter('device', $deviceName);
         }
+
         if ($deviceBrand !== null) {
             $sq->where(
-                $sq->expr()->eq('es.device_brand', $deviceBrand)
-            );
+                $sq->expr()->eq('es.device_brand', ':deviceBrand')
+            )
+                ->setParameter('deviceBrand', $deviceBrand);
         }
+
         if ($deviceModel !== null) {
             $sq->where(
-                $sq->expr()->eq('es.device_model', $deviceModel)
+                $sq->expr()->eq('es.device_model', ':deviceModel')
+            )
+                ->setParameter('deviceModel', $deviceModel);
+        }
+
+        if ($lead !== null) {
+            $sq->where(
+                $sq->expr()->eq('es.lead_id', $lead->getId())
             );
         }
-    if ($lead !== null) {
-        $sq->where(
-            $sq->expr()->eq('es.lead_id', $lead->getId())
-        );
-    }
 
         if ($fromDate !== null) {
             //make sure the date is UTC
@@ -84,8 +97,6 @@ class LeadDeviceRepository extends CommonRepository
         //get totals
         $device = $sq->execute()->fetchAll();
 
-
-
-        return (!empty($device))?$device[0]:array();
+        return (!empty($device)) ? $device[0] : [];
     }
 }
