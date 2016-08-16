@@ -35,21 +35,14 @@ class LeadDeviceRepository extends CommonRepository
         \DateTime $fromDate = null,
         \DateTime $toDate = null
     ) {
-        $inIds = (!is_array($statIds)) ? [$statIds] : $statIds;
-
-        if (empty($inIds)) {
-            return [];
-        }
-
         $sq = $this->_em->getConnection()->createQueryBuilder();
         $sq->select('es.id as id, es.device as device')
             ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
-        if ($statIds) {
-            if (!is_array($statIds)) {
-                $statIds = [(int) $statIds];
-            }
+        if (!empty($statIds)) {
+            $inIds = (!is_array($statIds)) ? [(int) $statIds] : $statIds;
+
             $sq->where(
-                $sq->expr()->in('es.id', $statIds)
+                $sq->expr()->in('es.id', $inIds)
             );
         }
 
