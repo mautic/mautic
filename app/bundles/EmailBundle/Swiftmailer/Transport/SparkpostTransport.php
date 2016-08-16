@@ -13,11 +13,11 @@ namespace Mautic\EmailBundle\Swiftmailer\Transport;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use SparkPost\APIResponseException;
-
 use SparkPost\SparkPost;
 use GuzzleHttp\Client;
 use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class SparkpostTransport
@@ -37,13 +37,19 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     protected $factory;
 
     /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * SparkpostTransport constructor.
      *
      * @param $apiKey
      */
-    public function __construct($apiKey)
+    public function __construct($apiKey, TranslatorInterface $translator)
     {
         $this->setApiKey($apiKey);
+        $this->translator = $translator;
     }
 
     /**
@@ -154,6 +160,12 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
         $message = $this->messageToArray($mauticTokens, $mergeVarPlaceholders, true);
 
+        // Sparkpost requires a subject
+        if (empty($message['subject'])) {
+
+            throw new \Exception($this->translator->trans('mautic.email.subject.notblank', [], 'validators'));
+        }
+
         if (isset($message['headers']['X-MC-InlineCSS'])) {
             $inlineCss = $message['headers']['X-MC-InlineCSS'];
         }
@@ -197,14 +209,23 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
                 $message['replyTo']['email'];
         }
 
+        $content = [
+            'from'           => (!empty($message['from']['name'])) ? $message['from']['name'].' <'.$message['from']['email'].'>'
+                : $message['from']['email'],
+            'subject'        => $message['subject'],
+        ];
+
+        // Sparkpost will set parts regardless if they are empty or not
+        if (!empty($message['html'])) {
+            $content['html'] = $message['html'];
+        }
+
+        if (!empty($message['text'])) {
+            $content['text'] = $message['text'];
+        }
+
         $sparkPostMessage = [
-            'content' => [
-                'html'           => $message['html'],
-                'text'           => $message['text'],
-                'from'           => (!empty($message['from']['name'])) ? $message['from']['name'].' <'.$message['from']['email'].'>'
-                    : $message['from']['email'],
-                'subject'        => $message['subject'],
-            ],
+            'content'        => $content,
             'recipients'     => $recipients,
             'headers'        => $message['headers'],
             'inline_css'     => $inlineCss,
