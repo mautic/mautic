@@ -55,6 +55,8 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
         $logger = $factory->getLogger();
         $logger->debug("Receiving webhook from Amazon");
 
+        $translator = $factory->getTranslator();
+
         // Data structure that Mautic expects to be returned from this callback
         $rows = array(
             DoNotContact::BOUNCED => array(
@@ -120,19 +122,19 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
                         # http://docs.aws.amazon.com/ses/latest/DeveloperGuide/notification-contents.html#complaint-object
                         switch ($message['complaint']['complaintFeedbackType']) {
                             case "abuse":
-                                $reason = "Indicates unsolicited email or some other kind of email abuse";
+                                $reason = $translator->trans("mautic.email.complaint.reason.abuse");
                                 break;
                             case "fraud":
-                                $reason = "Indicates some kind of fraud or phishing activity";
+                                $reason = $translator->trans("mautic.email.complaint.reason.fraud");
                                 break;
                             case "virus":
-                                $reason = "Reports that a virus is found in the originating message";
+                                $reason = $translator->trans("mautic.email.complaint.reason.virus");
                                 break;
                         }
                     }
 
                     if ($reason == null) {
-                        $reason = "Unkown ISP complaint";
+                        $reason = $translator->trans("mautic.email.complaint.reason.unkown");
                     }
 
                     $rows[DoNotContact::UNSUBSCRIBED]['emails'][$complainedRecipient['emailAddress']] = $reason;
@@ -141,8 +143,6 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
             }
 
         }
-
-        //print_r($rows);
 
         return $rows;
     }
