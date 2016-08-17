@@ -186,7 +186,12 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 try {
                     $folders = $mailbox->getListingFolders();
                     $choices = array_combine($folders, $folders);
-                } catch (\Exception $e) {}
+                } catch (\Exception $e) {
+                    // If the connection failed - add back the selected folder just in case it's a temporary connection issue
+                    if (!empty($options['data']['folder'])) {
+                        $choices[$options['data']['folder']] = $options['data']['folder'];
+                    }
+                }
             }
 
             $builder->add(
