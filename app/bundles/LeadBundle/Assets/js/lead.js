@@ -1103,4 +1103,15 @@ Mautic.initUniqueIdentifierFields = function() {
             });
         });
     }
-}
+};
+
+Mautic.updateFilterPositioning = function (el) {
+    var $el = mQuery(el);
+    var $parentEl = $el.closest('.panel');
+
+    if ($el.val() == 'and') {
+        $parentEl.addClass('in-group');
+    } else {
+        $parentEl.removeClass('in-group');
+    }
+};
