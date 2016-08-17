@@ -16,6 +16,7 @@ use SparkPost\APIResponseException;
 use SparkPost\SparkPost;
 use GuzzleHttp\Client;
 use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
+use SparkPost\SparkPostException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -71,14 +72,37 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
+     * Start this Transport mechanism.
+     */
+    public function start()
+    {
+        try {
+            $sparky   = $this->createSparkPost();
+            $response = $sparky->transmissions->get();
+            $response->wait();
+        } catch (SparkPostException $exception) {
+            $response = json_decode($exception->getMessage(), true);
+
+            if (is_array($response) && isset($response['errors'])) {
+                $this->throwException($response['errors'][0]['message']);
+            } else {
+                $this->throwException($exception->getMessage());
+            }
+        }
+
+        $this->started = true;
+    }
+
+    /**
      * @return SparkPost
      * @throws \Swift_TransportException
      */
     protected function createSparkPost()
     {
         if ($this->apiKey === null) {
-            throw new \Swift_TransportException('Cannot create instance of \SparkPost\SparkPost while API key is NULL');
+            $this->throwException('Cannot create instance of \SparkPost\SparkPost while API key is NULL');
         }
+
         $httpAdapter = new GuzzleAdapter(new Client());
         $sparky      = new SparkPost($httpAdapter, ['key' => $this->apiKey]);
 
