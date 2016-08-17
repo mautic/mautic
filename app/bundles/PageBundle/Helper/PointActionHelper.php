@@ -84,8 +84,17 @@ class PointActionHelper
             if (!isset($hitStats)) {
                 $hitStats = $hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
             }
-            if (isset($hitStats['sum']) && $hitStats['sum'] >= $action['properties']['accumulative_time']) {
-                $changePoints['accumulative_time'] = true;
+            if (isset($hitStats['sum'])) {
+                $unit = $action['properties']['accumulative_time_unit'];
+                switch ($unit){
+                    case 'i': ($action['properties']['accumulative_time'] == $action['properties']['accumulative_time']/60)?$changePoints['accumulative_time'] = true:$changePoints['accumulative_time'] = false;
+                        break;
+                    case 'H': ($action['properties']['accumulative_time'] == $action['properties']['accumulative_time']) / 3600?$changePoints['accumulative_time'] = true:$changePoints['accumulative_time'] = false;
+                        break;
+                    case 'd': ($action['properties']['accumulative_time'] == $action['properties']['accumulative_time'] / 86400)?$changePoints['accumulative_time'] = true:$changePoints['accumulative_time'] = false;
+                        break;
+                }
+
             } else {
                 $changePoints['accumulative_time'] = false;
             }
@@ -95,7 +104,7 @@ class PointActionHelper
             if (!isset($hitStats)) {
                 $hitStats = $hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
             }
-            if (isset($hitStats['count']) && $hitStats['count'] >= $action['properties']['page_hits']) {
+            if (isset($hitStats['count']) && $hitStats['count'] === $action['properties']['page_hits']) {
                 $changePoints['page_hits'] = true;
             } else {
                 $changePoints['page_hits'] = false;
@@ -105,12 +114,17 @@ class PointActionHelper
         if ($action['properties']['returns_within']) {
             $latestHit = $hitRepository->getLatestHit(['leadId' => $lead->getId(), $urlWithSqlWC]);
             $latestPlus = clone $latestHit;
-            $latestPlus->add(new \DateInterval('PT' . $action['properties']['returns_within'] . 'S'));
-            $now = new \dateTime();
-            if ($latestPlus >= $now) {
-                $changePoints['returns_within'] = true;
-            } else {
-                $changePoints['returns_within'] = false;
+            //$latestPlus->add(new \DateInterval('PT' . $action['properties']['returns_within'] . 'S'));
+            $now = new \DateTime();
+            $diff = $now->diff($latestPlus);
+            $unit = $action['properties']['returns_within_unit'];
+            switch ($unit){
+                case 'i': ($diff->i >= $action['properties']['returns_within'])?$changePoints['returns_within'] = true:$changePoints['returns_within'] = false;
+                    break;
+                case 'H': ($diff->h >= $action['properties']['returns_within'])?$changePoints['returns_within'] = true:$changePoints['returns_within'] = false;
+                    break;
+                case 'd': ($diff->d >= $action['properties']['returns_within'])?$changePoints['returns_within'] = true:$changePoints['returns_within'] = false;
+                    break;
             }
         }
 
@@ -119,12 +133,17 @@ class PointActionHelper
                 $latestHit = $hitRepository->getLatestHit(['leadId' => $lead->getId(), $urlWithSqlWC]);
             }
             $latestPlus = clone $latestHit;
-            $latestPlus->add(new \DateInterval('PT' . $action['properties']['returns_after'] . 'S'));
-            $now = new \dateTime();
-            if ($latestPlus >= $now) {
-                $changePoints['returns_after'] = true;
-            } else {
-                $changePoints['returns_after'] = false;
+            //$latestPlus->add(new \DateInterval('PT' . $action['properties']['returns_after'] . 'S'));
+            $now = new \DateTime();
+            $diff = $now->diff($latestPlus);
+            $unit = $action['properties']['returns_after_unit'];
+            switch ($unit){
+                case 'i': ($diff->i >= $action['properties']['returns_after'])?$changePoints['returns_after'] = true:$changePoints['returns_after'] = false;
+                    break;
+                case 'H': ($diff->h >= $action['properties']['returns_after'])?$changePoints['returns_after'] = true:$changePoints['returns_after'] = false;
+                    break;
+                case 'd': ($diff->d >= $action['properties']['returns_after'])?$changePoints['returns_after'] = true:$changePoints['returns_after'] = false;
+                    break;
             }
         }
 

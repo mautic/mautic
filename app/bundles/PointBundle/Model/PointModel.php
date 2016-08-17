@@ -231,7 +231,9 @@ class PointModel extends CommonFormModel
         foreach ($availablePoints as $action) {
             //if it's already been done, then skip it
             if (isset($completedActions[$action->getId()])) {
-                continue;
+                $properties = unserialize($completedActions[$action->getId()]['properties']);
+                if(empty($properties['page_hits']))
+                    continue;
             }
 
             //make sure the action still exists
