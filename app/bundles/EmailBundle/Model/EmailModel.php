@@ -1406,10 +1406,12 @@ class EmailModel extends FormModel
     }
 
     /**
-     * @param Stat   $stat
-     * @param string $comments
-     * @param string $reason
-     * @param bool   $flush
+     * @param Stat $stat
+     * @param      $comments
+     * @param int  $reason
+     * @param bool $flush
+     *
+     * @return bool|DoNotContact
      */
     public function setDoNotContact(Stat $stat, $comments, $reason = DoNotContact::BOUNCED, $flush = true)
     {
@@ -1418,8 +1420,11 @@ class EmailModel extends FormModel
         if ($lead instanceof Lead) {
             $email   = $stat->getEmail();
             $channel = ($email) ? ['email' => $email->getId()] : 'email';
-            $this->leadModel->addDncForLead($lead, $channel, $comments, $reason, $flush);
+
+            return $this->leadModel->addDncForLead($lead, $channel, $comments, $reason, $flush);
         }
+
+        return false;
     }
 
     /**
@@ -1446,11 +1451,13 @@ class EmailModel extends FormModel
     }
 
     /**
-     * @param           $email
-     * @param string    $reason
-     * @param string    $comments
-     * @param bool|true $flush
-     * @param int|null  $leadId
+     * @param        $email
+     * @param int    $reason
+     * @param string $comments
+     * @param bool   $flush
+     * @param null   $leadId
+     *
+     * @return array
      */
     public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, $comments = '', $flush = true, $leadId = null)
     {
@@ -1463,8 +1470,9 @@ class EmailModel extends FormModel
             $leadId = [$leadId];
         }
 
+        $dnc = [];
         foreach ($leadId as $lead) {
-            $this->leadModel->addDncForLead(
+            $dnc[] = $this->leadModel->addDncForLead(
                 $this->em->getReference('MauticLeadBundle:Lead', $lead),
                 'email',
                 $comments,
@@ -1472,12 +1480,16 @@ class EmailModel extends FormModel
                 $flush
             );
         }
+
+        return $dnc;
     }
 
     /**
      * Processes the callback response from a mailer for bounces and unsubscribes
      *
      * @param array $response
+     *
+     * @return array|void
      */
     public function processMailerCallback(array $response)
     {
@@ -1494,9 +1506,11 @@ class EmailModel extends FormModel
 
         // Keep track to prevent duplicates before flushing
         $emails = [];
+        $dnc    = [];
+
         foreach ($response as $type => $entries) {
             if (!empty($entries['hashIds'])) {
-                $stats = $this->getStatRepository()->getEntities(
+                $stats = $statRepo->getEntities(
                     [
                         'filter' => [
                             'force' => [
@@ -1517,7 +1531,7 @@ class EmailModel extends FormModel
                         $reason = $this->translator->trans('mautic.email.bounce.reason.'.$reason);
                     }
 
-                    $this->setDoNotContact($s, $reason, $type);
+                    $dnc[] = $this->setDoNotContact($s, $reason, $type);
 
                     $s->setIsFailed(true);
                     $this->em->persist($s);
@@ -1543,10 +1557,12 @@ class EmailModel extends FormModel
                         $reason = $this->translator->trans('mautic.email.bounce.reason.'.$reason);
                     }
 
-                    $this->setEmailDoNotContact($email, $type, $reason, true, $leadId);
+                    $dnc = array_merge($dnc, $this->setEmailDoNotContact($email, $type, $reason, true, $leadId));
                 }
             }
         }
+
+        return $dnc;
     }
 
     /**
