@@ -451,6 +451,9 @@ class ThemeHelper
         $tmpPath   = $this->pathsHelper->getSystemPath('cache', true).'/tmp_'.$themeName.'.zip';
         $zipper    = new \ZipArchive();
         $finder    = new Finder();
+
+        if (file_exists($tmpPath)) @unlink($tmpPath);
+        
         $archive   = $zipper->open($tmpPath, \ZipArchive::CREATE);
 
         $finder->files()->in($themePath);
@@ -460,7 +463,7 @@ class ThemeHelper
         } else {
             foreach ($finder as $file) {
                 $filePath = $file->getRealPath();
-                $localPath = str_replace($themePath.'/', '', $filePath);
+                $localPath = $file->getRelativePathname();
                 $zipper->addFile($filePath, $localPath);
             }
             $zipper->close();
