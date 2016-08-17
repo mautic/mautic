@@ -8,36 +8,36 @@
  */
 
 return array(
-    'routes' => array(
+    'routes'   => array(
         'main' => array(
             'mautic_pointtriggerevent_action' => array(
-                'path' => '/points/triggers/events/{objectAction}/{objectId}',
+                'path'       => '/points/triggers/events/{objectAction}/{objectId}',
                 'controller' => 'MauticPointBundle:TriggerEvent:execute'
             ),
-            'mautic_pointtrigger_index' => array(
-                'path' => '/points/triggers/{page}',
+            'mautic_pointtrigger_index'       => array(
+                'path'       => '/points/triggers/{page}',
                 'controller' => 'MauticPointBundle:Trigger:index'
             ),
-            'mautic_pointtrigger_action' => array(
-                'path' => '/points/triggers/{objectAction}/{objectId}',
+            'mautic_pointtrigger_action'      => array(
+                'path'       => '/points/triggers/{objectAction}/{objectId}',
                 'controller' => 'MauticPointBundle:Trigger:execute'
             ),
-            'mautic_point_index' => array(
-                'path' => '/points/{page}',
+            'mautic_point_index'              => array(
+                'path'       => '/points/{page}',
                 'controller' => 'MauticPointBundle:Point:index'
             ),
-            'mautic_point_action' => array(
-                'path' => '/points/{objectAction}/{objectId}',
+            'mautic_point_action'             => array(
+                'path'       => '/points/{objectAction}/{objectId}',
                 'controller' => 'MauticPointBundle:Point:execute'
             )
         ),
-        'api' => array(
-            'mautic_api_getpoints' => array(
-                'path' => '/points',
+        'api'  => array(
+            'mautic_api_getpoints'   => array(
+                'path'       => '/points',
                 'controller' => 'MauticPointBundle:Api\PointApi:getEntities'
             ),
-            'mautic_api_getpoint' => array(
-                'path' => '/points/{id}',
+            'mautic_api_getpoint'    => array(
+                'path'       => '/points/{id}',
                 'controller' => 'MauticPointBundle:Api\PointApi:getEntity'
             ),
             'mautic_api_applyrule' => array(
@@ -46,16 +46,16 @@ return array(
                 'method' => 'PATCH'
             ),
             'mautic_api_gettriggers' => array(
-                'path' => '/points/triggers',
+                'path'       => '/points/triggers',
                 'controller' => 'MauticPointBundle:Api\TriggerApi:getEntities'
             ),
-            'mautic_api_gettrigger' => array(
-                'path' => '/points/triggers/{id}',
+            'mautic_api_gettrigger'  => array(
+                'path'       => '/points/triggers/{id}',
                 'controller' => 'MauticPointBundle:Api\TriggerApi:getEntity'
             )
         )
     ),
-    
+
     'menu'     => array(
         'main' => array(
             'mautic.points.menu.root' => array(
@@ -76,14 +76,14 @@ return array(
             )
         )
     ),
-    
+
     'categories' => array(
         'point' => null
     ),
-    
+
     'services' => array(
         'events' => array(
-            'mautic.point.subscriber' => array(
+            'mautic.point.subscriber'            => array(
                 'class' => 'Mautic\PointBundle\EventListener\PointSubscriber'
             ),
             'mautic.point.leadbundle.subscriber' => array(
@@ -93,29 +93,29 @@ return array(
                     'mautic.point.model.trigger'
                 ]
             ),
-            'mautic.point.search.subscriber' => array(
+            'mautic.point.search.subscriber'     => array(
                 'class' => 'Mautic\PointBundle\EventListener\SearchSubscriber'
             ),
             'mautic.point.dashboard.subscriber'  => array(
                 'class' => 'Mautic\PointBundle\EventListener\DashboardSubscriber'
             ),
         ),
-        'forms' => array(
-            'mautic.point.type.form' => array(
-                'class' => 'Mautic\PointBundle\Form\Type\PointType',
+        'forms'  => array(
+            'mautic.point.type.form'                  => array(
+                'class'     => 'Mautic\PointBundle\Form\Type\PointType',
                 'arguments' => 'mautic.factory',
-                'alias' => 'point'
+                'alias'     => 'point'
             ),
-            'mautic.point.type.action' => array(
+            'mautic.point.type.action'                => array(
                 'class' => 'Mautic\PointBundle\Form\Type\PointActionType',
                 'alias' => 'pointaction'
             ),
-            'mautic.pointtrigger.type.form' => array(
-                'class' => 'Mautic\PointBundle\Form\Type\TriggerType',
+            'mautic.pointtrigger.type.form'           => array(
+                'class'     => 'Mautic\PointBundle\Form\Type\TriggerType',
                 'arguments' => 'mautic.factory',
-                'alias' => 'pointtrigger'
+                'alias'     => 'pointtrigger'
             ),
-            'mautic.pointtrigger.type.action' => array(
+            'mautic.pointtrigger.type.action'         => array(
                 'class' => 'Mautic\PointBundle\Form\Type\TriggerEventType',
                 'alias' => 'pointtriggerevent'
             ),

@@ -9,10 +9,10 @@
 
 namespace Mautic\PointBundle\Controller\Api;
 
-use Mautic\ApiBundle\Controller\CommonApiController;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Mautic\ApiBundle\ApiEvents;
+use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Event\ApiEvent;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -22,9 +22,7 @@ class PointApiController extends CommonApiController
 {
 
     /**
-     *
      * {@inheritdoc}
-     *
      */
     public function initialize(FilterControllerEvent $event)
     {
@@ -38,12 +36,10 @@ class PointApiController extends CommonApiController
     }
 
     /**
-     *
      * @param unknown $id
      * @param unknown $leadId
      *
      * @return
-     *
      */
     public function applyRuleAction($id, $leadId)
     {

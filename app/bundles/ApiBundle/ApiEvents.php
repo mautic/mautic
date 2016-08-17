@@ -22,7 +22,7 @@ final class ApiEvents
      * @var string
      */
     const CLIENT_PRE_SAVE = 'mautic.client_pre_save';
-    
+
     /**
      * The mautic.client_post_save event is thrown right after an API client is persisted.
      *
@@ -31,7 +31,7 @@ final class ApiEvents
      * @var string
      */
     const CLIENT_POST_SAVE = 'mautic.client_post_save';
-    
+
     /**
      * The mautic.client_post_delete event is thrown after an API client is deleted.
      *
@@ -40,7 +40,7 @@ final class ApiEvents
      * @var string
      */
     const CLIENT_POST_DELETE = 'mautic.client_post_delete';
-    
+
     /**
      * The mautic.build_api_route event is thrown to build Mautic API routes
      *
@@ -49,7 +49,7 @@ final class ApiEvents
      * @var string
      */
     const BUILD_ROUTE = 'mautic.build_api_route';
-    
+
     /**
      *
      * @var string

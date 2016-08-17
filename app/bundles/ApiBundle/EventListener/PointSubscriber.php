@@ -37,7 +37,7 @@ class PointSubscriber extends CommonSubscriber
             ),
             'formType' => 'pointaction_apicall'
         );
-        
+
         $event->addAction('api.call', $action);
     }
 
