@@ -16,6 +16,8 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -30,11 +32,40 @@ class ClientModel extends FormModel
     private $apiMode;
 
     /**
-     * @return void
+     * @var Session
      */
-    public function initialize()
+    protected $session;
+
+    /**
+     * @var null|\Symfony\Component\HttpFoundation\Request
+     */
+    protected $request;
+
+    /**
+     * ClientModel constructor.
+     *
+     * @param RequestStack $requestStack
+     */
+    public function __construct(RequestStack $requestStack)
     {
-        $this->apiMode = $this->factory->getRequest()->get('api_mode', $this->factory->getSession()->get('mautic.client.filter.api_mode', 'oauth1a'));
+        $this->request = $requestStack->getCurrentRequest();
+        $this->apiMode = $this->request->get('api_mode', $this->request->getSession()->get('mautic.client.filter.api_mode', 'oauth1a'));
+    }
+
+    /**
+     * @param $apiMode
+     */
+    public function setApiMode($apiMode)
+    {
+        $this->apiMode = $apiMode;
+    }
+
+    /**
+     * @param Session $session
+     */
+    public function setSession(Session $session)
+    {
+        $this->session = $session;
     }
 
     /**
@@ -144,14 +175,12 @@ class ClientModel extends FormModel
             throw new MethodNotAllowedHttpException(array('Client', 'Consumer'));
         }
 
-        $me = $this->factory->getUser();
-
         //remove the user from the client
         if ($this->apiMode == 'oauth2') {
-            $entity->removeUser($me);
+            $entity->removeUser($this->user);
             $this->saveEntity($entity);
         } else {
-            $this->getRepository()->deleteAccessTokens($entity, $me);
+            $this->getRepository()->deleteAccessTokens($entity, $this->user);
         }
     }
 }

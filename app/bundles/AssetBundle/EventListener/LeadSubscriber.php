@@ -8,7 +8,10 @@
  */
 namespace Mautic\AssetBundle\EventListener;
 
+use Mautic\AssetBundle\AssetEvents;
+use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -21,17 +24,30 @@ use Mautic\LeadBundle\LeadEvents;
  */
 class LeadSubscriber extends CommonSubscriber
 {
+    protected $model;
+
+    /**
+     * LeadSubscriber constructor.
+     *
+     * @param MauticFactory $factory
+     */
+    public function __construct(MauticFactory $factory, AssetModel $model)
+    {
+        parent::__construct($factory);
+
+        $this->model = $model;
+    }
 
     /**
      * @return array
      */
     static public function getSubscribedEvents()
     {
-        return array(
-            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
-            LeadEvents::CURRENT_LEAD_CHANGED => array('onLeadChange', 0),
-            LeadEvents::LEAD_POST_MERGE      => array('onLeadMerge', 0)
-        );
+        return [
+            LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
+            LeadEvents::CURRENT_LEAD_CHANGED => ['onLeadChange', 0],
+            LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
+        ];
     }
 
     /**
@@ -42,46 +58,48 @@ class LeadSubscriber extends CommonSubscriber
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         // Set available event types
-        $eventTypeKey = 'asset.download';
+        $eventTypeKey  = 'asset.download';
         $eventTypeName = $this->translator->trans('mautic.asset.event.download');
         $event->addEventType($eventTypeKey, $eventTypeName);
 
         // Decide if those events are filtered
-        $filters = $event->getEventFilters();
-
         if (!$event->isApplicable($eventTypeKey)) {
+
             return;
         }
 
-        $lead    = $event->getLead();
-        $options = array('ipIds' => array(), 'filters' => $filters);
+        $lead = $event->getLead();
 
-
-        /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
-        /*
-        foreach ($lead->getIpAddresses() as $ip) {
-            $options['ipIds'][] = $ip->getId();
-        }
-        */
         /** @var \Mautic\AssetBundle\Entity\DownloadRepository $downloadRepository */
-        $downloadRepository = $this->factory->getEntityManager()->getRepository('MauticAssetBundle:Download');
+        $downloadRepository = $this->em->getRepository('MauticAssetBundle:Download');
+        $downloads          = $downloadRepository->getLeadDownloads($lead->getId(), $event->getQueryOptions());
 
-        $downloads = $downloadRepository->getLeadDownloads($lead->getId(), $options);
+        // Add total number to counter
+        $event->addToCounter($eventTypeKey, $downloads);
 
-        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-        $model = $this->factory->getModel('asset.asset');
+        if (!$event->isEngagementCount()) {
 
-        // Add the downloads to the event array
-        foreach ($downloads as $download) {
-            $event->addEvent(array(
-                'event'     => $eventTypeKey,
-                'eventLabel' => $eventTypeName,
-                'timestamp' => $download['dateDownload'],
-                'extra'     => array(
-                    'asset' => $model->getEntity($download['asset_id'])
-                ),
-                'contentTemplate' => 'MauticAssetBundle:SubscribedEvents\Timeline:index.html.php'
-            ));
+            // Add the downloads to the event array
+            foreach ($downloads['results'] as $download) {
+                $asset = $this->model->getEntity($download['asset_id']);
+                $event->addEvent(
+                    [
+                        'event'           => $eventTypeKey,
+                        'eventLabel'      => [
+                            'label' => $download['title'],
+                            'href'  => $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $download['asset_id']])
+                        ],
+                        'extra'           => [
+                            'asset'            => $asset,
+                            'assetDownloadUrl' => $this->model->generateUrl($asset)
+                        ],
+                        'eventType'       => $eventTypeName,
+                        'timestamp'       => $download['dateDownload'],
+                        'icon'            => 'fa-download',
+                        'contentTemplate' => 'MauticAssetBundle:SubscribedEvents\Timeline:index.html.php'
+                    ]
+                );
+            }
         }
     }
 
@@ -90,7 +108,11 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadChange(LeadChangeEvent $event)
     {
-        $this->factory->getModel('asset')->getDownloadRepository()->updateLeadByTrackingId($event->getNewLead()->getId(), $event->getNewTrackingId(), $event->getOldTrackingId());
+        $this->model->getDownloadRepository()->updateLeadByTrackingId(
+            $event->getNewLead()->getId(),
+            $event->getNewTrackingId(),
+            $event->getOldTrackingId()
+        );
     }
 
     /**
@@ -98,6 +120,6 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadMerge(LeadMergeEvent $event)
     {
-        $this->factory->getModel('asset')->getDownloadRepository()->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
+        $this->model->getDownloadRepository()->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }
 }

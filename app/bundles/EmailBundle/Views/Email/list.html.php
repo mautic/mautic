@@ -38,7 +38,7 @@ if (count($items)):
             ));
             ?>
 
-            <th class="visible-sm visible-md visible-lg col-email-stats"><?php echo $view['translator']->trans('mautic.email.thead.stats'); ?></th>
+            <th class="visible-sm visible-md visible-lg col-email-stats"><?php echo $view['translator']->trans('mautic.core.stats'); ?></th>
 
             <?php
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
@@ -53,8 +53,8 @@ if (count($items)):
         <tbody>
         <?php foreach ($items as $item): ?>
             <?php
-            $variantChildren = $item->getVariantChildren();
-            $hasVariants     = count($variantChildren);
+            $hasVariants     = $item->isVariant();
+            $hasTranslations = $item->isTranslation();
             $type            = $item->getEmailType();
             ?>
             <tr>
@@ -65,7 +65,7 @@ if (count($items)):
                         array(
                             'attr' => array(
                                 'data-toggle' => 'ajax',
-                                'href'        => $view['router']->generate('mautic_email_action', array('objectAction' => 'send', 'objectId' => $item->getId())),
+                                'href'        => $view['router']->path('mautic_email_action', array('objectAction' => 'send', 'objectId' => $item->getId())),
                             ),
                             'iconClass' => 'fa fa-send-o',
                             'btnText'   => 'mautic.email.send'
@@ -91,13 +91,22 @@ if (count($items)):
                         <?php else: ?>
                         <i class="fa fa-fw fa-lg fa-toggle-on text-muted disabled"></i>
                         <?php endif; ?>
-                        <a href="<?php echo $view['router']->generate('mautic_email_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
+                        <a href="<?php echo $view['router']->path('mautic_email_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
                             <?php echo $item->getName(); ?>
                             <?php if ($hasVariants): ?>
-                            <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.email.icon_tooltip.abtest'); ?>"><i class="fa fa-fw fa-sitemap"></i></span>
+                            <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.icon_tooltip.ab_test'); ?>">
+                                <i class="fa fa-fw fa-sitemap"></i>
+                            </span>
+                            <?php endif; ?>
+                            <?php if ($hasTranslations): ?>
+                            <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.icon_tooltip.translation'); ?>">
+                                <i class="fa fa-fw fa-language"></i>
+                            </span>
                             <?php endif; ?>
                             <?php if ($type == 'list'): ?>
-                            <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.email.icon_tooltip.list_email'); ?>"><i class="fa fa-fw fa-list"></i></span>
+                            <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.email.icon_tooltip.list_email'); ?>">
+                                <i class="fa fa-fw fa-pie-chart"></i>
+                            </span>
                             <?php endif; ?>
                         </a>
                     </div>
@@ -129,7 +138,7 @@ if (count($items)):
         'totalItems'      => $totalItems,
         'page'            => $page,
         'limit'           => $limit,
-        'baseUrl'         => $view['router']->generate('mautic_email_index'),
+        'baseUrl'         => $view['router']->path('mautic_email_index'),
         'sessionVar'      => 'email'
     )); ?>
 </div>

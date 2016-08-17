@@ -9,7 +9,12 @@
 
 namespace Mautic\CoreBundle\Templating\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\UserBundle\Event\AuthenticationContentEvent;
+use Mautic\UserBundle\UserEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Templating\Helper\Helper;
 
 /**
@@ -18,16 +23,32 @@ use Symfony\Component\Templating\Helper\Helper;
 class SecurityHelper extends Helper
 {
     /**
-     * @var MauticFactory
+     * @var CorePermissions
      */
-    private $factory;
+    private $security;
 
     /**
-     * @param MauticFactory $factory
+     * @var Request
      */
-    public function __construct(MauticFactory $factory)
+    private $request;
+
+    /**
+     * @var Dispatcher
+     */
+    private $dispatcher;
+
+    /**
+     * SecurityHelper constructor.
+     *
+     * @param CorePermissions $security
+     * @param RequestStack    $requestStack
+     * @param EventDispatcherInterface      $dispatcher
+     */
+    public function __construct(CorePermissions $security, RequestStack $requestStack, EventDispatcherInterface $dispatcher)
     {
-        $this->factory = $factory;
+        $this->security   = $security;
+        $this->request    = $requestStack->getCurrentRequest();
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -49,7 +70,7 @@ class SecurityHelper extends Helper
      */
     public function hasEntityAccess($ownPermission, $otherPermission, $ownerId)
     {
-        return $this->factory->getSecurity()->hasEntityAccess($ownPermission, $otherPermission, $ownerId);
+        return $this->security->hasEntityAccess($ownPermission, $otherPermission, $ownerId);
     }
 
     /**
@@ -59,6 +80,24 @@ class SecurityHelper extends Helper
      */
     public function isGranted($permission)
     {
-        return $this->factory->getSecurity()->isGranted($permission);
+        return $this->security->isGranted($permission);
+    }
+
+    /**
+     * Get content from listeners
+     */
+    public function getAuthenticationContent()
+    {
+        $content = '';
+        if ($this->dispatcher->hasListeners(UserEvents::USER_AUTHENTICATION_CONTENT)) {
+            $event = new AuthenticationContentEvent($this->request);
+            $this->dispatcher->dispatch(UserEvents::USER_AUTHENTICATION_CONTENT, $event);
+            $content = $event->getContent();
+
+            // Remove post_logout session after content has been generated
+            $this->request->getSession()->remove('post_logout');
+        }
+
+        return $content;
     }
 }

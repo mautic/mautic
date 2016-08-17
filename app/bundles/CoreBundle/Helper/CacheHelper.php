@@ -28,14 +28,20 @@ class CacheHelper
 
     protected $env;
 
+    protected $configFile;
+
+    protected $containerFile;
+
     /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
     {
-        $this->factory  = $factory;
-        $this->cacheDir = $factory->getSystemPath('cache', true);
-        $this->env      = $factory->getEnvironment();
+        $this->factory       = $factory;
+        $this->cacheDir      = $factory->getSystemPath('cache', true);
+        $this->env           = $factory->getEnvironment();
+        $this->configFile    = $this->factory->getLocalConfigFile(false);
+        $this->containerFile = $this->factory->getKernel()->getContainerFile();
     }
 
     /**
@@ -45,13 +51,12 @@ class CacheHelper
      */
     public function clearCache()
     {
-        $this->clearSessionItems();
-
         $memoryLimit = ini_get('memory_limit');
         if ((int) substr($memoryLimit, 0, -1) < 128) {
             ini_set('memory_limit', '128M');
         }
 
+        $this->clearSessionItems();
         $this->clearOpcaches();
 
         //attempt to squash command output
@@ -83,20 +88,25 @@ class CacheHelper
 
         $fs = new Filesystem();
         $fs->remove($this->cacheDir);
+
+        $this->clearOpcaches();
     }
 
     /**
      * Delete's the file Symfony caches settings in
+     *
+     * @param bool $configSave
      */
-    public function clearContainerFile()
+    public function clearContainerFile($configSave = true)
     {
-        $this->clearOpcaches(true);
+        $this->clearSessionItems();
 
         $containerFile = $this->factory->getKernel()->getContainerFile();
-
         if (file_exists($containerFile)) {
             unlink($containerFile);
         }
+
+        $this->clearOpcaches($configSave);
     }
 
     /**
@@ -152,12 +162,12 @@ class CacheHelper
      */
     protected function clearOpcaches($configSave = false)
     {
-        // Clear opcaches before rebuilding the cache to ensure latest filechanges are used
+        // Clear opcaches before rebuilding the cache to ensure latest file changes are used
         if (function_exists('opcache_reset')) {
-            if ($configSave) {
+            if ($configSave && function_exists('opcache_invalidate')) {
                 // Clear the cached config file
-                $configFile = $this->factory->getLocalConfigFile(false);
-                opcache_invalidate($configFile);
+                opcache_invalidate($this->configFile, true);
+                opcache_invalidate($this->containerFile, true);
             } else {
                 // Clear the entire cache as anything could have been affected
                 opcache_reset();
@@ -165,7 +175,7 @@ class CacheHelper
         }
 
         if (function_exists('apc_clear_cache')) {
-            apc_clear_cache('user');
+            apc_clear_cache();
         }
     }
 }

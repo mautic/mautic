@@ -38,7 +38,7 @@ class Version20150724000000 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function mysqlUp(Schema $schema)
+    public function up(Schema $schema)
     {
         // Check that render_style was not added by migration 20150521
         $table = $schema->getTable($this->prefix . 'forms');
@@ -124,104 +124,5 @@ class Version20150724000000 extends AbstractMauticMigration
         $this->addSql('ALTER TABLE ' . $this->prefix . 'permissions DROP FOREIGN KEY ' . $this->findPropertyName('permissions', 'fk', 'D60322AC'));
         $this->addSql('ALTER TABLE ' . $this->prefix . 'permissions CHANGE role_id role_id INT NOT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'permissions ADD CONSTRAINT ' . $this->generatePropertyName('permissions', 'fk', array('role_id')) . ' FOREIGN KEY (role_id) REFERENCES ' . $this->prefix . 'roles (id) ON DELETE CASCADE');
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    public function postgresqlUp(Schema $schema)
-    {
-        // Check that render_style was not added by migration 20150521
-        $table = $schema->getTable($this->prefix . 'forms');
-        if (!$table->hasColumn('render_style')) {
-            $this->addSql('ALTER TABLE ' . $this->prefix . 'forms ADD COLUMN render_style BOOLEAN DEFAULT NULL');
-        }
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_consumers RENAME COLUMN consumerkey TO consumer_key');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_consumers ALTER consumer_key SET NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_consumers RENAME COLUMN consumersecret TO consumer_secret');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_consumers ALTER consumer_secret SET NOT NULL');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_access_tokens ALTER consumer_id SET NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_access_tokens ALTER user_id SET NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_access_tokens RENAME COLUMN expiresat TO expires_at');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_request_tokens ALTER consumer_id SET NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_request_tokens RENAME COLUMN expiresat TO expires_at');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_access_tokens ALTER expires_at TYPE BIGINT');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth1_request_tokens ALTER expires_at TYPE BIGINT');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth2_accesstokens ALTER expires_at TYPE BIGINT');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth2_refreshtokens ALTER expires_at TYPE BIGINT');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth2_authcodes ALTER expires_at TYPE BIGINT');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth2_clients ALTER name TYPE VARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'oauth2_clients ALTER name SET NOT NULL');
-
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaigns ALTER name SET NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaigns ALTER name TYPE VARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_events ALTER name SET NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_events ALTER name TYPE VARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log DROP CONSTRAINT ' . $this->findPropertyName('campaign_lead_event_log', 'fk', '696c06d6'));
-        $this->addSql('DROP INDEX ' . $this->findPropertyName('campaign_lead_event_log', 'idx', '696C06D6') . '');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log RENAME COLUMN ipaddress_id TO ip_id');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD CONSTRAINT ' . $this->generatePropertyName('campaign_lead_event_log', 'fk', array('ip_id')) . ' FOREIGN KEY (ip_id) REFERENCES ' . $this->prefix . 'ip_addresses (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('campaign_lead_event_log', 'idx', array('ip_id')) . ' ON ' . $this->prefix . 'campaign_lead_event_log (ip_id)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'audit_log ALTER ip_address TYPE VARCHAR(45)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'ip_addresses ALTER ip_address TYPE VARCHAR(45)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_donotemail ALTER date_added SET NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ALTER name SET NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'emails ALTER email_type TYPE TEXT');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref DROP CONSTRAINT ' . $this->findPropertyName('email_assets_xref', 'fk', 'A832C1C9'));
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref DROP CONSTRAINT ' . $this->findPropertyName('email_assets_xref', 'fk', '75DA1941'));
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('email_id')) . ' FOREIGN KEY (email_id) REFERENCES ' . $this->prefix . 'emails (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_assets_xref ADD CONSTRAINT ' . $this->generatePropertyName('email_assets_xref', 'fk', array('asset_id')) . ' FOREIGN KEY (asset_id) REFERENCES ' . $this->prefix . 'assets (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats ALTER retry_count DROP DEFAULT');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'email_stats ALTER retry_count TYPE integer USING (trim(retry_count)::integer)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_actions ALTER name SET NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_actions ALTER name TYPE VARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields DROP CONSTRAINT ' . $this->findPropertyName('form_fields', 'fk', '5FF69B7D'));
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ALTER form_id SET NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'form_fields ADD CONSTRAINT ' . $this->generatePropertyName('form_fields', 'fk', array('form_id')) . ' FOREIGN KEY (form_id) REFERENCES ' . $this->prefix . 'forms (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_ips_xref DROP CONSTRAINT ' . $this->findPropertyName('lead_ips_xref', 'fk', '0655458D'));
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_ips_xref ADD CONSTRAINT ' . $this->generatePropertyName('lead_ips_xref', 'fk', array('lead_id')) . ' FOREIGN KEY (lead_id) REFERENCES ' . $this->prefix . 'leads (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_notes ALTER lead_id SET NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_notes ALTER text TYPE TEXT');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_points_change_log DROP CONSTRAINT ' . $this->findPropertyName('lead_points_change_log', 'fk', '6955458D'));
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_points_change_log ALTER event_name TYPE VARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_points_change_log ALTER action_name TYPE VARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_points_change_log ADD CONSTRAINT ' . $this->generatePropertyName('lead_points_change_log', 'fk', array('lead_id')) . ' FOREIGN KEY (lead_id) REFERENCES ' . $this->prefix . 'leads (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'pages ALTER meta_description TYPE VARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'pages ALTER redirect_url TYPE VARCHAR(100)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'point_lead_action_log DROP CONSTRAINT ' . $this->findPropertyName('point_lead_action_log', 'fk', '696c06d6'));
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'point_lead_action_log DROP CONSTRAINT ' . $this->findPropertyName('point_lead_action_log', 'fk', 'C028CEA2'));
-        $this->addSql('DROP INDEX ' . $this->findPropertyName('point_lead_action_log', 'idx', '696C06D6') . '');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'point_lead_action_log RENAME COLUMN ipaddress_id TO ip_id');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'point_lead_action_log ADD CONSTRAINT ' . $this->generatePropertyName('point_lead_action_log', 'fk', array('ip_id')) . ' FOREIGN KEY (ip_id) REFERENCES ' . $this->prefix . 'ip_addresses (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'point_lead_action_log ADD CONSTRAINT ' . $this->generatePropertyName('point_lead_action_log', 'fk', array('point_id')) . ' FOREIGN KEY (point_id) REFERENCES ' . $this->prefix . 'points (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('point_lead_action_log', 'idx', array('ip_id')) . ' ON ' . $this->prefix . 'point_lead_action_log (ip_id)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'point_lead_event_log DROP CONSTRAINT ' . $this->findPropertyName('point_lead_event_log', 'fk', '696c06d6'));
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'point_lead_event_log DROP CONSTRAINT ' . $this->findPropertyName('point_lead_event_log', 'fk', '71F7E88B'));
-        $this->addSql('DROP INDEX ' . $this->findPropertyName('point_lead_event_log', 'idx', '696C06D6') . '');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'point_lead_event_log RENAME COLUMN ipaddress_id TO ip_id');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'point_lead_event_log ADD CONSTRAINT ' . $this->generatePropertyName('point_lead_event_log', 'fk', array('ip_id')) . ' FOREIGN KEY (ip_id) REFERENCES ' . $this->prefix . 'ip_addresses (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'point_lead_event_log ADD CONSTRAINT ' . $this->generatePropertyName('point_lead_event_log', 'fk', array('event_id')) . ' FOREIGN KEY (event_id) REFERENCES ' . $this->prefix . 'point_trigger_events (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('CREATE INDEX ' . $this->generatePropertyName('point_lead_event_log', 'idx', array('ip_id')) . 'Dro ON ' . $this->prefix . 'point_lead_event_log (ip_id)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'points ALTER name SET NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'points ALTER name TYPE VARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'point_triggers ALTER name SET NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'point_triggers ALTER name TYPE VARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'point_trigger_events ALTER name SET NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'point_trigger_events ALTER name TYPE VARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'users ALTER role_id SET NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'users ALTER username TYPE VARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'users ALTER first_name TYPE VARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'users ALTER last_name TYPE VARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'users ALTER email TYPE VARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'users ALTER position TYPE VARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'users ALTER timezone TYPE VARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'users ALTER locale TYPE VARCHAR(255)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'permissions DROP CONSTRAINT ' . $this->findPropertyName('permissions', 'fk', 'D60322AC'));
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'permissions ALTER role_id SET NOT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'permissions ADD CONSTRAINT ' . $this->generatePropertyName('permissions', 'fk', array('role_id')) . ' FOREIGN KEY (role_id) REFERENCES ' . $this->prefix . 'roles (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
     }
 }

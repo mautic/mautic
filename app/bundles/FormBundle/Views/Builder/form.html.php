@@ -14,20 +14,22 @@ $fields   = $form->getFields();
 <?php if ($form->getRenderStyle()) echo $view->render($theme.'MauticFormBundle:Builder:style.html.php', array('form' => $form, 'formName' => $formName)); ?>
 
 <div id="mauticform_wrapper<?php echo $formName ?>" class="mauticform_wrapper">
-    <form autocomplete="false" role="form" method="post" action="<?php echo $view['router']->generate('mautic_form_postresults', array('formId' => $form->getId()), true); ?>" id="mauticform<?php echo $formName ?>" data-mautic-form="<?php echo ltrim($formName, '_') ?>">
+    <form autocomplete="false" role="form" method="post" action="<?php echo $view['router']->url('mautic_form_postresults', array('formId' => $form->getId())); ?>" id="mauticform<?php echo $formName ?>" data-mautic-form="<?php echo ltrim($formName, '_') ?>">
         <div class="mauticform-error" id="mauticform<?php echo $formName ?>_error"></div>
         <div class="mauticform-message" id="mauticform<?php echo $formName ?>_message"></div>
         <div class="mauticform-innerform">
 <?php
 foreach ($fields as $f):
-    if ($f->isCustom()):
-        $params = $f->getCustomParameters();
-        $template = $params['template'];
-    else:
-        $template = 'MauticFormBundle:Field:' . $f->getType() . '.html.php';
-    endif;
+    if ($f->showForContact($submissions, $lead, $form)):
+        if ($f->isCustom()):
+            $params = $f->getCustomParameters();
+            $template = $params['template'];
+        else:
+            $template = 'MauticFormBundle:Field:' . $f->getType() . '.html.php';
+        endif;
 
-    echo $view->render($theme.$template, array('field' => $f->convertToArray(), 'id' => $f->getAlias(), 'formName' => $formName));
+        echo $view->render($theme.$template, array('field' => $f->convertToArray(), 'id' => $f->getAlias(), 'formName' => $formName));
+    endif;
 endforeach;
 ?>
 

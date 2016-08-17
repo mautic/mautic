@@ -45,6 +45,7 @@ class AjaxController extends CommonAjaxController
     {
         $integration = $request->request->get('integration');
         $settings    = $request->request->get('settings');
+
         $dataArray   = array('success' => 0);
 
         if (!empty($integration) && !empty($settings)) {
@@ -58,7 +59,7 @@ class AjaxController extends CommonAjaxController
 
                 if (!empty($integrationFields)) {
                     // Get a list of custom form fields
-                    $leadFields = $this->factory->getModel('plugin')->getLeadFields();
+                    $leadFields = $this->getModel('plugin')->getLeadFields();
                     list ($specialInstructions, $alertType) = $object->getFormNotes('leadfield_match');
                     $defaults                               = $object->getIntegrationSettings()->getFeatureSettings();
                     $data                                   = isset($defaults['leadFields']) ? $defaults['leadFields'] : array();

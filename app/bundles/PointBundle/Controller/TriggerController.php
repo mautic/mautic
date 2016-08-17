@@ -59,7 +59,7 @@ class TriggerController extends FormController
         $orderBy    = $this->factory->getSession()->get('mautic.point.trigger.orderby', 't.name');
         $orderByDir = $this->factory->getSession()->get('mautic.point.trigger.orderbydir', 'ASC');
 
-        $triggers = $this->factory->getModel('point.trigger')->getEntities(
+        $triggers = $this->getModel('point.trigger')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -117,7 +117,7 @@ class TriggerController extends FormController
      */
     public function viewAction($objectId)
     {
-        $entity = $this->factory->getModel('point.trigger')->getEntity($objectId);
+        $entity = $this->getModel('point.trigger')->getEntity($objectId);
 
         //set the page we came from
         $page = $this->factory->getSession()->get('mautic.point.trigger.page', 1);
@@ -183,7 +183,7 @@ class TriggerController extends FormController
     public function newAction($entity = null)
     {
         /** @var \Mautic\PointBundle\Model\TriggerModel $model */
-        $model = $this->factory->getModel('point.trigger');
+        $model = $this->getModel('point.trigger');
 
         if (!($entity instanceof Trigger)) {
             /** @var \Mautic\PointBundle\Entity\Trigger $entity */
@@ -191,7 +191,7 @@ class TriggerController extends FormController
         }
 
         $session   = $this->factory->getSession();
-        $sessionId = $this->request->request->get('pointtrigger[sessionId]', sha1(uniqid(mt_rand(), true)), true);
+        $sessionId = $this->request->request->get('pointtrigger[sessionId]', 'mautic_'.sha1(uniqid(mt_rand(), true)), true);
 
         if (!$this->factory->getSecurity()->isGranted('point:triggers:create')) {
             return $this->accessDenied();
@@ -304,7 +304,7 @@ class TriggerController extends FormController
     public function editAction($objectId, $ignorePost = false)
     {
         /** @var \Mautic\PointBundle\Model\TriggerModel $model */
-        $model      = $this->factory->getModel('point.trigger');
+        $model      = $this->getModel('point.trigger');
         $entity     = $model->getEntity($objectId);
         $session    = $this->factory->getSession();
         $cleanSlate = true;
@@ -374,7 +374,7 @@ class TriggerController extends FormController
 
                         //delete entities
                         if (count($deletedEvents)) {
-                            $this->factory->getModel('point.triggerEvent')->deleteEntities($deletedEvents);
+                            $this->getModel('point.triggerEvent')->deleteEntities($deletedEvents);
                         }
 
                         $this->addFlash('mautic.core.notice.updated', array(
@@ -467,7 +467,7 @@ class TriggerController extends FormController
      */
     public function cloneAction($objectId)
     {
-        $model  = $this->factory->getModel('point.trigger');
+        $model  = $this->getModel('point.trigger');
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -506,7 +506,7 @@ class TriggerController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->factory->getModel('point.trigger');
+            $model  = $this->getModel('point.trigger');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
@@ -563,7 +563,7 @@ class TriggerController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model     = $this->factory->getModel('point.trigger');
+            $model     = $this->getModel('point.trigger');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = array();
 

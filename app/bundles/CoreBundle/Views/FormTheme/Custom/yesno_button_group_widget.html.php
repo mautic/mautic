@@ -16,7 +16,7 @@ if (isset($attr['onchange'])) {
         <?php $class =
             (!empty($child->vars['checked']) ? ' active' : '') .
             (!empty($child->vars['disabled']) || !empty($child->vars['read_only']) ? ' disabled' : '') .
-            ($child->vars['value'] === '0' ? ' btn-no' : ' btn-yes') .
+            ($child->vars['value'] === '0' ? ' btn-no' : ($child->vars['value'] === '1' ? ' btn-yes' : ' btn-extra')) .
             ($child->vars['value'] === '0' && !empty($child->vars['checked']) ? ' btn-danger' : '') .
             ($child->vars['value'] === '1' && !empty($child->vars['checked']) ? ' btn-success' : ''); ?>
         <label class="btn btn-default <?php echo $class; ?>">

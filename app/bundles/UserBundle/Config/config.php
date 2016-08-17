@@ -30,10 +30,19 @@ return array(
                 'controller' => 'MauticUserBundle:Security:login',
             ),
             'mautic_user_logincheck'    => array(
-                'path' => '/login_check'
+                'path' => '/login_check',
+                'controller' => 'MauticUserBundle:Security:loginCheck',
             ),
             'mautic_user_logout'        => array(
                 'path' => '/logout'
+            ),
+            'mautic_sso_login'    => array(
+                'path'       => '/sso_login/{integration}',
+                'controller' => 'MauticUserBundle:Security:ssoLogin'
+            ),
+            'mautic_sso_login_check'    => array(
+                'path'       => '/sso_login_check/{integration}',
+                'controller' => 'MauticUserBundle:Security:ssoLoginCheck',
             ),
             'mautic_user_index'         => array(
                 'path'       => '/users/{page}',
@@ -111,7 +120,13 @@ return array(
         'forms'  => array(
             'mautic.form.type.user'           => array(
                 'class'     => 'Mautic\UserBundle\Form\Type\UserType',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'translator',
+                    'doctrine.orm.entity_manager',
+                    'mautic.user.model.user',
+                    'mautic.helper.language',
+                    'mautic.helper.core_parameters',
+                ],
                 'alias'     => 'user'
             ),
             'mautic.form.type.role'           => array(
@@ -136,8 +151,13 @@ return array(
             ),
             'mautic.form.type.user_list'      => array(
                 'class'     => 'Mautic\UserBundle\Form\Type\UserListType',
-                'arguments' => 'mautic.factory',
+                'arguments' => 'mautic.user.model.user',
                 'alias'     => 'user_list'
+            ),
+            'mautic.form.type.role_list'      => array(
+                'class'     => 'Mautic\UserBundle\Form\Type\RoleListType',
+                'arguments' => 'mautic.user.model.role',
+                'alias'     => 'role_list'
             )
         ),
         'other'  => array(
@@ -162,13 +182,47 @@ return array(
                 'arguments' => 'Mautic\UserBundle\Entity\Permission',
                 'factory'   => array('@mautic.permission.manager', 'getRepository')
             ),
+            'mautic.user.form_authenticator' => array(
+                'class'  => 'Mautic\UserBundle\Security\Authenticator\FormAuthenticator',
+                'arguments' => array(
+                    'mautic.helper.integration',
+                    'security.password_encoder',
+                    'event_dispatcher',
+                    'request_stack'
+                )
+            ),
+            'mautic.user.preauth_authenticator' => array(
+                'class'     => 'Mautic\UserBundle\Security\Authenticator\PreAuthAuthenticator',
+                'arguments' => array(
+                    'mautic.helper.integration',
+                    'event_dispatcher',
+                    'request_stack',
+                    '', // providerKey
+                    '' // User provider
+                ),
+                'public'    => false
+            ),
             'mautic.user.provider'                   => array(
                 'class'     => 'Mautic\UserBundle\Security\Provider\UserProvider',
                 'arguments' => array(
                     'mautic.user.repository',
                     'mautic.permission.repository',
-                    'session'
+                    'session',
+                    'event_dispatcher',
+                    'security.encoder_factory'
                 )
+            ),
+            'mautic.security.authentication_listener' => array(
+                'class' => 'Mautic\UserBundle\Security\Firewall\AuthenticationListener',
+                'arguments' => array(
+                    'mautic.security.authentication_handler',
+                    'security.token_storage',
+                    'security.authentication.manager',
+                    'monolog.logger',
+                    'event_dispatcher',
+                    '' // providerKey
+                ),
+                'public' => false
             ),
             'mautic.security.authentication_handler' => array(
                 'class'     => 'Mautic\UserBundle\Security\Authentication\AuthenticationHandler',
@@ -179,7 +233,22 @@ return array(
             ),
             'mautic.security.logout_handler'         => array(
                 'class'     => 'Mautic\UserBundle\Security\Authentication\LogoutHandler',
-                'arguments' => 'mautic.factory'
+                'arguments' => [
+                    'mautic.user.model.user',
+                    'event_dispatcher',
+                    'mautic.helper.user'
+                ]
+            )
+        ),
+        'models' =>  array(
+            'mautic.user.model.role' => array(
+                'class' => 'Mautic\UserBundle\Model\RoleModel'
+            ),
+            'mautic.user.model.user' => array(
+                'class' => 'Mautic\UserBundle\Model\UserModel',
+                'arguments' => array(
+                    'mautic.helper.mailer'
+                )
             )
         )
     )

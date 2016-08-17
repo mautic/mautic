@@ -17,22 +17,34 @@ use Mautic\CoreBundle\Helper\Chart\ChartInterface;
  */
 class PieChart extends AbstractChart implements ChartInterface
 {
+    /**
+     * Holds the suma of the all dataset values
+     *
+     * @var float
+     */
     protected $totalCount = 0;
 
     /**
      * Render chart data
      */
-    public function render() {
+    public function render($withCounts = true)
+    {
+        $data = array('data' => array(), 'backgroundColor' => array(), 'hoverBackgroundColor' => array());
 
-        // Add numbers to the labels
-        if ($this->totalCount) {
-            foreach ($this->datasets as &$dataset) {
-                $percentige = round($dataset['value'] / $this->totalCount * 100, 2);
-                $dataset['label'] .= '; ' . $dataset['value'] . 'x, ' . $percentige . '%';
+        foreach ($this->datasets as $datasetId => $value) {
+            $color = $this->configureColorHelper($datasetId);
+            $data['data'][] = $value;
+            $data['backgroundColor'][] = $color->toRgba(0.8);
+            $data['hoverBackgroundColor'][] = $color->toRgba(0.9);
+            if ($withCounts) {
+                $this->labels[$datasetId] = $this->buildFullLabel($this->labels[$datasetId], $value);
             }
         }
 
-        return $this->datasets;
+        return array(
+            'labels'   => $this->labels,
+            'datasets' => array($data)
+        );
     }
 
     /**
@@ -46,16 +58,24 @@ class PieChart extends AbstractChart implements ChartInterface
     public function setDataset($label, $value)
     {
         $this->totalCount += $value;
-        $datasetId = count($this->datasets);
-        $color = $this->configureColorHelper($datasetId);
-
-        $this->datasets[] = array(
-            'label'     => $label,
-            'value'     => $value,
-            'color'     => $color->toRgba(0.6),
-            'highlight' => $color->toRgba(1)
-        );
+        $this->datasets[] = $value;
+        $this->labels[] = $label;
 
         return $this;
+    }
+
+    /**
+     * Adds to the label also the value and the percentage
+     *
+     * @param  string  $label
+     * @param  integer $value
+     *
+     * @return string
+     */
+    public function buildFullLabel($label, $value)
+    {
+        if (!$this->totalCount) return $label;
+        $percentage = round($value / $this->totalCount * 100, 2);
+        return $label . '; ' . $value . 'x, ' . $percentage . '%';
     }
 }

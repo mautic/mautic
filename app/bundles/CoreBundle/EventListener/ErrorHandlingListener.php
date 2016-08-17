@@ -61,12 +61,36 @@ class ErrorHandlingListener implements EventSubscriberInterface
         $error = error_get_last();
 
         if ($error !== null) {
-            $this->logger->error("Fatal: {$error['message']} - in file {$error['file']} - at line {$error['line']}");
+            $name = $this->getErrorName($error['type']);
+            $this->logger->error("$name: {$error['message']} - in file {$error['file']} - at line {$error['line']}");
 
-            defined('MAUTIC_OFFLINE') or define('MAUTIC_OFFLINE', 1);
-            $message    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
-            $submessage = 'System administrators, check server logs for errors.';
-            include __DIR__ . '/../../../../offline.php';
+            if ($error['type'] === E_ERROR || $error['type'] === E_CORE_ERROR || $error['type'] === E_USER_ERROR) {
+                defined('MAUTIC_OFFLINE') or define('MAUTIC_OFFLINE', 1);
+
+                if (MAUTIC_ENV == 'dev') {
+                    $message    = "<pre>{$error['message']} - in file {$error['file']} - at line {$error['line']}</pre>";
+
+                    // Get a trace
+                    ob_start();
+                    debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+                    $trace = ob_get_contents();
+                    ob_end_clean();
+
+                    // Remove first item from backtrace as it's this function which
+                    // is redundant.
+                    $trace = preg_replace ('/^#0\s+' . __FUNCTION__ . "[^\n]*\n/", '', $trace, 1);
+
+                    // Renumber backtrace items.
+                    $trace = preg_replace ('/^#(\d+)/me', '\'#\' . ($1 - 1)', $trace);
+
+                    $submessage = "<pre>$trace</pre>";
+                } else {
+                    $message    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
+                    $submessage = 'System administrators, check server logs for errors.';
+                }
+
+                include __DIR__.'/../../../../offline.php';
+            }
         }
     }
 
@@ -107,5 +131,37 @@ class ErrorHandlingListener implements EventSubscriberInterface
     public function onKernelRequest(GetResponseEvent $event)
     {
         // Do nothing.  Just want symfony to call the class to set the error handling functions
+    }
+
+    /**
+     * @param $bit
+     *
+     * @return string
+     */
+    private function getErrorName($bit)
+    {
+        switch ($bit) {
+            case E_ERROR:
+            case E_USER_ERROR:
+            case E_CORE_ERROR:
+            case E_RECOVERABLE_ERROR:
+
+                return "Error";
+
+            case E_WARNING:
+            case E_USER_WARNING:
+            case E_CORE_WARNING:
+
+                return "Warning";
+
+            case E_DEPRECATED:
+            case E_USER_DEPRECATED:
+
+                return "Deprecation";
+
+            default:
+
+                return "Notice";
+        }
     }
 }

@@ -61,7 +61,7 @@ $isStandalone = $activeForm->isStandalone();
                                     <ul class="dropdown-menu" role="menu">
                                         <?php foreach ($fields as $fieldType => $field): ?>
                                             <li id="field_<?php echo $fieldType; ?>">
-                                                <a class="list-group-item" data-toggle="ajaxmodal" data-target="#formComponentModal" href="<?php echo $view['router']->generate('mautic_formfield_action', array('objectAction' => 'new', 'type' => $fieldType, 'tmpl' => 'field', 'formId' => $formId)); ?>">
+                                                <a class="list-group-item" data-toggle="ajaxmodal" data-target="#formComponentModal" href="<?php echo $view['router']->path('mautic_formfield_action', array('objectAction' => 'new', 'type' => $fieldType, 'tmpl' => 'field', 'formId' => $formId)); ?>">
                                                     <div>
                                                         <?php echo $field; ?>
                                                     </div>
@@ -71,23 +71,23 @@ $isStandalone = $activeForm->isStandalone();
                                     </ul>
                                 </div>
                             </div>
-                            <?php
-                            foreach ($formFields as $field):
-                                if (!empty($field['isCustom'])):
-                                    $params   = $field['customParameters'];
-                                    $template = $params['template'];
-                                else:
-                                    $template = 'MauticFormBundle:Field:' . $field['type'] . '.html.php';
-                                endif;
-                                echo $view->render($template, array(
-                                    'field'   => $field,
-                                    'inForm'  => true,
-                                    'id'      => $field['id'],
-                                    'deleted' => in_array($field['id'], $deletedFields),
-                                    'formId'  => $formId
-                                ));
-                            endforeach;
-                            ?>
+                            <?php foreach ($formFields as $field): ?>
+                                <?php if (!in_array($field['id'], $deletedFields)) : ?>
+                                    <?php if (!empty($field['isCustom'])):
+                                        $params   = $field['customParameters'];
+                                        $template = $params['template'];
+                                    else:
+                                        $template = 'MauticFormBundle:Field:' . $field['type'] . '.html.php';
+                                    endif; ?>
+                                    <?php echo $view->render('MauticFormBundle:Builder:fieldwrapper.html.php', [
+                                        'template' => $template,
+                                        'field'    => $field,
+                                        'inForm'   => true,
+                                        'id'       => $field['id'],
+                                        'formId'   => $formId
+                                    ]); ?>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
                             <?php if (!count($formFields)): ?>
                             <div class="alert alert-info" id="form-field-placeholder">
                                 <p><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
@@ -111,7 +111,7 @@ $isStandalone = $activeForm->isStandalone();
                                             </li>
                                             <?php foreach ($action as $k => $e): ?>
                                                 <li id="action_<?php echo $k; ?>">
-                                                    <a data-toggle="ajaxmodal" data-target="#formComponentModal" class="list-group-item" href="<?php echo $view['router']->generate('mautic_formaction_action', array('objectAction' => 'new', 'type' => $k, 'tmpl'=> 'action', 'formId' => $formId)); ?>">
+                                                    <a data-toggle="ajaxmodal" data-target="#formComponentModal" class="list-group-item" href="<?php echo $view['router']->path('mautic_formaction_action', array('objectAction' => 'new', 'type' => $k, 'tmpl'=> 'action', 'formId' => $formId)); ?>">
                                                         <div data-toggle="tooltip" title="<?php echo $view['translator']->trans($e['description']); ?>">
                                                             <span><?php echo $view['translator']->trans($e['label']); ?></span>
                                                         </div>
@@ -122,19 +122,18 @@ $isStandalone = $activeForm->isStandalone();
                                     </ul>
                                 </div>
                             </div>
-                            <?php
-                            foreach ($formActions as $action):
-                                $template = (isset($action['settings']['template'])) ? $action['settings']['template'] :
-                                    'MauticFormBundle:Action:generic.html.php';
-                                echo $view->render($template, array(
-                                    'action'  => $action,
-                                    'inForm'  => true,
-                                    'id'      => $action['id'],
-                                    'deleted' => in_array($action['id'], $deletedActions),
-                                    'formId'  => $formId
-                                ));
-                            endforeach;
-                            ?>
+                            <?php foreach ($formActions as $action): ?>
+                                <?php if (!in_array($action['id'], $deletedActions)) : ?>
+                                    <?php $template = (isset($action['settings']['template'])) ? $action['settings']['template'] :
+                                        'MauticFormBundle:Action:generic.html.php';
+                                    echo $view->render($template, array(
+                                        'action'  => $action,
+                                        'inForm'  => true,
+                                        'id'      => $action['id'],
+                                        'formId'  => $formId
+                                    )); ?>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
                             <?php if (!count($formActions)): ?>
                                 <div class="alert alert-info" id="form-action-placeholder">
                                     <p><?php echo $view['translator']->trans('mautic.form.form.addaction'); ?></p>

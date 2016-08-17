@@ -10,36 +10,47 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.dashboard.header.index'));
 $view['slots']->set('mauticContent', 'dashboard');
 
-$buttons[] = array(
-    'attr'      => array(
-        'class'       => 'btn btn-default btn-nospin',
-        'data-toggle' => 'ajaxmodal',
-        'data-target' => '#MauticSharedModal',
-        'href'        => $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'new')),
-        'data-header' => $view['translator']->trans('mautic.dashboard.widget.add'),
+$buttons = array(
+    array(
+        'attr'      => array(
+            'class'       => 'btn btn-default btn-nospin',
+            'data-toggle' => 'ajaxmodal',
+            'data-target' => '#MauticSharedModal',
+            'href'        => $view['router']->path('mautic_dashboard_action', array('objectAction' => 'new')),
+            'data-header' => $view['translator']->trans('mautic.dashboard.widget.add'),
+        ),
+        'iconClass' => 'fa fa-plus',
+        'btnText'   => 'mautic.dashboard.widget.add'
     ),
-    'iconClass' => 'fa fa-plus',
-    'btnText'   => 'mautic.dashboard.widget.add'
-);
-
-$buttons[] = array(
-    'attr'      => array(
-        'class'       => 'btn btn-default btn-nospin',
-        'href'        => $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'export')),
-        'data-toggle' => ''
+    array(
+        'attr'      => array(
+            'class'       => 'btn btn-default btn-nospin',
+            'href'        => 'javascript:void()',
+            'onclick'     => "Mautic.exportDashboardLayout('{$view['translator']->trans('mautic.dashboard.confirmation_layout_name')}', '{$view['router']->path('mautic_dashboard_action', array('objectAction' => 'export'))}', true);",
+            'data-toggle' => ''
+        ),
+        'iconClass' => 'fa fa-save',
+        'btnText'   => 'mautic.core.form.save'
     ),
-    'iconClass' => 'fa fa-cloud-download',
-    'btnText'   => 'mautic.dashboard.export.widgets'
-);
-
-$buttons[] = array(
-    'attr'      => array(
-        'class'       => 'btn btn-default',
-        'href'        => $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'import')),
-        'data-header' => $view['translator']->trans('mautic.dashboard.widget.import'),
+    array(
+        'attr'      => array(
+            'class'       => 'btn btn-default btn-nospin',
+            'href'        => 'javascript:void()',
+            'onclick'     => "Mautic.exportDashboardLayout('{$view['translator']->trans('mautic.dashboard.confirmation_layout_name')}', '{$view['router']->path('mautic_dashboard_action', array('objectAction' => 'export'))}', false);",
+            'data-toggle' => ''
+        ),
+        'iconClass' => 'fa fa-cloud-download',
+        'btnText'   => 'mautic.dashboard.export.widgets'
     ),
-    'iconClass' => 'fa fa-cloud-upload',
-    'btnText'   => 'mautic.dashboard.widget.import'
+    array(
+        'attr'      => array(
+            'class'       => 'btn btn-default',
+            'href'        => $view['router']->path('mautic_dashboard_action', array('objectAction' => 'import')),
+            'data-header' => $view['translator']->trans('mautic.dashboard.widget.import'),
+        ),
+        'iconClass' => 'fa fa-cloud-upload',
+        'btnText'   => 'mautic.dashboard.widget.import'
+    )
 );
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
@@ -55,13 +66,14 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 </div>
 
 <?php if (count($widgets)): ?>
-    <div id="dashboard-widgets" class="cards">
+    <div id="dashboard-widgets" class="dashboard-widgets cards">
         <?php foreach ($widgets as $widget): ?>
-            <div class="card-flex widget" data-widget-id="<?php echo $widget->getId(); ?>" style="width: <?php echo !empty($widget->getWidth()) ? $widget->getWidth() . '' : '100' ?>%; height: <?php echo !empty($widget->getHeight()) ? $widget->getHeight() . 'px' : '300px' ?>">
+            <div class="card-flex widget" data-widget-id="<?php echo $widget->getId(); ?>" style="width: <?php echo $widget->getWidth() ? $widget->getWidth() . '' : '100' ?>%; height: <?php echo $widget->getHeight() ? $widget->getHeight() . 'px' : '300px' ?>">
                 <?php echo $view->render('MauticDashboardBundle:Widget:detail.html.php', array('widget' => $widget)); ?>
             </div>
         <?php endforeach; ?>
     </div>
+    <div id="cloned-widgets" class="dashboard-widgets cards"></div>
 <?php else: ?>
     <div class="well well col-md-6 col-md-offset-3 mt-md">
         <div class="row">
@@ -71,7 +83,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <div class="col-xs-9">
                 <h4><i class="fa fa-quote-left"></i> <?php echo $view['translator']->trans('mautic.dashboard.nowidgets.tip.header'); ?> <i class="fa fa-quote-right"></i></h4>
                 <p class="mt-md"><?php echo $view['translator']->trans('mautic.dashboard.nowidgets.tip'); ?></p>
-                <a href="<?php echo $view['router']->generate('mautic_dashboard_action', array('objectAction' => 'applyDashboardFile', 'file' => 'default.json')); ?>" class="btn btn-success">
+                <a href="<?php echo $view['router']->path('mautic_dashboard_action', array('objectAction' => 'applyDashboardFile', 'file' => 'default.json')); ?>" class="btn btn-success">
                     Apply the default dashboard
                 </a>
             </div>

@@ -11,6 +11,7 @@ $toggleTemplate = '<div class="col-md-3">{content}</div>';
 $properties     = (isset($form['properties'])) ? $form['properties'] : array();
 
 $showAttributes = isset($form['labelAttributes']) || isset($form['inputAttributes']) || isset($form['containerAttributes']) || isset($properties['labelAttributes']);
+$showBehavior   = isset($form['showWhenValueExists']) || isset($properties['showWhenValueExists']);
 
 $placeholder    = '';
 if (isset($properties['placeholder'])):
@@ -26,7 +27,16 @@ if (isset($properties['labelAttributes'])):
     unset($form['properties']['labelAttributes']);
 endif;
 
-$showProperties = (isset($form['properties']) && count($form['properties']));
+$showProperties = false;
+if (isset($form['properties']) && count($form['properties'])):
+    // Only show if there is at least one non-hidden field
+    foreach ($form['properties'] as $property):
+        if ('hidden' != $property->vars['block_prefixes'][1]):
+            $showProperties = true;
+            break;
+        endif;
+    endforeach;
+endif;
 
 // Check for validation errors to show on tabs
 $generalTabError    = (isset($form['label']) && ($view['form']->containsErrors($form['label'])));
@@ -86,6 +96,14 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                 </a>
             </li>
             <?php endif; ?>
+
+            <?php if ($showBehavior): ?>
+            <li role="progressive-profiling">
+                <a href="#progressive-profiling" aria-controls="progressive-profiling" role="tab" data-toggle="tab">
+                    <?php echo $view['translator']->trans('mautic.form.field.section.progressive.profiling'); ?>
+                </a>
+            </li>
+            <?php endif; ?>
         </ul>
 
         <!-- Tab panes -->
@@ -132,10 +150,14 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
 
                         <?php foreach ($properties as $name => $property): ?>
                             <?php if ($form['properties'][$name]->isRendered() || $name == 'labelAttributes') continue; ?>
-                            <?php $col = ($name == 'text') ? 12 : 6; ?>
+
+                            <?php  if ($form['properties'][$name]->vars['block_prefixes'][1] == 'hidden') : echo $view['form']->row($form['properties'][$name]); ?>
+                            <?php else:
+                                $col = ($name == 'text') ? 12 : 6; ?>
                             <div class="col-md-<?php echo $col; ?>">
                                 <?php echo $view['form']->row($form['properties'][$name]); ?>
                             </div>
+                            <?php endif; ?>
                         <?php endforeach; ?>
 
                     <?php endif; ?>
@@ -151,6 +173,16 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                     <?php echo $view['form']->rowIfExists($form, 'inputAttributes', $template); ?>
                     <?php echo $view['form']->rowIfExists($form, 'containerAttributes', $template); ?>
                     <?php echo $customAttributes; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <?php if ($showBehavior): ?>
+            <div role="tabpanel" class="tab-pane" id="progressive-profiling">
+                <div class="row">
+                    <?php echo $view['form']->rowIfExists($form, 'showWhenValueExists', $template); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'showAfterXSubmissions', $template); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'isAutoFill', $template); ?>
                 </div>
             </div>
             <?php endif; ?>

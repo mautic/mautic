@@ -65,17 +65,18 @@ Mautic.testMonitoredEmailServerConnection = function(mailbox) {
 
 Mautic.testEmailServerConnection = function(sendEmail) {
     var data = {
-        transport:  mQuery('#config_emailconfig_mailer_transport').val(),
-        amazon_region:  mQuery('#config_emailconfig_mailer_amazon_region').val(),
-        host:       mQuery('#config_emailconfig_mailer_host').val(),
-        port:       mQuery('#config_emailconfig_mailer_port').val(),
-        encryption: mQuery('#config_emailconfig_mailer_encryption').val(),
-        authMode:   mQuery('#config_emailconfig_mailer_auth_mode').val(),
-        user:       mQuery('#config_emailconfig_mailer_user').val(),
-        password:   mQuery('#config_emailconfig_mailer_password').val(),
-        from_name:  mQuery('#config_emailconfig_mailer_from_name').val(),
-        from_email: mQuery('#config_emailconfig_mailer_from_email').val(),
-        send_test:  (typeof sendEmail !== 'undefined') ? sendEmail : false
+        amazon_region: mQuery('#config_emailconfig_mailer_amazon_region').val(),
+        api_key:       mQuery('#config_emailconfig_mailer_api_key').val(),
+        authMode:      mQuery('#config_emailconfig_mailer_auth_mode').val(),
+        encryption:    mQuery('#config_emailconfig_mailer_encryption').val(),
+        from_email:    mQuery('#config_emailconfig_mailer_from_email').val(),
+        from_name:     mQuery('#config_emailconfig_mailer_from_name').val(),
+        host:          mQuery('#config_emailconfig_mailer_host').val(),
+        password:      mQuery('#config_emailconfig_mailer_password').val(),
+        port:          mQuery('#config_emailconfig_mailer_port').val(),
+        send_test:     (typeof sendEmail !== 'undefined') ? sendEmail : false,
+        transport:     mQuery('#config_emailconfig_mailer_transport').val(),
+        user:          mQuery('#config_emailconfig_mailer_user').val()
     };
 
     mQuery('#mailerTestButtonContainer .fa-spinner').removeClass('hide');

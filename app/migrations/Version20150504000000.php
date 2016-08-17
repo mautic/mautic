@@ -52,36 +52,11 @@ class Version20150504000000 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function postgresqlUp(Schema $schema)
-    {
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log DROP CONSTRAINT ' . $this->findPropertyName('campaign_lead_event_log', 'fk', 'F639F774'));
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD metadata TEXT DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD non_action_path_taken BOOLEAN DEFAULT NULL');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD CONSTRAINT ' . $this->generatePropertyName('campaign_lead_event_log', 'fk', array('campaign_id')) . ' FOREIGN KEY (campaign_id) REFERENCES ' . $this->prefix . 'campaigns (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('COMMENT ON COLUMN ' . $this->prefix . 'campaign_lead_event_log.metadata IS \'(DC2Type:array)\'');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_fields ADD is_unique_identifer BOOLEAN DEFAULT NULL');
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    public function mysqlUp(Schema $schema)
+    public function up(Schema $schema)
     {
         $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log DROP FOREIGN KEY ' . $this->findPropertyName('campaign_lead_event_log', 'fk', 'F639F774'));
         $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD metadata LONGTEXT DEFAULT NULL COMMENT \'(DC2Type:array)\', ADD non_action_path_taken TINYINT(1) DEFAULT NULL');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD CONSTRAINT ' . $this->generatePropertyName('campaign_lead_event_log', 'fk', array('campaign_id')) . ' FOREIGN KEY (campaign_id) REFERENCES ' . $this->prefix . 'campaigns (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_fields ADD is_unique_identifer TINYINT(1) DEFAULT NULL');
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    public function mssqlUp(Schema $schema)
-    {
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD metadata VARCHAR(MAX)');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD non_action_path_taken BIT');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log DROP CONSTRAINT ' . $this->findPropertyName('campaign_lead_event_log', 'fk', 'F639F774'));
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'campaign_lead_event_log ADD CONSTRAINT ' . $this->generatePropertyName('campaign_lead_event_log', 'fk', array('campaign_id')) . ' FOREIGN KEY (campaign_id) REFERENCES ' . $this->prefix . 'campaigns (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'lead_fields ADD is_unique_identifer BIT');
     }
 }

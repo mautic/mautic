@@ -59,7 +59,7 @@ class MenuRenderer implements RendererInterface
             'ancestorClass'     => 'open',
             'firstClass'        => 'first',
             'lastClass'         => 'last',
-            'template'          => "MauticCoreBundle:Menu:main.html.php",
+            'template'          => 'MauticCoreBundle:Menu:main.html.php',
             'compressed'        => false,
             'allow_safe_labels' => false,
             'clear_matcher'     => true,
@@ -82,22 +82,13 @@ class MenuRenderer implements RendererInterface
         if ($options['clear_matcher']) {
             $this->matcher->clear();
         }
-        $manipulator = new MenuManipulator();
-        if ($options["menu"] == "admin") {
-            //render html
-            $html = $this->engine->render("MauticCoreBundle:Menu:admin.html.php", array(
-                "item"    => $item,
-                "options" => $options,
-                "matcher" => $this->matcher
-            ));
-        } else {
-            //render html
-            $html = $this->engine->render("MauticCoreBundle:Menu:main.html.php", array(
-                "item"    => $item,
-                "options" => $options,
-                "matcher" => $this->matcher
-            ));
-        }
+
+        //render html
+        $html = $this->engine->render($options['template'], array(
+            'item'    => $item,
+            'options' => $options,
+            'matcher' => $this->matcher
+        ));
 
         return $html;
     }

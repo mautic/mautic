@@ -1,8 +1,8 @@
 <?php
 /**
- * @package     Allyde mPower Social Bundle
- * @copyright   Allyde, Inc. All rights reserved
- * @author      Allyde, Inc
+ * @package     Mautic
+ * @copyright   Mautic, Inc
+ * @author      Mautic, Inc
  * @link        http://allyde.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */

@@ -21,11 +21,16 @@ class AssetExtension extends Twig_Extension
     /**
      * @var AssetsHelper
      */
-    protected $helper;
+    protected $assetsHelper;
 
-    public function __construct(MauticFactory $factory)
+    /**
+     * AssetExtension constructor.
+     *
+     * @param AssetsHelper $assetsHelper
+     */
+    public function __construct(AssetsHelper $assetsHelper)
     {
-        $this->helper = $factory->getHelper('template.assets');
+        $this->assetsHelper = $assetsHelper;
     }
 
     /**
@@ -45,14 +50,14 @@ class AssetExtension extends Twig_Extension
 
     public function getName()
     {
-        return 'asset';
+        return 'coreasset';
     }
 
     public function outputSystemStylesheets()
     {
         ob_start();
 
-        $this->helper->outputSystemStylesheets();
+        $this->assetsHelper->outputSystemStylesheets();
 
         return ob_get_clean();
     }
@@ -65,7 +70,7 @@ class AssetExtension extends Twig_Extension
     {
         ob_start();
 
-        $this->helper->outputSystemScripts($includeEditor);
+        $this->assetsHelper->outputSystemScripts($includeEditor);
 
         return ob_get_clean();
     }
@@ -74,7 +79,7 @@ class AssetExtension extends Twig_Extension
     {
         ob_start();
 
-        $this->helper->outputScripts($name);
+        $this->assetsHelper->outputScripts($name);
 
         return ob_get_clean();
     }
@@ -83,7 +88,7 @@ class AssetExtension extends Twig_Extension
     {
         ob_start();
 
-        $this->helper->outputStyles();
+        $this->assetsHelper->outputStyles();
 
         return ob_get_clean();
     }
@@ -92,13 +97,13 @@ class AssetExtension extends Twig_Extension
     {
         ob_start();
 
-        $this->helper->outputHeadDeclarations();
+        $this->assetsHelper->outputHeadDeclarations();
 
         return ob_get_clean();
     }
 
     public function getAssetUrl($path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false)
     {
-        return $this->helper->getUrl($path, $packageName, $version, $absolute, $ignorePrefix);
+        return $this->assetsHelper->getUrl($path, $packageName, $version, $absolute, $ignorePrefix);
     }
 }

@@ -162,4 +162,51 @@ class FormFieldHelper
 
         return $errors;
     }
+
+    public function populateField($field, $value, $formName, &$formHtml)
+    {
+        $alias = $field->getAlias();
+
+        switch ($field->getType()) {
+            case 'text':
+            case 'email':
+            case 'hidden':
+                if (preg_match('/<input(.*?)id="mauticform_input_' . $formName . '_' . $alias . '"(.*?)value="(.*?)"(.*?)\/>/i', $formHtml, $match)) {
+                    $replace = '<input' . $match[1] . 'id="mauticform_input_' . $formName . '_' . $alias . '"' . $match[2] . 'value="' . urldecode($value) . '"' . $match[4] . '/>';
+                    $formHtml = str_replace($match[0], $replace, $formHtml);
+                }
+                break;
+            case 'textarea':
+                if (preg_match('/<textarea(.*?)id="mauticform_input_' . $formName . '_' . $alias . '"(.*?)>(.*?)<\/textarea>/i', $formHtml, $match)) {
+                    $replace = '<textarea' . $match[1] . 'id="mauticform_input_' . $formName . '_' . $alias . '"' . $match[2] . '>' . urldecode($value) . '</textarea>';
+                    $formHtml = str_replace($match[0], $replace, $formHtml);
+                }
+                break;
+            case 'checkboxgrp':
+                if (!is_array($value)) {
+                    $value = array($value);
+                }
+                foreach ($value as $val) {
+                    $val = urldecode($val);
+                    if (preg_match(
+                        '/<input(.*?)id="mauticform_checkboxgrp_checkbox(.*?)"(.*?)value="' . $val . '"(.*?)\/>/i',
+                        $formHtml,
+                        $match
+                    )) {
+                        $replace = '<input' . $match[1] . 'id="mauticform_checkboxgrp_checkbox' . $match[2] . '"' . $match[3] . 'value="' . $val . '"'
+                            . $match[4] . ' checked />';
+                        $formHtml = str_replace($match[0], $replace, $formHtml);
+                    }
+                }
+                break;
+            case 'radiogrp':
+                $value = urldecode($value);
+                if (preg_match('/<input(.*?)id="mauticform_radiogrp_radio(.*?)"(.*?)value="' . $value . '"(.*?)\/>/i', $formHtml, $match)) {
+                    $replace = '<input' . $match[1] . 'id="mauticform_radiogrp_radio' . $match[2] . '"' . $match[3] . 'value="' . $value . '"' . $match[4]
+                        . ' checked />';
+                    $formHtml = str_replace($match[0], $replace, $formHtml);
+                }
+                break;
+        }
+    }
 }

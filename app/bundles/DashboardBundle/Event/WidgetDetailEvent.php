@@ -12,8 +12,8 @@ namespace Mautic\DashboardBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class WidgetDetailEvent
@@ -29,6 +29,7 @@ class WidgetDetailEvent extends CommonEvent
     protected $errorMessage;
     protected $uniqueId;
     protected $cacheDir;
+    protected $uniqueCacheDir;
     protected $cacheTimeout;
     protected $startTime = 0;
     protected $loadTime = 0;
@@ -39,7 +40,7 @@ class WidgetDetailEvent extends CommonEvent
      */
     protected $security = null;
 
-    public function __construct(Translator $translator)
+    public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
         $this->startTime = microtime();
@@ -50,9 +51,10 @@ class WidgetDetailEvent extends CommonEvent
      *
      * @param string $cacheDir
      */
-    public function setCacheDir($cacheDir)
+    public function setCacheDir($cacheDir, $uniqueCacheDir = null)
     {
         $this->cacheDir = $cacheDir;
+        $this->uniqueCacheDir = $uniqueCacheDir;
     }
 
     /**
@@ -163,7 +165,7 @@ class WidgetDetailEvent extends CommonEvent
 
         // Store the template data to the cache
         if (!$skipCache && $this->cacheDir && $this->widget->getCacheTimeout() > 0) {
-            $cache = new CacheStorageHelper($this->cacheDir);
+            $cache = new CacheStorageHelper($this->cacheDir, $this->uniqueCacheDir);
             $cache->set($this->getUniqueWidgetId(), $templateData);
         }
     }
@@ -210,13 +212,18 @@ class WidgetDetailEvent extends CommonEvent
             return $this->uniqueId;
         }
 
+        $params = $this->getWidget()->getParams();
+        // Unset dateFrom and dateTo since they constantly change
+        unset($params['dateFrom'], $params['dateTo']);
+
         $uniqueSettings = array(
-            'params' => $this->getWidget()->getParams(),
-            'width' => $this->getWidget()->getWidth(),
+            'params' => $params,
+            'width'  => $this->getWidget()->getWidth(),
             'height' => $this->getWidget()->getHeight(),
+            'locale' => $this->translator->getLocale()
         );
 
-        return $this->uniqueId = $this->getType() . '_' . substr(md5(json_encode($uniqueSettings)), 0, 16);
+        return $this->uniqueId = $this->getType().'_'.substr(md5(json_encode($uniqueSettings)), 0, 16);
     }
 
     /**
@@ -231,7 +238,7 @@ class WidgetDetailEvent extends CommonEvent
             return false;
         }
 
-        $cache = new CacheStorageHelper($this->cacheDir);
+        $cache = new CacheStorageHelper($this->cacheDir, $this->uniqueCacheDir);
         $data  = $cache->get($this->getUniqueWidgetId(), $this->cacheTimeout);
 
         if ($data) {

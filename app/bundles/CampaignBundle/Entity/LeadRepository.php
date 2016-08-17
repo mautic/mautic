@@ -11,7 +11,6 @@ namespace Mautic\CampaignBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Helper\GraphHelper;
 
 /**
  * LeadRepository
@@ -56,59 +55,22 @@ class LeadRepository extends CommonRepository
     /**
      * Get leads for a specific campaign
      *
+     * @deprecated  2.1.0; Use MauticLeadBundle\Entity\LeadRepository\getEntityContacts() instead
+     *
      * @param $args
      *
      * @return array
      */
     public function getLeadsWithFields($args)
     {
-        //DBAL
-        $dq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $dq->select('count(*) as count')
-            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
 
-        //Fix arguments if necessary
-        $args = $this->convertOrmProperties('Mautic\\LeadBundle\\Entity\\Lead', $args);
-
-        $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $sq->select('null')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl');
-
-        $expr = $sq->expr()->andX(
-            $sq->expr()->eq('cl.lead_id', 'l.id'),
-            $sq->expr()->eq('cl.manually_removed', ':false')
+        return $this->getEntityManager()->getRepository('MauticLeadBundle:Lead')->getEntityContacts(
+            $args,
+            'campaign_leads',
+            isset($args['campaign_id']) ? $args['campaign_id'] : 0,
+            ['manually_removed' => 0],
+            'campaign_id'
         );
-        $dq->setParameter('false', false, 'boolean');
-
-        if (isset($args['campaign_id'])) {
-            $expr->add(
-                $sq->expr()->eq('cl.campaign_id', (int) $args['campaign_id'])
-            );
-        }
-        $sq->where($expr);
-
-        $dq->andWhere(
-            sprintf('EXISTS (%s)', $sq->getSQL())
-        );
-
-        //get a total count
-        $result = $dq->execute()->fetchAll();
-        $total  = $result[0]['count'];
-
-        //now get the actual paginated results
-        $this->buildOrderByClause($dq, $args);
-        $this->buildLimiterClauses($dq, $args);
-
-        $dq->resetQueryPart('select')
-            ->select('l.*');
-
-        $leads = $dq->execute()->fetchAll();
-
-        return (!empty($args['withTotalCount'])) ?
-            array(
-                'count' => $total,
-                'results' => $leads
-            ) : $leads;
     }
 
     /**

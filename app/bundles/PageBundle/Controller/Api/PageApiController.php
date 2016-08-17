@@ -24,7 +24,7 @@ class PageApiController extends CommonApiController
     public function initialize (FilterControllerEvent $event)
     {
         parent::initialize($event);
-        $this->model            = $this->factory->getModel('page');
+        $this->model            = $this->getModel('page');
         $this->entityClass      = 'Mautic\PageBundle\Entity\Page';
         $this->entityNameOne    = 'page';
         $this->entityNameMulti  = 'pages';

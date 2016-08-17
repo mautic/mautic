@@ -72,7 +72,7 @@ if ($tmpl == 'index')
                                 'attr' => array(
                                     'data-toggle' => '',
                                     'target'      => '_blank',
-                                    'href'        => $view['router']->generate('mautic_form_action', array('objectAction' => 'preview', 'objectId' => $item->getId())),
+                                    'href'        => $view['router']->path('mautic_form_action', array('objectAction' => 'preview', 'objectId' => $item->getId())),
                                 ),
                                 'iconClass' => 'fa fa-camera',
                                 'btnText'   => 'mautic.form.form.preview'
@@ -80,7 +80,7 @@ if ($tmpl == 'index')
                             array(
                                 'attr' => array(
                                     'data-toggle' => 'ajax',
-                                    'href'        => $view['router']->generate('mautic_form_action', array('objectAction' => 'results', 'objectId' => $item->getId())),
+                                    'href'        => $view['router']->path('mautic_form_action', array('objectAction' => 'results', 'objectId' => $item->getId())),
                                 ),
                                 'iconClass' => 'fa fa-database',
                                 'btnText'   => 'mautic.form.form.results'
@@ -92,7 +92,7 @@ if ($tmpl == 'index')
                 <td>
                     <div>
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'form.form')); ?>
-                        <a href="<?php echo $view['router']->generate('mautic_form_action', array('objectAction' => 'view', 'objectId' => $item->getId())); ?>" data-toggle="ajax" data-menu-link="mautic_form_index">
+                        <a href="<?php echo $view['router']->path('mautic_form_action', array('objectAction' => 'view', 'objectId' => $item->getId())); ?>" data-toggle="ajax" data-menu-link="mautic_form_index">
                             <?php echo $item->getName(); ?>
                             <?php if ($item->getFormType() == 'campaign'): ?>
                                 <span  data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.form.icon_tooltip.campaign_form'); ?>"><i class="fa fa-fw fa-cube"></i></span>
@@ -110,7 +110,7 @@ if ($tmpl == 'index')
                     <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
                 </td>
                 <td class="visible-md visible-lg">
-                    <a href="<?php echo $view['router']->generate('mautic_form_action', array('objectAction' => 'results', 'objectId' => $item->getId())); ?>" data-toggle="ajax" data-menu-link="mautic_form_index" class="btn btn-primary btn-xs" <?php echo ($i['submission_count'] == 0) ? "disabled=disabled" : ""; ?>>
+                    <a href="<?php echo $view['router']->path('mautic_form_action', array('objectAction' => 'results', 'objectId' => $item->getId())); ?>" data-toggle="ajax" data-menu-link="mautic_form_index" class="btn btn-primary btn-xs" <?php echo ($i['submission_count'] == 0) ? "disabled=disabled" : ""; ?>>
                         <?php echo $view['translator']->transChoice('mautic.form.form.viewresults', $i['submission_count'], array('%count%' => $i['submission_count'])); ?>
                     </a>
                 </td>
@@ -124,7 +124,7 @@ if ($tmpl == 'index')
         'totalItems'      => $totalItems,
         'page'            => $page,
         'limit'           => $limit,
-        'baseUrl'         => $view['router']->generate('mautic_form_index'),
+        'baseUrl'         => $view['router']->path('mautic_form_index'),
         'sessionVar'      => 'form',
     )); ?>
     </div>

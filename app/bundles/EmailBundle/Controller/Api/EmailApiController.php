@@ -12,6 +12,7 @@ namespace Mautic\EmailBundle\Controller\Api;
 use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -25,7 +26,7 @@ class EmailApiController extends CommonApiController
     public function initialize (FilterControllerEvent $event)
     {
         parent::initialize($event);
-        $this->model            = $this->factory->getModel('email');
+        $this->model            = $this->getModel('email');
         $this->entityClass      = 'Mautic\EmailBundle\Entity\Email';
         $this->entityNameOne    = 'email';
         $this->entityNameMulti  = 'emails';
@@ -112,7 +113,7 @@ class EmailApiController extends CommonApiController
                 return $this->accessDenied();
             }
 
-            $leadModel = $this->factory->getModel('lead');
+            $leadModel = $this->getModel('lead');
             $lead      = $leadModel->getEntity($leadId);
 
             if ($lead == null) {
@@ -130,10 +131,16 @@ class EmailApiController extends CommonApiController
 
             $leadFields = array_merge(array('id' => $leadId), $leadModel->flattenFields($lead->getFields()));
 
-            $this->model->sendEmail($entity, $leadFields, array(
-                'source' => array('api', 0),
-                'tokens' => $cleantokens
-            ));
+            if(MailHelper::applyFrequencyRules($lead)) {
+                $this->model->sendEmail(
+                    $entity,
+                    $leadFields,
+                    array(
+                        'source' => array('api', 0),
+                        'tokens' => $cleantokens
+                    )
+                );
+            }
 
             $view = $this->view(array('success' => 1), Codes::HTTP_OK);
 

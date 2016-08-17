@@ -15,10 +15,10 @@ $buttons = $preButtons = array();
 if ($permissions['lead:leads:create']) {
     $preButtons[] = array(
         'attr'      => array(
-            'class'       => 'btn btn-default btn-nospin',
+            'class'       => 'btn btn-default btn-nospin quickadd',
             'data-toggle' => 'ajaxmodal',
             'data-target' => '#MauticSharedModal',
-            'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'quickAdd')),
+            'href'        => $view['router']->path('mautic_contact_action', array('objectAction' => 'quickAdd')),
             'data-header' => $view['translator']->trans('mautic.lead.lead.menu.quickadd'),
         ),
         'iconClass' => 'fa fa-bolt',
@@ -27,17 +27,18 @@ if ($permissions['lead:leads:create']) {
 
     $buttons[] = array(
         'attr'      => array(
-            'href'  => $view['router']->generate('mautic_lead_action', array('objectAction' => 'import')),
+            'href'  => $view['router']->path('mautic_contact_action', array('objectAction' => 'import')),
         ),
         'iconClass' => 'fa fa-upload',
         'btnText'   => 'mautic.lead.lead.import'
     );
 }
 
+// Only show toggle buttons for accessibility
 $extraHtml = <<<button
-<div class="btn-group ml-5">
-    <span data-toggle="tooltip" title="{$view['translator']->trans('mautic.lead.tooltip.list')}" data-placement="left"><a id="table-view" href="{$view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'list'))}" data-toggle="ajax" class="btn btn-default"><i class="fa fa-fw fa-table"></i></span></a>
-    <span data-toggle="tooltip" title="{$view['translator']->trans('mautic.lead.tooltip.grid')}" data-placement="left"><a id="card-view" href="{$view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'grid'))}" data-toggle="ajax" class="btn btn-default"><i class="fa fa-fw fa-th-large"></i></span></a>
+<div class="btn-group ml-5 sr-only ">
+    <span data-toggle="tooltip" title="{$view['translator']->trans('mautic.lead.tooltip.list')}" data-placement="left"><a id="table-view" href="{$view['router']->path('mautic_contact_index', array('page' => $page, 'view' => 'list'))}" data-toggle="ajax" class="btn btn-default"><i class="fa fa-fw fa-table"></i></span></a>
+    <span data-toggle="tooltip" title="{$view['translator']->trans('mautic.lead.tooltip.grid')}" data-placement="left"><a id="card-view" href="{$view['router']->path('mautic_contact_index', array('page' => $page, 'view' => 'grid'))}" data-toggle="ajax" class="btn btn-default"><i class="fa fa-fw fa-th-large"></i></span></a>
 </div>
 button;
 
@@ -45,7 +46,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'templateButtons' => array(
         'new' => $permissions['lead:leads:create']
     ),
-    'routeBase' => 'lead',
+    'routeBase' => 'contact',
     'langVar'   => 'lead.lead',
     'preCustomButtons' => $preButtons,
     'customButtons'    => $buttons,
@@ -81,44 +82,57 @@ if ($indexMode == 'list') {
     );
 }
 
-$customButtons = array_merge(
-    $customButtons,
-    array(
+if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) {
+    $customButtons = array_merge(
+        $customButtons,
         array(
-            'attr'      => array(
-                'class'       => 'btn btn-default btn-sm btn-nospin',
-                'data-toggle' => 'ajaxmodal',
-                'data-target' => '#MauticSharedModal',
-                'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'batchLists')),
-                'data-header' => $view['translator']->trans('mautic.lead.batch.lists')
+            array(
+                'attr'      => array(
+                    'class'       => 'btn btn-default btn-sm btn-nospin',
+                    'data-toggle' => 'ajaxmodal',
+                    'data-target' => '#MauticSharedModal',
+                    'href'        => $view['router']->path('mautic_contact_action', array('objectAction' => 'batchLists')),
+                    'data-header' => $view['translator']->trans('mautic.lead.batch.lists')
+                ),
+                'tooltip' => $view['translator']->trans('mautic.lead.batch.lists'),
+                'iconClass' => 'fa fa-pie-chart'
             ),
-            'tooltip' => $view['translator']->trans('mautic.lead.batch.lists'),
-            'iconClass' => 'fa fa-list'
-        ),
-        array(
-            'attr'      => array(
-                'class'       => 'btn btn-default btn-sm btn-nospin',
-                'data-toggle' => 'ajaxmodal',
-                'data-target' => '#MauticSharedModal',
-                'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'batchCampaigns')),
-                'data-header' => $view['translator']->trans('mautic.lead.batch.campaigns'),
+            array(
+                'attr'      => array(
+                    'class'       => 'btn btn-default btn-sm btn-nospin',
+                    'data-toggle' => 'ajaxmodal',
+                    'data-target' => '#MauticSharedModal',
+                    'href'        => $view['router']->path('mautic_contact_action', array('objectAction' => 'batchStages')),
+                    'data-header' => $view['translator']->trans('mautic.lead.batch.stages'),
+                ),
+                'tooltip' => $view['translator']->trans('mautic.lead.batch.stages'),
+                'iconClass' => 'fa fa-tachometer'
             ),
-            'tooltip' => $view['translator']->trans('mautic.lead.batch.campaigns'),
-            'iconClass' => 'fa fa-clock-o'
-        ),
-        array(
-            'attr'      => array(
-                'class'       => 'hidden-xs btn btn-default btn-sm btn-nospin',
-                'data-toggle' => 'ajaxmodal',
-                'data-target' => '#MauticSharedModal',
-                'href'        => $view['router']->generate('mautic_lead_action', array('objectAction' => 'batchDnc')),
-                'data-header' => $view['translator']->trans('mautic.lead.batch.dnc'),
+            array(
+                'attr'      => array(
+                    'class'       => 'btn btn-default btn-sm btn-nospin',
+                    'data-toggle' => 'ajaxmodal',
+                    'data-target' => '#MauticSharedModal',
+                    'href'        => $view['router']->path('mautic_contact_action', array('objectAction' => 'batchCampaigns')),
+                    'data-header' => $view['translator']->trans('mautic.lead.batch.campaigns'),
+                ),
+                'tooltip' => $view['translator']->trans('mautic.lead.batch.campaigns'),
+                'iconClass' => 'fa fa-clock-o'
             ),
-            'tooltip' => $view['translator']->trans('mautic.lead.batch.dnc'),
-            'iconClass' => 'fa fa-send text-danger'
+            array(
+                'attr'      => array(
+                    'class'       => 'hidden-xs btn btn-default btn-sm btn-nospin',
+                    'data-toggle' => 'ajaxmodal',
+                    'data-target' => '#MauticSharedModal',
+                    'href'        => $view['router']->path('mautic_contact_action', array('objectAction' => 'batchDnc')),
+                    'data-header' => $view['translator']->trans('mautic.lead.batch.dnc'),
+                ),
+                'tooltip' => $view['translator']->trans('mautic.lead.batch.dnc'),
+                'iconClass' => 'fa fa-ban text-danger'
+            )
         )
-    )
-);
+    );
+}
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
@@ -127,7 +141,7 @@ $customButtons = array_merge(
         'searchHelp'  => 'mautic.lead.lead.help.searchcommands',
         'action'      => $currentRoute,
         'langVar'     => 'lead.lead',
-        'routeBase'   => 'lead',
+        'routeBase'   => 'contact',
         'preCustomButtons' => $customButtons,
         'templateButtons' => array(
             'delete' => $permissions['lead:leads:deleteown'] || $permissions['lead:leads:deleteother']

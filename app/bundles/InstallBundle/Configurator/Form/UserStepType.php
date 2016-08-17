@@ -43,137 +43,137 @@ class UserStepType extends AbstractType
         $builder->add(
             'firstname',
             'text',
-            array(
+            [
                 'label'       => 'mautic.core.firstname',
-                'label_attr'  => array('class' => 'control-label'),
-                'attr'        => array('class' => 'form-control'),
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
                 'required'    => true,
                 'data'        => (!empty($storedData->firstname)) ? $storedData->firstname : '',
-                'constraints' => array(
+                'constraints' => [
                     new Assert\NotBlank(
-                        array(
+                        [
                             'message' => 'mautic.core.value.required'
-                        )
+                        ]
                     )
-                )
-            )
+                ]
+            ]
         );
 
         $builder->add(
             'lastname',
             'text',
-            array(
+            [
                 'label'       => 'mautic.core.lastname',
-                'label_attr'  => array('class' => 'control-label'),
-                'attr'        => array('class' => 'form-control'),
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
                 'required'    => true,
                 'data'        => (!empty($storedData->lastname)) ? $storedData->lastname : '',
-                'constraints' => array(
+                'constraints' => [
                     new Assert\NotBlank(
-                        array(
+                        [
                             'message' => 'mautic.core.value.required'
-                        )
+                        ]
                     )
-                )
-            )
+                ]
+            ]
         );
 
         $builder->add(
             'email',
             'email',
-            array(
+            [
                 'label'       => 'mautic.install.form.user.email',
-                'label_attr'  => array('class' => 'control-label'),
-                'attr'        => array(
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
                     'class'    => 'form-control',
                     'preaddon' => 'fa fa-envelope'
-                ),
+                ],
                 'required'    => true,
                 'data'        => (!empty($storedData->email)) ? $storedData->email : '',
-                'constraints' => array(
+                'constraints' => [
                     new Assert\NotBlank(
-                        array(
+                        [
                             'message' => 'mautic.core.value.required'
-                        )
+                        ]
                     ),
                     new Assert\Email(
-                        array(
+                        [
                             'message' => 'mautic.core.email.required'
-                        )
+                        ]
                     )
-                )
-            )
+                ]
+            ]
         );
 
         $builder->add(
             'username',
             'text',
-            array(
+            [
                 'label'       => 'mautic.install.form.user.username',
-                'label_attr'  => array('class' => 'control-label'),
-                'attr'        => array(
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
                     'class' => 'form-control'
-                ),
+                ],
                 'required'    => true,
                 'data'        => (!empty($storedData->username)) ? $storedData->username : '',
-                'constraints' => array(
+                'constraints' => [
                     new Assert\NotBlank(
-                        array(
+                        [
                             'message' => 'mautic.core.value.required'
-                        )
+                        ]
                     )
-                )
-            )
+                ]
+            ]
         );
 
         $builder->add(
             'password',
             'password',
-            array(
+            [
                 'label'       => 'mautic.install.form.user.password',
-                'label_attr'  => array('class' => 'control-label'),
-                'attr'        => array(
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.user.user.form.help.passwordrequirements',
                     'preaddon' => 'fa fa-lock'
-                ),
+                ],
                 'required'    => true,
-                'constraints' => array(
+                'constraints' => [
                     new Assert\NotBlank(
-                        array(
+                        [
                             'message' => 'mautic.core.value.required'
-                        )
+                        ]
                     ),
                     new Assert\Length(
-                        array(
+                        [
                             'min'        => 6,
                             'minMessage' => 'mautic.install.password.minlength'
-                        )
+                        ]
                     )
-                )
-            )
+                ]
+            ]
         );
 
         $builder->add(
             'buttons',
             'form_buttons',
-            array(
-                'pre_extra_buttons' => array(
-                    array(
+            [
+                'pre_extra_buttons' => [
+                    [
                         'name'  => 'next',
                         'label' => 'mautic.install.next.step',
                         'type'  => 'submit',
-                        'attr'  => array(
+                        'attr'  => [
                             'class'   => 'btn btn-success pull-right btn-next',
                             'icon'    => 'fa fa-arrow-circle-right',
                             'onclick' => 'MauticInstaller.showWaitMessage(event);'
-                        )
-                    )
-                ),
+                        ]
+                    ]
+                ],
                 'apply_text'        => '',
                 'save_text'         => '',
                 'cancel_text'       => ''
-            )
+            ]
         );
 
         if (!empty($options['action'])) {

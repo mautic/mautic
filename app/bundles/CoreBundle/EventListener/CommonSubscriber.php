@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Menu\MenuHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Symfony\Component\Routing\Route;
@@ -61,6 +62,16 @@ class CommonSubscriber implements EventSubscriberInterface
     protected $translator;
 
     /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected $em;
+
+    /**
+     * @var \Symfony\Bundle\FrameworkBundle\Routing\Router
+     */
+    protected $router;
+
+    /**
      * @param MauticFactory $factory
      */
     public function __construct (MauticFactory $factory)
@@ -73,6 +84,8 @@ class CommonSubscriber implements EventSubscriberInterface
         $this->params      = $factory->getSystemParameters();
         $this->dispatcher  = $factory->getDispatcher();
         $this->translator  = $factory->getTranslator();
+        $this->em          = $factory->getEntityManager();
+        $this->router      = $factory->getRouter();
 
         $this->init();
     }
@@ -106,23 +119,17 @@ class CommonSubscriber implements EventSubscriberInterface
 
         if (empty($allItems[$name])) {
             $bundles = $this->factory->getMauticBundles(true);
-
+            $menuItems = array();
             foreach ($bundles as $bundle) {
                 if (!empty($bundle['config']['menu'][$name])) {
-                    $menu        = $bundle['config']['menu'][$name];
-                    $menuItems[] = array(
-                        'priority' => !isset($menu['priority']) ? 9999 : $menu['priority'],
-                        'items'    => !isset($menu['items']) ? $menu : $menu['items']
+                    $menu = $bundle['config']['menu'][$name];
+                    $event->addMenuItems(
+                        array(
+                            'priority' => !isset($menu['priority']) ? 9999 : $menu['priority'],
+                            'items'    => !isset($menu['items']) ? $menu : $menu['items']
+                        )
                     );
                 }
-            }
-
-            /** @var \Mautic\CoreBundle\Menu\MenuHelper $menuHelper */
-            $menuHelper = $this->factory->getHelper('menu');
-            $menuHelper->sortByPriority($menuItems);
-
-            foreach ($menuItems as $items) {
-                $event->addMenuItems($items['items']);
             }
 
             $allItems[$name] = $event->getMenuItems();
@@ -147,6 +154,7 @@ class CommonSubscriber implements EventSubscriberInterface
 
         if (empty($icons)) {
             $bundles    = $this->factory->getMauticBundles(true);
+            /** @var MenuHelper $menuHelper */
             $menuHelper = $this->factory->getHelper('menu');
             foreach ($bundles as $bundle) {
                 if (!empty($bundle['config']['menu']['main'])) {
@@ -207,14 +215,16 @@ class CommonSubscriber implements EventSubscriberInterface
                         $defaults['_format'] = 'json';
                     }
 
-                    // Set requirements
-                    $requirements = (!empty($details['requirements'])) ? $details['requirements'] : array();
+                    $method = '';
 
                     if (isset($details['method'])) {
-                        $requirements['_method'] = $details['method'];
-                    } elseif ($type == 'api') {
-                        $requirements['_method'] = 'GET';
+                        $method = $details['method'];
+                    } elseif ($type === 'api') {
+                        $method = 'GET';
                     }
+
+                    // Set requirements
+                    $requirements = (!empty($details['requirements'])) ? $details['requirements'] : array();
 
                     // Set some very commonly used defaults and requirements
                     if (strpos($details['path'], '{page}') !== false) {
@@ -242,7 +252,7 @@ class CommonSubscriber implements EventSubscriberInterface
                     }
 
                     // Add the route
-                    $collection->add($name, new Route($details['path'], $defaults, $requirements));
+                    $collection->add($name, new Route($details['path'], $defaults, $requirements, [], '', [], $method));
                 }
             }
         }

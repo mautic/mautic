@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\ApiBundle\Event as ApiEvents;
 use Mautic\InstallBundle\Controller\InstallController;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Event\LoginEvent;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -36,7 +37,10 @@ class CoreSubscriber extends CommonSubscriber
     {
         return array(
             KernelEvents::CONTROLLER          => array('onKernelController', 0),
-            KernelEvents::REQUEST             => array('onKernelRequest', 0),
+            KernelEvents::REQUEST             => [
+                ['onKernelRequest', 0],
+                ['onKernelRequestAddGlobalJS', 0]
+            ],
             CoreEvents::BUILD_MENU            => array('onBuildMenu', 9999),
             CoreEvents::BUILD_ROUTE           => array('onBuildRoute', 0),
             CoreEvents::FETCH_ICONS           => array('onFetchIcons', 9999),
@@ -83,13 +87,31 @@ class CoreSubscriber extends CommonSubscriber
 
         $request->setLocale($locale);
 
-        // Set a cookie with session name for CKEditor's filemanager
+        // Set a cookie with session name for filemanager
         $sessionName = $request->cookies->get('mautic_session_name');
         if ($sessionName != session_name()) {
             /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
             $cookieHelper = $this->factory->getHelper('cookie');
             $cookieHelper->setCookie('mautic_session_name', session_name(), null);
         }
+    }
+
+    /**
+     * Add mauticForms in js script tag for Froala
+     *
+     * @param GetResponseEvent $event
+     */
+    public function onKernelRequestAddGlobalJS(GetResponseEvent $event)
+    {
+        if (defined('MAUTIC_INSTALLER')) {
+            return;
+        }
+
+        $list = $this->factory->getEntityManager()->getRepository('MauticFormBundle:Form')->getSimpleList();
+
+        $mauticForms = json_encode($list, JSON_FORCE_OBJECT | JSON_PRETTY_PRINT);
+
+        $this->factory->getHelper('template.assets')->addScriptDeclaration("var mauticForms = {$mauticForms};");
     }
 
     /**
@@ -127,14 +149,14 @@ class CoreSubscriber extends CommonSubscriber
             //dispatch on login events
             $dispatcher = $this->factory->getDispatcher();
             if ($dispatcher->hasListeners(UserEvents::USER_LOGIN)) {
-                $event = new LoginEvent($this->factory);
+                $event = new LoginEvent($this->factory->getUser());
                 $dispatcher->dispatch(UserEvents::USER_LOGIN, $event);
             }
         } else {
             $session->remove('mautic.user');
         }
 
-        //set a couple variables used by Ckeditor's filemanager
+        //set a couple variables used by filemanager
         $session->set('mautic.docroot', $event->getRequest()->server->get('DOCUMENT_ROOT'));
         $session->set('mautic.basepath', $event->getRequest()->getBasePath());
         $session->set('mautic.imagepath', $this->factory->getParameter('image_path'));

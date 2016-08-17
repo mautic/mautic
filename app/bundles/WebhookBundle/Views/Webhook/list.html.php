@@ -65,7 +65,7 @@ if ($tmpl == 'index')
                         <td>
                             <div>
                                 <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item'=> $item, 'model' => 'webhook')); ?>
-                                <a data-toggle="ajax" href="<?php echo $view['router']->generate('mautic_webhook_action', array('objectId' => $item->getId(), 'objectAction' => 'view')); ?>">
+                                <a data-toggle="ajax" href="<?php echo $view['router']->path('mautic_webhook_action', array('objectId' => $item->getId(), 'objectAction' => 'view')); ?>">
                                     <?php echo $item->getName(); ?>
                                 </a>
                                 <?php if ($description = $item->getDescription()): ?>
@@ -87,7 +87,7 @@ if ($tmpl == 'index')
             "page"            => $page,
             "limit"           => $limit,
             "menuLinkId"      => 'mautic_webhook_index',
-            "baseUrl"         => $view['router']->generate('mautic_webhook_index'),
+            "baseUrl"         => $view['router']->path('mautic_webhook_index'),
             'sessionVar'      => 'mautic_webhook'
         )); ?>
     </div>

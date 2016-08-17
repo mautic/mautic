@@ -1,8 +1,22 @@
 <?php
 defined('MAUTIC_OFFLINE') or die('access denied');
 
+if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+    // Ajax response so set a header if applicable and bail in order to not inject raw HTML into a possible json response
+    if (!headers_sent()) {
+        if (!empty($submessage)) {
+            $message .= " $submessage";
+        }
+
+        header("X-Mautic-System-Error: $message");
+    }
+
+    exit;
+}
+
 // Get the URLs base path
-$base = str_replace('index.php', '', $_SERVER['SCRIPT_NAME']);
+$inDev = strpos($_SERVER['SCRIPT_NAME'], 'index_dev.php') !== false;
+$base  = str_replace(['index.php', 'index_dev.php'], '', $_SERVER['SCRIPT_NAME']);
 
 // Determine if there is an asset prefix
 $root = __DIR__;
@@ -18,6 +32,7 @@ $assetBase = $assetPrefix . $base . $paths['assets'];
 // Allow a custom error page
 if (file_exists(__DIR__ . '/custom_offline.php')) {
     include __DIR__ . '/custom_offline.php';
+
     exit;
 }
 

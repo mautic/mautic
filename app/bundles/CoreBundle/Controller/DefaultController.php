@@ -34,7 +34,7 @@ class DefaultController extends CommonController
             return $this->redirect($this->generateUrl('mautic_dashboard_index'));
         } else {
             /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
-            $pageModel = $this->factory->getModel('page');
+            $pageModel = $this->getModel('page');
             $page      = $pageModel->getEntity($root);
 
             if (empty($page)) {
@@ -80,7 +80,7 @@ class DefaultController extends CommonController
     public function notificationsAction()
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model = $this->factory->getModel('core.notification');
+        $model = $this->getModel('core.notification');
 
         list($notifications, $showNewIndicator, $updateMessage) = $model->getNotificationContent();
 
@@ -92,65 +92,5 @@ class DefaultController extends CommonController
                 'updateMessage'    => $updateMessage
             )
         ));
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @deprecated Temp fix for pre 1.0.0-rc1
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    public function publicBcRedirectAction(Request $request)
-    {
-        $requestUri = $request->getRequestUri();
-
-        $url = str_replace('/p/', '/', $requestUri);
-
-        return $this->redirect($url, 301);
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @deprecated Temp fix for pre 1.0.0-rc2
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    public function ajaxBcRedirectAction(Request $request)
-    {
-        $requestUri = $request->getRequestUri();
-
-        if ($actionQuery = $request->query->get('action', false)) {
-            if (strpos($actionQuery, 'core:updateDatabaseMigration') !== false) {
-                // Check for update request and forward to controller if requesting an update so the process will finish
-                $actionQuery = str_replace('core:', '', $actionQuery);
-                return $this->forward("MauticCoreBundle:Ajax:executeAjax", array(
-                    'action'  => $actionQuery,
-                    //forward the request as well as Symfony creates a subrequest without GET/POST
-                    'request' => $this->request
-                ));
-            }
-        }
-
-        $url = str_replace('/ajax', '/s/ajax', $requestUri);
-
-        return $this->redirect($url, 301);
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @deprecated Temp fix for pre 1.0.0-rc2
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    public function updateBcRedirectAction(Request $request)
-    {
-        $requestUri = $request->getRequestUri();
-
-        $url = str_replace('/update', '/s/update', $requestUri);
-
-        return $this->redirect($url, 301);
     }
 }

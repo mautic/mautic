@@ -58,21 +58,19 @@ return array(
     
     'menu'     => array(
         'main' => array(
-            'priority' => 40,
-            'items'    => array(
-                'mautic.points.menu.root' => array(
-                    'id'        => 'mautic_points_root',
-                    'iconClass' => 'fa-calculator',
-                    'access'    => array('point:points:view', 'point:triggers:view'),
-                    'children'  => array(
-                        'mautic.point.menu.index'         => array(
-                            'route'  => 'mautic_point_index',
-                            'access' => 'point:points:view'
-                        ),
-                        'mautic.point.trigger.menu.index' => array(
-                            'route'  => 'mautic_pointtrigger_index',
-                            'access' => 'point:triggers:view'
-                        )
+            'mautic.points.menu.root' => array(
+                'id'        => 'mautic_points_root',
+                'iconClass' => 'fa-calculator',
+                'access'    => array('point:points:view', 'point:triggers:view'),
+                'priority'  => 30,
+                'children'  => array(
+                    'mautic.point.menu.index'         => array(
+                        'route'  => 'mautic_point_index',
+                        'access' => 'point:points:view'
+                    ),
+                    'mautic.point.trigger.menu.index' => array(
+                        'route'  => 'mautic_pointtrigger_index',
+                        'access' => 'point:triggers:view'
                     )
                 )
             )
@@ -89,7 +87,11 @@ return array(
                 'class' => 'Mautic\PointBundle\EventListener\PointSubscriber'
             ),
             'mautic.point.leadbundle.subscriber' => array(
-                'class' => 'Mautic\PointBundle\EventListener\LeadSubscriber'
+                'class' => 'Mautic\PointBundle\EventListener\LeadSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.point.model.trigger'
+                ]
             ),
             'mautic.point.search.subscriber' => array(
                 'class' => 'Mautic\PointBundle\EventListener\SearchSubscriber'
@@ -120,6 +122,27 @@ return array(
             'mautic.point.type.genericpoint_settings' => array(
                 'class' => 'Mautic\PointBundle\Form\Type\GenericPointSettingsType',
                 'alias' => 'genericpoint_settings'
+            )
+        ),
+        'models' =>  array(
+            'mautic.point.model.point' => array(
+                'class' => 'Mautic\PointBundle\Model\PointModel',
+                'arguments' => array(
+                    'session',
+                    'mautic.helper.ip_lookup',
+                    'mautic.lead.model.lead'
+                )
+            ),
+            'mautic.point.model.triggerevent' => array(
+                'class' => 'Mautic\PointBundle\Model\TriggerEventModel'
+            ),
+            'mautic.point.model.trigger' => array(
+                'class' => 'Mautic\PointBundle\Model\TriggerModel',
+                'arguments' => array(
+                    'mautic.helper.ip_lookup',
+                    'mautic.lead.model.lead',
+                    'mautic.point.model.triggerevent'
+                )
             )
         )
     )

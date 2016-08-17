@@ -26,7 +26,7 @@ class ReportApiController extends CommonApiController
     public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
-        $this->model            = $this->factory->getModel('report');
+        $this->model            = $this->getModel('report');
         $this->entityClass      = 'Mautic\ReportBundle\Entity\Report';
         $this->entityNameOne    = 'report';
         $this->entityNameMulti  = 'reports';

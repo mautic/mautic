@@ -87,6 +87,20 @@ $template = '<div class="col-md-6">{content}</div>';
 </div>
 <?php endif; ?>
 
+<?php if (count(array_intersect($fieldKeys, array('cors_restrict_domains')))): ?>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.cors'); ?></h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'cors_restrict_domains', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'cors_valid_domains', $template); ?>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
 <?php if (count(array_intersect($fieldKeys, array('trusted_hosts', 'trusted_proxies', 'ip_lookup_service', 'transifex_username', 'do_not_track_ips')))): ?>
 <div class="panel panel-primary">
     <div class="panel-heading">
@@ -127,6 +141,13 @@ $template = '<div class="col-md-6">{content}</div>';
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'transifex_username', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'transifex_password', $template); ?>
+        </div>
+        <?php endif; ?>
+
+        <?php if (isset($fields['link_shortener_url'])): ?>
+        <hr class="text-muted" />
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'link_shortener_url', $template); ?>
         </div>
         <?php endif; ?>
     </div>

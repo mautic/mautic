@@ -83,7 +83,7 @@ if ($tmpl == 'index')
                         <div>
                             <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', array('item' => $item, 'model' => 'category', 'query' => 'bundle=' . $bundle)); ?>
                             <?php if ($permissions[$bundle . ':categories:edit']): ?>
-                            <a href="<?php echo $view['router']->generate('mautic_category_action', array('bundle' => $bundle, 'objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="<?php echo $title; ?>"
+                            <a href="<?php echo $view['router']->path('mautic_category_action', array('bundle' => $bundle, 'objectAction' => 'edit', 'objectId' => $item->getId())); ?>" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="<?php echo $title; ?>"
                             <?php endif; ?>
                             <span><?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)</span>
                             <?php if ($permissions[$bundle . ':categories:edit']): ?>
@@ -109,7 +109,7 @@ if ($tmpl == 'index')
                 "page"       => $page,
                 "limit"      => $limit,
                 "menuLinkId" => 'mautic_category_index',
-                "baseUrl"    => $view['router']->generate('mautic_category_index', array(
+                "baseUrl"    => $view['router']->path('mautic_category_index', array(
                     'bundle' => ($bundle == 'category') ? 'all' : $bundle
                 )),
                 'sessionVar' => 'category'

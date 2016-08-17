@@ -34,16 +34,23 @@ abstract class AbstractChart
     /**
      * Date from
      *
-     * @var DateTime
+     * @var \DateTime
      */
     protected $dateFrom;
 
     /**
      * Date to
      *
-     * @var DateTime
+     * @var \DateTime
      */
     protected $dateTo;
+
+    /**
+     * Timezone data is requested to be in
+     *
+     * @var
+     */
+    protected $timezone;
 
     /**
      * Time unit
@@ -51,6 +58,13 @@ abstract class AbstractChart
      * @var string
      */
     protected $unit;
+
+    /**
+     * True if unit is H, i, or s
+     *
+     * @var bool
+     */
+    protected $isTimeUnit = false;
 
     /**
      * amount of items
@@ -71,7 +85,7 @@ abstract class AbstractChart
      *
      * @param  string  $unit
      *
-     * @return DateInterval
+     * @return \DateInterval
      */
     public function getUnitInterval($unit = null)
     {
@@ -111,25 +125,35 @@ abstract class AbstractChart
     /**
      * Sets the clones of the date range and validates it
      *
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
      */
     public function setDateRange(\DateTime $dateFrom, \DateTime $dateTo)
     {
         $this->dateFrom = clone $dateFrom;
-        $this->dateTo = clone $dateTo;
+        $this->dateTo   = clone $dateTo;
 
         // a diff of two identical dates returns 0, but we expect 24 hours
         if ($dateFrom == $dateTo) {
             $this->dateTo->modify('+1 day');
         }
+
+        // If today, adjust dateTo to be end of today if unit is not time based or to the current hour if it is
+        $now = new \DateTime();
+        if ($now->format('Y-m-d') == $this->dateTo->format('Y-m-d') && $this->isTimeUnit) {
+            $this->dateTo = $now;
+        } else {
+            $this->dateTo->setTime(23, 59, 59);
+        }
+
+        $this->timezone = $dateFrom->getTimezone();
     }
 
     /**
      * Modify the date to add one current time unit to it and subtract 1 second.
      * Can be used to get the current day results.
      *
-     * @param DateTime $date
+     * @param \DateTime $date
      */
     public function addOneUnitMinusOneSec(\DateTime &$date)
     {
@@ -145,14 +169,19 @@ abstract class AbstractChart
     {
         switch ($this->unit) {
             case 'd':
+                $amount = ($this->dateTo->diff($this->dateFrom)->format('%a') + 1);
+                break;
             case 'W':
-                $unit = 'a';
-                $amount = ($this->dateTo->diff($this->dateFrom)->format('%' . $unit) + 1);
-                $amount = $this->unit == 'W' ? floor($amount / 7) : $amount;
+                $dayAmount = $this->dateTo->diff($this->dateFrom)->format('%a');
+                $amount = (ceil($dayAmount / 7) + 1);
                 break;
             case 'm':
                 $amount = $this->dateTo->diff($this->dateFrom)->format('%y') * 12 + $this->dateTo->diff($this->dateFrom)->format('%m');
+
+                // Add 1 month if there are some days left
                 if ($this->dateTo->diff($this->dateFrom)->format('%d') > 0) $amount++;
+
+                // Add 1 month if count of days are greater or equal than in date to
                 if ($this->dateFrom->format('d') >= $this->dateTo->format('d')) $amount++;
                 break;
             case 'H':
@@ -171,11 +200,14 @@ abstract class AbstractChart
     /**
      * Returns appropriate time unit from a date range so the line/bar charts won't be too full/empty
      *
+     * @param $dateFrom
+     * @param $dateTo
+     *
      * @return string
      */
-    public function getTimeUnitFromDateRange()
+    public function getTimeUnitFromDateRange($dateFrom, $dateTo)
     {
-        $diff = $this->dateTo->diff($this->dateFrom)->format('%a');
+        $diff = $dateTo->diff($dateFrom)->format('%a');
         $unit = 'd';
 
         if ($diff <= 1) $unit = 'H';
@@ -184,18 +216,6 @@ abstract class AbstractChart
         if ($diff > 1000) $unit = 'Y';
 
         return $unit;
-    }
-
-    /**
-     * Returns the initiated chart query object
-     *
-     * @param Connection $connection
-     *
-     * @return ChartQuery
-     */
-    public function getChartQuery(Connection $connection)
-    {
-        return new ChartQuery($connection, $this->dateFrom, $this->dateTo, $this->unit);
     }
 
     /**
@@ -214,7 +234,7 @@ abstract class AbstractChart
         } else {
             $color = $colorHelper->buildRandomColor();
         }
-        
+
         return $color;
     }
 }

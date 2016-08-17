@@ -11,22 +11,44 @@ namespace Mautic\PluginBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
+use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\PluginEvents;
 
 /**
  * Class CampaignSubscriber
  */
 class CampaignSubscriber extends CommonSubscriber
 {
+    /**
+     * @var IntegrationHelper
+     */
+    protected $integrationHelper;
+    
+    /**
+     * CampaignSubscriber constructor.
+     * 
+     * @param MauticFactory $factory
+     * @param IntegrationHelper $integrationHelper
+     */
+    public function __construct(MauticFactory $factory, IntegrationHelper $integrationHelper)
+    {
+        $this->integrationHelper = $integrationHelper;
+        
+        parent::__construct($factory);
+    }
 
     /**
      * {@inheritdoc}
      */
     static public function getSubscribedEvents()
     {
-        return array(
-            CampaignEvents::CAMPAIGN_ON_BUILD => array('onCampaignBuild', 0)
-        );
+        return [
+            CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],
+            PluginEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0]
+        ];
     }
 
     /**
@@ -34,14 +56,44 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        $action = array(
+        $action = [
             'label'       => 'mautic.plugin.actions.push_lead',
             'description' => 'mautic.plugin.actions.tooltip',
             'formType'    => 'integration_list',
             'formTheme'   => 'MauticPluginBundle:FormTheme\Integration',
-            'callback'    => array('\\Mautic\\PluginBundle\\Helper\\EventHelper', 'pushLead')
-        );
+            'eventName'   => PluginEvents::ON_CAMPAIGN_TRIGGER_ACTION
+        ];
 
         $event->addAction('plugin.leadpush', $action);
+    }
+
+    /**
+     * @param CampaignExecutionEvent $event
+     */
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    {
+        $config = $event->getConfig();
+        $lead   = $event->getLead();
+        
+        $integration = (!empty($config['integration'])) ? $config['integration'] : null;
+        $feature     = (empty($integration)) ? 'push_lead' : null;
+
+        $services = $this->integrationHelper->getIntegrationObjects($integration, $feature);
+        $success  = false;
+
+        foreach ($services as $name => $s) {
+            $settings = $s->getIntegrationSettings();
+            if (!$settings->isPublished()) {
+                continue;
+            }
+
+            if (method_exists($s, 'pushLead')) {
+                if ($s->pushLead($lead, $config)) {
+                    $success = true;
+                }
+            }
+        }
+
+        return $event->setResult($success);
     }
 }

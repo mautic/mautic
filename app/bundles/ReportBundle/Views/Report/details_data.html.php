@@ -18,7 +18,7 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
 <?php if (!empty($columnOrder)): ?>
 <!-- table section -->
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
-    <div class="page-list"">
+    <div class="page-list">
         <div class="table-responsive table-responsive-force">
             <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
                 <thead>
@@ -32,7 +32,6 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
                                 'orderBy'    => $key,
                                 'text'       => $columns[$key]['label'],
                                 'class'      => 'col-report-' . $columns[$key]['type'],
-                                'filterBy'   => $key,
                                 'dataToggle' => in_array($columns[$key]['type'], array('date', 'datetime')) ? 'date' : '',
                                 'target'     => '.report-content'
                             ));
@@ -49,7 +48,16 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
                         <tr>
                             <td><?php echo $startCount; ?></td>
                             <?php foreach ($columnOrder as $key): ?>
-                                <td><?php echo $view['formatter']->_($row[$columns[$key]['label']], $columns[$key]['type']); ?></td>
+                                <td>
+                                    <?php $closeLink = false; ?>
+                                    <?php if (isset($columns[$key]['link']) && !empty($row[$columns[$key]['alias']])): ?>
+                                    <?php $closeLink = true; ?>
+                                    <a href="<?php echo $view['router']->path($columns[$key]['link'], ['objectAction' => 'view', 'objectId' => $row[$columns[$key]['alias']]]); ?>" class="label label-success">
+                                    <?php endif;?>
+                                    <?php echo $view['formatter']->_($row[$columns[$key]['alias']], $columns[$key]['type']); ?>
+                                    <?php if ($closeLink): ?></a><?php endif; ?>
+                                </td>
+
                             <?php endforeach; ?>
                         </tr>
                         <?php $startCount++; ?>
@@ -70,7 +78,7 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
                 'totalItems'      => $totalResults,
                 'page'            => $reportPage,
                 'limit'           => $limit,
-                'baseUrl'         => $view['router']->generate('mautic_report_view', array(
+                'baseUrl'         => $view['router']->path('mautic_report_view', array(
                     'objectId' => $report->getId()
                 )),
                 'sessionVar'      => 'report.' . $report->getId(),
@@ -83,24 +91,22 @@ $startCount  = ($dataCount > $limit) ? ($reportPage * $limit) - ($dataCount - 1)
 <?php endif; ?>
 
 <?php if (!empty($graphOrder) && !empty($graphs)): ?>
-<div class="mt-lg">
-    <div class="row">
-        <div class="pa-md">
-            <div class="row equal">
-            <?php
+<div class="mt-lg pa-md">
+    <div class="row equal">
+    <?php
+    $rowCount = 0;
+    foreach ($graphOrder as $key):
+        $details =  $graphs[$key];
+        if (!isset($details['data']))
+            continue;
+        if ($rowCount >= 12):
+            echo '</div><div class="row equal">';
             $rowCount = 0;
-            foreach ($graphOrder as $key):
-                $details =  $graphs[$key];
-                if ($rowCount >= 12):
-                    echo '</div><div class="row equal">';
-                    $rowCount = 0;
-                endif;
-                echo $view->render('MauticReportBundle:Graph:'.ucfirst($details['type']).'.html.php', array('graph' => $details['data'], 'options' => $details['options'], 'report' => $report));
-                $rowCount += ($details['type'] == 'line') ? 12 : 4;
-            endforeach;
-            ?>
-            </div>
-        </div>
+        endif;
+        echo $view->render('MauticReportBundle:Graph:'.ucfirst($details['type']).'.html.php', array('graph' => $details['data'], 'options' => $details['options'], 'report' => $report));
+        $rowCount += ($details['type'] == 'line') ? 12 : 4;
+    endforeach;
+    ?>
     </div>
 </div>
 <?php endif; ?>

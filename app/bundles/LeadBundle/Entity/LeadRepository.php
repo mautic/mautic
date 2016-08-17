@@ -222,7 +222,7 @@ class LeadRepository extends CommonRepository
      * Get list of lead Ids by unique field data.
      *
      * @param $uniqueFieldsWithData is an array of columns & values to filter by
-     * @param $leadId is the current lead id. Added to query to skip and find other leads.
+     * @param int $leadId is the current lead id. Added to query to skip and find other leads.
      *
      * @return array
      */
@@ -250,11 +250,12 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param $email
+     * @param string $email
+     * @param boolean $all Set to true to return all matching lead id's
      *
-     * @return integer|null
+     * @return array|null
      */
-    public function getLeadByEmail($email)
+    public function getLeadByEmail($email, $all = false)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('l.id')
@@ -265,7 +266,7 @@ class LeadRepository extends CommonRepository
         $result = $q->execute()->fetchAll();
 
         if (count($result)) {
-            return $result[0];
+            return $all ? $result : $result[0];
         } else {
             return null;
         }
@@ -475,9 +476,25 @@ class LeadRepository extends CommonRepository
         $args = $this->convertOrmProperties('Mautic\\LeadBundle\\Entity\\Lead', $args);
 
         //DBAL
-        $dq = $this->_em->getConnection()->createQueryBuilder();
-        $dq->select('count(l.id) as count')
-            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
+        $dq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $dq->select('COUNT(l.id) as count')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
+
+        // Filter by an entity query
+        if (isset($args['entity_query'])) {
+            $dq->andWhere(
+                sprintf('EXISTS (%s)', $args['entity_query']->getSQL())
+            );
+
+            if (isset($args['entity_parameters'])) {
+                foreach ($args['entity_parameters'] as $name => $value) {
+                    $dq->setParameter($name, $value);
+                }
+            }
+        }
+
         $this->buildWhereClause($dq, $args);
 
         //get a total count
@@ -488,8 +505,8 @@ class LeadRepository extends CommonRepository
         $this->buildOrderByClause($dq, $args);
         $this->buildLimiterClauses($dq, $args);
 
-        $dq->resetQueryPart('select');
-        $dq->select('l.*');
+        $dq->resetQueryPart('select')
+            ->select('l.*');
         $results = $dq->execute()->fetchAll();
 
         //loop over results to put fields in something that can be assigned to the entities
@@ -574,6 +591,46 @@ class LeadRepository extends CommonRepository
                 'count' => $total,
                 'results' => $results
             ) : $results;
+    }
+
+    /**
+     * Get contats for a specific channel entity
+     *
+     * @param $args - same as getEntity/getEntities
+     * @param        $joinTable
+     * @param        $entityId
+     * @param string $contactColumnName
+     *
+     * @return array
+     */
+    public function getEntityContacts($args, $joinTable, $entityId, $filters = [], $contactColumnName = 'id')
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $qb->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.$joinTable, 'entity')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('l.id', 'entity.lead_id'),
+                    $qb->expr()->eq("entity.{$contactColumnName}", (int) $entityId)
+                )
+            );
+
+        $parameters = [];
+        if ($filters) {
+            foreach ($filters as $column => $value) {
+                $parameterName = $this->generateRandomParameterName();
+                $qb->andWhere(
+                    $qb->expr()->eq("entity.{$column}", ":{$parameterName}")
+                );
+                $parameters[$parameterName] = $value;
+            }
+        }
+
+        $args['entity_query']      = $qb;
+        $args['entity_parameters'] = $parameters;
+
+        return $this->getEntities($args);
     }
 
     /**
@@ -671,34 +728,8 @@ class LeadRepository extends CommonRepository
         switch ($command) {
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous'):
                 $expr = $q->expr()->$xFunc(
-                    $q->expr()->$xSubFunc(
-                        $q->expr()->$eqFunc("l.firstname", $q->expr()->literal('')),
-                        $q->expr()->$nullFunc("l.firstname")
-                    ),
-                    $q->expr()->$xSubFunc(
-                        $q->expr()->$eqFunc("l.lastname", $q->expr()->literal('')),
-                        $q->expr()->$nullFunc("l.lastname")
-                    ),
-                    $q->expr()->$xSubFunc(
-                        $q->expr()->$eqFunc("l.company", $q->expr()->literal('')),
-                        $q->expr()->$nullFunc("l.company")
-                    ),
-                    $q->expr()->$xSubFunc(
-                        $q->expr()->$eqFunc("l.email", $q->expr()->literal('')),
-                        $q->expr()->$nullFunc("l.email")
-                    )
+                    $q->expr()->$nullFunc('l.date_identified')
                 );
-
-                if (!empty($this->availableSocialFields)) {
-                    foreach ($this->availableSocialFields as $field) {
-                        $expr->add(
-                            $q->expr()->$xSubFunc(
-                                $q->expr()->$eqFunc("l.$field", $q->expr()->literal('')),
-                                $q->expr()->$nullFunc("l.$field")
-                            )
-                        );
-                    }
-                }
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
@@ -706,20 +737,20 @@ class LeadRepository extends CommonRepository
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.isunowned'):
-                $expr = $q->expr()->$xFunc(
+                $expr = $q->expr()->orX(
                     $q->expr()->$eqFunc("l.owner_id", 0),
                     $q->expr()->$nullFunc("l.owner_id")
                 );
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.owner'):
-                $expr = $q->expr()->$xFunc(
-                    $q->expr()->$likeFunc('LOWER(u.firstName)', ':'.$unique),
-                    $q->expr()->$likeFunc('LOWER(u.lastName)', ':'.$unique)
+                $expr = $q->expr()->orX(
+                    $q->expr()->$likeFunc('LOWER(u.first_name)', ':'.$unique),
+                    $q->expr()->$likeFunc('LOWER(u.last_name)', ':'.$unique)
                 );
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
-                $expr = $q->expr()->$xFunc(
+                $expr = $q->expr()->orX(
                     $q->expr()->$likeFunc('LOWER(l.firstname)', ":$unique"),
                     $q->expr()->$likeFunc('LOWER(l.lastname)', ":$unique")
                 );
@@ -844,7 +875,8 @@ class LeadRepository extends CommonRepository
             'mautic.core.searchcommand.email',
             'mautic.lead.lead.searchcommand.owner',
             'mautic.core.searchcommand.ip',
-            'mautic.lead.lead.searchcommand.tag'
+            'mautic.lead.lead.searchcommand.tag',
+            'mautic.lead.lead.searchcommand.stage'
         );
 
         if (!empty($this->availableSearchFields)) {

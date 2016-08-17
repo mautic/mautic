@@ -9,12 +9,14 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Monolog\Logger;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -25,6 +27,146 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class FieldModel extends FormModel
 {
+    static public $coreFields   = [
+        // Listed according to $order for installation
+        'title'     => [
+            'type'       => 'lookup',
+            'properties' => ['list' => '|Mr|Mrs|Miss'],
+            'fixed'      => true,
+        ],
+        'firstname' => [
+            'fixed' => true,
+            'short' => true,
+        ],
+        'lastname'  => [
+            'fixed' => true,
+            'short' => true,
+        ],
+        'company'          => [
+            'fixed' => true,
+        ],
+        'position'         => [
+            'fixed' => true,
+        ],
+        'email'            => [
+            'type'   => 'email',
+            'unique' => true,
+            'fixed'  => true,
+            'short'  => true,
+        ],
+        'mobile'           => [
+            'type'     => 'tel',
+            'fixed'    => true,
+            'listable' => true,
+        ],
+        'phone'            => [
+            'type'     => 'tel',
+            'fixed'    => true,
+            'listable' => true,
+        ],
+        'fax'              => [
+            'type'     => 'tel',
+            'listable' => true,
+        ],
+        'address1'         => [
+            'fixed'    => true,
+            'listable' => true,
+        ],
+        'address2'         => [
+            'fixed'    => true,
+            'listable' => true,
+        ],
+        'city'             => [
+            'fixed' => true,
+        ],
+        'state'            => [
+            'type'  => 'region',
+            'fixed' => true,
+        ],
+        'zipcode'          => [
+            'fixed' => true,
+        ],
+        'country'          => [
+            'type'  => 'country',
+            'fixed' => true,
+        ],
+        'preferred_locale' => [
+            'type'     => 'locale',
+            'fixed'    => true,
+            'listable' => true,
+        ],
+        'attribution_date' => [
+            'type'     => 'datetime',
+            'fixed'    => true,
+            'listable' => true,
+        ],
+        'attribution'      => [
+            'type'       => 'number',
+            'properties' => ['roundmode' => 4, 'precision' => 2],
+            'fixed'      => true,
+            'listable'   => true,
+        ],
+        'website'          => [
+            'type'     => 'url',
+            'listable' => true,
+        ],
+        'facebook'   => [
+            'listable' => true,
+            'group' => 'social',
+        ],
+        'foursquare' => [
+            'listable' => true,
+            'group' => 'social',
+        ],
+        'googleplus' => [
+            'listable' => true,
+            'group' => 'social',
+        ],
+        'instagram'  => [
+            'listable' => true,
+            'group' => 'social',
+        ],
+        'linkedin'   => [
+            'listable' => true,
+            'group' => 'social',
+        ],
+        'skype'      => [
+            'listable' => true,
+            'group' => 'social',
+        ],
+        'twitter'    => [
+            'listable' => true,
+            'group' => 'social',
+        ],
+    ];
+
+    /**
+     * @var SchemaHelperFactory
+     */
+    protected $schemaHelperFactory;
+
+    /**
+     * @var Logger
+     */
+    protected $logger;
+
+    /**
+     * FieldModel constructor.
+     *
+     * @param SchemaHelperFactory $schemaHelperFactory
+     */
+    public function __construct(SchemaHelperFactory $schemaHelperFactory)
+    {
+        $this->schemaHelperFactory = $schemaHelperFactory;
+    }
+
+    /**
+     * @param Logger $logger
+     */
+    public function setLogger(Logger $logger)
+    {
+        $this->logger = $logger;
+    }
 
     /**
      * @return \Doctrine\ORM\EntityRepository
@@ -139,41 +281,37 @@ class FieldModel extends FormModel
 
         if ($entity->getId()) {
             //create the field as its own column in the leads table
-            $leadsSchema = $this->factory->getSchemaHelper('column', 'leads');
+            $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', 'leads');
             if ($isNew || (!$isNew && !$leadsSchema->checkColumnExists($alias))) {
+                $schemaDefinition = self::getSchemaDefinition($alias, $entity->getType(), $isUnique);
                 $leadsSchema->addColumn(
-                    array(
-                        'name'    => $alias,
-                        'type'    => (in_array($alias, array('country', 'email') ) || $isUnique) ? 'string' : 'text',
-                        'options' => array(
-                            'notnull' => false
-                        )
-                    )
+                    $schemaDefinition
                 );
                 $leadsSchema->executeChanges();
 
-                if ($isUnique) {
-                    // Get list of current uniques
-                    $uniqueIdentifierFields = $this->getUniqueIdentifierFields();
-
-                    // Always use email
-                    $indexColumns   = array('email');
-                    $indexColumns   = array_merge($indexColumns, array_keys($uniqueIdentifierFields));
-                    $indexColumns[] = $alias;
-
-                    // Only use three to prevent max key length errors
-                    $indexColumns = array_slice($indexColumns, 0, 3);
-
+                // Update the unique_identifier_search index and add an index for this field
+                /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
+                $modifySchema = $this->schemaHelperFactory->getSchemaHelper('index', 'leads');
+                if ('string' == $schemaDefinition['type']) {
                     try {
-                        // Update the unique_identifier_search index
-                        /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
-                        $modifySchema = $this->factory->getSchemaHelper('index', 'leads');
+                        $modifySchema->addIndex([$alias], $alias.'_search');
                         $modifySchema->allowColumn($alias);
-                        $modifySchema->addIndex($indexColumns, 'unique_identifier_search');
-                        $modifySchema->addIndex(array($alias), 'lead_field'.$alias.'_search');
+                        if ($isUnique) {
+                            // Get list of current uniques
+                            $uniqueIdentifierFields = $this->getUniqueIdentifierFields();
+
+                            // Always use email
+                            $indexColumns   = ['email'];
+                            $indexColumns   = array_merge($indexColumns, array_keys($uniqueIdentifierFields));
+                            $indexColumns[] = $alias;
+
+                            // Only use three to prevent max key length errors
+                            $indexColumns = array_slice($indexColumns, 0, 3);
+                            $modifySchema->addIndex($indexColumns, 'unique_identifier_search');
+                        }
                         $modifySchema->executeChanges();
                     } catch (\Exception $e) {
-                        error_log($e);
+                        $this->logger->addWarning($e->getMessage());
                     }
                 }
             }
@@ -193,7 +331,7 @@ class FieldModel extends FormModel
         parent::deleteEntity($entity);
 
         //remove the column from the leads table
-        $leadsSchema = $this->factory->getSchemaHelper('column', 'leads');
+        $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', 'leads');
         $leadsSchema->dropColumn($entity->getAlias());
         $leadsSchema->executeChanges();
     }
@@ -210,7 +348,7 @@ class FieldModel extends FormModel
         $entities = parent::deleteEntities($ids);
 
         //remove the column from the leads table
-        $leadsSchema = $this->factory->getSchemaHelper('column', 'leads');
+        $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', 'leads');
         foreach ($entities as $e) {
             $leadsSchema->dropColumn($e->getAlias());
         }
@@ -494,5 +632,58 @@ class FieldModel extends FormModel
     public function getUniqueIdentifierFields()
     {
         return $this->getUniqueIdentiferFields();
+    }
+
+    /**
+     * Get the MySQL database type based on the field type
+     * Use a static function so that it's accessible from DoctrineSubscriber
+     * without causing a circular service injection error
+     *
+     * @param $fieldType
+     *
+     * @return array
+     */
+    static public function getSchemaDefinition($alias, $type, $isUnique = false)
+    {
+        // Unique is always a string in order to control index length
+        if ($isUnique) {
+
+            return [
+                'name'    => $alias,
+                'type'    => 'string',
+                'options' => [
+                    'notnull' => false
+                ]
+            ];
+        }
+
+        switch ($type) {
+            case 'datetime':
+            case 'date':
+            case 'time':
+            case 'boolean':
+                $schemaType = $type;
+                break;
+            case 'number':
+                $schemaType = 'float';
+                break;
+            case 'locale':
+            case 'country':
+            case 'email':
+            case 'lookup':
+            case 'region':
+            case 'tel':
+            case 'text':
+                $schemaType = 'string';
+                break;
+            default:
+                $schemaType = 'text';
+        }
+
+        return [
+            'name'    => $alias,
+            'type'    => $schemaType,
+            'options' => ['notnull' => false]
+        ];
     }
 }

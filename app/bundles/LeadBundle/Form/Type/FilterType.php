@@ -109,6 +109,17 @@ class FilterType extends AbstractType
                     $customOptions['multiple'] = true;
                     $type                      = 'choice';
                     break;
+                case 'lead_email_received':
+                    if (!isset($data['filter'])) {
+                        $data['filter'] = array();
+                    } elseif (!is_array($data['filter'])) {
+                        $data['filter'] = array($data['filter']);
+                    }
+
+                    $customOptions['choices']  = $options['emails'];
+                    $customOptions['multiple'] = true;
+                    $type                      = 'choice';
+                    break;
                 case 'tags':
                     if (!isset($data['filter'])) {
                         $data['filter'] = array();
@@ -126,6 +137,10 @@ class FilterType extends AbstractType
                             'onchange'             => 'Mautic.createLeadTag(this)'
                         )
                     );
+                    $type                      = 'choice';
+                    break;
+                case 'stage':
+                    $customOptions['choices']  = $options['stage'];
                     $type                      = 'choice';
                     break;
                 case 'timezone':
@@ -217,7 +232,10 @@ class FilterType extends AbstractType
                     }
 
                     if ($fieldType == 'select') {
-                        array_unshift($choices, array('' => ''));
+                        // array_unshift cannot be used because numeric values get lost as keys
+                        $choices = array_reverse($choices, true);
+                        $choices[''] = '';
+                        $choices = array_reverse($choices, true);
                     }
 
                     $customOptions['choices'] = $choices;
@@ -351,7 +369,9 @@ class FilterType extends AbstractType
                 'regions',
                 'fields',
                 'lists',
-                'tags'
+                'emails',
+                'tags',
+                'stage'
             )
         );
 

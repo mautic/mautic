@@ -101,6 +101,8 @@ class Campaign extends FormEntity
     {
         $this->leads  = new ArrayCollection();
         $this->events = new ArrayCollection();
+        $this->lists  = new ArrayCollection();
+        $this->forms  = new ArrayCollection();
         $this->id     = null;
 
         parent::__clone();

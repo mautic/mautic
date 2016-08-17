@@ -54,3 +54,8 @@
         # RedirectTemp cannot be used instead
     </IfModule>
 </IfModule>
+
+<IfModule mod_php5.c>
+    # @link https://github.com/mautic/mautic/issues/1504
+    php_value always_populate_raw_post_data -1
+</IfModule>

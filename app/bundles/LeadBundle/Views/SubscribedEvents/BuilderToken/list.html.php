@@ -16,7 +16,7 @@ if ($tmpl == 'index') {
     <div class="list-group">
         <?php
         foreach ($items as $i):
-        $token = $view->escape(\Mautic\CoreBundle\Helper\BuilderTokenHelper::getVisualTokenHtml('{leadfield=' . $i['alias'] . '}', $i['label']))
+        $token = $view->escape(\Mautic\CoreBundle\Helper\BuilderTokenHelper::getVisualTokenHtml('{contactfield=' . $i['alias'] . '}', $i['label']))
         ?>
             <a href="#" class="list-group-item" data-token="<?php echo $token; ?>">
                 <span><?php echo $i['label']; ?></span>
@@ -29,7 +29,7 @@ if ($tmpl == 'index') {
         "page"              => $page,
         "limit"             => $limit,
         "fixedLimit"        => true,
-        "baseUrl"           => $view['router']->generate('mautic_lead_emailtoken_index'),
+        "baseUrl"           => $view['router']->path('mautic_contact_emailtoken_index'),
         "paginationWrapper" => 'text-center',
         "paginationClass"   => "sm",
         'sessionVar'        => 'lead.emailtoken',

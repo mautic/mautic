@@ -21,7 +21,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\CoreBundle\Helper\EmojiHelper;
-use Mautic\CoreBundle\Templating\TemplateNameParser;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class MailHelper
@@ -105,7 +105,7 @@ class MailHelper
     protected $source = array();
 
     /**
-     * @var null
+     * @var Email|null
      */
     protected $email = null;
 
@@ -207,6 +207,13 @@ class MailHelper
     private $transportStartTime;
 
     /**
+     * Simply a md5 of the content so that event listeners can easily determine if the content has been changed
+     *
+     * @var string
+     */
+    private $contentHash;
+
+    /**
      * @param MauticFactory $factory
      * @param               $mailer
      * @param null          $from
@@ -241,10 +248,24 @@ class MailHelper
     }
 
     /**
+     * Mirrors previous MauticFactory functionality
+     *
+     * @param bool $cleanSlate
+     * @return $this
+     */
+    public function getMailer($cleanSlate = true)
+    {
+        $this->reset($cleanSlate);
+
+        return $this;
+    }
+
+    /**
      * Send the message
      *
      * @param bool $dispatchSendEvent
      * @param bool $isQueueFlush (a tokenized/batch send via API such as Mandrill)
+     * @param bool $useOwnerAsMailer
      *
      * @return bool
      */
@@ -367,7 +388,6 @@ class MailHelper
 
                 if (!empty($failures)) {
                     $this->errors['failures'] = $failures;
-
                     $this->logError('Sending failed for one or more recipients');
                 }
 
@@ -523,7 +543,7 @@ class MailHelper
         unset($this->lead, $this->idHash, $this->eventTokens, $this->queuedRecipients, $this->errors);
 
         $this->eventTokens  = $this->queuedRecipients = $this->errors = array();
-        $this->lead         = $this->idHash = null;
+        $this->lead         = $this->idHash = $this->contentHash = null;
         $this->internalSend = $this->fatal = false;
 
         $this->logger->clear();
@@ -788,6 +808,9 @@ class MailHelper
     public function setPlainText($content)
     {
         $this->plainText = $content;
+
+        // Update the identifier for the content
+        $this->contentHash = md5($this->body['content'].$this->plainText);
     }
 
     /**
@@ -835,18 +858,35 @@ class MailHelper
      * @param string $contentType
      * @param null   $charset
      * @param bool   $ignoreTrackingPixel
+     * @param bool   $ignoreEmbedImageConversion
      */
-    public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false)
+    public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false, $ignoreEmbedImageConversion = false)
     {
-        if (!$ignoreTrackingPixel) {
+        if (!$ignoreEmbedImageConversion && $this->factory->getParameter('mailer_convert_embed_images')) {
+            $matches = array();
+            if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
+                $replaces = array();
+                foreach($matches[1] AS $match) {
+                    if (strpos($match, 'cid:') === false) {
+                        $replaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
+                    }
+                }
+                $content = strtr($content, $replaces);
+            }
+        }
+
+        if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
             // Append tracking pixel
-            $trackingImg = '<img style="display: none;" height="1" width="1" src="{tracking_pixel}" alt="Mautic is open source marketing automation" />';
+            $trackingImg = '<img style="display: none;" height="1" width="1" src="{tracking_pixel}" alt="" />';
             if (strpos($content, '</body>') !== false) {
                 $content = str_replace('</body>', $trackingImg.'</body>', $content);
             } else {
                 $content .= $trackingImg;
             }
         }
+
+        // Update the identifier for the content
+        $this->contentHash = md5($content.$this->plainText);
 
         $this->body = array(
             'content'     => $content,
@@ -866,6 +906,16 @@ class MailHelper
     }
 
     /**
+     * Return the content identifier
+     *
+     * @return string
+     */
+    public function getContentHash()
+    {
+        return $this->contentHash;
+    }
+
+    /**
      * Set to address(es)
      *
      * @param $addresses
@@ -876,7 +926,11 @@ class MailHelper
     public function setTo($addresses, $name = null)
     {
         if (!is_array($addresses)) {
-            $addresses = array($addresses => $name);
+            if (($name !== null) && (trim($name))) {
+                $addresses = [$addresses => trim($name)];
+            } else {
+                $addresses = [$addresses];
+            }
         }
 
         $this->checkBatchMaxRecipients(count($addresses));
@@ -1223,8 +1277,11 @@ class MailHelper
             $this->setPlainText($plainText);
         }
 
-        $template = $email->getTemplate();
-        if (!empty($template)) {
+        $BCcontent = $email->getContent();
+        $customHtml = $email->getCustomHtml();
+        // Process emails created by Mautic v1
+        if (empty($customHtml) && !empty($BCcontent)) {
+            $template = $email->getTemplate();
             if (empty($slots)) {
                 $template = $email->getTemplate();
                 $slots    = $this->factory->getTheme($template)->getSlots('email');
@@ -1244,9 +1301,6 @@ class MailHelper
                 'email'    => $email,
                 'template' => $template
             ), true);
-        } else {
-            // Tak on the tracking pixel token
-            $customHtml = $email->getCustomHtml();
         }
 
         // Convert short codes to emoji
@@ -1328,18 +1382,6 @@ class MailHelper
     }
 
     /**
-     * Set custom tokens
-     *
-     * @param array $tokens
-     *
-     * @deprecated Since 1.1.  Use setTokens() instead. To be removed in 2.0
-     */
-    public function setCustomTokens(array $tokens)
-    {
-        $this->setTokens($tokens);
-    }
-
-    /**
      * Get tokens
      *
      * @return array
@@ -1415,6 +1457,8 @@ class MailHelper
         $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_SEND, $event);
 
         $this->eventTokens = array_merge($this->eventTokens, $event->getTokens());
+
+        unset($event);
     }
 
     /**
@@ -1553,20 +1597,20 @@ class MailHelper
         if (substr($url, 0, 4) !== 'http' && substr($url, 0, 3) !== 'ftp') {
             return null;
         }
+
+        if ($this->email) {
+            // Get a Trackable which is channel aware
+            /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
+            $trackableModel = $this->factory->getModel('page.trackable');
+            $trackable      = $trackableModel->getTrackableByUrl($url, 'email', $this->email->getId());
+
+            return $trackable->getRedirect();
+        }
+
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
         $redirectModel = $this->factory->getModel('page.redirect');
 
-        $link = $redirectModel->getRedirectByUrl($url, $this->email);
-
-        return $link;
-    }
-
-    /**
-     * @deprecated 1.2.3 - to be removed in 2.0.  Use createEmailStat() instead
-     */
-    public function createLeadEmailStat()
-    {
-        $this->createEmailStat();
+        return $redirectModel->getRedirectByUrl($url);
     }
 
     /**
@@ -1627,23 +1671,25 @@ class MailHelper
         if (!isset($copies[$id])) {
             $hash = (strlen($id) !== 32) ? md5($this->subject.$this->body['content']) : $id;
 
-            $copy = $emailModel->getCopyRepository()->findByHash($hash);
+            $copy        = $emailModel->getCopyRepository()->findByHash($hash);
+            $copyCreated = false;
             if (null === $copy) {
-                // Create a copy entry
-                $copy = new Copy();
-                $copy->setId($hash)
-                    ->setBody($this->body['content'])
-                    ->setSubject($this->subject)
-                    ->setDateCreated(new \DateTime())
-                    ->setEmail($this->email);
-
-                $emailModel->getCopyRepository()->saveEntity($copy);
+                if (!$emailModel->getCopyRepository()->saveCopy($hash, $this->subject, $this->body['content'])) {
+                    // Try one more time to find the ID in case there was overlap when creating
+                    $copy = $emailModel->getCopyRepository()->findByHash($hash);
+                } else {
+                    $copyCreated = true;
+                }
             }
 
-            $copies[$id] = $copy;
+            if ($copy || $copyCreated) {
+                $copies[$id] = $hash;
+            }
         }
 
-        $stat->setStoredCopy($copies[$id]);
+        if (isset($copies[$id])) {
+            $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $copies[$id]));
+        }
 
         if ($persist) {
             $emailModel->getStatRepository()->saveEntity($stat);
@@ -1766,5 +1812,45 @@ class MailHelper
             $value = isset($content[$slot]) ? $content[$slot] : "";
             $slotsHelper->set($slot, $value);
         }
+    }
+
+    /**
+     * @param Lead $lead
+     */
+    public function applyFrequencyRules(Lead $lead)
+    {
+        $frequencyRule = $lead->getFrequencyRules();
+
+        /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
+        $emailModel = $this->factory->getModel('email');
+
+        $statRepo = $emailModel->getStatRepository();
+
+        $now = new \DateTime();
+        $channels = $frequencyRule['channels'];
+
+        if(!empty($frequencyRule) and in_array('email', $channels,true))
+        {
+            $frequencyTime = new \DateInterval('P'.$frequencyRule['frequency_time']);
+            $frequencyNumber = $frequencyRule['frequency_number'];
+        }
+        elseif($this->factory->getParameter('frequency_number') > 0)
+        {
+            $frequencyTime = new \DateInterval('P'.$frequencyRule['frequency_time']);
+            $frequencyNumber = $this->factory->getParameter('frequency_number');
+        }
+
+        $now->sub($frequencyTime);
+        $sentQuery = $statRepo->getLeadStats($lead->getId(), array('fromDate' => $now));
+
+        if(!empty($sentQuery) and count($sentQuery) < $frequencyNumber)
+        {
+            return true;
+        }
+        elseif (empty($sentQuery))
+        {
+            return true;
+        }
+        return false;
     }
 }

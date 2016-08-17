@@ -23,7 +23,7 @@
                         'btnClass'      => 'btn btn-danger btn-xs',
                         'message'       => $view["translator"]->trans("mautic.api.client.form.confirmrevoke", array("%name%" => $k->getName())),
                         'confirmText'   => $view["translator"]->trans("mautic.api.client.form.revoke"),
-                        'confirmAction' => $view['router']->generate('mautic_client_action',array("objectAction" => "revoke", "objectId" => $k->getId())),
+                        'confirmAction' => $view['router']->path('mautic_client_action',array("objectAction" => "revoke", "objectId" => $k->getId())),
                         'iconClass'     => 'fa fa-trash-o',
                         'btnText'       => $view["translator"]->trans("mautic.api.client.form.revoke")
                     )

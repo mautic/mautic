@@ -527,7 +527,7 @@ body > #app-wrapper {
   background-color: rgba(255, 255, 255, 0.06);
 }
 .app-sidebar .sidebar-header {
-  z-index: 10;
+  z-index: 100;
   height: 60px;
   padding-left: 15px;
   padding-right: 15px;
@@ -1541,6 +1541,19 @@ a.media {
   color: #f2f2f2;
   background-color: #4e5d9d;
 }
+.extra-menu {
+  height: 60px;
+  padding-top: 20px;
+  position: absolute;
+  right: 15px;
+}
+.extra-menu a {
+  font-size: 1.1em;
+  color: rgba(255, 255, 255, 0.55);
+}
+.extra-menu a:hover {
+  color: #fff;
+}
 .list-group-item > a {
   position: relative;
   z-index: 1;
@@ -1840,6 +1853,9 @@ ul.dropdown-menu-form {
   padding-right: 32px;
   width: 100%;
   overflow: hidden;
+}
+.mautic-brand.pull-left {
+  width: 75%;
 }
 .mautic-brand > svg.mautic-logo-figure {
   width: 32px;
@@ -4257,32 +4273,8 @@ lesshat-selector { -lh-property: 0 ;
   margin: 6px 12px;
   white-space: normal;
 }
-.builder .list-group-item.ui-draggable-dragging {
-  background-color: #fff;
-}
-.builder .over-droppable {
-  border: dashed 2px #4e5e9e;
-  -webkit-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.75);
-  -moz-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.75);
-  box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.75);
-  font-weight: bold;
-  font-size: 2em;
-}
 .builder .builder-panel-top {
-  position: fixed;
-  top: 0;
-  z-index: 1030;
-  background-color: #d5d4d4;
-  padding-top: 10px;
-  width: 255px;
-}
-.builder .builder-tokens {
-  margin-top: 140px;
-}
-.builder #customHtmlDropzone {
-  height: 95px;
-  display: table;
-  width: 100%;
+  margin-bottom: 10px;
 }
 .builder .template-dnd-help,
 .builder .custom-dnd-help {
@@ -4534,4 +4526,34 @@ body.noscroll {
 .table .input-group-sm .dropdown-toggle {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
+}
+.input-group .input-group-btn button {
+  height: 32px;
+}
+.theme-selected {
+  border: 1px solid #4e5e9e;
+  -webkit-box-shadow: 0px 0px 40px #f3f3f3;
+  box-shadow: 0px 0px 40px #f3f3f3;
+}
+#app-content.content-only .toolbar-form-buttons.pull-right {
+  padding-right: 20px;
+}
+.fr-toolbar {
+  border-top: 2px solid #4e5d9d;
+}
+.modal-body-content iframe.fr-iframe {
+  min-height: 300px;
+}
+.CodeMirror {
+  border: 1px solid #d5d5d5;
+  border-radius: 3px;
+}
+table.table > tbody > tr > td.long-text {
+  max-width: 500px;
+  min-width: 300px;
+  -ms-word-break: break-all;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  white-space: normal;
 }

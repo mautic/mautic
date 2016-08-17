@@ -27,7 +27,7 @@ class SourceController extends CommonFormController
         $success = 0;
         $valid   = $cancelled = false;
         $method  = $this->request->getMethod();
-        $session = $this->factory->getSession();
+        $session = $this->get('session');
         if ($method == 'POST') {
             $source     = $this->request->request->get('campaign_leadsource');
             $sourceType = $source['sourceType'];
@@ -45,7 +45,7 @@ class SourceController extends CommonFormController
 
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest()
-            || !$this->factory->getSecurity()->isGranted(
+            || !$this->get('mautic.security')->isGranted(
                 array(
                     'campaign:campaigns:edit',
                     'campaign:campaigns:create'
@@ -56,7 +56,7 @@ class SourceController extends CommonFormController
             return $this->modalAccessDenied();
         }
 
-        $sourceList = $this->factory->getModel('campaign')->getSourceLists($sourceType);
+        $sourceList = $this->getModel('campaign')->getSourceLists($sourceType);
         $form       = $this->get('form.factory')->create(
             'campaign_leadsource',
             $source,
@@ -128,7 +128,7 @@ class SourceController extends CommonFormController
      */
     public function editAction($objectId)
     {
-        $session         = $this->factory->getSession();
+        $session         = $this->get('session');
         $method          = $this->request->getMethod();
         $selectedSources = $session->get('mautic.campaign.'.$objectId.'.leadsources.modified', array());
         if ($method == 'POST') {
@@ -151,7 +151,7 @@ class SourceController extends CommonFormController
 
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest()
-            || !$this->factory->getSecurity()->isGranted(
+            || !$this->get('mautic.security')->isGranted(
                 array(
                     'campaign:campaigns:edit',
                     'campaign:campaigns:create'
@@ -162,7 +162,7 @@ class SourceController extends CommonFormController
             return $this->modalAccessDenied();
         }
 
-        $sourceList = $this->factory->getModel('campaign')->getSourceLists($sourceType);
+        $sourceList = $this->getModel('campaign')->getSourceLists($sourceType);
         $form       = $this->get('form.factory')->create(
             'campaign_leadsource',
             $source,
@@ -237,13 +237,13 @@ class SourceController extends CommonFormController
      */
     public function deleteAction($objectId)
     {
-        $session         = $this->factory->getSession();
+        $session         = $this->get('session');
         $modifiedSources = $session->get('mautic.campaign.'.$objectId.'.leadsources.modified', array());
         $sourceType      = $this->request->get('sourceType');
 
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest()
-            || !$this->factory->getSecurity()->isGranted(
+            || !$this->get('mautic.security')->isGranted(
                 array(
                     'campaign:campaigns:edit',
                     'campaign:campaigns:create'

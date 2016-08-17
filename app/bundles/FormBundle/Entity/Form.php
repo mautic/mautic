@@ -120,6 +120,13 @@ class Form extends FormEntity
     private $formType;
 
     /**
+     * This var is used to cache the result once gained from the loop
+     *
+     * @var boolean
+     */
+    private $usesProgressiveProfiling = null;
+
+    /**
      * @return void
      */
     public function __clone ()
@@ -762,12 +769,39 @@ class Form extends FormEntity
      */
     public function generateFormName()
     {
-        return strtolower(
+        $name = strtolower(
             InputHelper::alphanum(
                 InputHelper::transliterate(
                     $this->name
                 )
             )
         );
+        return (empty($name)) ? 'form-' . $this->id : $name;
+    }
+
+    /**
+     * Check if some Progressive Profiling setting is turned on on any of the form fields
+     *
+     * @return boolean
+     */
+    public function usesProgressiveProfiling()
+    {
+        if ($this->usesProgressiveProfiling !== null) {
+            return $this->usesProgressiveProfiling;
+        }
+
+        // Progressive profiling must be turned off in the kiosk mode
+        if ($this->getInKioskMode() === false) {
+            // Search for a field with a progressive profiling setting on
+            foreach ($this->fields->toArray() as $field) {
+                if ($field->getShowWhenValueExists() === false || $field->getShowAfterXSubmissions() > 0) {
+                    $this->usesProgressiveProfiling = true;
+                    return $this->usesProgressiveProfiling;
+                }
+            }
+        }
+
+        $this->usesProgressiveProfiling = false;
+        return $this->usesProgressiveProfiling;
     }
 }

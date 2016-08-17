@@ -26,7 +26,7 @@ class ProfileController extends FormController
     {
         //get current user
         $me    = $this->get('security.context')->getToken()->getUser();
-        $model = $this->factory->getModel('user.user');
+        $model = $this->getModel('user.user');
 
         //set some permissions
         $permissions = array(
@@ -154,7 +154,18 @@ class ProfileController extends FormController
                         if ($fetchLanguage['error']) {
                             $me->setLocale(null);
                             $model->saveEntity($me);
-                            $this->addFlash('mautic.core.could.not.set.language');
+                            $message = 'mautic.core.could.not.set.language';
+                            $messageVars = array();
+
+                            if (isset($fetchLanguage['message'])) {
+                                $message = $fetchLanguage['message'];
+                            }
+
+                            if (isset($fetchLanguage['vars'])) {
+                                $messageVars = $fetchLanguage['vars'];
+                            }
+
+                            $this->addFlash($message, $messageVars);
                         }
                     }
 

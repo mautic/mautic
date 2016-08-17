@@ -18,6 +18,15 @@ final class PageEvents
 {
 
     /**
+     * The mautic.video_on_hit event is thrown when a public page is browsed and a hit recorded in the analytics table
+     *
+     * The event listener receives a Mautic\PageBundle\Event\VideoHitEvent instance.
+     *
+     * @var string
+     */
+    const VIDEO_ON_HIT = 'mautic.video_on_hit';
+
+    /**
      * The mautic.page_on_hit event is thrown when a public page is browsed and a hit recorded in the analytics table
      *
      * The event listener receives a Mautic\PageBundle\Event\PageHitEvent instance.
@@ -89,4 +98,14 @@ final class PageEvents
      * @var string
      */
     const REDIRECT_DO_NOT_TRACK = 'mautic.redirect_do_not_track';
+
+    /**
+     * The mautic.page.on_campaign_trigger_decision event is fired when the campaign decision triggers.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.page.on_campaign_trigger_decision';
 }

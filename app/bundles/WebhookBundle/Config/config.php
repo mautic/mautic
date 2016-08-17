@@ -65,6 +65,15 @@ return array(
             'mautic.webhook.audit.subscriber' => array(
                 'class' => 'Mautic\WebhookBundle\EventListener\WebhookSubscriber'
             ),
+        ),
+        'models' =>  array(
+            'mautic.webhook.model.webhook' => array(
+                'class' => 'Mautic\WebhookBundle\Model\WebhookModel',
+                'arguments' => array(
+                    'mautic.helper.core_parameters',
+                    'jms_serializer'
+                )
+            )
         )
     ),
 

@@ -23,8 +23,7 @@ $view['slots']->set("headerTitle", $header);
 ?>
 
 <?php echo $view['form']->start($form); ?>
-
-<div class="row">
+<div class="box-layout">
 	<div class="col-xs-12 bg-white height-auto">
 		<!-- tabs controls -->
 		<ul class="bg-auto nav nav-tabs pr-md pl-md">

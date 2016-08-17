@@ -137,7 +137,8 @@ class Event
 
         $builder->setTable('campaign_events')
             ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\EventRepository')
-            ->addIndex(array('type', 'event_type'), 'campaign_event_type_search');
+            ->addIndex(['type', 'event_type'], 'campaign_event_type_search')
+            ->addIndex(['event_type'], 'event_type');
 
         $builder->addIdColumns();
 

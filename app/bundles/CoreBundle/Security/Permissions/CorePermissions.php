@@ -10,76 +10,72 @@
 namespace Mautic\CoreBundle\Security\Permissions;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\Permission;
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CorePermissions
  */
 class CorePermissions
 {
+    /**
+     * @var Translator
+     */
+    private $translator;
 
     /**
-     * @var MauticFactory
+     * @var UserHelper
      */
-    protected $factory;
+    protected $userHelper;
 
     /**
-     * @param MauticFactory $factory
+     * @var EntityManager
      */
-    public function __construct(MauticFactory $factory)
+    private $em;
+
+    /**
+     * @var TokenStorageInterface
+     */
+    private $tokenStorage;
+
+    /**
+     * @var array
+     */
+    private $params;
+
+    /**
+     * @var array
+     */
+    private $bundles;
+
+    /**
+     * @var array
+     */
+    private $pluginBundles;
+
+    /**
+     * CorePermissions constructor.
+     *
+     * @param Translator            $translator
+     * @param EntityManager         $em
+     * @param TokenStorageInterface $tokenStorage
+     * @param array                 $parameters
+     * @param                       $bundles
+     * @param                       $pluginBundles
+     */
+    public function __construct(UserHelper $userHelper, TranslatorInterface $translator, EntityManager $em, TokenStorageInterface $tokenStorage, array $parameters, $bundles, $pluginBundles)
     {
-        $this->factory = $factory;
-    }
-
-    /**
-     * @return \Symfony\Bundle\FrameworkBundle\Translation\Translator
-     */
-    protected function getTranslator()
-    {
-        return $this->factory->getTranslator();
-    }
-
-    /**
-     * @return EntityManager
-     */
-    protected function getEm()
-    {
-        return $this->factory->getEntityManager();
-    }
-
-    /**
-     * @return bool|mixed
-     */
-    protected function getBundles()
-    {
-        return $this->factory->getParameter('bundles');
-    }
-
-    /**
-     * @return array
-     */
-    protected function getPluginBundles()
-    {
-        return $this->factory->getPluginBundles();
-    }
-
-    /**
-     * @return SecurityContext
-     */
-    protected function getSecurityContext()
-    {
-        return $this->factory->getSecurityContext();
-    }
-
-    /**
-     * @return array
-     */
-    protected function getParams()
-    {
-        return $this->factory->getSystemParameters();
+        $this->translator    = $translator;
+        $this->em            = $em;
+        $this->tokenStorage  = $tokenStorage;
+        $this->params        = $parameters;
+        $this->bundles       = $bundles;
+        $this->pluginBundles = $pluginBundles;
+        $this->userHelper    = $userHelper;
     }
 
     /**
@@ -92,10 +88,6 @@ class CorePermissions
         static $classes = array();
         if (empty($classes)) {
             foreach ($this->getBundles() as $bundle) {
-                if ($bundle['base'] == "Core") {
-                    continue;
-                } //do not include this file
-
                 $object = $this->getPermissionObject($bundle['base'], false);
                 if (!empty($object)) {
                     $classes[strtolower($bundle['base'])] = $object;
@@ -137,7 +129,10 @@ class CorePermissions
                     $bundleName = 'Mautic' . $bundleName;
                 }
 
-                if (array_key_exists($bundleName, $checkBundles)) {
+                if ($bundle == 'Core') {
+                    $className = $checkBundles[$bundleName]['namespace'] . "\\Security\\Permissions\\SystemPermissions";
+                    $exists    = class_exists($className);
+                } elseif (array_key_exists($bundleName, $checkBundles)) {
                     $className = $checkBundles[$bundleName]['namespace'] . "\\Security\\Permissions\\{$bundle}Permissions";
                     $exists    = class_exists($className);
                 } else {
@@ -207,7 +202,7 @@ class CorePermissions
 
         //get a list of plugin bundles so we can tell later if a bundle is core or plugin
         $pluginBundles = $this->getPluginBundles();
-        
+
         //create entities
         foreach ($bundlePermissions as $bundle => $permissions) {
             foreach ($permissions as $name => $perms) {
@@ -253,7 +248,7 @@ class CorePermissions
         static $grantedPermissions = array();
 
         if ($userEntity === null) {
-            $userEntity = $this->getUser();
+            $userEntity = $this->userHelper->getUser();
         }
 
         if (!is_array($requestedPermission)) {
@@ -269,8 +264,7 @@ class CorePermissions
 
             $parts = explode(':', $permission);
 
-            // addon @deprecated 1.1.4; will be removed in 2.0
-            if (($parts[0] == 'addon' ||$parts[0] == 'plugin') && count($parts) == 4) {
+            if ($parts[0] == 'plugin' && count($parts) == 4) {
                 $isPlugin = true;
                 array_shift($parts);
             } else {
@@ -349,8 +343,8 @@ class CorePermissions
             }
 
             $parts = explode(':', $p);
-            // addon @deprecated 1.1.4; will be removed in 2.0
-            if (($parts[0] == 'addon' || $parts[0] == 'plugin') && count($parts) == 4) {
+
+            if ($parts[0] == 'plugin' && count($parts) == 4) {
                 $isPlugin = true;
                 array_shift($parts);
             } else {
@@ -380,7 +374,7 @@ class CorePermissions
      */
     public function hasEntityAccess($ownPermission, $otherPermission, $ownerId = 0)
     {
-        $user = $this->getUser();
+        $user = $this->userHelper->getUser();
         if (!is_object($user)) {
             //user is likely anon. so assume no access and let controller handle via published status
             return false;
@@ -419,9 +413,9 @@ class CorePermissions
             } else {
                 return false;
             }
-        } elseif ($own && (int) $this->getUser()->getId() === (int) $ownerId) {
+        } elseif ($own && (int) $this->userHelper->getUser()->getId() === (int) $ownerId) {
             return true;
-        } elseif ($other && (int) $this->getUser()->getId() !== (int) $ownerId) {
+        } elseif ($other && (int) $this->userHelper->getUser()->getId() !== (int) $ownerId) {
             return true;
         } else {
             return false;
@@ -456,24 +450,69 @@ class CorePermissions
     }
 
     /**
-     * @return User|mixed
-     */
-    private function getUser()
-    {
-        if ($token = $this->getSecurityContext()->getToken()) {
-            $this->user = $token->getUser();
-        } else {
-            $this->user = new User();
-        }
-        return $this->user;
-    }
-
-    /**
      * @return bool
      */
     public function isAnonymous()
     {
-        $userEntity = $this->getUser();
+        $userEntity = $this->userHelper->getUser();
         return ($userEntity instanceof User && $userEntity->getId()) ? false : true;
+    }
+
+    /**
+     * @return \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     */
+    protected function getTranslator()
+    {
+        return $this->translator;
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEm()
+    {
+        return $this->em;
+    }
+
+    /**
+     * @return bool|mixed
+     */
+    protected function getBundles()
+    {
+        return $this->bundles;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getPluginBundles()
+    {
+        return $this->pluginBundles;
+    }
+
+    /**
+     * @deprecated 1.2.3; to be removed in 2.0
+     *
+     * @return TokenStorageInterface
+     */
+    protected function getSecurityContext()
+    {
+        return $this->getTokenStorage();
+    }
+
+    /**
+     * @return TokenStorageInterface
+     */
+    protected function getTokenStorage()
+    {
+        return $this->tokenStorage;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getParams()
+    {
+        return $this->params;
     }
 }

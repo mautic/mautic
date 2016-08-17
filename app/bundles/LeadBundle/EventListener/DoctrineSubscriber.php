@@ -10,20 +10,30 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-
 use Doctrine\DBAL\Types\StringType;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
-use Doctrine\ORM\Tools\Event\GenerateSchemaTableEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Model\FieldModel;
+use Monolog\Logger;
 
+/**
+ * Class DoctrineSubscriber
+ */
 class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
 {
-    private $factory;
+    /**
+     * @var Logger
+     */
+    protected $logger;
 
-    public function __construct(MauticFactory $factory)
+    /**
+     * DoctrineSubscriber constructor.
+     *
+     * @param Logger $logger
+     */
+    public function __construct(Logger $logger)
     {
-        $this->factory = $factory;
+        $this->logger = $logger;
     }
 
     /**
@@ -36,6 +46,9 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
         );
     }
 
+    /**
+     * @param GenerateSchemaEventArgs $args
+     */
     public function postGenerateSchema(GenerateSchemaEventArgs $args)
     {
         $schema = $args->getSchema();
@@ -48,24 +61,25 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
             $table = $schema->getTable(MAUTIC_TABLE_PREFIX.'leads');
 
             //get a list of fields
-            $fields = $this->factory->getModel('lead.field')->getRepository()->getFieldAliases();
+            $fields = $args->getEntityManager()->getConnection()->createQueryBuilder()
+                ->select('f.alias, f.is_unique_identifer as is_unique, f.type')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
+                ->orderBy('f.field_order', 'ASC')
+                ->execute()->fetchAll();
 
             // Compile which ones are unique identifiers
             // Email will always be included first
             $uniqueFields = array('email' => 'email');
-
             foreach ($fields as $f) {
                 if ($f['is_unique'] && $f['alias'] != 'email') {
                     $uniqueFields[$f['alias']] = $f['alias'];
                 }
 
-                if (in_array($f['alias'], array('country', 'email')) || $f['is_unique']) {
-                    $table->addColumn($f['alias'], 'string', array('notnull' => false));
-                    $table->addIndex(array($f['alias']), MAUTIC_TABLE_PREFIX.'lead_field'.$f['alias'].'_search');
-                } elseif ($f['is_unique']) {
-                    $table->addColumn($f['alias'], 'string', array('notnull' => false));
-                } else {
-                    $table->addColumn($f['alias'], 'text', array('notnull' => false));
+                $columnDef = FieldModel::getSchemaDefinition($f['alias'], $f['type'], !empty($f['is_unique']));
+                $table->addColumn($columnDef['name'], $columnDef['type'], $columnDef['options']);
+
+                if ('text' != $columnDef['type']) {
+                    $table->addIndex([$columnDef['name']], MAUTIC_TABLE_PREFIX.$f['alias'].'_search');
                 }
             }
 
@@ -89,9 +103,11 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                 $table->addIndex($uniqueFields, MAUTIC_TABLE_PREFIX.'unique_identifier_search');
             }
 
+            $table->addIndex(['attribution', 'attribution_date'], MAUTIC_TABLE_PREFIX.'contact_attribution');
+
         } catch (\Exception $e) {
             //table doesn't exist or something bad happened so oh well
-            error_log($e->getMessage());
+            $this->logger->addError('SCHEMA ERROR: '.$e->getMessage());
         }
     }
 }

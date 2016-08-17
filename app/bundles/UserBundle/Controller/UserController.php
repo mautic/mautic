@@ -54,7 +54,7 @@ class UserController extends FormController
         $filter = array('string' => $search, 'force' => '');
 
         $tmpl  = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
-        $users = $this->factory->getModel('user.user')->getEntities(
+        $users = $this->getModel('user.user')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -126,7 +126,7 @@ class UserController extends FormController
         }
 
         /** @var \Mautic\UserBundle\Model\UserModel $model */
-        $model = $this->factory->getModel('user.user');
+        $model = $this->getModel('user.user');
 
         //retrieve the user entity
         $user = $model->getEntity();
@@ -168,7 +168,18 @@ class UserController extends FormController
                         if ($fetchLanguage['error']) {
                             $user->setLocale(null);
                             $model->saveEntity($user);
-                            $this->addFlash('mautic.core.could.not.set.language');
+                            $message = 'mautic.core.could.not.set.language';
+                            $messageVars = array();
+
+                            if (isset($fetchLanguage['message'])) {
+                                $message = $fetchLanguage['message'];
+                            }
+
+                            if (isset($fetchLanguage['vars'])) {
+                                $messageVars = $fetchLanguage['vars'];
+                            }
+
+                            $this->addFlash($message, $messageVars);
                         }
                     }
 
@@ -222,7 +233,7 @@ class UserController extends FormController
         if (!$this->factory->getSecurity()->isGranted('user:users:edit')) {
             return $this->accessDenied();
         }
-        $model = $this->factory->getModel('user.user');
+        $model = $this->getModel('user.user');
         $user  = $model->getEntity($objectId);
 
         //set the page we came from
@@ -289,7 +300,18 @@ class UserController extends FormController
                         if ($fetchLanguage['error']) {
                             $user->setLocale(null);
                             $model->saveEntity($user);
-                            $this->addFlash('mautic.core.could.not.set.language');
+                            $message = 'mautic.core.could.not.set.language';
+                            $messageVars = array();
+
+                            if (isset($fetchLanguage['message'])) {
+                                $message = $fetchLanguage['message'];
+                            }
+
+                            if (isset($fetchLanguage['vars'])) {
+                                $messageVars = $fetchLanguage['vars'];
+                            }
+
+                            $this->addFlash($message, $messageVars);
                         }
                     }
 
@@ -357,7 +379,7 @@ class UserController extends FormController
         if ($this->request->getMethod() == 'POST') {
             //ensure the user logged in is not getting deleted
             if ((int) $currentUser->getId() !== (int) $objectId) {
-                $model = $this->factory->getModel('user.user');
+                $model = $this->getModel('user.user');
                 $entity = $model->getEntity($objectId);
 
                 if ($entity === null) {
@@ -404,7 +426,7 @@ class UserController extends FormController
      */
     public function contactAction($objectId)
     {
-        $model   = $this->factory->getModel('user.user');
+        $model   = $this->getModel('user.user');
         $user    = $model->getEntity($objectId);
 
         //user not found
@@ -470,7 +492,7 @@ class UserController extends FormController
                         'details'   => $details,
                         'ipAddress' => $this->factory->getIpAddressFromRequest()
                     );
-                    $this->factory->getModel('core.auditLog')->writeToLog($log);
+                    $this->getModel('core.auditLog')->writeToLog($log);
 
                     $this->addFlash('mautic.user.user.notice.messagesent', array('%name%' => $user->getName()));
                 }
@@ -489,7 +511,7 @@ class UserController extends FormController
             $form->get('returnUrl')->setData($returnUrl);
 
             if (!empty($reEntity) && !empty($reEntityId)) {
-                $model  = $this->factory->getModel($reEntity);
+                $model  = $this->getModel($reEntity);
                 $entity = $model->getEntity($reEntityId);
 
                 if ($entity !== null) {
@@ -533,7 +555,7 @@ class UserController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model     = $this->factory->getModel('user');
+            $model     = $this->getModel('user');
             $ids       = json_decode($this->request->query->get('ids', ''));
             $deleteIds = array();
             $currentUser    = $this->factory->getUser();

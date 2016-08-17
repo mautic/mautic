@@ -10,8 +10,8 @@
 
 <script>
     var mauticBasePath    = '<?php echo $app->getRequest()->getBasePath(); ?>';
-    var mauticBaseUrl     = '<?php echo $view['router']->generate("mautic_base_index"); ?>';
-    var mauticAjaxUrl     = '<?php echo $view['router']->generate("mautic_core_ajax"); ?>';
+    var mauticBaseUrl     = '<?php echo $view['router']->path("mautic_base_index"); ?>';
+    var mauticAjaxUrl     = '<?php echo $view['router']->path("mautic_core_ajax"); ?>';
     var mauticAssetPrefix = '<?php echo $view['assets']->getAssetPrefix(true); ?>';
     var mauticContent     = '<?php $view['slots']->output('mauticContent',''); ?>';
     var mauticEnv         = '<?php echo $app->getEnvironment(); ?>';
@@ -22,5 +22,4 @@
         pleaseWait: '<?php echo $view['translator']->trans('mautic.core.wait'); ?>'
     };
 </script>
-<?php $view['assets']->outputSystemScripts(); ?>
-<?php $view['assets']->loadEditor(); ?>
+<?php $view['assets']->outputSystemScripts(true); ?>

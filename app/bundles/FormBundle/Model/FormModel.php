@@ -9,16 +9,21 @@
 
 namespace Mautic\FormBundle\Model;
 
+use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\FormEvents;
+use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -26,6 +31,58 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class FormModel extends CommonFormModel
 {
+    /**
+     * @var null|\Symfony\Component\HttpFoundation\Request
+     */
+    protected $request;
+
+    /**
+     * @var TemplatingHelper
+     */
+    protected $templatingHelper;
+
+    /**
+     * @var SchemaHelperFactory
+     */
+    protected $schemaHelperFactory;
+
+    /**
+     * @var ActionModel
+     */
+    protected $formActionModel;
+
+    /**
+     * @var FieldModel
+     */
+    protected $formFieldModel;
+
+    /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * FormModel constructor.
+     *
+     * @param ActionModel $formActionModel
+     * @param FieldModel $formFieldModel
+     */
+    public function __construct(
+        RequestStack $requestStack,
+        TemplatingHelper $templatingHelper,
+        SchemaHelperFactory $schemaHelperFactory,
+        ActionModel $formActionModel,
+        FieldModel $formFieldModel,
+        LeadModel $leadModel
+    )
+    {
+        $this->request = $requestStack->getCurrentRequest();
+        $this->templatingHelper = $templatingHelper;
+        $this->schemaHelperFactory = $schemaHelperFactory;
+        $this->formActionModel = $formActionModel;
+        $this->formFieldModel = $formFieldModel;
+        $this->leadModel = $leadModel;
+    }
 
     /**
      * {@inheritdoc}
@@ -66,7 +123,9 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
+     * @param null $id
+     *
+     * @return Form
      */
     public function getEntity($id = null)
     {
@@ -126,7 +185,7 @@ class FormModel extends CommonFormModel
     public function setFields(Form $entity, $sessionFields)
     {
         $order          = 1;
-        $existingFields = $entity->getFields();
+        $existingFields = $entity->getFields()->toArray();
 
         foreach ($sessionFields as $key => $properties) {
             $isNew = (!empty($properties['id']) && isset($existingFields[$properties['id']])) ? false : true;
@@ -159,9 +218,7 @@ class FormModel extends CommonFormModel
 
         // Persist if the entity is known
         if ($entity->getId()) {
-            /** @var \Mautic\FormBundle\Model\FieldModel $fieldModel */
-            $fieldModel = $this->factory->getModel('form.field');
-            $fieldModel->saveEntities($entity->getFields());
+            $this->formFieldModel->saveEntities($existingFields);
         }
     }
 
@@ -176,7 +233,7 @@ class FormModel extends CommonFormModel
             return;
         }
 
-        $existingFields = $entity->getFields();
+        $existingFields = $entity->getFields()->toArray();
         $deleteFields   = array();
         foreach ($sessionFields as $fieldId) {
             if (isset($existingFields[$fieldId])) {
@@ -187,7 +244,7 @@ class FormModel extends CommonFormModel
 
         // Delete fields from db
         if (count($deleteFields)) {
-            $this->factory->getModel('form.field')->deleteEntities($deleteFields);
+            $this->formFieldModel->deleteEntities($deleteFields);
         }
     }
 
@@ -198,8 +255,8 @@ class FormModel extends CommonFormModel
     public function setActions(Form $entity, $sessionActions)
     {
         $order   = 1;
-        $existingActions = $entity->getActions();
-        $savedFields     = $entity->getFields();
+        $existingActions = $entity->getActions()->toArray();
+        $savedFields     = $entity->getFields()->toArray();
 
         //match sessionId with field Id to update mapped fields
         $fieldIds = array();
@@ -239,9 +296,7 @@ class FormModel extends CommonFormModel
 
         // Persist if form is being edited
         if ($entity->getId()) {
-            /** @var \Mautic\FormBundle\Model\ActionModel $actionModel */
-            $actionModel = $this->factory->getModel('form.action');
-            $actionModel->saveEntities($entity->getActions());
+            $this->formActionModel->saveEntities($existingActions);
         }
     }
 
@@ -279,7 +334,7 @@ class FormModel extends CommonFormModel
      */
     public function getContent(Form $form, $withScript = true, $useCache = true)
     {
-        if ($useCache) {
+        if ($useCache && !$form->usesProgressiveProfiling()) {
             $cachedHtml = $form->getCachedHtml();
         }
 
@@ -305,26 +360,41 @@ class FormModel extends CommonFormModel
     public function generateHtml(Form $entity, $persist = true)
     {
         //generate cached HTML
-        $templating = $this->factory->getTemplating();
-        $theme      = $entity->getTemplate();
+        $theme = $entity->getTemplate();
+        $submissions = null;
+        $lead = $this->leadModel->getCurrentLead();
 
         if (!empty($theme)) {
             $theme .= '|';
         }
 
-        $html = $templating->render(
+        if ($entity->usesProgressiveProfiling()) {
+            $submissions = $this->getRepository()->getFormResults(
+                $entity,
+                [
+                    'leadId' => $lead->getId(),
+                    'limit'  => 200
+                ]
+            );
+        }
+
+        $html = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:form.html.php',
-            array(
-                'form'  => $entity,
-                'theme' => $theme,
-            )
+            [
+                'form'        => $entity,
+                'theme'       => $theme,
+                'submissions' => $submissions,
+                'lead'        => $lead
+            ]
         );
 
-        $entity->setCachedHtml($html);
+        if (!$entity->usesProgressiveProfiling()) {
+            $entity->setCachedHtml($html);
 
-        if ($persist) {
-            //bypass model function as events aren't needed for this
-            $this->getRepository()->saveEntity($entity);
+            if ($persist) {
+                //bypass model function as events aren't needed for this
+                $this->getRepository()->saveEntity($entity);
+            }
         }
 
         return $html;
@@ -340,7 +410,7 @@ class FormModel extends CommonFormModel
     public function createTableSchema(Form $entity, $isNew = false, $dropExisting = false)
     {
         //create the field as its own column in the leads table
-        $schemaHelper = $this->factory->getSchemaHelper('table');
+        $schemaHelper = $this->schemaHelperFactory->getSchemaHelper('table');
         $name         = "form_results_" . $entity->getId() . "_" . $entity->getAlias();
         $columns      = $this->generateFieldColumns($entity);
         if ($isNew || (!$isNew && !$schemaHelper->checkTableExists($name))) {
@@ -355,7 +425,7 @@ class FormModel extends CommonFormModel
             $schemaHelper->executeChanges();
         } else {
             //check to make sure columns exist
-            $schemaHelper = $this->factory->getSchemaHelper('column', $name);
+            $schemaHelper = $this->schemaHelperFactory->getSchemaHelper('column', $name);
             foreach ($columns as $c) {
                 if (!$schemaHelper->checkColumnExists($c['name'])) {
                     $schemaHelper->addColumn($c, false);
@@ -374,7 +444,7 @@ class FormModel extends CommonFormModel
 
         if (!$entity->getId()) {
             //delete the associated results table
-            $schemaHelper = $this->factory->getSchemaHelper('table');
+            $schemaHelper = $this->schemaHelperFactory->getSchemaHelper('table');
             $schemaHelper->deleteTable("form_results_" . $entity->deletedId . "_" . $entity->getAlias());
             $schemaHelper->executeChanges();
         }
@@ -386,7 +456,7 @@ class FormModel extends CommonFormModel
     public function deleteEntities($ids)
     {
         $entities = parent::deleteEntities($ids);
-        $schemaHelper = $this->factory->getSchemaHelper('table');
+        $schemaHelper = $this->schemaHelperFactory->getSchemaHelper('table');
         foreach ($entities as $id => $entity) {
             //delete the associated results table
             $schemaHelper->deleteTable("form_results_" . $id . "_" . $entity->getAlias());
@@ -404,7 +474,7 @@ class FormModel extends CommonFormModel
      */
     public function generateFieldColumns(Form $form)
     {
-        $fields = $form->getFields();
+        $fields = $form->getFields()->toArray();
 
         $columns = array(
             array(
@@ -476,14 +546,13 @@ class FormModel extends CommonFormModel
      */
     public function getFormScript(Form $form)
     {
-        $templating = $this->factory->getTemplating();
-        $theme      = $form->getTemplate();
+        $theme = $form->getTemplate();
 
         if (!empty($theme)) {
             $theme .= '|';
         }
 
-        $script = $templating->render(
+        $script = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:script.html.php',
             array(
                 'form'  => $form,
@@ -502,57 +571,43 @@ class FormModel extends CommonFormModel
      */
     public function populateValuesWithGetParameters(Form $form, &$formHtml)
     {
+        $fieldHelper = new FormFieldHelper($this->translator);
         $request  = $this->factory->getRequest();
         $formName = $form->generateFormName();
+
+        $fields = $form->getFields()->toArray();
+        /** @var \Mautic\FormBundle\Entity\Field $f */
+        foreach ($fields as $f) {
+            $alias = $f->getAlias();
+            if ($this->request->query->has($alias)) {
+                $value = $this->request->query->get($alias);
+
+                $fieldHelper->populateField($f, $value, $formName, $formHtml);
+            }
+        }
+    }
+
+    public function populateValuesWithLead(Form $form, &$formHtml)
+    {
+        $fieldHelper = new FormFieldHelper($this->translator);
+
+        $formName = $form->generateFormName();
+
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $lead = $this->factory->getModel('lead')->getCurrentLead();
 
         $fields = $form->getFields();
         /** @var \Mautic\FormBundle\Entity\Field $f */
         foreach ($fields as $f) {
-            $alias = $f->getAlias();
-            if ($request->query->has($alias)) {
-                $value = $request->query->get($alias);
+            $leadField = $f->getLeadField();
+            $isAutoFill = $f->getIsAutoFill();
 
-                switch ($f->getType()) {
-                    case 'text':
-                    case 'email':
-                    case 'hidden':
-                        if (preg_match('/<input(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)value="(.*?)"(.*?)\/>/i', $formHtml, $match)) {
-                            $replace  = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'value="'.urldecode($value).'"'.$match[4].'/>';
-                            $formHtml = str_replace($match[0], $replace, $formHtml);
-                        }
-                        break;
-                    case 'textarea':
-                        if (preg_match('/<textarea(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)>(.*?)<\/textarea>/i', $formHtml, $match)) {
-                            $replace  = '<textarea'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'>'.urldecode($value).'</textarea>';
-                            $formHtml = str_replace($match[0], $replace, $formHtml);
-                        }
-                        break;
-                    case 'checkboxgrp':
-                        if (!is_array($value)) {
-                            $value = array($value);
-                        }
-                        foreach ($value as $val) {
-                            $val = urldecode($val);
-                            if (preg_match(
-                                '/<input(.*?)id="mauticform_checkboxgrp_checkbox(.*?)"(.*?)value="'.$val.'"(.*?)\/>/i',
-                                $formHtml,
-                                $match
-                            )) {
-                                $replace  = '<input'.$match[1].'id="mauticform_checkboxgrp_checkbox'.$match[2].'"'.$match[3].'value="'.$val.'"'
-                                    .$match[4].' checked />';
-                                $formHtml = str_replace($match[0], $replace, $formHtml);
-                            }
-                        }
-                        break;
-                    case 'radiogrp':
-                        $value = urldecode($value);
-                        if (preg_match('/<input(.*?)id="mauticform_radiogrp_radio(.*?)"(.*?)value="'.$value.'"(.*?)\/>/i', $formHtml, $match)) {
-                            $replace  = '<input'.$match[1].'id="mauticform_radiogrp_radio'.$match[2].'"'.$match[3].'value="'.$value.'"'.$match[4]
-                                .' checked />';
-                            $formHtml = str_replace($match[0], $replace, $formHtml);
-                        }
-                        break;
-                }
+            if (isset($leadField) && $isAutoFill) {
+                $value = $lead->getFieldValue($leadField);
+                
+		        if (!empty($value)) {
+		            $fieldHelper->populateField($f, $value, $formName, $formHtml);
+		        }
             }
         }
     }
@@ -621,11 +676,11 @@ class FormModel extends CommonFormModel
     /**
      * Get a list of assets in a date range
      *
-     * @param integer  $limit
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     * @param array    $filters
-     * @param array    $options
+     * @param integer   $limit
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param array     $filters
+     * @param array     $options
      *
      * @return array
      */
@@ -638,7 +693,7 @@ class FormModel extends CommonFormModel
 
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('t.created_by = :userId')
-                ->setParameter('userId', $this->factory->getUser()->getId());
+                ->setParameter('userId', $this->user->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
