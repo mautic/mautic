@@ -12,7 +12,7 @@ $view['slots']->set('mauticContent', 'page');
 $isExisting = $activePage->getId();
 
 $variantParent = $activePage->getVariantParent();
-$subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.page.header.editvariant', [
+$subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.core.variant_of', [
     '%name%' => $activePage->getTitle(),
     '%parent%' => $variantParent->getTitle()
 ]) . '</span></div>' : '';

@@ -47,11 +47,9 @@ $view['slots']->set('headerTitle', $header);
         </div>
         <div class="col-md-3 bg-white height-auto bdr-l">
             <div class="pr-lg pl-lg pt-md pb-md">
-                <?php
-                // To be added back when we figure out the parent/variant relationship
-                //echo $view['form']->row($form['variantParent']); ?>
                 <?php echo $view['form']->row($form['category']); ?>
                 <?php echo $view['form']->row($form['language']); ?>
+                <?php echo $view['form']->row($form['translationParent']); ?>
                 <div class="hide">
                     <div id="publishStatus">
                         <?php echo $view['form']->row($form['isPublished']); ?>

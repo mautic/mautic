@@ -23,18 +23,18 @@ class BuildJsSubscriber extends CommonSubscriber
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            CoreEvents::BUILD_MAUTIC_JS => array('onBuildJs', 1000)
-        );
+        return [
+            CoreEvents::BUILD_MAUTIC_JS => ['onBuildJs', 1000]
+        ];
     }
 
     /**
      * Adds the MauticJS definition and core
      * JS functions for use in Bundles. This
      * must retain top priority of 1000
-     * 
+     *
      * @param BuildJsEvent $event
-     * 
+     *
      * @return void
      */
     public function onBuildJs(BuildJsEvent $event)
@@ -48,6 +48,10 @@ s=this.x64Rotl(s,33),s=this.x64Multiply(s,l),n=this.x64Xor(n,s);case 8:o=this.x6
 var MauticJS = MauticJS || {};
 
 MauticJS.serialize = function(obj) {
+    if ('string' == typeof obj) {
+        return obj;
+    }
+
     return Object.keys(obj).map(function(key) {
         return key + '=' + obj[key];
     }).join('&');
@@ -135,6 +139,93 @@ MauticJS.parseTextToJSON = function(maybeJSON) {
     }
 
     return response;
+};
+
+MauticJS.insertScript = function (scriptUrl) {
+    var scriptsInHead = document.getElementsByTagName('head')[0].getElementsByTagName('script');
+    var lastScript    = scriptsInHead[scriptsInHead.length - 1];
+    var scriptTag     = document.createElement('script');
+    scriptTag.async   = 1;
+    scriptTag.src     = scriptUrl;
+    
+    if (lastScript) {
+        lastScript.parentNode.insertBefore(scriptTag, lastScript);
+    } else {
+        document.getElementsByTagName('head')[0].appendChild(scriptTag);
+    }
+};
+
+MauticJS.insertStyle = function (styleUrl) {
+    var linksInHead = document.getElementsByTagName('head')[0].getElementsByTagName('link');
+    var lastLink    = linksInHead[linksInHead.length - 1];
+    var linkTag     = document.createElement('link');
+    linkTag.rel     = "stylesheet";
+    linkTag.type    = "text/css";
+    linkTag.href    = styleUrl;
+    
+    if (lastLink) {
+        lastLink.parentNode.insertBefore(linkTag, lastLink.nextSibling);
+    } else {
+        document.getElementsByTagName('head')[0].appendChild(linkTag);
+    }
+};
+
+MauticJS.guid = function () {
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+    }
+    
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+};
+
+function s4() {
+  return Math.floor((1 + Math.random()) * 0x10000)
+    .toString(16)
+    .substring(1);
+}
+
+MauticJS.pixelLoaded = function(f) {
+    if (!/in/.test(document.readyState)) {
+        setTimeout('MauticJS.pixelLoaded(' + f + ')', 9)
+    } else {
+        // Only fetch once a tracking pixel has been loaded
+        var maxChecks  = 3000; // Keep it from indefinitely checking in case the pixel was never embedded
+        var checkPixel = setInterval(function() {
+            if (maxChecks > 0 && !MauticJS.isPixelLoaded()) {
+                // Try again
+                maxChecks--;
+                return;
+            }
+    
+            clearInterval(checkPixel);
+            // Either the pixel is loaded or the tests failed so initiate function anyway
+            f();
+        }, 1);
+    }
+};
+
+MauticJS.isPixelLoaded = function() {
+    if (typeof MauticJS.trackingPixel === 'undefined') {
+        // Check the DOM for the tracking pixel
+        MauticJS.trackingPixel = null;
+        var imgs = Array.prototype.slice.apply(document.getElementsByTagName('img'));
+        for (var i = 0; i < imgs.length; i++) {
+            if (imgs[i].src.indexOf('mtracking.gif') !== -1) {
+                MauticJS.trackingPixel = imgs[i];
+                break;
+            }
+        }
+        if (MauticJS.trackingPixel === null) {
+            console.log('Mautic tracking is not initiated correctly. Follow the documentation.');
+        }
+    }
+
+    if (MauticJS.trackingPixel && MauticJS.trackingPixel.complete && MauticJS.trackingPixel.naturalWidth !== 0) {
+        // All the browsers should be covered by this - image is loaded
+        return true;
+    }
+
+    return false;
 };
 
 if (typeof window[window.MauticTrackingObject] === 'undefined') {

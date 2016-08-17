@@ -7,4 +7,5 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-echo $view['form']->widget($form);
+echo "<hr />\n";
+echo $view['form']->row($form);

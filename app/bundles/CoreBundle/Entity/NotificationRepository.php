@@ -63,6 +63,65 @@ class NotificationRepository extends CommonRepository
             $filter['id'] = (int) $id;
         }
 
-        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX . 'notifications', $filter);
+        $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX . 'notifications', ['is_read' => 1], $filter);
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getUpstreamLastDate()
+    {
+        $qb = $this->createQueryBuilder('n')
+            ->select('partial n.{id, dateAdded}')
+            ->where('n.type = :type')
+            ->setParameter('type', 'upstream')
+            ->setMaxResults(1);
+
+        /** @var Notification $result */
+        $result = $qb->getQuery()->getOneOrNullResult();
+
+        return $result === null ? null : $result->getDateAdded();
+    }
+
+    /**
+     * Fetch notifications for this user
+     *
+     * @param      $userId
+     * @param null $afterId
+     * @param bool $includeRead
+     * @param null $type
+     *
+     * @return array
+     */
+    public function getNotifications($userId, $afterId = null, $includeRead = false, $type = null)
+    {
+        $qb = $this->createQueryBuilder('n');
+
+        $expr = $qb->expr()->andX(
+            $qb->expr()->eq('IDENTITY(n.user)', (int) $userId)
+        );
+
+        if ($afterId) {
+            $expr->add(
+                $qb->expr()->gt('n.id', (int) $afterId)
+            );
+        }
+
+        if (!$includeRead) {
+            $expr->add(
+                $qb->expr()->eq('n.isRead', 0)
+            );
+        }
+
+        if (null !== $type) {
+            $expr->add(
+                $qb->expr()->eq('n.type', ':type')
+            );
+            $qb->setParameter('type', $type);
+        }
+
+        $qb->where($expr);
+
+        return $qb->getQuery()->getArrayResult();
     }
 }
