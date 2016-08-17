@@ -70,6 +70,33 @@ class FormController extends CommonController
     }
 
     /**
+     * Decide if current user can edit or can edit specific entity if entity is provided
+     * For BC, if permissionBase property is not set, it allow to edit only to administrators.
+     *
+     * @param object $entity
+     *
+     * @return boolean
+     */
+    protected function canEdit($entity = null)
+    {
+        if ($this->permissionBase) {
+            if ($entity) {
+                return $this->factory->getSecurity()->hasEntityAccess(
+                    $this->permissionBase.':editown',
+                    $this->permissionBase.':editother',
+                    $entity->getCreatedBy()
+                );
+            } else {
+                return $this->factory->getSecurity()->isGranted(
+                    $this->permissionBase.':edit'
+                );
+            }
+        } else {
+            return $this->factory->getUser()->isAdmin();
+        }
+    }
+
+    /**
      * Returns view to index with a locked out message
      *
      * @param array  $postActionVars
@@ -91,9 +118,10 @@ class FormController extends CommonController
 
         $modelClass   = $this->getModel($model);
         $nameFunction = $modelClass->getNameGetter();
+        $this->permissionBase = $model->getPermissionBase();
 
-        if ($this->factory->getUser()->isAdmin()) {
-            $override = $this->get('translator')->trans(
+        if ($this->canEdit($entity)) {
+            $override     = $this->get('translator')->trans(
                 'mautic.core.override.lock',
                 array(
                     '%url%' => $this->generateUrl(
@@ -155,10 +183,12 @@ class FormController extends CommonController
      */
     public function unlockAction($id, $modelName)
     {
-        if ($this->factory->getUser()->isAdmin()) {
-            $model = $this->getModel($modelName);
+        $model   = $this->getModel($modelName);
+        $entity  = $model->getEntity($id);
+        $this->permissionBase = $model->getPermissionBase();
 
-            $entity = $model->getEntity($id);
+        if ($this->canEdit($entity)) {
+            
             if ($entity !== null && $entity->getCheckedOutBy() !== null) {
                 $model->unlockEntity($entity);
             }
