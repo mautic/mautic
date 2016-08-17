@@ -227,10 +227,6 @@ class AjaxController extends CommonAjaxController
                     if ($this->container->has($transport)) {
                         $mailer = $this->container->get($transport);
                     }
-
-                    if ('mautic.transport.sparkpost' == $transport) {
-                        $mailer->setApiKey($settings['api_key']);
-                    }
             }
 
             if (method_exists($mailer, 'setMauticFactory')) {
@@ -238,9 +234,16 @@ class AjaxController extends CommonAjaxController
             }
 
             if (!empty($mailer)) {
+                if (is_callable($mailer, 'setApiKey')) {
+                    if (empty($settings['api_key'])) {
+                        $settings['api_key'] = $this->get('mautic.helper.core_parameters')->getParameter('mailer_api_key');
+                    }
+                    $mailer->setApiKey($settings['api_key']);
+                }
+
                 if (is_callable([$mailer, 'setUsername']) && is_callable([$mailer, 'setPassword'])) {
                     if (empty($settings['password'])) {
-                        $settings['password'] = $this->factory->getParameter('mailer_password');
+                        $settings['password'] = $this->get('mautic.helper.core_parameters')->getParameter('mailer_password');
                     }
                     $mailer->setUsername($settings['user']);
                     $mailer->setPassword($settings['password']);
