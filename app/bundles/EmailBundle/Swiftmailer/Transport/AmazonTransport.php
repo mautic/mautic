@@ -9,25 +9,31 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
+use Joomla\Http\Exception\UnexpectedResponseException;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Exception\TransferException;
+use Joomla\Http\Http;
 
 /**
  * Class AmazonTransport
  */
 class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackTransport
 {
+
+    private $httpClient;
+
     /**
      * {@inheritdoc}
      */
-    public function __construct($host = 'localhost', $port = 25, $security = null)
+    public function __construct($host = 'localhost', Http $httpClient)
     {
         parent::__construct($host, 587, 'tls');
         $this->setAuthMode('login');
+        $this->httpClient = $httpClient;
     }
 
     /**
@@ -43,8 +49,6 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
     /**
      * Handle bounces & complaints from Amazon
      *
-     * http://docs.aws.amazon.com/ses/latest/DeveloperGuide/best-practices-bounces-complaints.html
-     *
      * @param Request       $request
      * @param MauticFactory $factory
      *
@@ -52,10 +56,25 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
      */
     public function handleCallbackResponse(Request $request, MauticFactory $factory)
     {
+        $translator = $factory->getTranslator();
         $logger = $factory->getLogger();
         $logger->debug("Receiving webhook from Amazon");
 
-        $translator = $factory->getTranslator();
+        $payload = json_decode($request->getContent(), TRUE);
+        return $this->processJsonPayload($payload, $logger, $translator);
+    }
+
+    /**
+     * Process json request from Amazon SES
+     *
+     * http://docs.aws.amazon.com/ses/latest/DeveloperGuide/best-practices-bounces-complaints.html
+     *
+     * @param array $payload from Amazon SES
+     * @param $logger
+     * @param $translator
+     * @return array with bounced and unsubscribed email addresses
+     */
+    public function processJsonPayload(array $payload, $logger, $translator) {
 
         // Data structure that Mautic expects to be returned from this callback
         $rows = array(
@@ -69,31 +88,22 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
             )
         );
 
-        $payload = json_decode($request->getContent(), TRUE);
-
         if ($payload['Type'] == 'SubscriptionConfirmation') {
             // Confirm Amazon SNS subscription by calling back the SubscribeURL from the playload
-            $client = new Client();
-
             $requestFailed = false;
             try {
-                $response = $client->get($payload['SubscribeURL']);
-                if ($response->getStatusCode() == 200) {
+                $response =  $this->httpClient->get($payload['SubscribeURL']);
+                if ($response->code == 200) {
                     $logger->info('Callback to SubscribeURL from Amazon SNS successfully');
                 }
                 else {
                     $requestFailed = true;
-                    $reason = "HTTP Code ".$response->getStatusCode().", ".$response->getBody();
+                    $reason = "HTTP Code ".$response->code.", ".$response->body;
                 }
             }
-            catch (TransferException $e) {
+            catch (UnexpectedResponseException $e) {
                 $requestFailed = true;
-                if ($e->hasResponse()) {
-                    $reason = Psr7\str($e->getResponse());
-                }
-                else {
                     $reason = $e->getMessage();
-                }
             }
 
             if ($requestFailed) {
