@@ -1452,21 +1452,25 @@ class EmailModel extends FormModel
      * @param bool|true $flush
      * @param int|null  $leadId
      */
-    public function setEmailDoNotContact($email, $reason = 'bounced', $comments = '', $flush = true, $leadId = null)
+    public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, $comments = '', $flush = true, $leadId = null)
     {
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
         $leadRepo = $this->em->getRepository('MauticLeadBundle:Lead');
-        $leadId   = (array) $leadRepo->getLeadByEmail($email, true);
 
-        /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
-        $leads = [];
-
-        foreach ($leadId as $lead) {
-            $leads[] = $leadRepo->getEntity($lead['id']);
+        if (null === $leadId) {
+            $leadId = (array) $leadRepo->getLeadByEmail($email, true);
+        } elseif (!is_array($leadId)) {
+            $leadId = [$leadId];
         }
 
-        foreach ($leads as $lead) {
-            $this->leadModel->addDncForLead($lead, 'email', $comments, $reason, $flush);
+        foreach ($leadId as $lead) {
+            $this->leadModel->addDncForLead(
+                $this->em->getReference('MauticLeadBundle:Lead', $lead),
+                'email',
+                $comments,
+                $reason,
+                $flush
+            );
         }
     }
 
@@ -1482,9 +1486,6 @@ class EmailModel extends FormModel
             return;
         }
 
-        $batch = 20;
-        $count = 0;
-
         $statRepo = $this->getStatRepository();
         $alias    = $statRepo->getTableAlias();
         if (!empty($alias)) {
@@ -1493,7 +1494,6 @@ class EmailModel extends FormModel
 
         // Keep track to prevent duplicates before flushing
         $emails = [];
-
         foreach ($response as $type => $entries) {
             if (!empty($entries['hashIds'])) {
                 $stats = $this->getStatRepository()->getEntities(
@@ -1521,10 +1521,6 @@ class EmailModel extends FormModel
 
                     $s->setIsFailed(true);
                     $this->em->persist($s);
-
-                    if ($count === $batch) {
-                        $count = 0;
-                    }
                 }
             }
 
@@ -1547,16 +1543,10 @@ class EmailModel extends FormModel
                         $reason = $this->translator->trans('mautic.email.bounce.reason.'.$reason);
                     }
 
-                    $this->setEmailDoNotContact($email, $type, $reason, ($count === $batch), $leadId);
-
-                    if ($count === $batch) {
-                        $count = 0;
-                    }
+                    $this->setEmailDoNotContact($email, $type, $reason, true, $leadId);
                 }
             }
         }
-
-        $this->em->flush();
     }
 
     /**
