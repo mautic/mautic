@@ -421,15 +421,19 @@ class PageModel extends FormModel
             }
 
             if (!empty($clickthrough['channel'])) {
-                $hit->setSource($clickthrough['channel'][0]);
-                $hit->setSourceId($clickthrough['channel'][1]);
+                $key = array_keys($clickthrough['channel']);
+                $hit->setSource($key[0]);
+                $hit->setSourceId($clickthrough['channel'][$key[0]]);
             } elseif (!empty($clickthrough['source'])) {
                 $hit->setSource($clickthrough['source'][0]);
                 $hit->setSourceId($clickthrough['source'][1]);
             }
 
             if (!empty($clickthrough['email'])) {
-                $hit->setEmail($this->em->getReference('MauticEmailBundle:Email', $clickthrough['email']));
+                $emailRepo = $this->em->getRepository("MauticEmailBundle:Email");
+                if ($emailRepo->getEntity($clickthrough['email'])) {
+                    $hit->setEmail($this->em->getReference('MauticEmailBundle:Email', $clickthrough['email']));
+                }
             }
         }
 
