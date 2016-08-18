@@ -29,6 +29,10 @@ class AmazonTransportTest extends KernelTestCase
         $this->container = self::$kernel->getContainer();
     }
 
+    /**
+     * Test that the confirmation URL from the payload is called
+     *
+     */
     public function testConfirmationCallbackSuccessfull()
     {
         $logger     = $this->container->get('logger');
@@ -70,6 +74,10 @@ PAYLOAD;
         $transport->processJsonPayload($jsonPayload, $logger, $translator);
     }
 
+    /**
+     * Test that a bounce message is properly processed by the mailer callback
+     *
+     */
     public function testSingleBounceCallbackSuccessfull()
     {
         $logger     = $this->container->get('logger');
@@ -97,6 +105,72 @@ PAYLOAD;
 
         $this->assertArrayHasKey('nope@nope.com', $rows[2]['emails']);
         $this->assertContains('Recipient address rejected', $rows[2]['emails']['nope@nope.com']);
+    }
+
+    /**
+     * Test that a complaint message without a feedback report is processed with the reason "unkown"
+     *
+     */
+    public function testSingleComplaintWithoutFeedbackCallbackSuccessfull()
+    {
+        $logger     = $this->container->get('logger');
+        $translator = $this->container->get('translator');
+
+        # payload which is sent by Amazon SES
+        $payload = <<<PAYLOAD
+{
+  "Type" : "Notification",
+  "MessageId" : "7c2d7069-7db3-53c8-87d0-20476a630fb6",
+  "TopicArn" : "arn:aws:sns:eu-west-1:918057160339:55hubs-mautic-test",
+  "Message": "{\"notificationType\":\"Complaint\", \"complaint\":{ \"complainedRecipients\":[ { \"emailAddress\":\"richard@example.com\" } ], \"timestamp\":\"2016-01-27T14:59:38.237Z\", \"feedbackId\":\"0000013786031775-fea503bc-7497-49e1-881b-a0379bb037d3-000000\" } }",
+  "Timestamp" : "2016-08-17T07:43:12.822Z",
+  "SignatureVersion" : "1",
+  "Signature" : "GNWnMWfKx1PPDjUstq2Ln13+AJWEK/Qo8YllYC7dGSlPhC5nClop5+vCj0CG2XN7aN41GhsJJ1e+F4IiRxm9v2wwua6BC3mtykrXEi8VeGy2HuetbF9bEeBEPbtbeIyIXJhdPDhbs4anPJwcEiN/toCoANoPWJ3jyVTOaUAxJb2oPTrvmjMxMpVE59sSo7Mz2+pQaUJl3ma0UgAC/lrYghi6n4cwlDTfbbIW+mbV7/d/5YN/tjL9/sD3DOuf+1PpFFTPsOVseZWV8PQ0/MWB2BOrKOKQyF7msLNX5iTkmsvRrbYULPvpbx32LsIxfNVFZJmsnTe2/6EGaAXf3TVPZA==",
+  "SigningCertURL" : "https://sns.eu-west-1.amazonaws.com/SimpleNotificationService-bb750dd426d95ee9390147a5624348ee.pem",
+  "UnsubscribeURL" : "https://sns.eu-west-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-1:918057160339:nope:1cddd2a6-bfa8-4eb5-b2b2-a7833eb5db9b"
+}
+PAYLOAD;
+
+        $jsonPayload = json_decode($payload, TRUE);
+
+        $transport = new AmazonTransport('localhost', new Http());
+        $rows = $transport->processJsonPayload($jsonPayload, $logger, $translator);
+
+        $this->assertArrayHasKey('richard@example.com', $rows[1]['emails']);
+        $this->assertEquals('mautic.email.complaint.reason.unkown', $rows[1]['emails']['richard@example.com']);
+    }
+
+    /**
+     * Test that a complaint message with a feedback is processed and the reason is set accordingly
+     *
+     */
+    public function testSingleComplaintWithFeedbackCallbackSuccessfull()
+    {
+        $logger     = $this->container->get('logger');
+        $translator = $this->container->get('translator');
+
+        # payload which is sent by Amazon SES
+        $payload = <<<PAYLOAD
+{
+  "Type" : "Notification",
+  "MessageId" : "7c2d7069-7db3-53c8-87d0-20476a630fb6",
+  "TopicArn" : "arn:aws:sns:eu-west-1:918057160339:55hubs-mautic-test",
+  "Message": "{ \"notificationType\":\"Complaint\", \"complaint\":{ \"userAgent\":\"AnyCompany Feedback Loop (V0.01)\", \"complainedRecipients\":[ { \"emailAddress\":\"richard@example.com\" } ], \"complaintFeedbackType\":\"abuse\", \"arrivalDate\":\"2016-01-27T14:59:38.237Z\", \"timestamp\":\"2016-01-27T14:59:38.237Z\", \"feedbackId\":\"000001378603177f-18c07c78-fa81-4a58-9dd1-fedc3cb8f49a-000000\" }}",
+  "Timestamp" : "2016-08-17T07:43:12.822Z",
+  "SignatureVersion" : "1",
+  "Signature" : "GNWnMWfKx1PPDjUstq2Ln13+AJWEK/Qo8YllYC7dGSlPhC5nClop5+vCj0CG2XN7aN41GhsJJ1e+F4IiRxm9v2wwua6BC3mtykrXEi8VeGy2HuetbF9bEeBEPbtbeIyIXJhdPDhbs4anPJwcEiN/toCoANoPWJ3jyVTOaUAxJb2oPTrvmjMxMpVE59sSo7Mz2+pQaUJl3ma0UgAC/lrYghi6n4cwlDTfbbIW+mbV7/d/5YN/tjL9/sD3DOuf+1PpFFTPsOVseZWV8PQ0/MWB2BOrKOKQyF7msLNX5iTkmsvRrbYULPvpbx32LsIxfNVFZJmsnTe2/6EGaAXf3TVPZA==",
+  "SigningCertURL" : "https://sns.eu-west-1.amazonaws.com/SimpleNotificationService-bb750dd426d95ee9390147a5624348ee.pem",
+  "UnsubscribeURL" : "https://sns.eu-west-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-1:918057160339:nope:1cddd2a6-bfa8-4eb5-b2b2-a7833eb5db9b"
+}
+PAYLOAD;
+
+        $jsonPayload = json_decode($payload, TRUE);
+
+        $transport = new AmazonTransport('localhost', new Http());
+        $rows = $transport->processJsonPayload($jsonPayload, $logger, $translator);
+
+        $this->assertArrayHasKey('richard@example.com', $rows[1]['emails']);
+        $this->assertEquals('mautic.email.complaint.reason.abuse', $rows[1]['emails']['richard@example.com']);
     }
 
 }
