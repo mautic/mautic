@@ -171,7 +171,6 @@ class WebhookModel extends FormModel
             return;
         }
 
-        $queueList   = [];
         $webhookList = [];
 
         /** @var \Mautic\WebhookBundle\Entity\Event $event */
@@ -183,9 +182,6 @@ class WebhookModel extends FormModel
 
             // add the queuelist and save everything
             $this->saveEntity($webhook);
-
-            // reset to empty array
-            $queueList = [];
         }
 
         if ($this->queueMode == 'immediate_process') {

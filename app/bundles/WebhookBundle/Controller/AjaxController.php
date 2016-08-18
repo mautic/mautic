@@ -18,7 +18,7 @@ class AjaxController extends CommonAjaxController
 {
     protected function sendHookTestAction(Request $request)
     {
-        $url = InputHelper::clean($request->request->get('url'));
+        $url = InputHelper::url($request->request->get('url'));
 
         // validate the URL
         if ($url == '' || ! $url) {
