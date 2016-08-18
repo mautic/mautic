@@ -953,7 +953,7 @@ class EmailModel extends FormModel
                 }
             }
 
-            if ($includeVariants) {
+            if ($includeVariants && $email->isVariant()) {
                 //get a list of variants for A/B testing
                 $childrenVariant = $email->getVariantChildren();
 
@@ -1008,35 +1008,50 @@ class EmailModel extends FormModel
                                 }
                             }
 
-                            $totalSent += $emailSettings[$child->getId()]['sentCount'];
+                            $totalSent += $emailSettings[$child->getId()]['variantCount'];
                         }
                     }
 
                     //set parent weight
                     $emailSettings[$email->getId()]['weight'] = ((100 - $variantWeight) / 100);
-
-                    //now find what percentage of current leads should receive the variants
-                    foreach ($emailSettings as $eid => $details) {
-                        $emailSettings[$eid]['weight'] = ($totalSent)
-                            ?
-                            ($details['weight'] - ($details['variantCount'] / $totalSent)) + $details['weight']
-                            :
-                            $details['weight'];
-                    }
                 } else {
                     $emailSettings[$email->getId()]['weight'] = 1;
                 }
             }
 
             $this->emailSettings[$email->getId()] = $emailSettings;
-        } else {
-            // Reorder according to variantSentCount so that campaigns which currently send one at a time alternate
-            uasort($this->emailSettings[$email->getId()], function($a, $b) {
-               if ($a['isVariant']) {
-                   return ($a['variantCount'] < $b['variantCount']) ? -1 : 1;
-               }
+        }
 
-               return 0;
+        if ($includeVariants && $email->isVariant()) {
+            //now find what percentage of current leads should receive the variants
+            if (!isset($totalSent)) {
+                $totalSent = 0;
+                foreach ($this->emailSettings[$email->getId()] as $eid => $details) {
+                    $totalSent += $details['variantCount'];
+                }
+            }
+
+            foreach ($this->emailSettings[$email->getId()] as $eid => $details) {
+                $this->emailSettings[$email->getId()][$eid]['send_weight'] = ($totalSent)
+                    ?
+                    ($details['weight'] - ($details['variantCount'] / $totalSent)) + $details['weight']
+                    :
+                    $details['weight'];
+            }
+
+            // Reorder according to send_weight so that campaigns which currently send one at a time alternate
+            uasort($this->emailSettings[$email->getId()], function($a, $b) {
+                if ($a['send_weight'] === $b['send_weight']) {
+                    if ($a['variantCount'] === $b['variantCount']) {
+                        return 0;
+                    }
+
+                    // if weight is the same - sort by least number sent
+                    return ($a['variantCount'] < $b['variantCount']) ? -1 : 1;
+                }
+
+                // sort by the one with most weight first
+                return ($a['send_weight'] > $b['send_weight']) ? -1 : 1;
             });
         }
 
@@ -1135,26 +1150,12 @@ class EmailModel extends FormModel
             return $singleEmail ? true : [];
         }
 
-        $backup = reset($emailSettings);
-
         foreach ($emailSettings as $eid => $details) {
-            if (isset($details['weight'])) {
-                $limit = round($count * $details['weight']);
-
-                if (!$limit) {
-                    // Don't send any emails to this one
-                    unset($emailSettings[$eid]);
-                } else {
-                    $emailSettings[$eid]['limit'] = $limit;
-                }
+            if (isset($details['send_weight'])) {
+                $emailSettings[$eid]['limit'] = ceil($count * $details['send_weight']);
             } else {
                 $emailSettings[$eid]['limit'] = $count;
             }
-        }
-
-        if (count($emailSettings) == 0) {
-            // Shouldn't happen but a safety catch
-            $emailSettings[$backup['entity']->getId()] = $backup;
         }
 
         // Store stat entities
@@ -1210,6 +1211,10 @@ class EmailModel extends FormModel
         $groupedContactsByEmail = [];
         $offset = 0;
         foreach ($emailSettings as $eid => $details) {
+            if (empty($details['limit'])) {
+
+                continue;
+            }
             $groupedContactsByEmail[$eid] = [];
             if ($details['limit']) {
                 // Take a chunk of contacts based on variant weights
