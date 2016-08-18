@@ -522,17 +522,11 @@ class AjaxController extends CommonAjaxController
                 $email->getCreatedBy()
             )
         ) {
-
             $mailer = $this->factory->getMailer();
             $mailer->setEmail($email, true, [], [], true);
 
             $data['body']    = $mailer->getBody();
             $data['subject'] = $mailer->getSubject();
-
-            // Parse tokens into view data
-            $tokens = $model->getBuilderComponents($email, ['tokens', 'visualTokens']);
-
-            BuilderTokenHelper::replaceTokensWithVisualPlaceholders($tokens, $data['body']);
         }
 
         return $this->sendJsonResponse($data);
