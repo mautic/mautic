@@ -36,16 +36,14 @@ class CookieHelper
      */
     public function __construct($cookiePath, $cookieDomain, $cookieSecure, $cookieHttp, RequestStack $requestStack)
     {
-        $this->path   = $cookiePath;
-        $this->domain = $cookieDomain;
-        $this->secure = $cookieSecure;
+        $this->path    = $cookiePath;
+        $this->domain  = $cookieDomain;
+        $this->secure  = $cookieSecure;
         $this->request = $requestStack->getCurrentRequest();
 
-        if (($this->secure == '' || $this->secure == null) && $this->request) {
-            $this->secure = ($requestStack->getCurrentRequest()->server->get('HTTPS', false));
+        if (('' === $this->secure || null === $this->secure) && $this->request) {
+            $this->secure = filter_var($requestStack->getCurrentRequest()->server->get('HTTPS', false), FILTER_VALIDATE_BOOLEAN);
         }
-
-        $this->httponly = $cookieHttp;
     }
 
     /**
@@ -57,10 +55,10 @@ class CookieHelper
      * @param null $secure
      * @param bool $httponly
      */
-    public function setCookie($name, $value, $expire = 1800, $path = null, $domain = null, $secure = null, $httponly = true)
+    public function setCookie($name, $value, $expire = 1800, $path = null, $domain = null, $secure = null, $httponly = null)
     {
 
-        if($this->request==null){
+        if ($this->request == null) {
             return true;
         }
 
@@ -84,7 +82,7 @@ class CookieHelper
      * @param null      $secure
      * @param bool|true $httponly
      */
-    public function deleteCookie($name, $path = null, $domain = null, $secure = null, $httponly = true)
+    public function deleteCookie($name, $path = null, $domain = null, $secure = null, $httponly = null)
     {
         $this->setCookie($name, '', time() - 3600, $path, $domain, $secure, $httponly);
     }
