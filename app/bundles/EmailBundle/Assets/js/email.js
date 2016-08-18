@@ -167,7 +167,7 @@ Mautic.loadNewEmailWindow = function(options) {
             var generator = window.open(options.windowUrl, 'newemailwindow', 'height=600,width=1100');
 
             if (!generator || generator.closed || typeof generator.closed == 'undefined') {
-                alert(response.popupBlockerMessage);
+                alert(mauticLang.popupBlockerMessage);
             } else {
                 generator.onload = function () {
                     Mautic.stopModalLoadingBar();
