@@ -394,7 +394,7 @@ class InputHelper
     {
         if (function_exists('transliterator_transliterate')) {
             // Use intl by default
-            return transliterator_transliterate('Any-Latin', $value);
+            return transliterator_transliterate('Any-Latin; Latin-ASCII', $value);
         }
 
         return \URLify::transliterate($value);
