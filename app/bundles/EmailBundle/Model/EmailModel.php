@@ -97,6 +97,11 @@ class EmailModel extends FormModel
     protected $updatingTranslationChildren = false;
 
     /**
+     * @var array
+     */
+    protected $emailSettings = [];
+
+    /**
      * EmailModel constructor.
      *
      * @param IpLookupHelper $ipLookupHelper
@@ -271,6 +276,18 @@ class EmailModel extends FormModel
             }
         }
         $this->em->flush();
+    }
+
+    /**
+     * @param Email $entity
+     */
+    public function deleteEntity($entity)
+    {
+        if ($entity->isVariant() && $entity->getIsPublished()) {
+            $this->resetVariants($entity);
+        }
+
+        parent::deleteEntity($entity);
     }
 
     /**
@@ -840,11 +857,8 @@ class EmailModel extends FormModel
             $lists = $email->getLists();
         }
 
-        //get email settings such as templates, weights, etc
-        $emailSettings = $this->getEmailSettings($email);
         $options       = [
             'source'        => ['email', $email->getId()],
-            'emailSettings' => $emailSettings,
             'allowResends'  => false,
             'customHeaders' => [
                 'Precedence' => 'Bulk',
@@ -894,12 +908,9 @@ class EmailModel extends FormModel
      *
      * @return array
      */
-    public function getEmailSettings(Email $email, $includeVariants = true)
+    public function &getEmailSettings(Email $email, $includeVariants = true)
     {
-        static $emailSettings = [];
-
-        if (empty($emailSettings[$email->getId()])) {
-
+        if (empty($this->emailSettings[$email->getId()])) {
             //used to house slots so they don't have to be fetched over and over for same template
             $slots = [];
             if ($template = $email->getTemplate()) {
@@ -1005,8 +1016,8 @@ class EmailModel extends FormModel
                     $emailSettings[$email->getId()]['weight'] = ((100 - $variantWeight) / 100);
 
                     //now find what percentage of current leads should receive the variants
-                    foreach ($emailSettings as $eid => &$details) {
-                        $details['weight'] = ($totalSent)
+                    foreach ($emailSettings as $eid => $details) {
+                        $emailSettings[$eid]['weight'] = ($totalSent)
                             ?
                             ($details['weight'] - ($details['variantCount'] / $totalSent)) + $details['weight']
                             :
@@ -1016,9 +1027,20 @@ class EmailModel extends FormModel
                     $emailSettings[$email->getId()]['weight'] = 1;
                 }
             }
+
+            $this->emailSettings[$email->getId()] = $emailSettings;
+        } else {
+            // Reorder according to variantSentCount so that campaigns which currently send one at a time alternate
+            uasort($this->emailSettings[$email->getId()], function($a, $b) {
+               if ($a['isVariant']) {
+                   return ($a['variantCount'] < $b['variantCount']) ? -1 : 1;
+               }
+
+               return 0;
+            });
         }
 
-        return $emailSettings;
+        return $this->emailSettings[$email->getId()];
     }
 
     /**
@@ -1041,7 +1063,6 @@ class EmailModel extends FormModel
     public function sendEmail($email, $leads, $options = [])
     {
         $source           = (isset($options['source'])) ? $options['source'] : null;
-        $emailSettings    = (isset($options['emailSettings'])) ? $options['emailSettings'] : [];
         $listId           = (isset($options['listId'])) ? $options['listId'] : null;
         $ignoreDNC        = (isset($options['ignoreDNC'])) ? $options['ignoreDNC'] : false;
         $allowResends     = (isset($options['allowResends'])) ? $options['allowResends'] : true;
@@ -1065,10 +1086,8 @@ class EmailModel extends FormModel
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
         $emailRepo = $this->getRepository();
 
-        if (empty($emailSettings)) {
-            //get email settings such as templates, weights, etc
-            $emailSettings = $this->getEmailSettings($email);
-        }
+        //get email settings such as templates, weights, etc
+        $emailSettings = &$this->getEmailSettings($email);
 
         $defaultFrequencyNumber = $this->coreParameters->getParameter('email_frequency_number');
         $defaultFrequencyTime = $this->coreParameters->getParameter('email_frequency_time');
@@ -1117,7 +1136,8 @@ class EmailModel extends FormModel
         }
 
         $backup = reset($emailSettings);
-        foreach ($emailSettings as $eid => &$details) {
+
+        foreach ($emailSettings as $eid => $details) {
             if (isset($details['weight'])) {
                 $limit = round($count * $details['weight']);
 
@@ -1125,10 +1145,10 @@ class EmailModel extends FormModel
                     // Don't send any emails to this one
                     unset($emailSettings[$eid]);
                 } else {
-                    $details['limit'] = $limit;
+                    $emailSettings[$eid]['limit'] = $limit;
                 }
             } else {
-                $details['limit'] = $count;
+                $emailSettings[$eid]['limit'] = $count;
             }
         }
 
@@ -1229,7 +1249,7 @@ class EmailModel extends FormModel
         }
 
         foreach ($groupedContactsByEmail as $parentId => $translatedEmails) {
-            $useSettings = &$emailSettings[$parentId];
+            $useSettings = $emailSettings[$parentId];
             foreach ($translatedEmails as $translatedId => $contacts) {
                 $emailEntity = ($translatedId === $parentId) ? $useSettings['entity'] : $useSettings['translations'][$translatedId];
 
@@ -1292,6 +1312,13 @@ class EmailModel extends FormModel
                         $emailSentCounts[$translatedId] = 0;
                     }
                     $emailSentCounts[$translatedId]++;
+
+                    // Update $emailSetting so campaign a/b tests are handled correctly
+                    $emailSettings[$parentId]['sentCount']++;
+
+                    if (!empty($emailSettings[$parentId]['isVariant'])) {
+                        $emailSettings[$parentId]['variantCount']++;
+                    }
                 }
             }
         }
@@ -1353,7 +1380,7 @@ class EmailModel extends FormModel
         }
 
         //get email settings
-        $emailSettings = $this->getEmailSettings($email, false);
+        $emailSettings = &$this->getEmailSettings($email, false);
 
         //noone to send to so bail
         if (empty($users)) {
