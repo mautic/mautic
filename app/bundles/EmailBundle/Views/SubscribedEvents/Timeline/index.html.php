@@ -11,15 +11,15 @@
 
 if ($item = ((isset($event['extra'])) ? $event['extra']['stat'] : false)): ?>
     <p>
-        <?php if (empty($item['dateRead'])) : ?>
+        <?php if (!empty($event['extra']['type']) and $event['extra']['type']==='sent') : ?>
             <?php echo $view['translator']->trans('mautic.email.timeline.event.not.read'); ?>
         <?php else : ?>
             <?php echo $view['translator']->trans(
                 'mautic.email.timeline.event.'.$event['extra']['type'],
                 [
-                    '%date%'     => $view['date']->toFull($item['dateRead']),
-                    '%interval%' => $view['date']->formatRange($item['timeToRead']),
-                    '%sent%'     => $view['date']->toFull($item['dateSent']),
+                    '%date%'     => $view['date']->toFull($event['timestamp']),
+                    '%interval%' => $view['date']->formatRange($event['timestamp']),
+                    '%sent%'     => $view['date']->toFull($event['dateSent']),
                 ]
             ); ?>
         <?php endif; ?>
