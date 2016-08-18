@@ -258,10 +258,13 @@ class WebhookModel extends FormModel
             return;
         }
 
+        // Set up custom headers
+        $headers = ['Content-Type' => 'application/json'];
+
         /** @var \Mautic\WebhookBundle\Entity\Webhook $webhook */
         try {
             /** @var \Joomla\Http\Http $http */
-            $response = $http->post($webhook->getWebhookUrl(), json_encode($payload));
+            $response = $http->post($webhook->getWebhookUrl(), json_encode($payload), $headers);
             $this->addLog($webhook, $response);
             // throw an error exception if we don't get a 200 back
             if ($response->code != 200) {
