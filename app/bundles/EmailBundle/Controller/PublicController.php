@@ -296,8 +296,8 @@ class PublicController extends CommonFormController
     {
         ignore_user_abort(true);
 
-        // Check to see if transport matches currently used transport
-        $currentTransport = $this->factory->getMailer()->getTransport();
+        // Use the real transport as the one in Mailer could be SpoolTransport if the system is configured to queue
+        $currentTransport = $this->get('swiftmailer.transport.real');
 
         if ($currentTransport instanceof InterfaceCallbackTransport && $currentTransport->getCallbackPath() == $transport) {
             $response = $currentTransport->handleCallbackResponse($this->request, $this->factory);
