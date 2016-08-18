@@ -108,9 +108,14 @@ trait VariantModelTrait
             // Do it here in addition to postVariantSave() so that it's available to the event listeners
             $changes = $entity->getChanges();
 
+            // If unpublished and wasn't changed from published - don't reset
+            if (!$entity->isPublished(false) && (!isset($changes['isPublished']))) {
+
+                return false;
+            }
+
             // Reset the variant
             if (!empty($changes) && empty($this->inConversion)) {
-
                 if (method_exists($entity, 'setVariantStartDate')) {
                     $entity->setVariantStartDate($variantStartDate);
                 }
