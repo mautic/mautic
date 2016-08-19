@@ -449,6 +449,30 @@ class LeadRepository extends CommonRepository
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @param integer $id
+     *
+     * @return mixed|null
+     */
+    public function getEntityHistory($id = 0)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->select('hits.*')
+            ->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'hits')
+            ->where("lead_id = :id")
+            ->setParameter('id', $id);
+
+        $result = $q->execute()->fetchAll();
+
+        if (count($result)) {
+            return $result;
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Get a list of leads
      *
      * @param array $args

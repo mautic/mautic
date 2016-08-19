@@ -129,6 +129,10 @@ return [
                 'path'       => '/segments/{id}/contact/remove/{leadId}',
                 'controller' => 'MauticLeadBundle:Api\ListApi:removeLead',
                 'method'     => 'POST'
+            ],
+            'mautic_api_getleadhistory_bc' => [
+                'path' => '/leads/{id}/history',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:getEntityHistory'
             ]
         ]
     ],
