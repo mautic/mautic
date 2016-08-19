@@ -124,7 +124,7 @@ return [
                 'method'     => 'POST'
             ],
             'mautic_api_getleadhistory_bc' => [
-                'path' => '/leads/{id}/history',
+                'path' => '/contacts/{id}/history',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getEntityHistory'
             ]
         ]

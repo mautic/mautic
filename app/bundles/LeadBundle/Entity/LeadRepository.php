@@ -455,16 +455,18 @@ class LeadRepository extends CommonRepository
      *
      * @return mixed|null
      */
-    public function getEntityHistory($id = 0)
+    public function getEntityHistory($id = 0, $start=0, $limit=0)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('hits.*')
             ->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'hits')
             ->where("lead_id = :id")
-            ->setParameter('id', $id);
-
+            ->setParameter('id', $id)
+            ->setFirstResult($start);
+            if ($limit!==0){
+                $q->setMaxResults($limit);
+            }
         $result = $q->execute()->fetchAll();
-
         if (count($result)) {
             return $result;
         } else {

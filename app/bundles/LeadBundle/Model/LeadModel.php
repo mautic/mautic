@@ -90,7 +90,7 @@ class LeadModel extends FormModel
 
     /**
      * LeadModel constructor.
-     * 
+     *
      * @param RequestStack $requestStack
      * @param CookieHelper $cookieHelper
      * @param IpLookupHelper $ipLookupHelper
@@ -230,17 +230,15 @@ class LeadModel extends FormModel
      *
      * @return null|object
      */
-    public function getEntityHistory($id = null)
+    public function getEntityHistory($id = null, $start=0, $limit=0)
     {
         if (null !== $id) {
             $repo = $this->getRepository();
             if (method_exists($repo, 'getEntityHistory')) {
-                return $repo->getEntityHistory($id);
+                return $repo->getEntityHistory($id, $start, $limit);
             }
-
             return $repo->find($id);
         }
-
         return null;
     }
 
@@ -979,7 +977,7 @@ class LeadModel extends FormModel
     {
         $repo = $this->getRepository();
         $leadId = (array) $repo->getLeadByEmail($email, true);
-        
+
         /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
         $leads = [];
 
