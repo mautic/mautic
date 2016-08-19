@@ -111,7 +111,7 @@ class SearchStringHelper
                 //arrived at the end of a single word that is not within a quote or parenthesis so add it as standalone
                 if ($string != ' ') {
                     $string = trim($string);
-                    $type = ($string == 'or' || $string == 'and') ? $string : '';
+                    $type = (strtolower($string) == 'or' || strtolower($string) == 'and') ? $string : '';
                     self::setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, $type, (!empty($chars)));
                 }
                 continue;
