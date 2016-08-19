@@ -319,7 +319,11 @@ class MailHelper
             }
 
             $this->message->setSubject($this->subject);
-            $this->message->setBody($this->body['content'], $this->body['contentType'], $this->body['charset']);
+            // Only set body if not empty or if plain text is empty - this ensures an empty HTML body does not show for
+            // messages only with plain text            
+            if (!empty($this->body['content']) || empty($this->plainText)) {
+                $this->message->setBody($this->body['content'], $this->body['contentType'], $this->body['charset']);
+            }
             $this->setMessagePlainText($isQueueFlush);
 
             if (!$isQueueFlush) {
