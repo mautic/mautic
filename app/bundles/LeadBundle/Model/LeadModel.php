@@ -1918,6 +1918,9 @@ class LeadModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
+        if (empty($options['includeAnonymous'])) {
+            $q->andWhere($q->expr()->isNotNull('t.date_identified'));
+        }
         $results = $q->execute()->fetchAll();
 
         if ($results) {
