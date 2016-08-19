@@ -1872,4 +1872,16 @@ class EmailModel extends FormModel
 
         return $upcomingEmails;
     }
+
+    /**
+     * @deprecated 2.1 - use $entity->getVariants() instead; to be removed in 3.0
+     *
+     * @param Page $entity
+     *
+     * @return array
+     */
+    public function getVariants(Email $entity)
+    {
+        return $entity->getVariants();
+    }
 }
