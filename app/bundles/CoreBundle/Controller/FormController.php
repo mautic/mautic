@@ -93,9 +93,9 @@ class FormController extends CommonController
                     $this->permissionBase.':edit'
                 );
             }
-        } else {
-            return $this->get('mautic.helper.user')->getUser()->isAdmin();
         }
+
+        return $this->get('mautic.helper.user')->getUser()->isAdmin();
     }
 
     /**
