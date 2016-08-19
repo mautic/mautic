@@ -321,19 +321,22 @@ class CommonRepository extends EntityRepository
                     list($expressions, $parameters) = $this->addAdvancedSearchWhereClause($q, $filter);
 
                     if (!empty($forceExpressions)) {
-                        $expressions->add($forceExpressions);
                         $parameters = array_merge($parameters, $forceParameters);
                     }
                 } elseif (!empty($forceExpressions)) {
-                    //We do not have a user search but have some required filters
-                    $expressions = $forceExpressions;
                     $parameters  = $forceParameters;
                 }
 
-                $filterCount = ($expressions instanceof \Countable) ? count($expressions) : count($expressions->getParts());
-
-                if (!empty($filterCount)) {
+                $filterCount = 0;
+                if (!empty($expressions) && $filterCount = ($expressions instanceof \Countable) ? count($expressions) : count($expressions->getParts())) {
                     $q->andWhere($expressions);
+                }
+
+                if (!empty($forceExpressions) &&  $forcedFilterCount = ($forceExpressions instanceof \Countable) ? count($forceExpressions) : count($forceExpressions->getParts())) {
+                    $q->andWhere($forceExpressions);
+                }
+
+                if (!empty($filterCount) || !empty($forceExpressions)) {
                     foreach ($parameters as $k => $v) {
                         if ($v === true || $v === false) {
                             $q->setParameter($k, $v, 'boolean');
