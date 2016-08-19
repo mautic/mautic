@@ -1023,4 +1023,16 @@ class PageModel extends FormModel
 
         return $results;
     }
+
+    /**
+     * @deprecated 2.1 - use $entity->getVariants() instead; to be removed in 3.0
+     *
+     * @param Page $entity
+     *
+     * @return array
+     */
+    public function getVariants(Page $entity)
+    {
+        return $entity->getVariants();
+    }
 }
