@@ -912,6 +912,7 @@ class EmailModel extends FormModel
     {
         if (empty($this->emailSettings[$email->getId()])) {
             //used to house slots so they don't have to be fetched over and over for same template
+            // BC for Mautic v1 templates
             $slots = [];
             if ($template = $email->getTemplate()) {
                 $slots[$template] = $this->themeHelper->getTheme($template)->getSlots('email');
@@ -1031,17 +1032,20 @@ class EmailModel extends FormModel
                 }
             }
 
-            foreach ($this->emailSettings[$email->getId()] as $eid => $details) {
-                $this->emailSettings[$email->getId()][$eid]['send_weight'] = ($totalSent)
-                    ?
-                    ($details['weight'] - ($details['variantCount'] / $totalSent)) + $details['weight']
-                    :
-                    $details['weight'];
+            foreach ($this->emailSettings[$email->getId()] as $eid => &$details) {
+                // Determine the deficit for email ordering
+                if ($totalSent) {
+                    $details['weight_deficit'] = $details['weight'] - ($details['variantCount'] / $totalSent);
+                    $details['send_weight'] = ($details['weight'] - ($details['variantCount'] / $totalSent)) + $details['weight'];
+                } else {
+                    $details['weight_deficit'] = $details['weight'];
+                    $details['send_weight']    = $details['weight'];
+                }
             }
 
             // Reorder according to send_weight so that campaigns which currently send one at a time alternate
             uasort($this->emailSettings[$email->getId()], function($a, $b) {
-                if ($a['send_weight'] === $b['send_weight']) {
+                if ($a['weight_deficit'] === $b['weight_deficit']) {
                     if ($a['variantCount'] === $b['variantCount']) {
                         return 0;
                     }
@@ -1050,8 +1054,8 @@ class EmailModel extends FormModel
                     return ($a['variantCount'] < $b['variantCount']) ? -1 : 1;
                 }
 
-                // sort by the one with most weight first
-                return ($a['send_weight'] > $b['send_weight']) ? -1 : 1;
+                // sort by the one with the greatest deficit first
+                return ($a['weight_deficit'] > $b['weight_deficit']) ? -1 : 1;
             });
         }
 
@@ -1157,6 +1161,7 @@ class EmailModel extends FormModel
                 $emailSettings[$eid]['limit'] = $count;
             }
         }
+        echo "\n\n";
 
         // Store stat entities
         $errors   = [];
