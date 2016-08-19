@@ -99,7 +99,7 @@ class Notification extends FormEntity
     /**
      * @var string
      */
-    private $notificationType;
+    private $notificationType = 'template';
 
     /**
      *
