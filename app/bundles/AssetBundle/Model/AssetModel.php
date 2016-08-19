@@ -173,7 +173,10 @@ class AssetModel extends FormModel
                 }
 
                 if (!empty($clickthrough['email'])) {
-                    $download->setEmail($this->em->getReference('MauticEmailBundle:Email', $clickthrough['email']));
+                    $emailRepo = $this->em->getRepository("MauticEmailBundle:Email");
+                    if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
+                        $download->setEmail($emailEntity);
+                    }
                 }
             }
 
