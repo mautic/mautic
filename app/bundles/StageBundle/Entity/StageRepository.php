@@ -187,9 +187,7 @@ class StageRepository extends CommonRepository
         $q->select('partial s.{id, name}')
             ->andWhere($q->expr()->eq('s.isPublished', ':true'))
             ->setParameter('true', true, 'boolean');
-        $q->andWhere(
-            $q->expr()->eq('s.name', $stageName)
-        );
+        $q->andWhere("s.name = '".$stageName."'");
 
         $result = $q->getQuery()->getResult();
 
