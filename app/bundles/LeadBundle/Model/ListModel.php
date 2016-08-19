@@ -1048,6 +1048,7 @@ class ListModel extends FormModel
         $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name as name,ll.alias as alias')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 't')
             ->join('t', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = t.leadlist_id')
+            ->join('t',MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = t.lead_id' )
             ->orderBy('leads', 'DESC')
             ->where($q->expr()->eq('ll.is_published', ':published'))
             ->setParameter('published', true)
@@ -1060,10 +1061,10 @@ class ListModel extends FormModel
             $q->andWhere("ll.id IN (".$segmentlist.")");
         }
         if(!empty($dateFrom)){
-            $q->andWhere("t.date_added >= '".$dateFrom->format('Y-m-d')."'");
+            $q->andWhere("l.date_added >= '".$dateFrom->format('Y-m-d')."'");
         }
         if(!empty($dateTo)){
-            $q->andWhere("t.date_added <= '".$dateTo->format('Y-m-d')." 23:59:59'");
+            $q->andWhere("l.date_added <= '".$dateTo->format('Y-m-d')." 23:59:59'");
         }
         if (!empty($options['canViewOthers'])) {
             $q->andWhere('ll.created_by = :userId')
@@ -1076,17 +1077,19 @@ class ListModel extends FormModel
         {
             $qAll = $this->em->getConnection()->createQueryBuilder();
             $qAll->select('COUNT(t.date_added) AS leads, 0 as id, "All Contacts" as name, "" as alias')
-                ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 't')
-                ->join('t', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = t.leadlist_id')
-                ->orderBy('leads', 'DESC')
-                ->where($qAll->expr()->eq('ll.is_published', ':published'))
-                ->setParameter('published', true);
+                ->from(MAUTIC_TABLE_PREFIX.'leads', 't');
+
 
             if (!empty($options['canViewOthers'])) {
                 $qAll->andWhere('ll.created_by = :userId')
                     ->setParameter('userId', $this->user->getId());
             }
-
+            if(!empty($dateFrom)){
+                $qAll->andWhere("t.date_added >= '".$dateFrom->format('Y-m-d')."'");
+            }
+            if(!empty($dateTo)){
+                $qAll->andWhere("t.date_added <= '".$dateTo->format('Y-m-d')." 23:59:59'");
+            }
             $resultsAll = $qAll->execute()->fetchAll();
             $results = array_merge($results,$resultsAll);
         }
@@ -1095,7 +1098,6 @@ class ListModel extends FormModel
 
     public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true, $listName){
 
-        $dateTo->add(new \DateInterval('PT23H59M59S'));
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
@@ -1107,9 +1109,9 @@ class ListModel extends FormModel
             unset($filter['flag']);
         }
 
-        $allLists = $query->getCountQuery('lead_lists_leads', 'lead_id', 'date_added', null);
+        $allLists = $query->getCountQuery('leads', 'id', 'date_added', null);
 
-        $lists = $query->count('lead_lists_leads', 'leadlist_id', 'date_added', $filter, null);
+        $lists = $query->count('leads', 'id', 'date_added', $filter, null);
 
         $all        = $query->fetchCount($allLists);
         $identified = $lists;
