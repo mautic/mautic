@@ -278,7 +278,7 @@ class PointModel extends CommonFormModel
 
                 if ($pointsChange) {
                     $delta = $action->getDelta();
-                    $lead->addToPoints($delta);
+                    $lead->adjustPoints($delta);
                     $parsed = explode('.', $action->getType());
                     $lead->addPointsChangeLogEntry(
                         $parsed[0],
