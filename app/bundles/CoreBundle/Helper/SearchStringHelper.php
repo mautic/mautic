@@ -178,7 +178,7 @@ class SearchStringHelper
                                       $setUpNext = true)
     {
         if (!empty($type)) {
-            $filters->{$baseName}[$keyCount]->type = $type;
+            $filters->{$baseName}[$keyCount]->type = strtolower($type);
         } elseif ($setFilter) {
             $string = strtolower($string);
 
