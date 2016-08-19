@@ -261,7 +261,7 @@ class HitRepository extends CommonRepository
         }
 
 
-        return new \DateTime($result['latest_hit']);
+        return new \DateTime($result['latest_hit'], new \DateTimeZone('UTC'));
     }
 
     /**
