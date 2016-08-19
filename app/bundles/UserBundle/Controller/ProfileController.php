@@ -25,18 +25,18 @@ class ProfileController extends FormController
     public function indexAction ()
     {
         //get current user
-        $me    = $this->get('security.context')->getToken()->getUser();
-        $model = $this->getModel('user.user');
+        $me    = $this->get('security.token_storage')->getToken()->getUser();
+        $model = $this->getModel('user');
 
         //set some permissions
         $permissions = array(
-            'apiAccess'    => ($this->factory->getParameter('api_enabled')) ?
-                $this->factory->getSecurity()->isGranted('api:access:full')
+            'apiAccess'    => ($this->get('mautic.helper.core_parameters')->getParameter('api_enabled')) ?
+                $this->get('mautic.security')->isGranted('api:access:full')
                 : 0,
-            'editName'     => $this->factory->getSecurity()->isGranted('user:profile:editname'),
-            'editUsername' => $this->factory->getSecurity()->isGranted('user:profile:editusername'),
-            'editPosition' => $this->factory->getSecurity()->isGranted('user:profile:editposition'),
-            'editEmail'    => $this->factory->getSecurity()->isGranted('user:profile:editemail')
+            'editName'     => $this->get('mautic.security')->isGranted('user:profile:editname'),
+            'editUsername' => $this->get('mautic.security')->isGranted('user:profile:editusername'),
+            'editPosition' => $this->get('mautic.security')->isGranted('user:profile:editposition'),
+            'editEmail'    => $this->get('mautic.security')->isGranted('user:profile:editemail')
         );
 
         $action = $this->generateUrl('mautic_user_account');
@@ -123,9 +123,9 @@ class ProfileController extends FormController
         }
 
         //Check for a submitted form and process it
-        $submitted = $this->factory->getSession()->get('formProcessed', 0);
+        $submitted = $this->get('session')->get('formProcessed', 0);
         if ($this->request->getMethod() == 'POST' && !$submitted) {
-            $this->factory->getSession()->set('formProcessed', 1);
+            $this->get('session')->set('formProcessed', 1);
 
             //check to see if the password needs to be rehashed
             $submittedPassword     = $this->request->request->get('user[plainPassword][password]', null, true);
@@ -142,7 +142,7 @@ class ProfileController extends FormController
                     $model->saveEntity($me);
 
                     //check if the user's locale has been downloaded already, fetch it if not
-                    $installedLanguages = $this->factory->getParameter('supported_languages');
+                    $installedLanguages = $this->get('mautic.helper.core_parameters')->getParameter('supported_languages');
 
                     if ($me->getLocale() && !array_key_exists($me->getLocale(), $installedLanguages)) {
                         /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
@@ -169,6 +169,16 @@ class ProfileController extends FormController
                         }
                     }
 
+
+                    // Update timezone and locale
+                    if ($tz = $me->getTimezone()) {
+                        $this->get('session')->set('_timezone', $tz);
+                    }
+
+                    if ($locale = $me->getLocale()) {
+                        $this->get('session')->set('_locale', $locale);
+                    }
+
                     $returnUrl = $this->generateUrl('mautic_user_account');
 
                     return $this->postActionRedirect(array(
@@ -189,7 +199,7 @@ class ProfileController extends FormController
                 return $this->redirect($this->generateUrl('mautic_dashboard_index'));
             }
         }
-        $this->factory->getSession()->set('formProcessed', 0);
+        $this->get('session')->set('formProcessed', 0);
 
         $parameters = array(
             'permissions'       => $permissions,
