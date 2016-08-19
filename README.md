@@ -199,6 +199,10 @@ Everyone can test submitted features and bug fixes. No programming skills are re
 5. Follow the steps from the PR description again to see if the result is as described.
 6. Write a comment how the test went. If there is a problem, provide as many information as possible including error log messages.
 
+## Unit Tests
+
+The unit tests can be executed in the Mautic root directory with `phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist app/bundles` command.
+
 <h2>FAQ and Contact Information</h2>
 <p>Marketing automation has historically been a difficult tool to implement in a business. The Mautic community is a rich environment for you to learn from others and share your knowledge as well. Open source means more than open code. Open source is providing equality for all and a chance to improve. If you have questions then the Mautic community can help provide the answers. </p>
 
