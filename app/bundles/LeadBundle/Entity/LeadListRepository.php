@@ -688,7 +688,7 @@ class LeadListRepository extends CommonRepository
                         $key = $string;
                         $isRelative = true;
                     }
-                    
+
                     if ($isRelative) {
                         if ($requiresBetween) {
                             $startWith = ($isTimestamp) ? $dtHelper->toUtcString('Y-m-d H:i:s') : $dtHelper->toUtcString('Y-m-d');
