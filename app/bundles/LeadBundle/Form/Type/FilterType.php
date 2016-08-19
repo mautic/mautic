@@ -10,6 +10,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -217,23 +218,7 @@ class FilterType extends AbstractType
                     }
 
                     $list = $options['fields'][$fieldName]['properties']['list'];
-                    if (!is_array($list)) {
-                        $parts = explode('||', $list);
-                        if (count($parts) > 1) {
-                            $labels = explode('|', $parts[0]);
-                            $values = explode('|', $parts[1]);
-                            $list   = array_combine($values, $labels);
-                        } else {
-                            $list = explode('|', $list);
-                            $list = array_combine($list, $list);
-                        }
-                    }
-
-                    $choices = [];
-                    foreach ($list as $value => $label) {
-                        $value           = html_entity_decode($value, ENT_QUOTES);
-                        $choices[$value] = $label;
-                    }
+                    $choices = FormFieldHelper::parseListStringIntoArray($list);
 
                     if ($fieldType == 'select') {
                         // array_unshift cannot be used because numeric values get lost as keys

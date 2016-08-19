@@ -85,26 +85,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                     <?php
                                     foreach ($fields as $value => $params):
                                         $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : array();
-                                        if (!is_array($list) && strpos($list, '|') !== false):
-                                            $parts = explode('||', $list);
-                                            if (count($parts) > 1):
-                                                $labels = explode('|', $parts[0]);
-                                                $values = explode('|', $parts[1]);
-                                                $list = array_combine($values, $labels);
-                                            else:
-                                                $labels = explode('|', $list);
-                                                $values = $labels;
-                                                $list = array_combine($values, $labels);
-                                            endif;
-                                        endif;
-                                        if (!is_array($list)):
-                                            $list = [$list => $list];
-                                        endif;
-                                        // Handle special chars so that validation doesn't fail
-                                        $choices =  [];
-                                        foreach ($list as $val => $label):
-                                            $choices[html_entity_decode($val, ENT_QUOTES)] = $label;
-                                        endforeach;
+                                        $choices   = \Mautic\LeadBundle\Helper\FormFieldHelper::parseListStringIntoArray($list);
                                         $list      = json_encode($choices);
                                         $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
                                         $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
