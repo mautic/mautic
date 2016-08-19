@@ -437,7 +437,9 @@ class PageModel extends FormModel
 
             if (!empty($clickthrough['email'])) {
                 $emailRepo = $this->em->getRepository("MauticEmailBundle:Email");
-                if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) $hit->setEmail($emailEntity);
+                if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
+                    $hit->setEmail($emailEntity);
+                }
             }
         }
 
