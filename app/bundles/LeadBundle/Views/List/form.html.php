@@ -90,11 +90,23 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                             if (count($parts) > 1):
                                                 $labels = explode('|', $parts[0]);
                                                 $values = explode('|', $parts[1]);
+                                                // Handle special chars so that validation doesn't fail
+                                                foreach ($values as &$val):
+                                                    $val = htmlspecialchars($val);
+                                                endforeach;
                                                 $list = array_combine($values, $labels);
                                             else:
-                                                $list = explode('|', $list);
-                                                $list = array_combine($list, $list);
+                                                $labels = explode('|', $list);
+                                                $values = $labels;
+                                                // Handle special chars so that validation doesn't fail
+                                                foreach ($values as &$val):
+                                                    $val = htmlspecialchars($val);
+                                                endforeach;
+                                                $list = array_combine($values, $labels);
                                             endif;
+                                        endif;
+                                        if (!is_array($list)):
+                                            $list = [htmlspecialchars($list) => $list];
                                         endif;
                                         $list      = json_encode($list);
                                         $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
