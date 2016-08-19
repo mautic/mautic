@@ -90,25 +90,22 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                             if (count($parts) > 1):
                                                 $labels = explode('|', $parts[0]);
                                                 $values = explode('|', $parts[1]);
-                                                // Handle special chars so that validation doesn't fail
-                                                foreach ($values as &$val):
-                                                    $val = htmlspecialchars($val);
-                                                endforeach;
                                                 $list = array_combine($values, $labels);
                                             else:
                                                 $labels = explode('|', $list);
                                                 $values = $labels;
-                                                // Handle special chars so that validation doesn't fail
-                                                foreach ($values as &$val):
-                                                    $val = htmlspecialchars($val);
-                                                endforeach;
                                                 $list = array_combine($values, $labels);
                                             endif;
                                         endif;
                                         if (!is_array($list)):
-                                            $list = [htmlspecialchars($list) => $list];
+                                            $list = [$list => $list];
                                         endif;
-                                        $list      = json_encode($list);
+                                        // Handle special chars so that validation doesn't fail
+                                        $choices =  [];
+                                        foreach ($list as $val => $label):
+                                            $choices[html_entity_decode($val, ENT_QUOTES)] = $label;
+                                        endforeach;
+                                        $list      = json_encode($choices);
                                         $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
                                         $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
                                         ?>

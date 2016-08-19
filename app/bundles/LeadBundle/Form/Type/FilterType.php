@@ -220,15 +220,19 @@ class FilterType extends AbstractType
                     if (!is_array($list)) {
                         $parts = explode('||', $list);
                         if (count($parts) > 1) {
-                            $labels  = explode('|', $parts[0]);
-                            $values  = explode('|', $parts[1]);
-                            $choices = array_combine($values, $labels);
+                            $labels = explode('|', $parts[0]);
+                            $values = explode('|', $parts[1]);
+                            $list   = array_combine($values, $labels);
                         } else {
-                            $list    = explode('|', $list);
-                            $choices = array_combine($list, $list);
+                            $list = explode('|', $list);
+                            $list = array_combine($list, $list);
                         }
-                    } else {
-                        $choices = $list;
+                    }
+
+                    $choices = [];
+                    foreach ($list as $value => $label) {
+                        $value           = html_entity_decode($value, ENT_QUOTES);
+                        $choices[$value] = $label;
                     }
 
                     if ($fieldType == 'select') {
