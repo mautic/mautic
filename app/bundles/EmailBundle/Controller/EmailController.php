@@ -777,7 +777,6 @@ class EmailController extends FormController
             $template = $entity->getTemplate();
             if (empty($template)) {
                 $content = $entity->getCustomHtml();
-                BuilderTokenHelper::replaceTokensWithVisualPlaceholders($tokens, $content);
                 $form['customHtml']->setData($content);
             }
         }
@@ -960,9 +959,6 @@ class EmailController extends FormController
         //merge any existing changes
         $newContent = $this->factory->getSession()->get('mautic.emailbuilder.'.$objectId.'.content', []);
         $content    = $entity->getContent();
-
-        $tokens = $model->getBuilderComponents($entity, ['tokens', 'visualTokens']);
-        BuilderTokenHelper::replaceTokensWithVisualPlaceholders($tokens, $content);
 
         if (is_array($newContent)) {
             $content = array_merge($content, $newContent);
