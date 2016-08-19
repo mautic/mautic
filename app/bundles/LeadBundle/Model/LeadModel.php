@@ -1166,7 +1166,7 @@ class LeadModel extends FormModel
      * @param int          $reason   Must be a class constant from the DoNotContact class.
      * @param bool         $persist
      *
-     * @return boolean If a DNC entry is added or updated, returns true. If a DNC is already present
+     * @return boolean|DoNotContact If a DNC entry is added or updated, returns the DoNotContact object. If a DNC is already present
      *                 and has the specified reason, nothing is done and this returns false.
      */
     public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $persist = true)
@@ -1197,7 +1197,7 @@ class LeadModel extends FormModel
                 $this->saveEntity($lead);
             }
 
-            return true;
+            return $dnc;
         }
         // Or if the given reason is different than the stated reason
         elseif ($isContactable !== $reason) {
@@ -1223,7 +1223,7 @@ class LeadModel extends FormModel
                         $this->saveEntity($lead);
                     }
 
-                    return true;
+                    return $dnc;
                 }
             }
         }
