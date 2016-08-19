@@ -377,6 +377,9 @@ class StatRepository extends CommonRepository
                 $query->andWhere(
                     $query->expr()->eq('s.is_read', 0)
                 );
+                $query->andWhere(
+                    $query->expr()->eq('s.is_failed', 0)
+                );
             } elseif ('failed' == $state) {
                 $query->andWhere(
                     $query->expr()->eq('s.is_failed', 1)

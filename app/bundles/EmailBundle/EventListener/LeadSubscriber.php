@@ -103,15 +103,17 @@ class LeadSubscriber extends CommonSubscriber
                 } else {
                     $eventName = $label;
                 }
-                if ('failed' == $state) {
-                    $state = 'sent';
+                if ('failed' == $state or 'sent' == $state) { //this is to get the correct column for date dateSent
+                    $dateSent = 'sent';
+                } else {
+                    $dateSent = 'read';
                 }
                 $event->addEvent(
                     [
                         'event'           => $eventTypeKey,
                         'eventLabel'      => $eventName,
                         'eventType'       => $eventTypeName,
-                        'timestamp'       => $stat['date'.ucfirst($state)],
+                        'timestamp'       => $stat['date'.ucfirst($dateSent)],
                         'dateSent'        => $stat['dateSent'],
                         'extra'           => [
                             'stat' => $stat,
