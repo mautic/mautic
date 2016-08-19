@@ -39,8 +39,8 @@ class TokenReplacementEvent extends CommonEvent
      */
     public function __construct($content, Lead $lead = null, array $clickthrough = [])
     {
-        $this->content = $content;
-        $this->lead = $lead;
+        $this->content      = $content;
+        $this->lead         = $lead;
         $this->clickthrough = $clickthrough;
     }
 
@@ -69,20 +69,12 @@ class TokenReplacementEvent extends CommonEvent
     }
 
     /**
-     * @param Lead $lead
-     */
-    public function setLead(Lead $lead)
-    {
-        $this->lead = $lead;
-    }
-
-    /**
      * @return array
      */
     public function getClickthrough()
     {
-        if (!in_array('lead_id', $this->clickthrough)) {
-            $this->clickthrough['lead_id'] = $this->lead->getId();
+        if (!in_array('lead', $this->clickthrough)) {
+            $this->clickthrough['lead'] = $this->lead->getId();
         }
 
         return $this->clickthrough;

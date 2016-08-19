@@ -37,7 +37,7 @@ class StageRepository extends CommonRepository
      */
     public function getTableAlias()
     {
-        return 'p';
+        return 's';
     }
 
     /**
@@ -49,8 +49,8 @@ class StageRepository extends CommonRepository
      */
     public function getPublishedByType($type)
     {
-        $q = $this->createQueryBuilder('p')
-            ->select('partial p.{id, name}')
+        $q = $this->createQueryBuilder('s')
+            ->select('partial s.{id, name}')
             ->setParameter('type', $type);
 
         //make sure the published up and down dates are good

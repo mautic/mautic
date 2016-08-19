@@ -28,9 +28,9 @@ class AjaxController extends CommonAjaxController
      */
     protected function updateConnectionsAction (Request $request)
     {
-        $session        = $this->factory->getSession();
+        $session        = $this->get('session');
         $campaignId     = InputHelper::clean($request->query->get('campaignId'));
-        $canvasSettings = $this->request->request->get('canvasSettings', array(), true);
+        $canvasSettings = $request->request->get('canvasSettings', array(), true);
 
         if (empty($campaignId)) {
             $dataArray = array('success' => 0);

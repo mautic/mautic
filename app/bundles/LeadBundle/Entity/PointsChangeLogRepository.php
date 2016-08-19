@@ -17,6 +17,8 @@ use Doctrine\ORM\Query;
  */
 class PointsChangeLogRepository extends CommonRepository
 {
+    use TimelineTrait;
+
     /**
      * Get a lead's point log
      *
@@ -24,27 +26,25 @@ class PointsChangeLogRepository extends CommonRepository
      * @param array   $options
      *
      * @return array
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function getLeadTimelineEvents($leadId, array $options = array())
     {
-        $query = $this->createQueryBuilder('lp')
-            ->select('lp.eventName, lp.actionName, lp.dateAdded, lp.type, lp.delta')
-            ->where('lp.lead = ' . $leadId);
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->from(MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp')
+            ->select('lp.event_name as eventName, lp.action_name as actionName, lp.date_added as dateAdded, lp.type, lp.delta, lp.id');
 
-        if (!empty($options['ipIds'])) {
-            $query->orWhere('lp.ipAddress IN (' . implode(',', $options['ipIds']) . ')');
+        if (null !== $leadId) {
+            $query->where('lp.lead_id = ' . (int) $leadId);
         }
 
-        if (isset($options['filters']['search']) && $options['filters']['search']) {
+        if (isset($options['search']) && $options['search']) {
             $query->andWhere($query->expr()->orX(
-                $query->expr()->like('lp.eventName', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
-                $query->expr()->like('lp.actionName', $query->expr()->literal('%' . $options['filters']['search'] . '%'))
+                $query->expr()->like('lp.event_name', $query->expr()->literal('%' . $options['search'] . '%')),
+                $query->expr()->like('lp.action_name', $query->expr()->literal('%' . $options['search'] . '%'))
             ));
         }
 
-        return $query->getQuery()->getArrayResult();
+        return $this->getTimelineResults($query, $options, 'lp.event_name', 'lp.date_added', [], ['dateAdded']);
     }
 
     /**
@@ -118,5 +118,13 @@ class PointsChangeLogRepository extends CommonRepository
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = ' . (int) $fromLeadId)
             ->execute();
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return 'lp';
     }
 }

@@ -476,10 +476,25 @@ class LeadRepository extends CommonRepository
         $args = $this->convertOrmProperties('Mautic\\LeadBundle\\Entity\\Lead', $args);
 
         //DBAL
-        $dq = $this->_em->getConnection()->createQueryBuilder();
-        $dq->select('count(l.id) as count')
-            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-            ->leftJoin('l', MAUTIC_TABLE_PREFIX . 'users', 'u', 'u.id = l.owner_id');
+        $dq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $dq->select('COUNT(l.id) as count')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
+
+        // Filter by an entity query
+        if (isset($args['entity_query'])) {
+            $dq->andWhere(
+                sprintf('EXISTS (%s)', $args['entity_query']->getSQL())
+            );
+
+            if (isset($args['entity_parameters'])) {
+                foreach ($args['entity_parameters'] as $name => $value) {
+                    $dq->setParameter($name, $value);
+                }
+            }
+        }
+
         $this->buildWhereClause($dq, $args);
 
         //get a total count
@@ -490,8 +505,8 @@ class LeadRepository extends CommonRepository
         $this->buildOrderByClause($dq, $args);
         $this->buildLimiterClauses($dq, $args);
 
-        $dq->resetQueryPart('select');
-        $dq->select('l.*');
+        $dq->resetQueryPart('select')
+            ->select('l.*');
         $results = $dq->execute()->fetchAll();
 
         //loop over results to put fields in something that can be assigned to the entities
@@ -576,6 +591,46 @@ class LeadRepository extends CommonRepository
                 'count' => $total,
                 'results' => $results
             ) : $results;
+    }
+
+    /**
+     * Get contats for a specific channel entity
+     *
+     * @param $args - same as getEntity/getEntities
+     * @param        $joinTable
+     * @param        $entityId
+     * @param string $contactColumnName
+     *
+     * @return array
+     */
+    public function getEntityContacts($args, $joinTable, $entityId, $filters = [], $contactColumnName = 'id')
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $qb->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.$joinTable, 'entity')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('l.id', 'entity.lead_id'),
+                    $qb->expr()->eq("entity.{$contactColumnName}", (int) $entityId)
+                )
+            );
+
+        $parameters = [];
+        if ($filters) {
+            foreach ($filters as $column => $value) {
+                $parameterName = $this->generateRandomParameterName();
+                $qb->andWhere(
+                    $qb->expr()->eq("entity.{$column}", ":{$parameterName}")
+                );
+                $parameters[$parameterName] = $value;
+            }
+        }
+
+        $args['entity_query']      = $qb;
+        $args['entity_parameters'] = $parameters;
+
+        return $this->getEntities($args);
     }
 
     /**

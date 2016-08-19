@@ -87,16 +87,21 @@ Mautic.emailOnLoad = function (container, response) {
         Mautic.activateSearchAutocomplete('list-search', 'email');
     }
 
+    var textarea = mQuery('#emailform_customHtml');
+
     mQuery(document).on('shown.bs.tab', function (e) {
-        mQuery('#emailform_customHtml').froalaEditor('popups.hideAll');
+        textarea.froalaEditor('popups.hideAll');
+    });
+
+    mQuery('a[href="#source-container"]').on('shown.bs.tab', function (e) {
+        textarea.froalaEditor('html.set', textarea.val());
     });
 
     mQuery('.btn-builder').on('click', function (e) {
-        mQuery('#emailform_customHtml').froalaEditor('popups.hideAll');
+        textarea.froalaEditor('popups.hideAll');
     });
 
     Mautic.intiSelectTheme(mQuery('#emailform_template'));
-    Mautic.fixFroalaEmailOutput();
 
     var plaintext = mQuery('#emailform_plainText');
     Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
@@ -108,22 +113,6 @@ Mautic.emailOnUnload = function(id) {
     }
     mQuery('#emailform_customHtml').froalaEditor('popups.hideAll');
 };
-
-Mautic.fixFroalaEmailOutput = function() {
-    if (mQuery('form[name="emailform"]').length) {
-        var textarea = mQuery('textarea.builder-html');
-        mQuery('form[name="emailform"]').on('before.submit.ajaxform', function() {
-            // update textarea from Froala's CodeMirror view on save
-            textarea.froalaEditor('events.trigger', 'form.submit');
-
-            var editorHtmlString = textarea.val();
-            Mautic.buildBuilderIframe(editorHtmlString, 'helper-iframe-for-html-manipulation');
-            var editorHtml = mQuery('iframe#helper-iframe-for-html-manipulation').contents();
-            editorHtml = Mautic.clearFroalaStyles(editorHtml);
-            textarea.val(editorHtml.find('html').get(0).outerHTML);
-        });
-    }
-}
 
 Mautic.insertEmailBuilderToken = function(editorId, token) {
     var editor = Mautic.getEmailBuilderEditorInstances();
@@ -269,10 +258,14 @@ Mautic.autoGeneratePlaintext = function() {
 Mautic.selectEmailType = function(emailType) {
     if (emailType == 'list') {
         mQuery('#leadList').removeClass('hide');
+        mQuery('#segmentTranslationParent').removeClass('hide');
+        mQuery('#templateTranslationParent').addClass('hide');
         mQuery('#publishStatus').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newListEmail);
     } else {
         mQuery('#publishStatus').removeClass('hide');
+        mQuery('#segmentTranslationParent').addClass('hide');
+        mQuery('#templateTranslationParent').removeClass('hide');
         mQuery('#leadList').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newTemplateEmail);
     }

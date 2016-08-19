@@ -51,6 +51,13 @@ return [
                     'leadId' => '\d+'
                 ]
             ],
+            'mautic_contacttimeline_action'       => [
+                'path'         => '/contacts/timeline/{leadId}/{page}',
+                'controller'   => 'MauticLeadBundle:Timeline:index',
+                'requirements' => [
+                    'leadId' => '\d+'
+                ]
+            ],
             'mautic_contact_action'           => [
                 'path'       => '/contacts/{objectAction}/{objectId}',
                 'controller' => 'MauticLeadBundle:Lead:execute'
@@ -157,7 +164,11 @@ return [
     'services' => [
         'events'  => [
             'mautic.lead.subscriber'                => [
-                'class' => 'Mautic\LeadBundle\EventListener\LeadSubscriber'
+                'class'     => 'Mautic\LeadBundle\EventListener\LeadSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.core.model.auditlog'
+                ]
             ],
             'mautic.lead.emailbundle.subscriber'    => [
                 'class' => 'Mautic\LeadBundle\EventListener\EmailSubscriber'
@@ -200,6 +211,13 @@ return [
             ],
             'mautic.lead.dashboard.subscriber'      => [
                 'class' => 'Mautic\LeadBundle\EventListener\DashboardSubscriber'
+            ],
+            'mautic.lead.maintenance.subscriber'    => [
+                'class' => 'Mautic\LeadBundle\EventListener\MaintenanceSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'doctrine.dbal.default_connection'
+                ]
             ],
         ],
         'forms'   => [
@@ -314,6 +332,10 @@ return [
                 'class'     => 'Mautic\LeadBundle\Form\Type\MergeType',
                 'alias'     => 'lead_merge'
             ],
+            'mautic.form.type.lead_contact_frequency_rules'               => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\ContactFrequencyType',
+                'alias'     => 'lead_contact_frequency_rules'
+            ],
             'mautic.form.type.campaignevent_lead_field_value'  => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadFieldValueType',
                 'arguments' => 'mautic.factory',
@@ -338,6 +360,7 @@ return [
             'mautic.lead.doctrine.subscriber'       => [
                 'class'     => 'Mautic\LeadBundle\EventListener\DoctrineSubscriber',
                 'tag'       => 'doctrine.event_subscriber',
+                'arguments' => 'monolog.logger.mautic'
             ],
             'mautic.validator.leadlistaccess' => [
                 'class'     => 'Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator',
@@ -386,7 +409,7 @@ return [
             ],
             'mautic.lead.model.note' => [
                 'class' => 'Mautic\LeadBundle\Model\NoteModel'
-            ],
+            ]
         ]
     ]
 ];
