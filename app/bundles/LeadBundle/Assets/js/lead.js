@@ -363,7 +363,7 @@ Mautic.addLeadListFilter = function (elId) {
 
     var prototype = mQuery('.available-filters').data('prototype');
     var fieldType = mQuery(filterId).data('field-type');
-    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale']) != -1);
+    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'multiselect', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale']) != -1);
 
     prototype = prototype.replace(/__name__/g, filterNum);
     prototype = prototype.replace(/__label__/g, label);
@@ -377,6 +377,9 @@ Mautic.addLeadListFilter = function (elId) {
     if (isSpecial) {
         var templateField = fieldType;
         if (fieldType == 'boolean') {
+            templateField = 'select';
+        }
+        if (fieldType == 'multiselect') {
             templateField = 'select';
         }
         var template = mQuery('#templates .' + templateField + '-template').clone();
@@ -411,7 +414,7 @@ Mautic.addLeadListFilter = function (elId) {
 
     //activate fields
     if (isSpecial) {
-        if (fieldType == 'select' || fieldType == 'boolean') {
+        if (fieldType == 'select' || fieldType == 'multiselect' || fieldType == 'boolean') {
             // Generate the options
             var fieldOptions = mQuery(filterId).data("field-list");
 
@@ -535,6 +538,10 @@ Mautic.leadfieldOnLoad = function (container) {
 
 Mautic.updateLeadFieldProperties = function(selectedVal) {
     var defaultValueField = mQuery('input#leadfield_defaultValue');
+
+    if (selectedVal == 'multiselect') {
+        selectedVal = 'select';
+    }
     if (selectedVal == 'lookup') {
         // Use select
         selectedVal = 'select';

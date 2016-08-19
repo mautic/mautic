@@ -225,7 +225,11 @@ $view['slots']->set(
                                                          style="max-height: 24px;"/>
                                                     <span class="mt-1"><?php echo $field['value']; ?>
                                                         <?php else: ?>
-                                                            <?php echo $field['value']; ?>
+                                                            <?php if( 'multiselect' === $field['type'] ): ?>
+                                                                <?php echo implode(", ",$field['value']); ?>
+                                                            <?php else: ?>
+                                                                <?php echo $field['value']; ?>
+                                                            <?php endif; ?>
                                                         <?php endif; ?>
                                                 </td>
                                             </tr>
