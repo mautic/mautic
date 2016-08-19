@@ -27,6 +27,9 @@ use Mautic\UserBundle\Model\UserModel;
 class EmailModel extends \PHPUnit_Framework_TestCase
 {
 
+    /**
+     * Test that an array of contacts are sent emails according to A/B test weights
+     */
     public function testVariantEmailWeightsAreAppropriateForMultipleContacts()
     {
         // Setup dependencies
@@ -230,6 +233,9 @@ class EmailModel extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3, $emailSettings[3]['variantCount'], $counts);
     }
 
+    /**
+     * Test that sending emails to contacts one at a time are according to A/B test weights
+     */
     public function testVariantEmailWeightsAreAppropriateForMultipleContactsSentOneAtATime()
     {
         // Setup dependencies

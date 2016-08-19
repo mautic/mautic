@@ -39,8 +39,8 @@ class PublicController extends CommonFormController
     public function indexAction($slug, Request $request)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model    = $this->getModel('page.page');
-        $security = $this->factory->getSecurity();
+        $model    = $this->getModel('page');
+        $security = $this->get('mautic.security');
         /** @var Page $entity */
         $entity   = $model->getEntityBySlugs($slug);
 
@@ -111,6 +111,7 @@ class PublicController extends CommonFormController
                     $variants      = [];
                     $variantWeight = 0;
                     $totalHits     = $entity->getVariantHits();
+
                     foreach ($childrenVariants as $id => $child) {
                         if ($child->isPublished()) {
                             $variantSettings = $child->getVariantSettings();
@@ -162,14 +163,29 @@ class PublicController extends CommonFormController
                             $totalHits += $variants[$id]['hits'];
 
                             //determine variant to show
-                            $byWeight = [];
-                            foreach ($variants as $id => $v) {
-                                $byWeight[$id] = ($totalHits) ? ($v['hits'] / $totalHits) - $v['weight'] : 0;
+                            foreach ($variants as $id => &$variant) {
+                                $variant['weight_deficit'] = ($totalHits) ? $variant['weight'] - ($variant['hits'] / $totalHits) : 0;
                             }
 
+                            // Reorder according to send_weight so that campaigns which currently send one at a time alternate
+                            uasort($variants, function($a, $b) {
+                                if ($a['weight_deficit'] === $b['weight_deficit']) {
+                                    if ($a['hits'] === $b['hits']) {
+                                        return 0;
+                                    }
+
+                                    // if weight is the same - sort by least number displayed
+                                    return ($a['hits'] < $b['hits']) ? -1 : 1;
+                                }
+
+                                // sort by the one with the greatest deficit first
+                                return ($a['weight_deficit'] > $b['weight_deficit']) ? -1 : 1;
+                            });
+
                             //find the one with the most difference from weight
-                            $greatestDiff = min($byWeight);
-                            $useId        = array_search($greatestDiff, $byWeight);
+
+                            reset($variants);
+                            $useId = key($variants);
 
                             //set the cookie - 14 days
                             $this->get('mautic.helper.cookie')->setCookie('mautic_page_'.$entity->getId(), $useId, 3600 * 24 * 14);
@@ -197,7 +213,7 @@ class PublicController extends CommonFormController
             }
 
             // Generate contents
-            $analytics = $this->factory->getHelper('template.analytics')->getCode();
+            $analytics = $this->get('mautic.helper.template.analytics')->getCode();
 
             $BCcontent = $entity->getContent();
             $content   = $entity->getCustomHtml();
@@ -242,7 +258,7 @@ class PublicController extends CommonFormController
             $this->get('templating.helper.assets')->addScript($this->get('router')->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL), 'onPageDisplay_headClose', true, 'mautic_js');
 
             $event = new PageDisplayEvent($content, $entity);
-            $this->factory->getDispatcher()->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
+            $this->get('event_dispatcher')->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
             $content = $event->getContent();
 
             $model->hitPage($entity, $this->request, 200, $lead, $query);
