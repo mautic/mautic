@@ -79,15 +79,17 @@ class FormController extends CommonController
      */
     protected function canEdit($entity = null)
     {
+        $security = $this->get('mautic.security');
+        
         if ($this->permissionBase) {
-            if ($entity) {
-                return $this->get('mautic.security')->hasEntityAccess(
+            if ($entity && $security->checkPermissionExists($this->permissionBase.':editown')) {
+                return $security->hasEntityAccess(
                     $this->permissionBase.':editown',
                     $this->permissionBase.':editother',
                     $entity->getCreatedBy()
                 );
-            } else {
-                return $this->get('mautic.security')->isGranted(
+            } elseif ($security->checkPermissionExists($this->permissionBase.':edit')) {
+                return $security->isGranted(
                     $this->permissionBase.':edit'
                 );
             }
