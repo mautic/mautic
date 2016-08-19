@@ -35,8 +35,8 @@ class PublicController extends \PHPUnit_Framework_TestCase
         // B = 25%
         // C = 25%
 
-        // Chooses B because all are equal deficits with no hit counts
-        $this->assertEquals('pageB', $this->getVariantContent(0,0,0));
+        // A = 0/50; B = 0/25; C = 0/25
+        $this->assertEquals('pageA', $this->getVariantContent(0,0,0));
 
         // A = 100/50; B = 0/25; C = 0/25
         $this->assertEquals('pageB', $this->getVariantContent(1,0,0));

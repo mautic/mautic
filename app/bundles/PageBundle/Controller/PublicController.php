@@ -164,7 +164,7 @@ class PublicController extends CommonFormController
 
                             //determine variant to show
                             foreach ($variants as $id => &$variant) {
-                                $variant['weight_deficit'] = ($totalHits) ? $variant['weight'] - ($variant['hits'] / $totalHits) : 0;
+                                $variant['weight_deficit'] = ($totalHits) ? $variant['weight'] - ($variant['hits'] / $totalHits) : $variant['weight'];
                             }
 
                             // Reorder according to send_weight so that campaigns which currently send one at a time alternate
