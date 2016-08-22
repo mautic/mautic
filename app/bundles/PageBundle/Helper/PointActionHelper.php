@@ -97,7 +97,6 @@ class PointActionHelper
                 $changePoints['accumulative_time'] = false;
             }
         }
-
         if ($action['properties']['page_hits']) {
             if (!isset($hitStats)) {
                 $hitStats = $hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
@@ -108,7 +107,6 @@ class PointActionHelper
                 $changePoints['page_hits'] = false;
             }
         }
-
         if ($action['properties']['returns_within']) {
             if ($now->getTimestamp() - $latestHit->getTimestamp() <= $action['properties']['returns_within']) {
                 $changePoints['returns_within'] = true;
@@ -116,7 +114,6 @@ class PointActionHelper
                 $changePoints['returns_within'] = false;
             }
         }
-
         if ($action['properties']['returns_after']) {
             if ($now->getTimestamp() - $latestHit->getTimestamp() >= $action['properties']['returns_after']) {
                 $changePoints['returns_after'] = true;
@@ -126,6 +123,6 @@ class PointActionHelper
         }
 
         // return true only if all configured options are true
-        return !in_array(true, $changePoints);
+        return !in_array(false, $changePoints);
     }
 }
