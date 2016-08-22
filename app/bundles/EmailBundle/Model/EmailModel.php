@@ -1367,6 +1367,7 @@ class EmailModel extends FormModel
 
         $mailer->useMailerTokenization();
 
+        $errors = [];
         foreach ($users as $user) {
             $idHash = uniqid();
             $mailer->setIdHash($idHash);
@@ -1385,17 +1386,27 @@ class EmailModel extends FormModel
                 $user['lastname']  = $userEntity->getLastName();
             }
 
-            $mailer->setTo($user['email'], $user['firstname'].' '.$user['lastname']);
+            if (!$mailer->setTo($user['email'], $user['firstname'].' '.$user['lastname'])) {
+                $errors[] = "{$user['email']}: ".$this->translator->trans('mautic.email.bounce.reason.bad_email');
+            } else {
+                if (!$mailer->queue(true)) {
+                    $errorArray = $mailer->getErrors();
+                    unset($errorArray['failures']);
+                    $errors[] = "{$user['email']}: ".implode('; ', $errorArray);
+                }
 
-            $mailer->queue(true);
-
-            if ($saveStat) {
-                $saveEntities[] = $mailer->createEmailStat(false, $user['email']);
+                if ($saveStat) {
+                    $saveEntities[] = $mailer->createEmailStat(false, $user['email']);
+                }
             }
         }
 
         //flush the message
-        $mailer->flushQueue();
+        if (!$mailer->flushQueue()) {
+            $errorArray = $mailer->getErrors();
+            unset($errorArray['failures']);
+            $errors[] = implode('; ', $errorArray);
+        }
 
         if (isset($saveEntities)) {
             $this->getStatRepository()->saveEntities($saveEntities);
@@ -1403,6 +1414,8 @@ class EmailModel extends FormModel
 
         //save some memory
         unset($mailer);
+
+        return $errors;
     }
 
     /**
