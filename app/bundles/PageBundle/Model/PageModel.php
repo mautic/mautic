@@ -663,9 +663,8 @@ class PageModel extends FormModel
                     $decoded = false;
                     if (isset($query['d'])) {
                         // parse_str auto urldecodes
-                        $query   = @unserialize(base64_decode($query['d']));
+                        $query   = $this->decodeArrayFromUrl($query['d'], false);
                         $decoded = true;
-                        unset($query['d']);
                     }
 
                     if (is_array($query) && !empty($query)) {
