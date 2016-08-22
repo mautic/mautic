@@ -2,10 +2,10 @@
 <html>
     <head>
         {% if page is defined %}
-        <title>{{ page.getTitle() }}</title>
-        <meta name="description" content="{{ page.getMetaDescription() }}">
+        <title>{pagetitle}</title>
+        <meta name="description" content="{pagemetadescription}">
         {% endif %}
-        <link rel="stylesheet" href="{{ getAssetUrl('themes/oxygen/css/oxygen.css') }}" type="text/css" />
+        <link rel="stylesheet" href="{{ getAssetUrl('themes/'~template~'/css/oxygen.css') }}" type="text/css" />
     </head>
     <body offset="0" class="body" style="padding: 0;margin: 0;display: block;background: #eeebeb;-webkit-text-size-adjust: none;-webkit-font-smoothing: antialiased;width: 100%;height: 100%;color: #6f6f6f;font-weight: 400;font-size: 18px;" bgcolor="#eeebeb">
         {{ outputScripts('bodyOpen') }}

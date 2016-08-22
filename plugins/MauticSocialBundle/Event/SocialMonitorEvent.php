@@ -72,7 +72,7 @@ class SocialMonitorEvent extends CommonEvent
      */
     public function getNewLeadCount()
     {
-        return $this->newLeads;
+        return $this->newLeadCount;
     }
 
     /**
@@ -82,7 +82,7 @@ class SocialMonitorEvent extends CommonEvent
      */
     public function getUpdatedLeadCount()
     {
-        return $this->updatedLeads;
+        return $this->updatedLeadCount;
     }
 
     /**
@@ -90,7 +90,7 @@ class SocialMonitorEvent extends CommonEvent
      */
     public function getTotalLeadCount()
     {
-        return $this->updatedLeads + $this->newLeads;
+        return $this->updatedLeadCount + $this->newLeadCount;
     }
 
     /**

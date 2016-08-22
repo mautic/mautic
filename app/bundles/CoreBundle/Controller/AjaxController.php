@@ -75,7 +75,7 @@ class AjaxController extends CommonController
                 $parts     = explode(":", $action);
                 $namespace = 'Mautic';
                 $isPlugin  = false;
-                
+
                 if (count($parts) == 3 && $parts['0'] == 'plugin') {
                     $namespace = 'MauticPlugin';
                     array_shift($parts);
@@ -234,11 +234,8 @@ class AjaxController extends CommonController
     {
         $dataArray = array('success' => 0);
         $name      = InputHelper::clean($request->request->get('model'));
-        if (strpos($name, '.') === false) {
-            $name = "$name.$name";
-        }
-        $id    = InputHelper::int($request->request->get('id'));
-        $model = $this->getModel($name);
+        $id        = InputHelper::int($request->request->get('id'));
+        $model     = $this->getModel($name);
 
         $post = $request->request->all();
         unset($post['model'], $post['id'], $post['action']);
@@ -448,7 +445,7 @@ class AjaxController extends CommonController
             // the cache is cleared by upgrade.php
             /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
             $cookieHelper = $this->factory->getHelper('cookie');
-            $cookieHelper->delete('mautic_update');
+            $cookieHelper->deleteCookie('mautic_update');
         } else {
             // Extract the archive file now
             if (!$zipper->extractTo(dirname($this->container->getParameter('kernel.root_dir')).'/upgrade')) {
@@ -671,21 +668,6 @@ class AjaxController extends CommonController
 
             $model->setOnlineStatus($status);
         }
-
-        return $this->sendJsonResponse(array('success' => 1));
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
-    protected function markNotificationsReadAction(Request $request)
-    {
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model = $this->getModel('core.notification');
-
-        $model->markAllRead();
 
         return $this->sendJsonResponse(array('success' => 1));
     }

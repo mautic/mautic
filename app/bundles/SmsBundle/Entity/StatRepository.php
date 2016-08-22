@@ -1,22 +1,19 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\SmsBundle\Entity;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * Class StatRepository
- *
- * @package Mautic\SmsBundle\Entity
+ * Class StatRepository.
  */
 class StatRepository extends CommonRepository
 {
@@ -24,6 +21,7 @@ class StatRepository extends CommonRepository
      * @param $trackingHash
      *
      * @return mixed
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -130,13 +128,40 @@ class StatRepository extends CommonRepository
                 $query->expr()->eq('IDENTITY(s.lead)', $leadId)
             );
 
-        if (!empty($options['ipIds'])) {
-            $query->orWhere('s.ipAddress IN (' . implode(',', $options['ipIds']) . ')');
+        if (isset($options['search']) && $options['search']) {
+            $query->andWhere(
+                $query->expr()->like('e.title', $query->expr()->literal('%' . $options['search'] . '%'))
+            );
         }
 
-        if (isset($options['filters']['search']) && $options['filters']['search']) {
+        if (isset($options['order'])) {
+            list ($orderBy, $orderByDir) = $options['order'];
+
+            switch ($orderBy) {
+                case 'eventLabel':
+                    $orderBy = 'e.title';
+                    break;
+                case 'timestamp':
+                default:
+                    $orderBy = 's.dateSent';
+                    break;
+            }
+
+            $query->orderBy($orderBy, $orderByDir);
+        }
+
+        if (!empty($options['limit'])) {
+            $query->setMaxResults($options['limit']);
+
+            if (!empty($options['start'])) {
+                $query->setFirstResult($options['start']);
+            }
+        }
+
+        if (isset($options['fromDate']) && $options['fromDate']) {
+            $dt = new DateTimeHelper($options['fromDate']);
             $query->andWhere(
-                $query->expr()->like('e.title', $query->expr()->literal('%' . $options['filters']['search'] . '%'))
+                $query->expr()->gte('s.dateSent', $query->expr()->literal($dt->toUtcString()))
             );
         }
 
@@ -154,65 +179,20 @@ class StatRepository extends CommonRepository
     public function updateLead($fromLeadId, $toLeadId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX . 'sms_message_stats')
+        $q->update(MAUTIC_TABLE_PREFIX.'sms_message_stats')
             ->set('sms_id', (int) $toLeadId)
-            ->where('sms_id = ' . (int) $fromLeadId)
+            ->where('sms_id = '.(int) $fromLeadId)
             ->execute();
     }
 
     /**
-     * Delete a stat
+     * Delete a stat.
      *
      * @param $id
      */
     public function deleteStat($id)
     {
-        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX . 'sms_message_stats', array('id' => (int) $id));
-    }
-
-    /**
-     * Fetch stats for some period of time.
-     *
-     * @param $smsIds
-     * @param $fromDate
-     * @param $state
-     *
-     * @return mixed
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    public function getSmsStats($smsIds, $fromDate, $state)
-    {
-        if (!is_array($smsIds)) {
-            $smsIds = array((int) $smsIds);
-        }
-
-        // Load points for selected period
-        $q = $this->createQueryBuilder('s');
-
-        $q->select('s.id, 1 as data, s.dateSent as date');
-
-        $q->where(
-            $q->expr()->in('IDENTITY(s.sms)', ':smses')
-        )
-            ->setParameter('smses', $smsIds);
-
-        if ($state != 'sent') {
-            $q->andWhere(
-                $q->expr()->eq('s.is'.ucfirst($state), ':true')
-            )
-                ->setParameter('true', true, 'boolean');
-        }
-
-        $q->andwhere(
-            $q->expr()->gte('s.dateSent', ':date')
-        )
-            ->setParameter('date', $fromDate)
-            ->orderBy('s.dateSent', 'ASC');
-
-        $stats = $q->getQuery()->getArrayResult();
-
-        return $stats;
+        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'sms_message_stats', ['id' => (int) $id]);
     }
 
     /**

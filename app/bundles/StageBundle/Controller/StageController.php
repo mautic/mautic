@@ -60,7 +60,7 @@ class StageController extends FormController
         $this->factory->getSession()->set('mautic.stage.filter', $search);
 
         $filter     = array('string' => $search, 'force' => array());
-        $orderBy    = $this->factory->getSession()->get('mautic.stage.orderby', 'p.name');
+        $orderBy    = $this->factory->getSession()->get('mautic.stage.orderby', 's.name');
         $orderByDir = $this->factory->getSession()->get('mautic.stage.orderbydir', 'ASC');
 
         $stages = $this->factory->getModel('stage')->getEntities(

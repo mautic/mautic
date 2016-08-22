@@ -13,6 +13,8 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\TranslationModelTrait;
+use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
@@ -24,6 +26,19 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class DynamicContentModel extends FormModel
 {
+    use VariantModelTrait;
+    use TranslationModelTrait;
+
+    /**
+     * Retrieve the permissions base
+     *
+     * @return string
+     */
+    public function getPermissionBase()
+    {
+        return 'dynamicContent:dynamicContents';
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -48,8 +63,21 @@ class DynamicContentModel extends FormModel
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @param object $entity
+     * @param bool   $unlock
+     */
+    public function saveEntity($entity, $unlock = true)
+    {
+        parent::saveEntity($entity, $unlock);
+
+        $this->postTranslationEntitySave($entity);
+    }
+
+    /**
      * Here just so PHPStorm calms down about type hinting.
-     * 
+     *
      * @param null $id
      *
      * @return null|DynamicContent
@@ -66,9 +94,9 @@ class DynamicContentModel extends FormModel
      * @param       $formFactory
      * @param null  $action
      * @param array $options
-     * 
+     *
      * @return mixed
-     * 
+     *
      * @throws \InvalidArgumentException
      */
     public function createForm($entity, $formFactory, $action = null, $options = [])
@@ -82,31 +110,6 @@ class DynamicContentModel extends FormModel
         }
 
         return $formFactory->create('dwc', $entity, $options);
-    }
-
-    /**
-     * Get the variant parent/children.
-     *
-     * @param DynamicContent $entity
-     *
-     * @return array
-     */
-    public function getVariants(DynamicContent $entity)
-    {
-        $parent = $entity->getVariantParent();
-
-        if (!empty($parent)) {
-            $children = $parent->getVariantChildren();
-        } else {
-            $parent = $entity;
-            $children = $entity->getVariantChildren();
-        }
-
-        if (empty($children)) {
-            $children = [];
-        }
-
-        return [$parent, $children];
     }
 
     /**
@@ -125,27 +128,29 @@ class DynamicContentModel extends FormModel
                 'slot' => ':slot',
                 'date_added' => $qb->expr()->literal((new \DateTime())->format('Y-m-d H:i:s'))
             ])->setParameter('slot', $slot);
-        
+
         $qb->execute();
     }
 
     /**
      * @param      $slot
-     * @param Lead $lead
-     * 
+     * @param Lead|array $lead
+     *
      * @return DynamicContent
      */
-    public function getSlotContentForLead($slot, Lead $lead)
+    public function getSlotContentForLead($slot, $lead)
     {
         $qb = $this->em->getConnection()->createQueryBuilder();
-        
+
+        $id = $lead instanceof Lead ? $lead->getId() : $lead['id'];
+
         $qb->select('dc.id, dc.content')
             ->from(MAUTIC_TABLE_PREFIX.'dynamic_content', 'dc')
             ->leftJoin('dc', MAUTIC_TABLE_PREFIX.'dynamic_content_lead_data', 'dcld', 'dcld.dynamic_content_id = dc.id')
             ->andWhere($qb->expr()->eq('dcld.slot', ':slot'))
             ->andWhere($qb->expr()->eq('dcld.lead_id', ':lead_id'))
             ->setParameter('slot', $slot)
-            ->setParameter('lead_id', $lead->getId())
+            ->setParameter('lead_id', $id)
             ->orderBy('dcld.date_added', 'DESC')
             ->addOrderBy('dcld.id', 'DESC');
 
@@ -154,11 +159,15 @@ class DynamicContentModel extends FormModel
 
     /**
      * @param DynamicContent $dynamicContent
-     * @param Lead           $lead
+     * @param Lead|array     $lead
      * @param string         $source
      */
-    public function createStatEntry(DynamicContent $dynamicContent, Lead $lead, $source = null)
+    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null)
     {
+        if (is_array($lead)) {
+            $lead = $this->em->getReference('MauticLeadBundle:Lead', $lead['id']);
+        }
+
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());
         $stat->setLead($lead);
@@ -222,8 +231,8 @@ class DynamicContentModel extends FormModel
      */
     public function limitQueryToCreator(QueryBuilder &$q)
     {
-        $q->join('t', MAUTIC_TABLE_PREFIX.'pages', 'p', 'p.id = t.page_id')
-            ->andWhere('p.created_by = :userId')
+        $q->join('t', MAUTIC_TABLE_PREFIX.'dynamic_content', 'd', 'd.id = t.dynamic_content_id')
+            ->andWhere('d.created_by = :userId')
             ->setParameter('userId', $this->user->getId());
     }
 

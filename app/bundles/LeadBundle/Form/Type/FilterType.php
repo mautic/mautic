@@ -67,7 +67,8 @@ class FilterType extends AbstractType
                     'or'  => 'mautic.lead.list.form.glue.or'
                 ),
                 'attr'    => array(
-                    'class' => 'form-control not-chosen'
+                    'class' => 'form-control not-chosen glue-select',
+                    'onchange' => 'Mautic.updateFilterPositioning(this)'
                 )
             )
         );
@@ -232,7 +233,10 @@ class FilterType extends AbstractType
                     }
 
                     if ($fieldType == 'select') {
-                        array_unshift($choices, array('' => ''));
+                        // array_unshift cannot be used because numeric values get lost as keys
+                        $choices = array_reverse($choices, true);
+                        $choices[''] = '';
+                        $choices = array_reverse($choices, true);
                     }
 
                     $customOptions['choices'] = $choices;

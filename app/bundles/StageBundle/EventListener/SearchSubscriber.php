@@ -54,7 +54,7 @@ class SearchSubscriber extends CommonSubscriber
                 $canEdit       = $this->security->isGranted('stage:stages:edit');
                 foreach ($items as $item) {
                     $stagesResults[] = $this->templating->renderResponse(
-                        'MauticStageBundle:SubscribedEvents\Search:global_stage.html.php',
+                        'MauticStageBundle:SubscribedEvents\Search:global.html.php',
                         array(
                             'item'    => $item,
                             'canEdit' => $canEdit
@@ -63,7 +63,7 @@ class SearchSubscriber extends CommonSubscriber
                 }
                 if ($stageCount > 5) {
                     $stagesResults[] = $this->templating->renderResponse(
-                        'MauticStageBundle:SubscribedEvents\Search:global_stage.html.php',
+                        'MauticStageBundle:SubscribedEvents\Search:global.html.php',
                         array(
                             'showMore'     => true,
                             'searchString' => $str,
@@ -73,45 +73,6 @@ class SearchSubscriber extends CommonSubscriber
                 }
                 $stagesResults['count'] = $stageCount;
                 $event->addResults('mautic.stage.actions.header.index', $stagesResults);
-            }
-        }
-
-        if ($this->security->isGranted('stage:triggers:view')) {
-            $str = $event->getSearchString();
-            if (empty($str)) {
-                return;
-            }
-
-            $items = $this->factory->getModel('stage.trigger')->getEntities(
-                array(
-                    'limit'  => 5,
-                    'filter' => $str
-                ));
-            $count = count($items);
-            if ($count > 0) {
-                $results = array();
-                $canEdit = $this->security->isGranted('stage:triggers:edit');
-                foreach ($items as $item) {
-                    $results[] = $this->templating->renderResponse(
-                        'MauticStageBundle:SubscribedEvents\Search:global_trigger.html.php',
-                        array(
-                            'item'    => $item,
-                            'canEdit' => $canEdit
-                        )
-                    )->getContent();
-                }
-                if ($count > 5) {
-                    $results[] = $this->templating->renderResponse(
-                        'MauticStageBundle:SubscribedEvents\Search:global_trigger.html.php',
-                        array(
-                            'showMore'     => true,
-                            'searchString' => $str,
-                            'remaining'    => ($count - 5)
-                        )
-                    )->getContent();
-                }
-                $results['count'] = $count;
-                $event->addResults('mautic.stage.trigger.header.index', $results);
             }
         }
     }

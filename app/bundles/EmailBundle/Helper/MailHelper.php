@@ -21,6 +21,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class MailHelper
@@ -318,7 +319,11 @@ class MailHelper
             }
 
             $this->message->setSubject($this->subject);
-            $this->message->setBody($this->body['content'], $this->body['contentType'], $this->body['charset']);
+            // Only set body if not empty or if plain text is empty - this ensures an empty HTML body does not show for
+            // messages only with plain text            
+            if (!empty($this->body['content']) || empty($this->plainText)) {
+                $this->message->setBody($this->body['content'], $this->body['contentType'], $this->body['charset']);
+            }
             $this->setMessagePlainText($isQueueFlush);
 
             if (!$isQueueFlush) {
@@ -876,7 +881,7 @@ class MailHelper
 
         if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
             // Append tracking pixel
-            $trackingImg = '<img style="display: none;" height="1" width="1" src="{tracking_pixel}" alt="Mautic is open source marketing automation" />';
+            $trackingImg = '<img style="display: none;" height="1" width="1" src="{tracking_pixel}" alt="" />';
             if (strpos($content, '</body>') !== false) {
                 $content = str_replace('</body>', $trackingImg.'</body>', $content);
             } else {
@@ -925,7 +930,11 @@ class MailHelper
     public function setTo($addresses, $name = null)
     {
         if (!is_array($addresses)) {
-            $addresses = array($addresses => $name);
+            if (($name !== null) && (trim($name))) {
+                $addresses = [$addresses => trim($name)];
+            } else {
+                $addresses = [$addresses];
+            }
         }
 
         $this->checkBatchMaxRecipients(count($addresses));
@@ -1807,5 +1816,45 @@ class MailHelper
             $value = isset($content[$slot]) ? $content[$slot] : "";
             $slotsHelper->set($slot, $value);
         }
+    }
+
+    /**
+     * @param Lead $lead
+     */
+    public function applyFrequencyRules(Lead $lead)
+    {
+        $frequencyRule = $lead->getFrequencyRules();
+
+        /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
+        $emailModel = $this->factory->getModel('email');
+
+        $statRepo = $emailModel->getStatRepository();
+
+        $now = new \DateTime();
+        $channels = $frequencyRule['channels'];
+
+        if(!empty($frequencyRule) and in_array('email', $channels,true))
+        {
+            $frequencyTime = new \DateInterval('P'.$frequencyRule['frequency_time']);
+            $frequencyNumber = $frequencyRule['frequency_number'];
+        }
+        elseif($this->factory->getParameter('frequency_number') > 0)
+        {
+            $frequencyTime = new \DateInterval('P'.$frequencyRule['frequency_time']);
+            $frequencyNumber = $this->factory->getParameter('frequency_number');
+        }
+
+        $now->sub($frequencyTime);
+        $sentQuery = $statRepo->getLeadStats($lead->getId(), array('fromDate' => $now));
+
+        if(!empty($sentQuery) and count($sentQuery) < $frequencyNumber)
+        {
+            return true;
+        }
+        elseif (empty($sentQuery))
+        {
+            return true;
+        }
+        return false;
     }
 }

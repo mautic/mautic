@@ -69,6 +69,7 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignAction(CampaignExecutionEvent $event)
     {
+        $event->setChannel('social.twitter');
         if ($response = $this->helper->sendTweetAction($event->getLead(), $event->getEvent())) {
             $event->setResult($response);
         } else {
