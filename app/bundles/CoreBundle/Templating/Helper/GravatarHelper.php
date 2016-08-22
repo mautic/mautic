@@ -72,7 +72,7 @@ class GravatarHelper extends Helper
      */
     public function getImage($email, $size = '250', $default = null)
     {
-        $localDefault = ($this->devMode || in_array($this->request->getHost(), $this->devHosts) || in_array($this->request->getClientIp(), ['127.0.0.1', 'fe80::1', '::1'])) ?
+        $localDefault = ($this->devMode || in_array($this->request->getClientIp(), array_merge($this->devHosts, ['127.0.0.1', 'fe80::1', '::1']))) ?
             'https://www.mautic.org/media/images/default_avatar.png' :
             $this->avatarHelper->getDefaultAvatar(true);
         $url          = 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($email))) . '?s='.$size;
