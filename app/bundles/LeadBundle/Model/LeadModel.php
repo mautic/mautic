@@ -1390,13 +1390,19 @@ class LeadModel extends FormModel
         }
 
         if (!empty($fields['stage']) && !empty($data[$fields['stage']])) {
-            // Set stage for contact
+            static $stages = [];
+            $stageName = $data[$fields['stage']];
+            if (!array_key_exists($stageName, $stages)) {
+                // Set stage for contact
+                $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($stageName);
 
-            $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($data[$fields['stage']]);
-
-            if (empty($stage)) {
-                $stage = new Stage();
-                $stage->setName($data[$fields['stage']]);
+                if (empty($stage)) {
+                    $stage = new Stage();
+                    $stage->setName($stageName);
+                    $stages[$stageName] = $stage;
+                }
+            } else {
+                $stage = $stages[$stageName];
             }
 
             $lead->setStage($stage);
@@ -1405,9 +1411,14 @@ class LeadModel extends FormModel
             $log = new StagesChangeLog();
             $log->setEventName($stage->getId().":".$stage->getName());
             $log->setLead($lead);
-            $log->setActionName($this->translator->trans('mautic.lead.import.action.name', array(
-                '%name%' => $this->user->getUsername()
-            )));
+            $log->setActionName(
+                $this->translator->trans(
+                    'mautic.lead.import.action.name',
+                    [
+                        '%name%' => $this->user->getUsername()
+                    ]
+                )
+            );
             $log->setDateAdded(new \DateTime());
             $lead->stageChangeLog($log);
         }
@@ -1462,6 +1473,10 @@ class LeadModel extends FormModel
         };
 
         $form = $this->createForm($lead, $this->formFactory, null, ['fields' => $leadFields, 'csrf_protection' => false]);
+
+        // Unset stage and owner from the form because it's already been handled
+        unset($form['stage'], $form['owner']);
+
         $form->submit($fieldData);
 
         if (!$form->isValid()) {
