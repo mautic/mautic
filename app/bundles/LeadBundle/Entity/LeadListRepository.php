@@ -517,9 +517,7 @@ class LeadListRepository extends CommonRepository
             }
 
             //the next one will determine the group
-            $glue = (isset($filters[$k + 1])) ? $filters[$k + 1]['glue'] : $details['glue'];
-
-            if ($glue == "or" || $details['glue'] == 'or') {
+            if ($details['glue'] == 'or') {
                 // Create a new group of andX expressions
                 if ($groupExpr->count()) {
                     $groups[]  = $groupExpr;
@@ -688,7 +686,7 @@ class LeadListRepository extends CommonRepository
                         $key = $string;
                         $isRelative = true;
                     }
-                    
+
                     if ($isRelative) {
                         if ($requiresBetween) {
                             $startWith = ($isTimestamp) ? $dtHelper->toUtcString('Y-m-d H:i:s') : $dtHelper->toUtcString('Y-m-d');

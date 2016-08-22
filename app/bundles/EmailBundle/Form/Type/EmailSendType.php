@@ -105,10 +105,6 @@ class EmailSendType extends AbstractType
                 ]
             );
 
-            if (isset($options['data']['email'])) {
-                $email = $options['data']['email'];
-            }
-
             // create button edit email
             $windowUrlEdit = $this->factory->getRouter()->generate(
                 'mautic_email_action',
@@ -127,7 +123,7 @@ class EmailSendType extends AbstractType
                     'attr'  => [
                         'class'    => 'btn btn-primary btn-nospin',
                         'onclick'  => 'Mautic.loadNewEmailWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
-                        'disabled' => !isset($email),
+                        'disabled' => !isset($options['data']['email']),
                         'icon'     => 'fa fa-edit'
                     ],
                     'label' => 'mautic.email.send.edit.email'
@@ -144,7 +140,7 @@ class EmailSendType extends AbstractType
                     'attr'  => [
                         'class'    => 'btn btn-primary btn-nospin',
                         'onclick'  => 'Mautic.loadNewEmailWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlPreview.'"}))',
-                        'disabled' => !isset($email),
+                        'disabled' => !isset($options['data']['email']),
                         'icon'     => 'fa fa-external-link'
                     ],
                     'label' => 'mautic.email.send.preview.email'

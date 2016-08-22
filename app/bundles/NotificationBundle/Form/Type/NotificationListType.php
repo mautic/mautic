@@ -52,7 +52,7 @@ class NotificationListType extends AbstractType
 
                     $choices = [];
 
-                    $notifications = $repo->getNotificationList('', 0, 0, $viewOther, $options['notification_type']);
+                    $notifications = $repo->getNotificationList('', 0, 0, $viewOther);
                     foreach ($notifications as $notification) {
                         $choices[$notification['language']][$notification['id']] = $notification['name'];
                     }
