@@ -29,7 +29,7 @@ use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
-use Symfony\Component\Console\Helper\ProgressBar;
+use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -535,7 +535,7 @@ class EventModel extends CommonFormModel
         $maxCount = ($max) ? $max : $totalStartingEvents;
 
         if ($output) {
-            $progress = new ProgressBar($output, $maxCount);
+            $progress = ProgressBarHelper::init($output, $maxCount);
             $progress->start();
         }
 
@@ -1107,7 +1107,7 @@ class EventModel extends CommonFormModel
         gc_enable();
 
         if ($output) {
-            $progress = new ProgressBar($output, $maxCount);
+            $progress = ProgressBarHelper::init($output, $maxCount);
             $progress->start();
             if ($max) {
                 $progress->setProgress($totalEventCount);
@@ -1352,7 +1352,7 @@ class EventModel extends CommonFormModel
 
         if ($leadCount) {
             if ($output) {
-                $progress = new ProgressBar($output, $maxCount);
+                $progress = ProgressBarHelper::init($output, $maxCount);
                 $progress->start();
                 if ($max) {
                     $progress->advance($totalEventCount);

@@ -23,7 +23,7 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
-use Symfony\Component\Console\Helper\ProgressBar;
+use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -526,7 +526,7 @@ class ListModel extends FormModel
             $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
 
             if ($output) {
-                $progress = new ProgressBar($output, $maxCount);
+                $progress = ProgressBarHelper::init($output, $maxCount);
                 $progress->start();
             }
 
@@ -621,7 +621,7 @@ class ListModel extends FormModel
             $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
 
             if ($output) {
-                $progress = new ProgressBar($output, $maxCount);
+                $progress = ProgressBarHelper::init($output, $maxCount);
                 $progress->start();
             }
 
