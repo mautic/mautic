@@ -431,8 +431,15 @@ class PageModel extends FormModel
             }
 
             if (!empty($clickthrough['channel'])) {
-                $hit->setSource($clickthrough['channel'][0]);
-                $hit->setSourceId($clickthrough['channel'][1]);
+                if (count($clickthrough['channel']) === 1) {
+                    $channelId = reset($clickthrough['channel']);
+                    $channel   = key($clickthrough['channel']);
+                } else {
+                    $channel   = $clickthrough['channel'][0];
+                    $channelId = (int) $clickthrough['channel'][1];
+                }
+                $hit->setSource($channel);
+                $hit->setSourceId($channelId);
             } elseif (!empty($clickthrough['source'])) {
                 $hit->setSource($clickthrough['source'][0]);
                 $hit->setSourceId($clickthrough['source'][1]);
@@ -1032,5 +1039,17 @@ class PageModel extends FormModel
         $results = $q->execute()->fetchAll();
 
         return $results;
+    }
+
+    /**
+     * @deprecated 2.1 - use $entity->getVariants() instead; to be removed in 3.0
+     *
+     * @param Page $entity
+     *
+     * @return array
+     */
+    public function getVariants(Page $entity)
+    {
+        return $entity->getVariants();
     }
 }

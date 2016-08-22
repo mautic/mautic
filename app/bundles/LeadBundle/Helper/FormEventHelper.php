@@ -22,13 +22,13 @@ use Mautic\LeadBundle\Entity\PointsChangeLog;
 class FormEventHelper
 {
     /**
-     * @param               $lead
+     * @param Lead          $lead
      * @param MauticFactory $factory
      * @param               $action
      * @param               $config
      * @param               $form
      */
-    public static function changePoints ($lead, MauticFactory $factory, $action, $config, $form)
+    public static function changePoints (Lead $lead, MauticFactory $factory, $action, $config, $form)
     {
         $model = $factory->getModel('lead');
 
@@ -40,11 +40,16 @@ class FormEventHelper
         $event->setIpAddress($factory->getIpAddress());
         $event->setDateAdded(new \DateTime());
 
-        $event->setDelta($config['points']);
         $event->setLead($lead);
 
+        $oldPoints = $lead->getPoints();
+
+        $lead->adjustPoints($config['points'], $config['operator']);
+
+        $newPoints = $lead->getPoints();
+
+        $event->setDelta($newPoints - $oldPoints);
         $lead->addPointsChangeLog($event);
-        $lead->addToPoints($config['points']);
 
         $model->saveEntity($lead, false);
     }
@@ -72,5 +77,5 @@ class FormEventHelper
         }
     }
 
-   
+
 }

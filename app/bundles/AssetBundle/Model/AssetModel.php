@@ -323,7 +323,7 @@ class AssetModel extends FormModel
      * Get a specific entity or generate a new one if id is empty
      *
      * @param $id
-     * @return null|object
+     * @return null|Asset
      */
     public function getEntity($id = null)
     {
