@@ -52,7 +52,7 @@ class SmsListType extends AbstractType
 
                     $choices = [];
 
-                    $smses = $repo->getSmsList('', 0, 0, $viewOther, $options['sms_type']);
+                    $smses = $repo->getSmsList('', 0, 0, $viewOther);
                     foreach ($smses as $sms) {
                         $choices[$sms['language']][$sms['id']] = $sms['name'];
                     }
