@@ -124,7 +124,7 @@ class EmailModel extends FormModel
         $this->leadModel          = $leadModel;
         $this->pageTrackableModel = $pageTrackableModel;
         $this->userModel          = $userModel;
-        $this->coreParameters    = $coreParametersHelper;
+        $this->coreParameters     = $coreParametersHelper;
     }
 
     /**

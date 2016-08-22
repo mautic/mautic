@@ -19,7 +19,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UpdateHelper;
 use Mautic\UserBundle\Entity\User;
-use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
@@ -58,11 +57,6 @@ class NotificationModel extends FormModel
     protected $coreParametersHelper;
 
     /**
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
      * NotificationModel constructor.
      *
      * @param PathsHelper          $pathsHelper
@@ -80,14 +74,6 @@ class NotificationModel extends FormModel
         $this->updateHelper         = $updateHelper;
         $this->rssReader            = $rssReader;
         $this->coreParametersHelper = $coreParametersHelper;
-    }
-
-    /**
-     * @param Logger $logger
-     */
-    public function setLogger(Logger $logger)
-    {
-        $this->logger = $logger;
     }
 
     /**
