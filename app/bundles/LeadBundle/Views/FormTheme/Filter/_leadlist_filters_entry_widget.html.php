@@ -9,9 +9,10 @@
 
 $isPrototype = ($form->vars['name'] == '__name__');
 $filterType  = $form['field']->vars['value'];
+$inGroup     = $form->vars['data']['glue'] === 'and';
 ?>
 
-<div class="panel">
+<div class="panel<?php echo ($inGroup && $first === false) ? ' in-group' : ''; ?>">
     <div class="panel-footer<?php if (!$isPrototype && $form->vars['name'] === '0') echo " hide"; ?>">
         <div class="col-sm-2 pl-0">
             <?php echo $view['form']->widget($form['glue']); ?>
