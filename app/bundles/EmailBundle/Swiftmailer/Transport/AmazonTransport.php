@@ -13,10 +13,8 @@ use Joomla\Http\Exception\UnexpectedResponseException;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7;
-use GuzzleHttp\Exception\TransferException;
 use Joomla\Http\Http;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Class AmazonTransport
@@ -87,6 +85,10 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
                 'emails' => array()
             )
         );
+
+        if (!isset($payload['Type'])) {
+            throw new HttpException(400, "Key 'Type' not found in payload ");
+        }
 
         if ($payload['Type'] == 'SubscriptionConfirmation') {
             // Confirm Amazon SNS subscription by calling back the SubscribeURL from the playload
