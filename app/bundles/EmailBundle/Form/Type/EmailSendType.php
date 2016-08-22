@@ -105,9 +105,7 @@ class EmailSendType extends AbstractType
                 ]
             );
 
-            if (isset($options['data']['email'])) {
-                $email = $options['data']['email'];
-            }
+            $email = $options['data']['email'];
 
             // create button edit email
             $windowUrlEdit = $this->factory->getRouter()->generate(
