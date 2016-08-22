@@ -35,6 +35,7 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\StageBundle\Entity\Stage;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -1379,14 +1380,21 @@ class LeadModel extends FormModel
             $lead->addPointsChangeLog($log);
         }
 
-        if (!empty($fields['stage']) && !empty($data[$fields['stage']]) && $lead->getId() === null) {
-            // Add points only for new leads
-            $lead->setStage($data[$fields['stage']]);
+        if (!empty($fields['stage']) && !empty($data[$fields['stage']])) {
+            // Set stage for contact
 
-            //add a lead point change log
+            $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($data[$fields['stage']]);
+
+            if (empty($stage)) {
+                $stage = new Stage();
+                $stage->setName($data[$fields['stage']]);
+            }
+
+            $lead->setStage($stage);
+
+            //add a contact stage change log
             $log = new StagesChangeLog();
-            $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($fields['stage']);
-            $log->setEventName($stage);
+            $log->setEventName($stage->getId().":".$stage->getName());
             $log->setLead($lead);
             $log->setActionName($this->translator->trans('mautic.lead.import.action.name', array(
                 '%name%' => $this->user->getUsername()
