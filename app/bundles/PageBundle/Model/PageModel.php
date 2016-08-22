@@ -436,7 +436,10 @@ class PageModel extends FormModel
             }
 
             if (!empty($clickthrough['email'])) {
-                $hit->setEmail($this->em->getReference('MauticEmailBundle:Email', $clickthrough['email']));
+                $emailRepo = $this->em->getRepository("MauticEmailBundle:Email");
+                if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
+                    $hit->setEmail($emailEntity);
+                }
             }
         }
 
