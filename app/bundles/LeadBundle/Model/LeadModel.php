@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -195,6 +196,16 @@ class LeadModel extends FormModel
     public function getDeviceRepository()
     {
         return $this->em->getRepository('MauticLeadBundle:LeadDevice');
+    }
+
+    /**
+     * Get the frequency rules repository
+     *
+     * @return \Mautic\LeadBundle\Entity\FrequencyRuleRepository
+     */
+    public function getFrequencyRuleRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:FrequencyRule');
     }
 
     /**
@@ -1155,7 +1166,7 @@ class LeadModel extends FormModel
      * @param int          $reason   Must be a class constant from the DoNotContact class.
      * @param bool         $persist
      *
-     * @return boolean If a DNC entry is added or updated, returns true. If a DNC is already present
+     * @return boolean|DoNotContact If a DNC entry is added or updated, returns the DoNotContact object. If a DNC is already present
      *                 and has the specified reason, nothing is done and this returns false.
      */
     public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $persist = true)
@@ -1186,7 +1197,7 @@ class LeadModel extends FormModel
                 $this->saveEntity($lead);
             }
 
-            return true;
+            return $dnc;
         }
         // Or if the given reason is different than the stated reason
         elseif ($isContactable !== $reason) {
@@ -1212,13 +1223,77 @@ class LeadModel extends FormModel
                         $this->saveEntity($lead);
                     }
 
-                    return true;
+                    return $dnc;
                 }
             }
         }
 
         return false;
     }
+
+    /**
+     * @param Lead $lead
+     * @param string $channel
+     *
+     * @return mixed
+     *
+     */
+    public function getFrequencyRule(Lead $lead, $channel = null)
+    {
+        if (is_array($channel)) {
+            $channel = key($channel);
+        }
+
+        /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRuleRepo */
+        $frequencyRuleRepo = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
+        $frequencyRules    = $frequencyRuleRepo->getFrequencyRules($channel, $lead->getId());
+
+        if (empty($frequencyRules)) {
+            return [];
+        }
+
+        return $frequencyRules;
+    }
+
+    /**
+     * Set frequency rules for lead per channel
+     *
+     * @param Lead         $lead
+     * @param string|array $channel  If an array with an ID, use the structure ['email' => 123]
+     * @param bool         $persist
+     *
+     * @return boolean Returns true.
+     */
+    public function setFrequencyRules(Lead $lead, $channel, $frequencyTime = null, $frequencyNumber = null)
+    {
+        // One query to get all the lead's current frequency rules and go ahead and create entities for them
+        $frequencyRules = $lead->getFrequencyRules()->toArray();
+        $entities       = [];
+        foreach ($channel as $ch) {
+            $frequencyRule = (isset($frequencyRules[$ch])) ? $frequencyRules[$ch] : new FrequencyRule();
+            $frequencyRule->setChannel($ch);
+            $frequencyRule->setLead($lead);
+            $frequencyRule->setDateAdded(new \DateTime);
+            $frequencyRule->setFrequencyNumber($frequencyNumber);
+            $frequencyRule->setFrequencyTime($frequencyTime);
+            $frequencyRule->setLead($lead);
+
+            $entities[$ch] = $frequencyRule;
+        }
+
+        if (!empty($entities)) {
+            $this->em->getRepository('MauticLeadBundle:FrequencyRule')->saveEntities($entities);
+        }
+
+        // Delete channels that were removed
+        $deleted = array_diff_key($frequencyRules, $entities);
+        if (!empty($deleted)) {
+            $this->em->getRepository('MauticLeadBundle:FrequencyRule')->deleteEntities($deleted);
+        }
+
+        return true;
+    }
+
 
     /**
      * @param      $fields

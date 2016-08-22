@@ -95,21 +95,21 @@ class MessageHelper
 
         $this->logger->debug("Analyzing message to {$message->toString}");
         // If message from Amazon SNS collect bounces and complaints
-        if ($message->fromAddress=='no-reply@sns.amazonaws.com') {        
-            $message = json_decode(strtok($message->textPlain, "\n"), true);        
+        if ($message->fromAddress=='no-reply@sns.amazonaws.com') {
+            $message = json_decode(strtok($message->textPlain, "\n"), true);
             if ($message['notificationType']=='Bounce') {
                 $isBounce = true;
                 $isUnsubscribe = false;
                 $toEmail = $message['mail']['source'];
-                $amazonEmail = $message['bounce']['bouncedRecipients'][0]['emailAddress'];    
+                $amazonEmail = $message['bounce']['bouncedRecipients'][0]['emailAddress'];
             }
             elseif ($message['notificationType']=='Complaint') {
                 $isBounce      = false;
                 $isUnsubscribe = true;
                 $toEmail       = $message['mail']['source'];
-                $amazonEmail = $message['complaint']['complainedRecipients'][0]['emailAddress'];    
+                $amazonEmail = $message['complaint']['complainedRecipients'][0]['emailAddress'];
             }
-        }        
+        }
         // Parse the to email if applicable
         if (preg_match('#^(.*?)\+(.*?)@(.*?)$#', $toEmail, $parts)) {
             if (strstr($parts[2], '_')) {
@@ -119,7 +119,7 @@ class MessageHelper
         }
 
         $messageDetails = array();
-        
+
 
         if ($allowBounce) {
             // If message from Amazon SNS fill details and don't process further
@@ -128,7 +128,7 @@ class MessageHelper
             $messageDetails['rule_cat'] = 'unknown';
             $messageDetails['rule_no'] = '0013';
             $messageDetails['bounce_type'] = 'hard';
-            $messageDetails['remove'] = 1; 
+            $messageDetails['remove'] = 1;
             } else {
                 if (!empty($message->dsnReport)) {
                     // Parse the bounce
@@ -161,7 +161,7 @@ class MessageHelper
                     $isBounce      = true;
                     $isUnsubscribe = false;
                 }
-            }    
+            }
         }
 
         if (!$isBounce && !$isUnsubscribe) {
@@ -292,7 +292,7 @@ class MessageHelper
                 MAUTIC_TABLE_PREFIX.'email_stats',
                 array(
                     'open_details' => serialize($openDetails),
-                    'retry_count'  => $stat['retry_count']++,
+                    'retry_count'  => ++$stat['retry_count'],
                     'is_failed'    => ($messageDetails['remove'] || $stat['retry_count'] == 5) ? 1 : 0
                 ),
                 array('id' => $stat['id'])

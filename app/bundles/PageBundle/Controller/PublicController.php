@@ -14,10 +14,13 @@ use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PageBundle\Entity\Page;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Class PublicController
@@ -235,6 +238,8 @@ class PublicController extends CommonFormController
                     $content = str_replace('</head>', $analytics."\n</head>", $content);
                 }
             }
+
+            $this->get('templating.helper.assets')->addScript($this->get('router')->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL), 'onPageDisplay_headClose', true, 'mautic_js');
 
             $event = new PageDisplayEvent($content, $entity);
             $this->factory->getDispatcher()->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
@@ -454,5 +459,27 @@ class PublicController extends CommonFormController
         $parentVariant = $entity->getVariantParent();
         $title         = (!empty($parentVariant)) ? $parentVariant->getTitle() : $entity->getTitle();
         $slotsHelper->set('pageTitle', $title);
+    }
+
+    /**
+     * Track video views
+     */
+    public function hitVideoAction()
+    {
+        // Only track XMLHttpRequests, because the hit should only come from there
+        if ($this->request->isXmlHttpRequest()) {
+            /** @var VideoModel $model */
+            $model = $this->getModel('page.video');
+
+            try {
+                $model->hitVideo($this->request);
+            } catch (\Exception $e) {
+                return new JsonResponse(['success' => false]);
+            }
+
+            return new JsonResponse(['success' => true]);
+        }
+
+        return new Response();
     }
 }

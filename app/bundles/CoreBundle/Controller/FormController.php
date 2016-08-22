@@ -552,8 +552,18 @@ class FormController extends CommonController
      */
     protected function editStandard($objectId, $ignorePost = false)
     {
+        $isClone = false;
         $model  = $this->getModel($this->modelName);
-        $entity = $model->getEntity($objectId);
+        if (is_object($objectId)) {
+            $entity   = $objectId;
+            $isClone  = true;
+            $objectId = 'mautic_'.sha1(uniqid(mt_rand(), true));
+        } elseif (strpos($objectId, 'mautic_') !== false) {
+            $isClone = true;
+            $entity = $model->getEntity();
+        } else {
+            $entity = $model->getEntity($objectId);
+        }
 
         //set the page we came from
         $page = $this->factory->getSession()->get($this->sessionBase.'.page', 1);
@@ -596,7 +606,7 @@ class FormController extends CommonController
         )
         ) {
             return $this->accessDenied();
-        } elseif ($model->isLocked($entity)) {
+        } elseif (!$isClone && $model->isLocked($entity)) {
             //deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, $this->modelName);
         }
@@ -645,8 +655,10 @@ class FormController extends CommonController
                     }
                 }
             } else {
-                //unlock the entity
-                $model->unlockEntity($entity);
+                if (!$isClone) {
+                    //unlock the entity
+                    $model->unlockEntity($entity);
+                }
 
                 $viewParameters = array('page' => $page);
                 $returnUrl      = $this->generateUrl($this->routeBase.'_index', $viewParameters);
@@ -664,8 +676,12 @@ class FormController extends CommonController
                         )
                     )
                 );
+            } elseif ($valid) {
+                // Rebuild the form with new action so that apply doesn't keep creating a clone
+                $action = $this->generateUrl($this->routeBase.'_action', ['objectAction' => 'edit', 'objectId' => $entity->getId()]);
+                $form   = $model->createForm($entity, $this->get('form.factory'), $action);
             }
-        } else {
+        } elseif (!$isClone) {
             $model->lockEntity($entity);
         }
 
@@ -730,8 +746,7 @@ class FormController extends CommonController
                 $this->afterCloneEntity($newEntity, $entity);
             }
 
-            $model->saveEntity($newEntity);
-            $objectId = $newEntity->getId();
+            return $this->editAction($newEntity, true, true);
         }
 
         return $this->editAction($objectId, true, true);

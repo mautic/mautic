@@ -80,7 +80,26 @@ $buttons[] = [
     'btnText'   => $view['translator']->trans('mautic.lead.lead.lists'),
     'iconClass' => 'fa fa-pie-chart',
 ];
+//View Contact Frequency button
 
+if ($edit) {
+    $buttons[] = [
+        'attr'      => [
+            'data-toggle' => 'ajaxmodal',
+            'data-target' => '#MauticSharedModal',
+            'data-header' => $view['translator']->trans(
+                'mautic.lead.lead.header.contact.frequency',
+                ['%name%' => $lead->getPrimaryIdentifier()]
+            ),
+            'href'        => $view['router']->path(
+                'mautic_contact_action',
+                ["objectId" => $lead->getId(), "objectAction" => "contactFrequency"]
+            )
+        ],
+        'btnText'   => $view['translator']->trans('mautic.lead.contact.frequency'),
+        'iconClass' => 'fa fa-signal'
+    ];
+}
 //View Campaigns List button
 if ($view['security']->isGranted('campaign:campaigns:edit')) {
     $buttons[] = [
@@ -101,7 +120,6 @@ if ($view['security']->isGranted('campaign:campaigns:edit')) {
         'iconClass' => 'fa fa-clock-o',
     ];
 }
-
 //Merge button
 if (($view['security']->hasEntityAccess(
         $permissions['lead:leads:deleteown'],

@@ -25,7 +25,7 @@ class ThemeController extends FormController
      *
      * @var array
      */
-    protected $defaultThemes = ['sunday', 'skyline', 'oxygen', 'goldstar', 'neopolitan', 'blank'];
+    protected $defaultThemes = ['sunday', 'skyline', 'oxygen', 'goldstar', 'neopolitan', 'blank', 'system'];
 
     /**
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
@@ -128,7 +128,7 @@ class ThemeController extends FormController
             $error = true;
         }
 
-        
+
         try {
             $zipPath = $themeHelper->zip($themeName);
         } catch (\Exception $e) {
@@ -138,7 +138,7 @@ class ThemeController extends FormController
             ];
             $error = true;
         }
-        
+
         if (!$error && !$zipPath) {
             $flashes[] = [
                 'type'    => 'error',

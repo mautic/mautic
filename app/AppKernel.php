@@ -33,14 +33,14 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const MINOR_VERSION = 0;
+    const MINOR_VERSION = 1;
 
     /**
      * Patch version number
      *
      * @const integer
      */
-    const PATCH_VERSION = 2;
+    const PATCH_VERSION = 1;
 
     /**
      * Extra version identifier

@@ -321,19 +321,22 @@ class CommonRepository extends EntityRepository
                     list($expressions, $parameters) = $this->addAdvancedSearchWhereClause($q, $filter);
 
                     if (!empty($forceExpressions)) {
-                        $expressions->add($forceExpressions);
                         $parameters = array_merge($parameters, $forceParameters);
                     }
                 } elseif (!empty($forceExpressions)) {
-                    //We do not have a user search but have some required filters
-                    $expressions = $forceExpressions;
                     $parameters  = $forceParameters;
                 }
 
-                $filterCount = ($expressions instanceof \Countable) ? count($expressions) : count($expressions->getParts());
-
-                if (!empty($filterCount)) {
+                $filterCount = 0;
+                if (!empty($expressions) && $filterCount = ($expressions instanceof \Countable) ? count($expressions) : count($expressions->getParts())) {
                     $q->andWhere($expressions);
+                }
+
+                if (!empty($forceExpressions) &&  $forcedFilterCount = ($forceExpressions instanceof \Countable) ? count($forceExpressions) : count($forceExpressions->getParts())) {
+                    $q->andWhere($forceExpressions);
+                }
+
+                if (!empty($filterCount) || !empty($forceExpressions)) {
                     foreach ($parameters as $k => $v) {
                         if ($v === true || $v === false) {
                             $q->setParameter($k, $v, 'boolean');
@@ -434,7 +437,7 @@ class CommonRepository extends EntityRepository
     {
         return array(
             false,
-            array()
+            array(),
         );
     }
 
@@ -620,7 +623,7 @@ class CommonRepository extends EntityRepository
 
         return array(
             $expr,
-            array("$unique" => $string)
+            array("$unique" => $string),
         );
     }
 
@@ -659,7 +662,25 @@ class CommonRepository extends EntityRepository
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.category'):
-                $expr           = $q->expr()->like("c.alias", ":$unique");
+                // Find the category prefix
+                $joins     = $q->getDQLPart('join');
+                $catPrefix = false;
+                foreach ($joins as $joinPrefix => $joinStatements) {
+                    /** @var Query\Expr\Join $join */
+                    foreach ($joinStatements as $join) {
+                        if (strpos($join->getJoin(), '.category') !== false) {
+                            $catPrefix = $join->getAlias();
+                            break;
+                        }
+                    }
+                    if ($catPrefix !== false) {
+                        break;
+                    }
+                }
+                if (false === $catPrefix) {
+                    $catPrefix = 'c';
+                }
+                $expr           = $q->expr()->like("{$catPrefix}.alias", ":$unique");
                 $filter->strict = true;
                 break;
         }
@@ -690,7 +711,7 @@ class CommonRepository extends EntityRepository
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.isuncategorized',
             'mautic.core.searchcommand.ismine',
-            'mautic.core.searchcommand.category'
+            'mautic.core.searchcommand.category',
         );
     }
 
