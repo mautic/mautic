@@ -37,6 +37,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\StageBundle\Entity\Stage;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Intl\Intl;
@@ -87,15 +88,21 @@ class LeadModel extends FormModel
     protected $leadListModel;
 
     /**
+     * @var FormFactory
+     */
+    protected $formFactory;
+
+    /**
      * LeadModel constructor.
      *
-     * @param RequestStack $requestStack
-     * @param CookieHelper $cookieHelper
-     * @param IpLookupHelper $ipLookupHelper
-     * @param PathsHelper $pathsHelper
+     * @param RequestStack      $requestStack
+     * @param CookieHelper      $cookieHelper
+     * @param IpLookupHelper    $ipLookupHelper
+     * @param PathsHelper       $pathsHelper
      * @param IntegrationHelper $integrationHelper
-     * @param FieldModel $leadFieldModel
-     * @param ListModel $leadListModel
+     * @param FieldModel        $leadFieldModel
+     * @param ListModel         $leadListModel
+     * @param FormFactory       $formFactory
      */
     public function __construct(
         RequestStack $requestStack,
@@ -104,16 +111,18 @@ class LeadModel extends FormModel
         PathsHelper $pathsHelper,
         IntegrationHelper $integrationHelper,
         FieldModel $leadFieldModel,
-        ListModel $leadListModel
+        ListModel $leadListModel,
+        FormFactory $formFactory
     )
     {
-        $this->request = $requestStack->getCurrentRequest();
-        $this->cookieHelper = $cookieHelper;
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->pathsHelper = $pathsHelper;
+        $this->request           = $requestStack->getCurrentRequest();
+        $this->cookieHelper      = $cookieHelper;
+        $this->ipLookupHelper    = $ipLookupHelper;
+        $this->pathsHelper       = $pathsHelper;
         $this->integrationHelper = $integrationHelper;
-        $this->leadFieldModel = $leadFieldModel;
-        $this->leadListModel = $leadListModel;
+        $this->leadFieldModel    = $leadFieldModel;
+        $this->leadListModel     = $leadListModel;
+        $this->formFactory       = $formFactory;
     }
 
     /**
@@ -1381,13 +1390,19 @@ class LeadModel extends FormModel
         }
 
         if (!empty($fields['stage']) && !empty($data[$fields['stage']])) {
-            // Set stage for contact
+            static $stages = [];
+            $stageName = $data[$fields['stage']];
+            if (!array_key_exists($stageName, $stages)) {
+                // Set stage for contact
+                $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($stageName);
 
-            $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($data[$fields['stage']]);
-
-            if (empty($stage)) {
-                $stage = new Stage();
-                $stage->setName($data[$fields['stage']]);
+                if (empty($stage)) {
+                    $stage = new Stage();
+                    $stage->setName($stageName);
+                    $stages[$stageName] = $stage;
+                }
+            } else {
+                $stage = $stages[$stageName];
             }
 
             $lead->setStage($stage);
@@ -1396,13 +1411,17 @@ class LeadModel extends FormModel
             $log = new StagesChangeLog();
             $log->setEventName($stage->getId().":".$stage->getName());
             $log->setLead($lead);
-            $log->setActionName($this->translator->trans('mautic.lead.import.action.name', array(
-                '%name%' => $this->user->getUsername()
-            )));
+            $log->setActionName(
+                $this->translator->trans(
+                    'mautic.lead.import.action.name',
+                    [
+                        '%name%' => $this->user->getUsername()
+                    ]
+                )
+            );
             $log->setDateAdded(new \DateTime());
             $lead->stageChangeLog($log);
         }
-
         unset($fields['stage']);
 
         // Set unsubscribe status
@@ -1428,11 +1447,56 @@ class LeadModel extends FormModel
             $this->modifyTags($lead, $tags, null, false);
         }
 
-        // Set profile data
+        // Set profile data using the form so that values are validated
+        $fieldData = [];
         foreach ($fields as $leadField => $importField) {
             // Prevent overwriting existing data with empty data
             if (array_key_exists($importField, $data) && !is_null($data[$importField]) && $data[$importField] != '') {
-                $lead->addUpdatedField($leadField, $data[$importField]);
+                $fieldData[$leadField] = $data[$importField];
+            }
+        }
+
+        static $leadFields;
+        if (null === $leadFields) {
+            $leadFields = $this->leadFieldModel->getEntities(
+                array(
+                    'force'          => array(
+                        array(
+                            'column' => 'f.isPublished',
+                            'expr'   => 'eq',
+                            'value'  => true
+                        )
+                    ),
+                    'hydration_mode' => 'HYDRATE_ARRAY'
+                )
+            );
+        };
+
+        $form = $this->createForm($lead, $this->formFactory, null, ['fields' => $leadFields, 'csrf_protection' => false]);
+
+        // Unset stage and owner from the form because it's already been handled
+        unset($form['stage'], $form['owner']);
+
+        $form->submit($fieldData);
+
+        if (!$form->isValid()) {
+            $fieldErrors = [];
+            foreach ($form as $formField) {
+                $errors = $formField->getErrors(true);
+                if (count($errors)) {
+                    $errorString = $formField->getConfig()->getOption('label') .": ";
+                    foreach ($errors as $error) {
+                        $errorString .= " {$error->getMessage()}";
+                    }
+                    $fieldErrors[] = $errorString;
+                }
+            }
+            $fieldErrors = implode("\n", $fieldErrors);
+            throw new \Exception($fieldErrors);
+        } else {
+            // All clear
+            foreach ($fieldData as $field => $value) {
+                $lead->addUpdatedField($field, $value);
             }
         }
 
