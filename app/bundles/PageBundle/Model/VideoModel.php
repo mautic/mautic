@@ -16,7 +16,6 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\VideoHit;
 use Mautic\PageBundle\Event\VideoHitEvent;
 use Mautic\PageBundle\PageEvents;
-use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -35,11 +34,6 @@ class VideoModel extends FormModel
     protected $ipLookupHelper;
 
     /**
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
      * VideoModel constructor.
      *
      * @param LeadModel      $leadModel
@@ -49,14 +43,6 @@ class VideoModel extends FormModel
     {
         $this->leadModel = $leadModel;
         $this->ipLookupHelper = $ipLookupHelper;
-    }
-
-    /**
-     * @param Logger $logger
-     */
-    public function setLogger(Logger $logger)
-    {
-        $this->logger = $logger;
     }
 
     /**
