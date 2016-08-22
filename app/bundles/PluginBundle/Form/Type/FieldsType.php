@@ -14,7 +14,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class SocialMediaServiceType
@@ -45,15 +45,18 @@ class FieldsType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(array('integration_fields', 'lead_fields'));
-        $resolver->setDefaults(array(
-            'special_instructions' => '',
-            'alert_type'           => ''
-        ));
+        $resolver->setRequired(['integration_fields', 'lead_fields']);
+        $resolver->setDefaults(
+            [
+                'special_instructions' => '',
+                'alert_type'           => '',
+                'allow_extra_fields'   => true
+            ]
+        );
     }
 
     /**

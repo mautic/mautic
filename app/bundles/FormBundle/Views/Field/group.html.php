@@ -7,6 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use \Mautic\CoreBundle\Helper\InputHelper;
 
 $containerType     = "{$type}grp";
 $defaultInputClass = "{$containerType}-{$type}";
@@ -29,15 +30,14 @@ if (stripos($optionLabelAttr, 'class') === false) {
 }
 
 $count   = 0;
-$firstId = 'mauticform_' . $containerType . '_' . $type . '_'.$field['alias'].'_'.\Mautic\CoreBundle\Helper\InputHelper::alphanum($list[0]);
+$firstId = 'mauticform_' . $containerType . '_' . $type . '_'.$field['alias'].'_'.InputHelper::alphanum(InputHelper::transliterate($list[0])).'1';
 
 $formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
-    array(
-        'deleted'  => (!empty($deleted)) ? $deleted : false,
+    [
         'id'       => $id,
         'formId'   => $formId,
         'formName' => $formName
-    )) : '';
+    ]) : '';
 
 $label = (!$field['showLabel']) ? '' : <<<HTML
 
@@ -49,10 +49,10 @@ $help = (empty($field['helpMessage'])) ? '' : <<<HTML
                 <span class="mauticform-helpmessage">{$field['helpMessage']}</span>
 HTML;
 
-$options = array();
-foreach ($list as $l):
+$options = [];
+foreach ($list as $counter => $l):
 
-$id               = $field['alias'].'_'.\Mautic\CoreBundle\Helper\InputHelper::alphanum($l);
+$id               = $field['alias'].'_'.InputHelper::alphanum(InputHelper::transliterate($l)).$counter;
 $checked          = ($field['defaultValue'] == $l) ? 'checked="checked"' : '';
 $checkboxBrackets = ($type == 'checkbox') ? '[]' : '';
 

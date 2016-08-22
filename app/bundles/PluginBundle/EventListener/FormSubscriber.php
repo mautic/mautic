@@ -25,7 +25,7 @@ class FormSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            FormEvents::FORM_ON_BUILD  => array('onFormBuild', 0)
+            FormEvents::FORM_ON_BUILD  => ['onFormBuild', 0]
         );
     }
 

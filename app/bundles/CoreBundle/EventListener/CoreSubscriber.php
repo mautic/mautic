@@ -37,7 +37,10 @@ class CoreSubscriber extends CommonSubscriber
     {
         return array(
             KernelEvents::CONTROLLER          => array('onKernelController', 0),
-            KernelEvents::REQUEST             => array('onKernelRequest', 0),
+            KernelEvents::REQUEST             => [
+                ['onKernelRequest', 0],
+                ['onKernelRequestAddGlobalJS', 0]
+            ],
             CoreEvents::BUILD_MENU            => array('onBuildMenu', 9999),
             CoreEvents::BUILD_ROUTE           => array('onBuildRoute', 0),
             CoreEvents::FETCH_ICONS           => array('onFetchIcons', 9999),
@@ -91,6 +94,24 @@ class CoreSubscriber extends CommonSubscriber
             $cookieHelper = $this->factory->getHelper('cookie');
             $cookieHelper->setCookie('mautic_session_name', session_name(), null);
         }
+    }
+
+    /**
+     * Add mauticForms in js script tag for Froala
+     *
+     * @param GetResponseEvent $event
+     */
+    public function onKernelRequestAddGlobalJS(GetResponseEvent $event)
+    {
+        if (defined('MAUTIC_INSTALLER')) {
+            return;
+        }
+
+        $list = $this->factory->getEntityManager()->getRepository('MauticFormBundle:Form')->getSimpleList();
+
+        $mauticForms = json_encode($list, JSON_FORCE_OBJECT | JSON_PRETTY_PRINT);
+
+        $this->factory->getHelper('template.assets')->addScriptDeclaration("var mauticForms = {$mauticForms};");
     }
 
     /**

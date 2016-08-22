@@ -559,8 +559,9 @@ var Mautic = {
                     editor.popups.hideAll();
                 });
 
-                var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'];
+                var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
                 var minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
+
 
                 if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
                     var options = {
@@ -1011,13 +1012,12 @@ var Mautic = {
             // trash created map objects to save some memory
             if (typeof Mautic.mapObjects !== 'undefined') {
                 mQuery.each(Mautic.mapObjects, function (i, map) {
-                    map.removeAllMarkers();
-                    map.remove();
+                    Mautic.destroyMap(map);
                 });
                 Mautic.mapObjects = [];
             }
 
-	    // trash tokens to save some memory
+    	    // trash tokens to save some memory
             if (typeof Mautic.builderTokens !== 'undefined') {
                 Mautic.builderTokens = {};
             }
@@ -1460,6 +1460,8 @@ var Mautic = {
      * @param form
      */
     ajaxifyForm: function (formName) {
+        Mautic.initializeFormFieldVisibilitySwitcher(formName);
+
         //prevent enter submitting form and instead jump to next line
         var form = 'form[name="' + formName + '"]';
         mQuery(form + ' input, ' + form + ' select').off('keydown.ajaxform');
@@ -1651,7 +1653,7 @@ var Mautic = {
 
         var target = mQuery(el).attr('data-target');
 
-        var route = mQuery(el).attr('href');
+        var route = (mQuery(el).attr('data-href')) ? mQuery(el).attr('data-href') : mQuery(el).attr('href');
         if (route.indexOf('javascript') >= 0) {
             return false;
         }
@@ -1666,7 +1668,14 @@ var Mautic = {
         var header = mQuery(el).attr('data-header');
         var footer = mQuery(el).attr('data-footer');
 
-        Mautic.loadAjaxModal(target, route, method, header, footer);
+        var preventDismissal = mQuery(el).attr('data-prevent-dismiss');
+        if (preventDismissal) {
+            // Reset
+            mQuery(el).removeAttr('data-prevent-dismiss');
+        }
+
+
+        Mautic.loadAjaxModal(target, route, method, header, footer, preventDismissal);
     },
 
     /**
@@ -1677,7 +1686,7 @@ var Mautic = {
      * @param header
      * @param footer
      */
-    loadAjaxModal: function (target, route, method, header, footer) {
+    loadAjaxModal: function (target, route, method, header, footer, preventDismissal) {
 
         //show the modal
         if (mQuery(target + ' .loading-placeholder').length) {
@@ -1718,6 +1727,29 @@ var Mautic = {
                 delete Mautic.modalContentXhr[target];
             }
         });
+
+        // Check if dismissal is allowed
+        if (typeof mQuery(target).data('bs.modal') !== 'undefined' && typeof mQuery(target).data('bs.modal').options !== 'undefined') {
+            if (preventDismissal) {
+                mQuery(target).data('bs.modal').options.keyboard = false;
+                mQuery(target).data('bs.modal').options.backdrop = 'static';
+            } else {
+                mQuery(target).data('bs.modal').options.keyboard = true;
+                mQuery(target).data('bs.modal').options.backdrop = true;
+            }
+        } else {
+            if (preventDismissal) {
+                mQuery(target).modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+            } else {
+                mQuery(target).modal({
+                    backdrop: true,
+                    keyboard: true
+                });
+            }
+        }
 
         mQuery(target).modal('show');
 
@@ -2787,18 +2819,12 @@ var Mautic = {
     /**
      * Marks notifications as read and clears unread indicators
      */
-    markNotificationsRead: function () {
+    showNotifications: function () {
         mQuery("#notificationsDropdown").unbind('hide.bs.dropdown');
         mQuery('#notificationsDropdown').on('hidden.bs.dropdown', function () {
             if (!mQuery('#newNotificationIndicator').hasClass('hide')) {
                 mQuery('#notifications .is-unread').remove();
                 mQuery('#newNotificationIndicator').addClass('hide');
-
-                mQuery.ajax({
-                    url: mauticAjaxUrl,
-                    type: "GET",
-                    data: "action=markNotificationsRead"
-                });
             }
         });
     },
@@ -3146,6 +3172,8 @@ var Mautic = {
                         Mautic.renderBarChart(canvas)
                     } else if (canvas.hasClass('simple-bar-chart')) {
                         Mautic.renderSimpleBarChart(canvas)
+                    } else if (canvas.hasClass('horizontal-bar-chart')) {
+                        Mautic.renderHorizontalBarChart(canvas)
                     }
                 }
                 canvas.addClass('chart-rendered');
@@ -3212,7 +3240,13 @@ var Mautic = {
         var chart = new Chart(canvas, {
             type: 'bar',
             data: data,
-            options: {}
+            options: {
+                scales: {
+                    xAxes: [{
+                        barPercentage: 35
+                    }]
+                }
+            }
         });
         Mautic.chartObjects.push(chart);
     },
@@ -3232,7 +3266,8 @@ var Mautic = {
                     xAxes: [{
                         stacked: false,
                         ticks: {fontSize: 9},
-                        gridLines: {display:false}
+                        gridLines: {display:false},
+                        barPercentage: 35
                     }],
                     yAxes: [{
                         display: false,
@@ -3240,10 +3275,60 @@ var Mautic = {
                         ticks: {beginAtZero: true, display: false},
                         gridLines: {display:false}
                     }],
-                    display: false,
+                    display: false
                 },
                 legend: {
                     display: false
+                }
+            }
+        });
+        Mautic.chartObjects.push(chart);
+    },
+
+    /**
+     * Render the chart.js simple bar chart
+     *
+     * @param mQuery element canvas
+     */
+    renderHorizontalBarChart: function(canvas) {
+        var data = mQuery.parseJSON(canvas.text());
+        var chart = new Chart(canvas, {
+            type: 'horizontalBar',
+            data: data,
+            options: {
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        stacked: false,
+                        gridLines: {display:false},
+                        ticks: {beginAtZero: true,display: true, fontSize: 8, stepSize: 5}
+                    }],
+                    yAxes: [{
+                        stacked: false,
+                        ticks: {beginAtZero: true, display: true, fontSize: 9},
+                        gridLines: {display:false},
+                        barPercentage: 8,
+                        categorySpacing: 1
+                    }],
+                    display: false
+                },
+                legend: {
+                    display: false
+                },
+                tooltips: {
+                    mode: 'single',
+                    bodyFontSize: 9,
+                    bodySpacing: 0,
+                    callbacks: {
+                        title: function(tooltipItems, data) {
+                            // Title doesn't make sense for scatter since we format the data as a point
+                            return '';
+                        },
+                        label: function(tooltipItem, data) {
+                            return  tooltipItem.xLabel + ': ' + tooltipItem.yLabel;
+                        }
+                    }
+
                 }
             }
         });
@@ -3256,7 +3341,6 @@ var Mautic = {
      * @param mQuery element scope
      */
     renderMaps: function(scope) {
-        if (!Mautic.mapObjects) Mautic.mapObjects = [];
         var maps = [];
 
         if (mQuery.type(scope) === 'string') {
@@ -3269,73 +3353,99 @@ var Mautic = {
 
         if (maps.length) {
             maps.each(function(index, element) {
-                var wrapper = mQuery(element);
+                Mautic.renderMap(mQuery(element));
+            });
+        }
+    },
+
+    renderMap: function(wrapper) {
+        // Map render causes a JS error on FF when the element is hidden
+        if (wrapper.is(':visible')) {
+            if (!Mautic.mapObjects) Mautic.mapObjects = [];
+            var data = wrapper.data('map-data');
+            if (typeof data === 'undefined' || !data.length) {
                 try {
-                    var data = mQuery.parseJSON(wrapper.text());
+                    data = mQuery.parseJSON(wrapper.text());
+                    wrapper.data('map-data', data);
                 } catch (error) {
 
                     return;
                 }
+            }
+            
+            // Markers have numerical indexes
+            var firstKey = Object.keys(data)[0];
 
-                // Markers have numerical indexes
-                var firstKey = Object.keys(data)[0];
+            // Check type of data
+            if (firstKey == "0") {
+                // Markers
+                var markersData = data,
+                    regionsData = {};
+            } else {
+                // Regions
+                var markersData = {},
+                    regionsData = data;
+            }
 
-                // Check type of data
-                if (firstKey == "0") {
-                    // Markers
-                    var markersData = data,
-                        regionsData = {};
-                } else {
-                    // Regions
-                    var markersData = {},
-                        regionsData = data;
-                }
-
-                wrapper.text('');
-                wrapper.vectorMap({
-                    backgroundColor: 'transparent',
-                    zoomOnScroll: false,
-                    markers: markersData,
-                    markerStyle: {
-                        initial: {
-                            fill: '#40C7B5'
-                        },
-                        selected: {
-                            fill: '#40C7B5'
-                        }
+            wrapper.text('');
+            wrapper.vectorMap({
+                backgroundColor: 'transparent',
+                zoomOnScroll: false,
+                markers: markersData,
+                markerStyle: {
+                    initial: {
+                        fill: '#40C7B5'
                     },
-                    regionStyle: {
-                        initial: {
-                            "fill": '#dce0e5',
-                            "fill-opacity": 1,
-                            "stroke": 'none',
-                            "stroke-width": 0,
-                            "stroke-opacity": 1
-                        },
-                        hover: {
-                            "fill-opacity": 0.7,
-                            "cursor": 'pointer'
-                        }
-                    },
-                    map: 'world_mill_en',
-                    series: {
-                        regions: [{
-                            values: regionsData,
-                            scale: ['#dce0e5', '#40C7B5'],
-                            normalizeFunction: 'polynomial'
-                        }]
-                    },
-                    onRegionTipShow: function (event, label, index) {
-                        if (data[index] > 0) {
-                            label.html(
-                                '<b>'+label.html()+'</b></br>'+
-                                data[index]+' Leads'
-                            );
-                        }
+                    selected: {
+                        fill: '#40C7B5'
                     }
-                });
-                Mautic.mapObjects.push(wrapper.vectorMap('get', 'mapObject'));
+                },
+                regionStyle: {
+                    initial: {
+                        "fill": '#dce0e5',
+                        "fill-opacity": 1,
+                        "stroke": 'none',
+                        "stroke-width": 0,
+                        "stroke-opacity": 1
+                    },
+                    hover: {
+                        "fill-opacity": 0.7,
+                        "cursor": 'pointer'
+                    }
+                },
+                map: 'world_mill_en',
+                series: {
+                    regions: [{
+                        values: regionsData,
+                        scale: ['#dce0e5', '#40C7B5'],
+                        normalizeFunction: 'polynomial'
+                    }]
+                },
+                onRegionTipShow: function (event, label, index) {
+                    if (data[index] > 0) {
+                        label.html(
+                            '<b>'+label.html()+'</b></br>'+
+                            data[index]+' Leads'
+                        );
+                    }
+                }
             });
+            wrapper.addClass('map-rendered');
+            Mautic.mapObjects.push(wrapper);
+            return wrapper;
+        }
+    },
+
+    /**
+     * Destroy a jVector map
+     */
+    destroyMap: function(wrapper) {
+        if (wrapper.hasClass('map-rendered')) {
+            var map = wrapper.vectorMap('get', 'mapObject');
+            map.removeAllMarkers();
+            map.remove();
+            wrapper.empty();
+            wrapper.removeClass('map-rendered');
         }
     },
 
@@ -3370,6 +3480,11 @@ var Mautic = {
         }
     },
 
+    /**
+     * Initialize theme selection
+     *
+     * @param themeField
+     */
     intiSelectTheme: function(themeField) {
         var customHtml = mQuery('textarea.builder-html');
         var isNew = Mautic.isNewEntity('#page_sessionId, #emailform_sessionId');
@@ -3381,7 +3496,9 @@ var Mautic = {
 
         if (customHtml.length) {
 
-            if (!customHtml.val().length) {
+            var emptyFroalaContent = '<!DOCTYPE html><html><head><title></title></head><body></body></html>';
+
+            if (!customHtml.val().length || customHtml.val() === emptyFroalaContent) {
                 Mautic.setThemeHtml(themeField.val());
             }
 
@@ -3404,7 +3521,7 @@ var Mautic = {
                 // Load the theme HTML to the source textarea
                 Mautic.setThemeHtml(currentLink.attr('data-theme'));
 
-                // Manipulate classes to achieve the theme selection illustion
+                // Manipulate classes to achieve the theme selection illusion
                 mQuery('.theme-list .panel').removeClass('theme-selected');
                 currentLink.closest('.panel').addClass('theme-selected');
                 mQuery('.theme-list .select-theme-selected').addClass('hide');
@@ -3415,11 +3532,95 @@ var Mautic = {
         }
     },
 
+    /**
+     * Set theme's HTML
+     *
+     * @param theme
+     */
     setThemeHtml: function(theme) {
         mQuery.get(mQuery('#builder_url').val()+'?template=' + theme, function(themeHtml) {
             var textarea = mQuery('textarea.builder-html');
             textarea.val(themeHtml);
             textarea.froalaEditor('html.set', themeHtml);
+        });
+    },
+
+    /**
+     * Initialize form field visibility switcher
+     *
+     * @param formName
+     */
+    initializeFormFieldVisibilitySwitcher: function (formName)
+    {
+        Mautic.switchFormFieldVisibilty(formName);
+
+        mQuery('form[name="'+formName+'"]').change(function() {
+            Mautic.switchFormFieldVisibilty(formName);
+        });
+    },
+
+    /**
+     * Switch form field visibility based on selected values
+     */
+    switchFormFieldVisibilty: function (formName) {
+        var form   = mQuery('form[name="'+formName+'"]');
+        var fields = {};
+
+        // find all fields to show
+        form.find('[data-show-on]').each(function(index, el) {
+            var field = mQuery(el);
+            var showOn = jQuery.parseJSON(field.attr('data-show-on'));
+
+            mQuery.each(showOn, function(fieldId, condition) {
+                if (typeof fields[field.attr('id')] == 'undefined' || fields[field.attr('id')] !== true) {
+                    if (mQuery('#' + fieldId).is(':checkbox') || mQuery('#' + fieldId).is(':radio')) {
+                        if ((condition == 'checked' && mQuery('#' + fieldId).is(':checked')) || (condition == '' && !mQuery('#' + fieldId).is(':checked'))) {
+                            fields[field.attr('id')] = true;
+                        } else {
+                            fields[field.attr('id')] = false;
+                        }
+                    } else {
+                        var sourceFieldVal = mQuery('#' + fieldId).val();
+                        if (mQuery.inArray(sourceFieldVal, condition) === -1) {
+                            fields[field.attr('id')] = false;
+                        } else {
+                            fields[field.attr('id')] = true;
+                        }
+                    }
+                }
+            });
+        });
+
+        // find all fields to hide
+        form.find('[data-hide-on]').each(function(index, el) {
+            var field  = mQuery(el);
+            var hideOn = jQuery.parseJSON(field.attr('data-hide-on'));
+            mQuery.each(hideOn, function(fieldId, condition) {
+                if (mQuery('#' + fieldId).is(':checkbox') || mQuery('#' + fieldId).is(':radio')) {
+                    if ((condition == 'checked' && mQuery('#' + fieldId).is(':checked')) || (condition == '' && !mQuery('#' + fieldId).is(':checked'))) {
+                        fields[field.attr('id')] = false;
+                    } else {
+                        fields[field.attr('id')] = true;
+                    }
+                } else {
+                    var sourceFieldVal = mQuery('#' + fieldId).val();
+                    if (mQuery.inArray(sourceFieldVal, condition) !== -1) {
+                        fields[field.attr('id')] = false;
+                    } else if (typeof fields[field.attr('id')] == 'undefined') {
+                        fields[field.attr('id')] = true;
+                    }
+                }
+            });
+        });
+
+        // show/hide according to conditions
+        mQuery.each(fields, function(fieldId, show) {
+            var fieldContainer = mQuery('#' + fieldId).closest('[class*="col-"]');;
+            if (show) {
+                fieldContainer.fadeIn();
+            } else {
+                fieldContainer.fadeOut();
+            }
         });
     },
 

@@ -475,6 +475,43 @@ class CampaignModel extends CommonFormModel
             $events['decision']     = $event->getLeadDecisions();
             $events['condition']    = $event->getLeadConditions();
             $events['action']       = $event->getActions();
+
+            $associationRestrictions = ['action' => [], 'decision' => []];
+            $anchorRestrictions      = [];
+
+            foreach ($events['decision'] as $key => $decision) {
+                if (isset($decision['associatedActions'])) {
+                    if (isset($decision['associatedActions'])) {
+                        $associationRestrictions['action'][$key] = $decision['associatedActions'];
+                    }
+                }
+                if (isset($action['anchorRestrictions'])) {
+                    foreach ($action['anchorRestrictions'] as $restriction) {
+                        list($group, $anchor) = explode('.',$restriction);
+                        if (!isset($anchorRestrictions[$group])) {
+                            $anchorRestrictions[$group][$key] = [];
+                        }
+                        $anchorRestrictions[$group][$key][] = $anchor;
+                    }
+                }
+            }
+            foreach ($events['action'] as $key => $action) {
+                if (isset($action['associatedDecisions'])) {
+                    $associationRestrictions['decision'][$key] = $action['associatedDecisions'];
+                }
+                if (isset($action['anchorRestrictions'])) {
+                    foreach ($action['anchorRestrictions'] as $restriction) {
+                        list($group, $anchor) = explode('.',$restriction);
+                        if (!isset($anchorRestrictions[$group][$key])) {
+                            $anchorRestrictions[$group][$key] = [];
+                        }
+                        $anchorRestrictions[$group][$key][] = $anchor;
+                    }
+                }
+            }
+
+            $events['connectionResrictions'] = $associationRestrictions;
+            $events['anchorRestrictions']    = $anchorRestrictions;
         }
 
         return $events;

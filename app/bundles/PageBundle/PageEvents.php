@@ -18,6 +18,15 @@ final class PageEvents
 {
 
     /**
+     * The mautic.video_on_hit event is thrown when a public page is browsed and a hit recorded in the analytics table
+     *
+     * The event listener receives a Mautic\PageBundle\Event\VideoHitEvent instance.
+     *
+     * @var string
+     */
+    const VIDEO_ON_HIT = 'mautic.video_on_hit';
+
+    /**
      * The mautic.page_on_hit event is thrown when a public page is browsed and a hit recorded in the analytics table
      *
      * The event listener receives a Mautic\PageBundle\Event\PageHitEvent instance.

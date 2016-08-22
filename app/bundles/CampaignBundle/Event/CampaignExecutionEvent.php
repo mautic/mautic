@@ -192,4 +192,17 @@ class CampaignExecutionEvent extends Event
     {
         return (strtolower($eventType) == strtolower($this->event['type']));
     }
+
+    /**
+     * @param      $channel
+     * @param null $channelId
+     */
+    public function setChannel($channel, $channelId = null)
+    {
+        if (null !== $this->log) {
+            // Set the channel since we have the resource
+            $this->log->setChannel($channel)
+                ->setChannelId($channelId);
+        }
+    }
 }

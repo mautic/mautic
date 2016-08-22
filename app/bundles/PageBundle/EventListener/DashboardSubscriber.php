@@ -40,6 +40,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'dwell.times' => array(),
         'popular.pages' => array(),
         'created.pages' => array(),
+        'device.granularity' => array()
     );
 
     /**
@@ -209,6 +210,28 @@ class DashboardSubscriber extends MainDashboardSubscriber
             }
             
             $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->stopPropagation();
+        }
+
+        if ($event->getType() == 'device.granularity') {
+            $widget = $event->getWidget();
+            $params = $widget->getParams();
+
+            if (!$event->isCached()) {
+                $model = $this->factory->getModel('page');
+                $event->setTemplateData(array(
+                    'chartType'   => 'pie',
+                    'chartHeight' => $widget->getHeight() - 80,
+                    'chartData'   => $model->getDeviceGranularityData(
+                        $params['dateFrom'],
+                        $params['dateTo'],
+                        array(),
+                        $canViewOthers
+                    )
+                ));
+            }
+
+            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
             $event->stopPropagation();
         }
     }

@@ -10,6 +10,7 @@
 namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
+use Mautic\CoreBundle\Controller\VariantAjaxControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -18,6 +19,24 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class AjaxController extends CommonAjaxController
 {
+    use VariantAjaxControllerTrait;
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function getAbTestFormAction(Request $request)
+    {
+        return $this->getAbTestForm(
+            $request,
+            'page',
+            'page_abtest_settings',
+            'page',
+            'MauticPageBundle:AbTest:form.html.php',
+            ['MauticPageBundle:AbTest:form.html.php', 'MauticPageBundle:FormTheme\Page']
+        );
+    }
 
     /**
      * @param Request $request
@@ -79,58 +98,6 @@ class AjaxController extends CommonAjaxController
                     $session->set($sessionVar, $content);
                     $dataArray['success'] = 1;
                 }
-            }
-        }
-
-        return $this->sendJsonResponse($dataArray);
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function getAbTestFormAction(Request $request)
-    {
-        $dataArray = array(
-            'success' => 0,
-            'html'    => ''
-        );
-        $type   = InputHelper::clean($request->request->get('abKey'));
-        $pageId = InputHelper::int($request->request->get('pageId'));
-
-        if (!empty($type)) {
-            //get the HTML for the form
-            /** @var \Mautic\PageBundle\Model\PageModel $model */
-            $model   = $this->getModel('page');
-
-            $page = $model->getEntity($pageId);
-
-            $abTestComponents = $model->getBuilderComponents($page, 'abTestWinnerCriteria');
-            $abTestSettings   = $abTestComponents['criteria'];
-
-            if (isset($abTestSettings[$type])) {
-                $html     = '';
-                $formType = (!empty($abTestSettings[$type]['formType'])) ? $abTestSettings[$type]['formType'] : '';
-                if (!empty($formType)) {
-                    $formOptions = (!empty($abTestSettings[$type]['formTypeOptions'])) ? $abTestSettings[$type]['formTypeOptions'] : array();
-                    $form        = $this->get('form.factory')->create('page_abtest_settings', array(), array('formType' => $formType, 'formTypeOptions' => $formOptions));
-                    $html        = $this->renderView('MauticPageBundle:AbTest:form.html.php', array(
-                        'form' => $this->setFormTheme($form, 'MauticPageBundle:AbTest:form.html.php', 'MauticPageBundle:FormTheme\Page')
-                    ));
-                }
-
-                $html = str_replace(array(
-                    'page_abtest_settings[',
-                    'page_abtest_settings_',
-                    'page_abtest_settings'
-                ), array(
-                    'page[variantSettings][',
-                    'page_variantSettings_',
-                    'page'
-                ), $html);
-                $dataArray['html']    = $html;
-                $dataArray['success'] = 1;
             }
         }
 

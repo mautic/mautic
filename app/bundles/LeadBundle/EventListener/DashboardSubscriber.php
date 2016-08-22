@@ -213,7 +213,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     if($list['id']){
                         $params['filter']['leadlist_id']=array(
                             'value' => $list['id'],
-                            'list_column_name' => 't.lead_id'
+                            'list_column_name' => 't.id'
                         );
                     }
                     else{
@@ -240,6 +240,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $params['dateFormat'],
                         $params['filter'],
                         $canViewOthers);
+
+                    $deviceGranularity[] = $model->getDeviceGranularityData($params['timeUnit'],
+                        $params['dateFrom'],
+                        $params['dateTo'],
+                        $params['dateFormat'],
+                        $params['filter'],
+                        $canViewOthers);
                 }
                 $width = 100/count($lists);
 
@@ -251,7 +258,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 180,
                     'chartItems'   => $items['chartItems'],
-                    'stages' => $stages
+                    'stages' => $stages,
+                    'devices' => $deviceGranularity
                 ));
                 $event->setTemplate('MauticCoreBundle:Helper:lifecycle.html.php');
                 $event->stopPropagation();
