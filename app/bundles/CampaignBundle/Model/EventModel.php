@@ -28,8 +28,7 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Model\LeadModel;
-use Monolog\Logger;
-use Symfony\Component\Console\Helper\ProgressBar;
+use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -72,11 +71,6 @@ class EventModel extends CommonFormModel
     protected $campaignModel;
 
     /**
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
      * @var mixed
      */
     protected $scheduleTimeForFailedEvents;
@@ -104,14 +98,6 @@ class EventModel extends CommonFormModel
         $this->batchCampaignSleepTime      = $coreParametersHelper->getParameter('mautic.batch_campaign_sleep_time');
         $this->scheduleTimeForFailedEvents = $coreParametersHelper->getParameter('campaign_time_wait_on_event_false');
         $this->factory                     = $factory;
-    }
-
-    /**
-     * @param Logger $logger
-     */
-    public function setLogger(Logger $logger)
-    {
-        $this->logger = $logger;
     }
 
     /**
@@ -535,7 +521,7 @@ class EventModel extends CommonFormModel
         $maxCount = ($max) ? $max : $totalStartingEvents;
 
         if ($output) {
-            $progress = new ProgressBar($output, $maxCount);
+            $progress = ProgressBarHelper::init($output, $maxCount);
             $progress->start();
         }
 
@@ -1107,7 +1093,7 @@ class EventModel extends CommonFormModel
         gc_enable();
 
         if ($output) {
-            $progress = new ProgressBar($output, $maxCount);
+            $progress = ProgressBarHelper::init($output, $maxCount);
             $progress->start();
             if ($max) {
                 $progress->setProgress($totalEventCount);
@@ -1352,7 +1338,7 @@ class EventModel extends CommonFormModel
 
         if ($leadCount) {
             if ($output) {
-                $progress = new ProgressBar($output, $maxCount);
+                $progress = ProgressBarHelper::init($output, $maxCount);
                 $progress->start();
                 if ($max) {
                     $progress->advance($totalEventCount);

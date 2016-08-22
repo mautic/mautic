@@ -186,7 +186,7 @@ class FormModel extends CommonFormModel
     {
         $order          = 1;
         $existingFields = $entity->getFields()->toArray();
-
+        $formName       = $entity->generateFormName();
         foreach ($sessionFields as $key => $properties) {
             $isNew = (!empty($properties['id']) && isset($existingFields[$properties['id']])) ? false : true;
             $field = !$isNew ? $existingFields[$properties['id']] : new Field();
@@ -198,6 +198,11 @@ class FormModel extends CommonFormModel
                 if (empty($properties['label'])) {
                     $properties['label'] = $field->getLabel();
                 }
+            }
+
+            if ($formName === $properties['alias']) {
+                // Change the alias to prevent potential ID collisions in the rendered HTML
+                $properties['alias'] = 'f_'.$properties['alias'];
             }
 
             foreach ($properties as $f => $v) {
@@ -572,8 +577,7 @@ class FormModel extends CommonFormModel
     public function populateValuesWithGetParameters(Form $form, &$formHtml)
     {
         $fieldHelper = new FormFieldHelper($this->translator);
-        $request  = $this->factory->getRequest();
-        $formName = $form->generateFormName();
+        $formName    = $form->generateFormName();
 
         $fields = $form->getFields()->toArray();
         /** @var \Mautic\FormBundle\Entity\Field $f */
@@ -604,7 +608,7 @@ class FormModel extends CommonFormModel
 
             if (isset($leadField) && $isAutoFill) {
                 $value = $lead->getFieldValue($leadField);
-                
+
 		        if (!empty($value)) {
 		            $fieldHelper->populateField($f, $value, $formName, $formHtml);
 		        }

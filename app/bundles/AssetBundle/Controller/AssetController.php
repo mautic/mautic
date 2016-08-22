@@ -204,10 +204,10 @@ class AssetController extends FormController
                         'total'     => $activeAsset->getDownloadCount(),
                         'unique'    => $activeAsset->getUniqueDownloadCount(),
                         'timeStats' => $model->getDownloadsLineChartData(
-                            null, 
-                            new \DateTime($dateRangeForm->get('date_from')->getData()), 
-                            new \DateTime($dateRangeForm->get('date_to')->getData()), 
-                            null, 
+                            null,
+                            new \DateTime($dateRangeForm->get('date_from')->getData()),
+                            new \DateTime($dateRangeForm->get('date_to')->getData()),
+                            null,
                             ['asset_id' => $activeAsset->getId()]
                         )
                     ]
@@ -259,13 +259,15 @@ class AssetController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction ()
+    public function newAction ($entity = null)
     {
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model = $this->getModel('asset');
 
         /** @var \Mautic\AssetBundle\Entity\Asset $entity */
-        $entity  = $model->getEntity();
+        if (null == $entity) {
+            $entity = $model->getEntity();
+        }
         $entity->setMaxSize(Asset::convertSizeToBytes($this->factory->getParameter('max_size') . 'M')); // convert from MB to B
         $method  = $this->request->getMethod();
         $session = $this->factory->getSession();
@@ -398,10 +400,8 @@ class AssetController extends FormController
     public function editAction ($objectId, $ignorePost = false)
     {
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-        $model = $this->getModel('asset');
-
-        /** @var \Mautic\AssetBundle\Entity\Asset $entity */
-        $entity     = $model->getEntity($objectId);
+        $model  = $this->getModel('asset');
+        $entity = $model->getEntity($objectId);
         $entity->setMaxSize(Asset::convertSizeToBytes($this->factory->getParameter('max_size') . 'M')); // convert from MB to B
         $session    = $this->factory->getSession();
         $page       = $this->factory->getSession()->get('mautic.asset.page', 1);
@@ -576,15 +576,13 @@ class AssetController extends FormController
             }
 
             $clone = clone $entity;
-            $clone->setDownloadCounts(0);
-            $clone->setUniqueDownloadCounts(0);
+            $clone->setDownloadCount(0);
+            $clone->setUniqueDownloadCount(0);
             $clone->setRevision(0);
             $clone->setIsPublished(false);
-            $model->saveEntity($clone);
-            $objectId = $clone->getId();
         }
 
-        return $this->editAction($objectId);
+        return $this->newAction($clone);
     }
 
     /**

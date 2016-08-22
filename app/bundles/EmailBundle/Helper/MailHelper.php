@@ -319,7 +319,11 @@ class MailHelper
             }
 
             $this->message->setSubject($this->subject);
-            $this->message->setBody($this->body['content'], $this->body['contentType'], $this->body['charset']);
+            // Only set body if not empty or if plain text is empty - this ensures an empty HTML body does not show for
+            // messages only with plain text            
+            if (!empty($this->body['content']) || empty($this->plainText)) {
+                $this->message->setBody($this->body['content'], $this->body['contentType'], $this->body['charset']);
+            }
             $this->setMessagePlainText($isQueueFlush);
 
             if (!$isQueueFlush) {
@@ -877,7 +881,7 @@ class MailHelper
 
         if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
             // Append tracking pixel
-            $trackingImg = '<img style="display: none;" height="1" width="1" src="{tracking_pixel}" alt="" />';
+            $trackingImg = '<img height="1" width="1" src="{tracking_pixel}" alt="" />';
             if (strpos($content, '</body>') !== false) {
                 $content = str_replace('</body>', $trackingImg.'</body>', $content);
             } else {

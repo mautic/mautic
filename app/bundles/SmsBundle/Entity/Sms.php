@@ -84,7 +84,7 @@ class Sms extends FormEntity
     /**
      * @var string
      */
-    private $smsType;
+    private $smsType = 'template';
 
     public function __clone()
     {

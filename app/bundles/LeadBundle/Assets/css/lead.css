@@ -48,6 +48,22 @@
     overflow: auto;
 }
 
+.selected-filters .in-group {
+    margin-left:20px;
+}
+
+.selected-filters .panel {
+    margin-bottom:0;
+    margin-top:20px;
+}
+
+.selected-filters .panel.in-group {
+    margin-top:0;
+    border-top:0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
 .col-leadpoints-date {
     width: 175px;
 }

@@ -35,7 +35,7 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Monolog\Logger;
+use Mautic\StageBundle\Entity\Stage;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -88,11 +88,6 @@ class LeadModel extends FormModel
     protected $leadListModel;
 
     /**
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
      * @var FormFactory
      */
     protected $formFactory;
@@ -128,14 +123,6 @@ class LeadModel extends FormModel
         $this->leadFieldModel    = $leadFieldModel;
         $this->leadListModel     = $leadListModel;
         $this->formFactory       = $formFactory;
-    }
-
-    /**
-     * @param Logger $logger
-     */
-    public function setLogger(Logger $logger)
-    {
-        $this->logger = $logger;
     }
 
     /**
@@ -1175,7 +1162,7 @@ class LeadModel extends FormModel
      * @param int          $reason   Must be a class constant from the DoNotContact class.
      * @param bool         $persist
      *
-     * @return boolean If a DNC entry is added or updated, returns true. If a DNC is already present
+     * @return boolean|DoNotContact If a DNC entry is added or updated, returns the DoNotContact object. If a DNC is already present
      *                 and has the specified reason, nothing is done and this returns false.
      */
     public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $persist = true)
@@ -1206,7 +1193,7 @@ class LeadModel extends FormModel
                 $this->saveEntity($lead);
             }
 
-            return true;
+            return $dnc;
         }
         // Or if the given reason is different than the stated reason
         elseif ($isContactable !== $reason) {
@@ -1232,7 +1219,7 @@ class LeadModel extends FormModel
                         $this->saveEntity($lead);
                     }
 
-                    return true;
+                    return $dnc;
                 }
             }
         }
@@ -1402,14 +1389,21 @@ class LeadModel extends FormModel
             $lead->addPointsChangeLog($log);
         }
 
-        if (!empty($fields['stage']) && !empty($data[$fields['stage']]) && $lead->getId() === null) {
-            // Add points only for new leads
-            $lead->setStage($data[$fields['stage']]);
+        if (!empty($fields['stage']) && !empty($data[$fields['stage']])) {
+            // Set stage for contact
 
-            //add a lead point change log
+            $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($data[$fields['stage']]);
+
+            if (empty($stage)) {
+                $stage = new Stage();
+                $stage->setName($data[$fields['stage']]);
+            }
+
+            $lead->setStage($stage);
+
+            //add a contact stage change log
             $log = new StagesChangeLog();
-            $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($fields['stage']);
-            $log->setEventName($stage);
+            $log->setEventName($stage->getId().":".$stage->getName());
             $log->setLead($lead);
             $log->setActionName($this->translator->trans('mautic.lead.import.action.name', array(
                 '%name%' => $this->user->getUsername()
