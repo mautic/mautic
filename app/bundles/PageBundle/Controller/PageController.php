@@ -302,7 +302,6 @@ class PageController extends FormController
                 ), "RETURN_ARRAY"),
                 'stats'         => array(
                     'pageviews' => $pageviews,
-                    'bounces'   => $model->getBounces($activePage),
                     'hits'      => array(
                         'total'  => $activePage->getHits(),
                         'unique' => $activePage->getUniqueHits()
