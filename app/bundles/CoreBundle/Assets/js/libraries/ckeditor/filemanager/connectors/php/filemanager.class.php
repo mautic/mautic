@@ -1260,24 +1260,7 @@ class Filemanager
 
     private function is_valid_path($path)
     {
-
-        //  @todo to remove
-        // if(!$this->startsWith(realpath($path), realpath($this->path_to_files))) return false;
-        // @see https://github.com/simogeo/Filemanager/issues/332
-        // @see http://stackoverflow.com/questions/5642785/php-a-good-way-to-universalize-paths-across-oss-slash-directions
-
-        // $givenpath = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $path);
-        // $rootpath = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $this->path_to_files);
-        // $this->__log('substr doc_root : ' . substr(realpath($path) . DIRECTORY_SEPARATOR, 0, strlen($this->doc_root)));
-        // $this->__log('doc_root : ' . realpath($this->doc_root) . DIRECTORY_SEPARATOR);
-
-        // return $this->startsWith($givenpath, $rootpath);
-
-        $this->__log('substr path_to_files : '.substr(realpath($path).DIRECTORY_SEPARATOR, 0, strlen($this->path_to_files)));
-        $this->__log('path_to_files : '.realpath($this->path_to_files).DIRECTORY_SEPARATOR);
-
-        return substr(realpath($path).DIRECTORY_SEPARATOR, 0, strlen($this->path_to_files)) == (realpath($this->path_to_files).DIRECTORY_SEPARATOR);
-
+       return file_exists($path);
     }
 
     private function unlinkRecursive($dir, $deleteRootToo = true)

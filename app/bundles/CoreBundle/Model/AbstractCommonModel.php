@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Translation\TranslatorInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class AbstractCommonModel
@@ -79,6 +80,11 @@ abstract class AbstractCommonModel
     protected $user;
 
     /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * @param EntityManager $em
      */
     public function setEntityManager(EntityManager $em)
@@ -117,6 +123,15 @@ abstract class AbstractCommonModel
     {
         $this->translator = $translator;
     }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
 
     /**
      * Initialize the user parameter for use in locking procedures

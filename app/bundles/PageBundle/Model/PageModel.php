@@ -31,7 +31,6 @@ use Mautic\PageBundle\PageEvents;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
-use Monolog\Logger;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -82,11 +81,6 @@ class PageModel extends FormModel
     protected $pageTrackableModel;
 
     /**
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
      * PageModel constructor.
      *
      * @param CookieHelper $cookieHelper
@@ -111,14 +105,6 @@ class PageModel extends FormModel
         $this->leadFieldModel = $leadFieldModel;
         $this->pageRedirectModel = $pageRedirectModel;
         $this->pageTrackableModel = $pageTrackableModel;
-    }
-
-    /**
-     * @param Logger $logger
-     */
-    public function setLogger(Logger $logger)
-    {
-        $this->logger = $logger;
     }
 
     /**
@@ -421,15 +407,25 @@ class PageModel extends FormModel
             }
 
             if (!empty($clickthrough['channel'])) {
-                $hit->setSource($clickthrough['channel'][0]);
-                $hit->setSourceId($clickthrough['channel'][1]);
+                if (count($clickthrough['channel']) === 1) {
+                    $channelId = reset($clickthrough['channel']);
+                    $channel   = key($clickthrough['channel']);
+                } else {
+                    $channel   = $clickthrough['channel'][0];
+                    $channelId = (int) $clickthrough['channel'][1];
+                }
+                $hit->setSource($channel);
+                $hit->setSourceId($channelId);
             } elseif (!empty($clickthrough['source'])) {
                 $hit->setSource($clickthrough['source'][0]);
                 $hit->setSourceId($clickthrough['source'][1]);
             }
 
             if (!empty($clickthrough['email'])) {
-                $hit->setEmail($this->em->getReference('MauticEmailBundle:Email', $clickthrough['email']));
+                $emailRepo = $this->em->getRepository("MauticEmailBundle:Email");
+                if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
+                    $hit->setEmail($emailEntity);
+                }
             }
         }
 
@@ -1022,5 +1018,17 @@ class PageModel extends FormModel
         $results = $q->execute()->fetchAll();
 
         return $results;
+    }
+
+    /**
+     * @deprecated 2.1 - use $entity->getVariants() instead; to be removed in 3.0
+     *
+     * @param Page $entity
+     *
+     * @return array
+     */
+    public function getVariants(Page $entity)
+    {
+        return $entity->getVariants();
     }
 }

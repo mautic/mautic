@@ -60,7 +60,7 @@ class SearchStringHelper
             self::$closingChars = $closingChars;
         }
 
-        $input = strtolower(trim(strip_tags($input)));
+        $input = trim(strip_tags($input));
 
         return self::splitUpSearchString($input);
     }
@@ -99,7 +99,7 @@ class SearchStringHelper
 
             if ($char == ':') {
                 //the string is a command
-                $command = strtolower(trim(substr($string, 0, -1)));
+                $command = trim(substr($string, 0, -1));
                 //does this have a negative?
                 if (strpos($command, '!') === 0) {
                     $filters->{$baseName}[$keyCount]->not = 1;
@@ -111,7 +111,7 @@ class SearchStringHelper
                 //arrived at the end of a single word that is not within a quote or parenthesis so add it as standalone
                 if ($string != ' ') {
                     $string = trim($string);
-                    $type = ($string == 'or' || $string == 'and') ? $string : '';
+                    $type = (strtolower($string) == 'or' || strtolower($string) == 'and') ? $string : '';
                     self::setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, $type, (!empty($chars)));
                 }
                 continue;
@@ -178,7 +178,7 @@ class SearchStringHelper
                                       $setUpNext = true)
     {
         if (!empty($type)) {
-            $filters->{$baseName}[$keyCount]->type = $type;
+            $filters->{$baseName}[$keyCount]->type = strtolower($type);
         } elseif ($setFilter) {
             $string = strtolower($string);
 

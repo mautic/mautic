@@ -656,9 +656,15 @@ class FormController extends CommonFormController
                     )
                 );
             } elseif ($form->get('buttons')->get('apply')->isClicked()) {
-                //rebuild everything to include new ids
+                // Rebuild everything to include new ids
                 $cleanSlate = true;
                 $reorder    = true;
+
+                if ($valid) {
+                    // Rebuild the form with new action so that apply doesn't keep creating a clone
+                    $action = $this->generateUrl('mautic_form_action', ['objectAction' => 'edit', 'objectId' => $entity->getId()]);
+                    $form   = $model->createForm($entity, $this->get('form.factory'), $action);
+                }
             }
         } else {
             $cleanSlate = true;

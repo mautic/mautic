@@ -665,7 +665,6 @@ class LeadRepository extends CommonRepository
         } else {
             $xFunc    = 'orX';
             $exprFunc = 'like';
-
         }
 
         $expr = $q->expr()->$xFunc(
@@ -713,13 +712,13 @@ class LeadRepository extends CommonRepository
         //DBAL QueryBuilder does not have an expr()->not() function; boo!!
         if ($filter->not) {
             $xFunc = "orX";
-            $xSubFunc = "andX";
+            $existsFunc = "NOT EXISTS";
             $eqFunc   = "neq";
             $nullFunc = "isNotNull";
             $likeFunc = "notLike";
         } else {
             $xFunc = "andX";
-            $xSubFunc = "orX";
+            $existsFunc = "EXISTS";
             $eqFunc   = "eq";
             $nullFunc = "isNull";
             $likeFunc = "like";
@@ -767,70 +766,57 @@ class LeadRepository extends CommonRepository
                 }
 
                 $sq = $this->_em->getConnection()->createQueryBuilder()
-                    ->select('ll.lead_id')
+                    ->select('null')
                     ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll');
 
                 $sq->where(
                     $sq->expr()->andX(
+                        $sq->expr()->eq('l.id', 'll.lead_id'),
                         $sq->expr()->eq('ll.leadlist_id', $listId),
                         $sq->expr()->orX(
                             $sq->expr()->isNull('ll.manually_removed'),
-                            $sq->expr()->eq('ll.manually_removed', ':false')
+                            $sq->expr()->eq('ll.manually_removed', ":$unique")
                         )
                     )
-                )
-                    ->setParameter('false', false, 'boolean');
-                $results = $sq->execute()->fetchAll();
+                );
 
-                $leadIds = array();
-                foreach ($results as $row) {
-                    $leadIds[] = $row['lead_id'];
-                }
-                if (!count($leadIds)) {
-                    $leadIds[] = 0;
-                }
-                $expr = $q->expr()->in('l.id', $leadIds);
+                $filter->string = false;
+                $filter->strict = false;
+
+                $expr = $q->expr()->andX(sprintf('%s (%s)', $existsFunc, $sq->getSQL()));
 
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ip'):
                 // search by IP
                 $sq = $this->_em->getConnection()->createQueryBuilder();
-                $sq->select('lip.lead_id')
+                $sq->select('null')
                     ->from(MAUTIC_TABLE_PREFIX.'lead_ips_xref', 'lip')
                     ->join('lip', MAUTIC_TABLE_PREFIX.'ip_addresses', 'ip', 'lip.ip_id = ip.id')
                     ->where(
-                        $sq->expr()->$likeFunc('ip.ip_address', ":$unique")
-                    )
-                    ->setParameter($unique, $string);
-                $results = $sq->execute()->fetchAll();
-                $leadIds = array();
-                foreach ($results as $row) {
-                    $leadIds[] = $row['lead_id'];
-                }
-                if (!count($leadIds)) {
-                    $leadIds[] = 0;
-                }
-                $expr = $q->expr()->in('l.id', $leadIds);
+                        $sq->expr()->andX(
+                            $sq->expr->andX('l.id', 'lip.lead_id'),
+                            $sq->expr()->$likeFunc('ip.ip_address', ":$unique")
+                        )
+                    );
+
+                $expr = $q->expr()->andX(sprintf('%s (%s)', $existsFunc, $sq->getSQL()));
+
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.tag'):
                 // search by tag
                 $sq = $this->_em->getConnection()->createQueryBuilder();
-                $sq->select('x.lead_id')
+                $sq->select('null')
                     ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x')
                     ->join('x', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id')
                     ->where(
-                        $sq->expr()->$eqFunc('t.tag', ":$unique")
-                    )
-                    ->setParameter($unique, $string);
-                $results = $sq->execute()->fetchAll();
-                $leadIds = array();
-                foreach ($results as $row) {
-                    $leadIds[] = $row['lead_id'];
-                }
-                if (!count($leadIds)) {
-                    $leadIds[] = 0;
-                }
-                $expr = $q->expr()->in('l.id', $leadIds);
+                        $sq->expr()->andX(
+                            $sq->expr()->eq('l.id', 'x.lead_id'),
+                            $sq->expr()->$eqFunc('t.tag', ":$unique")
+                        )
+                    );
+
+                $expr = $q->expr()->andX(sprintf('%s (%s)', $existsFunc, $sq->getSQL()));
+
                 break;
             case $this->translator->trans('mautic.core.searchcommand.email'):
                 $expr = $q->expr()->$likeFunc('LOWER(l.email)', ":$unique");
@@ -846,10 +832,7 @@ class LeadRepository extends CommonRepository
         }
 
         $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-
-        if ($command != $this->translator->trans('mautic.lead.lead.searchcommand.list')) {
-            $parameters[$unique] = $string;
-        }
+        $parameters[$unique] = $string;
 
         return array(
             $expr,

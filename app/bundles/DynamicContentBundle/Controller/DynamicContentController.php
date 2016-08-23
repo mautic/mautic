@@ -308,7 +308,7 @@ class DynamicContentController extends FormController
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
-                return $this->postActionRedirect($postActionVars);
+                return $this->viewAction($entity->getId());
             }
         } else {
             //lock the entity
@@ -402,13 +402,7 @@ class DynamicContentController extends FormController
 
         return $this->delegateView(
             [
-                'returnUrl'       => $this->generateUrl(
-                    'mautic_dynamicContent_action',
-                    [
-                        'objectAction' => 'view',
-                        'objectId'     => $entity->getId(),
-                    ]
-                ),
+                'returnUrl' => $action,
                 'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:details.html.php',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_dynamicContent_index',

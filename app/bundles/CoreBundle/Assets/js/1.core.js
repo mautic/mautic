@@ -286,7 +286,7 @@ var Mautic = {
             useClasses: false,
             imageOutputSize: true,
             htmlAllowedTags: ['a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base', 'bdi', 'bdo', 'blockquote', 'br', 'button', 'canvas', 'caption', 'cite', 'code', 'col', 'colgroup', 'datalist', 'dd', 'del', 'details', 'dfn', 'dialog', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'i', 'iframe', 'img', 'input', 'ins', 'kbd', 'keygen', 'label', 'legend', 'li', 'link', 'main', 'map', 'mark', 'menu', 'menuitem', 'meter', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'option', 'output', 'p', 'param', 'pre', 'progress', 'queue', 'rp', 'rt', 'ruby', 's', 'samp', 'script', 'style', 'section', 'select', 'small', 'source', 'span', 'strike', 'strong', 'sub', 'summary', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'time', 'title', 'tr', 'track', 'u', 'ul', 'var', 'video', 'wbr', 'center'],
-            htmlAllowedAttrs: ['data-atwho-at-query', 'data-section', 'data-section-wrapper', 'accept', 'accept-charset', 'accesskey', 'action', 'align', 'alt', 'async', 'autocomplete', 'autofocus', 'autoplay', 'autosave', 'background', 'bgcolor', 'border', 'charset', 'cellpadding', 'cellspacing', 'checked', 'cite', 'class', 'color', 'cols', 'colspan', 'content', 'contenteditable', 'contextmenu', 'controls', 'coords', 'data', 'data-.*', 'datetime', 'default', 'defer', 'dir', 'dirname', 'disabled', 'download', 'draggable', 'dropzone', 'enctype', 'for', 'form', 'formaction', 'headers', 'height', 'hidden', 'high', 'href', 'hreflang', 'http-equiv', 'icon', 'id', 'ismap', 'itemprop', 'keytype', 'kind', 'label', 'lang', 'language', 'list', 'loop', 'low', 'max', 'maxlength', 'media', 'method', 'min', 'multiple', 'name', 'novalidate', 'open', 'optimum', 'pattern', 'ping', 'placeholder', 'poster', 'preload', 'pubdate', 'radiogroup', 'readonly', 'rel', 'required', 'reversed', 'rows', 'rowspan', 'sandbox', 'scope', 'scoped', 'scrolling', 'seamless', 'selected', 'shape', 'size', 'sizes', 'span', 'src', 'srcdoc', 'srclang', 'srcset', 'start', 'step', 'summary', 'spellcheck', 'style', 'tabindex', 'target', 'title', 'type', 'translate', 'usemap', 'value', 'valign', 'width', 'wrap', 'contenteditable']
+            htmlAllowedAttrs: ['data-atwho-at-query', 'data-section', 'data-section-wrapper', 'accept', 'accept-charset', 'accesskey', 'action', 'align', 'allowfullscreen', 'alt', 'async', 'autocomplete', 'autofocus', 'autoplay', 'autosave', 'background', 'bgcolor', 'border', 'charset', 'cellpadding', 'cellspacing', 'checked', 'cite', 'class', 'color', 'cols', 'colspan', 'content', 'contenteditable', 'contextmenu', 'controls', 'coords', 'data', 'data-.*', 'datetime', 'default', 'defer', 'dir', 'dirname', 'disabled', 'download', 'draggable', 'dropzone', 'enctype', 'for', 'form', 'formaction', 'frameborder', 'headers', 'height', 'hidden', 'high', 'href', 'hreflang', 'http-equiv', 'icon', 'id', 'ismap', 'itemprop', 'keytype', 'kind', 'label', 'lang', 'language', 'list', 'loop', 'low', 'max', 'maxlength', 'media', 'method', 'min', 'mozallowfullscreen', 'multiple', 'name', 'novalidate', 'open', 'optimum', 'pattern', 'ping', 'placeholder', 'poster', 'preload', 'pubdate', 'radiogroup', 'readonly', 'rel', 'required', 'reversed', 'rows', 'rowspan', 'sandbox', 'scope', 'scoped', 'scrolling', 'seamless', 'selected', 'shape', 'size', 'sizes', 'span', 'src', 'srcdoc', 'srclang', 'srcset', 'start', 'step', 'summary', 'spellcheck', 'style', 'tabindex', 'target', 'title', 'type', 'translate', 'usemap', 'value', 'valign', 'webkitallowfullscreen', 'width', 'wrap']
         };
 
         // Set the Froala license key
@@ -562,6 +562,11 @@ var Mautic = {
                 var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
                 var minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
 
+                if (textarea.hasClass('editor-email')) {
+                    maxButtons = mQuery.grep(maxButtons, function(value) {
+                        return value != 'insertGatedVideo';
+                    });
+                }
 
                 if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
                     var options = {
@@ -583,13 +588,13 @@ var Mautic = {
                         Mautic.showChangeThemeWarning = true;
                     });
 
-                    textarea.froalaEditor(mQuery.extend(options, Mautic.basicFroalaOptions));
+                    textarea.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, options));
                 } else {
-                    textarea.froalaEditor(mQuery.extend({
+                    textarea.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, {
                         // Set custom buttons with separator between them.
                         toolbarButtons: minButtons,
                         heightMin: 100
-                    }, Mautic.basicFroalaOptions));
+                    }));
                 }
             });
         }
@@ -1012,13 +1017,12 @@ var Mautic = {
             // trash created map objects to save some memory
             if (typeof Mautic.mapObjects !== 'undefined') {
                 mQuery.each(Mautic.mapObjects, function (i, map) {
-                    map.removeAllMarkers();
-                    map.remove();
+                    Mautic.destroyMap(map);
                 });
                 Mautic.mapObjects = [];
             }
 
-	    // trash tokens to save some memory
+    	    // trash tokens to save some memory
             if (typeof Mautic.builderTokens !== 'undefined') {
                 Mautic.builderTokens = {};
             }
@@ -3342,7 +3346,6 @@ var Mautic = {
      * @param mQuery element scope
      */
     renderMaps: function(scope) {
-        if (!Mautic.mapObjects) Mautic.mapObjects = [];
         var maps = [];
 
         if (mQuery.type(scope) === 'string') {
@@ -3355,73 +3358,99 @@ var Mautic = {
 
         if (maps.length) {
             maps.each(function(index, element) {
-                var wrapper = mQuery(element);
+                Mautic.renderMap(mQuery(element));
+            });
+        }
+    },
+
+    renderMap: function(wrapper) {
+        // Map render causes a JS error on FF when the element is hidden
+        if (wrapper.is(':visible')) {
+            if (!Mautic.mapObjects) Mautic.mapObjects = [];
+            var data = wrapper.data('map-data');
+            if (typeof data === 'undefined' || !data.length) {
                 try {
-                    var data = mQuery.parseJSON(wrapper.text());
+                    data = mQuery.parseJSON(wrapper.text());
+                    wrapper.data('map-data', data);
                 } catch (error) {
 
                     return;
                 }
+            }
+            
+            // Markers have numerical indexes
+            var firstKey = Object.keys(data)[0];
 
-                // Markers have numerical indexes
-                var firstKey = Object.keys(data)[0];
+            // Check type of data
+            if (firstKey == "0") {
+                // Markers
+                var markersData = data,
+                    regionsData = {};
+            } else {
+                // Regions
+                var markersData = {},
+                    regionsData = data;
+            }
 
-                // Check type of data
-                if (firstKey == "0") {
-                    // Markers
-                    var markersData = data,
-                        regionsData = {};
-                } else {
-                    // Regions
-                    var markersData = {},
-                        regionsData = data;
-                }
-
-                wrapper.text('');
-                wrapper.vectorMap({
-                    backgroundColor: 'transparent',
-                    zoomOnScroll: false,
-                    markers: markersData,
-                    markerStyle: {
-                        initial: {
-                            fill: '#40C7B5'
-                        },
-                        selected: {
-                            fill: '#40C7B5'
-                        }
+            wrapper.text('');
+            wrapper.vectorMap({
+                backgroundColor: 'transparent',
+                zoomOnScroll: false,
+                markers: markersData,
+                markerStyle: {
+                    initial: {
+                        fill: '#40C7B5'
                     },
-                    regionStyle: {
-                        initial: {
-                            "fill": '#dce0e5',
-                            "fill-opacity": 1,
-                            "stroke": 'none',
-                            "stroke-width": 0,
-                            "stroke-opacity": 1
-                        },
-                        hover: {
-                            "fill-opacity": 0.7,
-                            "cursor": 'pointer'
-                        }
-                    },
-                    map: 'world_mill_en',
-                    series: {
-                        regions: [{
-                            values: regionsData,
-                            scale: ['#dce0e5', '#40C7B5'],
-                            normalizeFunction: 'polynomial'
-                        }]
-                    },
-                    onRegionTipShow: function (event, label, index) {
-                        if (data[index] > 0) {
-                            label.html(
-                                '<b>'+label.html()+'</b></br>'+
-                                data[index]+' Leads'
-                            );
-                        }
+                    selected: {
+                        fill: '#40C7B5'
                     }
-                });
-                Mautic.mapObjects.push(wrapper.vectorMap('get', 'mapObject'));
+                },
+                regionStyle: {
+                    initial: {
+                        "fill": '#dce0e5',
+                        "fill-opacity": 1,
+                        "stroke": 'none',
+                        "stroke-width": 0,
+                        "stroke-opacity": 1
+                    },
+                    hover: {
+                        "fill-opacity": 0.7,
+                        "cursor": 'pointer'
+                    }
+                },
+                map: 'world_mill_en',
+                series: {
+                    regions: [{
+                        values: regionsData,
+                        scale: ['#dce0e5', '#40C7B5'],
+                        normalizeFunction: 'polynomial'
+                    }]
+                },
+                onRegionTipShow: function (event, label, index) {
+                    if (data[index] > 0) {
+                        label.html(
+                            '<b>'+label.html()+'</b></br>'+
+                            data[index]+' Leads'
+                        );
+                    }
+                }
             });
+            wrapper.addClass('map-rendered');
+            Mautic.mapObjects.push(wrapper);
+            return wrapper;
+        }
+    },
+
+    /**
+     * Destroy a jVector map
+     */
+    destroyMap: function(wrapper) {
+        if (wrapper.hasClass('map-rendered')) {
+            var map = wrapper.vectorMap('get', 'mapObject');
+            map.removeAllMarkers();
+            map.remove();
+            wrapper.empty();
+            wrapper.removeClass('map-rendered');
         }
     },
 

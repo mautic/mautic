@@ -1252,8 +1252,8 @@ function remove_mautic_deleted_files(array $status)
                     if (file_exists($dirpath) && !glob($dirpath.'/*')) {
                         @chmod($dirpath, 0777);
                         if (!@unlink($dirpath)) {
-                            // Failed to delete, reset the permissions to 644 for safety
-                            @chmod($dirpath, 0644);
+                            // Failed to delete, reset the permissions to 0755 for safety
+                            @chmod($dirpath, 0755);
                         }
                     }
                 }
