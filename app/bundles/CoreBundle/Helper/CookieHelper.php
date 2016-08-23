@@ -36,11 +36,12 @@ class CookieHelper
      */
     public function __construct($cookiePath, $cookieDomain, $cookieSecure, $cookieHttp, RequestStack $requestStack)
     {
-        $this->path    = $cookiePath;
-        $this->domain  = $cookieDomain;
-        $this->secure  = $cookieSecure;
-        $this->request = $requestStack->getCurrentRequest();
+        $this->path     = $cookiePath;
+        $this->domain   = $cookieDomain;
+        $this->secure   = $cookieSecure;
+        $this->httponly = $cookieHttp;
 
+        $this->request = $requestStack->getCurrentRequest();
         if (('' === $this->secure || null === $this->secure) && $this->request) {
             $this->secure = filter_var($requestStack->getCurrentRequest()->server->get('HTTPS', false), FILTER_VALIDATE_BOOLEAN);
         }
