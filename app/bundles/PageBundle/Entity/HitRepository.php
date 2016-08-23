@@ -274,9 +274,13 @@ class HitRepository extends CommonRepository
 
         // Get the total number of hits
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $pageExpr = count($inIds) > 1 ? $q->expr()->in('h.page_id', $inIds) : $q->expr()->eq('h.page_id', $inIds[0]);
+
         $q->select('p.id, p.unique_hits')
             ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
-            ->where($q->expr()->in('p.id', $inIds));
+            ->where($pageExpr);
+
         $results = $q->execute()->fetchAll();
 
         $return  = array();
@@ -293,11 +297,17 @@ class HitRepository extends CommonRepository
         $sq->select('b.tracking_id')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'b')
             ->leftJoin('b', MAUTIC_TABLE_PREFIX.'pages', 'p', 'b.page_id = p.id')
-            ->andWhere($sq->expr()->eq('b.code', '200'));
+            ->where(
+                $sq->expr()->andX(
+                    $sq->expr()->eq('b.code', '200'),
+                    $pageExpr
+                )
+            );
+
 
         if ($fromDate !== null) {
             //make sure the date is UTC
-            $dt = new DateTimeHelper($fromDate);
+            $dt = new DateTimeHelper($fromDate, 'Y-m-d H:i:s', 'local');
             $sq->andWhere(
                 $sq->expr()->gte('b.date_hit', $sq->expr()->literal($dt->toUtcString()))
             );
@@ -315,9 +325,6 @@ class HitRepository extends CommonRepository
 
         // Now group bounced sessions by page_id to get the number of bounces per page
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-
-        $pageExpr = count($inIds) > 1 ? $q->expr()->in('h.page_id', $inIds) : $q->expr()->eq('h.page_id', $inIds[0]);
-
         $q->select('h.page_id, count(distinct(h.tracking_id)) as bounces')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
             ->where(
