@@ -260,11 +260,13 @@ class PageController extends FormController
 
         // Audit Log
         $logs = $this->getModel('core.auditLog')->getLogForObject('page', $activePage->getId(), $activePage->getDateAdded());
+        $dateFrom = new \DateTime($dateRangeForm->get('date_from')->getData());
+        $dateTo = new \DateTime($dateRangeForm->get('date_to')->getData());
 
         $pageviews = $model->getHitsLineChartData(
             null,
-            new \DateTime($dateRangeForm->get('date_from')->getData()),
-            new \DateTime($dateRangeForm->get('date_to')->getData()),
+            $dateFrom,
+            $dateTo,
             null,
             array('page_id' => $activePage->getId(), 'flag' => 'total_and_unique')
         );
@@ -302,7 +304,7 @@ class PageController extends FormController
                 ), "RETURN_ARRAY"),
                 'stats'         => array(
                     'pageviews' => $pageviews,
-                    'bounces'   => $model->getBounces($activePage),
+                    'bounces'   => $model->getBounces($activePage, $dateFrom),
                     'hits'      => array(
                         'total'  => $activePage->getHits(),
                         'unique' => $activePage->getUniqueHits()

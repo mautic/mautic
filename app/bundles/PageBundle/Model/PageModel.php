@@ -778,13 +778,14 @@ class PageModel extends FormModel
     /**
      * Get number of page bounces
      *
-     * @param Page $page
+     * @param Page      $page
+     * @param \DateTime $fromDate
      *
      * @return int
      */
-    public function getBounces (Page $page)
+    public function getBounces (Page $page, \DateTime $fromDate = null)
     {
-        return $this->getHitRepository()->getBounces($page->getId());
+        return $this->getHitRepository()->getBounces($page->getId(), $fromDate);
     }
 
     /**
