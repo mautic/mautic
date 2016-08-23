@@ -221,7 +221,7 @@ class Configurator
         foreach ($this->parameters as $key => $value) {
             if ($value !== '') {
                 if (is_string($value)) {
-                    $value = "'" . addslashes($value) . "'";
+                    $value = "'" . addcslashes($value, '\\\'') . "'";
                 } elseif (is_bool($value)) {
                     $value = ($value) ? 'true' : 'false';
                 } elseif (is_null($value)) {
@@ -261,7 +261,7 @@ class Configurator
             if (is_array($value)) {
                 $string .= $this->renderArray($value, $level + 1);
             } else {
-                $string .= '"'.addslashes($value).'"';
+                $string .= '"'.addcslashes($value, '\\"').'"';
             }
 
             $counter--;

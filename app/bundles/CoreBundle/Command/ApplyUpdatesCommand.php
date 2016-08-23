@@ -11,7 +11,7 @@ namespace Mautic\CoreBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\Console\Helper\ProgressBar;
+use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -95,7 +95,7 @@ EOT
         }
 
         // Start a progress bar, don't give a max number of steps because it is conditional
-        $progressBar = new ProgressBar($output);
+        $progressBar = ProgressBarHelper::init($output);
         $progressBar->setFormat('Step %current% [%bar%] <info>%message%</info>');
 
         if ($package) {

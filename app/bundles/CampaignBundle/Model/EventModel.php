@@ -28,8 +28,7 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Model\LeadModel;
-use Monolog\Logger;
-use Symfony\Component\Console\Helper\ProgressBar;
+use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -72,11 +71,6 @@ class EventModel extends CommonFormModel
     protected $campaignModel;
 
     /**
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
      * @var mixed
      */
     protected $scheduleTimeForFailedEvents;
@@ -104,14 +98,6 @@ class EventModel extends CommonFormModel
         $this->batchCampaignSleepTime      = $coreParametersHelper->getParameter('mautic.batch_campaign_sleep_time');
         $this->scheduleTimeForFailedEvents = $coreParametersHelper->getParameter('campaign_time_wait_on_event_false');
         $this->factory                     = $factory;
-    }
-
-    /**
-     * @param Logger $logger
-     */
-    public function setLogger(Logger $logger)
-    {
-        $this->logger = $logger;
     }
 
     /**
@@ -169,58 +155,30 @@ class EventModel extends CommonFormModel
      * @param $originalEvents
      * @param $deletedEvents
      */
-    public function deleteEvents($currentEvents, $originalEvents, $deletedEvents)
+    public function deleteEvents($currentEvents, $deletedEvents)
     {
-        $orderedDelete = array();
+        $deletedKeys = [];
         foreach ($deletedEvents as $k => $deleteMe) {
             if ($deleteMe instanceof Event) {
                 $deleteMe = $deleteMe->getId();
             }
 
             if (strpos($deleteMe, 'new') === 0) {
-                continue;
+                unset($deletedEvents[$k]);
             }
 
-            if (isset($originalEvents[$deleteMe]) && !in_array($deleteMe, $orderedDelete)) {
-                $this->buildEventHierarchy($originalEvents[$deleteMe], $orderedDelete);
-            }
-        }
-
-        //remove any events that are now part of the current events (i.e. a child moved from a deleted parent)
-        foreach ($orderedDelete as $k => $deleteMe) {
             if (isset($currentEvents[$deleteMe])) {
-                unset($orderedDelete[$k]);
+                unset($deletedEvents[$k]);
             }
+
+            $deletedKeys[] = $deleteMe;
         }
 
-        $this->deleteEntities($orderedDelete);
-    }
+        // wipe out any references to these events to prevent restraint violations
+        $this->getRepository()->nullEventRelationships($deletedKeys);
 
-    /**
-     * Build a hierarchy of children and parent entities for deletion
-     *
-     * @param $entity
-     * @param $hierarchy
-     */
-    public function buildEventHierarchy($entity, &$hierarchy)
-    {
-        if ($entity instanceof Event) {
-            $children = $entity->getChildren();
-            $id       = $entity->getId();
-        } else {
-            $children = (isset($entity['children'])) ? $entity['children'] : array();
-            $id       = $entity['id'];
-        }
-        $hasChildren = count($children) ? true : false;
-
-        if (!$hasChildren) {
-            $hierarchy[] = $id;
-        } else {
-            foreach ($children as $child) {
-                $this->buildEventHierarchy($child, $hierarchy);
-            }
-            $hierarchy[] = $id;
-        }
+        // delete the events
+        $this->deleteEntities($deletedEvents);
     }
 
     /**
@@ -535,7 +493,7 @@ class EventModel extends CommonFormModel
         $maxCount = ($max) ? $max : $totalStartingEvents;
 
         if ($output) {
-            $progress = new ProgressBar($output, $maxCount);
+            $progress = ProgressBarHelper::init($output, $maxCount);
             $progress->start();
         }
 
@@ -1107,7 +1065,7 @@ class EventModel extends CommonFormModel
         gc_enable();
 
         if ($output) {
-            $progress = new ProgressBar($output, $maxCount);
+            $progress = ProgressBarHelper::init($output, $maxCount);
             $progress->start();
             if ($max) {
                 $progress->setProgress($totalEventCount);
@@ -1352,7 +1310,7 @@ class EventModel extends CommonFormModel
 
         if ($leadCount) {
             if ($output) {
-                $progress = new ProgressBar($output, $maxCount);
+                $progress = ProgressBarHelper::init($output, $maxCount);
                 $progress->start();
                 if ($max) {
                     $progress->advance($totalEventCount);

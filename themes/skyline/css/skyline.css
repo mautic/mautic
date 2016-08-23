@@ -42,13 +42,22 @@ table {
 h1, h2, h3 {
     padding: 0;
     margin: 0;
-    color: #ffffff;
+    color: #37302d;
     font-weight: 400;
 }
 
 h3 {
     color: #21c5ba;
     font-size: 24px;
+}
+
+.well {
+    margin: 30px auto;
+    width: 800px;
+}
+
+.text-center {
+    text-align: center;
 }
 
 @media screen {
