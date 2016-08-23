@@ -249,13 +249,16 @@ abstract class AbstractCommonModel
     /**
      * Decode a string appended to URL into an array
      *
-     * @param $string
+     * @param      $string
+     * @param bool $urlDecode
      *
      * @return mixed
      */
-    public function decodeArrayFromUrl($string)
+    public function decodeArrayFromUrl($string, $urlDecode = true)
     {
-        return unserialize(base64_decode(urldecode($string)));
+        $raw = $urlDecode ? urldecode($string) : $string;
+
+        return unserialize(base64_decode($raw));
     }
 
     /**
