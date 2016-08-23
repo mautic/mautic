@@ -95,7 +95,7 @@ Mautic.loadNewDynamicContentWindow = function(options) {
             var generator = window.open(options.windowUrl, 'newDynamicContentwindow', 'height=600,width=530');
 
             if (!generator || generator.closed || typeof generator.closed == 'undefined') {
-                alert(response.popupBlockerMessage);
+                alert(mauticLang.popupBlockerMessage);
             } else {
                 generator.onload = function () {
                     Mautic.stopModalLoadingBar();
