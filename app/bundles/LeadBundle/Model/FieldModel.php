@@ -30,7 +30,7 @@ class FieldModel extends FormModel
         // Listed according to $order for installation
         'title'     => [
             'type'       => 'lookup',
-            'properties' => ['list' => '|Mr|Mrs|Miss'],
+            'properties' => ['list' => 'Mr|Mrs|Miss'],
             'fixed'      => true,
         ],
         'firstname' => [
