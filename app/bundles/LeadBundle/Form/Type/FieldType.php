@@ -172,8 +172,8 @@ class FieldType extends AbstractType
             $form = $event->getForm();
             $data = $event->getData();
             $type = (is_array($data)) ? (isset($data['type']) ? $data['type'] : null) : $data->getType();
-
             switch ($type) {
+                case 'multiselect':
                 case 'select':
                 case 'lookup':
                     if (is_array($data) && isset($data['properties'])) {
@@ -181,7 +181,6 @@ class FieldType extends AbstractType
                     } else {
                         $properties = $data->getProperties();
                     }
-
                     if (isset($properties['list']) && is_string($properties['list'])) {
                         $properties['list'] = array_map('trim', explode('|', $properties['list']));
                     }

@@ -383,11 +383,13 @@ class LeadRepository extends CommonRepository
         $leadValues = array_merge(array_flip(array_keys($fields)), $leadValues);
 
         $fieldValues = array();
-
         //loop over results to put fields in something that can be assigned to the entities
         foreach ($leadValues as $k => $r) {
             if (isset($fields[$k])) {
                 if ($byGroup) {
+                    if ($fields[$k]['type'] === 'multiselect') {
+                        $r = explode("|", $r);
+                    }
                     $fieldValues[$fields[$k]['group']][$fields[$k]['alias']]          = $fields[$k];
                     $fieldValues[$fields[$k]['group']][$fields[$k]['alias']]['value'] = $r;
                 } else {
@@ -406,7 +408,6 @@ class LeadRepository extends CommonRepository
                 }
             }
         }
-
         return $fieldValues;
     }
 

@@ -194,6 +194,37 @@ class LeadType extends AbstractType
 
                     $builder->add($alias, $type, $opts);
                     break;
+                case 'multiselect':
+                    $choices = [];
+                    if ($type == 'multiselect' && !empty($properties['list'])) {
+                        $list = $properties['list'];
+                        foreach ($list as $l) {
+                            $l           = trim($l);
+                            $choices[$l] = $l;
+                        }
+                        $expanded = false;
+                    }
+
+                    if (!empty($choices)) {
+                        $builder->add(
+                            $alias,
+                            'choice',
+                            [
+                                'choices'     => $choices,
+                                'required'    => $required,
+                                'label'       => $field['label'],
+                                'label_attr'  => ['class' => 'control-label'],
+                                'data'        => $value,
+                                'attr'        => $attr,
+                                'mapped'      => false,
+                                'multiple'    => true,
+                                'empty_value' => false,
+                                'expanded'    => $expanded,
+                                'constraints' => $constraints
+                            ]
+                        );
+                    }
+                    break;
                 case 'select':
                 case 'boolean':
                     $choices = [];
