@@ -10,11 +10,9 @@
 namespace Mautic\PageBundle\Model;
 
 use Mautic\CoreBundle\Helper\CookieHelper;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\LeadDevice;
-use Mautic\LeadBundle\Entity\Tag;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\LeadBundle\Entity\Lead;
@@ -200,6 +198,18 @@ class PageModel extends FormModel
 
         $this->postVariantSaveEntity($entity, $resetVariants, $pageIds, $variantStartDate);
         $this->postTranslationEntitySave($entity);
+    }
+
+    /**
+     * @param Page $entity
+     */
+    public function deleteEntity($entity)
+    {
+        if ($entity->isVariant() && $entity->getIsPublished()) {
+            $this->resetVariants($entity);
+        }
+
+        parent::deleteEntity($entity);
     }
 
     /**
