@@ -309,33 +309,26 @@ class HitRepository extends CommonRepository
         // Include if a single hit to page or multiple hits to the same page
         $sq->having('count(distinct(b.page_id)) = 1');
 
-        // Load this data into a temporary table
-        $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
-        $tempTableName = $platform->getTemporaryTableName('tmp_0');
-        $sql = $platform->getCreateTemporaryTableSnippetSQL().' '.$tempTableName.' AS ('.$sq->getSQL().');';
-        $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
-        $stmt->execute();
+        $sqResults = $sq->execute()->fetchAll();
+
+        $trackingIds = array_column($sqResults, 'tracking_id');
 
         // Now group bounced sessions by page_id to get the number of bounces per page
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $pageExpr = count($inIds) > 1 ? $q->expr()->in('h.page_id', $inIds) : $q->expr()->eq('h.page_id', $inIds[0]);
+
         $q->select('h.page_id, count(distinct(h.tracking_id)) as bounces')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
-            ->innerJoin(
-                'h',
-                $tempTableName,
-                't',
-                $q->expr()->andx(
-                    $q->expr()->eq('h.tracking_id', 't.tracking_id'),
-                    $q->expr()->in('h.page_id', $inIds)
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->in('h.tracking_id', '"' . implode('", "', $trackingIds) . '"'),
+                    $pageExpr
                 )
             )
             ->groupBy('h.page_id');
 
         $results = $q->execute()->fetchAll();
-
-        // Drop the temporary table now
-        $stmt = $this->getEntityManager()->getConnection()->prepare($platform->getDropTemporaryTableSQL($tempTableName));
-        $stmt->execute();
 
         foreach ($results as $r) {
             $return[$r['page_id']]['bounces'] = (int) $r['bounces'];
