@@ -506,6 +506,13 @@ Mautic.initSlotListeners = function() {
             });
 
             var buttons = ['bold', 'italic', 'fontSize', 'insertImage', 'insertGatedVideo', 'insertLink', 'insertTable', 'undo', 'redo', '-', 'paragraphFormat', 'align', 'color', 'formatOL', 'formatUL', 'indent', 'outdent', 'token'];
+            var builderEl = parent.mQuery('.builder');
+
+            if (builderEl.length && builderEl.hasClass('email-builder')) {
+                buttons = mQuery.grep(buttons, function(value) {
+                    return value != 'insertGatedVideo';
+                });
+            }
 
             var inlineFroalaOptions = {
                 toolbarButtons: buttons,
