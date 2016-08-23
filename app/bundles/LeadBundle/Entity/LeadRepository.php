@@ -449,6 +449,35 @@ class LeadRepository extends CommonRepository
     }
 
     /**
+     *
+     * {@inheritdoc}
+     *
+     * @param integer $id contact id           
+     * @param integer $start start of pagination
+     * @param integer $limit size of pagination
+     * @return mixed|null
+     */
+    public function getEntityUrlHistory($id = 0, $start = 0, $limit = 0)
+    {
+        $q = $this->_em->getConnection()
+            ->createQueryBuilder()
+            ->select('hits.*')
+            ->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'hits')
+            ->where("lead_id = :id")
+            ->setParameter('id', $id)
+            ->setFirstResult($start);
+        if ($limit !== 0) {
+            $q->setMaxResults($limit);
+        }
+        $result = $q->execute()->fetchAll();
+        if (count($result)) {
+            return $result;
+        } else {
+            return null;
+        }
+    }
+    
+    /**
      * Get a list of leads
      *
      * @param array $args

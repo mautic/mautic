@@ -224,6 +224,27 @@ class LeadModel extends FormModel
         return "getPrimaryIdentifier";
     }
 
+
+    /**
+     * Get a specific entity Url history
+     *
+     * @param integer $id contact id           
+     * @param integer $start start of pagination
+     * @param integer $limit size of pagination
+     * @return null|object
+     */
+    public function getEntityUrlHistory($id = null, $start=0, $limit=0)
+    {
+        if (null !== $id) {
+            $repo = $this->getRepository();
+            if (method_exists($repo, 'getEntityUrlHistory')) {
+                return $repo->getEntityUrlHistory($id, $start, $limit);
+            }
+            return $repo->find($id);
+        }
+        return null;
+    }
+    
     /**
      * {@inheritdoc}
      *
