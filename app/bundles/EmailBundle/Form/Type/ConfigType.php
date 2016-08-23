@@ -316,28 +316,6 @@ class ConfigType extends AbstractType
             ]
         );
 
-        $mailerLoginShowConditions = '{
-            "config_emailconfig_mailer_auth_mode":[
-                "plain",
-                "login",
-                "cram-md5"
-            ], "config_emailconfig_mailer_transport":[
-                "mautic.transport.mandrill",
-                "mautic.transport.sendgrid",
-                "mautic.transport.amazon",
-                "mautic.transport.postmark",
-                "gmail"
-            ]
-        }';
-
-        $mailerLoginHideConditions = '{
-         "config_emailconfig_mailer_transport":[
-                "mail",
-                "sendmail",
-                "mautic.transport.sparkpost"
-            ]
-        }';
-
         $builder->add(
             'mailer_auth_mode',
             'choice',
@@ -359,6 +337,50 @@ class ConfigType extends AbstractType
             ]
         );
 
+        $mailerLoginUserShowConditions = '{
+            "config_emailconfig_mailer_auth_mode":[
+                "plain",
+                "login",
+                "cram-md5"
+            ], "config_emailconfig_mailer_transport":[
+                "mautic.transport.mandrill",
+                "mautic.transport.sendgrid",
+                "mautic.transport.amazon",
+                "mautic.transport.postmark",
+                "gmail"
+            ]
+        }';
+
+        $mailerLoginPasswordShowConditions = '{
+            "config_emailconfig_mailer_auth_mode":[
+                "plain",
+                "login",
+                "cram-md5"
+            ], "config_emailconfig_mailer_transport":[
+                "mautic.transport.sendgrid",
+                "mautic.transport.amazon",
+                "mautic.transport.postmark",
+                "gmail"
+            ]
+        }';
+
+        $mailerLoginUserHideConditions = '{
+         "config_emailconfig_mailer_transport":[
+                "mail",
+                "sendmail",
+                "mautic.transport.sparkpost"
+            ]
+        }';
+
+        $mailerLoginPasswordHideConditions = '{
+         "config_emailconfig_mailer_transport":[
+                "mail",
+                "sendmail",
+                "mautic.transport.sparkpost",
+                "mautic.transport.mandrill"
+            ]
+        }';
+
         $builder->add(
             'mailer_user',
             'text',
@@ -367,8 +389,8 @@ class ConfigType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
-                    'data-show-on' => $mailerLoginShowConditions,
-                    'data-hide-on' => $mailerLoginHideConditions,
+                    'data-show-on' => $mailerLoginUserShowConditions,
+                    'data-hide-on' => $mailerLoginUserHideConditions,
                     'tooltip'      => 'mautic.email.config.mailer.user.tooltip',
                     'autocomplete' => 'off'
                 ],
@@ -386,8 +408,8 @@ class ConfigType extends AbstractType
                     'class'        => 'form-control',
                     'placeholder'  => 'mautic.user.user.form.passwordplaceholder',
                     'preaddon'     => 'fa fa-lock',
-                    'data-show-on' => $mailerLoginShowConditions,
-                    'data-hide-on' => $mailerLoginHideConditions,
+                    'data-show-on' => $mailerLoginPasswordShowConditions,
+                    'data-hide-on' => $mailerLoginPasswordHideConditions,
                     'tooltip'      => 'mautic.email.config.mailer.password.tooltip',
                     'autocomplete' => 'off'
                 ],
@@ -395,10 +417,10 @@ class ConfigType extends AbstractType
             ]
         );
 
-        $apiKeyShowConditions = '{"config_emailconfig_mailer_transport":["mautic.transport.sparkpost"]}';
+        $apiKeyShowConditions = '{"config_emailconfig_mailer_transport":["mautic.transport.sparkpost", "mautic.transport.mandrill"]}';
         $builder->add(
             'mailer_api_key',
-            'text',
+            'password',
             [
                 'label'      => 'mautic.email.config.mailer.apikey',
                 'label_attr' => ['class' => 'control-label'],

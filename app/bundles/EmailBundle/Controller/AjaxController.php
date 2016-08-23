@@ -205,14 +205,15 @@ class AjaxController extends CommonAjaxController
      */
     protected function testEmailServerConnectionAction(Request $request)
     {
-        $dataArray = array('success' => 0, 'message' => '');
+        $dataArray = ['success' => 0, 'message' => ''];
+        $user      = $this->get('mautic.helper.user')->getUser();
 
-        if ($this->factory->getUser()->isAdmin()) {
+        if ($user->isAdmin()) {
             $settings = $request->request->all();
 
             $transport = $settings['transport'];
 
-            switch($transport) {
+            switch ($transport) {
                 case 'gmail':
                     $mailer = new \Swift_SmtpTransport('smtp.gmail.com', 465, 'ssl');
                     break;
@@ -226,10 +227,6 @@ class AjaxController extends CommonAjaxController
                     if ($this->container->has($transport)) {
                         $mailer = $this->container->get($transport);
                     }
-
-                    if ('mautic.transport.sparkpost' == $transport) {
-                        $mailer->setApiKey($settings['api_key']);
-                    }
             }
 
             if (method_exists($mailer, 'setMauticFactory')) {
@@ -237,9 +234,16 @@ class AjaxController extends CommonAjaxController
             }
 
             if (!empty($mailer)) {
-                if (is_callable([$mailer, 'setUsername']) && is_callable([$mailer, 'setPassword'])){
+                if (is_callable($mailer, 'setApiKey')) {
+                    if (empty($settings['api_key'])) {
+                        $settings['api_key'] = $this->get('mautic.helper.core_parameters')->getParameter('mailer_api_key');
+                    }
+                    $mailer->setApiKey($settings['api_key']);
+                }
+
+                if (is_callable([$mailer, 'setUsername']) && is_callable([$mailer, 'setPassword'])) {
                     if (empty($settings['password'])) {
-                        $settings['password'] = $this->factory->getParameter('mailer_password');
+                        $settings['password'] = $this->get('mautic.helper.core_parameters')->getParameter('mailer_password');
                     }
                     $mailer->setUsername($settings['user']);
                     $mailer->setPassword($settings['password']);
@@ -250,7 +254,7 @@ class AjaxController extends CommonAjaxController
 
                 try {
                     $mailer->start();
-                    $translator = $this->factory->getTranslator();
+                    $translator = $this->get('translator');
 
                     if ($settings['send_test'] == 'true') {
                         $message = new \Swift_Message(
@@ -258,15 +262,12 @@ class AjaxController extends CommonAjaxController
                             $translator->trans('mautic.email.config.mailer.transport.test_send.body')
                         );
 
-                        $user         = $this->factory->getUser();
                         $userFullName = trim($user->getFirstName().' '.$user->getLastName());
-
-                        $message->setFrom([$settings['from_email'] => $settings['from_name']]);
-                        if ($userFullName) {
-                            $message->setTo([$user->getEmail() => $user->getFirstName().' '.$user->getLastName()]);
-                        } else {
-                            $message->setTo([$user->getEmail()]);
+                        if (empty($userFullName)) {
+                            $userFullName = null;
                         }
+                        $message->setFrom([$settings['from_email'] => $settings['from_name']]);
+                        $message->setTo([$user->getEmail() => $userFullName]);
 
                         $mailer->send($message);
                     }
@@ -279,7 +280,7 @@ class AjaxController extends CommonAjaxController
                 }
             }
         }
+
         return $this->sendJsonResponse($dataArray);
     }
-
 }

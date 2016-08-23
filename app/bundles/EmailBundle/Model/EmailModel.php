@@ -1236,8 +1236,6 @@ class EmailModel extends FormModel
                 // Flush the mail queue if applicable
                 $flushQueue();
 
-                // Use batching/tokenization if supported
-                $mailer->useMailerTokenization();
                 $mailer->setSource($source);
                 $mailer->setEmail($emailEntity, true, $useSettings['slots'], $assetAttachments);
 
@@ -1364,8 +1362,6 @@ class EmailModel extends FormModel
         $mailer->setLead($lead, true);
         $mailer->setTokens($tokens);
         $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments, (!$saveStat));
-
-        $mailer->useMailerTokenization();
 
         $errors = [];
         foreach ($users as $user) {
