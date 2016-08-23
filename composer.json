@@ -110,6 +110,12 @@
         "webfactory/exceptions-bundle": "~4.3",
         "phpunit/phpunit": "4.5"
     },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/mautic/BazingaOAuthServerBundle.git"
+        }
+    ],
     "scripts": {
         "post-install-cmd": [
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
