@@ -196,7 +196,10 @@ return [
             ],
             'mautic.helper.mailbox'              => [
                 'class'     => 'Mautic\EmailBundle\MonitoredEmail\Mailbox',
-                'arguments' => 'mautic.factory'
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.paths'
+                ]
             ],
             'mautic.helper.message'            => [
                 'class'     => 'Mautic\EmailBundle\Helper\MessageHelper',
