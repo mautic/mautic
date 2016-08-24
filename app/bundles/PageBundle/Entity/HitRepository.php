@@ -238,7 +238,7 @@ class HitRepository extends CommonRepository
     public function getLatestHit($options)
     {
         $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('MAX(h.date_hit) latest_hit')
+        $sq->select('h.date_hit latest_hit')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h');
 
         if (isset($options['leadId'])) {
@@ -246,7 +246,6 @@ class HitRepository extends CommonRepository
                 $sq->expr()->eq('h.lead_id', $options['leadId'])
             );
         }
-
         if (isset($options['urls']) && $options['urls']) {
             $inUrls = (!is_array($options['urls'])) ? array($options['urls']) : $options['urls'];
             foreach ($inUrls as $k => $u) {
@@ -254,10 +253,14 @@ class HitRepository extends CommonRepository
                     ->setParameter('url_'.$k, $u);
             }
         }
-
+        if (isset($options['second_to_last'])) {
+            $sq->andWhere($sq->expr()->neq('h.id', $options['second_to_last']));
+        } else {
+            $sq->orderBy('h.date_hit','DESC limit 1');
+        }
         $result = $sq->execute()->fetch();
 
-        return new \DateTime($result['latest_hit']);
+        return new \DateTime($result['latest_hit'], new \DateTimeZone('UTC'));
     }
 
     /**
