@@ -270,16 +270,13 @@ class HitRepository extends CommonRepository
      */
     public function getBounces($pageIds, \DateTime $fromDate = null)
     {
-        $inIds = (!is_array($pageIds)) ? array($pageIds) : $pageIds;
+        $inOrEq = (! is_array($pageIds)) ? 'eq' : 'in';
 
         // Get the total number of hits
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-
-        $pageExpr = count($inIds) > 1 ? $q->expr()->in('h.page_id', $inIds) : $q->expr()->eq('h.page_id', $inIds[0]);
-
         $q->select('p.id, p.unique_hits')
             ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
-            ->where($pageExpr);
+            ->where($q->expr()->$inOrEq('p.id', $pageIds));
 
         $results = $q->execute()->fetchAll();
 
@@ -296,11 +293,10 @@ class HitRepository extends CommonRepository
         $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $sq->select('b.tracking_id')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'b')
-            ->leftJoin('b', MAUTIC_TABLE_PREFIX.'pages', 'p', 'b.page_id = p.id')
             ->where(
                 $sq->expr()->andX(
                     $sq->expr()->eq('b.code', '200'),
-                    $pageExpr
+                    $q->expr()->$inOrEq('b.page_id', $pageIds)
                 )
             );
 
@@ -330,7 +326,7 @@ class HitRepository extends CommonRepository
             ->where(
                 $q->expr()->andX(
                     $q->expr()->in('h.tracking_id', '"' . implode('", "', $trackingIds) . '"'),
-                    $pageExpr
+                    $q->expr()->$inOrEq('h.page_id', $pageIds)
                 )
             )
             ->groupBy('h.page_id');
