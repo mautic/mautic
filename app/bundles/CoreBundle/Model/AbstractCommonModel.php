@@ -256,9 +256,14 @@ abstract class AbstractCommonModel
      */
     public function decodeArrayFromUrl($string, $urlDecode = true)
     {
-        $raw = $urlDecode ? urldecode($string) : $string;
+        $raw     = $urlDecode ? urldecode($string) : $string;
+        $decoded = base64_decode($raw);
 
-        return unserialize(base64_decode($raw));
+        if (strpos(strtolower($decoded), 'a') !== 0) {
+            throw new \InvalidArgumentException(sprintf('The string %s is not a serialized array.', $decoded));
+        }
+
+        return unserialize($decoded);
     }
 
     /**
