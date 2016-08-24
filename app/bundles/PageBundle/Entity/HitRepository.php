@@ -265,10 +265,11 @@ class HitRepository extends CommonRepository
      *
      * @param array|string $pageIds
      * @param \DateTime    $fromDate
+     * @param bool         $isVariantCheck
      *
      * @return array
      */
-    public function getBounces($pageIds, \DateTime $fromDate = null)
+    public function getBounces($pageIds, \DateTime $fromDate = null, $isVariantCheck = false)
     {
         $inOrEq = (! is_array($pageIds)) ? 'eq' : 'in';
 
@@ -283,7 +284,7 @@ class HitRepository extends CommonRepository
         $return  = array();
         foreach ($results as $p) {
             $return[$p['id']] = array(
-                'totalHits' => $p['unique_hits'],
+                'totalHits' => $isVariantCheck ? $p['variant_hits'] : $p['unique_hits'],
                 'bounces'   => 0,
                 'rate'      => 0
             );

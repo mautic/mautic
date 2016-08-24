@@ -35,7 +35,7 @@ class AbTestHelper
 
         if ($startDate != null && !empty($pageIds)) {
             //get their bounce rates
-            $counts = $repo->getBounces($pageIds, $startDate);
+            $counts = $repo->getBounces($pageIds, $startDate, true);
             if ($counts) {
                 //let's arrange by rate
                 $rates             = [];
