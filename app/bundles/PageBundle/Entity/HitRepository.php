@@ -275,7 +275,7 @@ class HitRepository extends CommonRepository
 
         // Get the total number of hits
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->select('p.id, p.unique_hits')
+        $q->select('p.id, p.unique_hits, p.variant_hits')
             ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
             ->where($q->expr()->$inOrEq('p.id', $pageIds));
 
