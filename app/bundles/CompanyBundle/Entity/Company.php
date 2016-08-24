@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\AccountBundle\Entity;
+namespace Mautic\CompanyBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
@@ -18,11 +18,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Class Account
+ * Class Company
  *
- * @package Mautic\AccountBundle\Entity
+ * @package Mautic\CompanyBundle\Entity
  */
-class Account extends FormEntity
+class Company extends FormEntity
 {
 
     /**
@@ -33,12 +33,12 @@ class Account extends FormEntity
     /**
      * @var string
      */
-    private $accountNumber;
+    private $companyNumber;
 
     /**
      * @var string
      */
-    private $accountSource;
+    private $companySource;
 
     /**
      * @var float
@@ -119,7 +119,7 @@ class Account extends FormEntity
     /**
      * @var integer
      */
-    private $rating;
+    private $score;
 
     /**
      * @var string
@@ -157,18 +157,18 @@ class Account extends FormEntity
     public static function loadMetadata (ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('accounts')
-            ->setCustomRepositoryClass('Mautic\AccountBundle\Entity\AccountRepository');
+        $builder->setTable('companies')
+            ->setCustomRepositoryClass('Mautic\CompanyBundle\Entity\CompanyRepository');
 
         $builder->addIdColumns();
 
-        $builder->createField('accountNumber', 'string')
-            ->columnName('account_number')
+        $builder->createField('companyNumber', 'string')
+            ->columnName('company_number')
             ->nullable()
             ->build();
 
-        $builder->createField('accountSource', 'string')
-            ->columnName('account_source')
+        $builder->createField('companySource', 'string')
+            ->columnName('company_source')
             ->nullable()
             ->build();
 
@@ -194,10 +194,10 @@ class Account extends FormEntity
         $builder->addField('industry', 'string');
 
         $builder->createManyToMany('leads', 'Mautic\LeadBundle\Entity\Lead')
-            ->setJoinTable('account_leads_xref')
+            ->setJoinTable('company_leads_xref')
             ->addInverseJoinColumn('lead_id', 'id', false)
-            ->addJoinColumn('account_id', 'id', false, false, 'CASCADE')
-            ->setIndexBy('account')
+            ->addJoinColumn('company_id', 'id', false, false, 'CASCADE')
+            ->setIndexBy('company')
             ->cascadeMerge()
             ->cascadePersist()
             ->cascadeDetach()
@@ -216,7 +216,7 @@ class Account extends FormEntity
 
         $builder->addPublishDates();
 
-        $builder->addField('rating', 'integer');
+        $builder->addField('score', 'integer');
 
         $builder->addField('state', 'string');
 
@@ -245,12 +245,12 @@ class Account extends FormEntity
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
-        $metadata->setGroupPrefix('account')
+        $metadata->setGroupPrefix('company')
             ->addListProperties(
                 array(
                     'id',
-                    'accountNumber',
-                    'accountSource',
+                    'companyNumber',
+                    'companySource',
                     'address1',
                     'address2',
                     'annualRevenue',
@@ -266,7 +266,7 @@ class Account extends FormEntity
                     'owner',
                     'phone',
                     'owner',
-                    'rating',
+                    'score',
                     'state',
                     'type',
                     'website',
@@ -300,51 +300,51 @@ class Account extends FormEntity
     }
 
     /**
-     * Set accountNumber
+     * Set companyNumber
      *
-     * @param integer $accountNumber
+     * @param integer $companyNumber
      *
      * @return string
      */
-    public function setAccountNumber ($accountNumber)
+    public function setCompanyNumber ($companyNumber)
     {
-        $this->isChanged('accountNumber', $accountNumber);
-        $this->accountNumber = $accountNumber;
+        $this->isChanged('companyNumber', $companyNumber);
+        $this->companyNumber = $companyNumber;
 
         return $this;
     }
 
     /**
-     * Get accountNumber
+     * Get companyNumber
      *
      * @return string
      */
-    public function getAccountNumber ()
+    public function getCompanyNumber ()
     {
-        return $this->accountNumber;
+        return $this->companyNumber;
     }
 
     /**
-     * Get accountSource
+     * Get companySource
      *
      * @return string
      */
-    public function getAccountSource ()
+    public function getCompanySource ()
     {
-        return $this->accountSource;
+        return $this->companySource;
     }
 
     /**
-     * Set accountSource
+     * Set companySource
      *
-     * @param integer $accountSource
+     * @param integer $companySource
      *
      * @return string
      */
-    public function setAccountSource ($accountSource)
+    public function setCompanySource ($companySource)
     {
-        $this->isChanged('accountSource', $accountSource);
-        $this->accountSource = $accountSource;
+        $this->isChanged('companySource', $companySource);
+        $this->companySource = $companySource;
 
         return $this;
     }
@@ -580,7 +580,7 @@ class Account extends FormEntity
      * @param                                    $key
      * @param \Mautic\CampaignBundle\Entity\Lead $lead
      *
-     * @return Account
+     * @return Company
      */
     public function addLead ($key, Lead $lead)
     {
@@ -692,28 +692,28 @@ class Account extends FormEntity
     }
 
     /**
-     * Set Rating
+     * Set Score
      *
-     * @param string $rating
+     * @param string $score
      *
      * @return string
      */
-    public function setRating ($rating)
+    public function setScore ($score)
     {
-        $this->isChanged('rating', $rating);
-        $this->rating = $rating;
+        $this->isChanged('score', $score);
+        $this->score = $score;
 
         return $this;
     }
 
     /**
-     * Get rating
+     * Get Score
      *
      * @return string
      */
-    public function getRating ()
+    public function getScore ()
     {
-        return $this->rating;
+        return $this->score;
     }
 
     /**
