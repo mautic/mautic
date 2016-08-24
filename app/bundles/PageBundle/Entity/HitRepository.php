@@ -271,74 +271,56 @@ class HitRepository extends CommonRepository
      */
     public function getBounces($pageIds, \DateTime $fromDate = null, $isVariantCheck = false)
     {
-        $inOrEq = (! is_array($pageIds)) ? 'eq' : 'in';
+        $inOrEq = (!is_array($pageIds)) ? 'eq' : 'in';
 
-        // Get the total number of hits
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->select('p.id, p.unique_hits, p.variant_hits')
+        $hitsColumn = ($isVariantCheck) ? 'variant_hits' : 'unique_hits';
+        $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $pages      = $q->select("p.id, p.$hitsColumn as totalHits, p.title")
             ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
-            ->where($q->expr()->$inOrEq('p.id', $pageIds));
+            ->where($q->expr()->$inOrEq('p.id', $pageIds))
+            ->execute()
+            ->fetchAll();
 
-        $results = $q->execute()->fetchAll();
-
-        $return  = array();
-        foreach ($results as $p) {
-            $return[$p['id']] = array(
-                'totalHits' => $isVariantCheck ? $p['variant_hits'] : $p['unique_hits'],
+        $return = [];
+        foreach ($pages as $p) {
+            $return[$p['id']] = [
+                'totalHits' => (int) $p['totalHits'],
                 'bounces'   => 0,
-                'rate'      => 0
-            );
+                'rate'      => 0,
+                'title'     => $p['title']
+            ];
         }
 
-        // Find what sessions were bounces
-        $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $sq->select('b.tracking_id')
-            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'b')
-            ->where(
-                $sq->expr()->andX(
-                    $sq->expr()->eq('b.code', '200'),
-                    $q->expr()->$inOrEq('b.page_id', $pageIds)
-                )
-            );
-
+        // Get the total number of bounces - simplified query for if date_left is null, it'll more than likely be a bounce or
+        // else we would have recorded the date_left on a subsequent page hit
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $expr = $q->expr()->andX(
+            $q->expr()->$inOrEq('h.page_id', $pageIds),
+            $q->expr()->eq('h.code', 200),
+            $q->expr()->isNull('h.date_left')
+        );
 
         if ($fromDate !== null) {
             //make sure the date is UTC
             $dt = new DateTimeHelper($fromDate, 'Y-m-d H:i:s', 'local');
-            $sq->andWhere(
-                $sq->expr()->gte('b.date_hit', $sq->expr()->literal($dt->toUtcString()))
+            $expr->add(
+                $q->expr()->gte('h.date_hit', $q->expr()->literal($dt->toUtcString()))
             );
         }
 
-        // Group by tracking ID to determine if the same session visited multiple pages
-        $sq->groupBy('b.tracking_id');
-
-        // Include if a single hit to page or multiple hits to the same page
-        $sq->having('count(distinct(b.page_id)) = 1');
-
-        $sqResults = $sq->execute()->fetchAll();
-
-        $trackingIds = array_column($sqResults, 'tracking_id');
-
-        // Now group bounced sessions by page_id to get the number of bounces per page
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->select('h.page_id, count(distinct(h.tracking_id)) as bounces')
+        $q->select('count(*) as bounces, h.page_id')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
-            ->where(
-                $q->expr()->andX(
-                    $q->expr()->in('h.tracking_id', '"' . implode('", "', $trackingIds) . '"'),
-                    $q->expr()->$inOrEq('h.page_id', $pageIds)
-                )
-            )
+            ->where($expr)
             ->groupBy('h.page_id');
 
         $results = $q->execute()->fetchAll();
 
-        foreach ($results as $r) {
-            $return[$r['page_id']]['bounces'] = (int) $r['bounces'];
-            $return[$r['page_id']]['rate']    = ($return[$r['page_id']]['totalHits']) ?
-                round(($r['bounces'] / $return[$r['page_id']]['totalHits']) * 100, 2) :
-                0;
+        foreach ($results as $p) {
+            $return[$p['page_id']]['bounces'] = (int) $p['bounces'];
+            $return[$p['page_id']]['rate']    = ($return[$p['page_id']]['totalHits']) ? round(
+                ($p['bounces'] / $return[$p['page_id']]['totalHits']) * 100,
+                2
+            ) : 0;
         }
 
         return (!is_array($pageIds)) ? $return[$pageIds] : $return;
