@@ -19,7 +19,7 @@ class LineChartTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox The getUnitInterval returns the correct interval objects
      *
-     * @covers Mautic\CoreBundle\Helper\Chart\LineChart::getUnitInterval
+     * @covers \Mautic\CoreBundle\Helper\Chart\LineChart::getUnitInterval
      */
     public function testGetUnitInterval()
     {
