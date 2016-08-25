@@ -158,11 +158,7 @@ $view['slots']->set(
             'langVar'         => 'lead.lead',
             'customButtons'   => $buttons,
             'templateButtons' => [
-                'edit'   => $view['security']->hasEntityAccess(
-                    $permissions['lead:leads:editown'],
-                    $permissions['lead:leads:editother'],
-                    $lead->getCreatedBy()
-                ),
+                'edit'   => $edit,
                 'delete' => $view['security']->hasEntityAccess(
                     $permissions['lead:leads:deleteown'],
                     $permissions['lead:leads:deleteother'],
@@ -171,7 +167,7 @@ $view['slots']->set(
                 'close'  => $view['security']->hasEntityAccess(
                     $permissions['lead:leads:viewown'],
                     $permissions['lead:leads:viewother'],
-                    $lead->getCreatedBy()
+                    $lead->getOwner()
                 ),
             ],
         ]

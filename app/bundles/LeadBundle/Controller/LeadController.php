@@ -1806,7 +1806,7 @@ class LeadController extends FormController
 
             $count = 0;
             foreach ($entities as $lead) {
-                if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getCreatedBy())) {
+                if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
                     $count++;
 
                     if (!empty($data['add'])) {
@@ -1910,7 +1910,7 @@ class LeadController extends FormController
             }
 
             foreach ($entities as $key => $lead) {
-                if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getCreatedBy())) {
+                if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
 
                     unset($entities[$key]);
                 }
@@ -2036,7 +2036,7 @@ class LeadController extends FormController
             if ($count = count($entities)) {
                 $persistEntities = [];
                 foreach ($entities as $lead) {
-                    if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getCreatedBy())) {
+                    if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
 
                         if ($model->addDncForLead($lead, 'email', $data['reason'], DoNotContact::MANUAL)) {
                             $persistEntities[] = $lead;
@@ -2127,7 +2127,7 @@ class LeadController extends FormController
 
             $count = 0;
             foreach ($entities as $lead) {
-                if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getCreatedBy())) {
+                if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
                     $count++;
 
                     if (!empty($data['addstage'])) {
