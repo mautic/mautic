@@ -38,7 +38,7 @@ return array(
         'forms'  => array(
             'mautic.form.type.webhook'                      => array(
                 'class'     => 'Mautic\WebhookBundle\Form\Type\WebhookType',
-                'arguments' => 'mautic.factory',
+                'arguments' => 'translator',
                 'alias'     => 'webhook'
             ),
             'mautic.form.type.webhookconfig'  => array(

@@ -11,6 +11,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\FormError;
 
 class FieldController extends FormController
@@ -209,6 +210,7 @@ class FieldController extends FormController
             return $this->accessDenied();
         }
 
+        /** @var FieldModel $model */
         $model   = $this->getModel('lead.field');
         $field   = $model->getEntity($objectId);
 
@@ -288,6 +290,10 @@ class FieldController extends FormController
                         )
                     )
                 );
+            } elseif ($valid) {
+                // Rebuild the form with new action so that apply doesn't keep creating a clone
+                $action = $this->generateUrl('mautic_contactfield_action', ['objectAction' => 'edit', 'objectId' => $field->getId()]);
+                $form   = $model->createForm($field, $this->get('form.factory'), $action);
             }
         } else {
             //lock the entity

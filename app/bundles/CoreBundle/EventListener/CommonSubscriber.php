@@ -113,30 +113,18 @@ class CommonSubscriber implements EventSubscriberInterface
      */
     protected function buildMenu (MauticEvents\MenuEvent $event)
     {
-        $name      = $event->getType();
-        $session   = $this->factory->getSession();
-        $allItems  = $session->get('mautic.menu.items', array());
-
-        if (empty($allItems[$name])) {
-            $bundles = $this->factory->getMauticBundles(true);
-            $menuItems = array();
-            foreach ($bundles as $bundle) {
-                if (!empty($bundle['config']['menu'][$name])) {
-                    $menu = $bundle['config']['menu'][$name];
-                    $event->addMenuItems(
-                        array(
-                            'priority' => !isset($menu['priority']) ? 9999 : $menu['priority'],
-                            'items'    => !isset($menu['items']) ? $menu : $menu['items']
-                        )
-                    );
-                }
+        $name = $event->getType();
+        $bundles = $this->factory->getMauticBundles(true);
+        foreach ($bundles as $bundle) {
+            if (!empty($bundle['config']['menu'][$name])) {
+                $menu = $bundle['config']['menu'][$name];
+                $event->addMenuItems(
+                    array(
+                        'priority' => !isset($menu['priority']) ? 9999 : $menu['priority'],
+                        'items'    => !isset($menu['items']) ? $menu : $menu['items']
+                    )
+                );
             }
-
-            $allItems[$name] = $event->getMenuItems();
-
-            unset($bundles, $menuItems);
-        } else {
-            $event->setMenuItems($allItems[$name]);
         }
     }
 

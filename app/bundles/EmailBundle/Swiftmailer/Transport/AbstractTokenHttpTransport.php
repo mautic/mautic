@@ -25,6 +25,11 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
     private $password;
 
     /**
+     * @var
+     */
+    private $apiKey;
+
+    /**
      * Return an array of headers for the POST
      *
      * @return array
@@ -86,6 +91,26 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
     public function getPassword()
     {
         return $this->password;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getApiKey()
+    {
+        return $this->apiKey;
+    }
+
+    /**
+     * @param mixed $apiKey
+     *
+     * @return AbstractTokenHttpTransport
+     */
+    public function setApiKey($apiKey)
+    {
+        $this->apiKey = $apiKey;
+
+        return $this;
     }
 
     /**

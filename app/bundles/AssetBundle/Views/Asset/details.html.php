@@ -23,6 +23,7 @@ $view['slots']->set(
                     $permissions['asset:assets:editother'],
                     $activeAsset->getCreatedBy()
                 ),
+                'clone'   => $permissions['asset:assets:create'],
                 'delete' => $security->hasEntityAccess(
                     $permissions['asset:assets:deleteown'],
                     $permissions['asset:assets:deleteother'],

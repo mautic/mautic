@@ -27,10 +27,15 @@ class ParseEmailEvent extends Event
     private $keys;
 
     /**
+     * @var array
+     */
+    private $criteriaRequests = [];
+
+    /**
      * @param array $messages
      * @param array $applicableKeys
      */
-    public function __construct(array $messages, array $applicableKeys)
+    public function __construct(array $messages = [], array $applicableKeys = [])
     {
         $this->messages = $messages;
         $this->keys     = $applicableKeys;
@@ -46,6 +51,37 @@ class ParseEmailEvent extends Event
         return $this->messages;
     }
 
+    /**
+     * @param array $messages
+     *
+     * @return ParseEmailEvent
+     */
+    public function setMessages($messages)
+    {
+        $this->messages = $messages;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getKeys()
+    {
+        return $this->keys;
+    }
+
+    /**
+     * @param mixed $keys
+     *
+     * @return ParseEmailEvent
+     */
+    public function setKeys($keys)
+    {
+        $this->keys = $keys;
+
+        return $this;
+    }
 
     /**
      * Check if the set of messages is applicable and should be processed by the listener
@@ -58,7 +94,7 @@ class ParseEmailEvent extends Event
     public function isApplicable($bundleKey, $folderKeys)
     {
         if (!is_array($folderKeys)) {
-            $folderKeys = array($folderKeys);
+            $folderKeys = [$folderKeys];
         }
 
         foreach ($folderKeys as $folderKey) {
@@ -71,5 +107,33 @@ class ParseEmailEvent extends Event
         }
 
         return false;
+    }
+
+    /**
+     * Set a criteria request for filtering fetched mail
+     *
+     * @param $bundleKey
+     * @param $folderKeys
+     * @param $criteria     This should be a string using combinations of Mautic\EmailBundle\MonitoredEmail\Mailbox::CRITERIA_* constants
+     */
+    public function setCriteriaRequest($bundleKey, $folderKeys, $criteria)
+    {
+        if (!is_array($folderKeys)) {
+            $folderKeys = [$folderKeys];
+        }
+
+        foreach ($folderKeys as $folderKey) {
+            $key = $bundleKey.'_'.$folderKey;
+
+            $this->criteriaRequests[$key] = $criteria;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getCriteriaRequests()
+    {
+        return $this->criteriaRequests;
     }
 }

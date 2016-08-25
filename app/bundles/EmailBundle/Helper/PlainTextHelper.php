@@ -454,7 +454,7 @@ class PlainTextHelper
         switch (strtolower($matches[1])) {
             case 'b':
             case 'strong':
-                return $this->toupper($matches[3]);
+                return $matches[3];
             case 'th':
                 return $this->toupper("\t\t" . $matches[3] . "\n");
             case 'h':

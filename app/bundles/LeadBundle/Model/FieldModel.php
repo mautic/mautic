@@ -16,7 +16,6 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
-use Monolog\Logger;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -31,7 +30,7 @@ class FieldModel extends FormModel
         // Listed according to $order for installation
         'title'     => [
             'type'       => 'lookup',
-            'properties' => ['list' => '|Mr|Mrs|Miss'],
+            'properties' => ['list' => 'Mr|Mrs|Miss'],
             'fixed'      => true,
         ],
         'firstname' => [
@@ -146,11 +145,6 @@ class FieldModel extends FormModel
     protected $schemaHelperFactory;
 
     /**
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
      * FieldModel constructor.
      *
      * @param SchemaHelperFactory $schemaHelperFactory
@@ -158,14 +152,6 @@ class FieldModel extends FormModel
     public function __construct(SchemaHelperFactory $schemaHelperFactory)
     {
         $this->schemaHelperFactory = $schemaHelperFactory;
-    }
-
-    /**
-     * @param Logger $logger
-     */
-    public function setLogger(Logger $logger)
-    {
-        $this->logger = $logger;
     }
 
     /**

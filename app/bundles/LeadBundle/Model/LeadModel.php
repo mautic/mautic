@@ -35,8 +35,9 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Monolog\Logger;
+use Mautic\StageBundle\Entity\Stage;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Intl\Intl;
@@ -87,20 +88,21 @@ class LeadModel extends FormModel
     protected $leadListModel;
 
     /**
-     * @var Logger
+     * @var FormFactory
      */
-    protected $logger;
+    protected $formFactory;
 
     /**
      * LeadModel constructor.
      *
-     * @param RequestStack $requestStack
-     * @param CookieHelper $cookieHelper
-     * @param IpLookupHelper $ipLookupHelper
-     * @param PathsHelper $pathsHelper
+     * @param RequestStack      $requestStack
+     * @param CookieHelper      $cookieHelper
+     * @param IpLookupHelper    $ipLookupHelper
+     * @param PathsHelper       $pathsHelper
      * @param IntegrationHelper $integrationHelper
-     * @param FieldModel $leadFieldModel
-     * @param ListModel $leadListModel
+     * @param FieldModel        $leadFieldModel
+     * @param ListModel         $leadListModel
+     * @param FormFactory       $formFactory
      */
     public function __construct(
         RequestStack $requestStack,
@@ -109,24 +111,18 @@ class LeadModel extends FormModel
         PathsHelper $pathsHelper,
         IntegrationHelper $integrationHelper,
         FieldModel $leadFieldModel,
-        ListModel $leadListModel
+        ListModel $leadListModel,
+        FormFactory $formFactory
     )
     {
-        $this->request = $requestStack->getCurrentRequest();
-        $this->cookieHelper = $cookieHelper;
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->pathsHelper = $pathsHelper;
+        $this->request           = $requestStack->getCurrentRequest();
+        $this->cookieHelper      = $cookieHelper;
+        $this->ipLookupHelper    = $ipLookupHelper;
+        $this->pathsHelper       = $pathsHelper;
         $this->integrationHelper = $integrationHelper;
-        $this->leadFieldModel = $leadFieldModel;
-        $this->leadListModel = $leadListModel;
-    }
-
-    /**
-     * @param Logger $logger
-     */
-    public function setLogger(Logger $logger)
-    {
-        $this->logger = $logger;
+        $this->leadFieldModel    = $leadFieldModel;
+        $this->leadListModel     = $leadListModel;
+        $this->formFactory       = $formFactory;
     }
 
     /**
@@ -1166,7 +1162,7 @@ class LeadModel extends FormModel
      * @param int          $reason   Must be a class constant from the DoNotContact class.
      * @param bool         $persist
      *
-     * @return boolean If a DNC entry is added or updated, returns true. If a DNC is already present
+     * @return boolean|DoNotContact If a DNC entry is added or updated, returns the DoNotContact object. If a DNC is already present
      *                 and has the specified reason, nothing is done and this returns false.
      */
     public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $persist = true)
@@ -1197,7 +1193,7 @@ class LeadModel extends FormModel
                 $this->saveEntity($lead);
             }
 
-            return true;
+            return $dnc;
         }
         // Or if the given reason is different than the stated reason
         elseif ($isContactable !== $reason) {
@@ -1223,7 +1219,7 @@ class LeadModel extends FormModel
                         $this->saveEntity($lead);
                     }
 
-                    return true;
+                    return $dnc;
                 }
             }
         }
@@ -1393,22 +1389,39 @@ class LeadModel extends FormModel
             $lead->addPointsChangeLog($log);
         }
 
-        if (!empty($fields['stage']) && !empty($data[$fields['stage']]) && $lead->getId() === null) {
-            // Add points only for new leads
-            $lead->setStage($data[$fields['stage']]);
+        if (!empty($fields['stage']) && !empty($data[$fields['stage']])) {
+            static $stages = [];
+            $stageName = $data[$fields['stage']];
+            if (!array_key_exists($stageName, $stages)) {
+                // Set stage for contact
+                $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($stageName);
 
-            //add a lead point change log
+                if (empty($stage)) {
+                    $stage = new Stage();
+                    $stage->setName($stageName);
+                    $stages[$stageName] = $stage;
+                }
+            } else {
+                $stage = $stages[$stageName];
+            }
+
+            $lead->setStage($stage);
+
+            //add a contact stage change log
             $log = new StagesChangeLog();
-            $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($fields['stage']);
-            $log->setEventName($stage);
+            $log->setEventName($stage->getId().":".$stage->getName());
             $log->setLead($lead);
-            $log->setActionName($this->translator->trans('mautic.lead.import.action.name', array(
-                '%name%' => $this->user->getUsername()
-            )));
+            $log->setActionName(
+                $this->translator->trans(
+                    'mautic.lead.import.action.name',
+                    [
+                        '%name%' => $this->user->getUsername()
+                    ]
+                )
+            );
             $log->setDateAdded(new \DateTime());
             $lead->stageChangeLog($log);
         }
-
         unset($fields['stage']);
 
         // Set unsubscribe status
@@ -1434,11 +1447,56 @@ class LeadModel extends FormModel
             $this->modifyTags($lead, $tags, null, false);
         }
 
-        // Set profile data
+        // Set profile data using the form so that values are validated
+        $fieldData = [];
         foreach ($fields as $leadField => $importField) {
             // Prevent overwriting existing data with empty data
             if (array_key_exists($importField, $data) && !is_null($data[$importField]) && $data[$importField] != '') {
-                $lead->addUpdatedField($leadField, $data[$importField]);
+                $fieldData[$leadField] = $data[$importField];
+            }
+        }
+
+        static $leadFields;
+        if (null === $leadFields) {
+            $leadFields = $this->leadFieldModel->getEntities(
+                array(
+                    'force'          => array(
+                        array(
+                            'column' => 'f.isPublished',
+                            'expr'   => 'eq',
+                            'value'  => true
+                        )
+                    ),
+                    'hydration_mode' => 'HYDRATE_ARRAY'
+                )
+            );
+        };
+
+        $form = $this->createForm($lead, $this->formFactory, null, ['fields' => $leadFields, 'csrf_protection' => false]);
+
+        // Unset stage and owner from the form because it's already been handled
+        unset($form['stage'], $form['owner']);
+
+        $form->submit($fieldData);
+
+        if (!$form->isValid()) {
+            $fieldErrors = [];
+            foreach ($form as $formField) {
+                $errors = $formField->getErrors(true);
+                if (count($errors)) {
+                    $errorString = $formField->getConfig()->getOption('label') .": ";
+                    foreach ($errors as $error) {
+                        $errorString .= " {$error->getMessage()}";
+                    }
+                    $fieldErrors[] = $errorString;
+                }
+            }
+            $fieldErrors = implode("\n", $fieldErrors);
+            throw new \Exception($fieldErrors);
+        } else {
+            // All clear
+            foreach ($fieldData as $field => $value) {
+                $lead->addUpdatedField($field, $value);
             }
         }
 
@@ -1918,6 +1976,9 @@ class LeadModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
+        if (empty($options['includeAnonymous'])) {
+            $q->andWhere($q->expr()->isNotNull('t.date_identified'));
+        }
         $results = $q->execute()->fetchAll();
 
         if ($results) {
