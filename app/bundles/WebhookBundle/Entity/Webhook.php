@@ -132,32 +132,24 @@ class Webhook extends FormEntity
                 )
             )
         );
+
         $metadata->addPropertyConstraint(
             'webhookUrl',
             new Assert\Url(
                 array(
-                    'message' => 'mautic.core.value.required',
-                    'groups'  => array('webhookUrl')
+                    'message' => 'mautic.core.valid_url_required'
                 )
             )
         );
-    }
 
-    /**
-     * @param Form $form
-     *
-     * @return array
-     */
-    public static function determineValidationGroups(Form $form)
-    {
-        $data       = $form->getData();
-        $groups     = array('Webhook');
-        $webhookUrl = $data->getWebhookUrl();
-        if ($webhookUrl) {
-            $groups[] = 'webhookUrl';
-        }
-
-        return $groups;
+        $metadata->addPropertyConstraint(
+            'webhookUrl',
+            new Assert\NotBlank(
+                array(
+                    'message' => 'mautic.core.valid_url_required'
+                )
+            )
+        );
     }
 
     /**

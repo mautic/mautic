@@ -14,7 +14,6 @@ use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Mautic\LeadBundle\LeadEvents;
@@ -522,17 +521,11 @@ class AjaxController extends CommonAjaxController
                 $email->getCreatedBy()
             )
         ) {
-
             $mailer = $this->factory->getMailer();
             $mailer->setEmail($email, true, [], [], true);
 
             $data['body']    = $mailer->getBody();
             $data['subject'] = $mailer->getSubject();
-
-            // Parse tokens into view data
-            $tokens = $model->getBuilderComponents($email, ['tokens', 'visualTokens']);
-
-            BuilderTokenHelper::replaceTokensWithVisualPlaceholders($tokens, $data['body']);
         }
 
         return $this->sendJsonResponse($data);

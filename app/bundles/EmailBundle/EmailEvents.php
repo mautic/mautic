@@ -19,7 +19,7 @@ final class EmailEvents
 {
 
     /**
-     * The mautic.email_on_open event is thrown when an email is opened
+     * The mautic.email_on_open event is dispatched when an email is opened
      *
      * The event listener receives a
      * Mautic\EmailBundle\Event\EmailOpenEvent instance.
@@ -29,7 +29,7 @@ final class EmailEvents
     const EMAIL_ON_OPEN  = 'mautic.email_on_open';
 
     /**
-     * The mautic.email_on_send event is thrown when an email is sent
+     * The mautic.email_on_send event is dispatched when an email is sent
      *
      * The event listener receives a
      * Mautic\EmailBundle\Event\EmailSendEvent instance.
@@ -40,7 +40,7 @@ final class EmailEvents
 
 
     /**
-     * The mautic.email_on_display event is thrown when an email is viewed via a browser
+     * The mautic.email_on_display event is dispatched when an email is viewed via a browser
      *
      * The event listener receives a
      * Mautic\EmailBundle\Event\EmailSendEvent instance.
@@ -50,7 +50,7 @@ final class EmailEvents
     const EMAIL_ON_DISPLAY  = 'mautic.email_on_display';
 
     /**
-     * The mautic.email_on_build event is thrown before displaying the email builder form to allow adding of tokens
+     * The mautic.email_on_build event is dispatched before displaying the email builder form to allow adding of tokens
      *
      * The event listener receives a
      * Mautic\EmailBundle\Event\EmailEvent instance.
@@ -60,7 +60,7 @@ final class EmailEvents
     const EMAIL_ON_BUILD   = 'mautic.email_on_build';
 
     /**
-     * The mautic.email_pre_save event is thrown right before a email is persisted.
+     * The mautic.email_pre_save event is dispatched right before a email is persisted.
      *
      * The event listener receives a
      * Mautic\EmailBundle\Event\EmailEvent instance.
@@ -70,7 +70,7 @@ final class EmailEvents
     const EMAIL_PRE_SAVE   = 'mautic.email_pre_save';
 
     /**
-     * The mautic.email_post_save event is thrown right after a email is persisted.
+     * The mautic.email_post_save event is dispatched right after a email is persisted.
      *
      * The event listener receives a
      * Mautic\EmailBundle\Event\EmailEvent instance.
@@ -80,7 +80,7 @@ final class EmailEvents
     const EMAIL_POST_SAVE   = 'mautic.email_post_save';
 
     /**
-     * The mautic.email_pre_delete event is thrown prior to when a email is deleted.
+     * The mautic.email_pre_delete event is dispatched prior to when a email is deleted.
      *
      * The event listener receives a
      * Mautic\EmailBundle\Event\EmailEvent instance.
@@ -90,7 +90,7 @@ final class EmailEvents
     const EMAIL_PRE_DELETE   = 'mautic.email_pre_delete';
 
     /**
-     * The mautic.email_post_delete event is thrown after a email is deleted.
+     * The mautic.email_post_delete event is dispatched after a email is deleted.
      *
      * The event listener receives a
      * Mautic\EmailBundle\Event\EmailEvent instance.
@@ -109,7 +109,7 @@ final class EmailEvents
     const MONITORED_EMAIL_CONFIG = 'mautic.monitored_email_config';
 
     /**
-     * The mautic.on_email_parse event is thrown when a monitored email box retrieves messages.
+     * The mautic.on_email_parse event is dispatched when a monitored email box retrieves messages.
      *
      * The event listener receives a Mautic\EmailBundle\Event\ParseEmailEvent instance.
      *
@@ -118,7 +118,17 @@ final class EmailEvents
     const EMAIL_PARSE = 'mautic.on_email_parse';
 
     /**
-     * The mautic.on_email_failed event is thrown when an email has failed to clear the queue and is about to be deleted
+     * The mautic.on_email_pre_fetch event is dispatched prior to fetching email through a configured monitored inbox in order to set
+     * search criteria for the mail to be fetched
+     *
+     * The event listener receives a Mautic\EmailBundle\Event\ParseEmailEvent instance.
+     *
+     * @var string
+     */
+    const EMAIL_PRE_FETCH = 'mautic.on_email_pre_fetch';
+
+    /**
+     * The mautic.on_email_failed event is dispatched when an email has failed to clear the queue and is about to be deleted
      * in order to give a bundle a chance to do an action based on failed email if required
      *
      * The event listener receives a Mautic\EmailBundle\Event\QueueEmailEvent instance.
@@ -128,7 +138,7 @@ final class EmailEvents
     const EMAIL_FAILED = 'mautic.on_email_failed';
 
     /**
-     * The mautic.on_email_resend event is thrown when an attempt to resend an email occurs
+     * The mautic.on_email_resend event is dispatched when an attempt to resend an email occurs
      * in order to give a bundle a chance to do an action based on failed email if required
      *
      * The event listener receives a Mautic\EmailBundle\Event\QueueEmailEvent instance.

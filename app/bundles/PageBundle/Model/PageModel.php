@@ -10,11 +10,9 @@
 namespace Mautic\PageBundle\Model;
 
 use Mautic\CoreBundle\Helper\CookieHelper;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\LeadDevice;
-use Mautic\LeadBundle\Entity\Tag;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\LeadBundle\Entity\Lead;
@@ -31,7 +29,6 @@ use Mautic\PageBundle\PageEvents;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
-use Monolog\Logger;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -82,11 +79,6 @@ class PageModel extends FormModel
     protected $pageTrackableModel;
 
     /**
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
      * PageModel constructor.
      *
      * @param CookieHelper $cookieHelper
@@ -111,14 +103,6 @@ class PageModel extends FormModel
         $this->leadFieldModel = $leadFieldModel;
         $this->pageRedirectModel = $pageRedirectModel;
         $this->pageTrackableModel = $pageTrackableModel;
-    }
-
-    /**
-     * @param Logger $logger
-     */
-    public function setLogger(Logger $logger)
-    {
-        $this->logger = $logger;
     }
 
     /**
@@ -214,6 +198,18 @@ class PageModel extends FormModel
 
         $this->postVariantSaveEntity($entity, $resetVariants, $pageIds, $variantStartDate);
         $this->postTranslationEntitySave($entity);
+    }
+
+    /**
+     * @param Page $entity
+     */
+    public function deleteEntity($entity)
+    {
+        if ($entity->isVariant() && $entity->getIsPublished()) {
+            $this->resetVariants($entity);
+        }
+
+        parent::deleteEntity($entity);
     }
 
     /**
@@ -436,7 +432,10 @@ class PageModel extends FormModel
             }
 
             if (!empty($clickthrough['email'])) {
-                $hit->setEmail($this->em->getReference('MauticEmailBundle:Email', $clickthrough['email']));
+                $emailRepo = $this->em->getRepository("MauticEmailBundle:Email");
+                if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
+                    $hit->setEmail($emailEntity);
+                }
             }
         }
 
@@ -670,12 +669,11 @@ class PageModel extends FormModel
                     $decoded = false;
                     if (isset($query['d'])) {
                         // parse_str auto urldecodes
-                        $query   = unserialize(base64_decode($query['d']));
+                        $query   = $this->decodeArrayFromUrl($query['d'], false);
                         $decoded = true;
-                        unset($query['d']);
                     }
 
-                    if (!empty($query)) {
+                    if (is_array($query) && !empty($query)) {
                         if (isset($query['page_url'])) {
                             $pageURL = $query['page_url'];
                             if (!$decoded) {
@@ -790,13 +788,14 @@ class PageModel extends FormModel
     /**
      * Get number of page bounces
      *
-     * @param Page $page
+     * @param Page      $page
+     * @param \DateTime $fromDate
      *
      * @return int
      */
-    public function getBounces (Page $page)
+    public function getBounces (Page $page, \DateTime $fromDate = null)
     {
-        return $this->getHitRepository()->getBounces($page->getId());
+        return $this->getHitRepository()->getBounces($page->getId(), $fromDate);
     }
 
     /**
