@@ -14,6 +14,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\UserBundle\Entity\User;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -87,11 +89,6 @@ class Company extends FormEntity
     private $description;
 
     /**
-     * @var string
-     */
-    private $industry;
-
-    /**
      * @var ArrayCollection
      */
     private $leads;
@@ -127,9 +124,15 @@ class Company extends FormEntity
     private $website;
 
     /**
-     * @var int
+     * @var \DateTime
      */
-    private $type;
+    private $publishUp;
+
+    /**
+     * @var \DateTime
+     */
+    private $publishDown;
+
 
     /**
      * @var \Mautic\UserBundle\Entity\User
@@ -185,13 +188,9 @@ class Company extends FormEntity
 
         $builder->addField('country', 'string');
 
-        $builder->addField('description', 'text');
-
         $builder->addField('email', 'text');
 
         $builder->addField('fax', 'string');
-
-        $builder->addField('industry', 'string');
 
         $builder->createManyToMany('leads', 'Mautic\LeadBundle\Entity\Lead')
             ->setJoinTable('company_leads_xref')
@@ -214,17 +213,16 @@ class Company extends FormEntity
 
         $builder->addField('phone', 'string');
 
-        $builder->addPublishDates();
-
         $builder->addField('score', 'integer');
 
         $builder->addField('state', 'string');
 
-        $builder->addField('type', 'string');
-
         $builder->addField('website', 'string');
 
         $builder->addField('zipcode', 'string');
+
+        $builder->addPublishDates();
+
 
     }
 
@@ -259,18 +257,21 @@ class Company extends FormEntity
                     'description',
                     'email',
                     'fax',
-                    'industry',
                     'leads',
                     'name',
                     'numberOfEmployees',
                     'owner',
                     'phone',
-                    'owner',
                     'score',
                     'state',
-                    'type',
                     'website',
                     'zipcode'
+                )
+            )
+            ->addProperties(
+                array(
+                    'publishUp',
+                    'publishDown'
                 )
             )
             ->build();
@@ -286,7 +287,20 @@ class Company extends FormEntity
     {
         $getter  = "get" . ucfirst($prop);
         $current = $this->$getter();
-        $this->changes[$prop] = array($current, $val);
+        if ($prop == 'owner') {
+            if ($current && !$val) {
+                $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
+            } elseif (!$current && $val) {
+                $this->changes['owner'] = [$current, $val->getName().' ('.$val->getId().')'];
+            } elseif ($current && $val && $current->getId() != $val->getId()) {
+                $this->changes['owner'] = [
+                    $current->getName().'('.$current->getId().')',
+                    $val->getName().'('.$val->getId().')'
+                ];
+            }
+        } else {
+            $this->changes[$prop] = array($current, $val);
+        }
     }
 
     /**
@@ -356,7 +370,7 @@ class Company extends FormEntity
      */
     public function getAddress1 ()
     {
-        return $this->adress1;
+        return $this->address1;
     }
 
     /**
@@ -381,7 +395,7 @@ class Company extends FormEntity
      */
     public function getAddress2 ()
     {
-        return $this->adress2;
+        return $this->address2;
     }
 
     /**
@@ -578,7 +592,7 @@ class Company extends FormEntity
      * Add lead
      *
      * @param                                    $key
-     * @param \Mautic\CampaignBundle\Entity\Lead $lead
+     * @param \Mautic\LeadBundle\Entity\Lead $lead
      *
      * @return Company
      */
@@ -814,6 +828,81 @@ class Company extends FormEntity
     public function getZipcode ()
     {
         return $this->zipcode;
+    }
+
+    /**
+     * Set publishUp
+     *
+     * @param \DateTime $publishUp
+     *
+     * @return Stage
+     */
+    public function setPublishUp ($publishUp)
+    {
+        $this->isChanged('publishUp', $publishUp);
+        $this->publishUp = $publishUp;
+
+        return $this;
+    }
+
+    /**
+     * Get publishUp
+     *
+     * @return \DateTime
+     */
+    public function getPublishUp ()
+    {
+        return $this->publishUp;
+    }
+
+    /**
+     * Set publishDown
+     *
+     * @param \DateTime $publishDown
+     *
+     * @return Stage
+     */
+    public function setPublishDown ($publishDown)
+    {
+        $this->isChanged('publishDown', $publishDown);
+        $this->publishDown = $publishDown;
+
+        return $this;
+    }
+
+    /**
+     * Get publishDown
+     *
+     * @return \DateTime
+     */
+    public function getPublishDown ()
+    {
+        return $this->publishDown;
+    }
+
+    /**
+     * Set owner
+     *
+     * @param User $owner
+     *
+     * @return Lead
+     */
+    public function setOwner(User $owner = null)
+    {
+        $this->isChanged('owner', $owner);
+        $this->owner = $owner;
+
+        return $this;
+    }
+
+    /**
+     * Get owner
+     *
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->owner;
     }
 
 }

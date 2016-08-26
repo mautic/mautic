@@ -7,15 +7,15 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\AccountBundle;
+namespace Mautic\CompanyBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * Class MauticAccountBundle
+ * Class MauticCompanyBundle
  *
- * @package Mautic\AccountBundle
+ * @package Mautic\CompanyBundle
  */
-class MauticAccountBundle extends Bundle
+class MauticCompanyBundle extends Bundle
 {
 }

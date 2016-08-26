@@ -7,20 +7,22 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\StageBundle\Form\Type;
+namespace Mautic\CompanyBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\StageBundle\Entity\Stage;
+use Mautic\CompanyBundle\Entity\Company;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 
 /**
- * Class StageType
+ * Class CompanyType
  */
-class StageType extends AbstractType
+class CompanyType extends AbstractType
 {
     /**
      * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
@@ -32,6 +34,8 @@ class StageType extends AbstractType
      */
     private $translator;
 
+    private $factory;
+
     /**
      * @param MauticFactory $factory
      */
@@ -39,6 +43,8 @@ class StageType extends AbstractType
     {
         $this->translator = $factory->getTranslator();
         $this->security = $factory->getSecurity();
+        $this->factory    = $factory;
+
     }
 
     /**
@@ -46,24 +52,174 @@ class StageType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html')));
-        $builder->addEventSubscriber(new FormExitSubscriber('stage', $options));
+        $builder->add('companyNumber', 'text', array(
+            'label' => 'mautic.company.company.number',
+            'required' => false,
+            'label_attr' => array(
+                'class' => 'control-label'
+            ), 'attr' => array(
+                'class' => 'form-control'
+            )));
+        $builder->add('companySource', 'text', array(
+            'label' => 'mautic.company.company.source',
+            'required' => false,
+            'label_attr' => array(
+                'class' => 'control-label'
+            ), 'attr' => array(
+                'class' => 'form-control'
+            )));
+        $builder->add('address1', 'text', array(
+            'label' => 'mautic.company.address1',
+            'required' => false,
+            'label_attr' => array(
+                'class' => 'control-label'
+            ), 'attr' => array(
+                'class' => 'form-control'
+            )));
+        $builder->add('address2', 'text', array(
+            'label' => 'mautic.company.address2',
+            'required' => false,
+            'label_attr' => array(
+                'class' => 'control-label'
+            ), 'attr' => array(
+                'class' => 'form-control'
+            )));
+        $builder->add('annualRevenue', 'text', array(
+            'label' => 'mautic.company.annual.revenue',
+            'required' => false,
+            'label_attr' => array(
+                'class' => 'control-label'
+            ), 'attr' => array(
+                'class' => 'form-control'
+            )));
+        $builder->add('city', 'text', array(
+            'label' => 'mautic.company.city',
+            'required' => false,
+            'label_attr' => array(
+                'class' => 'control-label'
+            ), 'attr' => array(
+                'class' => 'form-control'
+            )));
+        $builder->add('country', 'choice',
+            array(
+                'choices'     => FormFieldHelper::getCountryChoices(),
+                'required'    => 'false',
+                'label'       => 'mautic.company.country',
+                'label_attr'  => array('class' => 'control-label'),
+                'attr'        => array(
+                    'class'            => 'form-control'
+                ),
+                'mapped'      => false,
+                'required' => false,
+                'multiple'    => false,
+                'expanded'    => false
+            ));
+        $builder->add('email', 'email', array(
+            'label' => 'mautic.company.email',
+            'required' => false,
+            'label_attr' => array(
+                'class' => 'control-label'
+            ), 'attr' => array(
+                'class' => 'form-control'
+            )));
+        $builder->add('fax', 'text', array(
+            'label' => 'mautic.company.fax',
+            'required' => false,
+            'label_attr' => array(
+                'class' => 'control-label'
+            ), 'attr' => array(
+                'class' => 'form-control'
+            )));
 
+        $builder->add('name', 'text', array(
+            'label' => 'mautic.company.name',
+            'label_attr' => array(
+                'class' => 'control-label'
+            ), 'attr' => array(
+                'class' => 'form-control'
+            )));
+        $builder->add('numberOfEmployees', 'text', array(
+            'label' => 'mautic.company.numberOfEmployees',
+            'required' => false,
+            'label_attr' => array(
+                'class' => 'control-label'
+            ), 'attr' => array(
+                'class' => 'form-control'
+            )));
+
+        $transformer = new IdToEntityModelTransformer(
+            $this->factory->getEntityManager(),
+            'MauticUserBundle:User'
+        );
+
+        $builder->add(
+            $builder->create(
+                'owner',
+                'user_list',
+                [
+                    'label'      => 'mautic.lead.lead.field.owner',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class' => 'form-control'
+                    ],
+                    'required'   => false,
+                    'multiple'   => false
+                ]
+            )
+                ->addModelTransformer($transformer)
+        );
+        $builder->add('phone', 'text', array(
+            'label' => 'mautic.company.phone',
+            'required' => false,
+            'label_attr' => array(
+                'class' => 'control-label'
+            ), 'attr' => array(
+                'class' => 'form-control'
+            )));
+        $builder->add('score', 'number', array(
+            'label' => 'mautic.company.score',
+            'required' => false,
+            'label_attr' => array(
+                'class' => 'control-label'
+            ), 'attr' => array(
+                'class' => 'form-control'
+            )));
+        $builder->add('state', 'text', array(
+            'label' => 'mautic.company.state',
+            'required' => false,
+            'label_attr' => array(
+                'class' => 'control-label'
+            ), 'attr' => array(
+                'class' => 'form-control'
+            )));
+        $builder->add('zipcode', 'text', array(
+            'label' => 'mautic.company.zipcode',
+            'required' => false,
+            'label_attr' => array(
+                'class' => 'control-label'
+            ), 'attr' => array(
+                'class' => 'form-control'
+            )));
+        $builder->add('website', 'text', array(
+        'label' => 'mautic.company.website',
+        'required' => false,
+        'label_attr' => array(
+            'class' => 'control-label'
+        ), 'attr' => array(
+            'class' => 'form-control'
+        )));
+        $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html')));
+        $builder->addEventSubscriber(new FormExitSubscriber('company', $options));
         $builder->add('description', 'textarea', array(
             'label' => 'mautic.core.description',
             'label_attr' => array('class' => 'control-label'),
             'attr' => array('class' => 'form-control editor'),
             'required' => false
         ));
-        $builder->add('name', 'text', array(
-            'label' => 'mautic.core.name',
-            'label_attr' => array(
-                'class' => 'control-label'
-            ), 'attr' => array(
-                'class' => 'form-control'
-            )));
-        $builder->add('weight', 'number', array(
-            'label' => 'mautic.stage.action.weight',
+
+        $builder->add('score', 'number', array(
+            'label' => 'mautic.company.score',
+            'required' => false,
             'label_attr' => array('class' => 'control-label'),
             'attr' =>
                 array(
@@ -74,8 +230,7 @@ class StageType extends AbstractType
             'required' => false
         ));
 
-
-        if (!empty($options['data']) && $options['data'] instanceof Stage) {
+        if (!empty($options['data']) && $options['data'] instanceof Company) {
             $readonly = !$this->security->hasEntityAccess(
                 'stage:stages:publishown',
                 'stage:stages:publishother',
@@ -120,16 +275,8 @@ class StageType extends AbstractType
             'required' => false
         ));
 
-        //add category
-        $builder->add('category', 'category', array(
-            'bundle' => 'stage'
-        ));
 
         $builder->add('buttons', 'form_buttons');
-
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
-        }
     }
 
     /**
@@ -137,13 +284,7 @@ class StageType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
-            'data_class' => 'Mautic\StageBundle\Entity\Stage',
-        ));
 
-        $resolver->setRequired(array('stageActions'));
-
-        $resolver->setOptional(array('actionType'));
     }
 
     /**
@@ -151,6 +292,6 @@ class StageType extends AbstractType
      */
     public function getName()
     {
-        return "stage";
+        return "company";
     }
 }
