@@ -9,7 +9,6 @@
 
 namespace MauticPlugin\MauticSocialBundle\Command;
 
-use Mautic\CoreBundle\Console\Output\ConsoleDatetimeOutput;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
@@ -71,7 +70,6 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->input  = $input;
-        $this->output = new ConsoleDatetimeOutput();
 
         /** @var \MauticPlugin\MauticSocialBundle\Model\MonitoringModel $model */
         $model = $this->getContainer()

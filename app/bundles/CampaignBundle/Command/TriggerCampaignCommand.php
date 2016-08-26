@@ -10,7 +10,6 @@
 namespace Mautic\CampaignBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
-use Mautic\CoreBundle\Console\Output\ConsoleDatetimeOutput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -71,8 +70,6 @@ class TriggerCampaignCommand extends ModeratedCommand
         $negativeOnly  = $input->getOption('negative-only');
         $batch         = $input->getOption('batch-limit');
         $max           = $input->getOption('max-events');
-
-        $output = new ConsoleDatetimeOutput();
 
         if (!$this->checkRunStatus($input, $output, ($id) ? $id : 'all')) {
 

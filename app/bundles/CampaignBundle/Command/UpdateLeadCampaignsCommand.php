@@ -10,7 +10,6 @@
 namespace Mautic\CampaignBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
-use Mautic\CoreBundle\Console\Output\ConsoleDatetimeOutput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -50,8 +49,6 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
         $id    = $input->getOption('campaign-id');
         $batch = $input->getOption('batch-limit');
         $max   = $input->getOption('max-contacts');
-
-        $output = new ConsoleDatetimeOutput();
 
         if (!$this->checkRunStatus($input, $output, ($id) ? $id : 'all')) {
 

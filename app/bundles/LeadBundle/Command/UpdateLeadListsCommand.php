@@ -10,7 +10,6 @@
 namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
-use Mautic\CoreBundle\Console\Output\ConsoleDatetimeOutput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -41,8 +40,6 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $container  = $this->getContainer();
         $factory    = $container->get('mautic.factory');
         $translator = $factory->getTranslator();
-
-        $output = new ConsoleDatetimeOutput();
 
         /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
         $listModel = $factory->getModel('lead.list');
