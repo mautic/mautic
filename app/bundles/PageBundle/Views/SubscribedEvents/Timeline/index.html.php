@@ -39,18 +39,18 @@ $query = $event['extra']['hit']['query'];
         </dd>
     <?php endif; ?>
     <dt><?php echo $view['translator']->trans('mautic.core.timeline.device.os'); ?></dt>
-    <?php if (isset($event['extra']['hit']['deviceOsName']) and !empty($event['extra']['hit']['deviceOsName'])): ?>
+    <?php if (!empty($event['extra']['hit']['deviceOsName'])): ?>
         <dd class="ellipsis">
             <?php echo $event['extra']['hit']['deviceOsName']; ?>
         </dd>
     <?php endif; ?>
-    <?php if (isset($event['extra']['hit']['deviceBrand']) and !empty($event['extra']['hit']['deviceBrand'])): ?>
+    <?php if (!empty($event['extra']['hit']['deviceBrand'])): ?>
         <dt><?php echo $view['translator']->trans('mautic.core.timeline.device.brand'); ?></dt>
         <dd class="ellipsis">
             <?php echo $event['extra']['hit']['deviceBrand']; ?>
         </dd>
     <?php endif; ?>
-    <?php if (isset($event['extra']['hit']['deviceModel'])  and !empty($event['extra']['hit']['deviceModel'])): ?>
+    <?php if (!empty($event['extra']['hit']['deviceModel'])): ?>
         <dt><?php echo $view['translator']->trans('mautic.core.timeline.device.model'); ?></dt>
         <dd class="ellipsis">
             <?php echo $event['extra']['hit']['deviceModel']; ?>
@@ -69,7 +69,7 @@ $query = $event['extra']['hit']['query'];
         <?php endif; ?>
         </dd>
 
-        <?php if (isset($event['extra']['hit']['clientInfo']) and !empty($event['extra']['hit']['clientInfo'])): ?>
+        <?php if (!empty($event['extra']['hit']['clientInfo'])): ?>
             <dt><?php echo $view['translator']->trans('mautic.core.timeline.device.client.info'); ?></dt>
             <dd class="ellipsis">
                 <?php
