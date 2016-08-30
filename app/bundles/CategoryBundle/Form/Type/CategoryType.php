@@ -54,38 +54,32 @@ class CategoryType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber());
         $builder->addEventSubscriber(new FormExitSubscriber('category.category', $options));
 
-        if ($options['data']->getId()) {
-            // Edit existing category from category manager - do not allow to edit bundle
-            $builder->add(
-                'bundle',
-                'hidden',
-                [
-                    'data' => $options['data']->getBundle()
-                ]
-            );
-        } elseif ($options['show_bundle_select'] == true) {
-            // Create new category from category bundle - let user select the bundle
-            $selected = $this->session->get('mautic.category.type', 'category');
-            $builder->add(
-                'bundle',
-                'category_bundles_form',
-                [
-                    'label'      => 'mautic.core.type',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => ['class' => 'form-control'],
-                    'required'   => true,
-                    'data'       => $selected
-                ]
-            );
-        } else {
-            // Create new category directly from another bundle - preset bundle
-            $builder->add(
-                'bundle',
-                'hidden',
-                [
-                    'data' => $options['bundle']
-                ]
-            );
+        if (!$options['data']->getId()) {
+            // Do not allow custom bundle
+            if ($options['show_bundle_select'] == true) {
+                // Create new category from category bundle - let user select the bundle
+                $selected = $this->session->get('mautic.category.type', 'category');
+                $builder->add(
+                    'bundle',
+                    'category_bundles_form',
+                    [
+                        'label'      => 'mautic.core.type',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => ['class' => 'form-control'],
+                        'required'   => true,
+                        'data'       => $selected
+                    ]
+                );
+            } else {
+                // Create new category directly from another bundle - preset bundle
+                $builder->add(
+                    'bundle',
+                    'hidden',
+                    [
+                        'data' => $options['bundle']
+                    ]
+                );
+            }
         }
 
         $builder->add(
