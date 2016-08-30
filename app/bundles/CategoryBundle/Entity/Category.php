@@ -14,6 +14,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotEqualTo;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
@@ -84,9 +85,23 @@ class Category extends FormEntity
      */
     public static function loadValidatorMetadata (ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('title', new NotBlank(array(
-            'message' => 'mautic.core.title.required'
-        )));
+        $metadata->addPropertyConstraint(
+            'title',
+            new NotBlank(
+                [
+                    'message' => 'mautic.core.title.required'
+                ]
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'bundle',
+            new NotBlank(
+                [
+                    'message' => 'mautic.core.value.required'
+                ]
+            )
+        );
     }
 
     /**
@@ -98,13 +113,18 @@ class Category extends FormEntity
     {
         $metadata->setGroupPrefix('category')
             ->addListProperties(
-                array(
+                [
                     'id',
                     'title',
                     'alias',
                     'description',
-                    'color'
-                )
+                    'color',
+                ]
+            )
+            ->addProperties(
+                [
+                    'bundle'
+                ]
             )
             ->build();
     }

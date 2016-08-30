@@ -13,9 +13,11 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CategoryType
@@ -24,87 +26,126 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class CategoryType extends AbstractType
 {
-
+    /**
+     * @var TranslatorInterface
+     */
     private $translator;
+
+    /**
+     * @var Session
+     */
     private $session;
 
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory) {
-        $this->translator = $factory->getTranslator();
-        $this->session = $factory->getSession();
+    public function __construct(TranslatorInterface $translator, Session $session)
+    {
+        $this->translator = $translator;
+        $this->session    = $session;
     }
 
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html')));
+        $builder->addEventSubscriber(new CleanFormSubscriber());
         $builder->addEventSubscriber(new FormExitSubscriber('category.category', $options));
 
         if ($options['data']->getId()) {
             // Edit existing category from category manager - do not allow to edit bundle
-            $builder->add('bundle', 'hidden', array(
-                'data' => $options['data']->getBundle()
-            ));
+            $builder->add(
+                'bundle',
+                'hidden',
+                [
+                    'data' => $options['data']->getBundle()
+                ]
+            );
         } elseif ($options['show_bundle_select'] == true) {
-           // Create new category from category bundle - let user select the bundle
-           $selected = $this->session->get('mautic.category.type', 'category');
-           $builder->add('bundle', 'category_bundles_form', array(
-               'label'      => 'mautic.core.type',
-               'label_attr' => array('class' => 'control-label'),
-               'attr'       => array('class' => 'form-control'),
-               'required'   => true,
-               'data'       => $selected
-           ));
-       } else {
+            // Create new category from category bundle - let user select the bundle
+            $selected = $this->session->get('mautic.category.type', 'category');
+            $builder->add(
+                'bundle',
+                'category_bundles_form',
+                [
+                    'label'      => 'mautic.core.type',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => ['class' => 'form-control'],
+                    'required'   => true,
+                    'data'       => $selected
+                ]
+            );
+        } else {
             // Create new category directly from another bundle - preset bundle
-            $builder->add('bundle', 'hidden', array(
-                'data' => $options['bundle']
-            ));
+            $builder->add(
+                'bundle',
+                'hidden',
+                [
+                    'data' => $options['bundle']
+                ]
+            );
         }
 
-        $builder->add('title', 'text', array(
-            'label'      => 'mautic.core.title',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
-        ));
+        $builder->add(
+            'title',
+            'text',
+            [
+                'label'      => 'mautic.core.title',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control']
+            ]
+        );
 
-        $builder->add('description', 'text', array(
-            'label'      => 'mautic.core.description',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
-            'required'   => false
-        ));
+        $builder->add(
+            'description',
+            'text',
+            [
+                'label'      => 'mautic.core.description',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false
+            ]
+        );
 
-        $builder->add('alias', 'text', array(
-            'label'      => 'mautic.core.alias',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.category.form.alias.help',
-            ),
-            'required'   => false
-        ));
+        $builder->add(
+            'alias',
+            'text',
+            [
+                'label'      => 'mautic.core.alias',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.category.form.alias.help',
+                ],
+                'required'   => false
+            ]
+        );
 
-        $builder->add('color', 'text', array(
-            'label'      => 'mautic.core.color',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'       => 'form-control',
-                'data-toggle' => 'color'
-            ),
-            'required'   => false
-        ));
+        $builder->add(
+            'color',
+            'text',
+            [
+                'label'      => 'mautic.core.color',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'       => 'form-control',
+                    'data-toggle' => 'color'
+                ],
+                'required'   => false
+            ]
+        );
 
         $builder->add('isPublished', 'yesno_button_group');
 
-        $builder->add('inForm', 'hidden', array(
-            'mapped' => false
-        ));
+        $builder->add(
+            'inForm',
+            'hidden',
+            [
+                'mapped' => false
+            ]
+        );
 
         $builder->add('buttons', 'form_buttons');
 
@@ -114,22 +155,30 @@ class CategoryType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
-            'data_class' => 'Mautic\CategoryBundle\Entity\Category',
-            'show_bundle_select' => false
-        ));
+        $resolver->setDefaults(
+            [
+                'data_class'         => 'Mautic\CategoryBundle\Entity\Category',
+                'show_bundle_select' => false,
+                'bundle'             => function (Options $options) {
+                    if (!$bundle = $options['data']->getBundle()) {
+                        $bundle = 'category';
+                    }
 
-        $resolver->setRequired(array('bundle'));
+                    return $bundle;
+                }
+            ]
+        );
     }
 
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return "category_form";
     }
 }
