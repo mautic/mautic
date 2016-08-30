@@ -17,20 +17,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class CompanyRepository extends CommonRepository
 {
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntities($args = array())
-    {
-        $q = $this
-            ->createQueryBuilder($this->getTableAlias());
-
-        $args['qb'] = $q;
-
-        return parent::getEntities($args);
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -76,7 +62,7 @@ class CompanyRepository extends CommonRepository
      *
      * @return array
      */
-    public function getCompanys($user = false, $id = '')
+    public function getCompanies($user = false, $id = '')
     {
         static $companys = array();
 
@@ -140,5 +126,49 @@ class CompanyRepository extends CommonRepository
         $results = $q->getQuery()->getArrayResult();
 
         return $results;
+    }
+
+    /**
+     * Get a count of leads that belong to the company
+     *
+     * @param $companyIds
+     *
+     * @return array
+     */
+    public function getLeadCount($companyIds)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('count(cl.lead_id) as thecount, cl.company_id')
+            ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl');
+
+        $returnArray = (is_array($companyIds));
+
+        if (!$returnArray) {
+            $companyIds = array($companyIds);
+        }
+
+        $q->where(
+            $q->expr()->in('cl.company_id', $companyIds),
+            $q->expr()->eq('cl.manually_removed', ':false')
+        )
+            ->setParameter('false', false, 'boolean')
+            ->groupBy('cl.company_id');
+
+        $result = $q->execute()->fetchAll();
+
+        $return = array();
+        foreach ($result as $r) {
+            $return[$r['company_id']] = $r['thecount'];
+        }
+
+        // Ensure lists without leads have a value
+        foreach ($companyIds as $l) {
+            if (!isset($return[$l])) {
+                $return[$l] = 0;
+            }
+        }
+
+        return ($returnArray) ? $return : $return[$companyIds[0]];
     }
 }

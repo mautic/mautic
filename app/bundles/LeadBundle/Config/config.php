@@ -393,7 +393,8 @@ return [
                     'mautic.helper.integration',
                     'mautic.lead.model.field',
                     'mautic.lead.model.list',
-                    'form.factory'
+                    'form.factory',
+                    'mautic.company.model.company'
                 ]
             ],
             'mautic.lead.model.field' => [

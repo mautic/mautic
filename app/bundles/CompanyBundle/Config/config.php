@@ -53,7 +53,6 @@ return [
             'mautic.company.model.company' => [
                 'class' => 'Mautic\CompanyBundle\Model\CompanyModel',
                 'arguments' => [
-                    'mautic.lead.model.lead',
                     'session'
                 ]
             ]

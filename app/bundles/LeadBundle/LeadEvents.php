@@ -297,4 +297,14 @@ final class LeadEvents
      * @var string
      */
     const ON_CAMPAIGN_TRIGGER_CONDITION = 'mautic.lead.on_campaign_trigger_condition';
+
+    /**
+     * The mautic.lead_company_change event is dispatched if a lead's company changes.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadCompanyChange instance.
+     *
+     * @var string
+     */
+    const LEAD_COMPANY_CHANGE   = 'mautic.lead_company_change';
 }

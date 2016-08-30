@@ -658,7 +658,7 @@ class LeadRepository extends CommonRepository
     {
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-
+        error_log($string);
         if ($filter->not) {
             $xFunc    = 'andX';
             $exprFunc = 'notLike';
@@ -666,7 +666,6 @@ class LeadRepository extends CommonRepository
             $xFunc    = 'orX';
             $exprFunc = 'like';
         }
-
         $expr = $q->expr()->$xFunc(
             $q->expr()->$exprFunc('l.firstname', ":$unique"),
             $q->expr()->$exprFunc('l.lastname', ":$unique"),
@@ -723,7 +722,6 @@ class LeadRepository extends CommonRepository
             $nullFunc = "isNull";
             $likeFunc = "like";
         }
-
         switch ($command) {
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous'):
                 $expr = $q->expr()->$xFunc(
@@ -824,6 +822,21 @@ class LeadRepository extends CommonRepository
             case $this->translator->trans('mautic.lead.lead.searchcommand.company'):
                 $expr = $q->expr()->$likeFunc('LOWER(l.company)', ":$unique");
                 break;
+            case $this->translator->trans('mautic.company.lead.searchcommand.company'):
+                // search by company entity
+                $sq = $this->_em->getConnection()->createQueryBuilder();
+                $sq->select('null')
+                    ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
+                    ->join('cl', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'comp.id = cl.company_id')
+                    ->where(
+                        $sq->expr()->andX(
+                            $sq->expr()->eq('l.id', 'cl.lead_id'),
+                            $sq->expr()->$likeFunc('comp.name', ":$unique")
+                        )
+                    );
+
+                $expr = $q->expr()->andX(sprintf('%s (%s)', $existsFunc, $sq->getSQL()));
+                break;
             default:
                 if (in_array($command, $this->availableSearchFields)) {
                     $expr = $q->expr()->$likeFunc('LOWER(l.'.$command.')', ":$unique");
@@ -859,7 +872,8 @@ class LeadRepository extends CommonRepository
             'mautic.lead.lead.searchcommand.owner',
             'mautic.core.searchcommand.ip',
             'mautic.lead.lead.searchcommand.tag',
-            'mautic.lead.lead.searchcommand.stage'
+            'mautic.lead.lead.searchcommand.stage',
+            'mautic.company.lead.searchcommand.company'
         );
 
         if (!empty($this->availableSearchFields)) {
