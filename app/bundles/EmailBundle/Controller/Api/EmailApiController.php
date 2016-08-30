@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 class EmailApiController extends CommonApiController
 {
 
-    public function initialize (FilterControllerEvent $event)
+    public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
         $this->model            = $this->getModel('email');
@@ -31,7 +31,7 @@ class EmailApiController extends CommonApiController
         $this->entityNameOne    = 'email';
         $this->entityNameMulti  = 'emails';
         $this->permissionBase   = 'email:emails';
-        $this->serializerGroups = array("emailDetails", "categoryList", "publishDetails", "assetList");
+        $this->serializerGroups = ['emailDetails', 'categoryList', 'publishDetails', 'assetList', 'formList'];
     }
 
     /**
@@ -39,22 +39,22 @@ class EmailApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getEntitiesAction ()
+    public function getEntitiesAction()
     {
         if (!$this->security->isGranted('email:emails:viewother')) {
             $this->listFilters[] =
-                array(
+                [
                     'column' => 'e.createdBy',
                     'expr'   => 'eq',
                     'value'  => $this->factory->getUser()->getId()
-                );
+                ];
         }
 
         //get parent level only
-        $this->listFilters[] = array(
+        $this->listFilters[] = [
             'column' => 'e.variantParent',
             'expr'   => 'isNull'
-        );
+        ];
 
         return parent::getEntitiesAction();
     }
@@ -67,7 +67,7 @@ class EmailApiController extends CommonApiController
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function sendAction ($id)
+    public function sendAction($id)
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
@@ -81,11 +81,11 @@ class EmailApiController extends CommonApiController
             list($count, $failed) = $this->model->sendEmailToLists($entity, $lists, $limit);
 
             $view = $this->view(
-                array(
+                [
                     'success'          => 1,
                     'sentCount'        => $count,
                     'failedRecipients' => $failed
-                ),
+                ],
                 Codes::HTTP_OK
             );
 
@@ -105,7 +105,7 @@ class EmailApiController extends CommonApiController
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function sendLeadAction ($id, $leadId)
+    public function sendLeadAction($id, $leadId)
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
@@ -123,26 +123,29 @@ class EmailApiController extends CommonApiController
             }
 
             $post   = $this->request->request->all();
-            $tokens = (!empty($post['tokens'])) ? $post['tokens'] : array();
+            $tokens = (!empty($post['tokens'])) ? $post['tokens'] : [];
 
-            $cleantokens = array_map(function ($v) {
-                return InputHelper::clean($v);
-            }, $tokens);
+            $cleantokens = array_map(
+                function ($v) {
+                    return InputHelper::clean($v);
+                },
+                $tokens
+            );
 
-            $leadFields = array_merge(array('id' => $leadId), $leadModel->flattenFields($lead->getFields()));
+            $leadFields = array_merge(['id' => $leadId], $leadModel->flattenFields($lead->getFields()));
 
-            if(MailHelper::applyFrequencyRules($lead)) {
+            if (MailHelper::applyFrequencyRules($lead)) {
                 $this->model->sendEmail(
                     $entity,
                     $leadFields,
-                    array(
-                        'source' => array('api', 0),
+                    [
+                        'source' => ['api', 0],
                         'tokens' => $cleantokens
-                    )
+                    ]
                 );
             }
 
-            $view = $this->view(array('success' => 1), Codes::HTTP_OK);
+            $view = $this->view(['success' => 1], Codes::HTTP_OK);
 
             return $this->handleView($view);
         }
