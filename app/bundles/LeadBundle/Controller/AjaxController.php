@@ -354,6 +354,36 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
+    protected function toggleCompanyLeadAction(Request $request)
+    {
+        $dataArray = ['success' => 0];
+        $leadId    = InputHelper::int($request->request->get('leadId'));
+        $companyId    = InputHelper::int($request->request->get('companyId'));
+        $action    = InputHelper::clean($request->request->get('companyAction'));
+
+        if (!empty($leadId) && !empty($companyId) && in_array($action, ['remove', 'add'])) {
+            $leadModel = $this->getModel('lead');
+            $companyModel = $this->getModel('company');
+
+            $lead = $leadModel->getEntity($leadId);
+            $company = $companyModel->getEntity($companyId);
+
+            if ($lead !== null && $company !== null) {
+                $class = $action == 'add' ? 'addLeadToCompany' : 'removeLeadFromCompany';
+                $companyModel->$class($company, $lead);
+                $dataArray['success'] = 1;
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     protected function getImportProgressAction(Request $request)
     {
         $dataArray = ['success' => 1];

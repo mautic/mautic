@@ -51,6 +51,11 @@ if ($tmpl == 'index') {
                         'class'      => 'visible-md visible-lg col-company-category'
                     )
                 );
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'sessionVar' => 'segment',
+                    'text'       => 'mautic.lead.list.thead.leadcount',
+                    'class'      => 'visible-md visible-lg col-leadlist-leadcount'
+                ));
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     array(
@@ -110,6 +115,11 @@ if ($tmpl == 'index') {
                         <?php if (isset($fields['core']['companywebsite'])) :?>
                         <?php echo $fields['core']['companywebsite']['value']; ?>
                         <?php   endif; ?>
+                    </td>
+                    <td class="visible-md visible-lg">
+                        <a class="label label-primary" href="<?php echo $view['router']->path('mautic_contact_index', array('search' => $view['translator']->trans('mautic.company.lead.searchcommand.company') . ':' . $item->getName())); ?>" data-toggle="ajax"<?php echo ($leadCounts[$item->getId()] == 0) ? "disabled=disabled" : ""; ?>>
+                            <?php echo $view['translator']->transChoice('mautic.lead.company.viewleads_count', $leadCounts[$item->getId()], array('%count%' => $leadCounts[$item->getId()])); ?>
+                        </a>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>

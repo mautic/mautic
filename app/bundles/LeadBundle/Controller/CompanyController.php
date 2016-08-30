@@ -94,10 +94,14 @@ class CompanyController extends FormController
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
+        $model = $this->getModel('company');
+        $companyIds    = array_keys($companies->getIterator()->getArrayCopy());
+        $leadCounts = (!empty($companyIds)) ? $model->getRepository()->getLeadCount($companyIds) : array();
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
                     'searchValue' => $search,
+                    'leadCounts'  => $leadCounts,
                     'items'       => $companies,
                     'page'        => $page,
                     'limit'       => $limit,
