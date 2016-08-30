@@ -55,4 +55,20 @@ class ModelFactory
 
         throw new \InvalidArgumentException($containerKey . ' is not a registered container key.');
     }
+
+    /**
+     * Check if a model exists
+     *
+     * @param $modelNameKey
+     */
+    public function hasModel($modelNameKey)
+    {
+        try {
+            $this->getModel($modelNameKey);
+
+            return true;
+        } catch (\InvalidArgumentException $exception) {
+            return false;
+        }
+    }
 }

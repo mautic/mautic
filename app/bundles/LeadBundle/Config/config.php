@@ -168,6 +168,9 @@ return [
                 'arguments' => [
                     'mautic.factory',
                     'mautic.core.model.auditlog'
+                ],
+                'methodCalls' => [
+                    'setModelFactory' => ['mautic.model.factory']
                 ]
             ],
             'mautic.lead.emailbundle.subscriber'    => [
