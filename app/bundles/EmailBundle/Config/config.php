@@ -20,13 +20,10 @@ return [
             ]
         ],
         'api'    => [
-            'mautic_api_getemails'     => [
+            'standard_entity' => [
+                'name'       => 'emails',
                 'path'       => '/emails',
-                'controller' => 'MauticEmailBundle:Api\EmailApi:getEntities'
-            ],
-            'mautic_api_getemail'      => [
-                'path'       => '/emails/{id}',
-                'controller' => 'MauticEmailBundle:Api\EmailApi:getEntity'
+                'controller' => 'MauticEmailBundle:Api\EmailApi'
             ],
             'mautic_api_sendemail'     => [
                 'path'       => '/emails/{id}/send',

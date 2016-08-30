@@ -101,7 +101,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @var
      */
-    private $emailType;
+    private $emailType = 'template';
 
     /**
      * @var \DateTime
@@ -417,21 +417,24 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         $metadata->setGroupPrefix('email')
             ->addListProperties(
-                array(
+                [
                     'id',
                     'name',
                     'subject',
                     'language',
                     'category',
-
-                )
+                ]
             )
             ->addProperties(
-                array(
+                [
                     'fromAddress',
                     'fromName',
                     'replyToAddress',
                     'bccAddress',
+                    'customHtml',
+                    'plainText',
+                    'template',
+                    'emailType',
                     'publishUp',
                     'publishDown',
                     'readCount',
@@ -442,8 +445,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'variantSentCount',
                     'variantReadCount',
                     'variantParent',
-                    'variantChildren'
-                )
+                    'variantChildren',
+                    'translationParent',
+                    'translationChildren',
+                    'unsubscribeForm',
+                ]
             )
             ->build();
     }
