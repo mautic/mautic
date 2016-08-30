@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Menu\MenuHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Class CoreSubscriber
@@ -191,58 +192,119 @@ class CommonSubscriber implements EventSubscriberInterface
         foreach ($bundles as $bundle) {
             if (!empty($bundle['config']['routes'][$type])) {
                 foreach ($bundle['config']['routes'][$type] as $name => $details) {
-                    // Set defaults and controller
-                    $defaults = (!empty($details['defaults'])) ? $details['defaults'] : array();
-                    if (isset($details['controller'])) {
-                        $defaults['_controller'] = $details['controller'];
-                    }
+                    if ('api' == $type && 'standard_entity' == $name) {
+                        $standards = [
+                            'getall' => [
+                                'action' => 'getEntities',
+                                'method' => 'GET',
+                                'path'   => '',
+                            ],
+                            'getone' => [
+                                'action' => 'getEntity',
+                                'method' => 'GET',
+                                'path'   => '/{id}',
+                            ],
+                            'new' => [
+                                'action' => 'newEntity',
+                                'method' => 'POST',
+                                'path'   => '/new',
+                            ],
+                            'editput' => [
+                                'action' => 'editEntity',
+                                'method' => 'PUT',
+                                'path'   => '/{id}/edit',
+                            ],
+                            'editpatch' => [
+                                'action' => 'editEntity',
+                                'method' => 'PATCH',
+                                'path'   => '/{id}/edit',
+                            ],
+                            'delete' => [
+                                'action' => 'deleteEntity',
+                                'method' => 'DELETE',
+                                'path'   => '/{id}/delete',
+                            ]
+                        ];
 
-                    if (isset($details['format'])) {
-                        $defaults['_format'] = $details['format'];
-                    } elseif ($type == 'api') {
-                        $defaults['_format'] = 'json';
-                    }
-
-                    $method = '';
-
-                    if (isset($details['method'])) {
-                        $method = $details['method'];
-                    } elseif ($type === 'api') {
-                        $method = 'GET';
-                    }
-
-                    // Set requirements
-                    $requirements = (!empty($details['requirements'])) ? $details['requirements'] : array();
-
-                    // Set some very commonly used defaults and requirements
-                    if (strpos($details['path'], '{page}') !== false) {
-                        if (!isset($defaults['page'])) {
-                            $defaults['page'] = 1;
+                        foreach (['name', 'path', 'controller'] as $required) {
+                            if (empty($details[$required])) {
+                                throw new \InvalidArgumentException("$bundle.$name must have $required defined");
+                            }
                         }
-                        if (!isset($requirements['page'])) {
-                            $requirements['page'] = '\d+';
-                        }
-                    }
-                    if (strpos($details['path'], '{objectId}') !== false) {
-                        if (!isset($defaults['objectId'])) {
-                            // Set default to 0 for the "new" actions
-                            $defaults['objectId'] = 0;
-                        }
-                        if (!isset($requirements['objectId'])) {
-                            // Only allow alphanumeric for objectId
-                            $requirements['objectId'] = "[a-zA-Z0-9_]+";
-                        }
-                    }
-                    if ($type == 'api' && strpos($details['path'], '{id}') !== false) {
-                        if (!isset($requirements['page'])) {
-                            $requirements['id'] = '\d+';
-                        }
-                    }
 
-                    // Add the route
-                    $collection->add($name, new Route($details['path'], $defaults, $requirements, [], '', [], $method));
+                        $routeName  = 'mautic_api_'.$details['name'].'_';
+                        $pathBase   = $details['path'];
+                        $controller = $details['controller'];
+                        foreach ($standards as $standardName => $standardDetails) {
+                            $details = array_merge(
+                                $standardDetails,
+                                [
+                                    'path'       => $pathBase.$standardDetails['path'],
+                                    'controller' => $controller.':'.$standardDetails['action'],
+                                    'method'     => $standardDetails['method'],
+                                ]
+                            );
+                            $this->addRouteToCollection($collection, $type, $routeName.$standardName, $details);
+                        }
+                    } else {
+                        $this->addRouteToCollection($collection, $type, $name, $details);
+                    }
                 }
             }
         }
+    }
+
+    private function addRouteToCollection(RouteCollection $collection, $type, $name, $details)
+    {
+        // Set defaults and controller
+        $defaults = (!empty($details['defaults'])) ? $details['defaults'] : array();
+        if (isset($details['controller'])) {
+            $defaults['_controller'] = $details['controller'];
+        }
+
+        if (isset($details['format'])) {
+            $defaults['_format'] = $details['format'];
+        } elseif ($type == 'api') {
+            $defaults['_format'] = 'json';
+        }
+
+        $method = '';
+
+        if (isset($details['method'])) {
+            $method = $details['method'];
+        } elseif ($type === 'api') {
+            $method = 'GET';
+        }
+
+        // Set requirements
+        $requirements = (!empty($details['requirements'])) ? $details['requirements'] : array();
+
+        // Set some very commonly used defaults and requirements
+        if (strpos($details['path'], '{page}') !== false) {
+            if (!isset($defaults['page'])) {
+                $defaults['page'] = 1;
+            }
+            if (!isset($requirements['page'])) {
+                $requirements['page'] = '\d+';
+            }
+        }
+        if (strpos($details['path'], '{objectId}') !== false) {
+            if (!isset($defaults['objectId'])) {
+                // Set default to 0 for the "new" actions
+                $defaults['objectId'] = 0;
+            }
+            if (!isset($requirements['objectId'])) {
+                // Only allow alphanumeric for objectId
+                $requirements['objectId'] = "[a-zA-Z0-9_]+";
+            }
+        }
+        if ($type == 'api' && strpos($details['path'], '{id}') !== false) {
+            if (!isset($requirements['page'])) {
+                $requirements['id'] = '\d+';
+            }
+        }
+
+        // Add the route
+        $collection->add($name, new Route($details['path'], $defaults, $requirements, [], '', [], $method));
     }
 }
