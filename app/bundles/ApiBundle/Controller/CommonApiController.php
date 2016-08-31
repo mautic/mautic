@@ -360,6 +360,20 @@ class CommonApiController extends FOSRestController implements MauticController
         }
 
         $submitParams = $this->prepareParametersForBinding($parameters, $entity, $action);
+
+        // Special handling of PATCH with boolean fields because Symfony fails to recognize true values
+        if ('PATCH' === $method) {
+            foreach ($form as $name => $child) {
+                if ('yesno_button_group' == $child->getConfig()->getType()->getName() && isset($submitParams[$name])) {
+                    $setter = "set".ucfirst($name);
+                    $data   = filter_var($submitParams[$name], FILTER_VALIDATE_BOOLEAN);
+                    $entity->$setter($data);
+
+                    unset($form[$name]);
+                }
+            }
+        }
+
         $form->submit($submitParams, 'PATCH' !== $method);
 
         if ($form->isValid()) {
