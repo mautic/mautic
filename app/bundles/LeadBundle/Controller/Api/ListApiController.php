@@ -34,22 +34,6 @@ class ListApiController extends CommonApiController
     }
 
     /**
-     * Obtains a list of smart lists for the user
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getListsAction ()
-    {
-        $lists   = $this->getModel('lead.list')->getUserLists();
-        $view    = $this->view($lists, Codes::HTTP_OK);
-        $context = SerializationContext::create()->setGroups(array('leadListList'));
-        $view->setSerializationContext($context);
-
-        return $this->handleView($view);
-    }
-
-
-    /**
      * Adds a lead to a list
      *
      * @param int $id     List ID
@@ -125,5 +109,26 @@ class ListApiController extends CommonApiController
         }
 
         return $this->notFound();
+    }
+
+    /**
+     * Checks if user has permission to access retrieved entity
+     *
+     * @param mixed  $entity
+     * @param string $action view|create|edit|publish|delete
+     *
+     * @return bool
+     */
+    protected function checkEntityAccess($entity, $action = 'view')
+    {
+        if ($action == 'create' || $action == 'edit' || $action == 'view') {
+            return $this->factory->getSecurity()->isGranted('lead:leads:viewown');
+        } elseif ($action == 'delete') {
+            return $this->factory->getSecurity()->hasEntityAccess(
+                true, 'lead:lists:deleteother', $entity->getCreatedBy()
+            );
+        }
+
+        return parent::checkEntityAccess($entity, $action);
     }
 }

@@ -145,8 +145,12 @@ class ListModel extends FormModel
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(array('LeadList'), 'Entity must be of class LeadList()');
         }
-        $params = (!empty($action)) ? array('action' => $action) : array();
-        return $formFactory->create('leadlist', $entity, $params);
+
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+        
+        return $formFactory->create('leadlist', $entity, $options);
     }
 
     /**
