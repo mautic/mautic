@@ -16,11 +16,11 @@
     var mauticContent     = '<?php $view['slots']->output('mauticContent',''); ?>';
     var mauticEnv         = '<?php echo $app->getEnvironment(); ?>';
     var mauticLang        = {
-        chosenChooseOne: '<?php echo $view->escape($view['translator']->trans('mautic.core.form.chooseone')); ?>',
-        chosenChooseMore: '<?php echo $view->escape($view['translator']->trans('mautic.core.form.choosemultiple')); ?>',
-        chosenNoResults: '<?php echo $view->escape($view['translator']->trans('mautic.core.form.nomatches')); ?>',
-        pleaseWait: '<?php echo$view->escape($view['translator']->trans('mautic.core.wait')); ?>',
-        popupBlockerMessage: '<?php echo $view->escape($view['translator']->trans('mautic.core.popupblocked')); ?>',
+        chosenChooseOne: "<?php echo $view->escape($view['translator']->trans('mautic.core.form.chooseone')); ?>",
+        chosenChooseMore: "<?php echo $view->escape($view['translator']->trans('mautic.core.form.choosemultiple')); ?>",
+        chosenNoResults: "<?php echo $view->escape($view['translator']->trans('mautic.core.form.nomatches')); ?>",
+        pleaseWait: "<?php echo$view->escape($view['translator']->trans('mautic.core.wait')); ?>",
+        popupBlockerMessage: "<?php echo $view->escape($view['translator']->trans('mautic.core.popupblocked')); ?>",
     };
 </script>
 <?php $view['assets']->outputSystemScripts(true); ?>
