@@ -2199,4 +2199,31 @@ class LeadController extends FormController
         }
     }
 
+
+
+    /**
+     * Set do not contact
+     *
+     * @param         $id
+     *
+     * @return        status of insertion of data
+     */
+    public function doNotContactAction($id)
+    {
+        $doNotContact = new DoNotContact();
+        
+        $entityManager = $this->get('doctrine')->getManager();
+        $lead =  $entityManager->getRepository('MauticLeadBundle:Lead')->findOneById($id);
+        $doNotContact->setLead($lead);
+        $doNotContact->setReason(3);
+        $doNotContact->setChannel('email');
+        $doNotContact->setChannelId(2);
+        $doNotContact->setComments('Manually marked as do not contact');
+        $doNotContact->setDateAdded(new \DateTime());
+        $entityManager->persist($doNotContact);
+        $entityManager->flush();
+        return new JsonResponse(['status'=>200]);
+    }
+    
+
 }

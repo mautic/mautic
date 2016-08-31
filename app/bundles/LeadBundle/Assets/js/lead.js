@@ -827,7 +827,7 @@ Mautic.removeBounceStatus = function (el, dncId) {
 
     Mautic.ajaxActionRequest('lead:removeBounceStatus', 'id=' + dncId, function() {
         mQuery('#bounceLabel' + dncId).tooltip('destroy');
-        mQuery('#bounceLabel' + dncId).fadeOut(300, function() { mQuery(this).remove(); });
+        mQuery('#bounceLabel' + dncId).fadeOut(300, function() { mQuery(this).remove(); window.location.reload();  });
     });
 };
 
@@ -1129,3 +1129,39 @@ Mautic.updateFilterPositioning = function (el) {
         $parentEl.removeClass('in-group');
     }
 };
+
+
+Mautic.doNotContact = function(action) {
+        if (typeof Mautic.activeActions == 'undefined') {
+            Mautic.activeActions = {};
+        } else if (typeof Mautic.activeActions[action] != 'undefined') {
+            // Action is currently being executed
+            return;
+        }
+
+        Mautic.activeActions[action] = true;
+
+        //dismiss modal if activated
+        Mautic.dismissConfirmation();
+        mQuery.ajax({
+            showLoadingBar: true,
+            url: action,
+            type: "POST",
+            dataType: "json",
+            success: function (response) {
+                Mautic.doNotContactSuccess(response);
+            },
+            error: function (request, textStatus, errorThrown) {
+                Mautic.processAjaxError(request, textStatus, errorThrown);
+            },
+            complete: function() {
+                delete Mautic.activeActions[action]
+            }
+        });
+}
+
+Mautic.doNotContactSuccess = function (response) {
+    if(response && response.status == 200) {
+        window.location.reload();
+    }
+}
