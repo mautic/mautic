@@ -327,8 +327,12 @@ class AssetModel extends FormModel
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(array('Asset'));
         }
-        $params = (!empty($action)) ? array('action' => $action) : array();
-        return $formFactory->create('asset', $entity, $params);
+        
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+        
+        return $formFactory->create('asset', $entity, $options);
     }
 
     /**

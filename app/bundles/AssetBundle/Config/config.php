@@ -28,14 +28,11 @@ return [
             ]
         ],
         'api' => [
-            'mautic_api_getassets' => [
-                'path' => '/assets',
-                'controller' => 'MauticAssetBundle:Api\AssetApi:getEntities'
+            'standard_entity' => [
+                'name'       => 'assets',
+                'path'       => '/assets',
+                'controller' => 'MauticAssetBundle:Api\AssetApi'
             ],
-            'mautic_api_getasset' => [
-                'path' => '/assets/{id}',
-                'controller' => 'MauticAssetBundle:Api\AssetApi:getEntity'
-            ]
         ],
         'public' => [
             'mautic_asset_download' => [

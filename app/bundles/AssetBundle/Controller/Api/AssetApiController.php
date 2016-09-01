@@ -32,24 +32,6 @@ class AssetApiController extends CommonApiController
     }
 
     /**
-     * Obtains a list of assets
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getEntitiesAction ()
-    {
-        if (!$this->security->isGranted('asset:assets:viewother')) {
-            $this->listFilters[] = array(
-                'column' => 'a.createdBy',
-                'expr'   => 'eq',
-                'value'  => $this->factory->getUser()->getId()
-            );
-        }
-
-        return parent::getEntitiesAction();
-    }
-
-    /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before going through serializer
      *
      * @param        $entity
