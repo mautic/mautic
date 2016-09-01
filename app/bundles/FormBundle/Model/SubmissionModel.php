@@ -308,10 +308,10 @@ class SubmissionModel extends CommonFormModel
         // Save the submission
         $this->saveEntity($submission);
 
-        if ($form->isStandalone()) {
-            // Now handle post submission actions
-            $this->executeFormActions($submissionEvent);
-        } else {
+        // Now handle post submission actions
+        $this->executeFormActions($submissionEvent);
+
+        if (!$form->isStandalone()) {
             // Find and add the lead to the associated campaigns
             $campaigns = $this->campaignModel->getCampaignsByForm($form);
             if (!empty($campaigns)) {

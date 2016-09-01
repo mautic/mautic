@@ -241,15 +241,13 @@ Mautic.onPostSubmitActionChange = function(value) {
 
 Mautic.selectFormType = function(formType) {
     if (formType == 'standalone') {
-        mQuery('#actions-tab').removeClass('hide');
-        mQuery('#actions-container').removeClass('hide')
+        mQuery('.action-standalone-only').removeClass('hide');
         mQuery('.page-header h3').text(mauticLang.newStandaloneForm);
     } else {
-        mQuery('#actions-tab').addClass('hide');
-        mQuery('#actions-container').addClass('hide');
+        mQuery('.action-standalone-only').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newCampaignForm);
     }
-
+    console.log(mQuery('li.action-standalone-only').length);
     mQuery('#mauticform_formType').val(formType);
 
     mQuery('body').removeClass('noscroll');

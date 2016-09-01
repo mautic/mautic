@@ -120,7 +120,8 @@ class FormSubscriber extends CommonSubscriber
             'formTypeCleanMasks' => [
                 'message' => 'html'
             ],
-            'eventName'          => FormEvents::ON_EXECUTE_SUBMIT_ACTION
+            'eventName'          => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'allowCampaignForm'  => true,
         ];
 
         $event->addSubmitAction('form.email', $action);
@@ -136,7 +137,8 @@ class FormSubscriber extends CommonSubscriber
                 'failure_email'        => 'email',
                 'authorization_header' => 'string'
             ],
-            'eventName'          => FormEvents::ON_EXECUTE_SUBMIT_ACTION
+            'eventName'          => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'allowCampaignForm'  => true,
         ];
 
         $event->addSubmitAction('form.repost', $action);
