@@ -10,14 +10,29 @@
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($trackables as $link): ?>
+                <?php 
+                    $totalClicks = 0;
+                    $totalUniqueClicks = 0;
+                    foreach ($trackables as $link):
+                            $totalClicks +=  $link['hits'];
+                            $totalUniqueClicks +=  $link['unique_hits'];
+                    endforeach;
+                ?>
                 <tr>
-                    <td class="long-text"><a href="<?php echo $link['url']; ?>"><?php echo $link['url']; ?></a></td>
-                    <td class="text-center"><?php echo $link['hits']; ?></td>
-                    <td class="text-center"><?php echo $link['unique_hits']; ?></td>
-                    <td><?php echo $link['redirect_id']; ?></td>
+                    <td class="long-text">Total Clicks</td>
+                    <td class="text-center"><?php echo $totalClicks; ?></td>
+                    <td class="text-center"><?php echo $totalUniqueClicks; ?></td>
+                    <td></td>
                 </tr>
-            <?php endforeach; ?>
+                
+                <?php foreach ($trackables as $link): ?>
+                    <tr>
+                        <td class="long-text"><a href="<?php echo $link['url']; ?>"><?php echo $link['url']; ?></a></td>
+                        <td class="text-center"><?php echo $link['hits']; ?></td>
+                        <td class="text-center"><?php echo $link['unique_hits']; ?></td>
+                        <td><?php echo $link['redirect_id']; ?></td>
+                    </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
     </div>
