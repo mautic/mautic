@@ -141,9 +141,7 @@ class StageType extends AbstractType
             'data_class' => 'Mautic\StageBundle\Entity\Stage',
         ));
 
-        $resolver->setRequired(array('stageActions'));
-
-        $resolver->setOptional(array('actionType'));
+        $resolver->setOptional(['stageActions', 'actionType']);
     }
 
     /**
