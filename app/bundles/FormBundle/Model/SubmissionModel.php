@@ -15,10 +15,13 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Result;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Event\SubmissionEvent;
+use Mautic\FormBundle\Event\ValidateEvent;
+use Mautic\FormBundle\Event\ValidationEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -80,13 +83,13 @@ class SubmissionModel extends CommonFormModel
     /**
      * SubmissionModel constructor.
      *
-     * @param IpLookupHelper $ipLookupHelper
+     * @param IpLookupHelper   $ipLookupHelper
      * @param TemplatingHelper $templatingHelper
-     * @param FormModel $formModel
-     * @param PageModel $pageModel
-     * @param LeadModel $leadModel
-     * @param CampaignModel $campaignModel
-     * @param LeadFieldModel $leadFieldModel
+     * @param FormModel        $formModel
+     * @param PageModel        $pageModel
+     * @param LeadModel        $leadModel
+     * @param CampaignModel    $campaignModel
+     * @param LeadFieldModel   $leadFieldModel
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -96,15 +99,14 @@ class SubmissionModel extends CommonFormModel
         LeadModel $leadModel,
         CampaignModel $campaignModel,
         LeadFieldModel $leadFieldModel
-    )
-    {
-        $this->ipLookupHelper = $ipLookupHelper;
+    ) {
+        $this->ipLookupHelper   = $ipLookupHelper;
         $this->templatingHelper = $templatingHelper;
-        $this->formModel = $formModel;
-        $this->pageModel = $pageModel;
-        $this->leadModel = $leadModel;
-        $this->campaignModel = $campaignModel;
-        $this->leadFieldModel = $leadFieldModel;
+        $this->formModel        = $formModel;
+        $this->pageModel        = $pageModel;
+        $this->leadModel        = $leadModel;
+        $this->campaignModel    = $campaignModel;
+        $this->leadFieldModel   = $leadFieldModel;
     }
 
     /**
@@ -118,8 +120,8 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * @param $post
-     * @param $server
+     * @param      $post
+     * @param      $server
      * @param Form $form
      *
      * @return boolean|string false if no error was encountered; otherwise the error message
@@ -133,6 +135,14 @@ class SubmissionModel extends CommonFormModel
         $submission->setDateSubmitted(new \DateTime());
         $submission->setForm($form);
 
+        //set the landing page the form was submitted from if applicable
+        if (!empty($post['mauticpage'])) {
+            $page = $this->pageModel->getEntity((int) $post['mauticpage']);
+            if ($page != null) {
+                $submission->setPage($page);
+            }
+        }
+
         $ipAddress = $this->ipLookupHelper->getIpAddress();
         $submission->setIpAddress($ipAddress);
 
@@ -145,29 +155,33 @@ class SubmissionModel extends CommonFormModel
         }
 
         //clean the referer by removing mauticError and mauticMessage
-        $referer = InputHelper::url($referer, null, null, array('mauticError', 'mauticMessage'));
+        $referer = InputHelper::url($referer, null, null, ['mauticError', 'mauticMessage']);
         $submission->setReferer($referer);
 
-        $fields           = $form->getFields();
-        $fieldArray       = array();
-        $results          = array();
-        $tokens           = array();
-        $leadFieldMatches = array();
-        $validationErrors = array();
+        // Create an event to be dispatched through the processes
+        $submissionEvent = new SubmissionEvent($submission, $post, $server);
 
+        $fields           = $form->getFields();
+        $fieldArray       = [];
+        $results          = [];
+        $tokens           = [];
+        $leadFieldMatches = [];
+        $validationErrors = [];
+
+        /** @var Field $f */
         foreach ($fields as $f) {
             $id    = $f->getId();
             $type  = $f->getType();
             $alias = $f->getAlias();
             $value = (isset($post[$alias])) ? $post[$alias] : '';
 
-            $fieldArray[$id] = array(
+            $fieldArray[$id] = [
                 'id'    => $id,
                 'type'  => $type,
-                'alias' => $alias
-            );
+                'alias' => $alias,
+            ];
 
-            if (in_array($type, array('button', 'freetext'))) {
+            if (in_array($type, ['button', 'freetext'])) {
                 //don't save items that don't have a value associated with it
                 continue;
             } elseif ($type == 'captcha') {
@@ -184,9 +198,13 @@ class SubmissionModel extends CommonFormModel
                 //somehow the user got passed the JS validation
                 $msg = $f->getValidationMessage();
                 if (empty($msg)) {
-                    $msg = $this->translator->trans('mautic.form.field.generic.validationfailed', array(
-                        '%label%' => $f->getLabel()
-                    ), 'validators');
+                    $msg = $this->translator->trans(
+                        'mautic.form.field.generic.validationfailed',
+                        [
+                            '%label%' => $f->getLabel(),
+                        ],
+                        'validators'
+                    );
                 }
 
                 $validationErrors[$alias] = $msg;
@@ -199,11 +217,10 @@ class SubmissionModel extends CommonFormModel
                 $params = $f->getCustomParameters();
                 if (!empty($value)) {
                     if (isset($params['valueFilter'])) {
-                        if (is_string($params['inputFilter'] &&
-                            method_exists('\Mautic\CoreBundle\Helper\InputHelper', $params['valueFilter']))) {
+                        if (is_string($params['valueFilter']) && is_callable(['\Mautic\CoreBundle\Helper\InputHelper', $params['valueFilter']])) {
                             $value = InputHelper::_($value, $params['valueFilter']);
                         } elseif (is_callable($params['valueFilter'])) {
-                            $value = call_user_func_array($params['valueFilter'], array($f, $value));
+                            $value = call_user_func_array($params['valueFilter'], [$f, $value]);
                         } else {
                             $value = InputHelper::_($value, 'clean');
                         }
@@ -212,13 +229,13 @@ class SubmissionModel extends CommonFormModel
                     }
                 }
 
+                // @deprecated - BC support; to be removed in 3.0 - be sure to remove support in FormBuilderEvent as well
                 if (isset($params['valueConstraints']) && is_callable($params['valueConstraints'])) {
-                    $customErrors = call_user_func_array($params['valueConstraints'], array($f, $value));
+                    $customErrors = call_user_func_array($params['valueConstraints'], [$f, $value]);
                     if (!empty($customErrors)) {
                         $validationErrors[$alias] = is_array($customErrors) ? implode('<br />', $customErrors) : $customErrors;
                     }
                 }
-
             } elseif (!empty($value)) {
                 $filter = $fieldHelper->getFieldFilter($type);
                 $value  = InputHelper::_($value, $filter);
@@ -227,6 +244,12 @@ class SubmissionModel extends CommonFormModel
                 if (!empty($validation)) {
                     $validationErrors[$alias] = is_array($validation) ? implode('<br />', $validation) : $validation;
                 }
+            }
+
+            // Check for custom validators
+            $isValid = $this->validateFieldValue($f, $value);
+            if (true !== $isValid) {
+                $validationErrors[$alias] = $isValid;
             }
 
             //convert array from checkbox groups and multiple selects
@@ -247,124 +270,34 @@ class SubmissionModel extends CommonFormModel
             }
         }
 
+        // Set the results
         $submission->setResults($results);
 
-        //execute submit actions
-        $actions = $form->getActions();
+        // Update the event
+        $submissionEvent->setFields($fieldArray)
+            ->setTokens($tokens)
+            ->setContactFieldMatches($leadFieldMatches);
 
-        //get post submit actions to make sure it still exists
-        $components       = $this->formModel->getCustomComponents();
-        $availableActions = $components['actions'];
+        // @deprecated - BC support; to be removed in 3.0 - be sure to remove the validator option from addSubmitAction as well
+        $this->validateActionCallbacks($submissionEvent, $validationErrors, $alias);
 
-        $args = array(
-            'post'       => $post,
-            'server'     => $server,
-            'factory'    => $this->factory, // WHAT??
-            'submission' => $submission,
-            'fields'     => $fieldArray,
-            'form'       => $form,
-            'tokens'     => $tokens
-        );
-
-        foreach ($actions as $action) {
-            $key = $action->getType();
-            if (!isset($availableActions[$key])) {
-                continue;
-            }
-
-            $settings       = $availableActions[$key];
-            $args['action'] = $action;
-            $args['config'] = $action->getProperties();
-            if (array_key_exists('validator', $settings)) {
-                $callback = $settings['validator'];
-                if (is_callable($callback)) {
-                    if (is_array($callback)) {
-                        $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                    } elseif (strpos($callback, '::') !== false) {
-                        $parts      = explode('::', $callback);
-                        $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-                    } else {
-                        $reflection = new \ReflectionMethod(null, $callback);
-                    }
-
-                    $pass = array();
-                    foreach ($reflection->getParameters() as $param) {
-                        if (isset($args[$param->getName()])) {
-                            $pass[] = $args[$param->getName()];
-                        } else {
-                            $pass[] = null;
-                        }
-                    }
-                    list($validated, $validatedMessage) = $reflection->invokeArgs($this, $pass);
-                    if (!$validated) {
-                        $validationErrors[$alias] = $validatedMessage;
-                    }
-                }
-            }
-        }
-
-        //return errors
+        //return errors if there any - this should be moved to right after foreach($fields) once validateActionCallbacks support is dropped
         if (!empty($validationErrors)) {
-            return array('errors' => $validationErrors);
+            return ['errors' => $validationErrors];
         }
-
-        //set the landing page the form was submitted from if applicable
-        if (!empty($post['mauticpage'])) {
-            $page = $this->pageModel->getEntity((int)$post['mauticpage']);
-            if ($page != null) {
-                $submission->setPage($page);
-            }
-        }
-
-        // Add a feedback parameter
-        $args['feedback'] = array();
 
         // Create/update lead
         if (!empty($leadFieldMatches)) {
-            $this->createLeadFromSubmit($form, $leadFieldMatches);
+            $lead = $this->createLeadFromSubmit($form, $leadFieldMatches);
+            $submission->setLead($lead);
         }
 
         if ($form->isStandalone()) {
             // Now handle post submission actions
-            foreach ($actions as $action) {
-                $key = $action->getType();
-                if (!isset($availableActions[$key])) {
-                    continue;
-                }
-
-                $settings       = $availableActions[$key];
-                $args['action'] = $action;
-                $args['config'] = $action->getProperties();
-
-                // Set the lead each time in case an action updates it
-                $args['lead'] = $this->leadModel->getCurrentLead();
-
-                $callback = $settings['callback'];
-                if (is_callable($callback)) {
-                    if (is_array($callback)) {
-                        $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                    } elseif (strpos($callback, '::') !== false) {
-                        $parts      = explode('::', $callback);
-                        $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-                    } else {
-                        $reflection = new \ReflectionMethod(null, $callback);
-                    }
-
-                    $pass = array();
-                    foreach ($reflection->getParameters() as $param) {
-                        if (isset($args[$param->getName()])) {
-                            $pass[] = $args[$param->getName()];
-                        } else {
-                            $pass[] = null;
-                        }
-                    }
-                    $returned               = $reflection->invokeArgs($this, $pass);
-                    $args['feedback'][$key] = $returned;
-                }
-            }
+            $this->executeFormActions($submissionEvent);
         }
 
-        // Get updated lead with tracking ID
+        // Get updated lead if applicable with tracking ID
         if ($form->isInKioskMode()) {
             $lead = $this->leadModel->getCurrentLead();
         } else {
@@ -388,15 +321,16 @@ class SubmissionModel extends CommonFormModel
         //save entity after the form submission events are fired in case a new lead is created
         $this->saveEntity($submission);
         if ($this->dispatcher->hasListeners(FormEvents::FORM_ON_SUBMIT)) {
-            $event = new SubmissionEvent($submission, $post, $server);
-            $this->dispatcher->dispatch(FormEvents::FORM_ON_SUBMIT, $event);
+            // Reset action config from executeFormActions()
+            $submissionEvent->setActionConfig(null, []);
+
+            // Dispatch to on submit listeners
+            $this->dispatcher->dispatch(FormEvents::FORM_ON_SUBMIT, $submissionEvent);
         }
 
-        //last round of callback commands from the submit actions; first come first serve
-        foreach ($args['feedback'] as $k => $data) {
-            if (!empty($data['callback'])) {
-                return array('callback' => $data);
-            }
+        //get callback command from the submit action; first come first serve
+        if ($callback = $submissionEvent->getPostSubmitCallback()) {
+            return ['callback' => $callback];
         }
 
         //made it to the end so return false that there was not an error
@@ -404,190 +338,9 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * Create/update lead from form submit
-     *
-     * @param       $form
-     * @param array $leadFieldMatches
-     *
-     * @return Lead
-     */
-    protected function createLeadFromSubmit($form, array $leadFieldMatches)
-    {
-        //set the mapped data
-        $leadFields = $this->leadFieldModel->getRepository()->getAliases(null, true, false);
-        $inKioskMode = $form->isInKioskMode();
-
-        if (!$inKioskMode) {
-            // Default to currently tracked lead
-            $lead          = $this->leadModel->getCurrentLead();
-            $leadId        = $lead->getId();
-            $currentFields = $this->leadModel->flattenFields($lead->getFields());
-
-            $this->logger->debug('FORM: Not in kiosk mode so using current contact ID #' . $lead->getId());
-        } else {
-            // Default to a new lead in kiosk mode
-            $lead = new Lead();
-            $lead->setNewlyCreated(true);
-            $currentFields = $leadFieldMatches;
-
-            $leadId = null;
-
-            $this->logger->debug('FORM: In kiosk mode so assuming a new contact');
-        }
-
-        $uniqueLeadFields = $this->leadFieldModel->getUniqueIdentiferFields();
-
-        // Closure to get data and unique fields
-        $getData = function($currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields) {
-            $uniqueFieldsWithData = $data = array();
-            foreach ($leadFields as $alias) {
-                $data[$alias] = '';
-
-                if (isset($currentFields[$alias])) {
-                    $value        = $currentFields[$alias];
-                    $data[$alias] = $value;
-
-                    // make sure the value is actually there and the field is one of our uniques
-                    if (!empty($value) && array_key_exists($alias, $uniqueLeadFields)) {
-                        $uniqueFieldsWithData[$alias] = $value;
-                    }
-                }
-            }
-
-            return ($uniqueOnly) ? $uniqueFieldsWithData : array($data, $uniqueFieldsWithData);
-        };
-
-        // Closure to help search for a conflict
-        $checkForIdentifierConflict = function($fieldSet1, $fieldSet2) {
-            // Find fields in both sets
-            $potentialConflicts = array_keys(
-                array_intersect_key($fieldSet1, $fieldSet2)
-            );
-
-            $this->logger->debug('FORM: Potential conflicts ' . implode(', ', array_keys($potentialConflicts)) . ' = ' . implode(', ', $potentialConflicts));
-
-            $conflicts = array();
-            foreach ($potentialConflicts as $field) {
-                if (!empty($fieldSet1[$field]) && !empty($fieldSet2[$field])) {
-                    if (strtolower($fieldSet1[$field]) !== strtolower($fieldSet2[$field])) {
-                        $conflicts[] = $field;
-                    }
-                }
-            }
-
-            return array(count($conflicts), $conflicts);
-        };
-
-        // Get data for the form submission
-        list ($data, $uniqueFieldsWithData) = $getData($leadFieldMatches);
-        $this->logger->debug('FORM: Unique fields submitted include ' . implode(', ', $uniqueFieldsWithData));
-
-        // Check for duplicate lead
-        /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
-        $leads = (!empty($uniqueFieldsWithData)) ? $this->em->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields($uniqueFieldsWithData, $leadId) : array();
-
-        $uniqueFieldsCurrent = $getData($currentFields, true);
-        if (count($leads)) {
-            $this->logger->debug(count($leads) . ' found based on unique identifiers');
-
-            /** @var \Mautic\LeadBundle\Entity\Lead $foundLead */
-            $foundLead = $leads[0];
-
-            $this->logger->debug('FORM: Testing contact ID# ' . $foundLead->getId() . ' for conflicts');
-
-            // Check for a conflict with the currently tracked lead
-            $foundLeadFields =  $this->leadModel->flattenFields($foundLead->getFields());
-
-            // Get unique identifier fields for the found lead then compare with the lead currently tracked
-            $uniqueFieldsFound = $getData($foundLeadFields, true);
-            list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
-
-            if ($inKioskMode || $hasConflict) {
-                // Use the found lead without merging because there is some sort of conflict with unique identifiers or in kiosk mode and thus should not merge
-                $lead = $foundLead;
-
-                if ($hasConflict) {
-                    $this->logger->debug('FORM: Conflicts found in ' . implode(', ' , $conflicts) . ' so not merging');
-                } else {
-                    $this->logger->debug('FORM: In kiosk mode so not merging');
-                }
-
-            } else {
-                $this->logger->debug('FORM: Merging contacts ' . $lead->getId() . ' and ' . $foundLead->getId());
-
-                // Merge the found lead with currently tracked lead
-                $lead = $this->leadModel->mergeLeads($lead, $foundLead);
-            }
-
-            // Update unique fields data for comparison with submitted data
-            $currentFields       = $this->leadModel->flattenFields($lead->getFields());
-            $uniqueFieldsCurrent = $getData($currentFields, true);
-        }
-
-        if (!$inKioskMode) {
-            // Check for conflicts with the submitted data and the currently tracked lead
-            list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsWithData, $uniqueFieldsCurrent);
-
-            $this->logger->debug('FORM: Current unique contact fields ' . implode(', ', array_keys($uniqueFieldsCurrent)) . ' = ' . implode(', ', $uniqueFieldsCurrent));
-
-            $this->logger->debug('FORM: Submitted unique contact fields ' . implode(', ', array_keys($uniqueFieldsWithData)) . ' = ' . implode(', ', $uniqueFieldsWithData));
-            if ($hasConflict) {
-                // There's a conflict so create a new lead
-                $lead = new Lead();
-                $lead->setNewlyCreated(true);
-
-                $this->logger->debug('FORM: Conflicts found in ' . implode(', ' , $conflicts) . ' between current tracked contact and submitted data so assuming a new contact');
-            }
-        }
-
-        //check for existing IP address
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
-
-        //no lead was found by a mapped email field so create a new one
-        if ($lead->isNewlyCreated()) {
-            if (!$inKioskMode) {
-                $lead->addIpAddress($ipAddress);
-                $this->logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to contact');
-            }
-
-        } elseif (!$inKioskMode) {
-            $leadIpAddresses = $lead->getIpAddresses();
-            if (!$leadIpAddresses->contains($ipAddress)) {
-                $lead->addIpAddress($ipAddress);
-
-                $this->logger->debug('FORM: Associating ' . $ipAddress->getIpAddress() . ' to contact');
-            }
-        }
-
-        //set the mapped fields
-        $this->leadModel->setFieldValues($lead, $data, false);
-
-        if (!empty($event)) {
-            $event->setIpAddress($ipAddress);
-            $lead->addPointsChangeLog($event);
-        }
-
-        // last active time
-        $lead->setLastActive(new \DateTime());
-
-        //create a new lead
-        $this->leadModel->saveEntity($lead, false);
-
-        if (!$inKioskMode) {
-            // Set the current lead which will generate tracking cookies
-            $this->leadModel->setCurrentLead($lead);
-        } else {
-            // Set system current lead which will still allow execution of events without generating tracking cookies
-            $this->leadModel->setSystemCurrentLead($lead);
-        }
-
-        return $lead;
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function getEntities (array $args = array())
+    public function getEntities(array $args = [])
     {
         return $this->getRepository()->getEntities($args);
     }
@@ -606,60 +359,64 @@ class SubmissionModel extends CommonFormModel
         $translator = $this->translator;
 
         $date = (new DateTimeHelper)->toLocalString();
-        $name = str_replace(' ', '_', $date) . '_' . $form->getAlias();
+        $name = str_replace(' ', '_', $date).'_'.$form->getAlias();
 
         switch ($format) {
             case 'csv':
-                $response = new StreamedResponse(function () use ($results, $form, $translator) {
-                    $handle = fopen('php://output', 'r+');
+                $response = new StreamedResponse(
+                    function () use ($results, $form, $translator) {
+                        $handle = fopen('php://output', 'r+');
 
-                    //build the header row
-                    $fields = $form->getFields();
-                    $header = array(
-                        $translator->trans('mautic.core.id'),
-                        $translator->trans('mautic.form.result.thead.date'),
-                        $translator->trans('mautic.core.ipaddress'),
-                        $translator->trans('mautic.form.result.thead.referrer')
-                    );
-                    foreach ($fields as $f) {
-                        if (in_array($f->getType(), array('button', 'freetext')) || $f->getSaveResult() === false)
-                            continue;
-                        $header[] = $f->getLabel();
-                    }
-                    //free memory
-                    unset($fields);
-
-                    //write the row
-                    fputcsv($handle, $header);
-
-                    //build the data rows
-                    foreach ($results as $k => $s) {
-                        $row = array(
-                            $s['id'],
-                            $s['dateSubmitted']->format('Y-m-d H:m:s'),
-                            $s['ipAddress']['ipAddress'],
-                            $s['referer']
-                        );
-                        foreach ($s['results'] as $k2 => $r) {
-                            if (in_array($r['type'], array('button', 'freetext')))
+                        //build the header row
+                        $fields = $form->getFields();
+                        $header = [
+                            $translator->trans('mautic.core.id'),
+                            $translator->trans('mautic.form.result.thead.date'),
+                            $translator->trans('mautic.core.ipaddress'),
+                            $translator->trans('mautic.form.result.thead.referrer'),
+                        ];
+                        foreach ($fields as $f) {
+                            if (in_array($f->getType(), ['button', 'freetext']) || $f->getSaveResult() === false) {
                                 continue;
-                            $row[] = $r['value'];
+                            }
+                            $header[] = $f->getLabel();
+                        }
+                        //free memory
+                        unset($fields);
+
+                        //write the row
+                        fputcsv($handle, $header);
+
+                        //build the data rows
+                        foreach ($results as $k => $s) {
+                            $row = [
+                                $s['id'],
+                                $s['dateSubmitted']->format('Y-m-d H:m:s'),
+                                $s['ipAddress']['ipAddress'],
+                                $s['referer'],
+                            ];
+                            foreach ($s['results'] as $k2 => $r) {
+                                if (in_array($r['type'], ['button', 'freetext'])) {
+                                    continue;
+                                }
+                                $row[] = $r['value'];
+                                //free memory
+                                unset($s['results'][$k2]);
+                            }
+
+                            fputcsv($handle, $row);
+
                             //free memory
-                            unset($s['results'][$k2]);
+                            unset($row, $results[$k]);;
                         }
 
-                        fputcsv($handle, $row);
-
-                        //free memory
-                        unset($row, $results[$k]);;
+                        fclose($handle);
                     }
-
-                    fclose($handle);
-                });
+                );
 
                 $response->headers->set('Content-Type', 'application/force-download');
                 $response->headers->set('Content-Type', 'application/octet-stream');
-                $response->headers->set('Content-Disposition', 'attachment; filename="' . $name . '.csv"');
+                $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.csv"');
                 $response->headers->set('Expires', 0);
                 $response->headers->set('Cache-Control', 'must-revalidate');
                 $response->headers->set('Pragma', 'public');
@@ -668,75 +425,79 @@ class SubmissionModel extends CommonFormModel
             case 'html':
                 $content = $this->templatingHelper->getTemplating()->renderResponse(
                     'MauticFormBundle:Result:export.html.php',
-                    array(
+                    [
                         'form'      => $form,
                         'results'   => $results,
-                        'pageTitle' => $name
-                    )
+                        'pageTitle' => $name,
+                    ]
                 )->getContent();
 
                 return new Response($content);
             case 'xlsx':
                 if (class_exists('PHPExcel')) {
-                    $response = new StreamedResponse(function () use ($results, $form, $translator, $name) {
-                        $objPHPExcel = new \PHPExcel();
-                        $objPHPExcel->getProperties()->setTitle($name);
+                    $response = new StreamedResponse(
+                        function () use ($results, $form, $translator, $name) {
+                            $objPHPExcel = new \PHPExcel();
+                            $objPHPExcel->getProperties()->setTitle($name);
 
-                        $objPHPExcel->createSheet();
+                            $objPHPExcel->createSheet();
 
-                        //build the header row
-                        $fields = $form->getFields();
-                        $header = array(
-                            $translator->trans('mautic.core.id'),
-                            $translator->trans('mautic.form.result.thead.date'),
-                            $translator->trans('mautic.core.ipaddress'),
-                            $translator->trans('mautic.form.result.thead.referrer')
-                        );
-                        foreach ($fields as $f) {
-                            if (in_array($f->getType(), array('button', 'freetext')) || $f->getSaveResult() === false)
-                                continue;
-                            $header[] = $f->getLabel();
-                        }
-                        //free memory
-                        unset($fields);
-
-                        //write the row
-                        $objPHPExcel->getActiveSheet()->fromArray($header, NULL, 'A1');
-
-                        //build the data rows
-                        $count = 2;
-                        foreach ($results as $k => $s) {
-                            $row = array(
-                                $s['id'],
-                                $s['dateSubmitted']->format('Y-m-d H:m:s'),
-                                $s['ipAddress']['ipAddress'],
-                                $s['referer']
-                            );
-                            foreach ($s['results'] as $k2 => $r) {
-                                if (in_array($r['type'], array('button', 'freetext')))
+                            //build the header row
+                            $fields = $form->getFields();
+                            $header = [
+                                $translator->trans('mautic.core.id'),
+                                $translator->trans('mautic.form.result.thead.date'),
+                                $translator->trans('mautic.core.ipaddress'),
+                                $translator->trans('mautic.form.result.thead.referrer'),
+                            ];
+                            foreach ($fields as $f) {
+                                if (in_array($f->getType(), ['button', 'freetext']) || $f->getSaveResult() === false) {
                                     continue;
-                                $row[] = $r['value'];
+                                }
+                                $header[] = $f->getLabel();
+                            }
+                            //free memory
+                            unset($fields);
+
+                            //write the row
+                            $objPHPExcel->getActiveSheet()->fromArray($header, null, 'A1');
+
+                            //build the data rows
+                            $count = 2;
+                            foreach ($results as $k => $s) {
+                                $row = [
+                                    $s['id'],
+                                    $s['dateSubmitted']->format('Y-m-d H:m:s'),
+                                    $s['ipAddress']['ipAddress'],
+                                    $s['referer'],
+                                ];
+                                foreach ($s['results'] as $k2 => $r) {
+                                    if (in_array($r['type'], ['button', 'freetext'])) {
+                                        continue;
+                                    }
+                                    $row[] = $r['value'];
+                                    //free memory
+                                    unset($s['results'][$k2]);
+                                }
+
+                                $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$count}");
+
                                 //free memory
-                                unset($s['results'][$k2]);
+                                unset($row, $results[$k]);
+
+                                //increment letter
+                                $count++;
                             }
 
-                            $objPHPExcel->getActiveSheet()->fromArray($row, NULL, "A{$count}");
+                            $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+                            $objWriter->setPreCalculateFormulas(false);
 
-                            //free memory
-                            unset($row, $results[$k]);
-
-                            //increment letter
-                            $count++;
+                            $objWriter->save('php://output');
                         }
-
-                        $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-                        $objWriter->setPreCalculateFormulas(false);
-
-                        $objWriter->save('php://output');
-                    });
+                    );
                     $response->headers->set('Content-Type', 'application/force-download');
                     $response->headers->set('Content-Type', 'application/octet-stream');
-                    $response->headers->set('Content-Disposition', 'attachment; filename="' . $name . '.xlsx"');
+                    $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.xlsx"');
                     $response->headers->set('Expires', 0);
                     $response->headers->set('Cache-Control', 'must-revalidate');
                     $response->headers->set('Pragma', 'public');
@@ -752,7 +513,7 @@ class SubmissionModel extends CommonFormModel
     /**
      * Get line chart data of submissions
      *
-     * @param char      $unit   {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param char      $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat
@@ -761,11 +522,17 @@ class SubmissionModel extends CommonFormModel
      *
      * @return array
      */
-    public function getSubmissionsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = array(), $canViewOthers = true)
-    {
-        $chart     = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query     = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-        $q = $query->prepareTimeDataQuery('form_submissions', 'date_submitted', $filter);
+    public function getSubmissionsLineChartData(
+        $unit,
+        \DateTime $dateFrom,
+        \DateTime $dateTo,
+        $dateFormat = null,
+        $filter = [],
+        $canViewOthers = true
+    ) {
+        $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $q     = $query->prepareTimeDataQuery('form_submissions', 'date_submitted', $filter);
 
         if (!$canViewOthers) {
             $q->join('t', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = t.form_id')
@@ -775,6 +542,7 @@ class SubmissionModel extends CommonFormModel
 
         $data = $query->loadAndBuildTimeData($q);
         $chart->setDataset($this->translator->trans('mautic.form.submission.count'), $data);
+
         return $chart->render();
     }
 
@@ -789,7 +557,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @return array
      */
-    public function getTopSubmissionReferrers($limit = 10, $dateFrom = null, $dateTo = null, $filters = array(), $canViewOthers = true)
+    public function getTopSubmissionReferrers($limit = 10, $dateFrom = null, $dateTo = null, $filters = [], $canViewOthers = true)
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.referer')
@@ -824,7 +592,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @return array
      */
-    public function getTopSubmitters($limit = 10, $dateFrom = null, $dateTo = null, $filters = array(), $canViewOthers = true)
+    public function getTopSubmitters($limit = 10, $dateFrom = null, $dateTo = null, $filters = [], $canViewOthers = true)
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.lead_id, l.firstname, l.lastname, l.email')
@@ -848,4 +616,366 @@ class SubmissionModel extends CommonFormModel
 
         return $results;
     }
+
+    /**
+     * Execute a form submit action
+     *
+     * @param SubmissionEvent $event
+     */
+    protected function executeFormActions(SubmissionEvent $event)
+    {
+        $actions          = $event->getSubmission()->getForm()->getActions();
+        $availableActions = $this->formModel->getCustomComponents()['actions'];
+
+        // @deprecated support for callback - to be removed in 3.0
+        $args = [
+            'post'       => $event->getPost(),
+            'server'     => $event->getServer(),
+            'factory'    => $this->factory, // WHAT??
+            'submission' => $event->getSubmission(),
+            'fields'     => $event->getFields(),
+            'form'       => $event->getSubmission()->getForm(),
+            'tokens'     => $event->getTokens(),
+            'feedback'   => [],
+            'lead'       => $event->getSubmission()->getLead()
+        ];
+
+        foreach ($actions as $action) {
+            $key = $action->getType();
+            if (!isset($availableActions[$key])) {
+                continue;
+            }
+
+            $settings = $availableActions[$key];
+            if (isset($settings['eventName'])) {
+                $event->setActionConfig($key, $action->getProperties());
+                $this->dispatcher->dispatch($settings['eventName'], $event);
+
+                // @deprecated support for callback - to be removed in 3.0
+                $args['lead']     = $event->getSubmission()->getLead();
+                $args['feedback'] = $event->getActionFeedback();
+            } elseif (isset($settings['callback'])) {
+                // @deprecated support for callback - to be removed in 3.0; be sure to remove callback support from FormBuilderEvent as well
+
+                $args['action'] = $action;
+                $args['config'] = $action->getProperties();
+
+                // Set the lead each time in case an action updates it
+                $args['lead'] = $this->leadModel->getCurrentLead();
+
+                $callback = $settings['callback'];
+                if (is_callable($callback)) {
+                    if (is_array($callback)) {
+                        $reflection = new \ReflectionMethod($callback[0], $callback[1]);
+                    } elseif (strpos($callback, '::') !== false) {
+                        $parts      = explode('::', $callback);
+                        $reflection = new \ReflectionMethod($parts[0], $parts[1]);
+                    } else {
+                        $reflection = new \ReflectionMethod(null, $callback);
+                    }
+
+                    $pass = [];
+                    foreach ($reflection->getParameters() as $param) {
+                        if (isset($args[$param->getName()])) {
+                            $pass[] = $args[$param->getName()];
+                        } else {
+                            $pass[] = null;
+                        }
+                    }
+                    $returned               = $reflection->invokeArgs($this, $pass);
+                    $args['feedback'][$key] = $returned;
+
+                    // Set these for updated plugins to leverage
+                    if (isset($returned['callback'])) {
+                        $event->setPostSubmitCallback($returned['callback']);
+                    }
+
+                    $event->setActionFeedback($key, $returned);
+                }
+            }
+        }
+    }
+
+    /**
+     * Create/update lead from form submit
+     *
+     * @param       $form
+     * @param array $leadFieldMatches
+     *
+     * @return Lead
+     */
+    protected function createLeadFromSubmit($form, array $leadFieldMatches)
+    {
+        //set the mapped data
+        $leadFields  = $this->leadFieldModel->getRepository()->getAliases(null, true, false);
+        $inKioskMode = $form->isInKioskMode();
+
+        if (!$inKioskMode) {
+            // Default to currently tracked lead
+            $lead          = $this->leadModel->getCurrentLead();
+            $leadId        = $lead->getId();
+            $currentFields = $this->leadModel->flattenFields($lead->getFields());
+
+            $this->logger->debug('FORM: Not in kiosk mode so using current contact ID #'.$lead->getId());
+        } else {
+            // Default to a new lead in kiosk mode
+            $lead = new Lead();
+            $lead->setNewlyCreated(true);
+            $currentFields = $leadFieldMatches;
+
+            $leadId = null;
+
+            $this->logger->debug('FORM: In kiosk mode so assuming a new contact');
+        }
+
+        $uniqueLeadFields = $this->leadFieldModel->getUniqueIdentiferFields();
+
+        // Closure to get data and unique fields
+        $getData = function ($currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields) {
+            $uniqueFieldsWithData = $data = [];
+            foreach ($leadFields as $alias) {
+                $data[$alias] = '';
+
+                if (isset($currentFields[$alias])) {
+                    $value        = $currentFields[$alias];
+                    $data[$alias] = $value;
+
+                    // make sure the value is actually there and the field is one of our uniques
+                    if (!empty($value) && array_key_exists($alias, $uniqueLeadFields)) {
+                        $uniqueFieldsWithData[$alias] = $value;
+                    }
+                }
+            }
+
+            return ($uniqueOnly) ? $uniqueFieldsWithData : [$data, $uniqueFieldsWithData];
+        };
+
+        // Closure to help search for a conflict
+        $checkForIdentifierConflict = function ($fieldSet1, $fieldSet2) {
+            // Find fields in both sets
+            $potentialConflicts = array_keys(
+                array_intersect_key($fieldSet1, $fieldSet2)
+            );
+
+            $this->logger->debug(
+                'FORM: Potential conflicts '.implode(', ', array_keys($potentialConflicts)).' = '.implode(', ', $potentialConflicts)
+            );
+
+            $conflicts = [];
+            foreach ($potentialConflicts as $field) {
+                if (!empty($fieldSet1[$field]) && !empty($fieldSet2[$field])) {
+                    if (strtolower($fieldSet1[$field]) !== strtolower($fieldSet2[$field])) {
+                        $conflicts[] = $field;
+                    }
+                }
+            }
+
+            return [count($conflicts), $conflicts];
+        };
+
+        // Get data for the form submission
+        list ($data, $uniqueFieldsWithData) = $getData($leadFieldMatches);
+        $this->logger->debug('FORM: Unique fields submitted include '.implode(', ', $uniqueFieldsWithData));
+
+        // Check for duplicate lead
+        /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
+        $leads = (!empty($uniqueFieldsWithData)) ? $this->em->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields(
+            $uniqueFieldsWithData,
+            $leadId
+        ) : [];
+
+        $uniqueFieldsCurrent = $getData($currentFields, true);
+        if (count($leads)) {
+            $this->logger->debug(count($leads).' found based on unique identifiers');
+
+            /** @var \Mautic\LeadBundle\Entity\Lead $foundLead */
+            $foundLead = $leads[0];
+
+            $this->logger->debug('FORM: Testing contact ID# '.$foundLead->getId().' for conflicts');
+
+            // Check for a conflict with the currently tracked lead
+            $foundLeadFields = $this->leadModel->flattenFields($foundLead->getFields());
+
+            // Get unique identifier fields for the found lead then compare with the lead currently tracked
+            $uniqueFieldsFound = $getData($foundLeadFields, true);
+            list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
+
+            if ($inKioskMode || $hasConflict) {
+                // Use the found lead without merging because there is some sort of conflict with unique identifiers or in kiosk mode and thus should not merge
+                $lead = $foundLead;
+
+                if ($hasConflict) {
+                    $this->logger->debug('FORM: Conflicts found in '.implode(', ', $conflicts).' so not merging');
+                } else {
+                    $this->logger->debug('FORM: In kiosk mode so not merging');
+                }
+
+            } else {
+                $this->logger->debug('FORM: Merging contacts '.$lead->getId().' and '.$foundLead->getId());
+
+                // Merge the found lead with currently tracked lead
+                $lead = $this->leadModel->mergeLeads($lead, $foundLead);
+            }
+
+            // Update unique fields data for comparison with submitted data
+            $currentFields       = $this->leadModel->flattenFields($lead->getFields());
+            $uniqueFieldsCurrent = $getData($currentFields, true);
+        }
+
+        if (!$inKioskMode) {
+            // Check for conflicts with the submitted data and the currently tracked lead
+            list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsWithData, $uniqueFieldsCurrent);
+
+            $this->logger->debug(
+                'FORM: Current unique contact fields '.implode(', ', array_keys($uniqueFieldsCurrent)).' = '.implode(', ', $uniqueFieldsCurrent)
+            );
+
+            $this->logger->debug(
+                'FORM: Submitted unique contact fields '.implode(', ', array_keys($uniqueFieldsWithData)).' = '.implode(', ', $uniqueFieldsWithData)
+            );
+            if ($hasConflict) {
+                // There's a conflict so create a new lead
+                $lead = new Lead();
+                $lead->setNewlyCreated(true);
+
+                $this->logger->debug(
+                    'FORM: Conflicts found in '.implode(', ', $conflicts)
+                    .' between current tracked contact and submitted data so assuming a new contact'
+                );
+            }
+        }
+
+        //check for existing IP address
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
+
+        //no lead was found by a mapped email field so create a new one
+        if ($lead->isNewlyCreated()) {
+            if (!$inKioskMode) {
+                $lead->addIpAddress($ipAddress);
+                $this->logger->debug('FORM: Associating '.$ipAddress->getIpAddress().' to contact');
+            }
+
+        } elseif (!$inKioskMode) {
+            $leadIpAddresses = $lead->getIpAddresses();
+            if (!$leadIpAddresses->contains($ipAddress)) {
+                $lead->addIpAddress($ipAddress);
+
+                $this->logger->debug('FORM: Associating '.$ipAddress->getIpAddress().' to contact');
+            }
+        }
+
+        //set the mapped fields
+        $this->leadModel->setFieldValues($lead, $data, false);
+
+        if (!empty($event)) {
+            $event->setIpAddress($ipAddress);
+            $lead->addPointsChangeLog($event);
+        }
+
+        // last active time
+        $lead->setLastActive(new \DateTime());
+
+        //create a new lead
+        $this->leadModel->saveEntity($lead, false);
+
+        if (!$inKioskMode) {
+            // Set the current lead which will generate tracking cookies
+            $this->leadModel->setCurrentLead($lead);
+        } else {
+            // Set system current lead which will still allow execution of events without generating tracking cookies
+            $this->leadModel->setSystemCurrentLead($lead);
+        }
+
+        return $lead;
+    }
+
+    /**
+     * Validates a field value
+     *
+     * @param Field $field
+     * @param       $value
+     *
+     * @return bool|string True if valid; otherwise string with invalid reason
+     */
+    protected function validateFieldValue(Field $field, $value)
+    {
+        $components = $this->formModel->getCustomComponents();
+
+        foreach ([$field->getType(), 'form'] as $type) {
+            if (isset($components['validators'][$type])) {
+                foreach ($components['validators'][$type] as $validator) {
+                    $event = $this->dispatcher->dispatch($validator['eventName'], new ValidationEvent($field, $value));
+                    if (!$event->isValid()) {
+                        return $event->getInvalidReason();
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @deprecated - added for BC; to be removed in 3.0
+     *
+     * @param Action[]        $actions
+     * @param SubmissionEvent $event
+     * @param                 $validationErrors
+     * @param                 $lastAlias            Because prior to now the last alias was used regardless
+     */
+    protected function validateActionCallbacks(SubmissionEvent $event, &$validationErrors, $lastAlias)
+    {
+        $args = [
+            'post'       => $event->getPost(),
+            'server'     => $event->getServer(),
+            'factory'    => $this->factory, // WHAT??
+            'submission' => $event->getSubmission(),
+            'fields'     => $event->getFields(),
+            'form'       => $event->getSubmission()->getForm(),
+            'tokens'     => $event->getTokens(),
+        ];
+
+        $actions          = $event->getSubmission()->getForm()->getActions();
+        $availableActions = $this->formModel->getCustomComponents()['actions'];
+
+        foreach ($actions as $action) {
+            $key = $action->getType();
+            if (!isset($availableActions[$key])) {
+                continue;
+            }
+
+            $settings       = $availableActions[$key];
+            $args['action'] = $action;
+            $args['config'] = $action->getProperties();
+            if (array_key_exists('validator', $settings)) {
+                $callback = $settings['validator'];
+                if (is_callable($callback)) {
+                    if (is_array($callback)) {
+                        $reflection = new \ReflectionMethod($callback[0], $callback[1]);
+                    } elseif (strpos($callback, '::') !== false) {
+                        $parts      = explode('::', $callback);
+                        $reflection = new \ReflectionMethod($parts[0], $parts[1]);
+                    } else {
+                        $reflection = new \ReflectionMethod(null, $callback);
+                    }
+
+                    $pass = [];
+                    foreach ($reflection->getParameters() as $param) {
+                        if (isset($args[$param->getName()])) {
+                            $pass[] = $args[$param->getName()];
+                        } else {
+                            $pass[] = null;
+                        }
+                    }
+                    list($validated, $validatedMessage) = $reflection->invokeArgs($this, $pass);
+                    if (!$validated) {
+                        $validationErrors[$lastAlias] = $validatedMessage;
+                    }
+                }
+            }
+        }
+
+        unset($args, $actions, $availableActions);
+    }
 }
+

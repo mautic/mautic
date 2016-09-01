@@ -519,9 +519,10 @@ class FormModel extends CommonFormModel
             //build them
             $event = new FormBuilderEvent($this->translator);
             $this->dispatcher->dispatch(FormEvents::FORM_ON_BUILD, $event);
-            $customComponents['fields']  = $event->getFormFields();
-            $customComponents['actions'] = $event->getSubmitActions();
-            $customComponents['choices'] = $event->getSubmitActionGroups();
+            $customComponents['fields']     = $event->getFormFields();
+            $customComponents['actions']    = $event->getSubmitActions();
+            $customComponents['choices']    = $event->getSubmitActionGroups();
+            $customComponents['validators'] = $event->getValidators();
         }
 
         return $customComponents;
