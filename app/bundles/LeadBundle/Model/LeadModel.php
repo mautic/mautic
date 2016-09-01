@@ -542,7 +542,7 @@ class LeadModel extends FormModel
         foreach ($fields as $field) {
             if ($field instanceof LeadField) {
                 $alias = $field->getAlias();
-                if ($field->isPublished()) {
+                if ($field->isPublished() and $field->getObject() === 'Lead') {
                     $group                          = $field->getGroup();
                     $array[$group][$alias]['id']    = $field->getId();
                     $array[$group][$alias]['group'] = $group;
@@ -552,7 +552,8 @@ class LeadModel extends FormModel
                 }
             } else {
                 $alias = $field['alias'];
-                if ($field['isPublished']) {
+                $this->logger->debug(print_r($field,true));
+                if ($field['isPublished'] and $field['object'] === 'Lead') {
                     $group = $field['group'];
                     $array[$group][$alias]['id']    = $field['id'];
                     $array[$group][$alias]['group'] = $group;

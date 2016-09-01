@@ -17,7 +17,7 @@ $view['slots']->set(
         'MauticCoreBundle:Helper:page_actions.html.php',
         array(
             'templateButtons' => array(
-                'new' => $permissions['company:companies:create']
+                'new' => $permissions['lead:leads:create']
             ),
             'routeBase'       => 'company'
         )
@@ -34,7 +34,7 @@ $view['slots']->set(
             'action'          => $currentRoute,
             'routeBase'       => 'company',
             'templateButtons' => array(
-                'delete' => $permissions['company:companies:delete']
+                'delete' => $permissions['lead:leads:deleteother']
             )
         )
     ); ?>

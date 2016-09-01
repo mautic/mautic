@@ -7,10 +7,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CompanyBundle\Controller;
+namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CompanyBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\Company;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -29,15 +29,15 @@ class CompanyController extends FormController
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(
             array(
-                'company:companies:view',
-                'company:companies:create',
-                'company:companies:edit',
-                'company:companies:delete'
+                'lead:leads:viewother',
+                'lead:leads:create',
+                'lead:leads:editother',
+                'lead:leads:deleteother'
             ),
             "RETURN_ARRAY"
         );
 
-        if (!$permissions['company:companies:view']) {
+        if (!$permissions['lead:leads:viewother']) {
             return $this->accessDenied();
         }
 
@@ -59,7 +59,7 @@ class CompanyController extends FormController
         $this->factory->getSession()->set('mautic.company.filter', $search);
 
         $filter     = array('string' => $search, 'force' => array());
-        $orderBy    = $this->factory->getSession()->get('mautic.company.orderby', 'comp.name');
+        $orderBy    = $this->factory->getSession()->get('mautic.company.orderby', 'comp.id');
 
         $companies = $this->factory->getModel('company')->getEntities(
             array(
@@ -80,7 +80,7 @@ class CompanyController extends FormController
                 array(
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => array('page' => $lastPage),
-                    'contentTemplate' => 'MauticCompanyBundle:Company:index',
+                    'contentTemplate' => 'MauticLeadBundle:Company:index',
                     'passthroughVars' => array(
                         'activeLink'    => '#mautic_company_index',
                         'mauticContent' => 'company'
@@ -104,7 +104,7 @@ class CompanyController extends FormController
                     'permissions' => $permissions,
                     'tmpl'        => $tmpl
                 ),
-                'contentTemplate' => 'MauticCompanyBundle:Company:list.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Company:list.html.php',
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_company_index',
                     'mauticContent' => 'company',
@@ -117,7 +117,7 @@ class CompanyController extends FormController
     /**
      * Generates new form and processes post data
      *
-     * @param  \Mautic\CompanyBundle\Entity\Company $entity
+     * @param  \Mautic\LeadBundle\Entity\Company $entity
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
@@ -126,11 +126,11 @@ class CompanyController extends FormController
         $model = $this->getModel('company');
 
         if (!($entity instanceof Company)) {
-            /** @var \Mautic\CompanyBundle\Entity\Company $entity */
+            /** @var \Mautic\LeadBundle\Entity\Company $entity */
             $entity = $model->getEntity();
         }
 
-        if (!$this->factory->getSecurity()->isGranted('company:companies:create')) {
+        if (!$this->factory->getSecurity()->isGranted('lead:leads:create')) {
             return $this->accessDenied();
         }
 
@@ -138,12 +138,25 @@ class CompanyController extends FormController
         $page = $this->factory->getSession()->get('mautic.company.page', 1);
 
         $action         = $this->generateUrl('mautic_company_action', array('objectAction' => 'new'));
-        $form           = $model->createForm(
-            $entity,
-            $this->get('form.factory'),
-            $action,
-            array()
+        $fields = $this->getModel('lead.field')->getEntities(
+            [
+                'force'          => [
+                    [
+                        'column' => 'f.isPublished',
+                        'expr'   => 'eq',
+                        'value'  => true
+                    ],
+                    [
+                        'column' => 'f.object',
+                        'expr'   => 'eq',
+                        'value'  => 'Company'
+                    ]
+                ],
+                'hydration_mode' => 'HYDRATE_ARRAY'
+            ]
         );
+        $form   = $model->createForm($entity, $this->get('form.factory'), $action, ['fields' => $fields]);
+
         $viewParameters = array('page' => $page);
 
         ///Check for a submitted form and process it
@@ -152,12 +165,21 @@ class CompanyController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
+                    //get custom field values
+                    $data = $this->request->request->get('lead');
+                    //pull the data from the form in order to apply the form's formatting
+                    foreach ($form as $f) {
+                        $data[$f->getName()] = $f->getData();
+                    }
+                    $model->setFieldValues($entity, $data, true);
+                    //form is valid so process the data
                     $model->saveEntity($entity);
 
+                    $identifier = $this->get('translator')->trans($model->getPrimaryIdentifier());
                     $this->addFlash(
                         'mautic.core.notice.created',
                         array(
-                            '%name%'      => $entity->getName(),
+                            '%name%'      => $identifier,
                             '%menu_link%' => 'mautic_company_index',
                             '%url%'       => $this->generateUrl(
                                 'mautic_company_action',
@@ -171,7 +193,7 @@ class CompanyController extends FormController
 
                     if ($form->get('buttons')->get('save')->isClicked()) {
                         $returnUrl = $this->generateUrl('mautic_company_index', $viewParameters);
-                        $template  = 'MauticCompanyBundle:Company:index';
+                        $template  = 'MauticLeadBundle:Company:index';
                     } else {
                         //return edit view so that all the session stuff is loaded
                         return $this->editAction($entity->getId(), true);
@@ -179,7 +201,7 @@ class CompanyController extends FormController
                 }
             } else {
                 $returnUrl = $this->generateUrl('mautic_company_index', $viewParameters);
-                $template  = 'MauticCompanyBundle:Company:index';
+                $template  = 'MauticLeadBundle:Company:index';
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
@@ -197,16 +219,17 @@ class CompanyController extends FormController
             }
         }
 
-        $themes = array('MauticCompanyBundle:FormTheme\Action');
+        $themes = array('MauticLeadBundle:FormTheme\Action');
 
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
                     'tmpl'    => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'entity'  => $entity,
-                    'form'    => $this->setFormTheme($form, 'MauticCompanyBundle:Company:form.html.php', $themes)
+                    'form'    => $this->setFormTheme($form, 'MauticLeadBundle:Company:form.html.php', $themes),
+                    'fields' => $model->organizeFieldsByGroup($fields)
                 ),
-                'contentTemplate' => 'MauticCompanyBundle:Company:form.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Company:form.html.php',
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_company_index',
                     'mauticContent' => 'company',
@@ -246,7 +269,7 @@ class CompanyController extends FormController
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
             'viewParameters'  => $viewParameters,
-            'contentTemplate' => 'MauticCompanyBundle:Company:index',
+            'contentTemplate' => 'MauticLeadBundle:Company:index',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_company_index',
                 'mauticContent' => 'company'
@@ -269,7 +292,7 @@ class CompanyController extends FormController
                     )
                 )
             );
-        } elseif (!$this->factory->getSecurity()->isGranted('company:companies:edit')) {
+        } elseif (!$this->factory->getSecurity()->isGranted('lead:leads:editother')) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
@@ -309,7 +332,7 @@ class CompanyController extends FormController
 
                     if ($form->get('buttons')->get('save')->isClicked()) {
                         $returnUrl = $this->generateUrl('mautic_company_index', $viewParameters);
-                        $template  = 'MauticCompanyBundle:Company:index';
+                        $template  = 'MauticLeadBundle:Company:index';
                     }
                 }
             } else {
@@ -317,7 +340,7 @@ class CompanyController extends FormController
                 $model->unlockEntity($entity);
 
                 $returnUrl = $this->generateUrl('mautic_company_index', $viewParameters);
-                $template  = 'MauticCompanyBundle:Company:index';
+                $template  = 'MauticLeadBundle:Company:index';
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
@@ -337,16 +360,16 @@ class CompanyController extends FormController
             $model->lockEntity($entity);
         }
 
-        $themes = array('MauticCompanyBundle:FormTheme\Action');
+        $themes = array('MauticLeadBundle:FormTheme\Action');
 
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
                     'tmpl'    => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'entity'  => $entity,
-                    'form'    => $this->setFormTheme($form, 'MauticCompanyBundle:Company:form.html.php', $themes)
+                    'form'    => $this->setFormTheme($form, 'MauticLeadBundle:Company:form.html.php', $themes)
                 ),
-                'contentTemplate' => 'MauticCompanyBundle:Company:form.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Company:form.html.php',
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_company_index',
                     'mauticContent' => 'company',
@@ -375,7 +398,7 @@ class CompanyController extends FormController
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
-            if (!$this->factory->getSecurity()->isGranted('company:companies:create')) {
+            if (!$this->factory->getSecurity()->isGranted('lead:leads:create')) {
                 return $this->accessDenied();
             }
 
@@ -401,7 +424,7 @@ class CompanyController extends FormController
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
             'viewParameters'  => array('page' => $page),
-            'contentTemplate' => 'MauticCompanyBundle:Company:index',
+            'contentTemplate' => 'MauticLeadBundle:Company:index',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_company_index',
                 'mauticContent' => 'company'
@@ -418,7 +441,7 @@ class CompanyController extends FormController
                     'msg'     => 'mautic.company.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
-            } elseif (!$this->factory->getSecurity()->isGranted('company:companies:delete')) {
+            } elseif (!$this->factory->getSecurity()->isGranted('lead:leads:deleteother')) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'company');
@@ -461,7 +484,7 @@ class CompanyController extends FormController
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
             'viewParameters'  => array('page' => $page),
-            'contentTemplate' => 'MauticCompanyBundle:Company:index',
+            'contentTemplate' => 'MauticLeadBundle:Company:index',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_company_index',
                 'mauticContent' => 'company'
@@ -483,7 +506,7 @@ class CompanyController extends FormController
                         'msg'     => 'mautic.company.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     );
-                } elseif (!$this->factory->getSecurity()->isGranted('company:companies:delete')) {
+                } elseif (!$this->factory->getSecurity()->isGranted('lead:leads:deleteother')) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'company', true);

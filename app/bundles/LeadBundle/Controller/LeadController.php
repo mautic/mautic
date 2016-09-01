@@ -222,6 +222,11 @@ class LeadController extends FormController
                             'column' => 'f.isShortVisible',
                             'expr'   => 'eq',
                             'value'  => true
+                        ],
+                        [
+                            'column' => 'f.object',
+                            'expr'   => 'like',
+                            'value'  => 'Lead'
                         ]
                     ]
                 ],
@@ -404,11 +409,17 @@ class LeadController extends FormController
                         'column' => 'f.isPublished',
                         'expr'   => 'eq',
                         'value'  => true
+                    ],
+                    [
+                        'column' => 'f.object',
+                        'expr'   => 'like',
+                        'value'  => 'Lead'
                     ]
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY'
             ]
         );
+
         $form   = $model->createForm($lead, $this->get('form.factory'), $action, ['fields' => $fields]);
 
         ///Check for a submitted form and process it
@@ -585,6 +596,11 @@ class LeadController extends FormController
                         'column' => 'f.isPublished',
                         'expr'   => 'eq',
                         'value'  => true
+                    ],
+                    [
+                        'column' => 'f.object',
+                        'expr'   => 'like',
+                        'value'  => 'Lead'
                     ]
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY'

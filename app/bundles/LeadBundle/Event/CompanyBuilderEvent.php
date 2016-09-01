@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CompanyBundle\Event;
+namespace Mautic\LeadBundle\Event;
 
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\EventDispatcher\Event;

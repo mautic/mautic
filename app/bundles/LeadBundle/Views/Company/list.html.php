@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if ($tmpl == 'index') {
-    $view->extend('MauticCompanyBundle:Company:index.html.php');
+    $view->extend('MauticLeadBundle:Company:index.html.php');
 }
 ?>
 
@@ -29,7 +29,7 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     array(
                         'sessionVar' => 'company',
-                        'orderBy'    => 's.name',
+                        'orderBy'    => 'comp.name',
                         'text'       => 'mautic.company.name',
                         'class'      => 'col-company-name',
                         'default'    => true
@@ -74,6 +74,7 @@ if ($tmpl == 'index') {
             </thead>
             <tbody>
             <?php foreach ($items as $item): ?>
+                <?php $fields = $item->getFields(); ?>
                 <tr>
                     <td>
                         <?php
@@ -82,9 +83,9 @@ if ($tmpl == 'index') {
                             array(
                                 'item'            => $item,
                                 'templateButtons' => array(
-                                    'edit'   => $permissions['company:companies:edit'],
-                                    'clone'  => $permissions['company:companies:create'],
-                                    'delete' => $permissions['company:companies:delete'],
+                                    'edit'   => $permissions['lead:leads:editother'],
+                                    'clone'  => $permissions['lead:leads:create'],
+                                    'delete' => $permissions['lead:leads:deleteother'],
                                 ),
                                 'routeBase'       => 'company'
                             )
@@ -98,21 +99,21 @@ if ($tmpl == 'index') {
                                 'mautic_company_action',
                                 array("objectAction" => "edit", "objectId" => $item->getId())
                             ); ?>" data-toggle="ajax">
-                                <?php echo $item->getName(); ?>
+                                <?php echo $fields['core']['name']['value']; ?>
                             </a>
                         </div>
                         </td>
                     <td class="visible-md visible-lg">
-                        <?php echo $item->getPhone(); ?>
+                        <?php echo $fields['core']['phone']['value']; ?>
                     </td>
                     <td>
                             <div class="text-muted mt-4">
-                                <small><?php echo $item->getEmail(); ?></small>
+                                <small><?php echo $fields['core']['email']['value']; ?></small>
                             </div>
                     </td>
 
                     <td class="visible-md visible-lg">
-                        <?php echo $item->getWebsite(); ?>
+                        <?php echo $fields['core']['website']['value']; ?>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
