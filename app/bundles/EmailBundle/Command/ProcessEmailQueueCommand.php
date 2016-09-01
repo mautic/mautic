@@ -11,7 +11,7 @@ namespace Mautic\EmailBundle\Command;
 
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\QueueEmailEvent;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Mautic\CoreBundle\Command\ModeratedCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -21,7 +21,7 @@ use Symfony\Component\Finder\Finder;
 /**
  * CLI command to process the e-mail queue
  */
-class ProcessEmailQueueCommand extends ContainerAwareCommand
+class ProcessEmailQueueCommand extends ModeratedCommand
 {
 
     /**
@@ -43,6 +43,8 @@ The <info>%command.name%</info> command is used to process the application's e-m
 <info>php %command.full_name%</info>
 EOT
         );
+
+        parent::configure();
     }
 
     /**
@@ -68,6 +70,10 @@ EOT
             return 0;
         }
 
+        if (!$this->checkRunStatus($input, $output)) {
+            return 0;
+        }
+        sleep(30);
         if (empty($timeout)) {
             $timeout = $container->getParameter('mautic.mailer_spool_clear_timeout');
         }
@@ -166,6 +172,8 @@ EOT
         }
         $input = new ArrayInput($commandArgs);
         $returnCode = $command->run($input, $output);
+
+        $this->completeRun();
 
         if ($returnCode !== 0) {
             return $returnCode;
