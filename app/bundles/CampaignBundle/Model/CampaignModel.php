@@ -458,8 +458,8 @@ class CampaignModel extends CommonFormModel
             $events = array();
             $event  = new Events\CampaignBuilderEvent($this->translator);
             $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_BUILD, $event);
-            $events['decision']     = $event->getLeadDecisions();
-            $events['condition']    = $event->getLeadConditions();
+            $events['decision']     = $event->getDecisions();
+            $events['condition']    = $event->getConditions();
             $events['action']       = $event->getActions();
 
             $associationRestrictions = ['action' => [], 'decision' => []];
