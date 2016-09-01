@@ -68,6 +68,10 @@ textarea.form-html {
     min-width: 125px;
 }
 
+.formresult-list th.col-formresult-id {
+    min-width: 125px;
+}
+
 .inline-spacer {
     padding-right: 20px;
 }

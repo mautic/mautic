@@ -122,6 +122,21 @@ class FieldType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'alias',
+            'text',
+            [
+                'label'       => 'mautic.form.field.form.alias',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.form.field.form.alias.tooltip'
+                ],
+                'disabled'    => (!empty($options['data']['id']) && strpos($options['data']['id'], 'new') === false) ? true : false,
+                'required'    => false
+            ]
+        );
+        
         if (!empty($options['customParameters'])) {
             $builder->add('properties', $customParams['formType'], $formTypeOptions);
         } else {

@@ -23,9 +23,15 @@ $formId = $form->getId();
                     'target'   => '#formResultTable'
                 ));
                 endif;
-                ?>
-                <th class="col-formresult-id"></th>
-                <?php
+
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'sessionVar' => 'formresult.'.$formId,
+                    'orderBy'    => 's.id',
+                    'text'       => 'mautic.core.id',
+                    'class'      => 'col-formresult-id',
+                    'filterBy'   => 's.id'
+                ));
+
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'formresult.'.$formId,
                     'orderBy'    => 's.date_submitted',

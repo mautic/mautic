@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Result;
 use Mautic\FormBundle\Entity\Submission;
@@ -276,6 +277,7 @@ class SubmissionModel extends CommonFormModel
         // Update the event
         $submissionEvent->setFields($fieldArray)
             ->setTokens($tokens)
+            ->setResults($results)
             ->setContactFieldMatches($leadFieldMatches);
 
         // @deprecated - BC support; to be removed in 3.0 - be sure to remove the validator option from addSubmitAction as well
@@ -292,11 +294,6 @@ class SubmissionModel extends CommonFormModel
             $submission->setLead($lead);
         }
 
-        if ($form->isStandalone()) {
-            // Now handle post submission actions
-            $this->executeFormActions($submissionEvent);
-        }
-
         // Get updated lead if applicable with tracking ID
         if ($form->isInKioskMode()) {
             $lead = $this->leadModel->getCurrentLead();
@@ -308,7 +305,13 @@ class SubmissionModel extends CommonFormModel
         }
         $submission->setLead($lead);
 
-        if (!$form->isStandalone()) {
+        // Save the submission
+        $this->saveEntity($submission);
+
+        if ($form->isStandalone()) {
+            // Now handle post submission actions
+            $this->executeFormActions($submissionEvent);
+        } else {
             // Find and add the lead to the associated campaigns
             $campaigns = $this->campaignModel->getCampaignsByForm($form);
             if (!empty($campaigns)) {
@@ -318,8 +321,6 @@ class SubmissionModel extends CommonFormModel
             }
         }
 
-        //save entity after the form submission events are fired in case a new lead is created
-        $this->saveEntity($submission);
         if ($this->dispatcher->hasListeners(FormEvents::FORM_ON_SUBMIT)) {
             // Reset action config from executeFormActions()
             $submissionEvent->setActionConfig(null, []);

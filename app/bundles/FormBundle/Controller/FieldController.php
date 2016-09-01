@@ -96,12 +96,10 @@ class FieldController extends CommonFormController
                     foreach ($fields as $f) {
                         $aliases[] = $f['alias'];
                     }
-                    $formField['alias'] = $this->getModel('form.field')->generateAlias($formField['label'], $aliases);
 
-                    if (empty($formField['alias'])) {
-                        // Likely a bogus label so generate random alias for column name
-                        $formField['alias'] = uniqid('f_');
-                    }
+                    // Generate or ensure a unique alias
+                    $alias              = empty($formField['alias']) ? $formField['label'] : $formField['alias'];
+                    $formField['alias'] = $this->getModel('form.field')->generateAlias($alias, $aliases);
 
                     // Force required for captcha
                     if ($formField['type'] == 'captcha') {

@@ -110,7 +110,12 @@ return [
     'services' => [
         'events' => [
             'mautic.form.subscriber'                => [
-                'class' => 'Mautic\FormBundle\EventListener\FormSubscriber'
+                'class' => 'Mautic\FormBundle\EventListener\FormSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.helper.mailer',
+                    'mautic.http.connector'
+                ]
             ],
             'mautic.form.pagebundle.subscriber'     => [
                 'class' => 'Mautic\FormBundle\EventListener\PageSubscriber'
@@ -207,8 +212,17 @@ return [
             ],
             'mautic.form.type.form_submitaction_sendemail'  => [
                 'class'     => 'Mautic\FormBundle\Form\Type\SubmitActionEmailType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'form_submitaction_sendemail'
+                'arguments' => 'translator',
+                'alias'     => 'form_submitaction_sendemail',
+                'methodCalls'  => [
+                    'setFieldModel' => ['mautic.form.model.field'],
+                ],
+            ],
+            'mautic.form.type.form_submitaction_repost' => [
+                'class'     => \Mautic\FormBundle\Form\Type\SubmitActionRepostType::class,
+                'methodCalls'  => [
+                    'setFieldModel' => ['mautic.form.model.field'],
+                ],
             ]
         ],
         'models' =>  [

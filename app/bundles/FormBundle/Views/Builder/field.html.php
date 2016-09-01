@@ -10,7 +10,7 @@ $template       = '<div class="col-md-6">{content}</div>';
 $toggleTemplate = '<div class="col-md-3">{content}</div>';
 $properties     = (isset($form['properties'])) ? $form['properties'] : array();
 
-$showAttributes = isset($form['labelAttributes']) || isset($form['inputAttributes']) || isset($form['containerAttributes']) || isset($properties['labelAttributes']);
+$showAttributes = isset($form['labelAttributes']) || isset($form['inputAttributes']) || isset($form['containerAttributes']) || isset($properties['labelAttributes']) || isset($form['alias']);
 $showBehavior   = isset($form['showWhenValueExists']) || isset($properties['showWhenValueExists']);
 
 $placeholder    = '';
@@ -169,6 +169,7 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
             <?php if ($showAttributes): ?>
             <div role="tabpanel" class="tab-pane" id="attributes">
                 <div class="row">
+                    <?php echo $view['form']->rowIfExists($form, 'alias', $template); ?>
                     <?php echo $view['form']->rowIfExists($form, 'labelAttributes', $template); ?>
                     <?php echo $view['form']->rowIfExists($form, 'inputAttributes', $template); ?>
                     <?php echo $view['form']->rowIfExists($form, 'containerAttributes', $template); ?>

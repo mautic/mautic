@@ -9,27 +9,59 @@
 
 namespace Mautic\FormBundle\EventListener;
 
+use Joomla\Http\Http;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\FormBundle\Event as Events;
+use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
 use Mautic\FormBundle\FormEvents;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Class FormSubscriber
  */
 class FormSubscriber extends CommonSubscriber
 {
+    /**
+     * @var MailHelper
+     */
+    private $mailer;
+
+    /**
+     * @var Http
+     */
+    private $connector;
+
+    /**
+     * FormSubscriber constructor.
+     *
+     * @param MauticFactory $factory
+     * @param MailHelper    $mailer
+     */
+    public function __construct(MauticFactory $factory, MailHelper $mailer, Http $connector)
+    {
+        parent::__construct($factory);
+
+        $this->mailer    = $mailer->getMailer();
+        $this->connector = $connector;
+    }
 
     /**
      * {@inheritdoc}
      */
-    static public function getSubscribedEvents ()
+    static public function getSubscribedEvents()
     {
-        return array(
-            FormEvents::FORM_POST_SAVE   => array('onFormPostSave', 0),
-            FormEvents::FORM_POST_DELETE => array('onFormDelete', 0),
-            FormEvents::FORM_ON_BUILD    => array('onFormBuilder', 0),
-        );
+        return [
+            FormEvents::FORM_POST_SAVE           => ['onFormPostSave', 0],
+            FormEvents::FORM_POST_DELETE         => ['onFormDelete', 0],
+            FormEvents::FORM_ON_BUILD            => ['onFormBuilder', 0],
+            FormEvents::ON_EXECUTE_SUBMIT_ACTION => [
+                ['onFormSubmitActionSendEmail', 0],
+                ['onFormSubmitActionRepost', 0],
+            ]
+        ];
     }
 
     /**
@@ -37,18 +69,18 @@ class FormSubscriber extends CommonSubscriber
      *
      * @param Events\FormEvent $event
      */
-    public function onFormPostSave (Events\FormEvent $event)
+    public function onFormPostSave(Events\FormEvent $event)
     {
         $form = $event->getForm();
         if ($details = $event->getChanges()) {
-            $log = array(
+            $log = [
                 "bundle"    => "form",
                 "object"    => "form",
                 "objectId"  => $form->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
                 "ipAddress" => $this->factory->getIpAddressFromRequest()
-            );
+            ];
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
     }
@@ -58,17 +90,17 @@ class FormSubscriber extends CommonSubscriber
      *
      * @param Events\FormEvent $event
      */
-    public function onFormDelete (Events\FormEvent $event)
+    public function onFormDelete(Events\FormEvent $event)
     {
         $form = $event->getForm();
-        $log  = array(
+        $log  = [
             "bundle"    => "form",
             "object"    => "form",
             "objectId"  => $form->deletedId,
             "action"    => "delete",
-            "details"   => array('name' => $form->getName()),
+            "details"   => ['name' => $form->getName()],
             "ipAddress" => $this->factory->getIpAddressFromRequest()
-        );
+        ];
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
 
@@ -77,21 +109,169 @@ class FormSubscriber extends CommonSubscriber
      *
      * @param FormBuilderEvent $event
      */
-    public function onFormBuilder (Events\FormBuilderEvent $event)
+    public function onFormBuilder(Events\FormBuilderEvent $event)
     {
-        // Add form submit actions
-        $action = array(
+        $action = [
             'group'              => 'mautic.email.actions',
             'label'              => 'mautic.form.action.sendemail',
             'description'        => 'mautic.form.action.sendemail.descr',
             'formType'           => 'form_submitaction_sendemail',
             'formTheme'          => 'MauticFormBundle:FormTheme\SubmitAction',
-            'formTypeCleanMasks' => array(
+            'formTypeCleanMasks' => [
                 'message' => 'html'
-            ),
-            'callback'           => '\Mautic\FormBundle\Helper\FormSubmitHelper::sendEmail'
-        );
+            ],
+            'eventName'          => FormEvents::ON_EXECUTE_SUBMIT_ACTION
+        ];
 
         $event->addSubmitAction('form.email', $action);
+
+        $action = [
+            'group'              => 'mautic.form.actions',
+            'label'              => 'mautic.form.action.repost',
+            'description'        => 'mautic.form.action.repost.descr',
+            'formType'           => SubmitActionRepostType::class,
+            'formTheme'          => 'MauticFormBundle:FormTheme\SubmitAction',
+            'formTypeCleanMasks' => [
+                'post_url'             => 'url',
+                'failure_email'        => 'email',
+                'authorization_header' => 'string'
+            ],
+            'eventName'          => FormEvents::ON_EXECUTE_SUBMIT_ACTION
+        ];
+
+        $event->addSubmitAction('form.repost', $action);
+    }
+
+    /**
+     * @param Events\SubmissionEvent $event
+     */
+    public function onFormSubmitActionSendEmail(Events\SubmissionEvent $event)
+    {
+        if (!$event->checkContext('form.email')) {
+            return;
+        }
+
+        // replace line brakes with <br> for textarea values
+        if ($tokens = $event->getTokens()) {
+            foreach ($tokens as $token => &$value) {
+                $value = nl2br(html_entity_decode($value));
+            }
+        }
+
+        $config    = $event->getActionConfig();
+        $lead      = $event->getSubmission()->getLead();
+        $leadEmail = $lead->getEmail();
+        $emails    = (!empty($config['to'])) ? array_fill_keys(explode(',', $config['to']), null) : [];
+
+        if (!empty($emails)) {
+            $this->mailer->setTo($emails);
+
+            if (!empty($leadEmail)) {
+                // Reply to lead for user convenience
+                $this->mailer->setReplyTo($leadEmail);
+            }
+
+            if (!empty($config['cc'])) {
+                $emails = array_fill_keys(explode(',', $config['cc']), null);
+                $this->mailer->setCc($emails);
+            }
+
+            if (!empty($config['bcc'])) {
+                $emails = array_fill_keys(explode(',', $config['bcc']), null);
+                $this->mailer->setBcc($emails);
+            }
+
+            $this->mailer->setSubject($config['subject']);
+
+            $this->mailer->addTokens($tokens);
+            $this->mailer->setBody($config['message']);
+            $this->mailer->parsePlainText($config['message']);
+
+            $this->mailer->send(true);
+        }
+
+        if ($config['copy_lead'] && !empty($leadEmail)) {
+            // Send copy to lead
+            $this->mailer->reset();
+            $this->mailer->setLead($lead->getProfileFields());
+            $this->mailer->setTo($leadEmail);
+            $this->mailer->setSubject($config['subject']);
+            $this->mailer->addTokens($tokens);
+            $this->mailer->setBody($config['message']);
+            $this->mailer->parsePlainText($config['message']);
+
+            $this->mailer->send(true);
+        }
+    }
+
+    /**
+     * @param Events\SubmissionEvent $event
+     */
+    public function onFormSubmitActionRepost(Events\SubmissionEvent $event)
+    {
+        if (!$event->checkContext('form.repost')) {
+            return;
+        }
+
+        $post    = $event->getPost();
+        $results = $event->getResults();
+        $config  = $event->getActionConfig();
+        $fields  = $event->getFields();
+
+        $payload = [];
+        foreach ($fields as $field) {
+            if (!isset($post[$field['alias']]) || 'button' == $field['type']) {
+                continue;
+            }
+
+            $key = (!empty($config[$field['alias']])) ? $config[$field['alias']] : $field['alias'];
+
+            // Use the cleaned value by default - but if set to not save result, get from post
+            $value = (isset($results[$field['alias']])) ? $results[$field['alias']] : $post[$field['alias']];
+
+            $payload[$key] = $value;
+        }
+
+        $headers = [
+            'X-Forwarded-For' => $event->getSubmission()->getIpAddress()->getIpAddress()
+        ];
+
+        if (!empty($config['authorization_header'])) {
+            // Ensure the user did not append Authorization:
+            if (strpos($config['authorization_header'], 'Authorization:')) {
+                $config['authorization_header'] = str_replace('Authorization:', '', $config['authorization_header']);
+            }
+            $headers['Authorization'] = trim($config['authorization_header']);
+        }
+
+        try {
+            $this->connector->post($config['post_url'], $payload, $headers, 10);
+        } catch (\Exception $e) {
+            $email = trim($config['failure_email']);
+            // Failed so send email if applicable
+            if (!empty($email)) {
+                $submission = $event->getSubmission();
+                $this->mailer->addTo($email);
+                $this->mailer->setSubject(
+                    $this->translator->trans('mautic.form.action.repost.failed_subject', ['%form%' => $submission->getForm()->getName()])
+                );
+                $this->mailer->setBody(
+                    $this->translator->trans(
+                        'mautic.form.action.repost.failed_message',
+                        [
+                            '%link%'    => $this->router->generate(
+                                'mautic_form_results',
+                                ['objectId' => $submission->getForm()->getId(), 'result' => $submission->getId()],
+                                UrlGeneratorInterface::ABSOLUTE_URL
+                            ),
+                            '%message%' => $e->getMessage()
+                        ]
+                    )
+                );
+                $this->mailer->parsePlainText();
+
+                $this->mailer->send();
+            }
+        }
     }
 }
