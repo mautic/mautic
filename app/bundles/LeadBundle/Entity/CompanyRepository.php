@@ -221,24 +221,23 @@ class CompanyRepository extends CommonRepository
      */
     public function getCompanies($user = false, $id = '')
     {
-        static $companys = array();
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        static $companies = array();
 
         if (is_object($user)) {
             $user = $user->getId();
         }
 
         $key = (int) $user.$id;
-        if (isset($companys[$key])) {
-            return $companys[$key];
+        if (isset($companies[$key])) {
+            return $companies[$key];
         }
 
-        $q = $this->_em->createQueryBuilder()
-            ->from('LeadBundle:Company', 'comp', 'comp.id');
-
-        $q->select('partial comp.{id, name}');
+        $q->select('comp.id, comp.name')
+            ->from(MAUTIC_TABLE_PREFIX .'companies', 'comp');
 
         if (!empty($user)) {
-            $q->orWhere('comp.createdBy = :user');
+            $q->orWhere('comp.created_by = :user');
             $q->setParameter('user', $user);
         }
 
@@ -250,9 +249,9 @@ class CompanyRepository extends CommonRepository
 
         $q->orderBy('comp.name');
 
-        $results = $q->getQuery()->getArrayResult();
+        $results = $q->execute()->fetchAll();
 
-        $companys[$key] = $results;
+        $companies[$key] = $results;
 
         return $results;
     }
@@ -266,21 +265,20 @@ class CompanyRepository extends CommonRepository
      */
     public function getCompanyByName($companyName)
     {
-        static $companies = array();
+        $q = $this->_em->getConnection()->createQueryBuilder();
 
         if (!$companyName) {
             return false;
         }
 
-        $q = $this->_em->createQueryBuilder()
-            ->from('LeadBundle:Company', 'comp', 'comp.id');
+        $q->select('partial comp.{id, name}')
+            ->from('LeadBundle:Company', 'comp');
 
-        $q->select('partial comp.{id, name}');
         $q->andWhere(
             $q->expr()->like('comp.name', $companyName)
         );
 
-        $results = $q->getQuery()->getArrayResult();
+        $results = $q->execute()->fetchAll();
 
         return $results;
     }

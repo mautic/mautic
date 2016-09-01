@@ -11,7 +11,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CompanyBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -325,7 +325,7 @@ class Lead extends FormEntity
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createManyToMany('companies', 'Mautic\CompanyBundle\Entity\Company')
+        $builder->createManyToMany('companies', 'Mautic\LeadBundle\Entity\Company')
             ->setJoinTable('companies_leads')
             ->addInverseJoinColumn('company_id', 'id', false)
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')

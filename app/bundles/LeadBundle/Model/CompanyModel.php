@@ -11,7 +11,6 @@ namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Entity\LeadField;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Event\CompanyBuilderEvent;

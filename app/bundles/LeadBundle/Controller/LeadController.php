@@ -2268,7 +2268,7 @@ class LeadController extends FormController
      */
     public function batchCompaniesAction($objectId = 0)
     {
-        /** @var \Mautic\CompanyBundle\Model\CompanyModel $model */
+        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
         $companyModel = $this->getModel('company');
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
