@@ -48,8 +48,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $batch = $input->getOption('batch-limit');
         $max   = $input->getOption('max-contacts');
 
-        if (!$this->checkRunStatus($input, $output, ($id) ? $id : 'all')) {
-
+        if (!$this->checkRunStatus($input, $output)) {
             return 0;
         }
 
