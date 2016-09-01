@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\StatDevice;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -2210,18 +2211,14 @@ class LeadController extends FormController
      */
     public function doNotContactAction($id)
     {
-        $doNotContact = new DoNotContact();
-        
-        $entityManager = $this->get('doctrine')->getManager();
+        $entityManager      = $this->get('doctrine')->getManager();
+        $emailModel         = $this->getModel('email');
+        $translator         = $this->get('translator');
+
         $lead =  $entityManager->getRepository('MauticLeadBundle:Lead')->findOneById($id);
-        $doNotContact->setLead($lead);
-        $doNotContact->setReason(3);
-        $doNotContact->setChannel('email');
-        $doNotContact->setChannelId(2);
-        $doNotContact->setComments('Manually marked as do not contact');
-        $doNotContact->setDateAdded(new \DateTime());
-        $entityManager->persist($doNotContact);
-        $entityManager->flush();
+
+        $emailModel->setDoNotContact(NULL, $translator->trans('mautic.email.dnc.manual'), DoNotContact::MANUAL, TRUE, $lead);
+        
         return new JsonResponse(['status'=>200]);
     }
     

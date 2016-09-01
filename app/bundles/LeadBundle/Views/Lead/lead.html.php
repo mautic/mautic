@@ -59,7 +59,7 @@ if (!$doNotContact) :
                 ['objectId' => $lead->getId(), 'objectAction' => 'doNotContact']
             ),
         ],
-        'btnText'   => $view['translator']->trans('mautic.lead.email.do_not_contact'),
+        'btnText'   => $view['translator']->trans('mautic.lead.event.donotcontact'),
         'iconClass' => 'fa fa-minus-circle',
     ];
 endif;
