@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\FormBundle\Event as Events;
+use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
 use Mautic\FormBundle\FormEvents;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -247,8 +248,41 @@ class FormSubscriber extends CommonSubscriber
         }
 
         try {
-            $this->connector->post($config['post_url'], $payload, $headers, 10);
-        } catch (\Exception $e) {
+            $response = $this->connector->post($config['post_url'], $payload, $headers, 10);
+
+            $error = false;
+            $violations = [];
+
+            if ($json = json_decode($response->body, true)) {
+                if (isset($json['error'])) {
+                    $error = $json['error'];
+                } elseif (isset($json['errors'])) {
+                    $error = implode(', ', $json['errors']);
+                } elseif (isset($json['violations'])) {
+                    $error      = $this->translator->trans('mautic.form.action.repost.validation_failed');
+                    $violations = $json['violations'];
+                } elseif (200 !== $response->code) {
+                    $error = $response->body;
+                }
+            } elseif (200 !== $response->code) {
+                $error = $response->body;
+            }
+
+            if ($error || $violations) {
+                $exception = (new ValidationException($error))
+                    ->setViolations($violations);
+
+                throw $exception;
+            }
+        } catch (\Exception $exception) {
+            $validationFailed = false;
+            if ($exception instanceof ValidationException) {
+                $validationFailed = true;
+                if ($violations = $exception->getViolations()) {
+                    throw $exception;
+                }
+            }
+
             $email = trim($config['failure_email']);
             // Failed so send email if applicable
             if (!empty($email)) {
@@ -261,18 +295,22 @@ class FormSubscriber extends CommonSubscriber
                     $this->translator->trans(
                         'mautic.form.action.repost.failed_message',
                         [
-                            '%link%'    => $this->router->generate(
+                            '%link%'    => ($validationFailed) ? $event->getRequest()->getUri() : $this->router->generate(
                                 'mautic_form_results',
                                 ['objectId' => $submission->getForm()->getId(), 'result' => $submission->getId()],
                                 UrlGeneratorInterface::ABSOLUTE_URL
                             ),
-                            '%message%' => $e->getMessage()
+                            '%message%' => $exception->getMessage()
                         ]
                     )
                 );
                 $this->mailer->parsePlainText();
 
                 $this->mailer->send();
+            }
+
+            if ($validationFailed) {
+                throw $exception;
             }
         }
     }

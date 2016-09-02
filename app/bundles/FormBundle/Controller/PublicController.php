@@ -92,7 +92,7 @@ class PublicController extends CommonFormController
                 } elseif ($status != 'published') {
                     $error = $translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
                 } else {
-                    $result = $this->getModel('form.submission')->saveSubmission($post, $server, $form);
+                    $result = $this->getModel('form.submission')->saveSubmission($post, $server, $form, $this->request);
                     if (!empty($result['errors'])) {
                         if ($messengerMode || $isAjax) {
                             $error = $result['errors'];

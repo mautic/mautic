@@ -12,6 +12,7 @@ namespace Mautic\FormBundle\Event;
 use Joomla\Http\Response;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\FormBundle\Entity\Submission;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class SubmissionEvent
@@ -91,15 +92,24 @@ class SubmissionEvent extends CommonEvent
     private $action;
 
     /**
-     * @param Submission $submission
-     * @param array      $post
-     * @param array      $server
+     * @var Request
      */
-    public function __construct(Submission $submission, $post, $server)
+    private $request;
+
+    /**
+     * SubmissionEvent constructor.
+     *
+     * @param Submission $submission
+     * @param            $post
+     * @param            $server
+     * @param Request    $request
+     */
+    public function __construct(Submission $submission, $post, $server, Request $request)
     {
-        $this->entity = $submission;
-        $this->post   = $post;
-        $this->server = $server;
+        $this->entity  = $submission;
+        $this->post    = $post;
+        $this->server  = $server;
+        $this->request = $request;
     }
 
     /**
@@ -126,6 +136,14 @@ class SubmissionEvent extends CommonEvent
     public function getServer()
     {
         return $this->server;
+    }
+
+    /**
+     * @return Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
     }
 
     /**

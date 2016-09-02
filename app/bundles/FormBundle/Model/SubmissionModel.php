@@ -23,6 +23,7 @@ use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Event\ValidateEvent;
 use Mautic\FormBundle\Event\ValidationEvent;
+use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -31,6 +32,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -127,7 +129,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @return boolean|string false if no error was encountered; otherwise the error message
      */
-    public function saveSubmission($post, $server, Form $form)
+    public function saveSubmission($post, $server, Form $form, Request $request = null)
     {
         $fieldHelper = new FormFieldHelper($this->translator);
 
@@ -160,7 +162,7 @@ class SubmissionModel extends CommonFormModel
         $submission->setReferer($referer);
 
         // Create an event to be dispatched through the processes
-        $submissionEvent = new SubmissionEvent($submission, $post, $server);
+        $submissionEvent = new SubmissionEvent($submission, $post, $server, $request);
 
         $fields           = $form->getFields();
         $fieldArray       = [];
@@ -309,7 +311,18 @@ class SubmissionModel extends CommonFormModel
         $this->saveEntity($submission);
 
         // Now handle post submission actions
-        $this->executeFormActions($submissionEvent);
+        try {
+            $this->executeFormActions($submissionEvent);
+        } catch (ValidationException $exception) {
+            // The action invalidated the form for whatever reason
+            $this->deleteEntity($submission);
+
+            if ($validationErrors = $exception->getViolations()) {
+                return ['errors' => $validationErrors];
+            }
+
+            return ['errors' => [$exception->getMessage()]];
+        }
 
         if (!$form->isStandalone()) {
             // Find and add the lead to the associated campaigns
