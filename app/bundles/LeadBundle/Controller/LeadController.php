@@ -2326,7 +2326,7 @@ class LeadController extends FormController
             $companies = $companyModel->getUserCompanies();
             $items  = [];
             foreach ($companies as $company) {
-                $items[$company['id']] = $company['name'];
+                $items[$company['id']] = $company['companyname'];
             }
 
             $route = $this->generateUrl(

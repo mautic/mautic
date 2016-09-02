@@ -9,8 +9,8 @@
 
 namespace Mautic\LeadBundle\Event;
 
-use Mautic\CompanyBundle\Entity\Company;
-use Mautic\CompanyBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 

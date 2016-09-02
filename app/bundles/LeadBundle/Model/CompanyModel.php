@@ -13,8 +13,11 @@ use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Event\CompanyBuilderEvent;
-use Mautic\LeadBundle\CompanyEvents;
+use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
+use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpFoundation\Session\Session;
 
@@ -52,6 +55,17 @@ class CompanyModel extends CommonFormModel
     {
         return $this->em->getRepository('MauticLeadBundle:Company');
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return \Mautic\LeadBundle\Entity\CompanyLeadRepository
+     */
+    public function getCompanyLeadRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:CompanyLead');
+    }
+
 
     /**
      * {@inheritdoc}
@@ -109,9 +123,9 @@ class CompanyModel extends CommonFormModel
     {
         $user  = (!$this->security->isGranted('lead:leads:viewother')) ?
             $this->factory->getUser() : false;
-        $companys = $this->em->getRepository('MauticLeadBundle:Company')->getCompanies($user);
+        $companies = $this->em->getRepository('MauticLeadBundle:Company')->getCompanies($user);
 
-        return $companys;
+        return $companies;
     }
 
     /**
@@ -209,5 +223,269 @@ class CompanyModel extends CommonFormModel
 
         $company->setFields($fieldValues);
     }
+
+    /* Add lead to company
+    *
+    * @param array|Company     $companies
+    * @param array|Lead        $lead
+    * @param bool              $manuallyAdded
+    * @param bool              $batchProcess
+    * @param int               $searchCompanyLead 0 = reference, 1 = yes, -1 = known to not exist
+    * @param \DateTime         $dateManipulated
+    *
+    * @throws \Doctrine\ORM\ORMException
+    */
+    public function addLeadToCompany($companies, $lead, $manuallyAdded = false, $batchProcess = false, $searchCompanyLead = 1, $dateManipulated = null)
+    {
+        if ($dateManipulated == null) {
+            $dateManipulated = new \DateTime();
+        }
+
+        if (!$lead instanceof Lead) {
+            $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
+            $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+        } else {
+            $leadId = $lead->getId();
+        }
+
+        $companyLeadAdd = array();
+        if (!$companies instanceof Company) {
+            //make sure they are ints
+            $searchForCompanies = array();
+            foreach ($companies as $k => &$l) {
+                $l = (int) $l;
+
+                if (!isset($companyLeadAdd[$l])) {
+                    $searchForCompanies[] = $l;
+                }
+            }
+
+            if (!empty($searchForCompanies)) {
+                $companyEntities = $this->getEntities(array(
+                    'filter' => array(
+                        'force' => array(
+                            array(
+                                'column' => 'comp.id',
+                                'expr'   => 'in',
+                                'value'  => $searchForCompanies
+                            )
+                        )
+                    )
+                ));
+
+                foreach ($companyEntities as $company) {
+                    $companyLeadAdd[$company->getId()] = $company;
+                }
+            }
+
+            unset($companyEntities, $searchForCompanies);
+        } else {
+            $companyLeadAdd[$companies->getId()] = $companies;
+
+            $companies = array($companies->getId());
+        }
+
+        if (!is_array($companies)) {
+            $companies = array($companies);
+        }
+
+        $persistCompany   = array();
+        $dispatchEvents = array();
+
+        foreach ($companies as $companyId) {
+            if (!isset($companyLeadAdd[$companyId])) {
+                // List no longer exists in the DB so continue to the next
+                continue;
+            }
+
+            if ($searchCompanyLead == -1) {
+                $companyLead = null;
+            } elseif ($searchCompanyLead) {
+                $companyLead = $this->getCompanyLeadRepository()->findOneBy(
+                    array(
+                        'lead' => $lead,
+                        'company' => $companyLeadAdd[$companyId]
+                    )
+                );
+            } else {
+                $companyLead = $this->em->getReference('MauticLeadBundle:CompanyLead',
+                    array(
+                        'lead' => $leadId,
+                        'company' => $companyId
+                    )
+                );
+            }
+
+            if ($companyLead != null) {
+                if ($manuallyAdded && $companyLead->wasManuallyRemoved()) {
+                    $companyLead->setManuallyRemoved(false);
+                    $companyLead->setManuallyAdded($manuallyAdded);
+
+                    $persistLists[]   = $companyLead;
+                    $dispatchEvents[] = $companyId;
+                } else {
+                    // Detach from Doctrine
+                    $this->em->detach($companyLead);
+
+                    continue;
+                }
+            } else {
+                $companyLead = new CompanyLead();
+                $companyLead->setCompany($companyLeadAdd[$companyId]);
+                $companyLead->setLead($lead);
+                $companyLead->setManuallyAdded($manuallyAdded);
+                $companyLead->setDateAdded($dateManipulated);
+
+                $persistCompany[]   = $companyLead;
+                $dispatchEvents[] = $companyId;
+            }
+        }
+
+        if (!empty($persistCompany)) {
+            $this->getRepository()->saveEntities($persistCompany);
+        }
+
+        // Clear CompanyLead entities from Doctrine memory
+        $this->em->clear('Mautic\CompanyBundle\Entity\CompanyLead');
+
+        if ($batchProcess) {
+            // Detach for batch processing to preserve memory
+            $this->em->detach($lead);
+        } elseif (!empty($dispatchEvents) && ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE))) {
+            foreach ($dispatchEvents as $companyId) {
+                $event = new LeadChangeCompanyEvent($lead, $companyLeadAdd[$companyId]);
+                $this->dispatcher->dispatch(LeadEvents::LEAD_COMPANY_CHANGE, $event);
+
+                unset($event);
+            }
+        }
+
+        unset($lead, $persistCompany, $companies);
+    }
+
+    /**
+     * Remove a lead from company
+     *
+     * @param           $companies
+     * @param           $lead
+     * @param bool      $manuallyRemoved
+     * @param bool      $batchProcess
+     * @param bool      $skipFindOne
+     *
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function removeLeadFromCompany($companies, $lead, $manuallyRemoved = false, $batchProcess = false, $skipFindOne = false)
+    {
+        if (!$lead instanceof Lead) {
+            $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
+            $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+        } else {
+            $leadId = $lead->getId();
+        }
+        $companyLeadRemove = array();
+        if (!$companies instanceof Company) {
+            //make sure they are ints
+            $searchForCompanies = array();
+            foreach ($companies as $k => &$l) {
+                $l = (int)$l;
+                if (!isset($companyLeadRemove[$l])) {
+                    $searchForCompanies[] = $l;
+                }
+            }
+
+            if (!empty($searchForCompanies)) {
+                $companyEntities = $this->getEntities(array(
+                    'filter' => array(
+                        'force' => array(
+                            array(
+                                'column' => 'comp.id',
+                                'expr'   => 'in',
+                                'value'  => $searchForCompanies
+                            )
+                        )
+                    )
+                ));
+
+                foreach ($companyEntities as $company) {
+                    $companyLeadRemove[$company->getId()] = $company;
+                }
+            }
+
+            unset($companyEntities, $searchForCompanies);
+
+        } else {
+            $companyLeadRemove[$companies->getId()] = $companies;
+
+            $companies = array($companies->getId());
+        }
+
+        if (!is_array($companies)) {
+            $companies = array($companies);
+        }
+
+        $persistCompany   = array();
+        $deleteCompany    = array();
+        $dispatchEvents = array();
+
+        foreach ($companies as $companyId) {
+            if (!isset( $companyLeadRemove[$companyId])) {
+                continue;
+            }
+
+            $companyLead = (!$skipFindOne) ?
+                $this->getCompanyLeadRepository()->findOneBy(array(
+                    'lead' => $lead,
+                    'company' => $companyLeadRemove[$companyId]
+                )) :
+                $this->em->getReference('MauticCompanyBundle:CompanyLead', array(
+                    'lead' => $leadId,
+                    'company' => $companyId
+                ));
+
+            if ($companyLead == null) {
+                // Lead is not part of this list
+                continue;
+            }
+
+            if (($manuallyRemoved && $companyLead->wasManuallyAdded()) || (!$manuallyRemoved && !$companyLead->wasManuallyAdded())) {
+                //lead was manually added and now manually removed or was not manually added and now being removed
+                $deleteCompanyLead[]    = $companyLead;
+                $dispatchEvents[] = $companyId;
+            } elseif ($manuallyRemoved && !$companyLead->wasManuallyAdded()) {
+                $companyLead->setManuallyRemoved(true);
+
+                $persistCompany[]   = $companyLead;
+                $dispatchEvents[] = $companyId;
+            }
+
+            unset($companyLead);
+        }
+
+        if (!empty($persistcompany)) {
+            $this->getRepository()->saveEntities($persistCompany);
+        }
+
+        if (!empty($deleteCompanyLead)) {
+            $this->getRepository()->deleteEntities($deleteCompanyLead);
+        }
+
+        // Clear CompanyLead entities from Doctrine memory
+        $this->em->clear('Mautic\CompanyBundle\Entity\CompanyLead');
+
+        if ($batchProcess) {
+            // Detach for batch processing to preserve memory
+            $this->em->detach($lead);
+        } elseif (!empty($dispatchEvents) && ($this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE))) {
+            foreach ($dispatchEvents as $listId) {
+                $event = new LeadChangeCompanyEvent($lead, $companyLeadRemove[$listId], false);
+                $this->dispatcher->dispatch(LeadEvents::LEAD_COMPANY_CHANGE, $event);
+
+                unset($event);
+            }
+        }
+
+        unset($lead, $deleteCompany, $persistCompany, $companies);
+    }
+
 
 }

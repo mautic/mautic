@@ -189,8 +189,8 @@ class CompanyRepository extends CommonRepository
     protected function addCatchAllWhereClause(&$q, $filter)
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, array(
-            'comp.name',
-            'comp.description'
+            'comp.companyname',
+            'comp.companydescription'
         ));
     }
 
@@ -233,7 +233,7 @@ class CompanyRepository extends CommonRepository
             return $companies[$key];
         }
 
-        $q->select('comp.id, comp.name')
+        $q->select('comp.id, comp.companyname')
             ->from(MAUTIC_TABLE_PREFIX .'companies', 'comp');
 
         if (!empty($user)) {
@@ -247,7 +247,7 @@ class CompanyRepository extends CommonRepository
             );
         }
 
-        $q->orderBy('comp.name');
+        $q->orderBy('comp.companyname');
 
         $results = $q->execute()->fetchAll();
 
