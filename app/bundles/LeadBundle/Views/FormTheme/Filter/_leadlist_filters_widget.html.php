@@ -14,3 +14,4 @@ foreach ($form as $i => $filter) {
         echo $view['form']->widget($filter, ['first' => ($i === 0)]);
     }
 }
+?>

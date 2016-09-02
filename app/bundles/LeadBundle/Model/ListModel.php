@@ -416,7 +416,8 @@ class ListModel extends FormModel
             }
             $choices[$field->getAlias()] = array(
                 'label'      => $field->getLabel(),
-                'properties' => $properties
+                'properties' => $properties,
+                'object'     => $field->getObject()
             );
 
             // Set operators allowed

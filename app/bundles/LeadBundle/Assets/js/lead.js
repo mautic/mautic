@@ -297,6 +297,15 @@ Mautic.leadlistOnLoad = function(container) {
     });
 };
 
+Mautic.leadlistPopulateChoices = function(el) {
+
+    Mautic.ajaxActionRequest('lead:getLeadFieldsPerObject', {'object': mQuery(el).val()},
+       function (response) {
+            console.log(response);
+        }
+    );
+};
+
 Mautic.convertLeadFilterInput = function(el) {
     var operator = mQuery(el).val();
     // Extract the filter number
