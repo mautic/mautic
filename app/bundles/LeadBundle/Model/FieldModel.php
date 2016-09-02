@@ -32,136 +32,136 @@ class FieldModel extends FormModel
             'type'       => 'lookup',
             'properties' => ['list' => 'Mr|Mrs|Miss'],
             'fixed'      => true,
-            'object'     => 'Lead'
+            'object'     => 'lead'
         ],
         'firstname' => [
             'fixed' => true,
             'short' => true,
-            'object'=> 'Lead'
+            'object'=> 'lead'
         ],
         'lastname'  => [
             'fixed' => true,
             'short' => true,
-            'object'=> 'Lead'
+            'object'=> 'lead'
         ],
         'company'          => [
             'fixed' => true,
-            'object'=> 'Lead'
+            'object'=> 'lead'
         ],
         'position'         => [
             'fixed' => true,
-            'object'=> 'Lead'
+            'object'=> 'lead'
         ],
         'email'            => [
             'type'   => 'email',
             'unique' => true,
             'fixed'  => true,
             'short'  => true,
-            'object' => 'Lead'
+            'object' => 'lead'
         ],
         'mobile'           => [
             'type'     => 'tel',
             'fixed'    => true,
             'listable' => true,
-            'object'   => 'Lead'
+            'object'   => 'lead'
         ],
         'phone'            => [
             'type'     => 'tel',
             'fixed'    => true,
             'listable' => true,
-            'object'   => 'Lead'
+            'object'   => 'lead'
         ],
         'fax'              => [
             'type'     => 'tel',
             'listable' => true,
-            'object'   => 'Lead'
+            'object'   => 'lead'
         ],
         'address1'         => [
             'fixed'    => true,
             'listable' => true,
-            'object'   => 'Lead'
+            'object'   => 'lead'
         ],
         'address2'         => [
             'fixed'    => true,
             'listable' => true,
-            'object'   => 'Lead'
+            'object'   => 'lead'
         ],
         'city'             => [
             'fixed' => true,
-            'object'=> 'Lead'
+            'object'=> 'lead'
         ],
         'state'            => [
             'type'  => 'region',
             'fixed' => true,
-            'object'=> 'Lead'
+            'object'=> 'lead'
         ],
         'zipcode'          => [
             'fixed' => true,
-            'object'=> 'Lead'
+            'object'=> 'lead'
         ],
         'country'          => [
             'type'  => 'country',
             'fixed' => true,
-            'object'=> 'Lead'
+            'object'=> 'lead'
         ],
         'preferred_locale' => [
             'type'     => 'locale',
             'fixed'    => true,
             'listable' => true,
-            'object'   => 'Lead'
+            'object'   => 'lead'
         ],
         'attribution_date' => [
             'type'     => 'datetime',
             'fixed'    => true,
             'listable' => true,
-            'object'   => 'Lead'
+            'object'   => 'lead'
         ],
         'attribution'      => [
             'type'       => 'number',
             'properties' => ['roundmode' => 4, 'precision' => 2],
             'fixed'      => true,
             'listable'   => true,
-            'object'     => 'Lead'
+            'object'     => 'lead'
         ],
         'website'          => [
             'type'     => 'url',
             'listable' => true,
-            'object'   => 'Lead'
+            'object'   => 'lead'
         ],
         'facebook'   => [
             'listable' => true,
             'group' => 'social',
-            'object'=> 'Lead'
+            'object'=> 'lead'
         ],
         'foursquare' => [
             'listable' => true,
             'group' => 'social',
-            'object'=> 'Lead'
+            'object'=> 'lead'
         ],
         'googleplus' => [
             'listable' => true,
             'group' => 'social',
-            'object'=> 'Lead'
+            'object'=> 'lead'
         ],
         'instagram'  => [
             'listable' => true,
             'group' => 'social',
-            'object'=> 'Lead'
+            'object'=> 'lead'
         ],
         'linkedin'   => [
             'listable' => true,
             'group' => 'social',
-            'object'=> 'Lead'
+            'object'=> 'lead'
         ],
         'skype'      => [
             'listable' => true,
             'group' => 'social',
-            'object'=> 'Lead'
+            'object'=> 'lead'
         ],
         'twitter'    => [
             'listable' => true,
             'group' => 'social',
-            'object'=> 'Lead'
+            'object'=> 'lead'
         ],
     ];
 
@@ -170,88 +170,88 @@ class FieldModel extends FormModel
         'companyNumber'     => [
             'fixed' => true,
             'group' => 'other',
-            'object'     => 'Company'
+            'object'     => 'company'
         ],
         'companySource' => [
             'fixed' => true,
             'group' => 'other',
-            'object'=> 'Company'
+            'object'=> 'company'
         ],
         'companyindustry'  => [
             'type'       => 'lookup',
             'properties' => ['list' => 'Construction|Manufacturing|Wholesale|Finance|Healthcare|Education|Government|Other,'],
             'fixed'      => true,
-            'object'     => 'Company'
+            'object'     => 'company'
         ],
         'companyaddress1'          => [
             'fixed' => true,
             'listable' => true,
-            'object'=> 'Company'
+            'object'=> 'company'
         ],
         'companyaddress2'         => [
             'fixed' => true,
             'listable' => true,
-            'object'=> 'Company'
+            'object'=> 'company'
         ],
         'companyemail'            => [
             'type'   => 'email',
             'unique' => true,
             'fixed'  => true,
-            'object' => 'Company'
+            'object' => 'company'
         ],
         'companyphone'           => [
             'type'     => 'tel',
             'fixed'    => true,
             'listable' => true,
-            'object'   => 'Company'
+            'object'   => 'company'
         ],
         'companycity'            => [
             'type'     => 'tel',
             'fixed'    => true,
             'listable' => true,
-            'object'   => 'Company'
+            'object'   => 'company'
         ],
         'companystate'            => [
             'type'  => 'region',
             'fixed' => true,
-            'object'=> 'Lead'
+            'object'=> 'company'
         ],
         'companyzipcode'              => [
             'type'     => 'tel',
             'listable' => true,
-            'object'   => 'Company'
+            'object'   => 'company'
         ],
         'companycountry'         => [
             'type'  => 'country',
             'fixed' => true,
-            'object'=> 'Company'
+            'object'=> 'company'
         ],
         'companydescription'         => [
             'fixed'    => true,
-            'object'   => 'Company'
+            'object'   => 'company'
         ],
         'companyname'            => [
             'fixed' => true,
-            'object'=> 'Company'
+            'object'=> 'company'
         ],
         'companynumberOfEmployees' => [
             'type'       => 'number',
             'fixed' => true,
             'group' => 'other',
-            'object'=> 'Company'
+            'object'=> 'company'
         ],
         'companyfax' => [
             'type'     => 'tel',
             'listable' => true,
             'group' => 'other',
-            'object'   => 'Company'
+            'object'   => 'company'
         ],
         'companyscore' => [
             'type'     => 'number',
             'fixed'    => true,
             'listable' => true,
             'group' => 'other',
-            'object'   => 'Company'
+            'object'   => 'company'
         ],
         'companyannualRevenue'      => [
             'type'       => 'number',
@@ -259,12 +259,12 @@ class FieldModel extends FormModel
             'fixed'      => true,
             'listable'   => true,
             'group' => 'other',
-            'object'     => 'Company'
+            'object'     => 'company'
         ],
         'companywebsite'          => [
             'type'     => 'url',
             'listable' => true,
-            'object'   => 'Company'
+            'object'   => 'company'
         ]
     ];
 
@@ -345,12 +345,17 @@ class FieldModel extends FormModel
 
         //set some defaults
         $this->setTimestamps($entity, $isNew, $unlock);
-
+        $objects = ['lead' => 'leads', 'company' => 'companies'];
         $alias = $entity->getAlias();
+        $object = $objects[$entity->getObject()];
 
         if ($isNew) {
             if (empty($alias)) {
                 $alias = $entity->getName();
+            }
+
+            if (empty($object)) {
+                $object = $objects[$entity->getObject()];
             }
 
             // clean the alias
@@ -396,7 +401,7 @@ class FieldModel extends FormModel
 
         if ($entity->getId()) {
             //create the field as its own column in the leads table
-            $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', 'leads');
+            $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', $object);
             if ($isNew || (!$isNew && !$leadsSchema->checkColumnExists($alias))) {
                 $schemaDefinition = self::getSchemaDefinition($alias, $entity->getType(), $isUnique);
                 $leadsSchema->addColumn(
@@ -406,7 +411,7 @@ class FieldModel extends FormModel
 
                 // Update the unique_identifier_search index and add an index for this field
                 /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
-                $modifySchema = $this->schemaHelperFactory->getSchemaHelper('index', 'leads');
+                $modifySchema = $this->schemaHelperFactory->getSchemaHelper('index', $object);
                 if ('string' == $schemaDefinition['type']) {
                     try {
                         $modifySchema->addIndex([$alias], $alias.'_search');
@@ -445,8 +450,11 @@ class FieldModel extends FormModel
     {
         parent::deleteEntity($entity);
 
+        $objects = ['lead' => 'leads', 'company' => 'companies'];
+        $object = $objects[$entity->getObject()];
+
         //remove the column from the leads table
-        $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', 'leads');
+        $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', $object);
         $leadsSchema->dropColumn($entity->getAlias());
         $leadsSchema->executeChanges();
     }
@@ -638,7 +646,7 @@ class FieldModel extends FormModel
      *
      * @return array
      */
-    public function getFieldList($byGroup = true, $alphabetical = true, $filters = array('isPublished' => true, 'object' => 'Lead'))
+    public function getFieldList($byGroup = true, $alphabetical = true, $filters = array('isPublished' => true, 'object' => 'lead'))
     {
         $forceFilters = array();
         foreach ($filters as $col => $val) {

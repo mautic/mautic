@@ -71,17 +71,6 @@ echo $view['form']->start($form);
                     </div>
                     <div class="pa-md">
                         <?php if ($group == 'core'): ?>
-                            <div class="form-group mb-0">
-                                <label
-                                    class="control-label mb-xs"><?php echo $form['companyemail']->vars['label']; ?></label>
-                                <div class="row">
-                                    <div class="col-sm-8">
-                                        <?php echo $view['form']->widget($form['companyemail'], array('attr' => array('placeholder' => $form['companyemail']->vars['label']))); ?>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr class="mnr-md mnl-md">
-
                             <?php if (isset($form['companyname'])): ?>
                                 <div class="form-group mb-0">
                                     <label
@@ -94,8 +83,18 @@ echo $view['form']->start($form);
                                         <?php endif; ?>
                                     </div>
                                 </div>
-                                <hr class="mnr-md mnl-md">
+
                             <?php endif; ?>
+                            <div class="form-group mb-0">
+                                <label
+                                    class="control-label mb-xs"><?php echo $form['companyemail']->vars['label']; ?></label>
+                                <div class="row">
+                                    <div class="col-sm-8">
+                                        <?php echo $view['form']->widget($form['companyemail'], array('attr' => array('placeholder' => $form['companyemail']->vars['label']))); ?>
+                                    </div>
+                                </div>
+                            </div>
+
                             <?php if (isset($form['companynameaddress1']) || isset($form['companynameaddress2']) || isset($form['companynamecity']) || isset($form['companynamestate']) || isset($form['companynamezipcode']) || isset($form['companynamecountry'])): ?>
                                 <div class="form-group mb-0">
                                     <label

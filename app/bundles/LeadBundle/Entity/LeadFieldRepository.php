@@ -28,7 +28,7 @@ class LeadFieldRepository extends CommonRepository
      *
      * @return array
      */
-    public function getAliases($exludingId, $publishedOnly = false, $includeEntityFields = true, $object = 'Lead')
+    public function getAliases($exludingId, $publishedOnly = false, $includeEntityFields = true, $object = 'lead')
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('l.alias')
@@ -79,7 +79,7 @@ class LeadFieldRepository extends CommonRepository
      * @param  string  $object name of object using the custom fields
      * @return array
      */
-    protected function addCatchAllWhereClause(&$q, $filter, $object = 'Lead')
+    protected function addCatchAllWhereClause(&$q, $filter, $object = 'lead')
     {
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
@@ -93,8 +93,8 @@ class LeadFieldRepository extends CommonRepository
         }
 
         $q->andWhere(
-            $q->expr()->eq('object', ':object')->setParameter('object', $object)
-        );
+            $q->expr()->eq('object', ':object')
+        )->setParameter('object', $object);
 
         return array(
             $expr,
@@ -119,7 +119,7 @@ class LeadFieldRepository extends CommonRepository
      *
      * @return array
      */
-    public function getFieldAliases($object = 'Lead')
+    public function getFieldAliases($object = 'lead')
     {
         $qb = $this->_em->getConnection()->createQueryBuilder();
 
@@ -142,7 +142,7 @@ class LeadFieldRepository extends CommonRepository
      *
      * @return boolean
      */
-    public function compareValue($lead, $field, $value, $operatorExpr, $object = 'Lead')
+    public function compareValue($lead, $field, $value, $operatorExpr, $object = 'lead')
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('l.id')
@@ -153,7 +153,7 @@ class LeadFieldRepository extends CommonRepository
                     $q->expr()->$operatorExpr('l.' . $field, ':value')
                 )
             )
-            ->andWhere($q->expr()->eq('object', ':object')->setParameter('object','Lead'))
+            ->andWhere($q->expr()->eq('object', ':object'))->setParameter('object',$object)
             ->setParameter('lead', (int) $lead)
             ->setParameter('value', $value);
 

@@ -433,6 +433,7 @@ return [
             'mautic.company.model.company' => [
                 'class' => 'Mautic\LeadBundle\Model\CompanyModel',
                 'arguments' => [
+                    'mautic.lead.model.field',
                     'session'
                 ]
             ]

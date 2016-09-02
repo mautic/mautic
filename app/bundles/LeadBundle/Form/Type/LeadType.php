@@ -107,9 +107,9 @@ class LeadType extends AbstractType
             );
         }
 
-        $fieldValues = (!empty($options['data'])) ? $options['data']->getFields() : ['filter' => ['isVisible' => true, 'object' => 'Lead']];
+        $fieldValues = (!empty($options['data'])) ? $options['data']->getFields() : ['filter' => ['isVisible' => true, 'object' => 'lead']];
         foreach ($options['fields'] as $field) {
-            if ($field['isPublished'] === false || $field['object'] !== 'Lead') continue;
+            if ($field['isPublished'] === false || $field['object'] !== 'lead') continue;
             $attr        = ['class' => 'form-control'];
             $properties  = $field['properties'];
             $type        = $field['type'];

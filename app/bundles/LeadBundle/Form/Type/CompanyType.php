@@ -54,9 +54,9 @@ class CompanyType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $fieldValues = (!empty($options['data'])) ? $options['data']->getFields() : ['filter' => ['isVisible' => true, 'object' => 'Company']];
+        $fieldValues = (!empty($options['data'])) ? $options['data']->getFields() : ['filter' => ['isVisible' => true, 'object' => 'company']];
         foreach ($options['fields'] as $field) {
-            if ($field['isPublished'] === false || $field['object'] !== 'Company') continue;
+            if ($field['isPublished'] === false || $field['object'] !== 'company') continue;
             $attr        = ['class' => 'form-control'];
             $properties  = $field['properties'];
             $type        = $field['type'];

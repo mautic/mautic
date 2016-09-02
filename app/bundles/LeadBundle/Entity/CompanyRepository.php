@@ -33,7 +33,7 @@ class CompanyRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
             ->where('f.is_published = :published')
             ->andWhere($fq->expr()->eq('object',':company'))
-            ->setParameter('company', 'Company')
+            ->setParameter('company', 'company')
             ->setParameter('published', true, 'boolean');
         $results = $fq->execute()->fetchAll();
 
@@ -127,7 +127,7 @@ class CompanyRepository extends CommonRepository
 
             //ORM - generates lead entities
             $q = $this->_em->createQueryBuilder();
-            $q->select('comp, u, i,' . $order)
+            $q->select('comp, u,' . $order)
                 ->from('MauticLeadBundle:Company', 'comp', 'comp.id')
                 ->leftJoin('comp.owner', 'u');
 

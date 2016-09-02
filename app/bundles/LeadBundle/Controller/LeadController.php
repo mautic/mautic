@@ -226,7 +226,7 @@ class LeadController extends FormController
                         [
                             'column' => 'f.object',
                             'expr'   => 'like',
-                            'value'  => 'Lead'
+                            'value'  => 'lead'
                         ]
                     ]
                 ],
@@ -413,7 +413,7 @@ class LeadController extends FormController
                     [
                         'column' => 'f.object',
                         'expr'   => 'like',
-                        'value'  => 'Lead'
+                        'value'  => 'lead'
                     ]
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY'
@@ -600,7 +600,7 @@ class LeadController extends FormController
                     [
                         'column' => 'f.object',
                         'expr'   => 'like',
-                        'value'  => 'Lead'
+                        'value'  => 'lead'
                     ]
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY'

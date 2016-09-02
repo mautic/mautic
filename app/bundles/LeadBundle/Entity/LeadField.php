@@ -105,7 +105,7 @@ class LeadField extends FormEntity
     /**
      * @var string
      */
-    private $object = 'Lead';
+    private $object = 'lead';
 
     /**
      * @var array

@@ -452,7 +452,7 @@ class FieldType extends AbstractType
             'object',
             'choice',
             [
-                'choices'     => ['Lead' => 'mautic.lead.contact', 'Company' => 'mautic.company.company'],
+                'choices'     => ['lead' => 'mautic.lead.contact', 'company' => 'mautic.company.company'],
                 'expanded'    => false,
                 'multiple'    => false,
                 'label'       => 'mautic.lead.field.object',

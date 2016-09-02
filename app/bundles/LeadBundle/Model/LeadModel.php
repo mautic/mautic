@@ -394,7 +394,7 @@ class LeadModel extends FormModel
             if (empty($fields)) {
                 $fields = $this->leadFieldModel->getEntities(
                     [
-                        'filter'         => ['isPublished' => true],
+                        'filter'         => ['isPublished' => true, 'object' => 'lead'],
                         'hydration_mode' => 'HYDRATE_ARRAY'
                     ]
                 );
@@ -552,8 +552,7 @@ class LeadModel extends FormModel
                 }
             } else {
                 $alias = $field['alias'];
-                $this->logger->debug(print_r($field,true));
-                if ($field['isPublished'] and $field['object'] === 'Lead') {
+                if ($field['isPublished'] and $field['object'] === 'lead') {
                     $group = $field['group'];
                     $array[$group][$alias]['id']    = $field['id'];
                     $array[$group][$alias]['group'] = $group;
@@ -1466,6 +1465,11 @@ class LeadModel extends FormModel
                             'column' => 'f.isPublished',
                             'expr'   => 'eq',
                             'value'  => true
+                        ),
+                        array(
+                            'column' => 'f.object',
+                            'expr'   => 'eq',
+                            'value'  => 'lead'
                         )
                     ),
                     'hydration_mode' => 'HYDRATE_ARRAY'

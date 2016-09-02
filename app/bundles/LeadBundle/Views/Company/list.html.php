@@ -29,19 +29,10 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     array(
                         'sessionVar' => 'company',
-                        'orderBy'    => 'comp.name',
+                        'orderBy'    => 'comp.companyname',
                         'text'       => 'mautic.company.name',
                         'class'      => 'col-company-name',
                         'default'    => true
-                    )
-                );
-
-                echo $view->render(
-                    'MauticCoreBundle:Helper:tableheader.html.php',
-                    array(
-                        'sessionVar' => 'company',
-                        'text'       => 'mautic.company.phone',
-                        'class'      => 'visible-md visible-lg col-company-category'
                     )
                 );
                 echo $view->render(
@@ -99,21 +90,26 @@ if ($tmpl == 'index') {
                                 'mautic_company_action',
                                 array("objectAction" => "edit", "objectId" => $item->getId())
                             ); ?>" data-toggle="ajax">
-                                <?php echo $fields['core']['name']['value']; ?>
+                                <?php if (isset($fields['core']['companyname'])) :?>
+                                <?php echo $fields['core']['companyname']['value']; ?>
+                                <?php   endif; ?>
                             </a>
                         </div>
                         </td>
-                    <td class="visible-md visible-lg">
-                        <?php echo $fields['core']['phone']['value']; ?>
-                    </td>
                     <td>
                             <div class="text-muted mt-4">
-                                <small><?php echo $fields['core']['email']['value']; ?></small>
+                <?php if (isset($fields['core']['companyemail'])) :?>
+                    <small>
+                        <?php echo $fields['core']['companyemail']['value'] ;?>
+                    </small>
+                <?php   endif; ?>
                             </div>
                     </td>
 
                     <td class="visible-md visible-lg">
-                        <?php echo $fields['core']['website']['value']; ?>
+                        <?php if (isset($fields['core']['companywebsite'])) :?>
+                        <?php echo $fields['core']['companywebsite']['value']; ?>
+                        <?php   endif; ?>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>

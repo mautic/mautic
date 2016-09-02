@@ -29,15 +29,19 @@ class CompanyModel extends CommonFormModel
      */
     protected $session;
 
-
+    /**
+     * @var FieldModel
+     */
+    protected $leadFieldModel;
     /**
      * PointModel constructor.
      *
      * @param Session $session
      *
      */
-    public function __construct(Session $session)
+    public function __construct(FieldModel $leadFieldModel, Session $session)
     {
+        $this->leadFieldModel = $leadFieldModel;
         $this->session = $session;
     }
     /**
@@ -56,6 +60,16 @@ class CompanyModel extends CommonFormModel
     public function getPermissionBase()
     {
         return 'company:companies';
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getNameGetter()
+    {
+        return "getPrimaryIdentifier";
     }
 
     /**
@@ -114,7 +128,7 @@ class CompanyModel extends CommonFormModel
         foreach ($fields as $field) {
             if ($field instanceof LeadField) {
                 $alias = $field->getAlias();
-                if ($field->isPublished() and $field->getObject() === 'Company') {
+                if ($field->isPublished() and $field->getObject() === 'company') {
                     $group                          = $field->getGroup();
                     $array[$group][$alias]['id']    = $field->getId();
                     $array[$group][$alias]['group'] = $group;
@@ -125,8 +139,7 @@ class CompanyModel extends CommonFormModel
             } else {
                 $alias = $field['alias'];
                 $field[]=$alias;
-                $this->logger->debug(print_r($field,true));
-                if ($field['isPublished'] and $field['object'] === 'Company') {
+                if ($field['isPublished'] and $field['object'] === 'company') {
                     $group = $field['group'];
                     $array[$group][$alias]['id']    = $field['id'];
                     $array[$group][$alias]['group'] = $group;
@@ -147,4 +160,55 @@ class CompanyModel extends CommonFormModel
 
         return $array;
     }
+
+    /**
+     * Populates custom field values for updating the company.
+     *
+     * @param Company    $company
+     * @param array      $data
+     * @param bool|false $overwriteWithBlank
+     *
+     * @return array
+     */
+    public function setFieldValues(Company &$company, array $data, $overwriteWithBlank = false)
+    {
+        //save the field values
+        $fieldValues = $company->getFields();
+
+        if (empty($fieldValues)) {
+            // Lead is new or they haven't been populated so let's build the fields now
+            static $fields;
+            if (empty($fields)) {
+                $fields = $this->leadFieldModel->getEntities(
+                    [
+                        'filter'         => ['isPublished' => true, 'object' => 'company'],
+                        'hydration_mode' => 'HYDRATE_ARRAY'
+                    ]
+                );
+                $fields = $this->organizeFieldsByGroup($fields);
+            }
+            $fieldValues = $fields;
+        }
+        //update existing values
+        foreach ($fieldValues as $group => &$groupFields) {
+            foreach ($groupFields as $alias => &$field) {
+                if (!isset($field['value'])) {
+                    $field['value'] = null;
+                }
+                // Only update fields that are part of the passed $data array
+                if (array_key_exists($alias, $data)) {
+                    $curValue = $field['value'];
+                    $newValue = $data[$alias];
+
+                    if ($curValue !== $newValue && (strlen($newValue) > 0 || (strlen($newValue) === 0 && $overwriteWithBlank))) {
+                        $field['value'] = $newValue;
+                        $company->addUpdatedField($alias, $newValue, $curValue);
+                    }
+                }
+            }
+        }
+
+        $company->setFields($fieldValues);
+    }
+
 }

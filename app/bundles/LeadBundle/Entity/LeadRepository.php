@@ -362,7 +362,7 @@ class LeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
             ->where('f.is_published = :published')
             ->andWhere($fq->expr()->eq('f.object',':object'))
-            ->setParameter('object','Lead')
+            ->setParameter('object','lead')
             ->orderBy('f.field_order', 'asc')
             ->setParameter('published', true, 'boolean');
         $results = $fq->execute()->fetchAll();
@@ -465,7 +465,7 @@ class LeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
             ->where('f.is_published = :published')
             ->andWhere($fq->expr()->eq('object',':object'))
-            ->setParameter('object','Lead')
+            ->setParameter('object','lead')
             ->setParameter('published', true, 'boolean');
         $results = $fq->execute()->fetchAll();
 

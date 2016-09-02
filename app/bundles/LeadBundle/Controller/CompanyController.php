@@ -149,7 +149,7 @@ class CompanyController extends FormController
                     [
                         'column' => 'f.object',
                         'expr'   => 'eq',
-                        'value'  => 'Company'
+                        'value'  => 'company'
                     ]
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY'
@@ -166,7 +166,7 @@ class CompanyController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     //get custom field values
-                    $data = $this->request->request->get('lead');
+                    $data = $this->request->request->get('company');
                     //pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
                         $data[$f->getName()] = $f->getData();
@@ -175,7 +175,7 @@ class CompanyController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
-                    $identifier = $this->get('translator')->trans($model->getPrimaryIdentifier());
+                    $identifier = $this->get('translator')->trans($entity->getPrimaryIdentifier());
                     $this->addFlash(
                         'mautic.core.notice.created',
                         array(
@@ -227,7 +227,7 @@ class CompanyController extends FormController
                     'tmpl'    => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'entity'  => $entity,
                     'form'    => $this->setFormTheme($form, 'MauticLeadBundle:Company:form.html.php', $themes),
-                    'fields' => $model->organizeFieldsByGroup($fields)
+                    'fields'  => $model->organizeFieldsByGroup($fields)
                 ),
                 'contentTemplate' => 'MauticLeadBundle:Company:form.html.php',
                 'passthroughVars' => array(
@@ -292,7 +292,10 @@ class CompanyController extends FormController
                     )
                 )
             );
-        } elseif (!$this->factory->getSecurity()->isGranted('lead:leads:editother')) {
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+            'lead:leads:editown',
+            'lead:leads:editother',
+            $entity->getOwner())) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
@@ -300,11 +303,28 @@ class CompanyController extends FormController
         }
 
         $action  = $this->generateUrl('mautic_company_action', array('objectAction' => 'edit', 'objectId' => $objectId));
+        $fields = $this->getModel('lead.field')->getEntities(
+            [
+                'force'          => [
+                    [
+                        'column' => 'f.isPublished',
+                        'expr'   => 'eq',
+                        'value'  => true
+                    ],
+                    [
+                        'column' => 'f.object',
+                        'expr'   => 'like',
+                        'value'  => 'company'
+                    ]
+                ],
+                'hydration_mode' => 'HYDRATE_ARRAY'
+            ]
+        );
         $form    = $model->createForm(
             $entity,
             $this->get('form.factory'),
             $action,
-            array()
+            ['fields' => $fields]
         );
 
         ///Check for a submitted form and process it
@@ -333,6 +353,10 @@ class CompanyController extends FormController
                     if ($form->get('buttons')->get('save')->isClicked()) {
                         $returnUrl = $this->generateUrl('mautic_company_index', $viewParameters);
                         $template  = 'MauticLeadBundle:Company:index';
+                    } elseif ($valid) {
+                        // Refetch and recreate the form in order to populate data manipulated in the entity itself
+                        $company = $model->getEntity($objectId);
+                        $form = $model->createForm($company, $this->get('form.factory'), $action, ['fields' => $fields]);
                     }
                 }
             } else {
@@ -361,13 +385,13 @@ class CompanyController extends FormController
         }
 
         $themes = array('MauticLeadBundle:FormTheme\Action');
-
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
                     'tmpl'    => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'entity'  => $entity,
-                    'form'    => $this->setFormTheme($form, 'MauticLeadBundle:Company:form.html.php', $themes)
+                    'form'    => $this->setFormTheme($form, 'MauticLeadBundle:Company:form.html.php', $themes),
+                    'fields'  => $model->organizeFieldsByGroup($entity->getFields()) //pass in the lead fields as they are already organized by ['group']['alias']
                 ),
                 'contentTemplate' => 'MauticLeadBundle:Company:form.html.php',
                 'passthroughVars' => array(

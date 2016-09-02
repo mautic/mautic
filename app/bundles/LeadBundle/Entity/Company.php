@@ -53,7 +53,12 @@ class Company extends FormEntity
      * @var array
      */
     protected $fields = [];
-
+    /**
+     * Just a place to store updated field values so we don't have to loop through them again comparing
+     *
+     * @var array
+     */
+    private $updatedFields = [];
     /**
      * @var \Mautic\UserBundle\Entity\User
      */
@@ -178,6 +183,21 @@ class Company extends FormEntity
     public function setFields($fields)
     {
         $this->fields = $fields;
+    }
+    /**
+     * Get the primary identifier for the lead
+     *
+     * @param bool $lastFirst
+     *
+     * @return string
+     */
+    public function getPrimaryIdentifier()
+    {
+        if ($name = $this->getName()) {
+            return $name;
+        } elseif (!empty($this->fields['core']['email']['value'])) {
+            return $this->fields['core']['email']['value'];
+        }
     }
 
     /**
@@ -334,5 +354,68 @@ class Company extends FormEntity
     {
         return $this->owner;
     }
+
+    /**
+     * Add an updated field to persist to the DB and to note changes
+     *
+     * @param        $alias
+     * @param        $value
+     * @param string $oldValue
+     */
+    public function addUpdatedField($alias, $value, $oldValue = '')
+    {
+        $value = trim($value);
+        if ($value == '') {
+            // Ensure value is null for consistency
+            $value = null;
+        }
+
+        $this->changes['fields'][$alias] = [$oldValue, $value];
+        $this->updatedFields[$alias]     = $value;
+    }
+
+    /**
+     * Get the array of updated fields
+     *
+     * @return array
+     */
+    public function getUpdatedFields()
+    {
+        return $this->updatedFields;
+    }
+
+
+    /**
+     * Get company field value
+     *
+     * @param      $field
+     * @param null $group
+     *
+     * @return bool
+     */
+    public function getFieldValue($field, $group = null)
+    {
+        if (isset($this->updatedFields[$field])) {
+
+            return $this->updatedFields[$field];
+        }
+
+        if (!empty($group) && isset($this->fields[$group][$field])) {
+
+            return $this->fields[$group][$field]['value'];
+        }
+
+        foreach ($this->fields as $group => $groupFields) {
+            foreach ($groupFields as $name => $details) {
+                if ($name == $field) {
+
+                    return $details['value'];
+                }
+            }
+        }
+
+        return false;
+    }
+
 
 }
