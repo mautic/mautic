@@ -275,9 +275,7 @@ class FormSubscriber extends CommonSubscriber
                 throw $exception;
             }
         } catch (\Exception $exception) {
-            $validationFailed = false;
             if ($exception instanceof ValidationException) {
-                $validationFailed = true;
                 if ($violations = $exception->getViolations()) {
                     throw $exception;
                 }
@@ -295,7 +293,7 @@ class FormSubscriber extends CommonSubscriber
                     $this->translator->trans(
                         'mautic.form.action.repost.failed_message',
                         [
-                            '%link%'    => ($validationFailed) ? $event->getRequest()->getUri() : $this->router->generate(
+                            '%link%'    => $this->router->generate(
                                 'mautic_form_results',
                                 ['objectId' => $submission->getForm()->getId(), 'result' => $submission->getId()],
                                 UrlGeneratorInterface::ABSOLUTE_URL
@@ -307,10 +305,6 @@ class FormSubscriber extends CommonSubscriber
                 $this->mailer->parsePlainText();
 
                 $this->mailer->send();
-            }
-
-            if ($validationFailed) {
-                throw $exception;
             }
         }
     }
