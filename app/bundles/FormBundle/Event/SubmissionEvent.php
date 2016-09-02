@@ -9,6 +9,7 @@
 
 namespace Mautic\FormBundle\Event;
 
+use Joomla\Http\Response;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\FormBundle\Entity\Submission;
 
@@ -56,7 +57,12 @@ class SubmissionEvent extends CommonEvent
      *
      * @var mixed
      */
-    private $callback;
+    private $callbacks;
+
+    /**
+     * @var mixed
+     */
+    private $callbackResponses;
 
     /**
      * @var array
@@ -211,24 +217,6 @@ class SubmissionEvent extends CommonEvent
     }
 
     /**
-     * @param $callback
-     */
-    public function setPostSubmitCallback($callback)
-    {
-        if (null === $this->callback) {
-            $this->callback = $callback;
-        }
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPostSubmitCallback()
-    {
-        return $this->callback;
-    }
-
-    /**
      * @param $key
      * @param $feedback
      */
@@ -280,5 +268,57 @@ class SubmissionEvent extends CommonEvent
     public function getActionConfig()
     {
         return $this->actionConfig;
+    }
+
+    /**
+     * Set an post submit callback - include $callback['eventName' => '', 'anythingElse' ...]
+     *
+     * @param string $key
+     * @param array  $callback
+     */
+    public function setPostSubmitCallback($key, array $callback)
+    {
+        // support for `callback` is @deprecated and should be removed in 3.0
+        if (!array_key_exists('eventName', $callback) && !array_key_exists('callback', $callback)) {
+            throw new \InvalidArgumentException('eventName or callback required');
+        }
+
+        $this->callbacks[$key] = $callback;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPostSubmitCallback($key = null)
+    {
+        return (null === $key) ? $this->callbacks : $this->callbacks[$key];
+    }
+
+    /**
+     * @return int
+     */
+    public function hasPostSubmitCallbacks()
+    {
+        return count($this->callbacks);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPostSubmitCallbackResponse($key = null)
+    {
+        return (null === $key) ? $this->callbackResponses : $this->callbackResponses[$key];
+    }
+
+    /**
+     * @param mixed $callbackResponses
+     *
+     * @return SubmissionEvent
+     */
+    public function setPostSubmitCallbackResponse($key, $callbackResponses)
+    {
+        $this->callbackResponses[$key] = $callbackResponses;
+
+        return $this;
     }
 }

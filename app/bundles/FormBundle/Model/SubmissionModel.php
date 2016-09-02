@@ -329,9 +329,9 @@ class SubmissionModel extends CommonFormModel
             $this->dispatcher->dispatch(FormEvents::FORM_ON_SUBMIT, $submissionEvent);
         }
 
-        //get callback command from the submit action; first come first serve
-        if ($callback = $submissionEvent->getPostSubmitCallback()) {
-            return ['callback' => $callback];
+        //get callback commands from the submit action
+        if ($submissionEvent->hasPostSubmitCallbacks()) {
+            return ['callback' => $submissionEvent];
         }
 
         //made it to the end so return false that there was not an error
@@ -688,7 +688,7 @@ class SubmissionModel extends CommonFormModel
 
                     // Set these for updated plugins to leverage
                     if (isset($returned['callback'])) {
-                        $event->setPostSubmitCallback($returned['callback']);
+                        $event->setPostSubmitCallback($key, $returned);
                     }
 
                     $event->setActionFeedback($key, $returned);

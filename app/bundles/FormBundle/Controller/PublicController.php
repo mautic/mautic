@@ -11,6 +11,7 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\FormBundle\Event\SubmissionEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -69,19 +70,27 @@ class PublicController extends CommonFormController
                 $postAction         = $form->getPostAction();
                 $postActionProperty = $form->getPostActionProperty();
 
-               //check to ensure the form is published
-                $status = $form->getPublishStatus();
+                //check to ensure the form is published
+                $status             = $form->getPublishStatus();
                 $dateTemplateHelper = $this->get('mautic.helper.template.date');
                 if ($status == 'pending') {
-                    $error = $translator->trans('mautic.form.submit.error.pending', array(
-                        '%date%' => $dateTemplateHelper->toFull($form->getPublishUp())
-                    ), 'flashes');
+                    $error = $translator->trans(
+                        'mautic.form.submit.error.pending',
+                        [
+                            '%date%' => $dateTemplateHelper->toFull($form->getPublishUp())
+                        ],
+                        'flashes'
+                    );
                 } elseif ($status == 'expired') {
-                    $error = $translator->trans('mautic.form.submit.error.expired', array(
-                        '%date%' => $dateTemplateHelper->toFull($form->getPublishDown())
-                    ), 'flashes');
+                    $error = $translator->trans(
+                        'mautic.form.submit.error.expired',
+                        [
+                            '%date%' => $dateTemplateHelper->toFull($form->getPublishDown())
+                        ],
+                        'flashes'
+                    );
                 } elseif ($status != 'published') {
-                    $error = $translator->trans('mautic.form.submit.error.unavailable', array(), 'flashes');
+                    $error = $translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
                 } else {
                     $result = $this->getModel('form.submission')->saveSubmission($post, $server, $form);
                     if (!empty($result['errors'])) {
@@ -93,35 +102,61 @@ class PublicController extends CommonFormController
                                 implode("</li><li>", $result['errors']).'</li></ol>' : false;
                         }
                     } elseif (!empty($result['callback'])) {
-                        $callback = $result['callback']['callback'];
-                        if (is_callable($callback)) {
-                            if (is_array($callback)) {
-                                $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                            } elseif (strpos($callback, '::') !== false) {
-                                $parts      = explode('::', $callback);
-                                $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-                            } else {
-                                $reflection= new \ReflectionMethod(null, $callback);
-                            }
+                        $callbackResponses = [];
+                        // Return the first Response object if one is defined
+                        $firstResponseObject = false;
 
-                            //add the factory to the arguments
-                            $result['callback']['factory'] = $this->factory;
+                        /** @var SubmissionEvent $submissionEvent */
+                        $submissionEvent    = $result['callback'];
+                        $callbacksRequested = $submissionEvent->getPostSubmitCallback();
+                        foreach ($callbacksRequested as $key => $callbackRequested) {
+                            $callbackRequested['messengerMode'] = $messengerMode;
+                            $callbackRequested['ajaxMode']      = $isAjax;
 
-                            $pass = array();
-                            $result['callback']['messengerMode'] = $messengerMode;
-                            foreach ($reflection->getParameters() as $param) {
-                                if (isset($result['callback'][$param->getName()])) {
-                                    $pass[] = $result['callback'][$param->getName()];
-                                } else {
-                                    $pass[] = null;
+                            if (isset($callbackRequested['eventName'])) {
+                                $submissionEvent->setPostSubmitCallback($key, $callbackRequested);
+
+                                $this->get('event_dispatcher')->dispatch($callbackRequested['eventName'], $submissionEvent);
+
+                                $callbackResponses[$key] = $submissionEvent->getPostSubmitCallbackResponse($key);
+                            } elseif (isset($callbackRequested['callback'])) {
+                                // @deprecated - to be removed in 3.0; use eventName instead - be sure to remove callback key support from SubmissionEvent::setPostSubmitCallback
+                                $callback = $callbackRequested['callback'];
+                                if (is_callable($callback)) {
+                                    if (is_array($callback)) {
+                                        $reflection = new \ReflectionMethod($callback[0], $callback[1]);
+                                    } elseif (strpos($callback, '::') !== false) {
+                                        $parts      = explode('::', $callback);
+                                        $reflection = new \ReflectionMethod($parts[0], $parts[1]);
+                                    } else {
+                                        $reflection = new \ReflectionMethod(null, $callback);
+                                    }
+
+                                    //add the factory to the arguments
+                                    $callbackRequested['factory'] = $this->factory;
+
+                                    $pass                                = [];
+                                    foreach ($reflection->getParameters() as $param) {
+                                        if (isset($callbackRequested[$param->getName()])) {
+                                            $pass[] = $callbackRequested[$param->getName()];
+                                        } else {
+                                            $pass[] = null;
+                                        }
+                                    }
+
+                                    $callbackResponses[$key] = $reflection->invokeArgs($this, $pass);
                                 }
                             }
 
-                            $callbackResponse = $reflection->invokeArgs($this, $pass);
-
-                            if (!$messengerMode && !$isAjax) {
-                                return $callbackResponse;
+                            if (!$firstResponseObject && $callbackResponses[$key] instanceof Response) {
+                                $firstResponseObject = $key;
                             }
+                        }
+
+                        if ($firstResponseObject && !$messengerMode && !$isAjax) {
+                            // Return the response given by the sbumit action
+
+                            return $callbackResponses[$firstResponseObject];
                         }
                     }
                 }
@@ -142,19 +177,33 @@ class PublicController extends CommonFormController
                 if ($postAction == 'redirect') {
                     $data['redirect'] = $postActionProperty;
                 } elseif (!empty($postActionProperty)) {
-                    $data['successMessage'] = $postActionProperty;
+                    $data['successMessage'] = [$postActionProperty];
                 }
 
-                if (!empty($callbackResponse)) {
-                    if ($callbackResponse instanceof RedirectResponse) {
-                        $data['redirect'] = $callbackResponse->getTargetUrl();
-                    } elseif ($callbackResponse instanceof Response) {
-                        $data['successMessage'] = $callbackResponse->getContent();
-                    } elseif (is_array($callbackResponse)) {
-                        $data = array_merge($data, $callbackResponse);
-                    } else {
-                        $data['successMessage'] = $callbackResponse->getContent();
+                if (!empty($callbackResponses)) {
+                    foreach ($callbackResponses as $key => $response) {
+                        // Convert the responses to something useful for a JS response
+                        if ($response instanceof RedirectResponse && !isset($data['redirect'])) {
+                            $data['redirect'] = $response->getTargetUrl();
+                        } elseif ($response instanceof Response) {
+                            if (!isset($data['successMessage'])) {
+                                $data['successMessage'] = [];
+                            }
+                            $data['successMessage'][] = $response->getContent();
+                        } elseif (is_array($response)) {
+                            $data = array_merge($data, $response);
+                        } elseif (is_string($response)) {
+                            if (!isset($data['successMessage'])) {
+                                $data['successMessage'] = [];
+                            }
+                            $data['successMessage'][] = $response;
+                        } // ignore anything else
                     }
+                }
+
+                // Combine all messages into one
+                if (isset($data['successMessage'])) {
+                    $data['successMessage'] = implode('<br /><br />', $data['successMessage']);
                 }
             }
 
