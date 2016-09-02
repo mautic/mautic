@@ -102,12 +102,22 @@ class PublicController extends CommonFormController
                                 implode("</li><li>", $result['errors']).'</li></ol>' : false;
                         }
                     } elseif (!empty($result['callback'])) {
-                        $callbackResponses = [];
+                        /** @var SubmissionEvent $submissionEvent */
+                        $submissionEvent   = $result['callback'];
+
                         // Return the first Response object if one is defined
                         $firstResponseObject = false;
+                        if ($callbackResponses = $submissionEvent->getPostSubmitCallbackResponse()) {
+                            // Some submit actions already injected it's responses
+                            foreach ($callbackResponses as $key => $response) {
+                                if ($response instanceof Response) {
+                                    $firstResponseObject = $key;
+                                    break;
+                                }
+                            }
+                        }
 
-                        /** @var SubmissionEvent $submissionEvent */
-                        $submissionEvent    = $result['callback'];
+                        // These submit actions have requested a callback after all is said and done
                         $callbacksRequested = $submissionEvent->getPostSubmitCallback();
                         foreach ($callbacksRequested as $key => $callbackRequested) {
                             $callbackRequested['messengerMode'] = $messengerMode;
@@ -117,8 +127,6 @@ class PublicController extends CommonFormController
                                 $submissionEvent->setPostSubmitCallback($key, $callbackRequested);
 
                                 $this->get('event_dispatcher')->dispatch($callbackRequested['eventName'], $submissionEvent);
-
-                                $callbackResponses[$key] = $submissionEvent->getPostSubmitCallbackResponse($key);
                             } elseif (isset($callbackRequested['callback'])) {
                                 // @deprecated - to be removed in 3.0; use eventName instead - be sure to remove callback key support from SubmissionEvent::setPostSubmitCallback
                                 $callback = $callbackRequested['callback'];

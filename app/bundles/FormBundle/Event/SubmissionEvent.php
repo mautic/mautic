@@ -299,7 +299,7 @@ class SubmissionEvent extends CommonEvent
      */
     public function hasPostSubmitCallbacks()
     {
-        return count($this->callbacks);
+        return count($this->callbacks) || count($this->callbackResponses);
     }
 
     /**
