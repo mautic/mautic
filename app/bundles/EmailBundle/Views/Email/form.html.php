@@ -10,6 +10,10 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'email');
 
+$dynamicContentPrototype = $form['dynamicContent']->vars['prototype'];
+$filterBlockPrototype    = $form['dynamicContent']->children[0]['filters']->vars['prototype'];
+$filterSelectPrototype   = $form['dynamicContent']->children[0]['filters']->children[0]['filters']->vars['prototype'];
+
 $variantParent = $email->getVariantParent();
 $isExisting = $email->getId();
 
@@ -48,6 +52,7 @@ $attr['data-submit-callback-async'] = "clearThemeHtmlBeforeSave";
                     <li <?php echo !$isExisting ? "class='active'" : ""; ?>><a href="#email-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.form.theme'); ?></a></li>
                     <li <?php echo $isExisting ? "class='active'" : ""; ?>><a href="#source-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.content'); ?></a></li>
                     <li><a href="#advanced-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.advanced'); ?></a></li>
+                    <li><a href="#dynamic-content-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.dynamicContent'); ?></a></li>
                 </ul>
                 <!--/ tabs controls -->
                 <div class="tab-content pa-md">
@@ -124,6 +129,32 @@ $attr['data-submit-callback-async'] = "clearThemeHtmlBeforeSave";
                             </div>
                         </div>
                     </div>
+
+                    <div class="tab-pane fade bdr-w-0" id="dynamic-content-container">
+                        <div class="row" id="emailFilters">
+                            <div class="col-md-12">
+                                <div class="row">
+                                <?php
+                                $tabHtml  = '<div class="col-xs-3 bg-auto dynamicContentFilterContainer">';
+                                $tabHtml .= '<ul class="nav nav-tabs pr-md pl-md tabs-left" id="emailDynamicContentTabs">';
+                                $tabContentHtml = '<div class="tab-content pa-md col-xs-9" id="emailDynamicContentContainer">';
+
+                                foreach ($form['dynamicContent'] as $i => $dynamicContent) {
+                                    $tabHtml .= '<li class="'.($i === 0 ? ' active' : '').'"><a role="tab" data-toggle="tab" href="#'.$dynamicContent->vars['id'].'">'.$view['translator']->trans('mautic.core.dynamicContent').' '.($i+1).'</a></li>';
+
+                                    $tabContentHtml .= $view['form']->widget($dynamicContent);
+                                }
+
+                                $tabHtml .= '<li><a href="javascript:void(0);" role="tab" id="emailAddNewDynamicContent"><i class="fa fa-plus text-success"></i> '.$view['translator']->trans('mautic.core.form.new').'</a></li></ul></div>';
+                                $tabContentHtml .= '</div>';
+
+                                echo $tabHtml;
+                                echo $tabContentHtml;
+                                ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -159,14 +190,18 @@ $attr['data-submit-callback-async'] = "clearThemeHtmlBeforeSave";
             <?php endif; ?>
 
             <?php echo $view['form']->row($form['unsubscribeForm']); ?>
-
-            <div class="hide">
-                <?php echo $view['form']->rest($form); ?>
-            </div>
+        </div>
+        <div class="hide">
+            <?php echo $view['form']->rest($form); ?>
         </div>
     </div>
 </div>
+
 <?php echo $view['form']->end($form); ?>
+
+<div id="dynamicContentPrototype" data-prototype="<?php echo $view->escape($view['form']->widget($dynamicContentPrototype)); ?>"></div>
+<div id="filterBlockPrototype" data-prototype="<?php echo $view->escape($view['form']->widget($filterBlockPrototype)); ?>"></div>
+<div id="filterSelectPrototype" data-prototype="<?php echo $view->escape($view['form']->widget($filterSelectPrototype)); ?>"></div>
 
 <?php echo $view->render('MauticCoreBundle:Helper:builder.html.php', [
     'type'          => 'email',

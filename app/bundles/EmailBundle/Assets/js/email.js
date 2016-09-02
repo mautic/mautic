@@ -105,6 +105,8 @@ Mautic.emailOnLoad = function (container, response) {
 
     var plaintext = mQuery('#emailform_plainText');
     Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
+
+    Mautic.initEmailDynamicContent();
 };
 
 Mautic.emailOnUnload = function(id) {
@@ -320,4 +322,100 @@ Mautic.disabledEmailAction = function(opener) {
 
     opener.mQuery('#campaignevent_properties_editEmailButton').prop('disabled', disabled);
     opener.mQuery('#campaignevent_properties_previewEmailButton').prop('disabled', disabled);
+};
+
+Mautic.initEmailDynamicContent = function() {
+    if (mQuery('#emailFilters').length) {
+        mQuery('#available_filters').on('change', function() {
+            if (mQuery(this).val()) {
+                Mautic.addDynamicContentListFilter(mQuery(this).val());
+                mQuery(this).val('');
+                mQuery(this).trigger('chosen:updated');
+            }
+        });
+
+        mQuery('#emailFilters .remove-selected').each( function (index, el) {
+            mQuery(el).on('click', function () {
+                mQuery(this).closest('.panel').animate(
+                    {'opacity': 0},
+                    'fast',
+                    function () {
+                        mQuery(this).remove();
+                    }
+                );
+
+                if (!mQuery('#emailFilters li:not(.placeholder)').length) {
+                    mQuery('#emailFilters li.placeholder').removeClass('hide');
+                } else {
+                    mQuery('#emailFilters li.placeholder').addClass('hide');
+                }
+            });
+        });
+
+        mQuery('#emailAddNewDynamicContent').on('click', function (e) {
+            e.preventDefault();
+
+            var tabHolder               = mQuery('#emailDynamicContentTabs');
+            var filterHolder            = mQuery('#emailDynamicContentContainer');
+            var dynamicContentPrototype = mQuery('#dynamicContentPrototype').data('prototype');
+            var dynamicContentIndex     = tabHolder.find('li').length - 1;
+            var newForm                 = dynamicContentPrototype.replace(/__name__/g, dynamicContentIndex);
+            var newTab                  = mQuery('<li><a role="tab" data-toggle="tab" href="#emailform_dynamicContent_' + dynamicContentIndex + '">Dynamic Content ' + (dynamicContentIndex + 1) + '</a></li>');
+
+            tabHolder.children().last().before(newTab);
+            filterHolder.append(newForm);
+            newTab.find('a').tab('show');
+
+            Mautic.initDynamicContentFilters();
+        });
+
+        Mautic.initDynamicContentFilters();
+    }
+
+    mQuery("*[data-toggle='field-lookup']").each(function (index) {
+        var target = mQuery(this).attr('data-target');
+        var options = mQuery(this).attr('data-options');
+        var field  = mQuery(this).attr('id');
+
+        Mautic.activateLeadFieldTypeahead(field, target, options);
+    });
+};
+
+Mautic.initDynamicContentFilters = function () {
+    mQuery('.emailAddNewDynamicContentFilter').on('click', function (e) {
+        e.preventDefault();
+
+        var $this                = mQuery(this);
+        var parentElement        = $this.parents('.panel');
+        var tabHolder            = parentElement.find('.nav');
+        var filterHolder         = parentElement.find('.tab-content');
+        var filterBlockPrototype = mQuery('#filterBlockPrototype');
+        var filterIndex          = filterHolder.find('.tab-pane').length;
+        var dynamicContentIndex  = $this.data('index');
+
+        var filterPrototype = filterBlockPrototype.data('prototype');
+        var newTab          = mQuery('<li><a role="tab" data-toggle="tab" href="#emailform_dynamicContent_' + dynamicContentIndex + '_filters_' + filterIndex + '">Filter ' + (filterIndex + 1) + '</a></li>');
+        var newForm         = filterPrototype.replace(/__name__/g, filterIndex)
+            .replace(/dynamicContent_0_filters/g, 'dynamicContent_' + dynamicContentIndex + '_filters')
+            .replace(/dynamicContent]\[0]\[filters/g, 'dynamicContent][' + dynamicContentIndex + '][filters');
+
+        tabHolder.children().last().before(newTab);
+        filterHolder.append(newForm);
+        newTab.find('a').tab('show');
+    });
+
+    mQuery('.remove-item').on('click', function (e) {
+        e.preventDefault();
+
+        var $this         = mQuery(this);
+        var parentElement = $this.parents('.tab-pane.dynamicContent');
+
+        parentElement.remove();
+        mQuery('a[href="#' + parentElement.attr('id') + '"]').parent().remove();
+        mQuery('#emailDynamicContentTabs').find('li').first().find('a').tab('show');
+    });
+};
+
+Mautic.addDynamicContentListFilter = function (filter) {
+    console.log(filter);
 };

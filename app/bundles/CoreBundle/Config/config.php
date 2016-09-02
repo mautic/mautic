@@ -213,6 +213,21 @@ return [
             'mautic.form.type.theme.upload'        => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\ThemeUploadType',
                 'alias'     => 'theme_upload'
+            ],
+            'mautic.form.type.dynamic_content_filter' => [
+                'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterType::class,
+                'alias'     => 'dynamic_content_filter',
+                'arguments' => 'mautic.factory'
+            ],
+            'mautic.form.type.dynamic_content_filter_entry' => [
+                'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryType::class,
+                'alias'     => 'dynamic_content_filter_entry',
+                'arguments' => 'mautic.factory'
+            ],
+            'mautic.form.type.dynamic_content_filter_entry_filters' => [
+                'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class,
+                'alias'     => 'dynamic_content_filter_entry_filters',
+                'arguments' => 'mautic.factory'
             ]
         ],
         'helpers' => [
