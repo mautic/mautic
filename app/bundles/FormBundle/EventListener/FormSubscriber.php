@@ -220,8 +220,12 @@ class FormSubscriber extends CommonSubscriber
         $results = $event->getResults();
         $config  = $event->getActionConfig();
         $fields  = $event->getFields();
+        $lead    = $event->getSubmission()->getLead();
 
-        $payload = [];
+        $payload = [
+            'mautic_contact' => $lead->getProfileFields()
+        ];
+
         foreach ($fields as $field) {
             if (!isset($post[$field['alias']]) || 'button' == $field['type']) {
                 continue;
