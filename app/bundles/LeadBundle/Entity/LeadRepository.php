@@ -662,7 +662,6 @@ class LeadRepository extends CommonRepository
     {
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-        error_log($string);
         if ($filter->not) {
             $xFunc    = 'andX';
             $exprFunc = 'notLike';
@@ -835,7 +834,7 @@ class LeadRepository extends CommonRepository
                     ->where(
                         $sq->expr()->andX(
                             $sq->expr()->eq('l.id', 'cl.lead_id'),
-                            $sq->expr()->$likeFunc('comp.name', ":$unique")
+                            $sq->expr()->$likeFunc('comp.companyname', ":$unique")
                         )
                     );
 
