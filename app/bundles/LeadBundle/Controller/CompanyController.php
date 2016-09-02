@@ -97,6 +97,9 @@ class CompanyController extends FormController
         $companyIds = array_keys($companies);
         $leadCounts = (!empty($companyIds)) ? $model->getRepository()->getLeadCount($companyIds) : array();
 
+        $model = $this->getModel('company');
+        $companyIds    = array_keys($companies->getIterator()->getArrayCopy());
+        $leadCounts = (!empty($companyIds)) ? $model->getRepository()->getLeadCount($companyIds) : array();
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
