@@ -240,11 +240,13 @@ class FormSubscriber extends CommonSubscriber
         ];
 
         if (!empty($config['authorization_header'])) {
-            // Ensure the user did not append Authorization:
-            if (strpos($config['authorization_header'], 'Authorization:')) {
-                $config['authorization_header'] = str_replace('Authorization:', '', $config['authorization_header']);
+            if (strpos($config['authorization_header'], ':') !== false) {
+                list($key, $value) = explode(':', $config['authorization_header']);
+            } else {
+                $key   = 'Authorization';
+                $value = $config['authorization_header'];
             }
-            $headers['Authorization'] = trim($config['authorization_header']);
+            $headers[trim($key)] = trim($value);
         }
 
         try {
