@@ -1170,7 +1170,8 @@ class EmailModel extends FormModel
 
         // Setup the mailer
         $mailer = $this->mailHelper->getMailer(!$sendBatchMail);
-
+		$mailer->enableQueue();
+		
         // Flushes the batch in case of using API mailers
         $flushQueue = function ($reset = true) use (&$mailer, &$saveEntities, &$errors, &$emailSentCounts, $sendBatchMail) {
 
