@@ -68,6 +68,15 @@ return [
                 'path'       => '/contacts',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getEntities'
             ],
+            'mautic_api_getdonotcontact'   => array(
+                'path'       => '/contacts/{id}/donotcontact',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:getDoNotEmail'
+            ),
+            'mautic_api_editdonotcontact'  => array(
+                'path'       => '/contacts/{id}/donotcontact',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:editDoNotEmail',
+                'method'     => 'POST'
+            ),
             'mautic_api_newcontact'           => [
                 'path'       => '/contacts/new',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:newEntity',

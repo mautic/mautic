@@ -205,6 +205,106 @@ class LeadApiController extends CommonApiController
     }
 
     /**
+     * Obtains DonotContact status on a specific Contact
+     *
+     * @param $id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getDoNotEmailAction($id)
+    {
+        $entity = $this->model->getEntity($id);
+        if ($entity !== null) {
+            if (!$this->factory->getSecurity()->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getOwner())) {
+                return $this->accessDenied();
+            }
+            $doNotEmailStatus = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->getDoNotEmail($id);
+            list($doNots, $count) = $this->prepareEntitiesForView($doNotEmailStatus);
+            if (!empty($doNotEmailStatus)){
+                $view = $this->view(
+                    array(
+
+                        'doNotContactStatus' => $doNotEmailStatus
+
+                    ),
+                    Codes::HTTP_OK
+                );
+            }
+            else
+            {
+                $doNotEmailStatus = array(
+                                         );
+                $view = $this->view(
+                    array(
+
+                        'doNotContactStatus' => $doNotEmailStatus
+
+                    ),
+                    Codes::HTTP_OK
+                );
+            }
+
+            $context = SerializationContext::create()->setGroups(array('leadNoteDetails'));
+            $view->setSerializationContext($context);
+
+            return $this->handleView($view);
+        }
+
+        return $this->notFound();
+    }
+
+    /**
+     * sets  DonotContact status on a specific Contact
+
+     *
+     * @param $id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function editDoNotEmailAction($id)
+    {
+        $entity = $this->model->getEntity($id);
+        $parameters = $this->request->request->all();
+        if ($entity !== null) {
+            if (!$this->factory->getSecurity()->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getOwner())) {
+                return $this->accessDenied();
+            }
+            $currentStatus = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->getDoNotEmail($id);
+
+            if ($currentStatus){
+                $this->model->removeDncForLead($entity, $parameters['channel']);
+            }
+            else{
+                $this->model->addDncForLead($entity, $parameters['channel'], $parameters['comments'], $parameters['reason']);
+            }
+
+            $doNotEmailStatus = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->getDoNotEmail($id);
+            if (empty($doNotEmailStatus)){
+
+                $doNotEmailStatus = array(
+                                         );
+            }
+
+            list($doNots, $count) = $this->prepareEntitiesForView($doNotEmailStatus);
+            $view = $this->view(
+                array(
+
+                    'doNotContactStatus' => $doNotEmailStatus
+
+                ),
+                Codes::HTTP_OK
+            );
+
+            $context = SerializationContext::create()->setGroups(array('leadNoteDetails'));
+            $view->setSerializationContext($context);
+
+            return $this->handleView($view);
+        }
+
+        return $this->notFound();
+    }
+
+    /**
      * Obtains a list of lead lists the lead is in
      *
      * @param $id
