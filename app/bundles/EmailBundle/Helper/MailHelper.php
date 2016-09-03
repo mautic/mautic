@@ -1464,8 +1464,9 @@ class MailHelper
     
     /**
      * Enables queue mode if the transport supports tokenization
-     * @param bool $enabled 
      *
+     * @param bool $enabled 
+     */
     public function enableQueue($enabled = true)
     {
         if ($this->tokenizationEnabled) {
