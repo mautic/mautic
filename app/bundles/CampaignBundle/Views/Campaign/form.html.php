@@ -46,6 +46,7 @@ $view['slots']->set("headerTitle", $header);
             echo $view['form']->row($form['isPublished']);
             echo $view['form']->row($form['publishUp']);
             echo $view['form']->row($form['publishDown']);
+            echo $view['form']->row($form['isRecurring']);
             ?>
         </div>
     </div>
