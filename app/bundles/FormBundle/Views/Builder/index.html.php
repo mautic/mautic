@@ -131,7 +131,7 @@ $formId = $form['sessionId']->vars['data'];
                                                         'action'       => $e,
                                                         'type'         => $k,
                                                         'isStandalone' => $activeForm->isStandalone(),
-                                                        'formId'       => $activeForm->getId(),
+                                                        'formId'       => $form['sessionId']->vars['data']
                                                     ]
                                                 )."\n\n";
                                                 if (!empty($e['allowCampaignForm']))
