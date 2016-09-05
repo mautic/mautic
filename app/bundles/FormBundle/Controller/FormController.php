@@ -672,9 +672,9 @@ class FormController extends CommonFormController
 
             //lock the entity
             $model->lockEntity($entity);
-
-            $form->get('sessionId')->setData($objectId);
         }
+        
+        $form->get('sessionId')->setData($objectId);
 
         // Get field and action settings
         $fieldHelper     = new FormFieldHelper($this->get('translator'));
