@@ -67,6 +67,36 @@ $customButtons[] = [
     'btnText'   => 'mautic.email.send.example',
 ];
 
+
+
+// $customButtons[] = array(
+//         'attr'      => array(
+//             'class'       => 'btn btn-default btn-nospin',
+//             'data-toggle' => 'ajaxmodal',
+//             'data-target' => '#MauticSharedModal',
+//             'href'        => $view['router']->path('mautic_email_action', array('objectAction' => 'sendExampleMultiple')),
+//             'data-header' => $view['translator']->trans('mautic.email.send.example.mutiple'),
+//         ),
+//         'iconClass' => 'fa fa-bolt',
+//         'btnText'   => 'mautic.email.send.example.mutiple'
+// );
+
+
+
+ $customButtons[] = array(
+        'attr'      => array(
+            'class'       => 'btn btn-default btn-nospin quickadd',
+            'data-toggle' => 'ajaxmodal',
+            'data-target' => '#MauticSharedModal',
+            'href'        => $view['router']->path('mautic_email_action', array('objectAction' => 'sendExampleMultiple')),
+            'data-header' => $view['translator']->trans('mautic.email.send.example.mutiple'),
+        ),
+        'iconClass' => 'fa fa-bolt',
+        'btnText'   => 'mautic.email.send.example.mutiple'
+    );
+
+ 
+
 // Only show A/B test button if not already a translation of an a/b test
 $allowAbTest = $email->isTranslation(true) && $translations['parent']->isVariant(true) ? false : true;
 

@@ -1315,6 +1315,50 @@ class EmailController extends FormController
         return $this->viewAction($objectId);
     }
 
+
+        /**
+     * Send example email to current user
+     *
+     * @param $objectId
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function exampleMultipleAction($objectId)
+    {
+
+
+
+            // return $this->postActionRedirect(
+            //         [
+            //             'returnUrl'       => "/s/emails/view/1",
+                
+            //             'passthroughVars' => [
+            //                 'activeLink'    => '#mautic_contact_index',
+            //                 'mauticContent' => 'lead',
+            //                 'closeModal'    => 1, //just in case in quick form
+            //             ]
+            //         ]
+            // );
+
+
+            if ($this->request->getMethod() == 'POST') {
+
+                    $data = $this->request->request->get('emails');
+
+                    var_dump($data); die();
+
+                   
+
+            }
+
+
+
+
+           
+    }
+
+
+
     /**
      * Deletes a group of entities
      *
@@ -1463,4 +1507,31 @@ class EmailController extends FormController
 
         return $slotTypes;
     }
+
+
+    
+    public function sendExampleMultipleAction()
+    {
+        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        $model = $this->getModel('lead.lead');
+
+        // Get the quick add form
+        $action = $this->generateUrl('mautic_email_action', ['objectAction' => 'exampleMultiple']);
+
+
+        return $this->delegateView(
+            [
+                'viewParameters'  => [
+                    'action' => $action
+                ],
+                'contentTemplate' => "MauticEmailBundle:Email:recipients.html.php",
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_contact_index',
+                    'mauticContent' => 'lead',
+                    'route'         => false
+                ]
+            ]
+        );
+    }
+
 }
