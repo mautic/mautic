@@ -164,6 +164,9 @@ class SubmissionModel extends CommonFormModel
         // Create an event to be dispatched through the processes
         $submissionEvent = new SubmissionEvent($submission, $post, $server, $request);
 
+        // Get a list of components to build custom fields from
+        $components = $this->formModel->getCustomComponents();
+
         $fields           = $form->getFields();
         $fieldArray       = [];
         $results          = [];
@@ -184,10 +187,7 @@ class SubmissionModel extends CommonFormModel
                 'alias' => $alias,
             ];
 
-            if (in_array($type, ['button', 'freetext'])) {
-                //don't save items that don't have a value associated with it
-                continue;
-            } elseif ($type == 'captcha') {
+            if ($type == 'captcha') {
                 $captcha = $fieldHelper->validateFieldValue($type, $value, $f);
                 if (!empty($captcha)) {
                     $props = $f->getProperties();
@@ -215,9 +215,18 @@ class SubmissionModel extends CommonFormModel
                 continue;
             }
 
+            if (in_array($type, $components['viewOnlyFields'])) {
+                //don't save items that don't have a value associated with it
+                continue;
+            }
+
             //clean and validate the input
             if ($f->isCustom()) {
-                $params = $f->getCustomParameters();
+                if (!isset($components['fields'][$f->getType()])) {
+                    continue;
+                }
+
+                $params = $components['fields'][$f->getType()];
                 if (!empty($value)) {
                     if (isset($params['valueFilter'])) {
                         if (is_string($params['valueFilter']) && is_callable(['\Mautic\CoreBundle\Helper\InputHelper', $params['valueFilter']])) {
@@ -371,6 +380,7 @@ class SubmissionModel extends CommonFormModel
     {
         $results    = $this->getEntities($queryArgs);
         $translator = $this->translator;
+        $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
 
         $date = (new DateTimeHelper)->toLocalString();
         $name = str_replace(' ', '_', $date).'_'.$form->getAlias();
@@ -378,7 +388,7 @@ class SubmissionModel extends CommonFormModel
         switch ($format) {
             case 'csv':
                 $response = new StreamedResponse(
-                    function () use ($results, $form, $translator) {
+                    function () use ($results, $form, $translator, $viewOnlyFields) {
                         $handle = fopen('php://output', 'r+');
 
                         //build the header row
@@ -390,7 +400,7 @@ class SubmissionModel extends CommonFormModel
                             $translator->trans('mautic.form.result.thead.referrer'),
                         ];
                         foreach ($fields as $f) {
-                            if (in_array($f->getType(), ['button', 'freetext']) || $f->getSaveResult() === false) {
+                            if (in_array($f->getType(), $viewOnlyFields) || $f->getSaveResult() === false) {
                                 continue;
                             }
                             $header[] = $f->getLabel();
@@ -410,7 +420,7 @@ class SubmissionModel extends CommonFormModel
                                 $s['referer'],
                             ];
                             foreach ($s['results'] as $k2 => $r) {
-                                if (in_array($r['type'], ['button', 'freetext'])) {
+                                if (in_array($r['type'], $viewOnlyFields)) {
                                     continue;
                                 }
                                 $row[] = $r['value'];
@@ -443,6 +453,7 @@ class SubmissionModel extends CommonFormModel
                         'form'      => $form,
                         'results'   => $results,
                         'pageTitle' => $name,
+                        'viewOnlyFields' => $viewOnlyFields
                     ]
                 )->getContent();
 
@@ -450,7 +461,7 @@ class SubmissionModel extends CommonFormModel
             case 'xlsx':
                 if (class_exists('PHPExcel')) {
                     $response = new StreamedResponse(
-                        function () use ($results, $form, $translator, $name) {
+                        function () use ($results, $form, $translator, $name, $viewOnlyFields) {
                             $objPHPExcel = new \PHPExcel();
                             $objPHPExcel->getProperties()->setTitle($name);
 
@@ -465,7 +476,7 @@ class SubmissionModel extends CommonFormModel
                                 $translator->trans('mautic.form.result.thead.referrer'),
                             ];
                             foreach ($fields as $f) {
-                                if (in_array($f->getType(), ['button', 'freetext']) || $f->getSaveResult() === false) {
+                                if (in_array($f->getType(), $viewOnlyFields) || $f->getSaveResult() === false) {
                                     continue;
                                 }
                                 $header[] = $f->getLabel();
@@ -486,7 +497,7 @@ class SubmissionModel extends CommonFormModel
                                     $s['referer'],
                                 ];
                                 foreach ($s['results'] as $k2 => $r) {
-                                    if (in_array($r['type'], ['button', 'freetext'])) {
+                                    if (in_array($r['type'], $viewOnlyFields)) {
                                         continue;
                                     }
                                     $row[] = $r['value'];

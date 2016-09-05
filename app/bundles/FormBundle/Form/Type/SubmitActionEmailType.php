@@ -61,11 +61,13 @@ class SubmitActionEmailType extends AbstractType
         );
 
         if (!isset($options['data']['message'])) {
-            $fields  = $this->getFormFields($options['attr']['data-formid']);
+            $fields   = $this->getFormFields($options['attr']['data-formid']);
+            $viewOnly = $this->formModel->getCustomComponents()['viewOnlyFields'];
+
             $message = '';
 
             foreach ($fields as $f) {
-                if (in_array($f['type'], ['button', 'freetext', 'captcha'])) {
+                if (in_array($f['type'], $viewOnly)) {
                     continue;
                 }
 

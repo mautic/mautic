@@ -365,9 +365,9 @@ class FormModel extends CommonFormModel
     public function generateHtml(Form $entity, $persist = true)
     {
         //generate cached HTML
-        $theme = $entity->getTemplate();
+        $theme       = $entity->getTemplate();
         $submissions = null;
-        $lead = $this->leadModel->getCurrentLead();
+        $lead        = $this->leadModel->getCurrentLead();
 
         if (!empty($theme)) {
             $theme .= '|';
@@ -386,10 +386,11 @@ class FormModel extends CommonFormModel
         $html = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:form.html.php',
             [
-                'form'        => $entity,
-                'theme'       => $theme,
-                'submissions' => $submissions,
-                'lead'        => $lead
+                'fieldSettings' => $this->getCustomComponents()['fields'],
+                'form'          => $entity,
+                'theme'         => $theme,
+                'submissions'   => $submissions,
+                'lead'          => $lead
             ]
         );
 
@@ -481,26 +482,26 @@ class FormModel extends CommonFormModel
     {
         $fields = $form->getFields()->toArray();
 
-        $columns = array(
-            array(
+        $columns     = [
+            [
                 'name' => 'submission_id',
                 'type' => 'integer'
-            ),
-            array(
+            ],
+            [
                 'name' => 'form_id',
                 'type' => 'integer'
-            )
-        );
-        $ignoreTypes = array('button', 'freetext');
+            ]
+        ];
+        $ignoreTypes = $this->getCustomComponents()['viewOnlyFields'];
         foreach ($fields as $f) {
             if (!in_array($f->getType(), $ignoreTypes) && $f->getSaveResult() !== false) {
-                $columns[] = array(
+                $columns[] = [
                     'name'    => $f->getAlias(),
                     'type'    => 'text',
-                    'options' => array(
+                    'options' => [
                         'notnull' => false
-                    )
-                );
+                    ]
+                ];
             }
         }
 
@@ -523,6 +524,15 @@ class FormModel extends CommonFormModel
             $customComponents['actions']    = $event->getSubmitActions();
             $customComponents['choices']    = $event->getSubmitActionGroups();
             $customComponents['validators'] = $event->getValidators();
+
+            // Generate a list of fields that are not persisted to the database by default
+            $notPersist = ['button', 'captcha', 'freetext'];
+            foreach ($customComponents['fields'] as $type => $field) {
+                if (isset($field['builderOptions']) && isset($field['builderOptions']['addSaveResult']) && false === $field['builderOptions']['addSaveResult']) {
+                    $notPersist[] = $type;
+                }
+            }
+            $customComponents['viewOnlyFields'] = $notPersist;
         }
 
         return $customComponents;

@@ -10,6 +10,7 @@
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\FormBundle\Model\FormModel;
 
 /**
  * Class ResultController
@@ -25,6 +26,7 @@ class ResultController extends CommonFormController
      */
     public function indexAction($objectId, $page)
     {
+        /** @var FormModel $formModel */
         $formModel = $this->getModel('form.form');
         $form      = $formModel->getEntity($objectId);
         $session   = $this->get('session');
@@ -136,14 +138,15 @@ class ResultController extends CommonFormController
         return $this->delegateView(
             [
                 'viewParameters'  => [
-                    'items'      => $results,
-                    'filters'    => $filters,
-                    'form'       => $form,
-                    'page'       => $page,
-                    'totalCount' => $count,
-                    'limit'      => $limit,
-                    'tmpl'       => $tmpl,
-                    'canDelete'  => $this->get('mautic.security')->hasEntityAccess(
+                    'items'          => $results,
+                    'filters'        => $filters,
+                    'form'           => $form,
+                    'viewOnlyFields' => $formModel->getCustomComponents()['viewOnlyFields'],
+                    'page'           => $page,
+                    'totalCount'     => $count,
+                    'limit'          => $limit,
+                    'tmpl'           => $tmpl,
+                    'canDelete'      => $this->get('mautic.security')->hasEntityAccess(
                         'form:forms:editown',
                         'form:forms:editother',
                         $form->getCreatedBy()

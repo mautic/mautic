@@ -12,6 +12,7 @@ namespace Mautic\FormBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\Event\SubmissionEvent;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -399,6 +400,7 @@ class PublicController extends CommonFormController
     public function embedAction()
     {
         $formId = InputHelper::int($this->request->get('id'));
+        /** @var FormModel $model */
         $model = $this->getModel('form');
         $form = $model->getEntity($formId);
 
@@ -406,7 +408,10 @@ class PublicController extends CommonFormController
             $status = $form->getPublishStatus();
             if ($status === 'published') {
                 if ($this->request->get('video')) {
-                    return $this->render('MauticFormBundle:Public:videoembed.html.php', ['form' => $form]);
+                    return $this->render(
+                        'MauticFormBundle:Public:videoembed.html.php',
+                        ['form' => $form, 'fieldSettings' => $model->getCustomComponents()['fields']]
+                    );
                 }
 
                 $content = $model->getContent($form, false, true);

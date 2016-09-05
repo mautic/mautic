@@ -673,7 +673,7 @@ class FormController extends CommonFormController
             //lock the entity
             $model->lockEntity($entity);
         }
-        
+
         $form->get('sessionId')->setData($objectId);
 
         // Get field and action settings
@@ -711,7 +711,6 @@ class FormController extends CommonFormController
                 }
 
                 $modifiedFields[$id] = $field;
-
 
                 if (!empty($field['leadField'])) {
                     $usedLeadFields[$id] = $field['leadField'];
@@ -774,6 +773,7 @@ class FormController extends CommonFormController
                     'actions'            => $customComponents['choices'],
                     'actionSettings'     => $customComponents['actions'],
                     'formFields'         => $modifiedFields,
+                    'fieldSettings'      => $customComponents['fields'],
                     'formActions'        => $modifiedActions,
                     'deletedFields'      => $deletedFields,
                     'deletedActions'     => $deletedActions,

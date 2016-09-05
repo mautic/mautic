@@ -11,6 +11,7 @@ namespace Mautic\FormBundle\Form\Type;
 
 
 use Mautic\FormBundle\Model\FieldModel;
+use Mautic\FormBundle\Model\FormModel;
 
 trait FormFieldTrait
 {
@@ -18,6 +19,11 @@ trait FormFieldTrait
      * @var FieldModel
      */
     protected $fieldModel;
+
+    /**
+     * @var FormModel
+     */
+    protected $formModel;
 
     /**
      * @param FieldModel $fieldModel
@@ -28,6 +34,14 @@ trait FormFieldTrait
     }
 
     /**
+     * @param FormModel $formModel
+     */
+    public function setFormModel(FormModel $formModel)
+    {
+        $this->formModel = $formModel;
+    }
+
+    /**
      * @param      $formId
      * @param bool $asTokens
      *
@@ -35,12 +49,13 @@ trait FormFieldTrait
      */
     protected function getFormFields($formId, $asTokens = true)
     {
-        $fields = $this->fieldModel->getSessionFields($formId);
+        $fields   = $this->fieldModel->getSessionFields($formId);
+        $viewOnly = $this->formModel->getCustomComponents()['viewOnlyFields'];
 
         $choices = [];
 
         foreach ($fields as $f) {
-            if (in_array($f['type'], ['button', 'freetext', 'captcha'])) {
+            if (in_array($f['type'], $viewOnly)) {
                 continue;
             }
 

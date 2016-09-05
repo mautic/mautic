@@ -19,10 +19,16 @@ $fields   = $form->getFields();
         <div class="mauticform-message" id="mauticform<?php echo $formName ?>_message"></div>
         <div class="mauticform-innerform">
 <?php
+/** @var \Mautic\FormBundle\Entity\Field $f */
 foreach ($fields as $f):
     if ($f->showForContact($submissions, $lead, $form)):
         if ($f->isCustom()):
-            $params = $f->getCustomParameters();
+            if (!isset($fieldSettings[$f->getType()])):
+                continue;
+            endif;
+            $params   = $fieldSettings[$f->getType()];
+            $f->setCustomParameters($params);
+
             $template = $params['template'];
         else:
             $template = 'MauticFormBundle:Field:' . $f->getType() . '.html.php';

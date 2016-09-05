@@ -47,7 +47,7 @@ class FieldType extends AbstractType
         if (!empty($options['customParameters'])) {
             $type = 'custom';
 
-            $customParams    =& $options['customParameters'];
+            $customParams    = $options['customParameters'];
             $formTypeOptions = [
                 'required' => false,
                 'label'    => false
@@ -136,7 +136,7 @@ class FieldType extends AbstractType
                 'required'    => false
             ]
         );
-        
+
         if (!empty($options['customParameters'])) {
             $builder->add('properties', $customParams['formType'], $formTypeOptions);
         } else {
