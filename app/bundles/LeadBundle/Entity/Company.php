@@ -195,8 +195,8 @@ class Company extends FormEntity
     {
         if ($name = $this->getName()) {
             return $name;
-        } elseif (!empty($this->fields['core']['email']['value'])) {
-            return $this->fields['core']['email']['value'];
+        } elseif (!empty($this->fields['core']['companyemail']['value'])) {
+            return $this->fields['core']['companyemail']['value'];
         }
     }
 
@@ -268,14 +268,14 @@ class Company extends FormEntity
      */
     public function getName()
     {
-        if (isset($this->updatedFields['name'])) {
+        if (isset($this->updatedFields['companyname'])) {
 
-            return $this->updatedFields['name'];
+            return $this->updatedFields['companyname'];
         }
 
-        if (!empty($this->fields['core']['name']['value'])) {
+        if (!empty($this->fields['core']['companyname']['value'])) {
 
-            return $this->fields['core']['name']['value'];
+            return $this->fields['core']['companyname']['value'];
         }
 
         return '';

@@ -19,6 +19,22 @@ class CompanyRepository extends CommonRepository
 {
 
     /**
+     * {@inheritdoc}
+     *
+     * @param $entity
+     * @param $flush
+     */
+    public function saveEntity($entity, $flush = true)
+    {
+        $this->_em->persist($entity);
+        if ($flush)
+            $this->_em->flush($entity);
+        $fields = $entity->getUpdatedFields();
+        if (!empty($fields)) {
+            $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX . 'companies', $fields, array('id' => $entity->getId()));
+        }
+    }
+    /**
      * Get a list of leads
      *
      * @param array $args
