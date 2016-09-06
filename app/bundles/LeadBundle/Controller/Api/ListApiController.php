@@ -34,6 +34,20 @@ class ListApiController extends CommonApiController
     }
 
     /**
+     * Obtains a list of smart lists for the user
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getListsAction ()
+    {
+        $lists   = $this->getModel('lead.list')->getUserLists();
+        $view    = $this->view($lists, Codes::HTTP_OK);
+        $context = SerializationContext::create()->setGroups(array('leadListList'));
+        $view->setSerializationContext($context);
+        return $this->handleView($view);
+    }
+
+    /**
      * Adds a lead to a list
      *
      * @param int $id     List ID
