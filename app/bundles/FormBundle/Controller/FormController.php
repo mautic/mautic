@@ -226,7 +226,7 @@ class FormController extends CommonFormController
         }
 
         $activeFormFields = [];
-        $fieldHelper      = new FormFieldHelper($this->get('translator'));
+        $fieldHelper      = $this->get('mautic.helper.form.field_helper');
         $availableFields  = $fieldHelper->getList($customComponents['fields']);
         foreach ($activeForm->getFields() as $field) {
             if (!isset($availableFields[$field->getType()])) {
@@ -424,7 +424,7 @@ class FormController extends CommonFormController
         //fire the form builder event
         $customComponents = $model->getCustomComponents($sessionId);
 
-        $fieldHelper = new FormFieldHelper($this->get('translator'));
+        $fieldHelper = $this->get('mautic.helper.form.field_helper');
 
         return $this->delegateView(
             [
@@ -677,7 +677,7 @@ class FormController extends CommonFormController
         $form->get('sessionId')->setData($objectId);
 
         // Get field and action settings
-        $fieldHelper     = new FormFieldHelper($this->get('translator'));
+        $fieldHelper     = $this->get('mautic.helper.form.field_helper');
         $availableFields = $fieldHelper->getList($customComponents['fields']);
 
         if ($cleanSlate) {

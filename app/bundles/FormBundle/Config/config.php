@@ -188,6 +188,12 @@ return [
                 'class' => 'Mautic\FormBundle\Form\Type\FormFieldCaptchaType',
                 'alias' => 'formfield_captcha'
             ],
+            'muatic.form.type.field_propertypagebreak'   => [
+                'class' => \Mautic\FormBundle\Form\Type\FormFieldPageBreakType::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
             'mautic.form.type.field_propertygroup'      => [
                 'class' => 'Mautic\FormBundle\Form\Type\FormFieldGroupType',
                 'alias' => 'formfield_group'
@@ -216,14 +222,16 @@ return [
                 'alias'     => 'form_submitaction_sendemail',
                 'methodCalls'  => [
                     'setFieldModel' => ['mautic.form.model.field'],
+                    'setFormModel'  => ['mautic.form.model.form'],
                 ],
             ],
             'mautic.form.type.form_submitaction_repost' => [
                 'class'     => \Mautic\FormBundle\Form\Type\SubmitActionRepostType::class,
                 'methodCalls'  => [
                     'setFieldModel' => ['mautic.form.model.field'],
+                    'setFormModel'  => ['mautic.form.model.form'],
                 ],
-            ]
+            ],
         ],
         'models' =>  [
             'mautic.form.model.action' => [
@@ -240,7 +248,8 @@ return [
                     'mautic.schema.helper.factory',
                     'mautic.form.model.action',
                     'mautic.form.model.field',
-                    'mautic.lead.model.lead'
+                    'mautic.lead.model.lead',
+                    'mautic.helper.form.field_helper',
                 ]
             ],
             'mautic.form.model.submission' => [
@@ -252,7 +261,17 @@ return [
                     'mautic.page.model.page',
                     'mautic.lead.model.lead',
                     'mautic.campaign.model.campaign',
-                    'mautic.lead.model.field'
+                    'mautic.lead.model.field',
+                    'mautic.helper.form.field_helper',
+                ]
+            ]
+        ],
+        'other' => [
+            'mautic.helper.form.field_helper' => [
+                'class' => \Mautic\FormBundle\Helper\FormFieldHelper::class,
+                'arguments' => [
+                    'translator',
+                    'validator'
                 ]
             ]
         ]

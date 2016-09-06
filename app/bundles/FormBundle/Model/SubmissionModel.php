@@ -84,6 +84,11 @@ class SubmissionModel extends CommonFormModel
     protected $leadFieldModel;
 
     /**
+     * @var FormFieldHelper
+     */
+    protected $fieldHelper;
+
+    /**
      * SubmissionModel constructor.
      *
      * @param IpLookupHelper   $ipLookupHelper
@@ -93,6 +98,7 @@ class SubmissionModel extends CommonFormModel
      * @param LeadModel        $leadModel
      * @param CampaignModel    $campaignModel
      * @param LeadFieldModel   $leadFieldModel
+     * @param FormFieldHelper  $fieldHelper
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -101,7 +107,8 @@ class SubmissionModel extends CommonFormModel
         PageModel $pageModel,
         LeadModel $leadModel,
         CampaignModel $campaignModel,
-        LeadFieldModel $leadFieldModel
+        LeadFieldModel $leadFieldModel,
+        FormFieldHelper $fieldHelper
     ) {
         $this->ipLookupHelper   = $ipLookupHelper;
         $this->templatingHelper = $templatingHelper;
@@ -110,6 +117,7 @@ class SubmissionModel extends CommonFormModel
         $this->leadModel        = $leadModel;
         $this->campaignModel    = $campaignModel;
         $this->leadFieldModel   = $leadFieldModel;
+        $this->fieldHelper      = $fieldHelper;
     }
 
     /**
@@ -131,8 +139,6 @@ class SubmissionModel extends CommonFormModel
      */
     public function saveSubmission($post, $server, Form $form, Request $request = null)
     {
-        $fieldHelper = new FormFieldHelper($this->translator);
-
         //everything matches up so let's save the results
         $submission = new Submission();
         $submission->setDateSubmitted(new \DateTime());
@@ -188,7 +194,7 @@ class SubmissionModel extends CommonFormModel
             ];
 
             if ($type == 'captcha') {
-                $captcha = $fieldHelper->validateFieldValue($type, $value, $f);
+                $captcha = $this->fieldHelper->validateFieldValue($type, $value, $f);
                 if (!empty($captcha)) {
                     $props = $f->getProperties();
                     //check for a custom message
@@ -249,12 +255,12 @@ class SubmissionModel extends CommonFormModel
                     }
                 }
             } elseif (!empty($value)) {
-                $filter = $fieldHelper->getFieldFilter($type);
+                $filter = $this->fieldHelper->getFieldFilter($type);
                 $value  = InputHelper::_($value, $filter);
 
-                $validation = $fieldHelper->validateFieldValue($type, $value);
-                if (!empty($validation)) {
-                    $validationErrors[$alias] = is_array($validation) ? implode('<br />', $validation) : $validation;
+                $isValid = $this->validateFieldValue($f, $value);
+                if (true !== $isValid) {
+                    $validationErrors[$alias] = is_array($isValid) ? implode('<br />', $isValid) : $isValid;
                 }
             }
 
@@ -924,8 +930,12 @@ class SubmissionModel extends CommonFormModel
      */
     protected function validateFieldValue(Field $field, $value)
     {
-        $components = $this->formModel->getCustomComponents();
+        $standardValidation = $this->fieldHelper->validateFieldValue($field->getType(), $value);
+        if (!empty($standardValidation)) {
+            return $standardValidation;
+        }
 
+        $components = $this->formModel->getCustomComponents();
         foreach ([$field->getType(), 'form'] as $type) {
             if (isset($components['validators'][$type])) {
                 foreach ($components['validators'][$type] as $validator) {

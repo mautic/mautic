@@ -35,6 +35,7 @@ class FieldType extends AbstractType
 
         $addHelpMessage =
         $addShowLabel =
+        $allowCustomAlias =
         $addDefaultValue =
         $addLabelAttributes =
         $addInputAttributes =
@@ -71,7 +72,8 @@ class FieldType extends AbstractType
                 'addLeadFieldList',
                 'addSaveResult',
                 'addBehaviorFields',
-                'addIsRequired'
+                'addIsRequired',
+                'addHtml'
             ];
             foreach ($addFields as $f) {
                 if (isset($customParams['builderOptions'][$f])) {
@@ -82,7 +84,7 @@ class FieldType extends AbstractType
             $type = $options['data']['type'];
             switch ($type) {
                 case 'freetext':
-                    $addHelpMessage      = $addDefaultValue = $addIsRequired = $addLeadFieldList = $addSaveResult = false;
+                    $addHelpMessage      = $addDefaultValue = $addIsRequired = $addLeadFieldList = $addSaveResult = $addBehaviorFields = false;
                     $labelText           = 'mautic.form.field.form.header';
                     $showLabelText       = 'mautic.form.field.form.showheader';
                     $inputAttributesText = 'mautic.form.field.form.freetext_attributes';
@@ -98,7 +100,10 @@ class FieldType extends AbstractType
                     $addHelpMessage = $addShowLabel = $addLabelAttributes = $addIsRequired = false;
                     break;
                 case 'captcha':
-                    $addShowLabel = $addIsRequired = $addDefaultValue = $addLeadFieldList = $addSaveResult = false;
+                    $addShowLabel = $addIsRequired = $addDefaultValue = $addLeadFieldList = $addSaveResult = $addBehaviorFields = false;
+                    break;
+                case 'pagebreak':
+                    $addShowLabel = $allowCustomAlias = $addHelpMessage = $addIsRequired = $addDefaultValue = $addLeadFieldList = $addSaveResult = $addBehaviorFields = false;
                     break;
                 case 'email':
                     $addBehaviorFields = false;
@@ -122,20 +127,22 @@ class FieldType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'alias',
-            'text',
-            [
-                'label'       => 'mautic.form.field.form.alias',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.form.field.form.alias.tooltip'
-                ],
-                'disabled'    => (!empty($options['data']['id']) && strpos($options['data']['id'], 'new') === false) ? true : false,
-                'required'    => false
-            ]
-        );
+        if ($allowCustomAlias) {
+            $builder->add(
+                'alias',
+                'text',
+                [
+                    'label'      => 'mautic.form.field.form.alias',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'   => 'form-control',
+                        'tooltip' => 'mautic.form.field.form.alias.tooltip'
+                    ],
+                    'disabled'   => (!empty($options['data']['id']) && strpos($options['data']['id'], 'new') === false) ? true : false,
+                    'required'   => false
+                ]
+            );
+        }
 
         if (!empty($options['customParameters'])) {
             $builder->add('properties', $customParams['formType'], $formTypeOptions);
@@ -193,6 +200,15 @@ class FieldType extends AbstractType
                     $builder->add(
                         'properties',
                         'formfield_captcha',
+                        [
+                            'label' => false
+                        ]
+                    );
+                    break;
+                case 'pagebreak':
+                    $builder->add(
+                        'properties',
+                        FormFieldPageBreakType::class,
                         [
                             'label' => false
                         ]

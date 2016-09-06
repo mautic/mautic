@@ -17,12 +17,10 @@ $formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actio
         'formId'  => $formId
     ]) : '';
 
-
 $label = (!$field['showLabel']) ? '' : <<<HTML
 
                 <label $labelAttr>{$view->escape($field['label'])}</label>
 HTML;
-
 
 $help = (empty($field['helpMessage'])) ? '' : <<<HTML
 
@@ -35,14 +33,12 @@ $textInput = <<<HTML
                 <textarea $inputAttr>{$field['defaultValue']}</textarea>
 HTML;
 
-
 else:
 $textInput = <<<HTML
 
                 <input {$inputAttr} type="$containerType" />
 HTML;
 endif;
-
 
 $html = <<<HTML
 

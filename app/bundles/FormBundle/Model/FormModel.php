@@ -62,10 +62,20 @@ class FormModel extends CommonFormModel
     protected $leadModel;
 
     /**
+     * @var FormFieldHelper
+     */
+    protected $fieldHelper;
+
+    /**
      * FormModel constructor.
      *
-     * @param ActionModel $formActionModel
-     * @param FieldModel $formFieldModel
+     * @param RequestStack        $requestStack
+     * @param TemplatingHelper    $templatingHelper
+     * @param SchemaHelperFactory $schemaHelperFactory
+     * @param ActionModel         $formActionModel
+     * @param FieldModel          $formFieldModel
+     * @param LeadModel           $leadModel
+     * @param FormFieldHelper     $fieldHelper
      */
     public function __construct(
         RequestStack $requestStack,
@@ -73,15 +83,17 @@ class FormModel extends CommonFormModel
         SchemaHelperFactory $schemaHelperFactory,
         ActionModel $formActionModel,
         FieldModel $formFieldModel,
-        LeadModel $leadModel
+        LeadModel $leadModel,
+        FormFieldHelper $fieldHelper
     )
     {
-        $this->request = $requestStack->getCurrentRequest();
-        $this->templatingHelper = $templatingHelper;
+        $this->request             = $requestStack->getCurrentRequest();
+        $this->templatingHelper    = $templatingHelper;
         $this->schemaHelperFactory = $schemaHelperFactory;
-        $this->formActionModel = $formActionModel;
-        $this->formFieldModel = $formFieldModel;
-        $this->leadModel = $leadModel;
+        $this->formActionModel     = $formActionModel;
+        $this->formFieldModel      = $formFieldModel;
+        $this->leadModel           = $leadModel;
+        $this->fieldHelper         = $fieldHelper;
     }
 
     /**
@@ -383,6 +395,47 @@ class FormModel extends CommonFormModel
             );
         }
 
+        // Determine pages
+        $fields    = $entity->getFields()->toArray();
+        $pages     = ['open' => [], 'close' => []];
+
+        $openFieldId =
+        $closeFieldId =
+        $previousId =
+        $lastPage = false;
+        $pageCount = 1;
+
+        foreach ($fields as $fieldId => $field) {
+            if ('pagebreak' == $field->getType() && $openFieldId) {
+                // Open the page
+                $pages['open'][$openFieldId] = $pageCount;
+                $openFieldId = false;
+                $lastPage = $fieldId;
+
+                // Close the page at the next page break
+                if ($previousId) {
+                    $pages['close'][$previousId] = $pageCount;
+
+                    $pageCount++;
+                }
+            } else {
+                if (!$openFieldId) {
+                    $openFieldId = $fieldId;
+                }
+            }
+
+            $previousId = $fieldId;
+        }
+
+        if (!empty($pages)) {
+            if ($openFieldId) {
+                $pages['open'][$openFieldId] = $pageCount;
+            }
+            if ($previousId !== $lastPage) {
+                $pages['close'][$previousId] = $pageCount;
+            }
+        }
+
         $html = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:form.html.php',
             [
@@ -390,7 +443,9 @@ class FormModel extends CommonFormModel
                 'form'          => $entity,
                 'theme'         => $theme,
                 'submissions'   => $submissions,
-                'lead'          => $lead
+                'lead'          => $lead,
+                'formPages'     => $pages,
+                'lastFormPage'  => $lastPage
             ]
         );
 
@@ -526,7 +581,7 @@ class FormModel extends CommonFormModel
             $customComponents['validators'] = $event->getValidators();
 
             // Generate a list of fields that are not persisted to the database by default
-            $notPersist = ['button', 'captcha', 'freetext'];
+            $notPersist = ['button', 'captcha', 'freetext', 'pagebreak'];
             foreach ($customComponents['fields'] as $type => $field) {
                 if (isset($field['builderOptions']) && isset($field['builderOptions']['addSaveResult']) && false === $field['builderOptions']['addSaveResult']) {
                     $notPersist[] = $type;
@@ -587,7 +642,6 @@ class FormModel extends CommonFormModel
      */
     public function populateValuesWithGetParameters(Form $form, &$formHtml)
     {
-        $fieldHelper = new FormFieldHelper($this->translator);
         $formName    = $form->generateFormName();
 
         $fields = $form->getFields()->toArray();
@@ -597,32 +651,32 @@ class FormModel extends CommonFormModel
             if ($this->request->query->has($alias)) {
                 $value = $this->request->query->get($alias);
 
-                $fieldHelper->populateField($f, $value, $formName, $formHtml);
+                $this->fieldHelper->populateField($f, $value, $formName, $formHtml);
             }
         }
     }
 
+    /**
+     * @param Form $form
+     * @param      $formHtml
+     */
     public function populateValuesWithLead(Form $form, &$formHtml)
     {
-        $fieldHelper = new FormFieldHelper($this->translator);
-
         $formName = $form->generateFormName();
-
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $lead = $this->factory->getModel('lead')->getCurrentLead();
+        $lead     = $this->leadModel->getCurrentLead();
 
         $fields = $form->getFields();
         /** @var \Mautic\FormBundle\Entity\Field $f */
         foreach ($fields as $f) {
-            $leadField = $f->getLeadField();
+            $leadField  = $f->getLeadField();
             $isAutoFill = $f->getIsAutoFill();
 
             if (isset($leadField) && $isAutoFill) {
                 $value = $lead->getFieldValue($leadField);
 
-		        if (!empty($value)) {
-		            $fieldHelper->populateField($f, $value, $formName, $formHtml);
-		        }
+                if (!empty($value)) {
+                    $this->fieldHelper->populateField($f, $value, $formName, $formHtml);
+                }
             }
         }
     }

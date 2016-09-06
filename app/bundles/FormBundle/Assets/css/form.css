@@ -4,6 +4,11 @@
     font-weight: bold;
 }
 
+.form-field-wrapper {
+    padding-top: 8px;
+
+}
+
 #mauticforms_fields .mauticform-row, #mauticforms_actions .mauticform-row {
     padding: 10px;
 }
@@ -30,7 +35,6 @@
 
 #mauticforms_fields .form-buttons {
     float: right;
-    margin-top: 8px;
 }
 
 #mauticforms_fields input, #mauticforms_fields textarea, #mauticforms_fields select {

@@ -10,7 +10,10 @@
 namespace Mautic\FormBundle\Helper;
 
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class FormFieldHelper
@@ -24,54 +27,68 @@ class FormFieldHelper
     private $translator;
 
     /**
-     * @var array
+     * @var ValidatorInterface|\Symfony\Component\Validator\ValidatorInterface
      */
-    private $types = array(
-        'text' => array(),
-        'textarea' => array(),
-        'country'  => array(),
-        //'button'  => array(),
-        'select' => array(),
-        'date' => array(),
-        'email' => array(
-            'filter' => 'email',
-            'constraints' => array(
-                '\Symfony\Component\Validator\Constraints\Email' =>
-                    array('message' => 'mautic.form.submission.email.invalid')
-            )
-        ),
-        'number' => array(
-            'filter' => 'float'
-        ),
-        'tel' => array(),
-        'url' => array(
-            'filter' => 'url',
-            'constraints' => array(
-                '\Symfony\Component\Validator\Constraints\Url' =>
-                    array('message' => 'mautic.form.submission.url.invalid')
-            )
-        ),
-        'freetext' => array(),
-        'checkboxgrp' => array(),
-        'radiogrp' => array(),
-        'hidden' => array(),
-        'captcha' => array(
-            'constraints' => array(
-                '\Symfony\Component\Validator\Constraints\NotBlank' =>
-                    array('message' => 'mautic.form.submission.captcha.invalid'),
-
-                '\Symfony\Component\Validator\Constraints\EqualTo' =>
-                    array('message' => 'mautic.form.submission.captcha.invalid')
-            )
-        )
-    );
+    private $validator;
 
     /**
-     * @param TranslatorInterface $translator
+     * @var array
      */
-    public function __construct(TranslatorInterface $translator)
+    private $types = [
+        'text'        => [],
+        'textarea'    => [],
+        'country'     => [],
+        //'button'  => [],
+        'select'      => [],
+        'date'        => [],
+        'email'       => [
+            'filter'      => 'email',
+            'constraints' => [
+                '\Symfony\Component\Validator\Constraints\Email' =>
+                    ['message' => 'mautic.form.submission.email.invalid'],
+            ],
+        ],
+        'number'      => [
+            'filter' => 'float',
+        ],
+        'tel'         => [],
+        'url'         => [
+            'filter'      => 'url',
+            'constraints' => [
+                '\Symfony\Component\Validator\Constraints\Url' =>
+                    ['message' => 'mautic.form.submission.url.invalid'],
+            ],
+        ],
+        'freetext'    => [],
+        'checkboxgrp' => [],
+        'radiogrp'    => [],
+        'hidden'      => [],
+        'captcha'     => [
+            'constraints' => [
+                '\Symfony\Component\Validator\Constraints\NotBlank' =>
+                    ['message' => 'mautic.form.submission.captcha.invalid'],
+
+                '\Symfony\Component\Validator\Constraints\EqualTo' =>
+                    ['message' => 'mautic.form.submission.captcha.invalid'],
+            ],
+        ],
+        'pagebreak'   => [],
+    ];
+
+    /**
+     * FormFieldHelper constructor.
+     *
+     * @param TranslatorInterface $translator
+     * @param ValidatorInterface  $validator
+     */
+    public function __construct(TranslatorInterface $translator, ValidatorInterface $validator = null)
     {
         $this->translator = $translator;
+
+        if (null === $validator) {
+            $validator = $validator = Validation::createValidator();
+        }
+        $this->validator = $validator;
     }
 
     /**
@@ -79,9 +96,9 @@ class FormFieldHelper
      *
      * @return array
      */
-    public function getList($customFields = array())
+    public function getList($customFields = [])
     {
-        $choices = array();
+        $choices = [];
 
         foreach ($this->types as $v => $type) {
             $choices[$v] = $this->translator->transConditional("mautic.core.type.{$v}", "mautic.form.field.type.{$v}");
@@ -92,6 +109,7 @@ class FormFieldHelper
         }
 
         natcasesort($choices);
+
         return $choices;
     }
 
@@ -116,8 +134,10 @@ class FormFieldHelper
             if (isset($this->types[$type]['filter'])) {
                 return $this->types[$type]['filter'];
             }
+
             return 'clean';
         }
+
         return 'alphanum';
     }
 
@@ -130,28 +150,29 @@ class FormFieldHelper
      */
     public function validateFieldValue($type, $value, $f = null)
     {
-        $errors = array();
+        $errors = [];
         if (isset($this->types[$type]['constraints'])) {
-            $validator = Validation::createValidator();
-
             foreach ($this->types[$type]['constraints'] as $constraint => $opts) {
                 //don't check empty values unless the constraint is NotBlank
-                if (strpos($constraint, 'NotBlank') === false && empty($value))
+                if (strpos($constraint, 'NotBlank') === false && empty($value)) {
                     continue;
+                }
 
                 if ($type == 'captcha' && strpos($constraint, 'EqualTo') !== false) {
-                    $props = $f->getProperties();
+                    $props         = $f->getProperties();
                     $opts['value'] = $props['captcha'];
                 }
 
-                $violations = $validator->validateValue($value, new $constraint($opts));
+                /** @var ConstraintViolationList $violations */
+                $violations = $this->validator->validate($value, new $constraint($opts));
 
                 if (count($violations)) {
+                    /** @var ConstraintViolation $v */
                     foreach ($violations as $v) {
-                        $transParameters = $v->getMessageParameters();
+                        $transParameters = $v->getParameters();
 
                         if ($f !== null) {
-                            $transParameters['%label%'] = "&quot;" . $f->getLabel() . "&quot;";
+                            $transParameters['%label%'] = "&quot;".$f->getLabel()."&quot;";
                         }
 
                         $errors[] = $this->translator->trans($v->getMessage(), $transParameters, 'validators');
@@ -163,6 +184,12 @@ class FormFieldHelper
         return $errors;
     }
 
+    /**
+     * @param $field
+     * @param $value
+     * @param $formName
+     * @param $formHtml
+     */
     public function populateField($field, $value, $formName, &$formHtml)
     {
         $alias = $field->getAlias();
@@ -171,39 +198,40 @@ class FormFieldHelper
             case 'text':
             case 'email':
             case 'hidden':
-                if (preg_match('/<input(.*?)id="mauticform_input_' . $formName . '_' . $alias . '"(.*?)value="(.*?)"(.*?)\/>/i', $formHtml, $match)) {
-                    $replace = '<input' . $match[1] . 'id="mauticform_input_' . $formName . '_' . $alias . '"' . $match[2] . 'value="' . urldecode($value) . '"' . $match[4] . '/>';
+                if (preg_match('/<input(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)value="(.*?)"(.*?)\/>/i', $formHtml, $match)) {
+                    $replace  = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'value="'.urldecode($value).'"'
+                        .$match[4].'/>';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
                 }
                 break;
             case 'textarea':
-                if (preg_match('/<textarea(.*?)id="mauticform_input_' . $formName . '_' . $alias . '"(.*?)>(.*?)<\/textarea>/i', $formHtml, $match)) {
-                    $replace = '<textarea' . $match[1] . 'id="mauticform_input_' . $formName . '_' . $alias . '"' . $match[2] . '>' . urldecode($value) . '</textarea>';
+                if (preg_match('/<textarea(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)>(.*?)<\/textarea>/i', $formHtml, $match)) {
+                    $replace  = '<textarea'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'>'.urldecode($value).'</textarea>';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
                 }
                 break;
             case 'checkboxgrp':
                 if (!is_array($value)) {
-                    $value = array($value);
+                    $value = [$value];
                 }
                 foreach ($value as $val) {
                     $val = urldecode($val);
                     if (preg_match(
-                        '/<input(.*?)id="mauticform_checkboxgrp_checkbox(.*?)"(.*?)value="' . $val . '"(.*?)\/>/i',
+                        '/<input(.*?)id="mauticform_checkboxgrp_checkbox(.*?)"(.*?)value="'.$val.'"(.*?)\/>/i',
                         $formHtml,
                         $match
                     )) {
-                        $replace = '<input' . $match[1] . 'id="mauticform_checkboxgrp_checkbox' . $match[2] . '"' . $match[3] . 'value="' . $val . '"'
-                            . $match[4] . ' checked />';
+                        $replace  = '<input'.$match[1].'id="mauticform_checkboxgrp_checkbox'.$match[2].'"'.$match[3].'value="'.$val.'"'
+                            .$match[4].' checked />';
                         $formHtml = str_replace($match[0], $replace, $formHtml);
                     }
                 }
                 break;
             case 'radiogrp':
                 $value = urldecode($value);
-                if (preg_match('/<input(.*?)id="mauticform_radiogrp_radio(.*?)"(.*?)value="' . $value . '"(.*?)\/>/i', $formHtml, $match)) {
-                    $replace = '<input' . $match[1] . 'id="mauticform_radiogrp_radio' . $match[2] . '"' . $match[3] . 'value="' . $value . '"' . $match[4]
-                        . ' checked />';
+                if (preg_match('/<input(.*?)id="mauticform_radiogrp_radio(.*?)"(.*?)value="'.$value.'"(.*?)\/>/i', $formHtml, $match)) {
+                    $replace  = '<input'.$match[1].'id="mauticform_radiogrp_radio'.$match[2].'"'.$match[3].'value="'.$value.'"'.$match[4]
+                        .' checked />';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
                 }
                 break;
