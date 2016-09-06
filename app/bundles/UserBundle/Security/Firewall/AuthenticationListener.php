@@ -118,7 +118,7 @@ class AuthenticationListener implements ListenerInterface
             }
         }
 
-        if ($response) {
+        if (!empty($response)) {
             $event->setResponse($response);
         }
     }

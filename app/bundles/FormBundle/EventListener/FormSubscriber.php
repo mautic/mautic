@@ -290,6 +290,8 @@ class FormSubscriber extends CommonSubscriber
             $email = trim($config['failure_email']);
             // Failed so send email if applicable
             if (!empty($email)) {
+                $post['array'] = $post;
+                $results    = $this->postToHtml($post);
                 $submission = $event->getSubmission();
                 $this->mailer->addTo($email);
                 $this->mailer->setSubject(
@@ -304,7 +306,8 @@ class FormSubscriber extends CommonSubscriber
                                 ['objectId' => $submission->getForm()->getId(), 'result' => $submission->getId()],
                                 UrlGeneratorInterface::ABSOLUTE_URL
                             ),
-                            '%message%' => $exception->getMessage()
+                            '%message%' => $exception->getMessage(),
+                            '%results%' => $results,
                         ]
                     )
                 );
@@ -313,5 +316,27 @@ class FormSubscriber extends CommonSubscriber
                 $this->mailer->send();
             }
         }
+    }
+
+    /**
+     * @param $post
+     *
+     * @return string
+     */
+    private function postToHtml($post)
+    {
+        $output = '<table>';
+        foreach ($post as $key => $row) {
+            $output .= "<tr><td style='vertical-align: top'><strong>$key</strong></td><td>";
+            if (is_array($row)) {
+                $output .= $this->postToHtml($row);
+            } else {
+                $output .= $row;
+            }
+            $output .= "</td></tr>";
+        }
+        $output .= '</table>';
+
+        return $output;
     }
 }
