@@ -1305,7 +1305,7 @@ class Lead extends FormEntity
      *
      * @return Stage
      */
-    public function setStage(Stage $stage)
+    public function setStage(Stage $stage = null)
     {
         $this->stage = $stage;
 
