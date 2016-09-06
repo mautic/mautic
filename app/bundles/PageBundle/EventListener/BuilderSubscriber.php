@@ -263,7 +263,8 @@ class BuilderSubscriber extends CommonSubscriber
                 }
                 $related[$parent->getId()] = [
                     "lang" => $trans,
-                    "url"  => $this->pageModel->generateUrl($parent, false)
+                    // Add ntrd to not auto redirect to another language
+                    "url"  => $this->pageModel->generateUrl($parent, false).'?ntrd=1'
                 ];
                 foreach ($children as $c) {
                     $lang  = $c->getLanguage();
@@ -273,7 +274,8 @@ class BuilderSubscriber extends CommonSubscriber
                     }
                     $related[$c->getId()] = [
                         "lang" => $trans,
-                        "url"  => $this->pageModel->generateUrl($c, false)
+                        // Add ntrd to not auto redirect to another language
+                        "url"  => $this->pageModel->generateUrl($c, false).'?ntrd=1'
                     ];
                 }
             }

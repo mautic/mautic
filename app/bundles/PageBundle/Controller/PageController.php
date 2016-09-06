@@ -181,7 +181,7 @@ class PageController extends FormController
         }
 
         //get A/B test information
-        list($parent, $children) = $model->getVariants($activePage);
+        list($parent, $children) = $activePage->getVariants();
         $properties   = array();
         $variantError = false;
         $weight       = 0;
@@ -270,7 +270,7 @@ class PageController extends FormController
         );
 
         //get related translations
-        list($translationParent, $translationChildren) = $model->getTranslations($activePage);
+        list($translationParent, $translationChildren) = $activePage->getTranslations();
 
         return $this->delegateView(array(
             'returnUrl'       => $this->generateUrl('mautic_page_action', array(
@@ -302,7 +302,6 @@ class PageController extends FormController
                 ), "RETURN_ARRAY"),
                 'stats'         => array(
                     'pageviews' => $pageviews,
-                    'bounces'   => $model->getBounces($activePage),
                     'hits'      => array(
                         'total'  => $activePage->getHits(),
                         'unique' => $activePage->getUniqueHits()
@@ -552,14 +551,13 @@ class PageController extends FormController
             $template = $entity->getTemplate();
             if (empty($template)) {
                 $content = $entity->getCustomHtml();
-                BuilderTokenHelper::replaceTokensWithVisualPlaceholders($tokens, $content);
                 $form['customHtml']->setData($content);
             }
         }
 
         $slotTypes = $model->getBuilderComponents($entity, 'slotTypes');
         $sectionForm = $this->get('form.factory')->create('builder_section');
-        
+
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'form'          => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
@@ -785,9 +783,6 @@ class PageController extends FormController
         //merge any existing changes
         $newContent = $this->factory->getSession()->get('mautic.pagebuilder.'.$objectId.'.content', array());
         $content    = $entity->getContent();
-
-        $tokens = $model->getBuilderComponents($entity, array('tokens', 'visualTokens'));
-        BuilderTokenHelper::replaceTokensWithVisualPlaceholders($tokens, $content);
 
         if (is_array($newContent)) {
             $content = array_merge($content, $newContent);
@@ -1046,14 +1041,21 @@ class PageController extends FormController
         /** @var \Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper $routerHelper */
         $routerHelper = $this->factory->getHelper('template.router');
 
+        $existingAssets = $assetsHelper->getAssets();
+
         $assetsHelper->addScriptDeclaration("var mauticBasePath    = '" . $this->request->getBasePath() . "';");
         $assetsHelper->addScriptDeclaration("var mauticAjaxUrl     = '" . $routerHelper->generate("mautic_core_ajax") . "';");
         $assetsHelper->addScriptDeclaration("var mauticBaseUrl     = '" . $routerHelper->generate("mautic_base_index") . "';");
         $assetsHelper->addScriptDeclaration("var mauticAssetPrefix = '" . $assetsHelper->getAssetPrefix(true) . "';");
         $assetsHelper->addCustomDeclaration($assetsHelper->getSystemScripts(true, true));
         $assetsHelper->addStylesheet('app/bundles/CoreBundle/Assets/css/libraries/builder.css');
+
+        // Use the assetsHelper to auto-build the asset html
         $builderAssets = $assetsHelper->getHeadDeclarations();
-        $assetsHelper->clear();
+
+        // Reset the assets helper to what it was before.
+        $assetsHelper->setAssets($existingAssets);
+
         return $builderAssets;
     }
 

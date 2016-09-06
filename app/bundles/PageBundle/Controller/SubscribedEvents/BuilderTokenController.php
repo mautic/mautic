@@ -9,8 +9,6 @@
 
 namespace Mautic\PageBundle\Controller\SubscribedEvents;
 
-use Mautic\PageBundle\Helper\BuilderTokenHelper;
-
 /**
  * Class BuilderTokenController
  */

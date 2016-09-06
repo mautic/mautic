@@ -12,11 +12,13 @@
 if ($item = ((isset($event['extra'])) ? $event['extra']['stat'] : false)): ?>
     <p>
         <?php if (!empty($item['isFailed'])) : ?>
-            <?php echo $view['translator']->trans('mautic.email.timeline.event.failed'); ?>
+
             <?php if (isset($item['openDetails']['bounces'])): ?>
                 <span class="label label-warning" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.email.timeline.event.bounced'); ?>">
                     <?php echo $view['translator']->trans('mautic.email.timeline.event.bounced'); ?>
                 </span>
+                <?php else : ?>
+                <?php echo $view['translator']->trans('mautic.email.timeline.event.failed'); ?>
             <?php endif; ?>
         <?php elseif (empty($item['dateRead'])) : ?>
             <?php echo $view['translator']->trans('mautic.email.timeline.event.not.read'); ?>
@@ -24,9 +26,9 @@ if ($item = ((isset($event['extra'])) ? $event['extra']['stat'] : false)): ?>
             <?php echo $view['translator']->trans(
                 'mautic.email.timeline.event.'.$event['extra']['type'],
                 [
-                    '%date%'     => $view['date']->toFull($item['dateRead']),
-                    '%interval%' => $view['date']->formatRange($item['timeToRead']),
-                    '%sent%'     => $view['date']->toFull($item['dateSent']),
+                    '%date%'     => $view['date']->toFull($event['timestamp']),
+                    '%interval%' => $view['date']->formatRange($event['timestamp']),
+                    '%sent%'     => $view['date']->toFull($event['dateSent']),
                 ]
             ); ?>
         <?php endif; ?>

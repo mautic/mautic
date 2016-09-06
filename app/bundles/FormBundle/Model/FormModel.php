@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
@@ -56,18 +57,31 @@ class FormModel extends CommonFormModel
     protected $formFieldModel;
 
     /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
      * FormModel constructor.
      *
      * @param ActionModel $formActionModel
      * @param FieldModel $formFieldModel
      */
-    public function __construct(RequestStack $requestStack, TemplatingHelper $templatingHelper, SchemaHelperFactory $schemaHelperFactory, ActionModel $formActionModel, FieldModel $formFieldModel)
+    public function __construct(
+        RequestStack $requestStack,
+        TemplatingHelper $templatingHelper,
+        SchemaHelperFactory $schemaHelperFactory,
+        ActionModel $formActionModel,
+        FieldModel $formFieldModel,
+        LeadModel $leadModel
+    )
     {
         $this->request = $requestStack->getCurrentRequest();
         $this->templatingHelper = $templatingHelper;
         $this->schemaHelperFactory = $schemaHelperFactory;
         $this->formActionModel = $formActionModel;
         $this->formFieldModel = $formFieldModel;
+        $this->leadModel = $leadModel;
     }
 
     /**
@@ -172,7 +186,7 @@ class FormModel extends CommonFormModel
     {
         $order          = 1;
         $existingFields = $entity->getFields()->toArray();
-
+        $formName       = $entity->generateFormName();
         foreach ($sessionFields as $key => $properties) {
             $isNew = (!empty($properties['id']) && isset($existingFields[$properties['id']])) ? false : true;
             $field = !$isNew ? $existingFields[$properties['id']] : new Field();
@@ -184,6 +198,11 @@ class FormModel extends CommonFormModel
                 if (empty($properties['label'])) {
                     $properties['label'] = $field->getLabel();
                 }
+            }
+
+            if ($formName === $properties['alias']) {
+                // Change the alias to prevent potential ID collisions in the rendered HTML
+                $properties['alias'] = 'f_'.$properties['alias'];
             }
 
             foreach ($properties as $f => $v) {
@@ -320,7 +339,7 @@ class FormModel extends CommonFormModel
      */
     public function getContent(Form $form, $withScript = true, $useCache = true)
     {
-        if ($useCache) {
+        if ($useCache && !$form->usesProgressiveProfiling()) {
             $cachedHtml = $form->getCachedHtml();
         }
 
@@ -347,24 +366,40 @@ class FormModel extends CommonFormModel
     {
         //generate cached HTML
         $theme = $entity->getTemplate();
+        $submissions = null;
+        $lead = $this->leadModel->getCurrentLead();
 
         if (!empty($theme)) {
             $theme .= '|';
         }
 
+        if ($entity->usesProgressiveProfiling()) {
+            $submissions = $this->getRepository()->getFormResults(
+                $entity,
+                [
+                    'leadId' => $lead->getId(),
+                    'limit'  => 200
+                ]
+            );
+        }
+
         $html = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:form.html.php',
-            array(
-                'form'  => $entity,
-                'theme' => $theme,
-            )
+            [
+                'form'        => $entity,
+                'theme'       => $theme,
+                'submissions' => $submissions,
+                'lead'        => $lead
+            ]
         );
 
-        $entity->setCachedHtml($html);
+        if (!$entity->usesProgressiveProfiling()) {
+            $entity->setCachedHtml($html);
 
-        if ($persist) {
-            //bypass model function as events aren't needed for this
-            $this->getRepository()->saveEntity($entity);
+            if ($persist) {
+                //bypass model function as events aren't needed for this
+                $this->getRepository()->saveEntity($entity);
+            }
         }
 
         return $html;
@@ -542,8 +577,7 @@ class FormModel extends CommonFormModel
     public function populateValuesWithGetParameters(Form $form, &$formHtml)
     {
         $fieldHelper = new FormFieldHelper($this->translator);
-        $request  = $this->factory->getRequest();
-        $formName = $form->generateFormName();
+        $formName    = $form->generateFormName();
 
         $fields = $form->getFields()->toArray();
         /** @var \Mautic\FormBundle\Entity\Field $f */
@@ -574,7 +608,7 @@ class FormModel extends CommonFormModel
 
             if (isset($leadField) && $isAutoFill) {
                 $value = $lead->getFieldValue($leadField);
-                
+
 		        if (!empty($value)) {
 		            $fieldHelper->populateField($f, $value, $formName, $formHtml);
 		        }

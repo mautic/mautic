@@ -318,7 +318,7 @@ $isStandalone = $activeForm->isStandalone();
                     <i><?php echo $view['translator']->trans('mautic.form.form.help.automaticcopy.iframe.note'); ?></i>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $view['translator']->trans('mautic.core.close'); ?></button>
                 </div>
             </div>
         </div>
@@ -350,7 +350,7 @@ $isStandalone = $activeForm->isStandalone();
                               onclick="this.setSelectionRange(0, this.value.length);"><?php echo $formContent; ?></textarea>
                 </div>
                 <div class="panel-footer text-right">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $view['translator']->trans('mautic.core.close'); ?></button>
                 </div>
             </div>
         </div>

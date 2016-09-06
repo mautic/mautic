@@ -38,6 +38,10 @@ class NoteController extends FormController
             return $lead;
         }
 
+        if ($this->request->getMethod() == 'POST') {
+            $this->setListFilters();
+        }
+
         $session = $this->get('session');
 
         //set limits
@@ -352,6 +356,7 @@ class NoteController extends FormController
      *
      * @param     $objectAction
      * @param int $objectId
+     * @param int $leadId
      *
      * @return Response
      */

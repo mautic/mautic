@@ -176,27 +176,25 @@
         'footerButtons' => true,
     ]
 );
-
 ?>
 <script>
     Mautic.campaignBuilderReconnectEndpoints = function () {
         // Reposition events
         <?php
         if (!empty($canvasSettings)):
-
         $sourceFound = false;
 
         foreach ($canvasSettings['nodes'] as $n):
-
-        if (isset($campaignSources[$n['id']])) {
+        if (isset($campaignSources[$n['id']]))
             $sourceFound = true;
-        }
         ?>
+
         mQuery('#CampaignEvent_<?php echo $n['id']; ?>').css({
             position: 'absolute',
             left: '<?php echo $n['positionX']; ?>px',
             top: '<?php echo $n['positionY']; ?>px'
         });
+
         Mautic.campaignBuilderEventPositions['CampaignEvent_<?php echo $n['id']; ?>'] = {
             left: <?php echo $n['positionX']; ?>,
             top: <?php echo $n['positionY']; ?>
@@ -205,8 +203,6 @@
 
         // Recreate jsPlumb connections and labels
         <?php
-        $labels = [];
-
         foreach ($canvasSettings['connections'] as $connection):
         if (isset($campaignEvents[$connection['targetId']])):
             $targetEvent = $campaignEvents[$connection['targetId']];
@@ -216,35 +212,36 @@
             continue;
         endif;
 
-        if (isset($labels[$connection['targetId']])):
-            $labelText = '';
-            if (isset($targetEvent['triggerMode'])):
-                if ($targetEvent['triggerMode'] == 'interval'):
-                    $labelText = $view['translator']->trans(
-                        'mautic.campaign.connection.trigger.interval.label'.($targetEvent['decisionPath'] == 'no' ? '_inaction' : ''),
-                        [
-                            '%number%' => $targetEvent['triggerInterval'],
-                            '%unit%'   => $view['translator']->transChoice(
-                                'mautic.campaign.event.intervalunit.'.$targetEvent['triggerIntervalUnit'],
-                                $targetEvent['triggerInterval']
-                            ),
-                        ]
-                    );
-                elseif ($targetEvent['triggerMode'] == 'date'):
-                    $labelText = $view['translator']->trans(
-                        'mautic.campaign.connection.trigger.date.label'.($targetEvent['decisionPath'] == 'no' ? '_inaction' : ''),
-                        [
-                            '%full%' => $view['date']->toFull($targetEvent['triggerDate']),
-                            '%time%' => $view['date']->toTime($targetEvent['triggerDate']),
-                            '%date%' => $view['date']->toShort($targetEvent['triggerDate']),
-                        ]
-                    );
-                endif;
+        $labelText = '';
+        if (isset($targetEvent['triggerMode'])):
+            if ($targetEvent['triggerMode'] == 'interval'):
+                $labelText = $view['translator']->trans(
+                    'mautic.campaign.connection.trigger.interval.label'.($targetEvent['decisionPath'] == 'no' ? '_inaction' : ''),
+                    [
+                        '%number%' => $targetEvent['triggerInterval'],
+                        '%unit%'   => $view['translator']->transChoice(
+                            'mautic.campaign.event.intervalunit.'.$targetEvent['triggerIntervalUnit'],
+                            $targetEvent['triggerInterval']
+                        ),
+                    ]
+                );
+            elseif ($targetEvent['triggerMode'] == 'date'):
+                $labelText = $view['translator']->trans(
+                    'mautic.campaign.connection.trigger.date.label'.($targetEvent['decisionPath'] == 'no' ? '_inaction' : ''),
+                    [
+                        '%full%' => $view['date']->toFull($targetEvent['triggerDate']),
+                        '%time%' => $view['date']->toTime($targetEvent['triggerDate']),
+                        '%date%' => $view['date']->toShort($targetEvent['triggerDate']),
+                    ]
+                );
             endif;
-            $labels[$connection['targetId']] = $labelText;
+        endif;
         ?>
+        <?php if (!empty($labelText)): ?>
+
         Mautic.campaignBuilderLabels["CampaignEvent_<?php echo $connection['targetId']; ?>"] = "<?php echo $labelText; ?>";
         <?php endif; ?>
+
         Mautic.campaignBuilderInstance.connect({
             uuids: [
                 "<?php echo "CampaignEvent_{$connection['sourceId']}_{$connection['anchors']['source']}"; ?>",
@@ -272,32 +269,44 @@
         endif;
         ?>
     };
+
     Mautic.campaignBuilderConnectionRestrictions = {
         <?php foreach ($eventSettings['connectionResrictions'] as $group => $groupRestrictions): ?>
+
         '<?php echo $group; ?>': {
+
             <?php
             $restrictions = [];
             foreach ($groupRestrictions as $event => $allowed):
                 $allowedString = implode("', '", $allowed);
                 $restrictions[] = "'$event': ['$allowedString']";
             endforeach;
-            echo implode(", \n", $restrictions);
             ?>
+
+            <?php echo implode(", \n", $restrictions); ?>
+
         },
         <?php endforeach; ?>
+
         'anchors': {
+
             <?php foreach ($eventSettings['anchorRestrictions'] as $group => $groupRestrictions): ?>
             '<?php echo $group; ?>': {
+
                 <?php
                 $restrictions = [];
                 foreach ($groupRestrictions as $event => $disallow):
                     $allowedString = implode("', '", $disallow);
                     $restrictions[] = "'$event': ['$allowedString']";
                 endforeach;
-                echo implode(", \n", $restrictions);
                 ?>
+
+                <?php echo implode(", \n", $restrictions); ?>
+
             },
+
             <?php endforeach; ?>
+
         }
     };
 </script>

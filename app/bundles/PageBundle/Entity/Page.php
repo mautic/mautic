@@ -14,18 +14,25 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\TranslationEntityInterface;
+use Mautic\CoreBundle\Entity\TranslationEntityTrait;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
+use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
+
 /**
  * Class Page
  *
  * @package Mautic\PageBundle\Entity
  */
-class Page extends FormEntity
+class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface
 {
+    use TranslationEntityTrait;
+    use VariantEntityTrait;
 
     /**
      * @var int
@@ -46,11 +53,6 @@ class Page extends FormEntity
      * @var string
      */
     private $template;
-
-    /**
-     * @var string
-     */
-    private $language = 'en';
 
     /**
      * @var string
@@ -113,36 +115,6 @@ class Page extends FormEntity
     private $category;
 
     /**
-     * @var ArrayCollection
-     **/
-    private $translationChildren;
-
-    /**
-     * @var Page
-     **/
-    private $translationParent = null;
-
-    /**
-     * @var ArrayCollection
-     **/
-    private $variantChildren;
-
-    /**
-     * @var Page
-     **/
-    private $variantParent = null;
-
-    /**
-     * @var array
-     */
-    private $variantSettings = array();
-
-    /**
-     * @var \DateTime
-     */
-    private $variantStartDate;
-
-    /**
      * Used to identify the page for the builder
      *
      * @var
@@ -152,6 +124,8 @@ class Page extends FormEntity
     public function __clone()
     {
         $this->id = null;
+        $this->clearTranslations();
+        $this->clearVariants();
 
         parent::__clone();
     }
@@ -183,10 +157,6 @@ class Page extends FormEntity
         $builder->addField('alias', 'string');
 
         $builder->addNullableField('template', 'string');
-
-        $builder->createField('language', 'string')
-            ->columnName('lang')
-            ->build();
 
         $builder->createField('customHtml', 'text')
             ->columnName('custom_html')
@@ -230,37 +200,8 @@ class Page extends FormEntity
 
         $builder->addCategory();
 
-        $builder->createOneToMany('translationChildren', 'Page')
-            ->setIndexBy('id')
-            ->setOrderBy(array('isPublished' => 'DESC'))
-            ->mappedBy('translationParent')
-            ->build();
-
-        $builder->createManyToOne('translationParent', 'Page')
-            ->inversedBy('translationChildren')
-            ->addJoinColumn('translation_parent_id', 'id', true)
-            ->build();
-
-        $builder->createManyToOne('variantParent', 'Page')
-            ->inversedBy('variantChildren')
-            ->addJoinColumn('variant_parent_id', 'id', true)
-            ->build();
-
-        $builder->createOneToMany('variantChildren', 'Page')
-            ->setIndexBy('id')
-            ->setOrderBy(array('isPublished' => 'DESC'))
-            ->mappedBy('variantParent')
-            ->build();
-
-        $builder->createField('variantSettings', 'array')
-            ->columnName('variant_settings')
-            ->nullable()
-            ->build();
-
-        $builder->createField('variantStartDate', 'datetime')
-            ->columnName('variant_start_date')
-            ->nullable()
-            ->build();
+        self::addTranslationMetadata($builder, self::class);
+        self::addVariantMetadata($builder, self::class);
     }
 
     /**
@@ -274,17 +215,6 @@ class Page extends FormEntity
 
         $metadata->addConstraint(new Callback(array(
             'callback' => function (Page $page, ExecutionContextInterface $context) {
-                $translationParent = $page->getTranslationParent();
-
-                if ($translationParent !== null) {
-                    $parentsVariantParent = $translationParent->getVariantParent();
-                    if ($parentsVariantParent !== null) {
-                        $context->buildViolation('mautic.page.translationparent.notallowed')
-                            ->atPath('translationParent')
-                            ->addViolation();
-                    }
-                }
-
                 $type = $page->getRedirectType();
                 if (!is_null($type)) {
                     $validator = $context->getValidator();
@@ -520,11 +450,13 @@ class Page extends FormEntity
     /**
      * Get hits
      *
-     * @return integer
+     * @param bool $includeVariants
+     *
+     * @return int|mixed
      */
-    public function getHits ()
+    public function getHits ($includeVariants = false)
     {
-        return $this->hits;
+        return ($includeVariants) ? $this->getAccumulativeVariantCount('getHits') : $this->hits;
     }
 
     /**
@@ -623,31 +555,6 @@ class Page extends FormEntity
     }
 
     /**
-     * Set language
-     *
-     * @param string $language
-     *
-     * @return Page
-     */
-    public function setLanguage ($language)
-    {
-        $this->isChanged('language', $language);
-        $this->language = $language;
-
-        return $this;
-    }
-
-    /**
-     * Get language
-     *
-     * @return string
-     */
-    public function getLanguage ()
-    {
-        return $this->language;
-    }
-
-    /**
      * Set category
      *
      * @param \Mautic\CategoryBundle\Entity\Category $category
@@ -742,185 +649,6 @@ class Page extends FormEntity
     }
 
     /**
-     * Add translationChildren
-     *
-     * @param Page $translationChildren
-     *
-     * @return Page
-     */
-    public function addTranslationChild (Page $translationChildren)
-    {
-        if (!$this->translationChildren->contains($translationChildren)) {
-            $this->translationChildren[] = $translationChildren;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Remove translationChildren
-     *
-     * @param Page $translationChildren
-     */
-    public function removeTranslationChild (Page $translationChildren)
-    {
-        $this->translationChildren->removeElement($translationChildren);
-    }
-
-    /**
-     * Get translationChildren
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getTranslationChildren ()
-    {
-        return $this->translationChildren;
-    }
-
-    /**
-     * Set translationParent
-     *
-     * @param Page $translationParent
-     *
-     * @return Page
-     */
-    public function setTranslationParent (Page $translationParent = null)
-    {
-        $this->isChanged('translationParent', $translationParent);
-        $this->translationParent = $translationParent;
-
-        return $this;
-    }
-
-    /**
-     * Remove variant parent
-     */
-    public function removeVariantParent ()
-    {
-        $this->isChanged('variantParent', '');
-        $this->variantParent = null;
-    }
-
-    /**
-     * Get translationParent
-     *
-     * @return Page
-     */
-    public function getTranslationParent ()
-    {
-        return $this->translationParent;
-    }
-
-    /**
-     * Add variantChildren
-     *
-     * @param Page $variantChildren
-     *
-     * @return Page
-     */
-    public function addVariantChild (Page $variantChildren)
-    {
-        if (!$this->variantChildren->contains($variantChildren)) {
-            $this->variantChildren[] = $variantChildren;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Remove variantChildren
-     *
-     * @param Page $variantChildren
-     */
-    public function removeVariantChild (Page $variantChildren)
-    {
-        $this->variantChildren->removeElement($variantChildren);
-    }
-
-    /**
-     * Get variantChildren
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getVariantChildren ()
-    {
-        return $this->variantChildren;
-    }
-
-    /**
-     * Set variantParent
-     *
-     * @param Page $variantParent
-     *
-     * @return Page
-     */
-    public function setVariantParent (Page $variantParent = null)
-    {
-        $this->isChanged('variantParent', $variantParent);
-        $this->variantParent = $variantParent;
-
-        return $this;
-    }
-
-    /**
-     * @param bool $isChild True to return if the email is a variant of a parent
-     *
-     * @return bool
-     */
-    public function isVariant($isChild = false)
-    {
-        if ($isChild) {
-            return ($this->variantParent === null) ? false : true;
-        } else {
-            return (!empty($this->variantParent) || count($this->variantChildren)) ? true : false;
-        }
-    }
-
-    /**
-     * Remove translation parent
-     */
-    public function removeTranslationParent ()
-    {
-        $this->isChanged('translationParent', '');
-        $this->translationParent = null;
-    }
-
-    /**
-     * Get variantParent
-     *
-     * @return Page
-     */
-    public function getVariantParent ()
-    {
-        return $this->variantParent;
-    }
-
-    /**
-     * Set variantSettings
-     *
-     * @param array $variantSettings
-     *
-     * @return Page
-     */
-    public function setVariantSettings ($variantSettings)
-    {
-        $this->isChanged('variantSettings', $variantSettings);
-        $this->variantSettings = $variantSettings;
-
-        return $this;
-    }
-
-    /**
-     * Get variantSettings
-     *
-     * @return array
-     */
-    public function getVariantSettings ()
-    {
-        return $this->variantSettings;
-    }
-
-    /**
      * Set uniqueHits
      *
      * @param integer $uniqueHits
@@ -939,17 +667,19 @@ class Page extends FormEntity
      *
      * @return integer
      */
-    public function getUniqueHits ()
+    public function getUniqueHits ($includeVariants = false)
     {
-        return $this->uniqueHits;
+        return ($includeVariants) ? $this->getAccumulativeVariantCount('getUniqueHits') : $this->uniqueHits;
     }
 
     /**
-     * @return mixed
+     * @param bool $includeVariants
+     *
+     * @return int|mixed
      */
-    public function getVariantHits ()
+    public function getVariantHits ($includeVariants = false)
     {
-        return $this->variantHits;
+        return ($includeVariants) ? $this->getAccumulativeVariantCount('getVariantHits') : $this->variantHits;
     }
 
     /**
@@ -958,23 +688,6 @@ class Page extends FormEntity
     public function setVariantHits ($variantHits)
     {
         $this->variantHits = $variantHits;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getVariantStartDate ()
-    {
-        return $this->variantStartDate;
-    }
-
-    /**
-     * @param mixed $variantStartDate
-     */
-    public function setVariantStartDate ($variantStartDate)
-    {
-        $this->isChanged('variantStartDate', $variantStartDate);
-        $this->variantStartDate = $variantStartDate;
     }
 
     /**

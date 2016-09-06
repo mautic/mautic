@@ -493,6 +493,12 @@ class TrackableModel extends AbstractCommonModel
             $url = str_replace('&amp;', '&', $url);
         }
 
+        // If this is just a token, validate it's supported before going further
+        if (preg_match('/^{.*?}$/i', $url) && !$this->validateTokenIsTrackable($url)) {
+
+            return false;
+        }
+
         // Default key and final URL to the given $url
         $trackableKey = $trackableUrl = $url;
 

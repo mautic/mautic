@@ -1,30 +1,25 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 
 /**
- * Class Stat
- *
- * @package Mautic\NotificationBundle\Entity
+ * Class Stat.
  */
 class Stat
 {
-
     /**
      * @var int
      */
@@ -88,7 +83,7 @@ class Stat
     /**
      * @var array
      */
-    private $tokens = array();
+    private $tokens = [];
 
     /**
      * @var int
@@ -98,7 +93,7 @@ class Stat
     /**
      * @var array
      */
-    private $clickDetails = array();
+    private $clickDetails = [];
 
     /**
      * @var \DateTime
@@ -108,16 +103,16 @@ class Stat
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('push_notification_stats')
             ->setCustomRepositoryClass('Mautic\NotificationBundle\Entity\StatRepository')
-            ->addIndex(array('notification_id', 'lead_id'), 'stat_notification_search')
-            ->addIndex(array('is_clicked'), 'stat_notification_clicked_search')
-            ->addIndex(array('tracking_hash'), 'stat_notification_hash_search')
-            ->addIndex(array('source', 'source_id'), 'stat_notification_source_search');
+            ->addIndex(['notification_id', 'lead_id'], 'stat_notification_search')
+            ->addIndex(['is_clicked'], 'stat_notification_clicked_search')
+            ->addIndex(['tracking_hash'], 'stat_notification_hash_search')
+            ->addIndex(['source', 'source_id'], 'stat_notification_source_search');
 
         $builder->addId();
 
@@ -178,7 +173,7 @@ class Stat
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -186,7 +181,7 @@ class Stat
     {
         $metadata->setGroupPrefix('stat')
             ->addProperties(
-                array(
+                [
                     'id',
                     'ipAddress',
                     'dateSent',
@@ -199,8 +194,8 @@ class Stat
                     'sourceId',
                     'trackingHash',
                     'lead',
-                    'notification'
-                )
+                    'notification',
+                ]
             )
             ->build();
     }
@@ -362,7 +357,7 @@ class Stat
      */
     public function upRetryCount()
     {
-        $this->retryCount++;
+        ++$this->retryCount;
     }
 
     /**
@@ -440,11 +435,11 @@ class Stat
     {
         $this->clickDetails[] = $details;
 
-        $this->clickCount++;
+        ++$this->clickCount;
     }
 
     /**
-     * Up the sent count
+     * Up the sent count.
      *
      * @return Stat
      */

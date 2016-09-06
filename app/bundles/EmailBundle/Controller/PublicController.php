@@ -296,8 +296,10 @@ class PublicController extends CommonFormController
     {
         ignore_user_abort(true);
 
-        // Check to see if transport matches currently used transport
-        $currentTransport = $this->factory->getMailer()->getTransport();
+        // Use the real transport as the one in Mailer could be SpoolTransport if the system is configured to queue
+        // Can't use swiftmailer.transport.real because it's not set for when queue is disabled
+        $transportParam   = $this->get('mautic.helper.core_parameters')->getParameter(('mailer_transport'));
+        $currentTransport = $this->get('swiftmailer.mailer.transport.'.$transportParam);
 
         if ($currentTransport instanceof InterfaceCallbackTransport && $currentTransport->getCallbackPath() == $transport) {
             $response = $currentTransport->handleCallbackResponse($this->request, $this->factory);

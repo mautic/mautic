@@ -32,7 +32,7 @@ class CampaignSubscriber extends CommonSubscriber
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD         => ['onCampaignBuild', 0],
             AssetEvents::ASSET_ON_LOAD                => ['onAssetDownload', 0],
-            AssetEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTrigger', 0]
+            AssetEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0]
         ];
     }
 
