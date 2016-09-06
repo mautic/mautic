@@ -54,7 +54,7 @@ class FormFieldPageBreakType extends AbstractType
                         ['message' => 'mautic.core.value.required']
                     )
                 ],
-                'data' => (empty($options['data'])) ? $this->translator->trans('mautic.core.continue') : $options['data']
+                'empty_data' => $this->translator->trans('mautic.core.continue')
             ]
         );
 
