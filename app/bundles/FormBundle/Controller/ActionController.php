@@ -281,12 +281,12 @@ class ActionController extends CommonFormController
     {
         $session = $this->factory->getSession();
         $formId  = $this->request->query->get('formId');
-        $actions = $session->get('mautic.form.'.$formId.'.actions.modified', array());
-        $delete  = $session->get('mautic.form.'.$formId.'.actions.deleted', array());
+        $actions = $session->get('mautic.form.'.$formId.'.actions.modified', []);
+        $delete  = $session->get('mautic.form.'.$formId.'.actions.deleted', []);
 
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest() ||
-            !$this->factory->getSecurity()->isGranted(array('form:forms:editown', 'form:forms:editother', 'form:forms:create'), 'MATCH_ONE')
+            !$this->factory->getSecurity()->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
         ) {
             return $this->accessDenied();
         }
@@ -301,7 +301,7 @@ class ActionController extends CommonFormController
 
             //take note if this is a submit button or not
             if ($formAction['type'] == 'button') {
-                $submits    = $session->get('mautic.formactions.submits', array());
+                $submits    = $session->get('mautic.formactions.submits', []);
                 $properties = $formAction['properties'];
                 if ($properties['type'] == 'submit' && in_array($objectId, $submits)) {
                     $key = array_search($objectId, $submits);
@@ -310,106 +310,15 @@ class ActionController extends CommonFormController
                 }
             }
 
-            $template = (!empty($formAction['settings']['template'])) ? $formAction['settings']['template'] :
-                'MauticFormBundle:Action:generic.html.php';
-
-            //prevent undefined errors
-            $entity     = new Action();
-            $blank      = $entity->convertToArray();
-            $formAction = array_merge($blank, $formAction);
-
-            $dataArray = array(
+            $dataArray = [
                 'mauticContent' => 'formAction',
                 'success'       => 1,
-                'target'        => '#mauticform_' . $objectId,
-                'route'         => false,
-                'actionId'      => $objectId,
-                'actionHtml'    => $this->renderView($template, array(
-                    'inForm'  => true,
-                    'action'  => $formAction,
-                    'id'      => $objectId,
-                    'deleted' => true,
-                    'formId'  => $formId
-                ))
-            );
+                'route'         => false
+            ];
         } else {
-            $dataArray = array('success' => 0);
+            $dataArray = ['success' => 0];
         }
 
-        $response = new JsonResponse($dataArray);
-
-        return $response;
-    }
-
-    /**
-     * Undeletes the entity
-     *
-     * @param $objectId
-     *
-     * @return JsonResponse
-     */
-    public function undeleteAction ($objectId)
-    {
-        $session = $this->factory->getSession();
-        $formId  = $this->request->query->get('formId');
-        $actions = $session->get('mautic.form.'.$formId.'.actions.modified', array());
-        $delete  = $session->get('mautic.form.'.$formId.'.actions.deleted', array());
-
-        //ajax only for form fields
-        if (!$this->request->isXmlHttpRequest() ||
-            !$this->factory->getSecurity()->isGranted(array('form:forms:editown', 'form:forms:editother', 'form:forms:create'), 'MATCH_ONE')
-        ) {
-            return $this->accessDenied();
-        }
-
-        $formAction = (array_key_exists($objectId, $actions)) ? $actions[$objectId] : null;
-
-        if ($this->request->getMethod() == 'POST' && $formAction !== null) {
-            //add the field to the delete list
-            if (in_array($objectId, $delete)) {
-                $key = array_search($objectId, $delete);
-                unset($delete[$key]);
-                $session->set('mautic.form.'.$formId.'.actions.deleted', $delete);
-            }
-
-            //take note if this is a submit button or not
-            if ($formAction['type'] == 'button') {
-                $properties = $formAction['properties'];
-                if ($properties['type'] == 'submit') {
-                    $submits   = $session->get('mautic.formactions.submits', array());
-                    $submits[] = $objectId;
-                    $session->set('mautic.formactions.submits', $submits);
-                }
-            }
-
-            $template = (!empty($formAction['settings']['template'])) ? $formAction['settings']['template'] :
-                'MauticFormBundle:Action:generic.html.php';
-
-            //prevent undefined errors
-            $entity     = new Action();
-            $blank      = $entity->convertToArray();
-            $formAction = array_merge($blank, $formAction);
-
-            $dataArray = array(
-                'mauticContent' => 'formAction',
-                'success'       => 1,
-                'target'        => '#mauticform_' . $objectId,
-                'route'         => false,
-                'actionId'      => $objectId,
-                'actionHtml'    => $this->renderView($template, array(
-                    'inForm'  => true,
-                    'action'  => $formAction,
-                    'id'      => $objectId,
-                    'deleted' => false,
-                    'formId'  => $formId
-                ))
-            );
-        } else {
-            $dataArray = array('success' => 0);
-        }
-
-        $response = new JsonResponse($dataArray);
-
-        return $response;
+        return new JsonResponse($dataArray);
     }
 }

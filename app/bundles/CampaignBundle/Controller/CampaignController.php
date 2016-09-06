@@ -11,12 +11,15 @@ namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class CampaignController extends FormController
 {
+    use EntityContactsTrait;
+
     /**
      * @param int $page
      *
@@ -203,16 +206,6 @@ class CampaignController extends FormController
      */
     public function viewAction($objectId)
     {
-        $tmpl = $this->request->get('tmpl', 'index');
-
-        if ($tmpl == 'campaignleads') {
-            //forward to leadsAction
-            $page  = $this->get('session')->get('mautic.campaign.lead.page', 1);
-            $query = ["ignoreAjax" => true, 'request' => $this->request];
-
-            return $this->forward('MauticCampaignBundle:Campaign:leads', ['objectId' => $objectId, 'page' => $page, $query]);
-        }
-
         $page = $this->get('session')->get('mautic.campaign.page', 1);
 
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
@@ -304,10 +297,10 @@ class CampaignController extends FormController
                     'sources'       => $model->getLeadSources($entity),
                     'dateRangeForm' => $dateRangeForm->createView(),
                     'campaignLeads' => $this->forward(
-                        'MauticCampaignBundle:Campaign:leads',
+                        'MauticCampaignBundle:Campaign:contacts',
                         [
                             'objectId'   => $entity->getId(),
-                            'page'       => $this->get('session')->get('mautic.campaign.lead.page', 1),
+                            'page'       => $this->get('session')->get('mautic.campaign.contact.page', 1),
                             'ignoreAjax' => true
                         ]
                     )->getContent()
@@ -334,95 +327,18 @@ class CampaignController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function leadsAction($objectId, $page = 1)
+    public function contactsAction($objectId, $page = 1)
     {
-        if (!$this->get('mautic.security')->isGranted('campaign:campaigns:view')) {
-            return $this->accessDenied();
-        }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
-
-        //set limits
-        $limit = $this->get('session')->get('mautic.campaign.lead.limit', $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
-
-        $search = $this->request->get('search', $this->get('session')->get('mautic.campaign.lead.filter', ''));
-        $this->get('session')->set('mautic.campaign.lead.filter', $search);
-
-        $filter     = ['string' => $search, 'force' => []];
-        $orderBy    = $this->get('session')->get('mautic.campaign.lead.orderby', 'l.id');
-        $orderByDir = $this->get('session')->get('mautic.campaign.lead.orderbydir', 'DESC');
-
-        // We need the EmailRepository to check if a lead is flagged as do not contact
-        /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
-        $emailRepo = $this->getModel('email')->getRepository();
-
-        $campaignLeadRepo = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:Lead');
-        $leads            = $campaignLeadRepo->getLeadsWithFields(
-            [
-                'campaign_id'    => $objectId,
-                'withTotalCount' => true,
-                'start'          => $start,
-                'limit'          => $limit,
-                'filter'         => $filter,
-                'orderBy'        => $orderBy,
-                'orderByDir'     => $orderByDir
-            ]
-        );
-
-        $count = $leads['count'];
-        if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
-            if ($count === 1) {
-                $lastPage = 1;
-            } else {
-                $lastPage = (ceil($count / $limit)) ?: 1;
-            }
-            $this->get('session')->set('mautic.campaign.lead.page', $lastPage);
-            $returnUrl = $this->generateUrl('mautic_campaign_contacts', ['objectId' => $objectId, 'page' => $lastPage]);
-
-            return $this->postActionRedirect(
-                [
-                    'returnUrl'       => $returnUrl,
-                    'viewParameters'  => ['page' => $lastPage, 'objectId' => $objectId],
-                    'contentTemplate' => 'MauticLeadBundle:Lead:grid.html.php',
-                    'passthroughVars' => [
-                        'mauticContent' => 'campaignLeads'
-                    ]
-                ]
-            );
-        }
-
-        $triggerModel = $this->getModel('point.trigger');
-        foreach ($leads['results'] as &$l) {
-            $l['color'] = $triggerModel->getColorForLeadPoints($l['points']);
-        }
-
-        return $this->delegateView(
-            [
-                'viewParameters'  => [
-                    'page'          => $page,
-                    'items'         => $leads['results'],
-                    'totalItems'    => $leads['count'],
-                    'tmpl'          => 'campaignleads',
-                    'indexMode'     => 'grid',
-                    'link'          => 'mautic_campaign_contacts',
-                    'sessionVar'    => 'campaign.lead',
-                    'limit'         => $limit,
-                    'objectId'      => $objectId,
-                    'noContactList' => $emailRepo->getDoNotEmailList()
-                ],
-                'contentTemplate' => 'MauticCampaignBundle:Campaign:leads.html.php',
-                'passthroughVars' => [
-                    'mauticContent' => 'campaignLeads',
-                    'route'         => false
-                ]
-            ]
+        return $this->generateContactsGrid(
+            $objectId,
+            $page,
+            'campaign:campaigns:view',
+            'campaign',
+            'campaign_leads',
+            null,
+            'campaign_id',
+            ['manually_removed' => 0]
         );
     }
 
@@ -725,7 +641,7 @@ class CampaignController extends FormController
                             $model->setCanvasSettings($entity, $connections);
 
                             if (!empty($deletedEvents)) {
-                                $this->getModel('campaign.event')->deleteEvents($entity->getEvents(), $modifiedEvents, $deletedEvents);
+                                $this->getModel('campaign.event')->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
                             }
                         }
 
@@ -788,6 +704,12 @@ class CampaignController extends FormController
             } else {
                 //rebuild everything to include new ids if valid
                 $cleanSlate = $valid;
+
+                if ($valid) {
+                    // Rebuild the form with new action so that apply doesn't keep creating a clone
+                    $action = $this->generateUrl('mautic_campaign_action', ['objectAction' => 'edit', 'objectId' => $entity->getId()]);
+                    $form   = $model->createForm($entity, $this->get('form.factory'), $action);
+                }
             }
         } else {
             $cleanSlate = true;

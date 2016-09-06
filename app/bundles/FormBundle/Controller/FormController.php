@@ -410,13 +410,14 @@ class FormController extends CommonFormController
             $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
             $field = new Field();
 
-            $modifiedFields[$keyId]              = $field->convertToArray();
-            $modifiedFields[$keyId]['label']     = $this->factory->getTranslator()->trans('mautic.core.form.submit');
-            $modifiedFields[$keyId]['alias']     = 'submit';
-            $modifiedFields[$keyId]['showLabel'] = 1;
-            $modifiedFields[$keyId]['type']      = 'button';
-            $modifiedFields[$keyId]['id']        = $keyId;
-            $modifiedFields[$keyId]['formId']    = $sessionId;
+            $modifiedFields[$keyId]                    = $field->convertToArray();
+            $modifiedFields[$keyId]['label']           = $this->factory->getTranslator()->trans('mautic.core.form.submit');
+            $modifiedFields[$keyId]['alias']           = 'submit';
+            $modifiedFields[$keyId]['showLabel']       = 1;
+            $modifiedFields[$keyId]['type']            = 'button';
+            $modifiedFields[$keyId]['id']              = $keyId;
+            $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-default"';
+            $modifiedFields[$keyId]['formId']          = $sessionId;
             unset($modifiedFields[$keyId]['form']);
             $session->set('mautic.form.'.$sessionId.'.fields.modified', $modifiedFields);
         }
@@ -655,9 +656,15 @@ class FormController extends CommonFormController
                     )
                 );
             } elseif ($form->get('buttons')->get('apply')->isClicked()) {
-                //rebuild everything to include new ids
+                // Rebuild everything to include new ids
                 $cleanSlate = true;
                 $reorder    = true;
+
+                if ($valid) {
+                    // Rebuild the form with new action so that apply doesn't keep creating a clone
+                    $action = $this->generateUrl('mautic_form_action', ['objectAction' => 'edit', 'objectId' => $entity->getId()]);
+                    $form   = $model->createForm($entity, $this->get('form.factory'), $action);
+                }
             }
         } else {
             $cleanSlate = true;

@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.3.3 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -100,11 +100,44 @@
      * Get to code mode.
      */
     function _showHTML ($btn) {
-      if (!$html_area) _initArea();
+      if (!$html_area) {
+        _initArea();
 
-      // Enable code mirror.
-      if (!code_mirror && editor.opts.codeMirror && typeof CodeMirror != 'undefined') {
-        code_mirror = CodeMirror.fromTextArea($html_area.get(0), editor.opts.codeMirrorOptions);
+        // Enable code mirror.
+        if (!code_mirror && editor.opts.codeMirror && typeof CodeMirror != 'undefined') {
+          code_mirror = CodeMirror.fromTextArea($html_area.get(0), editor.opts.codeMirrorOptions);
+        }
+        else {
+          editor.events.$on($html_area, 'keydown keyup change input', function () {
+            if (!editor.opts.height) {
+              if (!this.rows) {
+                this.rows = 1;
+              }
+
+              // Textarea has no content anymore.
+              if (this.value.length === 0) {
+                this.rows = 1;
+              }
+
+              else {
+                this.style.height = 'auto';
+
+                // Decrease height in case text is deleted.
+                while (this.rows > 1 && this.scrollHeight <= this.offsetHeight) {
+                  this.rows -= 1;
+                }
+
+                // Increase textarea height.
+                while (this.scrollHeight > this.offsetHeight && (!editor.opts.heightMax || this.offsetHeight < editor.opts.heightMax)) {
+                  this.rows += 1;
+                }
+              }
+            }
+            else {
+              this.rows = null;
+            }
+          });
+        }
       }
 
       editor.undo.saveStep();
@@ -184,9 +217,11 @@
           $html_area.css('max-height', editor.opts.height || editor.opts.heightMax);
         }
 
-        $html_area.val(html.replace(/FROALA-SM/g, '').replace(/FROALA-EM/g, ''));
+        $html_area.val(html.replace(/FROALA-SM/g, '').replace(/FROALA-EM/g, '')).trigger('change');
+        var scroll_top = $(editor.o_doc).scrollTop();
         $html_area.focus();
         $html_area.get(0).setSelectionRange(s_index, e_index);
+        $(editor.o_doc).scrollTop(scroll_top);
       }
 
       // Disable buttons.

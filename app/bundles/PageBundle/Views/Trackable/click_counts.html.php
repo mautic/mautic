@@ -12,7 +12,7 @@
             <tbody>
             <?php foreach ($trackables as $link): ?>
                 <tr>
-                    <td><a href="<?php echo $link['url']; ?>"><?php echo $link['url']; ?></a></td>
+                    <td class="long-text"><a href="<?php echo $link['url']; ?>"><?php echo $link['url']; ?></a></td>
                     <td class="text-center"><?php echo $link['hits']; ?></td>
                     <td class="text-center"><?php echo $link['unique_hits']; ?></td>
                     <td><?php echo $link['redirect_id']; ?></td>

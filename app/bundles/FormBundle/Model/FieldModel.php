@@ -89,13 +89,19 @@ class FieldModel extends CommonFormModel
         //make sure alias is not already taken
         $testAlias = $alias;
 
-        $count     = (int) in_array($alias, $aliases);
-        $aliasTag  = $count;
+        $count    = (int) in_array($alias, $aliases);
+        $aliasTag = $count;
 
         while ($count) {
-            $testAlias = $alias . $aliasTag;
+            $testAlias = $alias.$aliasTag;
             $count     = (int) in_array($testAlias, $aliases);
             $aliasTag++;
+        }
+
+        // Prevent internally used identifiers in the form HTML from colliding with the generated field's ID
+        $internalUse = ['message', 'error', 'id', 'return', 'name', 'messenger'];
+        if (in_array($testAlias, $internalUse)) {
+            $testAlias = 'f_'.$testAlias;
         }
 
         $aliases[] = $testAlias;

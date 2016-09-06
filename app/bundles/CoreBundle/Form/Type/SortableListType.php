@@ -64,6 +64,15 @@ class SortableListType extends AbstractType
             'error_bubbling' => false
         ));
 
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use($options) {
+            // remove empty options
+            $data = $event->getData();
+            if (isset($data['list']) && $options['option_notblank']) {
+                $data['list'] = array_filter($data['list']);
+                $event->setData($data);
+            }
+        });
+
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
             //reorder list in case keys were dynamically removed
             $data = $event->getData();

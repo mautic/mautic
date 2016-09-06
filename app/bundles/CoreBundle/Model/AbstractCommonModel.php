@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Translation\TranslatorInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class AbstractCommonModel
@@ -43,7 +44,7 @@ abstract class AbstractCommonModel
 
     /**
      * @deprecated 2.0; to be removed in 3.0
-     *             
+     *
      * @var MauticFactory
      */
     protected $factory;
@@ -77,6 +78,11 @@ abstract class AbstractCommonModel
      * @var User
      */
     protected $user;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
 
     /**
      * @param EntityManager $em
@@ -117,6 +123,15 @@ abstract class AbstractCommonModel
     {
         $this->translator = $translator;
     }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
 
     /**
      * Initialize the user parameter for use in locking procedures
@@ -234,13 +249,21 @@ abstract class AbstractCommonModel
     /**
      * Decode a string appended to URL into an array
      *
-     * @param $string
+     * @param      $string
+     * @param bool $urlDecode
      *
      * @return mixed
      */
-    public function decodeArrayFromUrl($string)
+    public function decodeArrayFromUrl($string, $urlDecode = true)
     {
-        return unserialize(base64_decode(urldecode($string)));
+        $raw     = $urlDecode ? urldecode($string) : $string;
+        $decoded = base64_decode($raw);
+
+        if (strpos(strtolower($decoded), 'a') !== 0) {
+            throw new \InvalidArgumentException(sprintf('The string %s is not a serialized array.', $decoded));
+        }
+
+        return unserialize($decoded);
     }
 
     /**
@@ -310,26 +333,22 @@ abstract class AbstractCommonModel
             return false;
         }
 
+        $entity = false;
         if (strpos($idSlug, ':') !== false) {
             $parts = explode(':', $idSlug);
             if (count($parts) == 2) {
                 $entity = $this->getEntity($parts[0]);
-
-                if (!empty($entity)) {
-
-                    return $entity;
-                }
             }
         } else {
             $entity = $this->getRepository()->findOneBySlugs($idSlug, $category, $lang);
-
-            if (!empty($entity)) {
-
-                return $entity;
-            }
         }
 
-        return false;
+        if ($entity && $lang) {
+            // Set the slug used to fetch the entity
+            $entity->languageSlug = $lang;
+        }
+
+        return $entity;
     }
 
     /**

@@ -14,6 +14,9 @@ use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\StatDevice;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -182,7 +185,8 @@ class LeadController extends FormController
                     'inSingleList'     => $inSingleList,
                     'noContactList'    => $emailRepo->getDoNotEmailList(),
                     'maxLeadId'        => $maxLeadId,
-                    'anonymousShowing' => $anonymousShowing
+                    'anonymousShowing' => $anonymousShowing,
+                    'showCheckbox'     => true,
                 ],
                 'contentTemplate' => "MauticLeadBundle:Lead:{$indexMode}.html.php",
                 'passthroughVars' => [
@@ -896,6 +900,89 @@ class LeadController extends FormController
     }
 
     /**
+     * Generates contact frequency rules form and action
+     *
+     * @param            $objectId
+     *
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function contactFrequencyAction ($objectId)
+    {
+        /** @var LeadModel $model */
+        $model = $this->getModel('lead');
+        $lead  = $model->getEntity($objectId);
+        $data = [];
+        if ($lead != null && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
+            $frequencyRules = $model->getFrequencyRule($lead);
+
+            foreach ($frequencyRules as $frequencyRule) {
+                $data['channels'][]       = $frequencyRule['channel'];
+                $data['frequency_number'] = $frequencyRule['frequency_number'];
+                $data['frequency_time']   = $frequencyRule['frequency_time'];
+            }
+
+            $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'contactFrequency', 'objectId' => $lead->getId()]);
+
+            $form = $this->get('form.factory')->create(
+                'lead_contact_frequency_rules',
+                [],
+                [
+                    'action' => $action,
+                    'data' => $data
+                ]
+            );
+            if ($this->request->getMethod() == 'POST') {
+                if (!$this->isFormCancelled($form)) {
+                    if ($valid = $this->isFormValid($form)) {
+                        $formdata = $form->getData();
+                        $model->setFrequencyRules($lead, $formdata['channels'], $formdata['frequency_time'], $formdata['frequency_number']);
+                    }
+                }
+
+                if ($valid) {
+                    $viewParameters = [
+                        'objectId'     => $lead->getId(),
+                        'objectAction' => 'view',
+                    ];
+
+                    return $this->postActionRedirect(
+                        [
+                            'returnUrl'       => $this->generateUrl('mautic_contact_action', $viewParameters),
+                            'viewParameters'  => $viewParameters,
+                            'contentTemplate' => 'MauticLeadBundle:Lead:view',
+                            'passthroughVars' => [
+                                'closeModal' => 1
+                            ]
+                        ]
+                    );
+                }
+            }
+            $tmpl = $this->request->get('tmpl', 'index');
+            return $this->delegateView(
+                [
+                    'viewParameters'   => [
+                        'tmpl'         => $tmpl,
+                        'action'       => $action,
+                        'form'         => $form->createView(),
+                        'currentRoute' => $this->generateUrl(
+                            'mautic_contact_action',
+                            [
+                                'objectAction' => 'contactFrequency',
+                                'objectId'     => $lead->getId()
+                            ]
+                        ),
+                    ],
+                    'contentTemplate' => 'MauticLeadBundle:Lead:frequency.html.php',
+                    'passthroughVars' => [
+                        'route'  => false,
+                        'target' => ($tmpl == 'update') ? '.lead-frequency-options' : null
+                    ]
+                ]
+            );
+        }
+    }
+
+    /**
      * Deletes the entity
      *
      * @param         $objectId
@@ -1077,7 +1164,6 @@ class LeadController extends FormController
             ]
         );
     }
-
 
     /**
      * Add/remove lead from a campaign
@@ -1329,8 +1415,8 @@ class LeadController extends FormController
 
                             $fileData = $form['file']->getData();
                             if (!empty($fileData)) {
-                                $errorMessage = null;
-                                $errorParameters = array();
+                                $errorMessage    = null;
+                                $errorParameters = [];
                                 try {
                                     $fileData->move($cacheDir, $fileName);
 
@@ -1385,7 +1471,7 @@ class LeadController extends FormController
                                     if (!is_null($errorMessage)) {
                                         $form->addError(
                                             new FormError(
-                                                $this->get('translator')->getTranslator()->trans($errorMessage, $errorParameters, 'validators')
+                                                $this->get('translator')->trans($errorMessage, $errorParameters, 'validators')
                                             )
                                         );
                                     }
@@ -2020,8 +2106,6 @@ class LeadController extends FormController
             $model = $this->getModel('lead');
             $data  = $this->request->request->get('lead_batch_stage', [], true);
             $ids   = json_decode($data['ids'], true);
-
-            $this->get('monolog.logger.mautic')->addError(print_r($ids, true));
 
             $entities = [];
             if (is_array($ids)) {

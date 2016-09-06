@@ -48,6 +48,22 @@
     overflow: auto;
 }
 
+.selected-filters .in-group {
+    margin-left:20px;
+}
+
+.selected-filters .panel {
+    margin-bottom:0;
+    margin-top:20px;
+}
+
+.selected-filters .panel.in-group {
+    margin-top:0;
+    border-top:0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
 .col-leadpoints-date {
     width: 175px;
 }
@@ -142,7 +158,6 @@ ul.tag-cloud li {
     overflow: visible!important;
     height: 53px;
 }
-
 .timeline-icon {
     width: 50px;
     text-align: center;
@@ -158,7 +173,6 @@ ul.tag-cloud li {
     word-wrap: break-word;
     -ms-word-break: break-all;
     word-break: break-all;
-    word-break: break-word;
     -ms-hyphens: auto;
     -moz-hyphens: auto;
     -webkit-hyphens: auto;
@@ -181,4 +195,8 @@ ul.tag-cloud li {
 
 #contact-timeline tr.timeline-details img {
     max-height: 200px;
+}
+.frequency{
+    width: 45px;
+
 }

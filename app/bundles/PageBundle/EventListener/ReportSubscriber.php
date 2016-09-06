@@ -114,7 +114,6 @@ class ReportSubscriber extends CommonSubscriber
             if ($event->checkContext('page.hits')) {
                 $hitPrefix   = 'ph.';
                 $redirectHit = 'r.';
-                $emailPrefix = 'e.';
                 $hitColumns  = [
                     $hitPrefix.'date_hit'          => [
                         'label' => 'mautic.page.report.hits.date_hit',
@@ -192,14 +191,35 @@ class ReportSubscriber extends CommonSubscriber
                         'label' => 'mautic.page.report.hits.redirect_unique_hits',
                         'type'  => 'string'
                     ],
-                    $emailPrefix.'id'              => [
-                        'label' => 'mautic.page.report.hits.email_id',
-                        'type'  => 'int'
-                    ],
-                    $emailPrefix.'subject'         => [
-                        'label' => 'mautic.page.report.hits.email_subject',
+                    'ds.device'         => [
+                        'label' => 'mautic.lead.device',
                         'type'  => 'string'
-                    ]
+                    ],
+                    'ds.device_brand'         => [
+                        'label' => 'mautic.lead.device_brand',
+                        'type'  => 'string'
+                    ],
+                    'ds.device_model'         => [
+                        'label' => 'mautic.lead.device_model',
+                        'type'  => 'string'
+                    ],
+                    'ds.device_os_name'         => [
+                        'label' => 'mautic.lead.device_os_name',
+                        'type'  => 'string'
+                    ],
+                    'ds.device_os_shortname'         => [
+                        'label' => 'mautic.lead.device_os_shortname',
+                        'type'  => 'string'
+                    ],
+                    'ds.device_os_version'         => [
+                        'label' => 'mautic.lead.device_os_version',
+                        'type'  => 'string'
+                    ],
+                    'ds.device_os_platform'         => [
+                        'label' => 'mautic.lead.device_os_platform',
+                        'type'  => 'string'
+                    ],
+
                 ];
                 $data        = [
                     'display_name' => 'mautic.page.hits',
@@ -213,6 +233,7 @@ class ReportSubscriber extends CommonSubscriber
                 $event->addGraph($context, 'line', 'mautic.page.graph.line.time.on.site');
                 $event->addGraph($context, 'pie', 'mautic.page.graph.pie.time.on.site', ['translate' => false]);
                 $event->addGraph($context, 'pie', 'mautic.page.graph.pie.new.vs.returning');
+                $event->addGraph($context, 'pie', 'mautic.page.graph.pie.devices');
                 $event->addGraph($context, 'pie', 'mautic.page.graph.pie.languages', ['translate' => false]);
                 $event->addGraph($context, 'table', 'mautic.page.table.referrers');
                 $event->addGraph($context, 'table', 'mautic.page.table.most.visited');
@@ -247,8 +268,8 @@ class ReportSubscriber extends CommonSubscriber
                     ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id')
                     ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'tp', 'p.id = tp.id')
                     ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'vp', 'p.id = vp.id')
-                    ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = ph.email_id')
-                    ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'page_redirects', 'r', 'r.id = ph.redirect_id');
+                    ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'page_redirects', 'r', 'r.id = ph.redirect_id')
+                    ->leftJoin('ph',MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id = ph.device_id');
 
                 $event->addIpAddressLeftJoin($qb, 'ph');
                 $event->addCategoryLeftJoin($qb, 'p');
@@ -373,7 +394,26 @@ class ReportSubscriber extends CommonSubscriber
                         ]
                     );
                     break;
+                case 'mautic.page.graph.pie.devices':
+                    $queryBuilder->select('ds.device, COUNT(distinct(ph.id)) as the_count')
+                        ->groupBy('ds.device');
+                    $data  = $queryBuilder->execute()->fetchAll();
+                    $chart = new PieChart();
 
+                    foreach ($data as $device) {
+                        $label = substr(empty($device['device'])?  $this->translator->trans('mautic.core.no.info'): $device['device'],0,12);
+                        $chart->setDataset($label, $device['the_count']);
+                    }
+
+                    $event->setGraph(
+                        $g,
+                        [
+                            'data'      => $chart->render(),
+                            'name'      => $g,
+                            'iconClass' => 'fa-globe'
+                        ]
+                    );
+                    break;
                 case 'mautic.page.table.referrers':
                     $limit                  = 10;
                     $offset                 = 0;

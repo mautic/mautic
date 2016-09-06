@@ -24,7 +24,7 @@ class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Check if IP outside a request that local IP is returned
      *
-     * @covers  Mautic\CoreBundle\Helper\ColorHelperTest::__construct
+     * @covers  \Mautic\CoreBundle\Helper\IpLookupHelper::getIpAddress
      */
     public function testLocalIpIsReturnedWhenNotInRequestScope()
     {
@@ -36,7 +36,7 @@ class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Check that the first IP is returned when the request is a proxy
      *
-     * @covers  Mautic\CoreBundle\Helper\ColorHelperTest::__construct
+     * @covers  \Mautic\CoreBundle\Helper\IpLookupHelper::getIpAddress
      */
     public function testClientIpIsReturnedFromProxy()
     {
@@ -49,7 +49,7 @@ class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Check that the first IP is returned with a web proxy
      *
-     * @covers  Mautic\CoreBundle\Helper\ColorHelperTest::__construct
+     * @covers  \Mautic\CoreBundle\Helper\IpLookupHelper::getIpAddress
      */
     public function testClientIpIsReturnedFromRequest()
     {
@@ -62,7 +62,7 @@ class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Check that a local IP is returned for internal IPs
      *
-     * @covers  Mautic\CoreBundle\Helper\ColorHelperTest::__construct
+     * @covers  \Mautic\CoreBundle\Helper\IpLookupHelper::getIpAddress
      */
     public function testLocalIpIsReturnedForInternalNetworkIp()
     {
