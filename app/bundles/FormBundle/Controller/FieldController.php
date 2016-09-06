@@ -101,9 +101,9 @@ class FieldController extends CommonFormController
                     $alias              = empty($formField['alias']) ? $formField['label'] : $formField['alias'];
                     $formField['alias'] = $this->getModel('form.field')->generateAlias($alias, $aliases);
 
-                    // Force required for captcha
+                    // Force required for captcha if not a honeypot
                     if ($formField['type'] == 'captcha') {
-                        $formField['isRequired'] = true;
+                        $formField['isRequired'] = !empty($formField['properties']['captcha']);
                     }
 
                     // Add it to the next to last assuming the last is the submit button
@@ -256,6 +256,11 @@ class FieldController extends CommonFormController
                                 }
                             }
                             $formField['alias'] = $this->getModel('form.field')->generateAlias($formField['label'], $aliases);
+                        }
+
+                        // Force required for captcha if not a honeypot
+                        if ($formField['type'] == 'captcha') {
+                            $formField['isRequired'] = !empty($formField['properties']['captcha']);
                         }
 
                         $fields[$objectId] = $formField;

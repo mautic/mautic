@@ -10,6 +10,11 @@
 namespace Mautic\FormBundle\Helper;
 
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints\Blank;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\EqualTo;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validation;
@@ -37,10 +42,13 @@ class FormFieldHelper
     private $types = [
         'captcha'     => [
             'constraints' => [
-                '\Symfony\Component\Validator\Constraints\NotBlank' =>
+                NotBlank::class =>
                     ['message' => 'mautic.form.submission.captcha.invalid'],
 
-                '\Symfony\Component\Validator\Constraints\EqualTo' =>
+                EqualTo::class =>
+                    ['message' => 'mautic.form.submission.captcha.invalid'],
+
+                Blank::class =>
                     ['message' => 'mautic.form.submission.captcha.invalid'],
             ],
         ],
@@ -50,7 +58,7 @@ class FormFieldHelper
         'email'       => [
             'filter'      => 'email',
             'constraints' => [
-                '\Symfony\Component\Validator\Constraints\Email' =>
+                Email::class =>
                     ['message' => 'mautic.form.submission.email.invalid'],
             ],
         ],
@@ -69,7 +77,7 @@ class FormFieldHelper
         'url'         => [
             'filter'      => 'url',
             'constraints' => [
-                '\Symfony\Component\Validator\Constraints\Url' =>
+                Url::class =>
                     ['message' => 'mautic.form.submission.url.invalid'],
             ],
         ],
@@ -158,9 +166,18 @@ class FormFieldHelper
                     continue;
                 }
 
-                if ($type == 'captcha' && strpos($constraint, 'EqualTo') !== false) {
-                    $props         = $f->getProperties();
-                    $opts['value'] = $props['captcha'];
+                if ($type == 'captcha') {
+                    $captcha = $f->getProperties()['captcha'];
+                    if (empty($captcha) && Blank::class !== $constraint) {
+                        // Used as a honeypot
+                        continue;
+                    } elseif (Blank::class === $constraint) {
+                        continue;
+                    }
+
+                    if (EqualTo::class == $constraint) {
+                        $opts['value'] = $captcha;
+                    }
                 }
 
                 /** @var ConstraintViolationList $violations */
