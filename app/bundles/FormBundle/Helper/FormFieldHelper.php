@@ -35,34 +35,6 @@ class FormFieldHelper
      * @var array
      */
     private $types = [
-        'text'        => [],
-        'textarea'    => [],
-        'country'     => [],
-        //'button'  => [],
-        'select'      => [],
-        'date'        => [],
-        'email'       => [
-            'filter'      => 'email',
-            'constraints' => [
-                '\Symfony\Component\Validator\Constraints\Email' =>
-                    ['message' => 'mautic.form.submission.email.invalid'],
-            ],
-        ],
-        'number'      => [
-            'filter' => 'float',
-        ],
-        'tel'         => [],
-        'url'         => [
-            'filter'      => 'url',
-            'constraints' => [
-                '\Symfony\Component\Validator\Constraints\Url' =>
-                    ['message' => 'mautic.form.submission.url.invalid'],
-            ],
-        ],
-        'freetext'    => [],
-        'checkboxgrp' => [],
-        'radiogrp'    => [],
-        'hidden'      => [],
         'captcha'     => [
             'constraints' => [
                 '\Symfony\Component\Validator\Constraints\NotBlank' =>
@@ -72,7 +44,35 @@ class FormFieldHelper
                     ['message' => 'mautic.form.submission.captcha.invalid'],
             ],
         ],
+        'checkboxgrp' => [],
+        'country'     => [],
+        'date'        => [],
+        'email'       => [
+            'filter'      => 'email',
+            'constraints' => [
+                '\Symfony\Component\Validator\Constraints\Email' =>
+                    ['message' => 'mautic.form.submission.email.invalid'],
+            ],
+        ],
+        'freetext'    => [],
+        'hidden'      => [],
+        'number'      => [
+            'filter' => 'float',
+        ],
         'pagebreak'   => [],
+        'password'    => [],
+        'radiogrp'    => [],
+        'select'      => [],
+        'tel'         => [],
+        'text'        => [],
+        'textarea'    => [],
+        'url'         => [
+            'filter'      => 'url',
+            'constraints' => [
+                '\Symfony\Component\Validator\Constraints\Url' =>
+                    ['message' => 'mautic.form.submission.url.invalid'],
+            ],
+        ],
     ];
 
     /**
