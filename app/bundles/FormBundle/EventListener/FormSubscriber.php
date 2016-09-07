@@ -135,7 +135,7 @@ class FormSubscriber extends CommonSubscriber
             'formTheme'          => 'MauticFormBundle:FormTheme\SubmitAction',
             'formTypeCleanMasks' => [
                 'post_url'             => 'url',
-                'failure_email'        => 'email',
+                'failure_email'        => 'string',
                 'authorization_header' => 'string'
             ],
             'eventName'          => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
@@ -164,7 +164,7 @@ class FormSubscriber extends CommonSubscriber
         $config    = $event->getActionConfig();
         $lead      = $event->getSubmission()->getLead();
         $leadEmail = $lead->getEmail();
-        $emails    = (!empty($config['to'])) ? array_fill_keys(explode(',', $config['to']), null) : [];
+        $emails    = $this->getEmailsFromString($config['to']);
 
         if (!empty($emails)) {
             $this->mailer->setTo($emails);
@@ -175,12 +175,12 @@ class FormSubscriber extends CommonSubscriber
             }
 
             if (!empty($config['cc'])) {
-                $emails = array_fill_keys(explode(',', $config['cc']), null);
+                $emails = $this->getEmailsFromString($config['cc']);
                 $this->mailer->setCc($emails);
             }
 
             if (!empty($config['bcc'])) {
-                $emails = array_fill_keys(explode(',', $config['bcc']), null);
+                $emails = $this->getEmailsFromString($config['bcc']);
                 $this->mailer->setBcc($emails);
             }
 
@@ -287,13 +287,14 @@ class FormSubscriber extends CommonSubscriber
                 }
             }
 
-            $email = trim($config['failure_email']);
+            $email = $config['failure_email'];
             // Failed so send email if applicable
             if (!empty($email)) {
                 $post['array'] = $post;
                 $results    = $this->postToHtml($post);
                 $submission = $event->getSubmission();
-                $this->mailer->addTo($email);
+                $emails     = $emails = $this->getEmailsFromString($email);
+                $this->mailer->setTo($emails);
                 $this->mailer->setSubject(
                     $this->translator->trans('mautic.form.action.repost.failed_subject', ['%form%' => $submission->getForm()->getName()])
                 );
@@ -338,5 +339,15 @@ class FormSubscriber extends CommonSubscriber
         $output .= '</table>';
 
         return $output;
+    }
+
+    /**
+     * @param $emailString
+     *
+     * @return array
+     */
+    private function getEmailsFromString($emailString)
+    {
+        return (!empty($emailString)) ? array_fill_keys(array_map('trim', explode(',', $emailString)), null) : [];
     }
 }
