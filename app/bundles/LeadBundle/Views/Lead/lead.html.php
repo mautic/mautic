@@ -445,6 +445,9 @@ $view['slots']->set(
                 </div>
             </div>
             <div class="panel-body pt-sm">
+                <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.lead.field.owner'); ?></h6>
+                <p class="text-muted"><?php echo $lead->getOwner()->getName(); ?></p>
+
                 <h6 class="fw-sb">
                     <?php echo $view['translator']->trans('mautic.lead.field.address'); ?>
                 </h6>
