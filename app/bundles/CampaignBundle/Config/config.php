@@ -32,14 +32,11 @@ return array(
             )
         ),
         'api'  => array(
-            'mautic_api_getcampaigns' => array(
+            'standard_entity' => [
+                'name'       => 'campaigns',
                 'path'       => '/campaigns',
-                'controller' => 'MauticCampaignBundle:Api\CampaignApi:getEntities'
-            ),
-            'mautic_api_getcampaign'  => array(
-                'path'       => '/campaigns/{id}',
-                'controller' => 'MauticCampaignBundle:Api\CampaignApi:getEntity'
-            ),
+                'controller' => 'MauticCampaignBundle:Api\CampaignApi'
+            ],
             'mautic_api_campaignaddcontact' => array(
                 'path'       => '/campaigns/{id}/contact/add/{leadId}',
                 'controller' => 'MauticCampaignBundle:Api\CampaignApi:addLead',

@@ -131,9 +131,12 @@ class CampaignModel extends CommonFormModel
         if (!$entity instanceof Campaign) {
             throw new MethodNotAllowedHttpException(array('Campaign'));
         }
-        $params = (!empty($action)) ? array('action' => $action) : array();
+        
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
 
-        return $formFactory->create('campaign', $entity, $params);
+        return $formFactory->create('campaign', $entity, $options);
     }
 
     /**
