@@ -18,7 +18,7 @@ $leadName = $lead->getPrimaryIdentifier();
         ?>
         <li class="list-group-item">
             <i class="fa fa-lg fa-fw <?php echo $switch . ' ' . $bgClass; ?>" id="companyLeadsToggle<?php echo $company['id']; ?>" onclick="Mautic.toggleCompanyLead('companyLeadsToggle<?php echo $company['id']; ?>', <?php echo $leadId; ?>, <?php echo $company['id']; ?>);"></i>
-            <span><?php echo $company['name']; ?></span>
+            <span><?php echo $company['companyname']; ?></span>
         </li>
     <?php endforeach; ?>
 </ul>

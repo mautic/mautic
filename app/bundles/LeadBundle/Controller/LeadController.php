@@ -1200,7 +1200,7 @@ class LeadController extends FormController
                 $lead->getOwner()
             )
         ) {
-            /** @var \Mautic\CompanyBundle\Model\CompanyModel $companyModel */
+            /** @var \Mautic\LeadBundle\Model\CompanyModel $companyModel */
             $companyModel = $this->getModel('company');
             $companies     = $companyModel->getUserCompanies();
 

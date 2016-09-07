@@ -342,7 +342,7 @@ class CompanyModel extends CommonFormModel
         }
 
         if (!empty($persistCompany)) {
-            $this->getRepository()->saveEntities($persistCompany);
+            $this->leadFieldModel->getRepository()->saveEntities($persistCompany);
         }
 
         // Clear CompanyLead entities from Doctrine memory
