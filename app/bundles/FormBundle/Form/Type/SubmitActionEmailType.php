@@ -62,16 +62,10 @@ class SubmitActionEmailType extends AbstractType
 
         if (!isset($options['data']['message'])) {
             $fields   = $this->getFormFields($options['attr']['data-formid']);
-            $viewOnly = $this->formModel->getCustomComponents()['viewOnlyFields'];
-
             $message = '';
 
-            foreach ($fields as $f) {
-                if (in_array($f['type'], $viewOnly)) {
-                    continue;
-                }
-
-                $message .= "<strong>{$f['label']}</strong>: {formfield={$f['alias']}}<br />";
+            foreach ($fields as $token => $label) {
+                $message .= "<strong>$label</strong>: $token<br />";
             }
         } else {
             $message = $options['data']['message'];
