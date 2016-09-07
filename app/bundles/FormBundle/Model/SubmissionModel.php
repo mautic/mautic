@@ -135,9 +135,9 @@ class SubmissionModel extends CommonFormModel
      * @param      $server
      * @param Form $form
      *
-     * @return boolean|string false if no error was encountered; otherwise the error message
+     * @return bool|array
      */
-    public function saveSubmission($post, $server, Form $form, Request $request = null)
+    public function saveSubmission($post, $server, Form $form, Request $request = null, $returnEvent = false)
     {
         //everything matches up so let's save the results
         $submission = new Submission();
@@ -362,8 +362,9 @@ class SubmissionModel extends CommonFormModel
             return ['callback' => $submissionEvent];
         }
 
-        //made it to the end so return false that there was not an error
-        return false;
+        // made it to the end so return the submission event to give the calling method access to tokens, results, etc
+        // otherwise return false that no errors were encountered (to keep BC really)
+        return ($returnEvent) ? ['submission' => $submissionEvent] : false;
     }
 
     /**
