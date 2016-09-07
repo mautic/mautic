@@ -268,21 +268,24 @@ class ListModel extends FormModel
         );
 
         //field choices
-        $choices = array(
+        $choices['lead'] = array(
             'date_added' => array(
                 'label'      => $this->translator->trans('mautic.core.date.added'),
                 'properties' => array('type' => 'date'),
-                'operators'  => 'default'
+                'operators'  => 'default',
+                'object'     => 'lead'
             ),
             'date_identified' => array(
                 'label'      => $this->translator->trans('mautic.lead.list.filter.date_identified'),
                 'properties' => array('type' => 'date'),
-                'operators'  => 'default'
+                'operators'  => 'default',
+                'object'     => 'lead'
             ),
             'last_active' => array(
                 'label'      => $this->translator->trans('mautic.lead.list.filter.last_active'),
                 'properties' => array('type' => 'date'),
-                'operators'  => 'default'
+                'operators'  => 'default',
+                'object'     => 'lead'
             ),
             'owner_id'   => array(
                 'label'      => $this->translator->trans('mautic.lead.list.filter.owner'),
@@ -290,19 +293,25 @@ class ListModel extends FormModel
                     'type'     => 'lookup_id',
                     'callback' => 'activateLeadFieldTypeahead'
                 ),
-                'operators'  => 'text'
+                'operators'  => 'text',
+                'object'     => 'lead'
+
             ),
             'points'     => array(
                 'label'      => $this->translator->trans('mautic.lead.lead.event.points'),
                 'properties' => array('type' => 'number'),
-                'operators'  => 'default'
+                'operators'  => 'default',
+                'object'     => 'lead'
+
             ),
             'leadlist'       => array(
-                'label'      => $this->translator->trans('mautic.lead.list.filter.lists'),
+                'label'      => 'lead '.$this->translator->trans('mautic.lead.list.filter.lists'),
                 'properties' => array(
                     'type' => 'leadlist'
                 ),
-                'operators'  => 'multiselect'
+                'operators'  => 'multiselect',
+                'object'     => 'lead'
+
             ),
             'lead_email_received'       => array(
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received'),
@@ -314,14 +323,18 @@ class ListModel extends FormModel
                         'in',
                         '!in'
                     )
-                )
+                ),
+                'object'     => 'lead'
+
             ),
             'tags'       => array(
                 'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
                 'properties' => array(
                     'type' => 'tags'
                 ),
-                'operators'  => 'multiselect'
+                'operators'  => 'multiselect',
+                'object'     => 'lead'
+
             ),
             'dnc_bounced'        => array(
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced'),
@@ -332,7 +345,9 @@ class ListModel extends FormModel
                         1 => $this->translator->trans('mautic.core.form.yes')
                     )
                 ),
-                'operators'  => 'bool'
+                'operators'  => 'bool',
+                'object'     => 'lead'
+
             ),
             'dnc_unsubscribed'   => array(
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed'),
@@ -343,7 +358,9 @@ class ListModel extends FormModel
                         1 => $this->translator->trans('mautic.core.form.yes')
                     )
                 ),
-                'operators'  => 'bool'
+                'operators'  => 'bool',
+                'object'     => 'lead'
+
             ),
             'dnc_bounced_sms'        => array(
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced_sms'),
@@ -354,7 +371,9 @@ class ListModel extends FormModel
                         1 => $this->translator->trans('mautic.core.form.yes')
                     )
                 ),
-                'operators'  => 'bool'
+                'operators'  => 'bool',
+                'object'     => 'lead'
+
             ),
             'dnc_unsubscribed_sms'   => array(
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed_sms'),
@@ -365,7 +384,9 @@ class ListModel extends FormModel
                         1 => $this->translator->trans('mautic.core.form.yes')
                     )
                 ),
-                'operators'  => 'bool'
+                'operators'  => 'bool',
+                'object'     => 'lead'
+
             ),
             'hit_url' => array(
                 'label' => $this->translator->trans('mautic.lead.list.filter.visited_url'),
@@ -377,7 +398,9 @@ class ListModel extends FormModel
                         '=',
                         'like'
                     )
-                )
+                ),
+                'object'     => 'lead'
+
             ),
             'stage' => array(
                 'label' => $this->translator->trans('mautic.lead.lead.field.stage'),
@@ -389,7 +412,9 @@ class ListModel extends FormModel
                         '=',
                         '!='
                     )
-                )
+                ),
+                'object'     => 'lead'
+
             )
         );
 
@@ -399,7 +424,8 @@ class ListModel extends FormModel
                 'filter' => array(
                     'isListable'  => true,
                     'isPublished' => true
-                )
+                ),
+                'orderBy'    => 'f.object'
             )
         );
         foreach ($fields as $field) {
@@ -414,7 +440,7 @@ class ListModel extends FormModel
                     $properties['callback'] = 'activateLeadFieldTypeahead';
                 }
             }
-            $choices[$field->getAlias()] = array(
+            $choices[$field->getObject()][$field->getAlias()] = array(
                 'label'      => $field->getLabel(),
                 'properties' => $properties,
                 'object'     => $field->getObject()
@@ -422,28 +448,33 @@ class ListModel extends FormModel
 
             // Set operators allowed
             if ($type == 'boolean') {
-                $choices[$field->getAlias()]['operators'] = 'bool';
+                $choices[$field->getObject()][$field->getAlias()]['operators'] = 'bool';
             } elseif (in_array($type, array('select', 'country', 'timezone', 'region'))) {
-                $choices[$field->getAlias()]['operators'] = 'select';
+                $choices[$field->getObject()][$field->getAlias()]['operators'] = 'select';
             } elseif (in_array($type, array('lookup', 'lookup_id',  'text', 'email', 'url', 'email', 'tel'))) {
-                $choices[$field->getAlias()]['operators'] = 'text';
+                $choices[$field->getObject()][$field->getAlias()]['operators'] = 'text';
             } else {
-                $choices[$field->getAlias()]['operators'] = 'default';
+                $choices[$field->getObject()][$field->getAlias()]['operators'] = 'default';
             }
         }
-
-        $cmp = function ($a, $b) {
-            return strcmp($a['label'], $b['label']);
-        };
-
-        uasort($choices, $cmp);
 
         foreach ($choices as $key => $choice) {
-            if (array_key_exists('operators', $choice) && is_string($choice['operators']) && array_key_exists($choice['operators'], $operators)) {
-                $choices[$key]['operators'] = $operators[$choice['operators']];
-            }
+            $cmp = function ($a, $b) {
+                return strcmp($a['label'], $b['label']);
+
+            };
+            uasort($choice, $cmp);
+            $choices[$key] = $choice;
         }
 
+
+        foreach ($choices as $object => $choiceObject) {
+            foreach ($choiceObject as $key => $choice) {
+                if (array_key_exists('operators', $choice) && is_string($choice['operators']) && array_key_exists($choice['operators'], $operators)) {
+                    $choices[$object][$key]['operators'] = $operators[$choice['operators']];
+                }
+            }
+        }
         return $choices;
     }
 
@@ -969,7 +1000,6 @@ class ListModel extends FormModel
     public function getLeadsByList($lists, $idOnly = false, $args = array())
     {
         $args['idOnly'] = $idOnly;
-
         return $this->getRepository()->getLeadsByList($lists, $args);
     }
 

@@ -79,29 +79,34 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                     </div>
                     <div class="tab-pane fade bdr-w-0" id="filters">
                         <div class="form-group">
-                            <input type="radio" name="object" value="lead" checked="true" onclick="Mautic.leadlistPopulateChoices(this)"> <?php echo $view['translator']->trans('mautic.lead.contact'); ?><br>
-                            <input type="radio" name="object" value="company" onclick="Mautic.leadlistPopulateChoices(this)"> <?php echo $view['translator']->trans('mautic.company.company'); ?><br>
-                        </div>
-                        <div class="form-group">
                             <div class="available-filters mb-md pl-0 col-md-4" data-prototype="<?php echo $view->escape($view['form']->row($form['filters']->vars['prototype'])); ?>" data-index="<?php echo $index + 1; ?>">
                                 <select class="chosen form-control" id="available_filters">
                                     <option value=""></option>
                                     <?php
-                                    foreach ($fields as $value => $params):
-                                        $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : array();
-                                        $choices   = \Mautic\LeadBundle\Helper\FormFieldHelper::parseListStringIntoArray($list);
-                                        $list      = json_encode($choices);
-                                        $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
-                                        $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
-                                        ?>
-                                        <option value="<?php echo $value; ?>" id="available_<?php echo $value; ?>" data-field-type="<?php echo $params['properties']['type']; ?>" data-field-list="<?php echo $view->escape($list); ?>" data-field-callback="<?php echo $callback; ?>" data-field-operators="<?php echo $operators; ?>"><?php echo $view['translator']->trans($params['label']); ?></option>
+                                    foreach ($fields as $object => $field):
+                                        $header    = $object;
+                                        $icon      = ($object == 'company') ? 'fa-building' : 'fa-user';
+                                    ?>
+                                    <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
+                                        <?php foreach ($field as $value => $params):
+                                            $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : array();
+                                            $choices   = \Mautic\LeadBundle\Helper\FormFieldHelper::parseListStringIntoArray($list);
+                                            $object    = $object;
+                                            $list      = json_encode($choices);
+                                            $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
+                                            $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
+                                            ?>
+                                            <option value="<?php echo $value; ?>" id="available_<?php echo $value; ?>" data-field-object="<?php echo $object; ?>" data-field-type="<?php echo $params['properties']['type']; ?>" data-field-list="<?php echo $view->escape($list); ?>" data-field-callback="<?php echo $callback; ?>" data-field-operators="<?php echo $operators; ?>" class="segment-filter fa <?php echo $icon;?>"><?php echo $view['translator']->trans($params['label']); ?></option>
+                                        <?php endforeach; ?>
+                                    </optgroup>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
                             <div class="clearfix"></div>
                         </div>
                         <div class="selected-filters" id="leadlist_filters">
-                            <?php echo $view['form']->widget($form['filters']); ?>
+                            <?php
+                            echo $view['form']->widget($form['filters']); ?>
                         </div>
                     </div>
                 </div>

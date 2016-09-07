@@ -383,6 +383,7 @@ Mautic.addLeadListFilter = function (elId) {
 
     var prototype = mQuery('.available-filters').data('prototype');
     var fieldType = mQuery(filterId).data('field-type');
+    var fieldObject = mQuery(filterId).data('field-object');
     var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale']) != -1);
 
     prototype = prototype.replace(/__name__/g, filterNum);
@@ -407,8 +408,14 @@ Mautic.addLeadListFilter = function (elId) {
 
     if (mQuery('#leadlist_filters div.panel').length == 0) {
         // First filter so hide the glue footer
-        mQuery(prototype).find(".panel-footer").addClass('hide');
+        mQuery(prototype).find(".panel-heading").addClass('hide');
     }
+    if (fieldObject == 'company') {
+        mQuery(prototype).find("#object-icon").addClass('fa-building');
+    } else {
+        mQuery(prototype).find("#object-icon").addClass('fa-user');
+    }
+    mQuery(prototype).find(".inline-spacer").append(fieldObject);
 
     mQuery(prototype).find("a.remove-selected").on('click', function() {
         mQuery(this).closest('.panel').animate(
@@ -422,6 +429,7 @@ Mautic.addLeadListFilter = function (elId) {
 
     mQuery(prototype).find("input[name='" + filterBase + "[field]']").val(elId);
     mQuery(prototype).find("input[name='" + filterBase + "[type]']").val(fieldType);
+    mQuery(prototype).find("input[name='" + filterBase + "[object]']").val(fieldObject);
 
     var filterEl = (isSpecial) ? "select[name='" + filterBase + "[filter]']" : "input[name='" + filterBase + "[filter]']";
 
