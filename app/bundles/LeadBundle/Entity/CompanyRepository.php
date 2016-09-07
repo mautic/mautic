@@ -286,7 +286,27 @@ class CompanyRepository extends CommonRepository
 
         return $fieldValues;
     }
+    /**
+     * Get companies by lead
+     *
+     * @param      $leadId
+     *
+     * @return array
+     */
+    public function getCompaniesByLeadId($leadId)
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
+        $q->select('comp.id, comp.companyname')
+            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
+            ->leftJoin('comp',MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id')
+            ->where('cl.lead_id = :leadId')
+            ->setParameter('leadId', $leadId)
+            ->orderBy('comp.companyname', 'ASC');
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
     /**
      * Function to remove non custom field columns from an arrayed lead row
      *
