@@ -305,16 +305,18 @@ class CompanyController extends FormController
         $action  = $this->generateUrl('mautic_company_action', array('objectAction' => 'edit', 'objectId' => $objectId));
         $fields = $this->getModel('lead.field')->getEntities(
             [
-                'force'          => [
-                    [
-                        'column' => 'f.isPublished',
-                        'expr'   => 'eq',
-                        'value'  => true
-                    ],
-                    [
-                        'column' => 'f.object',
-                        'expr'   => 'like',
-                        'value'  => 'company'
+                'filter' => [
+                    'force'          => [
+                        [
+                            'column' => 'f.isPublished',
+                            'expr'   => 'eq',
+                            'value'  => true
+                        ],
+                        [
+                            'column' => 'f.object',
+                            'expr'   => 'eq',
+                            'value'  => 'company'
+                        ]
                     ]
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY'
@@ -333,6 +335,17 @@ class CompanyController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
+                    $data = $this->request->request->get('company');
+
+                    //pull the data from the form in order to apply the form's formatting
+                    foreach ($form as $f) {
+                        $name = $f->getName();
+                        if (strpos($name, 'field_') === 0) {
+                            $data[$name] = $f->getData();
+                        }
+                    }
+
+                    $model->setFieldValues($entity, $data, true);
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
                     $this->addFlash(
@@ -353,10 +366,6 @@ class CompanyController extends FormController
                     if ($form->get('buttons')->get('save')->isClicked()) {
                         $returnUrl = $this->generateUrl('mautic_company_index', $viewParameters);
                         $template  = 'MauticLeadBundle:Company:index';
-                    } elseif ($valid) {
-                        // Refetch and recreate the form in order to populate data manipulated in the entity itself
-                        $company = $model->getEntity($objectId);
-                        $form = $model->createForm($company, $this->get('form.factory'), $action, ['fields' => $fields]);
                     }
                 }
             } else {
@@ -378,6 +387,10 @@ class CompanyController extends FormController
                         )
                     )
                 );
+            } elseif ($valid) {
+                // Refetch and recreate the form in order to populate data manipulated in the entity itself
+                $company = $model->getEntity($objectId);
+                $form = $model->createForm($company, $this->get('form.factory'), $action, ['fields' => $fields]);
             }
         } else {
             //lock the entity
@@ -391,7 +404,7 @@ class CompanyController extends FormController
                     'tmpl'    => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'entity'  => $entity,
                     'form'    => $this->setFormTheme($form, 'MauticLeadBundle:Company:form.html.php', $themes),
-                    'fields'  => $model->organizeFieldsByGroup($entity->getFields()) //pass in the lead fields as they are already organized by ['group']['alias']
+                    'fields'  => $entity->getFields() //pass in the lead fields as they are already organized by ['group']['alias']
                 ),
                 'contentTemplate' => 'MauticLeadBundle:Company:form.html.php',
                 'passthroughVars' => array(
