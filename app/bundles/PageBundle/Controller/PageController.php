@@ -302,7 +302,6 @@ class PageController extends FormController
                 ), "RETURN_ARRAY"),
                 'stats'         => array(
                     'pageviews' => $pageviews,
-                    'bounces'   => $model->getBounces($activePage),
                     'hits'      => array(
                         'total'  => $activePage->getHits(),
                         'unique' => $activePage->getUniqueHits()
@@ -552,7 +551,6 @@ class PageController extends FormController
             $template = $entity->getTemplate();
             if (empty($template)) {
                 $content = $entity->getCustomHtml();
-                BuilderTokenHelper::replaceTokensWithVisualPlaceholders($tokens, $content);
                 $form['customHtml']->setData($content);
             }
         }
@@ -785,9 +783,6 @@ class PageController extends FormController
         //merge any existing changes
         $newContent = $this->factory->getSession()->get('mautic.pagebuilder.'.$objectId.'.content', array());
         $content    = $entity->getContent();
-
-        $tokens = $model->getBuilderComponents($entity, array('tokens', 'visualTokens'));
-        BuilderTokenHelper::replaceTokensWithVisualPlaceholders($tokens, $content);
 
         if (is_array($newContent)) {
             $content = array_merge($content, $newContent);

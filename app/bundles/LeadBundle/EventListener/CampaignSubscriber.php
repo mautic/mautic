@@ -143,7 +143,7 @@ class CampaignSubscriber extends CommonSubscriber
         $somethingHappened = false;
 
         if ($lead !== null && !empty($points)) {
-            $lead->addToPoints($points);
+            $lead->adjustPoints($points);
 
             //add a lead point change log
             $log = new PointsChangeLog();

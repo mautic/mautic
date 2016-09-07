@@ -14,12 +14,137 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\Exception\MailboxException;
 use stdClass;
 
 class Mailbox
 {
+    /**
+     * Return all mails matching the rest of the criteria
+     */
+    const CRITERIA_ALL = 'ALL';
+
+    /**
+     * Match mails with the \\ANSWERED flag set
+     */
+    const CRITERIA_ANSWERED = 'ANSWERED';
+
+    /**
+     * CRITERIA_BCC "string" - match mails with "string" in the Bcc: field
+     */
+    const CRITERIA_BCC = "BCC";
+
+    /**
+     * CRITERIA_BEFORE "date" - match mails with Date: before "date"
+     */
+    const CRITERIA_BEFORE = "BEFORE";
+
+    /**
+     * CRITERIA_BODY "string" - match mails with "string" in the body of the mail
+     */
+    const CRITERIA_BODY = "BODY";
+
+    /**
+     * CRITERIA_CC "string" - match mails with "string" in the Cc: field
+     */
+    const CRITERIA_CC = "CC";
+
+    /**
+     * Match deleted mails
+     */
+    const CRITERIA_DELETED = "DELETED";
+
+    /**
+     * Match mails with the \\FLAGGED (sometimes referred to as Important or Urgent) flag set
+     */
+    const CRITERIA_FLAGGED = "FLAGGED";
+
+    /**
+     * CRITERIA_FROM "string" - match mails with "string" in the From: field
+     */
+    const CRITERIA_FROM = "FROM";
+
+    /**
+     *  CRITERIA_KEYWORD "string" - match mails with "string" as a keyword
+     */
+    const CRITERIA_KEYWORD = "KEYWORD";
+
+    /**
+     * Match new mails
+     */
+    const CRITERIA_NEW = "NEW";
+
+    /**
+     * Match old mails
+     */
+    const CRITERIA_OLD = "OLD";
+
+    /**
+     * CRITERIA_ON "date" - match mails with Date: matching "date"
+     */
+    const CRITERIA_ON = "ON";
+
+    /**
+     * Match mails with the \\RECENT flag set
+     */
+    const CRITERIA_RECENT = "RECENT";
+
+    /**
+     * Match mails that have been read (the \\SEEN flag is set)
+     */
+    const CRITERIA_SEEN = "SEEN";
+
+    /**
+     * CRITERIA_SINCE "date" - match mails with Date: after "date"
+     */
+    const CRITERIA_SINCE = "SINCE";
+
+    /**
+     *  CRITERIA_SUBJECT "string" - match mails with "string" in the Subject:
+     */
+    const CRITERIA_SUBJECT = "SUBJECT";
+
+    /**
+     * CRITERIA_TEXT "string" - match mails with text "string"
+     */
+    const CRITERIA_TEXT = "TEXT";
+
+    /**
+     * CRITERIA_TO "string" - match mails with "string" in the To:
+     */
+    const CRITERIA_TO = "TO";
+
+    /**
+     *  Match mails that have not been answered
+     */
+    const CRITERIA_UNANSWERED = "UNANSWERED";
+
+    /**
+     * Match mails that are not deleted
+     */
+    const CRITERIA_UNDELETED = "UNDELETED";
+
+    /**
+     * Match mails that are not flagged
+     */
+    const CRITERIA_UNFLAGGED = "UNFLAGGED";
+
+    /**
+     * CRITERIA_UNKEYWORD "string" - match mails that do not have the keyword "string"
+     */
+    const CRITERIA_UNKEYWORD = "UNKEYWORD";
+
+    /**
+     * Match mails which have not been read yet
+     */
+    const CRITERIA_UNSEEN = "UNSEEN";
+
+    /**
+     * Match mails which have not been read yet - alias of CRITERIA_UNSEEN
+     */
+    const CRITERIA_UNREAD = 'UNSEEN';
 
     protected $imapPath;
     protected $imapFullPath;
@@ -27,7 +152,7 @@ class Mailbox
     protected $imapFolder = 'INBOX';
     protected $imapOptions = 0;
     protected $imapRetriesNum = 0;
-    protected $imapParams = array();
+    protected $imapParams = [];
     protected $serverEncoding = 'UTF-8';
     protected $attachmentsDir;
     protected $settings;
@@ -35,29 +160,30 @@ class Mailbox
     protected $mailboxes;
 
     /**
-     * @param MauticFactory $factory
+     * Mailbox constructor.
+     *
+     * @param CoreParametersHelper $parametersHelper
+     * @param PathsHelper          $pathsHelper
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(CoreParametersHelper $parametersHelper, PathsHelper $pathsHelper)
     {
-        $this->factory = $factory;
-
-        $this->mailboxes = $this->factory->getParameter('monitored_email');
+        $this->mailboxes = $parametersHelper->getParameter('monitored_email', []);
 
         if (isset($this->mailboxes['general'])) {
             $this->settings = $this->mailboxes['general'];
         } else {
-            $this->settings = array(
-                'host'      => '',
-                'port'      => '',
-                'password'  => '',
-                'user'      => '',
+            $this->settings = [
+                'host'       => '',
+                'port'       => '',
+                'password'   => '',
+                'user'       => '',
                 'encryption' => ''
-            );
+            ];
         }
 
         // Check that cache attachments directory exists
-        $cacheDir             = $factory->getSystemPath('cache');
-        $this->attachmentsDir = $cacheDir . '/attachments';
+        $cacheDir             = $pathsHelper->getSystemPath('cache', true);
+        $this->attachmentsDir = $cacheDir.'/attachments';
 
         if (!file_exists($this->attachmentsDir)) {
             mkdir($this->attachmentsDir);
@@ -77,7 +203,8 @@ class Mailbox
      * @return bool
      * @throws MailboxException
      */
-    public function isConfigured($bundleKey = null, $folderKey = null) {
+    public function isConfigured($bundleKey = null, $folderKey = null)
+    {
         if ($bundleKey !== null) {
             try {
                 $this->switchMailbox($bundleKey, $folderKey);
@@ -88,10 +215,8 @@ class Mailbox
         }
 
         return (
-            !empty($this->settings['host']) &&
-            !empty($this->settings['port']) &&
-            !empty($this->settings['user']) &&
-            !empty($this->settings['password'])
+            !empty($this->settings['host']) && !empty($this->settings['port']) && !empty($this->settings['user'])
+            && !empty($this->settings['password'])
         );
     }
 
@@ -105,14 +230,15 @@ class Mailbox
      */
     public function switchMailbox($bundle, $mailbox = '')
     {
-        $key = $bundle . (!empty($mailbox) ? '_' . $mailbox : '');
+        $key = $bundle.(!empty($mailbox) ? '_'.$mailbox : '');
 
         if (isset($this->mailboxes[$key])) {
-            $this->settings = (!empty($this->mailboxes[$key]['override_settings'])) ? $this->mailboxes[$key] : $this->mailboxes['general'];
-            $this->imapFolder = $this->mailboxes[$key]['folder'];
+            $this->settings           = (!empty($this->mailboxes[$key]['override_settings'])) ? $this->mailboxes[$key] : $this->mailboxes['general'];
+            $this->imapFolder         = $this->mailboxes[$key]['folder'];
+            $this->settings['folder'] = $this->mailboxes[$key]['folder'];
             $this->setImapPath();
         } else {
-            throw new MailboxException($key . ' not found');
+            throw new MailboxException($key.' not found');
         }
     }
 
@@ -128,10 +254,15 @@ class Mailbox
 
     /**
      * Set imap path based on mailbox settings
+     *
+     * @param null $settings
      */
-    public function setImapPath()
+    public function setImapPath($settings = null)
     {
-        $paths              = $this->getImapPath($this->settings);
+        if (null == $settings) {
+            $settings = $this->settings;
+        }
+        $paths              = $this->getImapPath($settings);
         $this->imapPath     = $paths['path'];
         $this->imapFullPath = $paths['full'];
     }
@@ -162,13 +293,13 @@ class Mailbox
             $fullPath .= $folder;
         }
 
-        return array('path' => $path, 'full' => $fullPath);
+        return ['path' => $path, 'full' => $fullPath];
     }
 
     /**
      * Override mailbox settings
      *
-     * @param array     $settings
+     * @param array $settings
      */
     public function setMailboxSettings(array $settings)
     {
@@ -195,18 +326,18 @@ class Mailbox
             return $this->settings;
         }
 
-        $key = $bundle . (!empty($mailbox) ? '_' . $mailbox : '');
+        $key = $bundle.(!empty($mailbox) ? '_'.$mailbox : '');
 
         if (isset($this->mailboxes[$key])) {
             $settings = (!empty($this->mailboxes[$key]['override_settings'])) ? $this->mailboxes[$key] : $this->mailboxes['general'];
 
-            $settings['folder']    = $this->mailboxes[$key]['folder'];
-            $this->setImapPath();
+            $settings['folder'] = $this->mailboxes[$key]['folder'];
+            $this->setImapPath($settings);
 
             $imapPath              = $this->getImapPath($settings);
             $settings['imap_path'] = $imapPath['full'];
         } else {
-            throw new MailboxException($key . ' not found');
+            throw new MailboxException($key.' not found');
         }
 
         return $settings;
@@ -311,7 +442,6 @@ class Mailbox
      *
      * @return bool
      */
-
     public function createMailbox()
     {
         return imap_createmailbox($this->getImapStream(), imap_utf7_encode($this->imapFullPath));
@@ -325,12 +455,10 @@ class Mailbox
      *
      * @return stdClass if the box doesn't exist
      */
-
     public function statusMailbox()
     {
         return imap_status($this->getImapStream(), $this->imapFullPath, SA_ALL);
     }
-
 
     /**
      * Gets listing the folders
@@ -340,10 +468,9 @@ class Mailbox
      *
      * @return array listing the folders
      */
-
     public function getListingFolders()
     {
-        static $folders = array();
+        static $folders = [];
 
         if (!isset($folders[$this->imapFullPath]) && $this->isConfigured()) {
             $tempFolders = @imap_list($this->getImapStream(), $this->imapPath, "*");
@@ -354,7 +481,7 @@ class Mailbox
                     $tempFolders[$key] = $folder;
                 }
             } else {
-                $tempFolders = array();
+                $tempFolders = [];
             }
 
             $folders[$this->imapFullPath] = $tempFolders;
@@ -376,7 +503,7 @@ class Mailbox
             $this->switchFolder($folder);
         }
 
-        return $this->searchMailBox('UNSEEN');
+        return $this->searchMailBox(self::CRITERIA_UNSEEN);
     }
 
     /**
@@ -393,7 +520,8 @@ class Mailbox
      *                         BEFORE "date" - match mails with Date: before "date"
      *                         BODY "string" - match mails with "string" in the body of the mail
      *                         CC "string" - match mails with "string" in the Cc: field
-     *                         DELETED - match deleted mails FLAGGED - match mails with the \\FLAGGED (sometimes referred to as Important or Urgent) flag set
+     *                         DELETED - match deleted mails
+     *                         FLAGGED - match mails with the \\FLAGGED (sometimes referred to as Important or Urgent) flag set
      *                         FROM "string" - match mails with "string" in the From: field
      *                         KEYWORD "string" - match mails with "string" as a keyword
      *                         NEW - match new mails
@@ -406,17 +534,18 @@ class Mailbox
      *                         TEXT "string" - match mails with text "string"
      *                         TO "string" - match mails with "string" in the To:
      *                         UNANSWERED - match mails that have not been answered
-     *                         UNDELETED - match mails that are not deleted UNFLAGGED - match mails that are not flagged
+     *                         UNDELETED - match mails that are not deleted
+     *                         UNFLAGGED - match mails that are not flagged
      *                         UNKEYWORD "string" - match mails that do not have the keyword "string"
      *                         UNSEEN - match mails which have not been read yet
      *
      * @return array Mails ids
      */
-    public function searchMailbox($criteria = 'ALL')
+    public function searchMailbox($criteria = self::CRITERIA_ALL)
     {
         $mailsIds = imap_search($this->getImapStream(), $criteria, SE_UID);
 
-        return $mailsIds ? $mailsIds : array();
+        return $mailsIds ? $mailsIds : [];
     }
 
     /**
@@ -476,7 +605,7 @@ class Mailbox
      */
     public function markMailAsRead($mailId)
     {
-        return $this->setFlag(array($mailId), '\\Seen');
+        return $this->setFlag([$mailId], '\\Seen');
     }
 
     /**
@@ -488,7 +617,7 @@ class Mailbox
      */
     public function markMailAsUnread($mailId)
     {
-        return $this->clearFlag(array($mailId), '\\Seen');
+        return $this->clearFlag([$mailId], '\\Seen');
     }
 
     /**
@@ -500,7 +629,7 @@ class Mailbox
      */
     public function markMailAsImportant($mailId)
     {
-        return $this->setFlag(array($mailId), '\\Flagged');
+        return $this->setFlag([$mailId], '\\Flagged');
     }
 
     /**
@@ -720,11 +849,12 @@ class Mailbox
         $mail->id          = $mailId;
         $mail->date        = date('Y-m-d H:i:s', isset($headObject->date) ? strtotime(preg_replace('/\(.*?\)/', '', $headObject->date)) : time());
         $mail->subject     = isset($headObject->subject) ? $this->decodeMimeStr($headObject->subject, $this->serverEncoding) : null;
-        $mail->fromName    = isset($headObject->from[0]->personal) ? $this->decodeMimeStr($headObject->from[0]->personal, $this->serverEncoding) : null;
+        $mail->fromName    = isset($headObject->from[0]->personal) ? $this->decodeMimeStr($headObject->from[0]->personal, $this->serverEncoding)
+            : null;
         $mail->fromAddress = strtolower($headObject->from[0]->mailbox.'@'.$headObject->from[0]->host);
 
         if (isset($headObject->to)) {
-            $toStrings = array();
+            $toStrings = [];
             foreach ($headObject->to as $to) {
                 if (!empty($to->mailbox) && !empty($to->host)) {
                     $toEmail            = strtolower($to->mailbox.'@'.$to->host);
@@ -765,8 +895,8 @@ class Mailbox
         // Parse X headers
         $tempArray = explode("\n", $header);
         if (is_array($tempArray) && count($tempArray)) {
-            $headers = array();
-            foreach($tempArray as $line) {
+            $headers = [];
+            foreach ($tempArray as $line) {
                 if (preg_match("/^X-(.*?): (.*?)$/is", trim($line), $matches)) {
                     $headers['x-'.strtolower($matches[1])] = $matches[2];
                 }
@@ -827,12 +957,12 @@ class Mailbox
             $attachment->id   = $attachmentId;
             $attachment->name = $fileName;
             if ($this->attachmentsDir) {
-                $replace              = array(
+                $replace              = [
                     '/\s/'                   => '_',
                     '/[^0-9a-zа-яіїє_\.]/iu' => '',
                     '/_+/'                   => '_',
                     '/(^_)|(_$)/'            => '',
-                );
+                ];
                 $fileSysName          = preg_replace(
                     '~[\\\\/]~',
                     '',
@@ -853,9 +983,13 @@ class Mailbox
                 } else {
                     $mail->textHtml .= $data;
                 }
-            } elseif ($partStructure->type == 1 && $partStructure->ifsubtype && (strtolower($partStructure->subtype) == 'report' && isset($params['REPORT-TYPE']) && strtolower($params['REPORT-TYPE']) == 'delivery-status')) {
-                    $mail->dsnMessage = trim($data);
-                    $isDsn = true;
+            } elseif ($partStructure->type == 1 && $partStructure->ifsubtype
+                && (strtolower($partStructure->subtype) == 'report'
+                    && isset($params['REPORT-TYPE'])
+                    && strtolower($params['REPORT-TYPE']) == 'delivery-status')
+            ) {
+                $mail->dsnMessage = trim($data);
+                $isDsn            = true;
             } elseif ($partStructure->type == 2 && $data) {
                 if ($isDsn || (strtolower($partStructure->subtype) == 'delivery-status')) {
                     $mail->dsnReport = $data;
@@ -882,7 +1016,7 @@ class Mailbox
      */
     protected function getParameters($partStructure)
     {
-        $params = array();
+        $params = [];
         if (!empty($partStructure->parameters)) {
             foreach ($partStructure->parameters as $param) {
                 $params[strtolower($param->attribute)] = $param->value;

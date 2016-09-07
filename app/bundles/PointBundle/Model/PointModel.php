@@ -43,7 +43,7 @@ class PointModel extends CommonFormModel
      * @var Session
      */
     protected $session;
-    
+
     /**
      * @var IpLookupHelper
      */
@@ -56,7 +56,7 @@ class PointModel extends CommonFormModel
 
     /**
      * PointModel constructor.
-     * 
+     *
      * @param Session $session
      * @param IpLookupHelper $ipLookupHelper
      * @param LeadModel $leadModel
@@ -278,7 +278,7 @@ class PointModel extends CommonFormModel
 
                 if ($pointsChange) {
                     $delta = $action->getDelta();
-                    $lead->addToPoints($delta);
+                    $lead->adjustPoints($delta);
                     $parsed = explode('.', $action->getType());
                     $lead->addPointsChangeLogEntry(
                         $parsed[0],
@@ -287,7 +287,7 @@ class PointModel extends CommonFormModel
                         $delta,
                         $ipAddress
                     );
-                    
+
                     $event = new PointActionEvent($action, $lead);
                     $this->dispatcher->dispatch(PointEvents::POINT_ON_ACTION, $event);
 

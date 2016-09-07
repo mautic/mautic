@@ -94,7 +94,8 @@ class PointActionUrlHitType extends AbstractType
                     'label_attr'    => array('class' => 'control-label'),
                     'attr'          => array(
                         'class'         => 'form-control',
-                        'tooltip'       => 'mautic.page.point.action.form.returns.within.descr'
+                        'tooltip'       => 'mautic.page.point.action.form.returns.within.descr',
+                        'onBlur'       => 'Mautic.EnablesOption(this.id)'
                     ),
                     'auto_initialize' => false
                 ))
@@ -114,7 +115,8 @@ class PointActionUrlHitType extends AbstractType
                     'label_attr'    => array('class' => 'control-label'),
                     'attr'          => array(
                         'class'         => 'form-control',
-                        'tooltip'       => 'mautic.page.point.action.form.returns.after.descr'
+                        'tooltip'       => 'mautic.page.point.action.form.returns.after.descr',
+                        'onBlur'       => 'Mautic.EnablesOption(this.id)'
                     ),
                     'auto_initialize' => false
                 ))

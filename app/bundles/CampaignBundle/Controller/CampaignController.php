@@ -641,7 +641,7 @@ class CampaignController extends FormController
                             $model->setCanvasSettings($entity, $connections);
 
                             if (!empty($deletedEvents)) {
-                                $this->getModel('campaign.event')->deleteEvents($entity->getEvents(), $modifiedEvents, $deletedEvents);
+                                $this->getModel('campaign.event')->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
                             }
                         }
 
@@ -704,6 +704,12 @@ class CampaignController extends FormController
             } else {
                 //rebuild everything to include new ids if valid
                 $cleanSlate = $valid;
+
+                if ($valid) {
+                    // Rebuild the form with new action so that apply doesn't keep creating a clone
+                    $action = $this->generateUrl('mautic_campaign_action', ['objectAction' => 'edit', 'objectId' => $entity->getId()]);
+                    $form   = $model->createForm($entity, $this->get('form.factory'), $action);
+                }
             }
         } else {
             $cleanSlate = true;

@@ -13,11 +13,12 @@ namespace Mautic\EmailBundle\Swiftmailer\Transport;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use SparkPost\APIResponseException;
-
 use SparkPost\SparkPost;
 use GuzzleHttp\Client;
-use Ivory\HttpAdapter\Guzzle6HttpAdapter;
+use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
+use SparkPost\SparkPostException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class SparkpostTransport
@@ -37,14 +38,19 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     protected $factory;
 
     /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * SparkpostTransport constructor.
      *
      * @param $apiKey
      */
-    public function __construct($apiKey)
+    public function __construct($apiKey, TranslatorInterface $translator)
     {
         $this->setApiKey($apiKey);
-        $this->getDispatcher();
+        $this->translator = $translator;
     }
 
     /**
@@ -66,15 +72,38 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
+     * Start this Transport mechanism.
+     */
+    public function start()
+    {
+        try {
+            $sparky   = $this->createSparkPost();
+            $response = $sparky->transmissions->get();
+            $response->wait();
+        } catch (SparkPostException $exception) {
+            $response = json_decode($exception->getMessage(), true);
+
+            if (is_array($response) && isset($response['errors'])) {
+                $this->throwException($response['errors'][0]['message']);
+            } else {
+                $this->throwException($exception->getMessage());
+            }
+        }
+
+        $this->started = true;
+    }
+
+    /**
      * @return SparkPost
      * @throws \Swift_TransportException
      */
     protected function createSparkPost()
     {
         if ($this->apiKey === null) {
-            throw new \Swift_TransportException('Cannot create instance of \SparkPost\SparkPost while API key is NULL');
+            $this->throwException('Cannot create instance of \SparkPost\SparkPost while API key is NULL');
         }
-        $httpAdapter = new Guzzle6HttpAdapter(new Client());
+
+        $httpAdapter = new GuzzleAdapter(new Client());
         $sparky      = new SparkPost($httpAdapter, ['key' => $this->apiKey]);
 
         return $sparky;
@@ -88,6 +117,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      */
     public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
     {
+        $sendCount = 0;
         if ($event = $this->getDispatcher()->createSendEvent($this, $message)) {
             $this->getDispatcher()->dispatchEvent($event, 'beforeSendPerformed');
             if ($event->bubbleCancelled()) {
@@ -99,10 +129,15 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         try {
             $sparkPost        = $this->createSparkPost();
             $sparkPostMessage = $this->getSparkPostMessage($message);
-            $response         = $sparkPost->transmission->send($sparkPostMessage);
-            $sendCount        = $response['results']['total_accepted_recipients'];
-        } catch (APIResponseException $e) {
-            $this->throwException($e->getAPIMessage());
+            $response         = $sparkPost->transmissions->post($sparkPostMessage);
+
+            $response = $response->wait();
+            if (200 == (int) $response->getStatusCode()) {
+                $results   = $response->getBody();
+                $sendCount = $results['results']['total_accepted_recipients'];
+            }
+        } catch (\Exception $e) {
+            $this->throwException($e->getMessage());
         }
 
         if ($event) {
@@ -149,6 +184,12 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
         $message = $this->messageToArray($mauticTokens, $mergeVarPlaceholders, true);
 
+        // Sparkpost requires a subject
+        if (empty($message['subject'])) {
+
+            throw new \Exception($this->translator->trans('mautic.email.subject.notblank', [], 'validators'));
+        }
+
         if (isset($message['headers']['X-MC-InlineCSS'])) {
             $inlineCss = $message['headers']['X-MC-InlineCSS'];
         }
@@ -192,19 +233,36 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
                 $message['replyTo']['email'];
         }
 
-        $sparkPostMessage = [
-            'html'           => $message['html'],
-            'text'           => $message['text'],
+        $content = [
             'from'           => (!empty($message['from']['name'])) ? $message['from']['name'].' <'.$message['from']['email'].'>'
                 : $message['from']['email'],
             'subject'        => $message['subject'],
+        ];
+
+        // Sparkpost will set parts regardless if they are empty or not
+        if (!empty($message['html'])) {
+            $content['html'] = $message['html'];
+        }
+
+        if (!empty($message['text'])) {
+            $content['text'] = $message['text'];
+        }
+
+        $sparkPostMessage = [
+            'content'        => $content,
             'recipients'     => $recipients,
-            'cc'             => array_values($message['recipients']['cc']),
-            'bcc'            => array_values($message['recipients']['bcc']),
             'headers'        => $message['headers'],
             'inline_css'     => $inlineCss,
             'tags'           => $tags
         ];
+
+        if (!empty($message['recipients']['cc'])) {
+            $sparkPostMessage['cc'] = array_values($message['recipients']['cc']);
+        }
+
+        if (!empty($message['recipients']['bcc'])) {
+            $sparkPostMessage['bcc'] = array_values($message['recipients']['bcc']);
+        }
 
         if (!empty($message['attachments'])) {
 

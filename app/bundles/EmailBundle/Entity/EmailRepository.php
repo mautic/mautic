@@ -491,19 +491,21 @@ class EmailRepository extends CommonRepository
      * @param $variantParentId
      * @param $date
      */
-    public function resetVariants($variantParentId, $date)
+    public function resetVariants($relatedIds, $date)
     {
+        if (!is_array($relatedIds)) {
+            $relatedIds = [(int) $relatedIds];
+        }
+
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
         $qb->update(MAUTIC_TABLE_PREFIX . 'emails')
             ->set('variant_read_count', 0)
             ->set('variant_sent_count', 0)
             ->set('variant_start_date', ':date')
             ->setParameter('date', $date)
             ->where(
-                $qb->expr()->orX(
-                    $qb->expr()->eq('id', (int) $variantParentId),
-                    $qb->expr()->eq('variant_parent_id', (int) $variantParentId)
-                )
+                $qb->expr()->in('id', $relatedIds)
             )
             ->execute();
     }

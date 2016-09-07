@@ -63,8 +63,8 @@ abstract class AbstractRemoteDataLookup extends AbstractLookup
 
         try {
             $response = ('post' == $this->method) ?
-                $this->connector->post($url, $this->getParameters(), $this->getHeaders()) :
-                $this->connector->get($url, $this->getHeaders());
+                $this->connector->post($url, $this->getParameters(), $this->getHeaders(), 10) :
+                $this->connector->get($url, $this->getHeaders(), 10);
 
             $this->parseResponse($response->body);
         } catch (\Exception $exception) {

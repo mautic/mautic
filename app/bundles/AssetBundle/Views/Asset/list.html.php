@@ -61,6 +61,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                             'templateButtons' => [
                                 'edit'       => $security->hasEntityAccess($permissions['asset:assets:editown'], $permissions['asset:assets:editother'], $item->getCreatedBy()),
                                 'delete'     => $security->hasEntityAccess($permissions['asset:assets:deleteown'], $permissions['asset:assets:deleteother'], $item->getCreatedBy()),
+                                'clone'      => $permissions['asset:assets:create'],
                             ],
                             'routeBase'  => 'asset',
                             'langVar'    => 'asset.asset',

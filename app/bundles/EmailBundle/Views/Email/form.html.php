@@ -15,7 +15,7 @@ $isExisting = $email->getId();
 
 $isExisting = $email->getId();
 
-$subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.email.header.editvariant', [
+$subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.core.variant_of', [
     '%name%' => $email->getName(),
     '%parent%' => $variantParent->getName()
 ]) . '</span></div>' : '';

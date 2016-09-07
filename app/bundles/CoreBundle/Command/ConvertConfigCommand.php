@@ -11,7 +11,6 @@ namespace Mautic\CoreBundle\Command;
 
 use Camspiers\JsonPretty\JsonPretty;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
