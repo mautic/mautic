@@ -223,13 +223,17 @@ class PageModel extends FormModel
             throw new MethodNotAllowedHttpException(array('Page'));
         }
 
-        if (!isset($options['formName'])) {
-            $options['formName'] = 'page';
+        $formName = 'page';
+
+        if (!empty($options['formName'])) {
+            $formName = $options['formName'];
         }
 
-        $params = (!empty($action)) ? array('action' => $action) : array();
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
 
-        return $formFactory->create($options['formName'], $entity, $params);
+        return $formFactory->create($formName, $entity, $options);
     }
 
     /**

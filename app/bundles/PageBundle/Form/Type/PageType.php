@@ -221,10 +221,12 @@ class PageType extends AbstractType
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($formModifier) {
                 $data = $event->getData();
-                $formModifier(
-                    $event->getForm(),
-                    $data['variantParent']
-                );
+                if (isset($data['variantParent'])) {
+                    $formModifier(
+                        $event->getForm(),
+                        $data['variantParent']
+                    );
+                }
             }
         );
 
