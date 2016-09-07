@@ -220,7 +220,6 @@ class CompanyModel extends CommonFormModel
                 }
             }
         }
-
         $company->setFields($fieldValues);
     }
 
