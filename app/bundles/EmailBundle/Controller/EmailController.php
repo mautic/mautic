@@ -1316,45 +1316,83 @@ class EmailController extends FormController
     }
 
 
-        /**
-     * Send example email to current user
+    /**
+     * Send example email to many users
      *
-     * @param $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function exampleMultipleAction($objectId)
+    public function exampleMultipleAction()
     {
-
-
-
-            // return $this->postActionRedirect(
-            //         [
-            //             'returnUrl'       => "/s/emails/view/1",
-                
-            //             'passthroughVars' => [
-            //                 'activeLink'    => '#mautic_contact_index',
-            //                 'mauticContent' => 'lead',
-            //                 'closeModal'    => 1, //just in case in quick form
-            //             ]
-            //         ]
-            // );
-
 
             if ($this->request->getMethod() == 'POST') {
 
-                    $data = $this->request->request->get('emails');
+                    $emails = $this->request->request->get('emails');
 
-                    var_dump($data); die();
+                    $objectId = 1;
 
-                   
+                    /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+                    $model  = $this->getModel('email');
+                    $entity = $model->getEntity($objectId);
 
+                    //not found or not allowed
+                    if ($entity === null
+                        || (!$this->factory->getSecurity()->hasEntityAccess(
+                            'email:emails:viewown',
+                            'email:emails:viewother',
+                            $entity->getCreatedBy()
+                        ))
+                    ) {
+                        return $this->viewAction($objectId);
+                    }
+
+                    // Prepare a fake lead
+                    /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
+                    $fieldModel = $this->getModel('lead.field');
+                    $fields     = $fieldModel->getFieldList(false, false);
+                    array_walk(
+                        $fields,
+                        function (&$field) {
+                            $field = "[$field]";
+                        }
+                    );
+                    $fields['id'] = 0;
+
+                    $errors = [];
+
+                    $user  = $this->factory->getUser();
+                    foreach($emails as $email) {
+                            $users = [
+                                [
+                                    // Setting the id, firstname and lastname to null as this is a unknown user
+                                    'id'        => '', 
+                                    'firstname' => '',
+                                    'lastname'  => '',
+                                    'email'     => $email
+                                ]
+                            ];
+
+                            // Send to current user
+                            $error = $model->sendEmailToUser($entity, $users, $fields, [], [], false);
+                            if(count($error)){
+                                array_push($errors, $error[0]);
+                            }
+                    }
+
+                    if (count($errors) != 0) {
+                        $this->addFlash(implode('; ', $errors));
+                    } else {
+                        $this->addFlash('mautic.email.notice.test_sent_multiple.success');
+                    }
+
+                    return $this->postActionRedirect(
+                            [
+                                'passthroughVars' => [
+                                    'closeModal'    => 1,
+                                ]
+                            ]
+                    );
             }
-
-
-
-
-           
     }
 
 
@@ -1509,7 +1547,10 @@ class EmailController extends FormController
     }
 
 
-    
+    /**
+     * Generating the modal box content for  
+     * the send multiple example email option
+     */ 
     public function sendExampleMultipleAction()
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
@@ -1525,11 +1566,6 @@ class EmailController extends FormController
                     'action' => $action
                 ],
                 'contentTemplate' => "MauticEmailBundle:Email:recipients.html.php",
-                'passthroughVars' => [
-                    'activeLink'    => '#mautic_contact_index',
-                    'mauticContent' => 'lead',
-                    'route'         => false
-                ]
             ]
         );
     }

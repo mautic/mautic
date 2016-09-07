@@ -69,31 +69,17 @@ $customButtons[] = [
 
 
 
-// $customButtons[] = array(
-//         'attr'      => array(
-//             'class'       => 'btn btn-default btn-nospin',
-//             'data-toggle' => 'ajaxmodal',
-//             'data-target' => '#MauticSharedModal',
-//             'href'        => $view['router']->path('mautic_email_action', array('objectAction' => 'sendExampleMultiple')),
-//             'data-header' => $view['translator']->trans('mautic.email.send.example.mutiple'),
-//         ),
-//         'iconClass' => 'fa fa-bolt',
-//         'btnText'   => 'mautic.email.send.example.mutiple'
-// );
-
-
-
- $customButtons[] = array(
-        'attr'      => array(
-            'class'       => 'btn btn-default btn-nospin quickadd',
-            'data-toggle' => 'ajaxmodal',
-            'data-target' => '#MauticSharedModal',
-            'href'        => $view['router']->path('mautic_email_action', array('objectAction' => 'sendExampleMultiple')),
-            'data-header' => $view['translator']->trans('mautic.email.send.example.mutiple'),
-        ),
-        'iconClass' => 'fa fa-bolt',
-        'btnText'   => 'mautic.email.send.example.mutiple'
-    );
+$customButtons[] = array(
+    'attr'      => array(
+        'class'       => 'btn btn-default btn-nospin quickadd',
+        'data-toggle' => 'ajaxmodal',
+        'data-target' => '#MauticSharedModal',
+        'href'        => $view['router']->path('mautic_email_action', array('objectAction' => 'sendExampleMultiple')),
+        'data-header' => $view['translator']->trans('mautic.email.send.example.mutiple'),
+    ),
+    'iconClass' => 'fa fa-users',
+    'btnText'   => 'mautic.email.send.example.mutiple'
+);
 
  
 
