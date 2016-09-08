@@ -198,11 +198,7 @@ class LeadType extends AbstractType
                 case 'boolean':
                     $choices = [];
                     if ($type == 'select' && !empty($properties['list'])) {
-                        $list = explode('|', $properties['list']);
-                        foreach ($list as $l) {
-                            $l           = trim($l);
-                            $choices[$l] = $l;
-                        }
+                        $choices = FormFieldHelper::parseList($properties['list']);
                         $expanded = false;
                     }
                     if ($type == 'boolean' && !empty($properties['yes']) && !empty($properties['no'])) {

@@ -141,26 +141,35 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
             <?php if ($showProperties): ?>
             <div role="tabpanel" class="tab-pane" id="properties">
                 <?php echo $view['form']->errors($form['properties']); ?>
+                <?php if (isset($properties['list'])): ?>
                 <div class="row">
-                    <?php if (isset($properties['list']) && count($properties) === 1): ?>
-                        <div class="col-md-6">
-                            <?php echo $view['form']->row($form['properties']); ?>
+                    <div class="col-md-12">
+                        <?php echo $view['form']->row($form['properties']['list']); ?>
+                    </div>
+                </div>
+                <?php endif; ?>
+                <?php if (isset($properties['optionlist'])): ?>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <?php echo $view['form']->row($form['properties']['optionlist']); ?>
                         </div>
-                    <?php else: ?>
+                    </div>
+                <?php endif; ?>
+                <div class="row">
+                    <?php
+                    foreach ($properties as $name => $property):
+                    if ($form['properties'][$name]->isRendered() || $name == 'labelAttributes') continue;
 
-                        <?php foreach ($properties as $name => $property): ?>
-                            <?php if ($form['properties'][$name]->isRendered() || $name == 'labelAttributes') continue; ?>
-
-                            <?php  if ($form['properties'][$name]->vars['block_prefixes'][1] == 'hidden') : echo $view['form']->row($form['properties'][$name]); ?>
-                            <?php else:
-                                $col = ($name == 'text') ? 12 : 6; ?>
-                            <div class="col-md-<?php echo $col; ?>">
-                                <?php echo $view['form']->row($form['properties'][$name]); ?>
-                            </div>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-
+                    if ($form['properties'][$name]->vars['block_prefixes'][1] == 'hidden') :
+                        echo $view['form']->row($form['properties'][$name]);
+                    else:
+                    $col = ($name == 'text') ? 12 : 6;
+                    ?>
+                    <div class="col-md-<?php echo $col; ?>">
+                        <?php echo $view['form']->row($form['properties'][$name]); ?>
+                    </div>
                     <?php endif; ?>
+                    <?php endforeach; ?>
                 </div>
             </div>
             <?php endif; ?>

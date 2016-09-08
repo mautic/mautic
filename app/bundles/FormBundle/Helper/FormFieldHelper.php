@@ -9,6 +9,7 @@
 
 namespace Mautic\FormBundle\Helper;
 
+use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Blank;
 use Symfony\Component\Validator\Constraints\Email;
@@ -23,14 +24,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * Class FormFieldHelper
  */
-class FormFieldHelper
+class FormFieldHelper extends AbstractFormFieldHelper
 {
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
     /**
      * @var ValidatorInterface|\Symfony\Component\Validator\ValidatorInterface
      */
@@ -97,28 +92,28 @@ class FormFieldHelper
             $validator = $validator = Validation::createValidator();
         }
         $this->validator = $validator;
+
+        parent::__construct();
+    }
+
+    /**
+     * Set the translation key prefix
+     */
+    public function setTranslationKeyPrefix()
+    {
+        $this->translationKeyPrefix = 'mautic.form.field.type.';
     }
 
     /**
      * @param array $customFields
      *
+     * @deprecated  to be removed in 3.0; use getChoiceList($customFields = []) instead
+     *
      * @return array
      */
     public function getList($customFields = [])
     {
-        $choices = [];
-
-        foreach ($this->types as $v => $type) {
-            $choices[$v] = $this->translator->transConditional("mautic.core.type.{$v}", "mautic.form.field.type.{$v}");
-        }
-
-        foreach ($customFields as $v => $f) {
-            $choices[$v] = $this->translator->trans($f['label']);
-        }
-
-        natcasesort($choices);
-
-        return $choices;
+        return $this->getChoiceList($customFields);
     }
 
     /**

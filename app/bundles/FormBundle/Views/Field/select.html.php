@@ -24,6 +24,7 @@ if (!isset($list)) {
 if (isset($list['list'])) {
     $list = $list['list'];
 }
+$list = \Mautic\FormBundle\Helper\FormFieldHelper::parseList($list);
 
 $formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
     [
@@ -51,11 +52,11 @@ HTML;
 
 $options = (!empty($emptyOption)) ? array($emptyOption) :  array();
 
-foreach ($list as $l):
-$selected = ($l === $field['defaultValue']) ? ' selected="selected"' : '';
+foreach ($list as $listValue => $listLabel):
+$selected = ($listValue === $field['defaultValue']) ? ' selected="selected"' : '';
 $options[] = <<<HTML
 
-                    <option value="{$view->escape($l)}"{$selected}>{$view->escape($l)}</option>
+                    <option value="{$view->escape($listValue)}"{$selected}>{$view->escape($listLabel)}</option>
 HTML;
 endforeach;
 

@@ -227,7 +227,7 @@ class FormController extends CommonFormController
 
         $activeFormFields = [];
         $fieldHelper      = $this->get('mautic.helper.form.field_helper');
-        $availableFields  = $fieldHelper->getList($customComponents['fields']);
+        $availableFields  = $fieldHelper->getChoiceList($customComponents['fields']);
         foreach ($activeForm->getFields() as $field) {
             if (!isset($availableFields[$field->getType()])) {
                 continue;
@@ -429,7 +429,7 @@ class FormController extends CommonFormController
         return $this->delegateView(
             [
                 'viewParameters'  => [
-                    'fields'         => $fieldHelper->getList($customComponents['fields']),
+                    'fields'         => $fieldHelper->getChoiceList($customComponents['fields']),
                     'actions'        => $customComponents['choices'],
                     'actionSettings' => $customComponents['actions'],
                     'formFields'     => $modifiedFields,
@@ -656,7 +656,7 @@ class FormController extends CommonFormController
                         ]
                     )
                 );
-            } elseif ($form->get('buttons')->get('apply')->isClicked()) {
+            } elseif ($valid && $form->get('buttons')->get('apply')->isClicked()) {
                 // Rebuild everything to include new ids
                 $cleanSlate = true;
                 $reorder    = true;
@@ -674,11 +674,13 @@ class FormController extends CommonFormController
             $model->lockEntity($entity);
         }
 
-        $form->get('sessionId')->setData($objectId);
+        if (!$form->isSubmitted()) {
+            $form->get('sessionId')->setData($objectId);
+        }
 
         // Get field and action settings
         $fieldHelper     = $this->get('mautic.helper.form.field_helper');
-        $availableFields = $fieldHelper->getList($customComponents['fields']);
+        $availableFields = $fieldHelper->getChoiceList($customComponents['fields']);
 
         if ($cleanSlate) {
             //clean slate

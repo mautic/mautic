@@ -24,31 +24,40 @@ class FormFieldGroupType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('labelAttributes', 'text', array(
-            'label'      => 'mautic.form.field.group.labelattr',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'     => 'form-control',
-                'tooltip'   => 'mautic.form.field.help.group.labelattr',
-                'maxlength' => '255'
-            ),
-            'required'   => false
-        ));
+        $builder->add(
+            'labelAttributes',
+            'text',
+            [
+                'label'      => 'mautic.form.field.group.labelattr',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'     => 'form-control',
+                    'tooltip'   => 'mautic.form.field.help.group.labelattr',
+                    'maxlength' => '255'
+                ],
+                'required'   => false
+            ]
+        );
 
         if (isset($options['data']['optionlist'])) {
             $data = $options['data']['optionlist'];
         } elseif (isset($options['data']['list'])) {
             // BC support
-            $data = array('list' => $options['data']['list']);
+            $data = ['list' => $options['data']['list']];
         } else {
-            $data = array();
+            $data = [];
         }
 
-        $builder->add('optionlist', 'sortablelist', array(
-            'label'      => 'mautic.core.form.list',
-            'label_attr' => array('class' => 'control-label'),
-            'data'       => $data
-        ));
+        $builder->add(
+            'optionlist',
+            'sortablelist',
+            [
+                'label'       => 'mautic.core.form.list',
+                'label_attr'  => ['class' => 'control-label'],
+                'data'        => $data,
+                'with_labels' => true,
+            ]
+        );
 
     }
 

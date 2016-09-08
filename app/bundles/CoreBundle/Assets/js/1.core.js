@@ -371,9 +371,16 @@ var Mautic = {
                     var order = 0;
                     mQuery('#' + prefix + '_list div.list-sortable div.input-group input').each(function () {
                         var name = mQuery(this).attr('name');
-                        name = name.replace(/(\[list\]\[[0-9]+\])$/g, '') + '[list][' + order + ']';
+                        if (mQuery(this).hasClass('sortable-label')) {
+                            name = name.replace(/(\[list\]\[[0-9]+\]\[label\])$/g, '') + '[list][' + order + '][label]';
+                        } else if (mQuery(this).hasClass('sortable-value')) {
+                            name = name.replace(/(\[list\]\[[0-9]+\]\[value\])$/g, '') + '[list][' + order + '][value]';
+                            order++;
+                        } else {
+                            name = name.replace(/(\[list\]\[[0-9]+\])$/g, '') + '[list][' + order + ']';
+                            order++;
+                        }
                         mQuery(this).attr('name', name);
-                        order++;
                     });
                 }
             });
@@ -3380,7 +3387,7 @@ var Mautic = {
                     return;
                 }
             }
-            
+
             // Markers have numerical indexes
             var firstKey = Object.keys(data)[0];
 

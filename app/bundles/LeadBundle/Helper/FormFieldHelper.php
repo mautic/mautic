@@ -9,11 +9,10 @@
 
 namespace Mautic\LeadBundle\Helper;
 
-use Symfony\Component\Form\Extension\Core\Type\LocaleType;
+use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Symfony\Component\Intl\Intl;
-use Symfony\Component\Translation\TranslatorInterface;
 
-class FormFieldHelper
+class FormFieldHelper extends AbstractFormFieldHelper
 {
 
     /**
@@ -96,30 +95,20 @@ class FormFieldHelper
         ]
     ];
 
-    private $translator;
-
     /**
-     * Set translator
-     *
-     * @param TranslatorInterface $translator
+     * Set the translation key prefix
      */
-    public function setTranslator(TranslatorInterface $translator)
+    public function setTranslationKeyPrefix()
     {
-        $this->translator = $translator;
+        $this->translationKeyPrefix = 'mautic.lead.field.type.';
     }
 
     /**
      * @return array
      */
-    public function getChoiceList()
+    public function getTypes()
     {
-        $choices = [];
-        foreach (self::$types as $v => $type) {
-            $choices[$v] = $this->translator->transConditional("mautic.core.type.{$v}", "mautic.lead.field.type.{$v}");
-        }
-        asort($choices);
-
-        return $choices;
+        return self::$types;
     }
 
     /**
@@ -221,37 +210,5 @@ class FormFieldHelper
     static function getLocaleChoices()
     {
         return Intl::getLocaleBundle()->getLocaleNames();
-    }
-
-    /**
-     * @param $list
-     *
-     * @return array
-     */
-    static function parseListStringIntoArray($list)
-    {
-        if (!is_array($list) && strpos($list, '|') !== false) {
-            $parts = explode('||', $list);
-            if (count($parts) > 1) {
-                $labels = explode('|', $parts[0]);
-                $values = explode('|', $parts[1]);
-                $list   = array_combine($values, $labels);
-            } else {
-                $labels = explode('|', $list);
-                $values = $labels;
-                $list   = array_combine($values, $labels);
-            }
-        }
-        if (!empty($list) && !is_array($list)) {
-            $list = [$list => $list];
-        }
-
-        // Handle special chars so that validation doesn't fail
-        $choices =  [];
-        foreach ($list as $val => $label) {
-            $choices[html_entity_decode($val, ENT_QUOTES)] = $label;
-        }
-
-        return $choices;
     }
 }
