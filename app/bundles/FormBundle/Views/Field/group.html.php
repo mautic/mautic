@@ -16,10 +16,14 @@ $ignoreName        = ($type == 'checkbox');
 
 include __DIR__.'/field_helper.php';
 
-$list = \Mautic\FormBundle\Helper\FormFieldHelper::parseList(
-    isset($properties['optionlist']) ? $properties['optionlist']['list'] : $properties['list']
-);
+if (!empty($properties['sync_list']) && !empty($field['leadField']) && isset($contactFields[$field['leadField']]) && $contactFields[$field['leadField']]['properties']['list']) {
+    $parseList = $contactFields[$field['leadField']]['properties']['list'];
+} else {
+    $parseList = isset($properties['optionlist']) ? $properties['optionlist']['list'] : $properties['list'];
+}
+$list = \Mautic\FormBundle\Helper\FormFieldHelper::parseList($parseList);
 $firstListValue  = reset($list);
+
 $optionLabelAttr = (isset($properties['labelAttributes'])) ? $properties['labelAttributes'] : '';
 $wrapDiv         = true;
 

@@ -10,10 +10,10 @@
 namespace Mautic\FormBundle\Model;
 
 use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
@@ -67,6 +67,11 @@ class FormModel extends CommonFormModel
     protected $fieldHelper;
 
     /**
+     * @var LeadFieldModel
+     */
+    protected $leadFieldModel;
+
+    /**
      * FormModel constructor.
      *
      * @param RequestStack        $requestStack
@@ -84,7 +89,8 @@ class FormModel extends CommonFormModel
         ActionModel $formActionModel,
         FieldModel $formFieldModel,
         LeadModel $leadModel,
-        FormFieldHelper $fieldHelper
+        FormFieldHelper $fieldHelper,
+        LeadFieldModel $leadFieldModel
     )
     {
         $this->request             = $requestStack->getCurrentRequest();
@@ -94,6 +100,7 @@ class FormModel extends CommonFormModel
         $this->formFieldModel      = $formFieldModel;
         $this->leadModel           = $leadModel;
         $this->fieldHelper         = $fieldHelper;
+        $this->leadFieldModel      = $leadFieldModel;
     }
 
     /**
@@ -440,6 +447,7 @@ class FormModel extends CommonFormModel
             $theme.'MauticFormBundle:Builder:form.html.php',
             [
                 'fieldSettings' => $this->getCustomComponents()['fields'],
+                'contactFields' => $this->leadFieldModel->getFieldListWithProperties(),
                 'form'          => $entity,
                 'theme'         => $theme,
                 'submissions'   => $submissions,

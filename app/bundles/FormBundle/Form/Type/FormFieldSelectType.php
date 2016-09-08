@@ -12,25 +12,23 @@ namespace Mautic\FormBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Class FormFieldSelectType
  */
 class FormFieldSelectType extends AbstractType
 {
+    use SortableListTrait;
+
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['field_type'] == 'select') {
-            $builder->add(
-                'list',
-                'sortablelist',
-                [
-                    'with_labels' => true
-                ]
-            );
+            $this->addSortableList($builder, $options);
         }
 
         $builder->add(

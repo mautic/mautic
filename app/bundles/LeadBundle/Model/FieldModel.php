@@ -548,6 +548,35 @@ class FieldModel extends FormModel
     }
 
     /**
+     * @param string $object
+     *
+     * @return array
+     */
+    public function getFieldListWithProperties($object = 'lead')
+    {
+        $contactFields = $this->getEntities(
+            [
+                'object'           => $object,
+                'ignore_paginator' => true,
+                'hydration_mode'   => 'hydrate_array'
+            ]
+        );
+
+        $fields = [];
+        foreach ($contactFields as $contactField) {
+            $fields[$contactField['alias']] = [
+                'label'        => $contactField['label'],
+                'alias'        => $contactField['alias'],
+                'type'         => $contactField['type'],
+                'defaultValue' => $contactField['defaultValue'],
+                'properties'   => $contactField['properties'],
+            ];
+        }
+
+        return $fields;
+    }
+
+    /**
      * Get the fields for a specific group
      *
      * @param       $group
@@ -589,7 +618,7 @@ class FieldModel extends FormModel
         return $leadFields;
     }
 
-    /*
+    /**
      * Retrieves a list of published fields that are unique identifers
      *
      * @return array
@@ -603,7 +632,7 @@ class FieldModel extends FormModel
         return $fields;
     }
 
-    /*
+    /**
      * Wrapper for misspelled getUniqueIdentiferFields
      *
      * @return array

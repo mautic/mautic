@@ -17,14 +17,23 @@ if (!empty($properties['multiple'])) {
     $inputAttr .= ' multiple="multiple"';
 }
 
-if (!isset($list)) {
-    $list = $properties['list'];
+$parseList = [];
+if (!empty($properties['sync_list']) && !empty($field['leadField']) && isset($contactFields[$field['leadField']]) && $contactFields[$field['leadField']]['properties']['list']) {
+    $parseList = $contactFields[$field['leadField']]['properties']['list'];
+} else {
+    if (isset($list)) {
+        $parseList = $list;
+    } else {
+        $parseList = $properties['list'];
+    }
+
+    if (isset($parseList['list'])) {
+        $parseList = $parseList['list'];
+    }
 }
 
-if (isset($list['list'])) {
-    $list = $list['list'];
-}
-$list = \Mautic\FormBundle\Helper\FormFieldHelper::parseList($list);
+$list = \Mautic\FormBundle\Helper\FormFieldHelper::parseList($parseList);
+$firstListValue  = reset($list);
 
 $formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
     [

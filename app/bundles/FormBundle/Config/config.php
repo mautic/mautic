@@ -250,6 +250,7 @@ return [
                     'mautic.form.model.field',
                     'mautic.lead.model.lead',
                     'mautic.helper.form.field_helper',
+                    'mautic.lead.model.field',
                 ]
             ],
             'mautic.form.model.submission' => [

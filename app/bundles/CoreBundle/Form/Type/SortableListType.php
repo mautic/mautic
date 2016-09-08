@@ -15,6 +15,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -31,6 +32,19 @@ class SortableListType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $constraints = ($options['option_required']) ? [
+            new Count(
+                [
+                    'minMessage' => 'mautic.form.lists.count',
+                    'min'        => 1
+                ]
+            )
+        ] : [];
+
+        if ($options['constraint_callback'] instanceof Callback) {
+            $constraints[] = $options['constraint_callback'];
+        }
+
         $builder->add(
             $builder->create(
                 'list',
@@ -59,14 +73,7 @@ class SortableListType extends AbstractType
                     'allow_add'      => true,
                     'allow_delete'   => true,
                     'prototype'      => true,
-                    'constraints'    => ($options['option_required']) ? [
-                        new Count(
-                            [
-                                'minMessage' => 'mautic.form.lists.count',
-                                'min'        => 1
-                            ]
-                        )
-                    ] : [],
+                    'constraints'    => $constraints,
                     'error_bubbling' => false
                 ]
             )
@@ -88,12 +95,13 @@ class SortableListType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'remove_onclick'  => 'Mautic.removeFormListOption(this);',
-                'option_required' => true,
-                'option_notblank' => true,
-                'remove_icon'     => 'fa fa-times',
-                'sortable'        => 'fa fa-ellipsis-v handle',
-                'with_labels'     => false,
+                'remove_onclick'      => 'Mautic.removeFormListOption(this);',
+                'option_required'     => true,
+                'option_notblank'     => true,
+                'constraint_callback' => false,
+                'remove_icon'         => 'fa fa-times',
+                'sortable'            => 'fa fa-ellipsis-v handle',
+                'with_labels'         => false,
             ]
         );
 

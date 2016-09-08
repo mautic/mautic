@@ -3596,7 +3596,11 @@ var Mautic = {
                         }
                     } else {
                         var sourceFieldVal = mQuery('#' + fieldId).val();
-                        if (mQuery.inArray(sourceFieldVal, condition) === -1) {
+                        if (condition == 'empty') {
+                            fields[field.attr('id')] = (sourceFieldVal == '') ? true : false;
+                        } else if (condition == 'notEmpty') {
+                            fields[field.attr('id')] = (sourceFieldVal == '') ? false : true;
+                        } else if (mQuery.inArray(sourceFieldVal, condition) === -1) {
                             fields[field.attr('id')] = false;
                         } else {
                             fields[field.attr('id')] = true;
@@ -3619,7 +3623,11 @@ var Mautic = {
                     }
                 } else {
                     var sourceFieldVal = mQuery('#' + fieldId).val();
-                    if (mQuery.inArray(sourceFieldVal, condition) !== -1) {
+                    if (condition == 'empty') {
+                        fields[field.attr('id')] = (sourceFieldVal == '') ? false : true;
+                    } else if (condition == 'notEmpty') {
+                        fields[field.attr('id')] = (sourceFieldVal == '') ? true : false;
+                    } else if (mQuery.inArray(sourceFieldVal, condition) !== -1) {
                         fields[field.attr('id')] = false;
                     } else if (typeof fields[field.attr('id')] == 'undefined') {
                         fields[field.attr('id')] = true;

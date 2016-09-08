@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class FormFieldGroupType extends AbstractType
 {
+    use SortableListTrait;
 
     /**
      * {@inheritdoc}
@@ -48,17 +49,7 @@ class FormFieldGroupType extends AbstractType
             $data = [];
         }
 
-        $builder->add(
-            'optionlist',
-            'sortablelist',
-            [
-                'label'       => 'mautic.core.form.list',
-                'label_attr'  => ['class' => 'control-label'],
-                'data'        => $data,
-                'with_labels' => true,
-            ]
-        );
-
+        $this->addSortableList($builder, $options, 'optionlist', $data);
     }
 
     /**

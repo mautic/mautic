@@ -155,6 +155,7 @@ class FieldType extends AbstractType
         if (!empty($options['customParameters'])) {
             $builder->add('properties', $customParams['formType'], $formTypeOptions);
         } else {
+            $propertiesData = (isset($options['data']['properties'])) ? $options['data']['properties'] : [];
             switch ($type) {
                 case 'select':
                 case 'country':
@@ -164,7 +165,8 @@ class FieldType extends AbstractType
                         [
                             'field_type' => $type,
                             'label'      => false,
-                            'parentData' => $options['data']
+                            'parentData' => $options['data'],
+                            'data'       => $propertiesData,
                         ]
                     );
                     break;
@@ -175,7 +177,7 @@ class FieldType extends AbstractType
                         'formfield_group',
                         [
                             'label' => false,
-                            'data'  => (isset($options['data']['properties'])) ? $options['data']['properties'] : array()
+                            'data'  => $propertiesData,
                         ]
                     );
                     break;
@@ -186,7 +188,8 @@ class FieldType extends AbstractType
                         [
                             'required' => false,
                             'label'    => false,
-                            'editor'   => true
+                            'editor'   => true,
+                            'data'     => $propertiesData,
                         ]
                     );
                     break;
@@ -200,7 +203,8 @@ class FieldType extends AbstractType
                         'properties',
                         'formfield_placeholder',
                         [
-                            'label' => false
+                            'label' => false,
+                            'data'  => $propertiesData,
                         ]
                     );
                     break;
@@ -209,7 +213,8 @@ class FieldType extends AbstractType
                         'properties',
                         'formfield_captcha',
                         [
-                            'label' => false
+                            'label' => false,
+                            'data'  => $propertiesData,
                         ]
                     );
                     break;
@@ -218,7 +223,8 @@ class FieldType extends AbstractType
                         'properties',
                         FormFieldPageBreakType::class,
                         [
-                            'label' => false
+                            'label' => false,
+                            'data'  => $propertiesData,
                         ]
                     );
                     break;

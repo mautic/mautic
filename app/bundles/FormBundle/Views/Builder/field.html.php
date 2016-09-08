@@ -141,6 +141,13 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
             <?php if ($showProperties): ?>
             <div role="tabpanel" class="tab-pane" id="properties">
                 <?php echo $view['form']->errors($form['properties']); ?>
+                <?php if (isset($properties['sync_list'])): ?>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <?php echo $view['form']->row($form['properties']['sync_list']); ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
                 <?php if (isset($properties['list'])): ?>
                 <div class="row">
                     <div class="col-md-12">
