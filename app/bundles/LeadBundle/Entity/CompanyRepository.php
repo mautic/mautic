@@ -21,18 +21,32 @@ class CompanyRepository extends CommonRepository
     /**
      * {@inheritdoc}
      *
-     * @param $entity
-     * @param $flush
+     * @param integer $id
+     *
+     * @return mixed|null
      */
-    public function saveEntity($entity, $flush = true)
+    public function getEntity($id = 0)
     {
-        $this->_em->persist($entity);
-        if ($flush)
-            $this->_em->flush($entity);
-        $fields = $entity->getUpdatedFields();
-        if (!empty($fields)) {
-            $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX . 'companies', $fields, array('id' => $entity->getId()));
+        try {
+            /** @var Lead $entity */
+            $entity = $this
+                ->createQueryBuilder('comp')
+                ->select('comp, u')
+                ->leftJoin('comp.owner', 'u')
+                ->where('comp.id = :companyId')
+                ->setParameter('companyId', $id)
+                ->getQuery()
+                ->getSingleResult();
+        } catch (\Exception $e) {
+            $entity = null;
         }
+
+        if ($entity != null) {
+            $fieldValues = $this->getFieldValues($id);
+            $entity->setFields($fieldValues);
+        }
+
+        return $entity;
     }
     /**
      * Get a list of leads
@@ -175,7 +189,124 @@ class CompanyRepository extends CommonRepository
                 'results' => $results
             ) : $results;
     }
+    /**
+     * {@inheritdoc}
+     *
+     * @param $entity
+     * @param $flush
+     */
+    public function saveEntity($entity, $flush = true)
+    {
+        $this->_em->persist($entity);
 
+        if ($flush)
+            $this->_em->flush($entity);
+
+        $fields = $entity->getUpdatedFields();
+        if (!empty($fields)) {
+            $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX . 'companies', $fields, array('id' => $entity->getId()));
+        }
+    }
+
+
+    /**
+     * Persist an array of entities
+     *
+     * @param array $entities
+     */
+    public function saveEntities($entities)
+    {
+        foreach ($entities as $k => $entity) {
+            // Leads cannot be batched due to requiring the ID to update the fields
+            $this->saveEntity($entity);
+        }
+    }
+    /**
+     * Get a list of fields and values
+     *
+     * @param           $id
+     * @param bool|true $byGroup
+     *
+     * @return array
+     */
+    public function getFieldValues($id, $byGroup = true)
+    {
+        //Get the list of custom fields
+        $fq = $this->_em->getConnection()->createQueryBuilder();
+        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.field_order, f.object')
+            ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
+            ->where('f.is_published = :published')
+            ->andWhere($fq->expr()->eq('f.object',':object'))
+            ->setParameter('object','company')
+            ->orderBy('f.field_order', 'asc')
+            ->setParameter('published', true, 'boolean');
+        $results = $fq->execute()->fetchAll();
+
+        $fields = array();
+        foreach ($results as $r) {
+            $fields[$r['alias']] = $r;
+        }
+
+        //use DBAL to get entity fields
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('*')
+            ->from(MAUTIC_TABLE_PREFIX . 'companies', 'comp')
+            ->where('comp.id = :companyId')
+            ->setParameter('companyId', $id);
+        $companyValues = $q->execute()->fetch();
+        $this->removeNonFieldColumns($companyValues);
+
+        // Reorder leadValues based on field order
+        $companyValues = array_merge(array_flip(array_keys($fields)), $companyValues);
+
+        $fieldValues = array();
+
+        //loop over results to put fields in something that can be assigned to the entities
+        foreach ($companyValues as $k => $r) {
+            if (isset($fields[$k])) {
+                if ($byGroup) {
+                    $fieldValues[$fields[$k]['group']][$fields[$k]['alias']]          = $fields[$k];
+                    $fieldValues[$fields[$k]['group']][$fields[$k]['alias']]['value'] = $r;
+                } else {
+                    $fieldValues[$fields[$k]['alias']]          = $fields[$k];
+                    $fieldValues[$fields[$k]['alias']]['value'] = $r;
+                }
+            }
+        }
+
+        if ($byGroup) {
+            //make sure each group key is present
+            $groups = array('core', 'social', 'personal', 'professional');
+            foreach ($groups as $g) {
+                if (!isset($fieldValues[$g])) {
+                    $fieldValues[$g] = array();
+                }
+            }
+        }
+
+        return $fieldValues;
+    }
+    /**
+     * Get companies by lead
+     *
+     * @param      $leadId
+     *
+     * @return array
+     */
+    public function getCompaniesByLeadId($leadId)
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $q->select('comp.id, comp.companyname')
+            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
+            ->leftJoin('comp',MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id')
+            ->where('cl.lead_id = :leadId')
+            ->setParameter('leadId', $leadId)
+            ->orderBy('comp.companyname', 'ASC');
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
     /**
      * Function to remove non custom field columns from an arrayed lead row
      *
