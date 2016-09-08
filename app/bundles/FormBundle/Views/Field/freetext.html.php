@@ -21,7 +21,7 @@ $label = (!$field['showLabel']) ? '' :
     <<<HTML
     
                 <h3 $labelAttr>
-                    {$view->escape($field['label'])}
+                    {$field['label']}
                 </h3>
 HTML;
 

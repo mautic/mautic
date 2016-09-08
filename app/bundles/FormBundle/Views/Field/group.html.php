@@ -43,7 +43,7 @@ $formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actio
 
 $label = (!$field['showLabel']) ? '' : <<<HTML
 
-                <label $labelAttr for="$firstId">{$view->escape($field['label'])}</label>
+                <label $labelAttr for="$firstId">{$field['label']}</label>
 HTML;
 
 $help = (empty($field['helpMessage'])) ? '' : <<<HTML
@@ -63,7 +63,7 @@ $option  = <<<HTML
 
                     <label id="mauticform_{$containerType}_label_{$id}" for="mauticform_{$containerType}_{$type}_{$id}" {$optionLabelAttr}>
                         <input {$inputAttr}{$checked} name="mauticform[{$field['alias']}]{$checkboxBrackets}" id="mauticform_{$containerType}_{$type}_{$id}" type="{$type}" value="{$view->escape($listValue)}" />
-                        {$view->escape($listLabel)}
+                        $listLabel
                     </label>
 HTML;
 

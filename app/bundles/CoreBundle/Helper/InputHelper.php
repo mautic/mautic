@@ -31,12 +31,23 @@ class InputHelper
      */
     private static $htmlFilter;
 
-    private static function getFilter($html = false)
+    /**
+     * @var
+     */
+    private static $strictHtmlFilter;
+
+    /**
+     * @param bool $html
+     * @param bool $strict
+     *
+     * @return InputFilter
+     */
+    private static function getFilter($html = false, $strict = false)
     {
         if (empty(self::$htmlFilter)) {
             // Most of Mautic's HTML uses include full HTML documents so use blacklist method
-            self::$htmlFilter = new InputFilter(array(), array(), 1, 1);
-            self::$htmlFilter->tagBlacklist = array(
+            self::$htmlFilter               = new InputFilter([], [], 1, 1);
+            self::$htmlFilter->tagBlacklist = [
                 'applet',
                 'bgsound',
                 'base',
@@ -48,19 +59,42 @@ class InputHelper
                 'layer',
                 'object',
                 'xml'
-            );
+            ];
 
-            self::$htmlFilter->attrBlacklist = array(
+            self::$htmlFilter->attrBlacklist = [
                 'codebase',
                 'dynsrc',
                 'lowsrc'
-            );
+            ];
+
+            // Strict HTML - basic one liner formating really
+            self::$strictHtmlFilter = new InputFilter(
+                [
+                    'b',
+                    'i',
+                    'u',
+                    'em',
+                    'strong',
+                    'a',
+                    'span'
+                ], [], 0, 1);
+
+            self::$strictHtmlFilter->attrBlacklist = [
+                'codebase',
+                'dynsrc',
+                'lowsrc'
+            ];
 
             // Standard behavior if HTML is not specifically used
             self::$stringFilter = new InputFilter();
         }
 
-        return ($html) ? self::$htmlFilter : self::$stringFilter;
+        switch (true) {
+            case $html:
+                return ($strict) ? self::$strictHtmlFilter : self::$htmlFilter;
+            default:
+                return self::$stringFilter;
+        }
     }
 
     /**
@@ -99,12 +133,15 @@ class InputHelper
                         } elseif (method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask[$k])) {
                             $useMask = $mask[$k];
                         }
+                    } elseif (is_array($v)) {
+                        // Likely a collection so use the same mask
+                        $useMask = $mask;
                     }
                 } elseif (method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask)) {
                     $useMask = $mask;
                 }
 
-                if (is_array($v) && is_array($useMask)) {
+                if (is_array($v)) {
                     $v = self::_($v, $useMask, $urldecode);
                 } elseif ($useMask == 'filter') {
                     $v = self::getFilter()->clean($v, $useMask);
@@ -115,14 +152,7 @@ class InputHelper
 
             return $value;
         } elseif (is_string($mask) && method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask)) {
-            if (is_array($value)) {
-                foreach ($value as $k => &$v) {
-                    $v = self::$mask($v, $urldecode);
-                }
-                return $value;
-            } else {
-                return self::$mask($value, $urldecode);
-            }
+            return self::$mask($value, $urldecode);
         } else {
             return self::getFilter()->clean($value, $mask);
         }
@@ -381,6 +411,24 @@ class InputHelper
         }
 
         return $value;
+    }
+
+    /**
+     * Allows tags 'b', 'i', 'u', 'em', 'strong', 'a', 'span'
+     *
+     * @param $data
+     *
+     * @return mixed|string
+     */
+    public static function strict_html($value)
+    {
+        if (is_array($value)) {
+            foreach ($value as &$val) {
+                $val = self::strict_html($val);
+            }
+        }
+
+        return self::getFilter(true, true)->clean($value, 'html');
     }
 
     /**

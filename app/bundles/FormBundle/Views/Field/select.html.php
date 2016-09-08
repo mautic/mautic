@@ -36,7 +36,7 @@ $formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actio
 
 $label = (!$field['showLabel']) ? '' : <<<HTML
 
-                <label $labelAttr>{$view->escape($field['label'])}</label>
+                <label $labelAttr>{$field['label']}</label>
 HTML;
 
 
