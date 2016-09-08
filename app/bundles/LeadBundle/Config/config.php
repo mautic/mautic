@@ -373,6 +373,16 @@ return [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CompanyType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'company'
+            ],
+            'mautic.company.campaign.action.type.form'                  => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\AddToCompanyActionType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'addtocompany_action'
+            ],
+            'mautic.company.list.type.form'                  => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\CompanyListType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'company_list'
             ]
         ],
         'other'   => [

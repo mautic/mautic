@@ -19,5 +19,34 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class CompanyLeadRepository extends CommonRepository
 {
 
+    /**
+     * Get companies by leadId
+     *
+     * @param $leadId
+     * @param $companyId
+     * @return array
+     */
+    public function getCompaniesByLeadId($leadId, $companyId = null)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
 
+        $q->select('cl.company_id')
+            ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
+        ->where('cl.lead_id = :leadId')
+        ->setParameter('leadId',$leadId);
+
+        $q->where(
+            $q->expr()->eq('cl.manually_removed', ':false')
+        )->setParameter('false', false, 'boolean');
+
+        if ($companyId) {
+            $q->where(
+                $q->expr()->eq('cl.company_id', ':companyId')
+            )->setParameter('companyId', $companyId);
+        }
+
+        $result = $q->execute()->fetchAll();
+
+        return $result;
+    }
 }

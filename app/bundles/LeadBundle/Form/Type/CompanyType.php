@@ -311,8 +311,29 @@ class CompanyType extends AbstractType
             'required' => false
         ));
 
+        if (!empty($options['update_select'])) {
+            $builder->add(
+                'buttons',
+                'form_buttons',
+                [
+                    'apply_text'        => false
+                ]
+            );
+            $builder->add(
+                'updateSelect',
+                'hidden',
+                [
+                    'data'   => $options['update_select'],
+                    'mapped' => false
+                ]
+            );
+        } else {
+            $builder->add(
+                'buttons',
+                'form_buttons'
+            );
+        }
 
-        $builder->add('buttons', 'form_buttons');
     }
 
     /**
@@ -327,7 +348,7 @@ class CompanyType extends AbstractType
             ]
         );
 
-        $resolver->setRequired(['fields', 'isShortForm']);
+        $resolver->setRequired(['fields', 'update_select']);
     }
 
     /**
