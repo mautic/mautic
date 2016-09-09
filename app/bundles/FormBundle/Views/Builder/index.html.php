@@ -99,6 +99,7 @@ $formId = $form['sessionId']->vars['data'];
                                             'inForm'   => true,
                                             'id'       => $field['id'],
                                             'formId'   => $formId,
+                                            'contactFields' => $contactFields
                                         ]
                                     ); ?>
                                 <?php endif; ?>

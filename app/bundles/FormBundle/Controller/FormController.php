@@ -438,7 +438,8 @@ class FormController extends CommonFormController
                     'deletedActions' => $deletedActions,
                     'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'activeForm'     => $entity,
-                    'form'           => $form->createView()
+                    'form'           => $form->createView(),
+                    'contactFields'  => $this->getModel('lead.field')->getFieldListWithProperties(),
                 ],
                 'contentTemplate' => 'MauticFormBundle:Builder:index.html.php',
                 'passthroughVars' => [
@@ -783,7 +784,8 @@ class FormController extends CommonFormController
                     'tmpl'               => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'activeForm'         => $entity,
                     'form'               => $form->createView(),
-                    'forceTypeSelection' => $forceTypeSelection
+                    'forceTypeSelection' => $forceTypeSelection,
+                    'contactFields'      => $this->getModel('lead.field')->getFieldListWithProperties(),
                 ],
                 'contentTemplate' => 'MauticFormBundle:Builder:index.html.php',
                 'passthroughVars' => [

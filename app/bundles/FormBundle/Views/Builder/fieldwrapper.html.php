@@ -26,7 +26,7 @@
             <?php if (!empty($field['leadField'])): ?>
                 <i class="fa fa-user" aria-hidden="true"></i>
                 <span class="inline-spacer">
-            <?php echo ucfirst($field['leadField']); ?>
+            <?php echo (isset($contactFields)) ? $contactFields[$field['leadField']]['label'] : ucfirst($field['leadField']); ?>
         </span>
             <?php endif; ?>
             <?php if (isset($field['showWhenValueExists']) && $field['showWhenValueExists'] === false): ?>
