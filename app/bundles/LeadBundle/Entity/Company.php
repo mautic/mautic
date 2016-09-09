@@ -309,7 +309,7 @@ class Company extends FormEntity
      *
      * @param \DateTime $publishDown
      *
-     * @return Stage
+     * @return Company
      */
     public function setPublishDown ($publishDown)
     {
@@ -334,7 +334,7 @@ class Company extends FormEntity
      *
      * @param User $owner
      *
-     * @return Lead
+     * @return Company
      */
     public function setOwner(User $owner = null)
     {
