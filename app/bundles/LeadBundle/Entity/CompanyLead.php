@@ -47,6 +47,11 @@ class CompanyLead
     private $manuallyAdded = false;
 
     /**
+     * @var bool
+     */
+    private $isPrimary = false;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata (ORM\ClassMetadata $metadata)
@@ -72,6 +77,9 @@ class CompanyLead
 
         $builder->createField('manuallyAdded', 'boolean')
             ->columnName('manually_added')
+            ->build();
+        $builder->createField('isPrimary', 'boolean')
+            ->columnName('is_primary')
             ->build();
     }
 
@@ -169,5 +177,21 @@ class CompanyLead
     public function wasManuallyAdded()
     {
         return $this->manuallyAdded;
+    }
+
+    /**
+     * @param bool $isPrimary
+     */
+    public function setIsPrimay ($isPrimary)
+    {
+        $this->isPrimary = $isPrimary;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsPrimary()
+    {
+        return $this->isPrimary;
     }
 }

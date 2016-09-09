@@ -166,7 +166,7 @@ class Lead extends FormEntity
     /**
      * @var ArrayCollection
      */
-    private $companies;
+    private $companies = [];
 
     /**
      * Constructor
@@ -330,6 +330,7 @@ class Lead extends FormEntity
             ->addInverseJoinColumn('company_id', 'id', false)
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
             ->setIndexBy('company')
+            ->fetchLazy()
             ->cascadeMerge()
             ->cascadePersist()
             ->cascadeDetach()
@@ -1326,6 +1327,21 @@ class Lead extends FormEntity
     public function setTags($tags)
     {
         $this->tags = $tags;
+
+        return $this;
+    }
+
+
+    /**
+     * Set companies
+     *
+     * @param $companies
+     *
+     * @return $this
+     */
+    public function setCompanies($companies)
+    {
+        $this->companies[] = $companies;
 
         return $this;
     }

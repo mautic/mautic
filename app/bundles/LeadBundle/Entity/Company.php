@@ -272,10 +272,9 @@ class Company extends FormEntity
 
             return $this->updatedFields['companyname'];
         }
+        if (!empty($this->fields['companyname']['value'])) {
 
-        if (!empty($this->fields['core']['companyname']['value'])) {
-
-            return $this->fields['core']['companyname']['value'];
+            return $this->fields['companyname']['value'];
         }
 
         return '';

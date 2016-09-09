@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -341,6 +342,9 @@ class LeadModel extends FormModel
 
             if (!empty($details['zipcode']) && empty($fields['core']['zipcode']['value'])) {
                 $entity->addUpdatedField('zipcode', $details['zipcode']);
+            }
+            if (!empty($details['companies']) && empty($fields['core']['companies']['value'])) {
+                $entity->addUpdatedField('companies', $details['companies']);
             }
         }
 
@@ -2055,5 +2059,16 @@ class LeadModel extends FormModel
         $this->dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
 
         return $event->getEventCounter();
+    }
+
+    public function addToCompany(Lead $lead, Company $company) {
+        //check if lead is in company already
+        $company = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId(), $company->getId());
+
+        if (empty($company)) {
+            $this->companyModel->addLeadToCompany($company,$lead);
+            return true;
+        }
+        return false;
     }
 }
