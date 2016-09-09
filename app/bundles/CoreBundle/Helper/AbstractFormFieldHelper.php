@@ -106,13 +106,13 @@ abstract class AbstractFormFieldHelper
         // Note if this was an array to start and if we need to determine if the keys are sequentially numerical
         // for BC purposes
         $checkNumericalKeys = true;
-
         if (!is_array($list)) {
             // Try to json decode first
-            if (!$list = json_decode($list, true)) {
+            if ($json = json_decode($list, true)) {
+                $list = $json;
+            } else {
                 if (strpos($list, '|') !== false) {
                     $checkNumericalKeys = false;
-
                     $parts = explode('||', $list);
                     if (count($parts) > 1) {
                         $labels = explode('|', $parts[0]);
