@@ -11,6 +11,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -142,6 +143,14 @@ class CompanyController extends FormController
         $page = $this->factory->getSession()->get('mautic.company.page', 1);
 
         $action         = $this->generateUrl('mautic_company_action', array('objectAction' => 'new'));
+
+        $updateSelect = ($this->request->getMethod() == 'POST')
+            ? $this->request->request->get('company[updateSelect]', false, true)
+            : $this->request->get(
+                'updateSelect',
+                false
+            );
+
         $fields = $this->getModel('lead.field')->getEntities(
             [
                 'force'          => [
@@ -159,7 +168,7 @@ class CompanyController extends FormController
                 'hydration_mode' => 'HYDRATE_ARRAY'
             ]
         );
-        $form   = $model->createForm($entity, $this->get('form.factory'), $action, ['fields' => $fields]);
+        $form   = $model->createForm($entity, $this->get('form.factory'), $action, ['fields' => $fields, 'update_select' => $updateSelect]);
 
         $viewParameters = array('page' => $page);
 
@@ -208,16 +217,31 @@ class CompanyController extends FormController
                 $template  = 'MauticLeadBundle:Company:index';
             }
 
+            $passthrough = [
+                'activeLink'    => '#mautic_company_index',
+                'mauticContent' => 'company'
+            ];
+
+            // Check to see if this is a popup
+            if (isset($form['updateSelect'])) {
+                $template    = false;
+                $passthrough = array_merge(
+                    $passthrough,
+                    [
+                        'updateSelect'   => $form['updateSelect']->getData(),
+                        'companyId'      => $entity->getId(),
+                        'companyName'    => $entity->getName()
+                    ]
+                );
+            }
+
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(
                     array(
                         'returnUrl'       => $returnUrl,
                         'viewParameters'  => $viewParameters,
                         'contentTemplate' => $template,
-                        'passthroughVars' => array(
-                            'activeLink'    => '#mautic_company_index',
-                            'mauticContent' => 'company'
-                        )
+                        'passthroughVars' => $passthrough
                     )
                 );
             }
@@ -237,6 +261,7 @@ class CompanyController extends FormController
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_company_index',
                     'mauticContent' => 'company',
+                    'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect')),
                     'route'         => $this->generateUrl(
                         'mautic_company_action',
                         array(

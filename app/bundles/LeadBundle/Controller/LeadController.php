@@ -324,7 +324,10 @@ class LeadController extends FormController
         $integrationHelper = $this->get('mautic.helper.integration');
         $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
-
+        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+        $companyModel      = $this->getModel('company');
+        $companiesRepo     = $companyModel->getRepository();
+        $companies         = $companiesRepo->getCompaniesByLeadId($objectId);
         // Set the social profile templates
         if ($socialProfiles) {
             foreach ($socialProfiles as $integration => &$details) {
@@ -351,6 +354,7 @@ class LeadController extends FormController
                     'lead'              => $lead,
                     'avatarPanelState'  => $this->request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
                     'fields'            => $fields,
+                    'companies'         => $companies,
                     'socialProfiles'    => $socialProfiles,
                     'socialProfileUrls' => $socialProfileUrls,
                     'places'            => $this->getPlaces($lead),
