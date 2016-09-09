@@ -114,7 +114,6 @@ return [
                 'arguments' => [
                     'mautic.factory',
                     'mautic.helper.mailer',
-                    'mautic.http.connector'
                 ]
             ],
             'mautic.form.pagebundle.subscriber'     => [

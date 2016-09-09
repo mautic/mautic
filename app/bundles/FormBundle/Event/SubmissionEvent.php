@@ -58,12 +58,12 @@ class SubmissionEvent extends CommonEvent
      *
      * @var mixed
      */
-    private $callbacks;
+    private $callbacks = [];
 
     /**
      * @var mixed
      */
-    private $callbackResponses;
+    private $callbackResponses = [];
 
     /**
      * @var array
@@ -329,13 +329,13 @@ class SubmissionEvent extends CommonEvent
     }
 
     /**
-     * @param mixed $callbackResponses
+     * @param mixed $callbackResponse
      *
      * @return SubmissionEvent
      */
-    public function setPostSubmitCallbackResponse($key, $callbackResponses)
+    public function setPostSubmitCallbackResponse($key, $callbackResponse)
     {
-        $this->callbackResponses[$key] = $callbackResponses;
+        $this->callbackResponses[$key] = $callbackResponse;
 
         return $this;
     }

@@ -9,7 +9,9 @@
 
 namespace Mautic\FormBundle\EventListener;
 
-use Joomla\Http\Http;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -18,6 +20,7 @@ use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
 use Mautic\FormBundle\FormEvents;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -31,22 +34,16 @@ class FormSubscriber extends CommonSubscriber
     private $mailer;
 
     /**
-     * @var Http
-     */
-    private $connector;
-
-    /**
      * FormSubscriber constructor.
      *
      * @param MauticFactory $factory
      * @param MailHelper    $mailer
      */
-    public function __construct(MauticFactory $factory, MailHelper $mailer, Http $connector)
+    public function __construct(MauticFactory $factory, MailHelper $mailer)
     {
         parent::__construct($factory);
 
-        $this->mailer    = $mailer->getMailer();
-        $this->connector = $connector;
+        $this->mailer = $mailer->getMailer();
     }
 
     /**
@@ -61,7 +58,7 @@ class FormSubscriber extends CommonSubscriber
             FormEvents::ON_EXECUTE_SUBMIT_ACTION => [
                 ['onFormSubmitActionSendEmail', 0],
                 ['onFormSubmitActionRepost', 0],
-            ]
+            ],
         ];
     }
 
@@ -80,7 +77,7 @@ class FormSubscriber extends CommonSubscriber
                 "objectId"  => $form->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->factory->getIpAddressFromRequest()
+                "ipAddress" => $this->factory->getIpAddressFromRequest(),
             ];
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
@@ -100,7 +97,7 @@ class FormSubscriber extends CommonSubscriber
             "objectId"  => $form->deletedId,
             "action"    => "delete",
             "details"   => ['name' => $form->getName()],
-            "ipAddress" => $this->factory->getIpAddressFromRequest()
+            "ipAddress" => $this->factory->getIpAddressFromRequest(),
         ];
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
@@ -119,7 +116,7 @@ class FormSubscriber extends CommonSubscriber
             'formType'           => 'form_submitaction_sendemail',
             'formTheme'          => 'MauticFormBundle:FormTheme\SubmitAction',
             'formTypeCleanMasks' => [
-                'message' => 'html'
+                'message' => 'html',
             ],
             'eventName'          => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm'  => true,
@@ -136,7 +133,7 @@ class FormSubscriber extends CommonSubscriber
             'formTypeCleanMasks' => [
                 'post_url'             => 'url',
                 'failure_email'        => 'string',
-                'authorization_header' => 'string'
+                'authorization_header' => 'string',
             ],
             'eventName'          => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm'  => true,
@@ -223,7 +220,7 @@ class FormSubscriber extends CommonSubscriber
         $lead    = $event->getSubmission()->getLead();
 
         $payload = [
-            'mautic_contact' => $lead->getProfileFields()
+            'mautic_contact' => $lead->getProfileFields(),
         ];
 
         foreach ($fields as $field) {
@@ -240,7 +237,7 @@ class FormSubscriber extends CommonSubscriber
         }
 
         $headers = [
-            'X-Forwarded-For' => $event->getSubmission()->getIpAddress()->getIpAddress()
+            'X-Forwarded-For' => $event->getSubmission()->getIpAddress()->getIpAddress(),
         ];
 
         if (!empty($config['authorization_header'])) {
@@ -254,32 +251,20 @@ class FormSubscriber extends CommonSubscriber
         }
 
         try {
-            $response = $this->connector->post($config['post_url'], $payload, $headers, 10);
+            $client    = new Client(['timeout' => 15]);
+            $response  = $client->post(
+                $config['post_url'],
+                [
+                    'form_params' => $payload,
+                    'headers'     => $headers,
+                ]
+            );
 
-            $error = false;
-            $violations = [];
-
-            if ($json = json_decode($response->body, true)) {
-                if (isset($json['error'])) {
-                    $error = $json['error'];
-                } elseif (isset($json['errors'])) {
-                    $error = implode(', ', $json['errors']);
-                } elseif (isset($json['violations'])) {
-                    $error      = $this->translator->trans('mautic.form.action.repost.validation_failed');
-                    $violations = $json['violations'];
-                } elseif (200 !== $response->code) {
-                    $error = $response->body;
-                }
-            } elseif (200 !== $response->code) {
-                $error = $response->body;
+            if ($redirect = $this->parseResponse($response)) {
+                $event->setPostSubmitCallbackResponse('form.repost', new RedirectResponse($redirect));
             }
-
-            if ($error || $violations) {
-                $exception = (new ValidationException($error))
-                    ->setViolations($violations);
-
-                throw $exception;
-            }
+        } catch (ServerException $exception) {
+            $this->parseResponse($exception->getResponse());
         } catch (\Exception $exception) {
             if ($exception instanceof ValidationException) {
                 if ($violations = $exception->getViolations()) {
@@ -317,6 +302,46 @@ class FormSubscriber extends CommonSubscriber
                 $this->mailer->send();
             }
         }
+    }
+
+    private function parseResponse(Response $response)
+    {
+        $body  = (string) $response->getBody();
+        $error = false;
+        $redirect = false;
+        $violations = [];
+
+        if ($json = json_decode($body, true)) {
+            $body = $json;
+        } elseif ($params = parse_str($body)) {
+            $body = $params;
+        }
+
+        if (is_array($body)) {
+            if (isset($body['error'])) {
+                $error = $body['error'];
+            } elseif (isset($body['errors'])) {
+                $error = implode(', ', $body['errors']);
+            } elseif (isset($body['violations'])) {
+                $error      = $this->translator->trans('mautic.form.action.repost.validation_failed');
+                $violations = $body['violations'];
+            } elseif (isset($body['redirect'])) {
+                $redirect = $body['redirect'];
+            }
+        }
+
+        if (!$error && 200 !== $response->getStatusCode()) {
+            $error = (string) $response->getBody();
+        }
+
+        if ($error || $violations) {
+            $exception = (new ValidationException($error))
+                ->setViolations($violations);
+
+            throw $exception;
+        }
+
+        return $redirect;
     }
 
     /**
