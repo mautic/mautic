@@ -53,24 +53,8 @@ class FieldController extends CommonFormController
             return $this->modalAccessDenied();
         }
 
-        //fire the form builder event
-        $customComponents = $this->getModel('form.form')->getCustomComponents();
-        $customParams     = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
-
-        // Only show the lead fields not already used
-        $usedLeadFields = $session->get('mautic.form.'.$formId.'.fields.leadfields', array());
-        $testLeadFields = array_flip($usedLeadFields);
-        $leadFields     = $this->getModel('lead.field')->getFieldList();
-        foreach ($leadFields as &$group) {
-            $group = array_diff_key($group, $testLeadFields);
-        }
-
-        $form = $this->get('form.factory')->create('formfield', $formField, array(
-            'action'           => $this->generateUrl('mautic_formfield_action', array('objectAction' => 'new')),
-            'customParameters' => $customParams,
-            'leadFields'       => $leadFields
-        ));
-        $form->get('formId')->setData($formId);
+        // Generate the form
+        $form = $this->getFieldForm($formId, $formField);
 
         if (!empty($customParams)) {
             $formField['isCustom']         = true;
@@ -122,6 +106,7 @@ class FieldController extends CommonFormController
                     $session->set('mautic.form.'.$formId.'.fields.modified', $fields);
 
                     // Keep track of used lead fields
+                    $usedLeadFields   = $this->get('session')->get('mautic.form.'.$formId.'.fields.leadfields', []);
                     if (!empty($formData['leadField'])) {
                         $usedLeadFields[$keyId] = $formData['leadField'];
                     } else {
@@ -201,7 +186,7 @@ class FieldController extends CommonFormController
         $fields    = $session->get('mautic.form.'.$formId.'.fields.modified', []);
         $success   = 0;
         $valid     = $cancelled = false;
-        $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : null;
+        $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : [];
 
         if ($formField !== null) {
             $fieldType = $formField['type'];
@@ -216,31 +201,8 @@ class FieldController extends CommonFormController
                 return $this->modalAccessDenied();
             }
 
-            //set custom params from event if applicable
-            $customParams = (!empty($formField['isCustom'])) ? $formField['customParameters'] : [];
-
-            // Only show the lead fields not already used
-            $usedLeadFields   = $session->get('mautic.form.'.$formId.'.fields.leadfields', []);
-            $testLeadFields   = array_flip($usedLeadFields);
-            $currentLeadField = (isset($formField['leadField'])) ? $formField['leadField'] : null;
-            if (!empty($currentLeadField) && isset($testLeadFields[$currentLeadField])) {
-                unset($testLeadFields[$currentLeadField]);
-            }
-            $leadFields = $this->getModel('lead.field')->getFieldList();
-            foreach ($leadFields as &$group) {
-                $group = array_diff_key($group, $testLeadFields);
-            }
-
-            $form = $this->get('form.factory')->create(
-                'formfield',
-                $formField,
-                [
-                    'action'           => $this->generateUrl('mautic_formfield_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
-                    'customParameters' => $customParams,
-                    'leadFields'       => $leadFields
-                ]
-            );
-            $form->get('formId')->setData($formId);
+            // Generate the form
+            $form = $this->getFieldForm($formId, $formField);
 
             //Check for a submitted form and process it
             if ($method == 'POST') {
@@ -278,6 +240,7 @@ class FieldController extends CommonFormController
                         $session->set('mautic.form.'.$formId.'.fields.modified', $fields);
 
                         // Keep track of used lead fields
+                        $usedLeadFields   = $this->get('session')->get('mautic.form.'.$formId.'.fields.leadfields', []);
                         if (!empty($formData['leadField'])) {
                             $usedLeadFields[$objectId] = $formData['leadField'];
                         } else {
@@ -391,9 +354,6 @@ class FieldController extends CommonFormController
                 $session->set('mautic.form.'.$formId.'.fields.leadfields', $usedLeadFields);
             }
 
-            //set custom params from event if applicable
-            $customParams = (!empty($formField['isCustom'])) ? $formField['customParameters'] : [];
-
             //add the field to the delete list
             if (!in_array($objectId, $delete)) {
                 $delete[] = $objectId;
@@ -410,5 +370,30 @@ class FieldController extends CommonFormController
         }
 
         return new JsonResponse($dataArray);
+    }
+
+    /**
+     * @param       $formId
+     * @param array $formField
+     *
+     * @return mixed
+     */
+    private function getFieldForm($formId, array $formField)
+    {
+        //fire the form builder event
+        $customComponents = $this->getModel('form.form')->getCustomComponents();
+        $customParams     = (isset($customComponents['fields'][$formField['type']])) ? $customComponents['fields'][$formField['type']] : false;
+
+        $form = $this->getModel('form.field')->createForm(
+            $formField,
+            $this->get('form.factory'),
+            (!empty($formField['id'])) ?
+                $this->generateUrl('mautic_formfield_action', ['objectAction' => 'edit', 'objectId' => $formField['id']])
+                : $this->generateUrl('mautic_formfield_action', ['objectAction' => 'new']),
+            ['customParameters' => $customParams]
+        );
+        $form->get('formId')->setData($formId);
+
+        return $form;
     }
 }

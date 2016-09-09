@@ -10,6 +10,8 @@
 namespace Mautic\FormBundle\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -19,18 +21,18 @@ trait SortableListTrait
      * @param FormBuilderInterface $builder
      * @param                      $options
      */
-    public function addSortableList(FormBuilderInterface $builder, $options, $listName = 'list', $listData = null)
+    public function addSortableList(FormBuilderInterface $builder, $options, $listName = 'list', $listData = null, $formName = 'formfield')
     {
         $listOptions = [
             'with_labels' => true,
             'attr'  => [
-                'data-hide-on' => '{"formfield_properties_sync_list_1": "checked"}',
+                'data-show-on' => '{"'.$formName.'_properties_syncList_1": "", "'.$formName.'_leadField:data-list-type": "empty"}',
             ],
             'option_required' => false,
             'constraint_callback' => new Callback(
-                function ($validateMe, ExecutionContextInterface $context) {
+                function ($validateMe, ExecutionContextInterface $context) use ($listName) {
                     $data = $context->getRoot()->getData();
-                    if (empty($data['properties']['sync_list']) && !count($data['properties']['list']['list'])) {
+                    if ((empty($data['properties']['syncList']) || empty($data['leadField'])) && !count($data['properties'][$listName]['list'])) {
                         $context->buildViolation('mautic.form.lists.count')->addViolation();
                     }
                 }
@@ -42,24 +44,27 @@ trait SortableListTrait
         }
 
         $builder->add($listName, 'sortablelist', $listOptions);
-
         $builder->add(
-            'sync_list',
+            'syncList',
             'yesno_button_group',
             [
+                'attr' => [
+                    'data-show-on' => '{"'.$formName.'_leadField:data-list-type": "1"}'
+                ],
                 'label' => 'mautic.form.field.form.property_list_sync_choices',
-                'data'  => (!isset($options['data']['sync_list'])) ? false : (boolean) $options['data']['sync_list'],
-                'constraints' => [
-                    new Callback(
-                        function ($validateMe, ExecutionContextInterface $context) {
-                            $data = $context->getRoot()->getData();
-                            if (!empty($data['properties']['sync_list']) && empty($data['leadField'])) {
-                                $context->buildViolation('mautic.form.lists.sync_list_requires_field')->addViolation();
-                            }
-                        }
-                    )
-                ]
+                'data'  => !isset($options['data']['syncList']) ? false : (boolean) $options['data']['syncList'],
             ]
         );
+
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function(FormEvent $event) {
+            $formData = $event->getForm()->getParent()->getData();
+
+            if (empty($formData['leadField'])) {
+                // Disable sync list if a contact field is not mapped
+                $data = $event->getData();
+                $data['syncList'] = '0';
+                $event->setData($data);
+            }
+        });
     }
 }

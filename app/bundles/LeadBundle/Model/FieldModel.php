@@ -568,6 +568,8 @@ class FieldModel extends FormModel
                 'label'        => $contactField['label'],
                 'alias'        => $contactField['alias'],
                 'type'         => $contactField['type'],
+                'group'        => $contactField['group'],
+                'group_label'  => $this->translator->trans('mautic.lead.field.group.' . $contactField['group']),
                 'defaultValue' => $contactField['defaultValue'],
                 'properties'   => $contactField['properties'],
             ];

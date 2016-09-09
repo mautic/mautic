@@ -711,6 +711,7 @@ class FormController extends CommonFormController
                     // Set the custom parameters
                     $field['customParameters'] = $customComponents['fields'][$field['type']];
                 }
+                $field['formId'] = $objectId;
 
                 $modifiedFields[$id] = $field;
 

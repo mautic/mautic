@@ -165,7 +165,11 @@ return [
             ],
             'mautic.form.type.field'                     => [
                 'class' => 'Mautic\FormBundle\Form\Type\FieldType',
-                'alias' => 'formfield'
+                'alias' => 'formfield',
+                'methodCalls'  => [
+                    'setFieldModel' => ['mautic.form.model.field'],
+                    'setFormModel'  => ['mautic.form.model.form'],
+                ],
             ],
             'mautic.form.type.action'                    => [
                 'class' => 'Mautic\FormBundle\Form\Type\ActionType',
@@ -237,7 +241,10 @@ return [
                 'class' => 'Mautic\FormBundle\Model\ActionModel'
             ],
             'mautic.form.model.field' => [
-                'class' => 'Mautic\FormBundle\Model\FieldModel'
+                'class' => 'Mautic\FormBundle\Model\FieldModel',
+                'arguments' => [
+                    'mautic.lead.model.field',
+                ]
             ],
             'mautic.form.model.form' => [
                 'class' => 'Mautic\FormBundle\Model\FormModel',

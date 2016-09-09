@@ -3580,6 +3580,56 @@ var Mautic = {
     switchFormFieldVisibilty: function (formName) {
         var form   = mQuery('form[name="'+formName+'"]');
         var fields = {};
+        var fieldsPriority = {};
+
+        var getFieldParts = function(fieldName) {
+            var returnObject = {"name": fieldName, "attribute": ''};
+            if (fieldName.search(':') !== -1) {
+                var returnArray = fieldName.split(':');
+                returnObject.name = returnArray[0];
+                returnObject.attribute = returnArray[1];
+            }
+
+            return returnObject;
+        };
+
+        var checkValueCondition = function (sourceFieldVal, condition) {
+            var visible = true;
+            if (typeof condition == 'object') {
+                visible = mQuery.inArray(sourceFieldVal, condition) !== -1;
+            } else if (condition == 'empty' || (condition == 'notEmpty')) {
+                var isEmpty = (sourceFieldVal == '' || sourceFieldVal == null || sourceFieldVal == 'undefined');
+                visible = (condition == 'empty') ? isEmpty : !isEmpty;
+            } else if (condition !== sourceFieldVal) {
+                visible = false;
+            }
+
+            return visible;
+        };
+
+        var checkFieldCondition = function (fieldId, attribute, condition) {
+            var visible = true;
+
+            if (attribute) {
+                // Compare the attribute value
+                if (typeof mQuery('#' + fieldId).attr(attribute) !== 'undefined') {
+                    var field = '#' + fieldId;
+                } else if (mQuery('#' + fieldId).is('select')) {
+                    // Check the value option
+                    var field = mQuery('#' + fieldId +' option[value="' + mQuery('#' + fieldId).val() + '"]');
+                } else {
+                    return visible;
+                }
+
+                var attributeValue = (typeof mQuery(field).attr(attribute) !== 'undefined') ? mQuery(field).attr(attribute) : null;
+
+                return checkValueCondition(attributeValue, condition);
+            } else if (mQuery('#' + fieldId).is(':checkbox') || mQuery('#' + fieldId).is(':radio')) {
+                return (condition == 'checked' && mQuery('#' + fieldId).is(':checked')) || (condition == '' && !mQuery('#' + fieldId).is(':checked'));
+            }
+
+            return checkValueCondition(mQuery('#' + fieldId).val(), condition);
+        }
 
         // find all fields to show
         form.find('[data-show-on]').each(function(index, el) {
@@ -3587,25 +3637,11 @@ var Mautic = {
             var showOn = jQuery.parseJSON(field.attr('data-show-on'));
 
             mQuery.each(showOn, function(fieldId, condition) {
-                if (typeof fields[field.attr('id')] == 'undefined' || fields[field.attr('id')] !== true) {
-                    if (mQuery('#' + fieldId).is(':checkbox') || mQuery('#' + fieldId).is(':radio')) {
-                        if ((condition == 'checked' && mQuery('#' + fieldId).is(':checked')) || (condition == '' && !mQuery('#' + fieldId).is(':checked'))) {
-                            fields[field.attr('id')] = true;
-                        } else {
-                            fields[field.attr('id')] = false;
-                        }
-                    } else {
-                        var sourceFieldVal = mQuery('#' + fieldId).val();
-                        if (condition == 'empty') {
-                            fields[field.attr('id')] = (sourceFieldVal == '') ? true : false;
-                        } else if (condition == 'notEmpty') {
-                            fields[field.attr('id')] = (sourceFieldVal == '') ? false : true;
-                        } else if (mQuery.inArray(sourceFieldVal, condition) === -1) {
-                            fields[field.attr('id')] = false;
-                        } else {
-                            fields[field.attr('id')] = true;
-                        }
-                    }
+                var fieldParts = getFieldParts(fieldId);
+
+                // Treat multiple fields as OR statements
+                if (typeof fields[field.attr('id')] === 'undefined' || !fields[field.attr('id')]) {
+                    fields[field.attr('id')] = checkFieldCondition(fieldParts.name, fieldParts.attribute, condition);
                 }
             });
         });
@@ -3614,24 +3650,18 @@ var Mautic = {
         form.find('[data-hide-on]').each(function(index, el) {
             var field  = mQuery(el);
             var hideOn = jQuery.parseJSON(field.attr('data-hide-on'));
+
+            if (typeof hideOn.display_priority !== 'undefined') {
+                fieldsPriority[field.attr('id')] = 'hide';
+                delete hideOn.display_priority;
+            }
+
             mQuery.each(hideOn, function(fieldId, condition) {
-                if (mQuery('#' + fieldId).is(':checkbox') || mQuery('#' + fieldId).is(':radio')) {
-                    if ((condition == 'checked' && mQuery('#' + fieldId).is(':checked')) || (condition == '' && !mQuery('#' + fieldId).is(':checked'))) {
-                        fields[field.attr('id')] = false;
-                    } else {
-                        fields[field.attr('id')] = true;
-                    }
-                } else {
-                    var sourceFieldVal = mQuery('#' + fieldId).val();
-                    if (condition == 'empty') {
-                        fields[field.attr('id')] = (sourceFieldVal == '') ? false : true;
-                    } else if (condition == 'notEmpty') {
-                        fields[field.attr('id')] = (sourceFieldVal == '') ? true : false;
-                    } else if (mQuery.inArray(sourceFieldVal, condition) !== -1) {
-                        fields[field.attr('id')] = false;
-                    } else if (typeof fields[field.attr('id')] == 'undefined') {
-                        fields[field.attr('id')] = true;
-                    }
+                var fieldParts = getFieldParts(fieldId);
+
+                // Treat multiple fields as OR statements
+                if (typeof fields[field.attr('id')] === 'undefined' || fields[field.attr('id')]) {
+                    fields[field.attr('id')] = !checkFieldCondition(fieldParts.name, fieldParts.attribute, condition);
                 }
             });
         });

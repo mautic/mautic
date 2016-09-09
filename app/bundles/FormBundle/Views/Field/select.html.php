@@ -18,7 +18,7 @@ if (!empty($properties['multiple'])) {
 }
 
 $parseList = [];
-if (!empty($properties['sync_list']) && !empty($field['leadField']) && isset($contactFields[$field['leadField']]) && $contactFields[$field['leadField']]['properties']['list']) {
+if (!empty($properties['syncList']) && !empty($field['leadField']) && isset($contactFields[$field['leadField']]) && $contactFields[$field['leadField']]['properties']['list']) {
     $parseList = $contactFields[$field['leadField']]['properties']['list'];
 } else {
     if (isset($list)) {
