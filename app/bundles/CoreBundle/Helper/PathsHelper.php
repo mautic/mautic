@@ -34,6 +34,11 @@ class PathsHelper
     /**
      * @var string
      */
+    protected $assetPath;
+
+    /**
+     * @var string
+     */
     protected $dashboardImportDir;
 
     /**
@@ -68,6 +73,7 @@ class PathsHelper
         $this->paths = $coreParametersHelper->getParameter('paths');
         $this->theme = $coreParametersHelper->getParameter('theme');
         $this->imagePath = $coreParametersHelper->getParameter('image_path');
+        $this->assetPath = $coreParametersHelper->getParameter('upload_dir');
         $this->dashboardImportDir = $coreParametersHelper->getParameter('dashboard_import_dir');
         $this->dashboardImportUserDir = $coreParametersHelper->getParameter('dashboard_import_user_dir');
         $this->kernelCacheDir = $coreParametersHelper->getParameter('kernel.cache_dir');
@@ -97,6 +103,8 @@ class PathsHelper
             if (substr($path, -1) === '/') {
                 $path = substr($path, 0, -1);
             }
+        } elseif ($name == 'assets') {
+            return realpath($this->assetPath);
         } elseif ($name == 'dashboard.user' || $name == 'dashboard.global') {
             //these are absolute regardless as they are configurable
             $globalPath = $this->dashboardImportDir;

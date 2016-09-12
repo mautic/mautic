@@ -68,6 +68,20 @@ return [
                 ],
             ],
         ],
+        'api' => [
+            // 'mautic_core_api_file_action'   => [
+            //     'path'       => '/files/{objectAction}/{objectId}',
+            //     'controller' => 'MauticCoreBundle:Api\FileAp:execute'
+            // ],
+            'mautic_core_api_file_list' => [
+                'path'       => '/files/{dir}',
+                'controller' => 'MauticCoreBundle:Api\FileApi:list'
+            ],
+            'mautic_core_api_file_action' => [
+                'path'       => '/files/{objectAction}/{objectId}',
+                'controller' => 'MauticCoreBundle:Api\FileApi'
+            ],
+        ],
     ],
     'menu'     => [
         'main'    => [

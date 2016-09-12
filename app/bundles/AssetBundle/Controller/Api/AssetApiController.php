@@ -10,6 +10,7 @@
 namespace Mautic\AssetBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\AssetBundle\Entity\Asset;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -44,5 +45,31 @@ class AssetApiController extends CommonApiController
         $entity->setDownloadUrl(
             $this->model->generateUrl($entity, true)
         );
+    }
+
+    /**
+     * Creates a new entity
+     *
+     * @return Response
+     */
+    public function newEntityAction()
+    {
+        $entity = $this->model->getEntity();
+
+        if (!$this->checkEntityAccess($entity, 'create')) {
+            return $this->accessDenied();
+        }
+
+        $parameters = $this->request->request->all();
+        $file = $this->request->files->get('file');
+
+        $entity->setTempId(uniqid('tmp_'));
+        // $entity->setTempName();
+        $entity->setMaxSize(Asset::convertSizeToBytes($this->factory->getParameter('max_size') . 'M')); // convert from MB to B
+        $entity->setUploadDir($this->factory->getParameter('upload_dir'));
+        $entity->preUpload();
+        $entity->upload();
+
+        return $this->processForm($entity, $parameters, 'POST');
     }
 }
