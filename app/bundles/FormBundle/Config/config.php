@@ -238,7 +238,8 @@ return [
                     'mautic.page.model.page',
                     'mautic.lead.model.lead',
                     'mautic.campaign.model.campaign',
-                    'mautic.lead.model.field'
+                    'mautic.lead.model.field',
+                    'mautic.company.model.company'
                 ]
             ]
         ]

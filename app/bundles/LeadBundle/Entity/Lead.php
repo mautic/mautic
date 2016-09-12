@@ -57,6 +57,11 @@ class Lead extends FormEntity
     /**
      * @var ArrayCollection
      */
+    private $companyChangeLog;
+
+    /**
+     * @var ArrayCollection
+     */
     private $doNotContact;
 
     /**
@@ -181,6 +186,7 @@ class Lead extends FormEntity
         $this->stageChangeLog  = new ArrayCollection();
         $this->frequencyRules  = new ArrayCollection();
         $this->companies       = new ArrayCollection();
+        $this->companyChangeLog= new ArrayCollection();
     }
 
     /**
@@ -221,6 +227,14 @@ class Lead extends FormEntity
             ->build();
 
         $builder->createOneToMany('pointsChangeLog', 'PointsChangeLog')
+            ->orphanRemoval()
+            ->setOrderBy(['dateAdded' => 'DESC'])
+            ->mappedBy('lead')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createOneToMany('companyChangeLog', 'CompanyChangeLog')
             ->orphanRemoval()
             ->setOrderBy(['dateAdded' => 'DESC'])
             ->mappedBy('lead')
@@ -909,6 +923,48 @@ class Lead extends FormEntity
     {
         return $this->pointsChangeLog;
     }
+
+    /**
+     * Creates a points change entry
+     *
+     * @param           $type
+     * @param           $name
+     * @param           $action
+     * @param           $pointsDelta
+     * @param IpAddress $ip
+     */
+    public function addCompanyChangeLogEntry($type, $name, $action, $company = null)
+    {
+        if (!$company) {
+            // No need to record a null delta
+            return;
+        }
+
+        // Create a new company change event
+        $event = new CompanyChangeLog();
+        $event->setType($type);
+        $event->setEventName($name);
+        $event->setActionName($action);
+        $event->setDateAdded(new \DateTime());
+        $event->setCompany($company);
+        $event->setLead($this);
+        $this->addCompanyChangeLog($event);
+    }
+
+    /**
+     * Add comapnyChangeLog
+     *
+     * @param CompanyChangeLog $companyChangeLog
+     *
+     * @return Lead
+     */
+    public function addCompanyChangeLog(CompanyChangeLog $companyChangeLog)
+    {
+        $this->companyChangeLog[] = $companyChangeLog;
+
+        return $this;
+    }
+
 
     /**
      * @param string $identifier

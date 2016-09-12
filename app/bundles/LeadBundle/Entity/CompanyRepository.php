@@ -429,6 +429,45 @@ class CompanyRepository extends CommonRepository
 
         return $results;
     }
+
+    /**
+     * Get a list of lists
+     *
+     * @param string $name
+     *
+     * @return array
+     */
+    public function identifyCompany($companyName, $city, $country, $state = null)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        if (!$companyName or !$city or !$country) {
+            return array();
+        }
+
+        $q->select('id')
+            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp');
+
+        $q->andWhere(
+            $q->expr()->eq('comp.companyname', ':companyName')
+        )->andWhere(
+            $q->expr()->eq('comp.companycity', ':city')
+        )->andWhere(
+            $q->expr()->eq('comp.companycountry',':country')
+        )->setParameter('companyName', $companyName)
+        ->setParameter('city', $city)
+        ->setParameter('country', $country);
+
+        if ($state) {
+            $q->andWhere(
+                $q->expr()->eq('comp.companystate', ':state')
+            )->setParameter('state', $state);
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
     /**
     +     * Get a count of leads that belong to the company
     +     *
