@@ -383,6 +383,11 @@ return [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CompanyListType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'company_list'
+            ],
+            'mautic.company.lead.type.form'                  => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\CompanyLeadType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'company_lead'
             ]
         ],
         'other'   => [

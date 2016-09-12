@@ -309,14 +309,11 @@ class LeadType extends AbstractType
                 ]
             ]
         );
-        $companyTransformer = new IdToEntityModelTransformer(
-            $this->factory->getEntityManager(),
-            'MauticLeadBundle:Company'
-        );
+
         $builder->add(
-            $builder->create(
+
         'companies',
-            'company_list',
+            'company_lead',
             [
                 'label'       => 'mautic.company.selectcompany',
                 'label_attr'  => ['class' => 'control-label'],
@@ -324,10 +321,10 @@ class LeadType extends AbstractType
                         'class'    => 'form-control',
                         'tooltip'  => 'mautic.company.choose.company_descr',
                      ],
-                'multiple'    => false,
+                'multiple'    => true,
                 'required'    => false
             ]
-            )->addModelTransformer($companyTransformer)
+
         );
 
         $transformer = new IdToEntityModelTransformer(
