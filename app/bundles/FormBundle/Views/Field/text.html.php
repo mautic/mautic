@@ -11,12 +11,6 @@ $defaultInputClass = (isset($inputClass)) ? $inputClass : 'input';
 
 include __DIR__.'/field_helper.php';
 
-$formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
-    [
-        'id'      => $id,
-        'formId'  => $formId
-    ]) : '';
-
 $label = (!$field['showLabel']) ? '' : <<<HTML
 
                 <label $labelAttr>{$field['label']}</label>
@@ -42,7 +36,7 @@ endif;
 
 $html = <<<HTML
 
-            <div $containerAttr>{$formButtons}{$label}{$help}{$textInput}
+            <div $containerAttr>{$label}{$help}{$textInput}
                 <span class="mauticform-errormsg" style="display: none;">$validationMessage</span>
             </div>
 

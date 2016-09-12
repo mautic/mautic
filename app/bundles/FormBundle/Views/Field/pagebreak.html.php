@@ -18,15 +18,7 @@ $classPrefix = 'btn btn-default mautic-pagebreak-';
 $appendAttribute($backButtonAttr, 'class', $classPrefix.'back');
 $appendAttribute($nextButtonAttr, 'class', $classPrefix.'next'.((!empty($inForm)) ? ' mr-lg ' : ''));
 
-if (!empty($inForm)) {
-    $formButtons = $view->render('MauticFormBundle:Builder:actions.html.php',
-        [
-            'id'       => $id,
-            'formId'   => $formId,
-            'formName' => $formName
-        ]);
-} else {
-    $formButtons    = '';
+if (empty($inForm)) {
     $containerAttr .= ' data-mautic-form-pagebreak="'.$fieldPage.'"';
 
     // Hidden by default and only visible if JS makes it so
@@ -39,7 +31,7 @@ if (empty(trim($field['properties']['prev_page_label']))) {
 
 $html = <<<HTML
 
-            <div $containerAttr>{$formButtons}
+            <div $containerAttr>
                 <button type="button" $backButtonAttr data-mautic-form-pagebreak-button="prev">{$field['properties']['prev_page_label']}</button>
                 <button type="button" $nextButtonAttr data-mautic-form-pagebreak-button="next">{$field['properties']['next_page_label']}</button>
             </div>

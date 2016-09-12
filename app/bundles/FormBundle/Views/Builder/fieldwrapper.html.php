@@ -9,6 +9,16 @@
 
 ?>
 <div class="panel form-field-wrapper" data-sortable-id="mauticform_<?php echo $field['id']; ?>">
+    <?php
+    echo $view->render('MauticFormBundle:Builder:actions.html.php',
+        [
+            'id'             => $field['id'],
+            'formId'         => $formId,
+            'formName'       => '',
+            'disallowDelete' => ('button' == $field['type'])
+        ]);
+    ?>
+    <div class="row ml-0 mr-0"><?php // wrap in a row to keep bootstrap container classes from affecting builder layout ?>
     <?php echo $view->render(
         $template,
         [
@@ -19,6 +29,7 @@
             'contactFields' => (isset($contactFields)) ? $contactFields : [],
         ]
     ); ?>
+    </div>
     <?php if ((isset($field['showWhenValueExists']) && $field['showWhenValueExists'] === false) || !empty($field['showAfterXSubmissions'])
         || !empty($field['leadField'])
     ): ?>

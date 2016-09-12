@@ -10,13 +10,6 @@
 $defaultInputClass = $containerType = 'freetext';
 include __DIR__.'/field_helper.php';
 
-$formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
-    [
-        'id'       => $id,
-        'formId'   => $formId,
-        'formName' => $formName
-    ]) : '';
-
 $label = (!$field['showLabel']) ? '' :
     <<<HTML
     
@@ -28,7 +21,7 @@ HTML;
 
 $html = <<<HTML
 
-            <div $containerAttr>{$formButtons}{$label}
+            <div $containerAttr>{$label}
                 <div $inputAttr>
                     {$properties['text']}
                 </div>

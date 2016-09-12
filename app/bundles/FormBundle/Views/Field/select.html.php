@@ -35,14 +35,6 @@ if (!empty($properties['syncList']) && !empty($field['leadField']) && isset($con
 $list = \Mautic\FormBundle\Helper\FormFieldHelper::parseList($parseList);
 $firstListValue  = reset($list);
 
-$formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
-    [
-        'id'       => $id,
-        'formId'   => $formId,
-        'formName' => $formName
-    ]) : '';
-
-
 $label = (!$field['showLabel']) ? '' : <<<HTML
 
                 <label $labelAttr>{$field['label']}</label>
@@ -72,7 +64,7 @@ endforeach;
 $optionsHtml = implode('', $options);
 $html = <<<HTML
 
-            <div $containerAttr>{$formButtons}{$label}{$help}
+            <div $containerAttr>{$label}{$help}
                 <select $inputAttr>$optionsHtml
                 </select>
                 <span class="mauticform-errormsg" style="display: none;">$validationMessage</span>

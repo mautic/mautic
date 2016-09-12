@@ -5,8 +5,7 @@
 }
 
 .form-field-wrapper {
-    padding-top: 8px;
-
+    position: relative;
 }
 
 #mauticforms_fields .mauticform-row, #mauticforms_actions .mauticform-row {
@@ -34,7 +33,9 @@
 }
 
 #mauticforms_fields .form-buttons {
-    float: right;
+    position: absolute;
+    right: 8px;
+    top: 8px;
 }
 
 #mauticforms_fields input, #mauticforms_fields textarea, #mauticforms_fields select {

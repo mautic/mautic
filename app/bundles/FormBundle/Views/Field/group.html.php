@@ -38,13 +38,6 @@ if (stripos($optionLabelAttr, 'class') === false) {
 $count   = 0;
 $firstId = 'mauticform_' . $containerType . '_' . $type . '_'.$field['alias'].'_'.InputHelper::alphanum(InputHelper::transliterate($firstListValue)).'1';
 
-$formButtons = (!empty($inForm)) ? $view->render('MauticFormBundle:Builder:actions.html.php',
-    [
-        'id'       => $id,
-        'formId'   => $formId,
-        'formName' => $formName
-    ]) : '';
-
 $label = (!$field['showLabel']) ? '' : <<<HTML
 
                 <label $labelAttr for="$firstId">{$field['label']}</label>
@@ -88,7 +81,7 @@ $optionHtml = implode('', $options);
 
 $html = <<<HTML
 
-            <div $containerAttr>$formButtons{$label}{$help}{$optionHtml}
+            <div $containerAttr>{$label}{$help}{$optionHtml}
                 <span class="mauticform-errormsg" style="display: none;">$validationMessage</span>
             </div>
 
