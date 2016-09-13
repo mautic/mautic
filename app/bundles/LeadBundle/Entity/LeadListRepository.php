@@ -21,6 +21,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\EventListener\MaintenanceSubscriber;
 
 /**
  * LeadListRepository
@@ -280,106 +281,130 @@ class LeadListRepository extends CommonRepository
                 $filters = array();
             }
 
+            $objectFilters = $this->arrangeFilters($filters);
+
             if ($dynamic && count($filters)) {
                 $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
                 $parameters = array();
-                $expr       = $this->getListFilterExpr($filters, $parameters, $q, false);
-                foreach ($parameters as $k => $v) {
-                    switch (true) {
-                        case is_bool($v):
-                            $paramType = 'boolean';
-                            break;
+                foreach ($objectFilters as $object => $filters) {
+                    $expr = $this->getListFilterExpr($filters, $parameters, $q, false);
+                    foreach ($parameters as $k => $v) {
+                        switch (true) {
+                            case is_bool($v):
+                                $paramType = 'boolean';
+                                break;
 
-                        case is_int($v):
-                            $paramType = 'integer';
-                            break;
+                            case is_int($v):
+                                $paramType = 'integer';
+                                break;
 
-                        case is_float($v):
-                            $paramType = 'float';
-                            break;
+                            case is_float($v):
+                                $paramType = 'float';
+                                break;
 
-                        default:
-                            $paramType = null;
-                            break;
+                            default:
+                                $paramType = null;
+                                break;
+                        }
+                        $q->setParameter($k, $v, $paramType);
                     }
-                    $q->setParameter($k, $v, $paramType);
-                }
 
-                if ($countOnly) {
-                    $select = 'count(l.id) as lead_count, max(l.id) as max_id';
-                } elseif ($idOnly) {
-                    $select = 'l.id';
-                } else {
-                    $select = 'l.*';
-                }
+                    if ($countOnly) {
+                        $select = 'count(l.id) as lead_count, max(l.id) as max_id';
+                    } elseif ($idOnly) {
+                        $select = 'l.id';
+                    } else {
+                        $select = 'l.*';
+                    }
 
-                $q->select($select)
-                    ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+                    $q->select($select)
+                        ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
 
-                // Only leads that existed at the time of count
-                if ($batchLimiters && !empty($batchLimiters['maxId'])) {
-                    $expr->add(
-                        $q->expr()->lte('l.id', $batchLimiters['maxId'])
-                    );
-                }
+                        // Only leads that existed at the time of count
+                        if ($batchLimiters && !empty($batchLimiters['maxId'])) {
+                            $expr->add(
+                                $q->expr()->lte('l.id', $batchLimiters['maxId'])
+                            );
+                        }
 
-                if ($newOnly) {
-                    // Leads that do not have any record in the lead_lists_leads table for this lead list
-                    $subqb = $this->_em->getConnection()->createQueryBuilder()
-                        ->select('null')
-                        ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
-                        ->where(
-                            $q->expr()->andX(
-                                $q->expr()->eq('ll.leadlist_id', $id),
-                                $q->expr()->eq('ll.lead_id', 'l.id')
+                        if ($newOnly) {
+                            // Leads that do not have any record in the lead_lists_leads table for this lead list
+                            $subqb = $this->_em->getConnection()->createQueryBuilder()
+                                ->select('null')
+                                ->from(MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll')
+                                ->where(
+                                    $q->expr()->andX(
+                                        $q->expr()->eq('ll.leadlist_id', $id),
+                                        $q->expr()->eq('ll.lead_id', 'l.id')
+                                    )
+                                );
+
+                                $q->andWhere(
+                                    sprintf('NOT EXISTS (%s)', $subqb->getSQL())
+                                );
+                            if ($object === 'lead') {
+                                $q->andWhere($expr);
+                            }
+
+                        } elseif ($nonMembersOnly) {
+                            // Only leads that are part of the list that no longer match filters and have not been manually removed
+                            $q->join('l', MAUTIC_TABLE_PREFIX . 'lead_lists_leads', 'll', 'l.id = ll.lead_id');
+
+                            $mainExpr = $q->expr()->andX();
+                            if ($batchLimiters && !empty($batchLimiters['dateTime'])) {
+                                // Only leads in the list at the time of count
+                                $mainExpr->add(
+                                    $q->expr()->lte('ll.date_added', $q->expr()->literal($batchLimiters['dateTime']))
+                                );
+                            }
+
+                            // Ignore those that have been manually added
+                            $mainExpr->addMultiple(
+                                array(
+                                    $q->expr()->eq('ll.manually_added', ':false'),
+                                    $q->expr()->eq('ll.leadlist_id', (int)$id)
+                                )
+                            );
+                            $q->setParameter('false', false, 'boolean');
+
+                            // Use an exists statement for better performance?? - https://dev.mysql.com/doc/refman/5.5/en/-existssubquery-optimization-with.html
+                            $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+                            $sq->select('null')
+                                ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+                                ->where('l.id = ll.lead_id');
+                            if ($object === 'lead') {
+                                $sq->
+                                andWhere($expr);
+                            }
+
+                            $q->andWhere(
+                                sprintf('NOT EXISTS (%s)', $sq->getSQL())
                             )
-                        );
+                                ->andWhere($mainExpr);
+                        }
+                    if ($object === 'company') {
+                        $compq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+                        $compq->select('id')
+                            ->from(MAUTIC_TABLE_PREFIX . 'companies', 'comp')
+                            ->where($expr);
 
-                    $expr->add(
-                        sprintf('NOT EXISTS (%s)', $subqb->getSQL())
-                    );
-
-                    $q->andWhere($expr);
-                } elseif ($nonMembersOnly) {
-                    // Only leads that are part of the list that no longer match filters and have not been manually removed
-                    $q->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll', 'l.id = ll.lead_id');
-
-                    $mainExpr = $q->expr()->andX();
-                    if ($batchLimiters && !empty($batchLimiters['dateTime'])) {
-                        // Only leads in the list at the time of count
-                        $mainExpr->add(
-                            $q->expr()->lte('ll.date_added', $q->expr()->literal($batchLimiters['dateTime']))
-                        );
+                        $clq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+                        $clq->select('null')
+                            ->from(MAUTIC_TABLE_PREFIX . 'companies_leads', 'cl')
+                            ->where('cl.lead_id = l.id')
+                            ->andWhere(sprintf('cl.company_id in (%s)', $compq->getSQL()));
                     }
-
-                    // Ignore those that have been manually added
-                    $mainExpr->addMultiple(
-                        array(
-                            $q->expr()->eq('ll.manually_added', ':false'),
-                            $q->expr()->eq('ll.leadlist_id', (int) $id)
-                        )
-                    );
-                    $q->setParameter('false', false, 'boolean');
-
-                    // Use an exists statement for better performance?? - https://dev.mysql.com/doc/refman/5.5/en/-existssubquery-optimization-with.html
-                    $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-                    $sq->select('null')
-                        ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-                        ->where('l.id = ll.lead_id')
-                        ->andWhere($expr);
-
-                    $q->andWhere(
-                        sprintf('NOT EXISTS (%s)', $sq->getSQL())
-                    )
-                        ->andWhere($mainExpr);
                 }
-
                 // Set limits if applied
                 if (!empty($limit)) {
                     $q->setFirstResult($start)
                         ->setMaxResults($limit);
                 }
-
+                if ( isset($clq)) {
+                    $q->andWhere(
+                        sprintf('EXISTS (%s)', $clq->getSQL())
+                    );
+                }
                 $results = $q->execute()->fetchAll();
                 foreach ($results as $r) {
                     if ($countOnly) {
@@ -448,6 +473,24 @@ class LeadListRepository extends CommonRepository
         return $return;
     }
 
+    public function arrangeFilters($filters) {
+        $objectFilters = [];
+        foreach ($filters as $filter) {
+            switch ($filter['object']) {
+                case 'lead' :
+                    $objectFilters['lead'][] = $filter;
+                    break;
+                case 'company' :
+                    $objectFilters['company'][] = $filter;
+                    break;
+                default :
+                    $objectFilters['lead'][] = $filter;
+                    break;
+            }
+        }
+        return $objectFilters;
+    }
+
     /**
      * @param                                   $filters
      * @param                                   $parameters
@@ -459,34 +502,39 @@ class LeadListRepository extends CommonRepository
      */
     public function getListFilterExpr($filters, &$parameters, QueryBuilder $q, $not = false, $leadId = null)
     {
-        static $leadTable;
-
         if (!count($filters)) {
 
             return $q->expr()->andX();
         }
 
-        // Get table columns
-        if (null === $leadTable) {
-            $schema = $this->_em->getConnection()->getSchemaManager();
-            /** @var \Doctrine\DBAL\Schema\Column[] $leadTable */
-            $leadTable = $schema->listTableColumns(MAUTIC_TABLE_PREFIX . 'leads');
-        }
+        // Get table columns regardless because of different tables being used
+        $schema = $this->_em->getConnection()->getSchemaManager();
+        /** @var \Doctrine\DBAL\Schema\Column[] $leadTable */
+        $leadTable = $schema->listTableColumns(MAUTIC_TABLE_PREFIX . 'leads');
+        $companyTable = $schema->listTableColumns(MAUTIC_TABLE_PREFIX . 'company');
 
         $options   = $this->getFilterExpressionFunctions();
         $groups    = array();
         $groupExpr = $q->expr()->andX();
 
         foreach ($filters as $k => $details) {
-            $column = isset($leadTable[$details['field']]) ? $leadTable[$details['field']] : false;
+            $object = (isset($details['object'])) ? $details['object'] : 'lead';
+            if($object == 'lead') {
+                $column = isset($leadTable[$details['field']]) ? $leadTable[$details['field']] : false;
+            } elseif($object == 'company') {
+                $column = isset($companyTable[$details['field']]) ? $companyTable[$details['field']] : false;
+            }
 
             //DBAL does not have a not() function so we have to use the opposite
             $func  = (!$not)
                 ? $options[$details['operator']]['expr']
                 :
                 $options[$details['operator']]['negate_expr'];
-            $field = "l.{$details['field']}";
-
+            if($object == 'lead') {
+                $field = "l.{$details['field']}";
+            } elseif($object == 'company') {
+                $field = "comp.{$details['field']}";
+            }
             // Format the field based on platform specific functions that DBAL doesn't support natively
             if ($column) {
                 $formatter  = AbstractFormatter::createFormatter($this->_em->getConnection());
@@ -520,7 +568,7 @@ class LeadListRepository extends CommonRepository
             if ($details['glue'] == 'or') {
                 // Create a new group of andX expressions
                 if ($groupExpr->count()) {
-                    $groups[]  = $groupExpr;
+                    $groups[$object][]  = $groupExpr;
                     $groupExpr = $q->expr()->andX();
                 }
             }

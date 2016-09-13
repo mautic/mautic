@@ -15,6 +15,8 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -88,6 +90,11 @@ class LeadModel extends FormModel
     protected $leadListModel;
 
     /**
+     * @var CompanyModel
+     */
+    protected $companyModel;
+
+    /**
      * @var FormFactory
      */
     protected $formFactory;
@@ -112,7 +119,8 @@ class LeadModel extends FormModel
         IntegrationHelper $integrationHelper,
         FieldModel $leadFieldModel,
         ListModel $leadListModel,
-        FormFactory $formFactory
+        FormFactory $formFactory,
+        CompanyModel $companyModel
     )
     {
         $this->request           = $requestStack->getCurrentRequest();
@@ -122,6 +130,7 @@ class LeadModel extends FormModel
         $this->integrationHelper = $integrationHelper;
         $this->leadFieldModel    = $leadFieldModel;
         $this->leadListModel     = $leadListModel;
+        $this->companyModel      = $companyModel;
         $this->formFactory       = $formFactory;
     }
 
@@ -334,6 +343,9 @@ class LeadModel extends FormModel
             if (!empty($details['zipcode']) && empty($fields['core']['zipcode']['value'])) {
                 $entity->addUpdatedField('zipcode', $details['zipcode']);
             }
+            if (!empty($details['companies']) && empty($fields['core']['companies']['value'])) {
+                $entity->addUpdatedField('companies', $details['companies']);
+            }
         }
 
         parent::saveEntity($entity, $unlock);
@@ -394,7 +406,7 @@ class LeadModel extends FormModel
             if (empty($fields)) {
                 $fields = $this->leadFieldModel->getEntities(
                     [
-                        'filter'         => ['isPublished' => true],
+                        'filter'         => ['isPublished' => true, 'object' => 'lead'],
                         'hydration_mode' => 'HYDRATE_ARRAY'
                     ]
                 );
@@ -542,7 +554,7 @@ class LeadModel extends FormModel
         foreach ($fields as $field) {
             if ($field instanceof LeadField) {
                 $alias = $field->getAlias();
-                if ($field->isPublished()) {
+                if ($field->isPublished() and $field->getObject() === 'Lead') {
                     $group                          = $field->getGroup();
                     $array[$group][$alias]['id']    = $field->getId();
                     $array[$group][$alias]['group'] = $group;
@@ -552,7 +564,7 @@ class LeadModel extends FormModel
                 }
             } else {
                 $alias = $field['alias'];
-                if ($field['isPublished']) {
+                if ($field['isPublished'] and $field['object'] === 'lead') {
                     $group = $field['group'];
                     $array[$group][$alias]['id']    = $field['id'];
                     $array[$group][$alias]['group'] = $group;
@@ -954,7 +966,6 @@ class LeadModel extends FormModel
     {
         $this->leadListModel->removeLead($lead, $lists, $manuallyRemoved);
     }
-
     /**
      * Add lead to lists
      *
@@ -1465,6 +1476,11 @@ class LeadModel extends FormModel
                             'column' => 'f.isPublished',
                             'expr'   => 'eq',
                             'value'  => true
+                        ),
+                        array(
+                            'column' => 'f.object',
+                            'expr'   => 'eq',
+                            'value'  => 'lead'
                         )
                     ),
                     'hydration_mode' => 'HYDRATE_ARRAY'
@@ -2043,5 +2059,16 @@ class LeadModel extends FormModel
         $this->dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
 
         return $event->getEventCounter();
+    }
+
+    public function addToCompany(Lead $lead, Company $company) {
+        //check if lead is in company already
+        $company = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId(), $company->getId());
+
+        if (empty($company)) {
+            $this->companyModel->addLeadToCompany($company,$lead);
+            return true;
+        }
+        return false;
     }
 }

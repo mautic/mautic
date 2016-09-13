@@ -70,7 +70,8 @@ class CampaignSubscriber extends CommonSubscriber
                 ['onCampaignTriggerActionChangePoints', 0],
                 ['onCampaignTriggerActionChangeLists', 1],
                 ['onCampaignTriggerActionUpdateLead', 2],
-                ['onCampaignTriggerActionUpdateTags', 3]
+                ['onCampaignTriggerActionUpdateTags', 3],
+                ['onCampaignTriggerActionAddToCompany', 4]
             ],
             LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0]
         ];
@@ -116,6 +117,14 @@ class CampaignSubscriber extends CommonSubscriber
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION
         ];
         $event->addAction('lead.changetags', $action);
+
+        $action = [
+            'label'       => 'mautic.lead.lead.events.addtocompany',
+            'description' => 'mautic.lead.lead.events.addtocompany_descr',
+            'formType'    => 'addtocompany_action',
+            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION
+        ];
+        $event->addAction('lead.addtocompany', $action);
 
         $trigger = [
             'label'       => 'mautic.lead.lead.events.field_value',
@@ -216,7 +225,6 @@ class CampaignSubscriber extends CommonSubscriber
     public function onCampaignTriggerActionUpdateTags(CampaignExecutionEvent $event)
     {
         if (!$event->checkContext('lead.changetags')) {
-
             return;
         }
 
@@ -230,6 +238,28 @@ class CampaignSubscriber extends CommonSubscriber
 
         return $event->setResult(true);
     }
+
+    /**
+     * @param CampaignExecutionEvent $event
+     */
+    public function onCampaignTriggerActionAddToCompany(CampaignExecutionEvent $event)
+    {
+        if (!$event->checkContext('lead.addtocompany')) {
+
+            return;
+        }
+
+        $company           = $event->getConfig()['company'];
+        $lead              = $event->getLead();
+        $somethingHappened = false;
+
+        if (!empty($company)) {
+            $somethingHappened =  $this->leadModel->addToCompany($lead, $company);
+        }
+
+        return $event->setResult($somethingHappened);
+    }
+
 
     /**
      * @param CampaignExecutionEvent $event
