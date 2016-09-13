@@ -404,38 +404,12 @@ class CompanyRepository extends CommonRepository
     }
 
     /**
-     * Get a list of lists
-     *
-     * @param string $name
-     *
-     * @return array
+    * Get a count of leads that belong to the company
+    *
+    * @param $companyIds
+    *
+    * @return array
      */
-    public function getCompanyByName($companyName)
-    {
-        $q = $this->_em->getConnection()->createQueryBuilder();
-
-        if (!$companyName) {
-            return false;
-        }
-
-        $q->select('partial comp.{id, name}')
-            ->from('LeadBundle:Company', 'comp');
-
-        $q->andWhere(
-            $q->expr()->like('comp.name', $companyName)
-        );
-
-        $results = $q->execute()->fetchAll();
-
-        return $results;
-    }
-    /**
-    +     * Get a count of leads that belong to the company
-    +     *
-    +     * @param $companyIds
-    +     *
-    +     * @return array
-    +     */
     public function getLeadCount($companyIds)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
