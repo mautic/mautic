@@ -62,7 +62,7 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
 
             //get a list of fields
             $fields = $args->getEntityManager()->getConnection()->createQueryBuilder()
-                ->select('f.alias, f.is_unique_identifer as is_unique, f.type')
+                ->select('f.alias, f.is_unique_identifer as is_unique, f.type, f.object')
                 ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
                 ->orderBy('f.field_order', 'ASC')
                 ->execute()->fetchAll();
