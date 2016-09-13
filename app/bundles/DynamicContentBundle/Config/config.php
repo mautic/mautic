@@ -35,13 +35,20 @@ return [
         'public' => [
             'mautic_api_dynamicContent_index' => [
                 'path' => '/dwc',
-                'controller' => 'MauticDynamicContentBundle:Api\DynamicContentApi:getEntities'
+                'controller' => 'MauticDynamicContentBundle:DynamicContentApi:getEntities'
             ],
             'mautic_api_dynamicContent_action' => [
                 'path' => '/dwc/{objectAlias}',
-                'controller' => 'MauticDynamicContentBundle:Api\DynamicContentApi:process'
+                'controller' => 'MauticDynamicContentBundle:DynamicContentApi:process'
             ]
         ],
+        'api'  => [
+            'standard_entity' => [
+                'name'       => 'dynamicContents',
+                'path'       => '/dynamiccontents',
+                'controller' => 'MauticDynamicContentBundle:Api\DynamicContentApi'
+            ]
+        ]
     ],
     'services' => [
         'events' => [
