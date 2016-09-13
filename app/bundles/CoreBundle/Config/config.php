@@ -77,9 +77,15 @@ return [
                 'path'       => '/files/{dir}',
                 'controller' => 'MauticCoreBundle:Api\FileApi:list'
             ],
+            'mautic_core_api_file_create' => [
+                'path'       => '/files/{dir}/create',
+                'controller' => 'MauticCoreBundle:Api\FileApi:create',
+                'method'     => 'POST'
+            ],
             'mautic_core_api_file_action' => [
                 'path'       => '/files/{objectAction}/{objectId}',
-                'controller' => 'MauticCoreBundle:Api\FileApi'
+                'controller' => 'MauticCoreBundle:Api\FileApi',
+                'method'     => 'POST'
             ],
         ],
     ],

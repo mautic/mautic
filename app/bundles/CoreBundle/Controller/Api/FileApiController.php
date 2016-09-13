@@ -50,14 +50,14 @@ class FileApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function createAction()
+    public function createAction($dir)
     {
-        $mediaDir = $this->getAbsolutePath();
+        $path = $this->getAbsolutePath($dir);
         if (!isset($this->response['error'])) {
             foreach ($this->request->files as $file) {
                 if (in_array($file->getMimeType(), $this->imageMimes)) {
                     $fileName = md5(uniqid()).'.'.$file->guessExtension();
-                    $file->move($mediaDir, $fileName);
+                    $file->move($path, $fileName);
                     $this->response['link'] = $this->getMediaUrl().'/'.$fileName;
                 } else {
                     $this->response['error'] = 'The uploaded image does not have an allowed mime type';
@@ -75,21 +75,7 @@ class FileApiController extends CommonApiController
      */
     public function listAction($dir)
     {
-        $possibleDirs = ['assets', 'images'];
-        $dir = InputHelper::alphanum($dir);
-
-        if (!in_array($dir, $possibleDirs)) {
-            return $this->notFound($dir.' not found. Only '.implode(' or ', $possibleDirs).' options are possible.');
-        }
-
-        $subdir = trim(InputHelper::alphanum($this->request->get('subdir', ''), true, false, ['\/']), '/');
-        $path   = $this->getAbsolutePath($dir).'/'.$subdir;
-
-        if (!file_exists($path)) {
-            return $this->notFound($subdir.' doesn\'t exist in the '.$dir.' dir.');
-        }
-        
-        $fnames = scandir($path);
+        $fnames = scandir($this->getAbsolutePath($dir));
 
         if (is_array($fnames)) {
             foreach ($fnames as $key => $name) {
@@ -102,7 +88,7 @@ class FileApiController extends CommonApiController
             return $this->returnError(ucfirst($dir).' dir is not readable', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        $view = $this->view([$this->entityNameOne => $fnames]);
+        $view = $this->view([$this->entityNameMulti => $fnames]);
 
         return $this->handleView($view);
     }
@@ -140,17 +126,31 @@ class FileApiController extends CommonApiController
      */
     public function getAbsolutePath($dir)
     {
-        $mediaDir = realpath($this->get('mautic.helper.paths')->getSystemPath($dir, true));
+        $possibleDirs = ['assets', 'images'];
+        $dir = InputHelper::alphanum($dir);
 
-        if ($mediaDir === false) {
+        if (!in_array($dir, $possibleDirs)) {
+            return $this->notFound($dir.' not found. Only '.implode(' or ', $possibleDirs).' options are possible.');
+        }
+
+        $absoluteDir = realpath($this->get('mautic.helper.paths')->getSystemPath($dir, true));
+
+        if ($absoluteDir === false) {
             return $this->returnError('Media dir does not exist', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        if (is_writable($mediaDir) === false) {
+        if (is_writable($absoluteDir) === false) {
             return $this->returnError('Media dir is not writable', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return $mediaDir;
+        $subdir = trim(InputHelper::alphanum($this->request->get('subdir', ''), true, false, ['\/']), '/');
+        $path   = $absoluteDir.'/'.$subdir;
+
+        if (!file_exists($path)) {
+            return $this->notFound($subdir.' doesn\'t exist in the '.$dir.' dir.');
+        }
+
+        return $path;
     }
 
     /**
