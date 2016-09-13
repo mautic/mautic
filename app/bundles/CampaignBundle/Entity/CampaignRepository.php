@@ -661,4 +661,164 @@ class CampaignRepository extends CommonRepository
 
         return $results;
     }
+
+    /**
+     * Get Manually Removed Contacts for a Campaign
+     *
+     * @param            $campaignId
+     * @param int        $start
+     * @param bool|false $limit
+     * @param array      $select
+     *
+     * @return mixed
+     */
+    public function getCampaignManuallyRemovedContacts($campaignId, $start = 0, $limit = false)
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $q->select('lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('cl.campaign_id', (int) $campaignId),
+                    $q->expr()->eq('cl.manually_removed', ':true')
+                )
+            )
+            ->setParameter('true', true, 'boolean')
+            ->orderBy('cl.lead_id', 'ASC');
+
+        if (!empty($limit)) {
+            $q->setFirstResult($start)
+                ->setMaxResults($limit);
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
+    /**
+     * Get Recurring Campaigns published and have recurring in their name
+     *
+     * @param int        $start
+     * @param bool|false $limit
+     *
+     * @return array
+     */
+    public function getRecurringCampaigns($start = 0, $limit = false)
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $q->select('id')
+            ->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('c.is_published', ':is_published'),
+                    $q->expr()->eq('c.is_recurring', ':is_recurring')
+                )
+            )
+            ->setParameter('is_published', '1')
+            ->setParameter('is_recurring', '1')
+            ->orderBy('c.id', 'ASC');
+
+        if (!empty($limit)) {
+            $q->setFirstResult($start)
+                ->setMaxResults($limit);
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
+     * Check Scheduled events for a combination of contact and campaign
+     *
+     * @param int        $start
+     * @param bool|false $limit
+     * @param int        $campaignId
+     * @param int	 $lead_Id
+     * @return bool
+     */
+
+    public function checkScheduledEvents($campaignId, $leadId, $start = 0, $limit = false)
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $q->select('lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'clel')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('clel.campaign_id', ':campaignId'),
+                    $q->expr()->eq('clel.lead_id', ':leadId'),
+                    $q->expr()->eq('clel.is_scheduled', ':is_scheduled')
+                )
+            )
+            ->setParameter('campaignId', (int) $campaignId)
+            ->setParameter('leadId', (int) $leadId)
+            ->setParameter('is_scheduled', '1');
+
+        if (!empty($limit)) {
+            $q->setFirstResult($start)
+                ->setMaxResults($limit);
+        }
+
+        $results = $q->execute()->fetchAll();
+        if ($results) {
+            return true;
+        }
+
+        else {
+            return false;
+        }
+    }
+
+    /**
+     * Delete Campaign Events for combination of Contact and campaign
+     * to let campaign rerun for Contact
+     *
+     * @param int        $campaignId
+     * @param int        $lead_Id
+     */
+
+    public function deleteCampaignEventLog($campaignId, $leadId)
+    {
+        // Delete events
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->delete(MAUTIC_TABLE_PREFIX . 'campaign_lead_event_log')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('campaign_id', ':campaignId'),
+                    $q->expr()->eq('lead_id', ':leadId')
+                )
+            )
+            ->setParameter('campaignId', (int) $campaignId)
+            ->setParameter('leadId', (int) $leadId)
+            ->execute();
+
+    }
+
+    /**
+     * Set ManuallyRemoved to 0 for combination of Contact and campaign
+     * to let campaign rerun for Contact
+     *
+     * @param int        $campaignId
+     * @param int        $lead_Id
+     */
+
+    public function setManuallyRemoved($campaignId, $leadId)
+    {
+        // Set Manually Removed to 0
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->update(MAUTIC_TABLE_PREFIX . 'campaign_leads')
+            ->set('manually_removed', ':manually_removed')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('campaign_id', (int) $campaignId),
+                    $q->expr()->eq('lead_id', (int) $leadId)
+                )
+              )
+            ->setParameter('manually_removed', '0')
+            ->execute();
+    }
+
 }

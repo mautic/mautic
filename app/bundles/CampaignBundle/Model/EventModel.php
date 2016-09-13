@@ -1893,4 +1893,61 @@ class EventModel extends CommonFormModel
 
         return $chart->render();
     }
+
+    /**
+     * Find and update recurring campaigns
+     *
+     * @param OutputInterface $output
+     *
+     * @return int
+     */
+    public function updateRecurringCampaigns($output)
+    {
+       $campaignRepo = $this->getCampaignRepository();
+       $campaignIds = $campaignRepo->getRecurringCampaigns();
+       $maxCount = 0;
+       $updatedCount = 0;
+       foreach ($campaignIds as $campaignId){
+           $manuallyRemovedContacts = $campaignRepo->getCampaignManuallyRemovedContacts($campaignId['id']);
+           foreach ($manuallyRemovedContacts as $leadId){
+               $scheduledEvents = $campaignRepo->checkScheduledEvents($campaignId['id'], $leadId['lead_id']);
+               if (!$scheduledEvents) {
+                   $maxCount++;
+               }
+           }
+       }
+
+       if ($output) {
+           if ($maxCount != 0) {
+               $output->writeln(
+                    $this->translator->trans(
+                        'mautic.campaign.recurring.event_count',
+                        array('%events%' => $maxCount)
+                    )
+                );
+               $progress = ProgressBarHelper::init($output, $maxCount);
+               $progress->start();
+            }
+        }
+       foreach ($campaignIds as $campaignId){
+           $manuallyRemovedContacts = $campaignRepo->getCampaignManuallyRemovedContacts($campaignId['id']);
+
+           foreach ($manuallyRemovedContacts as $leadId){
+               $scheduledEvents = $campaignRepo->checkScheduledEvents($campaignId['id'], $leadId['lead_id']);
+
+               if ($maxCount != $updatedCount){
+                   if (!$scheduledEvents) {
+                       $campaignRepo->deleteCampaignEventLog($campaignId['id'], $leadId['lead_id']);
+                       $campaignRepo->setManuallyRemoved($campaignId['id'], $leadId['lead_id']);
+                       $updatedCount ++;
+                       $progress->setProgress($updatedCount);
+                   }
+               if ($updatedCount != 0 && $maxCount == $updatedCount){
+                   $output->writeln('');
+               }
+               }
+           }
+       }
+    return $updatedCount;
+    }
 }

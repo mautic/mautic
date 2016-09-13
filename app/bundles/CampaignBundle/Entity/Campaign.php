@@ -84,6 +84,10 @@ class Campaign extends FormEntity
     private $canvasSettings = array();
 
     /**
+     * @var bool
+     */
+    private $isRecurring;
+    /**
      * Constructor
      */
     public function __construct ()
@@ -155,6 +159,10 @@ class Campaign extends FormEntity
         $builder->createField('canvasSettings', 'array')
             ->columnName('canvas_settings')
             ->nullable()
+            ->build();
+
+        $builder->createField('isRecurring', 'boolean')
+            ->columnName('is_recurring')
             ->build();
     }
 
@@ -518,5 +526,19 @@ class Campaign extends FormEntity
     public function setCanvasSettings (array $canvasSettings)
     {
         $this->canvasSettings = $canvasSettings;
+    }
+
+    public function getIsRecurring ()
+    {
+        return $this->isRecurring;
+    }
+
+    /**
+     * @param bool $isRecurring
+     */
+    public function setIsRecurring ($isRecurring)
+    {
+        $this->isChanged('isRecurring', $isRecurring);
+        $this->isRecurring = $isRecurring;
     }
 }

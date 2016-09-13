@@ -167,8 +167,14 @@ class TriggerCampaignCommand extends ModeratedCommand
                             ."\n"
                         );
                     }
-                }
-
+                //find and update recurring campaigns
+                $output->writeln('<comment>'.$translator->trans('mautic.campaign.trigger.recurring').'</comment>');
+                $processed = $model->updateRecurringCampaigns($output);
+                $output->writeln(
+                            '<comment>'.$translator->trans('mautic.campaign.trigger.events_executed', array('%events%' => $processed)).'</comment>'
+                            ."\n"
+                        );
+                    }
                 $em->detach($c);
                 unset($c);
             }

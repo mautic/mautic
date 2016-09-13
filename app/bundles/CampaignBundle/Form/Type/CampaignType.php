@@ -103,6 +103,21 @@ class CampaignType extends AbstractType
             'required'   => false
         ));
 
+	if (!$options['data']->isRecurring()){
+            $builder->add('isRecurring', 'yesno_button_group', array(
+                'label'       => 'mautic.campaign.form.isrecurring',
+                'read_only'   => $readonly,
+                'data'        => false
+            ));
+        }
+
+        else{
+            $builder->add('isRecurring', 'yesno_button_group', array(
+                'label'       => 'mautic.campaign.form.isrecurring',
+                'read_only'   => $readonly
+            ));
+        }
+
         $builder->add('sessionId', 'hidden', array(
             'mapped' => false
         ));
