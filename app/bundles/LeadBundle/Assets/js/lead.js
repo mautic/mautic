@@ -41,7 +41,6 @@ Mautic.leadOnLoad = function (container, response) {
 
         Mautic.updateLeadFieldProperties(mQuery('#leadfield_type').val());
     }
-
     // Timeline filters
     var timelineForm = mQuery(container + ' #timeline-filters');
     if (timelineForm.length) {
