@@ -12,6 +12,7 @@ namespace Mautic\PageBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -19,12 +20,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class PageListType extends AbstractType
 {
-
-    /**
-     * @var array
-     */
-    private $choices = array();
-
     /**
      * @var \Mautic\PageBundle\Model\PageModel
      */
@@ -47,37 +42,39 @@ class PageListType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $model = $this->model;
+        $model        = $this->model;
         $canViewOther = $this->canViewOther;
 
-        $resolver->setDefaults(array(
-            'choices'       => function (Options $options) use ($model, $canViewOther) {
-                $choices = array();
-                $pages = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids']);
-                foreach ($pages as $page) {
-                    $choices[$page['language']][$page['id']] = "{$page['title']} ({$page['id']})";
-                }
+        $resolver->setDefaults(
+            [
+                'choices'     => function (Options $options) use ($model, $canViewOther) {
+                    $choices = [];
+                    $pages   = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids']);
+                    foreach ($pages as $page) {
+                        $choices[$page['language']][$page['id']] = "{$page['title']} ({$page['id']})";
+                    }
 
-                //sort by language
-                ksort($choices);
+                    //sort by language
+                    ksort($choices);
 
-                foreach ($choices as $lang => &$pages) {
-                    ksort($pages);
-                }
+                    foreach ($choices as $lang => &$pages) {
+                        ksort($pages);
+                    }
 
-                return $choices;
-            },
-            'empty_value'   => false,
-            'expanded'      => false,
-            'multiple'      => true,
-            'required'      => false,
-            'top_level'     => 'variant',
-            'ignore_ids'    => array()
-        ));
+                    return $choices;
+                },
+                'empty_value' => false,
+                'expanded'    => false,
+                'multiple'    => true,
+                'required'    => false,
+                'top_level'   => 'variant',
+                'ignore_ids'  => []
+            ]
+        );
 
-        $resolver->setOptional(array('top_level', 'ignore_ids'));
+        $resolver->setDefined(['top_level', 'ignore_ids']);
     }
 
     /**

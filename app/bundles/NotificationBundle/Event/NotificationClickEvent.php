@@ -1,12 +1,12 @@
 <?php
 /**
- * @package     Mautic
  * @copyright   2016 Mautic Contributors. All rights reserved.
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 namespace Mautic\NotificationBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -14,9 +14,7 @@ use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Entity\Stat;
 
 /**
- * Class NotificationClickEvent
- *
- * @package Mautic\NotificationBundle\Event
+ * Class NotificationClickEvent.
  */
 class NotificationClickEvent extends CommonEvent
 {
@@ -30,13 +28,13 @@ class NotificationClickEvent extends CommonEvent
      */
     public function __construct(Stat $stat, $request)
     {
-        $this->entity  = $stat;
+        $this->entity = $stat;
         $this->notification = $stat->getNotification();
         $this->request = $request;
     }
 
     /**
-     * Returns the Notification entity
+     * Returns the Notification entity.
      *
      * @return Notification
      */
@@ -46,7 +44,7 @@ class NotificationClickEvent extends CommonEvent
     }
 
     /**
-     * Get notification request
+     * Get notification request.
      *
      * @return string
      */

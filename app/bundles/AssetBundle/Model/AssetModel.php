@@ -157,14 +157,26 @@ class AssetModel extends FormModel
                         $this->leadModel->setCurrentLead($lead);
                     }
                 }
-
-                if (!empty($clickthrough['source'])) {
+                if (!empty($clickthrough['channel'])) {
+                    if (count($clickthrough['channel']) === 1) {
+                        $channelId = reset($clickthrough['channel']);
+                        $channel   = key($clickthrough['channel']);
+                    } else {
+                        $channel   = $clickthrough['channel'][0];
+                        $channelId = (int) $clickthrough['channel'][1];
+                    }
+                    $download->setSource($channel);
+                    $download->setSourceId($channelId);
+                } elseif (!empty($clickthrough['source'])) {
                     $download->setSource($clickthrough['source'][0]);
                     $download->setSourceId($clickthrough['source'][1]);
                 }
 
                 if (!empty($clickthrough['email'])) {
-                    $download->setEmail($this->em->getReference('MauticEmailBundle:Email', $clickthrough['email']));
+                    $emailRepo = $this->em->getRepository("MauticEmailBundle:Email");
+                    if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
+                        $download->setEmail($emailEntity);
+                    }
                 }
             }
 
@@ -323,7 +335,7 @@ class AssetModel extends FormModel
      * Get a specific entity or generate a new one if id is empty
      *
      * @param $id
-     * @return null|object
+     * @return null|Asset
      */
     public function getEntity($id = null)
     {

@@ -19,7 +19,7 @@ class ColorHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox The helper is instantiated correctly
      *
-     * @covers Mautic\CoreBundle\Helper\ColorHelperTest::__construct
+     * @covers \Mautic\CoreBundle\Helper\ColorHelper::__construct
      */
     public function testTheHelperIsInstantiatedWithoutAttributeCorrectly()
     {
@@ -32,7 +32,7 @@ class ColorHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox A color hex hash can be set and the correct RGB representations filled
      *
-     * @covers Mautic\CoreBundle\Helper\EncryptionHelper::__construct
+     * @covers \Mautic\CoreBundle\Helper\ColorHelper::__construct
      */
     public function testThatColorHexAreSetCorrectly()
     {
@@ -56,8 +56,8 @@ class ColorHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox A color hex hash can be set and received in the correct and valid hex format
      *
-     * @covers Mautic\CoreBundle\Helper\EncryptionHelper::setHex
-     * @covers Mautic\CoreBundle\Helper\EncryptionHelper::toHex
+     * @covers \Mautic\CoreBundle\Helper\ColorHelper::setHex
+     * @covers \Mautic\CoreBundle\Helper\ColorHelper::toHex
      */
     public function testThatColorHexAreConvertedBackToHexCorrectly()
     {
@@ -80,7 +80,7 @@ class ColorHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox A color hex hash can be set and received in the correct and valid rgb format
      *
-     * @covers Mautic\CoreBundle\Helper\EncryptionHelper::toRgb
+     * @covers \Mautic\CoreBundle\Helper\ColorHelper::toRgb
      */
     public function testThatColorHexAreConvertedToRgbCorrectly()
     {
@@ -102,7 +102,7 @@ class ColorHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox A color hex hash can be set and received in the correct and valid rgba format
      *
-     * @covers Mautic\CoreBundle\Helper\EncryptionHelper::toRgba
+     * @covers \Mautic\CoreBundle\Helper\ColorHelper::toRgba
      */
     public function testThatColorHexAreConvertedToRgbaCorrectly()
     {
@@ -125,8 +125,8 @@ class ColorHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox The random color is within borders and not 0, 0, 0
      *
-     * @covers Mautic\CoreBundle\Helper\EncryptionHelper::buildRandomColor
-     * @covers Mautic\CoreBundle\Helper\EncryptionHelper::getColorArray
+     * @covers \Mautic\CoreBundle\Helper\ColorHelper::buildRandomColor
+     * @covers \Mautic\CoreBundle\Helper\ColorHelper::getColorArray
      */
     public function testThatRandomColorIsWithinBorders()
     {

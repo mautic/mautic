@@ -86,11 +86,18 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onPageHit(PageHitEvent $event)
     {
-        $hit    = $event->getHit();
-        $page   = $hit->getPage();
-        $typeId = $page instanceof Page ? 'page.pagehit.' . $page->getId() : null;
+        $hit       = $event->getHit();
+        $channel   = 'page';
+        $channelId = null;
 
-        $this->campaignEventModel->triggerEvent('page.pagehit', $hit, $typeId);
+        if ($redirect = $hit->getRedirect()) {
+            $channel   = 'page.redirect';
+            $channelId = $redirect->getId();
+        } elseif ($page = $hit->getPage()) {
+            $channelId = $page->getId();
+        }
+
+        $this->campaignEventModel->triggerEvent('page.pagehit', $hit, $channel, $channelId);
     }
 
     /**
@@ -109,7 +116,7 @@ class CampaignSubscriber extends CommonSubscriber
 
         // Check Landing Pages
         if ($pageHit instanceof Page) {
-            list($parent, $children)  = $this->pageModel->getVariants($pageHit);
+            list($parent, $children)  = $pageHit->getVariants();
             //use the parent (self or configured parent)
             $pageHitId = $parent->getId();
         } else {

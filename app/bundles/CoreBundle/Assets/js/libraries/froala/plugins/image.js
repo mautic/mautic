@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.3.3 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -578,7 +578,7 @@
       if ($input.val().length > 0) {
         showProgressBar();
         _setProgressMessage('Loading image');
-        insert(editor.helpers.sanitizeURL($input.val()), true, [], $current_image);
+        insert($input.val(), true, [], $current_image);
         $input.val('');
         $input.blur();
       }
@@ -612,6 +612,8 @@
     function insert (link, sanitize, data, $existing_img, response) {
       editor.edit.off();
       _setProgressMessage('Loading image');
+
+      if (sanitize) link = editor.helpers.sanitizeURL(link);
 
       var image = new Image();
       image.onload = function () {
@@ -1652,21 +1654,23 @@
 
       // Copy/cut image.
       editor.events.on('window.cut window.copy', function (e) {
-        _selectImage();
-        $.FE.copied_text = '\n';
-        $.FE.copied_html = $current_image.get(0).outerHTML;
+        if ($current_image) {
+          _selectImage();
+          $.FE.copied_text = '\n';
+          $.FE.copied_html = $current_image.get(0).outerHTML;
 
-        if (e.type == 'copy') {
-          setTimeout(function () {
-            _editImg($current_image);
-          })
-        }
-        else {
-          _exitEdit(true);
-          editor.undo.saveStep();
-          setTimeout(function () {
+          if (e.type == 'copy') {
+            setTimeout(function () {
+              _editImg($current_image);
+            })
+          }
+          else {
+            _exitEdit(true);
             editor.undo.saveStep();
-          }, 0);
+            setTimeout(function () {
+              editor.undo.saveStep();
+            }, 0);
+          }
         }
       }, true);
 
@@ -2227,6 +2231,14 @@
   })
 
   // Image align.
+  if (!$.FE.ICONS.align) {
+    $.FE.DefineIcon('align', { NAME: 'align-left' });
+    $.FE.DefineIcon('align-left', { NAME: 'align-left' });
+    $.FE.DefineIcon('align-right', { NAME: 'align-right' });
+    $.FE.DefineIcon('align-center', { NAME: 'align-center' });
+    $.FE.DefineIcon('align-justify', { NAME: 'align-justify' });
+  }
+
   $.FE.DefineIcon('imageAlign', {
     NAME: 'align-center'
   })

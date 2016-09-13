@@ -9,6 +9,7 @@
 
 namespace Mautic\CategoryBundle\Controller;
 
+use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
@@ -272,7 +273,8 @@ class CategoryController extends FormController
      */
     public function editAction ($bundle, $objectId, $ignorePost = false)
     {
-        $session   = $this->factory->getSession();
+        $session = $this->factory->getSession();
+        /** @var CategoryModel $model */
         $model     = $this->getModel('category');
         $entity    = $model->getEntity($objectId);
         $success   = $closeModal = 0;
@@ -283,19 +285,22 @@ class CategoryController extends FormController
         //not found
         if ($entity === null) {
             $closeModal = true;
-        } elseif (!$this->factory->getSecurity()->isGranted($bundle . ':categories:view')) {
+        } elseif (!$this->factory->getSecurity()->isGranted($bundle.':categories:view')) {
             return $this->modalAccessDenied();
         } elseif ($model->isLocked($entity)) {
             return $this->modalAccessDenied();
         }
 
         //Create the form
-        $action = $this->generateUrl('mautic_category_action', array(
-            'objectAction' => 'edit',
-            'objectId'     => $objectId,
-            'bundle'       => $bundle
-        ));
-        $form   = $model->createForm($entity, $this->get('form.factory'), $action, array('bundle' => $bundle));
+        $action = $this->generateUrl(
+            'mautic_category_action',
+            [
+                'objectAction' => 'edit',
+                'objectId'     => $objectId,
+                'bundle'       => $bundle
+            ]
+        );
+        $form   = $model->createForm($entity, $this->get('form.factory'), $action, ['bundle' => $bundle]);
         $form['inForm']->setData($inForm);
 
         ///Check for a submitted form and process it
@@ -308,9 +313,25 @@ class CategoryController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
-                    $this->addFlash('mautic.category.notice.updated', array(
-                        '%name%' => $entity->getName()
-                    ));
+                    $this->addFlash(
+                        'mautic.category.notice.updated',
+                        [
+                            '%name%' => $entity->getTitle()
+                        ]
+                    );
+
+                    if ($form->get('buttons')->get('apply')->isClicked()) {
+                        // Rebuild the form with new action so that apply doesn't keep creating a clone
+                        $action = $this->generateUrl(
+                            'mautic_category_action',
+                            [
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId(),
+                                'bundle'       => $bundle
+                            ]
+                        );
+                        $form   = $model->createForm($entity, $this->get('form.factory'), $action, ['bundle' => $bundle]);
+                    }
                 }
             } else {
                 $success = 1;
@@ -327,71 +348,51 @@ class CategoryController extends FormController
 
         if ($closeModal) {
             if ($inForm) {
-                return new JsonResponse(array(
-                    'mauticContent' => 'category',
-                    'closeModal'    => 1,
-                    'inForm'        => 1,
-                    'categoryName'  => $entity->getName(),
-                    'categoryId'    => $entity->getId()
-                ));
+                return new JsonResponse(
+                    [
+                        'mauticContent' => 'category',
+                        'closeModal'    => 1,
+                        'inForm'        => 1,
+                        'categoryName'  => $entity->getTitle(),
+                        'categoryId'    => $entity->getId()
+                    ]
+                );
             }
 
-            $viewParameters = array(
+            $viewParameters = [
                 'page'   => $session->get('mautic.category.page'),
                 'bundle' => $bundle
+            ];
+
+            return $this->postActionRedirect(
+                [
+                    'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParameters),
+                    'viewParameters'  => $viewParameters,
+                    'contentTemplate' => 'MauticCategoryBundle:Category:index',
+                    'passthroughVars' => [
+                        'activeLink'    => '#mautic_'.$bundle.'category_index',
+                        'mauticContent' => 'category',
+                        'closeModal'    => 1
+                    ]
+                ]
             );
-
-            return $this->postActionRedirect(array(
-                'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParameters),
-                'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'MauticCategoryBundle:Category:index',
-                'passthroughVars' => array(
-                    'activeLink'    => '#mautic_' . $bundle . 'category_index',
-                    'mauticContent' => 'category',
-                    'closeModal'    => 1
-                )
-            ));
         } else {
-            return $this->ajaxAction(array(
-                'contentTemplate' => 'MauticCategoryBundle:Category:form.html.php',
-                'viewParameters'  => array(
-                    'form'           => $form->createView(),
-                    'activeCategory' => $entity,
-                    'bundle'         => $bundle
-                ),
-                'passthroughVars' => array(
-                    'mauticContent' => 'category',
-                    'success'       => $success,
-                    'route'         => false
-                )
-            ));
+            return $this->ajaxAction(
+                [
+                    'contentTemplate' => 'MauticCategoryBundle:Category:form.html.php',
+                    'viewParameters'  => [
+                        'form'           => $form->createView(),
+                        'activeCategory' => $entity,
+                        'bundle'         => $bundle
+                    ],
+                    'passthroughVars' => [
+                        'mauticContent' => 'category',
+                        'success'       => $success,
+                        'route'         => false
+                    ]
+                ]
+            );
         }
-    }
-
-    /**
-     * Clone an entity
-     *
-     * @param $objectId
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     */
-    public function cloneAction ($bundle, $objectId)
-    {
-        $model  = $this->getModel('category');
-        $entity = $model->getEntity($objectId);
-
-        if ($entity != null) {
-            if (!$this->factory->getSecurity()->isGranted($bundle . ':categories:create')) {
-                return $this->accessDenied();
-            }
-
-            $clone = clone $entity;
-            $clone->setIsPublished(false);
-            $model->saveEntity($clone);
-            $objectId = $clone->getId();
-        }
-
-        return $this->editAction($bundle, $objectId);
     }
 
     /**

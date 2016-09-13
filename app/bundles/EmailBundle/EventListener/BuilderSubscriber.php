@@ -73,7 +73,8 @@ class BuilderSubscriber extends CommonSubscriber
         $tokens = array(
             '{unsubscribe_text}' => $this->translator->trans('mautic.email.token.unsubscribe_text'),
             '{webview_text}'     => $this->translator->trans('mautic.email.token.webview_text'),
-            '{signature}'        => $this->translator->trans('mautic.email.token.signature')
+            '{signature}'        => $this->translator->trans('mautic.email.token.signature'),
+            '{subject}'          => $this->translator->trans('mautic.email.subject')
         );
 
         if ($event->tokensRequested(array_keys($tokens))) {
@@ -137,6 +138,7 @@ class BuilderSubscriber extends CommonSubscriber
     {
         $idHash = $event->getIdHash();
         $lead   = $event->getLead();
+        $email  = $event->getEmail();
 
         if ($idHash == null) {
             // Generate a bogus idHash to prevent errors for routes that may include it
@@ -161,8 +163,8 @@ class BuilderSubscriber extends CommonSubscriber
         $event->addToken('{webview_text}', $webviewText);
 
         // Show public email preview if the lead is not known to prevent 404
-        if (empty($lead['id']) && $event->getEmail()) {
-            $event->addToken('{webview_url}', $model->buildUrl('mautic_email_preview', array('objectId' => $event->getEmail()->getId())));
+        if (empty($lead['id']) && $email) {
+            $event->addToken('{webview_url}', $model->buildUrl('mautic_email_preview', array('objectId' => $email->getId())));
         } else {
             $event->addToken('{webview_url}', $model->buildUrl('mautic_email_webview', array('idHash' => $idHash)));
         }
@@ -180,6 +182,8 @@ class BuilderSubscriber extends CommonSubscriber
 
         $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
         $event->addToken('{signature}', $signatureText);
+
+        $event->addToken('{subject}', $event->getSubject());
     }
 
     /**

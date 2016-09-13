@@ -27,7 +27,6 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\PageModel;
-use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -79,11 +78,6 @@ class SubmissionModel extends CommonFormModel
     protected $leadFieldModel;
 
     /**
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
      * SubmissionModel constructor.
      *
      * @param IpLookupHelper $ipLookupHelper
@@ -111,14 +105,6 @@ class SubmissionModel extends CommonFormModel
         $this->leadModel = $leadModel;
         $this->campaignModel = $campaignModel;
         $this->leadFieldModel = $leadFieldModel;
-    }
-
-    /**
-     * @param Logger $logger
-     */
-    public function setLogger(Logger $logger)
-    {
-        $this->logger = $logger;
     }
 
     /**

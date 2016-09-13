@@ -199,6 +199,19 @@ class InputHelper
     }
 
     /**
+     * Returns a satnitized string which can be used in a file system
+     *
+     * @param  $value
+     *
+     * @return string
+     */
+    public static function filename($value)
+    {
+        $value = str_replace(' ', '_', $value);
+        return preg_replace("/[^a-z0-9\.\_]/", "", strtolower($value));
+    }
+
+    /**
      * Returns raw value
      *
      * @param            $value
@@ -379,6 +392,11 @@ class InputHelper
      */
     public static function transliterate($value)
     {
+        if (function_exists('transliterator_transliterate')) {
+            // Use intl by default
+            return transliterator_transliterate('Any-Latin; Latin-ASCII', $value);
+        }
+
         return \URLify::transliterate($value);
     }
 }

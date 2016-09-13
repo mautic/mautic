@@ -117,7 +117,7 @@ class CategoryModel extends FormModel
      * Get a specific entity or generate a new one if id is empty
      *
      * @param $id
-     * @return null|object
+     * @return Category
      */
     public function getEntity($id = null)
     {

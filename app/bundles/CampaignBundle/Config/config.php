@@ -28,7 +28,7 @@ return array(
             ),
             'mautic_campaign_contacts'       => array(
                 'path'       => '/campaigns/view/{objectId}/contact/{page}',
-                'controller' => 'MauticCampaignBundle:Campaign:leads',
+                'controller' => 'MauticCampaignBundle:Campaign:contacts',
             )
         ),
         'api'  => array(
@@ -74,7 +74,12 @@ return array(
                 'class' => 'Mautic\CampaignBundle\EventListener\CampaignSubscriber'
             ),
             'mautic.campaign.leadbundle.subscriber'     => array(
-                'class' => 'Mautic\CampaignBundle\EventListener\LeadSubscriber'
+                'class' => 'Mautic\CampaignBundle\EventListener\LeadSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.campaign.model.campaign',
+                    'mautic.lead.model.lead'
+                ]
             ),
             'mautic.campaign.calendarbundle.subscriber' => array(
                 'class' => 'Mautic\CampaignBundle\EventListener\CalendarSubscriber'

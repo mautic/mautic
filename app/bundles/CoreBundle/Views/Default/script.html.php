@@ -19,7 +19,8 @@
         chosenChooseOne: '<?php echo $view['translator']->trans('mautic.core.form.chooseone'); ?>',
         chosenChooseMore: '<?php echo $view['translator']->trans('mautic.core.form.choosemultiple'); ?>',
         chosenNoResults: '<?php echo $view['translator']->trans('mautic.core.form.nomatches'); ?>',
-        pleaseWait: '<?php echo $view['translator']->trans('mautic.core.wait'); ?>'
+        pleaseWait: '<?php echo $view['translator']->trans('mautic.core.wait'); ?>',
+        popupBlockerMessage: '<?php echo $view['translator']->trans('mautic.core.popupblocked'); ?>',
     };
 </script>
 <?php $view['assets']->outputSystemScripts(true); ?>

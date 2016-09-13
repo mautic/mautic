@@ -10,6 +10,7 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
+use Mautic\CoreBundle\Controller\VariantAjaxControllerTrait;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
@@ -18,6 +19,7 @@ use Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\MandrillTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\PostmarkTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport;
+use Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport;
 
 /**
  * Class AjaxController
@@ -26,6 +28,8 @@ use Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport;
  */
 class AjaxController extends CommonAjaxController
 {
+    use VariantAjaxControllerTrait;
+
     /**
      * @param Request $request
      *
@@ -33,60 +37,14 @@ class AjaxController extends CommonAjaxController
      */
     protected function getAbTestFormAction(Request $request)
     {
-        $dataArray = array(
-            'success' => 0,
-            'html'    => ''
+        return $this->getAbTestForm(
+            $request,
+            'email',
+            'email_abtest_settings',
+            'emailform',
+            'MauticEmailBundle:AbTest:form.html.php',
+            ['MauticEmailBundle:AbTest:form.html.php', 'MauticEmailBundle:FormTheme\Email']
         );
-        $type      = InputHelper::clean($request->request->get('abKey'));
-        $emailId   = InputHelper::int($request->request->get('emailId'));
-
-        if (!empty($type)) {
-            //get the HTML for the form
-            /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-            $model = $this->getModel('email');
-
-            $email = $model->getEntity($emailId);
-
-            $abTestComponents = $model->getBuilderComponents($email, 'abTestWinnerCriteria');
-            $abTestSettings   = $abTestComponents['criteria'];
-
-            if (isset($abTestSettings[$type])) {
-                $html     = '';
-                $formType = (!empty($abTestSettings[$type]['formType'])) ? $abTestSettings[$type]['formType'] : '';
-                if (!empty($formType)) {
-                    $formOptions = (!empty($abTestSettings[$type]['formTypeOptions'])) ? $abTestSettings[$type]['formTypeOptions'] : array();
-                    $form        = $this->get('form.factory')->create(
-                        'email_abtest_settings',
-                        array(),
-                        array('formType' => $formType, 'formTypeOptions' => $formOptions)
-                    );
-                    $html        = $this->renderView(
-                        'MauticEmailBundle:AbTest:form.html.php',
-                        array(
-                            'form' => $this->setFormTheme($form, 'MauticEmailBundle:AbTest:form.html.php', 'MauticEmailBundle:FormTheme\Email')
-                        )
-                    );
-                }
-
-                $html                 = str_replace(
-                    array(
-                        'email_abtest_settings[',
-                        'email_abtest_settings_',
-                        'email_abtest_settings'
-                    ),
-                    array(
-                        'emailform[variantSettings][',
-                        'emailform_variantSettings_',
-                        'emailform'
-                    ),
-                    $html
-                );
-                $dataArray['html']    = $html;
-                $dataArray['success'] = 1;
-            }
-        }
-
-        return $this->sendJsonResponse($dataArray);
     }
 
     /**
@@ -247,26 +205,28 @@ class AjaxController extends CommonAjaxController
      */
     protected function testEmailServerConnectionAction(Request $request)
     {
-        $dataArray = array('success' => 0, 'message' => '');
+        $dataArray = ['success' => 0, 'message' => ''];
+        $user      = $this->get('mautic.helper.user')->getUser();
 
-        if ($this->factory->getUser()->isAdmin()) {
+        if ($user->isAdmin()) {
             $settings = $request->request->all();
 
             $transport = $settings['transport'];
 
-            switch($transport) {
+            switch ($transport) {
                 case 'gmail':
                     $mailer = new \Swift_SmtpTransport('smtp.gmail.com', 465, 'ssl');
                     break;
                 case 'smtp':
                     $mailer = new \Swift_SmtpTransport($settings['host'], $settings['port'], $settings['encryption']);
                     break;
-                case 'mautic.transport.amazon':
-                    $mailer = new AmazonTransport($settings['amazon_region']);
-                    break;
                 default:
                     if ($this->container->has($transport)) {
                         $mailer = $this->container->get($transport);
+
+                        if ('mautic.transport.amazon' == $transport) {
+                            $mailer->setHost($settings['amazon_region']);
+                        }
                     }
             }
 
@@ -275,18 +235,27 @@ class AjaxController extends CommonAjaxController
             }
 
             if (!empty($mailer)) {
-                if (empty($settings['password'])) {
-                    $settings['password'] = $this->factory->getParameter('mailer_password');
+                if (is_callable($mailer, 'setApiKey')) {
+                    if (empty($settings['api_key'])) {
+                        $settings['api_key'] = $this->get('mautic.helper.core_parameters')->getParameter('mailer_api_key');
+                    }
+                    $mailer->setApiKey($settings['api_key']);
                 }
-                $mailer->setUsername($settings['user']);
-                $mailer->setPassword($settings['password']);
+
+                if (is_callable([$mailer, 'setUsername']) && is_callable([$mailer, 'setPassword'])) {
+                    if (empty($settings['password'])) {
+                        $settings['password'] = $this->get('mautic.helper.core_parameters')->getParameter('mailer_password');
+                    }
+                    $mailer->setUsername($settings['user']);
+                    $mailer->setPassword($settings['password']);
+                }
 
                 $logger = new \Swift_Plugins_Loggers_ArrayLogger();
                 $mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($logger));
 
                 try {
                     $mailer->start();
-                    $translator = $this->factory->getTranslator();
+                    $translator = $this->get('translator');
 
                     if ($settings['send_test'] == 'true') {
                         $message = new \Swift_Message(
@@ -294,15 +263,12 @@ class AjaxController extends CommonAjaxController
                             $translator->trans('mautic.email.config.mailer.transport.test_send.body')
                         );
 
-                        $user         = $this->factory->getUser();
                         $userFullName = trim($user->getFirstName().' '.$user->getLastName());
-
-                        $message->setFrom([$settings['from_email'] => $settings['from_name']]);
-                        if ($userFullName) {
-                            $message->setTo([$user->getEmail() => $user->getFirstName().' '.$user->getLastName()]);
-                        } else {
-                            $message->setTo([$user->getEmail()]);
+                        if (empty($userFullName)) {
+                            $userFullName = null;
                         }
+                        $message->setFrom([$settings['from_email'] => $settings['from_name']]);
+                        $message->setTo([$user->getEmail() => $userFullName]);
 
                         $mailer->send($message);
                     }
@@ -318,5 +284,4 @@ class AjaxController extends CommonAjaxController
 
         return $this->sendJsonResponse($dataArray);
     }
-
 }

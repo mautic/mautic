@@ -10,6 +10,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -67,7 +68,8 @@ class FilterType extends AbstractType
                     'or'  => 'mautic.lead.list.form.glue.or'
                 ),
                 'attr'    => array(
-                    'class' => 'form-control not-chosen'
+                    'class' => 'form-control not-chosen glue-select',
+                    'onchange' => 'Mautic.updateFilterPositioning(this)'
                 )
             )
         );
@@ -217,19 +219,7 @@ class FilterType extends AbstractType
                     }
 
                     $list = $options['fields'][$fieldName]['properties']['list'];
-                    if (!is_array($list)) {
-                        $parts = explode('||', $list);
-                        if (count($parts) > 1) {
-                            $labels  = explode('|', $parts[0]);
-                            $values  = explode('|', $parts[1]);
-                            $choices = array_combine($values, $labels);
-                        } else {
-                            $list    = explode('|', $list);
-                            $choices = array_combine($list, $list);
-                        }
-                    } else {
-                        $choices = $list;
-                    }
+                    $choices = FormFieldHelper::parseListStringIntoArray($list);
 
                     if ($fieldType == 'select') {
                         // array_unshift cannot be used because numeric values get lost as keys
