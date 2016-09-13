@@ -155,7 +155,7 @@ class CampaignSubscriber extends CommonSubscriber
                 }
 
                 $eventDetails = $event->getEventDetails();
-                $options      = ['source' => ['campaign', $eventDetails['campaign']['id']], 'type' => $type];
+                $options      = ['source' => ['campaign', $eventDetails['campaign']['id']], 'email_type' => $type];
                 $emailSent    = $this->emailModel->sendEmail($email, $leadCredentials, $options);
             }
 
