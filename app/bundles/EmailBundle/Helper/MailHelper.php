@@ -120,16 +120,11 @@ class MailHelper
     protected $eventTokens   = array();
 
     /**
-     * Tells the mailer to use batching/tokenized emails if it's available
+     * Tells the helper that the transport supports tokenized emails (likely HTTP API)
      *
      * @var bool
      */
     protected $tokenizationEnabled = false;
-
-    /**
-     * @var bool
-     */
-    protected $tokenizationSupported = false;
 
     /**
      * @var array
@@ -236,7 +231,7 @@ class MailHelper
 
         // Check if batching is supported by the transport
         if ($this->factory->getParameter('mailer_spool_type') == 'memory' && $this->transport instanceof InterfaceTokenTransport) {
-            $this->tokenizationSupported = true;
+            $this->tokenizationEnabled = true;
         }
 
         // Set factory if supported
@@ -271,6 +266,18 @@ class MailHelper
      */
     public function send($dispatchSendEvent = false, $isQueueFlush = false, $useOwnerAsMailer = true)
     {
+        if ($this->tokenizationEnabled && !empty($this->queuedRecipients) && !$isQueueFlush) {
+            // This transport uses tokenization and queue()/flushQueue() was not used therefore use them in order
+            // properly populate metadata for this transport
+
+            if ($result = $this->queue($dispatchSendEvent)) {
+
+                $result = $this->flushQueue();
+            }
+
+            return $result;
+        }
+
         // Set from email
         if (!$isQueueFlush && $useOwnerAsMailer && $this->factory->getParameter('mailer_is_owner') && isset($this->lead['id'])) {
             if (!isset($this->lead['owner_id'])) {
@@ -566,7 +573,6 @@ class MailHelper
                 'charset'     => null
             );
 
-            $this->tokenizationEnabled = false;
             $this->plainTextSet        = false;
 
             $this->message = $this->getMessageInstance();
@@ -686,7 +692,7 @@ class MailHelper
     public function getMessageInstance()
     {
         try {
-            $message = ($this->tokenizationSupported) ? MauticMessage::newInstance() : \Swift_Message::newInstance();
+            $message = ($this->tokenizationEnabled) ? MauticMessage::newInstance() : \Swift_Message::newInstance();
 
             return $message;
         } catch (\Exception $e) {
@@ -930,11 +936,8 @@ class MailHelper
     public function setTo($addresses, $name = null)
     {
         if (!is_array($addresses)) {
-            if (($name !== null) && (trim($name))) {
-                $addresses = [$addresses => trim($name)];
-            } else {
-                $addresses = [$addresses];
-            }
+            $name      = $this->cleanName($name);
+            $addresses = [$addresses => $name];
         }
 
         $this->checkBatchMaxRecipients(count($addresses));
@@ -964,6 +967,7 @@ class MailHelper
         $this->checkBatchMaxRecipients();
 
         try {
+            $name = $this->cleanName($name);
             $this->message->addTo($address, $name);
             $this->queuedRecipients[$address] = $name;
 
@@ -988,6 +992,7 @@ class MailHelper
         $this->checkBatchMaxRecipients(count($addresses), 'cc');
 
         try {
+            $name = $this->cleanName($name);
             $this->message->setCc($addresses, $name);
 
             return true;
@@ -1011,6 +1016,7 @@ class MailHelper
         $this->checkBatchMaxRecipients(1, 'cc');
 
         try {
+            $name = $this->cleanName($name);
             $this->message->addCc($address, $name);
 
             return true;
@@ -1034,6 +1040,7 @@ class MailHelper
         $this->checkBatchMaxRecipients(count($addresses), 'bcc');
 
         try {
+            $name = $this->cleanName($name);
             $this->message->setBcc($addresses, $name);
 
             return true;
@@ -1057,6 +1064,7 @@ class MailHelper
         $this->checkBatchMaxRecipients(1, 'bcc');
 
         try {
+            $name = $this->cleanName($name);
             $this->message->addBcc($address, $name);
 
             return true;
@@ -1098,6 +1106,7 @@ class MailHelper
     public function setReplyTo($addresses, $name = null)
     {
         try {
+            $name = $this->cleanName($name);
             $this->message->setReplyTo($addresses, $name);
         } catch (\Exception $e) {
             $this->logError($e);
@@ -1127,6 +1136,7 @@ class MailHelper
     public function setFrom($address, $name = null)
     {
         try {
+            $name = $this->cleanName($name);
             $this->message->setFrom($address, $name);
         } catch (\Exception $e) {
             $this->logError($e);
@@ -1432,17 +1442,15 @@ class MailHelper
     /**
      * Tell the mailer to use batching/tokenized emails if available.  It's up to the function calling to execute flushQueue to send the mail.
      *
+     * @deprecated 2.1.1 - to be removed in 3.0
+     *
      * @param bool $tokenizationEnabled
      *
      * @return bool Returns true if batching/tokenization is supported by the mailer
      */
     public function useMailerTokenization($tokenizationEnabled = true)
     {
-        if ($this->tokenizationSupported) {
-            $this->tokenizationEnabled = $tokenizationEnabled;
-        }
-
-        return $this->tokenizationSupported;
+        trigger_error('useMailerTokenization is no longer used as it is automatically handled based on what the transport supports.', E_DEPRECATED);
     }
 
     /**
@@ -1856,5 +1864,26 @@ class MailHelper
             return true;
         }
         return false;
+    }
+
+    /**
+     * Clean the name - if empty, set as null to ensure pretty headers
+     *
+     * @param $name
+     *
+     * @return null|string
+     */
+    private function cleanName($name)
+    {
+        if (null !== $name) {
+            $name = trim($name);
+
+            // If empty, replace with null so that email clients do not show empty name because of To: '' <email@domain.com>
+            if (empty($name)) {
+                $name = null;
+            }
+        }
+
+        return $name;
     }
 }

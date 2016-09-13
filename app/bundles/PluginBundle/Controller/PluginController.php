@@ -224,7 +224,7 @@ class PluginController extends FormController
                                 'integration'         => $integration,
                                 'authUrl'             => $oauthUrl,
                                 'authorize'           => 1,
-                                'popupBlockerMessage' => $this->factory->getTranslator()->trans('mautic.integration.oauth.popupblocked')
+                                'popupBlockerMessage' => $this->factory->getTranslator()->trans('mautic.core.popupblocked')
                             ]
                         );
                     }

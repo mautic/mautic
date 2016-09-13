@@ -641,7 +641,7 @@ class CampaignController extends FormController
                             $model->setCanvasSettings($entity, $connections);
 
                             if (!empty($deletedEvents)) {
-                                $this->getModel('campaign.event')->deleteEvents($entity->getEvents(), $modifiedEvents, $deletedEvents);
+                                $this->getModel('campaign.event')->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
                             }
                         }
 

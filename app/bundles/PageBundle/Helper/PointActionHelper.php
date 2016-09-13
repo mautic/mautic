@@ -79,49 +79,43 @@ class PointActionHelper
                 $changePoints['first_time'] = true;
             }
         }
+        $now = new \DateTime();
+        $latestHit = $hitRepository->getLatestHit(['leadId' => $lead->getId(), $urlWithSqlWC, 'second_to_last' => $eventDetails->getId()]);
 
         if ($action['properties']['accumulative_time']) {
             if (!isset($hitStats)) {
                 $hitStats = $hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
             }
-            if (isset($hitStats['sum']) && $hitStats['sum'] >= $action['properties']['accumulative_time']) {
-                $changePoints['accumulative_time'] = true;
+
+            if (isset($hitStats['sum'])) {
+                if($now->getTimestamp() - $latestHit->getTimestamp() == $hitStats['sum']) {
+                    $changePoints['accumulative_time'] = true;
+                } else {
+                    $changePoints['accumulative_time'] = false;
+                }
             } else {
                 $changePoints['accumulative_time'] = false;
             }
         }
-
         if ($action['properties']['page_hits']) {
             if (!isset($hitStats)) {
                 $hitStats = $hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
             }
-            if (isset($hitStats['count']) && $hitStats['count'] >= $action['properties']['page_hits']) {
+            if (isset($hitStats['count']) && $hitStats['count'] === $action['properties']['page_hits']) {
                 $changePoints['page_hits'] = true;
             } else {
                 $changePoints['page_hits'] = false;
             }
         }
-
         if ($action['properties']['returns_within']) {
-            $latestHit = $hitRepository->getLatestHit(['leadId' => $lead->getId(), $urlWithSqlWC]);
-            $latestPlus = clone $latestHit;
-            $latestPlus->add(new \DateInterval('PT' . $action['properties']['returns_within'] . 'S'));
-            $now = new \dateTime();
-            if ($latestPlus >= $now) {
+            if ($now->getTimestamp() - $latestHit->getTimestamp() <= $action['properties']['returns_within']) {
                 $changePoints['returns_within'] = true;
             } else {
                 $changePoints['returns_within'] = false;
             }
         }
-
         if ($action['properties']['returns_after']) {
-            if (!isset($latestHit)) {
-                $latestHit = $hitRepository->getLatestHit(['leadId' => $lead->getId(), $urlWithSqlWC]);
-            }
-            $latestPlus = clone $latestHit;
-            $latestPlus->add(new \DateInterval('PT' . $action['properties']['returns_after'] . 'S'));
-            $now = new \dateTime();
-            if ($latestPlus >= $now) {
+            if ($now->getTimestamp() - $latestHit->getTimestamp() >= $action['properties']['returns_after']) {
                 $changePoints['returns_after'] = true;
             } else {
                 $changePoints['returns_after'] = false;

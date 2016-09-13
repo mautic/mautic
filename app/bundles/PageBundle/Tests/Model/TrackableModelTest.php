@@ -254,6 +254,31 @@ class TrackableModelTest extends WebTestCase
         $this->assertFalse(strpos($url, $content), 'https:// should have been stripped from the token URL');
     }
 
+
+    /**
+     * @testdox Test that tokens that are supposed to be ignored are
+     *
+     * @covers Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     */
+    public function testUnsupportedTokensAreNotConverted()
+    {
+        $url   = '{random_token}';
+        $model = $this->getModel($url);
+
+        list($content, $trackables) = $model->parseContentForTrackables(
+            $this->generateContent($url, 'text'),
+            array(
+                '{unsubscribe_url}' => 'https://domain.com/email/unsubscribe/xxxxxxx'
+            ),
+            'email',
+            1
+        );
+
+        $this->assertEmpty($trackables, $content);
+    }
+
     /**
      * @testdox Test that a URL injected into the do not track list is not converted
      *

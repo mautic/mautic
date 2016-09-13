@@ -196,7 +196,10 @@ return [
             ],
             'mautic.helper.mailbox'              => [
                 'class'     => 'Mautic\EmailBundle\MonitoredEmail\Mailbox',
-                'arguments' => 'mautic.factory'
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.paths'
+                ]
             ],
             'mautic.helper.message'            => [
                 'class'     => 'Mautic\EmailBundle\Helper\MessageHelper',
@@ -249,7 +252,10 @@ return [
             'mautic.transport.sparkpost'          => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-                'arguments'    => ['%mautic.mailer_api_key%'],
+                'arguments'    => [
+                    '%mautic.mailer_api_key%',
+                    'translator'
+                ],
                 'methodCalls'  => [
                     'setMauticFactory' => ['mautic.factory']
                 ]

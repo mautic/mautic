@@ -18,7 +18,7 @@ class AjaxController extends CommonAjaxController
 {
     protected function sendHookTestAction(Request $request)
     {
-        $url = InputHelper::clean($request->request->get('url'));
+        $url = InputHelper::url($request->request->get('url'));
 
         // validate the URL
         if ($url == '' || ! $url) {
@@ -44,11 +44,14 @@ class AjaxController extends CommonAjaxController
 
         $payloads['timestamp'] = $now->format('c');
 
+        // Set up custom headers
+        $headers = ['Content-Type' => 'application/json'];
+
         // instantiate new http class
         $http = new Http();
 
         // set the response
-        $response = $http->post($url, json_encode($payloads));
+        $response = $http->post($url, json_encode($payloads), $headers);
 
         // default to an error message
         $dataArray = array(

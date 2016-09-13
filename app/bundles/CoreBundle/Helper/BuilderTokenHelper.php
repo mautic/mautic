@@ -280,48 +280,6 @@ class BuilderTokenHelper
     }
 
     /**
-     * @param $tokens
-     * @param $content
-     */
-    static public function replaceTokensWithVisualPlaceholders($tokens, &$content)
-    {
-        if (is_array($content)) {
-            foreach ($content as &$slot) {
-                self::replaceTokensWithVisualPlaceholders($tokens, $slot);
-            }
-        } else {
-            if (isset($tokens['visualTokens'])) {
-                // Get all the tokens in the content
-                $replacedTokens = array();
-                if (preg_match_all('/{(.*?)}/', $content, $matches)) {
-                    $search = $replace = array();
-
-                    foreach ($matches[0] as $tokenMatch) {
-                        if (!in_array($tokenMatch, $replacedTokens)) {
-                            $replacedTokens[] = $tokenMatch;
-
-                            if (strstr($tokenMatch, '|')) {
-                                // This token has been customized
-                                $tokenParts = explode('|', $tokenMatch);
-                                $token      = $tokenParts[0].'}';
-                            } else {
-                                $token = $tokenMatch;
-                            }
-
-                            if (in_array($token, $tokens['visualTokens'])) {
-                                $search[]  = $tokenMatch;
-                                $replace[] = self::getVisualTokenHtml($tokenMatch, $tokens['tokens'][$token]);
-                            }
-                        }
-                    }
-
-                    $content = str_ireplace($search, $replace, $content);
-                }
-            }
-        }
-    }
-
-    /**
      * @param $token
      * @param $description
      * @param $forPregReplace

@@ -55,9 +55,11 @@
         <div class="col-sm-4 col-md-2">
             <?php echo $view['form']->row($form['port']); ?>
         </div>
+        <?php if (extension_loaded('openssl')) : ?>
         <div class="col-sm-8 col-md-4">
             <?php echo $view['form']->row($form['encryption']); ?>
         </div>
+        <?php endif; ?>
     </div>
 
     <div class="row">
