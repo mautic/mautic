@@ -77,27 +77,27 @@ class SlotButtonType extends SlotType
             ),
         ]);
 
-        // $builder->add('background-color', 'text', [
-        //     'label'      => 'mautic.core.background.color',
-        //     'label_attr' => ['class' => 'control-label'],
-        //     'required'   => false,
-        //     'attr'       => [
-        //         'class'           => 'form-control',
-        //         'data-slot-param' => 'background-color',
-        //         'data-toggle'     => 'color'
-        //     ],
-        // ]);
+        $builder->add('background-color', 'text', [
+            'label'      => 'mautic.core.background.color',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => [
+                'class'           => 'form-control',
+                'data-slot-param' => 'background-color',
+                'data-toggle'     => 'color'
+            ],
+        ]);
 
-        // $builder->add('color', 'text', [
-        //     'label'      => 'mautic.core.text.color',
-        //     'label_attr' => ['class' => 'control-label'],
-        //     'required'   => false,
-        //     'attr'       => [
-        //         'class'           => 'form-control',
-        //         'data-slot-param' => 'color',
-        //         'data-toggle'     => 'color'
-        //     ],
-        // ]);
+        $builder->add('color', 'text', [
+            'label'      => 'mautic.core.text.color',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => [
+                'class'           => 'form-control',
+                'data-slot-param' => 'color',
+                'data-toggle'     => 'color'
+            ],
+        ]);
     }
 
     /**

@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.3.3 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -127,7 +127,7 @@
 
   FE.PLUGINS = {};
 
-  FE.VERSION = '2.3.3';
+  FE.VERSION = '2.3.4';
 
   FE.INSTANCES = [];
 
@@ -1404,6 +1404,7 @@
                   .replace(/tel%3A/gi, 'tel:')
                   .replace(/notes%3A/gi, 'notes:')
                   .replace(/data%3Aimage/gi, 'data:image')
+                  .replace(/blob%3A/gi, 'blob:')
                   .replace(/webkit-fake-url%3A/gi, 'webkit-fake-url:')
                   .replace(/%3F/g, '?')
                   .replace(/%3D/g, '=')
@@ -1645,6 +1646,7 @@
         if (blurActive() /* && document.activeElement != this */) {
           if (focused === true) {
             trigger(e.type, [e]);
+            enableBlur();
           }
         }
       });
@@ -2302,6 +2304,11 @@
           var range = ranges(0);
           var node = range.startContainer;
 
+          // https://github.com/froala/wysiwyg-editor/issues/1399.
+          if (node.nodeType == Node.TEXT_NODE && range.startOffset == (node.textContent || '').length && node.nextSibling) {
+            node = node.nextSibling;
+          }
+
           // Get parrent if node type is not DOM.
           if (node.nodeType == Node.ELEMENT_NODE) {
             var node_found = false;
@@ -2542,6 +2549,9 @@
             var collapsed = range.collapsed;
             var start_m = editor.markers.place(range, true, i); // Start.
             var end_m = editor.markers.place(range, false, i); // End.
+
+            // https://github.com/froala/wysiwyg-editor/issues/1398.
+            editor.$el.get(0).normalize();
 
             if (editor.browser.safari && !collapsed) {
               var range = editor.doc.createRange();
@@ -3237,6 +3247,14 @@
       editor.clean.lists();
 
       editor.spaces.normalize();
+
+      // https://github.com/froala/wysiwyg-editor/issues/1379
+      var last_marker = editor.$el.find('.fr-marker:last').get(0);
+      var first_marker = editor.$el.find('.fr-marker:first').get(0);
+      if (!last_marker.nextSibling && first_marker.previousSibling && first_marker.previousSibling.tagName == 'BR' && editor.node.isElement(last_marker.parentNode) && editor.node.isElement(first_marker.parentNode)) {
+        editor.$el.append('<br>');
+      }
+
       restore();
     }
 
@@ -3369,7 +3387,7 @@
           // No previous text or previous text ends with space.
           // No previous voide.
           // Current text starts with space.
-          if ((!prevText || / $/.test(prevText.data)) && text[0] === ' ') {
+          if ((!prevText || / $/.test(prevText.data)) && text[0] === ' ' && (!node.previousSibling || !editor.node.isVoid(node.previousSibling) || node.previousSibling.tagName === 'BR')) {
             // Remove starting space.
             text = text.substr(1);
           }
@@ -3392,7 +3410,7 @@
           // Block or BR.
           if (editor.node.isBlock(node) || editor.node.isVoid(node)) {
             // If there was a previous text collapse ending spaces;
-            if (prevText && prevText.data) {
+            if (prevText && prevText.data && (editor.node.isBlock(node) || node.tagName === 'BR')) {
               prevText.data = prevText.data.replace(/ $/, '');
             }
 
@@ -3465,6 +3483,11 @@
         // Previous sibling is not void or block.
         if (node.previousSibling && !editor.node.isVoid(node.previousSibling) && !editor.node.isBlock(node.previousSibling)) {
           new_text = new_text.replace(/^\u00A0([^ $])/, ' $1');
+
+          // https://github.com/froala/wysiwyg-editor/issues/1355.
+          if (new_text.length === 1 && new_text.charCodeAt(0) === 160 && node.nextSibling && !editor.node.isVoid(node.nextSibling) && !editor.node.isBlock(node.nextSibling)) {
+            new_text = ' ';
+          }
         }
 
         // Convert middle nbsp to spaces.
@@ -4039,6 +4062,9 @@
         editor.$el.html(head_bad_html + '\n' + body_html);
         editor.node.clearAttributes(editor.$el.get(0));
         editor.$el.attr(body_attrs);
+        editor.$el.addClass('fr-view');
+        editor.$el.attr('spellcheck', editor.opts.spellcheck);
+        editor.$el.attr('dir', editor.opts.direction);
 
         editor.$head.html(head_html);
         editor.node.clearAttributes(editor.$head.get(0));
@@ -4151,12 +4177,16 @@
 
           if (rules) {
             for (var idx = 0, len = rules.length; idx < len; idx++) {
-              var class_selector = editor.opts.iframe ? 'body ' : '.fr-view ';
-
-              if (rules[idx].selectorText && rules[idx].selectorText.indexOf(class_selector) === 0) {
+              if (rules[idx].selectorText) {
                 if (rules[idx].style.cssText.length > 0) {
-                  var selector = rules[idx].selectorText.replace(class_selector, '').replace(/::/g, ':');
-                  var elms = editor.$el.get(0).querySelectorAll(selector);
+                  var selector = rules[idx].selectorText.replace(/body |\.fr-view /g, '').replace(/::/g, ':');
+                  var elms;
+                  try {
+                    elms = editor.$el.get(0).querySelectorAll(selector);
+                  }
+                  catch (ex) {
+                    elms = [];
+                  }
 
                   for (var j = 0; j < elms.length; j++) {
                     // Save original style.
@@ -4212,6 +4242,16 @@
             updated_elms[i].setAttribute('fr-original-class', updated_elms[i].getAttribute('class'));
             updated_elms[i].removeAttribute('class');
           }
+
+          // Make sure that we have the inline style first.
+          if ((updated_elms[i].getAttribute('fr-original-style') || '').trim().length > 0) {
+            var original_rules = updated_elms[i].getAttribute('fr-original-style').split(';');
+            for (var j = 0; j < original_rules.length; j++) {
+              if (original_rules[j].indexOf(':') > 0) {
+                updated_elms[i].style[original_rules[j].split(':')[0].trim()] = original_rules[j].split(':')[1].trim();
+              }
+            }
+          }
         }
       }
 
@@ -4224,7 +4264,9 @@
         }
         else {
           html = getDoctype(editor.iframe_document);
+          editor.$el.removeClass('fr-view');
           html += '<html' + editor.node.attributes(editor.$html.get(0)) + '>' + editor.$html.html() + '</html>';
+          editor.$el.addClass('fr-view');
         }
       }
       else if (editor.opts.fullPage) {
@@ -4522,6 +4564,8 @@
 
   $.FE.MODULES.size = function (editor) {
     function syncIframe () {
+      refresh();
+
       if (editor.opts.height) {
         editor.$el.css('minHeight', editor.opts.height - editor.helpers.getPX(editor.$el.css('padding-top')) - editor.helpers.getPX(editor.$el.css('padding-bottom')));
       }
@@ -4567,7 +4611,7 @@
       refresh();
 
       // Sync iframe height.
-      if (editor.opts.iframe) {
+      if (editor.$iframe) {
         editor.events.on('keyup', syncIframe);
         editor.events.on('commands.after', syncIframe);
         editor.events.on('html.set', syncIframe);
@@ -4668,8 +4712,7 @@
             paddingLeft: Math.max(editor.helpers.getPX(editor.$el.css('padding-left')), padding_left),
             marginLeft: Math.max(editor.helpers.getPX(editor.$el.css('margin-left')), margin_left)
           })
-        .text(editor.language.translate(editor.opts.placeholderText || editor.$oel.attr('placeholder') || ''))
-        .css('height', editor.$el.height() - Math.max(editor.helpers.getPX(editor.$el.css('margin-top')), margin_top) - Math.max(editor.helpers.getPX(editor.$el.css('padding-top')), padding_top));
+        .text(editor.language.translate(editor.opts.placeholderText || editor.$oel.attr('placeholder') || ''));
 
       editor.$placeholder.html(editor.$placeholder.text().replace(/\n/g, '<br>'));
     }
@@ -4844,7 +4887,7 @@
 
       if (editor.opts.iframe) {
         editor.$iframe.addClass('fr-iframe');
-        editor.$html.find('body').addClass('fr-view');
+        editor.$el.addClass('fr-view');
 
         for (var i = 0; i < editor.o_doc.styleSheets.length; i++) {
           var rules;
@@ -5490,6 +5533,7 @@
 
             do {
               c_node = c_node.parentNode;
+
               c_str = c_str + editor.node.closeTagString(c_node);
               o_str = editor.node.openTagString($(c_node).clone().addClass('fr-split').get(0)) + o_str;
 
@@ -5501,7 +5545,7 @@
             } while ($outer_span.get(0) != c_node);
 
             // Build breaking string.
-            var str = c_str + editor.node.openTagString($outer_span.clone().css(prop, val || '').get(0)) + io_str + $span.html() + ic_str + '</span>' + o_str;
+            var str = c_str + editor.node.openTagString($($outer_span.get(0)).clone().css(prop, val || '').get(0)) + io_str + $span.css(prop, '').get(0).outerHTML + ic_str + '</span>' + o_str;
             $span.replaceWith('<span id="fr-break"></span>');
             var html = $outer_span.get(0).outerHTML;
 
@@ -5521,7 +5565,7 @@
 
         editor.html.cleanEmptyTags();
 
-        editor.$el.find('span').each(function () {
+        $(editor.$el.find('span').get().reverse()).each(function () {
           if (!this.attributes || this.attributes.length == 0) {
             $(this).replaceWith(this.innerHTML);
           }
@@ -5860,7 +5904,16 @@
         var e_el = editor.selection.endElement();
 
         if (s_el == e_el && s_el && s_el.tagName == 'HR') {
-          editor.selection.clear();
+          if (s_el.nextSibling) {
+            if (!editor.node.isBlock(s_el.nextSibling)) {
+              $(s_el).after($.FE.MARKERS);
+            }
+            else {
+              editor.selection.setAtStart(s_el.nextSibling);
+            }
+          }
+
+          editor.selection.restore();
         }
       })
     }
@@ -6484,6 +6537,12 @@
             }
             else {
               $(prev_node).after($.FE.MARKERS);
+
+              // https://github.com/froala/wysiwyg-editor/issues/1379.
+              if (editor.node.isElement(prev_node.parentNode) && !marker.nextSibling && prev_node.previousSibling && prev_node.previousSibling.tagName == 'BR') {
+                $(marker).after('<br>');
+              }
+
               prev_node.parentNode.removeChild(prev_node);
             }
           }
@@ -6960,7 +7019,13 @@
 
       // We are right in the main element.
       if (deep_parent == null) {
-        $(marker).replaceWith('<br/>' + $.FE.MARKERS + '<br/>');
+        default_tag = editor.html.defaultTag();
+        if (!default_tag || !editor.node.isElement(marker.parentNode)) {
+          $(marker).replaceWith('<br/>' + $.FE.MARKERS + '<br/>');
+        }
+        else {
+          $(marker).replaceWith('<' + default_tag + '>' + $.FE.MARKERS + '<br>' + '</' + default_tag + '>');
+        }
       }
 
       // There is a parent.
@@ -7040,10 +7105,11 @@
      */
     function _startEnter (marker, shift, quote) {
       var deep_parent = editor.node.deepestParent(marker, [], !quote);
+      var default_tag;
 
       if (deep_parent && deep_parent.tagName == 'BLOCKQUOTE') {
         if (_isAtStart(marker, deep_parent)) {
-          var default_tag = editor.html.defaultTag();
+          default_tag = editor.html.defaultTag();
           if (default_tag) {
             $(deep_parent).before('<' + default_tag + '>' + $.FE.MARKERS + '<br>' + '</' + default_tag + '>');
           }
@@ -7064,7 +7130,14 @@
 
       // We are right in the main element.
       if (deep_parent == null) {
-        $(marker).replaceWith('<br>' + $.FE.MARKERS);
+        default_tag = editor.html.defaultTag();
+
+        if (!default_tag || !editor.node.isElement(marker.parentNode)) {
+          $(marker).replaceWith('<br>' + $.FE.MARKERS);
+        }
+        else {
+          $(marker).replaceWith('<' + default_tag + '>' + $.FE.MARKERS + '<br>' + '</' + default_tag + '>');
+        }
       }
       else {
         if (editor.node.isBlock(deep_parent)) {
@@ -7249,7 +7322,7 @@
     }
   }
 
-$.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return a;for(var c="",f=b("charCodeAt"),g=b("fromCharCode"),h=l.indexOf(a[0]),i=1;i<a.length-2;i++){for(var j=d(++h),k=a[f](i),m="";/[0-9-]/.test(a[i+1]);)m+=a[++i];m=parseInt(m,10)||0,k=e(k,j,m),k^=h-1&31,c+=String[g](k)}return c}function d(a){for(var b=a.toString(),c=0,d=0;d<b.length;d++)c+=parseInt(b.charAt(d),10);return c>10?c%9+1:c}function e(a,b,c){for(var d=Math.abs(c);d-- >0;)a-=b;return 0>c&&(a+=123),a}function f(a){return a&&"none"==a.css("display")?(a.remove(),!0):!1}function g(){return f(j)||f(k)}function h(){return a.$box?(a.$box.append(n(b(n("kTDD4spmKD1klaMB1C7A5RA1G3RA10YA5qhrjuvnmE1D3FD2bcG-7noHE6B2JB4C3xXA8WF6F-10RG2C3G3B-21zZE3C3H3xCA16NC4DC1f1hOF1MB3B-21whzQH5UA2WB10kc1C2F4D3XC2YD4D1C4F3GF2eJ2lfcD-13HF1IE1TC11TC7WE4TA4d1A2YA6XA4d1A3yCG2qmB-13GF4A1B1KH1HD2fzfbeQC3TD9VE4wd1H2A20A2B-22ujB3nBG2A13jBC10D3C2HD5D1H1KB11uD-16uWF2D4A3F-7C9D-17c1E4D4B3d1D2CA6B2B-13qlwzJF2NC2C-13E-11ND1A3xqUA8UE6bsrrF-7C-22ia1D2CF2H1E2akCD2OE1HH1dlKA6PA5jcyfzB-22cXB4f1C3qvdiC4gjGG2H2gklC3D-16wJC1UG4dgaWE2D5G4g1I2H3B7vkqrxH1H2EC9C3E4gdgzKF1OA1A5PF5C4WWC3VA6XA4e1E3YA2YA5HE4oGH4F2H2IB10D3D2NC5G1B1qWA9PD6PG5fQA13A10XA4C4A3e1H2BA17kC-22cmOB1lmoA2fyhcptwWA3RA8A-13xB-11nf1I3f1B7GB3aD3pavFC10D5gLF2OG1LSB2D9E7fQC1F4F3wpSB5XD3NkklhhaE-11naKA9BnIA6D1F5bQA3A10c1QC6Kjkvitc2B6BE3AF3E2DA6A4JD2IC1jgA-64MB11D6C4==")))),j=a.$box.find("> div:last"),k=j.find("> a"),void("rtl"==a.opts.direction&&j.css("left","auto").css("right",0))):!1}function i(){var c=a.opts.key||[""];"string"==typeof c&&(c=[c]),a.ul=!0;for(var d=0;d<c.length;d++){var e=n(c[d])||"";if(!(e!==n(b(n("mcVRDoB1BGILD7YFe1BTXBA7B6==")))&&e.indexOf(m,e.length-m.length)<0&&[n("9qqG-7amjlwq=="),n("KA3B3C2A6D1D5H5H1A3==")].indexOf(m)<0)){a.ul=!1;break}}a.ul===!0&&h(),a.events.on("contentChanged",function(){a.ul===!0&&g()&&h()}),a.events.on("destroy",function(){j&&j.length&&j.remove()},!0)}var j,k,l="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",m=function(){for(var a=0,b=document.domain,c=b.split("."),d="_gd"+(new Date).getTime();a<c.length-1&&-1==document.cookie.indexOf(d+"="+d);)b=c.slice(-1-++a).join("."),document.cookie=d+"="+d+";domain="+b+";";return document.cookie=d+"=;expires=Thu, 01 Jan 1970 00:00:01 GMT;domain="+b+";",b}(),n=b(c);return{_init:i}}
+$.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return a;for(var c="",f=b("charCodeAt"),g=b("fromCharCode"),h=l.indexOf(a[0]),i=1;i<a.length-2;i++){for(var j=d(++h),k=a[f](i),m="";/[0-9-]/.test(a[i+1]);)m+=a[++i];m=parseInt(m,10)||0,k=e(k,j,m),k^=h-1&31,c+=String[g](k)}return c}function d(a){for(var b=a.toString(),c=0,d=0;d<b.length;d++)c+=parseInt(b.charAt(d),10);return c>10?c%9+1:c}function e(a,b,c){for(var d=Math.abs(c);d-- >0;)a-=b;return 0>c&&(a+=123),a}function f(a){return a&&"none"==a.css("display")?(a.remove(),!0):!1}function g(){return f(j)||f(k)}function h(){return a.$box?(a.$box.append(n(b(n("kTDD4spmKD1klaMB1C7A5RA1G3RA10YA5qhrjuvnmE1D3FD2bcG-7noHE6B2JB4C3xXA8WF6F-10RG2C3G3B-21zZE3C3H3xCA16NC4DC1f1hOF1MB3B-21whzQH5UA2WB10kc1C2F4D3XC2YD4D1C4F3GF2eJ2lfcD-13HF1IE1TC11TC7WE4TA4d1A2YA6XA4d1A3yCG2qmB-13GF4A1B1KH1HD2fzfbeQC3TD9VE4wd1H2A20A2B-22ujB3nBG2A13jBC10D3C2HD5D1H1KB11uD-16uWF2D4A3F-7C9D-17c1E4D4B3d1D2CA6B2B-13qlwzJF2NC2C-13E-11ND1A3xqUA8UE6bsrrF-7C-22ia1D2CF2H1E2akCD2OE1HH1dlKA6PA5jcyfzB-22cXB4f1C3qvdiC4gjGG2H2gklC3D-16wJC1UG4dgaWE2D5G4g1I2H3B7vkqrxH1H2EC9C3E4gdgzKF1OA1A5PF5C4WWC3VA6XA4e1E3YA2YA5HE4oGH4F2H2IB10D3D2NC5G1B1qWA9PD6PG5fQA13A10XA4C4A3e1H2BA17kC-22cmOB1lmoA2fyhcptwWA3RA8A-13xB-11nf1I3f1B7GB3aD3pavFC10D5gLF2OG1LSB2D9E7fQC1F4F3wpSB5XD3NkklhhaE-11naKA9BnIA6D1F5bQA3A10c1QC6Kjkvitc2B6BE3AF3E2DA6A4JD2IC1jgA-64MB11D6C4==")))),j=a.$box.find("> div:last"),k=j.find("> a"),void("rtl"==a.opts.direction&&j.css("left","auto").css("right",0))):!1}function i(){var c=a.opts.key||[""];"string"==typeof c&&(c=[c]),a.ul=!0;for(var d=0;d<c.length;d++){var e=n(c[d])||"";if(!(e!==n(b(n("mcVRDoB1BGILD7YFe1BTXBA7B6==")))&&e.indexOf(m,e.length-m.length)<0&&[n("9qqG-7amjlwq=="),n("KA3B3C2A6D1D5H5H1A3=="),n("QzbzvxyB2yA-9m==")].indexOf(m)<0)){a.ul=!1;break}}a.ul===!0&&h(),a.events.on("contentChanged",function(){a.ul===!0&&g()&&h()}),a.events.on("destroy",function(){j&&j.length&&j.remove()},!0)}var j,k,l="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",m=function(){for(var a=0,b=document.domain,c=b.split("."),d="_gd"+(new Date).getTime();a<c.length-1&&-1==document.cookie.indexOf(d+"="+d);)b=c.slice(-1-++a).join("."),document.cookie=d+"="+d+";domain="+b+";";return document.cookie=d+"=;expires=Thu, 01 Jan 1970 00:00:01 GMT;domain="+b+";",b}(),n=b(c);return{_init:i}}
 
   // Enter possible actions.
   $.FE.ENTER_P = 0;
@@ -7524,6 +7597,8 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
     function _tab (e) {
       if (editor.opts.tabSpaces > 0) {
         if (editor.selection.isCollapsed()) {
+          editor.undo.saveStep();
+
           e.preventDefault();
           e.stopPropagation();
 
@@ -7531,6 +7606,8 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
           for (var i = 0; i < editor.opts.tabSpaces; i++) str += '&nbsp;';
           editor.html.insert(str);
           editor.placeholder.refresh();
+
+          editor.undo.saveStep();
         }
         else {
           e.preventDefault();
@@ -7633,7 +7710,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
         _tab(e);
       }
 
-      else if (!ctrlKey(e) && isCharacter(e.which) && !editor.selection.isCollapsed()) {
+      else if (!ctrlKey(e) && isCharacter(e.which) && !editor.selection.isCollapsed() && !e.ctrlKey) {
         editor.selection.remove();
       }
 
@@ -8153,6 +8230,9 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       // Clean empty links.
       html = html.replace(/<a>(.[^<]+)<\/a>/gi, '$1');
 
+      // https://github.com/froala/wysiwyg-editor/issues/1364.
+      html = html.replace(/<br> */g, '<br>');
+
       // Process list indent.
       var $div = $('<div>').html(html);
       $div.find('li[data-indent]').each (function (index, li) {
@@ -8237,12 +8317,14 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       }
 
       // Google Docs paste.
+      var is_gdocs = false;
       if (clipboard_html.indexOf('id="docs-internal-guid') >= 0) {
         clipboard_html = clipboard_html.replace(/^.* id="docs-internal-guid[^>]*>(.*)<\/b>.*$/, '$1');
+        is_gdocs = true;
       }
 
       // Word paste.
-      if (clipboard_html.match(/(class=\"?Mso|style=\"[^\"]*\bmso\-|w:WordDocument)/gi)) {
+      if (clipboard_html.match(/(class=\"?Mso|class=\'?Mso|style=\"[^\"]*\bmso\-|style=\'[^\']*\bmso\-|w:WordDocument)/gi)) {
         // Strip spaces at the beginning.
         clipboard_html = clipboard_html.replace(/^\n*/g, '').replace(/^ /g, '');
 
@@ -8294,11 +8376,13 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
         })
 
         // Remove unecessary new_lines.
-        $tmp.find('br').each (function () {
-          if (this.previousSibling && editor.node.isBlock(this.previousSibling)) {
-            $(this).remove();
-          }
-        })
+        if (!is_gdocs) {
+          $tmp.find('br').each (function () {
+            if (this.previousSibling && editor.node.isBlock(this.previousSibling)) {
+              $(this).remove();
+            }
+          })
+        }
 
         clipboard_html = $tmp.html();
 
@@ -8776,6 +8860,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
         // Restore snapshot.
         editor.snapshot.restore(snapshot);
+        last_html = snapshot.html;
 
         // Hide popups.
         editor.popups.hideAll();
@@ -8804,6 +8889,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
         // Restore snapshot.
         editor.snapshot.restore(snapshot);
+        last_html = snapshot.html;
 
         // Hide popups.
         editor.popups.hideAll();
@@ -8948,6 +9034,15 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       editor.$tooltip.css('position', '');
       editor.$tooltip.css('left', left);
       editor.$tooltip.css('top', top);
+
+      if ($(editor.o_doc).find('body').css('position') != 'static') {
+        editor.$tooltip.css('margin-left', - $(editor.o_doc).find('body').offset().left);
+        editor.$tooltip.css('margin-top', - $(editor.o_doc).find('body').offset().top);
+      }
+      else {
+        editor.$tooltip.css('margin-left', '');
+        editor.$tooltip.css('margin-top', '');
+      }
     }
 
     function bind ($el, selector, above) {
@@ -9509,6 +9604,8 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
       // https://github.com/froala/wysiwyg-editor/issues/1248
       _events(id)._repositionPopup();
+
+      _unmarkExit();
     }
 
     function onShow (id, callback) {
@@ -9865,6 +9962,8 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
           else if (originalTarget && $(originalTarget).is(input_selector)) {
             e.stopPropagation();
           }
+
+          _unmarkExit();
         },
 
         /**
@@ -10137,13 +10236,13 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       var width = $el.outerWidth();
 
       // Normalize right.
-      if ($el.parent().offset().left + left + width > editor.helpers.getPX($(editor.opts.scrollableContainer).css('left')) + $(editor.opts.scrollableContainer).width() - 10) {
-       left = $(editor.opts.scrollableContainer).width() - width - 10 - $el.parent().offset().left + $(editor.opts.scrollableContainer).offset().left;
+      if (left + width > $(editor.opts.scrollableContainer).width() - 10) {
+        left = $(editor.opts.scrollableContainer).width() - width - 10;
       }
 
       // Normalize left.
-      if ($el.parent().offset().left + left < $(editor.opts.scrollableContainer).offset().left) {
-        left = 10 - $el.parent().offset().left + $(editor.opts.scrollableContainer).offset().left;
+      if (left < 0) {
+        left = 10;
       }
 
       return left;
@@ -10173,9 +10272,18 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
     function at (left, top, $el, obj_height) {
       var $container = $el.data('container');
 
-      if ($container && $container.get(0).tagName != 'BODY') {
+      if ($container && (!$container.is('body') || $container.css('position') != 'static')) {
         if (left) left -= $container.offset().left;
-        if (top) top -= $container.offset().top - $container.scrollTop();
+        if (top) top -= $container.offset().top;
+
+        if ($container.get(0).tagName != 'BODY') {
+          if (left) left += $container.scrollLeft();
+          if (top) top += $container.scrollTop();
+        }
+        else if ($container.css('position') == 'absolute') {
+          if (left) left += $container.position().left;
+          if (top) top += $container.position().top;
+        }
       }
 
       // Apply iframe correction.
@@ -10793,9 +10901,9 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       if ($active_dropdowns.next().find(editor.o_doc.activeElement).length) return true;
 
       // Check if we should actually hide the toolbar.
-      if (editor.events.trigger('toolbar.hide') == false) return false;
-
-      editor.$tb.hide();
+      if (editor.events.trigger('toolbar.hide') !== false) {
+        editor.$tb.hide();
+      }
     }
 
     function show () {

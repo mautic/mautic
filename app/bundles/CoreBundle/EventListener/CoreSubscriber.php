@@ -37,7 +37,11 @@ class CoreSubscriber extends CommonSubscriber
     {
         return array(
             KernelEvents::CONTROLLER          => array('onKernelController', 0),
-            KernelEvents::REQUEST             => array('onKernelRequest', 0),
+            KernelEvents::REQUEST             => [
+                ['onKernelRequestSetTimezone', 9999],
+                ['onKernelRequestSetLocale', 15], // Must be 15 to load after Symfony's default Locale listener
+                ['onKernelRequestAddGlobalJS', 0]
+            ],
             CoreEvents::BUILD_MENU            => array('onBuildMenu', 9999),
             CoreEvents::BUILD_ROUTE           => array('onBuildRoute', 0),
             CoreEvents::FETCH_ICONS           => array('onFetchIcons', 9999),
@@ -46,43 +50,19 @@ class CoreSubscriber extends CommonSubscriber
     }
 
     /**
-     * Set default timezone/locale
+     * Set timezone
      *
      * @param GetResponseEvent $event
-     *
-     * @return void
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequestSetTimezone(GetResponseEvent $event)
     {
-        // Set the user's default locale
         $request = $event->getRequest();
         if (!$request->hasPreviousSession()) {
             return;
         }
 
-        $currentUser = $this->factory->getUser();
-
-        //set the user's timezone
-        if (is_object($currentUser)) {
-            $tz = $currentUser->getTimezone();
-        }
-
-        if (empty($tz)) {
-            $tz = $this->params['default_timezone'];
-        }
-
-        date_default_timezone_set($tz);
-
-        if (!$locale = $request->attributes->get('_locale')) {
-            if (is_object($currentUser)) {
-                $locale = $currentUser->getLocale();
-            }
-            if (empty($locale)) {
-                $locale = $this->params['locale'];
-            }
-        }
-
-        $request->setLocale($locale);
+        // Set date/time
+        date_default_timezone_set($request->getSession()->get('_timezone', $this->params['default_timezone']));
 
         // Set a cookie with session name for filemanager
         $sessionName = $request->cookies->get('mautic_session_name');
@@ -91,6 +71,47 @@ class CoreSubscriber extends CommonSubscriber
             $cookieHelper = $this->factory->getHelper('cookie');
             $cookieHelper->setCookie('mautic_session_name', session_name(), null);
         }
+    }
+
+    /**
+     * Set default locale
+     *
+     * @param GetResponseEvent $event
+     *
+     * @return void
+     */
+    public function onKernelRequestSetLocale(GetResponseEvent $event)
+    {
+        // Set the user's default locale
+        $request = $event->getRequest();
+        if (!$request->hasPreviousSession()) {
+            return;
+        }
+
+        // Set locale
+        if ($locale = $request->attributes->get('_locale')) {
+            $request->getSession()->set('_locale', $locale);
+        } else {
+            $request->setLocale($request->getSession()->get('_locale', $this->params['locale']));
+        }
+    }
+
+    /**
+     * Add mauticForms in js script tag for Froala
+     *
+     * @param GetResponseEvent $event
+     */
+    public function onKernelRequestAddGlobalJS(GetResponseEvent $event)
+    {
+        if (defined('MAUTIC_INSTALLER')) {
+            return;
+        }
+
+        $list = $this->factory->getEntityManager()->getRepository('MauticFormBundle:Form')->getSimpleList();
+
+        $mauticForms = json_encode($list, JSON_FORCE_OBJECT | JSON_PRETTY_PRINT);
+
+        $this->factory->getHelper('template.assets')->addScriptDeclaration("var mauticForms = {$mauticForms};");
     }
 
     /**
@@ -123,6 +144,20 @@ class CoreSubscriber extends CommonSubscriber
                 $userModel->setOnlineStatus('online');
 
                 $userModel->getRepository()->setLastLogin($user);
+
+                // Set the timezone and locale in session while we have it since Symfony dispatches the onKernelRequest prior to the
+                // firewall setting the known user
+                $tz = $user->getTimezone();
+                if (empty($tz)) {
+                    $tz = $this->params['default_timezone'];
+                }
+                $session->set('_timezone', $tz);
+
+                $locale = $user->getLocale();
+                if (empty($locale)) {
+                    $locale = $this->params['locale'];
+                }
+                $session->set('_locale', $locale);
             }
 
             //dispatch on login events

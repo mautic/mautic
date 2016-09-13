@@ -665,7 +665,7 @@ class ConfigType extends AbstractType
             array(
                 'label'       => 'mautic.core.config.form.cookie.secure',
                 'empty_value' => 'mautic.core.form.default',
-                'data'        => (array_key_exists('cookie_secure', $options['data']) && !empty($options['data']['cookie_secure'])) ? true : false,
+                'data'        => (array_key_exists('cookie_secure', $options['data'])) ? $options['data']['cookie_secure'] : '',
                 'attr'        => array(
                     'tooltip' => 'mautic.core.config.form.cookie.secure.tooltip'
                 )

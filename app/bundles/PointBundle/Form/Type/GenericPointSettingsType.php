@@ -16,6 +16,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\NotEqualTo;
 
 /**
  * Class GenericPointSettingsType
@@ -37,7 +38,15 @@ class GenericPointSettingsType extends AbstractType
                     'tooltip' => 'mautic.point.action.delta.help'
                 ),
             'precision'  => 0,
-            'data'       => $default
+            'data'       => $default,
+            'constraints' => [
+                new NotEqualTo(
+                    [
+                        'value'   => '0',
+                        'message' => 'mautic.core.required.value'
+                    ]
+                )
+            ]
         ));
     }
 

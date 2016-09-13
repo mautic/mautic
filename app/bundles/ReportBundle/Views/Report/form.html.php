@@ -14,7 +14,7 @@ $header = ($report->getId()) ?
     $view['translator']->trans('mautic.report.report.header.edit',
         array('%name%' => $view['translator']->trans($report->getName()))) :
     $view['translator']->trans('mautic.report.report.header.new');
-//die(var_dump($form->vars));
+
 $view['slots']->set("headerTitle", $header);
 $showGraphTab = count($form['graphs']->vars['choices']);
 ?>

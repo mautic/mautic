@@ -160,7 +160,8 @@ class ZohoIntegration extends CrmAbstractIntegration
                         if (!(bool)$field['isreadonly'] || in_array($field['type'], array('Lookup', 'OwnerLookup', 'Boolean'))) {
                             continue;
                         }
-                        $key              = InputHelper::alphanum($field['dv']);
+
+                        $key              = InputHelper::alphanum(InputHelper::transliterate($field['dv']));
                         $zohoFields[$key] = array(
                             'type'     => 'string',
                             'label'    => $field['label'],

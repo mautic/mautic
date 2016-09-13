@@ -41,7 +41,7 @@ class MenuHelper
      *
      * @var array
      */
-    private $orphans = array();
+    private $orphans = [];
 
     /**
      * @var array
@@ -69,7 +69,7 @@ class MenuHelper
      *
      * @param      $items
      * @param int  $depth
-     * @param int $defaultPriority
+     * @param int  $defaultPriority
      */
     public function createMenuStructure(&$items, $depth = 0, $defaultPriority = 9999)
     {
@@ -81,12 +81,12 @@ class MenuHelper
             if (isset($i['bundle'])) {
                 // Category shortcut
                 $bundleName = $i['bundle'];
-                $i          = array(
+                $i          = [
                     'access'          => $bundleName.':categories:view',
                     'route'           => 'mautic_category_index',
                     'id'              => 'mautic_'.$bundleName.'category_index',
-                    'routeParameters' => array('bundle' => $bundleName),
-                );
+                    'routeParameters' => ['bundle' => $bundleName],
+                ];
             }
 
             // Check to see if menu is restricted
@@ -136,10 +136,10 @@ class MenuHelper
 
             //Set link attributes
             if (!isset($i['linkAttributes'])) {
-                $i['linkAttributes'] = array(
+                $i['linkAttributes'] = [
                     'data-menu-link' => $i['id'],
                     'id'             => $i['id']
-                );
+                ];
             } elseif (!isset($i['linkAttributes']['id'])) {
                 $i['linkAttributes']['id']             = $i['id'];
                 $i['linkAttributes']['data-menu-link'] = $i['id'];
@@ -147,7 +147,7 @@ class MenuHelper
                 $i['linkAttributes']['data-menu-link'] = $i['id'];
             }
 
-            $i['extras']          = array();
+            $i['extras']          = [];
             $i['extras']['depth'] = $depth;
 
             // Note a divider
@@ -178,7 +178,7 @@ class MenuHelper
             // Determine if this item needs to be listed in a bundle outside it's own
             if (isset($i['parent'])) {
                 if (!isset($this->orphans[$i['parent']])) {
-                    $this->orphans[$i['parent']] = array();
+                    $this->orphans[$i['parent']] = [];
                 }
 
                 $this->orphans[$i['parent']][$k] = $i;
@@ -194,14 +194,14 @@ class MenuHelper
     }
 
     /**
-     * Get orphaned menu items
+     * Get and reset orphaned menu items
      *
      * @return array
      */
-    public function getOrphans()
+    public function resetOrphans()
     {
-        $orphans = $this->orphans;
-        $this->orphans = array();
+        $orphans       = $this->orphans;
+        $this->orphans = [];
 
         return $orphans;
     }
@@ -220,16 +220,18 @@ class MenuHelper
                 $priority = (isset($items['priority'])) ? $items['priority'] : 9999;
                 foreach ($this->orphans[$key] as &$orphan) {
                     if (!isset($orphan['extras'])) {
-                        $orphan['extras'] = array();
+                        $orphan['extras'] = [];
                     }
                     $orphan['extras']['depth'] = $depth;
                     if (!isset($orphan['priority'])) {
-                        $orphan['priority']  = $priority;
+                        $orphan['priority'] = $priority;
                     }
                 }
 
-                $items['children'] = (!isset($items['children'])) ?
-                    $this->orphans[$key] :
+                $items['children'] = (!isset($items['children']))
+                    ?
+                    $this->orphans[$key]
+                    :
                     $items['children'] = array_merge($items['children'], $this->orphans[$key]);
                 unset($this->orphans[$key]);
             } elseif (isset($items['children'])) {
@@ -241,8 +243,8 @@ class MenuHelper
 
         // Append orphans that couldn't find a home
         if ($appendOrphans && count($this->orphans)) {
-            $menuItems = array_merge($menuItems, $this->orphans);
-            $this->orphans = array();
+            $menuItems     = array_merge($menuItems, $this->orphans);
+            $this->orphans = [];
         }
     }
 

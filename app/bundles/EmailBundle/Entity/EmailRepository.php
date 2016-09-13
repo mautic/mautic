@@ -196,7 +196,9 @@ class EmailRepository extends CommonRepository
         );
 
         if ($variantIds) {
-            $variantIds[] = (int) $emailId;
+            if (!in_array($emailId, $variantIds)) {
+                $variantIds[] = (int) $emailId;
+            }
             $statExpr->add(
                 $statQb->expr()->in('stat.email_id', $variantIds)
             );
@@ -297,12 +299,14 @@ class EmailRepository extends CommonRepository
      * @param int    $limit
      * @param int    $start
      * @param bool   $viewOther
-     * @param bool   $topLevelOnly
-     * @param string $emailType
+     * @param bool   $topLevel
+     * @param null   $emailType
+     * @param array  $ignoreIds
+     * @param null   $variantParentId
      *
      * @return array
      */
-    public function getEmailList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevelOnly = false, $emailType = null)
+    public function getEmailList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $emailType = null, array $ignoreIds = [], $variantParentId = null)
     {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, subject, name, language}');
@@ -317,8 +321,26 @@ class EmailRepository extends CommonRepository
                 ->setParameter('id', $this->currentUser->getId());
         }
 
-        if ($topLevelOnly) {
-            $q->andWhere($q->expr()->isNull('e.variantParent'));
+        if ($topLevel) {
+            if (true === $topLevel || $topLevel == 'variant') {
+                $q->andWhere($q->expr()->isNull('e.variantParent'));
+            } elseif ($topLevel == 'translation') {
+                $q->andWhere($q->expr()->isNull('e.translationParent'));
+            }
+        }
+
+        if ($variantParentId) {
+            $q->andWhere(
+                $q->expr()->andX(
+                    $q->expr()->eq('IDENTITY(e.variantParent)', (int) $variantParentId),
+                    $q->expr()->eq('e.id', (int) $variantParentId)
+                )
+            );
+        }
+
+        if (!empty($ignoreIds)) {
+            $q->andWhere($q->expr()->notIn('e.id', ':emailIds'))
+                ->setParameter('emailIds', $ignoreIds);
         }
 
         if (!empty($emailType)) {
@@ -460,45 +482,26 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * Null variant parent
-     *
-     * @param $ids
-     */
-    public function nullVariantParent($ids)
-    {
-        if (!is_array($ids)) {
-            $ids = array($ids);
-        }
-
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $qb->update(MAUTIC_TABLE_PREFIX . 'emails')
-            ->set('variant_parent_id', ':null')
-            ->setParameter('null', null)
-            ->where(
-                $qb->expr()->in('variant_parent_id', $ids)
-            )
-            ->execute();
-    }
-
-    /**
      * Resets variant_start_date, variant_read_count, variant_sent_count
      *
      * @param $variantParentId
      * @param $date
      */
-    public function resetVariants($variantParentId, $date)
+    public function resetVariants($relatedIds, $date)
     {
+        if (!is_array($relatedIds)) {
+            $relatedIds = [(int) $relatedIds];
+        }
+
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
         $qb->update(MAUTIC_TABLE_PREFIX . 'emails')
             ->set('variant_read_count', 0)
             ->set('variant_sent_count', 0)
             ->set('variant_start_date', ':date')
             ->setParameter('date', $date)
             ->where(
-                $qb->expr()->orX(
-                    $qb->expr()->eq('id', (int) $variantParentId),
-                    $qb->expr()->eq('variant_parent_id', (int) $variantParentId)
-                )
+                $qb->expr()->in('id', $relatedIds)
             )
             ->execute();
     }

@@ -50,7 +50,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
             )
             ->addOption(
                 '--time-interval',
-                '-ti',
+                '-a',
                 InputOption::VALUE_OPTIONAL,
                 'Send time interval to check updates on Salesforce, it should be a correct php formatted time interval in the past eg:(-10 minutes)'
             )
@@ -98,7 +98,6 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 $params['end']=$endDate;
 
                 if(strtotime($startDate) > strtotime('-30 days')) {
-                    $processed = 0;
                     $processed = intval($integrationObject->getLeads($params));
 
                     $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');

@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.3.3 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -40,7 +40,7 @@
 
   // Extend defaults.
   $.extend($.FE.DEFAULTS, {
-    fileUploadURL: 'http://i.froala.com/upload',
+    fileUploadURL: 'https://i.froala.com/upload',
     fileUploadParam: 'file',
     fileUploadParams: {},
     fileUploadToS3: false,
@@ -362,7 +362,7 @@
 
           // Set upload events.
           xhr.onload = function () {
-            _fileUploaded.call(xhr, [(editor.opts.fileUseSelectedText ? null : file.name)]);
+            _fileUploaded.call(xhr, (editor.opts.fileUseSelectedText ? null : file.name));
           };
           xhr.onerror = _fileUploadError;
           xhr.upload.onprogress = _fileUploadProgress;

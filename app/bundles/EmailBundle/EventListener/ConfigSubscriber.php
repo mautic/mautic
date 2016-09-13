@@ -47,7 +47,8 @@ class ConfigSubscriber extends CommonSubscriber
     {
         $event->unsetIfEmpty(
             array(
-                'mailer_password'
+                'mailer_password',
+                'mailer_api_key'
             )
         );
 
