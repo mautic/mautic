@@ -11,6 +11,7 @@
 
 namespace Mautic\ApiBundle\Controller;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
@@ -274,7 +275,7 @@ class CommonApiController extends FOSRestController implements MauticController
         $parameters = $this->request->request->all();
         $method     = $this->request->getMethod();
 
-        if ($entity === null) {
+        if ($entity === null || !$entity->getId()) {
             if ($method === 'PATCH') {
                 //PATCH requires that an entity exists
                 return $this->notFound();
@@ -352,7 +353,7 @@ class CommonApiController extends FOSRestController implements MauticController
         }
         $form = $this->createEntityForm($entity);
 
-        if ('POST' == $method) {
+        if ('new' == $action) {
             // All the properties have to be defined in order for validation to work
             // Bug reported https://github.com/symfony/symfony/issues/19788
             $defaultProperties = $this->getEntityDefaultProperties($entity);
@@ -414,10 +415,23 @@ class CommonApiController extends FOSRestController implements MauticController
     {
         $class      = get_class($entity);
         $chain      = array_reverse(class_parents($entity), true) + [$class => $class];
-        $properties = [];
+        $defaultValues = [];
 
+        $classMetdata = new ClassMetadata($class);
         foreach ($chain as $class) {
-            $properties += (new \ReflectionClass($class))->getDefaultProperties();
+            if (method_exists($class, 'loadMetadata')) {
+                $class::loadMetadata($classMetdata);
+            }
+            $defaultValues += (new \ReflectionClass($class))->getDefaultProperties();
+        }
+
+        // These are the mapped columns
+        $fields = $classMetdata->getFieldNames();
+
+        // Merge values in with $fields
+        $properties = [];
+        foreach ($fields as $field) {
+            $properties[$field] = $defaultValues[$field];
         }
 
         return $properties;
