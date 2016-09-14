@@ -73,8 +73,8 @@ $query = $event['extra']['hit']['query'];
             <dt><?php echo $view['translator']->trans('mautic.core.timeline.device.client.info'); ?></dt>
             <dd class="ellipsis">
                 <?php
-                //foreach($event['extra']['hit']['clientInfo'] as $clientInfo)
-                //    echo $clientInfo;
+                foreach($event['extra']['hit']['clientInfo'] as $clientInfo)
+                    echo $clientInfo;
                 ?>
             </dd>
         <?php endif; ?>
