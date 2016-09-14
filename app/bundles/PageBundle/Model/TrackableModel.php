@@ -515,8 +515,9 @@ class TrackableModel extends AbstractCommonModel
 
         // Check if URL is trackable
         $tokenizedHost = (!isset($urlParts['host']) && isset($urlParts['path'])) ? $urlParts['path'] : $urlParts['host'];
-        if (preg_match('/^(\{\S+?\})/', $tokenizedHost, $match)) {
+        if (preg_match('/^(\{\S+?\})(.*)/', $tokenizedHost, $match)) {
             $token = $match[1];
+            $rest = $match[2];
 
             // Tokenized hosts shouldn't use a scheme since the token value should contain it
             if ($scheme = (!empty($urlParts['scheme'])) ? $urlParts['scheme'] : false) {
@@ -531,7 +532,7 @@ class TrackableModel extends AbstractCommonModel
                 return false;
             }
 
-            $trackableUrl = (!empty($urlParts['query'])) ? $this->contentTokens[$token].'?'.$urlParts['query'] : $this->contentTokens[$token];
+            $trackableUrl = ((!empty($urlParts['query'])) ? $this->contentTokens[$token].'?'.$urlParts['query'] : $this->contentTokens[$token]) . (!empty($rest) ? $rest : '');
             $trackableKey = $trackableUrl;
 
             // Replace the URL token with the actual URL
@@ -597,7 +598,7 @@ class TrackableModel extends AbstractCommonModel
         if ($tokenizedHost && !preg_match('/^(\{\S+?\})$/', $tokenizedHost)) {
             // Currently this does not apply to something like "{leadfield=firstname}.com" since that could result in URL per lead
 
-            return false;
+            //return false;
         }
 
         // Validate if this token is listed as not to be tracked
