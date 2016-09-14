@@ -181,6 +181,31 @@ var Mautic = {
     },
 
     /**
+     * Translations
+     *
+     * @param id     string
+     * @param params object
+     */
+    translate: function (id, params) {
+        if (!mauticLang.hasOwnProperty(id)) {
+            return id;
+        }
+
+        var translated = mauticLang[id];
+
+        if (params) {
+            for (var key in params) {
+                if (!params.hasOwnProperty(key)) continue;
+
+                var regEx = new RegExp('%' + key + '%', 'g');
+                translated = translated.replace(regEx, params[key])
+            }
+        }
+
+        return translated;
+    },
+
+    /**
      * Setups browser notifications
      */
     setupBrowserNotifier: function () {
