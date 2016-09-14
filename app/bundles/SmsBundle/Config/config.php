@@ -119,6 +119,13 @@ return [
                 'controller' => 'MauticSmsBundle:Api\SmsApi:receive',
             ],
         ],
+        'api'  => [
+            'standard_entity' => [
+                'name'       => 'smses',
+                'path'       => '/smses',
+                'controller' => 'MauticSmsBundle:Api\SmsApi'
+            ]
+        ]
     ],
     'menu' => [
         'main' => [
