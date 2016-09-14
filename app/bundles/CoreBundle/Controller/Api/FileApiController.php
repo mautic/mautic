@@ -124,7 +124,7 @@ class FileApiController extends CommonApiController
      *
      * @return string
      */
-    public function getAbsolutePath($dir)
+    protected function getAbsolutePath($dir)
     {
         $possibleDirs = ['assets', 'images'];
         $dir = InputHelper::alphanum($dir);
@@ -158,7 +158,7 @@ class FileApiController extends CommonApiController
      *
      * @return string
      */
-    public function getMediaUrl()
+    protected function getMediaUrl()
     {
         return $this->request->getScheme().'://'
             .$this->request->getHttpHost()

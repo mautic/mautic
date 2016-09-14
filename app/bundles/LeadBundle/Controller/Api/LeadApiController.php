@@ -68,28 +68,24 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param $entity
-     *
-     * @return mixed|void
+     * @return array
      */
-    protected function createEntityForm($entity)
+    protected function getEntityFormOptions()
     {
         $fields = $this->getModel('lead.field')->getEntities(
-            array(
-                'force'          => array(
-                    array(
+            [
+                'force'          => [
+                    [
                         'column' => 'f.isPublished',
                         'expr'   => 'eq',
                         'value'  => true
-                    )
-                ),
+                    ]
+                ],
                 'hydration_mode' => 'HYDRATE_ARRAY'
-            )
+            ]
         );
 
-        return $this->model->createForm($entity, $this->get('form.factory'), null, ['fields' => $fields, 'csrf_protection' => false]);
+        return ['fields' => $fields];
     }
 
     /**

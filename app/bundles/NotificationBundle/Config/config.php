@@ -130,6 +130,13 @@ return [
                 'controller' => 'MauticNotificationBundle:Js:manifest',
             ],
         ],
+        'api'  => [
+            'standard_entity' => [
+                'name'       => 'notifications',
+                'path'       => '/notifications',
+                'controller' => 'MauticNotificationBundle:Api\NotificationApi'
+            ]
+        ]
     ],
     'menu' => [
         'main' => [
