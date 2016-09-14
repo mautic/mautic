@@ -1457,7 +1457,7 @@ class MailHelper
      */
     public function useMailerTokenization($tokenizationEnabled = true)
     {
-        @trigger_error('useMailerTokenization is no longer used as it is automatically handled based on what the transport supports.', E_DEPRECATED);
+        @trigger_error('useMailerTokenization() is now deprecated. Use enableQueue() instead.', E_DEPRECATED);
         
         $this->enableQueue($tokenizationEnabled);
     }
