@@ -42,7 +42,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
      */
     public function load(ObjectManager $manager)
     {
-        $fields       = FieldModel::$coreFields;
+        $fields       = array_merge(FieldModel::$coreFields, FieldModel::$coreFields);
         $translator   = $this->container->get('translator');
         $indexesToAdd = [];
 
