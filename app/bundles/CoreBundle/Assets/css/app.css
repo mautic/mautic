@@ -4557,12 +4557,6 @@ table.table > tbody > tr > td.long-text {
   word-wrap: break-word;
   white-space: normal;
 }
-.dynamicContentFilterContainer {
-  padding-right:0!important;
-}
-#emailDynamicContentContainer .remove-item {
-  display:block;
-}
 /*!
  * bootstrap-vertical-tabs - v1.1.0
  * https://dbtek.github.io/bootstrap-vertical-tabs
@@ -4573,6 +4567,8 @@ table.table > tbody > tr > td.long-text {
 .tabs-left, .tabs-right {
   border-bottom: none;
   padding-top: 2px;
+  box-shadow:none;
+  -webkit-box-shadow:none;
 }
 .tabs-left {
   border-right: 1px solid #ddd;
@@ -4656,4 +4652,39 @@ table.table > tbody > tr > td.long-text {
   -ms-transform: rotate(-90deg);
   -o-transform: rotate(-90deg);
   transform: rotate(-90deg);
+}
+
+.dynamicContentFilterContainer .btn-primary:hover {
+  color:#5d6c7c;
+}
+
+#dynamicContentContainer .remove-item {
+  display:block;
+}
+#dynamicContentContainer > .tab-pane > .panel > ul {
+  white-space: nowrap;
+  overflow:auto;
+  overflow-y:hidden;
+  max-width:100%;
+}
+#dynamicContentContainer > .tab-pane > .panel > ul li {
+  display:inline-block;
+  vertical-align: top;
+  float:none;
+}
+
+div[data-filter-container] .in-group {
+  margin-left:20px;
+}
+
+div[data-filter-container] .panel {
+  margin-bottom:0;
+  margin-top:20px;
+}
+
+div[data-filter-container] .panel.in-group {
+  margin-top:0;
+  border-top:0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }

@@ -9,45 +9,17 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class FilterType
+ * Class DynamicContentFilterType
  *
- * @package Mautic\LeadBundle\Form\Type
+ * @package Mautic\CoreBundle\Form\Type
  */
 class DynamicContentFilterType extends AbstractType
 {
-    private $operatorChoices;
-    private $translator;
-    private $currentListId;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
-    {
-        /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
-        $listModel       = $factory->getModel('lead.list');
-        $operatorChoices = $listModel->getFilterExpressionFunctions();
-
-        $this->operatorChoices = array();
-        foreach ($operatorChoices as $key => $value) {
-            if (empty($value['hide'])) {
-                $this->operatorChoices[$key] = $value['label'];
-            }
-        }
-
-        $this->translator    = $factory->getTranslator();
-        $this->currentListId = $factory->getRequest()->attributes->get('objectId', false);
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -60,7 +32,7 @@ class DynamicContentFilterType extends AbstractType
             [
                 'label' => 'mautic.core.dynamicContent.token_name',
                 'attr'  => [
-                    'class' => 'form-control'
+                    'class' => 'form-control dynamic-content-token-name'
                 ]
             ]
         );
@@ -71,7 +43,7 @@ class DynamicContentFilterType extends AbstractType
             [
                 'label' => 'mautic.core.dynamicContent.default_content',
                 'attr'  => [
-                    'class' => 'form-control'
+                    'class' => 'form-control editor editor-basic'
                 ]
             ]
         );
@@ -86,11 +58,10 @@ class DynamicContentFilterType extends AbstractType
                         'label' => false,
                         'attr'  => [
                             'class' => 'form-control'
-                        ],
-                        'content' => '',
-                        'filters' => ''
+                        ]
                     ],
-                    'allow_add' => true
+                    'allow_add'      => true,
+                    'allow_delete'   => true,
                 ]
             )
         );
@@ -101,33 +72,12 @@ class DynamicContentFilterType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(
-            [
-                'timezones',
-                'countries',
-                'regions',
-                'fields',
-                'lists',
-                'emails',
-                'tags',
-                'stage'
-            ]
-        );
-
         $resolver->setDefaults(
             [
                 'label'          => false,
                 'error_bubbling' => false
             ]
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
-    {
-        $view->vars['fields'] = $options['fields'];
     }
 
     /**

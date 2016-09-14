@@ -37,13 +37,9 @@ class EmailType extends AbstractType
     private $em;
     private $request;
 
-    private $fieldChoices = [];
-    private $timezoneChoices = [];
     private $countryChoices = [];
     private $regionChoices = [];
-    private $listChoices = [];
-    private $emailChoices = [];
-    private $tagChoices = [];
+    private $timezoneChoices = [];
     private $stageChoices = [];
     private $localeChoices = [];
 
@@ -57,40 +53,13 @@ class EmailType extends AbstractType
         $this->em           = $factory->getEntityManager();
         $this->request      = $factory->getRequest();
 
-        /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
-        $listModel          = $factory->getModel('lead.list');
-        $this->fieldChoices = $listModel->getChoiceFields();
-
-        // Locales
-        $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
         $this->countryChoices  = FormFieldHelper::getCountryChoices();
         $this->regionChoices   = FormFieldHelper::getRegionChoices();
+        $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
         $this->localeChoices   = FormFieldHelper::getLocaleChoices();
 
-        // Segments
-        $lists = $listModel->getUserLists();
-        foreach ($lists as $list) {
-            $this->listChoices[$list['id']] = $list['name'];
-        }
-
-        // Emails
-        /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
-        $emailModel = $factory->getModel('email');
-        $viewOther  = $factory->getSecurity()->isGranted('email:emails:viewother');
-        $emails     = $emailModel->getRepository()->getEmailList('', 0, 0, $viewOther, true);
-        foreach ($emails as $email) {
-            $this->emailChoices[$email['language']][$email['id']] = $email['name'];
-        }
-        ksort($this->emailChoices);
-
-        // Tags
-        $leadModel = $factory->getModel('lead');
-        $tags      = $leadModel->getTagList();
-        foreach ($tags as $tag) {
-            $this->tagChoices[$tag['value']] = $tag['label'];
-        }
-
         $stages = $factory->getModel('stage')->getRepository()->getSimpleList();
+
         foreach ($stages as $stage) {
             $this->stageChoices[$stage['value']] = $stage['label'];
         }
@@ -518,14 +487,6 @@ class EmailType extends AbstractType
                     'type'           => 'dynamic_content_filter',
                     'options'        => [
                         'label'     => false,
-                        'timezones' => $this->timezoneChoices,
-                        'countries' => $this->countryChoices,
-                        'regions'   => $this->regionChoices,
-                        'fields'    => $this->fieldChoices,
-                        'lists'     => $this->listChoices,
-                        'emails'    => $this->emailChoices,
-                        'tags'      => $this->tagChoices,
-                        'stage'     => $this->stageChoices
                     ],
                     'error_bubbling' => false,
                     'mapped'         => true,
@@ -563,14 +524,10 @@ class EmailType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['fields']    = $this->fieldChoices;
         $view->vars['countries'] = $this->countryChoices;
         $view->vars['regions']   = $this->regionChoices;
         $view->vars['timezones'] = $this->timezoneChoices;
-        $view->vars['lists']     = $this->listChoices;
-        $view->vars['emails']    = $this->emailChoices;
-        $view->vars['tags']      = $this->tagChoices;
-        $view->vars['stage']     = $this->stageChoices;
+        $view->vars['stages']    = $this->stageChoices;
         $view->vars['locales']   = $this->localeChoices;
     }
 

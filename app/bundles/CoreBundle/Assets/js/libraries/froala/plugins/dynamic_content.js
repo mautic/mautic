@@ -46,12 +46,15 @@
     /**
      * Exec fullscreen.
      */
-    function toggle () {
-        alert('will show dynamic content');
+    function toggle (val) {
+        editor.events.focus(true);
+        editor.selection.restore();
+
+        editor.html.insert('{dynamiccontent="' + val + '"}');
     }
 
     function _init () {
-      if (!editor.$wp) return false;
+        Mautic.updateDynamicContentDropdown();
     }
 
     return {
@@ -64,11 +67,10 @@
   // Register the font size command.
   $.FE.RegisterCommand('dynamicContent', {
     title: 'Dynamic Content',
-    undo: false,
-    focus: false,
     forcedRefresh: true,
-    callback: function () {
-      this.dynamicContent.toggle();
+    type: 'dropdown',
+    callback: function (cmd, val) {
+      this.dynamicContent.toggle(val);
     },
     plugin: 'dynamicContent'
   });

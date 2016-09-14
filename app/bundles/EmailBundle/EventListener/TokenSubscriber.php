@@ -85,13 +85,13 @@ class TokenSubscriber extends CommonSubscriber
             $defaultContent = $data['content'];
             $filterContent  = null;
 
-            foreach ($data['filters'] as $i => $filter) {
+            foreach ($data['filters'] as $filter) {
                 if ($this->matchFilterForLead($filter['filters'], $lead)) {
                     $filterContent = $filter['content'];
                 }
             }
 
-            $event->addToken('{dynamic_content_'.$i.'}', $filterContent ?: $defaultContent);
+            $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $filterContent ?: $defaultContent);
         }
     }
 
@@ -103,53 +103,79 @@ class TokenSubscriber extends CommonSubscriber
      */
     private function matchFilterForLead(array $filter, array $lead)
     {
+        $groups   = [];
+        $groupNum = 0;
+
         foreach ($filter as $key => $data) {
             if (!array_key_exists($data['field'], $lead)) {
-                continue; //throw new \InvalidArgumentException(sprintf('The field %s is not a valid profile field to filter on.', $data['field']));
+                continue;
+            }
+
+            /**
+             * Split the filters into groups based on the glue.
+             * The first filter and any filters whose glue is
+             * "or" will start a new group.
+             */
+            if ($groupNum === 0 || $data['glue'] === 'or') {
+                $groupNum++;
+                $groups[$groupNum] = null;
+            }
+
+            /**
+             * If the group has been marked as false, there
+             * is no need to continue checking the others
+             * in the group.
+             */
+            if ($groups[$groupNum] === false) {
+                continue;
             }
 
             $leadVal   = $lead[$data['field']];
             $filterVal = $data['filter'];
 
+            if (!is_array($filterVal) && in_array($data['type'], ['number', 'boolean'])) {
+                $filterVal = $data['type'] === 'number' ? (float) $filterVal : (bool) $filterVal;
+            }
+
+            if (in_array($data['operator'], ['like', '!like'])) {
+                $leadVal = (string) $leadVal;
+                $filterVal = (string) $filterVal;
+            }
+
             switch ($data['operator']) {
                 case '=':
-                    if ($leadVal === $filterVal) {
-                        continue;
-                    }
-
-                    return false;
+                    $groups[$groupNum] = $leadVal === $filterVal;
+                    break;
                 case '!=':
-                    if ($leadVal !== $filterVal) {
-                        continue;
-                    }
-
-                    return false;
+                    $groups[$groupNum] = $leadVal !== $filterVal;
+                    break;
+                case 'gt':
+                    $groups[$groupNum] = $leadVal > $filterVal;
+                    break;
+                case 'gte':
+                    $groups[$groupNum] = $leadVal >= $filterVal;
+                    break;
+                case 'lt':
+                    $groups[$groupNum] = $leadVal < $filterVal;
+                    break;
+                case 'lte':
+                    $groups[$groupNum] = $leadVal <= $filterVal;
+                    break;
                 case 'empty':
-                    if (empty($leadVal)) {
-                        continue;
-                    }
-
-                    return false;
+                    $groups[$groupNum] = empty($leadVal);
+                    break;
                 case '!empty':
-                    if (!empty($leadVal)) {
-                        continue;
-                    }
-
-                    return false;
+                    $groups[$groupNum] = !empty($leadVal);
+                    break;
                 case 'like':
-                    if (strpos($leadVal, $filterVal) !== false) {
-                        continue;
-                    }
-
-                    return false;
+                    $groups[$groupNum] = strpos($leadVal, $filterVal) !== false;
+                    break;
                 case '!like':
-                    if (strpos($leadVal, $filterVal) === false) {
-                        continue;
-                    }
+                    $groups[$groupNum] = strpos($leadVal, $filterVal) === false;
                     break;
             }
         }
 
-        return true;
+        return in_array(true, $groups);
     }
 }

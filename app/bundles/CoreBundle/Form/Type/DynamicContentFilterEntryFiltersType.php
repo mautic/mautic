@@ -11,6 +11,7 @@ namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -22,34 +23,32 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class FilterType
+ * Class DynamicContentFilterEntryFiltersType
  *
- * @package Mautic\LeadBundle\Form\Type
+ * @package Mautic\CoreBundle\Form\Type
  */
 class DynamicContentFilterEntryFiltersType extends AbstractType
 {
-    private $operatorChoices;
+    private $operatorChoices = [];
     private $translator;
-    private $currentListId;
 
     /**
+     * DynamicContentFilterEntryFiltersType constructor.
+     *
      * @param MauticFactory $factory
+     * @param ListModel     $listModel
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(MauticFactory $factory, ListModel $listModel)
     {
-        /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
-        $listModel       = $factory->getModel('lead.list');
         $operatorChoices = $listModel->getFilterExpressionFunctions();
 
-        $this->operatorChoices = array();
         foreach ($operatorChoices as $key => $value) {
             if (empty($value['hide'])) {
                 $this->operatorChoices[$key] = $value['label'];
             }
         }
 
-        $this->translator    = $factory->getTranslator();
-        $this->currentListId = $factory->getRequest()->attributes->get('objectId', false);
+        $this->translator = $factory->getTranslator();
     }
 
     /**
@@ -76,9 +75,8 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
 
         $translator      = $this->translator;
         $operatorChoices = $this->operatorChoices;
-        $currentListId   = $this->currentListId;
 
-        $formModifier = function (FormEvent $event, $eventName) use ($translator, $operatorChoices, $currentListId) {
+        $formModifier = function (FormEvent $event, $eventName) use ($translator, $operatorChoices) {
             $data      = $event->getData();
             $form      = $event->getForm();
             $options   = $form->getConfig()->getOptions();
@@ -95,68 +93,26 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
             $customOptions = array();
 
             switch ($fieldType) {
-                case 'leadlist':
-                    if (!isset($data['filter'])) {
-                        $data['filter'] = array();
-                    } elseif (!is_array($data['filter'])) {
-                        $data['filter'] = array($data['filter']);
-                    }
-
-                    // Don't show the current list ID in the choices
-                    if (!empty($currentListId)) {
-                        unset($options['lists'][$currentListId]);
-                    }
-
-                    $customOptions['choices']  = $options['lists'];
-                    $customOptions['multiple'] = true;
-                    $type                      = 'choice';
-                    break;
-                case 'lead_email_received':
-                    if (!isset($data['filter'])) {
-                        $data['filter'] = array();
-                    } elseif (!is_array($data['filter'])) {
-                        $data['filter'] = array($data['filter']);
-                    }
-
-                    $customOptions['choices']  = $options['emails'];
-                    $customOptions['multiple'] = true;
-                    $type                      = 'choice';
-                    break;
-                case 'tags':
-                    if (!isset($data['filter'])) {
-                        $data['filter'] = array();
-                    } elseif (!is_array($data['filter'])) {
-                        $data['filter'] = array($data['filter']);
-                    }
-                    $customOptions['choices']  = $options['tags'];
-                    $customOptions['multiple'] = true;
-                    $attr                      = array_merge(
-                        $attr,
-                        array(
-                            'data-placeholder'     => $translator->trans('mautic.lead.tags.select_or_create'),
-                            'data-no-results-text' => $translator->trans('mautic.lead.tags.enter_to_create'),
-                            'data-allow-add'       => 'true',
-                            'onchange'             => 'Mautic.createLeadTag(this)'
-                        )
-                    );
-                    $type                      = 'choice';
-                    break;
-                case 'stage':
-                    $customOptions['choices']  = $options['stage'];
-                    $type                      = 'choice';
-                    break;
-                case 'timezone':
                 case 'country':
                 case 'region':
+                case 'timezone':
+                case 'stage':
+                case 'locale':
                     switch ($fieldType) {
-                        case 'timezone':
-                            $choiceKey = 'timezones';
-                            break;
                         case 'country':
                             $choiceKey = 'countries';
                             break;
                         case 'region':
                             $choiceKey = 'regions';
+                            break;
+                        case 'timezone':
+                            $choiceKey = 'timezones';
+                            break;
+                        case 'stage':
+                            $choiceKey = 'stages';
+                            break;
+                        case 'locale':
+                            $choiceKey = 'locales';
                             break;
                     }
 
@@ -343,7 +299,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
         );
 
         $builder->add('field', 'hidden');
-
+        $builder->add('object', 'hidden');
         $builder->add('type', 'hidden');
     }
 
@@ -353,32 +309,21 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setRequired(
-            array(
-                'timezones',
+            [
                 'countries',
                 'regions',
-                'fields',
-                'lists',
-                'emails',
-                'tags',
-                'stage'
-            )
+                'timezones',
+                'stages',
+                'locales'
+            ]
         );
 
         $resolver->setDefaults(
-            array(
+            [
                 'label'          => false,
                 'error_bubbling' => false
-            )
+            ]
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
-    {
-        $view->vars['fields'] = $options['fields'];
     }
 
     /**

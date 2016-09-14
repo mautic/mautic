@@ -37,6 +37,15 @@ if (!isset($attachmentSize)) {
     $attachmentSize = 0;
 }
 
+$templates = [
+    'select'    => 'select-template',
+    'countries' => 'country-template',
+    'regions'   => 'region-template',
+    'timezones' => 'timezone-template',
+    'stages'    => 'stage-template',
+    'locales'   => 'locale-template',
+];
+
 $attr = $form->vars['attr'];
 $attr['data-submit-callback-async'] = "clearThemeHtmlBeforeSave";
 
@@ -131,21 +140,24 @@ $attr['data-submit-callback-async'] = "clearThemeHtmlBeforeSave";
                     </div>
 
                     <div class="tab-pane fade bdr-w-0" id="dynamic-content-container">
-                        <div class="row" id="emailFilters">
+                        <div class="row">
                             <div class="col-md-12">
                                 <div class="row">
                                 <?php
-                                $tabHtml  = '<div class="col-xs-3 bg-auto dynamicContentFilterContainer">';
-                                $tabHtml .= '<ul class="nav nav-tabs pr-md pl-md tabs-left" id="emailDynamicContentTabs">';
-                                $tabContentHtml = '<div class="tab-content pa-md col-xs-9" id="emailDynamicContentContainer">';
+                                $tabHtml  = '<div class="col-xs-3 dynamicContentFilterContainer">';
+                                $tabHtml .= '<ul class="nav nav-tabs pr-md pl-md tabs-left" id="dynamicContentTabs">';
+                                $tabHtml .= '<li><a href="javascript:void(0);" role="tab" class="btn btn-primary" id="addNewDynamicContent"><i class="fa fa-plus text-success"></i> '.$view['translator']->trans('mautic.core.form.new').'</a></li>';
+                                $tabContentHtml = '<div class="tab-content pa-md col-xs-9" id="dynamicContentContainer">';
 
                                 foreach ($form['dynamicContent'] as $i => $dynamicContent) {
-                                    $tabHtml .= '<li class="'.($i === 0 ? ' active' : '').'"><a role="tab" data-toggle="tab" href="#'.$dynamicContent->vars['id'].'">'.$view['translator']->trans('mautic.core.dynamicContent').' '.($i+1).'</a></li>';
+                                    $linkText = $dynamicContent['tokenName']->vars['value'] ?: $view['translator']->trans('mautic.core.dynamicContent').' '.($i+1);
+
+                                    $tabHtml .= '<li class="'.($i === 0 ? ' active' : '').'"><a role="tab" data-toggle="tab" href="#'.$dynamicContent->vars['id'].'">'.$linkText.'</a></li>';
 
                                     $tabContentHtml .= $view['form']->widget($dynamicContent);
                                 }
 
-                                $tabHtml .= '<li><a href="javascript:void(0);" role="tab" id="emailAddNewDynamicContent"><i class="fa fa-plus text-success"></i> '.$view['translator']->trans('mautic.core.form.new').'</a></li></ul></div>';
+                                $tabHtml .= '</ul></div>';
                                 $tabContentHtml .= '</div>';
 
                                 echo $tabHtml;
@@ -202,6 +214,31 @@ $attr['data-submit-callback-async'] = "clearThemeHtmlBeforeSave";
 <div id="dynamicContentPrototype" data-prototype="<?php echo $view->escape($view['form']->widget($dynamicContentPrototype)); ?>"></div>
 <div id="filterBlockPrototype" data-prototype="<?php echo $view->escape($view['form']->widget($filterBlockPrototype)); ?>"></div>
 <div id="filterSelectPrototype" data-prototype="<?php echo $view->escape($view['form']->widget($filterSelectPrototype)); ?>"></div>
+
+<div class="hide" id="templates">
+    <?php foreach ($templates as $dataKey => $template): ?>
+        <?php $attr = ($dataKey == 'tags') ? ' data-placeholder="' . $view['translator']->trans('mautic.lead.tags.select_or_create') . '" data-no-results-text="' . $view['translator']->trans('mautic.lead.tags.enter_to_create') . '" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : ''; ?>
+        <select class="form-control not-chosen <?php echo $template; ?>" name="emailform[dynamicContent][__dynamicContentIndex__][filters][__dynamicContentFilterIndex__][filters][__name__][filter]" id="emailform_dynamicContent___dynamicContentIndex___filters___dynamicContentFilterIndex___filters___name___filter"<?php echo $attr; ?>>
+            <?php
+            if (isset($form->vars[$dataKey])):
+                foreach ($form->vars[$dataKey] as $value => $label):
+                    if (is_array($label)):
+                        echo "<optgroup label=\"$value\">\n";
+                        foreach ($label as $optionValue => $optionLabel):
+                            echo "<option value=\"$optionValue\">$optionLabel</option>\n";
+                        endforeach;
+                        echo "</optgroup>\n";
+                    else:
+                        if ($dataKey == 'lists' && (isset($currentListId) && (int) $value === (int) $currentListId))
+                            continue;
+                        echo "<option value=\"$value\">$label</option>\n";
+                    endif;
+                endforeach;
+            endif;
+            ?>
+        </select>
+    <?php endforeach; ?>
+</div>
 
 <?php echo $view->render('MauticCoreBundle:Helper:builder.html.php', [
     'type'          => 'email',

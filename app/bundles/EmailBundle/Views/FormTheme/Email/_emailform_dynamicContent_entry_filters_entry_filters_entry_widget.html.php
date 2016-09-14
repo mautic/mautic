@@ -12,7 +12,7 @@ $filterType  = $form['field']->vars['value'];
 $inGroup     = $form->vars['data']['glue'] === 'and';
 ?>
 
-<div class="panel<?php echo ($inGroup && $first === false) ? ' in-group' : ''; ?>">
+<div class="panel<?php echo ($isPrototype || ($inGroup && !$first)) ? ' in-group' : ''; ?>">
     <div class="panel-footer<?php if (!$isPrototype && $form->vars['name'] === '0') echo " hide"; ?>">
         <div class="col-sm-2 pl-0">
             <?php echo $view['form']->widget($form['glue']); ?>
@@ -20,7 +20,7 @@ $inGroup     = $form->vars['data']['glue'] === 'and';
     </div>
     <div class="panel-body">
         <div class="col-xs-6 col-sm-3 field-name">
-            <span><?php echo ($isPrototype) ? '__label__' : $fields[$filterType]['label']; ?></span>
+            <span><?php echo ($isPrototype) ? '__label__' : $form->parent->parent->vars['fields'][$filterType]['label']; ?></span>
         </div>
 
         <div class="col-xs-6 col-sm-3 padding-none">
@@ -40,5 +40,6 @@ $inGroup     = $form->vars['data']['glue'] === 'and';
         </div>
         <?php echo $view['form']->widget($form['field']); ?>
         <?php echo $view['form']->widget($form['type']); ?>
+        <?php echo $view['form']->widget($form['object']); ?>
     </div>
 </div>
