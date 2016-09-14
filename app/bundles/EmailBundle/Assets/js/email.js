@@ -392,18 +392,6 @@ Mautic.initEmailDynamicContent = function() {
     });
 };
 
-Mautic.addDynamicContentTokenToDropdown = function (tokenName, index) {
-    var prototype       = '<li><a class="fr-command" data-cmd="dynamicContent" data-param1="__tokenName__">__tokenName__</a></li>';
-    var optionContainer = mQuery('#source-container button[data-cmd="dynamicContent"]').next().find('ul');
-    var newOption       = prototype.replace(/__tokenName__/g, tokenName);
-
-    if (index) {
-        mQuery(optionContainer.find('li')[index]).replaceWith(newOption);
-    } else {
-        optionContainer.append(newOption);
-    }
-};
-
 Mautic.initDynamicContentItem = function () {
     mQuery('.addNewDynamicContentFilter').on('click', function (e) {
         e.preventDefault();
