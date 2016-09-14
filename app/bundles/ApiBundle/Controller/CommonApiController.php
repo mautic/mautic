@@ -350,16 +350,14 @@ class CommonApiController extends FOSRestController implements MauticController
         } else {
             $statusCode = Codes::HTTP_CREATED;
             $action     = 'new';
-        }
-        $form = $this->createEntityForm($entity);
 
-        if ('new' == $action) {
             // All the properties have to be defined in order for validation to work
             // Bug reported https://github.com/symfony/symfony/issues/19788
             $defaultProperties = $this->getEntityDefaultProperties($entity);
             $parameters        = array_merge($defaultProperties, $parameters);
         }
 
+        $form         = $this->createEntityForm($entity);
         $submitParams = $this->prepareParametersForBinding($parameters, $entity, $action);
 
         // Special handling of boolean fields because Symfony fails to recognize true values on PATCH but also adds
