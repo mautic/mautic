@@ -60,7 +60,7 @@ class Form extends FormEntity
     /**
      * @var string
      */
-    private $postAction;
+    private $postAction = 'return';
 
     /**
      * @var string

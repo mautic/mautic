@@ -50,14 +50,11 @@ return [
             ]
         ],
         'api'    => [
-            'mautic_api_getforms' => [
+            'standard_entity' => [
+                'name'       => 'forms',
                 'path'       => '/forms',
-                'controller' => 'MauticFormBundle:Api\FormApi:getEntities'
+                'controller' => 'MauticFormBundle:Api\FormApi'
             ],
-            'mautic_api_getform'  => [
-                'path'       => '/forms/{id}',
-                'controller' => 'MauticFormBundle:Api\FormApi:getEntity'
-            ]
         ],
         'public' => [
             'mautic_form_postresults'  => [
