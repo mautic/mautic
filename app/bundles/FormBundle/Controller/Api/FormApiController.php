@@ -63,6 +63,8 @@ class FormApiController extends CommonApiController
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
+        $method = $this->request->getMethod();
+
         // Set clean alias to prevent SQL errors
         $alias = $this->model->cleanAlias($entity->getName(), '', 10);
         $entity->setAlias($alias);
@@ -82,25 +84,32 @@ class FormApiController extends CommonApiController
             $fieldModel = $this->getModel('form.field');
             $aliases = $entity->getFieldAliases();
 
-            foreach ($parameters['fields'] as &$field) {
-
-                // Ignore fields without a label
-                if (empty($field['label'])) {
-                    continue;
+            foreach ($parameters['fields'] as &$fieldParams) {
+                
+                // Create an alias from the label
+                $fieldParams['alias'] = $fieldModel->generateAlias($fieldParams['label'], $aliases);
+                
+                if (empty($fieldParams['alias'])) {
+                    // Likely a bogus label so generate random alias for column name
+                    $fieldParams['alias'] = uniqid('f_');
                 }
 
                 // Create an unique ID if not set - the following code requires one
-                if (empty($field['id'])) {
-                    $field['id'] = 'new' . hash('sha1', uniqid(mt_rand()));
-
+                if (empty($fieldParams['id'])) {
+                    $fieldParams['id'] = 'new' . hash('sha1', uniqid(mt_rand()));
+                    $fieldEntity = $fieldModel->getEntity();
+                } else {
+                    $fieldEntity = $fieldModel->getEntity($fieldParams['id']);
                 }
 
-                // Create an alias from the label
-                $field['alias'] = $fieldModel->generateAlias($field['label'], $aliases);
-                
-                if (empty($field['alias'])) {
-                    // Likely a bogus label so generate random alias for column name
-                    $field['alias'] = uniqid('f_');
+                $fieldForm = $this->createEntityForm($fieldEntity, $fieldModel);
+                $fieldForm->submit($fieldParams, 'PATCH' !== $method);
+
+                if (!$fieldForm->isValid()) {
+                    $formErrors = $this->getFormErrorMessages($fieldForm);
+                    $msg        = $this->getFormErrorMessage($formErrors);
+
+                    return $this->returnError($msg, Codes::HTTP_BAD_REQUEST, $formErrors);
                 }
             }
 
