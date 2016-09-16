@@ -11,6 +11,7 @@ namespace Mautic\FormBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use FOS\RestBundle\Util\Codes;
 
 /**
  * Class FormApiController
@@ -86,30 +87,25 @@ class FormApiController extends CommonApiController
 
             foreach ($parameters['fields'] as &$fieldParams) {
                 
-                // Create an alias from the label
-                $fieldParams['alias'] = $fieldModel->generateAlias($fieldParams['label'], $aliases);
-                
-                if (empty($fieldParams['alias'])) {
-                    // Likely a bogus label so generate random alias for column name
-                    $fieldParams['alias'] = uniqid('f_');
-                }
-
-                // Create an unique ID if not set - the following code requires one
                 if (empty($fieldParams['id'])) {
+                    // Create an unique ID if not set - the following code requires one
                     $fieldParams['id'] = 'new' . hash('sha1', uniqid(mt_rand()));
                     $fieldEntity = $fieldModel->getEntity();
                 } else {
                     $fieldEntity = $fieldModel->getEntity($fieldParams['id']);
                 }
 
-                $fieldForm = $this->createEntityForm($fieldEntity, $fieldModel);
+                $fieldEntityArray = $fieldEntity->convertToArray();
+                $fieldEntityArray['formId'] = $formId;
+                $fieldEntityArray['alias'] = $fieldParams['alias'] = $fieldModel->generateAlias($fieldEntityArray['label'], $aliases);
+
+                $fieldForm = $this->createEntityForm($fieldEntityArray, $fieldModel);
                 $fieldForm->submit($fieldParams, 'PATCH' !== $method);
 
                 if (!$fieldForm->isValid()) {
                     $formErrors = $this->getFormErrorMessages($fieldForm);
                     $msg        = $this->getFormErrorMessage($formErrors);
-
-                    return $this->returnError($msg, Codes::HTTP_BAD_REQUEST, $formErrors);
+                    throw new \Exception('Fields: '.$msg);
                 }
             }
 

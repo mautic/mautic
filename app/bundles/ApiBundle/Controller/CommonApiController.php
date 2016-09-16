@@ -323,7 +323,13 @@ class CommonApiController extends FOSRestController implements MauticController
         $form->submit($submitParams, 'PATCH' !== $method);
 
         if ($form->isValid()) {
-            $this->preSaveEntity($entity, $form, $parameters, $action);
+
+            try {
+                $this->preSaveEntity($entity, $form, $parameters, $action);
+            } catch (\Exception $e) {
+                return $this->returnError($e->getMessage(), Codes::HTTP_BAD_REQUEST);
+            }
+            
             $this->model->saveEntity($entity);
             $headers = [];
             //return the newly created entities location if applicable
