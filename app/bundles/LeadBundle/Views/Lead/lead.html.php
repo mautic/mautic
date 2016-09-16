@@ -49,7 +49,7 @@ if (!$doNotContact) :
         'attr'      => [
             'id'          => 'doNotContactButton',
             'data-toggle' => 'confirmation',
-            'data-message' => 'Do not contact?',
+            'data-message' => $view['translator']->trans('mautic.lead.event.donotcontact').' ?',
             'data-confirm-text' => 'Ok',
             'data-confirm-callback' => 'doNotContact',
             'data-cancel-text' => 'Cancel',
