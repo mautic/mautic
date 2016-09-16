@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
+use Mautic\CoreBundle\Entity\MessageQueue;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -37,6 +38,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
+use Mautic\CoreBundle\Model\MessageQueueModel;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use DeviceDetector\DeviceDetector;
@@ -86,6 +88,8 @@ class EmailModel extends FormModel
      */
     protected $userModel;
 
+
+
     /**
      * @var Mixed
      */
@@ -130,6 +134,7 @@ class EmailModel extends FormModel
         $this->pageTrackableModel = $pageTrackableModel;
         $this->userModel          = $userModel;
         $this->coreParameters     = $coreParametersHelper;
+
     }
 
     /**
@@ -1075,7 +1080,7 @@ class EmailModel extends FormModel
      *                       bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
      *                       bool  sendBatchMail    If false, the function will not send batched mail but will defer to calling function to handle it
      *                       array assetAttachments Array of optional Asset IDs to attach
-     *
+     * @param MessageQueue $queue
      * @return mixed
      * @throws \Doctrine\ORM\ORMException
      */
@@ -1089,7 +1094,6 @@ class EmailModel extends FormModel
         $sendBatchMail    = (isset($options['sendBatchMail'])) ? $options['sendBatchMail'] : true;
         $assetAttachments = (isset($options['assetAttachments'])) ? $options['assetAttachments'] : [];
         $customHeaders    = (isset($options['customHeaders'])) ? $options['customHeaders'] : [];
-
         if (!$email->getId()) {
             return false;
         }
@@ -1150,7 +1154,7 @@ class EmailModel extends FormModel
 
         //noone to send to so bail
         if (empty($count)) {
-
+            return false;
             return $singleEmail ? true : [];
         }
 

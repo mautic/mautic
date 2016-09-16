@@ -363,6 +363,10 @@ return [
                 'class'     => 'Mautic\CoreBundle\Factory\MauticFactory',
                 'arguments' => 'service_container',
             ],
+            'mautic.model.factory'                      => [
+                'class'     => 'Mautic\CoreBundle\Factory\ModelFactory',
+                'arguments' => 'service_container',
+            ],
             'mautic.templating.name_parser'       => [
                 'class'     => 'Mautic\CoreBundle\Templating\TemplateNameParser',
                 'arguments' => 'kernel',
@@ -599,6 +603,15 @@ return [
             ],
             'mautic.core.model.form'         => [
                 'class' => 'Mautic\CoreBundle\Model\FormModel',
+            ],
+            'mautic.core.model.messagequeue' => [
+                'class'       => 'Mautic\CoreBundle\Model\MessageQueueModel',
+                'arguments'   => [
+                    'mautic.helper.core_parameters',
+                    'mautic.email.model.email',
+                    'mautic.campaign.model.campaign',
+                    'mautic.lead.model.lead'
+                ]
             ],
         ],
     ],

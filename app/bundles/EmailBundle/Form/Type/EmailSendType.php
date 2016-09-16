@@ -146,6 +146,37 @@ class EmailSendType extends AbstractType
                     'label' => 'mautic.email.send.preview.email'
                 ]
             );
+            if (!empty($options['with_email_types'])) {
+                $builder->add(
+                    'priority',
+                    'choice',
+                    array(
+                        'choices' => [
+                            '2' => 'mautic.core.message.send.priority.normal',
+                            '1' => 'mautic.core.message.send.priority.high'
+                        ],
+                        'label' => 'mautic.core.message.send.priority',
+                        'required' => false,
+                        'attr' => array(
+                            'class' => 'form-control',
+                            'tooltip' => 'mautic.core.message.send.priority.tooltip'
+                        )
+                    )
+                );
+
+                $builder->add(
+                    'attempts',
+                    'integer',
+                    array(
+                        'label' => 'mautic.core.message.send.attempts',
+                        'required' => true,
+                        'attr' => array(
+                            'class' => 'form-control',
+                            'tooltip' => 'mautic.core.message.send.attempts.tooltip'
+                        )
+                    )
+                );
+            }
         }
     }
 
