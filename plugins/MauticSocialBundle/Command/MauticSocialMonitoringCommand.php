@@ -70,6 +70,7 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->input  = $input;
+        $this->output = $output;
 
         /** @var \MauticPlugin\MauticSocialBundle\Model\MonitoringModel $model */
         $model = $this->getContainer()
