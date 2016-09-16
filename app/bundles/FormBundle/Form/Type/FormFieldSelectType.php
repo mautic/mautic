@@ -10,15 +10,17 @@
 namespace Mautic\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Class FormFieldSelectType
  */
 class FormFieldSelectType extends AbstractType
 {
+    use SortableListTrait;
 
     /**
      * {@inheritdoc}
@@ -26,36 +28,46 @@ class FormFieldSelectType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['field_type'] == 'select') {
-            $builder->add('list', 'sortablelist', array());
+            $this->addSortableList($builder, $options);
         }
 
-        $builder->add('empty_value', 'text', array(
-            'label'      => 'mautic.form.field.form.emptyvalue',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
-            'required'   => false
-        ));
+        $builder->add(
+            'empty_value',
+            'text',
+            [
+                'label'      => 'mautic.form.field.form.emptyvalue',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false
+            ]
+        );
 
         if (!empty($options['parentData'])) {
             $default = (empty($options['parentData']['properties']['multiple'])) ? false : true;
         } else {
             $default = false;
         }
-        $builder->add('multiple', 'yesno_button_group', array(
-            'label' => 'mautic.form.field.form.multiple',
-            'data'  => $default
-        ));
+        $builder->add(
+            'multiple',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.form.field.form.multiple',
+                'data'  => $default
+            ]
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
-            'field_type' => 'select',
-            'parentData' => array()
-        ));
+        $resolver->setDefaults(
+            [
+                'field_type' => 'select',
+                'parentData' => []
+            ]
+        );
     }
 
     /**

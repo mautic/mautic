@@ -90,4 +90,14 @@ final class FormEvents
      * @var string
      */
     const ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.form.on_campaign_trigger_decision';
+
+    /**
+     * The mautic.form.on_execute_submit_action event is dispatched to excecute the form submit actions
+     *
+     * The event listener receives a
+     * Mautic\FormBundle\Event\SubmissionEvent
+     *
+     * @var string
+     */
+    const ON_EXECUTE_SUBMIT_ACTION = 'matuic.form.on_execute_submit_action';
 }

@@ -263,7 +263,6 @@ class Form extends FormEntity
             $groups[] = 'messageRequired';
         } elseif ($postAction == 'redirect') {
             $groups[] = 'urlRequired';
-            $groups[] = 'urlRequiredPassTwo';
         }
 
         return $groups;

@@ -183,16 +183,17 @@ class FieldType extends AbstractType
                     }
 
                     if (isset($properties['list']) && is_string($properties['list'])) {
-                        $properties['list'] = array_map('trim', explode('|', $properties['list']));
+                        $properties['list'] = FormFieldHelper::parseList($properties['list']);
                     }
 
                     $form->add(
                         'properties',
                         'sortablelist',
                         [
-                            'required' => false,
-                            'label'    => 'mautic.lead.field.form.properties.select',
-                            'data'     => $properties
+                            'required'    => false,
+                            'label'       => 'mautic.lead.field.form.properties.select',
+                            'data'        => $properties,
+                            'with_labels' => true
                         ]
                     );
                     break;

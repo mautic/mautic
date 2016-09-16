@@ -219,7 +219,7 @@ class FilterType extends AbstractType
                     }
 
                     $list = $options['fields'][$fieldName]['properties']['list'];
-                    $choices = FormFieldHelper::parseListStringIntoArray($list);
+                    $choices = FormFieldHelper::parseList($list);
 
                     if ($fieldType == 'select') {
                         // array_unshift cannot be used because numeric values get lost as keys

@@ -327,7 +327,7 @@ class MailHelper
 
             $this->message->setSubject($this->subject);
             // Only set body if not empty or if plain text is empty - this ensures an empty HTML body does not show for
-            // messages only with plain text            
+            // messages only with plain text
             if (!empty($this->body['content']) || empty($this->plainText)) {
                 $this->message->setBody($this->body['content'], $this->body['contentType'], $this->body['charset']);
             }
@@ -1428,7 +1428,9 @@ class MailHelper
     public function parsePlainText($content = null)
     {
         if ($content == null) {
-            $content = $this->message->getBody();
+            if (!$content = $this->message->getBody()) {
+                $content = $this->body['content'];
+            }
         }
 
         $request = $this->factory->getRequest();

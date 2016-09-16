@@ -85,7 +85,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                     <?php
                                     foreach ($fields as $value => $params):
                                         $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : array();
-                                        $choices   = \Mautic\LeadBundle\Helper\FormFieldHelper::parseListStringIntoArray($list);
+                                        $choices   = \Mautic\LeadBundle\Helper\FormFieldHelper::parseList($list);
                                         $list      = json_encode($choices);
                                         $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
                                         $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
