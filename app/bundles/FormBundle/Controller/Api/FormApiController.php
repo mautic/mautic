@@ -57,4 +57,68 @@ class FormApiController extends CommonApiController
     {
         $entity->automaticJs = '<script type="text/javascript" src="' . $this->generateUrl('mautic_form_generateform', array('id' => $entity->getId()), true) . '"></script>';
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    {
+        // Set clean alias to prevent SQL errors
+        $alias = $this->model->cleanAlias($entity->getName(), '', 10);
+        $entity->setAlias($alias);
+
+        // Set timestamps
+        $this->model->setTimestamps($entity, true, false);
+
+        if (!$entity->getId()) {
+            // Save the form first to get the form ID.
+            // Using the repository function to not trigger the listeners twice.
+            $this->model->getRepository()->saveEntity($entity);
+        }
+
+        $formId = $entity->getId();
+
+        if (!empty($parameters['fields']) && is_array($parameters['fields'])) {
+            $fieldModel = $this->getModel('form.field');
+            $aliases = $entity->getFieldAliases();
+
+            foreach ($parameters['fields'] as &$field) {
+
+                // Ignore fields without a label
+                if (empty($field['label'])) {
+                    continue;
+                }
+
+                // Create an unique ID if not set - the following code requires one
+                if (empty($field['id'])) {
+                    $field['id'] = 'new' . hash('sha1', uniqid(mt_rand()));
+
+                }
+
+                // Create an alias from the label
+                $field['alias'] = $fieldModel->generateAlias($field['label'], $aliases);
+                
+                if (empty($field['alias'])) {
+                    // Likely a bogus label so generate random alias for column name
+                    $field['alias'] = uniqid('f_');
+                }
+            }
+
+            $this->model->setFields($entity, $parameters['fields']);
+        }
+
+        if (!empty($parameters['actions']) && is_array($parameters['actions'])) {
+
+            foreach ($parameters['actions'] as &$action) {
+                if (empty($action['id'])) {
+                    $action['id'] = 'new' . hash('sha1', uniqid(mt_rand()));
+                }
+            }
+
+            // Save the form first and new actions so that new fields are available to actions.
+            // Using the repository function to not trigger the listeners twice.
+            $this->model->getRepository()->saveEntity($entity);
+            $this->model->setActions($entity, $parameters['actions']);
+        }
+    }
 }

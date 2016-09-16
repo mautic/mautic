@@ -241,6 +241,10 @@ class Form extends FormEntity
             'message' => 'mautic.form.form.postactionproperty_redirect.notblank',
             'groups'  => array('urlRequiredPassTwo')
         )));
+
+        $metadata->addPropertyConstraint('formType', new Assert\Choice([
+            'choices' => array('standalone', 'campaign')
+        ]));
     }
 
     /**
@@ -565,6 +569,25 @@ class Form extends FormEntity
     public function getFields ()
     {
         return $this->fields;
+    }
+
+    /**
+     * Get array of field aliases
+     *
+     * @return array
+     */
+    public function getFieldAliases ()
+    {
+        $aliases = [];
+        $fields  = $this->getFields();
+
+        if ($fields) {
+            foreach ($fields as $field) {
+                $aliases[] = $field->getAlias();
+            }
+        }
+
+        return $aliases;
     }
 
     /**
