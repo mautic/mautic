@@ -19,7 +19,7 @@ class MessageQueueRepository extends CommonRepository
     protected function findMessage($channel,$channelId,$leadId)
     {
         $results = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('mq.id, ,mq.channel_id, mq.lead_id')
+            ->select('mq.id, mq.channel ,mq.channel_id, mq.lead_id')
             ->from(MAUTIC_TABLE_PREFIX . 'message_queue', 'mq')
             ->where('mq.lead_id = :leadId')
             ->andWhere('mq.channel = :channel')
