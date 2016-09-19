@@ -222,6 +222,11 @@ class LeadController extends FormController
                             'column' => 'f.isShortVisible',
                             'expr'   => 'eq',
                             'value'  => true
+                        ],
+                        [
+                            'column' => 'f.object',
+                            'expr'   => 'like',
+                            'value'  => 'lead'
                         ]
                     ]
                 ],
@@ -404,11 +409,17 @@ class LeadController extends FormController
                         'column' => 'f.isPublished',
                         'expr'   => 'eq',
                         'value'  => true
+                    ],
+                    [
+                        'column' => 'f.object',
+                        'expr'   => 'like',
+                        'value'  => 'lead'
                     ]
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY'
             ]
         );
+
         $form   = $model->createForm($lead, $this->get('form.factory'), $action, ['fields' => $fields]);
 
         ///Check for a submitted form and process it
@@ -580,11 +591,18 @@ class LeadController extends FormController
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $fields = $this->getModel('lead.field')->getEntities(
             [
-                'force'          => [
-                    [
-                        'column' => 'f.isPublished',
-                        'expr'   => 'eq',
-                        'value'  => true
+                'filter' => [
+                    'force'          => [
+                        [
+                            'column' => 'f.isPublished',
+                            'expr'   => 'eq',
+                            'value'  => true
+                        ],
+                        [
+                            'column' => 'f.object',
+                            'expr'   => 'like',
+                            'value'  => 'lead'
+                        ]
                     ]
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY'

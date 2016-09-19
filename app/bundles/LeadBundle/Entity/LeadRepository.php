@@ -358,9 +358,11 @@ class LeadRepository extends CommonRepository
     {
         //Get the list of custom fields
         $fq = $this->_em->getConnection()->createQueryBuilder();
-        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.field_order')
+        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.field_order, f.object')
             ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
             ->where('f.is_published = :published')
+            ->andWhere($fq->expr()->eq('f.object',':object'))
+            ->setParameter('object','lead')
             ->orderBy('f.field_order', 'asc')
             ->setParameter('published', true, 'boolean');
         $results = $fq->execute()->fetchAll();
@@ -459,9 +461,11 @@ class LeadRepository extends CommonRepository
     {
         //Get the list of custom fields
         $fq = $this->_em->getConnection()->createQueryBuilder();
-        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group"')
+        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object')
             ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
             ->where('f.is_published = :published')
+            ->andWhere($fq->expr()->eq('object',':object'))
+            ->setParameter('object','lead')
             ->setParameter('published', true, 'boolean');
         $results = $fq->execute()->fetchAll();
 
