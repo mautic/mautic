@@ -58,6 +58,15 @@ final class LeadEvents
     const LEAD_UTMTAGS_ADD = 'mautic.lead_utmtags_add';
 
     /**
+     * The mautic.lead_company_change event is dispatched if a lead's company changes.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadCompanyChange instance.
+     *
+     * @var string
+     */
+    const LEAD_COMPANY_CHANGE   = 'mautic.lead_company_change';
+    /**
      * The mautic.lead_list_change event is dispatched if a lead's lists changes.
      *
      * The event listener receives a

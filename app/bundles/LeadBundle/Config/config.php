@@ -373,6 +373,21 @@ return [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CompanyType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'company'
+            ],
+            'mautic.company.campaign.action.type.form'                  => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\AddToCompanyActionType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'addtocompany_action'
+            ],
+            'mautic.company.list.type.form'                  => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\CompanyListType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'company_list'
+            ],
+            'mautic.company.lead.type.form'                  => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\CompanyLeadType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'company_lead'
             ]
         ],
         'other'   => [
@@ -412,7 +427,8 @@ return [
                     'mautic.helper.integration',
                     'mautic.lead.model.field',
                     'mautic.lead.model.list',
-                    'form.factory'
+                    'form.factory',
+                    'mautic.company.model.company'
                 ]
             ],
             'mautic.lead.model.field' => [

@@ -41,7 +41,6 @@ $edit   = $view['security']->hasEntityAccess(
 );
 
 $buttons = [];
-
 //Send email button
 if (!empty($fields['core']['email']['value'])) {
     $buttons[] = [
@@ -79,6 +78,24 @@ $buttons[] = [
     ],
     'btnText'   => $view['translator']->trans('mautic.lead.lead.lists'),
     'iconClass' => 'fa fa-pie-chart',
+];
+//View Lead Companies button
+$buttons[] = [
+    'attr'      => [
+        'data-toggle' => 'ajaxmodal',
+        'data-target' => '#MauticSharedModal',
+        'data-header' => $view['translator']->trans(
+            'mautic.lead.lead.header.companies',
+            ['%name%' => $lead->getPrimaryIdentifier()]
+        ),
+        'data-footer' => 'false',
+        'href'        => $view['router']->path(
+            'mautic_contact_action',
+            ["objectId" => $lead->getId(), "objectAction" => "company"]
+        ),
+    ],
+    'btnText'   => $view['translator']->trans('mautic.lead.lead.companies'),
+    'iconClass' => 'fa fa-building',
 ];
 //View Contact Frequency button
 
@@ -510,6 +527,15 @@ $view['slots']->set(
             <?php $tags = $lead->getTags(); ?>
             <?php foreach ($tags as $tag): ?>
                 <h5 class="pull-left mt-xs mr-xs"><span class="label label-success"><?php echo $tag->getTag(); ?></span>
+                </h5>
+            <?php endforeach; ?>
+            <div class="clearfix"></div>
+        </div>
+        <div class="pa-sm">
+            <div class="panel-title">  <?php echo $view['translator']->trans(
+                    'mautic.lead.lead.companies'); ?></div>
+            <?php foreach ($companies as $company): ?>
+                <h5 class="pull-left mt-xs mr-xs"><span class="label label-success"><?php echo $company['companyname']; ?></span>
                 </h5>
             <?php endforeach; ?>
             <div class="clearfix"></div>

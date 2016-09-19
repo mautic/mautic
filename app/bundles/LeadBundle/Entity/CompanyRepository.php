@@ -286,7 +286,27 @@ class CompanyRepository extends CommonRepository
 
         return $fieldValues;
     }
+    /**
+     * Get companies by lead
+     *
+     * @param      $leadId
+     *
+     * @return array
+     */
+    public function getCompaniesByLeadId($leadId)
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
+        $q->select('comp.id, comp.companyname')
+            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
+            ->leftJoin('comp',MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id')
+            ->where('cl.lead_id = :leadId')
+            ->setParameter('leadId', $leadId)
+            ->orderBy('comp.companyname', 'ASC');
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
     /**
      * Function to remove non custom field columns from an arrayed lead row
      *
@@ -316,8 +336,8 @@ class CompanyRepository extends CommonRepository
     protected function addCatchAllWhereClause(&$q, $filter)
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, array(
-            'comp.name',
-            'comp.description'
+            'comp.companyname',
+            'comp.companydescription'
         ));
     }
 
@@ -348,24 +368,23 @@ class CompanyRepository extends CommonRepository
      */
     public function getCompanies($user = false, $id = '')
     {
-        static $companys = array();
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        static $companies = array();
 
         if (is_object($user)) {
             $user = $user->getId();
         }
 
         $key = (int) $user.$id;
-        if (isset($companys[$key])) {
-            return $companys[$key];
+        if (isset($companies[$key])) {
+            return $companies[$key];
         }
 
-        $q = $this->_em->createQueryBuilder()
-            ->from('LeadBundle:Company', 'comp', 'comp.id');
-
-        $q->select('partial comp.{id, name}');
+        $q->select('comp.id, comp.companyname')
+            ->from(MAUTIC_TABLE_PREFIX .'companies', 'comp');
 
         if (!empty($user)) {
-            $q->orWhere('comp.createdBy = :user');
+            $q->orWhere('comp.created_by = :user');
             $q->setParameter('user', $user);
         }
 
@@ -375,11 +394,11 @@ class CompanyRepository extends CommonRepository
             );
         }
 
-        $q->orderBy('comp.name');
+        $q->orderBy('comp.companyname');
 
-        $results = $q->getQuery()->getArrayResult();
+        $results = $q->execute()->fetchAll();
 
-        $companys[$key] = $results;
+        $companies[$key] = $results;
 
         return $results;
     }
@@ -393,22 +412,64 @@ class CompanyRepository extends CommonRepository
      */
     public function getCompanyByName($companyName)
     {
-        static $companies = array();
+        $q = $this->_em->getConnection()->createQueryBuilder();
 
         if (!$companyName) {
             return false;
         }
 
-        $q = $this->_em->createQueryBuilder()
-            ->from('LeadBundle:Company', 'comp', 'comp.id');
+        $q->select('partial comp.{id, name}')
+            ->from('LeadBundle:Company', 'comp');
 
-        $q->select('partial comp.{id, name}');
         $q->andWhere(
             $q->expr()->like('comp.name', $companyName)
         );
 
-        $results = $q->getQuery()->getArrayResult();
+        $results = $q->execute()->fetchAll();
 
         return $results;
+    }
+    /**
+    +     * Get a count of leads that belong to the company
+    +     *
+    +     * @param $companyIds
+    +     *
+    +     * @return array
+    +     */
+    public function getLeadCount($companyIds)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('count(cl.lead_id) as thecount, cl.company_id')
+            ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl');
+
+        $returnArray = (is_array($companyIds));
+
+        if (!$returnArray) {
+            $companyIds = array($companyIds);
+        }
+
+        $q->where(
+            $q->expr()->in('cl.company_id', $companyIds),
+            $q->expr()->eq('cl.manually_removed', ':false')
+        )
+            ->setParameter('false', false, 'boolean')
+            ->groupBy('cl.company_id');
+
+        $result = $q->execute()->fetchAll();
+
+        $return = array();
+        foreach ($result as $r) {
+                $return[$r['company_id']] = $r['thecount'];
+            }
+
+        // Ensure lists without leads have a value
+        foreach ($companyIds as $l) {
+                if (!isset($return[$l])) {
+                        $return[$l] = 0;
+                    }
+        }
+
+        return ($returnArray) ? $return : $return[$companyIds[0]];
     }
 }

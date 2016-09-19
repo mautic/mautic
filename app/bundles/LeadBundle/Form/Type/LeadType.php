@@ -296,9 +296,8 @@ class LeadType extends AbstractType
                     break;
             }
         }
-
         $builder->add(
-        'tags',
+            'tags',
             'lead_tag',
             [
                 'by_reference' => false,
@@ -309,6 +308,23 @@ class LeadType extends AbstractType
                     'onchange'              => 'Mautic.createLeadTag(this)'
                 ]
             ]
+        );
+
+        $builder->add(
+
+        'companies',
+            'company_lead',
+            [
+                'label'       => 'mautic.company.selectcompany',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                        'class'    => 'form-control',
+                        'tooltip'  => 'mautic.company.choose.company_descr',
+                     ],
+                'multiple'    => true,
+                'required'    => false
+            ]
+
         );
 
         $transformer = new IdToEntityModelTransformer(

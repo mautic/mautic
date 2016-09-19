@@ -324,7 +324,10 @@ class LeadController extends FormController
         $integrationHelper = $this->get('mautic.helper.integration');
         $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
-
+        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+        $companyModel      = $this->getModel('company');
+        $companiesRepo     = $companyModel->getRepository();
+        $companies         = $companiesRepo->getCompaniesByLeadId($objectId);
         // Set the social profile templates
         if ($socialProfiles) {
             foreach ($socialProfiles as $integration => &$details) {
@@ -351,6 +354,7 @@ class LeadController extends FormController
                     'lead'              => $lead,
                     'avatarPanelState'  => $this->request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
                     'fields'            => $fields,
+                    'companies'         => $companies,
                     'socialProfiles'    => $socialProfiles,
                     'socialProfileUrls' => $socialProfileUrls,
                     'places'            => $this->getPlaces($lead),
@@ -1179,6 +1183,50 @@ class LeadController extends FormController
                     'lead'       => $lead
                 ],
                 'contentTemplate' => 'MauticLeadBundle:LeadLists:index.html.php'
+            ]
+        );
+    }
+    /**
+     * Add/remove lead from a company
+     *
+     * @param $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function companyAction($objectId)
+    {
+        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        $model = $this->getModel('lead');
+        $lead  = $model->getEntity($objectId);
+
+        if ($lead != null
+            && $this->get('mautic.security')->hasEntityAccess(
+                'lead:leads:editown',
+                'lead:leads:editother',
+                $lead->getOwner()
+            )
+        ) {
+            /** @var \Mautic\LeadBundle\Model\CompanyModel $companyModel */
+            $companyModel = $this->getModel('company');
+            $companies     = $companyModel->getUserCompanies();
+
+            // Get a list of lists for the lead
+            $companyLeads = $lead->getCompanies();
+            foreach ($companyLeads as $cl) {
+                $companyLead[$cl->getId()] = $cl->getId();
+            }
+
+        } else {
+            $companies = $companyLead = [];
+        }
+        return $this->delegateView(
+            [
+                'viewParameters'  => [
+                    'companies'      => $companies,
+                    'companyLead' => $companyLead,
+                    'lead'       => $lead
+                ],
+                'contentTemplate' => 'MauticLeadBundle:Lead:company.html.php'
             ]
         );
     }
@@ -2111,7 +2159,7 @@ class LeadController extends FormController
     }
 
     /**
-     * Bulk edit lead campaigns
+     * Bulk edit lead stages
      *
      * @param int $objectId
      *
@@ -2199,6 +2247,106 @@ class LeadController extends FormController
                     'viewParameters'  => [
                         'form' => $this->createForm(
                             'lead_batch_stage',
+                            [],
+                            [
+                                'items'  => $items,
+                                'action' => $route
+                            ]
+                        )->createView()
+                    ],
+                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                    'passthroughVars' => [
+                        'activeLink'    => '#mautic_contact_index',
+                        'mauticContent' => 'leadBatch',
+                        'route'         => $route
+                    ]
+                ]
+            );
+        }
+    }
+
+    /**
+     * Bulk edit lead's companies
+     *
+     * @param int $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function batchCompaniesAction($objectId = 0)
+    {
+        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+        $companyModel = $this->getModel('company');
+        if ($this->request->getMethod() == 'POST') {
+            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            $model = $this->getModel('lead');
+            $data  = $this->request->request->get('lead_batch', [], true);
+            $ids   = json_decode($data['ids'], true);
+            $entities = [];
+            if (is_array($ids)) {
+                $entities = $model->getEntities(
+                    [
+                        'filter'           => [
+                            'force' => [
+                                [
+                                    'column' => 'l.id',
+                                    'expr'   => 'in',
+                                    'value'  => $ids
+                                ]
+                            ],
+                        ],
+                        'ignore_paginator' => true
+                    ]
+                );
+            }
+
+            $count = 0;
+            foreach ($entities as $lead) {
+                if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getCreatedBy())) {
+                    $count++;
+                    if (!empty($data['add'])) {
+                        $companyModel->addLeadToCompany($data['add'], $lead);
+                    }
+                    if (!empty($data['remove'])) {
+                        $companyModel->removeLeadFromCompany($data['remove'], $lead);
+                    }
+                }
+            }
+            // Save entities
+            $model->saveEntities($entities);
+            $this->addFlash(
+                'mautic.lead.batch_leads_affected',
+                [
+                    'pluralCount' => $count,
+                    '%count%'     => $count
+                ]
+            );
+
+            return new JsonResponse(
+                [
+                    'closeModal' => true,
+                    'flashes'    => $this->getFlashContent()
+                ]
+            );
+        } else {
+            // Get a list of lists
+            $companies = $companyModel->getUserCompanies();
+            $items  = [];
+            foreach ($companies as $company) {
+                $items[$company['id']] = $company['companyname'];
+            }
+
+            $route = $this->generateUrl(
+                'mautic_contact_action',
+                [
+                    'objectAction' => 'batchCompanies'
+                ]
+            );
+
+            return $this->delegateView(
+                [
+                    'viewParameters'  => [
+                        'form' => $this->createForm(
+                            'lead_batch',
                             [],
                             [
                                 'items'  => $items,

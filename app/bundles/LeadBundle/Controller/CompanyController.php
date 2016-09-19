@@ -11,6 +11,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -93,11 +94,15 @@ class CompanyController extends FormController
         $this->factory->getSession()->set('mautic.company.page', $page);
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $model = $this->getModel('company');
+        $companyIds = array_keys($companies);
+        $leadCounts = (!empty($companyIds)) ? $model->getRepository()->getLeadCount($companyIds) : array();
 
         return $this->delegateView(
             array(
                 'viewParameters'  => array(
                     'searchValue' => $search,
+                    'leadCounts'  => $leadCounts,
                     'items'       => $companies,
                     'page'        => $page,
                     'limit'       => $limit,
@@ -138,6 +143,14 @@ class CompanyController extends FormController
         $page = $this->factory->getSession()->get('mautic.company.page', 1);
 
         $action         = $this->generateUrl('mautic_company_action', array('objectAction' => 'new'));
+
+        $updateSelect = ($this->request->getMethod() == 'POST')
+            ? $this->request->request->get('company[updateSelect]', false, true)
+            : $this->request->get(
+                'updateSelect',
+                false
+            );
+
         $fields = $this->getModel('lead.field')->getEntities(
             [
                 'force'          => [
@@ -155,7 +168,7 @@ class CompanyController extends FormController
                 'hydration_mode' => 'HYDRATE_ARRAY'
             ]
         );
-        $form   = $model->createForm($entity, $this->get('form.factory'), $action, ['fields' => $fields]);
+        $form   = $model->createForm($entity, $this->get('form.factory'), $action, ['fields' => $fields, 'update_select' => $updateSelect]);
 
         $viewParameters = array('page' => $page);
 
@@ -204,16 +217,31 @@ class CompanyController extends FormController
                 $template  = 'MauticLeadBundle:Company:index';
             }
 
+            $passthrough = [
+                'activeLink'    => '#mautic_company_index',
+                'mauticContent' => 'company'
+            ];
+
+            // Check to see if this is a popup
+            if (isset($form['updateSelect'])) {
+                $template    = false;
+                $passthrough = array_merge(
+                    $passthrough,
+                    [
+                        'updateSelect'   => $form['updateSelect']->getData(),
+                        'companyId'      => $entity->getId(),
+                        'companyName'    => $entity->getName()
+                    ]
+                );
+            }
+
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(
                     array(
                         'returnUrl'       => $returnUrl,
                         'viewParameters'  => $viewParameters,
                         'contentTemplate' => $template,
-                        'passthroughVars' => array(
-                            'activeLink'    => '#mautic_company_index',
-                            'mauticContent' => 'company'
-                        )
+                        'passthroughVars' => $passthrough
                     )
                 );
             }
@@ -233,6 +261,7 @@ class CompanyController extends FormController
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_company_index',
                     'mauticContent' => 'company',
+                    'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect')),
                     'route'         => $this->generateUrl(
                         'mautic_company_action',
                         array(
@@ -334,6 +363,15 @@ class CompanyController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
+                    $data = $this->request->request->get('company');
+                    //pull the data from the form in order to apply the form's formatting
+                    foreach ($form as $f) {
+                        $name = $f->getName();
+                        if (strpos($name, 'field_') === 0) {
+                            $data[$name] = $f->getData();
+                        }
+                    }
+                    $model->setFieldValues($entity, $data, true);
                     //form is valid so process the data
                     $data = $this->request->request->get('company');
 
