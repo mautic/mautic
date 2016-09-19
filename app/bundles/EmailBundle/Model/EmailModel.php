@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\CoreBundle\Entity\MessageQueue;
-use Mautic\EmailBundle\Helper\MessageQueueHelper;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -90,6 +89,11 @@ class EmailModel extends FormModel
     protected $userModel;
 
     /**
+     * @var MessageQueueModel
+     */
+    protected $messageQueueModel;
+
+    /**
      * @var Mixed
      */
     protected $coreParameters;
@@ -123,7 +127,8 @@ class EmailModel extends FormModel
         LeadModel $leadModel,
         TrackableModel $pageTrackableModel,
         UserModel $userModel,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        MessageQueueModel $messageQueueModel
     ) {
         $this->ipLookupHelper     = $ipLookupHelper;
         $this->themeHelper        = $themeHelper;
@@ -133,6 +138,8 @@ class EmailModel extends FormModel
         $this->pageTrackableModel = $pageTrackableModel;
         $this->userModel          = $userModel;
         $this->coreParameters     = $coreParametersHelper;
+        $this->messageQueueModel  = $messageQueueModel;
+
     }
 
     /**
@@ -1144,7 +1151,7 @@ class EmailModel extends FormModel
         $leadIds = implode(",", $leadIds);
 
         if ($emailType == 'marketing') {
-            MessageQueueHelper::addToQueue($sendTo, $source[1],'email', $email->getId(), $emailAttempts, $emailPriority);
+            $this->messageQueueModel->addToQueue($sendTo, $source[1],'email', $email->getId(), $emailAttempts, $emailPriority);
         }
 
         $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', $leadIds, $listId, $defaultFrequencyNumber, $defaultFrequencyTime);
@@ -1154,7 +1161,7 @@ class EmailModel extends FormModel
             {
                 unset($sendTo[$frequencyRuleMet['lead_id']]);
                 if ($emailType == 'marketing') {
-                    MessageQueueHelper::rescheduleMessage($frequencyRuleMet['lead_id'],'email', $email->getId(), $frequencyRuleMet['frequency_number'].substr($frequencyRuleMet['frequency_time'],0,1));
+                    $this->messageQueueModel->rescheduleMessage($frequencyRuleMet['lead_id'],'email', $email->getId(), $frequencyRuleMet['frequency_number'].substr($frequencyRuleMet['frequency_time'],0,1));
                 }
             }
         }

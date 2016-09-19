@@ -175,7 +175,7 @@ class MessageQueueModel extends FormModel
             throw new MethodNotAllowedHttpException(['Message Queue']);
         }
         switch ($action) {
-            case "message_queued":
+            case "post_save":
                 $name = CoreEvents::MESSAGE_QUEUED;
                 break;
             default:

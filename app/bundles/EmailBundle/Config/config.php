@@ -213,12 +213,6 @@ return [
                     'mailer'
                 ]
             ],
-            'mautic.helper.messagequeue'             => [
-                'class'     => 'Mautic\EmailBundle\Helper\MessageQueueHelper',
-                'arguments' => [
-                    'mautic.core.model.messagequeue'
-                ]
-            ],
             // Mailers
             'mautic.transport.amazon'            => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport',
