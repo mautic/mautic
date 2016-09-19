@@ -54,7 +54,7 @@ class SubmissionRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX . 'form_fields', 'f')
             ->where('f.form_id = ' . $form->getId())
             ->andWhere(
-                $fq->expr()->notIn('f.type', array("'button'", "'freetext'")),
+                $fq->expr()->notIn('f.type', array("'button'", "'freetext'", "'pagebreak'")),
                 $fq->expr()->eq('f.save_result', ':saveResult')
             )
             ->orderBy('f.field_order', 'ASC')
