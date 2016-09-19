@@ -605,7 +605,6 @@ return [
                 'arguments'   => [
                     'mautic.helper.core_parameters',
                     'mautic.email.model.email',
-                    'mautic.campaign.model.campaign',
                     'mautic.lead.model.lead'
                 ]
             ],

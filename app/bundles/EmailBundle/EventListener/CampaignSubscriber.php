@@ -149,22 +149,28 @@ class CampaignSubscriber extends CommonSubscriber
             $email = $this->emailModel->getEntity($emailId);
 
             $eventDetails = $event->getEventDetails();
-            $options      = ['source' => ['campaign', $eventDetails['campaign']['id']]];
+            $options      = [
+                'source'            => ['campaign', $eventDetails['campaign']['id']],
+                'email_type'        => $config['email_type'],
+                'email_attempts'    => $config['attempts'],
+                'email_priority'    => $config['priority']
+            ];
             $event->setChannel('email', $emailId);
 
             if ($email != null && $email->isPublished()) {
                 // Determine if this email is transactional/marketing
                 $type = (isset($config['email_type'])) ? $config['email_type'] : 'transactional';
+
                 if ('marketing' == $type) {
                     // Determine if this lead has received the email before
-                    $stats = $this->emailModel->getStatRepository()->findContactEmailStats($leadCredentials['id'], $emailId);
+                    $leadIds = implode(",", [$leadCredentials['id']]);
+                    $stats = $this->emailModel->getStatRepository()->checkContactsSentEmail($leadIds, $emailId);
 
-                    if (!count($stats)) {
-                        $this->messageQueueModel->addToQueue($lead, $eventDetails['campaign']['id'],'email', $emailId, $options, $config['attempts'], $config['priority']);
+                    if (empty($stats)) {
+                        $emailSent    = $this->emailModel->sendEmail($email, $leadCredentials, $options);
                     }
-                    return $event->setResult(true);
                 }
-                $emailSent    = $this->emailModel->sendEmail($email, $leadCredentials, $options);
+
             }
         }
 

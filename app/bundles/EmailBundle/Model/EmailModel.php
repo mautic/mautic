@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\CoreBundle\Entity\MessageQueue;
+use Mautic\EmailBundle\Helper\MessageQueueHelper;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -88,8 +89,6 @@ class EmailModel extends FormModel
      */
     protected $userModel;
 
-
-
     /**
      * @var Mixed
      */
@@ -134,7 +133,6 @@ class EmailModel extends FormModel
         $this->pageTrackableModel = $pageTrackableModel;
         $this->userModel          = $userModel;
         $this->coreParameters     = $coreParametersHelper;
-
     }
 
     /**
@@ -1094,6 +1092,10 @@ class EmailModel extends FormModel
         $sendBatchMail    = (isset($options['sendBatchMail'])) ? $options['sendBatchMail'] : true;
         $assetAttachments = (isset($options['assetAttachments'])) ? $options['assetAttachments'] : [];
         $customHeaders    = (isset($options['customHeaders'])) ? $options['customHeaders'] : [];
+        $emailType        = (isset($options['email_type'])) ? $options['email_type'] : [];
+        $emailAttempts    = (isset($options['email_attempts'])) ? $options['email_attempts'] : [];
+        $emailPriority    = (isset($options['email_priority'])) ? $options['email_priority'] : [];
+
         if (!$email->getId()) {
             return false;
         }
@@ -1118,17 +1120,6 @@ class EmailModel extends FormModel
         /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
         $frequencyRulesRepo = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
 
-        $leadIds = array_keys($leads);
-        $leadIds = implode(",", $leadIds);
-
-        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', $leadIds, $listId, $defaultFrequencyNumber, $defaultFrequencyTime);
-
-        if (!empty($dontSendTo)) {
-            foreach ($dontSendTo as $frequencyRuleMet)
-            {
-                unset($leads[$frequencyRuleMet['lead_id']]);
-            }
-        }
         $sendTo = $leads;
 
         if (!$ignoreDNC) {
@@ -1149,12 +1140,30 @@ class EmailModel extends FormModel
             }
         }
 
+        $leadIds = array_keys($sendTo);
+        $leadIds = implode(",", $leadIds);
+
+        if ($emailType == 'marketing') {
+            MessageQueueHelper::addToQueue($sendTo, $source[1],'email', $email->getId(), $emailAttempts, $emailPriority);
+        }
+
+        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', $leadIds, $listId, $defaultFrequencyNumber, $defaultFrequencyTime);
+
+        if (!empty($dontSendTo)) {
+            foreach ($dontSendTo as $frequencyRuleMet)
+            {
+                unset($sendTo[$frequencyRuleMet['lead_id']]);
+                if ($emailType == 'marketing') {
+                    MessageQueueHelper::rescheduleMessage($frequencyRuleMet['lead_id'],'email', $email->getId(), $frequencyRuleMet['frequency_number'].substr($frequencyRuleMet['frequency_time'],0,1));
+                }
+            }
+        }
+
         //get a count of leads
         $count = count($sendTo);
 
-        //noone to send to so bail
-        if (empty($count)) {
-            return false;
+        //noone to send to so bail or if marketing email from a campaign has been put in a queue
+        if (empty($count) || $emailType == 'marketing') {
             return $singleEmail ? true : [];
         }
 

@@ -10,15 +10,16 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
+use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 /**
  * MessageQueueRepository
  */
 class MessageQueueRepository extends CommonRepository
 {
-    protected function findMessage($channel,$channelId,$leadId)
+    public function findMessage($channel,$channelId,$leadId)
     {
-        $results = $this->getEntityManager()->getConnection()->createQueryBuilder()
+        $results = $this->_em->getConnection()->createQueryBuilder()
             ->select('mq.id, mq.channel ,mq.channel_id, mq.lead_id')
             ->from(MAUTIC_TABLE_PREFIX . 'message_queue', 'mq')
             ->where('mq.lead_id = :leadId')
@@ -29,6 +30,7 @@ class MessageQueueRepository extends CommonRepository
             ->setParameter('channelId',$channelId)
             ->execute()
             ->fetchAll();
+
        return $results;
     }
 
@@ -47,7 +49,7 @@ class MessageQueueRepository extends CommonRepository
             ->setParameter('success', false, 'boolean')
             ->setParameter('scheduledDate',$scheduledDate->format('Y-m-d 00:00:00'))
             ->setParameter('scheduledDateEnd',$scheduledDate->format('Y-m-d 23:59:59'));
-        $q->orderBy('priority,scheduledDate', 'ASC');
+        $q->orderBy('priority,scheduled_date', 'ASC');
         $results= $q->execute($exp)
             ->fetchAll();
 

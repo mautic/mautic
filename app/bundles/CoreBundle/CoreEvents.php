@@ -103,4 +103,13 @@ final class CoreEvents
      * @var string
      */
     const MAINTENANCE_CLEANUP_DATA = 'mautic.maintenance_cleanup_data';
+
+    /**
+     * The mautic.message_queued event is dispatched to save a message to the queue
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\MessageQueueEvent instance.
+     *
+     * @var string
+     */
+    const MESSAGE_QUEUED = 'mautic.message_queued';
 }

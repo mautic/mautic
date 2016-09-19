@@ -10,17 +10,19 @@
 namespace Mautic\CoreBundle\Model;
 
 use Doctrine\DBAL\DBALException;
-use Doctrine\ORM\EntityNotFoundException;
-use Mautic\CampaignBundle\CampaignEvents;
-use Mautic\CampaignBundle\Entity\Campaign;
+
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\CampaignBundle\Event\CampaignEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Entity\MessageQueue;
+use Mautic\CoreBundle\Event\MessageQueueEvent;
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Entity\MessageQueueRepository;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 
 /**
@@ -35,12 +37,7 @@ class MessageQueueModel extends FormModel
     protected $leadModel;
 
     /**
-     * @var CampaignModel
-     */
-    protected $campaignModel;
-
-    /**
-     * @var CampaignModel
+     * @var EmailModel
      */
     protected $emailModel;
 
@@ -49,9 +46,9 @@ class MessageQueueModel extends FormModel
      *
      *
      */
-    public function __construct(CoreParametersHelper $coreParametersHelper, EmailModel $emailModel, CampaignModel $campaignModel, LeadModel $leadModel) {
+    public function __construct(CoreParametersHelper $coreParametersHelper, EmailModel $emailModel, LeadModel $leadModel) {
+
         $this->emailModel = $emailModel;
-        $this->campaignModel = $campaignModel;
         $this->leadModel = $leadModel;
     }
 
@@ -61,33 +58,43 @@ class MessageQueueModel extends FormModel
     }
 
     /**
+     * @param $leads
+     * @param $campaignId
      * @param $channel
      * @param $channelId
-     * @param CampaignEvent $event
-     * @param $messageQueue
+     * @param $options
      * @param int $maxAttempts
      * @param int $priority
+     * @return bool|MessageQueue
      */
-    public function addToQueue(Lead $lead, $campaignId, $channel, $channelId,  $options,  $maxAttempts = 1, $priority = 1)
+    public function addToQueue($leads, $campaignId, $channel, $channelId, $maxAttempts = 1, $priority = 1)
     {
+        $messageQueues = [];
 
-        if (!empty($this->getRepository()->findMessage($channel,$channelId,$lead->getId()))) {
-            $messageQueue = new MessageQueue();
-            $messageQueue->setCampaign($campaignId);
-            $messageQueue->setChannel($channel);
-            $messageQueue->setChannelId($channelId);
-            $messageQueue->setDatePublished(new \DateTime());
-            $messageQueue->setMaxAttempts($maxAttempts);
-            $messageQueue->setLead($lead);
-            $messageQueue->setPriority($priority);
-            $messageQueue->setScheduledDate(new \DateTime());
-            $messageQueue->setOptions($options);
+        echo $channel;
+        echo $channelId;
 
-            $this->getRepository()->saveEntity($messageQueue);
+        foreach ($leads as $lead){
 
-            return true;
+            if (empty($this->getRepository()->findMessage($channel,$channelId,$lead['id']))) {
+                $leadEntity = $this->leadModel->getEntity($lead['id']);
+                $messageQueue = new MessageQueue();
+                $messageQueue->setCampaign($campaignId);
+                $messageQueue->setChannel($channel);
+                $messageQueue->setChannelId($channelId);
+                $messageQueue->setDatePublished(new \DateTime());
+                $messageQueue->setMaxAttempts($maxAttempts);
+                $messageQueue->setLead($leadEntity);
+                $messageQueue->setPriority($priority);
+                $messageQueue->setScheduledDate(new \DateTime());
+
+                $messageQueues[] = $messageQueue;
+            }
         }
-        return false;
+
+        $this->saveEntities($messageQueues);
+
+        return true;
     }
 
     /**
@@ -121,30 +128,69 @@ class MessageQueueModel extends FormModel
                 $message->setSuccess(true);
                 $message->setLastAttempt(new \DateTime());
                 $message->setDateSent(new \DateTime());
-                $queue->setStatus('sent');
+                $message->setStatus('sent');
                 $messages[$queueItem['channelId']] = $message;
             } else {
-                $this->rescheduleMessage($message, $lead);
+                $this->rescheduleMessage($lead->getId(),$queueItem['sms'],  $queueItem['channelId'],  '15M', $message);
             }
         }
 
         //add listener
-        $this->getRepository()->saveEntities($messages);
+        $this->saveEntities($messages);
     }
 
     /**
-     *
+     * @param $queue
+     * @param $leadId
+     * @param string $rescheduleDate
      */
-    public function rescheduleMessage($queue, $lead) {
-
-        if (is_object($queue)) {
-            $frequencyRule = $this->leadModel->getFrequencyRule($lead);
+    public function rescheduleMessage($leadId, $channel, $channelId, $rescheduleDate = '15M', $queue)
+    {
+        if (!$queue) {
+            $queue = $this->getRepository()->findMessage($channel,$channelId,$leadId);
+        }
+        if ($queue) {
             $queue->setAttempts($queue->getAttempts() + 1);
             $queue->setLastAttempt(new \DateTime());
-            $queue->setScheduledDate($queue->getScheduledDate()->add('PT'.$frequencyRule['frequency_number'].substr($frequencyRule['frequency_time'],0,1)));
+            $queue->setScheduledDate($queue->getScheduledDate()->add('PT'.$rescheduleDate));
             $queue->setStatus('rescheduled');
-            $this->getRepository()->saveEntity($queue);
+            $this->saveEntity($queue);
         }
 
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $action
+     * @param $entity
+     * @param $isNew
+     * @param $event
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     */
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    {
+        if (!$entity instanceof MessageQueue) {
+            throw new MethodNotAllowedHttpException(['Message Queue']);
+        }
+        switch ($action) {
+            case "message_queued":
+                $name = CoreEvents::MESSAGE_QUEUED;
+                break;
+            default:
+                return null;
+        }
+        if ($this->dispatcher->hasListeners($name)) {
+            if (empty($event)) {
+                $event = new MessageQueueEvent($entity, $isNew);
+                $event->setEntityManager($this->em);
+            }
+            $this->dispatcher->dispatch($name, $event);
+            return $event;
+        } else {
+            return null;
+        }
+    }
+
 }
