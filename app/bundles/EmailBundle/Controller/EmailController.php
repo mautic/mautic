@@ -1336,7 +1336,7 @@ class EmailController extends FormController
 
             //not found or not allowed
             if ($entity === null
-                || (!$this->factory->getSecurity()->hasEntityAccess(
+                || (!$this->security->hasEntityAccess(
                     'email:emails:viewown',
                     'email:emails:viewother',
                     $entity->getCreatedBy()
@@ -1359,8 +1359,8 @@ class EmailController extends FormController
 
             $errors = [];
 
-            $user  = $this->factory->getUser();
-            foreach($emails as $email) {
+            $user  = $this->get('mautic.helper.user')->getUser();
+            foreach ($emails as $email) {
                 $users = [
                     [
                         // Setting the id, firstname and lastname to null as this is a unknown user
@@ -1373,7 +1373,7 @@ class EmailController extends FormController
 
                 // Send to current user
                 $error = $model->sendEmailToUser($entity, $users, $fields, [], [], false);
-                if(count($error)){
+                if (count($error)) {
                     array_push($errors, $error[0]);
                 }
             }
