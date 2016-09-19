@@ -325,19 +325,19 @@ Mautic.disabledEmailAction = function(opener) {
 
 
 Mautic.addNewRecepient = function () {
-        var textBox = '';
-        textBox +=  '<div class="dynamic-filed">';
-        textBox +=  '<div class="form-group col-xs-10">';
-        textBox +=  '<input type="email"  required="true" name="emails[]" class="form-control" autocomplete="false">';
-        textBox +=  '</div> ';
-        textBox +=  '<div class="form-group col-xs-2">';
-        textBox +=  '<button type="button" onclick="Mautic.deleteRecipient(this)" class="btn btn-danger"> X </button>';
-        textBox +=  '</div>  ';
-        textBox +=  '</div>  ';
-        mQuery('.dynamic-field-outer').append(textBox);
+    var textBox = '';
+    textBox +=  '<div class="dynamic-filed">';
+    textBox +=  '<div class="form-group col-xs-10">';
+    textBox +=  '<input type="email"  required="true" name="emails[]" class="form-control" autocomplete="false">';
+    textBox +=  '</div> ';
+    textBox +=  '<div class="form-group col-xs-2">';
+    textBox +=  '<button type="button" onclick="Mautic.deleteRecipient(this)" class="btn btn-danger"> X </button>';
+    textBox +=  '</div>  ';
+    textBox +=  '</div>  ';
+    mQuery('.dynamic-field-outer').append(textBox);
 }
 
 Mautic.deleteRecipient = function (_this) {
-        mQuery(_this).closest('.dynamic-filed').remove();
+    mQuery(_this).closest('.dynamic-filed').remove();
 }
 
