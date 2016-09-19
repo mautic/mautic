@@ -12,6 +12,7 @@ use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Event\AssetLoadEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PointBundle\Event\PointBuilderEvent;
+use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
 
 /**
@@ -21,6 +22,20 @@ use Mautic\PointBundle\PointEvents;
  */
 class PointSubscriber extends CommonSubscriber
 {
+    /**
+     * @var PointModel
+     */
+    protected $pointModel;
+
+    /**
+     * PointSubscriber constructor.
+     *
+     * @param PointModel $pointModel
+     */
+    public function __construct(PointModel $pointModel)
+    {
+        $this->pointModel = $pointModel;
+    }
 
     /**
      * @return array
@@ -59,7 +74,7 @@ class PointSubscriber extends CommonSubscriber
         $asset = $event->getRecord()->getAsset();
         
         if ($asset !== null) {
-            $this->factory->getModel('point')->triggerAction('asset.download', $asset);
+            $this->pointModel->triggerAction('asset.download', $asset);
         }
     }
 }

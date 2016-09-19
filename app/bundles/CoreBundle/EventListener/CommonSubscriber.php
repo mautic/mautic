@@ -9,17 +9,45 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Doctrine\ORM\EntityManager;
+use JMS\Serializer\Serializer;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Menu\MenuHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CoreSubscriber
  */
 class CommonSubscriber implements EventSubscriberInterface
 {
+    /**
+     * Do not use Factory in your events. There's a couple places where we
+     * still need to in core, but we are working on refactoring. This
+     * is completely temporary.
+     *
+     * @param MauticFactory $factory
+     *
+     * @deprecated Will be removed in 3.0. Use __construct to inject your dependencies.
+     */
+    public function setFactory(MauticFactory $factory)
+    {
+        $this->factory = $factory;
+    }
+
+    /**
+     * @var MauticFactory
+     *
+     * @deprecated Will be removed in 3.0. Use __construct to inject your dependencies.
+     */
+    protected $factory;
 
     /**
      * @var \Symfony\Component\HttpFoundation\Request
@@ -47,11 +75,6 @@ class CommonSubscriber implements EventSubscriberInterface
     protected $dispatcher;
 
     /**
-     * @var MauticFactory
-     */
-    protected $factory;
-
-    /**
      * @var array
      */
     protected $params;
@@ -72,28 +95,88 @@ class CommonSubscriber implements EventSubscriberInterface
     protected $router;
 
     /**
-     * @param MauticFactory $factory
+     * CommonSubscriber constructor.
      */
-    public function __construct (MauticFactory $factory)
+    public function __construct()
     {
-        $this->factory     = $factory;
-        $this->templating  = $factory->getTemplating();
-        $this->request     = $factory->getRequest();
-        $this->security    = $factory->getSecurity();
-        $this->serializer  = $factory->getSerializer();
-        $this->params      = $factory->getSystemParameters();
-        $this->dispatcher  = $factory->getDispatcher();
-        $this->translator  = $factory->getTranslator();
-        $this->em          = $factory->getEntityManager();
-        $this->router      = $factory->getRouter();
-
-        $this->init();
     }
 
     /**
-     * Post __construct setup so that inheriting classes don't have to pass all the arguments
+     * @param TemplatingHelper $templatingHelper
      */
-    protected function init()
+    public function setTemplating(TemplatingHelper $templatingHelper)
+    {
+        $this->templating = $templatingHelper->getTemplating();
+    }
+
+    /**
+     * @param RequestStack $requestStack
+     */
+    public function setRequest(RequestStack $requestStack)
+    {
+        $this->request = $requestStack->getCurrentRequest();
+    }
+
+    /**
+     * @param CorePermissions $security
+     */
+    public function setSecurity(CorePermissions $security)
+    {
+        $this->security = $security;
+    }
+
+    /**
+     * @param Serializer $serializer
+     */
+    public function setSerializer(Serializer $serializer)
+    {
+        $this->serializer = $serializer;
+    }
+
+    /**
+     * @param array $parameters
+     */
+    public function setSystemParameters(array $parameters)
+    {
+        $this->params = $parameters;
+    }
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function setTranslator(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
+    /**
+     * @param EntityManager $entityManager
+     */
+    public function setEntityManager(EntityManager $entityManager)
+    {
+        $this->em = $entityManager;
+    }
+
+    /**
+     * @param Router $router
+     */
+    public function setRouter(Router $router)
+    {
+        $this->router = $router;
+    }
+
+    /**
+     * Automatic post-construct setup.
+     */
+    public function init()
     {
 
     }

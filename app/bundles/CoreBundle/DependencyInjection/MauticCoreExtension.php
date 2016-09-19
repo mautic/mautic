@@ -165,6 +165,10 @@ class MauticCoreExtension extends Extension
 
                                 $definition->addTag($tag, $tagArguments);
                             }
+
+                            if ($type == 'events') {
+                                $definition->addTag('mautic.event_subscriber');
+                            }
                         }
 
                         // Set public service

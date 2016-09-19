@@ -97,13 +97,21 @@ return array(
     'services'   => array(
         'events' => array(
             'mautic.api.subscriber'              => array(
-                'class' => 'Mautic\ApiBundle\EventListener\ApiSubscriber'
+                'class' => 'Mautic\ApiBundle\EventListener\ApiSubscriber',
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.helper.core_parameters',
+                    'mautic.core.model.auditlog'
+                ]
             ),
             'mautic.api.configbundle.subscriber' => array(
                 'class' => 'Mautic\ApiBundle\EventListener\ConfigSubscriber'
             ),
             'mautic.api.search.subscriber'       => array(
-                'class' => 'Mautic\ApiBundle\EventListener\SearchSubscriber'
+                'class' => 'Mautic\ApiBundle\EventListener\SearchSubscriber',
+                'arguments' => [
+                    'mautic.api.model.client'
+                ]
             )
         ),
         'forms'  => array(
@@ -120,7 +128,11 @@ return array(
         'other'  => array(
             'mautic.api.oauth.event_listener'                         => array(
                 'class'        => 'Mautic\ApiBundle\EventListener\OAuthEventListener',
-                'arguments'    => 'mautic.factory',
+                'arguments'    => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.security',
+                    'translator'
+                ],
                 'tags'         => array(
                     'kernel.event_listener',
                     'kernel.event_listener'

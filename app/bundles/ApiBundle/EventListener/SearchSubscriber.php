@@ -9,6 +9,7 @@
 
 namespace Mautic\ApiBundle\EventListener;
 
+use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
@@ -20,6 +21,20 @@ use Mautic\CoreBundle\Event as MauticEvents;
  */
 class SearchSubscriber extends CommonSubscriber
 {
+    /**
+     * @var ClientModel
+     */
+    protected $apiClientModel;
+
+    /**
+     * SearchSubscriber constructor.
+     *
+     * @param ClientModel $apiClientModel
+     */
+    public function __construct(ClientModel $apiClientModel)
+    {
+        $this->apiClientModel = $apiClientModel;
+    }
 
     /**
      * @return array
@@ -43,7 +58,7 @@ class SearchSubscriber extends CommonSubscriber
                 return;
             }
 
-            $clients = $this->factory->getModel('api.client')->getEntities(
+            $clients = $this->apiClientModel->getEntities(
                 array(
                     'limit'  => 5,
                     'filter' => $str
@@ -86,7 +101,7 @@ class SearchSubscriber extends CommonSubscriber
         if ($security->isGranted('api:clients:view')) {
             $event->addCommands(
                 'mautic.api.client.header.index',
-                $this->factory->getModel('api.client')->getCommandList()
+                $this->apiClientModel->getCommandList()
             );
         }
     }

@@ -31,7 +31,7 @@ class AjaxController extends CommonController
 
     /**
      * @param array   $dataArray
-     * @param integer $statusCoce
+     * @param integer $statusCode
      * @param boolean $addIgnoreWdt
      *
      * @return JsonResponse
