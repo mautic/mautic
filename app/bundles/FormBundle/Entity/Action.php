@@ -122,6 +122,17 @@ class Action
     }
 
     /**
+     * @param ClassMetadata $metadata
+     */
+    public static function loadValidatorMetadata (ClassMetadata $metadata)
+    {
+        $metadata->addPropertyConstraint('type', new Assert\NotBlank([
+            'message' => 'mautic.core.name.required',
+            'groups'  => ['action']
+        ]));
+    }
+
+    /**
      * @param $prop
      * @param $val
      *

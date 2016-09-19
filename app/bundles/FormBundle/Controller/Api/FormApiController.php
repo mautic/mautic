@@ -113,10 +113,25 @@ class FormApiController extends CommonApiController
         }
 
         if (!empty($parameters['actions']) && is_array($parameters['actions'])) {
+            $actionModel = $this->getModel('form.action');
 
-            foreach ($parameters['actions'] as &$action) {
-                if (empty($action['id'])) {
-                    $action['id'] = 'new' . hash('sha1', uniqid(mt_rand()));
+            foreach ($parameters['actions'] as &$actionParams) {
+                if (empty($actionParams['id'])) {
+                    $actionParams['id'] = 'new' . hash('sha1', uniqid(mt_rand()));
+                    $actionEntity = $actionModel->getEntity();
+                } else {
+                    $actionEntity = $actionModel->getEntity($actionParams['id']);
+                }
+
+                $actionEntity->setForm($entity);
+
+                $actionForm = $this->createEntityForm($actionEntity, $actionModel);
+                $actionForm->submit($actionParams, 'PATCH' !== $method);
+
+                if (!$actionForm->isValid()) {
+                    $formErrors = $this->getFormErrorMessages($actionForm);
+                    $msg        = $this->getFormErrorMessage($formErrors);
+                    throw new \Exception('Actions: '.$msg);
                 }
             }
 
