@@ -129,6 +129,14 @@ return [
             ],
             'mautic.email.dashboard.subscriber'      => [
                 'class' => 'Mautic\EmailBundle\EventListener\DashboardSubscriber'
+            ],
+            'mautic.email.message.queue.subscriber'      => [
+                'class' => 'Mautic\EmailBundle\EventListener\MessageQueueSubscriber',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.lead.model.lead',
+                    'mautic.email.model.email',
+                ]
             ]
         ],
         'forms'  => [
@@ -273,7 +281,8 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.page.model.trackable',
                     'mautic.user.model.user',
-                    'mautic.helper.core_parameters'
+                    'mautic.helper.core_parameters',
+                    'mautic.core.model.messagequeue',
                 ]
             ]
         ]

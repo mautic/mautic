@@ -604,7 +604,6 @@ return [
                 'class'       => 'Mautic\CoreBundle\Model\MessageQueueModel',
                 'arguments'   => [
                     'mautic.helper.core_parameters',
-                    'mautic.email.model.email',
                     'mautic.lead.model.lead'
                 ]
             ],

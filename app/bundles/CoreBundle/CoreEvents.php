@@ -112,4 +112,13 @@ final class CoreEvents
      * @var string
      */
     const MESSAGE_QUEUED = 'mautic.message_queued';
+
+    /**
+     * The mautic.message_queued event is dispatched to save a message to the queue
+     *
+     * The event listener receives a Mautic\CoreBundle\Event\MessageQueueEvent instance.
+     *
+     * @var string
+     */
+    const PROCESS_MESSAGE_QUEUE = 'mautic.process_message_queue';
 }

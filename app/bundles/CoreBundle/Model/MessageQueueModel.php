@@ -11,6 +11,7 @@ namespace Mautic\CoreBundle\Model;
 
 use Doctrine\DBAL\DBALException;
 
+use Mautic\CoreBundle\Event\MessageQueueProcessEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -37,18 +38,12 @@ class MessageQueueModel extends FormModel
     protected $leadModel;
 
     /**
-     * @var EmailModel
-     */
-    protected $emailModel;
-
-    /**
      * messageModel constructor.
      *
      *
      */
-    public function __construct(CoreParametersHelper $coreParametersHelper, EmailModel $emailModel, LeadModel $leadModel) {
+    public function __construct(CoreParametersHelper $coreParametersHelper, LeadModel $leadModel) {
 
-        $this->emailModel = $emailModel;
         $this->leadModel = $leadModel;
     }
 
@@ -106,23 +101,16 @@ class MessageQueueModel extends FormModel
         $queue = $this->getRepository()->getQueuedMessages($channel, $channelId);
         /* @var $queueItem messageQueue */
         $messages = [];
+
         foreach ($queue as $queueItem)
         {
             $success = false;
-            $lead = $this->leadModel->getEntity($queueItem['lead']);
-            $leadCredentials = ($lead instanceof Lead) ? $lead->getProfileFields() : $lead;
-            $leadCredentials['owner_id'] = (
-                ($lead instanceof Lead) && ($owner = $lead->getOwner())
-            ) ? $owner->getId() : 0;
-
-            $options = $queueItem['options'];
-
-            if ($queueItem['channel'] == 'email'){
-                $message = $this->emailModel->getEntity($queueItem['channelId']);
-                $success = $this->emailModel->sendEmail($message, $leadCredentials, $options);
-
-            }
             $message = $this->getRepository()->getEntity((int)$queueItem['id']);
+            $event = new MessageQueueProcessEvent($message);
+            $new = false;
+            $success = $this->dispatchEvent('process_message_queue',$message, $new, $event);
+            $lead = $message->getLead();
+
             if ($success) {
                 $message->setAttempts($message->getAttempts() + 1);
                 $message->setSuccess(true);
@@ -175,6 +163,9 @@ class MessageQueueModel extends FormModel
             throw new MethodNotAllowedHttpException(['Message Queue']);
         }
         switch ($action) {
+            case "process_message_queue":
+                $name = CoreEvents::PROCESS_MESSAGE_QUEUE;
+                break;
             case "post_save":
                 $name = CoreEvents::MESSAGE_QUEUED;
                 break;
