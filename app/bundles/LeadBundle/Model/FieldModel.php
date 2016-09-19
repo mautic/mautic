@@ -44,10 +44,6 @@ class FieldModel extends FormModel
             'short' => true,
             'object'=> 'lead'
         ],
-        'company'          => [
-            'fixed' => true,
-            'object'=> 'lead'
-        ],
         'position'         => [
             'fixed' => true,
             'object'=> 'lead'
