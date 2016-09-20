@@ -60,6 +60,72 @@ class FormApiController extends CommonApiController
     }
 
     /**
+     * Remove fields from a form
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function removeFieldsAction($formId)
+    {
+        if (!$this->security->isGranted(['form:forms:editown', 'form:forms:editother'], 'MATCH_ONE')) {
+            return $this->accessDenied();
+        }
+
+        $entity = $this->model->getEntity($formId);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        $fieldsToDelete = $this->request->get('fields');
+
+        if (!is_array($fieldsToDelete)) {
+            return $this->badRequest('The fields attribute must be array.');
+        }
+
+        $this->model->deleteFields($entity, $fieldsToDelete);
+
+        $view = $this->view([$this->entityNameOne => $entity]);
+        return $this->handleView($view);
+    }
+
+    /**
+     * Remove fields from a form
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function removeActionsAction($formId)
+    {
+        if (!$this->security->isGranted(['form:forms:editown', 'form:forms:editother'], 'MATCH_ONE')) {
+            return $this->accessDenied();
+        }
+
+        $entity = $this->model->getEntity($formId);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        $actionsToDelete = $this->request->get('actions');
+
+        if (!is_array($actionsToDelete)) {
+            return $this->badRequest('The actions attribute must be array.');
+        }
+
+        $currentActions = $entity->getActions();
+
+        foreach ($currentActions as $currentAction) {
+            if (in_array($currentAction->getId(), $actionsToDelete)) {
+                $entity->removeAction($currentAction);
+            }
+        }
+
+        $this->model->saveEntity($entity);
+
+        $view = $this->view([$this->entityNameOne => $entity]);
+        return $this->handleView($view);
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')

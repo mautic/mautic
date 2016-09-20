@@ -55,6 +55,16 @@ return [
                 'path'       => '/forms',
                 'controller' => 'MauticFormBundle:Api\FormApi'
             ],
+            'mautic_api_formremovefields' => [
+                'path'       => '/forms/{formId}/fields/remove',
+                'controller' => 'MauticFormBundle:Api\FormApi:removeFields',
+                'method'     => 'DELETE'
+            ],
+            'mautic_api_formremoveactions' => [
+                'path'       => '/forms/{formId}/actions/remove',
+                'controller' => 'MauticFormBundle:Api\FormApi:removeActions',
+                'method'     => 'DELETE'
+            ]
         ],
         'public' => [
             'mautic_form_postresults'  => [
