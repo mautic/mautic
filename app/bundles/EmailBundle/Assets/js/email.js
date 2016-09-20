@@ -562,6 +562,12 @@ Mautic.addDynamicContentFilter = function (selectedFilter) {
     // Convert to DOM
     prototype = mQuery(prototype);
 
+    if (fieldObject == 'company') {
+        prototype.find('.object-icon').removeClass('fa-user').addClass('fa-building');
+    } else {
+        prototype.find('.object-icon').removeClass('fa-building').addClass('fa-user');
+    }
+
     var filterBase  = "emailform[dynamicContent][" + dynamicContentIndex + "][filters][" + dynamicContentFilterIndex + "][filters][" + filterNum + "]";
     var filterIdBase = "emailform_dynamicContent_" + dynamicContentIndex + "_filters_" + dynamicContentFilterIndex + "_filters_" + filterNum;
 
