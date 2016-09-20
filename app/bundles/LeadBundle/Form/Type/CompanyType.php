@@ -49,7 +49,7 @@ class CompanyType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder = $this->getFormFields($builder, $options, 'company');
+        $this->getFormFields($builder, $options, 'company');
 
         $transformer = new IdToEntityModelTransformer(
             $this->em,

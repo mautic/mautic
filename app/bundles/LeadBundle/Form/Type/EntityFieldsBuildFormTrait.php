@@ -209,8 +209,5 @@ trait EntityFieldsBuildFormTrait
                     break;
             }
         }
-
-
-        return $builder;
     }
 }

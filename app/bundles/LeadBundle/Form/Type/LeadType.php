@@ -109,7 +109,7 @@ class LeadType extends AbstractType
             );
         }
 
-        $builder = $this->getFormFields($builder, $options, 'lead');
+        $this->getFormFields($builder, $options, 'lead');
 
         $builder->add(
             'tags',

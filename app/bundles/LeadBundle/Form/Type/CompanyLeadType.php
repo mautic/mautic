@@ -36,7 +36,7 @@ class CompanyLeadType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if ($options['add_transformer']) {
+
             $transformer = new CompanyEntityTransformer(
                 $this->em,
                 'MauticLeadBundle:Company',
@@ -46,7 +46,7 @@ class CompanyLeadType extends AbstractType
             );
 
             $builder->addModelTransformer($transformer);
-        }
+
     }
 
     /**
@@ -64,8 +64,7 @@ class CompanyLeadType extends AbstractType
                 'property'        => 'companies',
                 'multiple'        => true,
                 'required'        => false,
-                'disabled'        => false,
-                'add_transformer' => true
+                'disabled'        => false
             )
         );
     }
