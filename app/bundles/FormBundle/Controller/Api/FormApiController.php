@@ -43,7 +43,7 @@ class FormApiController extends CommonApiController
             $this->listFilters = array(
                 'column' => 'f.createdBy',
                 'expr'   => 'eq',
-                'value'  => $this->factory->getUser()->getId()
+                'value'  => $this->user->getId()
             );
         }
 

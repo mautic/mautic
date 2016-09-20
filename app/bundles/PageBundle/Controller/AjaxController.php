@@ -67,7 +67,7 @@ class AjaxController extends CommonAjaxController
     {
         $dataArray = array('success' => 0);
         $entityId  = InputHelper::clean($request->request->get('entity'));
-        $session   = $this->factory->getSession();
+        $session   = $this->get('session');
 
         if (!empty($entityId)) {
             $sessionVar = 'mautic.pagebuilder.' . $entityId . '.content';

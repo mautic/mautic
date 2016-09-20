@@ -78,7 +78,7 @@ class CommonSubscriber implements EventSubscriberInterface
     protected $params;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var TranslatorInterface
      */
     protected $translator;
 

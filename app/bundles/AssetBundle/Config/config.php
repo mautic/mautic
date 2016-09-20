@@ -84,7 +84,10 @@ return [
                 'class' => 'Mautic\AssetBundle\EventListener\FormSubscriber'
             ],
             'mautic.asset.campaignbundle.subscriber' => [
-                'class' => 'Mautic\AssetBundle\EventListener\CampaignSubscriber'
+                'class' => 'Mautic\AssetBundle\EventListener\CampaignSubscriber',
+                'arguments' => [
+                    'mautic.campaign.model.event'
+                ]
             ],
             'mautic.asset.reportbundle.subscriber' => [
                 'class' => 'Mautic\AssetBundle\EventListener\ReportSubscriber'

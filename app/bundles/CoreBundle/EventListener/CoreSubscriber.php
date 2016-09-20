@@ -263,8 +263,21 @@ class CoreSubscriber extends CommonSubscriber
             //also set the request for easy access throughout controllers
             $controller[0]->setRequest($request);
 
-            //set the factory for easy use access throughout the controllers
+            // set the factory for easy use access throughout the controllers
+            // @deprecated To be removed in 3.0
             $controller[0]->setFactory($this->factory);
+
+            // set the user as well
+            $controller[0]->setUser($this->userHelper->getUser());
+
+            // and the core parameters helper
+            $controller[0]->setCoreParametersHelper($this->coreParametersHelper);
+
+            // and the dispatcher
+            $controller[0]->setDispatcher($this->dispatcher);
+
+            // and the translator
+            $controller[0]->setTranslator($this->translator);
 
             //run any initialize functions
             $controller[0]->initialize($event);

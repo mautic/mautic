@@ -29,7 +29,7 @@ class TriggerEventController extends CommonFormController
         $success = 0;
         $valid   = $cancelled = false;
         $method  = $this->request->getMethod();
-        $session = $this->factory->getSession();
+        $session = $this->get('session');
 
         if ($method == 'POST') {
             $triggerEvent = $this->request->request->get('pointtriggerevent');
@@ -48,7 +48,7 @@ class TriggerEventController extends CommonFormController
         //ajax only for form fields
         if (!$eventType ||
             !$this->request->isXmlHttpRequest() ||
-            !$this->factory->getSecurity()->isGranted(array(
+            !$this->get('mautic.security')->isGranted(array(
                 'point:triggers:edit',
                 'point:triggers:create'
             ), 'MATCH_ONE')
@@ -151,7 +151,7 @@ class TriggerEventController extends CommonFormController
      */
     public function editAction ($objectId)
     {
-        $session      = $this->factory->getSession();
+        $session      = $this->get('session');
         $method       = $this->request->getMethod();
         $triggerId    = ($method == "POST") ? $this->request->request->get('pointtriggerevent[triggerId]', '', true) : $this->request->query->get('triggerId');
         $events      = $session->get('mautic.point.' . $triggerId . '.triggerevents.modified', array());
@@ -168,7 +168,7 @@ class TriggerEventController extends CommonFormController
             //ajax only for form fields
             if (!$eventType ||
                 !$this->request->isXmlHttpRequest() ||
-                !$this->factory->getSecurity()->isGranted(array(
+                !$this->get('mautic.security')->isGranted(array(
                     'point:triggers:edit',
                     'point:triggers:create'
                 ), 'MATCH_ONE')
@@ -190,7 +190,7 @@ class TriggerEventController extends CommonFormController
                         //form is valid so process the data
 
                         //save the properties to session
-                        $session  = $this->factory->getSession();
+                        $session  = $this->get('session');
                         $events  = $session->get('mautic.point.' . $triggerId . '.triggerevents.modified');
                         $formData = $form->getData();
                         //overwrite with updated data
@@ -275,14 +275,14 @@ class TriggerEventController extends CommonFormController
      */
     public function deleteAction ($objectId)
     {
-        $session   = $this->factory->getSession();
+        $session   = $this->get('session');
         $triggerId = $this->request->get('triggerId');
         $events   = $session->get('mautic.point.' . $triggerId . '.triggerevents.modified', array());
         $delete    = $session->get('mautic.point.' . $triggerId . '.triggerevents.deleted', array());
 
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest() ||
-            !$this->factory->getSecurity()->isGranted(array(
+            !$this->get('mautic.security')->isGranted(array(
                 'point:triggers:edit',
                 'point:triggers:create'
             ), 'MATCH_ONE')
@@ -338,14 +338,14 @@ class TriggerEventController extends CommonFormController
      */
     public function undeleteAction ($objectId)
     {
-        $session   = $this->factory->getSession();
+        $session   = $this->get('session');
         $triggerId = $this->request->get('triggerId');
         $events   = $session->get('mautic.point.' . $triggerId . '.triggerevents.modified', array());
         $delete    = $session->get('mautic.point.' . $triggerId . '.triggerevents.deleted', array());
 
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest() ||
-            !$this->factory->getSecurity()->isGranted(array(
+            !$this->get('mautic.security')->isGranted(array(
                 'point:triggers:edit',
                 'point:triggers:create'
             ), 'MATCH_ONE')

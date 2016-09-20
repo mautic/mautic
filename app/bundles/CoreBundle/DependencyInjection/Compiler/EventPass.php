@@ -51,10 +51,6 @@ class EventPass implements CompilerPassInterface
                 $definition->addMethodCall('setLogger', array(new Reference('monolog.logger.mautic')));
             }
             
-            if ($reflected->hasProperty('session')) {
-                $definition->addMethodCall('setSession', array(new Reference('session')));
-            }
-            
             // Temporary, for development purposes
             if ($reflected->hasProperty('factory')) {
                 $definition->addMethodCall('setFactory', array(new Reference('mautic.factory')));
