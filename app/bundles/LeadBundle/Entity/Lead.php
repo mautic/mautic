@@ -344,7 +344,7 @@ class Lead extends FormEntity
             ->addInverseJoinColumn('company_id', 'id', false)
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
             ->setIndexBy('company')
-            ->fetchLazy()
+            ->fetchExtraLazy()
             ->cascadeMerge()
             ->cascadePersist()
             ->cascadeDetach()

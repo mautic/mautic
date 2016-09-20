@@ -1252,10 +1252,6 @@ Mautic.companyOnLoad = function (container, response) {
         }
 
         window.close();
-    } else if (mQuery('#emailform_plainText').length) {
-        // @todo initiate the token dropdown
-    } else if (mQuery(container + ' #list-search').length) {
-        Mautic.activateSearchAutocomplete('list-search', 'email');
     }
 
     var textarea = mQuery('#emailform_customHtml');

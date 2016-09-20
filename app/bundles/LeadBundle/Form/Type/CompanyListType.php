@@ -9,8 +9,9 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\UserBundle\Entity\User;
 use Mautic\LeadBundle\Entity\CompanyRepository;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -27,20 +28,20 @@ class CompanyListType extends AbstractType
      */
     private $repo;
 
-    /**
-     * @var bool
-     */
-    private $viewOther;
+    private $companyModel;
 
     /**
-     * @param MauticFactory $factory
+     * @param CompanyModel $companyModel
+     * @param UserHelper $userHelper
+     *
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(CompanyModel $companyModel, UserHelper $userHelper)
     {
-        $this->viewOther = $factory->getSecurity()->isGranted('lead:leads:viewother');
-        $this->repo      = $factory->getModel('company')->getRepository();
+        $this->companyModel = $companyModel;
 
-        $this->repo->setCurrentUser($factory->getUser());
+        $this->repo = $this->companyModel->getRepository();
+
+        $this->repo->setCurrentUser($userHelper->getUser());
     }
 
     /**
@@ -63,7 +64,7 @@ class CompanyListType extends AbstractType
                 }
             ]
         );
-        $resolver->setDefined(['email_type', 'top_level', 'top_level_parent', 'ignore_ids']);
+        $resolver->setDefined(['top_level', 'top_level_parent', 'ignore_ids']);
     }
 
     /**

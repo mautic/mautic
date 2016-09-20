@@ -42,25 +42,15 @@ class CompanyBuilderEvent extends Event
      *
      * @param string $key    - a unique identifier; it is recommended that it be namespaced i.e. lead.action
      * @param array  $action - can contain the following keys:
-     *  'label'           => (required) what to display in the list
-     *  'description'     => (optional) short description of event
-     *  'template'        => (optional) template to use for the action's HTML in the company builder
-     *      i.e AcmeMyBundle:CompanyAction:theaction.html.php
-     *  'formType'        => (optional) name of the form type SERVICE for the action; will use a default form with company change only
-     *  'formTypeOptions' => (optional) array of options to pass to formType
-     *  'callback'        => (optional) callback function that will be passed when the action is triggered; return true to
-     *                       change the configured companies or false to ignore the action
-     *      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
-     *          Mautic\CoreBundle\Factory\MauticFactory $factory
-     *          Mautic\LeadBundle\Entity\Lead $lead
-     *          $eventDetails - variable sent from firing function to call back function
-     *          array $action = array(
-     *              'id' => int
-     *              'type' => string
-     *              'name' => string
-     *              'properties' => array()
-     *         )
-     *
+     *                       'label'            => (required) what to display in the list
+     *                       'description'      => (optional) short description of event
+     *                       'formType'         => (optional) name of the form type SERVICE for the action
+     *                       'formTypeOptions'  => (optional) array of options to pass to the formType service
+     *                       'formTheme'        => (optional) form theme
+     *                       'timelineTemplate' => (optional) custom template for the lead timeline
+     *                       'eventName'        => (required) The event to fire when this event is triggered.
+     *                       'associatedDecisions' => (optional) Array of decision types to limit what this action can be associated with
+     *                       'anchorRestrictions' => (optional) Array of event anchors this event should not be allowed to connect to
      * @return void
      * @throws InvalidArgumentException
      */
@@ -72,8 +62,8 @@ class CompanyBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            array('group', 'label'),
-            array('callback'),
+            ['group', 'label'],
+            [],
             $action
         );
 

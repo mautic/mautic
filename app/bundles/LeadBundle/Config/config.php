@@ -371,22 +371,22 @@ return [
             ],
             'mautic.company.type.form'                  => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CompanyType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['doctrine.orm.entity_manager','mautic.security'],
                 'alias'     => 'company'
             ],
             'mautic.company.campaign.action.type.form'                  => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\AddToCompanyActionType',
-                'arguments' => 'mautic.factory',
+                'arguments' => 'router',
                 'alias'     => 'addtocompany_action'
             ],
             'mautic.company.list.type.form'                  => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CompanyListType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.company.model.company',  'mautic.helper.user'],
                 'alias'     => 'company_list'
             ],
             'mautic.company.lead.type.form'                  => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CompanyLeadType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['doctrine.orm.entity_manager','mautic.security'],
                 'alias'     => 'company_lead'
             ]
         ],

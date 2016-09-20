@@ -10,7 +10,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Form\DataTransformer\CompanyEntityTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -18,25 +18,27 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class CompanyLeadType extends AbstractType
 {
-
     /**
      * @var
      */
-    private $factory;
+    private $em;
+
 
     /**
-     * @param MauticFactory $factory
+     * @param EntityManager $entityManager
+     *
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(EntityManager $entityManager)
     {
-        $this->factory = $factory;
+        $this->em = $entityManager;
+
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['add_transformer']) {
             $transformer = new CompanyEntityTransformer(
-                $this->factory->getEntityManager(),
+                $this->em,
                 'MauticLeadBundle:Company',
                 'id',
                 ($options['multiple']),

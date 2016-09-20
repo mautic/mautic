@@ -502,17 +502,23 @@ class LeadListRepository extends CommonRepository
      */
     public function getListFilterExpr($filters, &$parameters, QueryBuilder $q, $not = false, $leadId = null)
     {
+        static $leadTable;
+        static $companyTable;
+
         if (!count($filters)) {
 
             return $q->expr()->andX();
         }
 
-        // Get table columns regardless because of different tables being used
         $schema = $this->_em->getConnection()->getSchemaManager();
-        /** @var \Doctrine\DBAL\Schema\Column[] $leadTable */
-        $leadTable = $schema->listTableColumns(MAUTIC_TABLE_PREFIX . 'leads');
-        $companyTable = $schema->listTableColumns(MAUTIC_TABLE_PREFIX . 'company');
-
+        // Get table columns
+        if (null === $leadTable) {
+            /** @var \Doctrine\DBAL\Schema\Column[] $leadTable */
+            $leadTable = $schema->listTableColumns(MAUTIC_TABLE_PREFIX . 'leads');
+        }
+        if (null === $companyTable) {
+            $companyTable = $schema->listTableColumns(MAUTIC_TABLE_PREFIX . 'company');
+        }
         $options   = $this->getFilterExpressionFunctions();
         $groups    = array();
         $groupExpr = $q->expr()->andX();

@@ -409,7 +409,7 @@ class CompanyRepository extends CommonRepository
     * @param $companyIds
     *
     * @return array
-     */
+    */
     public function getLeadCount($companyIds)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();

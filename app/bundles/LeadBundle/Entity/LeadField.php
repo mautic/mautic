@@ -128,7 +128,8 @@ class LeadField extends FormEntity
         $builder->addLifecycleEvent('identifierWorkaround', 'postLoad');
 
         $builder->setTable('lead_fields')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadFieldRepository');
+            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadFieldRepository')
+            ->addIndex(['object'], 'search_by_object');
 
         $builder->addId();
 

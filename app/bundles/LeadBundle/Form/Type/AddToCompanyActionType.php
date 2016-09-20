@@ -9,7 +9,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -23,18 +23,21 @@ use Doctrine\ORM\EntityRepository;
  */
 class AddToCompanyActionType extends AbstractType
 {
-    private $factory;
+    /**
+     * @var RouterInterface
+     */
+    protected $router;
 
     /**
-     * @param MauticFactory $factory
+     * @param RouterInterface   $router
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(RouterInterface $router)
     {
-        $this->factory = $factory;
+        $this->router = $router;
     }
 
     /**
-     * @param FormBuilderInterface $builder
+    * @param FormBuilderInterface $builder
      * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -60,7 +63,7 @@ class AddToCompanyActionType extends AbstractType
             ]
         );
 
-        $windowUrl = $this->factory->getRouter()->generate(
+        $windowUrl = $this->router->generate(
             'mautic_company_action',
             [
                 'objectAction' => 'new',

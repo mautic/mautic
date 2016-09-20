@@ -105,10 +105,10 @@ class Company extends FormEntity
             ->setJoinTable('company_leads_xref')
             ->addInverseJoinColumn('lead_id', 'id', false)
             ->addJoinColumn('company_id', 'id', false, false, 'CASCADE')
-            ->setIndexBy('company')
             ->cascadeMerge()
             ->cascadePersist()
             ->cascadeDetach()
+            ->fetchExtraLazy()
             ->build();
 
         $builder->createManyToOne('owner', 'Mautic\UserBundle\Entity\User')
