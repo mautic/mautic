@@ -673,14 +673,16 @@ Mautic.addDynamicContentFilter = function (selectedFilter) {
     // Remove inapplicable operator types
     var operators = selectedOption.data('field-operators');
 
-    if (typeof operators.include != 'undefined') {
-        mQuery('#' + filterIdBase + '_operator option').filter(function () {
-            return mQuery.inArray(mQuery(this).val(), operators['include']) == -1
-        }).remove();
-    } else if (typeof operators.exclude != 'undefined') {
-        mQuery('#' + filterIdBase + '_operator option').filter(function () {
-            return mQuery.inArray(mQuery(this).val(), operators['exclude']) !== -1
-        }).remove();
+    if (typeof operators != "undefined") {
+        if (typeof operators.include != 'undefined') {
+            mQuery('#' + filterIdBase + '_operator option').filter(function () {
+                return mQuery.inArray(mQuery(this).val(), operators['include']) == -1
+            }).remove();
+        } else if (typeof operators.exclude != 'undefined') {
+            mQuery('#' + filterIdBase + '_operator option').filter(function () {
+                return mQuery.inArray(mQuery(this).val(), operators['exclude']) !== -1
+            }).remove();
+        }
     }
 
     // Convert based on first option in list
