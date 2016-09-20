@@ -26,6 +26,7 @@ trait DynamicContentEntityTrait
     {
         $builder->createField('dynamicContent', 'array')
             ->columnName('dynamic_content')
+            ->nullable()
             ->build();
     }
 
