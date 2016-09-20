@@ -12,6 +12,8 @@ namespace Mautic\LeadBundle\Form\Type;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 trait EntityFieldsBuildFormTrait
 {
