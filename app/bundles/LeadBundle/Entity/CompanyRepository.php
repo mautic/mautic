@@ -302,7 +302,7 @@ class CompanyRepository extends CommonRepository
             ->leftJoin('comp',MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id')
             ->where('cl.lead_id = :leadId')
             ->setParameter('leadId', $leadId)
-            ->orderBy('comp.companyname', 'ASC');
+            ->orderBy('comp.id', 'DESC');
         $results = $q->execute()->fetchAll();
 
         return $results;
@@ -380,21 +380,21 @@ class CompanyRepository extends CommonRepository
             return $companies[$key];
         }
 
-        $q->select('comp.id, comp.companyname')
+        $q->select('comp.*')
             ->from(MAUTIC_TABLE_PREFIX .'companies', 'comp');
 
-        if (!empty($user)) {
+        if ($user) {
             $q->orWhere('comp.created_by = :user');
             $q->setParameter('user', $user);
         }
 
         if (!empty($id)) {
-            $q->andWhere(
-                $q->expr()->neq('comp.id', $id)
+            $q->where(
+                $q->expr()->eq('comp.id', $id)
             );
         }
 
-        $q->orderBy('comp.companyname');
+        $q->orderBy('comp.id', 'DESC');
 
         $results = $q->execute()->fetchAll();
 

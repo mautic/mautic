@@ -70,7 +70,7 @@ CREATE TABLE {$this->prefix}companies (
   `publish_down` datetime DEFAULT NULL COMMENT '(DC2Type:datetime)',
   `is_published` tinyint(4) DEFAULT NULL,
   PRIMARY KEY(id),
-  INDEX {$this->prefix}comanyname (`comanyname`, `companyemail`)
+  INDEX {$this->prefix}companyname (`companyname`, `companyemail`)
 ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
 SQL;
         $this->addSql($sql);
@@ -88,5 +88,7 @@ CREATE TABLE {$this->prefix}company_leads_xref (
 SQL;
 
         $this->addSql($sql);
+
+        $this->addSql("ALTER TABLE {$this->prefix}lead_fields ADD object VARCHAR(255) DEFAULT 'lead'");
     }
 }
