@@ -81,11 +81,6 @@ class CompanyChangeLog
             ->columnName('action_name')
             ->build();
 
-        $builder->createManyToOne('company', 'Company')
-            ->inversedBy('companies')
-            ->addJoinColumn('company_id', 'id', false, false, 'CASCADE')
-            ->build();
-
         $builder->addDateAdded();
     }
 
