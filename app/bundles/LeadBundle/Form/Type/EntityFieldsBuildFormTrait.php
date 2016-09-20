@@ -22,7 +22,7 @@ trait EntityFieldsBuildFormTrait
     {
         $fieldValues = (!empty($options['data'])) ? $options['data']->getFields() : ['filter' => ['isVisible' => true, 'object' => $object]];
         foreach ($options['fields'] as $field) {
-            if ($field['isPublished'] === false || $field['object'] !== 'company') continue;
+            if ($field['isPublished'] === false || $field['object'] !== $object) continue;
             $attr = ['class' => 'form-control'];
             $properties = $field['properties'];
             $type = $field['type'];

@@ -408,16 +408,18 @@ class LeadController extends FormController
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'new']);
         $fields = $this->getModel('lead.field')->getEntities(
             [
-                'force'          => [
-                    [
-                        'column' => 'f.isPublished',
-                        'expr'   => 'eq',
-                        'value'  => true
-                    ],
-                    [
-                        'column' => 'f.object',
-                        'expr'   => 'like',
-                        'value'  => 'lead'
+                'filter' => [
+                    'force'          => [
+                        [
+                            'column' => 'f.isPublished',
+                            'expr'   => 'eq',
+                            'value'  => true
+                        ],
+                        [
+                            'column' => 'f.object',
+                            'expr'   => 'like',
+                            'value'  => 'lead'
+                        ]
                     ]
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY'

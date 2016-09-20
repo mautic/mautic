@@ -153,16 +153,18 @@ class CompanyController extends FormController
 
         $fields = $this->getModel('lead.field')->getEntities(
             [
-                'force'          => [
-                    [
-                        'column' => 'f.isPublished',
-                        'expr'   => 'eq',
-                        'value'  => true
-                    ],
-                    [
-                        'column' => 'f.object',
-                        'expr'   => 'eq',
-                        'value'  => 'company'
+                'filter' => [
+                    'force'          => [
+                        [
+                            'column' => 'f.isPublished',
+                            'expr'   => 'eq',
+                            'value'  => true
+                        ],
+                        [
+                            'column' => 'f.object',
+                            'expr'   => 'eq',
+                            'value'  => 'company'
+                        ]
                     ]
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY'
