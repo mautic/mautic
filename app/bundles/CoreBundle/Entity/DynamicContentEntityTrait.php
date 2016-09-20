@@ -94,7 +94,13 @@ trait DynamicContentEntityTrait
                         'content' => null,
                         'filters' => [
                             [
-                                'glue'   => null
+                                'glue'     => null,
+                                'field'    => null,
+                                'object'   => null,
+                                'type'     => null,
+                                'operator' => null,
+                                'display'  => null,
+                                'filter'   => null
                             ]
                         ]
                     ]

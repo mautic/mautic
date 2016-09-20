@@ -80,6 +80,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
             $data      = $event->getData();
             $form      = $event->getForm();
             $options   = $form->getConfig()->getOptions();
+
             $fieldType = $data['type'];
             $fieldName = $data['field'];
 

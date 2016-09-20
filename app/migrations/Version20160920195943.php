@@ -39,7 +39,30 @@ class Version20160920195943 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
+        $defaultDynamicContent = serialize([
+            [
+                'tokenName' => null,
+                'content'   => null,
+                'filters'   => [
+                    [
+                        'content' => null,
+                        'filters' => [
+                            [
+                                'glue'     => null,
+                                'field'    => null,
+                                'object'   => null,
+                                'type'     => null,
+                                'operator' => null,
+                                'display'  => null,
+                                'filter'   => null
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+
         $this->addSql("ALTER TABLE {$this->prefix}emails ADD dynamic_content LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)';");
-        $this->addSql("UPDATE {$this->prefix}emails SET dynamic_content = 'a:1:{i:0;a:3:{s:9:\"tokenName\";N;s:7:\"content\";N;s:7:\"filters\";a:1:{i:0;a:2:{s:7:\"content\";N;s:7:\"filters\";a:1:{i:0;a:1:{s:4:\"glue\";N;}}}}}}' WHERE dynamic_content IS NULL;");
+        $this->addSql("UPDATE {$this->prefix}emails SET dynamic_content = '{$defaultDynamicContent}' WHERE dynamic_content IS NULL;");
     }
 }
