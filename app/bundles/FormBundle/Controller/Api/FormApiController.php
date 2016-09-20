@@ -65,6 +65,9 @@ class FormApiController extends CommonApiController
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         $method = $this->request->getMethod();
+        $fieldModel = $this->getModel('form.field');
+        $actionModel = $this->getModel('form.action');
+        $isNew = false;
 
         // Set clean alias to prevent SQL errors
         $alias = $this->model->cleanAlias($entity->getName(), '', 10);
@@ -74,15 +77,21 @@ class FormApiController extends CommonApiController
         $this->model->setTimestamps($entity, true, false);
 
         if (!$entity->getId()) {
+            $isNew = true;
+
             // Save the form first to get the form ID.
             // Using the repository function to not trigger the listeners twice.
             $this->model->getRepository()->saveEntity($entity);
         }
 
         $formId = $entity->getId();
+        $requestFieldIds = [];
+        $requestActionIds = [];
+        $currentFields = $entity->getFields();
+        $currentActions = $entity->getActions();
 
+        // Add fields from the request
         if (!empty($parameters['fields']) && is_array($parameters['fields'])) {
-            $fieldModel = $this->getModel('form.field');
             $aliases = $entity->getFieldAliases();
 
             foreach ($parameters['fields'] as &$fieldParams) {
@@ -93,6 +102,7 @@ class FormApiController extends CommonApiController
                     $fieldEntity = $fieldModel->getEntity();
                 } else {
                     $fieldEntity = $fieldModel->getEntity($fieldParams['id']);
+                    $requestFieldIds[] = $fieldParams['id'];
                 }
 
                 $fieldEntityArray = $fieldEntity->convertToArray();
@@ -112,8 +122,23 @@ class FormApiController extends CommonApiController
             $this->model->setFields($entity, $parameters['fields']);
         }
 
+        // Remove fiels which weren't in the PUT request
+        if (!$isNew && $method === 'PUT') {
+            $fieldsToDelete = [];
+
+            foreach ($currentFields as $currentField) {
+                if (!in_array($currentField->getId(), $requestFieldIds)) {
+                    $fieldsToDelete[] = $currentField->getId();
+                }
+            }
+
+            if ($fieldsToDelete) {
+                $this->model->deleteFields($entity, $fieldsToDelete);
+            }
+        }
+
+        // Add actions from the request
         if (!empty($parameters['actions']) && is_array($parameters['actions'])) {
-            $actionModel = $this->getModel('form.action');
 
             foreach ($parameters['actions'] as &$actionParams) {
                 if (empty($actionParams['id'])) {
@@ -121,6 +146,7 @@ class FormApiController extends CommonApiController
                     $actionEntity = $actionModel->getEntity();
                 } else {
                     $actionEntity = $actionModel->getEntity($actionParams['id']);
+                    $requestActionIds[] = $actionParams['id'];
                 }
 
                 $actionEntity->setForm($entity);
@@ -139,6 +165,15 @@ class FormApiController extends CommonApiController
             // Using the repository function to not trigger the listeners twice.
             $this->model->getRepository()->saveEntity($entity);
             $this->model->setActions($entity, $parameters['actions']);
+        }
+
+        // Remove actions which weren't in the PUT request
+        if (!$isNew && $method === 'PUT') {
+            foreach ($currentActions as $currentAction) {
+                if (!in_array($currentAction->getId(), $requestActionIds)) {
+                    $entity->removeAction($currentAction);
+                }
+            }
         }
     }
 }

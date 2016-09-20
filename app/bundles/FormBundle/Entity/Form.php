@@ -296,7 +296,9 @@ class Form extends FormEntity
                     'submissionCount',
                     'inKioskMode',
                     'renderStyle',
-                    'formType'
+                    'formType',
+                    'postAction',
+                    'postActionProperty'
                 )
             )
             ->build();
@@ -667,13 +669,13 @@ class Form extends FormEntity
     }
 
     /**
-     * Remove actions
+     * Remove action
      *
-     * @param Action $actions
+     * @param Action $action
      */
-    public function removeAction (Action $actions)
+    public function removeAction (Action $action)
     {
-        $this->actions->removeElement($actions);
+        $this->actions->removeElement($action);
     }
 
     /**
