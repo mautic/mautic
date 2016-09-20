@@ -41,7 +41,7 @@ CREATE TABLE {$this->prefix}lead_companies_change_log (
   company_id int(11) NOT NULL,
   type tinytext NOT NULL,
   event_name varchar(255) NOT NULL,
-  action-name varchar(255) NOT NULL,
+  action_name varchar(255) NOT NULL,
   date_added datetime NOT NULL,
   PRIMARY KEY(id)
 ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;

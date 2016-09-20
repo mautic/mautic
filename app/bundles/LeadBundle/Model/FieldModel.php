@@ -163,12 +163,12 @@ class FieldModel extends FormModel
 
     static public $coreCompanyFields   = [
         // Listed according to $order for installation
-        'companyNumber'     => [
+        'companynumber'     => [
             'fixed' => true,
             'group' => 'other',
             'object'     => 'company'
         ],
-        'companySource' => [
+        'companysource' => [
             'fixed' => true,
             'group' => 'other',
             'object'=> 'company'
