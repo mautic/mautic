@@ -314,11 +314,11 @@ class RoleController extends FormController
      */
     private function getPermissionsConfig (Entity\Role $role)
     {
-        $permissionObjects = $this->factory->getSecurity()->getPermissionObjects();
-        $translator        = $this->factory->getTranslator();
+        $permissionObjects = $this->get('mautic.security')->getPermissionObjects();
+        $translator        = $this->get('translator');
 
         $permissionsArray = ($role->getId()) ?
-            $this->factory->getEntityManager()->getRepository('MauticUserBundle:Permission')->getPermissionsByRole($role, true) :
+            $this->get('doctrine')->getManager()->getRepository('MauticUserBundle:Permission')->getPermissionsByRole($role, true) :
             array();
 
         $permissions     = array();
