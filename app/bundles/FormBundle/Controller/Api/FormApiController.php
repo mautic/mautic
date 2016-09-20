@@ -60,11 +60,11 @@ class FormApiController extends CommonApiController
     }
 
     /**
-     * Remove fields from a form
+     * Delete fields from a form
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function removeFieldsAction($formId)
+    public function deleteFieldsAction($formId)
     {
         if (!$this->security->isGranted(['form:forms:editown', 'form:forms:editother'], 'MATCH_ONE')) {
             return $this->accessDenied();
@@ -89,11 +89,11 @@ class FormApiController extends CommonApiController
     }
 
     /**
-     * Remove fields from a form
+     * Delete fields from a form
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function removeActionsAction($formId)
+    public function deleteActionsAction($formId)
     {
         if (!$this->security->isGranted(['form:forms:editown', 'form:forms:editother'], 'MATCH_ONE')) {
             return $this->accessDenied();

@@ -55,14 +55,14 @@ return [
                 'path'       => '/forms',
                 'controller' => 'MauticFormBundle:Api\FormApi'
             ],
-            'mautic_api_formremovefields' => [
-                'path'       => '/forms/{formId}/fields/remove',
-                'controller' => 'MauticFormBundle:Api\FormApi:removeFields',
+            'mautic_api_formdeletefields' => [
+                'path'       => '/forms/{formId}/fields/delete',
+                'controller' => 'MauticFormBundle:Api\FormApi:deleteFields',
                 'method'     => 'DELETE'
             ],
-            'mautic_api_formremoveactions' => [
-                'path'       => '/forms/{formId}/actions/remove',
-                'controller' => 'MauticFormBundle:Api\FormApi:removeActions',
+            'mautic_api_formdeleteactions' => [
+                'path'       => '/forms/{formId}/actions/delete',
+                'controller' => 'MauticFormBundle:Api\FormApi:deleteActions',
                 'method'     => 'DELETE'
             ]
         ],
