@@ -186,6 +186,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->clearTranslations();
         $this->clearVariants();
 
+        $this->resetDynamicContent();
+
         parent::__clone();
     }
 
@@ -198,7 +200,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->stats            = new ArrayCollection();
         $this->variantChildren  = new ArrayCollection();
         $this->assetAttachments = new ArrayCollection();
-        $this->dynamicContent   = new ArrayCollection();
+
+        $this->resetDynamicContent();
     }
 
     /**

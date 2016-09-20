@@ -39,6 +39,6 @@ class Version20160920195943 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->addSql("ALTER TABLE {$this->prefix}emails ADD dynamic_content LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)';");
+        $this->addSql("ALTER TABLE {$this->prefix}emails ADD dynamic_content LONGTEXT NOT NULL COMMENT '(DC2Type:array)';");
     }
 }

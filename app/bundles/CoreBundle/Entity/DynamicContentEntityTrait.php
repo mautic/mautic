@@ -17,17 +17,7 @@ trait DynamicContentEntityTrait
     /**
      * @var ArrayCollection
      */
-    private $dynamicContent = [
-        [
-            'tokenName' => null,
-            'content'   => null,
-            'filters'   => [
-                [
-                    'glue'   => null
-                ]
-            ]
-        ]
-    ];
+    private $dynamicContent;
 
     /**
      * @param ClassMetadata $builder
@@ -36,7 +26,6 @@ trait DynamicContentEntityTrait
     {
         $builder->createField('dynamicContent', 'array')
             ->columnName('dynamic_content')
-            ->nullable()
             ->build();
     }
 
@@ -88,5 +77,30 @@ trait DynamicContentEntityTrait
         if ($this->dynamicContent->containsKey($token)) {
             return $this->dynamicContent->get($token);
         }
+    }
+
+    /**
+     * Reset dynamic content.
+     */
+    public function resetDynamicContent()
+    {
+        $defaultDynamicContent = [
+            [
+                'tokenName' => null,
+                'content'   => null,
+                'filters'   => [
+                    [
+                        'content' => null,
+                        'filters' => [
+                            [
+                                'glue'   => null
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->dynamicContent = new ArrayCollection($defaultDynamicContent);
     }
 }
