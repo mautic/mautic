@@ -14,7 +14,6 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\Model\PageModel;
@@ -38,16 +37,13 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * CampaignSubscriber constructor.
      *
-     * @param MauticFactory $factory
      * @param PageModel $pageModel
      * @param EventModel $campaignEventModel
      */
-    public function __construct(MauticFactory $factory, PageModel $pageModel, EventModel $campaignEventModel)
+    public function __construct(PageModel $pageModel, EventModel $campaignEventModel)
     {
         $this->pageModel = $pageModel;
         $this->campaignEventModel = $campaignEventModel;
-
-        parent::__construct($factory);
     }
 
     /**

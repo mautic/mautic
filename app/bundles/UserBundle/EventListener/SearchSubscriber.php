@@ -12,6 +12,8 @@ namespace Mautic\UserBundle\EventListener;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\UserBundle\Model\RoleModel;
+use Mautic\UserBundle\Model\UserModel;
 
 /**
  * Class SearchSubscriber
@@ -20,6 +22,27 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
  */
 class SearchSubscriber extends CommonSubscriber
 {
+    /**
+     * @var UserModel
+     */
+    protected $userModel;
+
+    /**
+     * @var RoleModel
+     */
+    protected $userRoleModel;
+
+    /**
+     * SearchSubscriber constructor.
+     *
+     * @param UserModel $userModel
+     * @param RoleModel $roleModel
+     */
+    public function __construct(UserModel $userModel, RoleModel $roleModel)
+    {
+        $this->userModel = $userModel;
+        $this->userRoleModel = $roleModel;
+    }
 
     /**
      * @return array
@@ -40,7 +63,7 @@ class SearchSubscriber extends CommonSubscriber
         }
 
         if ($this->security->isGranted('user:users:view')) {
-            $users = $this->factory->getModel('user.user')->getEntities(
+            $users = $this->userModel->getEntities(
                 array(
                     'limit'  => 5,
                     'filter' => $str
@@ -74,7 +97,7 @@ class SearchSubscriber extends CommonSubscriber
         }
 
         if ($this->security->isGranted('user:roles:view')) {
-            $roles = $this->factory->getModel('user.role')->getEntities(
+            $roles = $this->userRoleModel->getEntities(
                 array(
                     'limit'  => 5,
                     'filter' => $str
@@ -116,13 +139,13 @@ class SearchSubscriber extends CommonSubscriber
         if ($this->security->isGranted('user:users:view')) {
             $event->addCommands(
                 'mautic.user.users',
-                $this->factory->getModel('user.user')->getCommandList()
+                $this->userModel->getCommandList()
             );
         }
         if ($this->security->isGranted('user:roles:view')) {
             $event->addCommands(
                 'mautic.user.roles',
-                $this->factory->getModel('user.role')->getCommandList()
+                $this->userRoleModel->getCommandList()
             );
         }
     }

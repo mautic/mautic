@@ -97,11 +97,6 @@ class MauticCoreExtension extends Extension
                             $details['arguments'] = array($details['arguments']);
                         }
 
-                        // Add MauticFactory to events
-                        if ($type == 'events' && !in_array('mautic.factory', $details['arguments'])) {
-                            $details['arguments'][] = 'mautic.factory';
-                        }
-
                         foreach ($details['arguments'] as $argument) {
                             if ($argument === '') {
                                 // To be added during compilation

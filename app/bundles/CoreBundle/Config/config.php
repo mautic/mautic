@@ -109,20 +109,36 @@ return [
         'events'  => [
             'mautic.core.subscriber'              => [
                 'class' => 'Mautic\CoreBundle\EventListener\CoreSubscriber',
+                'arguments' => [
+                    'mautic.helper.bundle',
+                    'mautic.helper.menu',
+                    'mautic.helper.user',
+                    'mautic.helper.cookie',
+                    'templating.helper.assets',
+                    'mautic.helper.core_parameters',
+                    'security.context',
+                    'mautic.user.model.user'
+                ]
             ],
             'mautic.core.configbundle.subscriber' => [
                 'class' => 'Mautic\CoreBundle\EventListener\ConfigSubscriber',
+                'arguments' => [
+                    'mautic.helper.language',
+                    'mautic.helper.core_parameters'
+                ]
             ],
             'mautic.webpush.js.subscriber'        => [
                 'class' => 'Mautic\CoreBundle\EventListener\BuildJsSubscriber',
             ],
             'mautic.core.dashboard.subscriber'    => [
                 'class' => 'Mautic\CoreBundle\EventListener\DashboardSubscriber',
+                'arguments' => [
+                    'mautic.core.model.auditlog'
+                ]
             ],
             'mautic.core.maintenance.subscriber'    => [
                 'class' => 'Mautic\CoreBundle\EventListener\MaintenanceSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'doctrine.dbal.default_connection'
                 ]
             ],
@@ -479,7 +495,7 @@ return [
                 'class'     => 'Mautic\CoreBundle\Menu\MenuHelper',
                 'arguments' => [
                     'mautic.security',
-                    'security.token_storage',
+                    'mautic.helper.user',
                     'request_stack',
                     '%mautic.parameters%',
                 ],

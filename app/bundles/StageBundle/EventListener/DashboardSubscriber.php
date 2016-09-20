@@ -12,6 +12,7 @@ use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\StageBundle\Model\StageModel;
 
 /**
  * Class DashboardSubscriber
@@ -47,6 +48,21 @@ class DashboardSubscriber extends MainDashboardSubscriber
     );
 
     /**
+     * @var StageModel
+     */
+    protected $stageModel;
+
+    /**
+     * DashboardSubscriber constructor.
+     *
+     * @param StageModel $stageModel
+     */
+    public function __construct(StageModel $stageModel)
+    {
+        $this->stageModel = $stageModel;
+    }
+
+    /**
      * Set a widget detail when needed
      *
      * @param WidgetDetailEvent $event
@@ -63,11 +79,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $params = $widget->getParams();
 
             if (!$event->isCached()) {
-                $model = $this->factory->getModel('stage');
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getStageLineChartData(
+                    'chartData'   => $this->stageModel->getStageLineChartData(
                         $params['timeUnit'],
                         $params['dateFrom'],
                         $params['dateTo'],

@@ -19,6 +19,7 @@ use Mautic\PageBundle\PageEvents;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 
 /**
  * Class BuilderSubscriber
@@ -29,6 +30,11 @@ class BuilderSubscriber extends CommonSubscriber
      * @var TokenHelper
      */
     protected $tokenHelper;
+
+    /**
+     * @var IntegrationHelper
+     */
+    protected $integrationHelper;
 
     /**
      * @var PageModel
@@ -43,12 +49,11 @@ class BuilderSubscriber extends CommonSubscriber
     protected $emailIsInternalSend = false;
     protected $emailEntity = null;
 
-    public function __construct(MauticFactory $factory, TokenHelper $tokenHelper, PageModel $pageModel)
+    public function __construct(TokenHelper $tokenHelper, IntegrationHelper $integrationHelper, PageModel $pageModel)
     {
-        $this->tokenHelper = $tokenHelper;
-        $this->pageModel   = $pageModel;
-
-        parent::__construct($factory);
+        $this->tokenHelper       = $tokenHelper;
+        $this->integrationHelper = $integrationHelper;
+        $this->pageModel         = $pageModel;
     }
 
     /**
@@ -210,7 +215,7 @@ class BuilderSubscriber extends CommonSubscriber
         static $content = "";
 
         if (empty($content)) {
-            $shareButtons = $this->factory->getHelper('integration')->getShareButtons();
+            $shareButtons = $this->integrationHelper->getShareButtons();
 
             $content = "<div class='share-buttons'>\n";
             foreach ($shareButtons as $network => $button) {

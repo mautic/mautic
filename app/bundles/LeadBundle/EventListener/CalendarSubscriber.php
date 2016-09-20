@@ -41,10 +41,9 @@ class CalendarSubscriber extends CommonSubscriber
     public function onCalendarGenerate(CalendarGeneratorEvent $event)
     {
         $dates  = $event->getDates();
-        $router = $this->factory->getRouter();
 
         // Lead Notes
-        $query = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+        $query = $this->em->getConnection()->createQueryBuilder();
         $query->select('ln.lead_id, l.firstname, l.lastname, ln.date_time AS start, ln.text AS description, ln.type')
             ->from(MAUTIC_TABLE_PREFIX . 'lead_notes', 'ln')
             ->leftJoin('ln', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'ln.lead_id = l.id')
@@ -68,7 +67,7 @@ class CalendarSubscriber extends CommonSubscriber
             }
             $date = new DateTimeHelper($object['start']);
             $object['start'] = $date->toLocalString(\DateTime::ISO8601);
-            $object['url']   = $router->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $object['lead_id']), true);
+            $object['url']   = $this->router->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $object['lead_id']), true);
             $object['attr']  = 'data-toggle="ajax"';
             $object['description'] = strip_tags(html_entity_decode($object['description']));
 

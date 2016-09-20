@@ -22,7 +22,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     /**
      * @var ReportModel
      */
-    protected $model;
+    protected $reportModel;
 
     /**
      * @var CorePermissions
@@ -57,18 +57,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'report:reports:viewother'
     );
 
-    /**
-     * DashboardSubscriber constructor.
-     *
-     * @param MauticFactory $factory
-     * @param ReportModel   $model
-     */
-    public function __construct(MauticFactory $factory, ReportModel $model, CorePermissions $security)
+    public function __construct(ReportModel $reportModel, CorePermissions $security)
     {
-        $this->model    = $model;
-        $this->security = $security;
-
-        parent::__construct($factory);
+        $this->reportModel = $reportModel;
+        $this->security    = $security;
     }
 
     /**
@@ -87,10 +79,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $params = $widget->getParams();
             if (!$event->isCached()) {
                 list($reportId, $graph) = explode(':', $params['graph']);
-                $report = $this->model->getEntity($reportId);
+                $report = $this->reportModel->getEntity($reportId);
 
                 if ($report && $this->security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
-                    $reportData = $this->model->getReportData(
+                    $reportData = $this->reportModel->getReportData(
                         $report,
                         null,
                         [

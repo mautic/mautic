@@ -12,8 +12,11 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Model\EmailModel;
 
 /**
  * Class EmailSubscriber
@@ -22,6 +25,34 @@ use Mautic\EmailBundle\EmailEvents;
  */
 class EmailSubscriber extends CommonSubscriber
 {
+    /**
+     * @var AuditLogModel
+     */
+    protected $auditLogModel;
+
+    /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
+
+    /**
+     * @var EmailModel
+     */
+    protected $emailModel;
+
+    /**
+     * EmailSubscriber constructor.
+     *
+     * @param IpLookupHelper $ipLookupHelper
+     * @param AuditLogModel  $auditLogModel
+     * @param EmailModel     $emailModel
+     */
+    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, EmailModel $emailModel)
+    {
+        $this->ipLookupHelper = $ipLookupHelper;
+        $this->auditLogModel = $auditLogModel;
+        $this->emailModel = $emailModel;
+    }
 
     /**
      * @return array
@@ -53,9 +84,9 @@ class EmailSubscriber extends CommonSubscriber
                 "objectId"  => $email->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->factory->getIpAddressFromRequest()
+                "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
             );
-            $this->factory->getModel('core.auditLog')->writeToLog($log);
+            $this->auditLogModel->writeToLog($log);
         }
     }
 
@@ -73,9 +104,9 @@ class EmailSubscriber extends CommonSubscriber
             "objectId"   => $email->deletedId,
             "action"     => "delete",
             "details"    => array('name' => $email->getName()),
-            "ipAddress"  => $this->factory->getIpAddressFromRequest()
+            "ipAddress"  => $this->ipLookupHelper->getIpAddressFromRequest()
         );
-        $this->factory->getModel('core.auditLog')->writeToLog($log);
+        $this->auditLogModel->writeToLog($log);
     }
 
     /**
@@ -88,14 +119,13 @@ class EmailSubscriber extends CommonSubscriber
         $message = $event->getMessage();
 
         if (isset($message->leadIdHash)) {
-            $model = $this->factory->getModel('email');
-            $stat  = $model->getEmailStatus($message->leadIdHash);
+            $stat = $this->emailModel->getEmailStatus($message->leadIdHash);
 
             if ($stat !== null) {
-                $reason = $this->factory->getTranslator()->trans('mautic.email.dnc.failed', array(
+                $reason = $this->translator->trans('mautic.email.dnc.failed', array(
                     "%subject%" => EmojiHelper::toShort($message->getSubject())
                 ));
-                $model->setDoNotContact($stat, $reason);
+                $this->emailModel->setDoNotContact($stat, $reason);
             }
         }
     }
@@ -128,26 +158,24 @@ class EmailSubscriber extends CommonSubscriber
         $message = $event->getMessage();
 
         if (isset($message->leadIdHash)) {
-            $model = $this->factory->getModel('email');
-            $stat  = $model->getEmailStatus($message->leadIdHash);
+            $stat  = $this->emailModel->getEmailStatus($message->leadIdHash);
             if ($stat !== null) {
                 $stat->upRetryCount();
 
                 $retries = $stat->getRetryCount();
                 if (true || $retries > 3) {
                     //tried too many times so just fail
-                    $reason = $this->factory->getTranslator()->trans('mautic.email.dnc.retries', array(
+                    $reason = $this->translator->trans('mautic.email.dnc.retries', array(
                         "%subject%" => EmojiHelper::toShort($message->getSubject())
                     ));
-                    $model->setDoNotContact($stat, $reason);
+                    $this->emailModel->setDoNotContact($stat, $reason);
                 } else {
                     //set it to try again
                     $event->tryAgain();
                 }
 
-                $em = $this->factory->getEntityManager();
-                $em->persist($stat);
-                $em->flush();
+                $this->em->persist($stat);
+                $this->em->flush();
             }
         }
     }

@@ -12,6 +12,7 @@ namespace Mautic\DynamicContentBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Event as Events;
 use Mautic\LeadBundle\Entity\Lead;
@@ -44,20 +45,29 @@ class DynamicContentSubscriber extends CommonSubscriber
     protected $assetTokenHelper;
 
     /**
+     * @var AuditLogModel
+     */
+    protected $auditLogModel;
+
+    /**
      * DynamicContentSubscriber constructor.
      *
-     * @param MauticFactory    $factory
      * @param TrackableModel   $trackableModel
      * @param PageTokenHelper  $pageTokenHelper
      * @param AssetTokenHelper $assetTokenHelper
+     * @param AuditLogModel    $auditLogModel
      */
-    public function __construct(MauticFactory $factory, TrackableModel $trackableModel, PageTokenHelper $pageTokenHelper, AssetTokenHelper $assetTokenHelper)
+    public function __construct(
+        TrackableModel $trackableModel,
+        PageTokenHelper $pageTokenHelper,
+        AssetTokenHelper $assetTokenHelper,
+        AuditLogModel $auditLogModel
+    )
     {
         $this->trackableModel = $trackableModel;
         $this->pageTokenHelper = $pageTokenHelper;
         $this->assetTokenHelper = $assetTokenHelper;
-
-        parent::__construct($factory);
+        $this->auditLogModel = $auditLogModel;
     }
 
     /**
@@ -88,7 +98,7 @@ class DynamicContentSubscriber extends CommonSubscriber
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details
             ];
-            $this->factory->getModel('core.auditLog')->writeToLog($log);
+            $this->auditLogModel->writeToLog($log);
         }
     }
 
@@ -107,7 +117,7 @@ class DynamicContentSubscriber extends CommonSubscriber
             "action"     => "delete",
             "details"    => ['name' => $entity->getName()]
         ];
-        $this->factory->getModel('core.auditLog')->writeToLog($log);
+        $this->auditLogModel->writeToLog($log);
     }
 
     public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event)

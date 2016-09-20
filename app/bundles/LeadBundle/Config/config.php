@@ -166,7 +166,7 @@ return [
             'mautic.lead.subscriber'                => [
                 'class'     => 'Mautic\LeadBundle\EventListener\LeadSubscriber',
                 'arguments' => [
-                    'mautic.factory',
+                    'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog'
                 ]
             ],
@@ -179,7 +179,6 @@ return [
             'mautic.lead.campaignbundle.subscriber' => [
                 'class' => 'Mautic\LeadBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.helper.ip_lookup',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.field'
@@ -188,7 +187,6 @@ return [
             'mautic.lead.reportbundle.subscriber'   => [
                 'class'     => 'Mautic\LeadBundle\EventListener\ReportSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.lead.model.list',
                     'mautic.lead.model.field',
                     'mautic.lead.model.lead',
@@ -204,18 +202,24 @@ return [
                 'class' => 'Mautic\LeadBundle\EventListener\PointSubscriber'
             ],
             'mautic.lead.search.subscriber'         => [
-                'class' => 'Mautic\LeadBundle\EventListener\SearchSubscriber'
+                'class' => 'Mautic\LeadBundle\EventListener\SearchSubscriber',
+                'arguments' => [
+                    'mautic.lead.model.lead'
+                ]
             ],
             'mautic.webhook.subscriber'             => [
                 'class' => 'Mautic\LeadBundle\EventListener\WebhookSubscriber'
             ],
             'mautic.lead.dashboard.subscriber'      => [
-                'class' => 'Mautic\LeadBundle\EventListener\DashboardSubscriber'
+                'class' => 'Mautic\LeadBundle\EventListener\DashboardSubscriber',
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.list'
+                ]
             ],
             'mautic.lead.maintenance.subscriber'    => [
                 'class' => 'Mautic\LeadBundle\EventListener\MaintenanceSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'doctrine.dbal.default_connection'
                 ]
             ],
