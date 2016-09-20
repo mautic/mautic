@@ -17,7 +17,17 @@ trait DynamicContentEntityTrait
     /**
      * @var ArrayCollection
      */
-    private $dynamicContent;
+    private $dynamicContent = [
+        [
+            'tokenName' => null,
+            'content'   => null,
+            'filters'   => [
+                [
+                    'glue'   => null
+                ]
+            ]
+        ]
+    ];
 
     /**
      * @param ClassMetadata $builder
