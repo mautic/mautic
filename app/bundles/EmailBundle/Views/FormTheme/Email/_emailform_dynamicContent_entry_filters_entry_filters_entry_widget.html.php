@@ -10,6 +10,7 @@
 $isPrototype = ($form->vars['name'] == '__name__');
 $filterType  = $form['field']->vars['value'];
 $inGroup     = $form->vars['data']['glue'] === 'and';
+$objectIcon  = (isset($form->vars['data']['object']) && $form->vars['data']['object'] == 'company') ? 'fa-building' : 'fa-user';
 ?>
 
 <div class="panel<?php echo ($isPrototype || ($inGroup && !$first)) ? ' in-group' : ''; ?>">
@@ -20,7 +21,7 @@ $inGroup     = $form->vars['data']['glue'] === 'and';
     </div>
     <div class="panel-body">
         <div class="col-xs-6 col-sm-3 field-name">
-            <span><?php echo ($isPrototype) ? '__label__' : $form->parent->parent->vars['fields'][$filterType]['label']; ?></span>
+            <i class="object-icon fa <?php echo $objectIcon; ?>"></i> <span><?php echo ($isPrototype) ? '__label__' : $form->parent->parent->vars['fields'][$filterType]['label']; ?></span>
         </div>
 
         <div class="col-xs-6 col-sm-3 padding-none">

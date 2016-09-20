@@ -541,10 +541,11 @@ Mautic.addDynamicContentFilter = function (selectedFilter) {
     var label           = selectedOption.text();
 
     // create a new filter
-    var filterNum = activeDynamicContentFilterContainer.children('.panel').length;
-    var prototype = mQuery('#filterSelectPrototype').data('prototype');
-    var fieldType = selectedOption.data('field-type');
-    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale']) != -1);
+    var filterNum   = activeDynamicContentFilterContainer.children('.panel').length;
+    var prototype   = mQuery('#filterSelectPrototype').data('prototype');
+    var fieldObject = selectedOption.data('field-object');
+    var fieldType   = selectedOption.data('field-type');
+    var isSpecial   = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'multiselect', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale']) != -1);
 
     // Update the prototype settings
     prototype = prototype.replace(/__name__/g, filterNum)
@@ -591,6 +592,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter) {
 
     prototype.find("input[name='" + filterBase + "[field]']").val(selectedFilter);
     prototype.find("input[name='" + filterBase + "[type]']").val(fieldType);
+    prototype.find("input[name='" + filterBase + "[object]']").val(fieldObject);
 
     var filterEl = (isSpecial) ? "select[name='" + filterBase + "[filter]']" : "input[name='" + filterBase + "[filter]']";
 
