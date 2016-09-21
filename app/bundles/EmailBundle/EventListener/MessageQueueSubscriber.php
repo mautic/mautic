@@ -72,11 +72,16 @@ class MessageQueueSubscriber extends CommonSubscriber
         $leadCredentials['owner_id'] = (
             ($lead instanceof Lead) && ($owner = $lead->getOwner())
         ) ? $owner->getId() : 0;
-        $options = $queueItem->getOptions();
 
-        $message = $this->emailModel->getEntity($queueItem->getChannelId());
+        $success = false;
+        
+        if (!empty($leadCredentials['email'])) {
+            $options = $queueItem->getOptions();
 
-        $success = $this->emailModel->sendEmail($message, $leadCredentials, $options);
+            $message = $this->emailModel->getEntity($queueItem->getChannelId());
+
+            $success = $this->emailModel->sendEmail($message, $leadCredentials, $options);
+        }
 
         return $success;
     }
