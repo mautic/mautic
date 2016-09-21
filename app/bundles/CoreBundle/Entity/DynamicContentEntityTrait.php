@@ -85,7 +85,7 @@ trait DynamicContentEntityTrait
      */
     public function checkDynamicContent()
     {
-        if ($this->dynamicContent == null || empty($this->dynamicContent->toArray())) {
+        if (empty($this->dynamicContent) || ($this->dynamicContent instanceof ArrayCollection && empty($this->dynamicContent->toArray()))) {
             $this->resetDynamicContent();
         }
     }
