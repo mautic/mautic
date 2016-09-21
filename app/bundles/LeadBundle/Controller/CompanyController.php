@@ -334,6 +334,13 @@ class CompanyController extends FormController
         }
 
         $action  = $this->generateUrl('mautic_company_action', array('objectAction' => 'edit', 'objectId' => $objectId));
+        $updateSelect = ($this->request->getMethod() == 'POST')
+            ? $this->request->request->get('company[updateSelect]', false, true)
+            : $this->request->get(
+                'updateSelect',
+                false
+            );
+
         $fields = $this->getModel('lead.field')->getEntities(
             [
                 'filter' => [
@@ -357,7 +364,7 @@ class CompanyController extends FormController
             $entity,
             $this->get('form.factory'),
             $action,
-            ['fields' => $fields]
+            ['fields' => $fields, 'update_select' => $updateSelect]
         );
 
         ///Check for a submitted form and process it
@@ -416,6 +423,24 @@ class CompanyController extends FormController
                 $template  = 'MauticLeadBundle:Company:index';
             }
 
+            $passthrough = [
+                'activeLink'    => '#mautic_company_index',
+                'mauticContent' => 'company'
+            ];
+
+            // Check to see if this is a popup
+            if (isset($form['updateSelect'])) {
+                $template    = false;
+                $passthrough = array_merge(
+                    $passthrough,
+                    [
+                        'updateSelect'   => $form['updateSelect']->getData(),
+                        'id'      => $entity->getId(),
+                        'companyname'    => $entity->getName()
+                    ]
+                );
+            }
+
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(
                     array_merge(
@@ -423,7 +448,8 @@ class CompanyController extends FormController
                         array(
                             'returnUrl'       => $returnUrl,
                             'viewParameters'  => $viewParameters,
-                            'contentTemplate' => $template
+                            'contentTemplate' => $template,
+                            'passthroughVars' => $passthrough
                         )
                     )
                 );
@@ -450,6 +476,7 @@ class CompanyController extends FormController
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_company_index',
                     'mauticContent' => 'company',
+                    'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect')),
                     'route'         => $this->generateUrl(
                         'mautic_company_action',
                         array(

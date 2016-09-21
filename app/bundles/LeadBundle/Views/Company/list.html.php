@@ -117,7 +117,7 @@ if ($tmpl == 'index') {
                         <?php   endif; ?>
                     </td>
                     <td class="visible-md visible-lg">
-                        <a class="label label-primary" href="<?php echo $view['router']->path('mautic_contact_index', array('search' => $view['translator']->trans('mautic.company.lead.searchcommand.company') . ':' . $item->getName())); ?>" data-toggle="ajax"<?php echo ($leadCounts[$item->getId()] == 0) ? "disabled=disabled" : ""; ?>>
+                        <a class="label label-primary" href="<?php echo $view['router']->path('mautic_contact_index', array('search' => $view['translator']->trans('mautic.company.lead.searchcommand.company') . ':' . $fields['core']['companyname']['value'])); ?>" data-toggle="ajax"<?php echo ($leadCounts[$item->getId()] == 0) ? "disabled=disabled" : ""; ?>>
                             <?php echo $view['translator']->transChoice('mautic.lead.company.viewleads_count', $leadCounts[$item->getId()], array('%count%' => $leadCounts[$item->getId()])); ?>
                         </a>
                     </td>

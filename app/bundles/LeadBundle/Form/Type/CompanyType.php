@@ -118,7 +118,7 @@ class CompanyType extends AbstractType
             'required' => false
         ));
 
-        if (!empty($options['update_select'])) {
+        if (empty($options['update_select'])) {
             $builder->add(
                 'buttons',
                 'form_buttons',

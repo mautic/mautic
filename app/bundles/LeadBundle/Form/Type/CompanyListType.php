@@ -9,7 +9,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\UserBundle\Entity\User;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\Form\AbstractType;
@@ -50,6 +50,7 @@ class CompanyListType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $companies = $this->repo->getCompanies(true);
+
         foreach ($companies as $company) {
             $companies_list[$company['id']] = $company['companyname'];
         }

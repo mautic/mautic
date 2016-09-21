@@ -371,11 +371,11 @@ class CompanyRepository extends CommonRepository
         $q = $this->_em->getConnection()->createQueryBuilder();
         static $companies = array();
 
-        if (is_object($user)) {
-            $user = $user->getId();
+        if ($user) {
+            $user = $this->currentUser;
         }
 
-        $key = (int) $user.$id;
+        $key = (int)$id;
         if (isset($companies[$key])) {
             return $companies[$key];
         }
@@ -383,15 +383,15 @@ class CompanyRepository extends CommonRepository
         $q->select('comp.*')
             ->from(MAUTIC_TABLE_PREFIX .'companies', 'comp');
 
-        if ($user) {
-            $q->orWhere('comp.created_by = :user');
-            $q->setParameter('user', $user);
-        }
-
         if (!empty($id)) {
             $q->where(
                 $q->expr()->eq('comp.id', $id)
             );
+        }
+
+        if ($user) {
+            $q->andWhere('comp.created_by = :user');
+            $q->setParameter('user', $user->getId());
         }
 
         $q->orderBy('comp.id', 'DESC');

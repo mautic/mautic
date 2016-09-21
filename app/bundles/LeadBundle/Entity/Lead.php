@@ -444,7 +444,7 @@ class Lead extends FormEntity
                 $this->changes['frequencyRules']['removed'][] = $val;
             }
         } elseif ($prop == 'companies') {
-            $this->changes['companies'] = ['', $val->getCompanies()];
+            $this->changes['companies'][] = $val;
         }elseif ($this->$getter() != $val) {
             $this->changes[$prop] = [$this->$getter(), $val];
         }
