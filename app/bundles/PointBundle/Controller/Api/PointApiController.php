@@ -21,7 +21,7 @@ class PointApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    public function initialize (FilterControllerEvent $event)
+    public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
         $this->model            = $this->getModel('point');
@@ -30,5 +30,20 @@ class PointApiController extends CommonApiController
         $this->entityNameMulti  = 'points';
         $this->permissionBase   = 'point:points';
         $this->serializerGroups = array('pointDetails', 'categoryList', 'publishDetails');
+    }
+
+    /**
+     * Return array of available point action types
+     */
+    public function getPointActionTypesAction()
+    {
+        if (!$this->security->isGranted([$this->permissionBase.':view', $this->permissionBase.':viewown'])) {
+            return $this->accessDenied();
+        }
+
+        $actionTypes = $this->model->getPointActions();
+        $view        = $this->view(['pointActionTypes' => $actionTypes['list']]);
+        
+        return $this->handleView($view);
     }
 }

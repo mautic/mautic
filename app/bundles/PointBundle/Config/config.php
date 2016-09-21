@@ -37,6 +37,10 @@ return array(
                 'path'       => '/points',
                 'controller' => 'MauticPointBundle:Api\PointApi'
             ],
+            'mautic_api_getpointactiontypes' => array(
+                'path'       => '/points/actions/types',
+                'controller' => 'MauticPointBundle:Api\PointApi:getPointActionTypes'
+            ),
             'mautic_api_gettriggers' => array(
                 'path'       => '/points/triggers',
                 'controller' => 'MauticPointBundle:Api\TriggerApi:getEntities'
