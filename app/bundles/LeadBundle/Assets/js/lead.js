@@ -410,10 +410,11 @@ Mautic.addLeadListFilter = function (elId) {
         // First filter so hide the glue footer
         mQuery(prototype).find(".panel-heading").addClass('hide');
     }
+    
     if (fieldObject == 'company') {
-        mQuery(prototype).find("#object-icon").addClass('fa-building');
+        mQuery(prototype).find(".object-icon").removeClass('fa-user').addClass('fa-building');
     } else {
-        mQuery(prototype).find("#object-icon").addClass('fa-user');
+        mQuery(prototype).find(".object-icon").removeClass('fa-building').addClass('fa-user');
     }
     mQuery(prototype).find(".inline-spacer").append(fieldObject);
 
