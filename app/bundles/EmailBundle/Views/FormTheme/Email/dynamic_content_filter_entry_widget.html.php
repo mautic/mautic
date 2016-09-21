@@ -6,7 +6,6 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 ?>
 <div class="tab-pane dynamic-content-filter bdr-w-0<?php echo ($form->vars['name'] === '0' ? ' active' : ' fade') ?>" id="<?php echo $form->vars['id'] ?>">
     <div class="row form-group">
@@ -56,7 +55,7 @@
     <?php
     foreach ($form['filters'] as $i => $filter) {
         $isPrototype = ($filter->vars['name'] == '__name__');
-        if ($isPrototype || isset($form->vars['fields'][$filter->vars['value']['field']])) {
+        if ($isPrototype || isset($form->vars['fields'][$filter->vars['value']['object']][$filter->vars['value']['field']])) {
             echo $view['form']->widget($filter, ['first' => ($i === 0)]);
         }
     }
