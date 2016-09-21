@@ -83,7 +83,7 @@ CREATE TABLE {$this->prefix}companies_leads (
         date_added datetime DEFAULT NULL,
         manually_added tinyint(4) DEFAULT NULL,
         manually_removed tinyint(4) DEFAULT NULL,
-        is_primary int(11) NOT NULL DEFAULT '1'
+        is_primary int(11) NOT NULL DEFAULT 1,
         INDEX {$lead_index} (lead_id), 
         INDEX {$company_index} (company_id),
         PRIMARY KEY(lead_id, company_id)
