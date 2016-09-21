@@ -592,7 +592,7 @@ class LeadController extends FormController
             ]
         );
         $form   = $model->createForm($lead, $this->get('form.factory'), $action, ['fields' => $fields]);
-var_dump($this->request->request);die;
+
         ///Check for a submitted form and process it
         if (!$ignorePost && $this->request->getMethod() == 'POST') {
             $valid = false;
