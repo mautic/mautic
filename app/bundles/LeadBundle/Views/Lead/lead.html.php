@@ -79,24 +79,7 @@ $buttons[] = [
     'btnText'   => $view['translator']->trans('mautic.lead.lead.lists'),
     'iconClass' => 'fa fa-pie-chart',
 ];
-//View Lead Companies button
-$buttons[] = [
-    'attr'      => [
-        'data-toggle' => 'ajaxmodal',
-        'data-target' => '#MauticSharedModal',
-        'data-header' => $view['translator']->trans(
-            'mautic.lead.lead.header.companies',
-            ['%name%' => $lead->getPrimaryIdentifier()]
-        ),
-        'data-footer' => 'false',
-        'href'        => $view['router']->path(
-            'mautic_contact_action',
-            ["objectId" => $lead->getId(), "objectAction" => "company"]
-        ),
-    ],
-    'btnText'   => $view['translator']->trans('mautic.lead.lead.companies'),
-    'iconClass' => 'fa fa-building',
-];
+
 //View Contact Frequency button
 
 if ($edit) {
