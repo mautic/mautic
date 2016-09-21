@@ -31,15 +31,12 @@ return array(
                 'controller' => 'MauticPointBundle:Point:execute'
             )
         ),
-        'api'  => array(
-            'mautic_api_getpoints'   => array(
+        'api'  => [
+            'standard_entity' => [
+                'name'       => 'points',
                 'path'       => '/points',
-                'controller' => 'MauticPointBundle:Api\PointApi:getEntities'
-            ),
-            'mautic_api_getpoint'    => array(
-                'path'       => '/points/{id}',
-                'controller' => 'MauticPointBundle:Api\PointApi:getEntity'
-            ),
+                'controller' => 'MauticPointBundle:Api\PointApi'
+            ],
             'mautic_api_gettriggers' => array(
                 'path'       => '/points/triggers',
                 'controller' => 'MauticPointBundle:Api\TriggerApi:getEntities'
@@ -48,7 +45,7 @@ return array(
                 'path'       => '/points/triggers/{id}',
                 'controller' => 'MauticPointBundle:Api\TriggerApi:getEntity'
             )
-        )
+        ]
     ),
 
     'menu'     => array(

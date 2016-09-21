@@ -135,6 +135,10 @@ class Point extends FormEntity
         $metadata->addPropertyConstraint('type', new Assert\NotBlank(array(
             'message' => 'mautic.point.type.notblank'
         )));
+
+        $metadata->addPropertyConstraint('delta', new Assert\NotBlank(array(
+            'message' => 'mautic.point.delta.notblank'
+        )));
     }
 
     /**

@@ -96,9 +96,15 @@ class PointModel extends CommonFormModel
         if (!$entity instanceof Point) {
             throw new MethodNotAllowedHttpException(array('Point'));
         }
+
         if (!empty($action)) {
             $options['action'] = $action;
         }
+
+        if (empty($options['pointActions'])) {
+            $options['pointActions'] = $this->getPointActions();
+        }
+        
         return $formFactory->create('point', $entity, $options);
     }
 
