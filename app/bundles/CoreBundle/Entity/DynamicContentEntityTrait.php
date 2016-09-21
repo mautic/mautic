@@ -81,6 +81,16 @@ trait DynamicContentEntityTrait
     }
 
     /**
+     * Check dynamic content.
+     */
+    public function checkDynamicContent()
+    {
+        if ($this->dynamicContent == null || empty($this->dynamicContent->toArray())) {
+            $this->resetDynamicContent();
+        }
+    }
+
+    /**
      * Reset dynamic content.
      */
     public function resetDynamicContent()

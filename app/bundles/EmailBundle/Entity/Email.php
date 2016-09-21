@@ -10,6 +10,7 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -221,8 +222,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $builder->setTable('emails')
             ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\EmailRepository')
-            ->addLifecycleEvent('cleanUrlsInContent', 'preUpdate')
-            ->addLifecycleEvent('cleanUrlsInContent', 'prePersist');
+            ->addLifecycleEvent('cleanUrlsInContent', Events::preUpdate)
+            ->addLifecycleEvent('cleanUrlsInContent', Events::prePersist)
+            ->addLifecycleEvent('checkDynamicContent', Events::preUpdate)
+            ->addLifecycleEvent('checkDynamicContent', Events::prePersist)
+            ->addLifecycleEvent('checkDynamicContent', Events::postLoad);
 
         $builder->addIdColumns();
 
