@@ -50,10 +50,11 @@ return [
             ]
         ],
         'api'    => [
-            'standard_entity' => [
-                'name'       => 'forms',
-                'path'       => '/forms',
-                'controller' => 'MauticFormBundle:Api\FormApi'
+            'mautic_api_formstandard' => [
+                'standard_entity' => true,
+                'name'            => 'forms',
+                'path'            => '/forms',
+                'controller'      => 'MauticFormBundle:Api\FormApi'
             ],
             'mautic_api_formdeletefields' => [
                 'path'       => '/forms/{formId}/fields/delete',

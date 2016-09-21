@@ -120,10 +120,11 @@ return [
             ],
         ],
         'api'  => [
-            'standard_entity' => [
-                'name'       => 'smses',
-                'path'       => '/smses',
-                'controller' => 'MauticSmsBundle:Api\SmsApi'
+            'mautic_api_smsesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'smses',
+                'path'            => '/smses',
+                'controller'      => 'MauticSmsBundle:Api\SmsApi'
             ]
         ]
     ],

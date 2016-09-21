@@ -26,10 +26,11 @@ return [
             ],
         ],
         'api'    => [
-            'standard_entity' => [
-                'name'       => 'categories',
-                'path'       => '/categories',
-                'controller' => 'MauticCategoryBundle:Api\CategoryApi'
+            'mautic_api_categoriesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'categories',
+                'path'            => '/categories',
+                'controller'      => 'MauticCategoryBundle:Api\CategoryApi'
             ],
         ],
     ],

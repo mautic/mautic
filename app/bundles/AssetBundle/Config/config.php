@@ -28,10 +28,11 @@ return [
             ]
         ],
         'api' => [
-            'standard_entity' => [
-                'name'       => 'assets',
-                'path'       => '/assets',
-                'controller' => 'MauticAssetBundle:Api\AssetApi'
+            'mautic_api_assetsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'assets',
+                'path'            => '/assets',
+                'controller'      => 'MauticAssetBundle:Api\AssetApi'
             ],
         ],
         'public' => [

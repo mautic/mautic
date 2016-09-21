@@ -32,10 +32,11 @@ return array(
             )
         ),
         'api'  => array(
-            'standard_entity' => [
-                'name'       => 'campaigns',
-                'path'       => '/campaigns',
-                'controller' => 'MauticCampaignBundle:Api\CampaignApi'
+            'mautic_api_campaignsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'campaigns',
+                'path'            => '/campaigns',
+                'controller'      => 'MauticCampaignBundle:Api\CampaignApi'
             ],
             'mautic_api_campaignaddcontact' => array(
                 'path'       => '/campaigns/{id}/contact/add/{leadId}',

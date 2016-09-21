@@ -32,23 +32,22 @@ return array(
             )
         ),
         'api'  => [
-            'standard_entity' => [
-                'name'       => 'points',
-                'path'       => '/points',
-                'controller' => 'MauticPointBundle:Api\PointApi'
+            'mautic_api_pointactionsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'points',
+                'path'            => '/points',
+                'controller'      => 'MauticPointBundle:Api\PointApi'
             ],
             'mautic_api_getpointactiontypes' => array(
                 'path'       => '/points/actions/types',
                 'controller' => 'MauticPointBundle:Api\PointApi:getPointActionTypes'
             ),
-            'mautic_api_gettriggers' => array(
-                'path'       => '/points/triggers',
-                'controller' => 'MauticPointBundle:Api\TriggerApi:getEntities'
-            ),
-            'mautic_api_gettrigger'  => array(
-                'path'       => '/points/triggers/{id}',
-                'controller' => 'MauticPointBundle:Api\TriggerApi:getEntity'
-            )
+            'mautic_api_pointtriggersstandard' => [
+                'standard_entity' => true,
+                'name'            => 'triggers',
+                'path'            => '/points/triggers',
+                'controller'      => 'MauticPointBundle:Api\TriggerApi'
+            ]
         ]
     ),
 

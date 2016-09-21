@@ -20,10 +20,11 @@ return [
             ]
         ],
         'api'  => [
-            'standard_entity' => [
-                'name'       => 'stages',
-                'path'       => '/stages',
-                'controller' => 'MauticStageBundle:Api\StageApi'
+            'mautic_api_stagesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'stages',
+                'path'            => '/stages',
+                'controller'      => 'MauticStageBundle:Api\StageApi'
             ],
             'mautic_api_stageddcontact'       => [
                 'path'       => '/stages/{id}/contact/add/{contactId}',

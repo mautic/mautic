@@ -116,10 +116,11 @@ return [
                 'path'       => '/contacts/list/segments',
                 'controller' => 'MauticLeadBundle:Api\ListApi:getLists'
             ],
-            'standard_entity' => [
-                'name'       => 'lists',
-                'path'       => '/segments',
-                'controller' => 'MauticLeadBundle:Api\ListApi'
+            'mautic_api_segmentsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'lists',
+                'path'            => '/segments',
+                'controller'      => 'MauticLeadBundle:Api\ListApi'
             ],
             'mautic_api_segmentaddcontact'       => [
                 'path'       => '/segments/{id}/contact/add/{leadId}',

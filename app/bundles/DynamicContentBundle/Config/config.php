@@ -43,10 +43,11 @@ return [
             ]
         ],
         'api'  => [
-            'standard_entity' => [
-                'name'       => 'dynamicContents',
-                'path'       => '/dynamiccontents',
-                'controller' => 'MauticDynamicContentBundle:Api\DynamicContentApi'
+            'mautic_api_dynamicContent_standard' => [
+                'standard_entity' => true,
+                'name'            => 'dynamicContents',
+                'path'            => '/dynamiccontents',
+                'controller'      => 'MauticDynamicContentBundle:Api\DynamicContentApi'
             ]
         ]
     ],

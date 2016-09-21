@@ -131,10 +131,11 @@ return [
             ],
         ],
         'api'  => [
-            'standard_entity' => [
-                'name'       => 'notifications',
-                'path'       => '/notifications',
-                'controller' => 'MauticNotificationBundle:Api\NotificationApi'
+            'mautic_api_notificationsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'notifications',
+                'path'            => '/notifications',
+                'controller'      => 'MauticNotificationBundle:Api\NotificationApi'
             ]
         ]
     ],

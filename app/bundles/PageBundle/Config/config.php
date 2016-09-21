@@ -46,10 +46,11 @@ return [
             ]
         ],
         'api'    => [
-            'standard_entity' => [
-                'name'       => 'pages',
-                'path'       => '/pages',
-                'controller' => 'MauticPageBundle:Api\PageApi'
+            'mautic_api_pagesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'pages',
+                'path'            => '/pages',
+                'controller'      => 'MauticPageBundle:Api\PageApi'
             ],
         ],
         'catchall'  => [
