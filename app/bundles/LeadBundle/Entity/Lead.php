@@ -444,7 +444,11 @@ class Lead extends FormEntity
                 $this->changes['frequencyRules']['removed'][] = $val;
             }
         } elseif ($prop == 'companies') {
-            $this->changes['companies'][] = $val;
+            if ($val instanceof Company) {
+                $this->changes['companies']['added'][] = $val->getId();
+            } else {
+                $this->changes['companies']['removed'][] = $val;
+            }
         }elseif ($this->$getter() != $val) {
             $this->changes[$prop] = [$this->$getter(), $val];
         }
@@ -1397,7 +1401,7 @@ class Lead extends FormEntity
      */
     public function setCompanies($companies)
     {
-        $this->companies[] = $companies;
+        $this->companies = $companies;
 
         return $this;
     }

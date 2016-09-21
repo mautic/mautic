@@ -77,11 +77,15 @@ SQL;
         $lead_index = $this->generatePropertyName('company_leads_xref', 'idx', array('lead_id'));
         $company_index =  $this->generatePropertyName('company_leads_xref', 'idx', array('company_id'));
         $sql = <<<SQL
-CREATE TABLE {$this->prefix}company_leads_xref (
+CREATE TABLE {$this->prefix}companies_leads (
         lead_id INT NOT NULL, 
         company_id INT NOT NULL, 
+        date_added datetime DEFAULT NULL,
+        manually_added tinyint(4) DEFAULT NULL,
+        manually_removed tinyint(4) DEFAULT NULL,
+        is_primary int(11) NOT NULL DEFAULT '1'
         INDEX {$lead_index} (lead_id), 
-        INDEX {$company_index} (company_id), 
+        INDEX {$company_index} (company_id),
         PRIMARY KEY(lead_id, company_id)
         ) 
         DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB
@@ -95,10 +99,9 @@ SQL;
 INSERT INTO `{$this->prefix}lead_fields` (`is_published`, `label`, `alias`, `type`, `field_group`, `default_value`, `is_required`, `is_fixed`, `is_visible`, `is_short_visible`, `is_listable`, `is_publicly_updatable`, `is_unique_identifer`, `field_order`, `object`,`properties`) 
 VALUES 
  (1, 'name', 'companyname', 'text', 'core', NULL, 1, 0, 1, 1, 1, 0, 0, 18, 'company', 'a:0:{}'),
-(1,  'description', 'description', 'textarea', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 17, 'company', 'a:0:{}'),
+(1,  'description', 'companydescription', 'textarea', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 17, 'company', 'a:0:{}'),
 (1, 'Company Number', 'companynumber', 'text', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 16, 'company', 'a:0:{}'),
 (1,  'Company Source', 'companysource', 'text', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 15, 'company', 'a:0:{}'),
-(1, 'Industry', 'industry', 'lookup', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 14, 'company', 'a:1:{s:4:"list";s:55:"Construction|Manufacturing|Wholesale|Finance|Healthcare";}'),
 (1, 'Address 1', 'companyaddress1', 'text', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 13, 'company', 'a:0:{}'),
 (1,  'Address 2', 'companyaddress2', 'text', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 12, 'company', 'a:0:{}'),
 (1, 'Email', 'companyemail', 'email', 'core', NULL, 0, 0, 1, 1, 1, 0, 1, 11, 'company', 'a:0:{}'),
@@ -107,10 +110,10 @@ VALUES
 (1, 'state', 'companystate', 'text', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 8, 'company', 'a:0:{}'),
 (1, 'zipcode', 'companyzipcode', 'text', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 7, 'company', 'a:0:{}'),
 (1, 'Country', 'companycountry', 'country', 'core', NULL, 0, 0, 1, 1, 1, 0, 1, 6, 'company', 'a:0:{}'),
-(1,  'Number of Employees', 'numberofemployees', 'number', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 5, 'company', 'a:2:{s:9:"roundmode";s:1:"3";s:9:"precision";s:1:"0";}'),
-(1,  'Fax', 'fax1', 'tel', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 4, 'company', 'a:0:{}'),
-(1,  'score', 'score', 'number', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 3, 'company', 'a:2:{s:9:"roundmode";s:1:"3";s:9:"precision";s:1:"0";}'),
-(1, 'Annual Revenue', 'annual_revenue', 'number', 'professional', NULL, 0, 0, 1, 1, 1, 0, 1, 2, 'company', 'a:2:{s:9:"roundmode";s:1:"3";s:9:"precision";s:1:"2";}'),
+(1,  'Number of Employees', 'companynumber_of_employees', 'number', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 5, 'company', 'a:2:{s:9:"roundmode";s:1:"3";s:9:"precision";s:1:"0";}'),
+(1,  'Fax', 'companyfax', 'tel', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 4, 'company', 'a:0:{}'),
+(1,  'score', 'companyscore', 'number', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 3, 'company', 'a:2:{s:9:"roundmode";s:1:"3";s:9:"precision";s:1:"0";}'),
+(1, 'Annual Revenue', 'companyannual_revenue', 'number', 'professional', NULL, 0, 0, 1, 1, 1, 0, 1, 2, 'company', 'a:2:{s:9:"roundmode";s:1:"3";s:9:"precision";s:1:"2";}'),
 (1, 'Website', 'companywebsite', 'url', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 1, 'company', 'a:0:{}');
 SQL;
 
