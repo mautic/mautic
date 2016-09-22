@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Doctrine\Type;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Mautic\CoreBundle\Helper\UTF8Helper;
@@ -27,9 +28,12 @@ class ArrayType extends \Doctrine\DBAL\Types\ArrayType
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
-        if (!is_array($value)) {
-
+        if (!is_array($value) && !($value instanceof ArrayCollection)) {
             return (null === $value) ? 'N;' : 'a:0:{}';
+        }
+
+        if ($value instanceof ArrayCollection) {
+            $value = $value->toArray();
         }
 
         // MySQL will crap out on corrupt UTF8 leading to broken serialized strings

@@ -187,8 +187,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->clearTranslations();
         $this->clearVariants();
 
-        $this->resetDynamicContent();
-
         parent::__clone();
     }
 
@@ -224,8 +222,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\EmailRepository')
             ->addLifecycleEvent('cleanUrlsInContent', Events::preUpdate)
             ->addLifecycleEvent('cleanUrlsInContent', Events::prePersist)
-            ->addLifecycleEvent('checkDynamicContent', Events::preUpdate)
-            ->addLifecycleEvent('checkDynamicContent', Events::prePersist)
             ->addLifecycleEvent('checkDynamicContent', Events::postLoad);
 
         $builder->addIdColumns();

@@ -20,7 +20,7 @@ trait DynamicContentEntityTrait
     private $dynamicContent;
 
     /**
-     * @param ClassMetadata $builder
+     * @param ClassMetadataBuilder $builder
      */
     static protected function addDynamicContentMetadata(ClassMetadataBuilder $builder)
     {
@@ -51,33 +51,7 @@ trait DynamicContentEntityTrait
      */
     public function getDynamicContentAsArray()
     {
-        return (array) $this->dynamicContent;
-    }
-
-    /**
-     * @param string $token          The dynamic content token
-     * @param string $defaultContent The default content to use in case no filters match.
-     * @param array  $filters        The dynamic content filters.
-     *
-     * @return $this
-     */
-    public function addDynamicContent($token, $defaultContent, $filters)
-    {
-        $this->dynamicContent->set($token, ['content' => $defaultContent, 'filters' => $filters]);
-
-        return $this;
-    }
-
-    /**
-     * @param string $token The dynamic content token.
-     *
-     * @return array An array containing the default content and the filters.
-     */
-    public function getDynamicContentForToken($token)
-    {
-        if ($this->dynamicContent->containsKey($token)) {
-            return $this->dynamicContent->get($token);
-        }
+        return $this->dynamicContent->toArray();
     }
 
     /**
