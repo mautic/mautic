@@ -47,7 +47,7 @@ class LeadFieldRepository extends CommonRepository
         }
 
         $q->andWhere(
-            $q->expr()->eq('object', ':object')
+            $q->expr()->eq('l.object', ':object')
         )->setParameter('object', $object);
 
         $results = $q->execute()->fetchAll();
@@ -93,7 +93,7 @@ class LeadFieldRepository extends CommonRepository
         }
 
         $q->andWhere(
-            $q->expr()->eq('object', ':object')
+            $q->expr()->eq('f.object', ':object')
         )->setParameter('object', $object);
 
         return array(
@@ -126,7 +126,7 @@ class LeadFieldRepository extends CommonRepository
         return $qb->select('f.alias, f.is_unique_identifer as is_unique, f.type, f.object')
                 ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
                 ->where( $qb->expr()->eq('object', ':object'))
-                ->setParameter('object',$object)
+                ->setParameter('f.object',$object)
                 ->orderBy('f.field_order', 'ASC')
                 ->execute()->fetchAll();
     }
@@ -138,11 +138,10 @@ class LeadFieldRepository extends CommonRepository
      * @param  integer $field alias
      * @param  string  $value to compare with
      * @param  string  $operatorExpr for WHERE clause
-     * @param  string  $object name of object using the custom fields
      *
      * @return boolean
      */
-    public function compareValue($lead, $field, $value, $operatorExpr, $object = 'lead')
+    public function compareValue($lead, $field, $value, $operatorExpr)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('l.id')
@@ -153,7 +152,6 @@ class LeadFieldRepository extends CommonRepository
                     $q->expr()->$operatorExpr('l.' . $field, ':value')
                 )
             )
-            ->andWhere($q->expr()->eq('object', ':object'))->setParameter('object',$object)
             ->setParameter('lead', (int) $lead)
             ->setParameter('value', $value);
 

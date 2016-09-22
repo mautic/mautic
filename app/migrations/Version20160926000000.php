@@ -98,21 +98,21 @@ SQL;
         $sql = <<<SQL
 INSERT INTO `{$this->prefix}lead_fields` (`is_published`, `label`, `alias`, `type`, `field_group`, `default_value`, `is_required`, `is_fixed`, `is_visible`, `is_short_visible`, `is_listable`, `is_publicly_updatable`, `is_unique_identifer`, `field_order`, `object`,`properties`) 
 VALUES 
- (1, 'name', 'companyname', 'text', 'core', NULL, 1, 0, 1, 1, 1, 0, 0, 18, 'company', 'a:0:{}'),
-(1,  'description', 'companydescription', 'textarea', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 17, 'company', 'a:0:{}'),
-(1, 'Company Number', 'companynumber', 'text', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 16, 'company', 'a:0:{}'),
-(1,  'Company Source', 'companysource', 'text', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 15, 'company', 'a:0:{}'),
+(1, 'Name', 'companyname', 'text', 'core', NULL, 1, 0, 1, 1, 1, 0, 0, 18, 'company', 'a:0:{}'),
+(1, 'Description', 'companydescription', 'textarea', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 17, 'company', 'a:0:{}'),
+(1, 'Number', 'companynumber', 'text', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 16, 'company', 'a:0:{}'),
+(1, 'Source', 'companysource', 'text', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 15, 'company', 'a:0:{}'),
 (1, 'Address 1', 'companyaddress1', 'text', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 13, 'company', 'a:0:{}'),
-(1,  'Address 2', 'companyaddress2', 'text', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 12, 'company', 'a:0:{}'),
+(1, 'Address 2', 'companyaddress2', 'text', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 12, 'company', 'a:0:{}'),
 (1, 'Email', 'companyemail', 'email', 'core', NULL, 0, 0, 1, 1, 1, 0, 1, 11, 'company', 'a:0:{}'),
 (1, 'Phone', 'companyphone', 'tel', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 10, 'company', 'a:0:{}'),
-(1,  'city', 'companycity', 'text', 'core', NULL, 0, 0, 1, 1, 1, 0, 1, 9, 'company', 'a:0:{}'),
-(1, 'state', 'companystate', 'text', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 8, 'company', 'a:0:{}'),
-(1, 'zipcode', 'companyzipcode', 'text', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 7, 'company', 'a:0:{}'),
+(1, 'City', 'companycity', 'text', 'core', NULL, 0, 0, 1, 1, 1, 0, 1, 9, 'company', 'a:0:{}'),
+(1, 'State', 'companystate', 'text', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 8, 'company', 'a:0:{}'),
+(1, 'Zip Code', 'companyzipcode', 'text', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 7, 'company', 'a:0:{}'),
 (1, 'Country', 'companycountry', 'country', 'core', NULL, 0, 0, 1, 1, 1, 0, 1, 6, 'company', 'a:0:{}'),
-(1,  'Number of Employees', 'companynumber_of_employees', 'number', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 5, 'company', 'a:2:{s:9:"roundmode";s:1:"3";s:9:"precision";s:1:"0";}'),
-(1,  'Fax', 'companyfax', 'tel', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 4, 'company', 'a:0:{}'),
-(1,  'score', 'companyscore', 'number', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 3, 'company', 'a:2:{s:9:"roundmode";s:1:"3";s:9:"precision";s:1:"0";}'),
+(1, 'Number of Employees', 'companynumber_of_employees', 'number', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 5, 'company', 'a:2:{s:9:"roundmode";s:1:"3";s:9:"precision";s:1:"0";}'),
+(1, 'Fax', 'companyfax', 'tel', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 4, 'company', 'a:0:{}'),
+(1, 'Score', 'companyscore', 'number', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 3, 'company', 'a:2:{s:9:"roundmode";s:1:"3";s:9:"precision";s:1:"0";}'),
 (1, 'Annual Revenue', 'companyannual_revenue', 'number', 'professional', NULL, 0, 0, 1, 1, 1, 0, 1, 2, 'company', 'a:2:{s:9:"roundmode";s:1:"3";s:9:"precision";s:1:"2";}'),
 (1, 'Website', 'companywebsite', 'url', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 1, 'company', 'a:0:{}');
 SQL;
