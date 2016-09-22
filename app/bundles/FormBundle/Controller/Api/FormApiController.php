@@ -175,7 +175,7 @@ class FormApiController extends CommonApiController
                 $fieldEntityArray['formId'] = $formId;
                 $fieldEntityArray['alias'] = $fieldParams['alias'] = $fieldModel->generateAlias($fieldEntityArray['label'], $aliases);
 
-                $fieldForm = $this->createEntityForm($fieldEntityArray, $fieldModel);
+                $fieldForm = $this->createFieldEntityForm($fieldEntityArray);
                 $fieldForm->submit($fieldParams, 'PATCH' !== $method);
 
                 if (!$fieldForm->isValid()) {
@@ -217,7 +217,7 @@ class FormApiController extends CommonApiController
 
                 $actionEntity->setForm($entity);
 
-                $actionForm = $this->createEntityForm($actionEntity, $actionModel);
+                $actionForm = $this->createActionEntityForm($actionEntity);
                 $actionForm->submit($actionParams, 'PATCH' !== $method);
 
                 if (!$actionForm->isValid()) {
@@ -241,5 +241,45 @@ class FormApiController extends CommonApiController
                 }
             }
         }
+    }
+
+    /**
+     * Creates the form instance
+     *
+     * @param $entity
+     *
+     * @return Form
+     */
+    protected function createActionEntityForm($entity)
+    {
+        return $this->getModel('form.action')->createForm(
+            $entity,
+            $this->get('form.factory'),
+            null,
+            [
+                'csrf_protection'    => false,
+                'allow_extra_fields' => true
+            ]
+        );
+    }
+
+    /**
+     * Creates the form instance
+     *
+     * @param $entity
+     *
+     * @return Form
+     */
+    protected function createFieldEntityForm($entity)
+    {
+        return $this->getModel('form.field')->createForm(
+            $entity,
+            $this->get('form.factory'),
+            null,
+            [
+                'csrf_protection'    => false,
+                'allow_extra_fields' => true
+            ]
+        );
     }
 }
