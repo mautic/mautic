@@ -392,8 +392,14 @@ Mautic.initEmailDynamicContent = function() {
     });
 };
 
-Mautic.initDynamicContentItem = function () {
-    mQuery('.addNewDynamicContentFilter').on('click', function (e) {
+Mautic.initDynamicContentItem = function (tabId) {
+    var $el = mQuery('#dynamic-content-container');
+
+    if (typeof tabId != "undefined") {
+        $el = mQuery(tabId);
+    }
+
+    $el.find('.addNewDynamicContentFilter').on('click', function (e) {
         e.preventDefault();
 
         var $this                = mQuery(this);
@@ -442,7 +448,7 @@ Mautic.initDynamicContentItem = function () {
         newTab.find('a').tab('show');
     });
 
-    mQuery('.dynamic-content-token-name').on('input', function (e) {
+    $el.find('.dynamic-content-token-name').on('input', function (e) {
         var $this = mQuery(this);
         var parentTab = $this.parents('.tab-pane');
         var correspondingTabLink = mQuery('a[href="#' + parentTab.attr('id') + '"]');
@@ -456,7 +462,7 @@ Mautic.initDynamicContentItem = function () {
         Mautic.updateDynamicContentDropdown();
     });
 
-    mQuery('a.remove-selected').on('click', function() {
+    $el.find('a.remove-selected').on('click', function() {
         mQuery(this).closest('.panel').animate(
             {'opacity': 0},
             'fast',
@@ -466,7 +472,7 @@ Mautic.initDynamicContentItem = function () {
         );
     });
 
-    mQuery('select[data-mautic="available_filters"]').on('change', function() {
+    $el.find('select[data-mautic="available_filters"]').on('change', function() {
         var $this = mQuery(this);
 
         if ($this.val()) {
@@ -476,7 +482,7 @@ Mautic.initDynamicContentItem = function () {
         }
     });
 
-    Mautic.initRemoveEvents(mQuery('.remove-item'));
+    Mautic.initRemoveEvents($el.find('.remove-item'));
 };
 
 Mautic.updateDynamicContentDropdown = function () {
