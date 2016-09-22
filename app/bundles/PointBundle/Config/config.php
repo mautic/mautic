@@ -38,15 +38,24 @@ return array(
                 'path'            => '/points',
                 'controller'      => 'MauticPointBundle:Api\PointApi'
             ],
-            'mautic_api_getpointactiontypes' => array(
+            'mautic_api_getpointactiontypes' => [
                 'path'       => '/points/actions/types',
                 'controller' => 'MauticPointBundle:Api\PointApi:getPointActionTypes'
-            ),
+            ],
             'mautic_api_pointtriggersstandard' => [
                 'standard_entity' => true,
                 'name'            => 'triggers',
                 'path'            => '/points/triggers',
                 'controller'      => 'MauticPointBundle:Api\TriggerApi'
+            ],
+            'mautic_api_getpointtriggereventtypes' => [
+                'path'       => '/points/triggers/types',
+                'controller' => 'MauticPointBundle:Api\TriggerApi:getPointTriggerEventTypes'
+            ],
+            'mautic_api_pointtriggerdeleteevents' => [
+                'path'       => '/points/triggers/{triggerId}/events/delete',
+                'controller' => 'MauticPointBundle:Api\TriggerApi:deletePointTriggerEvents',
+                'method'     => 'DELETE'
             ]
         ]
     ),

@@ -157,7 +157,8 @@ class Trigger extends FormEntity
                     'publishDown',
                     'points',
                     'color',
-                    'events'
+                    'events',
+                    'triggerExistingLeads'
                 )
             )
             ->build();

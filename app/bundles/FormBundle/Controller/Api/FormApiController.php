@@ -188,7 +188,7 @@ class FormApiController extends CommonApiController
             $this->model->setFields($entity, $parameters['fields']);
         }
 
-        // Remove fiels which weren't in the PUT request
+        // Remove fields which weren't in the PUT request
         if (!$isNew && $method === 'PUT') {
             $fieldsToDelete = [];
 
