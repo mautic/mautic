@@ -377,7 +377,7 @@ Mautic.initEmailDynamicContent = function() {
 
             Mautic.updateDynamicContentDropdown();
 
-            Mautic.initDynamicContentItem();
+            Mautic.initDynamicContentItem(tabId);
         });
 
         Mautic.initDynamicContentItem();
