@@ -49,7 +49,7 @@ return array(
                 'controller'      => 'MauticPointBundle:Api\TriggerApi'
             ],
             'mautic_api_getpointtriggereventtypes' => [
-                'path'       => '/points/triggers/types',
+                'path'       => '/points/triggers/events/types',
                 'controller' => 'MauticPointBundle:Api\TriggerApi:getPointTriggerEventTypes'
             ],
             'mautic_api_pointtriggerdeleteevents' => [
