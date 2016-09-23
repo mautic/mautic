@@ -391,7 +391,6 @@ class CompanyModel extends CommonFormModel
                     $searchForCompanies[] = $l;
                 }
             }
-
             if (!empty($searchForCompanies)) {
                 $companyEntities = $this->getEntities(array(
                     'filter' => array(
@@ -421,7 +420,6 @@ class CompanyModel extends CommonFormModel
         if (!is_array($companies)) {
             $companies = array($companies);
         }
-
         $persistCompany   = array();
         $deleteCompany    = array();
         $dispatchEvents = array();
@@ -463,7 +461,6 @@ class CompanyModel extends CommonFormModel
         if (!empty($persistcompany)) {
             $this->getRepository()->saveEntities($persistCompany);
         }
-
         if (!empty($deleteCompanyLead)) {
             $this->getRepository()->deleteEntities($deleteCompanyLead);
         }

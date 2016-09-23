@@ -237,7 +237,7 @@ return [
         'forms'   => [
             'mautic.form.type.lead'                           => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\LeadType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory','mautic.company.model.company'],
                 'alias'     => 'lead'
             ],
             'mautic.form.type.leadlist'                       => [
@@ -383,11 +383,6 @@ return [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CompanyListType',
                 'arguments' => ['mautic.company.model.company',  'mautic.helper.user'],
                 'alias'     => 'company_list'
-            ],
-            'mautic.company.lead.type.form'                  => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\CompanyLeadType',
-                'arguments' => ['doctrine.orm.entity_manager','mautic.security'],
-                'alias'     => 'company_lead'
             ]
         ],
         'other'   => [

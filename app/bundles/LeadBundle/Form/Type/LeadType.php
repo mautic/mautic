@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
@@ -35,14 +36,16 @@ class LeadType extends AbstractType
 
     private $translator;
     private $factory;
+    private $companyModel;
 
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(MauticFactory $factory, CompanyModel $companyModel)
     {
         $this->translator = $factory->getTranslator();
         $this->factory    = $factory;
+        $this->companyModel = $companyModel;
     }
 
     /**
@@ -124,15 +127,15 @@ class LeadType extends AbstractType
                 ]
             ]
         );
-        $companyTransformer = new IdToEntityModelTransformer(
-            $this->factory->getEntityManager(),
-            'MauticLeadBundle:Company',
-            'id',
-            true
-        );
+
+        $companyLeadRepo = $this->companyModel->getCompanyLeadRepository();
+        $leadCompanies = $companyLeadRepo->getCompaniesByLeadId($options['data']->getId());
+
+        foreach ($leadCompanies as $company) {
+            $lead_companies[$company['company_id']] = $company['company_id'];
+        }
 
         $builder->add(
-            $builder->create(
         'companies',
             'company_list',
             [
@@ -145,9 +148,8 @@ class LeadType extends AbstractType
                 'multiple'    => true,
                 'required'    => false,
                 'mapped'     => false,
-
+                'data'      => $lead_companies
             ]
-            )->addModelTransformer($companyTransformer)
         );
 
         $transformer = new IdToEntityModelTransformer(

@@ -396,7 +396,6 @@ class LeadModel extends FormModel
         }
         if (isset($data['companies'])) {
             $this->modifyCompanies($lead,$data['companies']);
-            unset($data['companies']);
         }
 
         //save the field values
@@ -1683,22 +1682,20 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Modify tags with support to remove via a prefixed minus sign
+     * Modify companies for lead
      *
      * @param Lead $lead
      * @param $companies
-     * @param bool $persist
      *
-     * @internal param $tags
      */
     public function modifyCompanies(Lead $lead, $companies)
     {
-        // See which tags already exist
+        // See which companies belong to the lead already
         $leadCompanies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
 
         foreach ($leadCompanies as $key => $leadCompany) {
-                if (!array_search($leadCompany['company_id'], $companies)) {
-                    $this->companyModel->removeLeadFromCompany($leadCompany, $lead);
+                if (array_search($leadCompany['company_id'], $companies) === false) {
+                    $this->companyModel->removeLeadFromCompany([$leadCompany['company_id']], $lead, true);
                 }
         }
         $this->companyModel->addLeadToCompany($companies,$lead,true);

@@ -30,12 +30,13 @@ class CompanyLeadRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $q->select('cl.company_id')
+        $q->select('cl.company_id, comp.companyname, comp.companycity, comp.companycountry')
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
+            ->join('cl',MAUTIC_TABLE_PREFIX.'companies','comp','comp.id = cl.company_id')
         ->where('cl.lead_id = :leadId')
         ->setParameter('leadId',$leadId);
 
-        $q->where(
+        $q->andWhere(
             $q->expr()->eq('cl.manually_removed', ':false')
         )->setParameter('false', false, 'boolean');
 
@@ -49,51 +50,4 @@ class CompanyLeadRepository extends CommonRepository
 
         return $result;
     }
-
-    /**
-     * Get a list of lists
-     *
-     * @param bool   $user
-     * @param string $alias
-     * @param string $id
-     *
-     * @return array
-     */
-    public function getCompanies($user = false, $id = '')
-    {
-        $q = $this->_em->getConnection()->createQueryBuilder();
-        static $companies = array();
-
-        if ($user) {
-            $user = $this->currentUser;
-        }
-
-        $key = (int)$id;
-        if (isset($companies[$key])) {
-            return $companies[$key];
-        }
-
-        $q->select('comp.*')
-            ->from(MAUTIC_TABLE_PREFIX .'companies', 'comp');
-
-        if (!empty($id)) {
-            $q->where(
-                $q->expr()->eq('comp.id', $id)
-            );
-        }
-
-        if ($user) {
-            $q->andWhere('comp.created_by = :user');
-            $q->setParameter('user', $user->getId());
-        }
-
-        $q->orderBy('comp.id', 'DESC');
-
-        $results = $q->execute()->fetchAll();
-
-        $companies[$key] = $results;
-
-        return $results;
-    }
-
 }
