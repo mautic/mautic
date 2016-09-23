@@ -101,7 +101,7 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction($idHash)
     {
-        if($this->factory->getParameter('track_mail_use_queue')) {
+        if($this->get('mautic.helper.core_parameters')->getParameter('track_mail_use_queue')) {
             $msg = array('request' => $this->request, 'idHash' => $idHash);
             $this->get('old_sound_rabbit_mq.task_email_producer')->publish(serialize($msg));
         } else {
