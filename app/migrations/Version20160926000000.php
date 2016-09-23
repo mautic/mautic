@@ -107,7 +107,7 @@ VALUES
 (1, 'Score', 'companyscore', 'number', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 3, 'company', 'a:2:{s:9:"roundmode";s:1:"3";s:9:"precision";s:1:"0";}'),
 (1, 'Annual Revenue', 'companyannual_revenue', 'number', 'professional', NULL, 0, 0, 1, 1, 1, 0, 1, 2, 'company', 'a:2:{s:9:"roundmode";s:1:"3";s:9:"precision";s:1:"2";}'),
 (1, 'Website', 'companywebsite', 'url', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 1, 'company', 'a:0:{}');
-(36,'Industry', 'companyindustry', 'lookup', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 14, 'company', 'a:1:{s:4:"list";s:55:"Construction|Manufacturing|Wholesale|Finance|Healthcare";}'),
+(1, 'Industry', 'companyindustry', 'lookup', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 14, 'company', 'a:1:{s:4:"list";s:55:"Construction|Manufacturing|Wholesale|Finance|Healthcare";}')
 SQL;
 
         $this->addSql($sql);

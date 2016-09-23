@@ -156,8 +156,5 @@ echo $view['form']->start($form);
             </div>
             <!--/ #pane -->
         </div>
-
     </div>
-
-
 <?php echo $view['form']->end($form); ?>
