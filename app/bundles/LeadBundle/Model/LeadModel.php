@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -343,9 +344,6 @@ class LeadModel extends FormModel
             if (!empty($details['zipcode']) && empty($fields['core']['zipcode']['value'])) {
                 $entity->addUpdatedField('zipcode', $details['zipcode']);
             }
-            if (!empty($details['companies']) && empty($fields['core']['companies']['value'])) {
-                $entity->addUpdatedField('companies', $details['companies']);
-            }
         }
 
         parent::saveEntity($entity, $unlock);
@@ -395,6 +393,10 @@ class LeadModel extends FormModel
             if (!empty($socialCache)) {
                 $lead->setSocialCache($socialCache);
             }
+        }
+        if (isset($data['companies'])) {
+            $this->modifyCompanies($lead,$data['companies']);
+            unset($data['companies']);
         }
 
         //save the field values
@@ -1603,6 +1605,7 @@ class LeadModel extends FormModel
      * @param      $persist
      *
      * @param bool True if tags modified
+     * @return bool
      */
     public function modifyTags(Lead $lead, $tags, array $removeTags = null, $persist = true)
     {
@@ -1677,6 +1680,28 @@ class LeadModel extends FormModel
         }
 
         return $tagsModified;
+    }
+
+    /**
+     * Modify tags with support to remove via a prefixed minus sign
+     *
+     * @param Lead $lead
+     * @param $companies
+     * @param bool $persist
+     *
+     * @internal param $tags
+     */
+    public function modifyCompanies(Lead $lead, $companies)
+    {
+        // See which tags already exist
+        $leadCompanies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
+
+        foreach ($leadCompanies as $key => $leadCompany) {
+                if (!array_search($leadCompany['company_id'], $companies)) {
+                    $this->companyModel->removeLeadFromCompany($leadCompany, $lead);
+                }
+        }
+        $this->companyModel->addLeadToCompany($companies,$lead,true);
     }
 
     /**

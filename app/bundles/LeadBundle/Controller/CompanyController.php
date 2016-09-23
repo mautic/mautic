@@ -428,30 +428,11 @@ class CompanyController extends FormController
                 'mauticContent' => 'company'
             ];
 
-            // Check to see if this is a popup
-            if (isset($form['updateSelect'])) {
-                $template    = false;
-                $passthrough = array_merge(
-                    $passthrough,
-                    [
-                        'updateSelect'   => $form['updateSelect']->getData(),
-                        'id'      => $entity->getId(),
-                        'companyname'    => $entity->getName()
-                    ]
-                );
-            }
-
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(
-                    array_merge(
-                        $postActionVars,
-                        array(
-                            'returnUrl'       => $returnUrl,
-                            'viewParameters'  => $viewParameters,
-                            'contentTemplate' => $template,
-                            'passthroughVars' => $passthrough
-                        )
-                    )
+
+                        $postActionVars
+
                 );
             } elseif ($valid) {
                 // Refetch and recreate the form in order to populate data manipulated in the entity itself

@@ -87,7 +87,7 @@ class CompanyEntityTransformer implements DataTransformerInterface
     {
         $repo   = $this->em->getRepository($this->repository);
 
-        $entities = $repo->getCompanies($id);
+        $entities = $repo->getCompanies();
 
         if (!count($entities)) {
             throw new TransformationFailedException(sprintf(

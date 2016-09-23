@@ -144,6 +144,7 @@ class LeadType extends AbstractType
                      ],
                 'multiple'    => true,
                 'required'    => false,
+                'mapped'     => false,
 
             ]
             )->addModelTransformer($companyTransformer)

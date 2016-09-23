@@ -517,8 +517,8 @@ $view['slots']->set(
         <div class="pa-sm">
             <div class="panel-title">  <?php echo $view['translator']->trans(
                     'mautic.lead.lead.companies'); ?></div>
-            <?php foreach ($companies as $company): ?>
-                <h5 class="pull-left mt-xs mr-xs"><span class="label label-success"><?php echo $company['companyname']; ?></span>
+            <?php foreach ($companies as $key => $company): ?>
+                <h5 class="pull-left mt-xs mr-xs"><span class="label <?php if ($key == 0): ?>label-primary <?php else: ?>label-success<?php endif?>" ><?php echo $company['companyname']; ?></span>
                 </h5>
             <?php endforeach; ?>
             <div class="clearfix"></div>

@@ -39,8 +39,6 @@ class Version20160926000000 extends AbstractMauticMigration
         $sql        = <<<SQL
 CREATE TABLE {$this->prefix}companies (
   `id` int(11) NOT NULL,
-  `companynumber` varchar(255) DEFAULT NULL,
-  `companysource` varchar(255) DEFAULT NULL,
   `companyname` varchar(255) NOT NULL,
   `companydescription` text,
   `companyaddress1` varchar(255) DEFAULT NULL,
@@ -54,8 +52,8 @@ CREATE TABLE {$this->prefix}companies (
   `companyfax` varchar(50) DEFAULT NULL,
   `companyannual_revenue` float DEFAULT NULL,
   `companynumber_of_employees` int(11) DEFAULT NULL,
-  `companyscore` int(11) DEFAULT NULL,
   `companywebsite` varchar(255) DEFAULT NULL,
+  `companyindustry` varchar(255) DEFAULT NULL,
   `owner_id` int(11) DEFAULT NULL,
   `date_added` DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)',
   `created_by` int(11) DEFAULT NULL,
@@ -66,9 +64,6 @@ CREATE TABLE {$this->prefix}companies (
   `checked_out_by` int(11) DEFAULT NULL,
   `checked_out_by_user` varchar(255) DEFAULT NULL,
   `date_modified` datetime DEFAULT NULL COMMENT '(DC2Type:datetime)',
-  `publish_up` datetime DEFAULT NULL COMMENT '(DC2Type:datetime)',
-  `publish_down` datetime DEFAULT NULL COMMENT '(DC2Type:datetime)',
-  `is_published` tinyint(4) DEFAULT NULL,
   PRIMARY KEY(id),
   INDEX {$this->prefix}companyname (`companyname`, `companyemail`)
 ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
@@ -83,7 +78,6 @@ CREATE TABLE {$this->prefix}companies_leads (
         date_added datetime DEFAULT NULL,
         manually_added tinyint(4) DEFAULT NULL,
         manually_removed tinyint(4) DEFAULT NULL,
-        is_primary int(11) NOT NULL DEFAULT 1,
         INDEX {$lead_index} (lead_id), 
         INDEX {$company_index} (company_id),
         PRIMARY KEY(lead_id, company_id)
@@ -100,11 +94,9 @@ INSERT INTO `{$this->prefix}lead_fields` (`is_published`, `label`, `alias`, `typ
 VALUES 
 (1, 'Name', 'companyname', 'text', 'core', NULL, 1, 0, 1, 1, 1, 0, 0, 18, 'company', 'a:0:{}'),
 (1, 'Description', 'companydescription', 'textarea', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 17, 'company', 'a:0:{}'),
-(1, 'Number', 'companynumber', 'text', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 16, 'company', 'a:0:{}'),
-(1, 'Source', 'companysource', 'text', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 15, 'company', 'a:0:{}'),
 (1, 'Address 1', 'companyaddress1', 'text', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 13, 'company', 'a:0:{}'),
 (1, 'Address 2', 'companyaddress2', 'text', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 12, 'company', 'a:0:{}'),
-(1, 'Email', 'companyemail', 'email', 'core', NULL, 0, 0, 1, 1, 1, 0, 1, 11, 'company', 'a:0:{}'),
+(1, 'Company Email', 'companyemail', 'email', 'core', NULL, 0, 0, 1, 1, 1, 0, 1, 11, 'company', 'a:0:{}'),
 (1, 'Phone', 'companyphone', 'tel', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 10, 'company', 'a:0:{}'),
 (1, 'City', 'companycity', 'text', 'core', NULL, 0, 0, 1, 1, 1, 0, 1, 9, 'company', 'a:0:{}'),
 (1, 'State', 'companystate', 'text', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 8, 'company', 'a:0:{}'),
@@ -115,6 +107,7 @@ VALUES
 (1, 'Score', 'companyscore', 'number', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 3, 'company', 'a:2:{s:9:"roundmode";s:1:"3";s:9:"precision";s:1:"0";}'),
 (1, 'Annual Revenue', 'companyannual_revenue', 'number', 'professional', NULL, 0, 0, 1, 1, 1, 0, 1, 2, 'company', 'a:2:{s:9:"roundmode";s:1:"3";s:9:"precision";s:1:"2";}'),
 (1, 'Website', 'companywebsite', 'url', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 1, 'company', 'a:0:{}');
+(36,'Industry', 'companyindustry', 'lookup', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 14, 'company', 'a:1:{s:4:"list";s:55:"Construction|Manufacturing|Wholesale|Finance|Healthcare";}'),
 SQL;
 
         $this->addSql($sql);

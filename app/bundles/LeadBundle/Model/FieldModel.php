@@ -168,11 +168,6 @@ class FieldModel extends FormModel
             'group' => 'other',
             'object'     => 'company'
         ],
-        'companysource' => [
-            'fixed' => true,
-            'group' => 'other',
-            'object'=> 'company'
-        ],
         'companyindustry'  => [
             'type'       => 'lookup',
             'properties' => ['list' => 'Construction|Manufacturing|Wholesale|Finance|Healthcare|Education|Government|Other,'],
@@ -238,13 +233,6 @@ class FieldModel extends FormModel
         ],
         'companyfax' => [
             'type'     => 'tel',
-            'listable' => true,
-            'group' => 'other',
-            'object'   => 'company'
-        ],
-        'companyscore' => [
-            'type'     => 'number',
-            'fixed'    => true,
             'listable' => true,
             'group' => 'other',
             'object'   => 'company'

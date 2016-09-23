@@ -169,11 +169,6 @@ class Lead extends FormEntity
     private $frequencyRules;
 
     /**
-     * @var ArrayCollection
-     */
-    private $companies = [];
-
-    /**
      * Constructor
      */
     public function __construct()
@@ -185,7 +180,6 @@ class Lead extends FormEntity
         $this->tags            = new ArrayCollection();
         $this->stageChangeLog  = new ArrayCollection();
         $this->frequencyRules  = new ArrayCollection();
-        $this->companies       = new ArrayCollection();
         $this->companyChangeLog= new ArrayCollection();
     }
 
@@ -337,17 +331,6 @@ class Lead extends FormEntity
             ->mappedBy('lead')
             ->cascadeAll()
             ->fetchExtraLazy()
-            ->build();
-
-        $builder->createManyToMany('companies', 'Mautic\LeadBundle\Entity\Company')
-            ->setJoinTable('companies_leads')
-            ->addInverseJoinColumn('company_id', 'id', false)
-            ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
-            ->setIndexBy('company')
-            ->fetchExtraLazy()
-            ->cascadeMerge()
-            ->cascadePersist()
-            ->cascadeDetach()
             ->build();
     }
 
@@ -552,23 +535,6 @@ class Lead extends FormEntity
     {
         return $this->ipAddresses;
     }
-    /**
-     * Add company
-     *
-     * @param Company $company
-     *
-     * @return Lead
-     */
-    public function addCompany(Company $company)
-    {
-        $companyId = $company->getId();
-        if (!isset($this->companies[$companyId])) {
-            $this->isChanged('companies', $company);
-            $this->companies[$companyId] = $company;
-        }
-
-        return $this;
-    }
 
     /**
      * Remove company
@@ -578,16 +544,6 @@ class Lead extends FormEntity
     public function removeCompany(Company $company)
     {
         $this->companies->removeElement($company);
-    }
-
-    /**
-     * Get comapanies
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getCompanies()
-    {
-        return $this->companies;
     }
 
     /**

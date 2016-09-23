@@ -73,51 +73,6 @@ class CompanyType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
-        if (!empty($options['data']) && $options['data'] instanceof Company) {
-            $readonly = !$this->security->hasEntityAccess(
-                'lead:leads:editother',
-                'lead:leads:editother',
-                $options['data']->getCreatedBy()
-            );
-
-            $data = $options['data']->isPublished(false);
-        } elseif (!$this->security->isGranted('lead:leads:editother')) {
-            $readonly = true;
-            $data = false;
-        } else {
-            $readonly = false;
-            $data = true;
-        }
-
-        $builder->add('isPublished', 'yesno_button_group', array(
-            'read_only' => $readonly,
-            'data' => $data
-        ));
-
-        $builder->add('publishUp', 'datetime', array(
-            'widget' => 'single_text',
-            'label' => 'mautic.core.form.publishup',
-            'label_attr' => array('class' => 'control-label'),
-            'attr' => array(
-                'class' => 'form-control',
-                'data-toggle' => 'datetime'
-            ),
-            'format' => 'yyyy-MM-dd HH:mm',
-            'required' => false
-        ));
-
-        $builder->add('publishDown', 'datetime', array(
-            'widget' => 'single_text',
-            'label' => 'mautic.core.form.publishdown',
-            'label_attr' => array('class' => 'control-label'),
-            'attr' => array(
-                'class' => 'form-control',
-                'data-toggle' => 'datetime'
-            ),
-            'format' => 'yyyy-MM-dd HH:mm',
-            'required' => false
-        ));
-
         if (empty($options['update_select'])) {
             $builder->add(
                 'buttons',

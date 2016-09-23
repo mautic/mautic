@@ -37,15 +37,6 @@ class Company extends FormEntity
      */
     private $leads;
 
-    /**
-     * @var \DateTime
-     */
-    private $publishUp;
-
-    /**
-     * @var \DateTime
-     */
-    private $publishDown;
 
     /**
      * Used by Mautic to populate the fields pulled from the DB
@@ -114,8 +105,6 @@ class Company extends FormEntity
         $builder->createManyToOne('owner', 'Mautic\UserBundle\Entity\User')
             ->addJoinColumn('owner_id', 'id', true, false, 'SET NULL')
             ->build();
-
-        $builder->addPublishDates();
     }
 
     /**
