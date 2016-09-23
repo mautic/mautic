@@ -36,7 +36,7 @@ class Version20160912000000 extends AbstractMauticMigration
     {
         $sql = <<<SQL
 CREATE TABLE {$this->prefix}lead_companies_change_log (
-  id int(11) NOT NULL,
+  id int(11) AUTO_INCREMENT NOT NULL,
   lead_id int(11) NOT NULL,
   company_id int(11) NOT NULL,
   type tinytext NOT NULL,

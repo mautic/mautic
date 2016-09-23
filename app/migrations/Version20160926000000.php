@@ -38,7 +38,7 @@ class Version20160926000000 extends AbstractMauticMigration
     {
         $sql        = <<<SQL
 CREATE TABLE {$this->prefix}companies (
-  `id` int(11) NOT NULL,
+  `id` int(11) AUTO_INCREMENT NOT NULL,
   `companyname` varchar(255) NOT NULL,
   `companydescription` text,
   `companyaddress1` varchar(255) DEFAULT NULL,
