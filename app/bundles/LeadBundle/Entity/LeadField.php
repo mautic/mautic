@@ -103,6 +103,11 @@ class LeadField extends FormEntity
     private $order = 0;
 
     /**
+     * @var string
+     */
+    private $object = 'lead';
+
+    /**
      * @var array
      */
     private $properties;
@@ -176,6 +181,8 @@ class LeadField extends FormEntity
             ->nullable()
             ->build();
 
+        $builder->addField('object', 'string');
+
         $builder->createField('properties', 'array')
             ->nullable()
             ->build();
@@ -211,7 +218,8 @@ class LeadField extends FormEntity
                     'alias',
                     'type',
                     'group',
-                    'order'
+                    'order',
+                    'object'
                 )
             )
             ->addProperties(
@@ -446,6 +454,30 @@ class LeadField extends FormEntity
     }
 
     /**
+     * Get object
+     *
+     * @return string
+     */
+    public function getObject ()
+    {
+        return $this->object;
+    }
+    /**
+     * Set object
+     *
+     * @param integer $object
+     *
+     * @return LeadField
+     */
+    public function setObject ($object)
+    {
+        $this->isChanged('object', $object);
+        $this->object = $object;
+
+        return $this;
+    }
+
+    /**
      * Get order
      *
      * @return integer
@@ -454,7 +486,6 @@ class LeadField extends FormEntity
     {
         return $this->order;
     }
-
     /**
      * Set isVisible
      *

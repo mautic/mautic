@@ -24,6 +24,8 @@ use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\PageModel;
@@ -73,9 +75,15 @@ class SubmissionModel extends CommonFormModel
     protected $campaignModel;
 
     /**
-     * @var LeadFieldModel
-     */
+    * @var LeadFieldModel
+    */
     protected $leadFieldModel;
+
+    /**
+     * @var CompanyModel
+     */
+    protected $companyModel;
+
 
     /**
      * SubmissionModel constructor.
@@ -95,7 +103,8 @@ class SubmissionModel extends CommonFormModel
         PageModel $pageModel,
         LeadModel $leadModel,
         CampaignModel $campaignModel,
-        LeadFieldModel $leadFieldModel
+        LeadFieldModel $leadFieldModel,
+        CompanyModel $companyModel
     )
     {
         $this->ipLookupHelper = $ipLookupHelper;
@@ -105,6 +114,7 @@ class SubmissionModel extends CommonFormModel
         $this->leadModel = $leadModel;
         $this->campaignModel = $campaignModel;
         $this->leadFieldModel = $leadFieldModel;
+        $this->companyModel = $companyModel;
     }
 
     /**
@@ -242,6 +252,7 @@ class SubmissionModel extends CommonFormModel
             }
 
             $leadField = $f->getLeadField();
+
             if (!empty($leadField)) {
                 $leadFieldMatches[$leadField] = $value;
             }
@@ -259,7 +270,7 @@ class SubmissionModel extends CommonFormModel
         $args = array(
             'post'       => $post,
             'server'     => $server,
-            'factory'    => $this->factory, // WHAT??
+            'factory'    => $this->factory, // WHAT?? blender
             'submission' => $submission,
             'fields'     => $fieldArray,
             'form'       => $form,
@@ -521,7 +532,9 @@ class SubmissionModel extends CommonFormModel
 
             // Update unique fields data for comparison with submitted data
             $currentFields       = $this->leadModel->flattenFields($lead->getFields());
+
             $uniqueFieldsCurrent = $getData($currentFields, true);
+
         }
 
         if (!$inKioskMode) {
@@ -579,6 +592,10 @@ class SubmissionModel extends CommonFormModel
         } else {
             // Set system current lead which will still allow execution of events without generating tracking cookies
             $this->leadModel->setSystemCurrentLead($lead);
+        }
+        $company = IdentifyCompanyHelper::identifyLeadsCompany($leadFieldMatches, $lead, $this->companyModel);
+        if ($company[1]) {
+            $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead Added to company', $company[0]);
         }
 
         return $lead;

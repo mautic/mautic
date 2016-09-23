@@ -91,6 +91,17 @@ if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) 
                     'class'       => 'btn btn-default btn-sm btn-nospin',
                     'data-toggle' => 'ajaxmodal',
                     'data-target' => '#MauticSharedModal',
+                    'href'        => $view['router']->path('mautic_contact_action', array('objectAction' => 'batchCompanies')),
+                    'data-header' => $view['translator']->trans('mautic.lead.batch.companies')
+                ),
+                'tooltip' => $view['translator']->trans('mautic.lead.batch.companies'),
+                'iconClass' => 'fa fa-building'
+            ),
+            array(
+                'attr'      => array(
+                    'class'       => 'btn btn-default btn-sm btn-nospin',
+                    'data-toggle' => 'ajaxmodal',
+                    'data-target' => '#MauticSharedModal',
                     'href'        => $view['router']->path('mautic_contact_action', array('objectAction' => 'batchLists')),
                     'data-header' => $view['translator']->trans('mautic.lead.batch.lists')
                 ),

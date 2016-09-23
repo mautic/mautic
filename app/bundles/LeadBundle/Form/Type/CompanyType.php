@@ -10,28 +10,32 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
-use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Mautic\UserBundle\Form\DataTransformer as Transformers;
+use Mautic\LeadBundle\Entity\Company;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Validator\Constraints\File;
+use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class LeadType
- *
- * @package Mautic\LeadBundle\Form\Type
+ * Class CompanyType
  */
-class LeadType extends AbstractType
+class CompanyType extends AbstractType
 {
+    /**
+     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
+     */
+    private $security;
 
+    /**
+     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     */
     private $translator;
+
     private $factory;
 
     /**
@@ -40,76 +44,19 @@ class LeadType extends AbstractType
     public function __construct(MauticFactory $factory)
     {
         $this->translator = $factory->getTranslator();
+        $this->security = $factory->getSecurity();
         $this->factory    = $factory;
+
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber());
-        $builder->addEventSubscriber(new FormExitSubscriber('lead.lead', $options));
-
-        if (!$options['isShortForm']) {
-            $imageChoices = [
-                'gravatar' => 'Gravatar',
-                'custom'   => 'mautic.lead.lead.field.custom_avatar'
-            ];
-
-            $cache = $options['data']->getSocialCache();
-            if (count($cache)) {
-                foreach ($cache as $key => $data) {
-                    $imageChoices[$key] = $key;
-                }
-            }
-
-            $builder->add(
-                'preferred_profile_image',
-                'choice',
-                [
-                    'choices'    => $imageChoices,
-                    'label'      => 'mautic.lead.lead.field.preferred_profile',
-                    'label_attr' => ['class' => 'control-label'],
-                    'required'   => true,
-                    'multiple'   => false,
-                    'attr'       => [
-                        'class' => 'form-control'
-                    ]
-                ]
-            );
-
-            $builder->add(
-                'custom_avatar',
-                'file',
-                [
-                    'label'      => false,
-                    'label_attr' => ['class' => 'control-label'],
-                    'required'   => false,
-                    'attr'       => [
-                        'class' => 'form-control'
-                    ],
-                    'mapped'     => false,
-                    'constraints' => [
-                        new File(
-                            [
-                                'mimeTypes' => [
-                                    'image/gif',
-                                    'image/jpeg',
-                                    'image/png'
-                                ],
-                                'mimeTypesMessage' => 'mautic.lead.avatar.types_invalid'
-                            ]
-                        )
-                    ]
-                ]
-            );
-        }
-
-        $fieldValues = (!empty($options['data'])) ? $options['data']->getFields() : ['filter' => ['isVisible' => true, 'object' => 'lead']];
+        $fieldValues = (!empty($options['data'])) ? $options['data']->getFields() : ['filter' => ['isVisible' => true, 'object' => 'company']];
         foreach ($options['fields'] as $field) {
-            if ($field['isPublished'] === false || $field['object'] !== 'lead') continue;
+            if ($field['isPublished'] === false || $field['object'] !== 'company') continue;
             $attr        = ['class' => 'form-control'];
             $properties  = $field['properties'];
             $type        = $field['type'];
@@ -296,39 +243,6 @@ class LeadType extends AbstractType
                     break;
             }
         }
-        $builder->add(
-            'tags',
-            'lead_tag',
-            [
-                'by_reference' => false,
-                'attr'         => [
-                    'data-placeholder'      => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
-                    'data-no-results-text'  => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
-                    'data-allow-add'        => 'true',
-                    'onchange'              => 'Mautic.createLeadTag(this)'
-                ]
-            ]
-        );
-        $companyTransformer = new IdToEntityModelTransformer(
-            $this->factory->getEntityManager(),
-            'MauticLeadBundle:Company'
-        );
-        $builder->add(
-            $builder->create(
-        'companies',
-            'company_list',
-            [
-                'label'       => 'mautic.company.selectcompany',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
-                        'class'    => 'form-control',
-                        'tooltip'  => 'mautic.company.choose.company_descr',
-                     ],
-                'multiple'    => false,
-                'required'    => false
-            ]
-            )->addModelTransformer($companyTransformer)
-        );
 
         $transformer = new IdToEntityModelTransformer(
             $this->factory->getEntityManager(),
@@ -349,69 +263,99 @@ class LeadType extends AbstractType
                     'multiple'   => false
                 ]
             )
-            ->addModelTransformer($transformer)
-        );
-
-        $transformer = new IdToEntityModelTransformer(
-            $this->factory->getEntityManager(),
-            'MauticStageBundle:Stage'
-        );
-
-        $builder->add(
-            $builder->create(
-                'stage',
-                'stage_list',
-                [
-                    'label'      => 'mautic.lead.lead.field.stage',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => [
-                        'class' => 'form-control'
-                    ],
-                    'required'   => false,
-                    'multiple'   => false
-                ]
-            )
                 ->addModelTransformer($transformer)
         );
 
-        if (!$options['isShortForm']) {
-            $builder->add('buttons', 'form_buttons');
+        if (!empty($options['data']) && $options['data'] instanceof Company) {
+            $readonly = !$this->security->hasEntityAccess(
+                'lead:leads:editother',
+                'lead:leads:editother',
+                $options['data']->getCreatedBy()
+            );
+
+            $data = $options['data']->isPublished(false);
+        } elseif (!$this->security->isGranted('lead:leads:editother')) {
+            $readonly = true;
+            $data = false;
         } else {
+            $readonly = false;
+            $data = true;
+        }
+
+        $builder->add('isPublished', 'yesno_button_group', array(
+            'read_only' => $readonly,
+            'data' => $data
+        ));
+
+        $builder->add('publishUp', 'datetime', array(
+            'widget' => 'single_text',
+            'label' => 'mautic.core.form.publishup',
+            'label_attr' => array('class' => 'control-label'),
+            'attr' => array(
+                'class' => 'form-control',
+                'data-toggle' => 'datetime'
+            ),
+            'format' => 'yyyy-MM-dd HH:mm',
+            'required' => false
+        ));
+
+        $builder->add('publishDown', 'datetime', array(
+            'widget' => 'single_text',
+            'label' => 'mautic.core.form.publishdown',
+            'label_attr' => array('class' => 'control-label'),
+            'attr' => array(
+                'class' => 'form-control',
+                'data-toggle' => 'datetime'
+            ),
+            'format' => 'yyyy-MM-dd HH:mm',
+            'required' => false
+        ));
+
+        if (!empty($options['update_select'])) {
             $builder->add(
                 'buttons',
                 'form_buttons',
                 [
-                    'apply_text' => false,
-                    'save_text'  => 'mautic.core.form.save'
+                    'apply_text'        => false
                 ]
+            );
+            $builder->add(
+                'updateSelect',
+                'hidden',
+                [
+                    'data'   => $options['update_select'],
+                    'mapped' => false
+                ]
+            );
+        } else {
+            $builder->add(
+                'buttons',
+                'form_buttons'
             );
         }
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
-        }
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
             [
-                'data_class'  => 'Mautic\LeadBundle\Entity\Lead',
+                'data_class'  => 'Mautic\LeadBundle\Entity\Company',
                 'isShortForm' => false
             ]
         );
 
-        $resolver->setRequired(['fields', 'isShortForm']);
+        $resolver->setRequired(['fields', 'update_select']);
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {
-        return "lead";
+        return "company";
     }
 }

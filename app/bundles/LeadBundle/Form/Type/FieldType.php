@@ -448,6 +448,22 @@ class FieldType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'object',
+            'choice',
+            [
+                'choices'     => ['lead' => 'mautic.lead.contact', 'company' => 'mautic.company.company'],
+                'expanded'    => false,
+                'multiple'    => false,
+                'label'       => 'mautic.lead.field.object',
+                'empty_value' => false,
+                'attr'        => [
+                    'class'    => 'form-control'
+                ],
+                'required'    => true
+            ]
+        );
+
         $builder->add('buttons', 'form_buttons');
 
         if (!empty($options["action"])) {

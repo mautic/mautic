@@ -11,6 +11,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -52,6 +53,11 @@ class Lead extends FormEntity
      * @var ArrayCollection
      */
     private $pointsChangeLog;
+
+    /**
+     * @var ArrayCollection
+     */
+    private $companyChangeLog;
 
     /**
      * @var ArrayCollection
@@ -163,6 +169,11 @@ class Lead extends FormEntity
     private $frequencyRules;
 
     /**
+     * @var ArrayCollection
+     */
+    private $companies = [];
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -174,6 +185,8 @@ class Lead extends FormEntity
         $this->tags            = new ArrayCollection();
         $this->stageChangeLog  = new ArrayCollection();
         $this->frequencyRules  = new ArrayCollection();
+        $this->companies       = new ArrayCollection();
+        $this->companyChangeLog= new ArrayCollection();
     }
 
     /**
@@ -214,6 +227,14 @@ class Lead extends FormEntity
             ->build();
 
         $builder->createOneToMany('pointsChangeLog', 'PointsChangeLog')
+            ->orphanRemoval()
+            ->setOrderBy(['dateAdded' => 'DESC'])
+            ->mappedBy('lead')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createOneToMany('companyChangeLog', 'CompanyChangeLog')
             ->orphanRemoval()
             ->setOrderBy(['dateAdded' => 'DESC'])
             ->mappedBy('lead')
@@ -317,6 +338,17 @@ class Lead extends FormEntity
             ->cascadeAll()
             ->fetchExtraLazy()
             ->build();
+
+        $builder->createManyToMany('companies', 'Mautic\LeadBundle\Entity\Company')
+            ->setJoinTable('companies_leads')
+            ->addInverseJoinColumn('company_id', 'id', false)
+            ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
+            ->setIndexBy('company')
+            ->fetchLazy()
+            ->cascadeMerge()
+            ->cascadePersist()
+            ->cascadeDetach()
+            ->build();
     }
 
     /**
@@ -345,7 +377,8 @@ class Lead extends FormEntity
                     'utmtags',
                     'stage',
                     'dateIdentified',
-                    'preferredProfileImage'
+                    'preferredProfileImage',
+                    'companies'
                 ]
             )
             ->build();
@@ -410,7 +443,9 @@ class Lead extends FormEntity
             } else {
                 $this->changes['frequencyRules']['removed'][] = $val;
             }
-        } elseif ($this->$getter() != $val) {
+        } elseif ($prop == 'companies') {
+            $this->changes['companies'] = ['', $val->getCompanies()];
+        }elseif ($this->$getter() != $val) {
             $this->changes[$prop] = [$this->$getter(), $val];
         }
     }
@@ -512,6 +547,43 @@ class Lead extends FormEntity
     public function getIpAddresses()
     {
         return $this->ipAddresses;
+    }
+    /**
+     * Add company
+     *
+     * @param Company $company
+     *
+     * @return Lead
+     */
+    public function addCompany(Company $company)
+    {
+        $companyId = $company->getId();
+        if (!isset($this->companies[$companyId])) {
+            $this->isChanged('companies', $company);
+            $this->companies[$companyId] = $company;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove company
+     *
+     * @param Company $company
+     */
+    public function removeCompany(Company $company)
+    {
+        $this->companies->removeElement($company);
+    }
+
+    /**
+     * Get comapanies
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getCompanies()
+    {
+        return $this->companies;
     }
 
     /**
@@ -851,6 +923,48 @@ class Lead extends FormEntity
     {
         return $this->pointsChangeLog;
     }
+
+    /**
+     * Creates a points change entry
+     *
+     * @param           $type
+     * @param           $name
+     * @param           $action
+     * @param           $pointsDelta
+     * @param IpAddress $ip
+     */
+    public function addCompanyChangeLogEntry($type, $name, $action, $company = null)
+    {
+        if (!$company) {
+            // No need to record a null delta
+            return;
+        }
+
+        // Create a new company change event
+        $event = new CompanyChangeLog();
+        $event->setType($type);
+        $event->setEventName($name);
+        $event->setActionName($action);
+        $event->setDateAdded(new \DateTime());
+        $event->setCompany($company);
+        $event->setLead($this);
+        $this->addCompanyChangeLog($event);
+    }
+
+    /**
+     * Add comapnyChangeLog
+     *
+     * @param CompanyChangeLog $companyChangeLog
+     *
+     * @return Lead
+     */
+    public function addCompanyChangeLog(CompanyChangeLog $companyChangeLog)
+    {
+        $this->companyChangeLog[] = $companyChangeLog;
+
+        return $this;
+    }
+
 
     /**
      * @param string $identifier
@@ -1269,6 +1383,21 @@ class Lead extends FormEntity
     public function setTags($tags)
     {
         $this->tags = $tags;
+
+        return $this;
+    }
+
+
+    /**
+     * Set companies
+     *
+     * @param $companies
+     *
+     * @return $this
+     */
+    public function setCompanies($companies)
+    {
+        $this->companies[] = $companies;
 
         return $this;
     }

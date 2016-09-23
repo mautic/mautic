@@ -10,7 +10,10 @@
 foreach ($form as $i => $filter) {
     $isPrototype = ($filter->vars['name'] == '__name__');
     $filterType  = $filter['field']->vars['value'];
-    if ($isPrototype || isset($form->parent->vars['fields'][$filter->vars['value']['field']])) {
-        echo $view['form']->widget($filter, ['first' => ($i === 0)]);
+    foreach ($form->parent->vars['fields'] as $object => $objectfields) {
+        if ($isPrototype || isset($objectfields[$filter->vars['value']['field']])) {
+            echo $view['form']->widget($filter, ['first' => ($i === 0)]);
+        }
     }
 }
+?>

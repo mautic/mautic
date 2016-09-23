@@ -124,7 +124,7 @@ $img = $view['lead_avatar']->getAvatar($lead);
                                             <div class="row">
                                                 <?php if (isset($form['company'])): ?>
                                                     <div class="col-sm-4">
-                                                        <?php echo $view['form']->widget($form['company'], array('attr' => array('placeholder' => $view['translator']->trans('mautic.core.company')))); ?>
+                                                        <?php echo $view['form']->widget($form['companies']); ?>
                                                     </div>
                                                 <?php endif; ?>
                                                 <?php if (isset($form['position'])): ?>
