@@ -134,34 +134,36 @@ class TriggerApiController extends CommonApiController
     }
 
     /**
-     * Delete actions from a point trigger
+     * Delete events from a point trigger
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function deletePointTriggerEventsAction($eventId)
+    public function deletePointTriggerEventsAction($triggerId)
     {
         if (!$this->security->isGranted([$this->permissionBase.':editown', $this->permissionBase.':editother'], 'MATCH_ONE')) {
             return $this->accessDenied();
         }
 
-        $entity = $this->model->getEntity($eventId);
+        $entity = $this->model->getEntity($triggerId);
 
         if ($entity === null) {
             return $this->notFound();
         }
 
         $eventsToDelete = $this->request->get('events');
+        $currentEvents  = $entity->getEvents();
 
         if (!is_array($eventsToDelete)) {
             return $this->badRequest('The events attribute must be array.');
         }
 
-        foreach ($eventsToDelete as $eventToDelete) {
-            $entity->removeTriggerEvent($currentEvent);
+        foreach ($currentEvents as $currentEvent) {
+            if (in_array($currentEvent->getId(), $eventsToDelete)) {
+                $entity->removeTriggerEvent($currentEvent);
+            }
         }
 
         $view = $this->view([$this->entityNameOne => $entity]);
         return $this->handleView($view);
     }
-
 }
