@@ -195,6 +195,7 @@ class LeadType extends AbstractType
                     $builder->add($alias, $type, $opts);
                     break;
                 case 'select':
+                case 'multiselect':
                 case 'boolean':
                     $typeProperties = [
                         'required'    => $required,
@@ -202,15 +203,16 @@ class LeadType extends AbstractType
                         'label_attr'  => ['class' => 'control-label'],
                         'attr'        => $attr,
                         'mapped'      => false,
-                        'multiple'    => false,
+                        'multiple'    => true,
                         'constraints' => $constraints
                     ];
 
                     $choiceType = 'choice';
                     $emptyValue = '';
-                    if ($type == 'select' && !empty($properties['list'])) {
+                    if (in_array($type, ['select', 'multiselect']) && !empty($properties['list'])) {
                         $typeProperties['choices']  = FormFieldHelper::parseList($properties['list']);
                         $typeProperties['expanded'] = false;
+                        $typeProperties['multiple'] = true;
                     }
                     if ($type == 'boolean' && !empty($properties['yes']) && !empty($properties['no'])) {
                         $choiceType              = 'yesno_button_group';
