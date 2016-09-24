@@ -556,7 +556,16 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
 
     if (mQuery('#field-templates .'+selectedVal).length) {
         mQuery('#leadfield_properties').html('');
-        mQuery('#leadfield_properties').append(mQuery('#field-templates .'+selectedVal).clone(true));
+        mQuery('#leadfield_properties')
+            .append(
+                mQuery(
+                    mQuery('#field-templates .'+selectedVal).html()
+                        .replace(/leadfield_properties_template/g, 'leadfield_properties')
+                )
+            );
+        mQuery("#leadfield_properties *[data-toggle='sortablelist']").each(function (index) {
+            Mautic.activateSortable(this);
+        });
     } else if (!mQuery('#leadfield_properties .'+selectedVal).length) {
         mQuery('#leadfield_properties').html('');
     }

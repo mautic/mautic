@@ -9,10 +9,11 @@
 
 $value = (isset($value)) ? $value : "";
 if (!isset($form) || !$form->vars['value']) {
-    $html = str_replace('properties_select_template', 'properties', $selectTemplate);
+    $html = str_replace(['properties_select_template', 'leadfield_properties'], ['properties', 'leadfield_properties_template'], $selectTemplate);
 } else {
     $html = $view['form']->row($form);
 }
+
 ?>
 
 <div class="select">

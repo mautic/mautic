@@ -347,43 +347,7 @@ var Mautic = {
 
         //initialize sortable lists
         mQuery(container + " *[data-toggle='sortablelist']").each(function (index) {
-            var prefix = mQuery(this).attr('data-prefix');
-
-            if (mQuery('#' + prefix + '_additem').length) {
-                mQuery('#' + prefix + '_additem').click(function () {
-                    var count = mQuery('#' + prefix + '_itemcount').val();
-                    var prototype = mQuery('#' + prefix + '_additem').attr('data-prototype');
-                    prototype = prototype.replace(/__name__/g, count);
-                    mQuery(prototype).appendTo(mQuery('#' + prefix + '_list div.list-sortable'));
-                    mQuery('#' + prefix + '_list_' + count).focus();
-                    count++;
-                    mQuery('#' + prefix + '_itemcount').val(count);
-                    return false;
-                });
-            }
-
-            mQuery('#' + prefix + '_list div.list-sortable').sortable({
-                items: 'div.sortable',
-                handle: 'span.postaddon',
-                axis: 'y',
-                containment: '#' + prefix + '_list',
-                stop: function (i) {
-                    var order = 0;
-                    mQuery('#' + prefix + '_list div.list-sortable div.input-group input').each(function () {
-                        var name = mQuery(this).attr('name');
-                        if (mQuery(this).hasClass('sortable-label')) {
-                            name = name.replace(/(\[list\]\[[0-9]+\]\[label\])$/g, '') + '[list][' + order + '][label]';
-                        } else if (mQuery(this).hasClass('sortable-value')) {
-                            name = name.replace(/(\[list\]\[[0-9]+\]\[value\])$/g, '') + '[list][' + order + '][value]';
-                            order++;
-                        } else {
-                            name = name.replace(/(\[list\]\[[0-9]+\])$/g, '') + '[list][' + order + ']';
-                            order++;
-                        }
-                        mQuery(this).attr('name', name);
-                    });
-                }
-            });
+            Mautic.activateSortable(this);
         });
 
         //downloads
@@ -927,6 +891,50 @@ var Mautic = {
             selectableHeader: "<input type='text' class='ms-search form-control' autocomplete='off'>",
             selectionHeader:  "<input type='text' class='ms-search form-control' autocomplete='off'>",
             keepOrder: true
+        });
+    },
+
+    /**
+     * Activate sortable
+     *
+     * @param el
+     */
+    activateSortable: function(el) {
+        var prefix = mQuery(el).attr('data-prefix');
+        if (mQuery('#' + prefix + '_additem').length) {
+            mQuery('#' + prefix + '_additem').click(function () {
+                var count = mQuery('#' + prefix + '_itemcount').val();
+                var prototype = mQuery('#' + prefix + '_additem').attr('data-prototype');
+                prototype = prototype.replace(/__name__/g, count);
+                mQuery(prototype).appendTo(mQuery('#' + prefix + '_list div.list-sortable'));
+                mQuery('#' + prefix + '_list_' + count).focus();
+                count++;
+                mQuery('#' + prefix + '_itemcount').val(count);
+                return false;
+            });
+        }
+
+        mQuery('#' + prefix + '_list div.list-sortable').sortable({
+            items: 'div.sortable',
+            handle: 'span.postaddon',
+            axis: 'y',
+            containment: '#' + prefix + '_list',
+            stop: function (i) {
+                var order = 0;
+                mQuery('#' + prefix + '_list div.list-sortable div.input-group input').each(function () {
+                    var name = mQuery(this).attr('name');
+                    if (mQuery(this).hasClass('sortable-label')) {
+                        name = name.replace(/(\[list\]\[[0-9]+\]\[label\])$/g, '') + '[list][' + order + '][label]';
+                    } else if (mQuery(this).hasClass('sortable-value')) {
+                        name = name.replace(/(\[list\]\[[0-9]+\]\[value\])$/g, '') + '[list][' + order + '][value]';
+                        order++;
+                    } else {
+                        name = name.replace(/(\[list\]\[[0-9]+\])$/g, '') + '[list][' + order + ']';
+                        order++;
+                    }
+                    mQuery(this).attr('name', name);
+                });
+            }
         });
     },
 
@@ -2559,6 +2567,8 @@ var Mautic = {
             mQuery(changedId).parent().removeClass(thisRemove).addClass(thisAdd);
             mQuery(otherLabel).removeClass(otherRemove).addClass(otherAdd);
         }
+
+        return true;
     },
 
     /**

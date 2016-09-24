@@ -10,6 +10,7 @@
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -358,7 +359,7 @@ class FieldType extends AbstractType
                 [
                     'choices'    => $options['leadFields'],
                     'choice_attr' => function($val, $key, $index) use ($options) {
-                        if (isset($options['leadFieldProperties']) && (!empty($options['leadFieldProperties'][$val]['properties']['list']) || !empty($options['leadFieldProperties'][$val]['properties']['optionlist']))) {
+                        if (!empty($options['leadFieldProperties'][$val]) && (in_array($options['leadFieldProperties'][$val]['type'], FormFieldHelper::getListTypes()) || !empty($options['leadFieldProperties'][$val]['properties']['list']) || !empty($options['leadFieldProperties'][$val]['properties']['optionlist']))) {
                             return ['data-list-type' => 1];
                         }
 

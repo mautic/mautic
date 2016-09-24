@@ -21,8 +21,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class SortableListType
- *
- * @deprecated Use DynamicListType instead
  */
 class SortableListType extends AbstractType
 {
@@ -74,7 +72,7 @@ class SortableListType extends AbstractType
                     'allow_delete'   => true,
                     'prototype'      => true,
                     'constraints'    => $constraints,
-                    'error_bubbling' => false
+                    'error_bubbling' => false,
                 ]
             )
         )->addModelTransformer(new SortableListTransformer($options['option_notblank']));

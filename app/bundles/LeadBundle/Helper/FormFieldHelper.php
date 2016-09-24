@@ -112,6 +112,14 @@ class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
+     * @return array
+     */
+    static public function getListTypes()
+    {
+        return ['select', 'boolean', 'lookup', 'country', 'region', 'timezone', 'locale'];
+    }
+
+    /**
      * @param $type
      * @param $properties
      *

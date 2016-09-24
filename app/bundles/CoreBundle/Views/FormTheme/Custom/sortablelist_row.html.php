@@ -16,7 +16,7 @@ $feedbackClass = (!empty($hasErrors)) ? " has-error" : "";
         <?php if ($isSortable): ?>
         <div id="sortable-<?php echo $form->vars['id']; ?>" class="list-sortable" <?php foreach ($attr as $k => $v) { printf('%s="%s" ', $view->escape($k), $view->escape($v)); }?>>
         <?php endif; ?>
-            <?php foreach ($list->children as $item): ?>
+            <?php foreach ($list->children as $key => $item): ?>
             <?php echo $view['form']->block($item, 'sortablelist_entry_row'); ?>
             <?php endforeach; ?>
         </div>

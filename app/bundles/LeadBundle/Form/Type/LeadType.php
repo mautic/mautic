@@ -196,36 +196,40 @@ class LeadType extends AbstractType
                     break;
                 case 'select':
                 case 'boolean':
-                    $choices = [];
+                    $typeProperties = [
+                        'required'    => $required,
+                        'label'       => $field['label'],
+                        'label_attr'  => ['class' => 'control-label'],
+                        'attr'        => $attr,
+                        'mapped'      => false,
+                        'multiple'    => false,
+                        'constraints' => $constraints
+                    ];
+
+                    $choiceType = 'choice';
+                    $emptyValue = '';
                     if ($type == 'select' && !empty($properties['list'])) {
-                        $choices = FormFieldHelper::parseList($properties['list']);
-                        $expanded = false;
+                        $typeProperties['choices']  = FormFieldHelper::parseList($properties['list']);
+                        $typeProperties['expanded'] = false;
                     }
                     if ($type == 'boolean' && !empty($properties['yes']) && !empty($properties['no'])) {
-                        $expanded = true;
-                        $choices  = [1 => $properties['yes'], 0 => $properties['no']];
-                        $attr     = [];
+                        $choiceType              = 'yesno_button_group';
+                        $typeProperties['expanded']  = true;
+                        $typeProperties['yes_label'] = $properties['yes'];
+                        $typeProperties['no_label']  = $properties['no'];
+                        $typeProperties['attr']      = [];
+                        $emptyValue                  = ' x ';
+                        if ($value !== '' && $value !== null) {
+                            $value = (int) $value;
+                        }
                     }
-
-                    if (!empty($choices)) {
-                        $builder->add(
-                            $alias,
-                            'choice',
-                            [
-                                'choices'     => $choices,
-                                'required'    => $required,
-                                'label'       => $field['label'],
-                                'label_attr'  => ['class' => 'control-label'],
-                                'data'        => ($type == 'boolean') ? (int) $value : $value,
-                                'attr'        => $attr,
-                                'mapped'      => false,
-                                'multiple'    => false,
-                                'empty_value' => false,
-                                'expanded'    => $expanded,
-                                'constraints' => $constraints
-                            ]
-                        );
-                    }
+                    $typeProperties['data'] = $value;
+                    $typeProperties['empty_value'] = $emptyValue;
+                    $builder->add(
+                        $alias,
+                        $choiceType,
+                        $typeProperties
+                    );
                     break;
                 case 'country':
                 case 'region':

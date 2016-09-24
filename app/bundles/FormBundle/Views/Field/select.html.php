@@ -13,23 +13,42 @@ $containerType         = 'select';
 
 include __DIR__.'/field_helper.php';
 
-if (!empty($properties['multiple'])) {
-    $inputAttr .= ' multiple="multiple"';
+$parseList = [];
+if (!empty($properties['syncList']) && !empty($field['leadField']) && isset($contactFields[$field['leadField']])) {
+    $leadFieldType = $contactFields[$field['leadField']]['type'];
+    switch (true) {
+        case (!empty($contactFields[$field['leadField']]['properties']['list'])):
+            $parseList = $contactFields[$field['leadField']]['properties']['list'];
+            break;
+        case ('country' == $leadFieldType):
+            $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getCountryChoices();
+            break;
+        case ('region' == $leadFieldType):
+            $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getRegionChoices();
+            break;
+        case ('timezone' == $leadFieldType):
+            $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getTimezonesChoices();
+            break;
+        case ('locale'):
+            $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getLocaleChoices();
+            break;
+    }
 }
 
-$parseList = [];
-if (!empty($properties['syncList']) && !empty($field['leadField']) && isset($contactFields[$field['leadField']]) && $contactFields[$field['leadField']]['properties']['list']) {
-    $parseList = $contactFields[$field['leadField']]['properties']['list'];
-} else {
+if (empty($parseList)) {
     if (isset($list)) {
         $parseList = $list;
-    } else {
+    } elseif (!empty($properties['list'])) {
         $parseList = $properties['list'];
     }
 
     if (isset($parseList['list'])) {
         $parseList = $parseList['list'];
     }
+}
+
+if (!empty($properties['multiple'])) {
+    $inputAttr .= ' multiple="multiple"';
 }
 
 $list = \Mautic\FormBundle\Helper\FormFieldHelper::parseList($parseList);
@@ -46,10 +65,13 @@ $help = (empty($field['helpMessage'])) ? '' : <<<HTML
                 <span class="mauticform-helpmessage">{$field['helpMessage']}</span>
 HTML;
 
-$emptyOption = (empty($properties['empty_value'])) ? '' : <<<HTML
+$emptyOption = '';
+if (!empty($properties['empty_value']) || empty($field['defaultValue'])):
+    $emptyOption = <<<HTML
 
                     <option value="">{$properties['empty_value']}</option>
 HTML;
+endif;
 
 $options = (!empty($emptyOption)) ? array($emptyOption) :  array();
 

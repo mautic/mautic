@@ -80,19 +80,11 @@ class MailchimpType extends AbstractType
         ));
 
         $builder->add('doubleOptin', 'yesno_button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
             'label'       => 'mautic.mailchimp.double_optin',
             'data'        => (!isset($options['data']['doubleOptin'])) ? true : $options['data']['doubleOptin']
         ));
 
         $builder->add('sendWelcome', 'yesno_button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
             'label'       => 'mautic.emailmarketing.send_welcome',
             'data'        => (!isset($options['data']['sendWelcome'])) ? true : $options['data']['sendWelcome']
         ));
