@@ -101,7 +101,7 @@ abstract class AbstractFormFieldHelper
      *
      * @return array
      */
-    static function parseList($list, $removeEmpty = true)
+    static function parseList($list, $removeEmpty = true, $ignoreNumerical = false)
     {
         // Note if this was an array to start and if we need to determine if the keys are sequentially numerical
         // for BC purposes
@@ -130,7 +130,7 @@ abstract class AbstractFormFieldHelper
             }
         }
 
-        if ($checkNumericalKeys && isset($list[0]) && !is_array($list[0]) && array_keys($list) === range(0, count($list) - 1)) {
+        if (!$ignoreNumerical && $checkNumericalKeys && isset($list[0]) && !is_array($list[0]) && array_keys($list) === range(0, count($list) - 1)) {
             // Numberical array so set labels as values
             $list = array_combine($list, $list);
         }
@@ -146,8 +146,6 @@ abstract class AbstractFormFieldHelper
 
                 if ($removeEmpty && empty($val) && empty($label)) {
                     continue;
-                } elseif (empty($val)) {
-                    $val = $label;
                 } elseif (empty($label)) {
                     $label = $val;
                 }

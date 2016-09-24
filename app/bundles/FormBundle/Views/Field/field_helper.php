@@ -86,7 +86,8 @@ if (!empty($inForm)) {
 $containerAttr         = 'id="mauticform'.$formName.'_'.$id.'" '.htmlspecialchars_decode($field['containerAttributes']);
 if (!isset($containerClass))
     $containerClass = $containerType;
-$defaultContainerClass = 'mauticform-row mauticform-'.$containerClass.' mauticform-field-'.$field['order'];
+$order = (isset($field['order'])) ? $field['order'] : 0;
+$defaultContainerClass = 'mauticform-row mauticform-'.$containerClass.' mauticform-field-'.$order;
 
 // Field is required
 $validationMessage     = '';
@@ -109,3 +110,51 @@ if (isset($field['isRequired']) && $field['isRequired']) {
 }
 
 $appendAttribute($containerAttr, 'class', $defaultContainerClass);
+
+// Setup list parsing
+if (isset($list) || isset($properties['syncList']) || isset($properties['list'])) {
+    $parseList = [];
+    $ignoreNumericalKeys = false;
+    if (!empty($properties['syncList']) && !empty($field['leadField']) && isset($contactFields[$field['leadField']])) {
+        $leadFieldType = $contactFields[$field['leadField']]['type'];
+        switch (true) {
+            case (!empty($contactFields[$field['leadField']]['properties']['list'])):
+                $parseList = $contactFields[$field['leadField']]['properties']['list'];
+                break;
+            case ('boolean' == $leadFieldType):
+                $parseList = [
+                    0 => $contactFields[$field['leadField']]['properties']['no'],
+                    1 => $contactFields[$field['leadField']]['properties']['yes'],
+                ];
+                $ignoreNumericalKeys = true;
+                break;
+            case ('country' == $leadFieldType):
+                $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getCountryChoices();
+                break;
+            case ('region' == $leadFieldType):
+                $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getRegionChoices();
+                break;
+            case ('timezone' == $leadFieldType):
+                $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getTimezonesChoices();
+                break;
+            case ('locale'):
+                $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getLocaleChoices();
+                break;
+        }
+    }
+
+    if (empty($parseList)) {
+        if (isset($list)) {
+            $parseList = $list;
+        } elseif (!empty($properties['list'])) {
+            $parseList = $properties['list'];
+        }
+
+        if (isset($parseList['list'])) {
+            $parseList = $parseList['list'];
+        }
+    }
+
+    $list           = \Mautic\FormBundle\Helper\FormFieldHelper::parseList($parseList, false, $ignoreNumericalKeys);
+    $firstListValue = reset($list);
+}

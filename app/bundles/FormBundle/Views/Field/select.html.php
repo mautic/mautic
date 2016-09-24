@@ -13,46 +13,9 @@ $containerType         = 'select';
 
 include __DIR__.'/field_helper.php';
 
-$parseList = [];
-if (!empty($properties['syncList']) && !empty($field['leadField']) && isset($contactFields[$field['leadField']])) {
-    $leadFieldType = $contactFields[$field['leadField']]['type'];
-    switch (true) {
-        case (!empty($contactFields[$field['leadField']]['properties']['list'])):
-            $parseList = $contactFields[$field['leadField']]['properties']['list'];
-            break;
-        case ('country' == $leadFieldType):
-            $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getCountryChoices();
-            break;
-        case ('region' == $leadFieldType):
-            $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getRegionChoices();
-            break;
-        case ('timezone' == $leadFieldType):
-            $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getTimezonesChoices();
-            break;
-        case ('locale'):
-            $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getLocaleChoices();
-            break;
-    }
-}
-
-if (empty($parseList)) {
-    if (isset($list)) {
-        $parseList = $list;
-    } elseif (!empty($properties['list'])) {
-        $parseList = $properties['list'];
-    }
-
-    if (isset($parseList['list'])) {
-        $parseList = $parseList['list'];
-    }
-}
-
 if (!empty($properties['multiple'])) {
     $inputAttr .= ' multiple="multiple"';
 }
-
-$list = \Mautic\FormBundle\Helper\FormFieldHelper::parseList($parseList);
-$firstListValue  = reset($list);
 
 $label = (!$field['showLabel']) ? '' : <<<HTML
 

@@ -12,7 +12,7 @@ namespace Mautic\FormBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
-use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -863,6 +863,7 @@ class FormController extends CommonFormController
      */
     public function previewAction($objectId)
     {
+        /** @var FormModel $model */
         $model = $this->getModel('form.form');
         $form  = $model->getEntity($objectId);
 

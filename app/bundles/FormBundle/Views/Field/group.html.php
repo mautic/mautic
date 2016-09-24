@@ -16,14 +16,6 @@ $ignoreName        = ($type == 'checkbox');
 
 include __DIR__.'/field_helper.php';
 
-if (!empty($properties['syncList']) && !empty($field['leadField']) && isset($contactFields[$field['leadField']]) && $contactFields[$field['leadField']]['properties']['list']) {
-    $parseList = $contactFields[$field['leadField']]['properties']['list'];
-} else {
-    $parseList = isset($properties['optionlist']) ? $properties['optionlist']['list'] : $properties['list'];
-}
-$list = \Mautic\FormBundle\Helper\FormFieldHelper::parseList($parseList);
-$firstListValue  = reset($list);
-
 $optionLabelAttr = (isset($properties['labelAttributes'])) ? $properties['labelAttributes'] : '';
 $wrapDiv         = true;
 
@@ -53,7 +45,7 @@ $counter = 0;
 foreach ($list as $listValue => $listLabel):
 
 $id               = $field['alias'].'_'.InputHelper::alphanum(InputHelper::transliterate($listValue)).$counter;
-$checked          = ($field['defaultValue'] == $listValue) ? 'checked="checked"' : '';
+$checked          = ($field['defaultValue'] === $listValue) ? 'checked="checked"' : '';
 $checkboxBrackets = ($type == 'checkbox') ? '[]' : '';
 
 $option  = <<<HTML
