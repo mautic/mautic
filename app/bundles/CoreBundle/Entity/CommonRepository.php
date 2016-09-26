@@ -738,7 +738,7 @@ class CommonRepository extends EntityRepository
         if ($setNowParameter) {
             $now = new \DateTime();
             if (!$isORM) {
-                $dtHelper = new DateTimeHelper($now);
+                $dtHelper = new DateTimeHelper($now, 'Y-m-d H:i:s', 'local');
                 $now = $dtHelper->toUtcString();
             }
             $q->setParameter('now', $now);
