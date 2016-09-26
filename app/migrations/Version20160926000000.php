@@ -64,6 +64,7 @@ CREATE TABLE {$this->prefix}companies (
   `checked_out_by` int(11) DEFAULT NULL,
   `checked_out_by_user` varchar(255) DEFAULT NULL,
   `date_modified` datetime DEFAULT NULL COMMENT '(DC2Type:datetime)',
+  `is_published` TINYINT(1) NOT NULL,
   PRIMARY KEY(id),
   INDEX {$this->prefix}companyname_search (companyname),
   INDEX {$this->prefix}companyaddress1_search (companyaddress1),
@@ -127,7 +128,7 @@ VALUES
 (1, 'Score', 'companyscore', 'number', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 3, 'company', 'a:2:{s:9:"roundmode";s:1:"3";s:9:"precision";s:1:"0";}'),
 (1, 'Annual Revenue', 'companyannual_revenue', 'number', 'professional', NULL, 0, 0, 1, 1, 1, 0, 1, 2, 'company', 'a:2:{s:9:"roundmode";s:1:"3";s:9:"precision";s:1:"2";}'),
 (1, 'Website', 'companywebsite', 'url', 'core', NULL, 0, 0, 1, 1, 1, 0, 0, 1, 'company', 'a:0:{}');
-(1, 'Industry', 'companyindustry', 'lookup', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 14, 'company', 'a:1:{s:4:"list";s:55:"Construction|Manufacturing|Wholesale|Finance|Healthcare";}')
+(1, 'Industry', 'companyindustry', 'lookup', 'professional', NULL, 0, 0, 1, 1, 1, 0, 0, 14, 'company', 'a:1:{s:4:"list";s:55:"Agriculture|Apparel|Banking|Biotechnology|Chemicals|Communications|Construction|Education|Electronics|Energy|Engineering|Entertainment|Environmental|Finance|Food & Beverage|Government|Healthcare|Hospitality|Insurance|Machinery|Manufacturing|Media|Not for Profit|Recreation|Retail|Shipping|Technology|Telecommunications|Transportation|Utilities|Other";}')
 SQL;
 
         $this->addSql($sql);

@@ -61,10 +61,8 @@ class CompanyRepository extends CommonRepository
         $fq = $this->_em->getConnection()->createQueryBuilder();
         $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group"')
             ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
-            ->where('f.is_published = :published')
-            ->andWhere($fq->expr()->eq('object',':company'))
-            ->setParameter('company', 'company')
-            ->setParameter('published', true, 'boolean');
+            ->where($fq->expr()->eq('object',':company'))
+            ->setParameter('company', 'company');
         $results = $fq->execute()->fetchAll();
 
         $fields = array();
@@ -235,11 +233,9 @@ class CompanyRepository extends CommonRepository
         $fq = $this->_em->getConnection()->createQueryBuilder();
         $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.field_order, f.object')
             ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
-            ->where('f.is_published = :published')
-            ->andWhere($fq->expr()->eq('f.object',':object'))
+            ->where($fq->expr()->eq('f.object',':object'))
             ->setParameter('object','company')
-            ->orderBy('f.field_order', 'asc')
-            ->setParameter('published', true, 'boolean');
+            ->orderBy('f.field_order', 'asc');
         $results = $fq->execute()->fetchAll();
 
         $fields = array();
@@ -297,7 +293,7 @@ class CompanyRepository extends CommonRepository
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $q->select('comp.id, comp.companyname')
+        $q->select('comp.id, comp.companyname, comp.companycity, comp.companycountry')
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
             ->leftJoin('comp',MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id')
             ->where('cl.lead_id = :leadId')

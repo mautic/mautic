@@ -73,7 +73,8 @@ echo $view['form']->start($form);
                                             <div class="row">
                                                 <?php if (isset($form['companyname'])): ?>
                                                     <div class="col-sm-4">
-                                                        <label class="control-label mb-xs"><?php echo $view['translator']->trans('mautic.core.company'); ?></label>
+                                                        <label class="control-label mb-xs required"><?php echo $view['translator']->trans('mautic.core.company'); ?></label>
+                                                        <?php echo $view['form']->errors($form['companyname']); ?>
                                                         <?php echo $view['form']->widget($form['companyname'], array('attr' => array('placeholder' => $view['translator']->trans('mautic.core.company')))); ?>
                                                     </div>
                                                 <?php endif; ?>

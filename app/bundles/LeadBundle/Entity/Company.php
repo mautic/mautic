@@ -121,12 +121,6 @@ class Company extends FormEntity
                     'leads'
                 )
             )
-            ->addProperties(
-                array(
-                    'publishUp',
-                    'publishDown'
-                )
-            )
             ->build();
     }
 
@@ -267,55 +261,6 @@ class Company extends FormEntity
         }
 
         return '';
-    }
-    /**
-     * Set publishUp
-     *
-     * @param \DateTime $publishUp
-     *
-     * @return Stage
-     */
-    public function setPublishUp ($publishUp)
-    {
-        $this->isChanged('publishUp', $publishUp);
-        $this->publishUp = $publishUp;
-
-        return $this;
-    }
-
-    /**
-     * Get publishUp
-     *
-     * @return \DateTime
-     */
-    public function getPublishUp ()
-    {
-        return $this->publishUp;
-    }
-
-    /**
-     * Set publishDown
-     *
-     * @param \DateTime $publishDown
-     *
-     * @return Company
-     */
-    public function setPublishDown ($publishDown)
-    {
-        $this->isChanged('publishDown', $publishDown);
-        $this->publishDown = $publishDown;
-
-        return $this;
-    }
-
-    /**
-     * Get publishDown
-     *
-     * @return \DateTime
-     */
-    public function getPublishDown ()
-    {
-        return $this->publishDown;
     }
 
     /**

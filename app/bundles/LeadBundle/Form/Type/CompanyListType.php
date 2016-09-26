@@ -50,6 +50,7 @@ class CompanyListType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $companies = $this->repo->getCompanies(true);
+        $companies_list = [];
 
         foreach ($companies as $company) {
             $companies_list[$company['id']] = $company['companyname'];

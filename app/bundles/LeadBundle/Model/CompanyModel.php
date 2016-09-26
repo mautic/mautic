@@ -141,7 +141,7 @@ class CompanyModel extends CommonFormModel
         foreach ($fields as $field) {
             if ($field instanceof LeadField) {
                 $alias = $field->getAlias();
-                if ($field->isPublished() and $field->getObject() === 'company') {
+                if ($field->getObject() === 'company') {
                     $group                          = $field->getGroup();
                     $array[$group][$alias]['id']    = $field->getId();
                     $array[$group][$alias]['group'] = $group;
@@ -152,7 +152,7 @@ class CompanyModel extends CommonFormModel
             } else {
                 $alias = $field['alias'];
                 $field[]=$alias;
-                if ($field['isPublished'] and $field['object'] === 'company') {
+                if ($field['object'] === 'company') {
                     $group = $field['group'];
                     $array[$group][$alias]['id']    = $field['id'];
                     $array[$group][$alias]['group'] = $group;
@@ -194,7 +194,7 @@ class CompanyModel extends CommonFormModel
             if (empty($fields)) {
                 $fields = $this->leadFieldModel->getEntities(
                     [
-                        'filter'         => ['isPublished' => true, 'object' => 'company'],
+                        'filter'         => ['object' => 'company'],
                         'hydration_mode' => 'HYDRATE_ARRAY'
                     ]
                 );

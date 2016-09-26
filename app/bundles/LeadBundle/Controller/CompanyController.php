@@ -156,11 +156,6 @@ class CompanyController extends FormController
                 'filter' => [
                     'force'          => [
                         [
-                            'column' => 'f.isPublished',
-                            'expr'   => 'eq',
-                            'value'  => true
-                        ],
-                        [
                             'column' => 'f.object',
                             'expr'   => 'eq',
                             'value'  => 'company'
@@ -345,11 +340,6 @@ class CompanyController extends FormController
             [
                 'filter' => [
                     'force'          => [
-                        [
-                            'column' => 'f.isPublished',
-                            'expr'   => 'eq',
-                            'value'  => true
-                        ],
                         [
                             'column' => 'f.object',
                             'expr'   => 'eq',
