@@ -12,11 +12,11 @@ $container->loadFromExtension(
     array(
         'connections'      => array(
             'default' => array(
-                'host' => 'localhost',
-                'port' => 5672,
-                'user' => 'guest',
-                'password' => 'guest',
-                'vhost' => '/',
+                'host' => '%mautic.rabbitmq_host%',
+                'port' => '%mautic.rabbitmq_port%',
+                'user' => '%mautic.rabbitmq_user%',
+                'password' => '%mautic.rabbitmq_password%',
+                'vhost' => '%mautic.rabbitmq_vhost%',
                 'lazy' => true,
                 'connection_timeout' => 3,
                 'heartbeat' => 2,

@@ -898,5 +898,10 @@ return [
         'cors_restrict_domains'     => true,
         'cors_valid_domains'        => [],
         'rss_notification_url'      => 'https://mautic.com/?feed=rss2&tag=notification',
+        'rabbitmq_host'             => 'localhost',
+        'rabbitmq_port'             => '5672',
+        'rabbitmq_vhost'            => '/',
+        'rabbitmq_user'             => 'guest',
+        'rabbitmq_password'         => 'guest',
     ],
 ];
