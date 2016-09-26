@@ -79,8 +79,8 @@ class CampaignBuilderEvent extends Event
             ['callback']
         );
 
-        $action['label']       = $this->translator->trans($decision['label']);
-        $action['description'] = (isset($action['description'])) ? $this->translator->trans($decision['description']) : '';
+        $decision['label']       = $this->translator->trans($decision['label']);
+        $decision['description'] = (isset($action['description'])) ? $this->translator->trans($decision['description']) : '';
 
         $this->decisions[$key] = $decision;
     }
