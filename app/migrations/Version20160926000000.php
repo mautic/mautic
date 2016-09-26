@@ -65,19 +65,33 @@ CREATE TABLE {$this->prefix}companies (
   `checked_out_by_user` varchar(255) DEFAULT NULL,
   `date_modified` datetime DEFAULT NULL COMMENT '(DC2Type:datetime)',
   PRIMARY KEY(id),
-  INDEX {$this->prefix}companyname (`companyname`, `companyemail`)
+  INDEX {$this->prefix}companyname_search (companyname),
+  INDEX {$this->prefix}companyaddress1_search (companyaddress1),
+  INDEX {$this->prefix}companyaddress2_search (companyaddress2),
+  INDEX {$this->prefix}companycity_search (companycity),
+  INDEX {$this->prefix}companystate_search (companystate),
+  INDEX {$this->prefix}companyzipcode_search (companyzipcode),
+  INDEX {$this->prefix}companycountry_search (companycountry),
+  INDEX {$this->prefix}companyemail_search (companyemail),
+  INDEX {$this->prefix}companyphone_search (companyphone),
+  INDEX {$this->prefix}companyfax_search (companyfax),
+  INDEX {$this->prefix}companyannual_revenue_search (companyannual_revenue),
+  INDEX {$this->prefix}companynumber_of_employees_search (companynumber_of_employees),
+  INDEX {$this->prefix}companywebsite_search (companywebsite),
+  INDEX {$this->prefix}companyindustry_search (companyindustry)
 ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
 SQL;
         $this->addSql($sql);
-        $lead_index = $this->generatePropertyName('company_leads_xref', 'idx', array('lead_id'));
-        $company_index =  $this->generatePropertyName('company_leads_xref', 'idx', array('company_id'));
+        $lead_index = $this->generatePropertyName('companies_leads', 'idx', ['lead_id']);
+        $company_index =  $this->generatePropertyName('companies_leads', 'idx', ['company_id']);
+
         $sql = <<<SQL
 CREATE TABLE {$this->prefix}companies_leads (
         lead_id INT NOT NULL, 
         company_id INT NOT NULL, 
-        date_added datetime DEFAULT NULL,
-        manually_added tinyint(4) DEFAULT NULL,
-        manually_removed tinyint(4) DEFAULT NULL,
+        date_added DATETIME NOT NULL COMMENT '(DC2Type:datetime)',
+        manually_added TINYINT(1) NOT NULL,
+        manually_removed TINYINT(1) NOT NULL,
         INDEX {$lead_index} (lead_id), 
         INDEX {$company_index} (company_id),
         PRIMARY KEY(lead_id, company_id)
@@ -86,6 +100,12 @@ CREATE TABLE {$this->prefix}companies_leads (
 SQL;
 
         $this->addSql($sql);
+
+        $lead_fk = $this->generatePropertyName('companies_leads', 'fk', ['lead_id']);
+        $company_fk = $this->generatePropertyName('companies_leads', 'fk', ['company_id']);
+
+        $this->addSql("ALTER TABLE {$this->prefix}companies_leads ADD CONSTRAINT {$company_fk} FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE;");
+        $this->addSql("ALTER TABLE {$this->prefix}companies_leads ADD CONSTRAINT {$lead_fk} FOREIGN KEY (lead_id) REFERENCES leads (id) ON DELETE CASCADE;");
 
         $this->addSql("ALTER TABLE {$this->prefix}lead_fields ADD object VARCHAR(255) DEFAULT 'lead'");
 

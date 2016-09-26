@@ -42,8 +42,9 @@ CREATE TABLE {$this->prefix}lead_companies_change_log (
   type tinytext NOT NULL,
   event_name varchar(255) NOT NULL,
   action_name varchar(255) NOT NULL,
-  date_added datetime NOT NULL,
-  PRIMARY KEY(id)
+  date_added DATETIME NOT NULL COMMENT '(DC2Type:datetime)',
+  PRIMARY KEY(id),
+  INDEX {$this->prefix}company_date_added (date_added)
 ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
 SQL;
         $this->addSql($sql);
