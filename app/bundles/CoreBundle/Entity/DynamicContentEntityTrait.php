@@ -10,14 +10,36 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\EventArgs;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 trait DynamicContentEntityTrait
 {
     /**
-     * @var ArrayCollection
+     * @var array
      */
-    private $dynamicContent;
+    private $dynamicContent = [
+        [
+            'tokenName' => null,
+            'content'   => null,
+            'filters'   => [
+                [
+                    'content' => null,
+                    'filters' => [
+                        [
+                            'glue'     => null,
+                            'field'    => null,
+                            'object'   => null,
+                            'type'     => null,
+                            'operator' => null,
+                            'display'  => null,
+                            'filter'   => null
+                        ]
+                    ]
+                ]
+            ]
+        ]
+    ];
 
     /**
      * @param ClassMetadataBuilder $builder
@@ -31,7 +53,7 @@ trait DynamicContentEntityTrait
     }
 
     /**
-     * @return ArrayCollection
+     * @return array
      */
     public function getDynamicContent()
     {
@@ -39,59 +61,10 @@ trait DynamicContentEntityTrait
     }
 
     /**
-     * @param ArrayCollection $dynamicContent
+     * @param array $dynamicContent
      */
     public function setDynamicContent($dynamicContent)
     {
         $this->dynamicContent = $dynamicContent;
-    }
-
-    /**
-     * @return array
-     */
-    public function getDynamicContentAsArray()
-    {
-        return $this->dynamicContent->toArray();
-    }
-
-    /**
-     * Check dynamic content.
-     */
-    public function checkDynamicContent()
-    {
-        if (empty($this->dynamicContent) || ($this->dynamicContent instanceof ArrayCollection && empty($this->dynamicContent->toArray()))) {
-            $this->resetDynamicContent();
-        }
-    }
-
-    /**
-     * Reset dynamic content.
-     */
-    public function resetDynamicContent()
-    {
-        $defaultDynamicContent = [
-            [
-                'tokenName' => null,
-                'content'   => null,
-                'filters'   => [
-                    [
-                        'content' => null,
-                        'filters' => [
-                            [
-                                'glue'     => null,
-                                'field'    => null,
-                                'object'   => null,
-                                'type'     => null,
-                                'operator' => null,
-                                'display'  => null,
-                                'filter'   => null
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ];
-
-        $this->dynamicContent = new ArrayCollection($defaultDynamicContent);
     }
 }

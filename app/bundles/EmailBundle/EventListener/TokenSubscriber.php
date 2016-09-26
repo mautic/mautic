@@ -54,7 +54,7 @@ class TokenSubscriber extends CommonSubscriber
         }
 
         $lead = $event->getLead();
-        $dynamicContentAsArray = $event->getEmail()->getDynamicContentAsArray();
+        $dynamicContentAsArray = $event->getEmail()->getDynamicContent();
 
         if (! empty($dynamicContentAsArray)) {
             $tokenEvent = new TokenReplacementEvent(null, $lead, ['lead' => null, 'dynamicContent' => $dynamicContentAsArray]);

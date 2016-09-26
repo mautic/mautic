@@ -29,6 +29,7 @@
                     <select class="chosen form-control" data-mautic="available_filters">
                         <option value=""></option>
                         <?php
+                        var_dump($fields);die;
                         foreach ($fields as $object => $field):
                             $header    = $object;
                             $icon      = ($object == 'company') ? 'fa-building' : 'fa-user';

@@ -199,8 +199,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->stats            = new ArrayCollection();
         $this->variantChildren  = new ArrayCollection();
         $this->assetAttachments = new ArrayCollection();
-
-        $this->resetDynamicContent();
     }
 
     /**
@@ -221,11 +219,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->setTable('emails')
             ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\EmailRepository')
             ->addLifecycleEvent('cleanUrlsInContent', Events::preUpdate)
-            ->addLifecycleEvent('cleanUrlsInContent', Events::prePersist)
-            ->addLifecycleEvent('checkDynamicContent', Events::postLoad);
+            ->addLifecycleEvent('cleanUrlsInContent', Events::prePersist);
 
         $builder->addIdColumns();
-
         $builder->createField('subject', 'text')
             ->nullable()
             ->build();
