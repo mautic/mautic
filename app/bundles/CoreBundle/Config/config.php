@@ -113,11 +113,16 @@ return [
                     'mautic.helper.bundle',
                     'mautic.helper.menu',
                     'mautic.helper.user',
-                    'mautic.helper.cookie',
                     'templating.helper.assets',
                     'mautic.helper.core_parameters',
                     'security.context',
                     'mautic.user.model.user'
+                ]
+            ],
+            'mautic.core.environment.subscriber' => [
+                'class' => 'Mautic\CoreBundle\EventListener\EnvironmentSubscriber',
+                'arguments' => [
+                    'mautic.helper.cookie',
                 ]
             ],
             'mautic.core.configbundle.subscriber' => [

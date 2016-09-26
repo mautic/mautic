@@ -55,11 +55,6 @@ class CoreSubscriber extends CommonSubscriber
     protected $userHelper;
 
     /**
-     * @var CookieHelper
-     */
-    protected $cookieHelper;
-
-    /**
      * @var AssetsHelper
      */
     protected $assetsHelper;
@@ -83,7 +78,6 @@ class CoreSubscriber extends CommonSubscriber
         BundleHelper $bundleHelper,
         MenuHelper $menuHelper,
         UserHelper $userHelper,
-        CookieHelper $cookieHelper,
         AssetsHelper $assetsHelper,
         CoreParametersHelper $coreParametersHelper,
         SecurityContext $securityContext,
@@ -93,7 +87,6 @@ class CoreSubscriber extends CommonSubscriber
         $this->bundleHelper         = $bundleHelper;
         $this->menuHelper           = $menuHelper;
         $this->userHelper           = $userHelper;
-        $this->cookieHelper         = $cookieHelper;
         $this->assetsHelper         = $assetsHelper;
         $this->securityContext      = $securityContext;
         $this->userModel            = $userModel;
@@ -105,73 +98,26 @@ class CoreSubscriber extends CommonSubscriber
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            KernelEvents::CONTROLLER          => array('onKernelController', 0),
-            KernelEvents::REQUEST             => [
-                ['onKernelRequestSetTimezone', 9999],
-                ['onKernelRequestSetLocale', 15], // Must be 15 to load after Symfony's default Locale listener
-                ['onKernelRequestAddGlobalJS', 0]
+        return [
+            KernelEvents::CONTROLLER          => [
+                ['onKernelController', 0],
+                ['onKernelRequestAddGlobalJS', 0],
             ],
-            CoreEvents::BUILD_MENU            => array('onBuildMenu', 9999),
-            CoreEvents::BUILD_ROUTE           => array('onBuildRoute', 0),
-            CoreEvents::FETCH_ICONS           => array('onFetchIcons', 9999),
-            SecurityEvents::INTERACTIVE_LOGIN => array('onSecurityInteractiveLogin', 0)
-        );
-    }
-
-    /**
-     * Set timezone
-     *
-     * @param GetResponseEvent $event
-     */
-    public function onKernelRequestSetTimezone(GetResponseEvent $event)
-    {
-        $request = $event->getRequest();
-        if (!$request->hasPreviousSession()) {
-            return;
-        }
-
-        // Set date/time
-        date_default_timezone_set($request->getSession()->get('_timezone', $this->params['default_timezone']));
-
-        // Set a cookie with session name for filemanager
-        $sessionName = $request->cookies->get('mautic_session_name');
-        if ($sessionName != session_name()) {
-            $this->cookieHelper->setCookie('mautic_session_name', session_name(), null);
-        }
-    }
-
-    /**
-     * Set default locale
-     *
-     * @param GetResponseEvent $event
-     *
-     * @return void
-     */
-    public function onKernelRequestSetLocale(GetResponseEvent $event)
-    {
-        // Set the user's default locale
-        $request = $event->getRequest();
-        if (!$request->hasPreviousSession()) {
-            return;
-        }
-
-        // Set locale
-        if ($locale = $request->attributes->get('_locale')) {
-            $request->getSession()->set('_locale', $locale);
-        } else {
-            $request->setLocale($request->getSession()->get('_locale', $this->params['locale']));
-        }
+            CoreEvents::BUILD_MENU            => ['onBuildMenu', 9999],
+            CoreEvents::BUILD_ROUTE           => ['onBuildRoute', 0],
+            CoreEvents::FETCH_ICONS           => ['onFetchIcons', 9999],
+            SecurityEvents::INTERACTIVE_LOGIN => ['onSecurityInteractiveLogin', 0]
+        ];
     }
 
     /**
      * Add mauticForms in js script tag for Froala
      *
-     * @param GetResponseEvent $event
+     * @param FilterControllerEvent $event
      */
-    public function onKernelRequestAddGlobalJS(GetResponseEvent $event)
+    public function onKernelRequestAddGlobalJS(FilterControllerEvent $event)
     {
-        if (defined('MAUTIC_INSTALLER')) {
+        if (defined('MAUTIC_INSTALLER') || $this->userHelper->getUser()->isGuest || !$event->isMasterRequest()) {
             return;
         }
 
