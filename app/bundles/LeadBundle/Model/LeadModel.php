@@ -1727,6 +1727,12 @@ class LeadModel extends FormModel
                     'expr'        => 'notLike',
                     'negate_expr' => 'like'
                 ),
+            'date'      =>
+                array(
+                    'label'       => 'mautic.lead.list.form.operator.date',
+                    'expr'        => 'date',
+                    'negate_expr' => 'date'
+                ),
         );
 
         return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];

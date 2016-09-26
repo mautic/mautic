@@ -697,7 +697,7 @@ class AjaxController extends CommonAjaxController
         $alias       = InputHelper::clean($request->request->get('alias'));
         $dataArray   = ['success' => 0, 'options' => null];
         $leadField   = $this->getModel('lead.field')->getRepository()->findOneBy(['alias' => $alias]);
-        $choiceTypes = ['boolean', 'locale', 'country', 'region', 'lookup', 'timezone', 'select', 'radio'];
+        $choiceTypes = ['boolean', 'locale', 'country', 'region', 'lookup', 'timezone', 'select', 'radio', 'date'];
 
         if ($leadField && in_array($leadField->getType(), $choiceTypes)) {
             $properties    = $leadField->getProperties();
@@ -725,6 +725,11 @@ class AjaxController extends CommonAjaxController
                         break;
                     case 'locale':
                         $options = FormFieldHelper::getLocaleChoices();
+                        break;
+                    case 'date':
+                        $fieldHelper = new FormFieldHelper();
+                        $fieldHelper->setTranslator($this->get('translator'));
+                        $options = $fieldHelper->getDateChoices();
                         break;
                     default:
                         $options = (!empty($properties)) ? $properties : [];
