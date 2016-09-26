@@ -213,13 +213,13 @@ class FormSubscriber extends CommonSubscriber
             return;
         }
 
-        $post    = $event->getPost();
-        $results = $event->getResults();
-        $config  = $event->getActionConfig();
-        $fields  = $event->getFields();
-        $lead    = $event->getSubmission()->getLead();
-
-        $payload = [
+        $post          = $event->getPost();
+        $results       = $event->getResults();
+        $config        = $event->getActionConfig();
+        $fields        = $event->getFields();
+        $lead          = $event->getSubmission()->getLead();
+        $matchedFields = [];
+        $payload       = [
             'mautic_contact' => $lead->getProfileFields(),
         ];
 
@@ -231,9 +231,9 @@ class FormSubscriber extends CommonSubscriber
             $key = (!empty($config[$field['alias']])) ? $config[$field['alias']] : $field['alias'];
 
             // Use the cleaned value by default - but if set to not save result, get from post
-            $value = (isset($results[$field['alias']])) ? $results[$field['alias']] : $post[$field['alias']];
-
-            $payload[$key] = $value;
+            $value               = (isset($results[$field['alias']])) ? $results[$field['alias']] : $post[$field['alias']];
+            $matchedFields[$key] = $field['alias'];
+            $payload[$key]       = $value;
         }
 
         $headers = [
@@ -251,8 +251,8 @@ class FormSubscriber extends CommonSubscriber
         }
 
         try {
-            $client    = new Client(['timeout' => 15]);
-            $response  = $client->post(
+            $client   = new Client(['timeout' => 15]);
+            $response = $client->post(
                 $config['post_url'],
                 [
                     'form_params' => $payload,
@@ -260,11 +260,11 @@ class FormSubscriber extends CommonSubscriber
                 ]
             );
 
-            if ($redirect = $this->parseResponse($response)) {
+            if ($redirect = $this->parseResponse($response, $matchedFields)) {
                 $event->setPostSubmitCallbackResponse('form.repost', new RedirectResponse($redirect));
             }
         } catch (ServerException $exception) {
-            $this->parseResponse($exception->getResponse());
+            $this->parseResponse($exception->getResponse(), $matchedFields);
         } catch (\Exception $exception) {
             if ($exception instanceof ValidationException) {
                 if ($violations = $exception->getViolations()) {
@@ -276,9 +276,9 @@ class FormSubscriber extends CommonSubscriber
             // Failed so send email if applicable
             if (!empty($email)) {
                 $post['array'] = $post;
-                $results    = $this->postToHtml($post);
-                $submission = $event->getSubmission();
-                $emails     = $emails = $this->getEmailsFromString($email);
+                $results       = $this->postToHtml($post);
+                $submission    = $event->getSubmission();
+                $emails        = $emails = $this->getEmailsFromString($email);
                 $this->mailer->setTo($emails);
                 $this->mailer->setSubject(
                     $this->translator->trans('mautic.form.action.repost.failed_subject', ['%form%' => $submission->getForm()->getName()])
@@ -304,11 +304,17 @@ class FormSubscriber extends CommonSubscriber
         }
     }
 
-    private function parseResponse(Response $response)
+    /**
+     * @param Response $response
+     * @param array    $matchedFields
+     *
+     * @return bool|mixed
+     */
+    private function parseResponse(Response $response, array $matchedFields = [])
     {
-        $body  = (string) $response->getBody();
-        $error = false;
-        $redirect = false;
+        $body       = (string) $response->getBody();
+        $error      = false;
+        $redirect   = false;
         $violations = [];
 
         if ($json = json_decode($body, true)) {
@@ -323,8 +329,18 @@ class FormSubscriber extends CommonSubscriber
             } elseif (isset($body['errors'])) {
                 $error = implode(', ', $body['errors']);
             } elseif (isset($body['violations'])) {
-                $error      = $this->translator->trans('mautic.form.action.repost.validation_failed');
-                $violations = $body['violations'];
+                $error          = $this->translator->trans('mautic.form.action.repost.validation_failed');
+                $formViolations = $body['violations'];
+
+                // Ensure the violations match up to Mautic's
+                $violations = [];
+                foreach ($formViolations as $field => $violation) {
+                    if (isset($matchedFields[$field])) {
+                        $violations[$matchedFields[$field]] = $violation;
+                    } else {
+                        $error .= ' '.$violation;
+                    }
+                }
             } elseif (isset($body['redirect'])) {
                 $redirect = $body['redirect'];
             }
