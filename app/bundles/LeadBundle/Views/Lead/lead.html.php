@@ -37,7 +37,7 @@ $groups = array_keys($fields);
 $edit   = $view['security']->hasEntityAccess(
     $permissions['lead:leads:editown'],
     $permissions['lead:leads:editother'],
-    $lead->getOwner()
+    $lead->getPermissionUser()
 );
 
 $buttons = [];
@@ -124,7 +124,7 @@ if ($view['security']->isGranted('campaign:campaigns:edit')) {
 if (($view['security']->hasEntityAccess(
         $permissions['lead:leads:deleteown'],
         $permissions['lead:leads:deleteother'],
-        $lead->getOwner()
+        $lead->getPermissionUser()
     ))
     && $edit
 ) {
@@ -162,12 +162,12 @@ $view['slots']->set(
                 'delete' => $view['security']->hasEntityAccess(
                     $permissions['lead:leads:deleteown'],
                     $permissions['lead:leads:deleteother'],
-                    $lead->getOwner()
+                    $lead->getPermissionUser()
                 ),
                 'close'  => $view['security']->hasEntityAccess(
                     $permissions['lead:leads:viewown'],
                     $permissions['lead:leads:viewother'],
-                    $lead->getOwner()
+                    $lead->getPermissionUser()
                 ),
             ],
         ]
