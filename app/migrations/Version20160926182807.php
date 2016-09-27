@@ -35,13 +35,13 @@ class Version20160926182807 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $sql        = <<<SQL
-insert into mautic_companies (companyname) SELECT DISTINCT TRIM(company) from mautic_leads where company IS NOT NULL and company <> ''
+insert into {$this->prefix}companies (companyname) SELECT DISTINCT TRIM(company) from {$this->prefix}leads where company IS NOT NULL and company <> ''
 SQL;
 
         $this->addSql($sql);
 
         $sql        = <<<SQL
-insert into mautic_companies_leads (company_id, lead_id) SELECT c.id, l.id from mautic_leads l join mautic_companies c on c.companyname = l.company
+insert into {$this->prefix}companies_leads (company_id, lead_id) SELECT c.id, l.id from {$this->prefix}leads l join {$this->prefix}companies c on c.companyname = l.company
 SQL;
 
         $this->addSql($sql);
