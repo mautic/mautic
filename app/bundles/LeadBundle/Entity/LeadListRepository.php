@@ -342,7 +342,7 @@ class LeadListRepository extends CommonRepository
                                 $q->andWhere(
                                     sprintf('NOT EXISTS (%s)', $subqb->getSQL())
                                 );
-                            if ($object === 'lead') {
+                            if ($object === 'lead' && !empty($expr)) {
                                 $q->andWhere($expr);
                             }
 
@@ -372,7 +372,7 @@ class LeadListRepository extends CommonRepository
                             $sq->select('null')
                                 ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
                                 ->where('l.id = ll.lead_id');
-                            if ($object === 'lead') {
+                            if ($object === 'lead' && !empty($expr)) {
                                 $sq->
                                 andWhere($expr);
                             }
