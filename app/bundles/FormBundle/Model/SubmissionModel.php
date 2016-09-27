@@ -424,6 +424,18 @@ class SubmissionModel extends CommonFormModel
      */
     protected function createLeadFromSubmit($form, array $leadFieldMatches)
     {
+        $companyFieldMatches = [];
+
+        if (isset($leadFieldMatches['company']) and isset($leadFieldMatches['city']) and isset($leadFieldMatches['country'])) {
+            $companyFieldMatches['company'] = $leadFieldMatches['company'];
+            unset ($leadFieldMatches['company']);
+            $companyFieldMatches['city'] = $leadFieldMatches['city'];
+            $companyFieldMatches['country'] = $leadFieldMatches['country'];
+            $companyFieldMatches['state'] = isset($leadFieldMatches['state']) ? $leadFieldMatches['state']: null;
+        } elseif (isset($leadFieldMatches['company'])) {
+            $this->logger->debug('FORM: Could not identify or create company, please provide  city and country fields for exact matches' . $leadFieldMatches['company']);
+            unset ($leadFieldMatches['company']);
+        }
         //set the mapped data
         $leadFields = $this->leadFieldModel->getRepository()->getAliases(null, true, false);
         $inKioskMode = $form->isInKioskMode();
@@ -593,7 +605,8 @@ class SubmissionModel extends CommonFormModel
             // Set system current lead which will still allow execution of events without generating tracking cookies
             $this->leadModel->setSystemCurrentLead($lead);
         }
-        $company = IdentifyCompanyHelper::identifyLeadsCompany($leadFieldMatches, $lead, $this->companyModel);
+
+        $company = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
         if ($company[1]) {
             $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead Added to company', $company[0]);
         }

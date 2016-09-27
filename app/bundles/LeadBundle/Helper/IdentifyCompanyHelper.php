@@ -43,6 +43,7 @@ class IdentifyCompanyHelper
     {
         $companyName = $companyDomain = null;
         $leadAdded = false;
+
         if (isset($parameters['company'])) {
             $companyName = filter_var($parameters['company'], FILTER_SANITIZE_SPECIAL_CHARS);
         } elseif(isset($parameters['email'])) {

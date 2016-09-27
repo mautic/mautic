@@ -298,7 +298,7 @@ class CompanyRepository extends CommonRepository
             ->leftJoin('comp',MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id')
             ->where('cl.lead_id = :leadId')
             ->setParameter('leadId', $leadId)
-            ->orderBy('comp.id', 'DESC');
+            ->orderBy('cl.date_added', 'DESC');
 
         if ($companyId) {
             $q->andWhere('comp.id = :companyId')->setParameter('companyId', $companyId);
@@ -445,5 +445,40 @@ class CompanyRepository extends CommonRepository
         }
 
         return ($returnArray) ? $return : $return[$companyIds[0]];
+    }
+
+    /**
+     * Get a list of lists
+     *
+     * @param $companyName
+     * @param $city
+     * @param $country
+     * @param null $state
+     * @return array
+     */
+    public function identifyCompany($companyName, $city, $country, $state = null)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        if (!$companyName or !$city or !$country) {
+            return array();
+        }
+        $q->select('id')
+            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp');
+        $q->andWhere(
+            $q->expr()->eq('comp.companyname', ':companyName')
+        )->andWhere(
+            $q->expr()->eq('comp.companycity', ':city')
+        )->andWhere(
+            $q->expr()->eq('comp.companycountry',':country')
+        )->setParameter('companyName', $companyName)
+            ->setParameter('city', $city)
+            ->setParameter('country', $country);
+        if ($state) {
+            $q->andWhere(
+                $q->expr()->eq('comp.companystate', ':state')
+            )->setParameter('state', $state);
+        }
+        $results = $q->execute()->fetchAll();
+        return $results;
     }
 }

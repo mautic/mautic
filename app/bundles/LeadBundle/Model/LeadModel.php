@@ -324,25 +324,41 @@ class LeadModel extends FormModel
      */
     public function saveEntity($entity, $unlock = true)
     {
+        $companyFieldMatches = [];
+        $fields = $entity->getFields();
+        $updatedFields = $entity->getUpdatedFields();
+        if (isset($updatedFields['company'])) {
+            $entity->addUpdatedField('company', null);
+            //$this->logger->error('Entity Save: Could not identify or create company, please provide  city and country fields for exact matches' . $updatedFields['company']);
+        }
+
         //check to see if we can glean information from ip address
         if (!$entity->imported && count($ips = $entity->getIpAddresses())) {
-            $fields = $entity->getFields();
-
             $details = $ips->first()->getIpDetails();
             if (!empty($details['city']) && empty($fields['core']['city']['value'])) {
                 $entity->addUpdatedField('city', $details['city']);
+                $companyFieldMatches['city'] = $details['city'];
             }
 
             if (!empty($details['region']) && empty($fields['core']['state']['value'])) {
                 $entity->addUpdatedField('state', $details['region']);
+                $companyFieldMatches['state'] = $details['region'];
             }
 
             if (!empty($details['country']) && empty($fields['core']['country']['value'])) {
                 $entity->addUpdatedField('country', $details['country']);
+                $companyFieldMatches['country'] = $details['country'];
             }
 
             if (!empty($details['zipcode']) && empty($fields['core']['zipcode']['value'])) {
                 $entity->addUpdatedField('zipcode', $details['zipcode']);
+            }
+        }
+
+        if (!empty($companyFieldMatches)) {
+            $company = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
+            if ($company[1]) {
+                $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead Added to company', $company[0]);
             }
         }
 
