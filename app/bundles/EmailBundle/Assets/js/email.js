@@ -321,13 +321,17 @@ Mautic.disabledEmailAction = function(opener) {
     opener.mQuery('#campaignevent_properties_editEmailButton').prop('disabled', disabled);
     opener.mQuery('#campaignevent_properties_previewEmailButton').prop('disabled', disabled);
 };
-Mautic.useMessageQueue = function(val) {
+Mautic.useMessageQueue = function(val, opener) {
+    if (typeof opener == 'undefined') {
+        opener = window;
+    }
     if (val === 'marketing') {
-        mQuery('#campaignevent_properties_priority').prop('disabled', false)
-        mQuery('#campaignevent_properties_attempts').prop('disabled', false)
+        opener.mQuery('#priority').removeClass( "queue_hide" ).addClass( "queue_show" );
+        opener.mQuery('#attempts').removeClass( "queue_hide" ).addClass( "queue_show" );
+
     }
     else {
-        mQuery('#campaignevent_properties_priority').prop('disabled', true)
-        mQuery('#campaignevent_properties_attempts').prop('disabled', true)
+        opener.mQuery('#priority').removeClass( "queue_show" ).addClass( "queue_hide" );
+        opener.mQuery('#attempts').removeClass( "queue_show" ).addClass( "queue_hide" );
     }
 };
