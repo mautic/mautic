@@ -72,7 +72,8 @@ return [
                 'mautic.email.emails' => [
                     'route'     => 'mautic_email_index',
                     'access'    => ['email:emails:viewown', 'email:emails:viewother'],
-                    'parent'    => 'mautic.core.channels'
+                    'parent'    => 'mautic.core.channels',
+                    'priority'  => 100
                 ]
             ]
         ]

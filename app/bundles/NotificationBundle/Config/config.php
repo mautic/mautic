@@ -109,6 +109,7 @@ return [
             'mautic_receive_notification' => [
                 'path' => '/notification/receive',
                 'controller' => 'MauticNotificationBundle:Api\NotificationApi:receive',
+
             ],
             'mautic_subscribe_notification' => [
                 'path' => '/notification/subscribe',
@@ -146,6 +147,7 @@ return [
                         ],
                     ],
                     'parent' => 'mautic.core.channels',
+                    'priority'  => 80
                 ],
             ],
         ],
