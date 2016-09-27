@@ -88,8 +88,8 @@ SQL;
 
         $sql = <<<SQL
 CREATE TABLE {$this->prefix}companies_leads (
-        lead_id INT DEFAULT NULL, 
-        company_id INT DEFAULT NULL, 
+        lead_id INT NOT NULL, 
+        company_id INT NOT NULL, 
         date_added DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)',
         manually_added TINYINT(1) DEFAULT NULL,
         manually_removed TINYINT(1) DEFAULT NULL,
