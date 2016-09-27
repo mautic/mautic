@@ -384,7 +384,7 @@ class LeadListRepository extends CommonRepository
                                 $q->andWhere($mainExpr);
                             }
                         }
-                    if ($object === 'company') {
+                    if ($object === 'company' && !empty($expr)) {
                         $compq = $this->getEntityManager()->getConnection()->createQueryBuilder();
                         $compq->select('id')
                             ->from(MAUTIC_TABLE_PREFIX . 'companies', 'comp')
