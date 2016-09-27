@@ -91,8 +91,8 @@ CREATE TABLE {$this->prefix}companies_leads (
         lead_id INT NOT NULL, 
         company_id INT NOT NULL, 
         date_added DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)',
-        manually_added TINYINT(1) DEFAULT NULL,
-        manually_removed TINYINT(1) DEFAULT NULL,
+        manually_added TINYINT(1) DEFAULT 0,
+        manually_removed TINYINT(1) DEFAULT 0,
         INDEX {$lead_index} (lead_id), 
         INDEX {$company_index} (company_id),
         PRIMARY KEY(lead_id, company_id)

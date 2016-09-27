@@ -368,6 +368,10 @@ class CompanyRepository extends CommonRepository
         $q = $this->_em->getConnection()->createQueryBuilder();
         static $companies = array();
 
+        if ($user) {
+            $user = $this->currentUser;
+        }
+
         $key = (int)$id;
         if (isset($companies[$key])) {
             return $companies[$key];
@@ -380,6 +384,11 @@ class CompanyRepository extends CommonRepository
             $q->where(
                 $q->expr()->eq('comp.id', $id)
             );
+        }
+
+        if ($user) {
+            $q->andWhere('comp.created_by = :user');
+            $q->setParameter('user', $user->getId());
         }
 
         $q->orderBy('comp.id', 'DESC');
