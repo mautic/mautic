@@ -342,7 +342,7 @@ class LeadListRepository extends CommonRepository
                                 $q->andWhere(
                                     sprintf('NOT EXISTS (%s)', $subqb->getSQL())
                                 );
-                            if ($object === 'lead' && !empty($expr)) {
+                            if ($object === 'lead') {
                                 $q->andWhere($expr);
                             }
 
@@ -372,19 +372,17 @@ class LeadListRepository extends CommonRepository
                             $sq->select('null')
                                 ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
                                 ->where('l.id = ll.lead_id');
-                            if ($object === 'lead' && !empty($expr)) {
+                            if ($object === 'lead') {
                                 $sq->
                                 andWhere($expr);
                             }
 
                             $q->andWhere(
                                 sprintf('NOT EXISTS (%s)', $sq->getSQL())
-                            );
-                            if (!empty($mainExpr)) {
-                                $q->andWhere($mainExpr);
-                            }
+                            )
+                                ->andWhere($mainExpr);
                         }
-                    if ($object === 'company' && !empty($expr)) {
+                    if ($object === 'company') {
                         $compq = $this->getEntityManager()->getConnection()->createQueryBuilder();
                         $compq->select('id')
                             ->from(MAUTIC_TABLE_PREFIX . 'companies', 'comp')
@@ -477,8 +475,9 @@ class LeadListRepository extends CommonRepository
 
     public function arrangeFilters($filters) {
         $objectFilters = [];
-        $object = (isset($filter['object'])) ? $filter['object'] : 'lead';
+
         foreach ($filters as $filter) {
+            $object = (isset($filter['object'])) ? $filter['object'] : 'lead';
             switch ($object) {
                 case 'lead' :
                     $objectFilters['lead'][] = $filter;
