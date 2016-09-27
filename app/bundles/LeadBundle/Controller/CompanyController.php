@@ -61,13 +61,15 @@ class CompanyController extends FormController
 
         $filter     = array('string' => $search, 'force' => array());
         $orderBy    = $this->factory->getSession()->get('mautic.company.orderby', 'comp.id');
+        $orderByDir = $this->factory->getSession()->get('mautic.company.orderbydir', 'DESC');
 
         $companies = $this->factory->getModel('company')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
                 'filter'     => $filter,
-                'orderBy'    => $orderBy
+                'orderBy'    => $orderBy,
+                'orderByDir' => $orderByDir
             )
         );
 
