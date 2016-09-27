@@ -39,8 +39,8 @@ class Version20160926000000 extends AbstractMauticMigration
         $sql        = <<<SQL
 CREATE TABLE {$this->prefix}companies (
   `id` int(11) AUTO_INCREMENT NOT NULL,
-  `companyname` varchar(255) NOT NULL,
-  `companydescription` text,
+  `companyname` varchar(255) DEFAULT NULL,
+  `companydescription` text DEFAULT NULL,
   `companyaddress1` varchar(255) DEFAULT NULL,
   `companyaddress2` varchar(255) DEFAULT NULL,
   `companycity` varchar(255) DEFAULT NULL,
@@ -88,11 +88,11 @@ SQL;
 
         $sql = <<<SQL
 CREATE TABLE {$this->prefix}companies_leads (
-        lead_id INT NOT NULL, 
-        company_id INT NOT NULL, 
-        date_added DATETIME NOT NULL COMMENT '(DC2Type:datetime)',
-        manually_added TINYINT(1) NOT NULL,
-        manually_removed TINYINT(1) NOT NULL,
+        lead_id INT DEFAULT NULL, 
+        company_id INT DEFAULT NULL, 
+        date_added DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)',
+        manually_added TINYINT(1) DEFAULT NULL,
+        manually_removed TINYINT(1) DEFAULT NULL,
         INDEX {$lead_index} (lead_id), 
         INDEX {$company_index} (company_id),
         PRIMARY KEY(lead_id, company_id)
