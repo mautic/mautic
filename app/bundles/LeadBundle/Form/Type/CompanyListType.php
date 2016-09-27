@@ -40,8 +40,6 @@ class CompanyListType extends AbstractType
         $this->companyModel = $companyModel;
 
         $this->repo = $this->companyModel->getRepository();
-
-        $this->repo->setCurrentUser($userHelper->getUser());
     }
 
     /**
@@ -49,7 +47,7 @@ class CompanyListType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $companies = $this->repo->getCompanies(true);
+        $companies = $this->repo->getCompanies(false);
         $companies_list = [];
 
         foreach ($companies as $company) {
