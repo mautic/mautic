@@ -23,7 +23,7 @@
         </div>
     <?php endif; ?>
     <?php if (isset($form['attempts'])): ?>
-        <div class="col-xs-5">
+        <div  class="col-xs-5">
             <?php echo $view['form']->row($form['attempts']); ?>
         </div>
     <?php endif; ?>
