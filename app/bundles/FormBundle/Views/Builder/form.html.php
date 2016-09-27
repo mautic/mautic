@@ -31,7 +31,7 @@ $pageCount = 1;
                 if (isset($formPages['open'][$fieldId])):
                     // Start a new page
                     $lastFieldAttribute = ($lastFormPage === $fieldId) ? ' data-mautic-form-pagebreak-lastpage="true"' : '';
-                    echo "\n          <div class=\"mauticform-page-$pageCount\" data-mautic-form-page=\"$pageCount\"$lastFieldAttribute>\n";
+                    echo "\n          <div class=\"mauticform-page-wrapper mauticform-page-$pageCount\" data-mautic-form-page=\"$pageCount\"$lastFieldAttribute>\n";
                 endif;
 
                 if ($f->showForContact($submissions, $lead, $form)):
