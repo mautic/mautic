@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
+use Mautic\CoreBundle\Entity\MessageQueue;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -37,6 +38,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
+use Mautic\CoreBundle\Model\MessageQueueModel;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use DeviceDetector\DeviceDetector;
@@ -87,6 +89,11 @@ class EmailModel extends FormModel
     protected $userModel;
 
     /**
+     * @var MessageQueueModel
+     */
+    protected $messageQueueModel;
+
+    /**
      * @var Mixed
      */
     protected $coreParameters;
@@ -120,7 +127,8 @@ class EmailModel extends FormModel
         LeadModel $leadModel,
         TrackableModel $pageTrackableModel,
         UserModel $userModel,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        MessageQueueModel $messageQueueModel
     ) {
         $this->ipLookupHelper     = $ipLookupHelper;
         $this->themeHelper        = $themeHelper;
@@ -130,6 +138,8 @@ class EmailModel extends FormModel
         $this->pageTrackableModel = $pageTrackableModel;
         $this->userModel          = $userModel;
         $this->coreParameters     = $coreParametersHelper;
+        $this->messageQueueModel  = $messageQueueModel;
+
     }
 
     /**
@@ -1075,7 +1085,7 @@ class EmailModel extends FormModel
      *                       bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
      *                       bool  sendBatchMail    If false, the function will not send batched mail but will defer to calling function to handle it
      *                       array assetAttachments Array of optional Asset IDs to attach
-     *
+     * @param MessageQueue $queue
      * @return mixed
      * @throws \Doctrine\ORM\ORMException
      */
@@ -1089,6 +1099,9 @@ class EmailModel extends FormModel
         $sendBatchMail    = (isset($options['sendBatchMail'])) ? $options['sendBatchMail'] : true;
         $assetAttachments = (isset($options['assetAttachments'])) ? $options['assetAttachments'] : [];
         $customHeaders    = (isset($options['customHeaders'])) ? $options['customHeaders'] : [];
+        $emailType        = (isset($options['email_type'])) ? $options['email_type'] : [];
+        $emailAttempts    = (isset($options['email_attempts'])) ? $options['email_attempts'] : [];
+        $emailPriority    = (isset($options['email_priority'])) ? $options['email_priority'] : [];
 
         if (!$email->getId()) {
             return false;
@@ -1114,17 +1127,6 @@ class EmailModel extends FormModel
         /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
         $frequencyRulesRepo = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
 
-        $leadIds = array_keys($leads);
-        $leadIds = implode(",", $leadIds);
-
-        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', $leadIds, $listId, $defaultFrequencyNumber, $defaultFrequencyTime);
-
-        if (!empty($dontSendTo)) {
-            foreach ($dontSendTo as $frequencyRuleMet)
-            {
-                unset($leads[$frequencyRuleMet['lead_id']]);
-            }
-        }
         $sendTo = $leads;
 
         if (!$ignoreDNC) {
@@ -1145,12 +1147,30 @@ class EmailModel extends FormModel
             }
         }
 
+        $leadIds = array_keys($sendTo);
+        $leadIds = implode(",", $leadIds);
+
+        if ($emailType == 'marketing') {
+            $this->messageQueueModel->addToQueue($sendTo, $source[1],'email', $email->getId(), $emailAttempts, $emailPriority);
+        }
+
+        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', $leadIds, $listId, $defaultFrequencyNumber, $defaultFrequencyTime);
+
+        if (!empty($dontSendTo)) {
+            foreach ($dontSendTo as $frequencyRuleMet)
+            {
+                unset($sendTo[$frequencyRuleMet['lead_id']]);
+                if ($emailType == 'marketing') {
+                    $this->messageQueueModel->rescheduleMessage($frequencyRuleMet['lead_id'],'email', $email->getId(), $frequencyRuleMet['frequency_number'].substr($frequencyRuleMet['frequency_time'],0,1));
+                }
+            }
+        }
+
         //get a count of leads
         $count = count($sendTo);
 
-        //noone to send to so bail
-        if (empty($count)) {
-
+        //noone to send to so bail or if marketing email from a campaign has been put in a queue
+        if (empty($count) || $emailType == 'marketing') {
             return $singleEmail ? true : [];
         }
 

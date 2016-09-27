@@ -50,7 +50,7 @@ class FrequencyRuleRepository extends CommonRepository
                     else DATE_SUB(NOW(),INTERVAL 1 '.$defaultFrequencyTime.')
                     end');
         } else {
-            $q->andWhere('(case fr.frequency_time 
+            $q->andWhere('(es.date_sent >= case fr.frequency_time 
                      when \'MONTH\' then DATE_SUB(NOW(),INTERVAL 1 MONTH) 
                      when \'DAY\' then DATE_SUB(NOW(),INTERVAL 1 DAY) 
                      when \'WEEK\' then DATE_SUB(NOW(),INTERVAL 1 WEEK) 
@@ -70,7 +70,6 @@ class FrequencyRuleRepository extends CommonRepository
         } else {
             $q->having('(count(es.lead_id) > fr.frequency_number)');
         }
-
         $results = $q->execute()->fetchAll();
 
         return $results;

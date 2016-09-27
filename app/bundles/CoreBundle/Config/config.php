@@ -600,6 +600,13 @@ return [
             'mautic.core.model.form'         => [
                 'class' => 'Mautic\CoreBundle\Model\FormModel',
             ],
+            'mautic.core.model.messagequeue' => [
+                'class'       => 'Mautic\CoreBundle\Model\MessageQueueModel',
+                'arguments'   => [
+                    'mautic.helper.core_parameters',
+                    'mautic.lead.model.lead'
+                ]
+            ],
         ],
     ],
 
