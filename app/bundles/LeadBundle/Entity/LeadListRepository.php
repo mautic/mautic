@@ -379,8 +379,10 @@ class LeadListRepository extends CommonRepository
 
                             $q->andWhere(
                                 sprintf('NOT EXISTS (%s)', $sq->getSQL())
-                            )
-                                ->andWhere($mainExpr);
+                            );
+                            if (!empty($mainExpr)) {
+                                $q->andWhere($mainExpr);
+                            }
                         }
                     if ($object === 'company') {
                         $compq = $this->getEntityManager()->getConnection()->createQueryBuilder();
