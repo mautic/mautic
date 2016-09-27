@@ -64,7 +64,7 @@ CREATE TABLE {$this->prefix}companies (
   `checked_out_by` int(11) DEFAULT NULL,
   `checked_out_by_user` varchar(255) DEFAULT NULL,
   `date_modified` datetime DEFAULT NULL COMMENT '(DC2Type:datetime)',
-  `is_published` TINYINT(1) NOT NULL,
+  `is_published` TINYINT(1) NOT NULL DEFAULT 1,
   PRIMARY KEY(id),
   INDEX {$this->prefix}companyname_search (companyname),
   INDEX {$this->prefix}companyaddress1_search (companyaddress1),
