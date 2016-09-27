@@ -31,8 +31,7 @@ class CompanyRepository extends CommonRepository
             /** @var Lead $entity */
             $entity = $this
                 ->createQueryBuilder('comp')
-                ->select('comp, u')
-                ->leftJoin('comp.owner', 'u')
+                ->select('comp')
                 ->where('comp.id = :companyId')
                 ->setParameter('companyId', $id)
                 ->getQuery()
@@ -79,8 +78,7 @@ class CompanyRepository extends CommonRepository
         $dq = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $dq->select('COUNT(comp.id) as count')
-            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
-            ->leftJoin('comp', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = comp.owner_id');
+            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp');
 
         // Filter by an entity query
         if (isset($args['entity_query'])) {
@@ -155,9 +153,8 @@ class CompanyRepository extends CommonRepository
 
             //ORM - generates lead entities
             $q = $this->_em->createQueryBuilder();
-            $q->select('comp, u,' . $order)
-                ->from('MauticLeadBundle:Company', 'comp', 'comp.id')
-                ->leftJoin('comp.owner', 'u');
+            $q->select('comp,' . $order)
+                ->from('MauticLeadBundle:Company', 'comp', 'comp.id');
 
             //only pull the leads as filtered via DBAL
             $q->where(

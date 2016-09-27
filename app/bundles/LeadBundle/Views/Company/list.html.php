@@ -29,10 +29,8 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     array(
                         'sessionVar' => 'company',
-                        'orderBy'    => 'comp.companyname',
                         'text'       => 'mautic.company.name',
-                        'class'      => 'col-company-name',
-                        'default'    => true
+                        'class'      => 'col-company-name'
                     )
                 );
                 echo $view->render(
@@ -60,7 +58,7 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     array(
                         'sessionVar' => 'company',
-                        'orderBy'    => 's.id',
+                        'orderBy'    => 'comp.id',
                         'text'       => 'mautic.core.id',
                         'class'      => 'visible-md visible-lg col-company-id'
                     )
