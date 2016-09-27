@@ -203,4 +203,16 @@ class UserApiController extends CommonApiController
 
         return $this->handleView($view);
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $entity
+     *
+     * @return mixed|void
+     */
+    protected function createEntityForm($entity)
+    {
+        return $this->model->createForm($entity, $this->get('form.factory'), null, ['csrf_protection' => false]);
+    }
 }
