@@ -321,3 +321,13 @@ Mautic.disabledEmailAction = function(opener) {
     opener.mQuery('#campaignevent_properties_editEmailButton').prop('disabled', disabled);
     opener.mQuery('#campaignevent_properties_previewEmailButton').prop('disabled', disabled);
 };
+Mautic.useMessageQueue = function(val) {
+    if (val === 'marketing') {
+        mQuery('#campaignevent_properties_priority').prop('disabled', false)
+        mQuery('#campaignevent_properties_attempts').prop('disabled', false)
+    }
+    else {
+        mQuery('#campaignevent_properties_priority').prop('disabled', true)
+        mQuery('#campaignevent_properties_attempts').prop('disabled', true)
+    }
+};
