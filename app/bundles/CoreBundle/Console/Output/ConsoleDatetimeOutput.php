@@ -33,13 +33,11 @@ class ConsoleDatetimeOutput extends ConsoleOutput implements ConsoleOutputInterf
     {
         $date = (new \DateTime())->format('Y-m-d H:i:s');
 
-        if ($message != "") {
-            $prefixedMessage = sprintf('[%s] %s', $date, $message);
-            parent::doWrite($prefixedMessage, $newline);
+        if (!empty($message)) {
+            $message = sprintf('[%s] %s', $date, $message);
         }
-        else {
-            parent::doWrite($message, $newline);
-        }
+
+        parent::doWrite($message, $newline);
     }
 
 }
