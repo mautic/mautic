@@ -475,8 +475,9 @@ class LeadListRepository extends CommonRepository
 
     public function arrangeFilters($filters) {
         $objectFilters = [];
+        $object = (isset($filter['object'])) ? $filter['object'] : 'lead';
         foreach ($filters as $filter) {
-            switch ($filter['object']) {
+            switch ($object) {
                 case 'lead' :
                     $objectFilters['lead'][] = $filter;
                     break;
