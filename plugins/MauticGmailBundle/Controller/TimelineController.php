@@ -77,9 +77,9 @@ class TimelineController extends CommonController
                 'viewParameters'  => [
                     'leads'        => $leads,
                     'page'        => $page,
-                    'events'      => $events
-                    //,'tmpl'   => 'index',
-                    ,'newCount' => (array_key_exists('count', $query) && $query['count'])?$query['count']:0
+                    'events'      => $events,
+                    'tmpl'   => (!$this->request->isXmlHttpRequest())?'index':'',
+                    'newCount' => (array_key_exists('count', $query) && $query['count'])?$query['count']:0
                 ],
                 'passthroughVars' => [
                     'route'         => false,
@@ -142,7 +142,7 @@ class TimelineController extends CommonController
                     'mauticContent' => 'gmailTimeline',
                     'timelineCount' => $events['total']
                 ],
-                'contentTemplate' => 'MauticGmailBundle:Timeline:list.html.php'
+                'contentTemplate' => 'MauticGmailBundle:Timeline:index.html.php'
             ]
         );
     }
