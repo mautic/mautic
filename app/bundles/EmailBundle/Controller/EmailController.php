@@ -1336,7 +1336,7 @@ class EmailController extends FormController
 
             //not found or not allowed
             if ($entity === null
-                || (!$this->security->hasEntityAccess(
+                || (!$this->get('mautic.security')->hasEntityAccess(
                     'email:emails:viewown',
                     'email:emails:viewother',
                     $entity->getCreatedBy()
