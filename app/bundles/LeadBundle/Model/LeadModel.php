@@ -1477,7 +1477,7 @@ class LeadModel extends FormModel
         $form = $this->createForm($lead, $this->formFactory, null, ['fields' => $leadFields, 'csrf_protection' => false]);
 
         // Unset stage and owner from the form because it's already been handled
-        unset($form['stage'], $form['owner']);
+        unset($form['stage'], $form['owner'], $form['tags']);
 
         $form->submit($fieldData);
 
