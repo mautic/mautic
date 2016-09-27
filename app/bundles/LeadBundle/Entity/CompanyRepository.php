@@ -289,7 +289,7 @@ class CompanyRepository extends CommonRepository
      *
      * @return array
      */
-    public function getCompaniesByLeadId($leadId)
+    public function getCompaniesByLeadId($leadId, $companyId = null)
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -299,6 +299,10 @@ class CompanyRepository extends CommonRepository
             ->where('cl.lead_id = :leadId')
             ->setParameter('leadId', $leadId)
             ->orderBy('comp.id', 'DESC');
+
+        if ($companyId) {
+            $q->andWhere('comp.id = :companyId')->setParameter('companyId', $companyId);
+        }
         $results = $q->execute()->fetchAll();
 
         return $results;

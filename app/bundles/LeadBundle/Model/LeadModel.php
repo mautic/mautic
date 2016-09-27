@@ -2083,11 +2083,16 @@ class LeadModel extends FormModel
         return $event->getEventCounter();
     }
 
-    public function addToCompany(Lead $lead, Company $company) {
+    public function addToCompany(Lead $lead, $company) {
         //check if lead is in company already
-        $company = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId(), $company->getId());
+        if (!$company instanceof Company)
+        {
+           $company = $this->companyModel->getEntity($company);
+        }
 
-        if (empty($company)) {
+        $companyLead = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId(), $company->getId());
+
+        if (empty($companyLead)) {
             $this->companyModel->addLeadToCompany($company,$lead);
             return true;
         }
