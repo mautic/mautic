@@ -317,7 +317,8 @@ $container->setParameter(
 
 // Monolog formatter
 $container->register('mautic.monolog.fulltrace.formatter', 'Monolog\Formatter\LineFormatter')
-    ->addMethodCall('includeStacktraces', array(true));
+    ->addMethodCall('includeStacktraces', array(true))
+    ->addMethodCall('ignoreEmptyContextAndExtra', array(true));
 
 //Register command line logging
 use Symfony\Component\DependencyInjection\Definition;
