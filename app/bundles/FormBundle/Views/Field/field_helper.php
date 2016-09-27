@@ -112,7 +112,7 @@ if (isset($field['isRequired']) && $field['isRequired']) {
 $appendAttribute($containerAttr, 'class', $defaultContainerClass);
 
 // Setup list parsing
-if (isset($list) || isset($properties['syncList']) || isset($properties['list'])) {
+if (isset($list) || isset($properties['syncList']) || isset($properties['list']) || isset($properties['optionlist'])) {
     $parseList = [];
     $ignoreNumericalKeys = false;
     if (!empty($properties['syncList']) && !empty($field['leadField']) && isset($contactFields[$field['leadField']])) {
@@ -148,6 +148,8 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
             $parseList = $list;
         } elseif (!empty($properties['list'])) {
             $parseList = $properties['list'];
+        } elseif (!empty($properties['optionlist'])) {
+            $parseList = $properties['optionlist'];
         }
 
         if (isset($parseList['list'])) {
