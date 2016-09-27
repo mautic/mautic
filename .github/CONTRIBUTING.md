@@ -14,7 +14,7 @@ Features that are determined not to fit within the direction of the Mautic Core 
 
 Mautic follows [Symfony's coding standards](http://symfony.com/doc/current/contributing/code/standards.html) by implementing pre-commit git hook running [php-cs-fixer](https://github.com/friendsofphp/php-cs-fixer), which is installed and updated with `composer install`/`composer update`.
 
-All code styling is handled automatically by the aforementioned git hook. In case if you setup git hook correctly (which is true if you run `composer update` before creating a pull request), you can format your code as you like - it will be converted to Mautic code style automatically.
+All code styling is handled automatically by the aforementioned git hook. In case if you setup git hook correctly (which is true if you ever run `composer install`/`composer update` before creating a pull request), you can format your code as you like - it will be converted to Mautic code style automatically.
 
 ### Pull Request Description Format
 

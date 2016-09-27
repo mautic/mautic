@@ -20,7 +20,7 @@ else
     echo ""
     echo "Please install php-cs-fixer, e.g.:"
     echo ""
-    echo "  composer require --dev friendsofphp/php-cs-fixer:dev-master"
+    echo "  composer require --dev friendsofphp/php-cs-fixer"
     echo ""
 fi
 
