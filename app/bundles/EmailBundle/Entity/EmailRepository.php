@@ -27,22 +27,26 @@ class EmailRepository extends CommonRepository
      *
      * @return array
      */
-    public function getDoNotEmailList()
+    public function getDoNotEmailList($leadIds = [])
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->select('distinct(l.email)')
+        $q->select('l.id, l.email')
             ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', 'dnc')
             ->leftJoin('dnc', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = dnc.lead_id')
             ->where('dnc.channel = "email"')
             ->andWhere($q->expr()->neq('l.email', $q->expr()->literal('')));
 
+        if ($leadIds) {
+            $q->andWhere(
+                $q->expr()->in('l.id', $leadIds)
+            );
+        }
 
         $results = $q->execute()->fetchAll();
 
         $dnc = array();
-
         foreach ($results as $r) {
-            $dnc[] = strtolower($r['email']);
+            $dnc[$r['id']] = strtolower($r['email']);
         }
 
         return $dnc;
@@ -527,5 +531,25 @@ class EmailRepository extends CommonRepository
         }
 
         $q->execute();
+    }
+
+    /**
+     * @param null $id
+     *
+     * @return \Doctrine\ORM\Internal\Hydration\IterableResult
+     */
+    public function getPublishedBroadcasts($id = null)
+    {
+        $qb = $this->createQueryBuilder($this->getTableAlias());
+        $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
+
+        if (!empty($id)) {
+            $expr->add(
+                $qb->expr()->eq($this->getTableAlias().'.id', (int) $id)
+            );
+        }
+        $qb->where($expr);
+
+        return $qb->getQuery()->iterate();
     }
 }
