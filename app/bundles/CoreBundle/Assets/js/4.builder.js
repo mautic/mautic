@@ -182,6 +182,18 @@ Mautic.clearThemeHtmlBeforeSave = function(form, callback) {
         textarea.val(editorHtml.find('html').get(0).outerHTML);
         callback();
     });
+
+    var dynamicContent = mQuery('#dynamic-content-container');
+
+    if (dynamicContent.length) {
+        var dynamicContentTextareas = dynamicContent.find('textarea.editor');
+
+        dynamicContentTextareas.each(function() {
+            var $this = mQuery(this);
+
+            $this.val(Mautic.clearFroalaStyles(mQuery($this.val())));
+        });
+    }
 }
 
 Mautic.clearFroalaStyles = function(content) {
