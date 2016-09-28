@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
 
-class MailHelper extends \PHPUnit_Framework_TestCase
+class MailHelperTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @expectedException \Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException

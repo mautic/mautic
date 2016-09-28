@@ -27,7 +27,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 
-class EmailModel extends \PHPUnit_Framework_TestCase
+class EmailModelTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
