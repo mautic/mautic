@@ -28,6 +28,10 @@ return [
                 'path'       => '/mtracking.gif',
                 'controller' => 'MauticPageBundle:Public:trackingImage'
             ],
+            'mautic_page_tracker_getcontact'  => [
+                'path'       => '/mtc',
+                'controller' => 'MauticPageBundle:Public:getContactId'
+            ],
             'mautic_url_redirect' => [
                 'path'       => '/r/{redirectId}',
                 'controller' => 'MauticPageBundle:Public:redirect'

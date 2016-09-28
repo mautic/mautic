@@ -671,7 +671,9 @@ class FormController extends CommonFormController
 
             //lock the entity
             $model->lockEntity($entity);
+        }
 
+        if (!$form->isSubmitted()) {
             $form->get('sessionId')->setData($objectId);
         }
 

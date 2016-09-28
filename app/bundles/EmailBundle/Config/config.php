@@ -156,6 +156,14 @@ return [
                 'arguments' => [
                     'mautic.email.model.email'
                 ]
+            ],
+            'mautic.email.broadcast.subscriber'      => [
+                'class' => 'Mautic\EmailBundle\EventListener\BroadcastSubscriber',
+                'arguments' => [
+                    'mautic.email.model.email',
+                    'doctrine.orm.entity_manager',
+                    'translator'
+                ]
             ]
         ],
         'forms'  => [

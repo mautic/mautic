@@ -68,7 +68,7 @@
                                     </div>
                                     <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 text-right">
                                         <i class="hidden-xs fa fa-bullseye fa-lg"></i>
-                                        <button class="visible-xs pull-right btn btn-sm btn-default btn-nospin text-primary" data-type="Decision">
+                                        <button class="visible-xs pull-right btn btn-sm btn-default btn-nospin text-primary" data-type="Action">
                                             <?php echo $view['translator']->trans('mautic.core.select'); ?>
                                         </button>
                                     </div>
@@ -91,7 +91,7 @@
                                     </div>
                                     <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 text-right">
                                         <i class="hidden-xs fa fa-filter fa-lg"></i>
-                                        <button class="visible-xs pull-right btn btn-sm btn-default btn-nospin text-danger" data-type="Decision">
+                                        <button class="visible-xs pull-right btn btn-sm btn-default btn-nospin text-danger" data-type="Condition">
                                             <?php echo $view['translator']->trans('mautic.core.select'); ?>
                                         </button>
                                     </div>

@@ -3405,7 +3405,7 @@ var Mautic = {
                     return;
                 }
             }
-            
+
             // Markers have numerical indexes
             var firstKey = Object.keys(data)[0];
 
@@ -3671,3 +3671,15 @@ var Mautic = {
         return null;
     }
 };
+
+// Show overflow in the App Wrapper when a Chosen dropdown is shown
+
+mQuery(document).on({
+    // The order in which the handlers are registered matters
+    "chosen:hiding_dropdown": function() {
+        mQuery('#app-wrapper').css('overflow', 'hidden');
+    },
+    "chosen:showing_dropdown": function() {
+        mQuery('#app-wrapper').css('overflow', 'visible');
+    }
+});
