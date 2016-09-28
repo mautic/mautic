@@ -26,7 +26,7 @@ class UpdateController extends CommonController
      */
     public function indexAction()
     {
-        if (!$this->factory->getUser()->isAdmin()) {
+        if (!$this->user->isAdmin()) {
             return $this->accessDenied();
         }
 
@@ -52,7 +52,7 @@ class UpdateController extends CommonController
      */
     public function schemaAction()
     {
-        if (!$this->factory->getUser()->isAdmin()) {
+        if (!$this->user->isAdmin()) {
             return $this->accessDenied();
         }
 

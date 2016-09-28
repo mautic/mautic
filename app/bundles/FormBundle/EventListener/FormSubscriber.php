@@ -11,6 +11,8 @@ namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\FormEvents;
 
@@ -19,6 +21,27 @@ use Mautic\FormBundle\FormEvents;
  */
 class FormSubscriber extends CommonSubscriber
 {
+    /**
+     * @var AuditLogModel
+     */
+    protected $auditLogModel;
+
+    /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
+
+    /**
+     * FormSubscriber constructor.
+     *
+     * @param IpLookupHelper $ipLookupHelper
+     * @param AuditLogModel  $auditLogModel
+     */
+    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    {
+        $this->ipLookupHelper = $ipLookupHelper;
+        $this->auditLogModel = $auditLogModel;
+    }
 
     /**
      * {@inheritdoc}
@@ -47,9 +70,9 @@ class FormSubscriber extends CommonSubscriber
                 "objectId"  => $form->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->factory->getIpAddressFromRequest()
+                "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
             );
-            $this->factory->getModel('core.auditLog')->writeToLog($log);
+            $this->auditLogModel->writeToLog($log);
         }
     }
 
@@ -67,15 +90,15 @@ class FormSubscriber extends CommonSubscriber
             "objectId"  => $form->deletedId,
             "action"    => "delete",
             "details"   => array('name' => $form->getName()),
-            "ipAddress" => $this->factory->getIpAddressFromRequest()
+            "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
         );
-        $this->factory->getModel('core.auditLog')->writeToLog($log);
+        $this->auditLogModel->writeToLog($log);
     }
 
     /**
      * Add a simple email form
      *
-     * @param FormBuilderEvent $event
+     * @param Events\FormBuilderEvent $event
      */
     public function onFormBuilder (Events\FormBuilderEvent $event)
     {

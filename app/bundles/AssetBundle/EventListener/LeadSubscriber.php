@@ -24,18 +24,19 @@ use Mautic\LeadBundle\LeadEvents;
  */
 class LeadSubscriber extends CommonSubscriber
 {
-    protected $model;
+    /**
+     * @var AssetModel
+     */
+    protected $assetModel;
 
     /**
      * LeadSubscriber constructor.
      *
-     * @param MauticFactory $factory
+     * @param AssetModel $assetModel
      */
-    public function __construct(MauticFactory $factory, AssetModel $model)
+    public function __construct(AssetModel $assetModel)
     {
-        parent::__construct($factory);
-
-        $this->model = $model;
+        $this->assetModel = $assetModel;
     }
 
     /**
@@ -81,7 +82,7 @@ class LeadSubscriber extends CommonSubscriber
 
             // Add the downloads to the event array
             foreach ($downloads['results'] as $download) {
-                $asset = $this->model->getEntity($download['asset_id']);
+                $asset = $this->assetModel->getEntity($download['asset_id']);
                 $event->addEvent(
                     [
                         'event'           => $eventTypeKey,
@@ -91,7 +92,7 @@ class LeadSubscriber extends CommonSubscriber
                         ],
                         'extra'           => [
                             'asset'            => $asset,
-                            'assetDownloadUrl' => $this->model->generateUrl($asset)
+                            'assetDownloadUrl' => $this->assetModel->generateUrl($asset)
                         ],
                         'eventType'       => $eventTypeName,
                         'timestamp'       => $download['dateDownload'],
@@ -108,7 +109,7 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadChange(LeadChangeEvent $event)
     {
-        $this->model->getDownloadRepository()->updateLeadByTrackingId(
+        $this->assetModel->getDownloadRepository()->updateLeadByTrackingId(
             $event->getNewLead()->getId(),
             $event->getNewTrackingId(),
             $event->getOldTrackingId()
@@ -120,6 +121,6 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadMerge(LeadMergeEvent $event)
     {
-        $this->model->getDownloadRepository()->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
+        $this->assetModel->getDownloadRepository()->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }
 }

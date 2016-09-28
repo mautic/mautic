@@ -9,13 +9,14 @@
 
 namespace Mautic\ApiBundle\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use FOS\OAuthServerBundle\Event\OAuthEvent;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class OAuthEventListener
 {
-
     /**
      * @var \Doctrine\ORM\EntityManager
      */
@@ -32,13 +33,17 @@ class OAuthEventListener
     private $translator;
 
     /**
-     * @param MauticFactory $factory
+     * OAuthEventListener constructor.
+     *
+     * @param EntityManager       $entityManager
+     * @param CorePermissions     $corePermissions
+     * @param TranslatorInterface $translator
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(EntityManager $entityManager, CorePermissions $corePermissions, TranslatorInterface $translator)
     {
-        $this->em             = $factory->getEntityManager();
-        $this->mauticSecurity = $factory->getSecurity();
-        $this->translator     = $factory->getTranslator();
+        $this->em             = $entityManager;
+        $this->mauticSecurity = $corePermissions;
+        $this->translator     = $translator;
     }
 
     /**

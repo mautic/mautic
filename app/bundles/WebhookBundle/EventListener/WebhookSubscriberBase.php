@@ -12,9 +12,10 @@ namespace Mautic\WebhookBundle\EventListener;
 use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\WebhookBundle\Model\WebhookModel;
 
 /**
- * Class LeadSubscriber
+ * Class WebhookSubscriberBase
  *
  * @package Mautic\Webhook\EventListener
  */
@@ -23,20 +24,15 @@ class WebhookSubscriberBase extends CommonSubscriber
     /** @var \Mautic\WebhookBundle\Model\WebhookModel $model */
     protected $webhookModel;
 
-    public function __construct(MauticFactory $factory)
+    /**
+     * @param WebhookModel $webhookModel
+     */
+    public function setWebhookModel(WebhookModel $webhookModel)
     {
-        parent::__construct($factory);
-        $this->webhookModel = $this->factory->getModel('webhook.webhook');
+        $this->webhookModel = $webhookModel;
     }
 
     /**
-     * {@inheritdoc}
-     */
-    static public function getSubscribedEvents() {
-        return array();
-    }
-
-    /*
      * Look up list of webhooks using the event type as an identifer
      *
      * @param $type string

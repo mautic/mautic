@@ -9,6 +9,7 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
+use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
@@ -20,6 +21,20 @@ use Mautic\CoreBundle\Event as MauticEvents;
  */
 class SearchSubscriber extends CommonSubscriber
 {
+    /**
+     * @var AssetModel
+     */
+    protected $assetModel;
+
+    /**
+     * SearchSubscriber constructor.
+     *
+     * @param AssetModel $assetModel
+     */
+    public function __construct(AssetModel $assetModel)
+    {
+        $this->assetModel = $assetModel;
+    }
 
     /**
      * @return array
@@ -57,7 +72,7 @@ class SearchSubscriber extends CommonSubscriber
                 );
             }
 
-            $assets = $this->factory->getModel('asset')->getEntities(
+            $assets = $this->assetModel->getEntities(
                 array(
                     'limit'  => 5,
                     'filter' => $filter
@@ -96,7 +111,7 @@ class SearchSubscriber extends CommonSubscriber
         if ($this->security->isGranted(array('asset:assets:viewown', 'asset:assets:viewother'), "MATCH_ONE")) {
             $event->addCommands(
                 'mautic.asset.assets',
-                $this->factory->getModel('asset')->getCommandList()
+                $this->assetModel->getCommandList()
             );
         }
     }

@@ -13,6 +13,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\PointBundle\Event\PointBuilderEvent;
+use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
 
 /**
@@ -20,6 +21,20 @@ use Mautic\PointBundle\PointEvents;
  */
 class PointSubscriber extends CommonSubscriber
 {
+    /**
+     * @var PointModel
+     */
+    protected $pointModel;
+
+    /**
+     * PointSubscriber constructor.
+     *
+     * @param PointModel $pointModel
+     */
+    public function __construct(PointModel $pointModel)
+    {
+        $this->pointModel = $pointModel;
+    }
 
     /**
      * {@inheritdoc}
@@ -55,6 +70,6 @@ class PointSubscriber extends CommonSubscriber
      */
     public function onFormSubmit(SubmissionEvent $event)
     {
-        $this->factory->getModel('point')->triggerAction('form.submit', $event->getSubmission());
+        $this->pointModel->triggerAction('form.submit', $event->getSubmission());
     }
 }

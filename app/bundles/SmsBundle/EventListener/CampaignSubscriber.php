@@ -15,6 +15,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\SmsBundle\Api\AbstractSmsApi;
@@ -28,6 +29,11 @@ use Mautic\SmsBundle\SmsEvents;
  */
 class CampaignSubscriber extends CommonSubscriber
 {
+    /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
     /**
      * @var LeadModel
      */
@@ -51,19 +57,25 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * CampaignSubscriber constructor.
      *
-     * @param MauticFactory  $factory
-     * @param LeadModel      $leadModel
-     * @param SmsModel       $smsModel
-     * @param AbstractSmsApi $smsApi
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param LeadModel            $leadModel
+     * @param SmsModel             $smsModel
+     * @param AbstractSmsApi       $smsApi
+     * @param SmsHelper            $smsHelper
      */
-    public function __construct(MauticFactory $factory, LeadModel $leadModel, SmsModel $smsModel, AbstractSmsApi $smsApi, SmsHelper $smsHelper)
+    public function __construct(
+        CoreParametersHelper $coreParametersHelper,
+        LeadModel $leadModel,
+        SmsModel $smsModel,
+        AbstractSmsApi $smsApi,
+        SmsHelper $smsHelper
+    )
     {
-        $this->leadModel = $leadModel;
-        $this->smsModel  = $smsModel;
-        $this->smsApi    = $smsApi;
-        $this->smsHelper = $smsHelper;
-
-        parent::__construct($factory);
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->leadModel            = $leadModel;
+        $this->smsModel             = $smsModel;
+        $this->smsApi               = $smsApi;
+        $this->smsHelper            = $smsHelper;
     }
 
     /**
@@ -82,7 +94,7 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        if ($this->factory->getParameter('sms_enabled')) {
+        if ($this->coreParametersHelper->getParameter('sms_enabled')) {
             $event->addAction(
                 'sms.send_text_sms',
                 [
@@ -144,8 +156,8 @@ class CampaignSubscriber extends CommonSubscriber
 
         $metadata = $this->smsApi->sendSms($leadPhoneNumber, $tokenEvent->getContent());
 
-        $defaultFrequencyNumber = $this->factory->getParameter('sms_frequency_number');
-        $defaultFrequencyTime = $this->factory->getParameter('sms_frequency_time');
+        $defaultFrequencyNumber = $this->coreParametersHelper->getParameter('sms_frequency_number');
+        $defaultFrequencyTime = $this->coreParametersHelper->getParameter('sms_frequency_time');
 
         /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
         $frequencyRulesRepo = $this->leadModel->getFrequencyRuleRepository();

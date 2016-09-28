@@ -25,14 +25,14 @@ class PopupController extends CommonController
         $response = $this->render(
             'MauticNotificationBundle:Popup:index.html.php',
             [
-                'siteUrl' => $this->factory->getParameter('site_url'),
+                'siteUrl' => $this->coreParametersHelper->getParameter('site_url'),
             ]
         );
 
         $content = $response->getContent();
 
         $event = new PageDisplayEvent($content, new Page());
-        $this->factory->getDispatcher()->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
+        $this->dispatcher->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
         $content = $event->getContent();
 
         return $response->setContent($content);

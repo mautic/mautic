@@ -30,7 +30,7 @@ class ConfigController extends FormController
     public function editAction ()
     {
         //admin only allowed
-        if (!$this->factory->getUser()->isAdmin()) {
+        if (!$this->user->isAdmin()) {
             return $this->accessDenied();
         }
 
@@ -39,8 +39,8 @@ class ConfigController extends FormController
         $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
         $formConfigs            = $event->getForms();
         $formThemes             = $event->getFormThemes();
-        $doNotChange            = $this->factory->getParameter('security.restrictedConfigFields');
-        $doNotChangeDisplayMode = $this->factory->getParameter('security.restrictedConfigFields.displayMode', 'remove');
+        $doNotChange            = $this->coreParametersHelper->getParameter('security.restrictedConfigFields');
+        $doNotChangeDisplayMode = $this->coreParametersHelper->getParameter('security.restrictedConfigFields.displayMode', 'remove');
 
         $this->mergeParamsWithLocal($formConfigs, $doNotChange);
 
@@ -114,7 +114,7 @@ class ConfigController extends FormController
                     }
                 } elseif (!$isWritabale) {
                     $form->addError(new FormError(
-                        $this->factory->getTranslator()->trans('mautic.config.notwritable')
+                        $this->translator->trans('mautic.config.notwritable')
                     ));
                 }
             }
@@ -134,7 +134,7 @@ class ConfigController extends FormController
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'tmpl'        => $tmpl,
-                'security'    => $this->factory->getSecurity(),
+                'security'    => $this->get('mautic.security'),
                 'form'        => $this->setFormTheme($form, 'MauticConfigBundle:Config:form.html.php', $formThemes),
                 'formConfigs' => $formConfigs,
                 'isWritable'  => $isWritabale
