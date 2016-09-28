@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -358,7 +359,7 @@ class LeadModel extends FormModel
         if (!empty($companyFieldMatches)) {
             $company = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
             if ($company[1]) {
-                $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead Added to company', $company[0]);
+                $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead Added to company', $company[1]);
             }
         }
 
@@ -409,9 +410,6 @@ class LeadModel extends FormModel
             if (!empty($socialCache)) {
                 $lead->setSocialCache($socialCache);
             }
-        }
-        if (isset($data['companies'])) {
-            $this->modifyCompanies($lead,$data['companies']);
         }
 
         //save the field values
@@ -1716,7 +1714,8 @@ class LeadModel extends FormModel
                     $this->companyModel->removeLeadFromCompany([$leadCompany['company_id']], $lead, true);
                 }
         }
-        $this->companyModel->addLeadToCompany($companies,$lead,true);
+
+        $this->companyModel->addLeadToCompany($companies,$lead,true, false, 1, null, true);
     }
 
     /**

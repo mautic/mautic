@@ -440,11 +440,20 @@ class LeadController extends FormController
                     foreach ($form as $f) {
                         $data[$f->getName()] = $f->getData();
                     }
+                    $companies = [];
+                    if (isset($data['companies'])) {
+                        $companies = $data['companies'];
+                        unset ($data['companies']);
+                    }
 
                     $model->setFieldValues($lead, $data, true);
-                    unset($data['companies']);
+
                     //form is valid so process the data
                     $model->saveEntity($lead);
+
+                    if (!empty($companies)) {
+                        $model->modifyCompanies($lead,$companies);
+                    }
 
                     // Upload avatar if applicable
                     $image = $form['preferred_profile_image']->getData();
@@ -631,10 +640,19 @@ class LeadController extends FormController
                         }
                     }
 
+                    $companies = [];
+                    if (isset($data['companies'])) {
+                        $companies = $data['companies'];
+                        unset ($data['companies']);
+                    }
                     $model->setFieldValues($lead, $data, true);
 
                     //form is valid so process the data
                     $model->saveEntity($lead, $form->get('buttons')->get('save')->isClicked());
+
+                    if (!empty($companies)) {
+                        $model->modifyCompanies($lead,$companies);
+                    }
 
                     // Upload avatar if applicable
                     $image = $form['preferred_profile_image']->getData();
