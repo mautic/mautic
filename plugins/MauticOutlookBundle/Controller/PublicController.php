@@ -22,7 +22,7 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction()
     {
-        $logger = $this->factory->getLogger();
+        $logger = $this->get('mautic.helper.logger');
 
         // if additional data were sent with the tracking pixel
         if ($this->request->server->get('QUERY_STRING')) {
@@ -31,7 +31,7 @@ class PublicController extends CommonFormController
             // URL attr 'd' is encoded so let's decode it first.
             if (isset($query['d'], $query['sig'])) {
                 // get secret from Outlook plugin settings
-                $integrationHelper = $this->factory->getHelper('integration');
+                $integrationHelper = $this->get('mautic.helper.integration');
                 $outlookIntegration = $integrationHelper->getIntegrationObject('Outlook');
                 $keys = $outlookIntegration->getDecryptedApiKeys();
 
@@ -98,7 +98,7 @@ class PublicController extends CommonFormController
     public function addStat($lead, $email, $query, $idHash)
     {
         if ($lead !== null) {
-            $mailer = $this->factory->getMailer();
+            $mailer = $this->get('mautic.helper.mailer')->getMailer();
 
             // To lead
             $mailer->addTo($email);
