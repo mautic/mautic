@@ -194,11 +194,9 @@ $attr['data-submit-callback-async'] = "clearThemeHtmlBeforeSave";
             <?php endif; ?>
 
             <?php if (!$isVariant): ?>
-            <div id="publishStatus"<?php echo ($emailType == 'list') ? ' class="hide"' : ''; ?>>
                 <?php echo $view['form']->row($form['isPublished']); ?>
                 <?php echo $view['form']->row($form['publishUp']); ?>
                 <?php echo $view['form']->row($form['publishDown']); ?>
-            </div>
             <?php endif; ?>
 
             <?php echo $view['form']->row($form['unsubscribeForm']); ?>

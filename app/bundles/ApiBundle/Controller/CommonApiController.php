@@ -17,9 +17,13 @@ use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CommonApiController
@@ -35,8 +39,27 @@ class CommonApiController extends FOSRestController implements MauticController
     /**
      * @var MauticFactory $factory
      */
-
     protected $factory;
+
+    /**
+     * @var User
+     */
+    protected $user;
+
+    /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
+
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
 
     /**
      * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions $security
@@ -46,7 +69,7 @@ class CommonApiController extends FOSRestController implements MauticController
     /**
      * Model object for processing the entity
      *
-     * @var \Mautic\CoreBundle\Model\CommonModel
+     * @var \Mautic\CoreBundle\Model\AbstractCommonModel
      */
     protected $model;
 
@@ -99,7 +122,7 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     public function initialize(FilterControllerEvent $event)
     {
-        $this->security = $this->factory->getSecurity();
+        $this->security = $this->get('mautic.security');
     }
 
     /**
@@ -108,6 +131,38 @@ class CommonApiController extends FOSRestController implements MauticController
     public function setRequest(Request $request)
     {
         $this->request = $request;
+    }
+
+    /**
+     * @param User $user
+     */
+    public function setUser(User $user)
+    {
+        $this->user = $user;
+    }
+
+    /**
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper)
+    {
+        $this->coreParametersHelper = $coreParametersHelper;
+    }
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function setTranslator(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
     }
 
     /**
@@ -139,7 +194,7 @@ class CommonApiController extends FOSRestController implements MauticController
 
         $args    = array(
             'start'          => $this->request->query->get('start', 0),
-            'limit'          => $this->request->query->get('limit', $this->factory->getParameter('default_pagelimit')),
+            'limit'          => $this->request->query->get('limit', $this->coreParametersHelper->getParameter('default_pagelimit')),
             'filter'         => array(
                 'string' => $this->request->query->get('search', ''),
                 'force'  => $this->listFilters

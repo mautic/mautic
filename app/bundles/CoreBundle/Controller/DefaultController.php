@@ -28,7 +28,7 @@ class DefaultController extends CommonController
      */
     public function indexAction(Request $request)
     {
-        $root = $this->factory->getParameter('webroot');
+        $root = $this->coreParametersHelper->getParameter('webroot');
 
         if (empty($root)) {
             return $this->redirect($this->generateUrl('mautic_dashboard_index'));
@@ -55,8 +55,8 @@ class DefaultController extends CommonController
      */
     public function globalSearchAction()
     {
-        $searchStr = $this->request->get("global_search", $this->factory->getSession()->get('mautic.global_search', ''));
-        $this->factory->getSession()->set('mautic.global_search', $searchStr);
+        $searchStr = $this->request->get("global_search", $this->get('session')->get('mautic.global_search', ''));
+        $this->get('session')->set('mautic.global_search', $searchStr);
 
         if (!empty($searchStr)) {
             $event = new GlobalSearchEvent($searchStr, $this->get('translator'));

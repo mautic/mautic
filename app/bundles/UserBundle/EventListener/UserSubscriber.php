@@ -11,6 +11,8 @@ namespace Mautic\UserBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\UserBundle\Event as Events;
 use Mautic\UserBundle\UserEvents;
 
@@ -19,6 +21,27 @@ use Mautic\UserBundle\UserEvents;
  */
 class UserSubscriber extends CommonSubscriber
 {
+    /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
+
+    /**
+     * @var AuditLogModel
+     */
+    protected $auditLogModel;
+
+    /**
+     * UserSubscriber constructor.
+     *
+     * @param IpLookupHelper $ipLookupHelper
+     * @param AuditLogModel  $auditLogModel
+     */
+    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    {
+        $this->ipLookupHelper = $ipLookupHelper;
+        $this->auditLogModel  = $auditLogModel;
+    }
 
     /**
      * @return array
@@ -49,9 +72,9 @@ class UserSubscriber extends CommonSubscriber
                 "objectId"  => $user->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->factory->getIpAddressFromRequest()
+                "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
             );
-            $this->factory->getModel('core.auditLog')->writeToLog($log);
+            $this->auditLogModel->writeToLog($log);
         }
     }
 
@@ -69,9 +92,9 @@ class UserSubscriber extends CommonSubscriber
             "objectId"   => $user->deletedId,
             "action"     => "delete",
             "details"    => array('name' => $user->getName()),
-            "ipAddress"  => $this->factory->getIpAddressFromRequest()
+            "ipAddress"  => $this->ipLookupHelper->getIpAddressFromRequest()
         );
-        $this->factory->getModel('core.auditLog')->writeToLog($log);
+        $this->auditLogModel->writeToLog($log);
     }
 
     /**
@@ -89,9 +112,9 @@ class UserSubscriber extends CommonSubscriber
                 "objectId"  => $role->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->factory->getIpAddressFromRequest()
+                "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
             );
-            $this->factory->getModel('core.auditLog')->writeToLog($log);
+            $this->auditLogModel->writeToLog($log);
         }
     }
 
@@ -109,8 +132,8 @@ class UserSubscriber extends CommonSubscriber
             "objectId"   => $role->deletedId,
             "action"     => "delete",
             "details"    => array('name' => $role->getName()),
-            "ipAddress"  => $this->factory->getIpAddressFromRequest()
+            "ipAddress"  => $this->ipLookupHelper->getIpAddressFromRequest()
         );
-        $this->factory->getModel('core.auditLog')->writeToLog($log);
+        $this->auditLogModel->writeToLog($log);
     }
 }

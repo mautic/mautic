@@ -16,7 +16,7 @@
                     $hasEditAccess = $security->hasEntityAccess(
                         $permissions['lead:leads:editown'],
                         $permissions['lead:leads:editother'],
-                        $item->getOwner()
+                        $item->getPermissionUser()
                     );
 
                     $custom = array();
@@ -54,7 +54,7 @@
                         'item'      => $item,
                         'templateButtons' => array(
                             'edit'      => $hasEditAccess,
-                            'delete'    => $security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $item->getOwner()),
+                            'delete'    => $security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $item->getPermissionUser()),
                         ),
                         'routeBase' => 'contact',
                         'langVar'   => 'lead.lead',

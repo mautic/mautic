@@ -11,6 +11,8 @@ namespace Mautic\WebhookBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\WebhookBundle\WebhookEvents as WebhookEvents;
 use Mautic\WebhookBundle\Event\WebhookEvent;
 
@@ -19,6 +21,27 @@ use Mautic\WebhookBundle\Event\WebhookEvent;
  */
 class WebhookSubscriber extends CommonSubscriber
 {
+    /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
+
+    /**
+     * @var AuditLogModel
+     */
+    protected $auditLogModel;
+
+    /**
+     * WebhookSubscriber constructor.
+     *
+     * @param IpLookupHelper $ipLookupHelper
+     * @param AuditLogModel  $auditLogModel
+     */
+    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    {
+        $this->ipLookupHelper = $ipLookupHelper;
+        $this->auditLogModel  = $auditLogModel;
+    }
     /**
      * {@inheritdoc}
      */
@@ -46,9 +69,9 @@ class WebhookSubscriber extends CommonSubscriber
                 "objectId"  => $webhook->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->factory->getIpAddressFromRequest()
+                "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
             );
-            $this->factory->getModel('core.auditLog')->writeToLog($log);
+            $this->auditLogModel->writeToLog($log);
         }
     }
 
@@ -66,8 +89,8 @@ class WebhookSubscriber extends CommonSubscriber
             "objectId"   => $event->getWebhook()->deletedId,
             "action"     => "delete",
             "details"    => array('name' => $webhook->getName()),
-            "ipAddress"  => $this->factory->getIpAddressFromRequest()
+            "ipAddress"  => $this->ipLookupHelper->getIpAddressFromRequest()
         );
-        $this->factory->getModel('core.auditLog')->writeToLog($log);
+        $this->auditLogModel->writeToLog($log);
     }
 }

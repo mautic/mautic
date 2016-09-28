@@ -262,10 +262,8 @@ Mautic.selectEmailType = function(emailType) {
         mQuery('#leadList').removeClass('hide');
         mQuery('#segmentTranslationParent').removeClass('hide');
         mQuery('#templateTranslationParent').addClass('hide');
-        mQuery('#publishStatus').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newListEmail);
     } else {
-        mQuery('#publishStatus').removeClass('hide');
         mQuery('#segmentTranslationParent').addClass('hide');
         mQuery('#templateTranslationParent').removeClass('hide');
         mQuery('#leadList').addClass('hide');

@@ -32,7 +32,7 @@ class AjaxController extends CommonAjaxController
         $dataArray  = array('success' => 0);
 
         /** @var \Mautic\PageBundle\Entity\PageRepository $pageRepository */
-        $pageRepository = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+        $pageRepository = $this->get('doctrine.orm.entity_manager')->getRepository('MauticPageBundle:Hit');
         $dataArray['viewingVisitors'] = $pageRepository->countVisitors(60, true);
 
         $dataArray['success'] = 1;
@@ -78,7 +78,7 @@ class AjaxController extends CommonAjaxController
     {
         $data = $request->request->get('ordering');
         $repo = $this->getModel('dashboard')->getRepository();
-        $repo->updateOrdering(array_flip($data), $this->factory->getUser()->getId());
+        $repo->updateOrdering(array_flip($data), $this->user->getId());
         $dataArray = array('success' => 1);
 
         return $this->sendJsonResponse($dataArray);
@@ -97,7 +97,7 @@ class AjaxController extends CommonAjaxController
         $dataArray = array('success' => 0);
 
         // @todo: build permissions
-        // if (!$this->factory->getSecurity()->isGranted('dashobard:widgets:delete')) {
+        // if (!$this->get('mautic.security')->isGranted('dashobard:widgets:delete')) {
         //     return $this->accessDenied();
         // }
 

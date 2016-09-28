@@ -157,9 +157,9 @@ class FormController extends CommonController
                         'returnUrl'    => $returnUrl
                     )
                 ),
-                '%date%'       => $date->format($this->factory->getParameter('date_format_dateonly')),
-                '%time%'       => $date->format($this->factory->getParameter('date_format_timeonly')),
-                '%datetime%'   => $date->format($this->factory->getParameter('date_format_full')),
+                '%date%'       => $date->format($this->coreParametersHelper->getParameter('date_format_dateonly')),
+                '%time%'       => $date->format($this->coreParametersHelper->getParameter('date_format_timeonly')),
+                '%datetime%'   => $date->format($this->coreParametersHelper->getParameter('date_format_full')),
                 '%override%'   => $override
             )
         );
@@ -282,10 +282,10 @@ class FormController extends CommonController
             $this->setListFilters();
         }
 
-        $session = $this->factory->getSession();
+        $session = $this->get('session');
 
         //set limits
-        $limit = $session->get($this->sessionBase.'.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $session->get($this->sessionBase.'.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -300,7 +300,7 @@ class FormController extends CommonController
         $repo  = $model->getRepository();
 
         if (!$permissions[$this->permissionBase.':viewother']) {
-            $filter['force'] = array('column' => $repo->getTableAlias().'.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
+            $filter['force'] = array('column' => $repo->getTableAlias().'.createdBy', 'expr' => 'eq', 'value' => $this->user->getId());
         }
 
         $orderBy    = $session->get($this->sessionBase.'.orderby', $repo->getTableAlias().'.name');
@@ -387,7 +387,7 @@ class FormController extends CommonController
         $security = $this->get('mautic.security');
 
         if ($entity === null) {
-            $page = $this->factory->getSession()->get($this->sessionBase.'.page', 1);
+            $page = $this->get('session')->get($this->sessionBase.'.page', 1);
 
             return $this->postActionRedirect(
                 array(
@@ -489,7 +489,7 @@ class FormController extends CommonController
         }
 
         //set the page we came from
-        $page = $this->factory->getSession()->get($this->sessionBase.'.page', 1);
+        $page = $this->get('session')->get($this->sessionBase.'.page', 1);
 
         $action = $this->generateUrl($this->routeBase.'_action', array('objectAction' => 'new'));
         $form   = $model->createForm($entity, $this->get('form.factory'), $action);
@@ -598,7 +598,7 @@ class FormController extends CommonController
         }
 
         //set the page we came from
-        $page = $this->factory->getSession()->get($this->sessionBase.'.page', 1);
+        $page = $this->get('session')->get($this->sessionBase.'.page', 1);
 
         //set the return URL
         $returnUrl = $this->generateUrl($this->routeBase.'_index', array('page' => $page));
@@ -793,7 +793,7 @@ class FormController extends CommonController
      */
     protected function deleteStandard($objectId)
     {
-        $page      = $this->factory->getSession()->get($this->sessionBase.'.page', 1);
+        $page      = $this->get('session')->get($this->sessionBase.'.page', 1);
         $returnUrl = $this->generateUrl($this->routeBase.'_index', array('page' => $page));
         $flashes   = array();
 
@@ -858,7 +858,7 @@ class FormController extends CommonController
      */
     protected function batchDeleteStandard()
     {
-        $page      = $this->factory->getSession()->get($this->sessionBase.'.page', 1);
+        $page      = $this->get('session')->get($this->sessionBase.'.page', 1);
         $returnUrl = $this->generateUrl($this->routeBase.'_index', array('page' => $page));
         $flashes   = array();
 

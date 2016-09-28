@@ -42,7 +42,7 @@ class AssetApiController extends CommonApiController
             $this->listFilters[] = array(
                 'column' => 'a.createdBy',
                 'expr'   => 'eq',
-                'value'  => $this->factory->getUser()->getId()
+                'value'  => $this->user->getId()
             );
         }
 

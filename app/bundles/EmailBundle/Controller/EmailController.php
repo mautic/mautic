@@ -32,7 +32,7 @@ class EmailController extends FormController
         $model = $this->getModel('email');
 
         //set some permissions
-        $permissions = $this->factory->getSecurity()->isGranted(
+        $permissions = $this->get('mautic.security')->isGranted(
             [
                 'email:emails:viewown',
                 'email:emails:viewother',
@@ -55,7 +55,7 @@ class EmailController extends FormController
             $this->setListFilters();
         }
 
-        $session = $this->factory->getSession();
+        $session = $this->get('session');
 
         $listFilters = [
             'filters' => [
@@ -68,7 +68,7 @@ class EmailController extends FormController
         $listFilters['filters']['groups'] = [];
 
         //set limits
-        $limit = $session->get('mautic.email.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.email.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -86,7 +86,7 @@ class EmailController extends FormController
         ];
         if (!$permissions['email:emails:viewother']) {
             $filter['force'][] =
-                ['column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId()];
+                ['column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
         //retrieve a list of Lead Lists
@@ -175,11 +175,12 @@ class EmailController extends FormController
 
         $emails = $model->getEntities(
             [
-                'start'      => $start,
-                'limit'      => $limit,
-                'filter'     => $filter,
-                'orderBy'    => $orderBy,
-                'orderByDir' => $orderByDir
+                'start'          => $start,
+                'limit'          => $limit,
+                'filter'         => $filter,
+                'orderBy'        => $orderBy,
+                'orderByDir'     => $orderByDir,
+                'ignoreListJoin' => true
             ]
         );
 
@@ -221,7 +222,7 @@ class EmailController extends FormController
                     'tmpl'        => $this->request->get('tmpl', 'index'),
                     'permissions' => $permissions,
                     'model'       => $model,
-                    'security'    => $this->factory->getSecurity(),
+                    'security'    => $this->get('mautic.security'),
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:list.html.php',
                 'passthroughVars' => [
@@ -244,12 +245,12 @@ class EmailController extends FormController
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model    = $this->getModel('email');
-        $security = $this->factory->getSecurity();
+        $security = $this->get('mautic.security');
 
         /** @var \Mautic\EmailBundle\Entity\Email $email */
         $email = $model->getEntity($objectId);
         //set the page we came from
-        $page = $this->factory->getSession()->get('mautic.email.page', 1);
+        $page = $this->get('session')->get('mautic.email.page', 1);
 
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);
@@ -278,7 +279,7 @@ class EmailController extends FormController
                     ]
                 ]
             );
-        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(
             'email:emails:viewown',
             'email:emails:viewother',
             $email->getCreatedBy()
@@ -475,8 +476,8 @@ class EmailController extends FormController
         }
 
         $method  = $this->request->getMethod();
-        $session = $this->factory->getSession();
-        if (!$this->factory->getSecurity()->isGranted('email:emails:create')) {
+        $session = $this->get('session');
+        if (!$this->get('mautic.security')->isGranted('email:emails:create')) {
             return $this->accessDenied();
         }
 
@@ -626,8 +627,8 @@ class EmailController extends FormController
         $method  = $this->request->getMethod();
 
         $entity  = $model->getEntity($objectId);
-        $session = $this->factory->getSession();
-        $page    = $this->factory->getSession()->get('mautic.email.page', 1);
+        $session = $this->get('session');
+        $page    = $this->get('session')->get('mautic.email.page', 1);
 
         //set the return URL
         $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
@@ -658,7 +659,7 @@ class EmailController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(
             'email:emails:editown',
             'email:emails:editother',
             $entity->getCreatedBy()
@@ -831,8 +832,8 @@ class EmailController extends FormController
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
-            if (!$this->factory->getSecurity()->isGranted('email:emails:create')
-                || !$this->factory->getSecurity()->hasEntityAccess(
+            if (!$this->get('mautic.security')->isGranted('email:emails:create')
+                || !$this->get('mautic.security')->hasEntityAccess(
                     'email:emails:viewown',
                     'email:emails:viewother',
                     $entity->getCreatedBy()
@@ -842,7 +843,7 @@ class EmailController extends FormController
             }
 
             $entity      = clone $entity;
-            $session     = $this->factory->getSession();
+            $session     = $this->get('session');
             $contentName = 'mautic.emailbuilder.'.$entity->getSessionId().'.content';
 
             $session->set($contentName, $entity->getContent());
@@ -860,7 +861,7 @@ class EmailController extends FormController
      */
     public function deleteAction($objectId)
     {
-        $page      = $this->factory->getSession()->get('mautic.email.page', 1);
+        $page      = $this->get('session')->get('mautic.email.page', 1);
         $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
         $flashes   = [];
 
@@ -884,7 +885,7 @@ class EmailController extends FormController
                     'msg'     => 'mautic.email.error.notfound',
                     'msgVars' => ['%id%' => $objectId]
                 ];
-            } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+            } elseif (!$this->get('mautic.security')->hasEntityAccess(
                 'email:emails:deleteown',
                 'email:emails:deleteother',
                 $entity->getCreatedBy()
@@ -934,7 +935,7 @@ class EmailController extends FormController
         //permission check
         if (strpos($objectId, 'new') !== false) {
             $isNew = true;
-            if (!$this->factory->getSecurity()->isGranted('email:emails:create')) {
+            if (!$this->get('mautic.security')->isGranted('email:emails:create')) {
                 return $this->accessDenied();
             }
             $entity = $model->getEntity();
@@ -943,7 +944,7 @@ class EmailController extends FormController
             $isNew  = false;
             $entity = $model->getEntity($objectId);
             if ($entity == null
-                || !$this->factory->getSecurity()->hasEntityAccess(
+                || !$this->get('mautic.security')->hasEntityAccess(
                     'email:emails:viewown',
                     'email:emails:viewother',
                     $entity->getCreatedBy()
@@ -957,7 +958,7 @@ class EmailController extends FormController
         $slots    = $this->factory->getTheme($template)->getSlots('email');
 
         //merge any existing changes
-        $newContent = $this->factory->getSession()->get('mautic.emailbuilder.'.$objectId.'.content', []);
+        $newContent = $this->get('session')->get('mautic.emailbuilder.'.$objectId.'.content', []);
         $content    = $entity->getContent();
 
         if (is_array($newContent)) {
@@ -1001,8 +1002,8 @@ class EmailController extends FormController
         if ($entity != null) {
             $parent = $entity->getVariantParent();
 
-            if ($parent || !$this->factory->getSecurity()->isGranted('email:emails:create')
-                || !$this->factory->getSecurity()->hasEntityAccess(
+            if ($parent || !$this->get('mautic.security')->isGranted('email:emails:create')
+                || !$this->get('mautic.security')->hasEntityAccess(
                     'email:emails:viewown',
                     'email:emails:viewother',
                     $entity->getCreatedBy()
@@ -1040,7 +1041,7 @@ class EmailController extends FormController
     public function winnerAction($objectId)
     {
         //todo - add confirmation to button click
-        $page      = $this->factory->getSession()->get('mautic.email', 1);
+        $page      = $this->get('session')->get('mautic.email', 1);
         $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
         $flashes   = [];
 
@@ -1064,7 +1065,7 @@ class EmailController extends FormController
                     'msg'     => 'mautic.email.error.notfound',
                     'msgVars' => ['%id%' => $objectId]
                 ];
-            } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+            } elseif (!$this->get('mautic.security')->hasEntityAccess(
                 'email:emails:editown',
                 'email:emails:editother',
                 $entity->getCreatedBy()
@@ -1117,7 +1118,7 @@ class EmailController extends FormController
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model   = $this->getModel('email');
         $entity  = $model->getEntity($objectId);
-        $session = $this->factory->getSession();
+        $session = $this->get('session');
         $page    = $session->get('mautic.email.page', 1);
 
         //set the return URL
@@ -1150,7 +1151,7 @@ class EmailController extends FormController
                 )
             );
         } elseif ($entity->getEmailType() == 'template'
-            || !$this->factory->getSecurity()->hasEntityAccess(
+            || !$this->get('mautic.security')->hasEntityAccess(
                 'email:emails:viewown',
                 'email:emails:viewother',
                 $entity->getCreatedBy()
@@ -1272,7 +1273,7 @@ class EmailController extends FormController
 
         //not found or not allowed
         if ($entity === null
-            || (!$this->factory->getSecurity()->hasEntityAccess(
+            || (!$this->get('mautic.security')->hasEntityAccess(
                 'email:emails:viewown',
                 'email:emails:viewother',
                 $entity->getCreatedBy()
@@ -1294,7 +1295,7 @@ class EmailController extends FormController
         $fields['id'] = 0;
 
         // Send to current user
-        $user  = $this->factory->getUser();
+        $user  = $this->user;
         $users = [
             [
                 'id'        => $user->getId(),
@@ -1322,7 +1323,7 @@ class EmailController extends FormController
      */
     public function batchDeleteAction()
     {
-        $page      = $this->factory->getSession()->get('mautic.email.page', 1);
+        $page      = $this->get('session')->get('mautic.email.page', 1);
         $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
         $flashes   = [];
 
@@ -1352,7 +1353,7 @@ class EmailController extends FormController
                         'msg'     => 'mautic.email.error.notfound',
                         'msgVars' => ['%id%' => $objectId]
                     ];
-                } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+                } elseif (!$this->get('mautic.security')->hasEntityAccess(
                     'email:emails:viewown',
                     'email:emails:viewother',
                     $entity->getCreatedBy()

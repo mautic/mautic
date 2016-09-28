@@ -144,7 +144,7 @@ class ReportSubscriber extends CommonSubscriber
 
         $graphs         = $event->getRequestedGraphs();
         $qb             = $event->getQueryBuilder();
-        $submissionRepo = $this->factory->getEntityManager()->getRepository('MauticFormBundle:Submission');
+        $submissionRepo = $this->em->getRepository('MauticFormBundle:Submission');
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
