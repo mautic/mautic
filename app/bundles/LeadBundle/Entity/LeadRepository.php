@@ -895,7 +895,8 @@ class LeadRepository extends CommonRepository
             'mautic.lead.lead.searchcommand.owner',
             'mautic.core.searchcommand.ip',
             'mautic.lead.lead.searchcommand.tag',
-            'mautic.lead.lead.searchcommand.stage'
+            'mautic.lead.lead.searchcommand.stage',
+            'mautic.lead.lead.searchcommand.duplicate'
         );
 
         if (!empty($this->availableSearchFields)) {
