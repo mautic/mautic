@@ -182,7 +182,7 @@ class FormController extends CommonFormController
         }
 
         $permissions = $this->get('mautic.security')->isGranted(
-            array(
+            [
                 'form:forms:viewown',
                 'form:forms:viewother',
                 'form:forms:create',
@@ -243,7 +243,7 @@ class FormController extends CommonFormController
                     'page'              => $page,
                     'logs'              => $logs,
                     'permissions'       => $permissions,
-                    'stats'             => array(
+                    'stats'             => [
                         'submissionsInTime' => $timeStats,
                     ],
                     'dateRangeForm'     => $dateRangeForm->createView(),
@@ -963,7 +963,7 @@ class FormController extends CommonFormController
                     'type'    => 'error',
                     'msg'     => 'mautic.form.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
-                );
+                ];
             } elseif (!$this->get('mautic.security')->hasEntityAccess(
                 'form:forms:deleteown',
                 'form:forms:deleteother',

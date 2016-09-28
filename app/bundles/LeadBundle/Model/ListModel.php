@@ -15,11 +15,10 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
-use Mautic\LeadBundle\Event\FilterChoiceEvent;
 use Mautic\LeadBundle\Event\LeadListEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
+use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -409,13 +408,14 @@ class ListModel extends FormModel
             if (in_array($type, array('lookup', 'multiselect', 'boolean'))) {
                 if ($type == 'boolean') {
                     //create a lookup list with ID
-                    $properties['list'] = $properties['yes'].'|'.$properties['no'].'||1|0';
+                    $properties['list'] = [
+                        0 => $properties['no'],
+                        1 => $properties['yes']
+                    ];
                 } else {
                     $properties['callback'] = 'activateLeadFieldTypeahead';
                 }
-            }
-            if ($type === 'multiselect') {
-                $properties['list']  = implode("|", $properties['list']);
+                $properties['list'] = FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, FormFieldHelper::parseList($properties['list']));
             }
             $choices[$field->getAlias()] = array(
                 'label'      => $field->getLabel(),
