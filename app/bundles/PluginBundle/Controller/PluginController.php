@@ -164,7 +164,7 @@ class PluginController extends FormController
                 $currentFeatureSettings = $entity->getFeatureSettings();
 
                 if ($valid = $this->isFormValid($form)) {
-                    $em          = $this->get('entity_manager');
+                    $em          = $this->get('doctrine.orm.entity_manager');
                     $integration = $entity->getName();
 
                     // Merge keys
@@ -348,7 +348,7 @@ class PluginController extends FormController
         $added   = $disabled = $updated = 0;
 
         // Get the metadata for plugins for installation
-        $em             = $this->get('entity_manager');
+        $em             = $this->get('doctrine.orm.entity_manager');
         $allMetadata    = $em->getMetadataFactory()->getAllMetadata();
         $pluginMetadata = $pluginInstalledSchemas = $currentPluginTables = [];
 
