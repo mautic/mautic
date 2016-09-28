@@ -54,7 +54,7 @@ class LeadApiController extends CommonApiController
 
         if (count($uniqueLeadFieldData)) {
             if (count($uniqueLeadFieldData)) {
-                $existingLeads = $this->get('entity_manager')->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields($uniqueLeadFieldData);
+                $existingLeads = $this->get('doctrine.orm.entity_manager')->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields($uniqueLeadFieldData);
 
                 if (!empty($existingLeads)) {
                     // Lead found so edit rather than create a new one
