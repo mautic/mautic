@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "2fea0986b7fc6ceeb984b4fc5003ac2d",
-    "content-hash": "e38e7652b2800f4b00aa6f3fee1380c5",
+    "hash": "b87247e34deae7f384698ef33596f231",
+    "content-hash": "d9182f29f3545972b1b1aab96d5b9afe",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -453,16 +453,16 @@
         },
         {
             "name": "doctrine/data-fixtures",
-            "version": "v1.2.0",
+            "version": "v1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/data-fixtures.git",
-                "reference": "1bd7eb8720cb600a9cf0a798698fbf4fa2bec9b8"
+                "reference": "b3cae5efef97191a08d53d733260f7eb667c16e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/data-fixtures/zipball/1bd7eb8720cb600a9cf0a798698fbf4fa2bec9b8",
-                "reference": "1bd7eb8720cb600a9cf0a798698fbf4fa2bec9b8",
+                "url": "https://api.github.com/repos/doctrine/data-fixtures/zipball/b3cae5efef97191a08d53d733260f7eb667c16e4",
+                "reference": "b3cae5efef97191a08d53d733260f7eb667c16e4",
                 "shasum": ""
             },
             "require": {
@@ -485,7 +485,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.1.x-dev"
+                    "dev-master": "1.3.x-dev"
                 }
             },
             "autoload": {
@@ -508,7 +508,7 @@
             "keywords": [
                 "database"
             ],
-            "time": "2016-06-19 09:43:21"
+            "time": "2016-06-20 18:08:26"
         },
         {
             "name": "doctrine/dbal",
@@ -1595,6 +1595,7 @@
                 "rest",
                 "web service"
             ],
+            "abandoned": "guzzlehttp/guzzle",
             "time": "2015-03-18 18:23:50"
         },
         {
@@ -2521,7 +2522,7 @@
                     "email": "stof@notk.org"
                 },
                 {
-                    "name": "Knplabs",
+                    "name": "KnpLabs",
                     "homepage": "http://knplabs.com"
                 },
                 {
