@@ -171,6 +171,7 @@ $baseUrl = isset($lead) ? $view['router']->path(
         'fixedLimit' => true,
         'baseUrl' => $baseUrl,
         'target' => '#timeline-table',
+        'totalItems'=>$events['total']
     ]
 ); ?>
 

@@ -18,7 +18,9 @@ return array(
             'mautic_gmail_tracker'             => [
                 'path'       => '/gmail/tracking.gif',
                 'controller' => 'MauticGmailBundle:Public:trackingImage'
-            ],
+            ]
+        ],
+        'main' => [
             'mautic_gmail_timeline_index'       => [
                 'path'         => '/gmail/timeline/{page}',
                 'controller'   => 'MauticGmailBundle:Timeline:index',
@@ -31,7 +33,7 @@ return array(
                 'path'         => '/gmail/timeline/logincheck',
                 'controller'   => 'MauticGmailBundle:Timeline:logincheck',
             ],
-            'mautic_gmail_timeline_view'       => [
+            'mautic_gmail_timeline_view'        => [
                 'path'         => '/gmail/timeline/view/{leadId}/{page}',
                 'controller'   => 'MauticGmailBundle:Timeline:view',
                 'requirements' => [

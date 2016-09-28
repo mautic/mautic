@@ -34,11 +34,6 @@ class TimelineController extends CommonController
 
     public function indexAction(Request $request, $page = 1)
     {
-        if ($this->factory->getSecurity()->isAnonymous()) {
-            return new RedirectResponse($this->generateUrl('mautic_gmail_timeline_login',
-                [ 'returnUrl'=>$this->generateUrl('mautic_gmail_timeline_index')]));
-        }
-
         $leads = $this->checkAllAccess('view');
 
         if ($leads instanceof Response) {
@@ -147,66 +142,6 @@ class TimelineController extends CommonController
         );
     }
 
-    /**
-     * Generates login form and processes login
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function loginAction (Request $request)
-    {
-        $session = $this->request->getSession();
 
-        // get the login error if there is one
-        if ($request->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
-            $error = $request->attributes->get(Security::AUTHENTICATION_ERROR);
-        } else {
-            $error = $session->get(Security::AUTHENTICATION_ERROR);
-            $session->remove(Security::AUTHENTICATION_ERROR);
-        }
-
-        if (!empty($error)) {
-            if (($error instanceof Exception\BadCredentialsException)) {
-                $msg = 'mautic.user.auth.error.invalidlogin';
-            } elseif ($error instanceof Exception\DisabledException) {
-                $msg = 'mautic.user.auth.error.disabledaccount';
-            } else {
-                $msg = $error->getMessage();
-            }
-
-            $this->addFlash($msg, array(), 'error', null, false);
-        }
-        $request->query->set('tmpl', 'login');
-        
-        return $this->delegateView(array(
-            'viewParameters'  => array(
-                'last_username' => $session->get(Security::LAST_USERNAME)
-            ),
-            'contentTemplate' => 'MauticGmailBundle:Timeline:login.html.php',
-            'passthroughVars' => array(
-                'route'          => $this->generateUrl('login'),
-                'mauticContent'  => 'user',
-                'sessionExpired' => true
-            )
-        ));
-    }
-
-    /**
-     * Authenticate user using a subrequest to the auth mechanism
-     */
-    public function loginCheckAction(Request $request)
-    {
-        $subRequest = Request::create($this->generateUrl('mautic_user_logincheck'), 'POST',
-            array('_username' => $request->get('_username'),
-                '_password' => $request->get('_password'),
-                '_csrf_token' => $request->get('_csrf_token'),
-                '_remember_me' => $request->get('_remember_me')
-                ),
-            $request->cookies->all(), array(), $request->server->all());
-
-        $httpKernel = $this->container->get('http_kernel');
-        $httpKernel->handle($subRequest, HttpKernelInterface::MASTER_REQUEST, false);
-
-        return $this->redirect($this->generateUrl('mautic_gmail_timeline_index'));
-    }
 
 }
