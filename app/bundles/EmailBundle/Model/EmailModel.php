@@ -1129,7 +1129,7 @@ class EmailModel extends FormModel
         $sendBatchMail    = (isset($options['sendBatchMail'])) ? $options['sendBatchMail'] : true;
         $assetAttachments = (isset($options['assetAttachments'])) ? $options['assetAttachments'] : [];
         $customHeaders    = (isset($options['customHeaders'])) ? $options['customHeaders'] : [];
-        $emailType        = (isset($options['email_type'])) ? $options['email_type'] : [];
+        $emailType        = (isset($options['email_type'])) ? $options['email_type'] : '';
         $emailAttempts    = (isset($options['email_attempts'])) ? $options['email_attempts'] : [];
         $emailPriority    = (isset($options['email_priority'])) ? $options['email_priority'] : [];
 
@@ -1188,7 +1188,7 @@ class EmailModel extends FormModel
 
         $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', $leadIds, $listId, $defaultFrequencyNumber, $defaultFrequencyTime);
 
-        if (!empty($dontSendTo)) {
+        if (!empty($dontSendTo) and $emailType != 'transactional') {
             foreach ($dontSendTo as $frequencyRuleMet)
             {
                 unset($sendTo[$frequencyRuleMet['lead_id']]);
