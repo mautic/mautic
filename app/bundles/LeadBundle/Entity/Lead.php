@@ -360,8 +360,7 @@ class Lead extends FormEntity
                     'utmtags',
                     'stage',
                     'dateIdentified',
-                    'preferredProfileImage',
-                    'companies'
+                    'preferredProfileImage'
                 ]
             )
             ->build();
@@ -426,13 +425,7 @@ class Lead extends FormEntity
             } else {
                 $this->changes['frequencyRules']['removed'][] = $val;
             }
-        } elseif ($prop == 'companies') {
-            if ($val instanceof Company) {
-                $this->changes['companies']['added'][] = $val->getId();
-            } else {
-                $this->changes['companies']['removed'][] = $val;
-            }
-        }elseif ($this->$getter() != $val) {
+        } elseif ($this->$getter() != $val) {
             $this->changes[$prop] = [$this->$getter(), $val];
         }
     }
@@ -544,16 +537,6 @@ class Lead extends FormEntity
     public function getIpAddresses()
     {
         return $this->ipAddresses;
-    }
-
-    /**
-     * Remove company
-     *
-     * @param Company $company
-     */
-    public function removeCompany(Company $company)
-    {
-        $this->companies->removeElement($company);
     }
 
     /**
@@ -1353,21 +1336,6 @@ class Lead extends FormEntity
     public function setTags($tags)
     {
         $this->tags = $tags;
-
-        return $this;
-    }
-
-
-    /**
-     * Set companies
-     *
-     * @param $companies
-     *
-     * @return $this
-     */
-    public function setCompanies($companies)
-    {
-        $this->companies = $companies;
 
         return $this;
     }

@@ -319,7 +319,6 @@ class LeadApiController extends CommonApiController
             unset($parameters['tags']);
         }
 
-        // Check for tag string
         if (isset($parameters['companies'])) {
             $this->model->modifyCompanies($entity, $parameters['companies']);
             unset($parameters['companies']);
