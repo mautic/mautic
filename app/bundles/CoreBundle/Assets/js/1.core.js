@@ -584,10 +584,6 @@ var Mautic = {
                         options.htmlRemoveTags = [];
                         options.lineBreakerTags = [];
                     }
-
-                    if (textarea.hasClass('editor-email')) {
-                        options.imageOutputSize = true;
-                    }
                     
                     textarea.on('froalaEditor.focus', function (e, editor) {
                         Mautic.showChangeThemeWarning = true;
