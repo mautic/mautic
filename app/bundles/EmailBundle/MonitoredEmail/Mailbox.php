@@ -913,8 +913,9 @@ class Mailbox
      * @param              $partNum
      * @param bool|true    $markAsSeen
      * @param bool|false   $isDsn
+     * @param bool|false   $isFbl
      */
-    protected function initMailPart(Message $mail, $partStructure, $partNum, $markAsSeen = true, $isDsn = false)
+    protected function initMailPart(Message $mail, $partStructure, $partNum, $markAsSeen = true, $isDsn = false, $isFbl = false)
     {
         $options = FT_UID;
         if (!$markAsSeen) {
@@ -977,33 +978,65 @@ class Mailbox
                 $data = $this->convertStringEncoding($data, $params['charset'], $this->serverEncoding);
             }
 
-            if ($partStructure->type == 0 && $data) {
-                if (strtolower($partStructure->subtype) == 'plain') {
-                    $mail->textPlain .= $data;
-                } else {
-                    $mail->textHtml .= $data;
-                }
-            } elseif ($partStructure->type == 1 && $partStructure->ifsubtype
-                && (strtolower($partStructure->subtype) == 'report'
-                    && isset($params['REPORT-TYPE'])
-                    && strtolower($params['REPORT-TYPE']) == 'delivery-status')
-            ) {
-                $mail->dsnMessage = trim($data);
-                $isDsn            = true;
-            } elseif ($partStructure->type == 2 && $data) {
-                if ($isDsn || (strtolower($partStructure->subtype) == 'delivery-status')) {
-                    $mail->dsnReport = $data;
-                } else {
-                    $mail->textPlain .= trim($data);
+            if (!empty($data)) {
+                $subtype = !empty($partStructure->ifsubtype)
+                    ? strtolower($partStructure->subtype)
+                    : '';
+                switch ($partStructure->type) {
+                    case TYPETEXT:
+                        switch ($subtype) {
+                            case 'plain':
+                                $mail->textPlain .= $data;
+                                break;
+                            case 'html':
+                            default:
+                                $mail->textHtml .= $data;
+                        }
+                        break;
+                    case TYPEMULTIPART:
+                        if (
+                            $subtype != 'report'
+                            ||
+                            empty($params['report-type'])
+                        ) {
+                            break;
+                        }
+                        $reportType = strtolower($params['report-type']);
+                        switch ($reportType) {
+                            case 'delivery-status':
+                                $mail->dsnMessage = trim($data);
+                                $isDsn = true;
+                                break;
+                            case 'feedback-report':
+                                $mail->fblMessage = trim($data);
+                                $isFbl = true;
+                                break;
+                            default:
+                                // Just pass through.
+                        }
+                        break;
+                    case TYPEMESSAGE:
+                        if ($isDsn || ($subtype == 'delivery-status')) {
+                            $mail->dsnReport = $data;
+                        }
+                        elseif ($isFbl || ($subtype == 'feedback-report')) {
+                            $mail->fblReport = $data;
+                        }
+                        else {
+                            $mail->textPlain .= trim($data);
+                        }
+                        break;
+                    default:
+                        // Just pass through.
                 }
             }
         }
         if (!empty($partStructure->parts)) {
             foreach ($partStructure->parts as $subPartNum => $subPartStructure) {
                 if ($partStructure->type == 2 && $partStructure->subtype == 'RFC822') {
-                    $this->initMailPart($mail, $subPartStructure, $partNum, $markAsSeen, $isDsn);
+                    $this->initMailPart($mail, $subPartStructure, $partNum, $markAsSeen, $isDsn, $isFbl);
                 } else {
-                    $this->initMailPart($mail, $subPartStructure, $partNum.'.'.($subPartNum + 1), $markAsSeen, $isDsn);
+                    $this->initMailPart($mail, $subPartStructure, $partNum.'.'.($subPartNum + 1), $markAsSeen, $isDsn, $isFbl);
                 }
             }
         }
