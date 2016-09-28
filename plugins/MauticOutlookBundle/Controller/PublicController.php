@@ -22,13 +22,20 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction()
     {
+        $logger = $this->factory->getLogger();
 
         // if additional data were sent with the tracking pixel
-        if ($this->request->server->get('QUERY_STRING')) {
-            parse_str($this->request->server->get('QUERY_STRING'), $query);
+        $query_str = $this->request->server->get('QUERY_STRING');
+        if (!$query_str) {
+            $logger->log('error', 'Query string not available');
+        } else {
+            if (strpos($query_str, '?d=') >= 0) $query_str = substr($query_str, strpos($query_str, '?d=')+1);
+            parse_str($query_str, $query);
 
             // URL attr 'd' is encoded so let's decode it first.
-            if (isset($query['d'], $query['sig'])) {
+            if (!isset($query['d'], $query['sig'])) {
+                $logger->log('error', 'Parameters are missing: ' . $query_str);
+            } else {
                 // get secret from Outlook plugin settings
                 $integrationHelper = $this->get('mautic.helper.integration');
                 $outlookIntegration = $integrationHelper->getIntegrationObject('Outlook');
@@ -49,10 +56,13 @@ class PublicController extends CommonFormController
                     parse_str($gz, $query);
                 } else {
                     // signatures don't match: stop
+                    $logger->log('error', 'Signatures don\'t match');
                     unset($query);
                 }
 
-                if (!empty($query) && isset($query['email'], $query['subject'], $query['body'])) {
+                if (empty($query) || !isset($query['email'], $query['subject'], $query['body'])) {
+                    $logger->log('error', 'Email information not available');
+                } else {
 
                     /** @var \Mautic\EmailBundle\Model\EmailModel $model */
                     $model = $this->getModel('email');
@@ -67,7 +77,10 @@ class PublicController extends CommonFormController
                             $lead = $this->createLead($email, $repo);
                         }
 
-                        if ($lead === null) continue; // lead was not created
+                        if ($lead === null) {
+                            $logger->log('error', 'Lead is null. It was not created');
+                            continue;
+                        } // lead was not created
 
                         $idHash = hash('crc32', $email.$query['body']);
                         $idHash = substr($idHash.$idHash, 0, 13); // 13 bytes length
@@ -76,6 +89,7 @@ class PublicController extends CommonFormController
 
                         // stat doesn't exist, create one
                         if ($stat === null) {
+                            $lead['email'] = $email; // email is needed
                             $this->addStat($lead, $email, $query, $idHash);
                         } else { // Prevent marking the email as read on creation
                             $model->hitEmail($idHash, $this->request); // add email event
