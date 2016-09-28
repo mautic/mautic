@@ -415,6 +415,10 @@ class LeadModel extends FormModel
                     $curValue = $field['value'];
                     $newValue = $data[$alias];
 
+                    if (is_array($newValue)) {
+                        $newValue = implode("|", $newValue);
+                    }
+
                     if ($curValue !== $newValue && (strlen($newValue) > 0 || (strlen($newValue) === 0 && $overwriteWithBlank))) {
                         $field['value'] = $newValue;
                         $lead->addUpdatedField($alias, $newValue, $curValue);
