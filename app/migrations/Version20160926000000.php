@@ -105,8 +105,8 @@ SQL;
         $lead_fk = $this->generatePropertyName('companies_leads', 'fk', ['lead_id']);
         $company_fk = $this->generatePropertyName('companies_leads', 'fk', ['company_id']);
 
-        $this->addSql("ALTER TABLE {$this->prefix}companies_leads ADD CONSTRAINT {$company_fk} FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE;");
-        $this->addSql("ALTER TABLE {$this->prefix}companies_leads ADD CONSTRAINT {$lead_fk} FOREIGN KEY (lead_id) REFERENCES leads (id) ON DELETE CASCADE;");
+        $this->addSql("ALTER TABLE {$this->prefix}companies_leads ADD CONSTRAINT {$company_fk} FOREIGN KEY (company_id) REFERENCES {$this->prefix}companies (id) ON DELETE CASCADE;");
+        $this->addSql("ALTER TABLE {$this->prefix}companies_leads ADD CONSTRAINT {$lead_fk} FOREIGN KEY (lead_id) REFERENCES {$this->prefix}leads (id) ON DELETE CASCADE;");
 
         $this->addSql("ALTER TABLE {$this->prefix}lead_fields ADD object VARCHAR(255) DEFAULT 'lead'");
 
