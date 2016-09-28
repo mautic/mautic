@@ -13,6 +13,9 @@ use Mautic\ApiBundle\ApiEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\ApiBundle\Event as Events;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -22,6 +25,34 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class ApiSubscriber extends CommonSubscriber
 {
+    /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
+
+    /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
+     * @var AuditLogModel
+     */
+    protected $auditLogModel;
+
+    /**
+     * ApiSubscriber constructor.
+     *
+     * @param IpLookupHelper       $ipLookupHelper
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param AuditLogModel        $auditLogModel
+     */
+    public function __construct(IpLookupHelper $ipLookupHelper, CoreParametersHelper $coreParametersHelper, AuditLogModel $auditLogModel)
+    {
+        $this->ipLookupHelper = $ipLookupHelper;
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->auditLogModel = $auditLogModel;
+    }
 
     /**
      * {@inheritdoc}
@@ -46,7 +77,7 @@ class ApiSubscriber extends CommonSubscriber
             return;
         }
 
-        $apiEnabled = $this->factory->getParameter('api_enabled');
+        $apiEnabled = $this->coreParametersHelper->getParameter('api_enabled');
         $request    = $event->getRequest();
         $requestUrl = $request->getRequestUri();
 
@@ -57,7 +88,7 @@ class ApiSubscriber extends CommonSubscriber
         if ($isApiRequest && !$apiEnabled) {
 
             throw new AccessDeniedHttpException(
-                $this->factory->getTranslator()->trans(
+                $this->translator->trans(
                     'mautic.core.url.error.401',
                     array(
                         '%url%' => $request->getRequestUri()
@@ -82,9 +113,9 @@ class ApiSubscriber extends CommonSubscriber
                 'objectId'  => $client->getId(),
                 'action'    => ($event->isNew()) ? 'create' : 'update',
                 'details'   => $details,
-                'ipAddress' => $this->factory->getIpAddressFromRequest()
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest()
             );
-            $this->factory->getModel('core.auditLog')->writeToLog($log);
+            $this->auditLogModel->writeToLog($log);
         }
     }
 
@@ -102,8 +133,8 @@ class ApiSubscriber extends CommonSubscriber
             'objectId'   => $client->deletedId,
             'action'     => 'delete',
             'details'    => array('name' => $client->getName()),
-            'ipAddress'  => $this->factory->getIpAddressFromRequest()
+            'ipAddress'  => $this->ipLookupHelper->getIpAddressFromRequest()
         );
-        $this->factory->getModel('core.auditLog')->writeToLog($log);
+        $this->auditLogModel->writeToLog($log);
     }
 }

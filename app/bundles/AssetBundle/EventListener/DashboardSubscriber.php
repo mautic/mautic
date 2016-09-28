@@ -8,6 +8,7 @@
  */
 namespace Mautic\AssetBundle\EventListener;
 
+use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
@@ -49,6 +50,20 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'asset:assets:viewother'
     );
 
+    /**
+     * @var AssetModel
+     */
+    protected $assetModel;
+
+    /**
+     * DashboardSubscriber constructor.
+     *
+     * @param AssetModel $assetModel
+     */
+    public function __construct(AssetModel $assetModel)
+    {
+        $this->assetModel = $assetModel;
+    }
 
     /**
      * Set a widget detail when needed 
@@ -67,11 +82,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $params = $widget->getParams();
 
             if (!$event->isCached()) {
-                $model = $this->factory->getModel('asset');
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getDownloadsLineChartData(
+                    'chartData'   => $this->assetModel->getDownloadsLineChartData(
                         $params['timeUnit'],
                         $params['dateFrom'],
                         $params['dateTo'],
@@ -92,7 +106,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData(array(
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,
-                    'chartData'   => $model->getUniqueVsRepetitivePieChartData($params['dateFrom'], $params['dateTo'], $canViewOthers)
+                    'chartData'   => $this->assetModel->getUniqueVsRepetitivePieChartData($params['dateFrom'], $params['dateTo'], $canViewOthers)
                 ));
             }
 
@@ -102,7 +116,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'popular.assets') {
             if (!$event->isCached()) {
-                $model = $this->factory->getModel('asset');
                 $params = $event->getWidget()->getParams();
 
                 if (empty($params['limit'])) {
@@ -112,13 +125,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
                 
-                $assets = $model->getPopularAssets($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers);
+                $assets = $this->assetModel->getPopularAssets($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers);
                 $items  = array();
 
                 // Build table rows with links
                 if ($assets) {
                     foreach ($assets as &$asset) {
-                        $assetUrl = $this->factory->getRouter()->generate('mautic_asset_action', array('objectAction' => 'view', 'objectId' => $asset['id']));
+                        $assetUrl = $this->router->generate('mautic_asset_action', array('objectAction' => 'view', 'objectId' => $asset['id']));
                         $row = array(
                             array(
                                 'value' => $asset['title'],
@@ -149,7 +162,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'created.assets') {
             if (!$event->isCached()) {
-                $model  = $this->factory->getModel('asset');
                 $params = $event->getWidget()->getParams();
 
                 if (empty($params['limit'])) {
@@ -159,13 +171,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $assets = $model->getAssetList($limit, $params['dateFrom'], $params['dateTo'], array(), array('canViewOthers' => $canViewOthers));
+                $assets = $this->assetModel->getAssetList($limit, $params['dateFrom'], $params['dateTo'], array(), array('canViewOthers' => $canViewOthers));
                 $items = array();
 
                 // Build table rows with links
                 if ($assets) {
                     foreach ($assets as &$asset) {
-                        $assetUrl = $this->factory->getRouter()->generate('mautic_asset_action', array('objectAction' => 'view', 'objectId' => $asset['id']));
+                        $assetUrl = $this->router->generate('mautic_asset_action', array('objectAction' => 'view', 'objectId' => $asset['id']));
                         $row = array(
                             array(
                                 'value' => $asset['name'],

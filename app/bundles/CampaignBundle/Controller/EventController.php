@@ -152,7 +152,7 @@ class EventController extends CommonFormController
             );
             $passthroughVars['eventType'] = $eventType;
 
-            $translator = $this->factory->getTranslator();
+            $translator = $this->translator;
             if ($event['triggerMode'] == 'interval') {
                 $label = 'mautic.campaign.connection.trigger.interval.label';
                 if ($anchorName == 'no') {
@@ -342,7 +342,7 @@ class EventController extends CommonFormController
                     );
                     $passthroughVars['eventType']  = $eventType;
 
-                    $translator = $this->factory->getTranslator();
+                    $translator = $this->translator;
                     if ($event['triggerMode'] == 'interval') {
                         $label = 'mautic.campaign.connection.trigger.interval.label';
                         if ($event['anchor'] == 'no') {

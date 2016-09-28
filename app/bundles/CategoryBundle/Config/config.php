@@ -41,7 +41,12 @@ return array(
     'services' => array(
         'events' => array(
             'mautic.category.subscriber' => array(
-                'class' => 'Mautic\CategoryBundle\EventListener\CategorySubscriber'
+                'class' => 'Mautic\CategoryBundle\EventListener\CategorySubscriber',
+                'arguments' => [
+                    'mautic.helper.bundle',
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog'
+                ]
             )
         ),
         'forms'  => array(

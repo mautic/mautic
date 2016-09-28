@@ -10,6 +10,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PointBundle\Event\PointBuilderEvent;
@@ -20,6 +21,20 @@ use Mautic\PointBundle\PointEvents;
  */
 class PageSubscriber extends CommonSubscriber
 {
+    /**
+     * @var EmailModel
+     */
+    protected $emailModel;
+
+    /**
+     * PageSubscriber constructor.
+     *
+     * @param EmailModel $emailModel
+     */
+    public function __construct(EmailModel $emailModel)
+    {
+        $this->emailModel = $emailModel;
+    }
 
     /**
      * {@inheritdoc}
@@ -43,18 +58,16 @@ class PageSubscriber extends CommonSubscriber
 
         if ($redirect && $email = $hit->getEmail()) {
             // Check for an email stat
-            /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-            $model = $this->factory->getModel('email');
-
             $clickthrough = $event->getClickthroughData();
+
             if (isset($clickthrough['stat'])) {
-                $stat = $model->getEmailStatus($clickthrough['stat']);
+                $stat = $this->emailModel->getEmailStatus($clickthrough['stat']);
             }
 
             if (empty($stat)) {
                 if ($lead = $hit->getLead()) {
                     // Try searching by email and lead IDs
-                    $stats = $model->getEmailStati($hit->getSourceId(), $lead->getId());
+                    $stats = $this->emailModel->getEmailStati($hit->getSourceId(), $lead->getId());
                     if (count($stats)) {
                         $stat = $stats[0];
                     }
@@ -65,7 +78,7 @@ class PageSubscriber extends CommonSubscriber
                 // Check to see if it has been marked as opened
                 if (!$stat->isRead()) {
                     // Mark it as read
-                    $model->hitEmail($stat, $this->request);
+                    $this->emailModel->hitEmail($stat, $this->request);
                 }
             }
         }

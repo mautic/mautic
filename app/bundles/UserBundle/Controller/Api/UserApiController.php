@@ -58,7 +58,7 @@ class UserApiController extends CommonApiController
      */
     public function deleteEntityAction ($id)
     {
-        if (!$this->factory->getSecurity()->isGranted('user:users:delete')) {
+        if (!$this->get('mautic.security')->isGranted('user:users:delete')) {
             return $this->accessDenied();
         }
 
@@ -72,7 +72,7 @@ class UserApiController extends CommonApiController
     {
         $entity = $this->model->getEntity();
 
-        if (!$this->factory->getSecurity()->isGranted('user:users:create')) {
+        if (!$this->get('mautic.security')->isGranted('user:users:create')) {
             return $this->accessDenied();
         }
 
@@ -102,13 +102,13 @@ class UserApiController extends CommonApiController
         $parameters = $this->request->request->all();
         $method     = $this->request->getMethod();
 
-        if (!$this->factory->getSecurity()->isGranted('user:users:edit')) {
+        if (!$this->get('mautic.security')->isGranted('user:users:edit')) {
             return $this->accessDenied();
         }
 
         if ($entity === null) {
             if ($method === "PATCH" ||
-                ($method === "PUT" && !$this->factory->getSecurity()->isGranted('user:users:create'))
+                ($method === "PUT" && !$this->get('mautic.security')->isGranted('user:users:create'))
             ) {
                 //PATCH requires that an entity exists or must have create access for PUT
                 return $this->notFound();
@@ -172,7 +172,7 @@ class UserApiController extends CommonApiController
             $permissions = array($permissions);
         }
 
-        $return = $this->factory->getSecurity()->isGranted($permissions, "RETURN_ARRAY", $entity);
+        $return = $this->get('mautic.security')->isGranted($permissions, "RETURN_ARRAY", $entity);
         $view   = $this->view($return, Codes::HTTP_OK);
 
         return $this->handleView($view);
@@ -185,7 +185,7 @@ class UserApiController extends CommonApiController
      */
     public function getRolesAction ()
     {
-        if (!$this->factory->getSecurity()->isGranted(
+        if (!$this->get('mautic.security')->isGranted(
             array('user:users:create', 'user:users:edit'),
             'MATCH_ONE'
         )

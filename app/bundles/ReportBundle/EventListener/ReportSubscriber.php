@@ -10,6 +10,8 @@
 namespace Mautic\ReportBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\ReportEvents;
 
@@ -18,6 +20,27 @@ use Mautic\ReportBundle\ReportEvents;
  */
 class ReportSubscriber extends CommonSubscriber
 {
+    /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
+
+    /**
+     * @var AuditLogModel
+     */
+    protected $auditLogModel;
+
+    /**
+     * ReportSubscriber constructor.
+     *
+     * @param IpLookupHelper $ipLookupHelper
+     * @param AuditLogModel  $auditLogModel
+     */
+    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    {
+        $this->ipLookupHelper = $ipLookupHelper;
+        $this->auditLogModel  = $auditLogModel;
+    }
 
     /**
      * {@inheritdoc}
@@ -45,9 +68,9 @@ class ReportSubscriber extends CommonSubscriber
                 "objectId"  => $report->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->factory->getIpAddressFromRequest()
+                "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
             );
-            $this->factory->getModel('core.auditLog')->writeToLog($log);
+            $this->auditLogModel->writeToLog($log);
         }
     }
 
@@ -65,8 +88,8 @@ class ReportSubscriber extends CommonSubscriber
             "objectId"   => $report->deletedId,
             "action"     => "delete",
             "details"    => array('name' => $report->getName()),
-            "ipAddress"  => $this->factory->getIpAddressFromRequest()
+            "ipAddress"  => $this->ipLookupHelper->getIpAddressFromRequest()
         );
-        $this->factory->getModel('core.auditLog')->writeToLog($log);
+        $this->auditLogModel->writeToLog($log);
     }
 }

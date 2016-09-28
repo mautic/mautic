@@ -27,9 +27,9 @@ class FieldController extends FormController
     public function indexAction($page = 1)
     {
         //set some permissions
-        $permissions = $this->factory->getSecurity()->isGranted(array('lead:fields:full'), 'RETURN_ARRAY');
+        $permissions = $this->get('mautic.security')->isGranted(array('lead:fields:full'), 'RETURN_ARRAY');
 
-        $session = $this->factory->getSession();
+        $session = $this->get('session');
 
         if (!$permissions['lead:fields:full']) {
             return $this->accessDenied();
@@ -39,13 +39,13 @@ class FieldController extends FormController
             $this->setListFilters();
         }
 
-        $limit = $session->get('mautic.leadfield.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.leadfield.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
         $search = $this->request->get('search', $session->get('mautic.leadfield.filter', ''));
         $session->set('mautic.leadfilter.filter', $search);
 
         //do some default filtering
-        $orderBy    = $this->factory->getSession()->get('mautic.leadfilter.orderby', 'f.order');
-        $orderByDir = $this->factory->getSession()->get('mautic.leadfilter.orderbydir', 'ASC');
+        $orderBy    = $this->get('session')->get('mautic.leadfilter.orderby', 'f.order');
+        $orderByDir = $this->get('session')->get('mautic.leadfilter.orderbydir', 'ASC');
 
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
@@ -118,7 +118,7 @@ class FieldController extends FormController
      */
     public function newAction ()
     {
-        if (!$this->factory->getSecurity()->isGranted('lead:fields:full')) {
+        if (!$this->get('mautic.security')->isGranted('lead:fields:full')) {
             return $this->accessDenied();
         }
 
@@ -206,7 +206,7 @@ class FieldController extends FormController
      */
     public function editAction ($objectId, $ignorePost = false)
     {
-        if (!$this->factory->getSecurity()->isGranted('lead:fields:full')) {
+        if (!$this->get('mautic.security')->isGranted('lead:fields:full')) {
             return $this->accessDenied();
         }
 
@@ -325,7 +325,7 @@ class FieldController extends FormController
         $entity  = $model->getEntity($objectId);
 
         if ($entity != null) {
-            if (!$this->factory->getSecurity()->isGranted('lead:fields:full')) {
+            if (!$this->get('mautic.security')->isGranted('lead:fields:full')) {
                 return $this->accessDenied();
             }
 
@@ -347,7 +347,7 @@ class FieldController extends FormController
      */
     public function deleteAction($objectId)
     {
-        if (!$this->factory->getSecurity()->isGranted('lead:fields:full')) {
+        if (!$this->get('mautic.security')->isGranted('lead:fields:full')) {
             return $this->accessDenied();
         }
 
@@ -405,7 +405,7 @@ class FieldController extends FormController
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function batchDeleteAction() {
-        if (!$this->factory->getSecurity()->isGranted('lead:fields:full')) {
+        if (!$this->get('mautic.security')->isGranted('lead:fields:full')) {
             return $this->accessDenied();
         }
 

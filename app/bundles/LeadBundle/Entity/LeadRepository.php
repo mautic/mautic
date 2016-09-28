@@ -795,7 +795,7 @@ class LeadRepository extends CommonRepository
                     ->join('lip', MAUTIC_TABLE_PREFIX.'ip_addresses', 'ip', 'lip.ip_id = ip.id')
                     ->where(
                         $sq->expr()->andX(
-                            $sq->expr->andX('l.id', 'lip.lead_id'),
+                            $sq->expr()->eq('l.id', 'lip.lead_id'),
                             $sq->expr()->$likeFunc('ip.ip_address', ":$unique")
                         )
                     );

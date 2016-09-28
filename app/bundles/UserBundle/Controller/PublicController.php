@@ -35,7 +35,7 @@ class PublicController extends FormController
                 $user = $model->getRepository()->findByIdentifier($data['identifier']);
 
                 if ($user == null) {
-                    $form['identifier']->addError(new FormError($this->factory->getTranslator()->trans('mautic.user.user.passwordreset.nouserfound', array(), 'validators')));
+                    $form['identifier']->addError(new FormError($this->translator->trans('mautic.user.user.passwordreset.nouserfound', array(), 'validators')));
                 } else {
                     $model->sendResetEmail($user);
 
@@ -80,7 +80,7 @@ class PublicController extends FormController
                 $user = $model->getRepository()->findByIdentifier($data['identifier']);
 
                 if ($user == null) {
-                    $form['identifier']->addError(new FormError($this->factory->getTranslator()->trans('mautic.user.user.passwordreset.nouserfound', array(), 'validators')));
+                    $form['identifier']->addError(new FormError($this->translator->trans('mautic.user.user.passwordreset.nouserfound', array(), 'validators')));
                 } else {
 
                     if ($this->request->getSession()->has('resetToken')) {

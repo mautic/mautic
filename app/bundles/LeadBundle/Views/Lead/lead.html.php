@@ -37,7 +37,7 @@ $groups = array_keys($fields);
 $edit   = $view['security']->hasEntityAccess(
     $permissions['lead:leads:editown'],
     $permissions['lead:leads:editother'],
-    $lead->getOwner()
+    $lead->getPermissionUser()
 );
 
 $buttons = [];
@@ -124,7 +124,7 @@ if ($view['security']->isGranted('campaign:campaigns:edit')) {
 if (($view['security']->hasEntityAccess(
         $permissions['lead:leads:deleteown'],
         $permissions['lead:leads:deleteother'],
-        $lead->getOwner()
+        $lead->getPermissionUser()
     ))
     && $edit
 ) {
@@ -158,20 +158,16 @@ $view['slots']->set(
             'langVar'         => 'lead.lead',
             'customButtons'   => $buttons,
             'templateButtons' => [
-                'edit'   => $view['security']->hasEntityAccess(
-                    $permissions['lead:leads:editown'],
-                    $permissions['lead:leads:editother'],
-                    $lead->getCreatedBy()
-                ),
+                'edit'   => $edit,
                 'delete' => $view['security']->hasEntityAccess(
                     $permissions['lead:leads:deleteown'],
                     $permissions['lead:leads:deleteother'],
-                    $lead->getOwner()
+                    $lead->getPermissionUser()
                 ),
                 'close'  => $view['security']->hasEntityAccess(
                     $permissions['lead:leads:viewown'],
                     $permissions['lead:leads:viewother'],
-                    $lead->getCreatedBy()
+                    $lead->getPermissionUser()
                 ),
             ],
         ]
@@ -445,6 +441,11 @@ $view['slots']->set(
                 </div>
             </div>
             <div class="panel-body pt-sm">
+            <?php if ($lead->getOwner()) : ?>
+                <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.lead.field.owner'); ?></h6>
+                <p class="text-muted"><?php echo $lead->getOwner()->getName(); ?></p>
+            <?php endif; ?>
+
                 <h6 class="fw-sb">
                     <?php echo $view['translator']->trans('mautic.lead.field.address'); ?>
                 </h6>

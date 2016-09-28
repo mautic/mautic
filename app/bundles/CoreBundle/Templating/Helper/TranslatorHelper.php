@@ -46,4 +46,23 @@ class TranslatorHelper extends BaseHelper
     {
         return $this->translator->transConditional($preferred, $alternative, $parameters, $domain, $locale);
     }
+
+    public function getJsLang()
+    {
+        $this->translator->addResource('mautic', null, $this->translator->getLocale(), 'javascript');
+
+        $messages = $this->translator->getMessages();
+
+        $oldKeys = [
+            "chosenChooseOne" => $this->trans('mautic.core.form.chooseone'),
+            "chosenChooseMore" => $this->trans('mautic.core.form.choosemultiple'),
+            "chosenNoResults" => $this->trans('mautic.core.form.nomatches'),
+            "pleaseWait" => $this->trans('mautic.core.wait'),
+            "popupBlockerMessage" => $this->trans('mautic.core.popupblocked')
+        ];
+
+        $jsLang = array_merge($messages['javascript'], $oldKeys);
+
+        return json_encode($jsLang, JSON_PRETTY_PRINT|JSON_FORCE_OBJECT);
+    }
 }

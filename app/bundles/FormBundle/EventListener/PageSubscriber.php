@@ -12,6 +12,7 @@ namespace Mautic\FormBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\FormBundle\Helper\PageTokenHelper;
+use Mautic\FormBundle\Model\FormModel;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
@@ -22,6 +23,21 @@ use Mautic\PageBundle\PageEvents;
 class PageSubscriber extends CommonSubscriber
 {
     private $formRegex = '{form=(.*?)}';
+
+    /**
+     * @var FormModel
+     */
+    protected $formModel;
+
+    /**
+     * PageSubscriber constructor.
+     *
+     * @param FormModel $formModel
+     */
+    public function __construct(FormModel $formModel)
+    {
+        $this->formModel = $formModel;
+    }
 
     /**
      * {@inheritdoc}
@@ -74,10 +90,8 @@ class PageSubscriber extends CommonSubscriber
         preg_match_all($regex, $content, $matches);
 
         if (count($matches[0])) {
-            /** @var \Mautic\FormBundle\Model\FormModel $model */
-            $model = $this->factory->getModel('form');
             foreach ($matches[1] as $k => $id) {
-                $form = $model->getEntity($id);
+                $form = $this->formModel->getEntity($id);
                 if ($form !== null &&
                     (
                         $form->isPublished(false) ||
@@ -86,7 +100,7 @@ class PageSubscriber extends CommonSubscriber
                         )
                     )
                 ) {
-                    $formHtml = ($form->isPublished()) ? $model->getContent($form) :
+                    $formHtml = ($form->isPublished()) ? $this->formModel->getContent($form) :
                         '<div class="mauticform-error">' .
                         $this->translator->trans('mautic.form.form.pagetoken.notpublished') .
                         '</div>';
@@ -98,9 +112,9 @@ class PageSubscriber extends CommonSubscriber
                     //pouplate get parameters
                     //priority populate value order by: query string (parameters) -> with lead
                     if (!$form->getInKioskMode()) {
-                        $model->populateValuesWithLead($form, $formHtml);
+                        $this->formModel->populateValuesWithLead($form, $formHtml);
                     }
-                    $model->populateValuesWithGetParameters($form, $formHtml);
+                    $this->formModel->populateValuesWithGetParameters($form, $formHtml);
 
                     $content = preg_replace('#{form=' . $id . '}#', $formHtml, $content);
                 } else {

@@ -34,8 +34,7 @@ class BuildJsSubscriber extends CommonSubscriber
      */
     public function onBuildJs(BuildJsEvent $event)
     {
-        $router = $this->factory->getRouter();
-        $subscribeUrl = $router->generate('mautic_notification_popup', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $subscribeUrl = $this->router->generate('mautic_notification_popup', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $subscribeTitle = 'Subscribe To Notifications';
         $width = 450;
         $height = 450;
