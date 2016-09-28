@@ -287,8 +287,11 @@ class LeadListRepository extends CommonRepository
                 $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
                 $parameters = array();
 
-                $expr = $this->getListFilterExpr($objectFilters['lead'], $parameters, $q, false, 'lead');
-                
+                if (isset($objectFilters['lead'])) {
+                    $expr = $this->getListFilterExpr($objectFilters['lead'], $parameters, $q, false, 'lead');
+                } else {
+                    $expr = $q->expr()->andX();
+                }
                 if (isset($objectFilters['company'])) {
                     $exprCompany = $this->getListFilterExpr($objectFilters['company'], $parameters, $q, false, 'company');
                 }
@@ -480,13 +483,12 @@ class LeadListRepository extends CommonRepository
 
     public function arrangeFilters($filters) {
         $objectFilters = [];
-
+        if (empty($filters)) {
+            $objectFilters['lead'][] = $filters;
+        }
         foreach ($filters as $filter) {
             $object = (isset($filter['object'])) ? $filter['object'] : 'lead';
             switch ($object) {
-                case 'lead' :
-                    $objectFilters['lead'][] = $filter;
-                    break;
                 case 'company' :
                     $objectFilters['company'][] = $filter;
                     break;
@@ -523,7 +525,7 @@ class LeadListRepository extends CommonRepository
             $leadTable = $schema->listTableColumns(MAUTIC_TABLE_PREFIX . 'leads');
         }
         if (null === $companyTable) {
-            $companyTable = $schema->listTableColumns(MAUTIC_TABLE_PREFIX . 'company');
+            $companyTable = $schema->listTableColumns(MAUTIC_TABLE_PREFIX . 'companies');
         }
         $options   = $this->getFilterExpressionFunctions();
         $groups    = array();
