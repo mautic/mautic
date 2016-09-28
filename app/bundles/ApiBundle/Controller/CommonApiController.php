@@ -99,7 +99,7 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     public function initialize(FilterControllerEvent $event)
     {
-        $this->security = $this->factory->getSecurity();
+        $this->security = $this->get('mautic.security');
     }
 
     /**
@@ -139,7 +139,7 @@ class CommonApiController extends FOSRestController implements MauticController
 
         $args    = array(
             'start'          => $this->request->query->get('start', 0),
-            'limit'          => $this->request->query->get('limit', $this->factory->getParameter('default_pagelimit')),
+            'limit'          => $this->request->query->get('limit', $this->coreParametersHelper->getParameter('default_pagelimit')),
             'filter'         => array(
                 'string' => $this->request->query->get('search', ''),
                 'force'  => $this->listFilters

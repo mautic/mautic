@@ -74,6 +74,7 @@ class EmailSendType extends AbstractType
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.email.send.emailtype.tooltip',
+                        'onClick' => 'Mautic.useMessageQueue(this.value)'
                     ],
                     'data'       => (!isset($options['data']['email_type'])) ? 'transactional' : $options['data']['email_type']
                 ]
@@ -166,7 +167,7 @@ class EmailSendType extends AbstractType
 
                 $builder->add(
                     'attempts',
-                    'integer',
+                    'text',
                     array(
                         'label' => 'mautic.core.message.send.attempts',
                         'required' => true,

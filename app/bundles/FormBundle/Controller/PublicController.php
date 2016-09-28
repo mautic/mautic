@@ -197,7 +197,7 @@ class PublicController extends CommonFormController
                 $msg = $postActionProperty;
             }
 
-            $session = $this->factory->getSession();
+            $session = $this->get('session');
             $session->set(
                 'mautic.emailbundle.message',
                 array(
@@ -217,7 +217,7 @@ class PublicController extends CommonFormController
      */
     public function messageAction()
     {
-        $session = $this->factory->getSession();
+        $session = $this->get('session');
         $message = $session->get('mautic.emailbundle.message', array());
 
         $msg     = (!empty($message['message'])) ? $message['message'] : '';
@@ -229,12 +229,12 @@ class PublicController extends CommonFormController
             $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
         }
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $this->factory->getParameter('theme') . ':message.html.php');
+        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':' . $this->coreParametersHelper->getParameter('theme') . ':message.html.php');
 
         return $this->render($logicalName, array(
             'message'  => $msg,
             'type'     => $msgType,
-            'template' => $this->factory->getParameter('theme')
+            'template' => $this->coreParametersHelper->getParameter('theme')
         ));
     }
 

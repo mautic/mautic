@@ -45,7 +45,7 @@ class ReportApiController extends CommonApiController
             $this->listFilters = array(
                 'column' => 'r.createdBy',
                 'expr'   => 'eq',
-                'value'  => $this->factory->getUser()->getId()
+                'value'  => $this->user->getId()
             );
         }
 

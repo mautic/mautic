@@ -18,7 +18,6 @@ use Mautic\PointBundle\PointEvents;
  */
 class PointSubscriber extends CommonSubscriber
 {
-
     /**
      * {@inheritdoc}
      */

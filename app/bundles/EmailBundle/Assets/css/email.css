@@ -25,3 +25,9 @@
 .email-filters {
 
 }
+.queue_hide {
+    display: none;
+}
+.queue_show{
+    display: block;
+}

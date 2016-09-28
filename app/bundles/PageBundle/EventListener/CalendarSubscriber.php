@@ -13,6 +13,7 @@ use Mautic\CalendarBundle\Event\CalendarGeneratorEvent;
 use Mautic\CalendarBundle\Event\EventGeneratorEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\PageBundle\Model\PageModel;
 
 /**
  * Class CalendarSubscriber
@@ -21,6 +22,20 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class CalendarSubscriber extends CommonSubscriber
 {
+    /**
+     * @var PageModel
+     */
+    protected $pageModel;
+
+    /**
+     * CalendarSubscriber constructor.
+     *
+     * @param PageModel $pageModel
+     */
+    public function __construct(PageModel $pageModel)
+    {
+        $this->pageModel = $pageModel;
+    }
 
     /**
      * @return array
@@ -44,7 +59,6 @@ class CalendarSubscriber extends CommonSubscriber
     public function onCalendarGenerate(CalendarGeneratorEvent $event)
     {
         $dates  = $event->getDates();
-        $router = $this->factory->getRouter();
 
         $commonSelect = 'p.title, p.id as page_id, c.color';
         $eventTypes = array(
@@ -52,7 +66,7 @@ class CalendarSubscriber extends CommonSubscriber
             'publish.down' => array('dateName' => 'publish_down', 'setter' => 'PublishDown')
         );
 
-        $query = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+        $query = $this->em->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX . 'pages', 'p')
             ->leftJoin('p', MAUTIC_TABLE_PREFIX . 'categories', 'c', 'c.id = p.category_id AND c.bundle=:bundle')
             ->setParameter('bundle', 'page')
@@ -79,13 +93,13 @@ class CalendarSubscriber extends CommonSubscriber
                 $object['entityId'] = $object['page_id'];
                 $object['entityType'] = 'page';
                 $object['editable'] = true;
-                $object['url']   = $router->generate('mautic_calendar_action', array(
+                $object['url']   = $this->router->generate('mautic_calendar_action', array(
                     'objectAction' => 'edit',
                     'source' => 'page',
                     'objectId' => $object['page_id'],
                     'startDate' => $date->toLocalString()
                 ), true);
-                $object['viewUrl']   = $router->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $object['page_id']), true);
+                $object['viewUrl']   = $this->router->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $object['page_id']), true);
                 $object['attr']  = array(
                     'data-toggle' => 'ajaxmodal',
                     'data-target' => '#CalendarEditModal',
@@ -115,16 +129,13 @@ class CalendarSubscriber extends CommonSubscriber
         }
 
         $entityId   = $event->getEntityId();
+        $entity     = $this->pageModel->getEntity($entityId);
 
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model   = $this->factory->getModel('page.page');
-        $entity  = $model->getEntity($entityId);
-
-        $event->setModel($model);
+        $event->setModel($this->pageModel);
         $event->setEntity($entity);
         $event->setContentTemplate('MauticPageBundle:SubscribedEvents\Calendar:modal.html.php');
         $event->setFormName('page_publish_dates');
-        $event->setAccess($this->factory->getSecurity()->hasEntityAccess(
+        $event->setAccess($this->security->hasEntityAccess(
             'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()));
     }
 }

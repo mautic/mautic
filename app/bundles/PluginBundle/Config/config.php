@@ -79,7 +79,6 @@ return [
             'mautic.plugin.campaignbundle.subscriber' => [
                 'class' => 'Mautic\PluginBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.helper.integration'
                 ]
             ]

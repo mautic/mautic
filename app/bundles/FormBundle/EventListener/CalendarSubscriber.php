@@ -42,7 +42,7 @@ class CalendarSubscriber extends CommonSubscriber
     {
         $dates = $event->getDates();
 
-        $query = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+        $query = $this->em->getConnection()->createQueryBuilder();
         $query->select('fs.referer AS url, f.name AS title, fs.date_submitted AS start')
             ->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs')
             ->leftJoin('fs', MAUTIC_TABLE_PREFIX . 'forms', 'f', 'fs.form_id = f.id')

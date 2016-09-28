@@ -9,18 +9,17 @@
 
 namespace Mautic\CoreBundle\Menu;
 
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * Class MenuHelper
  */
 class MenuHelper
 {
-
     /**
      * @var CorePermissions
      */
@@ -51,15 +50,15 @@ class MenuHelper
     /**
      * MenuHelper constructor.
      *
-     * @param CorePermissions       $security
-     * @param TokenStorageInterface $tokenStorage
-     * @param RequestStack          $requestStack
-     * @param array                 $mauticParameters
+     * @param CorePermissions $security
+     * @param UserHelper      $userHelper
+     * @param RequestStack    $requestStack
+     * @param array           $mauticParameters
      */
-    public function __construct(CorePermissions $security, TokenStorageInterface $tokenStorage, RequestStack $requestStack, array $mauticParameters)
+    public function __construct(CorePermissions $security, UserHelper $userHelper, RequestStack $requestStack, array $mauticParameters)
     {
         $this->security         = $security;
-        $this->user             = $tokenStorage->getToken()->getUser();
+        $this->user             = $userHelper->getUser();
         $this->mauticParameters = $mauticParameters;
         $this->request          = $requestStack->getCurrentRequest();
     }

@@ -30,7 +30,7 @@ class FormController extends CommonFormController
     public function indexAction($page = 1)
     {
         //set some permissions
-        $permissions = $this->factory->getSecurity()->isGranted(
+        $permissions = $this->get('mautic.security')->isGranted(
             array(
                 'form:forms:viewown',
                 'form:forms:viewother',
@@ -54,10 +54,10 @@ class FormController extends CommonFormController
             $this->setListFilters();
         }
 
-        $session = $this->factory->getSession();
+        $session = $this->get('session');
 
         //set limits
-        $limit = $session->get('mautic.form.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.form.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -69,7 +69,7 @@ class FormController extends CommonFormController
         $filter = array('string' => $search, 'force' => array());
 
         if (!$permissions['form:forms:viewother']) {
-            $filter['force'][] = array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
+            $filter['force'][] = array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->user->getId());
         }
 
         $orderBy    = $session->get('mautic.form.orderby', 'f.name');
@@ -117,7 +117,7 @@ class FormController extends CommonFormController
             'page'        => $page,
             'limit'       => $limit,
             'permissions' => $permissions,
-            'security'    => $this->factory->getSecurity(),
+            'security'    => $this->get('mautic.security'),
             'tmpl'        => $this->request->get('tmpl', 'index')
         );
 
@@ -148,7 +148,7 @@ class FormController extends CommonFormController
         $activeForm = $model->getEntity($objectId);
 
         //set the page we came from
-        $page = $this->factory->getSession()->get('mautic.form.page', 1);
+        $page = $this->get('session')->get('mautic.form.page', 1);
 
         if ($activeForm === null) {
             //set the return URL
@@ -172,7 +172,7 @@ class FormController extends CommonFormController
                     )
                 )
             );
-        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(
             'form:forms:viewown',
             'form:forms:viewother',
             $activeForm->getCreatedBy()
@@ -181,7 +181,7 @@ class FormController extends CommonFormController
             return $this->accessDenied();
         }
 
-        $permissions = $this->factory->getSecurity()->isGranted(
+        $permissions = $this->get('mautic.security')->isGranted(
             array(
                 'form:forms:viewown',
                 'form:forms:viewother',
@@ -243,7 +243,7 @@ class FormController extends CommonFormController
                     'page'              => $page,
                     'logs'              => $logs,
                     'permissions'       => $permissions,
-                    'security'          => $this->factory->getSecurity(),
+                    'security'          => $this->get('mautic.security'),
                     'stats'             => array(
                         'submissionsInTime' => $timeStats,
                     ),
@@ -274,14 +274,14 @@ class FormController extends CommonFormController
         /** @var \Mautic\FormBundle\Model\FormModel $model */
         $model   = $this->getModel('form');
         $entity  = $model->getEntity();
-        $session = $this->factory->getSession();
+        $session = $this->get('session');
 
-        if (!$this->factory->getSecurity()->isGranted('form:forms:create')) {
+        if (!$this->get('mautic.security')->isGranted('form:forms:create')) {
             return $this->accessDenied();
         }
 
         //set the page we came from
-        $page = $this->factory->getSession()->get('mautic.form.page', 1);
+        $page = $this->get('session')->get('mautic.form.page', 1);
 
         $sessionId = $this->request->request->get('mauticform[sessionId]', 'mautic_'.sha1(uniqid(mt_rand(), true)), true);
 
@@ -411,7 +411,7 @@ class FormController extends CommonFormController
             $field = new Field();
 
             $modifiedFields[$keyId]                    = $field->convertToArray();
-            $modifiedFields[$keyId]['label']           = $this->factory->getTranslator()->trans('mautic.core.form.submit');
+            $modifiedFields[$keyId]['label']           = $this->translator->trans('mautic.core.form.submit');
             $modifiedFields[$keyId]['alias']           = 'submit';
             $modifiedFields[$keyId]['showLabel']       = 1;
             $modifiedFields[$keyId]['type']            = 'button';
@@ -484,11 +484,11 @@ class FormController extends CommonFormController
             }
         }
 
-        $session    = $this->factory->getSession();
+        $session    = $this->get('session');
         $cleanSlate = true;
 
         //set the page we came from
-        $page = $this->factory->getSession()->get('mautic.form.page', 1);
+        $page = $this->get('session')->get('mautic.form.page', 1);
 
         //set the return URL
         $returnUrl = $this->generateUrl('mautic_form_index', array('page' => $page));
@@ -519,7 +519,7 @@ class FormController extends CommonFormController
                     )
                 )
             );
-        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(
             'form:forms:editown',
             'form:forms:editother',
             $entity->getCreatedBy()
@@ -671,7 +671,9 @@ class FormController extends CommonFormController
 
             //lock the entity
             $model->lockEntity($entity);
+        }
 
+        if (!$form->isSubmitted()) {
             $form->get('sessionId')->setData($objectId);
         }
 
@@ -812,8 +814,8 @@ class FormController extends CommonFormController
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
-            if (!$this->factory->getSecurity()->isGranted('form:forms:create')
-                || !$this->factory->getSecurity()->hasEntityAccess(
+            if (!$this->get('mautic.security')->isGranted('form:forms:create')
+                || !$this->get('mautic.security')->hasEntityAccess(
                     'form:forms:viewown',
                     'form:forms:viewother',
                     $entity->getCreatedBy()
@@ -865,7 +867,7 @@ class FormController extends CommonFormController
                 '<h1>'.
                 $this->get('translator')->trans('mautic.form.error.notfound', array('%id%' => $objectId), 'flashes').
                 '</h1>';
-        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(
             'form:forms:editown',
             'form:forms:editother',
             $form->getCreatedBy()
@@ -934,7 +936,7 @@ class FormController extends CommonFormController
      */
     public function deleteAction($objectId)
     {
-        $page      = $this->factory->getSession()->get('mautic.form.page', 1);
+        $page      = $this->get('session')->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', array('page' => $page));
         $flashes   = array();
 
@@ -958,7 +960,7 @@ class FormController extends CommonFormController
                     'msg'     => 'mautic.form.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
-            } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+            } elseif (!$this->get('mautic.security')->hasEntityAccess(
                 'form:forms:deleteown',
                 'form:forms:deleteother',
                 $entity->getCreatedBy()
@@ -999,7 +1001,7 @@ class FormController extends CommonFormController
      */
     public function batchDeleteAction()
     {
-        $page      = $this->factory->getSession()->get('mautic.form.page', 1);
+        $page      = $this->get('session')->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', array('page' => $page));
         $flashes   = array();
 
@@ -1028,7 +1030,7 @@ class FormController extends CommonFormController
                         'msg'     => 'mautic.form.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     );
-                } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+                } elseif (!$this->get('mautic.security')->hasEntityAccess(
                     'form:forms:deleteown',
                     'form:forms:deleteother',
                     $entity->getCreatedBy()
@@ -1071,7 +1073,7 @@ class FormController extends CommonFormController
      */
     public function clearSessionComponents($sessionId)
     {
-        $session = $this->factory->getSession();
+        $session = $this->get('session');
         $session->remove('mautic.form.'.$sessionId.'.fields.modified');
         $session->remove('mautic.form.'.$sessionId.'.fields.deleted');
         $session->remove('mautic.form.'.$sessionId.'.fields.leadfields');
@@ -1085,7 +1087,7 @@ class FormController extends CommonFormController
      */
     public function batchRebuildHtmlAction()
     {
-        $page      = $this->factory->getSession()->get('mautic.form.page', 1);
+        $page      = $this->get('session')->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', array('page' => $page));
         $flashes   = array();
 
@@ -1114,7 +1116,7 @@ class FormController extends CommonFormController
                         'msg'     => 'mautic.form.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     );
-                } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+                } elseif (!$this->get('mautic.security')->hasEntityAccess(
                     'form:forms:editown',
                     'form:forms:editother',
                     $entity->getCreatedBy()

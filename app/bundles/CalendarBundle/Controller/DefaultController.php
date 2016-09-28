@@ -52,8 +52,8 @@ class DefaultController extends FormController
 
         $model   = $event->getModel();
         $entity  = $event->getEntity();
-        $session = $this->factory->getSession();
-        $sourceSession = $this->factory->getSession()->get('mautic.calendar.' . $source, 1);
+        $session = $this->get('session');
+        $sourceSession = $this->get('session')->get('mautic.calendar.' . $source, 1);
 
         //set the return URL
         $returnUrl = $this->generateUrl('mautic_calendar_index', array($source => $sourceSession));

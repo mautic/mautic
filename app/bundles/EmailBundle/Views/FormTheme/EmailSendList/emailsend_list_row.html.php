@@ -18,12 +18,12 @@
         </div>
     <?php endif; ?>
     <?php if (isset($form['priority'])): ?>
-        <div class="col-xs-5">
+        <div id="priority" class="col-xs-5 queue_hide">
             <?php echo $view['form']->row($form['priority']); ?>
         </div>
     <?php endif; ?>
     <?php if (isset($form['attempts'])): ?>
-        <div class="col-xs-5">
+        <div id="attempts" class="col-xs-5 queue_hide">
             <?php echo $view['form']->row($form['attempts']); ?>
         </div>
     <?php endif; ?>

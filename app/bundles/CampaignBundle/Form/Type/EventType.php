@@ -49,23 +49,26 @@ class EventType extends AbstractType
             ]
         );
 
-        if ($options['data']['eventType'] == 'action' || $options['data']['eventType'] == 'condition') {
+        if (in_array($options['data']['eventType'], ['action', 'condition'])) {
             $label = 'mautic.campaign.form.type';
-            if ('no' == $options['data']['anchor']) {
+
+            $choices = [
+                'immediate' => 'mautic.campaign.form.type.immediate',
+                'interval'  => 'mautic.campaign.form.type.interval',
+                'date'      => 'mautic.campaign.form.type.date'
+            ];
+
+            if ('no' == $options['data']['anchor'] && 'condition' != $options['data']['eventType']) {
                 $label .= '_inaction';
-                $choices = [
-                    'interval' => 'mautic.campaign.form.type.interval_inaction',
-                    'date'     => 'mautic.campaign.form.type.date_inaction'
-                ];
-                $default = 'interval';
-            } else {
-                $choices = [
-                    'immediate' => 'mautic.campaign.form.type.immediate',
-                    'interval'  => 'mautic.campaign.form.type.interval',
-                    'date'      => 'mautic.campaign.form.type.date'
-                ];
-                $default = 'immediate';
+
+                unset($choices['immediate']);
+                $choices['interval'] = $choices['interval'].'_inaction';
+                $choices['date'] = $choices['date'].'_inaction';
             }
+
+            reset($choices);
+            $default = key($choices);
+
             $triggerMode = (empty($options['data']['triggerMode'])) ? $default : $options['data']['triggerMode'];
             $builder->add(
                 'triggerMode',

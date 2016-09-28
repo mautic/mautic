@@ -260,10 +260,8 @@ Mautic.selectEmailType = function(emailType) {
         mQuery('#leadList').removeClass('hide');
         mQuery('#segmentTranslationParent').removeClass('hide');
         mQuery('#templateTranslationParent').addClass('hide');
-        mQuery('#publishStatus').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newListEmail);
     } else {
-        mQuery('#publishStatus').removeClass('hide');
         mQuery('#segmentTranslationParent').addClass('hide');
         mQuery('#templateTranslationParent').removeClass('hide');
         mQuery('#leadList').addClass('hide');
@@ -320,4 +318,18 @@ Mautic.disabledEmailAction = function(opener) {
 
     opener.mQuery('#campaignevent_properties_editEmailButton').prop('disabled', disabled);
     opener.mQuery('#campaignevent_properties_previewEmailButton').prop('disabled', disabled);
+};
+Mautic.useMessageQueue = function(val, opener) {
+    if (typeof opener == 'undefined') {
+        opener = window;
+    }
+    if (val === 'marketing') {
+        opener.mQuery('#priority').removeClass( "queue_hide" ).addClass( "queue_show" );
+        opener.mQuery('#attempts').removeClass( "queue_hide" ).addClass( "queue_show" );
+
+    }
+    else {
+        opener.mQuery('#priority').removeClass( "queue_show" ).addClass( "queue_hide" );
+        opener.mQuery('#attempts').removeClass( "queue_show" ).addClass( "queue_hide" );
+    }
 };

@@ -57,7 +57,7 @@ class ExceptionController extends CommonController
                 $layout = 'Error';
             }
 
-            $anonymous    = $this->factory->getSecurity()->isAnonymous();
+            $anonymous    = $this->get('mautic.security')->isAnonymous();
             $baseTemplate = 'MauticCoreBundle:Default:slim.html.php';
             if ($anonymous) {
                 if ($templatePage = $this->factory->getTheme()->getErrorPageTemplate($code)) {

@@ -18,7 +18,6 @@ use Mautic\PageBundle\PageEvents;
  */
 class PageSubscriber extends CommonSubscriber
 {
-
     /**
      * {@inheritdoc}
      */
