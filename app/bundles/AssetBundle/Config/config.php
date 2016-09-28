@@ -68,16 +68,26 @@ return [
     'services' => [
         'events' => [
             'mautic.asset.subscriber' => [
-                'class' => 'Mautic\AssetBundle\EventListener\AssetSubscriber'
+                'class' => 'Mautic\AssetBundle\EventListener\AssetSubscriber',
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog'
+                ]
             ],
             'mautic.asset.pointbundle.subscriber' => [
-                'class' => 'Mautic\AssetBundle\EventListener\PointSubscriber'
+                'class' => 'Mautic\AssetBundle\EventListener\PointSubscriber',
+                'arguments' => [
+                    'mautic.point.model.point'
+                ]
             ],
             'mautic.asset.formbundle.subscriber' => [
                 'class' => 'Mautic\AssetBundle\EventListener\FormSubscriber'
             ],
             'mautic.asset.campaignbundle.subscriber' => [
-                'class' => 'Mautic\AssetBundle\EventListener\CampaignSubscriber'
+                'class' => 'Mautic\AssetBundle\EventListener\CampaignSubscriber',
+                'arguments' => [
+                    'mautic.campaign.model.event'
+                ]
             ],
             'mautic.asset.reportbundle.subscriber' => [
                 'class' => 'Mautic\AssetBundle\EventListener\ReportSubscriber'
@@ -85,14 +95,13 @@ return [
             'mautic.asset.builder.subscriber' => [
                 'class' => 'Mautic\AssetBundle\EventListener\BuilderSubscriber',
                 'arguments' => [
-                    'mautic.factory',
-                    'mautic.asset.helper.token'
+                    'mautic.asset.helper.token',
+                    'mautic.lead.model.lead'
                 ]
             ],
             'mautic.asset.leadbundle.subscriber' => [
                 'class'     => 'Mautic\AssetBundle\EventListener\LeadSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.asset.model.asset'
                 ]
             ],
@@ -106,7 +115,10 @@ return [
                 'class' => 'Mautic\AssetBundle\EventListener\ConfigSubscriber'
             ],
             'mautic.asset.search.subscriber' => [
-                'class' => 'Mautic\AssetBundle\EventListener\SearchSubscriber'
+                'class' => 'Mautic\AssetBundle\EventListener\SearchSubscriber',
+                'arguments' => [
+                    'mautic.asset.model.asset'
+                ]
             ],
             'oneup_uploader.pre_upload' => [
                 'class' => 'Mautic\AssetBundle\EventListener\UploadSubscriber',
@@ -117,7 +129,10 @@ return [
                 ]
             ],
             'mautic.asset.dashboard.subscriber' => [
-                'class' => 'Mautic\AssetBundle\EventListener\DashboardSubscriber'
+                'class' => 'Mautic\AssetBundle\EventListener\DashboardSubscriber',
+                'arguments' => [
+                    'mautic.asset.model.asset'
+                ]
             ]
         ],
         'forms' => [

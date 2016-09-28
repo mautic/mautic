@@ -79,20 +79,30 @@ return array(
     'services' => array(
         'events' => array(
             'mautic.point.subscriber'            => array(
-                'class' => 'Mautic\PointBundle\EventListener\PointSubscriber'
+                'class' => 'Mautic\PointBundle\EventListener\PointSubscriber',
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog'
+                ]
             ),
             'mautic.point.leadbundle.subscriber' => array(
                 'class' => 'Mautic\PointBundle\EventListener\LeadSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.point.model.trigger'
                 ]
             ),
             'mautic.point.search.subscriber'     => array(
-                'class' => 'Mautic\PointBundle\EventListener\SearchSubscriber'
+                'class' => 'Mautic\PointBundle\EventListener\SearchSubscriber',
+                'arguments' => [
+                    'mautic.point.model.point',
+                    'mautic.point.model.trigger'
+                ]
             ),
             'mautic.point.dashboard.subscriber'  => array(
-                'class' => 'Mautic\PointBundle\EventListener\DashboardSubscriber'
+                'class' => 'Mautic\PointBundle\EventListener\DashboardSubscriber',
+                'arguments' => [
+                    'mautic.point.model.point'
+                ]
             ),
         ),
         'forms'  => array(

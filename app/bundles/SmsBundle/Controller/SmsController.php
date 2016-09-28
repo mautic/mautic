@@ -67,7 +67,7 @@ class SmsController extends FormController
         $listFilters['filters']['groups'] = [];
 
         //set limits
-        $limit = $session->get('mautic.sms.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.sms.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -80,7 +80,7 @@ class SmsController extends FormController
 
         if (!$permissions['sms:smses:viewother']) {
             $filter['force'][] =
-                ['column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId()];
+                ['column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
         //retrieve a list of categories
@@ -207,7 +207,7 @@ class SmsController extends FormController
                 'permissions' => $permissions,
                 'model' => $model,
                 'security' => $this->get('mautic.security'),
-                'configured' => $this->factory->getParameter('sms_enabled'),
+                'configured' => $this->coreParametersHelper->getParameter('sms_enabled'),
             ],
             'contentTemplate' => 'MauticSmsBundle:Sms:list.html.php',
             'passthroughVars' => [

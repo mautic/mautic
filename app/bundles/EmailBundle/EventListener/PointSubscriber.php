@@ -15,6 +15,7 @@ use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
+use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
 
 /**
@@ -22,6 +23,20 @@ use Mautic\PointBundle\PointEvents;
  */
 class PointSubscriber extends CommonSubscriber
 {
+    /**
+     * @var PointModel
+     */
+    protected $pointModel;
+
+    /**
+     * PointSubscriber constructor.
+     *
+     * @param PointModel $pointModel
+     */
+    public function __construct(PointModel $pointModel)
+    {
+        $this->pointModel = $pointModel;
+    }
 
     /**
      * {@inheritdoc}
@@ -84,7 +99,7 @@ class PointSubscriber extends CommonSubscriber
      */
     public function onEmailOpen(EmailOpenEvent $event)
     {
-        $this->factory->getModel('point')->triggerAction('email.open', $event->getEmail());
+        $this->pointModel->triggerAction('email.open', $event->getEmail());
     }
 
     /**
@@ -95,11 +110,12 @@ class PointSubscriber extends CommonSubscriber
     public function onEmailSend(EmailSendEvent $event)
     {
         if ($leadArray = $event->getLead()) {
-            $lead = $this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $leadArray['id']);
+            $lead = $this->em->getReference('MauticLeadBundle:Lead', $leadArray['id']);
         } else {
 
             return;
         }
-        $this->factory->getModel('point')->triggerAction('email.send', $event->getEmail(), null, $lead);
+
+        $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead);
     }
 }

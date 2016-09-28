@@ -39,6 +39,8 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 use Mautic\CoreBundle\Model\MessageQueueModel;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use DeviceDetector\DeviceDetector;
@@ -203,11 +205,6 @@ class EmailModel extends FormModel
 
         // Ensure that list emails are published
         if ($entity->getEmailType() == 'list') {
-            $entity->setIsPublished(true);
-            $entity->setPublishDown(null);
-            $entity->setPublishUp(null);
-
-
             // Ensure that this email has the same lists assigned as the translated parent if applicable
             /** @var Email $translationParent */
             if ($translationParent = $entity->getTranslationParent()) {
@@ -857,10 +854,11 @@ class EmailModel extends FormModel
      * @param Email $email
      * @param array $lists
      * @param int   $limit
+     * @param bool  $batch   True to process and batch all pending leads
      *
      * @return array array(int $sentCount, int $failedCount, array $failedRecipientsByList)
      */
-    public function sendEmailToLists(Email $email, $lists = null, $limit = null)
+    public function sendEmailToLists(Email $email, $lists = null, $limit = null, $batch = false, OutputInterface $output = null)
     {
         //get the leads
         if (empty($lists)) {
@@ -879,8 +877,21 @@ class EmailModel extends FormModel
         $sentCount   = 0;
         $failedCount = 0;
 
+        $progress = false;
+        if ($batch && $output) {
+            $progressCounter = 0;
+            $totalLeadCount = $this->getPendingLeads($email, null, true);
+            if (! $totalLeadCount) {
+                return;
+            }
+
+            // Broadcast send through CLI
+            $output->writeln("\n<info>".$email->getName().'</info>');
+            $progress       = new ProgressBar($output, $totalLeadCount);
+        }
+
         foreach ($lists as $list) {
-            if ($limit !== null && $limit <= 0) {
+            if (!$batch && $limit !== null && $limit <= 0) {
                 // Hit the max for this batch
                 break;
             }
@@ -888,23 +899,43 @@ class EmailModel extends FormModel
             $options['listId'] = $list->getId();
             $leads             = $this->getPendingLeads($email, $list->getId(), false, $limit);
             $leadCount         = count($leads);
-            $sentCount += $leadCount;
 
-            if ($limit != null) {
-                // Only retrieve the difference between what has already been sent and the limit
-                $limit -= $leadCount;
+            while ($leadCount) {
+                $sentCount += $leadCount;
+
+                if (!$batch && $limit != null) {
+                    // Only retrieve the difference between what has already been sent and the limit
+                    $limit -= $leadCount;
+                }
+
+                $listErrors = $this->sendEmail($email, $leads, $options);
+
+                if (!empty($listErrors)) {
+                    $listFailedCount = count($listErrors);
+
+                    $sentCount -= $listFailedCount;
+                    $failedCount += $listFailedCount;
+
+                    $failed[$options['listId']] = $listErrors;
+                }
+
+                if ($batch) {
+                    if ($progress) {
+                        $progressCounter += $leadCount;
+                        $progress->setProgress($progressCounter);
+                    }
+
+                    // Get the next batch of leads
+                    $leads     = $this->getPendingLeads($email, $list->getId(), false, $limit);
+                    $leadCount = count($leads);
+                } else {
+                    $leadCount = 0;
+                }
             }
+        }
 
-            $listErrors = $this->sendEmail($email, $leads, $options);
-
-            if (!empty($listErrors)) {
-                $listFailedCount = count($listErrors);
-
-                $sentCount -= $listFailedCount;
-                $failedCount += $listFailedCount;
-
-                $failed[$options['listId']] = $listErrors;
-            }
+        if ($progress) {
+            $progress->finish();
         }
 
         return [$sentCount, $failedCount, $failed];
@@ -1094,7 +1125,6 @@ class EmailModel extends FormModel
         $source           = (isset($options['source'])) ? $options['source'] : null;
         $listId           = (isset($options['listId'])) ? $options['listId'] : null;
         $ignoreDNC        = (isset($options['ignoreDNC'])) ? $options['ignoreDNC'] : false;
-        $allowResends     = (isset($options['allowResends'])) ? $options['allowResends'] : true;
         $tokens           = (isset($options['tokens'])) ? $options['tokens'] : [];
         $sendBatchMail    = (isset($options['sendBatchMail'])) ? $options['sendBatchMail'] : true;
         $assetAttachments = (isset($options['assetAttachments'])) ? $options['assetAttachments'] : [];
@@ -1128,21 +1158,23 @@ class EmailModel extends FormModel
         $frequencyRulesRepo = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
 
         $sendTo = $leads;
+        $leadIds = array_keys($leads);
+        $leadIds = implode(",", $leadIds);
+
+        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', $leadIds, $listId, $defaultFrequencyNumber, $defaultFrequencyTime);
+
+        if (!empty($dontSendTo)) {
+            foreach ($dontSendTo as $frequencyRuleMet) {
+                unset($leads[$frequencyRuleMet['lead_id']]);
+            }
+        }
 
         if (!$ignoreDNC) {
-            //get the list of do not contacts
-            static $dnc;
-            if (!is_array($dnc)) {
-                $dnc = $emailRepo->getDoNotEmailList();
-            }
-
+            $dnc = $emailRepo->getDoNotEmailList($leadIds);
 
             if (!empty($dnc)) {
-                foreach ($sendTo as $k => $lead) {
-                    //weed out do not contacts
-                    if (in_array(strtolower($lead['email']), $dnc)) {
-                        unset($sendTo[$k]);
-                    }
+                foreach ($dnc as $removeMeId => $removeMeEmail) {
+                    unset($leads[$removeMeId]);
                 }
             }
         }
@@ -1181,7 +1213,6 @@ class EmailModel extends FormModel
                 $emailSettings[$eid]['limit'] = $count;
             }
         }
-        echo "\n\n";
 
         // Store stat entities
         $errors   = [];
@@ -1227,7 +1258,6 @@ class EmailModel extends FormModel
 
             return true;
         };
-
 
         // Randomize the contacts for statistic purposes
         shuffle($sendTo);
@@ -1278,6 +1308,7 @@ class EmailModel extends FormModel
             }
         }
 
+        $badEmails = [];
         foreach ($groupedContactsByEmail as $parentId => $translatedEmails) {
             $useSettings = $emailSettings[$parentId];
             foreach ($translatedEmails as $translatedId => $contacts) {
@@ -1311,14 +1342,22 @@ class EmailModel extends FormModel
 
                             // Bad email so note and continue
                             $errors[$contact['id']] = $contact['email'];
-
+                            $badEmails[$contact['id']] = $contact['email'];
                             continue;
                         }
                     } catch (BatchQueueMaxException $e) {
                         // Queue full so flush then try again
                         $flushQueue(false);
 
-                        $mailer->addTo($contact['email'], $contact['firstname'].' '.$contact['lastname']);
+                        if (!$mailer->addTo($contact['email'], $contact['firstname'].' '.$contact['lastname'])) {
+                            // Clear the errors so it doesn't stop the next send
+                            $mailer->clearErrors();
+
+                            // Bad email so note and continue
+                            $errors[$contact['id']] = $contact['email'];
+                            $badEmails[$contact['id']] = $contact['email'];
+                            continue;
+                        }
                     }
 
                     //queue or send the message
@@ -1326,10 +1365,6 @@ class EmailModel extends FormModel
                         $errors[$contact['id']] = $contact['email'];
 
                         continue;
-                    }
-
-                    if (!$allowResends) {
-                        $sent[$parentId][$contact['id']] = $contact['id'];
                     }
 
                     //create a stat
@@ -1357,6 +1392,20 @@ class EmailModel extends FormModel
         // Persist stats
         $statRepo->saveEntities($saveEntities);
 
+        // Update bad emails as bounces
+        if (count($badEmails)) {
+            foreach ($badEmails as $contactId => $contactEmail) {
+                $this->leadModel->addDncForLead(
+                    $this->em->getReference('MauticLeadBundle:Lead', $contactId),
+                    ['email' => $email->getId()],
+                    $this->translator->trans('mautic.email.bounce.reason.bad_email'),
+                    DoNotContact::BOUNCED,
+                    true,
+                    false
+                );
+            }
+        }
+
         // Update sent counts
         foreach ($emailSentCounts as $emailId => $count) {
             // Retry a few times in case of deadlock errors
@@ -1373,12 +1422,10 @@ class EmailModel extends FormModel
         }
 
         // Free RAM
-        foreach ($saveEntities as $stat) {
-            $this->em->detach($stat);
-            unset($stat);
-        }
+        $this->em->clear('Mautic\EmailBundle\Entity\Stat');
+        $this->em->clear('Mautic\LeadBundle\Entity\DoNotContact');
 
-        unset($emailSentCounts, $emailSettings, $options, $tokens, $useEmail, $sendTo);
+        unset($saveEntities, $badEmails, $emailSentCounts, $emailSettings, $options, $tokens, $useEmail, $sendTo);
 
         return $singleEmail ? (empty($errors)) : $errors;
     }

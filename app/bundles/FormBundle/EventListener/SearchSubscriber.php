@@ -12,6 +12,8 @@ namespace Mautic\FormBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\FormBundle\Model\FormModel;
 
 /**
  * Class SearchSubscriber
@@ -20,6 +22,27 @@ use Mautic\CoreBundle\Event as MauticEvents;
  */
 class SearchSubscriber extends CommonSubscriber
 {
+    /**
+     * @var UserHelper
+     */
+    protected $userHelper;
+
+    /**
+     * @var FormModel
+     */
+    protected $formModel;
+
+    /**
+     * SearchSubscriber constructor.
+     *
+     * @param UserHelper $userHelper
+     * @param FormModel  $formModel
+     */
+    public function __construct(UserHelper $userHelper, FormModel $formModel)
+    {
+        $this->userHelper = $userHelper;
+        $this->formModel  = $formModel;
+    }
 
     /**
      * @return array
@@ -50,11 +73,11 @@ class SearchSubscriber extends CommonSubscriber
             //only show own forms if the user does not have permission to view others
             if (!$permissions['form:forms:viewother']) {
                 $filter['force'] = array(
-                    array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId()->getId())
+                    array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->userHelper->getUser()->getId())
                 );
             }
 
-            $forms = $this->factory->getModel('form.form')->getEntities(
+            $forms = $this->formModel->getEntities(
                 array(
                     'limit'  => 5,
                     'filter' => $filter
@@ -92,7 +115,7 @@ class SearchSubscriber extends CommonSubscriber
         if ($this->security->isGranted(array('form:forms:viewown', 'form:forms:viewother'), "MATCH_ONE")) {
             $event->addCommands(
                 'mautic.form.forms',
-                $this->factory->getModel('form.form')->getCommandList()
+                $this->formModel->getCommandList()
             );
         }
     }

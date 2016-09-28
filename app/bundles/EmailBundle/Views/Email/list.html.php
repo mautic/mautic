@@ -86,11 +86,7 @@ if (count($items)):
                 </td>
                 <td>
                     <div>
-                        <?php if ($type == 'template'): ?>
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php',array('item' => $item, 'model' => 'email')); ?>
-                        <?php else: ?>
-                        <i class="fa fa-fw fa-lg fa-toggle-on text-muted disabled"></i>
-                        <?php endif; ?>
                         <a href="<?php echo $view['router']->path('mautic_email_action', array("objectAction" => "view", "objectId" => $item->getId())); ?>" data-toggle="ajax">
                             <?php echo $item->getName(); ?>
                             <?php if ($hasVariants): ?>

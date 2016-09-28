@@ -27,7 +27,7 @@ class StageController extends FormController
     public function indexAction($page = 1)
     {
         //set some permissions
-        $permissions = $this->factory->getSecurity()->isGranted(
+        $permissions = $this->get('mautic.security')->isGranted(
             array(
                 'stage:stages:view',
                 'stage:stages:create',
@@ -47,23 +47,23 @@ class StageController extends FormController
         }
 
         //set limits
-        $limit = $this->factory->getSession()->get(
+        $limit = $this->get('session')->get(
             'mautic.stage.limit',
-            $this->factory->getParameter('default_pagelimit')
+            $this->coreParametersHelper->getParameter('default_pagelimit')
         );
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
-        $search = $this->request->get('search', $this->factory->getSession()->get('mautic.stage.filter', ''));
-        $this->factory->getSession()->set('mautic.stage.filter', $search);
+        $search = $this->request->get('search', $this->get('session')->get('mautic.stage.filter', ''));
+        $this->get('session')->set('mautic.stage.filter', $search);
 
         $filter     = array('string' => $search, 'force' => array());
-        $orderBy    = $this->factory->getSession()->get('mautic.stage.orderby', 's.name');
-        $orderByDir = $this->factory->getSession()->get('mautic.stage.orderbydir', 'ASC');
+        $orderBy    = $this->get('session')->get('mautic.stage.orderby', 's.name');
+        $orderByDir = $this->get('session')->get('mautic.stage.orderbydir', 'ASC');
 
-        $stages = $this->factory->getModel('stage')->getEntities(
+        $stages = $this->getModel('stage')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -76,7 +76,7 @@ class StageController extends FormController
         $count = count($stages);
         if ($count && $count < ($start + 1)) {
             $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->factory->getSession()->set('mautic.stage.page', $lastPage);
+            $this->get('session')->set('mautic.stage.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_stage_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(
@@ -93,7 +93,7 @@ class StageController extends FormController
         }
 
         //set what page currently on so that we can return here after form submission/cancellation
-        $this->factory->getSession()->set('mautic.stage.page', $page);
+        $this->get('session')->set('mautic.stage.page', $page);
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
@@ -137,12 +137,12 @@ class StageController extends FormController
             $entity = $model->getEntity();
         }
 
-        if (!$this->factory->getSecurity()->isGranted('stage:stages:create')) {
+        if (!$this->get('mautic.security')->isGranted('stage:stages:create')) {
             return $this->accessDenied();
         }
 
         //set the page we came from
-        $page = $this->factory->getSession()->get('mautic.stage.page', 1);
+        $page = $this->get('session')->get('mautic.stage.page', 1);
 
         $actionType = ($this->request->getMethod() == 'POST') ? $this->request->request->get('stage[type]', '', true)
             : '';
@@ -254,7 +254,7 @@ class StageController extends FormController
         $entity = $model->getEntity($objectId);
 
         //set the page we came from
-        $page = $this->factory->getSession()->get('mautic.stage.page', 1);
+        $page = $this->get('session')->get('mautic.stage.page', 1);
 
         $viewParameters = array('page' => $page);
 
@@ -287,7 +287,7 @@ class StageController extends FormController
                     )
                 )
             );
-        } elseif (!$this->factory->getSecurity()->isGranted('stage:stages:edit')) {
+        } elseif (!$this->get('mautic.security')->isGranted('stage:stages:edit')) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
@@ -403,7 +403,7 @@ class StageController extends FormController
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
-            if (!$this->factory->getSecurity()->isGranted('stage:stages:create')) {
+            if (!$this->get('mautic.security')->isGranted('stage:stages:create')) {
                 return $this->accessDenied();
             }
 
@@ -423,7 +423,7 @@ class StageController extends FormController
      */
     public function deleteAction($objectId)
     {
-        $page      = $this->factory->getSession()->get('mautic.stage.page', 1);
+        $page      = $this->get('session')->get('mautic.stage.page', 1);
         $returnUrl = $this->generateUrl('mautic_stage_index', array('page' => $page));
         $flashes   = array();
 
@@ -447,7 +447,7 @@ class StageController extends FormController
                     'msg'     => 'mautic.stage.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
-            } elseif (!$this->factory->getSecurity()->isGranted('stage:stages:delete')) {
+            } elseif (!$this->get('mautic.security')->isGranted('stage:stages:delete')) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'stage');
@@ -483,7 +483,7 @@ class StageController extends FormController
      */
     public function batchDeleteAction()
     {
-        $page      = $this->factory->getSession()->get('mautic.stage.page', 1);
+        $page      = $this->get('session')->get('mautic.stage.page', 1);
         $returnUrl = $this->generateUrl('mautic_stage_index', array('page' => $page));
         $flashes   = array();
 
@@ -512,7 +512,7 @@ class StageController extends FormController
                         'msg'     => 'mautic.stage.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     );
-                } elseif (!$this->factory->getSecurity()->isGranted('stage:stages:delete')) {
+                } elseif (!$this->get('mautic.security')->isGranted('stage:stages:delete')) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'stage', true);

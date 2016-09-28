@@ -12,6 +12,8 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\EmailBundle\Model\EmailModel;
 
 /**
  * Class SearchSubscriber
@@ -20,6 +22,27 @@ use Mautic\CoreBundle\Event as MauticEvents;
  */
 class SearchSubscriber extends CommonSubscriber
 {
+    /**
+     * @var EmailModel
+     */
+    protected $emailModel;
+
+    /**
+     * @var UserHelper
+     */
+    protected $userHelper;
+
+    /**
+     * SearchSubscriber constructor.
+     *
+     * @param UserHelper $userHelper
+     * @param EmailModel $emailModel
+     */
+    public function __construct(UserHelper $userHelper, EmailModel $emailModel)
+    {
+        $this->userHelper = $userHelper;
+        $this->emailModel = $emailModel;
+    }
 
     /**
      * @return array
@@ -52,11 +75,11 @@ class SearchSubscriber extends CommonSubscriber
                 $filter['force'][] = array(
                     'column' => 'IDENTITY(e.createdBy)',
                     'expr'   => 'eq',
-                    'value'  => $this->factory->getUser()->getId()
+                    'value'  => $this->userHelper->getUser()->getId()
                 );
             }
 
-            $emails = $this->factory->getModel('email')->getEntities(
+            $emails = $this->emailModel->getEntities(
                 array(
                     'limit'  => 5,
                     'filter' => $filter
@@ -95,7 +118,7 @@ class SearchSubscriber extends CommonSubscriber
         if ($this->security->isGranted(array('email:emails:viewown', 'email:emails:viewother'), "MATCH_ONE")) {
             $event->addCommands(
                 'mautic.email.emails',
-                $this->factory->getModel('email')->getCommandList()
+                $this->emailModel->getCommandList()
             );
         }
     }

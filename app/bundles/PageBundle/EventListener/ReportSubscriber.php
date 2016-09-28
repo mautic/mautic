@@ -296,7 +296,7 @@ class ReportSubscriber extends CommonSubscriber
 
         $graphs  = $event->getRequestedGraphs();
         $qb      = $event->getQueryBuilder();
-        $hitRepo = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+        $hitRepo = $this->em->getRepository('MauticPageBundle:Hit');
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
@@ -361,8 +361,8 @@ class ReportSubscriber extends CommonSubscriber
                     $all       = $chartQuery->fetchCount($allQ);
                     $unique    = $chartQuery->fetchCount($uniqueQ);
                     $returning = $all - $unique;
-                    $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.unique'), $unique);
-                    $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.graph.pie.new.vs.returning.returning'), $returning);
+                    $chart->setDataset($this->translator->trans('mautic.page.unique'), $unique);
+                    $chart->setDataset($this->translator->trans('mautic.page.graph.pie.new.vs.returning.returning'), $returning);
 
                     $event->setGraph(
                         $g,

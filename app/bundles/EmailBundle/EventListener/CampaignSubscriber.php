@@ -9,7 +9,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\CoreBundle\Model\MessageQueueModel;
 use Mautic\LeadBundle\Entity\Lead;
@@ -17,7 +17,6 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
-use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\LeadBundle\Model\LeadModel;
 
@@ -44,19 +43,23 @@ class CampaignSubscriber extends CommonSubscriber
     protected $messageQueueModel;
 
     /**
+     * @var EventModel
+     */
+    protected $campaignEventModel;
+
+    /**
      * CampaignSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param LeadModel     $leadModel
-     * @param EmailModel    $emailModel
+     * @param LeadModel  $leadModel
+     * @param EmailModel $emailModel
+     * @param EventModel $eventModel
      */
-    public function __construct(MauticFactory $factory, LeadModel $leadModel, EmailModel $emailModel, MessageQueueModel $messageQueueModel)
+    public function __construct(LeadModel $leadModel, EmailModel $emailModel, EventModel $eventModel, MessageQueueModel $messageQueueModel)
     {
         $this->leadModel  = $leadModel;
         $this->emailModel = $emailModel;
+        $this->campaignEventModel = $eventModel;
         $this->messageQueueModel = $messageQueueModel;
-
-        parent::__construct($factory);
     }
 
     /**
@@ -106,7 +109,7 @@ class CampaignSubscriber extends CommonSubscriber
         $email = $event->getEmail();
 
         if ($email !== null) {
-            $this->factory->getModel('campaign.event')->triggerEvent('email.open', $email, 'email', $email->getId());
+            $this->campaignEventModel->triggerEvent('email.open', $email, 'email', $email->getId());
         }
     }
 

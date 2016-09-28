@@ -8,10 +8,10 @@
  */
 namespace Mautic\CampaignBundle\EventListener;
 
-use Mautic\DashboardBundle\DashboardEvents;
+use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
  * Class DashboardSubscriber
@@ -48,6 +48,28 @@ class DashboardSubscriber extends MainDashboardSubscriber
     );
 
     /**
+     * @var EventModel
+     */
+    protected $campaignEventModel;
+
+    /**
+     * @var CampaignModel
+     */
+    protected $campaignModel;
+
+    /**
+     * DashboardSubscriber constructor.
+     *
+     * @param CampaignModel $campaignModel
+     * @param EventModel    $campaignEventModel
+     */
+    public function __construct(CampaignModel $campaignModel, EventModel $campaignEventModel)
+    {
+        $this->campaignModel      = $campaignModel;
+        $this->campaignEventModel = $campaignEventModel;
+    }
+
+    /**
      * Set a widget detail when needed 
      *
      * @param WidgetDetailEvent $event
@@ -64,12 +86,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $params = $widget->getParams();
 
             if (!$event->isCached()) {
-                $model = $this->factory->getModel('campaign.event');
-
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getEventLineChartData(
+                    'chartData'   => $this->campaignEventModel->getEventLineChartData(
                         $params['timeUnit'],
                         $params['dateFrom'],
                         $params['dateTo'],
@@ -88,12 +108,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $params = $widget->getParams();
 
             if (!$event->isCached()) {
-                $model = $this->factory->getModel('campaign');
-
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getLeadsAddedLineChartData(
+                    'chartData'   => $this->campaignModel->getLeadsAddedLineChartData(
                         $params['timeUnit'],
                         $params['dateFrom'],
                         $params['dateTo'],

@@ -16,7 +16,7 @@ return [
                     'route' => 'mautic_dynamicContent_index',
                     'access' => ['dynamicContent:dynamicContents:viewown', 'dynamicContent:dynamicContents:viewother'],
                     'parent' => 'mautic.core.components',
-                    'priority' => 200,
+                    'priority' => 90,
                 ],
             ],
         ],
@@ -48,7 +48,6 @@ return [
             'mautic.dynamicContent.campaignbundle.subscriber' => [
                 'class' => 'Mautic\DynamicContentBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.lead.model.lead',
                     'mautic.dynamicContent.model.dynamicContent',
                     'session'
@@ -60,10 +59,10 @@ return [
             'mautic.dynamicContent.subscriber' => [
                 'class' => 'Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.page.model.trackable',
                     'mautic.page.helper.token',
-                    'mautic.asset.helper.token'
+                    'mautic.asset.helper.token',
+                    'mautic.core.model.auditlog'
                 ]
             ],
         ],

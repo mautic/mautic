@@ -386,6 +386,8 @@ class PageModel extends FormModel
      * @param Lead|null $lead
      * @param array     $query
      *
+     *
+     * @return Hit $hit
      * @throws \Exception
      */
     public function hitPage($page, Request $request, $code = '200', Lead $lead = null, $query = [])
@@ -641,6 +643,8 @@ class PageModel extends FormModel
 
         //save hit to the cookie to use to update the exit time
         $this->cookieHelper->setCookie('mautic_referer_id', $hit->getId());
+
+        return $hit;
     }
 
     /**

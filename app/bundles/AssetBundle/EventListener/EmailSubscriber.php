@@ -18,7 +18,6 @@ use Mautic\EmailBundle\Event\EmailBuilderEvent;
  */
 class EmailSubscriber extends CommonSubscriber
 {
-
     /**
      * {@inheritdoc}
      */
