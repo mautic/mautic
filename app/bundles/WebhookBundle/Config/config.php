@@ -63,7 +63,11 @@ return array(
                 'class' => 'Mautic\WebhookBundle\EventListener\ConfigSubscriber'
             ),
             'mautic.webhook.audit.subscriber' => array(
-                'class' => 'Mautic\WebhookBundle\EventListener\WebhookSubscriber'
+                'class' => 'Mautic\WebhookBundle\EventListener\WebhookSubscriber',
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog'
+                ]
             ),
         ),
         'models' =>  array(

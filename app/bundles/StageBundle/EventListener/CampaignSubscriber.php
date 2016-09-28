@@ -9,14 +9,12 @@
 namespace Mautic\StageBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\StageBundle\StageEvents;
-use Mautic\StageBundle\Event\StageEvent;
 use Mautic\LeadBundle\Model\LeadModel;
 
 /**
@@ -39,16 +37,13 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * CampaignSubscriber constructor.
      *
-     * @param MauticFactory $factory
      * @param LeadModel $leadModel
      * @param StageModel $stageModel
      */
-    public function __construct(MauticFactory $factory, LeadModel $leadModel, StageModel $stageModel)
+    public function __construct(LeadModel $leadModel, StageModel $stageModel)
     {
         $this->leadModel = $leadModel;
         $this->stageModel = $stageModel;
-
-        parent::__construct($factory);
     }
 
     /**

@@ -23,12 +23,12 @@ class PublicController extends CommonFormController
     /**
      * @param string $slug
      *
-     * @return void
+     * @return Response
      */
     public function downloadAction($slug)
     {
         //find the asset
-        $security   = $this->factory->getSecurity();
+        $security   = $this->get('mautic.security');
 
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model      = $this->getModel('asset');
@@ -78,7 +78,7 @@ class PublicController extends CommonFormController
             } else {
                 try {
                     //set the uploadDir
-                    $entity->setUploadDir($this->factory->getParameter('upload_dir'));
+                    $entity->setUploadDir($this->get('mautic.helper.core_parameters')->getParameter('upload_dir'));
                     $contents = $entity->getFileContents();
                     $model->trackDownload($entity, $this->request, 200);
                 } catch (\Exception $e) {

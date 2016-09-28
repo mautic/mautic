@@ -12,6 +12,7 @@ use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\PageBundle\Model\PageModel;
 
 /**
  * Class DashboardSubscriber
@@ -54,6 +55,21 @@ class DashboardSubscriber extends MainDashboardSubscriber
     );
 
     /**
+     * @var PageModel
+     */
+    protected $pageModel;
+
+    /**
+     * DashboardSubscriber constructor.
+     *
+     * @param PageModel $pageModel
+     */
+    public function __construct(PageModel $pageModel)
+    {
+        $this->pageModel = $pageModel;
+    }
+
+    /**
      * Set a widget detail when needed 
      *
      * @param WidgetDetailEvent $event
@@ -74,11 +90,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
             }
 
             if (!$event->isCached()) {
-                $model = $this->factory->getModel('page');
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getHitsLineChartData(
+                    'chartData'   => $this->pageModel->getHitsLineChartData(
                         $params['timeUnit'],
                         $params['dateFrom'],
                         $params['dateTo'],
@@ -96,11 +111,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
         if ($event->getType() == 'unique.vs.returning.leads') {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
-                $model = $this->factory->getModel('page');
                 $event->setTemplateData(array(
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,
-                    'chartData'   => $model->getNewVsReturningPieChartData($params['dateFrom'], $params['dateTo'], array(), $canViewOthers)
+                    'chartData'   => $this->pageModel->getNewVsReturningPieChartData($params['dateFrom'], $params['dateTo'], array(), $canViewOthers)
                 ));
             }
 
@@ -111,11 +125,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
         if ($event->getType() == 'dwell.times') {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
-                $model = $this->factory->getModel('page');
                 $event->setTemplateData(array(
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,
-                    'chartData'   => $model->getDwellTimesPieChartData($params['dateFrom'], $params['dateTo'], array(), $canViewOthers)
+                    'chartData'   => $this->pageModel->getDwellTimesPieChartData($params['dateFrom'], $params['dateTo'], array(), $canViewOthers)
                 ));
             }
 
@@ -125,7 +138,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'popular.pages') {
             if (!$event->isCached()) {
-                $model  = $this->factory->getModel('page');
                 $params = $event->getWidget()->getParams();
 
                 if (empty($params['limit'])) {
@@ -135,13 +147,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $pages = $model->getPopularPages($limit, $params['dateFrom'], $params['dateTo'], array(), $canViewOthers);
+                $pages = $this->pageModel->getPopularPages($limit, $params['dateFrom'], $params['dateTo'], array(), $canViewOthers);
                 $items = array();
 
                 // Build table rows with links
                 if ($pages) {
                     foreach ($pages as &$page) {
-                        $pageUrl = $this->factory->getRouter()->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $page['id']));
+                        $pageUrl = $this->router->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $page['id']));
                         $row = array(
                             array(
                                 'value' => $page['title'],
@@ -172,7 +184,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'created.pages') {
             if (!$event->isCached()) {
-                $model  = $this->factory->getModel('page');
                 $params = $event->getWidget()->getParams();
 
                 if (empty($params['limit'])) {
@@ -182,13 +193,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $pages = $model->getPageList($limit, $params['dateFrom'], $params['dateTo'], array(), $canViewOthers);
+                $pages = $this->pageModel->getPageList($limit, $params['dateFrom'], $params['dateTo'], array(), $canViewOthers);
                 $items = array();
 
                 // Build table rows with links
                 if ($pages) {
                     foreach ($pages as &$page) {
-                        $pageUrl = $this->factory->getRouter()->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $page['id']));
+                        $pageUrl = $this->router->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $page['id']));
                         $row = array(
                             array(
                                 'value' => $page['name'],
@@ -218,11 +229,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $params = $widget->getParams();
 
             if (!$event->isCached()) {
-                $model = $this->factory->getModel('page');
                 $event->setTemplateData(array(
                     'chartType'   => 'pie',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getDeviceGranularityData(
+                    'chartData'   => $this->pageModel->getDeviceGranularityData(
                         $params['dateFrom'],
                         $params['dateTo'],
                         array(),

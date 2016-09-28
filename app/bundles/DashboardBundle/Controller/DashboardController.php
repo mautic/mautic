@@ -33,7 +33,7 @@ class DashboardController extends FormController
         $widgets = $model->getWidgets();
 
         // Apply the default dashboard if no widget exists
-        if (!count($widgets) && $this->factory->getUser()->getId()) {
+        if (!count($widgets) && $this->user->getId()) {
             return $this->applyDashboardFileAction('global.default');
         }
 
@@ -45,7 +45,7 @@ class DashboardController extends FormController
 
         // Set new date range to the session
         if ($this->request->isMethod('POST')) {
-            $session = $this->factory->getSession();
+            $session = $this->get('session');
             if (!empty($dateRangeFilter['date_from'])) {
                 $from = new \DateTime($dateRangeFilter['date_from']);
                 $session->set('mautic.dashboard.date.from', $from->format($mysqlFormat));
@@ -71,7 +71,7 @@ class DashboardController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'security'          => $this->factory->getSecurity(),
+                'security'          => $this->get('mautic.security'),
                 'widgets'           => $widgets,
                 'dateRangeForm'     => $dateRangeForm->createView()
             ),
@@ -281,7 +281,7 @@ class DashboardController extends FormController
         /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
         $model            = $this->getModel('dashboard');
         $widgetsPaginator = $model->getWidgets();
-        $usersName        = $this->factory->getUser()->getName();
+        $usersName        = $this->user->getName();
         $dateTime         = new \DateTime;
         $dateStamp        = $dateTime->format('Y-m-d H:i:s');
         $name             = $this->request->get(
@@ -442,7 +442,7 @@ class DashboardController extends FormController
                     } else {
                         $form->addError(
                             new FormError(
-                                $this->factory->getTranslator()->trans('mautic.dashboard.upload.filenotfound', array(), 'validators')
+                                $this->translator->trans('mautic.dashboard.upload.filenotfound', array(), 'validators')
                             )
                         );
                     }

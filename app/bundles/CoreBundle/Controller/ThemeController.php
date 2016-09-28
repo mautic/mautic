@@ -33,7 +33,7 @@ class ThemeController extends FormController
     public function indexAction()
     {
         //set some permissions
-        $permissions = $this->factory->getSecurity()->isGranted([
+        $permissions = $this->get('mautic.security')->isGranted([
             'core:themes:view',
             'core:themes:create',
             'core:themes:edit',
@@ -59,7 +59,7 @@ class ThemeController extends FormController
                     if (in_array($themeName, $this->defaultThemes)) {
                         $form->addError(
                             new FormError(
-                                $this->factory->getTranslator()->trans('mautic.core.theme.default.cannot.overwrite', ['%name%' => $themeName], 'validators')
+                                $this->translator->trans('mautic.core.theme.default.cannot.overwrite', ['%name%' => $themeName], 'validators')
                             )
                         );
                     } elseif (!empty($fileData)) {
@@ -70,14 +70,14 @@ class ThemeController extends FormController
                         } catch (\Exception $e) {
                             $form->addError(
                                 new FormError(
-                                    $this->factory->getTranslator()->trans($e->getMessage(), [], 'validators')
+                                    $this->translator->trans($e->getMessage(), [], 'validators')
                                 )
                             );
                         }
                     } else {
                         $form->addError(
                             new FormError(
-                                $this->factory->getTranslator()->trans('mautic.dashboard.upload.filenotfound', [], 'validators')
+                                $this->translator->trans('mautic.dashboard.upload.filenotfound', [], 'validators')
                             )
                         );
                     }
@@ -91,7 +91,7 @@ class ThemeController extends FormController
                 'defaultThemes' => $this->defaultThemes,
                 'form'          => $form->createView(),
                 'permissions'   => $permissions,
-                'security'      => $this->factory->getSecurity()
+                'security'      => $this->get('mautic.security')
             ],
             'contentTemplate' => 'MauticCoreBundle:Theme:list.html.php',
             'passthroughVars' => [
@@ -115,7 +115,7 @@ class ThemeController extends FormController
         $flashes     = [];
         $error       = false;
 
-        if (!$this->factory->getSecurity()->isGranted('core:themes:edit')) {
+        if (!$this->get('mautic.security')->isGranted('core:themes:edit')) {
             return $this->accessDenied();
         }
 
@@ -231,7 +231,7 @@ class ThemeController extends FormController
                 'msg'     => 'mautic.core.theme.error.notfound',
                 'msgVars' => ['%theme%' => $themeName]
             ];
-        } elseif (!$this->factory->getSecurity()->isGranted('core:themes:delete')) {
+        } elseif (!$this->get('mautic.security')->isGranted('core:themes:delete')) {
             return $this->accessDenied();
         } elseif (in_array($themeName, $this->defaultThemes)) {
             $flashes[] = [

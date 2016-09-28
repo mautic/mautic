@@ -41,9 +41,8 @@ class CalendarSubscriber extends CommonSubscriber
     public function onCalendarGenerate(CalendarGeneratorEvent $event)
     {
         $dates  = $event->getDates();
-        $router = $this->factory->getRouter();
 
-        $query = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+        $query = $this->em->getConnection()->createQueryBuilder();
         $query->select('es.email_id, e.subject AS title, COUNT(es.id) AS quantity, es.date_sent AS start, e.plain_text AS description, cat.color, es.lead_id, l.firstname, l.lastname, l.email')
             ->from(MAUTIC_TABLE_PREFIX . 'email_stats', 'es')
             ->leftJoin('es', MAUTIC_TABLE_PREFIX . 'emails', 'e', 'es.email_id = e.id')
@@ -67,7 +66,7 @@ class CalendarSubscriber extends CommonSubscriber
             $date = new DateTimeHelper($object['start']);
             $object['start'] = $date->toLocalString(\DateTime::ISO8601);
             if ($object['email_id']) {
-                $object['url']          = $router->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $object['email_id']), true);
+                $object['url']          = $this->router->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $object['email_id']), true);
                 $object['attr']         = 'data-toggle="ajax"';
                 $object['description']  = html_entity_decode($object['description']);
                 $object['title']        = $this->translator->trans('mautic.email.event.sent', array('%email%' => $object['title'], '%x%' => $object['quantity']));
@@ -80,7 +79,7 @@ class CalendarSubscriber extends CommonSubscriber
                     $contactName = $this->translator->trans('mautic.lead.lead.anonymous');
                 }
                 $details                = $this->translator->trans('mautic.email.event.sent.direct', array('%contact%' => $contactName));
-                $object['url']          = $router->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $object['lead_id']), true);
+                $object['url']          = $this->router->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $object['lead_id']), true);
                 $object['attr']         = 'data-toggle="ajax"';
                 $object['title']        = $details;
                 $object['description']  = $details;

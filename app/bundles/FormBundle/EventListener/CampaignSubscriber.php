@@ -11,6 +11,7 @@ namespace Mautic\FormBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\FormBundle\Event\SubmissionEvent;
@@ -36,18 +37,22 @@ class CampaignSubscriber extends CommonSubscriber
     protected $formSubmissionModel;
 
     /**
+     * @var EventModel
+     */
+    protected $campaignEventModel;
+
+    /**
      * CampaignSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param FormModel $formModel
+     * @param FormModel       $formModel
      * @param SubmissionModel $formSubmissionModel
+     * @param EventModel      $campaignEventModel
      */
-    public function __construct(MauticFactory $factory, FormModel $formModel, SubmissionModel $formSubmissionModel)
+    public function __construct(FormModel $formModel, SubmissionModel $formSubmissionModel, EventModel $campaignEventModel)
     {
         $this->formModel = $formModel;
         $this->formSubmissionModel = $formSubmissionModel;
-
-        parent::__construct($factory);
+        $this->campaignEventModel = $campaignEventModel;
     }
 
     /**
@@ -98,7 +103,7 @@ class CampaignSubscriber extends CommonSubscriber
     public function onFormSubmit(SubmissionEvent $event)
     {
         $form = $event->getSubmission()->getForm();
-        $this->factory->getModel('campaign.event')->triggerEvent('form.submit', $form, 'form', $form->getId());
+        $this->campaignEventModel->triggerEvent('form.submit', $form, 'form', $form->getId());
     }
 
     /**

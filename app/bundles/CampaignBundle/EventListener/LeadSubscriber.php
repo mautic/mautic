@@ -38,14 +38,11 @@ class LeadSubscriber extends CommonSubscriber
     /**
      * LeadSubscriber constructor.
      *
-     * @param MauticFactory $factory
      * @param CampaignModel $campaignModel
      * @param LeadModel     $leadModel
      */
-    public function __construct(MauticFactory $factory, CampaignModel $campaignModel, LeadModel $leadModel)
+    public function __construct(CampaignModel $campaignModel, LeadModel $leadModel)
     {
-        parent::__construct($factory);
-
         $this->campaignModel = $campaignModel;
         $this->leadModel     = $leadModel;
     }
@@ -72,11 +69,6 @@ class LeadSubscriber extends CommonSubscriber
     {
         static $campaignLists = [], $listCampaigns = [], $campaignReferences = [];
 
-        /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
-        $model = $this->factory->getModel('campaign');
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead');
-
         $leads  = $event->getLeads();
         $list   = $event->getList();
         $action = $event->wasAdded() ? 'added' : 'removed';
@@ -84,7 +76,7 @@ class LeadSubscriber extends CommonSubscriber
 
         //get campaigns for the list
         if (!isset($listCampaigns[$list->getId()])) {
-            $listCampaigns[$list->getId()] = $model->getRepository()->getPublishedCampaignsByLeadLists($list->getId());
+            $listCampaigns[$list->getId()] = $this->campaignModel->getRepository()->getPublishedCampaignsByLeadLists($list->getId());
         }
 
         $leadLists = $em->getRepository('MauticLeadBundle:LeadList')->getLeadLists($leads, true, true);
@@ -96,7 +88,7 @@ class LeadSubscriber extends CommonSubscriber
                 }
 
                 if ($action == 'added') {
-                    $model->addLeads($campaignReferences[$c['id']], $leads, false, true);
+                    $this->campaignModel->addLeads($campaignReferences[$c['id']], $leads, false, true);
                 } else {
                     if (!isset($campaignLists[$c['id']])) {
                         $campaignLists[$c['id']] = [];
@@ -115,13 +107,13 @@ class LeadSubscriber extends CommonSubscriber
                         }
                     }
 
-                    $model->removeLeads($campaignReferences[$c['id']], $removeLeads, false, true);
+                    $this->campaignModel->removeLeads($campaignReferences[$c['id']], $removeLeads, false, true);
                 }
             }
         }
 
         // Save memory with batch processing
-        unset($event, $em, $model, $leadModel, $leads, $list, $listCampaigns, $leadLists);
+        unset($event, $em, $model, $leads, $list, $listCampaigns, $leadLists);
     }
 
     /**

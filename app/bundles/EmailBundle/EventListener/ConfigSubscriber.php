@@ -13,6 +13,7 @@ use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 /**
  * Class ConfigSubscriber
@@ -21,6 +22,20 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
  */
 class ConfigSubscriber extends CommonSubscriber
 {
+    /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
+     * ConfigSubscriber constructor.
+     *
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function __construct(CoreParametersHelper $coreParametersHelper)
+    {
+        $this->coreParametersHelper = $coreParametersHelper;
+    }
 
     /**
      * @return array
@@ -55,7 +70,7 @@ class ConfigSubscriber extends CommonSubscriber
         $data = $event->getConfig('emailconfig');
 
         // Get the original data so that passwords aren't lost
-        $monitoredEmail = $this->factory->getParameter('monitored_email');
+        $monitoredEmail = $this->coreParametersHelper->getParameter('monitored_email');
         if (isset($data['monitored_email'])) {
             foreach ($data['monitored_email'] as $key => $monitor) {
                 if (empty($monitor['password']) && !empty($monitoredEmail[$key]['password'])) {

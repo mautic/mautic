@@ -12,6 +12,7 @@ namespace Mautic\StageBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\StageBundle\Model\StageModel;
 
 /**
  * Class SearchSubscriber
@@ -20,6 +21,20 @@ use Mautic\CoreBundle\Event as MauticEvents;
  */
 class SearchSubscriber extends CommonSubscriber
 {
+    /**
+     * @var StageModel
+     */
+    protected $stageModel;
+
+    /**
+     * SearchSubscriber constructor.
+     *
+     * @param StageModel $stageModel
+     */
+    public function __construct(StageModel $stageModel)
+    {
+        $this->stageModel = $stageModel;
+    }
 
     /**
      * @return array
@@ -43,7 +58,7 @@ class SearchSubscriber extends CommonSubscriber
                 return;
             }
 
-            $items      = $this->factory->getModel('stage')->getEntities(
+            $items      = $this->stageModel->getEntities(
                 array(
                     'limit'  => 5,
                     'filter' => $str
@@ -82,11 +97,10 @@ class SearchSubscriber extends CommonSubscriber
      */
     public function onBuildCommandList (MauticEvents\CommandListEvent $event)
     {
-        $security = $this->security;
-        if ($security->isGranted('stage:stages:view')) {
+        if ($this->security->isGranted('stage:stages:view')) {
             $event->addCommands(
                 'mautic.stage.actions.header.index',
-                $this->factory->getModel('stage')->getCommandList()
+                $this->stageModel->getCommandList()
             );
         }
     }

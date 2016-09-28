@@ -368,7 +368,7 @@ class PublicController extends CommonFormController
         $redirect      = $redirectModel->getRedirectById($redirectId);
 
         if (empty($redirect) || !$redirect->isPublished(false)) {
-            throw $this->createNotFoundException($this->factory->getTranslator()->trans('mautic.core.url.error.404'));
+            throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404'));
         }
 
         $this->getModel('page')->hitPage($redirect, $this->request);

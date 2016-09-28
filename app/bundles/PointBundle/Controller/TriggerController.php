@@ -28,7 +28,7 @@ class TriggerController extends FormController
     public function indexAction($page = 1)
     {
         //set some permissions
-        $permissions = $this->factory->getSecurity()->isGranted(array(
+        $permissions = $this->get('mautic.security')->isGranted(array(
             'point:triggers:view',
             'point:triggers:create',
             'point:triggers:edit',
@@ -46,18 +46,18 @@ class TriggerController extends FormController
         }
 
         //set limits
-        $limit = $this->factory->getSession()->get('mautic.point.trigger.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $this->get('session')->get('mautic.point.trigger.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
-        $search = $this->request->get('search', $this->factory->getSession()->get('mautic.point.trigger.filter', ''));
-        $this->factory->getSession()->set('mautic.point.trigger.filter', $search);
+        $search = $this->request->get('search', $this->get('session')->get('mautic.point.trigger.filter', ''));
+        $this->get('session')->set('mautic.point.trigger.filter', $search);
 
         $filter = array('string' => $search, 'force' => array());
-        $orderBy    = $this->factory->getSession()->get('mautic.point.trigger.orderby', 't.name');
-        $orderByDir = $this->factory->getSession()->get('mautic.point.trigger.orderbydir', 'ASC');
+        $orderBy    = $this->get('session')->get('mautic.point.trigger.orderby', 't.name');
+        $orderByDir = $this->get('session')->get('mautic.point.trigger.orderbydir', 'ASC');
 
         $triggers = $this->getModel('point.trigger')->getEntities(
             array(
@@ -71,7 +71,7 @@ class TriggerController extends FormController
         $count = count($triggers);
         if ($count && $count < ($start + 1)) {
             $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->factory->getSession()->set('mautic.point.trigger.page', $lastPage);
+            $this->get('session')->set('mautic.point.trigger.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_pointtrigger_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(array(
@@ -86,7 +86,7 @@ class TriggerController extends FormController
         }
 
         //set what page currently on so that we can return here after form submission/cancellation
-        $this->factory->getSession()->set('mautic.point.trigger.page', $page);
+        $this->get('session')->set('mautic.point.trigger.page', $page);
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
@@ -120,9 +120,9 @@ class TriggerController extends FormController
         $entity = $this->getModel('point.trigger')->getEntity($objectId);
 
         //set the page we came from
-        $page = $this->factory->getSession()->get('mautic.point.trigger.page', 1);
+        $page = $this->get('session')->get('mautic.point.trigger.page', 1);
 
-        $permissions = $this->factory->getSecurity()->isGranted(array(
+        $permissions = $this->get('mautic.security')->isGranted(array(
             'point:triggers:view',
             'point:triggers:create',
             'point:triggers:edit',
@@ -190,15 +190,15 @@ class TriggerController extends FormController
             $entity  = $model->getEntity();
         }
 
-        $session   = $this->factory->getSession();
+        $session   = $this->get('session');
         $sessionId = $this->request->request->get('pointtrigger[sessionId]', 'mautic_'.sha1(uniqid(mt_rand(), true)), true);
 
-        if (!$this->factory->getSecurity()->isGranted('point:triggers:create')) {
+        if (!$this->get('mautic.security')->isGranted('point:triggers:create')) {
             return $this->accessDenied();
         }
 
         //set the page we came from
-        $page = $this->factory->getSession()->get('mautic.point.trigger.page', 1);
+        $page = $this->get('session')->get('mautic.point.trigger.page', 1);
 
         //set added/updated events
         $addEvents     = $session->get('mautic.point.'.$sessionId.'.triggerevents.modified', array());
@@ -306,11 +306,11 @@ class TriggerController extends FormController
         /** @var \Mautic\PointBundle\Model\TriggerModel $model */
         $model      = $this->getModel('point.trigger');
         $entity     = $model->getEntity($objectId);
-        $session    = $this->factory->getSession();
+        $session    = $this->get('session');
         $cleanSlate = true;
 
         //set the page we came from
-        $page = $this->factory->getSession()->get('mautic.point.trigger.page', 1);
+        $page = $this->get('session')->get('mautic.point.trigger.page', 1);
 
         //set the return URL
         $returnUrl = $this->generateUrl('mautic_pointtrigger_index', array('page' => $page));
@@ -338,7 +338,7 @@ class TriggerController extends FormController
                     )
                 ))
             );
-        } elseif (!$this->factory->getSecurity()->isGranted('point:triggers:edit')) {
+        } elseif (!$this->get('mautic.security')->isGranted('point:triggers:edit')) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
@@ -471,7 +471,7 @@ class TriggerController extends FormController
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
-            if (!$this->factory->getSecurity()->isGranted('point:triggers:create')) {
+            if (!$this->get('mautic.security')->isGranted('point:triggers:create')) {
                 return $this->accessDenied();
             }
 
@@ -491,7 +491,7 @@ class TriggerController extends FormController
      */
     public function deleteAction($objectId)
     {
-        $page      = $this->factory->getSession()->get('mautic.point.trigger.page', 1);
+        $page      = $this->get('session')->get('mautic.point.trigger.page', 1);
         $returnUrl = $this->generateUrl('mautic_pointtrigger_index', array('page' => $page));
         $flashes   = array();
 
@@ -515,7 +515,7 @@ class TriggerController extends FormController
                     'msg'     => 'mautic.point.trigger.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
-            } elseif (!$this->factory->getSecurity()->isGranted('point:triggers:delete')) {
+            } elseif (!$this->get('mautic.security')->isGranted('point:triggers:delete')) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'point.trigger');
@@ -548,7 +548,7 @@ class TriggerController extends FormController
      */
     public function batchDeleteAction()
     {
-        $page      = $this->factory->getSession()->get('mautic.point.trigger.page', 1);
+        $page      = $this->get('session')->get('mautic.point.trigger.page', 1);
         $returnUrl = $this->generateUrl('mautic_pointtrigger_index', array('page' => $page));
         $flashes   = array();
 
@@ -577,7 +577,7 @@ class TriggerController extends FormController
                         'msg'     => 'mautic.point.trigger.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     );
-                } elseif (!$this->factory->getSecurity()->isGranted('point:triggers:delete')) {
+                } elseif (!$this->get('mautic.security')->isGranted('point:triggers:delete')) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'point.trigger', true);
@@ -612,7 +612,7 @@ class TriggerController extends FormController
      */
     public function clearSessionComponents($sessionId)
     {
-        $session = $this->factory->getSession();
+        $session = $this->get('session');
         $session->remove('mautic.point.'.$sessionId.'.triggerevents.modified');
         $session->remove('mautic.point.'.$sessionId.'.triggerevents.deleted');
     }

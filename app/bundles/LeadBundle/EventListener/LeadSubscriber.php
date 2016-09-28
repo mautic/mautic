@@ -13,6 +13,7 @@ use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Event as Events;
@@ -33,16 +34,19 @@ class LeadSubscriber extends CommonSubscriber
     protected $auditLogModel;
 
     /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
+
+    /**
      * LeadSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param EntityManager $em
-     * @param AuditLogModel $auditLogModel
+     * @param IpLookupHelper $ipLookupHelper
+     * @param AuditLogModel  $auditLogModel
      */
-    public function __construct(MauticFactory $factory, AuditLogModel $auditLogModel)
+    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
-        parent::__construct($factory);
-
+        $this->ipLookupHelper = $ipLookupHelper;
         $this->auditLogModel = $auditLogModel;
     }
 
@@ -94,7 +98,7 @@ class LeadSubscriber extends CommonSubscriber
                     "objectId"  => $lead->getId(),
                     "action"    => ($event->isNew()) ? "create" : "update",
                     "details"   => $details,
-                    "ipAddress" => $this->factory->getIpAddressFromRequest()
+                    "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
                 ];
                 $this->auditLogModel->writeToLog($log);
 
@@ -106,7 +110,7 @@ class LeadSubscriber extends CommonSubscriber
                         "objectId"  => $lead->getId(),
                         "action"    => "identified",
                         "details"   => [],
-                        "ipAddress" => $this->factory->getIpAddressFromRequest()
+                        "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
                     ];
                     $this->auditLogModel->writeToLog($log);
 
@@ -160,7 +164,7 @@ class LeadSubscriber extends CommonSubscriber
             "objectId"  => $lead->deletedId,
             "action"    => "delete",
             "details"   => ['name' => $lead->getPrimaryIdentifier()],
-            "ipAddress" => $this->factory->getIpAddressFromRequest()
+            "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
         ];
         $this->auditLogModel->writeToLog($log);
     }
@@ -180,7 +184,7 @@ class LeadSubscriber extends CommonSubscriber
                 "objectId"  => $field->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->factory->getIpAddressFromRequest()
+                "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
             ];
             $this->auditLogModel->writeToLog($log);
         }
@@ -200,7 +204,7 @@ class LeadSubscriber extends CommonSubscriber
             "objectId"  => $field->deletedId,
             "action"    => "delete",
             "details"   => ['name', $field->getLabel()],
-            "ipAddress" => $this->factory->getIpAddressFromRequest()
+            "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
         ];
         $this->auditLogModel->writeToLog($log);
     }
@@ -220,7 +224,7 @@ class LeadSubscriber extends CommonSubscriber
                 "objectId"  => $note->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->factory->getIpAddressFromRequest()
+                "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
             ];
             $this->auditLogModel->writeToLog($log);
         }
@@ -240,7 +244,7 @@ class LeadSubscriber extends CommonSubscriber
             "objectId"  => $note->deletedId,
             "action"    => "delete",
             "details"   => ['text', $note->getText()],
-            "ipAddress" => $this->factory->getIpAddressFromRequest()
+            "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
         ];
         $this->auditLogModel->writeToLog($log);
     }
@@ -271,7 +275,7 @@ class LeadSubscriber extends CommonSubscriber
             "objectId"  => $event->getLoser()->getId(),
             "action"    => "merge",
             "details"   => ['merged_into' => $event->getVictor()->getId()],
-            "ipAddress" => $this->factory->getIpAddressFromRequest()
+            "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
         ];
         $this->auditLogModel->writeToLog($log);
     }

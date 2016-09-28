@@ -12,6 +12,7 @@ use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\PointBundle\Model\PointModel;
 
 /**
  * Class DashboardSubscriber
@@ -47,6 +48,21 @@ class DashboardSubscriber extends MainDashboardSubscriber
     );
 
     /**
+     * @var PointModel
+     */
+    protected $pointModel;
+
+    /**
+     * DashboardSubscriber constructor.
+     *
+     * @param PointModel $pointModel
+     */
+    public function __construct(PointModel $pointModel)
+    {
+        $this->pointModel = $pointModel;
+    }
+
+    /**
      * Set a widget detail when needed 
      *
      * @param WidgetDetailEvent $event
@@ -63,11 +79,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $params = $widget->getParams();
 
             if (!$event->isCached()) {
-                $model = $this->factory->getModel('point');
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getPointLineChartData(
+                    'chartData'   => $this->pointModel->getPointLineChartData(
                         $params['timeUnit'],
                         $params['dateFrom'],
                         $params['dateTo'],
