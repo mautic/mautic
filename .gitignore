@@ -41,6 +41,3 @@
 !/media/images/.htaccess
 /media/dashboards/*
 !/media/dashboards/*.json
-plugins/MauticGmailBundle/Views/Timeline/index2.html.php
-plugins/MauticGmailBundle/Views/Timeline/slim.html.php
-plugins/MauticGmailBundle/Views/Timeline/base.html.php
