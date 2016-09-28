@@ -11,6 +11,7 @@ namespace Mautic\FormBundle\Model;
 
 use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
@@ -40,6 +41,11 @@ class FormModel extends CommonFormModel
      * @var TemplatingHelper
      */
     protected $templatingHelper;
+
+    /**
+     * @var ThemeHelper
+     */
+    protected $themeHelper;
 
     /**
      * @var SchemaHelperFactory
@@ -76,15 +82,18 @@ class FormModel extends CommonFormModel
      *
      * @param RequestStack        $requestStack
      * @param TemplatingHelper    $templatingHelper
+     * @param ThemeHelper         $themeHelper
      * @param SchemaHelperFactory $schemaHelperFactory
      * @param ActionModel         $formActionModel
      * @param FieldModel          $formFieldModel
      * @param LeadModel           $leadModel
      * @param FormFieldHelper     $fieldHelper
+     * @param LeadFieldModel      $leadFieldModel
      */
     public function __construct(
         RequestStack $requestStack,
         TemplatingHelper $templatingHelper,
+        ThemeHelper $themeHelper,
         SchemaHelperFactory $schemaHelperFactory,
         ActionModel $formActionModel,
         FieldModel $formFieldModel,
@@ -93,8 +102,9 @@ class FormModel extends CommonFormModel
         LeadFieldModel $leadFieldModel
     )
     {
-        $this->request             = $requestStack->getCurrentRequest();
-        $this->templatingHelper    = $templatingHelper;
+        $this->request = $requestStack->getCurrentRequest();
+        $this->templatingHelper = $templatingHelper;
+        $this->themeHelper = $themeHelper;
         $this->schemaHelperFactory = $schemaHelperFactory;
         $this->formActionModel     = $formActionModel;
         $this->formFieldModel      = $formFieldModel;
@@ -387,6 +397,7 @@ class FormModel extends CommonFormModel
         $theme       = $entity->getTemplate();
         $submissions = null;
         $lead        = $this->leadModel->getCurrentLead();
+        $style       = '';
 
         if (!empty($theme)) {
             $theme .= '|';
@@ -402,22 +413,28 @@ class FormModel extends CommonFormModel
             );
         }
 
+        if ($entity->getRenderStyle()) {
+            $templating = $this->templatingHelper->getTemplating();
+            $styleTheme = $theme.'MauticFormBundle:Builder:style.html.php';
+            $style      = $templating->render($this->themeHelper->checkForTwigTemplate($styleTheme));
+        }
+
         // Determine pages
-        $fields    = $entity->getFields()->toArray();
-        $pages     = ['open' => [], 'close' => []];
+        $fields = $entity->getFields()->toArray();
+        $pages  = ['open' => [], 'close' => []];
 
         $openFieldId =
         $closeFieldId =
         $previousId =
         $lastPage = false;
-        $pageCount = 1;
+        $pageCount   = 1;
 
         foreach ($fields as $fieldId => $field) {
             if ('pagebreak' == $field->getType() && $openFieldId) {
                 // Open the page
                 $pages['open'][$openFieldId] = $pageCount;
-                $openFieldId = false;
-                $lastPage = $fieldId;
+                $openFieldId                 = false;
+                $lastPage                    = $fieldId;
 
                 // Close the page at the next page break
                 if ($previousId) {
@@ -453,7 +470,8 @@ class FormModel extends CommonFormModel
                 'submissions'   => $submissions,
                 'lead'          => $lead,
                 'formPages'     => $pages,
-                'lastFormPage'  => $lastPage
+                'lastFormPage'  => $lastPage,
+                'style'         => $style
             ]
         );
 

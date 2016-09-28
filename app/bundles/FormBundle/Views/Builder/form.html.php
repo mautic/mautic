@@ -12,9 +12,7 @@ $fields    = $form->getFields();
 $pageCount = 1;
 ?>
 
-<?php if ($form->getRenderStyle()) {
-    echo $view->render($theme.'MauticFormBundle:Builder:style.html.php', ['form' => $form, 'formName' => $formName]);
-} ?>
+<?php echo $style; ?>
 
 <div id="mauticform_wrapper<?php echo $formName ?>" class="mauticform_wrapper">
     <form autocomplete="false" role="form" method="post" action="<?php echo $view['router']->url(
