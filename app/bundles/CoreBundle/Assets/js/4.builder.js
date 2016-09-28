@@ -523,14 +523,14 @@ Mautic.initSlotListeners = function() {
                 imageEditButtons: ['imageReplace', 'imageAlign', 'imageRemove', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
             };
 
-            slot.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, inlineFroalaOptions));
+            slot.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, inlineFroalaOptions));
             slot.froalaEditor('toolbar.hide');
         } else if (type === 'image') {
             var image = slot.find('img');
             // fix of badly destroyed image slot
             image.removeAttr('data-froala.editor');
             // Init Froala editor
-            image.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, {
+            image.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
                     linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
                     imageEditButtons: ['imageReplace', 'imageAlign', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
                 }

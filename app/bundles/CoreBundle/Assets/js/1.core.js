@@ -614,9 +614,9 @@ var Mautic = {
                         Mautic.showChangeThemeWarning = true;
                     });
 
-                    textarea.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, options));
+                    textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, options));
                 } else {
-                    textarea.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, {
+                    textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
                         // Set custom buttons with separator between them.
                         toolbarButtons: minButtons,
                         heightMin: 100

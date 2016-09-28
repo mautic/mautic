@@ -362,7 +362,7 @@ Mautic.initEmailDynamicContent = function() {
             var textarea      = itemContainer.find('.editor');
             var firstInput    = itemContainer.find('input[type="text"]').first();
 
-            textarea.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, {
+            textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
                 // Set custom buttons with separator between them.
                 toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline'],
                 heightMin: 300
@@ -435,7 +435,7 @@ Mautic.initDynamicContentItem = function (tabId) {
             }
         });
 
-        altTextarea.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, {
+        altTextarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
             // Set custom buttons with separator between them.
             toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline'],
             heightMin: 300
