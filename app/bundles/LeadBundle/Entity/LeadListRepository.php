@@ -343,9 +343,11 @@ class LeadListRepository extends CommonRepository
                         $expr->add(
                                 sprintf('NOT EXISTS (%s)', $subqb->getSQL())
                             );
-
+                        if(isset($objectFilters['lead']) ) {
                             $q->andWhere($expr);
-
+                        } else {
+                            $q->andWhere(sprintf('NOT EXISTS (%s)', $subqb->getSQL()));
+                        }
 
                     } elseif ($nonMembersOnly) {
                         // Only leads that are part of the list that no longer match filters and have not been manually removed
@@ -372,9 +374,10 @@ class LeadListRepository extends CommonRepository
                         $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
                         $sq->select('null')
                             ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-                            ->where('l.id = ll.lead_id')
-                            ->andWhere($expr);
-
+                            ->where('l.id = ll.lead_id');
+                        if(isset($objectFilters['lead']) ) {
+                            $sq->andWhere($expr);
+                        }
                         $q->andWhere(
                             sprintf('NOT EXISTS (%s)', $sq->getSQL())
                         )
@@ -403,7 +406,6 @@ class LeadListRepository extends CommonRepository
                         sprintf('EXISTS (%s)', $clq->getSQL())
                     );
                 }
-
                 $results = $q->execute()->fetchAll();
                 foreach ($results as $r) {
                     if ($countOnly) {
