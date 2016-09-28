@@ -339,7 +339,7 @@ class LeadListRepository extends CommonRepository
                                     )
                                 );
 
-                                $q->andWhere(
+                            $expr->add(
                                     sprintf('NOT EXISTS (%s)', $subqb->getSQL())
                                 );
                             if ($object === 'lead') {
@@ -400,7 +400,7 @@ class LeadListRepository extends CommonRepository
                     $q->setFirstResult($start)
                         ->setMaxResults($limit);
                 }
-                if ( isset($clq)) {
+                if (isset($clq)) {
                     $q->andWhere(
                         sprintf('EXISTS (%s)', $clq->getSQL())
                     );
@@ -508,7 +508,6 @@ class LeadListRepository extends CommonRepository
         static $companyTable;
 
         if (!count($filters)) {
-
             return $q->expr()->andX();
         }
 
@@ -576,7 +575,7 @@ class LeadListRepository extends CommonRepository
             if ($details['glue'] == 'or') {
                 // Create a new group of andX expressions
                 if ($groupExpr->count()) {
-                    $groups[$object][]  = $groupExpr;
+                    $groups[]  = $groupExpr;
                     $groupExpr = $q->expr()->andX();
                 }
             }
