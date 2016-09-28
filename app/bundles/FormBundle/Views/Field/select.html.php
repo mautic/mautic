@@ -29,7 +29,7 @@ $help = (empty($field['helpMessage'])) ? '' : <<<HTML
 HTML;
 
 $emptyOption = '';
-if (!empty($properties['empty_value']) || empty($field['defaultValue'])):
+if ((!empty($properties['empty_value']) || empty($field['defaultValue']) && empty($properties['multiple']))):
     $emptyOption = <<<HTML
 
                     <option value="">{$properties['empty_value']}</option>

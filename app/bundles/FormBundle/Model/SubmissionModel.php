@@ -139,6 +139,8 @@ class SubmissionModel extends CommonFormModel
      */
     public function saveSubmission($post, $server, Form $form, Request $request = null, $returnEvent = false)
     {
+        $leadFields = $this->leadFieldModel->getFieldListWithProperties(false);
+
         //everything matches up so let's save the results
         $submission = new Submission();
         $submission->setDateSubmitted(new \DateTime());
@@ -270,6 +272,18 @@ class SubmissionModel extends CommonFormModel
                 $validationErrors[$alias] = $isValid;
             }
 
+            $leadField = $f->getLeadField();
+            if (!empty($leadField)) {
+                $leadValue = $value;
+                if (is_array($leadValue)) {
+                    // Multiselect lead fields store the values with bars
+                    $delimeter =  ('multiselect' === $leadFields[$leadField]['type']) ? '|' : ', ';
+                    $leadValue = implode($delimeter, $leadValue);
+                }
+
+                $leadFieldMatches[$leadField] = $leadValue;
+            }
+
             //convert array from checkbox groups and multiple selects
             if (is_array($value)) {
                 $value = implode(", ", $value);
@@ -280,11 +294,6 @@ class SubmissionModel extends CommonFormModel
             //save the result
             if ($f->getSaveResult() !== false) {
                 $results[$alias] = $value;
-            }
-
-            $leadField = $f->getLeadField();
-            if (!empty($leadField)) {
-                $leadFieldMatches[$leadField] = $value;
             }
         }
 
@@ -307,7 +316,7 @@ class SubmissionModel extends CommonFormModel
 
         // Create/update lead
         if (!empty($leadFieldMatches)) {
-            $lead = $this->createLeadFromSubmit($form, $leadFieldMatches);
+            $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
             $submission->setLead($lead);
         }
 
@@ -736,10 +745,9 @@ class SubmissionModel extends CommonFormModel
      *
      * @return Lead
      */
-    protected function createLeadFromSubmit($form, array $leadFieldMatches)
+    protected function createLeadFromSubmit($form, array $leadFieldMatches, $leadFields)
     {
         //set the mapped data
-        $leadFields  = $this->leadFieldModel->getRepository()->getAliases(null, true, false);
         $inKioskMode = $form->isInKioskMode();
 
         if (!$inKioskMode) {
@@ -765,7 +773,7 @@ class SubmissionModel extends CommonFormModel
         // Closure to get data and unique fields
         $getData = function ($currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields) {
             $uniqueFieldsWithData = $data = [];
-            foreach ($leadFields as $alias) {
+            foreach ($leadFields as $alias => $properties) {
                 $data[$alias] = '';
 
                 if (isset($currentFields[$alias])) {

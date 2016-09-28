@@ -388,12 +388,10 @@ Mautic.addLeadListFilter = function (elId) {
 
     if (isSpecial) {
         var templateField = fieldType;
-        if (fieldType == 'boolean') {
+        if (fieldType == 'boolean' || fieldType == 'multiselect') {
             templateField = 'select';
         }
-        if (fieldType == 'multiselect') {
-            templateField = 'select';
-        }
+
         var template = mQuery('#templates .' + templateField + '-template').clone();
         mQuery(template).attr('name', mQuery(template).attr('name').replace(/__name__/g, filterNum));
         mQuery(template).attr('id', mQuery(template).attr('id').replace(/__name__/g, filterNum));
@@ -553,10 +551,7 @@ Mautic.leadfieldOnLoad = function (container) {
 Mautic.updateLeadFieldProperties = function(selectedVal) {
     var defaultValueField = mQuery('input#leadfield_defaultValue');
 
-    if (selectedVal == 'multiselect') {
-        selectedVal = 'select';
-    }
-    if (selectedVal == 'lookup') {
+    if (selectedVal == 'lookup' || selectedVal == 'multiselect') {
         // Use select
         selectedVal = 'select';
     }

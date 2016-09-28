@@ -214,37 +214,6 @@ class LeadType extends AbstractType
 
                     $builder->add($alias, $type, $opts);
                     break;
-                case 'multiselect':
-                    $choices = [];
-                    if ($type == 'multiselect' && !empty($properties['list'])) {
-                        $list = $properties['list'];
-                        foreach ($list as $l) {
-                            $l           = trim($l);
-                            $choices[$l] = $l;
-                        }
-                        $expanded = false;
-                    }
-
-                    if (!empty($choices)) {
-                        $builder->add(
-                            $alias,
-                            'choice',
-                            [
-                                'choices'     => $choices,
-                                'required'    => $required,
-                                'label'       => $field['label'],
-                                'label_attr'  => ['class' => 'control-label'],
-                                'data'        => $value,
-                                'attr'        => $attr,
-                                'mapped'      => false,
-                                'multiple'    => true,
-                                'empty_value' => false,
-                                'expanded'    => $expanded,
-                                'constraints' => $constraints
-                            ]
-                        );
-                    }
-                    break;
                 case 'select':
                 case 'multiselect':
                 case 'boolean':
@@ -264,6 +233,10 @@ class LeadType extends AbstractType
                         $typeProperties['choices']  = FormFieldHelper::parseList($properties['list']);
                         $typeProperties['expanded'] = false;
                         $typeProperties['multiple'] = ('multiselect' === $type);
+
+                        if ($typeProperties['multiple']) {
+                            $emptyValue = false;
+                        }
                     }
                     if ($type == 'boolean' && !empty($properties['yes']) && !empty($properties['no'])) {
                         $choiceType              = 'yesno_button_group';
@@ -276,7 +249,7 @@ class LeadType extends AbstractType
                             $value = (int) $value;
                         }
                     }
-                    $typeProperties['data'] = $value;
+                    $typeProperties['data']        = $value;
                     $typeProperties['empty_value'] = $emptyValue;
                     $builder->add(
                         $alias,
