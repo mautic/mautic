@@ -22,7 +22,7 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction()
     {
-        $logger = $this->factory->getLogger();
+        $logger = $this->get('monolog.logger.mautic');
 
         // if additional data were sent with the tracking pixel
         $query_str = $this->request->server->get('QUERY_STRING');
