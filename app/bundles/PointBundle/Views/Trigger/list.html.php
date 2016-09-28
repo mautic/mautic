@@ -24,7 +24,7 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
             echo "<th class='col-pointtrigger-color'></th>";
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                'sessionVar' => 'pointtrigger',
+                'sessionVar' => 'point.trigger',
                 'orderBy'    => 't.name',
                 'text'       => 'mautic.core.name',
                 'class'      => 'col-pointtrigger-name',
@@ -32,21 +32,21 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
             ));
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                'sessionVar' => 'pointtrigger',
-                'orderBy'    => 'c.title',
+                'sessionVar' => 'point.trigger',
+                'orderBy'    => 'cat.title',
                 'text'       => 'mautic.core.category',
                 'class'      => 'col-pointtrigger-category visible-md visible-lg'
             ));
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                'sessionVar' => 'pointtrigger',
+                'sessionVar' => 'point.trigger',
                 'orderBy'    => 't.points',
                 'text'       => 'mautic.point.trigger.thead.points',
                 'class'      => 'col-pointtrigger-points'
             ));
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                'sessionVar' => 'pointtrigger',
+                'sessionVar' => 'point.trigger',
                 'orderBy'    => 't.id',
                 'text'       => 'mautic.core.id',
                 'class'      => 'col-pointtrigger-id visible-md visible-lg'
