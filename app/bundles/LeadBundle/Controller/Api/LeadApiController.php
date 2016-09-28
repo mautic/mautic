@@ -162,7 +162,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
         if ($entity !== null) {
-            if (!$this->factory->getSecurity()->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getOwner())) {
+            if (!$this->factory->getSecurity()->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
                 return $this->accessDenied();
             }
 
@@ -215,7 +215,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
         if ($entity !== null) {
-            if (!$this->factory->getSecurity()->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getOwner())) {
+            if (!$this->factory->getSecurity()->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
                 return $this->accessDenied();
             }
 
@@ -255,7 +255,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
         if ($entity !== null) {
-            if (!$this->factory->getSecurity()->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getOwner())) {
+            if (!$this->factory->getSecurity()->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
                 return $this->accessDenied();
             }
 

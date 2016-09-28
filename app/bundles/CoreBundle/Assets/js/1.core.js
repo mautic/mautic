@@ -181,6 +181,31 @@ var Mautic = {
     },
 
     /**
+     * Translations
+     *
+     * @param id     string
+     * @param params object
+     */
+    translate: function (id, params) {
+        if (!mauticLang.hasOwnProperty(id)) {
+            return id;
+        }
+
+        var translated = mauticLang[id];
+
+        if (params) {
+            for (var key in params) {
+                if (!params.hasOwnProperty(key)) continue;
+
+                var regEx = new RegExp('%' + key + '%', 'g');
+                translated = translated.replace(regEx, params[key])
+            }
+        }
+
+        return translated;
+    },
+
+    /**
      * Setups browser notifications
      */
     setupBrowserNotifier: function () {
@@ -3701,3 +3726,15 @@ var Mautic = {
         return null;
     }
 };
+
+// Show overflow in the App Wrapper when a Chosen dropdown is shown
+
+mQuery(document).on({
+    // The order in which the handlers are registered matters
+    "chosen:hiding_dropdown": function() {
+        mQuery('#app-wrapper').css('overflow', 'hidden');
+    },
+    "chosen:showing_dropdown": function() {
+        mQuery('#app-wrapper').css('overflow', 'visible');
+    }
+});
