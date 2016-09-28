@@ -41,21 +41,5 @@ return array(
                 ]
             ],
         ]
-    ),
-
-    'services'    => array(
-        'events' => array(
-            'mautic.gmail.formbundle.subscriber' => array(
-                'class' => 'MauticPlugin\MauticGmailBundle\EventListener\FormSubscriber'
-            )
-        ),
-        'forms'  => array(
-            'mautic.form.type.fieldslist.selectidentifier'  => array(
-                'class' => 'MauticPlugin\MauticGmailBundle\Form\Type\FormFieldsType',
-                'arguments' => 'mautic.factory',
-                'alias' => 'formfields_list'
-            )
-        )
     )
-
 );
