@@ -26,7 +26,7 @@ class FocusPropertiesType extends AbstractType
                     'yesno_button_group',
                     [
                         'label' => 'mautic.focus.form.bar.allow_hide',
-                        'data'  => (isset($options['allow_hide'])) ? $options['allow_hide'] : true,
+                        'data'  => (isset($options['data']['allow_hide'])) ? $options['data']['allow_hide'] : true,
                         'attr'  => [
                             'onchange' => 'Mautic.focusUpdatePreview()',
                         ],
@@ -42,7 +42,7 @@ class FocusPropertiesType extends AbstractType
                             'tooltip'  => 'mautic.focus.form.bar.push_page.tooltip',
                             'onchange' => 'Mautic.focusUpdatePreview()',
                         ],
-                        'data'  => (isset($options['push_page'])) ? $options['push_page'] : true,
+                        'data'  => (isset($options['data']['push_page'])) ? $options['data']['push_page'] : true,
                     ]
                 );
 
@@ -55,26 +55,7 @@ class FocusPropertiesType extends AbstractType
                             'tooltip'  => 'mautic.focus.form.bar.sticky.tooltip',
                             'onchange' => 'Mautic.focusUpdatePreview()',
                         ],
-                        'data'  => (isset($options['sticky'])) ? $options['sticky'] : true,
-                    ]
-                );
-
-                $builder->add(
-                    'placement',
-                    'choice',
-                    [
-                        'choices'     => [
-                            'top'    => 'mautic.focus.form.placement.top',
-                            'bottom' => 'mautic.focus.form.placement.bottom',
-                        ],
-                        'label'       => 'mautic.focus.form.placement',
-                        'label_attr'  => ['class' => 'control-label'],
-                        'attr'        => [
-                            'class'    => 'form-control',
-                            'onchange' => 'Mautic.focusUpdatePreview()',
-                        ],
-                        'required'    => false,
-                        'empty_value' => false,
+                        'data'  => (isset($options['data']['sticky'])) ? $options['data']['sticky'] : true,
                     ]
                 );
 
@@ -97,53 +78,46 @@ class FocusPropertiesType extends AbstractType
                     ]
                 );
 
+                $choices = [
+                    'top'    => 'mautic.focus.form.placement.top',
+                    'bottom' => 'mautic.focus.form.placement.bottom',
+                ];
                 break;
             case 'modal':
-                $builder->add(
-                    'placement',
-                    'choice',
-                    [
-                        'choices'     => [
-                            'top'    => 'mautic.focus.form.placement.top',
-                            'middle' => 'mautic.focus.form.placement.middle',
-                            'bottom' => 'mautic.focus.form.placement.bottom',
-                        ],
-                        'label'       => 'mautic.focus.form.placement',
-                        'label_attr'  => ['class' => 'control-label'],
-                        'attr'        => [
-                            'class'    => 'form-control',
-                            'onchange' => 'Mautic.focusUpdatePreview()',
-                        ],
-                        'required'    => false,
-                        'empty_value' => false,
-                    ]
-                );
+                $choices = [
+                    'top'    => 'mautic.focus.form.placement.top',
+                    'middle' => 'mautic.focus.form.placement.middle',
+                    'bottom' => 'mautic.focus.form.placement.bottom',
+                ];
                 break;
             case 'notification':
-
-                $builder->add(
-                    'placement',
-                    'choice',
-                    [
-                        'choices'     => [
-                            'top_left'     => 'mautic.focus.form.placement.top_left',
-                            'top_right'    => 'mautic.focus.form.placement.top_right',
-                            'bottom_left'  => 'mautic.focus.form.placement.bottom_left',
-                            'bottom_right' => 'mautic.focus.form.placement.bottom_right',
-                        ],
-                        'label'       => 'mautic.focus.form.placement',
-                        'label_attr'  => ['class' => 'control-label'],
-                        'attr'        => [
-                            'class'    => 'form-control',
-                            'onchange' => 'Mautic.focusUpdatePreview()',
-                        ],
-                        'required'    => false,
-                        'empty_value' => false,
-                    ]
-                );
+                $choices = [
+                    'top_left'     => 'mautic.focus.form.placement.top_left',
+                    'top_right'    => 'mautic.focus.form.placement.top_right',
+                    'bottom_left'  => 'mautic.focus.form.placement.bottom_left',
+                    'bottom_right' => 'mautic.focus.form.placement.bottom_right',
+                ];
                 break;
             case 'page':
                 break;
+        }
+
+        if (!empty($choices)) {
+            $builder->add(
+                'placement',
+                'choice',
+                [
+                    'choices'     => $choices,
+                    'label'       => 'mautic.focus.form.placement',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'attr'        => [
+                        'class'    => 'form-control',
+                        'onchange' => 'Mautic.focusUpdatePreview()',
+                    ],
+                    'required'    => false,
+                    'empty_value' => false,
+                ]
+            );
         }
     }
 

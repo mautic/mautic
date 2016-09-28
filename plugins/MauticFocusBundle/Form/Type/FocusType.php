@@ -138,7 +138,7 @@ class FocusType extends AbstractType
             ]
         );
 
-        $builder->add('properties', 'focus_entity_properties');
+        $builder->add('properties', 'focus_entity_properties', ['data' => $options['data']->getProperties()]);
 
         // Will be managed by JS
         $builder->add('type', 'hidden');

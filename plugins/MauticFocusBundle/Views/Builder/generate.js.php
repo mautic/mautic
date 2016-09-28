@@ -16,8 +16,9 @@ if ($useTimeout) {
     $timeout = ($props['when'] == '5seconds') ? 5000 : 60000;
 }
 
-$debug = ($app->getEnvironment() == 'dev') ? 'true' : 'false';
-$animate = (!isset($props['animate']) || !empty($props['animate']));
+$debug          = ($app->getEnvironment() == 'dev') ? 'true' : 'false';
+$animate        = (!isset($props['animate']) || !empty($props['animate']));
+$linkActivation = (!isset($props['link_activation']) || !empty($props['link_activation']));
 
 if (!isset($preview)) {
     $preview = false;
@@ -211,6 +212,8 @@ switch ($style) {
                 document.documentElement.addEventListener('mouseleave', Focus.engageVisitor);
 
                 // Add a listener to every link
+                <?php if ($linkActivation): ?>
+
                 var elements = document.getElementsByTagName('a');
 
                 for (var i = 0, len = elements.length; i < len; i++) {
@@ -225,6 +228,8 @@ switch ($style) {
                         }
                     }
                 }
+                <?php endif; ?>
+
                 <?php else: ?>
                 if (Focus.debug)
                     console.log('show immediately');

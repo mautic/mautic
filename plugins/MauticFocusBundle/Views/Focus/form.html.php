@@ -175,6 +175,7 @@ echo $view['form']->start($form);
                     <div class="hide" id="focusTypeProperties">
                         <?php echo $view['form']->row($form['properties']['animate']); ?>
                         <?php echo $view['form']->row($form['properties']['when']); ?>
+                        <?php echo $view['form']->row($form['properties']['link_activation']); ?>
                         <?php echo $view['form']->row($form['properties']['frequency']); ?>
                         <div class="hidden-focus-type-notice">
                             <?php echo $view['form']->row($form['properties']['stop_after_conversion']); ?>
@@ -207,7 +208,6 @@ echo $view['form']->start($form);
                                     </div>
                                 </div>
                             </li>
-
                             <li class="focus-properties focus-bar-properties list-group-item pl-sm pr-sm" style="display: none;"></li>
 
                             <li data-focus-style="modal" class="focus-style visible-focus-style-modal list-group-item pl-sm pr-sm">
@@ -223,7 +223,6 @@ echo $view['form']->start($form);
                                     </div>
                                 </div>
                             </li>
-
                             <li class="focus-properties focus-modal-properties list-group-item pl-sm pr-sm" style="display: none;"></li>
 
                             <li data-focus-style="notification" class="focus-style visible-focus-style-notification list-group-item pl-sm pr-sm">
@@ -241,7 +240,6 @@ echo $view['form']->start($form);
                                     </div>
                                 </div>
                             </li>
-
                             <li class="focus-properties focus-notification-properties list-group-item pl-sm pr-sm" style="display: none;"></li>
 
                             <li data-focus-style="page" class="focus-style visible-focus-style-page list-group-item pl-sm pr-sm">
@@ -257,9 +255,7 @@ echo $view['form']->start($form);
                                     </div>
                                 </div>
                             </li>
-                            <!--
-                            <li class="focus-properties focus-page-properties list-group-item pl-sm pr-sm" style="display: none;"></li>
-                            -->
+                            <!-- <li class="focus-properties focus-page-properties list-group-item pl-sm pr-sm" style="display: none;"></li> -->
                         </ul>
                     </div>
 
@@ -282,6 +278,9 @@ echo $view['form']->start($form);
                         <div class="focus-hide visible-focus-style-notification">
                             <?php echo $view['form']->row($form['properties']['notification']['placement']); ?>
                         </div>
+
+                        <!-- page type properties -->
+                        <!-- <div class="focus-hide visible-focus-style-page"></div> -->
                     </div>
                 </div>
                 <!-- end focus style -->

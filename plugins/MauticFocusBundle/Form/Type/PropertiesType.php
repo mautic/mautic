@@ -26,6 +26,7 @@ class PropertiesType extends AbstractType
             'focus_properties',
             [
                 'focus_style' => 'bar',
+                'data'        => (isset($options['data']['bar'])) ? $options['data']['bar'] : []
             ]
         );
 
@@ -34,6 +35,7 @@ class PropertiesType extends AbstractType
             'focus_properties',
             [
                 'focus_style' => 'modal',
+                'data'        => (isset($options['data']['modal'])) ? $options['data']['modal'] : []
             ]
         );
 
@@ -42,6 +44,7 @@ class PropertiesType extends AbstractType
             'focus_properties',
             [
                 'focus_style' => 'notification',
+                'data'        => (isset($options['data']['notification'])) ? $options['data']['notification'] : []
             ]
         );
 
@@ -50,18 +53,31 @@ class PropertiesType extends AbstractType
             'focus_properties',
             [
                 'focus_style' => 'page',
+                'data'        => (isset($options['data']['page'])) ? $options['data']['page'] : []
             ]
         );
-        
+
         $builder->add(
             'animate',
             'yesno_button_group',
             [
                 'label' => 'mautic.focus.form.animate',
-                'data'  => (isset($options['animate'])) ? $options['animate'] : true,
+                'data'  => (isset($options['data']['animate'])) ? $options['data']['animate'] : true,
                 'attr'  => [
                     'onchange' => 'Mautic.focusUpdatePreview()',
                 ],
+            ]
+        );
+
+        $builder->add(
+            'link_activation',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.focus.form.activate_for_links',
+                'data'  => (isset($options['data']['link_activation'])) ? $options['data']['link_activation'] : true,
+                'attr'  => [
+                    'data-show-on' => '{"focus_properties_when": ["leave"]}'
+                ]
             ]
         );
 
@@ -131,7 +147,7 @@ class PropertiesType extends AbstractType
             'yesno_button_group',
             [
                 'label' => 'mautic.focus.form.engage_after_conversion',
-                'data'  => (isset($options['stop_after_conversion'])) ? $options['stop_after_conversion'] : true,
+                'data'  => (isset($options['data']['stop_after_conversion'])) ? $options['data']['stop_after_conversion'] : true,
                 'attr'  => [
                     'tooltip' => 'mautic.focus.form.engage_after_conversion.tooltip',
                 ],
