@@ -288,7 +288,11 @@ class LeadListRepository extends CommonRepository
                 $parameters = array();
 
                 $expr = $this->getListFilterExpr($objectFilters['lead'], $parameters, $q, false, 'lead');
-                $exprCompany = $this->getListFilterExpr($objectFilters['company'], $parameters, $q, false, 'company');
+                
+                if (isset($objectFilters['company'])) {
+                    $exprCompany = $this->getListFilterExpr($objectFilters['company'], $parameters, $q, false, 'company');
+                }
+
                 foreach ($parameters as $k => $v) {
                     switch (true) {
                         case is_bool($v):
