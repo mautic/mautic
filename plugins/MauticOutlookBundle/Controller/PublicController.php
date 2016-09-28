@@ -22,7 +22,6 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction()
     {
-        $logger = $this->get('mautic.helper.logger');
 
         // if additional data were sent with the tracking pixel
         if ($this->request->server->get('QUERY_STRING')) {
