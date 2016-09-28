@@ -526,9 +526,10 @@ class LeadListRepository extends CommonRepository
         $groupExpr = $q->expr()->andX();
 
         foreach ($filters as $k => $details) {
-            if ($details['object'] != $object) {
+            if (isset($details['object']) && $details['object'] != $object) {
                 continue;
             }
+
             if($object == 'lead') {
                 $column = isset($leadTable[$details['field']]) ? $leadTable[$details['field']] : false;
             } elseif($object == 'company') {
