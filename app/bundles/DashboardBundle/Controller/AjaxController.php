@@ -32,7 +32,7 @@ class AjaxController extends CommonAjaxController
         $dataArray  = array('success' => 0);
 
         /** @var \Mautic\PageBundle\Entity\PageRepository $pageRepository */
-        $pageRepository = $this->get('entity_manager')->getRepository('MauticPageBundle:Hit');
+        $pageRepository = $this->get('doctrine.orm.entity_manager')->getRepository('MauticPageBundle:Hit');
         $dataArray['viewingVisitors'] = $pageRepository->countVisitors(60, true);
 
         $dataArray['success'] = 1;
