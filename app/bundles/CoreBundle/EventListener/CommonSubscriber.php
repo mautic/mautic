@@ -14,6 +14,7 @@ use JMS\Serializer\Serializer;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -185,5 +186,13 @@ class CommonSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents ()
     {
         return array();
+    }
+
+    /**
+     * @param Logger $logger
+     */
+    public function setLogger(Logger $logger)
+    {
+        $this->logger = $logger;
     }
 }
