@@ -1182,7 +1182,6 @@ class EmailModel extends FormModel
                 $emailSettings[$eid]['limit'] = $count;
             }
         }
-        echo "\n\n";
 
         // Store stat entities
         $errors   = [];
