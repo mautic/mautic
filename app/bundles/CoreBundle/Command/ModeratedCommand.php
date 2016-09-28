@@ -86,7 +86,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
 
         flock($fp, LOCK_UN);
         fclose($fp);
-        sleep(10);
+
         return true;
     }
 
