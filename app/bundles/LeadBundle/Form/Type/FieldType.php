@@ -460,7 +460,8 @@ class FieldType extends AbstractType
                 'attr'        => [
                     'class'    => 'form-control'
                 ],
-                'required'    => true
+                'required'    => true,
+                'disabled'    => ($disabled || !$new)
             ]
         );
 
