@@ -398,8 +398,6 @@ return [
                 'arguments' => [
                     'mautic.helper.user',
                     'translator',
-                    'doctrine.orm.entity_manager',
-                    'security.token_storage',
                     '%mautic.parameters%',
                     '%mautic.bundles%',
                     '%mautic.plugin.bundles%'
