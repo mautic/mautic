@@ -520,7 +520,6 @@ Mautic.initSlotListeners = function() {
                 toolbarButtonsSM: buttons,
                 toolbarButtonsXS: buttons,
                 linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
-                useClasses: false,
                 imageEditButtons: ['imageReplace', 'imageAlign', 'imageRemove', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
             };
 
@@ -533,7 +532,6 @@ Mautic.initSlotListeners = function() {
             // Init Froala editor
             image.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, {
                     linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
-                    useClasses: false,
                     imageEditButtons: ['imageReplace', 'imageAlign', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
                 }
             ));

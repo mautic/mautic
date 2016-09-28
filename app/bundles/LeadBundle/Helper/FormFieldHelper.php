@@ -25,6 +25,14 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'textarea' => [
             'properties' => []
         ],
+        'multiselect' => [
+            'properties' => [
+                'list' => [
+                    'required'  => true,
+                    'error_msg' => 'mautic.lead.field.select.listmissing'
+                ]
+            ]
+        ],
         'select'   => [
             'properties' => [
                 'list' => [
