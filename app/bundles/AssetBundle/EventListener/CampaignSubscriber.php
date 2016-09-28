@@ -14,6 +14,7 @@ use Mautic\AssetBundle\Event\AssetLoadEvent;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 
 /**
@@ -23,6 +24,20 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
  */
 class CampaignSubscriber extends CommonSubscriber
 {
+    /**
+     * @var EventModel
+     */
+    protected $campaignEventModel;
+
+    /**
+     * CampaignSubscriber constructor.
+     *
+     * @param EventModel $campaignEventModel
+     */
+    public function __construct(EventModel $campaignEventModel)
+    {
+        $this->campaignEventModel = $campaignEventModel;
+    }
 
     /**
      * @return array
@@ -54,14 +69,14 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * Trigger point actions for asset download
      *
-     * @param AssetEvent $event
+     * @param AssetLoadEvent $event
      */
     public function onAssetDownload(AssetLoadEvent $event)
     {
         $asset = $event->getRecord()->getAsset();
 
         if ($asset !== null) {
-            $this->factory->getModel('campaign.event')->triggerEvent('asset.download', $asset, 'asset', $asset->getId());
+            $this->campaignEventModel->triggerEvent('asset.download', $asset, 'asset', $asset->getId());
         }
     }
 

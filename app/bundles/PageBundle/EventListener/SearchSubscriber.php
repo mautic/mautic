@@ -12,6 +12,8 @@ namespace Mautic\PageBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\PageBundle\Model\PageModel;
 
 /**
  * Class SearchSubscriber
@@ -20,6 +22,27 @@ use Mautic\CoreBundle\Event as MauticEvents;
  */
 class SearchSubscriber extends CommonSubscriber
 {
+    /**
+     * @var UserHelper
+     */
+    protected $userHelper;
+
+    /**
+     * @var PageModel
+     */
+    protected $pageModel;
+
+    /**
+     * SearchSubscriber constructor.
+     *
+     * @param UserHelper $userHelper
+     * @param PageModel  $pageModel
+     */
+    public function __construct(UserHelper $userHelper, PageModel $pageModel)
+    {
+        $this->userHelper = $userHelper;
+        $this->pageModel  = $pageModel;
+    }
 
     /**
      * @return array
@@ -53,11 +76,11 @@ class SearchSubscriber extends CommonSubscriber
                 $filter['force'][] = array(
                     'column' => 'IDENTITY(p.createdBy)',
                     'expr'   => 'eq',
-                    'value'  => $this->factory->getUser()->getId()
+                    'value'  => $this->userHelper->getUser()->getId()
                 );
             }
 
-            $pages = $this->factory->getModel('page.page')->getEntities(
+            $pages = $this->pageModel->getEntities(
                 array(
                     'limit'  => 5,
                     'filter' => $filter
@@ -96,7 +119,7 @@ class SearchSubscriber extends CommonSubscriber
         if ($this->security->isGranted(array('page:pages:viewown', 'page:pages:viewother'), "MATCH_ONE")) {
             $event->addCommands(
                 'mautic.page.pages',
-                $this->factory->getModel('page.page')->getCommandList()
+                $this->pageModel->getCommandList()
             );
         }
     }

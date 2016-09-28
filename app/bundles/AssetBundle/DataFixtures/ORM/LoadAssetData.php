@@ -43,8 +43,7 @@ class LoadAssetData extends AbstractFixture implements OrderedFixtureInterface, 
      */
     public function load(ObjectManager $manager)
     {
-        $factory = $this->container->get('mautic.factory');
-        $repo    = $factory->getModel('asset.asset')->getRepository();
+        $repo = $this->container->get('mautic.asset.model.asset')->getRepository();
 
         $asset = new Asset();
         $asset

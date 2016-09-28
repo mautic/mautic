@@ -12,6 +12,8 @@ namespace Mautic\ReportBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\ReportBundle\Model\ReportModel;
 
 /**
  * Class SearchSubscriber
@@ -20,6 +22,27 @@ use Mautic\CoreBundle\Event as MauticEvents;
  */
 class SearchSubscriber extends CommonSubscriber
 {
+    /**
+     * @var UserHelper
+     */
+    protected $userHelper;
+
+    /**
+     * @var ReportModel
+     */
+    protected $reportModel;
+
+    /**
+     * SearchSubscriber constructor.
+     *
+     * @param UserHelper  $userHelper
+     * @param ReportModel $reportModel
+     */
+    public function __construct(UserHelper $userHelper, ReportModel $reportModel)
+    {
+        $this->userHelper  = $userHelper;
+        $this->reportModel = $reportModel;
+    }
 
     /**
      * @return array
@@ -53,11 +76,11 @@ class SearchSubscriber extends CommonSubscriber
                 $filter['force'][] = array(
                     'column' => 'IDENTITY(r.createdBy)',
                     'expr'   => 'eq',
-                    'value'  => $this->factory->getUser()->getId()
+                    'value'  => $this->userHelper->getUser()->getId()
                 );
             }
 
-            $items = $this->factory->getModel('report')->getEntities(
+            $items = $this->reportModel->getEntities(
                 array(
                     'limit'  => 5,
                     'filter' => $filter
@@ -97,7 +120,7 @@ class SearchSubscriber extends CommonSubscriber
         if ($this->security->isGranted(array('report:reports:viewown', 'report:reports:viewother'), "MATCH_ONE")) {
             $event->addCommands(
                 'mautic.report.reports',
-                $this->factory->getModel('report')->getCommandList()
+                $this->reportModel->getCommandList()
             );
         }
     }

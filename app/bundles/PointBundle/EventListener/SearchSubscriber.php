@@ -12,6 +12,8 @@ namespace Mautic\PointBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\PointBundle\Model\PointModel;
+use Mautic\PointBundle\Model\TriggerModel;
 
 /**
  * Class SearchSubscriber
@@ -20,6 +22,27 @@ use Mautic\CoreBundle\Event as MauticEvents;
  */
 class SearchSubscriber extends CommonSubscriber
 {
+    /**
+     * @var PointModel
+     */
+    protected $pointModel;
+
+    /**
+     * @var TriggerModel
+     */
+    protected $pointTriggerModel;
+
+    /**
+     * SearchSubscriber constructor.
+     *
+     * @param PointModel   $pointModel
+     * @param TriggerModel $pointTriggerModel
+     */
+    public function __construct(PointModel $pointModel, TriggerModel $pointTriggerModel)
+    {
+        $this->pointModel = $pointModel;
+        $this->pointTriggerModel = $pointTriggerModel;
+    }
 
     /**
      * @return array
@@ -43,7 +66,7 @@ class SearchSubscriber extends CommonSubscriber
                 return;
             }
 
-            $items      = $this->factory->getModel('point')->getEntities(
+            $items      = $this->pointModel->getEntities(
                 array(
                     'limit'  => 5,
                     'filter' => $str
@@ -82,7 +105,7 @@ class SearchSubscriber extends CommonSubscriber
                 return;
             }
 
-            $items = $this->factory->getModel('point.trigger')->getEntities(
+            $items = $this->pointTriggerModel->getEntities(
                 array(
                     'limit'  => 5,
                     'filter' => $str
@@ -125,7 +148,7 @@ class SearchSubscriber extends CommonSubscriber
         if ($security->isGranted('point:points:view')) {
             $event->addCommands(
                 'mautic.point.actions.header.index',
-                $this->factory->getModel('point')->getCommandList()
+                $this->pointModel->getCommandList()
             );
         }
     }

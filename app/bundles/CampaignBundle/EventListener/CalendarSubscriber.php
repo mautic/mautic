@@ -20,7 +20,6 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class CalendarSubscriber extends CommonSubscriber
 {
-
     /**
      * @return array
      */
@@ -41,7 +40,6 @@ class CalendarSubscriber extends CommonSubscriber
     public function onCalendarGenerate(CalendarGeneratorEvent $event)
     {
         $dates  = $event->getDates();
-        $router = $this->factory->getRouter();
         $now    = new DateTimeHelper;
 
         $commonSelect = 'cl.campaign_id, c.name AS campaign_name, l.firstname, l.lastname, ce.type AS event_type, ce.name as event_name, cat.color';
@@ -49,7 +47,7 @@ class CalendarSubscriber extends CommonSubscriber
         $eventTypes['triggered'] = array('dateName' => 'cl.date_triggered');
         $eventTypes['upcoming']  = array('dateName' => 'cl.trigger_date');
 
-        $query = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+        $query = $this->em->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX . 'campaign_lead_event_log', 'cl')
             ->leftJoin('cl', MAUTIC_TABLE_PREFIX . 'campaigns', 'c', 'cl.campaign_id = c.id')
             ->leftJoin('cl', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'cl.lead_id = l.id')
@@ -83,7 +81,7 @@ class CalendarSubscriber extends CommonSubscriber
                 }
                 $date = new DateTimeHelper($object['start']);
                 $object['start'] = $date->toLocalString(\DateTime::ISO8601);
-                $object['url']   = $router->generate('mautic_campaign_action', array('objectAction' => 'view', 'objectId' => $object['campaign_id']), true);
+                $object['url']   = $this->router->generate('mautic_campaign_action', array('objectAction' => 'view', 'objectId' => $object['campaign_id']), true);
                 $object['attr']  = 'data-toggle="ajax"';
                 $object['description'] = $this->translator->trans('mautic.campaign.event.' . $eventKey . '.description', array('%campaign%' => $object['campaign_name'], '%lead%' => $leadName));
                 $object['title'] = $this->translator->trans('mautic.campaign.event.' . $eventKey, array('%event%' => $object['event_name']));

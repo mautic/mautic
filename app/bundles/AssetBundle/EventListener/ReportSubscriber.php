@@ -23,7 +23,6 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
  */
 class ReportSubscriber extends CommonSubscriber
 {
-
     /**
      * @return array
      */
@@ -169,7 +168,7 @@ class ReportSubscriber extends CommonSubscriber
 
         $graphs       = $event->getRequestedGraphs();
         $qb           = $event->getQueryBuilder();
-        $downloadRepo = $this->factory->getEntityManager()->getRepository('MauticAssetBundle:Download');
+        $downloadRepo = $this->em->getRepository('MauticAssetBundle:Download');
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);

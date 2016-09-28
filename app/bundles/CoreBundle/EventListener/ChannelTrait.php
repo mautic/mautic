@@ -41,6 +41,8 @@ trait ChannelTrait
      *
      * @param $channel
      * @param $channelId
+     *
+     * @return mixed
      */
     protected function getChannelEntity($channel, $channelId)
     {

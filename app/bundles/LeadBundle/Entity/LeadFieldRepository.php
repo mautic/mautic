@@ -128,8 +128,33 @@ class LeadFieldRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('l.id')
-            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-            ->where(
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
+
+        if ($field === "tags") {
+            // Special reserved tags field
+            $q->join('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x', 'l.id = x.lead_id')
+                ->join('x', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id') 
+                ->where(
+                    $q->expr()->andX(
+                        $q->expr()->eq('l.id', ':lead'),
+                        $q->expr()->eq('t.tag', ':value')
+                    )
+                )
+                ->setParameter('lead', (int) $lead)
+                ->setParameter('value', $value);
+
+            $result = $q->execute()->fetch();
+
+            if (($operatorExpr === "eq") || ($operatorExpr === "like")) {
+                return !empty($result['id']);
+            } elseif (($operatorExpr === "neq") || ($operatorExpr === "notLike")) {
+                return empty($result['id']);
+            } else {
+                return false;
+            }            
+        } else {
+            // Standard field
+            $q->where(
                 $q->expr()->andX(
                     $q->expr()->eq('l.id', ':lead'),
                     $q->expr()->$operatorExpr('l.' . $field, ':value')
@@ -138,9 +163,10 @@ class LeadFieldRepository extends CommonRepository
             ->setParameter('lead', (int) $lead)
             ->setParameter('value', $value);
 
-        $result = $q->execute()->fetch();
+            $result = $q->execute()->fetch();
 
-        return !empty($result['id']);
+            return !empty($result['id']);
+        }
     }
 
 }
