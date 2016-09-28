@@ -80,6 +80,22 @@ class UpdateHelper
     }
 
     /**
+     * Tries to get server OS
+     *
+     * @return string
+     */
+    public function getServerOs()
+    {
+        if (function_exists('php_uname')) {
+            return php_uname('s') . ' ' . php_uname('r');
+        } elseif (defined('PHP_OS')) {
+            return PHP_OS;
+        }
+
+        return 'N/A';
+    }
+
+    /**
      * Retrieves the update data from our home server
      *
      * @param bool $overrideCache
@@ -115,7 +131,7 @@ class UpdateHelper
                     'version'       => $this->factory->getVersion(),
                     'phpVersion'    => PHP_VERSION,
                     'dbDriver'      => $this->factory->getParameter('db_driver'),
-                    'serverOs'      => php_uname('s').' '.php_uname('r'),
+                    'serverOs'      => $this->getServerOs(),
                     'instanceId'    => $instanceId,
                     'installSource' => $this->factory->getParameter('install_source', 'Mautic')
                 ]

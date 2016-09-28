@@ -100,7 +100,8 @@
 
         "piwik/device-detector": "~3.7.0",
         "php-http/guzzle6-adapter": "^1.1",
-        "sparkpost/sparkpost": "~2.0.3"
+        "sparkpost/sparkpost": "~2.0.3",
+        "doctrine/data-fixtures": "1.2.1"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~2.8",

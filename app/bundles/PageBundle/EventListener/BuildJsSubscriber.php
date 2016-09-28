@@ -43,6 +43,8 @@ class BuildJsSubscriber extends CommonSubscriber
             $router->generate('mautic_page_tracker', array(), UrlGeneratorInterface::ABSOLUTE_URL)
         );
 
+        $contactIdUrl = $router->generate('mautic_page_tracker_getcontact', array(), UrlGeneratorInterface::ABSOLUTE_URL);
+
         $js = <<<JS
 (function(m, l, n, d) {
     m.pageTrackingUrl = (l.protocol == 'https:' ? 'https:' : 'http:') + '//{$pageTrackingUrl}';
@@ -105,6 +107,17 @@ class BuildJsSubscriber extends CommonSubscriber
     }
 
 })(MauticJS, location, navigator, document);
+
+MauticJS.getTrackedContact = function () {
+    var url = '$contactIdUrl';
+    MauticJS.makeCORSRequest('GET', url, {}, function(response, xhr) {
+        if (response.id) {
+            document.cookie = "mtc_id="+response.id+";";
+        }
+    });
+};
+
+MauticJS.pixelLoaded(MauticJS.getTrackedContact);
 JS;
 
         $event->appendJs($js, 'Mautic Tracking Pixel');
