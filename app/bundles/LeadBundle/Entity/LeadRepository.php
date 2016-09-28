@@ -803,6 +803,42 @@ class LeadRepository extends CommonRepository
                 $expr = $q->expr()->andX(sprintf('%s (%s)', $existsFunc, $sq->getSQL()));
 
                 break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.duplicate'):
+                $prateek = explode("+", $string);
+
+                $imploder = array();
+
+                foreach ($prateek as $key => $value) {
+                    $list = $this->_em->getRepository("MauticLeadBundle:LeadList")->findOneByAlias($value);
+                    $imploder[] = ( (!empty($list)) ? (int) $list->getId() : 0 );
+                }
+
+                //logic. In query, Sum(manuall_removed should be less than the current)
+                $pluck = sizeof($imploder) - 1;
+
+                $imploder = (string)(implode(",", $imploder));
+
+                $sq = $this->_em->getConnection()->createQueryBuilder();
+                $sq -> select('lll.lead_id')
+                    -> from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
+                    -> where("lll.leadlist_id in ( ".$imploder." )")
+                    //-> where("lll.leadlist_id in ( :imploder )")
+                    -> groupBy('lll.lead_id')
+                    -> having('COUNT(lll.lead_id) > :counting AND SUM(lll.manually_removed) < :counting')
+                    -> setParameter('counting', $pluck)
+                    //-> setParameter('imploder', $imploder)
+                ;
+
+                $results = $sq->execute()->fetchAll();
+
+                $leadIds = array();
+                foreach ($results as $row) {
+                    $leadIds[] = $row['lead_id'];
+                }
+                if (!sizeof($leadIds)) $leadIds[0] = 0;
+                $expr = $q->expr()->in('l.id', $leadIds);
+
+                break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.tag'):
                 // search by tag
                 $sq = $this->_em->getConnection()->createQueryBuilder();
@@ -876,7 +912,8 @@ class LeadRepository extends CommonRepository
             'mautic.core.searchcommand.ip',
             'mautic.lead.lead.searchcommand.tag',
             'mautic.lead.lead.searchcommand.stage',
-            'mautic.company.lead.searchcommand.company'
+            'mautic.company.lead.searchcommand.company',
+            'mautic.lead.lead.searchcommand.duplicate'
         );
 
         if (!empty($this->availableSearchFields)) {

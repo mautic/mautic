@@ -33,6 +33,8 @@ class Message
     public $textHtml;
     public $dsnReport;
     public $dsnMessage;
+    public $fblReport;
+    public $fblMessage;
     public $xHeaders = array();
 
     /** @var Attachment[] */
