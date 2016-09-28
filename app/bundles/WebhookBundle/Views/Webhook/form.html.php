@@ -29,7 +29,7 @@ $view['slots']->set("headerTitle", $header);
                 <div class="col-md-6">
                     <?php echo $view['form']->row($form['name']); ?>
                     <?php echo $view['form']->row($form['description']); ?>
-                    <?php echo $view['form']->row($form['webhook_url']); ?>
+                    <?php echo $view['form']->row($form['webhookUrl']); ?>
                     <div class="row">
                         <div class="col-md-5">
                             <?php echo $view['form']->row($form['sendTest']); ?>

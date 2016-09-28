@@ -32,13 +32,10 @@ class LeadSubscriber extends CommonSubscriber
     /**
      * LeadSubscriber constructor.
      *
-     * @param MauticFactory $factory
      * @param TriggerModel  $triggerModel
      */
-    public function __construct(MauticFactory $factory, TriggerModel $triggerModel)
+    public function __construct(TriggerModel $triggerModel)
     {
-        parent::__construct($factory);
-
         $this->triggerModel = $triggerModel;
     }
 
@@ -123,7 +120,7 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param LeadChangeEvent $event
+     * @param LeadMergeEvent $event
      */
     public function onLeadMerge(LeadMergeEvent $event)
     {

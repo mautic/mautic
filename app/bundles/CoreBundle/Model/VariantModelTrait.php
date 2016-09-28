@@ -108,9 +108,14 @@ trait VariantModelTrait
             // Do it here in addition to postVariantSave() so that it's available to the event listeners
             $changes = $entity->getChanges();
 
+            // If unpublished and wasn't changed from published - don't reset
+            if (!$entity->isPublished(false) && (!isset($changes['isPublished']))) {
+
+                return false;
+            }
+
             // Reset the variant
             if (!empty($changes) && empty($this->inConversion)) {
-
                 if (method_exists($entity, 'setVariantStartDate')) {
                     $entity->setVariantStartDate($variantStartDate);
                 }
@@ -121,9 +126,12 @@ trait VariantModelTrait
                         $entity->$method(0);
                     }
                 }
+
+                return true;
             }
         }
 
+        return false;
     }
 
     /**
@@ -144,17 +152,35 @@ trait VariantModelTrait
 
         // Reset associated variants if applicable due to changes
         if ($resetVariants && empty($this->inConversion)) {
-            $repo = $this->getRepository();
+            $this->resetVariants($entity, $relatedIds, $variantStartDate);
+        }
+    }
 
-            if (method_exists($repo, 'resetVariants')) {
-                if (!in_array($entity->getId(), $relatedIds)) {
-                    $relatedIds[] = $entity->getId();
-                }
+    /**
+     * @param           $entity
+     * @param           $relatedIds
+     * @param \DateTime $variantStartDate
+     */
+    protected function resetVariants($entity, $relatedIds = null, \DateTime $variantStartDate = null)
+    {
+        $repo = $this->getRepository();
 
-                // Ensure UTC since we're saving directly to the DB
-                $variantStartDate->setTimezone(new \DateTimeZone('UTC'));
-                $repo->resetVariants($relatedIds, $variantStartDate->format('Y-m-d H:i:s'));
+        if (method_exists($repo, 'resetVariants')) {
+            if (null == $relatedIds) {
+                $relatedIds = $entity->getRelatedEntityIds();
             }
+
+            if (!in_array($entity->getId(), $relatedIds)) {
+                $relatedIds[] = $entity->getId();
+            }
+
+            if (null === $variantStartDate) {
+                $variantStartDate = new \DateTime();
+            }
+
+            // Ensure UTC since we're saving directly to the DB
+            $variantStartDate->setTimezone(new \DateTimeZone('UTC'));
+            $repo->resetVariants($relatedIds, $variantStartDate->format('Y-m-d H:i:s'));
         }
     }
 }

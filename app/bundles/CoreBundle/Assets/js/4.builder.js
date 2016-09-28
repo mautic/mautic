@@ -506,6 +506,13 @@ Mautic.initSlotListeners = function() {
             });
 
             var buttons = ['bold', 'italic', 'fontSize', 'insertImage', 'insertGatedVideo', 'insertLink', 'insertTable', 'undo', 'redo', '-', 'paragraphFormat', 'align', 'color', 'formatOL', 'formatUL', 'indent', 'outdent', 'token'];
+            var builderEl = parent.mQuery('.builder');
+
+            if (builderEl.length && builderEl.hasClass('email-builder')) {
+                buttons = mQuery.grep(buttons, function(value) {
+                    return value != 'insertGatedVideo';
+                });
+            }
 
             var inlineFroalaOptions = {
                 toolbarButtons: buttons,
@@ -513,7 +520,6 @@ Mautic.initSlotListeners = function() {
                 toolbarButtonsSM: buttons,
                 toolbarButtonsXS: buttons,
                 linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
-                useClasses: false,
                 imageEditButtons: ['imageReplace', 'imageAlign', 'imageRemove', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
             };
 
@@ -526,7 +532,6 @@ Mautic.initSlotListeners = function() {
             // Init Froala editor
             image.froalaEditor(mQuery.extend(Mautic.basicFroalaOptions, {
                     linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
-                    useClasses: false,
                     imageEditButtons: ['imageReplace', 'imageAlign', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
                 }
             ));

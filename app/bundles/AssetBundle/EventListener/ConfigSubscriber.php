@@ -20,7 +20,6 @@ use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
  */
 class ConfigSubscriber extends CommonSubscriber
 {
-
     /**
      * @return array
      */

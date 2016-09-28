@@ -70,6 +70,35 @@ class FormController extends CommonController
     }
 
     /**
+     * Decide if current user can edit or can edit specific entity if entity is provided
+     * For BC, if permissionBase property is not set, it allow to edit only to administrators.
+     *
+     * @param object $entity
+     *
+     * @return boolean
+     */
+    protected function canEdit($entity = null)
+    {
+        $security = $this->get('mautic.security');
+        
+        if ($this->permissionBase) {
+            if ($entity && $security->checkPermissionExists($this->permissionBase.':editown')) {
+                return $security->hasEntityAccess(
+                    $this->permissionBase.':editown',
+                    $this->permissionBase.':editother',
+                    $entity->getCreatedBy()
+                );
+            } elseif ($security->checkPermissionExists($this->permissionBase.':edit')) {
+                return $security->isGranted(
+                    $this->permissionBase.':edit'
+                );
+            }
+        }
+
+        return $this->get('mautic.helper.user')->getUser()->isAdmin();
+    }
+
+    /**
      * Returns view to index with a locked out message
      *
      * @param array  $postActionVars
@@ -91,9 +120,10 @@ class FormController extends CommonController
 
         $modelClass   = $this->getModel($model);
         $nameFunction = $modelClass->getNameGetter();
+        $this->permissionBase = $modelClass->getPermissionBase();
 
-        if ($this->factory->getUser()->isAdmin()) {
-            $override = $this->get('translator')->trans(
+        if ($this->canEdit($entity)) {
+            $override     = $this->get('translator')->trans(
                 'mautic.core.override.lock',
                 array(
                     '%url%' => $this->generateUrl(
@@ -127,9 +157,9 @@ class FormController extends CommonController
                         'returnUrl'    => $returnUrl
                     )
                 ),
-                '%date%'       => $date->format($this->factory->getParameter('date_format_dateonly')),
-                '%time%'       => $date->format($this->factory->getParameter('date_format_timeonly')),
-                '%datetime%'   => $date->format($this->factory->getParameter('date_format_full')),
+                '%date%'       => $date->format($this->coreParametersHelper->getParameter('date_format_dateonly')),
+                '%time%'       => $date->format($this->coreParametersHelper->getParameter('date_format_timeonly')),
+                '%datetime%'   => $date->format($this->coreParametersHelper->getParameter('date_format_full')),
                 '%override%'   => $override
             )
         );
@@ -155,10 +185,12 @@ class FormController extends CommonController
      */
     public function unlockAction($id, $modelName)
     {
-        if ($this->factory->getUser()->isAdmin()) {
-            $model = $this->getModel($modelName);
+        $model   = $this->getModel($modelName);
+        $entity  = $model->getEntity($id);
+        $this->permissionBase = $model->getPermissionBase();
 
-            $entity = $model->getEntity($id);
+        if ($this->canEdit($entity)) {
+            
             if ($entity !== null && $entity->getCheckedOutBy() !== null) {
                 $model->unlockEntity($entity);
             }
@@ -221,7 +253,7 @@ class FormController extends CommonController
     protected function indexStandard($page = 1)
     {
         //set some permissions
-        $permissions = $this->factory->getSecurity()->isGranted(
+        $permissions = $this->get('mautic.security')->isGranted(
             array(
                 $this->permissionBase.':view',
                 $this->permissionBase.':viewown',
@@ -250,10 +282,10 @@ class FormController extends CommonController
             $this->setListFilters();
         }
 
-        $session = $this->factory->getSession();
+        $session = $this->get('session');
 
         //set limits
-        $limit = $session->get($this->sessionBase.'.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $session->get($this->sessionBase.'.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -268,7 +300,7 @@ class FormController extends CommonController
         $repo  = $model->getRepository();
 
         if (!$permissions[$this->permissionBase.':viewother']) {
-            $filter['force'] = array('column' => $repo->getTableAlias().'.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
+            $filter['force'] = array('column' => $repo->getTableAlias().'.createdBy', 'expr' => 'eq', 'value' => $this->user->getId());
         }
 
         $orderBy    = $session->get($this->sessionBase.'.orderby', $repo->getTableAlias().'.name');
@@ -316,7 +348,7 @@ class FormController extends CommonController
             'page'        => $page,
             'limit'       => $limit,
             'permissions' => $permissions,
-            'security'    => $this->factory->getSecurity(),
+            'security'    => $this->get('mautic.security'),
             'tmpl'        => $this->request->get('tmpl', 'index')
         );
 
@@ -352,10 +384,10 @@ class FormController extends CommonController
     {
         $model    = $this->getModel($this->modelName);
         $entity   = $model->getEntity($objectId);
-        $security = $this->factory->getSecurity();
+        $security = $this->get('mautic.security');
 
         if ($entity === null) {
-            $page = $this->factory->getSession()->get($this->sessionBase.'.page', 1);
+            $page = $this->get('session')->get($this->sessionBase.'.page', 1);
 
             return $this->postActionRedirect(
                 array(
@@ -452,12 +484,12 @@ class FormController extends CommonController
         $model  = $this->getModel($this->modelName);
         $entity = $model->getEntity();
 
-        if (!$this->factory->getSecurity()->isGranted($this->permissionBase.':create')) {
+        if (!$this->get('mautic.security')->isGranted($this->permissionBase.':create')) {
             return $this->accessDenied();
         }
 
         //set the page we came from
-        $page = $this->factory->getSession()->get($this->sessionBase.'.page', 1);
+        $page = $this->get('session')->get($this->sessionBase.'.page', 1);
 
         $action = $this->generateUrl($this->routeBase.'_action', array('objectAction' => 'new'));
         $form   = $model->createForm($entity, $this->get('form.factory'), $action);
@@ -552,11 +584,21 @@ class FormController extends CommonController
      */
     protected function editStandard($objectId, $ignorePost = false)
     {
+        $isClone = false;
         $model  = $this->getModel($this->modelName);
-        $entity = $model->getEntity($objectId);
+        if (is_object($objectId)) {
+            $entity   = $objectId;
+            $isClone  = true;
+            $objectId = 'mautic_'.sha1(uniqid(mt_rand(), true));
+        } elseif (strpos($objectId, 'mautic_') !== false) {
+            $isClone = true;
+            $entity = $model->getEntity();
+        } else {
+            $entity = $model->getEntity($objectId);
+        }
 
         //set the page we came from
-        $page = $this->factory->getSession()->get($this->sessionBase.'.page', 1);
+        $page = $this->get('session')->get($this->sessionBase.'.page', 1);
 
         //set the return URL
         $returnUrl = $this->generateUrl($this->routeBase.'_index', array('page' => $page));
@@ -589,14 +631,14 @@ class FormController extends CommonController
                     )
                 )
             );
-        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(
             $this->permissionBase.':editown',
             $this->permissionBase.':editother',
             $entity->getCreatedBy()
         )
         ) {
             return $this->accessDenied();
-        } elseif ($model->isLocked($entity)) {
+        } elseif (!$isClone && $model->isLocked($entity)) {
             //deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, $this->modelName);
         }
@@ -645,8 +687,10 @@ class FormController extends CommonController
                     }
                 }
             } else {
-                //unlock the entity
-                $model->unlockEntity($entity);
+                if (!$isClone) {
+                    //unlock the entity
+                    $model->unlockEntity($entity);
+                }
 
                 $viewParameters = array('page' => $page);
                 $returnUrl      = $this->generateUrl($this->routeBase.'_index', $viewParameters);
@@ -664,8 +708,12 @@ class FormController extends CommonController
                         )
                     )
                 );
+            } elseif ($valid) {
+                // Rebuild the form with new action so that apply doesn't keep creating a clone
+                $action = $this->generateUrl($this->routeBase.'_action', ['objectAction' => 'edit', 'objectId' => $entity->getId()]);
+                $form   = $model->createForm($entity, $this->get('form.factory'), $action);
             }
-        } else {
+        } elseif (!$isClone) {
             $model->lockEntity($entity);
         }
 
@@ -710,8 +758,8 @@ class FormController extends CommonController
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
-            if (!$this->factory->getSecurity()->isGranted($this->permissionBase.':create')
-                || !$this->factory->getSecurity()->hasEntityAccess(
+            if (!$this->get('mautic.security')->isGranted($this->permissionBase.':create')
+                || !$this->get('mautic.security')->hasEntityAccess(
                     $this->permissionBase.':viewown',
                     $this->permissionBase.':viewother',
                     $entity->getCreatedBy()
@@ -730,8 +778,7 @@ class FormController extends CommonController
                 $this->afterCloneEntity($newEntity, $entity);
             }
 
-            $model->saveEntity($newEntity);
-            $objectId = $newEntity->getId();
+            return $this->editAction($newEntity, true, true);
         }
 
         return $this->editAction($objectId, true, true);
@@ -746,7 +793,7 @@ class FormController extends CommonController
      */
     protected function deleteStandard($objectId)
     {
-        $page      = $this->factory->getSession()->get($this->sessionBase.'.page', 1);
+        $page      = $this->get('session')->get($this->sessionBase.'.page', 1);
         $returnUrl = $this->generateUrl($this->routeBase.'_index', array('page' => $page));
         $flashes   = array();
 
@@ -770,7 +817,7 @@ class FormController extends CommonController
                     'msg'     => $this->langStringBase.'.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
-            } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+            } elseif (!$this->get('mautic.security')->hasEntityAccess(
                 $this->permissionBase.':deleteown',
                 $this->permissionBase.':deleteother',
                 $entity->getCreatedBy()
@@ -811,7 +858,7 @@ class FormController extends CommonController
      */
     protected function batchDeleteStandard()
     {
-        $page      = $this->factory->getSession()->get($this->sessionBase.'.page', 1);
+        $page      = $this->get('session')->get($this->sessionBase.'.page', 1);
         $returnUrl = $this->generateUrl($this->routeBase.'_index', array('page' => $page));
         $flashes   = array();
 
@@ -840,7 +887,7 @@ class FormController extends CommonController
                         'msg'     => $this->langStringBase.'.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     );
-                } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+                } elseif (!$this->get('mautic.security')->hasEntityAccess(
                     $this->permissionBase.':deleteown',
                     $this->permissionBase.':deleteother',
                     $entity->getCreatedBy()

@@ -251,10 +251,18 @@ class LeadDevice
      */
     public function setDeviceOs ($deviceOs)
     {
-        $this->deviceOsName = $deviceOs['name'];
-        $this->deviceOsShortName = $deviceOs['short_name'];
-        $this->deviceOsVersion = $deviceOs['version'];
-        $this->deviceOsPlatform = $deviceOs['platform'];
+        if (isset($deviceOs['name'])) {
+            $this->deviceOsName = $deviceOs['name'];
+        }
+        if (isset($deviceOs['short_name'])) {
+            $this->deviceOsShortName = $deviceOs['short_name'];
+        }
+        if (isset($deviceOs['version'])) {
+            $this->deviceOsVersion = $deviceOs['version'];
+        }
+        if (isset($deviceOs['platform'])) {
+            $this->deviceOsPlatform = $deviceOs['platform'];
+        }
     }
 
     /**

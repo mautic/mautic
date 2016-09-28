@@ -99,7 +99,9 @@
         "stack/builder": "^1.0",
 
         "piwik/device-detector": "~3.7.0",
-        "sparkpost/php-sparkpost": "~1.2.0"
+        "php-http/guzzle6-adapter": "^1.1",
+        "sparkpost/sparkpost": "~2.0.3",
+        "doctrine/data-fixtures": "1.2.1"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~2.8",
@@ -109,6 +111,12 @@
         "webfactory/exceptions-bundle": "~4.3",
         "phpunit/phpunit": "4.5"
     },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/mautic/BazingaOAuthServerBundle.git"
+        }
+    ],
     "scripts": {
         "post-install-cmd": [
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",

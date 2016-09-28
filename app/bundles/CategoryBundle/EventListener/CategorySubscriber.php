@@ -13,6 +13,9 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CategoryBundle\Event as Events;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
+use Mautic\CoreBundle\Helper\BundleHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 
 /**
  * Class CategorySubscriber
@@ -21,6 +24,34 @@ use Mautic\CategoryBundle\Event\CategoryTypesEvent;
  */
 class CategorySubscriber extends CommonSubscriber
 {
+    /**
+     * @var BundleHelper
+     */
+    protected $bundleHelper;
+
+    /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
+
+    /**
+     * @var AuditLogModel
+     */
+    protected $auditLogModel;
+
+    /**
+     * CategorySubscriber constructor.
+     *
+     * @param BundleHelper   $bundleHelper
+     * @param IpLookupHelper $ipLookupHelper
+     * @param AuditLogModel  $auditLogModel
+     */
+    public function __construct(BundleHelper $bundleHelper, IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    {
+        $this->bundleHelper = $bundleHelper;
+        $this->ipLookupHelper = $ipLookupHelper;
+        $this->auditLogModel = $auditLogModel;
+    }
 
     /**
      * @return array
@@ -43,7 +74,7 @@ class CategorySubscriber extends CommonSubscriber
      */
     public function onCategoryBundleListBuild(CategoryTypesEvent $event)
     {
-        $bundles = $this->factory->getMauticBundles(true);
+        $bundles = $this->bundleHelper->getMauticBundles(true);
 
         foreach ($bundles as $bundle) {
             if (!empty($bundle['config']['categories'])) {
@@ -69,9 +100,9 @@ class CategorySubscriber extends CommonSubscriber
                 "objectId"  => $category->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->factory->getIpAddressFromRequest()
+                "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
             );
-            $this->factory->getModel('core.auditLog')->writeToLog($log);
+            $this->auditLogModel->writeToLog($log);
         }
     }
 
@@ -89,8 +120,8 @@ class CategorySubscriber extends CommonSubscriber
             "objectId"   => $category->deletedId,
             "action"     => "delete",
             "details"    => array('name' => $category->getTitle()),
-            "ipAddress"  => $this->factory->getIpAddressFromRequest()
+            "ipAddress"  => $this->ipLookupHelper->getIpAddressFromRequest()
         );
-        $this->factory->getModel('core.auditLog')->writeToLog($log);
+        $this->auditLogModel->writeToLog($log);
     }
 }

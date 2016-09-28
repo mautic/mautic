@@ -10,7 +10,6 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -34,21 +33,18 @@ class LeadSubscriber extends CommonSubscriber
     /**
      * @var VideoModel
      */
-    protected $videoModel;
+    protected $pageVideoModel;
 
     /**
      * LeadSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param PageModel     $pageModel
-     * @param VideoModel    $videoModel
+     * @param PageModel  $pageModel
+     * @param VideoModel $pageVideoModel
      */
-    public function __construct(MauticFactory $factory, PageModel $pageModel, VideoModel $videoModel)
+    public function __construct(PageModel $pageModel, VideoModel $pageVideoModel)
     {
-        parent::__construct($factory);
-
-        $this->pageModel  = $pageModel;
-        $this->videoModel = $videoModel;
+        $this->pageModel = $pageModel;
+        $this->pageVideoModel = $pageVideoModel;
     }
 
     /**
@@ -185,7 +181,8 @@ class LeadSubscriber extends CommonSubscriber
 
         /** @var \Mautic\PageBundle\Entity\VideoHitRepository $hitRepository */
         $hitRepository = $this->em->getRepository('MauticPageBundle:VideoHit');
-        $hits          = $hitRepository->getTimelineStats($event->getLead()->getId(), $event->getQueryOptions());
+
+        $hits = $hitRepository->getTimelineStats($event->getLead()->getId(), $event->getQueryOptions());
 
         $event->addToCounter($eventTypeKey, $hits);
 
@@ -234,7 +231,7 @@ class LeadSubscriber extends CommonSubscriber
             $event->getVictor()->getId()
         );
 
-        $this->videoModel->getHitRepository()->updateLead(
+        $this->pageVideoModel->getHitRepository()->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );

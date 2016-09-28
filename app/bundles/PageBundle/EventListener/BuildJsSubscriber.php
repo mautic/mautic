@@ -10,12 +10,28 @@ namespace Mautic\PageBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
+use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * Class BuildJsSubscriber
  */
 class BuildJsSubscriber extends CommonSubscriber
 {
+    /**
+     * @var AssetsHelper
+     */
+    protected $assetsHelper;
+
+    /**
+     * BuildJsSubscriber constructor.
+     *
+     * @param AssetsHelper $assetsHelper
+     */
+    public function __construct(AssetsHelper $assetsHelper)
+    {
+        $this->assetsHelper = $assetsHelper;
+    }
+
     /**
      * @return array
      */
@@ -36,12 +52,13 @@ class BuildJsSubscriber extends CommonSubscriber
      */
     public function onBuildJs(BuildJsEvent $event)
     {
-        $router = $this->factory->getRouter();
         $pageTrackingUrl = str_replace(
             array('http://', 'https://'),
             '',
-            $router->generate('mautic_page_tracker', array(), UrlGeneratorInterface::ABSOLUTE_URL)
+            $this->router->generate('mautic_page_tracker', array(), UrlGeneratorInterface::ABSOLUTE_URL)
         );
+
+        $contactIdUrl = $router->generate('mautic_page_tracker_getcontact', array(), UrlGeneratorInterface::ABSOLUTE_URL);
 
         $js = <<<JS
 (function(m, l, n, d) {
@@ -105,6 +122,17 @@ class BuildJsSubscriber extends CommonSubscriber
     }
 
 })(MauticJS, location, navigator, document);
+
+MauticJS.getTrackedContact = function () {
+    var url = '$contactIdUrl';
+    MauticJS.makeCORSRequest('GET', url, {}, function(response, xhr) {
+        if (response.id) {
+            document.cookie = "mtc_id="+response.id+";";
+        }
+    });
+};
+
+MauticJS.pixelLoaded(MauticJS.getTrackedContact);
 JS;
 
         $event->appendJs($js, 'Mautic Tracking Pixel');
@@ -112,12 +140,10 @@ JS;
 
     public function onBuildJsForVideo(BuildJsEvent $event)
     {
-        $router = $this->factory->getRouter();
-        $assetsHelper = $this->factory->getHelper('template.assets');
-        $formSubmitUrl = $router->generate('mautic_form_postresults_ajax', [], UrlGeneratorInterface::ABSOLUTE_URL);
-        $mauticBaseUrl = $router->generate('mautic_base_index', [], UrlGeneratorInterface::ABSOLUTE_URL);
-        $mediaElementCss = $assetsHelper->getUrl('media/css/mediaelementplayer.css', null, null, true);
-        $jQueryUrl = $assetsHelper->getUrl('app/bundles/CoreBundle/Assets/js/libraries/2.jquery.js', null, null, true);
+        $formSubmitUrl = $this->router->generate('mautic_form_postresults_ajax', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $mauticBaseUrl = $this->router->generate('mautic_base_index', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $mediaElementCss = $this->assetsHelper->getUrl('media/css/mediaelementplayer.css', null, null, true);
+        $jQueryUrl = $this->assetsHelper->getUrl('app/bundles/CoreBundle/Assets/js/libraries/2.jquery.js', null, null, true);
 
         $mediaElementJs = <<<'JS'
 /*!

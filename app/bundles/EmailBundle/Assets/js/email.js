@@ -167,7 +167,7 @@ Mautic.loadNewEmailWindow = function(options) {
             var generator = window.open(options.windowUrl, 'newemailwindow', 'height=600,width=1100');
 
             if (!generator || generator.closed || typeof generator.closed == 'undefined') {
-                alert(response.popupBlockerMessage);
+                alert(mauticLang.popupBlockerMessage);
             } else {
                 generator.onload = function () {
                     Mautic.stopModalLoadingBar();
@@ -260,10 +260,8 @@ Mautic.selectEmailType = function(emailType) {
         mQuery('#leadList').removeClass('hide');
         mQuery('#segmentTranslationParent').removeClass('hide');
         mQuery('#templateTranslationParent').addClass('hide');
-        mQuery('#publishStatus').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newListEmail);
     } else {
-        mQuery('#publishStatus').removeClass('hide');
         mQuery('#segmentTranslationParent').addClass('hide');
         mQuery('#templateTranslationParent').removeClass('hide');
         mQuery('#leadList').addClass('hide');

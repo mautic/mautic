@@ -68,7 +68,7 @@ class ListApiController extends CommonApiController
             // Does the lead exist and the user has permission to edit
             if ($lead == null) {
                 return $this->notFound();
-            } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
+            } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
                 return $this->accessDenied();
             }
 
@@ -107,7 +107,7 @@ class ListApiController extends CommonApiController
             // Does the lead exist and the user has permission to edit
             if ($lead == null) {
                 return $this->notFound();
-            } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
+            } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
                 return $this->accessDenied();
             }
 

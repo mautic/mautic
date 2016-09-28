@@ -29,17 +29,12 @@ class ClientModel extends FormModel
     /**
      * @var string
      */
-    private $apiMode;
+    private $apiMode = 'oauth1a';
 
     /**
      * @var Session
      */
     protected $session;
-
-    /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
-     */
-    protected $request;
 
     /**
      * ClientModel constructor.
@@ -48,8 +43,11 @@ class ClientModel extends FormModel
      */
     public function __construct(RequestStack $requestStack)
     {
-        $this->request = $requestStack->getCurrentRequest();
-        $this->apiMode = $this->request->get('api_mode', $this->request->getSession()->get('mautic.client.filter.api_mode', 'oauth1a'));
+        $request = $requestStack->getCurrentRequest();
+
+        if ($request) {
+            $this->apiMode = $request->get('api_mode', $request->getSession()->get('mautic.client.filter.api_mode', 'oauth1a'));
+        }
     }
 
     /**

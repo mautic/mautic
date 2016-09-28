@@ -12,6 +12,7 @@ namespace Mautic\FormBundle\Model;
 use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\FormBundle\Entity\Action;
@@ -42,6 +43,11 @@ class FormModel extends CommonFormModel
     protected $templatingHelper;
 
     /**
+     * @var ThemeHelper
+     */
+    protected $themeHelper;
+
+    /**
      * @var SchemaHelperFactory
      */
     protected $schemaHelperFactory;
@@ -64,12 +70,18 @@ class FormModel extends CommonFormModel
     /**
      * FormModel constructor.
      *
+     * @param RequestStack $requestStack
+     * @param TemplatingHelper $templatingHelper
+     * @param ThemeHelper $themeHelper
+     * @param SchemaHelperFactory $schemaHelperFactory
      * @param ActionModel $formActionModel
      * @param FieldModel $formFieldModel
+     * @param LeadModel $leadModel
      */
     public function __construct(
         RequestStack $requestStack,
         TemplatingHelper $templatingHelper,
+        ThemeHelper $themeHelper,
         SchemaHelperFactory $schemaHelperFactory,
         ActionModel $formActionModel,
         FieldModel $formFieldModel,
@@ -78,6 +90,7 @@ class FormModel extends CommonFormModel
     {
         $this->request = $requestStack->getCurrentRequest();
         $this->templatingHelper = $templatingHelper;
+        $this->themeHelper = $themeHelper;
         $this->schemaHelperFactory = $schemaHelperFactory;
         $this->formActionModel = $formActionModel;
         $this->formFieldModel = $formFieldModel;
@@ -186,7 +199,7 @@ class FormModel extends CommonFormModel
     {
         $order          = 1;
         $existingFields = $entity->getFields()->toArray();
-
+        $formName       = $entity->generateFormName();
         foreach ($sessionFields as $key => $properties) {
             $isNew = (!empty($properties['id']) && isset($existingFields[$properties['id']])) ? false : true;
             $field = !$isNew ? $existingFields[$properties['id']] : new Field();
@@ -198,6 +211,11 @@ class FormModel extends CommonFormModel
                 if (empty($properties['label'])) {
                     $properties['label'] = $field->getLabel();
                 }
+            }
+
+            if ($formName === $properties['alias']) {
+                // Change the alias to prevent potential ID collisions in the rendered HTML
+                $properties['alias'] = 'f_'.$properties['alias'];
             }
 
             foreach ($properties as $f => $v) {
@@ -363,6 +381,7 @@ class FormModel extends CommonFormModel
         $theme = $entity->getTemplate();
         $submissions = null;
         $lead = $this->leadModel->getCurrentLead();
+        $style = '';
 
         if (!empty($theme)) {
             $theme .= '|';
@@ -378,13 +397,20 @@ class FormModel extends CommonFormModel
             );
         }
 
+        if ($entity->getRenderStyle()) {
+            $templating = $this->templatingHelper->getTemplating();
+            $styleTheme = $theme.'MauticFormBundle:Builder:style.html.php';
+            $style = $templating->render($this->themeHelper->checkForTwigTemplate($styleTheme));
+        }
+
         $html = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:form.html.php',
             [
                 'form'        => $entity,
                 'theme'       => $theme,
                 'submissions' => $submissions,
-                'lead'        => $lead
+                'lead'        => $lead,
+                'style'       => $style
             ]
         );
 
@@ -572,8 +598,7 @@ class FormModel extends CommonFormModel
     public function populateValuesWithGetParameters(Form $form, &$formHtml)
     {
         $fieldHelper = new FormFieldHelper($this->translator);
-        $request  = $this->factory->getRequest();
-        $formName = $form->generateFormName();
+        $formName    = $form->generateFormName();
 
         $fields = $form->getFields()->toArray();
         /** @var \Mautic\FormBundle\Entity\Field $f */
@@ -604,7 +629,7 @@ class FormModel extends CommonFormModel
 
             if (isset($leadField) && $isAutoFill) {
                 $value = $lead->getFieldValue($leadField);
-                
+
 		        if (!empty($value)) {
 		            $fieldHelper->populateField($f, $value, $formName, $formHtml);
 		        }

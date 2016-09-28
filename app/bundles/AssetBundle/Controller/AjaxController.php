@@ -49,7 +49,7 @@ class AjaxController extends CommonAjaxController
     {
         $provider   = InputHelper::string($request->request->get('provider'));
         $path       = InputHelper::string($request->request->get('path', ''));
-        $dispatcher = $this->factory->getDispatcher();
+        $dispatcher = $this->dispatcher;
         $name       = AssetEvents::ASSET_ON_REMOTE_BROWSE;
 
         if (!$dispatcher->hasListeners($name)) {

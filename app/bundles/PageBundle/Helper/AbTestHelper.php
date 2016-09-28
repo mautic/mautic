@@ -21,12 +21,13 @@ class AbTestHelper
     /**
      * Determines the winner of A/B test based on bounce rates
      *
-     * @param MauticFactory $factory
-     * @param Page          $parent
+     * @param $factory
+     * @param Page $parent
+     * @param Page[] $children
      *
      * @return array
      */
-    public static function determineBounceTestWinner($factory, $parent)
+    public static function determineBounceTestWinner($factory, $parent, $children)
     {
         //find the hits that did not go any further
         $repo      = $factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
@@ -35,15 +36,49 @@ class AbTestHelper
 
         if ($startDate != null && !empty($pageIds)) {
             //get their bounce rates
-            $counts = $repo->getBounces($pageIds, $startDate);
+            $counts = $repo->getBounces($pageIds, $startDate, true);
             if ($counts) {
+                // Group by translation
+                $combined = [
+                    $parent->getId() => $counts[$parent->getId()]
+                ];
+
+                if ($parent->hasTranslations()) {
+                    $translations = $parent->getTranslationChildren()->getKeys();
+
+                    foreach ($translations as $translation) {
+                        $combined[$parent->getId()]['bounces'] += $counts[$translation]['bounces'];
+                        $combined[$parent->getId()]['totalHits'] += $counts[$translation]['totalHits'];
+                        $combined[$parent->getId()]['rate'] = ($counts[$parent->getId()]['totalHits']) ? round(
+                            ($counts[$parent->getId()]['bounces'] / $counts[$parent->getId()]['totalHits']) * 100,
+                            2
+                        ) : 0;
+                    }
+                }
+
+                foreach ($children as $child) {
+                    if ($child->hasTranslations()) {
+                        $combined[$child->getId()] = $counts[$child->getId()];
+                        $translations = $child->getTranslationChildren()->getKeys();
+                        foreach ($translations as $translation) {
+                            $combined[$child->getId()]['bounces'] += $counts[$translation]['bounces'];
+                            $combined[$child->getId()]['totalHits'] += $counts[$translation]['totalHits'];
+                            $combined[$child->getId()]['rate'] = ($counts[$child->getId()]['totalHits']) ? round(
+                                ($counts[$child->getId()]['bounces'] / $counts[$child->getId()]['totalHits']) * 100,
+                                2
+                            ) : 0;
+                        }
+                    }
+                }
+                unset($counts);
+
                 //let's arrange by rate
                 $rates             = [];
                 $support['data']   = [];
                 $support['labels'] = [];
                 $bounceLabel       = $factory->getTranslator()->trans('mautic.page.abtest.label.bounces');
 
-                foreach ($counts as $pid => $stats) {
+                foreach ($combined as $pid => $stats) {
                     $rates[$pid]                     = $stats['rate'];
                     $support['data'][$bounceLabel][] = $rates[$pid];
                     $support['labels'][]             = $pid.':'.$stats['title'];

@@ -13,6 +13,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PointBundle\Event\PointBuilderEvent;
+use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
 
 /**
@@ -20,6 +21,20 @@ use Mautic\PointBundle\PointEvents;
  */
 class PointSubscriber extends CommonSubscriber
 {
+    /**
+     * @var PointModel
+     */
+    protected $pointModel;
+
+    /**
+     * PointSubscriber constructor.
+     *
+     * @param PointModel $pointModel
+     */
+    public function __construct(PointModel $pointModel)
+    {
+        $this->pointModel = $pointModel;
+    }
 
     /**
      * {@inheritdoc}
@@ -68,10 +83,10 @@ class PointSubscriber extends CommonSubscriber
     {
         if ($event->getPage()) {
             // Mautic Landing Page was hit
-            $this->factory->getModel('point')->triggerAction('page.hit', $event->getHit());
+            $this->pointModel->triggerAction('page.hit', $event->getHit());
         } else {
             // Mautic Tracking Pixel was hit
-            $this->factory->getModel('point')->triggerAction('url.hit', $event->getHit());
+            $this->pointModel->triggerAction('url.hit', $event->getHit());
         }
     }
 }

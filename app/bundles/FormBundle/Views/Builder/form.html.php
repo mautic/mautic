@@ -11,7 +11,7 @@ $formName = '_' . $form->generateFormName();
 $fields   = $form->getFields();
 ?>
 
-<?php if ($form->getRenderStyle()) echo $view->render($theme.'MauticFormBundle:Builder:style.html.php', array('form' => $form, 'formName' => $formName)); ?>
+<?php echo $style; ?>
 
 <div id="mauticform_wrapper<?php echo $formName ?>" class="mauticform_wrapper">
     <form autocomplete="false" role="form" method="post" action="<?php echo $view['router']->url('mautic_form_postresults', array('formId' => $form->getId())); ?>" id="mauticform<?php echo $formName ?>" data-mautic-form="<?php echo ltrim($formName, '_') ?>">

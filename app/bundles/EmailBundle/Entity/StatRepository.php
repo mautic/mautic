@@ -347,12 +347,7 @@ class StatRepository extends CommonRepository
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'emails', 'e', 's.email_id = e.id')
-            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'email_copies', 'ec', 's.copy_id = ec.id')
-            ->where(
-                $query->expr()->andX(
-                    $query->expr()->eq('s.is_failed', 0)
-                )
-            );
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'email_copies', 'ec', 's.copy_id = ec.id');
 
         if ($leadId) {
             $query->andWhere(
@@ -382,6 +377,14 @@ class StatRepository extends CommonRepository
                 $query->andWhere(
                     $query->expr()->eq('s.is_read', 0)
                 );
+                $query->andWhere(
+                    $query->expr()->eq('s.is_failed', 0)
+                );
+            } elseif ('failed' == $state) {
+                $query->andWhere(
+                    $query->expr()->eq('s.is_failed', 1)
+                );
+                $state = 'sent';
             }
         } else {
             $state = 'sent';

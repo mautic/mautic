@@ -13,7 +13,6 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\LeadEvents;
@@ -45,18 +44,15 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * CampaignSubscriber constructor.
      *
-     * @param MauticFactory  $factory
      * @param IpLookupHelper $ipLookupHelper
      * @param LeadModel      $leadModel
      * @param FieldModel     $leadFieldModel
      */
-    public function __construct(MauticFactory $factory, IpLookupHelper $ipLookupHelper, LeadModel $leadModel, FieldModel $leadFieldModel)
+    public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, FieldModel $leadFieldModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
         $this->leadModel      = $leadModel;
         $this->leadFieldModel = $leadFieldModel;
-
-        parent::__construct($factory);
     }
 
     /**
@@ -143,7 +139,7 @@ class CampaignSubscriber extends CommonSubscriber
         $somethingHappened = false;
 
         if ($lead !== null && !empty($points)) {
-            $lead->addToPoints($points);
+            $lead->adjustPoints($points);
 
             //add a lead point change log
             $log = new PointsChangeLog();

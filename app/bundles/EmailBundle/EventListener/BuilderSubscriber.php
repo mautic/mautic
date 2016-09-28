@@ -10,10 +10,14 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Model\RedirectModel;
+use Mautic\PageBundle\Model\TrackableModel;
 
 /**
  * Class BuilderSubscriber
@@ -22,6 +26,47 @@ use Mautic\PageBundle\Entity\Trackable;
  */
 class BuilderSubscriber extends CommonSubscriber
 {
+    /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
+     * @var EmailModel
+     */
+    protected $emailModel;
+
+    /**
+     * @var TrackableModel
+     */
+    protected $pageTrackableModel;
+
+    /**
+     * @var RedirectModel
+     */
+    protected $pageRedirectModel;
+
+    /**
+     * BuilderSubscriber constructor.
+     *
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param EmailModel           $emailModel
+     * @param TrackableModel       $trackableModel
+     * @param RedirectModel        $redirectModel
+     */
+    public function __construct(
+        CoreParametersHelper $coreParametersHelper,
+        EmailModel $emailModel,
+        TrackableModel $trackableModel,
+        RedirectModel $redirectModel
+    )
+    {
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->emailModel = $emailModel;
+        $this->pageTrackableModel = $trackableModel;
+        $this->pageRedirectModel = $redirectModel;
+    }
+
     /**
      * @return array
      */
@@ -144,33 +189,32 @@ class BuilderSubscriber extends CommonSubscriber
             // Generate a bogus idHash to prevent errors for routes that may include it
             $idHash = uniqid();
         }
-        $model = $this->factory->getModel('email');
 
-        $unsubscribeText = $this->factory->getParameter('unsubscribe_text');
+        $unsubscribeText = $this->coreParametersHelper->getParameter('unsubscribe_text');
         if (!$unsubscribeText) {
             $unsubscribeText = $this->translator->trans('mautic.email.unsubscribe.text', array('%link%' => '|URL|'));
         }
-        $unsubscribeText = str_replace('|URL|', $model->buildUrl('mautic_email_unsubscribe', array('idHash' => $idHash)), $unsubscribeText);
+        $unsubscribeText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_unsubscribe', array('idHash' => $idHash)), $unsubscribeText);
         $event->addToken('{unsubscribe_text}', $unsubscribeText);
 
-        $event->addToken('{unsubscribe_url}', $model->buildUrl('mautic_email_unsubscribe', array('idHash' => $idHash)));
+        $event->addToken('{unsubscribe_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe', array('idHash' => $idHash)));
 
-        $webviewText = $this->factory->getParameter('webview_text');
+        $webviewText = $this->coreParametersHelper->getParameter('webview_text');
         if (!$webviewText) {
             $webviewText = $this->translator->trans('mautic.email.webview.text', array('%link%' => '|URL|'));
         }
-        $webviewText = str_replace('|URL|', $model->buildUrl('mautic_email_webview', array('idHash' => $idHash)), $webviewText);
+        $webviewText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_webview', array('idHash' => $idHash)), $webviewText);
         $event->addToken('{webview_text}', $webviewText);
 
         // Show public email preview if the lead is not known to prevent 404
         if (empty($lead['id']) && $email) {
-            $event->addToken('{webview_url}', $model->buildUrl('mautic_email_preview', array('objectId' => $email->getId())));
+            $event->addToken('{webview_url}', $this->emailModel->buildUrl('mautic_email_preview', array('objectId' => $email->getId())));
         } else {
-            $event->addToken('{webview_url}', $model->buildUrl('mautic_email_webview', array('idHash' => $idHash)));
+            $event->addToken('{webview_url}', $this->emailModel->buildUrl('mautic_email_webview', array('idHash' => $idHash)));
         }
 
-        $signatureText = $this->factory->getParameter('default_signature_text');
-        $fromName      = $this->factory->getParameter('mailer_from_name');
+        $signatureText = $this->coreParametersHelper->getParameter('default_signature_text');
+        $fromName      = $this->coreParametersHelper->getParameter('mailer_from_name');
 
         if (!empty($lead['owner_id'])) {
             $owner = $this->factory->getModel('lead')->getRepository()->getLeadOwner($lead['owner_id']);
@@ -199,11 +243,6 @@ class BuilderSubscriber extends CommonSubscriber
             return;
         }
 
-        /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
-        $trackableModel = $this->factory->getModel('page.trackable');
-        /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
-        $redirectModel = $this->factory->getModel('page.redirect');
-
         $email   = $event->getEmail();
         $emailId = ($email) ? $email->getId() : null;
 
@@ -217,9 +256,9 @@ class BuilderSubscriber extends CommonSubscriber
         foreach ($trackables as $token => $trackable) {
             $url = ($trackable instanceof Trackable)
                 ?
-                $trackableModel->generateTrackableUrl($trackable, $clickthrough)
+                $this->pageTrackableModel->generateTrackableUrl($trackable, $clickthrough)
                 :
-                $redirectModel->generateRedirectUrl($trackable, $clickthrough);
+                $this->pageRedirectModel->generateRedirectUrl($trackable, $clickthrough);
 
             $event->addToken($token, $url);
         }
@@ -242,11 +281,9 @@ class BuilderSubscriber extends CommonSubscriber
             $html = $event->getContent();
             $text = $event->getPlainText();
 
-            /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
-            $trackableModel = $this->factory->getModel('page.trackable');
             $contentTokens  = $event->getTokens();
 
-            list($content, $trackables) = $trackableModel->parseContentForTrackables(
+            list($content, $trackables) = $this->pageTrackableModel->parseContentForTrackables(
                 array($html, $text),
                 $contentTokens,
                 ($emailId) ? 'email' : null,
@@ -266,8 +303,8 @@ class BuilderSubscriber extends CommonSubscriber
             $convertedContent[$event->getContentHash()] = $trackables;
 
             // Don't need to preserve Trackable or Redirect entities in memory
-            $this->factory->getEntityManager()->clear('Mautic\PageBundle\Entity\Redirect');
-            $this->factory->getEntityManager()->clear('Mautic\PageBundle\Entity\Trackable');
+            $this->em->clear('Mautic\PageBundle\Entity\Redirect');
+            $this->em->clear('Mautic\PageBundle\Entity\Trackable');
 
             unset($html, $text, $trackables);
         }

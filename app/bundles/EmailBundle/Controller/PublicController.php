@@ -29,7 +29,7 @@ class PublicController extends CommonFormController
         $stat  = $model->getEmailStatus($idHash);
 
         if (!empty($stat)) {
-            if ($this->factory->getSecurity()->isAnonymous()) {
+            if ($this->get('mautic.security')->isAnonymous()) {
                 $model->hitEmail($stat, $this->request, true);
             }
 
@@ -126,7 +126,7 @@ class PublicController extends CommonFormController
 
             $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
 
-            $message = $this->factory->getParameter('unsubscribe_message');
+            $message = $this->coreParametersHelper->getParameter('unsubscribe_message');
             if (!$message) {
                 $message = $translator->trans(
                     'mautic.email.unsubscribed.success',
@@ -166,7 +166,7 @@ class PublicController extends CommonFormController
         }
 
         if (empty($template) && empty($formTemplate)) {
-            $template = $this->factory->getParameter('theme');
+            $template = $this->coreParametersHelper->getParameter('theme');
         } else if (!empty($formTemplate)) {
             $template = $formTemplate;
         }
@@ -225,9 +225,9 @@ class PublicController extends CommonFormController
 
             $model->removeDoNotContact($stat->getEmailAddress());
 
-            $message = $this->factory->getParameter('resubscribe_message');
+            $message = $this->coreParametersHelper->getParameter('resubscribe_message');
             if (!$message) {
-                $message = $this->factory->getTranslator()->trans(
+                $message = $this->translator->trans(
                     'mautic.email.resubscribed.success',
                     array(
                         '%unsubscribedUrl%' => '|URL|',
@@ -249,10 +249,10 @@ class PublicController extends CommonFormController
 
         } else {
             $email   = $lead = false;
-            $message = $this->factory->getTranslator()->trans('mautic.email.stat_record.not_found');
+            $message = $this->translator->trans('mautic.email.stat_record.not_found');
         }
 
-        $template = ($email !== null) ? $email->getTemplate() : $this->factory->getParameter('theme');
+        $template = ($email !== null) ? $email->getTemplate() : $this->coreParametersHelper->getParameter('theme');
         $theme    = $this->factory->getTheme($template);
 
         if ($theme->getTheme() != $template) {
@@ -262,7 +262,7 @@ class PublicController extends CommonFormController
         // Ensure template still exists
         $theme = $this->factory->getTheme($template);
         if (empty($theme) || $theme->getTheme() !== $template) {
-            $template = $this->factory->getParameter('theme');
+            $template = $this->coreParametersHelper->getParameter('theme');
         }
 
         $analytics = $this->factory->getHelper('template.analytics')->getCode();
@@ -296,8 +296,10 @@ class PublicController extends CommonFormController
     {
         ignore_user_abort(true);
 
-        // Check to see if transport matches currently used transport
-        $currentTransport = $this->factory->getMailer()->getTransport();
+        // Use the real transport as the one in Mailer could be SpoolTransport if the system is configured to queue
+        // Can't use swiftmailer.transport.real because it's not set for when queue is disabled
+        $transportParam   = $this->get('mautic.helper.core_parameters')->getParameter(('mailer_transport'));
+        $currentTransport = $this->get('swiftmailer.mailer.transport.'.$transportParam);
 
         if ($currentTransport instanceof InterfaceCallbackTransport && $currentTransport->getCallbackPath() == $transport) {
             $response = $currentTransport->handleCallbackResponse($this->request, $this->factory);
@@ -329,9 +331,9 @@ class PublicController extends CommonFormController
         $emailEntity = $model->getEntity($objectId);
 
         if (
-            ($this->factory->getSecurity()->isAnonymous() && !$emailEntity->isPublished())
-            || (!$this->factory->getSecurity()->isAnonymous()
-                && !$this->factory->getSecurity()->hasEntityAccess(
+            ($this->get('mautic.security')->isAnonymous() && !$emailEntity->isPublished())
+            || (!$this->get('mautic.security')->isAnonymous()
+                && !$this->get('mautic.security')->hasEntityAccess(
                     'email:emails:viewown',
                     'email:emails:viewother',
                     $emailEntity->getCreatedBy()
@@ -403,7 +405,7 @@ class PublicController extends CommonFormController
                 'lead'         => $fields
             )
         );
-        $this->factory->getDispatcher()->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
+        $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
 
         $content = $event->getContent(true);
 

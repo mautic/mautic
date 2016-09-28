@@ -140,6 +140,6 @@ class FileController extends AjaxController
         return $this->request->getScheme().'://'
             .$this->request->getHttpHost()
             .$this->request->getBasePath().'/'
-            .$this->factory->getParameter('image_path');
+            .$this->coreParametersHelper->getParameter('image_path');
     }
 }

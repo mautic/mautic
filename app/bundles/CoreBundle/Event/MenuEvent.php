@@ -21,7 +21,7 @@ class MenuEvent extends Event
     /**
      * @var array
      */
-    protected $menuItems = array('children' => array());
+    protected $menuItems = ['children' => []];
 
     /**
      * @var
@@ -95,7 +95,8 @@ class MenuEvent extends Event
     {
         $this->helper->placeOrphans($this->menuItems['children'], true);
         $this->helper->sortByPriority($this->menuItems['children']);
-        
+        $this->helper->resetOrphans();
+
         return $this->menuItems;
     }
 
@@ -106,4 +107,5 @@ class MenuEvent extends Event
     {
         return $this->type;
     }
+
 }

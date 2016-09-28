@@ -10,11 +10,13 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Debug\Exception\ClassNotFoundException;
 use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,6 +26,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Templating\DelegatingEngine;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CommonController
@@ -41,6 +44,26 @@ class CommonController extends Controller implements MauticController
     protected $request;
 
     /**
+     * @var User
+     */
+    protected $user;
+
+    /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
+
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * @param Request $request
      */
     public function setRequest(Request $request)
@@ -56,6 +79,38 @@ class CommonController extends Controller implements MauticController
     public function setFactory(MauticFactory $factory)
     {
         $this->factory = $factory;
+    }
+
+    /**
+     * @param User $user
+     */
+    public function setUser(User $user)
+    {
+        $this->user = $user;
+    }
+
+    /**
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper)
+    {
+        $this->coreParametersHelper = $coreParametersHelper;
+    }
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function setTranslator(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
     }
 
     /**
@@ -281,8 +336,8 @@ class CommonController extends Controller implements MauticController
         }
 
         //render browser notifications
-        $passthrough['browserNotifications'] = $this->factory->getSession()->get('mautic.browser.notifications', array());
-        $this->factory->getSession()->set('mautic.browser.notifications', array());
+        $passthrough['browserNotifications'] = $this->get('session')->get('mautic.browser.notifications', array());
+        $this->get('session')->set('mautic.browser.notifications', array());
 
         $tmpl = (isset($parameters['tmpl'])) ? $parameters['tmpl'] : $this->request->get('tmpl', 'index');
         if ($tmpl == 'index') {
@@ -381,11 +436,11 @@ class CommonController extends Controller implements MauticController
      */
     public function accessDenied($batch = false, $msg = 'mautic.core.url.error.401')
     {
-        $anonymous = $this->factory->getSecurity()->isAnonymous();
+        $anonymous = $this->get('mautic.security')->isAnonymous();
 
         if ($anonymous || !$batch) {
             throw new AccessDeniedHttpException(
-                $this->factory->getTranslator()->trans($msg,
+                $this->translator->trans($msg,
                     array(
                         '%url%' => $this->request->getRequestUri()
                     )
@@ -396,7 +451,7 @@ class CommonController extends Controller implements MauticController
         if ($batch) {
             return array(
                 'type' => 'error',
-                'msg'  => $this->factory->getTranslator()->trans('mautic.core.error.accessdenied', array(), 'flashes')
+                'msg'  => $this->translator->trans('mautic.core.error.accessdenied', array(), 'flashes')
             );
         }
     }
@@ -409,7 +464,7 @@ class CommonController extends Controller implements MauticController
     public function notFound($msg = 'mautic.core.url.error.404')
     {
         throw new NotFoundHttpException(
-            $this->factory->getTranslator()->trans($msg,
+            $this->translator->trans($msg,
                 array(
                     '%url%' => $this->request->getRequestUri()
                 )
@@ -427,7 +482,7 @@ class CommonController extends Controller implements MauticController
     public function modalAccessDenied($msg = 'mautic.core.error.accessdenied')
     {
         return new JsonResponse(array(
-            'error' => $this->factory->getTranslator()->trans($msg, array(), 'flashes')
+            'error' => $this->translator->trans($msg, array(), 'flashes')
         ));
     }
 
@@ -588,7 +643,7 @@ class CommonController extends Controller implements MauticController
             }
         }
 
-        $this->factory->getSession()->getFlashBag()->add($type, $translatedMessage);
+        $this->get('session')->getFlashBag()->add($type, $translatedMessage);
 
         if (!defined('MAUTIC_INSTALLER') && $addNotification) {
             switch ($type) {
@@ -627,7 +682,7 @@ class CommonController extends Controller implements MauticController
             $domain = 'flashes';
         }
 
-        $translator = $this->factory->getTranslator();
+        $translator = $this->translator;
 
         if ($domain === false) {
             //message is already translated
@@ -655,7 +710,7 @@ class CommonController extends Controller implements MauticController
             $icon        = $assetHelper->getUrl($icon, null, null, true);
         }
 
-        $session                = $this->factory->getSession();
+        $session                = $this->get('session');
         $browserNotifications   = $session->get('mautic.browser.notifications', array());
         $browserNotifications[] = array(
             'message' => $translatedMessage,

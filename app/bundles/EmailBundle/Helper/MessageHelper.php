@@ -76,6 +76,7 @@ class MessageHelper
         // Assume is an unsubscribe
         $isUnsubscribe = $allowUnsubscribe;
         $isBounce      = false;
+        $isFbl         = false;
         $toEmail       = reset($message->to);
 
         // Check for bounce emails via + notation if applicable
@@ -83,33 +84,41 @@ class MessageHelper
             if (strpos($to, '+bounce') !== false) {
                 $isBounce      = true;
                 $isUnsubscribe = false;
+                $isFbl         = false;
                 $toEmail       = $to;
                 break;
             } elseif (strpos($to, '+unsubscribe')) {
                 $isBounce      = false;
                 $isUnsubscribe = true;
+                $isFbl         = false;
                 $toEmail       = $to;
                 break;
             }
         }
+        // Detect FBL-report.
+        if (preg_match("/.*feedback-type: abuse.*/is", $message->fblReport, $match)) {
+            $isBounce      = false;
+            $isUnsubscribe = false;
+            $isFbl         = true;
+        }
 
         $this->logger->debug("Analyzing message to {$message->toString}");
         // If message from Amazon SNS collect bounces and complaints
-        if ($message->fromAddress=='no-reply@sns.amazonaws.com') {        
-            $message = json_decode(strtok($message->textPlain, "\n"), true);        
+        if ($message->fromAddress=='no-reply@sns.amazonaws.com') {
+            $message = json_decode(strtok($message->textPlain, "\n"), true);
             if ($message['notificationType']=='Bounce') {
                 $isBounce = true;
                 $isUnsubscribe = false;
                 $toEmail = $message['mail']['source'];
-                $amazonEmail = $message['bounce']['bouncedRecipients'][0]['emailAddress'];    
+                $amazonEmail = $message['bounce']['bouncedRecipients'][0]['emailAddress'];
             }
             elseif ($message['notificationType']=='Complaint') {
                 $isBounce      = false;
                 $isUnsubscribe = true;
                 $toEmail       = $message['mail']['source'];
-                $amazonEmail = $message['complaint']['complainedRecipients'][0]['emailAddress'];    
+                $amazonEmail = $message['complaint']['complainedRecipients'][0]['emailAddress'];
             }
-        }        
+        }
         // Parse the to email if applicable
         if (preg_match('#^(.*?)\+(.*?)@(.*?)$#', $toEmail, $parts)) {
             if (strstr($parts[2], '_')) {
@@ -119,7 +128,7 @@ class MessageHelper
         }
 
         $messageDetails = array();
-        
+
 
         if ($allowBounce) {
             // If message from Amazon SNS fill details and don't process further
@@ -128,7 +137,7 @@ class MessageHelper
             $messageDetails['rule_cat'] = 'unknown';
             $messageDetails['rule_no'] = '0013';
             $messageDetails['bounce_type'] = 'hard';
-            $messageDetails['remove'] = 1; 
+            $messageDetails['remove'] = 1;
             } else {
                 if (!empty($message->dsnReport)) {
                     // Parse the bounce
@@ -161,10 +170,10 @@ class MessageHelper
                     $isBounce      = true;
                     $isUnsubscribe = false;
                 }
-            }    
+            }
         }
 
-        if (!$isBounce && !$isUnsubscribe) {
+        if (!$isBounce && !$isUnsubscribe && !$isFbl) {
             $this->logger->debug('No reason found to process.');
             return false;
         }
@@ -202,7 +211,16 @@ class MessageHelper
                 } else {
                     // Email not found for the bounce so abort
                     $this->logger->error('BOUNCE ERROR: A lead could be found from the bounce email. From: ' . $message->fromAddress . '; To: ' . $message->toString . '; Subject: ' . $message->subject);
-
+                    return false;
+                }
+            } elseif ($isFbl) {
+                if (preg_match("/Received:.*for (.*);.*?/isU", $message->textPlain, $match)) {
+                    if ($parsedAddressList = self::parseAddressList($match[1])) {
+                        $leadEmail = key($parsedAddressList);
+                    }
+                }
+                else {
+                    $this->logger->error("Parsing of FBL-report failed for message #{$message->id}");
                     return false;
                 }
             } else {
@@ -265,7 +283,7 @@ class MessageHelper
         }
 
         // Set message details for unsubscribe requests
-        if ($isUnsubscribe) {
+        if ($isUnsubscribe || $isFbl) {
             $messageDetails = array(
                 'remove'   => true,
                 'email'    => $leadEmail,
@@ -292,7 +310,7 @@ class MessageHelper
                 MAUTIC_TABLE_PREFIX.'email_stats',
                 array(
                     'open_details' => serialize($openDetails),
-                    'retry_count'  => $stat['retry_count']++,
+                    'retry_count'  => ++$stat['retry_count'],
                     'is_failed'    => ($messageDetails['remove'] || $stat['retry_count'] == 5) ? 1 : 0
                 ),
                 array('id' => $stat['id'])
@@ -334,11 +352,10 @@ class MessageHelper
                             'channel'      => 'email',
                             'channel_id'   => $emailId,
                             'date_added'   => $dtHelper->toUtcString(),
-                            'reason'       => ($isUnsubscribe) ? DoNotContact::UNSUBSCRIBED : DoNotContact::BOUNCED,
+                            'reason'       => ($isUnsubscribe || $isFbl) ? DoNotContact::UNSUBSCRIBED : DoNotContact::BOUNCED,
                             'comments'     => $this->factory->getTranslator()->trans('mautic.email.bounce.reason.'.$messageDetails['rule_cat'])
                         )
                     );
-
                 } catch (\Exception $e) {
                     $this->logger->error($e->getMessage());
                 }
@@ -878,15 +895,13 @@ class MessageHelper
 
         // ======= parse $dsn_report ======
         // get the recipient email
-        if (preg_match("/Original-Recipient: rfc822;(.*)/i", $dsn_report, $match)) {
-            $email_arr = imap_rfc822_parse_adrlist($match[1], 'default.domain.name');
-            if (isset($email_arr[0]->host) && $email_arr[0]->host != '.SYNTAX-ERROR.' && $email_arr[0]->host != 'default.domain.name') {
-                $result['email'] = $email_arr[0]->mailbox.'@'.$email_arr[0]->host;
-            }
-        } else if (preg_match("/Final-Recipient: rfc822;(.*)/i", $dsn_report, $match)) {
-            $email_arr = imap_rfc822_parse_adrlist($match[1], 'default.domain.name');
-            if (isset($email_arr[0]->host) && $email_arr[0]->host != '.SYNTAX-ERROR.' && $email_arr[0]->host != 'default.domain.name') {
-                $result['email'] = $email_arr[0]->mailbox.'@'.$email_arr[0]->host;
+        if (
+            preg_match("/Original-Recipient: rfc822;(.*)/i", $dsn_report, $match)
+            ||
+            preg_match("/Final-Recipient: rfc822;(.*)/i", $dsn_report, $match)
+        ) {
+            if ($parsedAddressList = self::parseAddressList($match[1])) {
+                $result['email'] = key($parsedAddressList);
             }
         }
 
@@ -2037,5 +2052,25 @@ class MessageHelper
         }
 
         return $result;
+    }
+
+    static public function parseAddressList($addresses)
+    {
+        $results = [];
+        $parsedAddresses = imap_rfc822_parse_adrlist($addresses, 'default.domain.name');
+        foreach ($parsedAddresses as $parsedAddress) {
+            if (
+                isset($parsedAddress->host)
+                &&
+                $parsedAddress->host != '.SYNTAX-ERROR.'
+                &&
+                $parsedAddress->host != 'default.domain.name'
+            ) {
+                $email = $parsedAddress->mailbox.'@'.$parsedAddress->host;
+                $name = isset($parsedAddress->personal) ? $parsedAddress->personal : null;
+                $results[$email] = $name;
+            }
+        }
+        return $results;
     }
 }

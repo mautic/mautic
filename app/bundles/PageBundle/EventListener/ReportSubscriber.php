@@ -114,7 +114,6 @@ class ReportSubscriber extends CommonSubscriber
             if ($event->checkContext('page.hits')) {
                 $hitPrefix   = 'ph.';
                 $redirectHit = 'r.';
-                $emailPrefix = 'e.';
                 $hitColumns  = [
                     $hitPrefix.'date_hit'          => [
                         'label' => 'mautic.page.report.hits.date_hit',
@@ -180,10 +179,6 @@ class ReportSubscriber extends CommonSubscriber
                         'label' => 'mautic.report.field.source_id',
                         'type'  => 'int'
                     ],
-                    $hitPrefix.'device'         => [
-                        'label' => 'mautic.page.report.hits.device',
-                        'type'  => 'string'
-                    ],
                     $redirectHit.'url'             => [
                         'label' => 'mautic.page.report.hits.redirect_url',
                         'type'  => 'url'
@@ -196,14 +191,35 @@ class ReportSubscriber extends CommonSubscriber
                         'label' => 'mautic.page.report.hits.redirect_unique_hits',
                         'type'  => 'string'
                     ],
-                    $emailPrefix.'id'              => [
-                        'label' => 'mautic.page.report.hits.email_id',
-                        'type'  => 'int'
-                    ],
-                    $emailPrefix.'subject'         => [
-                        'label' => 'mautic.page.report.hits.email_subject',
+                    'ds.device'         => [
+                        'label' => 'mautic.lead.device',
                         'type'  => 'string'
-                    ]
+                    ],
+                    'ds.device_brand'         => [
+                        'label' => 'mautic.lead.device_brand',
+                        'type'  => 'string'
+                    ],
+                    'ds.device_model'         => [
+                        'label' => 'mautic.lead.device_model',
+                        'type'  => 'string'
+                    ],
+                    'ds.device_os_name'         => [
+                        'label' => 'mautic.lead.device_os_name',
+                        'type'  => 'string'
+                    ],
+                    'ds.device_os_shortname'         => [
+                        'label' => 'mautic.lead.device_os_shortname',
+                        'type'  => 'string'
+                    ],
+                    'ds.device_os_version'         => [
+                        'label' => 'mautic.lead.device_os_version',
+                        'type'  => 'string'
+                    ],
+                    'ds.device_os_platform'         => [
+                        'label' => 'mautic.lead.device_os_platform',
+                        'type'  => 'string'
+                    ],
+
                 ];
                 $data        = [
                     'display_name' => 'mautic.page.hits',
@@ -252,8 +268,8 @@ class ReportSubscriber extends CommonSubscriber
                     ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id')
                     ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'tp', 'p.id = tp.id')
                     ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'vp', 'p.id = vp.id')
-                    ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = ph.email_id')
-                    ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'page_redirects', 'r', 'r.id = ph.redirect_id');
+                    ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'page_redirects', 'r', 'r.id = ph.redirect_id')
+                    ->leftJoin('ph',MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id = ph.device_id');
 
                 $event->addIpAddressLeftJoin($qb, 'ph');
                 $event->addCategoryLeftJoin($qb, 'p');
@@ -280,7 +296,7 @@ class ReportSubscriber extends CommonSubscriber
 
         $graphs  = $event->getRequestedGraphs();
         $qb      = $event->getQueryBuilder();
-        $hitRepo = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+        $hitRepo = $this->em->getRepository('MauticPageBundle:Hit');
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
@@ -345,8 +361,8 @@ class ReportSubscriber extends CommonSubscriber
                     $all       = $chartQuery->fetchCount($allQ);
                     $unique    = $chartQuery->fetchCount($uniqueQ);
                     $returning = $all - $unique;
-                    $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.unique'), $unique);
-                    $chart->setDataset($this->factory->getTranslator()->trans('mautic.page.graph.pie.new.vs.returning.returning'), $returning);
+                    $chart->setDataset($this->translator->trans('mautic.page.unique'), $unique);
+                    $chart->setDataset($this->translator->trans('mautic.page.graph.pie.new.vs.returning.returning'), $returning);
 
                     $event->setGraph(
                         $g,
@@ -380,7 +396,6 @@ class ReportSubscriber extends CommonSubscriber
                     break;
                 case 'mautic.page.graph.pie.devices':
                     $queryBuilder->select('ds.device, COUNT(distinct(ph.id)) as the_count')
-                        ->join('ph',MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id = ph.device_id')
                         ->groupBy('ds.device');
                     $data  = $queryBuilder->execute()->fetchAll();
                     $chart = new PieChart();

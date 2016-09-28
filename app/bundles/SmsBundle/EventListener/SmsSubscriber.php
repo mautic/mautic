@@ -10,6 +10,7 @@
 namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
@@ -26,6 +27,11 @@ use Mautic\SmsBundle\SmsEvents;
  */
 class SmsSubscriber extends CommonSubscriber
 {
+    /**
+     * @var AuditLogModel
+     */
+    protected $auditLogModel;
+
     /**
      * @var TrackableModel
      */
@@ -44,22 +50,21 @@ class SmsSubscriber extends CommonSubscriber
     /**
      * DynamicContentSubscriber constructor.
      *
-     * @param MauticFactory    $factory
+     * @param AuditLogModel    $auditLogModel
      * @param TrackableModel   $trackableModel
      * @param PageTokenHelper  $pageTokenHelper
      * @param AssetTokenHelper $assetTokenHelper
      */
     public function __construct(
-        MauticFactory $factory,
+        AuditLogModel $auditLogModel,
         TrackableModel $trackableModel,
         PageTokenHelper $pageTokenHelper,
         AssetTokenHelper $assetTokenHelper
     ) {
+        $this->auditLogModel    = $auditLogModel;
         $this->trackableModel   = $trackableModel;
         $this->pageTokenHelper  = $pageTokenHelper;
         $this->assetTokenHelper = $assetTokenHelper;
-
-        parent::__construct($factory);
     }
 
     /**
@@ -90,7 +95,7 @@ class SmsSubscriber extends CommonSubscriber
                 'action'   => ($event->isNew()) ? 'create' : 'update',
                 'details'  => $details,
             ];
-            $this->factory->getModel('core.auditLog')->writeToLog($log);
+            $this->auditLogModel->writeToLog($log);
         }
     }
 
@@ -109,7 +114,7 @@ class SmsSubscriber extends CommonSubscriber
             'action'   => 'delete',
             'details'  => ['name' => $entity->getName()],
         ];
-        $this->factory->getModel('core.auditLog')->writeToLog($log);
+        $this->auditLogModel->writeToLog($log);
     }
 
     /**

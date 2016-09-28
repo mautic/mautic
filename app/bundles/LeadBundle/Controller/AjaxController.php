@@ -14,7 +14,6 @@ use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Mautic\LeadBundle\LeadEvents;
@@ -64,7 +63,7 @@ class AjaxController extends CommonAjaxController
         if ($field && $value) {
             $repo        = $this->getModel('lead.lead')->getRepository();
             $leads       = $repo->getLeadsByFieldValue($field, $value, $ignore);
-            $dataArray['existsMessage'] = $this->factory->getTranslator()->trans('mautic.lead.exists.by.field').': ';
+            $dataArray['existsMessage'] = $this->translator->trans('mautic.lead.exists.by.field').': ';
 
             foreach ($leads as $lead) {
                 $fields = $repo->getFieldValues($lead->getId());
@@ -76,7 +75,7 @@ class AjaxController extends CommonAjaxController
                 }
 
                 if (!$name) {
-                    $name = $this->factory->getTranslator()->trans('mautic.lead.lead.anonymous');
+                    $name = $this->translator->trans('mautic.lead.lead.anonymous');
                 }
 
                 $leadLink = $this->generateUrl('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $lead->getId()]);
@@ -146,7 +145,7 @@ class AjaxController extends CommonAjaxController
             $model = $this->getModel('lead.lead');
             $lead  = $model->getEntity($leadId);
 
-            if ($lead !== null && $this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getOwner())) {
+            if ($lead !== null && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getPermissionUser())) {
                 $leadFields = $lead->getFields();
                 /** @var IntegrationHelper $integrationHelper */
                 $integrationHelper = $this->factory->getHelper('integration');
@@ -208,7 +207,7 @@ class AjaxController extends CommonAjaxController
             $model = $this->getModel('lead.lead');
             $lead  = $model->getEntity($leadId);
 
-            if ($lead !== null && $this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getOwner())) {
+            if ($lead !== null && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getPermissionUser())) {
                 $dataArray['success'] = 1;
                 /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
                 $helper         = $this->factory->getHelper('integration');
@@ -255,7 +254,7 @@ class AjaxController extends CommonAjaxController
 
             if ($lead !== null) {
 
-                $session = $this->factory->getSession();
+                $session = $this->get('session');
 
                 $filter = [
                     'search'        => $search,
@@ -266,7 +265,7 @@ class AjaxController extends CommonAjaxController
                 $session->set('mautic.lead.'.$leadId.'.timeline.filters', $filter);
 
                 // Trigger the TIMELINE_ON_GENERATE event to fetch the timeline events from subscribed bundles
-                $dispatcher = $this->factory->getDispatcher();
+                $dispatcher = $this->dispatcher;
                 $event      = new LeadTimelineEvent($lead, $filter);
                 $dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
 
@@ -359,8 +358,8 @@ class AjaxController extends CommonAjaxController
     {
         $dataArray = ['success' => 1];
 
-        if ($this->factory->getSecurity()->isGranted('lead:leads:create')) {
-            $session               = $this->factory->getSession();
+        if ($this->get('mautic.security')->isGranted('lead:leads:create')) {
+            $session               = $this->get('session');
             $dataArray['progress'] = $session->get('mautic.lead.import.progress', [0, 0]);
             $dataArray['percent']  = ($dataArray['progress'][1]) ? ceil(($dataArray['progress'][0] / $dataArray['progress'][1]) * 100) : 100;
         }
@@ -416,7 +415,7 @@ class AjaxController extends CommonAjaxController
 
         if (!empty($maxId)) {
             //set some permissions
-            $permissions = $this->factory->getSecurity()->isGranted(
+            $permissions = $this->get('mautic.security')->isGranted(
                 [
                     'lead:leads:viewown',
                     'lead:leads:viewother',
@@ -435,12 +434,12 @@ class AjaxController extends CommonAjaxController
 
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model   = $this->getModel('lead.lead');
-            $session = $this->factory->getSession();
+            $session = $this->get('session');
 
             $search = $session->get('mautic.lead.filter', '');
 
             $filter     = ['string' => $search, 'force' => []];
-            $translator = $this->factory->getTranslator();
+            $translator = $this->translator;
             $anonymous  = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
             $mine       = $translator->trans('mautic.core.searchcommand.ismine');
             $indexMode  = $session->get('mautic.lead.indexmode', 'list');
@@ -486,7 +485,7 @@ class AjaxController extends CommonAjaxController
                         'items'         => $results['results'],
                         'noContactList' => $emailRepo->getDoNotEmailList(),
                         'permissions'   => $permissions,
-                        'security'      => $this->factory->getSecurity(),
+                        'security'      => $this->get('mautic.security'),
                         'highlight'     => true
                     ]
                 );
@@ -516,23 +515,17 @@ class AjaxController extends CommonAjaxController
         $email = $model->getEntity($emailId);
 
         if ($email !== null
-            && $this->factory->getSecurity()->hasEntityAccess(
+            && $this->get('mautic.security')->hasEntityAccess(
                 'email:emails:viewown',
                 'email:emails:viewother',
                 $email->getCreatedBy()
             )
         ) {
-
             $mailer = $this->factory->getMailer();
             $mailer->setEmail($email, true, [], [], true);
 
             $data['body']    = $mailer->getBody();
             $data['subject'] = $mailer->getSubject();
-
-            // Parse tokens into view data
-            $tokens = $model->getBuilderComponents($email, ['tokens', 'visualTokens']);
-
-            BuilderTokenHelper::replaceTokensWithVisualPlaceholders($tokens, $data['body']);
         }
 
         return $this->sendJsonResponse($data);
@@ -552,7 +545,7 @@ class AjaxController extends CommonAjaxController
         $updatedTags = (!empty($post['tags']) && is_array($post['tags'])) ? $post['tags'] : [];
         $data        = ['success' => 0];
 
-        if ($lead !== null && $this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
+        if ($lead !== null && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
 
             $leadModel->setTags($lead, $updatedTags, true);
 
@@ -644,7 +637,7 @@ class AjaxController extends CommonAjaxController
                 }
             }
 
-            $leadModel = $this->factory->getModel('lead');
+            $leadModel = $this->getModel('lead');
 
             if (!empty($newUtmTags)) {
                 $leadModel->getUtmTagRepository()->saveEntities($newUtmTags);

@@ -44,7 +44,7 @@ class WidgetApiController extends CommonApiController
      */
     public function getTypesAction()
     {
-        $dispatcher = $this->factory->getDispatcher();
+        $dispatcher = $this->dispatcher;
         $event      = new WidgetTypeListEvent();
         $event->setTranslator($this->get('translator'));
         $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE, $event);
