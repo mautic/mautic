@@ -12,6 +12,8 @@ use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\FormBundle\Model\FormModel;
+use Mautic\FormBundle\Model\SubmissionModel;
 
 /**
  * Class DashboardSubscriber
@@ -50,6 +52,28 @@ class DashboardSubscriber extends MainDashboardSubscriber
     );
 
     /**
+     * @var SubmissionModel
+     */
+    protected $formSubmissionModel;
+
+    /**
+     * @var FormModel
+     */
+    protected $formModel;
+
+    /**
+     * DashboardSubscriber constructor.
+     *
+     * @param SubmissionModel $formSubmissionModel
+     * @param FormModel       $formModel
+     */
+    public function __construct(SubmissionModel $formSubmissionModel, FormModel $formModel)
+    {
+        $this->formModel = $formModel;
+        $this->formSubmissionModel = $formSubmissionModel;
+    }
+
+    /**
      * Set a widget detail when needed 
      *
      * @param WidgetDetailEvent $event
@@ -66,11 +90,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $params = $widget->getParams();
 
             if (!$event->isCached()) {
-                $model = $this->factory->getModel('form.submission');
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getSubmissionsLineChartData(
+                    'chartData'   => $this->formSubmissionModel->getSubmissionsLineChartData(
                         $params['timeUnit'],
                         $params['dateFrom'],
                         $params['dateTo'],
@@ -86,7 +109,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'top.submission.referrers') {
             if (!$event->isCached()) {
-                $model  = $this->factory->getModel('form.submission');
                 $params = $event->getWidget()->getParams();
 
                 if (empty($params['limit'])) {
@@ -96,7 +118,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $referrers = $model->getTopSubmissionReferrers($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers);
+                $referrers = $this->formSubmissionModel->getTopSubmissionReferrers($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers);
                 $items = array();
 
                 // Build table rows with links
@@ -133,7 +155,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'top.submitters') {
             if (!$event->isCached()) {
-                $model  = $this->factory->getModel('form.submission');
                 $params = $event->getWidget()->getParams();
 
                 if (empty($params['limit'])) {
@@ -143,14 +164,14 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $submitters = $model->getTopSubmitters($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers);
+                $submitters = $this->formSubmissionModel->getTopSubmitters($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers);
                 $items = array();
 
                 // Build table rows with links
                 if ($submitters) {
                     foreach ($submitters as &$submitter) {
                         $name = $submitter['lead_id'];
-                        $leadUrl = $this->factory->getRouter()->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $submitter['lead_id']));
+                        $leadUrl = $this->router->generate('mautic_contact_action', array('objectAction' => 'view', 'objectId' => $submitter['lead_id']));
                         if ($submitter['firstname'] || $submitter['lastname']) {
                             $name = trim($submitter['firstname'] . ' ' . $submitter['lastname']);
                         } elseif ($submitter['email']) {
@@ -187,7 +208,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'created.forms') {
             if (!$event->isCached()) {
-                $model  = $this->factory->getModel('form');
                 $params = $event->getWidget()->getParams();
 
                 if (empty($params['limit'])) {
@@ -197,13 +217,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $forms = $model->getFormList($limit, $params['dateFrom'], $params['dateTo'], array(), array('canViewOthers' => true));
+                $forms = $this->formModel->getFormList($limit, $params['dateFrom'], $params['dateTo'], array(), array('canViewOthers' => true));
                 $items = array();
 
                 // Build table rows with links
                 if ($forms) {
                     foreach ($forms as &$form) {
-                        $formUrl = $this->factory->getRouter()->generate('mautic_form_action', array('objectAction' => 'view', 'objectId' => $form['id']));
+                        $formUrl = $this->router->generate('mautic_form_action', array('objectAction' => 'view', 'objectId' => $form['id']));
                         $row = array(
                             array(
                                 'value' => $form['name'],

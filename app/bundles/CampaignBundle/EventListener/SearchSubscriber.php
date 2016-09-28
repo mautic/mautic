@@ -9,6 +9,7 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
@@ -20,6 +21,20 @@ use Mautic\CoreBundle\Event as MauticEvents;
  */
 class SearchSubscriber extends CommonSubscriber
 {
+    /**
+     * @var CampaignModel
+     */
+    protected $campaignModel;
+
+    /**
+     * SearchSubscriber constructor.
+     *
+     * @param CampaignModel $campaignModel
+     */
+    public function __construct(CampaignModel $campaignModel)
+    {
+        $this->campaignModel = $campaignModel;
+    }
 
     /**
      * @return array
@@ -43,7 +58,7 @@ class SearchSubscriber extends CommonSubscriber
                 return;
             }
 
-            $campaigns = $this->factory->getModel('campaign')->getEntities(
+            $campaigns = $this->campaignModel->getEntities(
                 array(
                     'limit'  => 5,
                     'filter' => $str
@@ -84,7 +99,7 @@ class SearchSubscriber extends CommonSubscriber
         if ($security->isGranted('campaign:campaigns:view')) {
             $event->addCommands(
                 'mautic.campaign.campaigns',
-                $this->factory->getModel('campaign')->getCommandList()
+                $this->campaignModel->getCommandList()
             );
         }
     }

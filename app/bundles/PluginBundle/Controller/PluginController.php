@@ -30,7 +30,7 @@ class PluginController extends FormController
      */
     public function indexAction()
     {
-        if (!$this->factory->getSecurity()->isGranted('plugin:plugins:manage')) {
+        if (!$this->get('mautic.security')->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
         }
 
@@ -44,7 +44,7 @@ class PluginController extends FormController
             ]
         );
 
-        $session      = $this->factory->getSession();
+        $session      = $this->get('session');
         $pluginFilter = $this->request->get('plugin', $session->get('mautic.integrations.filter', ''));
 
         $session->set('mautic.integrations.filter', $pluginFilter);
@@ -126,7 +126,7 @@ class PluginController extends FormController
      */
     public function configAction($name)
     {
-        if (!$this->factory->getSecurity()->isGranted('plugin:plugins:manage')) {
+        if (!$this->get('mautic.security')->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
         }
 
@@ -164,7 +164,7 @@ class PluginController extends FormController
                 $currentFeatureSettings = $entity->getFeatureSettings();
 
                 if ($valid = $this->isFormValid($form)) {
-                    $em          = $this->factory->getEntityManager();
+                    $em          = $this->get('doctrine.orm.entity_manager');
                     $integration = $entity->getName();
 
                     // Merge keys
@@ -210,7 +210,7 @@ class PluginController extends FormController
                     if ($authorize) {
                         //redirect to the oauth URL
                         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
-                        $event    = $this->factory->getDispatcher()->dispatch(
+                        $event    = $this->dispatcher->dispatch(
                             PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT,
                             new PluginIntegrationAuthRedirectEvent(
                                 $integrationObject,
@@ -224,7 +224,7 @@ class PluginController extends FormController
                                 'integration'         => $integration,
                                 'authUrl'             => $oauthUrl,
                                 'authorize'           => 1,
-                                'popupBlockerMessage' => $this->factory->getTranslator()->trans('mautic.core.popupblocked')
+                                'popupBlockerMessage' => $this->translator->trans('mautic.core.popupblocked')
                             ]
                         );
                     }
@@ -295,7 +295,7 @@ class PluginController extends FormController
      */
     public function infoAction($name)
     {
-        if (!$this->factory->getSecurity()->isGranted('plugin:plugins:manage')) {
+        if (!$this->get('mautic.security')->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
         }
 
@@ -338,17 +338,17 @@ class PluginController extends FormController
      */
     public function reloadAction()
     {
-        if (!$this->factory->getSecurity()->isGranted('plugin:plugins:manage')) {
+        if (!$this->get('mautic.security')->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
         }
 
         /** @var \Mautic\PluginBundle\Model\PluginModel $model */
         $model   = $this->getModel('plugin');
-        $plugins = $this->factory->getParameter('plugin.bundles');
+        $plugins = $this->coreParametersHelper->getParameter('plugin.bundles');
         $added   = $disabled = $updated = 0;
 
         // Get the metadata for plugins for installation
-        $em             = $this->factory->getEntityManager();
+        $em             = $this->get('doctrine.orm.entity_manager');
         $allMetadata    = $em->getMetadataFactory()->getAllMetadata();
         $pluginMetadata = $pluginInstalledSchemas = $currentPluginTables = [];
 
@@ -514,7 +514,7 @@ class PluginController extends FormController
         );
 
         $viewParameters = [
-            'page' => $this->factory->getSession()->get('mautic.plugin.page')
+            'page' => $this->get('session')->get('mautic.plugin.page')
         ];
 
         // Refresh the index contents

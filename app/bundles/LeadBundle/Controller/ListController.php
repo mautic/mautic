@@ -30,10 +30,10 @@ class ListController extends FormController
     {
         /** @var ListModel $model */
         $model   = $this->getModel('lead.list');
-        $session = $this->factory->getSession();
+        $session = $this->get('session');
 
         //set some permissions
-        $permissions = $this->factory->getSecurity()->isGranted(array(
+        $permissions = $this->get('mautic.security')->isGranted(array(
             'lead:leads:viewown',
             'lead:leads:viewother',
             'lead:lists:viewother',
@@ -51,7 +51,7 @@ class ListController extends FormController
         }
 
         //set limits
-        $limit = $session->get('mautic.segment.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.segment.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -124,9 +124,9 @@ class ListController extends FormController
             'page'        => $page,
             'limit'       => $limit,
             'permissions' => $permissions,
-            'security'    => $this->factory->getSecurity(),
+            'security'    => $this->get('mautic.security'),
             'tmpl'        => $tmpl,
-            'currentUser' => $this->factory->getUser(),
+            'currentUser' => $this->user,
             'searchValue' => $search
         );
 
@@ -148,7 +148,7 @@ class ListController extends FormController
      */
     public function newAction ()
     {
-        if (!$this->factory->getSecurity()->isGranted('lead:leads:viewown')) {
+        if (!$this->get('mautic.security')->isGranted('lead:leads:viewown')) {
             return $this->accessDenied();
         }
 
@@ -157,7 +157,7 @@ class ListController extends FormController
         /** @var ListModel $model */
         $model      =$this->getModel('lead.list');
         //set the page we came from
-        $page       = $this->factory->getSession()->get('mautic.segment.page', 1);
+        $page       = $this->get('session')->get('mautic.segment.page', 1);
         //set the return URL for post actions
         $returnUrl  = $this->generateUrl('mautic_segment_index', array('page' => $page));
         $action     = $this->generateUrl('mautic_segment_action', array('objectAction' => 'new'));
@@ -226,7 +226,7 @@ class ListController extends FormController
         $list    = $model->getEntity($objectId);
 
         //set the page we came from
-        $page    = $this->factory->getSession()->get('mautic.segment.page', 1);
+        $page    = $this->get('session')->get('mautic.segment.page', 1);
 
         //set the return URL
         $returnUrl  = $this->generateUrl('mautic_segment_index', array('page' => $page));
@@ -253,7 +253,7 @@ class ListController extends FormController
                     )
                 ))
             );
-        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(
             true, 'lead:lists:editother', $list->getCreatedBy()
         )) {
             return $this->accessDenied();
@@ -317,7 +317,7 @@ class ListController extends FormController
      */
     public function deleteAction($objectId)
     {
-        $page      = $this->factory->getSession()->get('mautic.segment.page', 1);
+        $page      = $this->get('session')->get('mautic.segment.page', 1);
         $returnUrl = $this->generateUrl('mautic_segment_index', array('page' => $page));
         $flashes   = array();
 
@@ -342,7 +342,7 @@ class ListController extends FormController
                     'msg'     => 'mautic.lead.list.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
-            } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+            } elseif (!$this->get('mautic.security')->hasEntityAccess(
                 true, 'lead:lists:deleteother', $list->getCreatedBy()
             )
             ) {
@@ -376,7 +376,7 @@ class ListController extends FormController
      * @return JsonResponse | RedirectResponse
      */
     public function batchDeleteAction() {
-        $page        = $this->factory->getSession()->get('mautic.segment.page', 1);
+        $page        = $this->get('session')->get('mautic.segment.page', 1);
         $returnUrl   = $this->generateUrl('mautic_segment_index', array('page' => $page));
         $flashes     = array();
 
@@ -406,7 +406,7 @@ class ListController extends FormController
                         'msg'     => 'mautic.lead.list.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     );
-                } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+                } elseif (!$this->get('mautic.security')->hasEntityAccess(
                     true, 'lead:lists:deleteother', $entity->getCreatedBy()
                 )) {
                     $flashes[] = $this->accessDenied(true);
@@ -465,7 +465,7 @@ class ListController extends FormController
      * @return array | JsonResponse | RedirectResponse
      */
     protected function changeList($listId, $action) {
-        $page        = $this->factory->getSession()->get('mautic.lead.page', 1);
+        $page        = $this->get('session')->get('mautic.lead.page', 1);
         $returnUrl   = $this->generateUrl('mautic_contact_index', array('page' => $page));
         $flashes     = array();
 
@@ -495,8 +495,8 @@ class ListController extends FormController
                     'msg'     => 'mautic.lead.lead.error.notfound',
                     'msgVars' => array('%id%' => $listId)
                 );
-            } elseif (!$this->factory->getSecurity()->hasEntityAccess(
-                'lead:leads:editown', 'lead:leads:editother', $lead->getOwner()
+            } elseif (!$this->get('mautic.security')->hasEntityAccess(
+                'lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser()
             )) {
                 return $this->accessDenied();
             } elseif ($list === null) {
@@ -505,7 +505,7 @@ class ListController extends FormController
                     'msg'     => 'mautic.lead.list.error.notfound',
                     'msgVars' => array('%id%' => $list->getId())
                 );
-            } elseif (!$list->isGlobal() && !$this->factory->getSecurity()->hasEntityAccess(
+            } elseif (!$list->isGlobal() && !$this->get('mautic.security')->hasEntityAccess(
                     true, 'lead:lists:viewother', $list->getCreatedBy()
                 )) {
                 return $this->accessDenied();

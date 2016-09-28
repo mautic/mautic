@@ -64,7 +64,7 @@ class AjaxController extends CommonAjaxController
 
         if ($objectId && $entity = $model->getEntity($objectId)) {
             $dataArray['success'] = 1;
-            $session              = $this->factory->getSession();
+            $session              = $this->get('session');
             $progress             = $session->get('mautic.email.send.progress', array(0, (int) $pending));
             $stats                = $session->get('mautic.email.send.stats', array('sent' => 0, 'failed' => 0, 'failedRecipients' => array()));
 
@@ -164,11 +164,11 @@ class AjaxController extends CommonAjaxController
     {
         $dataArray = array('success' => 0, 'message' => '');
 
-        if ($this->factory->getUser()->isAdmin()) {
+        if ($this->user->isAdmin()) {
             $settings = $request->request->all();
 
             if (empty($settings['password'])) {
-                $existingMonitoredSettings = $this->factory->getParameter('monitored_email');
+                $existingMonitoredSettings = $this->coreParametersHelper->getParameter('monitored_email');
                 if (is_array($existingMonitoredSettings) && (!empty($existingMonitoredSettings[$settings['mailbox']]['password']))) {
                     $settings['password'] = $existingMonitoredSettings[$settings['mailbox']]['password'];
                 }
@@ -187,7 +187,7 @@ class AjaxController extends CommonAjaxController
                     }
                 }
                 $dataArray['success'] = 1;
-                $dataArray['message'] = $this->factory->getTranslator()->trans('mautic.core.success');
+                $dataArray['message'] = $this->translator->trans('mautic.core.success');
             } catch (\Exception $e) {
                 $dataArray['message'] = $e->getMessage();
             }

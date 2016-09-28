@@ -29,7 +29,7 @@ class UserController extends FormController
      */
     public function indexAction($page = 1)
     {
-        if (!$this->factory->getSecurity()->isGranted('user:users:view')) {
+        if (!$this->get('mautic.security')->isGranted('user:users:view')) {
             return $this->accessDenied();
         }
 
@@ -38,17 +38,17 @@ class UserController extends FormController
         }
 
         //set limits
-        $limit = $this->factory->getSession()->get('mautic.user.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $this->get('session')->get('mautic.user.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
-        $orderBy    = $this->factory->getSession()->get('mautic.user.orderby', 'u.lastName, u.firstName, u.username');
-        $orderByDir = $this->factory->getSession()->get('mautic.user.orderbydir', 'ASC');
+        $orderBy    = $this->get('session')->get('mautic.user.orderby', 'u.lastName, u.firstName, u.username');
+        $orderByDir = $this->get('session')->get('mautic.user.orderbydir', 'ASC');
 
-        $search = $this->request->get('search', $this->factory->getSession()->get('mautic.user.filter', ''));
-        $this->factory->getSession()->set('mautic.user.filter', $search);
+        $search = $this->request->get('search', $this->get('session')->get('mautic.user.filter', ''));
+        $this->get('session')->set('mautic.user.filter', $search);
 
         //do some default filtering
         $filter = array('string' => $search, 'force' => '');
@@ -68,7 +68,7 @@ class UserController extends FormController
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
             $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->factory->getSession()->set('mautic.user.page', $lastPage);
+            $this->get('session')->set('mautic.user.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_user_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(array(
@@ -86,13 +86,13 @@ class UserController extends FormController
         }
 
         //set what page currently on so that we can return here after form submission/cancellation
-        $this->factory->getSession()->set('mautic.user.page', $page);
+        $this->get('session')->set('mautic.user.page', $page);
 
         //set some permissions
         $permissions = array(
-            'create' => $this->factory->getSecurity()->isGranted('user:users:create'),
-            'edit'   => $this->factory->getSecurity()->isGranted('user:users:editother'),
-            'delete' => $this->factory->getSecurity()->isGranted('user:users:deleteother'),
+            'create' => $this->get('mautic.security')->isGranted('user:users:create'),
+            'edit'   => $this->get('mautic.security')->isGranted('user:users:editother'),
+            'delete' => $this->get('mautic.security')->isGranted('user:users:deleteother'),
         );
 
         $parameters = array(
@@ -121,7 +121,7 @@ class UserController extends FormController
      */
     public function newAction()
     {
-        if (!$this->factory->getSecurity()->isGranted('user:users:create')) {
+        if (!$this->get('mautic.security')->isGranted('user:users:create')) {
             return $this->accessDenied();
         }
 
@@ -135,7 +135,7 @@ class UserController extends FormController
         $returnUrl = $this->generateUrl('mautic_user_index');
 
         //set the page we came from
-        $page = $this->factory->getSession()->get('mautic.user.page', 1);
+        $page = $this->get('session')->get('mautic.user.page', 1);
 
         //get the user form factory
         $action = $this->generateUrl('mautic_user_action', array('objectAction' => 'new'));
@@ -156,7 +156,7 @@ class UserController extends FormController
                     $model->saveEntity($user);
 
                     //check if the user's locale has been downloaded already, fetch it if not
-                    $installedLanguages = $this->factory->getParameter('supported_languages');
+                    $installedLanguages = $this->coreParametersHelper->getParameter('supported_languages');
 
                     if ($user->getLocale() && !array_key_exists($user->getLocale(), $installedLanguages)) {
                         /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
@@ -230,14 +230,14 @@ class UserController extends FormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
-        if (!$this->factory->getSecurity()->isGranted('user:users:edit')) {
+        if (!$this->get('mautic.security')->isGranted('user:users:edit')) {
             return $this->accessDenied();
         }
         $model = $this->getModel('user.user');
         $user  = $model->getEntity($objectId);
 
         //set the page we came from
-        $page = $this->factory->getSession()->get('mautic.user.page', 1);
+        $page = $this->get('session')->get('mautic.user.page', 1);
 
         //set the return URL
         $returnUrl = $this->generateUrl('mautic_user_index', array('page' => $page));
@@ -288,7 +288,7 @@ class UserController extends FormController
                     $model->saveEntity($user, $form->get('buttons')->get('save')->isClicked());
 
                     //check if the user's locale has been downloaded already, fetch it if not
-                    $installedLanguages = $this->factory->getParameter('supported_languages');
+                    $installedLanguages = $this->coreParametersHelper->getParameter('supported_languages');
 
                     if ($user->getLocale() && !array_key_exists($user->getLocale(), $installedLanguages)) {
                         /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
@@ -356,12 +356,12 @@ class UserController extends FormController
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction($objectId) {
-        if (!$this->factory->getSecurity()->isGranted('user:users:delete')) {
+        if (!$this->get('mautic.security')->isGranted('user:users:delete')) {
             return $this->accessDenied();
         }
 
-        $currentUser    = $this->factory->getUser();
-        $page           = $this->factory->getSession()->get('mautic.user.page', 1);
+        $currentUser    = $this->user;
+        $page           = $this->get('session')->get('mautic.user.page', 1);
         $returnUrl      = $this->generateUrl('mautic_user_index', array('page' => $page));
         $success        = 0;
         $flashes        = array();
@@ -447,7 +447,7 @@ class UserController extends FormController
         $action = $this->generateUrl('mautic_user_action', array('objectAction' => 'contact', 'objectId' => $objectId));
         $form   = $this->createForm(new FormType\ContactType(), array(), array('action' => $action));
 
-        $currentUser = $this->factory->getUser();
+        $currentUser = $this->user;
 
         if ($this->request->getMethod() == 'POST') {
             $formUrl   = $this->request->request->get('contact[returnUrl]', '', true);
@@ -540,7 +540,7 @@ class UserController extends FormController
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function batchDeleteAction() {
-        $page        = $this->factory->getSession()->get('mautic.user.page', 1);
+        $page        = $this->get('session')->get('mautic.user.page', 1);
         $returnUrl   = $this->generateUrl('mautic_user_index', array('page' => $page));
         $flashes     = array();
 
@@ -558,7 +558,7 @@ class UserController extends FormController
             $model     = $this->getModel('user');
             $ids       = json_decode($this->request->query->get('ids', ''));
             $deleteIds = array();
-            $currentUser    = $this->factory->getUser();
+            $currentUser    = $this->user;
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
@@ -575,7 +575,7 @@ class UserController extends FormController
                         'msg'     => 'mautic.user.user.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     );
-                } elseif (!$this->factory->getSecurity()->isGranted('user:users:delete')) {
+                } elseif (!$this->get('mautic.security')->isGranted('user:users:delete')) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'user', true);

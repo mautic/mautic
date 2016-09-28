@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 
@@ -35,16 +36,20 @@ class BuilderSubscriber extends CommonSubscriber
     protected $tokenHelper;
 
     /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
      * BuilderSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param TokenHelper   $tokenHelper
+     * @param TokenHelper $tokenHelper
+     * @param LeadModel   $leadModel
      */
-    public function __construct(MauticFactory $factory, TokenHelper $tokenHelper)
+    public function __construct(TokenHelper $tokenHelper, LeadModel $leadModel)
     {
         $this->tokenHelper = $tokenHelper;
-
-        parent::__construct($factory);
+        $this->leadModel   = $leadModel;
     }
 
     /**
@@ -95,7 +100,7 @@ class BuilderSubscriber extends CommonSubscriber
     public function onPageDisplay(PageDisplayEvent $event)
     {
         $page   = $event->getPage();
-        $leadId = ($this->factory->getSecurity()->isAnonymous()) ? $this->factory->getModel('lead')->getCurrentLead()->getId() : null;
+        $leadId = ($this->security->isAnonymous()) ? $this->leadModel->getCurrentLead()->getId() : null;
         $tokens = $this->generateTokensFromContent($event, $leadId, array('page', $page->getId()));
 
         $content = $event->getContent();

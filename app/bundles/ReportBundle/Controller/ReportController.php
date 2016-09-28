@@ -54,7 +54,7 @@ class ReportController extends FormController
         }
 
         //set limits
-        $limit = $this->container->get('session')->get('mautic.report.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $this->container->get('session')->get('mautic.report.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -66,7 +66,7 @@ class ReportController extends FormController
         $filter = ['string' => $search, 'force' => []];
 
         if (!$permissions['report:reports:viewother']) {
-            $filter['force'][] = ['column' => 'r.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId()];
+            $filter['force'][] = ['column' => 'r.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
         $orderBy    = $this->container->get('session')->get('mautic.report.orderby', 'r.name');
