@@ -584,7 +584,7 @@ var Mautic = {
                         options.htmlRemoveTags = [];
                         options.lineBreakerTags = [];
                     }
-                    
+
                     textarea.on('froalaEditor.focus', function (e, editor) {
                         Mautic.showChangeThemeWarning = true;
                     });
