@@ -42,6 +42,28 @@ $edit   = $view['security']->hasEntityAccess(
 
 $buttons = [];
 
+
+//Do not contact button
+if (!$doNotContact) :
+    $buttons[] = [
+        'attr'      => [
+            'id'          => 'doNotContactButton',
+            'data-toggle' => 'confirmation',
+            'data-message' => $view['translator']->trans('mautic.lead.event.donotcontact').' ?',
+            'data-confirm-text' => 'Ok',
+            'data-confirm-callback' => 'doNotContact',
+            'data-cancel-text' => 'Cancel',
+            'data-cancel-callback' => 'dismissConfirmation',
+            'href'        => $view['router']->path(
+                'mautic_contact_action',
+                ['objectId' => $lead->getId(), 'objectAction' => 'doNotContact']
+            ),
+        ],
+        'btnText'   => $view['translator']->trans('mautic.lead.event.donotcontact'),
+        'iconClass' => 'fa fa-minus-circle',
+    ];
+endif;
+
 //Send email button
 if (!empty($fields['core']['email']['value'])) {
     $buttons[] = [

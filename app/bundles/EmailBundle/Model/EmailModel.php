@@ -1495,13 +1495,18 @@ class EmailModel extends FormModel
      *
      * @return bool|DoNotContact
      */
-    public function setDoNotContact(Stat $stat, $comments, $reason = DoNotContact::BOUNCED, $flush = true)
-    {
-        $lead = $stat->getLead();
-
+    public function setDoNotContact(Stat $stat = NULL, $comments, $reason = DoNotContact::BOUNCED, $flush = true , $lead = NULL)
+    {   
+        if(!empty($stat)) {
+            $lead = $stat->getLead();
+        }
         if ($lead instanceof Lead) {
-            $email   = $stat->getEmail();
-            $channel = ($email) ? ['email' => $email->getId()] : 'email';
+            if(!empty($stat)) {
+                $email   = $stat->getEmail();
+                $channel = ($email) ? ['email' => $email->getId()] : 'email';
+            } else {
+                $channel = 'email';
+            }
 
             return $this->leadModel->addDncForLead($lead, $channel, $comments, $reason, $flush);
         }
