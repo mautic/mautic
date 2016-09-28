@@ -78,8 +78,8 @@ class UserApiController extends CommonApiController
 
         $parameters = $this->request->request->all();
 
-        if (isset($parameters['plainPassword']['password'])) {
-            $submittedPassword = $parameters['plainPassword']['password'];
+        if (isset($parameters['plainPassword'])) {
+            $submittedPassword = $parameters['plainPassword'];
             $encoder           = $this->get('security.encoder_factory')->getEncoder($entity);
             $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword));
         }
