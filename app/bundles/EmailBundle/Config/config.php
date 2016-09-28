@@ -128,6 +128,14 @@ return [
             ],
             'mautic.email.dashboard.subscriber'      => [
                 'class' => 'Mautic\EmailBundle\EventListener\DashboardSubscriber'
+            ],
+            'mautic.email.broadcast.subscriber'      => [
+                'class' => 'Mautic\EmailBundle\EventListener\BroadcastSubscriber',
+                'arguments' => [
+                    'mautic.email.model.email',
+                    'doctrine.orm.entity_manager',
+                    'translator'
+                ]
             ]
         ],
         'forms'  => [

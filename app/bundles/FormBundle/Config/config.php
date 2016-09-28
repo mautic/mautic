@@ -223,6 +223,7 @@ return [
                 'arguments' => [
                     'request_stack',
                     'mautic.helper.templating',
+                    'mautic.helper.theme',
                     'mautic.schema.helper.factory',
                     'mautic.form.model.action',
                     'mautic.form.model.field',

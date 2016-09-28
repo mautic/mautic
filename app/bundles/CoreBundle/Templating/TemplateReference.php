@@ -124,4 +124,18 @@ class TemplateReference extends BaseTemplateReference
 
         return $template;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLogicalName()
+    {
+        $logicalName = parent::getLogicalName();
+
+        if (!empty($this->themeOverride)) {
+            $logicalName = $this->themeOverride.'|'.$logicalName;
+        }
+
+        return $logicalName;
+    }
 }

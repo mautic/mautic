@@ -18,7 +18,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
 {
     protected $checkfile;
     protected $key;
-    protected $pidTable = array();
+    protected $pidTable = [];
 
     /* @var OutputInterface $output */
     protected $output;
@@ -52,7 +52,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
 
         $this->pidTable = json_decode(fgets($fp, 8192), true);
         if (!is_array($this->pidTable)) {
-            $this->pidTable = array();
+            $this->pidTable = [];
         }
 
         $currentPid = getmypid();
@@ -86,7 +86,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
 
         flock($fp, LOCK_UN);
         fclose($fp);
-
+        sleep(10);
         return true;
     }
 

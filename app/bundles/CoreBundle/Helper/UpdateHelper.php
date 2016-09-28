@@ -80,6 +80,22 @@ class UpdateHelper
     }
 
     /**
+     * Tries to get server OS
+     *
+     * @return string
+     */
+    public function getServerOs()
+    {
+        if (function_exists('php_uname')) {
+            return php_uname('s') . ' ' . php_uname('r');
+        } elseif (defined('PHP_OS')) {
+            return PHP_OS;
+        }
+
+        return 'N/A';
+    }
+
+    /**
      * Retrieves the update data from our home server
      *
      * @param bool $overrideCache
@@ -88,7 +104,7 @@ class UpdateHelper
      */
     public function fetchData($overrideCache = false)
     {
-        $cacheFile = $this->factory->getSystemPath('cache') . '/lastUpdateCheck.txt';
+        $cacheFile = $this->factory->getSystemPath('cache').'/lastUpdateCheck.txt';
 
         // Check if we have a cache file and try to return cached data if so
         if (!$overrideCache && is_readable($cacheFile)) {
@@ -106,77 +122,85 @@ class UpdateHelper
         // Before processing the update data, send up our metrics
         try {
             // Generate a unique instance ID for the site
-            $instanceId = hash('sha1', $this->factory->getParameter('secret_key') . 'Mautic' . $this->factory->getParameter('db_driver'));
+            $instanceId = hash('sha1', $this->factory->getParameter('secret_key').'Mautic'.$this->factory->getParameter('db_driver'));
 
-            $data = array(
-                'application'   => 'Mautic',
-                'version'       => $this->factory->getVersion(),
-                'phpVersion'    => PHP_VERSION,
-                'dbDriver'      => $this->factory->getParameter('db_driver'),
-                'serverOs'      => php_uname('s') . ' ' . php_uname('r'),
-                'instanceId'    => $instanceId,
-                'installSource' => $this->factory->getParameter('install_source', 'Mautic')
+            $data = array_map(
+                'trim',
+                [
+                    'application'   => 'Mautic',
+                    'version'       => $this->factory->getVersion(),
+                    'phpVersion'    => PHP_VERSION,
+                    'dbDriver'      => $this->factory->getParameter('db_driver'),
+                    'serverOs'      => $this->getServerOs(),
+                    'instanceId'    => $instanceId,
+                    'installSource' => $this->factory->getParameter('install_source', 'Mautic')
+                ]
             );
 
-            $this->connector->post('https://updates.mautic.org/stats/send', $data, array(), 10);
+            $this->connector->post('https://updates.mautic.org/stats/send', $data, [], 10);
         } catch (\Exception $exception) {
             // Not so concerned about failures here, move along
         }
 
         // Get the update data
         try {
-            $appData = array(
-                'appVersion' => $this->factory->getVersion(),
-                'phpVersion' => PHP_VERSION,
-                'stability'  => $this->factory->getParameter('update_stability')
+            $appData = array_map(
+                'trim',
+                [
+                    'appVersion' => $this->factory->getVersion(),
+                    'phpVersion' => PHP_VERSION,
+                    'stability'  => $this->factory->getParameter('update_stability')
+                ]
             );
 
-            $data    = $this->connector->post('https://updates.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates', $appData, array(), 10);
-            $update  = json_decode($data->body);
+            $data   = $this->connector->post('https://updates.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates', $appData, [], 10);
+            $update = json_decode($data->body);
         } catch (\Exception $exception) {
             // Log the error
             $logger = $this->factory->getLogger();
-            $logger->addError('An error occurred while attempting to fetch updates: ' . $exception->getMessage());
+            $logger->addError('An error occurred while attempting to fetch updates: '.$exception->getMessage());
 
-            return array(
+            return [
                 'error'   => true,
                 'message' => 'mautic.core.updater.error.fetching.updates'
-            );
+            ];
         }
 
         if ($data->code != 200) {
             // Log the error
             $logger = $this->factory->getLogger();
-            $logger->addError(sprintf(
-                'An unexpected %1$s code was returned while attempting to fetch updates.  The message received was: %2$s',
-                $data->code,
-                is_string($data->body) ? $data->body : implode('; ', $data->body)
-            ));
+            $logger->addError(
+                sprintf(
+                    'An unexpected %1$s code was returned while attempting to fetch updates.  The message received was: %2$s',
+                    $data->code,
+                    is_string($data->body) ? $data->body : implode('; ', $data->body)
+                )
+            );
 
-            return array(
+            return [
                 'error'   => true,
                 'message' => 'mautic.core.updater.error.fetching.updates'
-            );
+            ];
         }
 
         // If the user's up-to-date, go no further
         if ($update->latest_version) {
-            return array(
+            return [
                 'error'   => false,
                 'message' => 'mautic.core.updater.running.latest.version'
-            );
+            ];
         }
 
         // Last sanity check, if the $update->version is older than our current version
         if (version_compare($this->factory->getVersion(), $update->version, 'ge')) {
-            return array(
+            return [
                 'error'   => false,
                 'message' => 'mautic.core.updater.running.latest.version'
-            );
+            ];
         }
 
         // The user is able to update to the latest version, cache the data first
-        $data = array(
+        $data = [
             'error'        => false,
             'message'      => 'mautic.core.updater.update.available',
             'version'      => $update->version,
@@ -184,7 +208,7 @@ class UpdateHelper
             'package'      => $update->package,
             'checkedTime'  => time(),
             'stability'    => $this->factory->getParameter('update_stability')
-        );
+        ];
 
         file_put_contents($cacheFile, json_encode($data));
 

@@ -496,7 +496,7 @@ class ListController extends FormController
                     'msgVars' => array('%id%' => $listId)
                 );
             } elseif (!$this->factory->getSecurity()->hasEntityAccess(
-                'lead:leads:editown', 'lead:leads:editother', $lead->getOwner()
+                'lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser()
             )) {
                 return $this->accessDenied();
             } elseif ($list === null) {

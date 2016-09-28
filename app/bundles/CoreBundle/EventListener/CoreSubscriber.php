@@ -38,7 +38,7 @@ class CoreSubscriber extends CommonSubscriber
         return array(
             KernelEvents::CONTROLLER          => array('onKernelController', 0),
             KernelEvents::REQUEST             => [
-                ['onKernelRequestSetTimezone', 9999],
+                ['onKernelRequestSetTimezone', 100],
                 ['onKernelRequestSetLocale', 15], // Must be 15 to load after Symfony's default Locale listener
                 ['onKernelRequestAddGlobalJS', 0]
             ],
@@ -56,6 +56,7 @@ class CoreSubscriber extends CommonSubscriber
      */
     public function onKernelRequestSetTimezone(GetResponseEvent $event)
     {
+
         $request = $event->getRequest();
         if (!$request->hasPreviousSession()) {
             return;
