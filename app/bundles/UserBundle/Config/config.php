@@ -111,10 +111,18 @@ return array(
     'services' => array(
         'events' => array(
             'mautic.user.subscriber'        => array(
-                'class'     => 'Mautic\UserBundle\EventListener\UserSubscriber'
+                'class'     => 'Mautic\UserBundle\EventListener\UserSubscriber',
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog'
+                ]
             ),
             'mautic.user.search.subscriber' => array(
-                'class'     => 'Mautic\UserBundle\EventListener\SearchSubscriber'
+                'class'     => 'Mautic\UserBundle\EventListener\SearchSubscriber',
+                'arguments' => [
+                    'mautic.user.model.user',
+                    'mautic.user.model.role'
+                ]
             )
         ),
         'forms'  => array(

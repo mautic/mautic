@@ -37,14 +37,11 @@ class LeadSubscriber extends CommonSubscriber
     /**
      * LeadSubscriber constructor.
      *
-     * @param MauticFactory $factory
      * @param FormModel     $formModel
      * @param PageModel     $pageModel
      */
-    public function __construct(MauticFactory $factory, FormModel $formModel, PageModel $pageModel)
+    public function __construct(FormModel $formModel, PageModel $pageModel)
     {
-        parent::__construct($factory);
-
         $this->formModel = $formModel;
         $this->pageModel = $pageModel;
     }

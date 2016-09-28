@@ -27,7 +27,7 @@ class AjaxController extends CommonAjaxController
                 'success' => 1,
                 'html' =>
                     '<div class="has-error"><span class="help-block">'
-                    . $this->factory->getTranslator()->trans('mautic.webhook.label.no.url')
+                    . $this->translator->trans('mautic.webhook.label.no.url')
                     . '</span></div>',
             );
 
@@ -58,7 +58,7 @@ class AjaxController extends CommonAjaxController
             'success' => 1,
             'html' =>
                 '<div class="has-error"><span class="help-block">'
-                . $this->factory->getTranslator()->trans('mautic.webhook.label.warning')
+                . $this->translator->trans('mautic.webhook.label.warning')
                 . '</span></div>',
         );
 
@@ -66,7 +66,7 @@ class AjaxController extends CommonAjaxController
         if ($response->code == 200) {
             $dataArray['html'] =
                 '<div class="has-success"><span class="help-block">'
-                . $this->factory->getTranslator()->trans('mautic.webhook.label.success')
+                . $this->translator->trans('mautic.webhook.label.success')
                 . '</span></div>';
         }
 

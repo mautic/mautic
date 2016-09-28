@@ -67,10 +67,7 @@ class ResultController extends CommonFormController
         }
 
         //set limits
-        $limit = $session->get(
-            'mautic.formresult.'.$objectId.'.limit',
-            $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit')
-        );
+        $limit = $session->get('mautic.formresult.'.$objectId.'.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
 
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {

@@ -27,13 +27,10 @@ class MaintenanceSubscriber extends CommonSubscriber
     /**
      * MaintenanceSubscriber constructor.
      *
-     * @param MauticFactory $factory
      * @param Connection    $db
      */
-    public function __construct(MauticFactory $factory, Connection $db)
+    public function __construct(Connection $db)
     {
-        parent::__construct($factory);
-
         $this->db = $db;
     }
 
@@ -48,10 +45,7 @@ class MaintenanceSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param $isDryRun
-     * @param $date
-     *
-     * @return int
+     * @param MaintenanceEvent $event
      */
     public function onDataCleanup (MaintenanceEvent $event)
     {
@@ -60,10 +54,8 @@ class MaintenanceSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param $isDryRun
-     * @param $date
-     *
-     * @return int
+     * @param MaintenanceEvent $event
+     * @param                  $table
      */
     private function cleanupData (MaintenanceEvent $event, $table)
     {

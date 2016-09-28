@@ -10,9 +10,7 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -77,7 +75,6 @@ class ReportSubscriber extends CommonSubscriber
     /**
      * ReportSubscriber constructor.
      *
-     * @param MauticFactory $factory
      * @param ListModel     $listModel
      * @param FieldModel    $fieldModel
      * @param LeadModel     $leadModel
@@ -85,10 +82,15 @@ class ReportSubscriber extends CommonSubscriber
      * @param CampaignModel $campaignModel
      * @param UserModel     $userModel
      */
-    public function __construct(MauticFactory $factory, ListModel $listModel, FieldModel $fieldModel, LeadModel $leadModel, StageModel $stageModel, CampaignModel $campaignModel, UserModel $userModel)
+    public function __construct(
+        ListModel $listModel,
+        FieldModel $fieldModel,
+        LeadModel $leadModel,
+        StageModel $stageModel,
+        CampaignModel $campaignModel,
+        UserModel $userModel
+    )
     {
-        parent::__construct($factory);
-
         $this->listModel     = $listModel;
         $this->fieldModel    = $fieldModel;
         $this->leadModel     = $leadModel;

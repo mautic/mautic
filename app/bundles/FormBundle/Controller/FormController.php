@@ -57,7 +57,7 @@ class FormController extends CommonFormController
         $session = $this->get('session');
 
         //set limits
-        $limit = $session->get('mautic.form.limit', $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.form.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -69,7 +69,7 @@ class FormController extends CommonFormController
         $filter = ['string' => $search, 'force' => []];
 
         if (!$permissions['form:forms:viewother']) {
-            $filter['force'][] = ['column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->get('mautic.helper.user')->getUser()->getId()];
+            $filter['force'][] = array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->user->getId());
         }
 
         $orderBy    = $session->get('mautic.form.orderby', 'f.name');
@@ -182,7 +182,7 @@ class FormController extends CommonFormController
         }
 
         $permissions = $this->get('mautic.security')->isGranted(
-            [
+            array(
                 'form:forms:viewown',
                 'form:forms:viewother',
                 'form:forms:create',
@@ -243,8 +243,7 @@ class FormController extends CommonFormController
                     'page'              => $page,
                     'logs'              => $logs,
                     'permissions'       => $permissions,
-                    'security'          => $this->get('mautic.security'),
-                    'stats'             => [
+                    'stats'             => array(
                         'submissionsInTime' => $timeStats,
                     ],
                     'dateRangeForm'     => $dateRangeForm->createView(),
@@ -410,7 +409,7 @@ class FormController extends CommonFormController
             $field = new Field();
 
             $modifiedFields[$keyId]                    = $field->convertToArray();
-            $modifiedFields[$keyId]['label']           = $this->get('translator')->trans('mautic.core.form.submit');
+            $modifiedFields[$keyId]['label']           = $this->translator->trans('mautic.core.form.submit');
             $modifiedFields[$keyId]['alias']           = 'submit';
             $modifiedFields[$keyId]['showLabel']       = 1;
             $modifiedFields[$keyId]['type']            = 'button';
@@ -942,8 +941,8 @@ class FormController extends CommonFormController
     public function deleteAction($objectId)
     {
         $page      = $this->get('session')->get('mautic.form.page', 1);
-        $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $page]);
-        $flashes   = [];
+        $returnUrl = $this->generateUrl('mautic_form_index', array('page' => $page));
+        $flashes   = array();
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
@@ -963,8 +962,8 @@ class FormController extends CommonFormController
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.form.error.notfound',
-                    'msgVars' => ['%id%' => $objectId]
-                ];
+                    'msgVars' => array('%id%' => $objectId)
+                );
             } elseif (!$this->get('mautic.security')->hasEntityAccess(
                 'form:forms:deleteown',
                 'form:forms:deleteother',
@@ -1007,8 +1006,8 @@ class FormController extends CommonFormController
     public function batchDeleteAction()
     {
         $page      = $this->get('session')->get('mautic.form.page', 1);
-        $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $page]);
-        $flashes   = [];
+        $returnUrl = $this->generateUrl('mautic_form_index', array('page' => $page));
+        $flashes   = array();
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
@@ -1033,7 +1032,7 @@ class FormController extends CommonFormController
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.form.error.notfound',
-                        'msgVars' => ['%id%' => $objectId]
+                        'msgVars' => array('%id%' => $objectId)
                     ];
                 } elseif (!$this->get('mautic.security')->hasEntityAccess(
                     'form:forms:deleteown',
@@ -1093,8 +1092,8 @@ class FormController extends CommonFormController
     public function batchRebuildHtmlAction()
     {
         $page      = $this->get('session')->get('mautic.form.page', 1);
-        $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $page]);
-        $flashes   = [];
+        $returnUrl = $this->generateUrl('mautic_form_index', array('page' => $page));
+        $flashes   = array();
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
@@ -1119,7 +1118,7 @@ class FormController extends CommonFormController
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.form.error.notfound',
-                        'msgVars' => ['%id%' => $objectId]
+                        'msgVars' => array('%id%' => $objectId)
                     ];
                 } elseif (!$this->get('mautic.security')->hasEntityAccess(
                     'form:forms:editown',

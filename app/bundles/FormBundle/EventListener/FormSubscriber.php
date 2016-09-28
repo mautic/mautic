@@ -14,8 +14,9 @@ use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
@@ -31,19 +32,30 @@ class FormSubscriber extends CommonSubscriber
     /**
      * @var MailHelper
      */
-    private $mailer;
+    protected $mailer;
+
+    /**
+     * @var AuditLogModel
+     */
+    protected $auditLogModel;
+
+    /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
 
     /**
      * FormSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param MailHelper    $mailer
+     * @param IpLookupHelper $ipLookupHelper
+     * @param AuditLogModel  $auditLogModel
+     * @param MailHelper     $mailer
      */
-    public function __construct(MauticFactory $factory, MailHelper $mailer)
+    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, MailHelper $mailer)
     {
-        parent::__construct($factory);
-
-        $this->mailer = $mailer->getMailer();
+        $this->ipLookupHelper = $ipLookupHelper;
+        $this->auditLogModel = $auditLogModel;
+        $this->mailer        = $mailer->getMailer();
     }
 
     /**
@@ -77,9 +89,9 @@ class FormSubscriber extends CommonSubscriber
                 "objectId"  => $form->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->factory->getIpAddressFromRequest(),
+                "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
             ];
-            $this->factory->getModel('core.auditLog')->writeToLog($log);
+            $this->auditLogModel->writeToLog($log);
         }
     }
 
@@ -96,16 +108,16 @@ class FormSubscriber extends CommonSubscriber
             "object"    => "form",
             "objectId"  => $form->deletedId,
             "action"    => "delete",
-            "details"   => ['name' => $form->getName()],
-            "ipAddress" => $this->factory->getIpAddressFromRequest(),
+            "details"   => array('name' => $form->getName()),
+            "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
         ];
-        $this->factory->getModel('core.auditLog')->writeToLog($log);
+        $this->auditLogModel->writeToLog($log);
     }
 
     /**
      * Add a simple email form
      *
-     * @param FormBuilderEvent $event
+     * @param Events\FormBuilderEvent $event
      */
     public function onFormBuilder(Events\FormBuilderEvent $event)
     {

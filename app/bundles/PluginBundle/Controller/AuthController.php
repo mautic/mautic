@@ -28,7 +28,7 @@ class AuthController extends FormController
     public function authCallbackAction ($integration)
     {
         $isAjax  = $this->request->isXmlHttpRequest();
-        $session = $this->factory->getSession();
+        $session = $this->get('session');
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper  = $this->factory->getHelper('integration');
@@ -91,7 +91,7 @@ class AuthController extends FormController
     {
         $postAuthTemplate = 'MauticPluginBundle:Auth:postauth.html.php';
 
-        $session     = $this->factory->getSession();
+        $session     = $this->get('session');
         $postMessage = $session->get('mautic.integration.postauth.message');
         $userData    = array();
 
@@ -102,7 +102,7 @@ class AuthController extends FormController
         $message = $type = '';
         $alert   = 'success';
         if (!empty($postMessage)) {
-            $message = $this->factory->getTranslator()->trans($postMessage[0], $postMessage[1], 'flashes');
+            $message = $this->translator->trans($postMessage[0], $postMessage[1], 'flashes');
             $session->remove('mautic.integration.postauth.message');
             $type = $postMessage[2];
             if ($type == 'error') {
@@ -128,7 +128,7 @@ class AuthController extends FormController
         $settings['integration'] = $integrationObject->getName();
 
         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
-        $event = $this->factory->getDispatcher()->dispatch(
+        $event = $this->dispatcher->dispatch(
             PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT,
             new PluginIntegrationAuthRedirectEvent(
                 $integrationObject,

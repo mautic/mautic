@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\LeadBundle\Model\LeadModel;
 
 /**
  * Class SearchSubscriber
@@ -20,6 +21,20 @@ use Mautic\CoreBundle\Event as MauticEvents;
  */
 class SearchSubscriber extends CommonSubscriber
 {
+    /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * SearchSubscriber constructor.
+     *
+     * @param LeadModel $leadModel
+     */
+    public function __construct(LeadModel $leadModel)
+    {
+        $this->leadModel = $leadModel;
+    }
 
     /**
      * @return array
@@ -62,7 +77,7 @@ class SearchSubscriber extends CommonSubscriber
                 $filter['force'] .= " $mine";
             }
 
-            $results = $this->factory->getModel('lead.lead')->getEntities(
+            $results = $this->leadModel->getEntities(
                 array(
                     'limit'          => 5,
                     'filter'         => $filter,
@@ -106,7 +121,7 @@ class SearchSubscriber extends CommonSubscriber
         if ($this->security->isGranted(array('lead:leads:viewown', 'lead:leads:viewother'), "MATCH_ONE")) {
             $event->addCommands(
                 'mautic.lead.leads',
-                $this->factory->getModel('lead.lead')->getCommandList()
+                $this->leadModel->getCommandList()
             );
         }
     }

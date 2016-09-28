@@ -20,7 +20,6 @@ use Mautic\FormBundle\FormEvents;
  */
 class FormSubscriber extends CommonSubscriber
 {
-
     /**
      * @return array
      */

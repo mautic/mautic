@@ -11,6 +11,9 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;
 
@@ -19,6 +22,34 @@ use Mautic\PageBundle\PageEvents;
  */
 class PageSubscriber extends CommonSubscriber
 {
+    /**
+     * @var AssetsHelper
+     */
+    protected $assetsHelper;
+
+    /**
+     * @var AuditLogModel
+     */
+    protected $auditLogModel;
+
+    /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
+
+    /**
+     * PageSubscriber constructor.
+     *
+     * @param AssetsHelper   $assetsHelper
+     * @param IpLookupHelper $ipLookupHelper
+     * @param AuditLogModel  $auditLogModel
+     */
+    public function __construct(AssetsHelper $assetsHelper, IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    {
+        $this->assetsHelper   = $assetsHelper;
+        $this->ipLookupHelper = $ipLookupHelper;
+        $this->auditLogModel  = $auditLogModel;
+    }
 
     /**
      * {@inheritdoc}
@@ -47,9 +78,9 @@ class PageSubscriber extends CommonSubscriber
                 "objectId"  => $page->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
-                "ipAddress" => $this->factory->getIpAddressFromRequest()
+                "ipAddress" => $this->ipLookupHelper->getIpAddressFromRequest()
             );
-            $this->factory->getModel('core.auditLog')->writeToLog($log);
+            $this->auditLogModel->writeToLog($log);
         }
     }
 
@@ -67,9 +98,9 @@ class PageSubscriber extends CommonSubscriber
             "objectId"   => $page->deletedId,
             "action"     => "delete",
             "details"    => array('name' => $page->getTitle()),
-            "ipAddress"  => $this->factory->getIpAddressFromRequest()
+            "ipAddress"  => $this->ipLookupHelper->getIpAddressFromRequest()
         );
-        $this->factory->getModel('core.auditLog')->writeToLog($log);
+        $this->auditLogModel->writeToLog($log);
     }
 
     /**
@@ -84,12 +115,9 @@ class PageSubscriber extends CommonSubscriber
     {
         $content = $event->getContent();
 
-        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
-        $assetsHelper = $this->factory->getHelper('template.assets');
-
         // Get scripts to insert before </head>
         ob_start();
-        $assetsHelper->outputScripts('onPageDisplay_headClose');
+        $this->assetsHelper->outputScripts('onPageDisplay_headClose');
         $headCloseScripts = ob_get_clean();
 
         if ($headCloseScripts) {
@@ -98,7 +126,7 @@ class PageSubscriber extends CommonSubscriber
 
         // Get scripts to insert after <body>
         ob_start();
-        $assetsHelper->outputScripts('onPageDisplay_bodyOpen');
+        $this->assetsHelper->outputScripts('onPageDisplay_bodyOpen');
         $bodyOpenScripts = ob_get_clean();
 
         if ($bodyOpenScripts) {
@@ -109,7 +137,7 @@ class PageSubscriber extends CommonSubscriber
 
         // Get scripts to insert before </body>
         ob_start();
-        $assetsHelper->outputScripts('onPageDisplay_bodyClose');
+        $this->assetsHelper->outputScripts('onPageDisplay_bodyClose');
         $bodyCloseScripts = ob_get_clean();
 
         if ($bodyCloseScripts) {

@@ -29,15 +29,12 @@ class CampaignSubscriber extends CommonSubscriber
     
     /**
      * CampaignSubscriber constructor.
-     * 
-     * @param MauticFactory $factory
+     *
      * @param IntegrationHelper $integrationHelper
      */
-    public function __construct(MauticFactory $factory, IntegrationHelper $integrationHelper)
+    public function __construct(IntegrationHelper $integrationHelper)
     {
         $this->integrationHelper = $integrationHelper;
-        
-        parent::__construct($factory);
     }
 
     /**

@@ -189,7 +189,7 @@ class ReportSubscriber extends CommonSubscriber
     /**
      * Initialize the QueryBuilder object to generate reports from
      *
-     * @param ReportGeneratorEvent $event
+     * @param ReportGraphEvent $event
      *
      * @return void
      */
@@ -203,7 +203,7 @@ class ReportSubscriber extends CommonSubscriber
 
         $graphs   = $event->getRequestedGraphs();
         $qb       = $event->getQueryBuilder();
-        $statRepo = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat');
+        $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);

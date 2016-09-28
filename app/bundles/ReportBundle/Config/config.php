@@ -66,14 +66,21 @@ return [
         'events' => [
             'mautic.report.search.subscriber' => [
                 'class' => 'Mautic\ReportBundle\EventListener\SearchSubscriber',
+                'arguments' => [
+                    'mautic.helper.user',
+                    'mautic.report.model.report'
+                ]
             ],
             'mautic.report.report.subscriber' => [
                 'class' => 'Mautic\ReportBundle\EventListener\ReportSubscriber',
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog'
+                ]
             ],
             'mautic.report.dashboard.subscriber' => [
                 'class'     => 'Mautic\ReportBundle\EventListener\DashboardSubscriber',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.report.model.report',
                     'mautic.security'
                 ]

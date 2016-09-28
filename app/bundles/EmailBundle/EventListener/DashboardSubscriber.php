@@ -12,6 +12,7 @@ use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\EmailBundle\Model\EmailModel;
 
 /**
  * Class DashboardSubscriber
@@ -55,6 +56,21 @@ class DashboardSubscriber extends MainDashboardSubscriber
     );
 
     /**
+     * @var EmailModel
+     */
+    protected $emailModel;
+
+    /**
+     * DashboardSubscriber constructor.
+     *
+     * @param EmailModel $emailModel
+     */
+    public function __construct(EmailModel $emailModel)
+    {
+        $this->emailModel = $emailModel;
+    }
+
+    /**
      * Set a widget detail when needed 
      *
      * @param WidgetDetailEvent $event
@@ -76,12 +92,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
             }
 
             if (!$event->isCached()) {
-                $model = $this->factory->getModel('email');
-
                 $event->setTemplateData(array(
                     'chartType'   => 'line',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getEmailsLineChartData(
+                    'chartData'   => $this->emailModel->getEmailsLineChartData(
                         $params['timeUnit'],
                         $params['dateFrom'],
                         $params['dateTo'],
@@ -97,7 +111,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
         }
 
         if ($event->getType() == 'ignored.vs.read.emails') {
-            $model = $this->factory->getModel('email');
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -105,7 +118,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData(array(
                     'chartType'   => 'pie',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getIgnoredVsReadPieChartData($params['dateFrom'], $params['dateTo'], array(), $canViewOthers)
+                    'chartData'   => $this->emailModel->getIgnoredVsReadPieChartData($params['dateFrom'], $params['dateTo'], array(), $canViewOthers)
                 ));
             }
 
@@ -114,13 +127,12 @@ class DashboardSubscriber extends MainDashboardSubscriber
         }
 
         if ($event->getType() == 'upcoming.emails') {
-            $model = $this->factory->getModel('email');
             $widget = $event->getWidget();
             $params = $widget->getParams();
             $height = $widget->getHeight();
             $limit  = round(($height - 80) / 60);
 
-            $upcomingEmails = $model->getUpcomingEmails($limit, $canViewOthers);
+            $upcomingEmails = $this->emailModel->getUpcomingEmails($limit, $canViewOthers);
 
             $event->setTemplate('MauticDashboardBundle:Dashboard:upcomingemails.html.php');
             $event->setTemplateData(array('upcomingEmails' => $upcomingEmails));
@@ -129,7 +141,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'most.sent.emails') {
             if (!$event->isCached()) {
-                $model  = $this->factory->getModel('email');
                 $params = $event->getWidget()->getParams();
 
                 if (empty($params['limit'])) {
@@ -139,7 +150,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $emails = $model->getEmailStatList(
+                $emails = $this->emailModel->getEmailStatList(
                     $limit,
                     $params['dateFrom'],
                     $params['dateTo'],
@@ -151,7 +162,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 // Build table rows with links
                 if ($emails) {
                     foreach ($emails as &$email) {
-                        $emailUrl = $this->factory->getRouter()->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $email['id']));
+                        $emailUrl = $this->router->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $email['id']));
                         $row = array(
                             array(
                                 'value' => $email['name'],
@@ -182,7 +193,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'most.read.emails') {
             if (!$event->isCached()) {
-                $model  = $this->factory->getModel('email');
                 $params = $event->getWidget()->getParams();
 
                 if (empty($params['limit'])) {
@@ -192,7 +202,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $emails = $model->getEmailStatList(
+                $emails = $this->emailModel->getEmailStatList(
                     $limit,
                     $params['dateFrom'],
                     $params['dateTo'],
@@ -204,7 +214,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 // Build table rows with links
                 if ($emails) {
                     foreach ($emails as &$email) {
-                        $emailUrl = $this->factory->getRouter()->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $email['id']));
+                        $emailUrl = $this->router->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $email['id']));
                         $row = array(
                             array(
                                 'value' => $email['name'],
@@ -235,7 +245,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
         if ($event->getType() == 'created.emails') {
             if (!$event->isCached()) {
-                $model  = $this->factory->getModel('email');
                 $params = $event->getWidget()->getParams();
 
                 if (empty($params['limit'])) {
@@ -245,7 +254,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $emails = $model->getEmailList(
+                $emails = $this->emailModel->getEmailList(
                     $limit,
                     $params['dateFrom'],
                     $params['dateTo'],
@@ -257,7 +266,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 // Build table rows with links
                 if ($emails) {
                     foreach ($emails as &$email) {
-                        $emailUrl = $this->factory->getRouter()->generate(
+                        $emailUrl = $this->router->generate(
                             'mautic_email_action', 
                             array(
                                 'objectAction' => 'view',
@@ -292,12 +301,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $params = $widget->getParams();
 
             if (!$event->isCached()) {
-                $model = $this->factory->getModel('email');
 
                 $event->setTemplateData(array(
                     'chartType'   => 'pie',
                     'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $model->getDeviceGranularityPieChartData(
+                    'chartData'   => $this->emailModel->getDeviceGranularityPieChartData(
                         $params['dateFrom'],
                         $params['dateTo'],
                         $canViewOthers
