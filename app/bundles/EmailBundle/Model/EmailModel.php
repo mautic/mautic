@@ -35,6 +35,7 @@ use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
@@ -81,6 +82,11 @@ class EmailModel extends FormModel
     protected $leadModel;
 
     /**
+     * @var CompanyModel
+     */
+    protected $companyModel;
+
+    /**
      * @var TrackableModel
      */
     protected $pageTrackableModel;
@@ -113,13 +119,15 @@ class EmailModel extends FormModel
     /**
      * EmailModel constructor.
      *
-     * @param IpLookupHelper $ipLookupHelper
-     * @param ThemeHelper    $themeHelper
-     * @param Mailbox        $mailboxHelper
-     * @param MailHelper     $mailHelper
-     * @param LeadModel      $leadModel
-     * @param TrackableModel $pageTrackableModel
-     * @param UserModel      $userModel
+     * @param IpLookupHelper       $ipLookupHelper
+     * @param ThemeHelper          $themeHelper
+     * @param Mailbox              $mailboxHelper
+     * @param MailHelper           $mailHelper
+     * @param LeadModel            $leadModel
+     * @param CompanyModel         $companyModel
+     * @param TrackableModel       $pageTrackableModel
+     * @param UserModel            $userModel
+     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -127,6 +135,7 @@ class EmailModel extends FormModel
         Mailbox $mailboxHelper,
         MailHelper $mailHelper,
         LeadModel $leadModel,
+        CompanyModel $companyModel,
         TrackableModel $pageTrackableModel,
         UserModel $userModel,
         CoreParametersHelper $coreParametersHelper,
@@ -137,6 +146,7 @@ class EmailModel extends FormModel
         $this->mailboxHelper      = $mailboxHelper;
         $this->mailHelper         = $mailHelper;
         $this->leadModel          = $leadModel;
+        $this->companyModel       = $companyModel;
         $this->pageTrackableModel = $pageTrackableModel;
         $this->userModel          = $userModel;
         $this->coreParameters     = $coreParametersHelper;
@@ -1198,6 +1208,9 @@ class EmailModel extends FormModel
             }
         }
 
+        // Hydrate contacts with company profile fields
+        $this->getContactCompanies($sendTo);
+
         //get a count of leads
         $count = count($sendTo);
 
@@ -2003,5 +2016,28 @@ class EmailModel extends FormModel
     public function getVariants(Email $entity)
     {
         return $entity->getVariants();
+    }
+
+    /**
+     * @param $sendTo
+     */
+    private function getContactCompanies(array &$sendTo)
+    {
+        $fetchCompanies = [];
+        foreach ($sendTo as $key => $contact) {
+            if (!isset($contact['companies'])) {
+                $fetchCompanies[$contact['id']] = $key;
+                $sendTo[$key]['companies']      = [];
+            }
+        }
+
+        if (!empty($fetchCompanies)) {
+            $companies = $this->companyModel->getCompaniesForContacts($fetchCompanies); // Simple dbal query that fetches lead_id IN $fetchCompanies and returns as array
+
+            foreach ($companies as $contactId => $contactCompanies) {
+                $key = $fetchCompanies[$contactId];
+                $sendTo[$key]['companies'] = $contactCompanies;
+            }
+        }
     }
 }

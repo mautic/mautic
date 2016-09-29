@@ -12,11 +12,11 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 
 /**
@@ -103,23 +103,30 @@ class AjaxController extends CommonAjaxController
         $filter    = InputHelper::clean($request->query->get('filter'));
         $leadField = InputHelper::clean($request->query->get('field'));
         if (!empty($leadField)) {
-            if ($leadField == "owner_id") {
-                $results = $this->getModel('lead.lead')->getLookupResults('user', $filter);
+            if (strpos($leadField, 'company') === 0) {
+                $results = $this->getModel('lead.company')->getLookupResults('company', [$leadField, $filter]);
                 foreach ($results as $r) {
-                    $name        = $r['firstName'].' '.$r['lastName'];
-                    $dataArray[] = [
-                        "value" => $name,
-                        "id"    => $r['id']
-                    ];
+                    $dataArray[] = ['value' => $r['label']];
                 }
-            } elseif ($leadField == "hit_url") {
-                $dataArray[] = [
-                    'value' => ''
-                ];
             } else {
-                $results = $this->getModel('lead.field')->getLookupResults($leadField, $filter);
-                foreach ($results as $r) {
-                    $dataArray[] = ['value' => $r[$leadField]];
+                if ($leadField == 'owner_id') {
+                    $results = $this->getModel('lead.lead')->getLookupResults('user', $filter);
+                    foreach ($results as $r) {
+                        $name        = $r['firstName'].' '.$r['lastName'];
+                        $dataArray[] = [
+                            'value' => $name,
+                            'id'    => $r['id'],
+                        ];
+                    }
+                } elseif ($leadField == 'hit_url') {
+                    $dataArray[] = [
+                        'value' => '',
+                    ];
+                } else {
+                    $results = $this->getModel('lead.field')->getLookupResults($leadField, $filter);
+                    foreach ($results as $r) {
+                        $dataArray[] = ['value' => $r[$leadField]];
+                    }
                 }
             }
         }
@@ -348,6 +355,36 @@ class AjaxController extends CommonAjaxController
 
         return $this->sendJsonResponse($dataArray);
     }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function toggleCompanyLeadAction(Request $request)
+    {
+        $dataArray = ['success' => 0];
+        $leadId    = InputHelper::int($request->request->get('leadId'));
+        $companyId    = InputHelper::int($request->request->get('companyId'));
+        $action    = InputHelper::clean($request->request->get('companyAction'));
+
+        if (!empty($leadId) && !empty($companyId) && in_array($action, ['remove', 'add'])) {
+            $leadModel = $this->getModel('lead');
+            $companyModel = $this->getModel('lead.company');
+
+            $lead = $leadModel->getEntity($leadId);
+            $company = $companyModel->getEntity($companyId);
+
+            if ($lead !== null && $company !== null) {
+                $class = $action == 'add' ? 'addLeadToCompany' : 'removeLeadFromCompany';
+                $companyModel->$class($company, $lead);
+                $dataArray['success'] = 1;
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
 
     /**
      * @param Request $request
@@ -736,5 +773,39 @@ class AjaxController extends CommonAjaxController
         $dataArray['success'] = 1;
 
         return $this->sendJsonResponse($dataArray);
+    }
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function getLeadFieldsPerObjectAction(Request $request)
+    {
+        $dataArray = ['success' => 1];
+
+        //$object = $request->request->get('object');
+
+        $fields = $this->getModel('lead.field')->getEntities(
+            [
+                 'filter' => [
+                     'force'          =>
+                    [
+                        'column' => 'f.isPublished',
+                        'expr'   => 'eq',
+                        'value'  => true
+                    ]
+                    ],
+                'hydration_mode' => 'HYDRATE_ARRAY',
+          ]
+        );
+
+        if(is_object($fields))
+        {
+            $fields = $fields->getIterator()->getArrayCopy();
+        }
+
+        $dataArray['fields'] = json_encode($fields);
+
+        return $this->sendJsonResponse($fields);
     }
 }

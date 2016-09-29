@@ -358,9 +358,11 @@ class LeadRepository extends CommonRepository
     {
         //Get the list of custom fields
         $fq = $this->_em->getConnection()->createQueryBuilder();
-        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.field_order')
+        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.field_order, f.object')
             ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
             ->where('f.is_published = :published')
+            ->andWhere($fq->expr()->eq('f.object',':object'))
+            ->setParameter('object','lead')
             ->orderBy('f.field_order', 'asc')
             ->setParameter('published', true, 'boolean');
         $results = $fq->execute()->fetchAll();
@@ -460,9 +462,11 @@ class LeadRepository extends CommonRepository
     {
         //Get the list of custom fields
         $fq = $this->_em->getConnection()->createQueryBuilder();
-        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group"')
+        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object')
             ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
             ->where('f.is_published = :published')
+            ->andWhere($fq->expr()->eq('object',':object'))
+            ->setParameter('object','lead')
             ->setParameter('published', true, 'boolean');
         $results = $fq->execute()->fetchAll();
 
@@ -659,7 +663,6 @@ class LeadRepository extends CommonRepository
     {
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-
         if ($filter->not) {
             $xFunc    = 'andX';
             $exprFunc = 'notLike';
@@ -667,7 +670,6 @@ class LeadRepository extends CommonRepository
             $xFunc    = 'orX';
             $exprFunc = 'like';
         }
-
         $expr = $q->expr()->$xFunc(
             $q->expr()->$exprFunc('l.firstname', ":$unique"),
             $q->expr()->$exprFunc('l.lastname', ":$unique"),
@@ -724,7 +726,6 @@ class LeadRepository extends CommonRepository
             $nullFunc = "isNull";
             $likeFunc = "like";
         }
-
         switch ($command) {
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous'):
                 $expr = $q->expr()->$xFunc(
@@ -861,6 +862,21 @@ class LeadRepository extends CommonRepository
             case $this->translator->trans('mautic.lead.lead.searchcommand.company'):
                 $expr = $q->expr()->$likeFunc('LOWER(l.company)', ":$unique");
                 break;
+            case $this->translator->trans('mautic.company.lead.searchcommand.company'):
+                // search by company entity
+                $sq = $this->_em->getConnection()->createQueryBuilder();
+                $sq->select('null')
+                    ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
+                    ->join('cl', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'comp.id = cl.company_id')
+                    ->where(
+                        $sq->expr()->andX(
+                            $sq->expr()->eq('l.id', 'cl.lead_id'),
+                            $sq->expr()->$likeFunc('comp.companyname', ":$unique")
+                        )
+                    );
+
+                $expr = $q->expr()->andX(sprintf('%s (%s)', $existsFunc, $sq->getSQL()));
+                break;
             default:
                 if (in_array($command, $this->availableSearchFields)) {
                     $expr = $q->expr()->$likeFunc('LOWER(l.'.$command.')', ":$unique");
@@ -897,6 +913,7 @@ class LeadRepository extends CommonRepository
             'mautic.core.searchcommand.ip',
             'mautic.lead.lead.searchcommand.tag',
             'mautic.lead.lead.searchcommand.stage',
+            'mautic.company.lead.searchcommand.company',
             'mautic.lead.lead.searchcommand.duplicate'
         );
 

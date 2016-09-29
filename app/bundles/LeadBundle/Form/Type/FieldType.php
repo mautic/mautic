@@ -173,6 +173,7 @@ class FieldType extends AbstractType
             $form = $event->getForm();
             $data = $event->getData();
             $type = (is_array($data)) ? (isset($data['type']) ? $data['type'] : null) : $data->getType();
+
             switch ($type) {
                 case 'multiselect':
                 case 'select':
@@ -187,8 +188,8 @@ class FieldType extends AbstractType
                         'properties',
                         'sortablelist',
                         [
-                            'required'    => false,
-                            'label'       => 'mautic.lead.field.form.properties.select',
+                            'required' => false,
+                            'label'    => 'mautic.lead.field.form.properties.select',
                             'data'        => $properties,
                             'with_labels' => true
                         ]
@@ -443,6 +444,23 @@ class FieldType extends AbstractType
                 'attr'  => [
                     'tooltip' => 'mautic.lead.field.form.ispubliclyupdatable.tooltip'
                 ]
+            ]
+        );
+
+        $builder->add(
+            'object',
+            'choice',
+            [
+                'choices'     => ['lead' => 'mautic.lead.contact', 'company' => 'mautic.company.company'],
+                'expanded'    => false,
+                'multiple'    => false,
+                'label'       => 'mautic.lead.field.object',
+                'empty_value' => false,
+                'attr'        => [
+                    'class'    => 'form-control'
+                ],
+                'required'    => true,
+                'disabled'    => ($disabled || !$new)
             ]
         );
 

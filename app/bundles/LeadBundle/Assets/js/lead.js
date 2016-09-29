@@ -41,7 +41,6 @@ Mautic.leadOnLoad = function (container, response) {
 
         Mautic.updateLeadFieldProperties(mQuery('#leadfield_type').val());
     }
-
     // Timeline filters
     var timelineForm = mQuery(container + ' #timeline-filters');
     if (timelineForm.length) {
@@ -298,6 +297,15 @@ Mautic.leadlistOnLoad = function(container) {
     });
 };
 
+Mautic.leadlistPopulateChoices = function(el) {
+
+    Mautic.ajaxActionRequest('lead:getLeadFieldsPerObject', {'object': mQuery(el).val()},
+       function (response) {
+            console.log(response);
+        }
+    );
+};
+
 Mautic.convertLeadFilterInput = function(el) {
     var operator = mQuery(el).val();
     console.log(el);
@@ -376,6 +384,7 @@ Mautic.addLeadListFilter = function (elId) {
 
     var prototype = mQuery('.available-filters').data('prototype');
     var fieldType = mQuery(filterId).data('field-type');
+    var fieldObject = mQuery(filterId).data('field-object');
     var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'multiselect', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale']) != -1);
 
     prototype = prototype.replace(/__name__/g, filterNum);
@@ -401,8 +410,15 @@ Mautic.addLeadListFilter = function (elId) {
 
     if (mQuery('#leadlist_filters div.panel').length == 0) {
         // First filter so hide the glue footer
-        mQuery(prototype).find(".panel-footer").addClass('hide');
+        mQuery(prototype).find(".panel-heading").addClass('hide');
     }
+
+    if (fieldObject == 'company') {
+        mQuery(prototype).find(".object-icon").removeClass('fa-user').addClass('fa-building');
+    } else {
+        mQuery(prototype).find(".object-icon").removeClass('fa-building').addClass('fa-user');
+    }
+    mQuery(prototype).find(".inline-spacer").append(fieldObject);
 
     mQuery(prototype).find("a.remove-selected").on('click', function() {
         mQuery(this).closest('.panel').animate(
@@ -416,6 +432,7 @@ Mautic.addLeadListFilter = function (elId) {
 
     mQuery(prototype).find("input[name='" + filterBase + "[field]']").val(elId);
     mQuery(prototype).find("input[name='" + filterBase + "[type]']").val(fieldType);
+    mQuery(prototype).find("input[name='" + filterBase + "[object]']").val(fieldObject);
 
     var filterEl = (isSpecial) ? "select[name='" + filterBase + "[filter]']" : "input[name='" + filterBase + "[filter]']";
 
@@ -689,6 +706,13 @@ Mautic.refreshLeadNotes = function(form) {
 Mautic.toggleLeadList = function(toggleId, leadId, listId) {
     var action = mQuery('#' + toggleId).hasClass('fa-toggle-on') ? 'remove' : 'add';
     var query = "action=lead:toggleLeadList&leadId=" + leadId + "&listId=" + listId + "&listAction=" + action;
+
+    Mautic.toggleLeadSwitch(toggleId, query, action);
+};
+
+Mautic.toggleCompanyLead = function(toggleId, leadId, companyId) {
+    var action = mQuery('#' + toggleId).hasClass('fa-toggle-on') ? 'remove' : 'add';
+    var query = "action=lead:toggleCompanyLead&leadId=" + leadId + "&companyId=" + companyId + "&companyAction=" + action;
 
     Mautic.toggleLeadSwitch(toggleId, query, action);
 };
@@ -1140,4 +1164,125 @@ Mautic.updateFilterPositioning = function (el) {
     } else {
         $parentEl.removeClass('in-group');
     }
+};
+
+Mautic.loadNewCompanyWindow = function(options) {
+    if (options.windowUrl) {
+        Mautic.startModalLoadingBar();
+
+        setTimeout(function() {
+            var generator = window.open(options.windowUrl, 'newcompanywindow', 'height=600,width=1100');
+
+            if (!generator || generator.closed || typeof generator.closed == 'undefined') {
+                alert(mauticLang.popupBlockerMessage);
+            } else {
+                generator.onload = function () {
+                    Mautic.stopModalLoadingBar();
+                    Mautic.stopIconSpinPostEvent();
+                };
+            }
+        }, 100);
+    }
+};
+
+Mautic.companyOnLoad = function (container, response) {
+    if (response && response.updateSelect) {
+        //added email through a popup
+        var newOption = mQuery('<option />').val(response.companyId);
+        newOption.html(response.companyName);
+
+        var opener = window.opener;
+        if(opener) {
+            var el = '#' + response.updateSelect;
+            var optgroup = el + " optgroup";
+            if (opener.mQuery(optgroup).length) {
+                // update option when new option equal with option item in group.
+                var firstOptionGroups = opener.mQuery(el + ' optgroup');
+                var isUpdateOption = false;
+                firstOptionGroups.each(function() {
+                    var firstOptions = mQuery(this).children();
+                    for (var i = 0; i < firstOptions.length; i++) {
+                        if (firstOptions[i].value === response.companyId.toString()) {
+                            firstOptions[i].text = response.companyName;
+                            isUpdateOption = true;
+                            break;
+                        }
+                    }
+                });
+
+                if (!isUpdateOption) {
+                    //the optgroup exist so append to it
+                    opener.mQuery(optgroup + " option:last").prev().before(newOption);
+                }
+            } else {
+                //create the optgroup
+                var newOptgroup = mQuery('<optgroup label= />');
+                newOption.appendTo(newOptgroup);
+                opener.mQuery(newOptgroup).appendTo(opener.mQuery(el));
+            }
+
+            var chooseOneOption = opener.mQuery(el + ' option:first');
+
+            var optionGroups = opener.mQuery(el + ' optgroup');
+            optionGroups.sort(function(a, b) {
+                var aLabel = mQuery(a).attr('label');
+                var bLabel = mQuery(b).attr('label');
+
+                if (aLabel > bLabel) {
+                    return 1;
+                } else if (aLabel < bLabel) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            });
+
+            optionGroups.each(function() {
+                var options = mQuery(this).children();
+                options.sort(function(a, b) {
+                    if (a.text > b.text) {
+                        return 1;
+                    } else if (a.text < b.text) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                });
+                mQuery(this).html(options);
+            });
+
+            if (opener.mQuery(el).prop('disabled')) {
+                opener.mQuery(el).prop('disabled', false);
+                chooseOneOption = mQuery('<option value="">' + mauticLang.chosenChooseOne + '</option>');
+            }
+
+            opener.mQuery(el).html(chooseOneOption);
+            optionGroups.appendTo(opener.mQuery(el));
+
+            newOption.prop('selected', true);
+
+            opener.mQuery(el).trigger("chosen:updated");
+        }
+
+        window.close();
+    }
+
+    var textarea = mQuery('#emailform_customHtml');
+
+    mQuery(document).on('shown.bs.tab', function (e) {
+        textarea.froalaEditor('popups.hideAll');
+    });
+
+    mQuery('a[href="#source-container"]').on('shown.bs.tab', function (e) {
+        textarea.froalaEditor('html.set', textarea.val());
+    });
+
+    mQuery('.btn-builder').on('click', function (e) {
+        textarea.froalaEditor('popups.hideAll');
+    });
+
+    Mautic.intiSelectTheme(mQuery('#emailform_template'));
+
+    var plaintext = mQuery('#emailform_plainText');
+    Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
 };
