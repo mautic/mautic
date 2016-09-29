@@ -394,9 +394,10 @@ class SubmissionModel extends CommonFormModel
      */
     public function exportResults($format, $form, $queryArgs)
     {
-        $results    = $this->getEntities($queryArgs);
-        $translator = $this->translator;
-        $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
+        $viewOnlyFields              = $this->formModel->getCustomComponents()['viewOnlyFields'];
+        $queryArgs['viewOnlyFields'] = $viewOnlyFields;
+        $results                     = $this->getEntities($queryArgs);
+        $translator                  = $this->translator;
 
         $date = (new DateTimeHelper)->toLocalString();
         $name = str_replace(' ', '_', $date).'_'.$form->getAlias();
@@ -466,9 +467,9 @@ class SubmissionModel extends CommonFormModel
                 $content = $this->templatingHelper->getTemplating()->renderResponse(
                     'MauticFormBundle:Result:export.html.php',
                     [
-                        'form'      => $form,
-                        'results'   => $results,
-                        'pageTitle' => $name,
+                        'form'           => $form,
+                        'results'        => $results,
+                        'pageTitle'      => $name,
                         'viewOnlyFields' => $viewOnlyFields
                     ]
                 )->getContent();

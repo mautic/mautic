@@ -27,11 +27,12 @@ class ResultController extends CommonFormController
     public function indexAction($objectId, $page)
     {
         /** @var FormModel $formModel */
-        $formModel = $this->getModel('form.form');
-        $form      = $formModel->getEntity($objectId);
-        $session   = $this->get('session');
-        $formPage  = $session->get('mautic.form.page', 1);
-        $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
+        $formModel      = $this->getModel('form.form');
+        $form           = $formModel->getEntity($objectId);
+        $session        = $this->get('session');
+        $formPage       = $session->get('mautic.form.page', 1);
+        $returnUrl      = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
+        $viewOnlyFields = $formModel->getCustomComponents()['viewOnlyFields'];
 
         if ($form === null) {
             //redirect back to form list
@@ -100,7 +101,8 @@ class ResultController extends CommonFormController
                 'orderBy'        => $orderBy,
                 'orderByDir'     => $orderByDir,
                 'form'           => $form,
-                'withTotalCount' => true
+                'withTotalCount' => true,
+                'viewOnlyFields' => $viewOnlyFields,
             ]
         );
 
@@ -138,7 +140,7 @@ class ResultController extends CommonFormController
                     'items'          => $results,
                     'filters'        => $filters,
                     'form'           => $form,
-                    'viewOnlyFields' => $formModel->getCustomComponents()['viewOnlyFields'],
+                    'viewOnlyFields' => $viewOnlyFields,
                     'page'           => $page,
                     'totalCount'     => $count,
                     'limit'          => $limit,
@@ -214,11 +216,11 @@ class ResultController extends CommonFormController
         $filters    = $session->get('mautic.formresult.'.$objectId.'.filters', []);
 
         $args = [
-            'limit'      => false,
-            'filter'     => ['force' => $filters],
-            'orderBy'    => $orderBy,
-            'orderByDir' => $orderByDir,
-            'form'       => $form
+            'limit'          => false,
+            'filter'         => ['force' => $filters],
+            'orderBy'        => $orderBy,
+            'orderByDir'     => $orderByDir,
+            'form'           => $form
         ];
 
         /** @var \Mautic\FormBundle\Model\SubmissionModel $model */
