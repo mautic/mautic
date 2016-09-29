@@ -1187,7 +1187,7 @@ class EmailModel extends FormModel
         }
 
         $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', $leadIds, $listId, $defaultFrequencyNumber, $defaultFrequencyTime);
-
+        $this->logger->error(print_r($emailType,true));
         if (!empty($dontSendTo) and $emailType != 'transactional') {
             foreach ($dontSendTo as $frequencyRuleMet)
             {
