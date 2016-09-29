@@ -29,12 +29,12 @@ class CompanyController extends FormController
     {
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted(
-            array(
+            [
                 'lead:leads:viewother',
                 'lead:leads:create',
                 'lead:leads:editother',
                 'lead:leads:deleteother'
-            ),
+            ],
             "RETURN_ARRAY"
         );
 
@@ -59,65 +59,69 @@ class CompanyController extends FormController
         $search = $this->request->get('search', $this->get('session')->get('mautic.company.filter', ''));
         $this->get('session')->set('mautic.company.filter', $search);
 
-        $filter     = array('string' => $search, 'force' => array());
+        $filter     = ['string' => $search, 'force' => []];
         $orderBy    = $this->get('session')->get('mautic.company.orderby', 'comp.companyname');
         $orderByDir = $this->get('session')->get('mautic.company.orderbydir', 'ASC');
 
         $companies = $this->getModel('company')->getEntities(
-            array(
-                'start'      => $start,
-                'limit'      => $limit,
-                'filter'     => $filter,
-                'orderBy'    => $orderBy,
-                'orderByDir' => $orderByDir
-            )
+            [
+                'start'          => $start,
+                'limit'          => $limit,
+                'filter'         => $filter,
+                'orderBy'        => $orderBy,
+                'orderByDir'     => $orderByDir,
+                'withTotalCount' => true,
+            ]
         );
 
-        $count = count($companies);
+        $count     = $companies['count'];
+        $companies = $companies['results'];
+
         if ($count && $count < ($start + 1)) {
             $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
             $this->get('session')->set('mautic.company.page', $lastPage);
-            $returnUrl = $this->generateUrl('mautic_company_index', array('page' => $lastPage));
+            $returnUrl = $this->generateUrl('mautic_company_index', ['page' => $lastPage]);
 
             return $this->postActionRedirect(
-                array(
+                [
                     'returnUrl'       => $returnUrl,
-                    'viewParameters'  => array('page' => $lastPage),
+                    'viewParameters'  => ['page' => $lastPage],
                     'contentTemplate' => 'MauticLeadBundle:Company:index',
-                    'passthroughVars' => array(
+                    'passthroughVars' => [
                         'activeLink'    => '#mautic_company_index',
                         'mauticContent' => 'company'
-                    )
-                )
+                    ]
+                ]
             );
         }
 
         //set what page currently on so that we can return here after form submission/cancellation
         $this->get('session')->set('mautic.company.page', $page);
 
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
-        $model = $this->getModel('company');
+        $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $model      = $this->getModel('company');
         $companyIds = array_keys($companies);
-        $leadCounts = (!empty($companyIds)) ? $model->getRepository()->getLeadCount($companyIds) : array();
+        $leadCounts = (!empty($companyIds)) ? $model->getRepository()->getLeadCount($companyIds) : [];
 
         return $this->delegateView(
-            array(
-                'viewParameters'  => array(
+            [
+                'viewParameters'  => [
                     'searchValue' => $search,
                     'leadCounts'  => $leadCounts,
                     'items'       => $companies,
                     'page'        => $page,
                     'limit'       => $limit,
                     'permissions' => $permissions,
-                    'tmpl'        => $tmpl
-                ),
+                    'tmpl'        => $tmpl,
+                    'totalItems'  => $count,
+                ],
                 'contentTemplate' => 'MauticLeadBundle:Company:list.html.php',
-                'passthroughVars' => array(
+                'passthroughVars' => [
                     'activeLink'    => '#mautic_company_index',
                     'mauticContent' => 'company',
-                    'route'         => $this->generateUrl('mautic_company_index', array('page' => $page))
-                )
-            )
+                    'route'         => $this->generateUrl('mautic_company_index', ['page' => $page])
+                ]
+            ]
         );
     }
 

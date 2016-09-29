@@ -132,7 +132,7 @@ if ($tmpl == 'index') {
         <?php echo $view->render(
             'MauticCoreBundle:Helper:pagination.html.php',
             array(
-                "totalItems" => count($items),
+                "totalItems" => $totalItems,
                 "page"       => $page,
                 "limit"      => $limit,
                 "menuLinkId" => 'mautic_company_index',
