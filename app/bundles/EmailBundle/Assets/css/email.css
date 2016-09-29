@@ -25,12 +25,3 @@
 .email-filters {
 
 }
-.queue_hide {
-    display: none;
-}
-.queue_show{
-    display: block;
-}
-.email-type{
-    z-index: 1!important;
-}
