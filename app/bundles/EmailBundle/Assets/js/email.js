@@ -320,18 +320,22 @@ Mautic.disabledEmailAction = function(opener) {
     opener.mQuery('#campaignevent_properties_editEmailButton').prop('disabled', disabled);
     opener.mQuery('#campaignevent_properties_previewEmailButton').prop('disabled', disabled);
 };
-Mautic.useMessageQueue = function(opener) {
-    if (typeof opener == 'undefined') {
-        opener = window;
-    }
-    val = opener.mQuery('input[name="campaignevent[properties][email_type]"]:checked').val();
-    if (val === 'marketing') {
-        opener.mQuery('#priority').removeClass( "queue_hide" ).addClass( "queue_show" );
-        opener.mQuery('#attempts').removeClass( "queue_hide" ).addClass( "queue_show" );
 
+Mautic.campaignEventOnLoad = function(container, response) {
+    var emailTypeBtns = mQuery('input.email-type');
+    if (emailTypeBtns.length) {
+        Mautic.toggleMessageQueueFields();
+        emailTypeBtns.on('change', function() {
+            Mautic.toggleMessageQueueFields();
+        });
     }
-    else {
-        opener.mQuery('#priority').removeClass( "queue_show" ).addClass( "queue_hide" );
-        opener.mQuery('#attempts').removeClass( "queue_show" ).addClass( "queue_hide" );
+}
+
+Mautic.toggleMessageQueueFields = function() {
+    val = mQuery('input.email-type:checked').val();
+    if (val === 'marketing') {
+        mQuery('#priority, #attempts').show();
+    } else {
+        mQuery('#priority, #attempts').hide();
     }
 };
