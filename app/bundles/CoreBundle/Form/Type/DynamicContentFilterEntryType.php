@@ -131,7 +131,7 @@ class DynamicContentFilterEntryType extends AbstractType
 
     private function filterFieldChoices()
     {
-        $this->fieldChoices = array_filter($this->fieldChoices, function ($key) {
+        $this->fieldChoices['lead'] = array_filter($this->fieldChoices['lead'], function ($key) {
             return !in_array($key, ['leadlist', 'lead_email_received', 'tags', 'dnc_bounced', 'dnc_unsubscribed', 'dnc_bounced_sms', 'dnc_unsubscribed_sms', 'hit_url']);
         }, ARRAY_FILTER_USE_KEY);
     }
