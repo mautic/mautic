@@ -63,7 +63,7 @@ class CompanyController extends FormController
         $orderBy    = $this->get('session')->get('mautic.company.orderby', 'comp.companyname');
         $orderByDir = $this->get('session')->get('mautic.company.orderbydir', 'ASC');
 
-        $companies = $this->getModel('company')->getEntities(
+        $companies = $this->getModel('lead.company')->getEntities(
             [
                 'start'          => $start,
                 'limit'          => $limit,
@@ -99,7 +99,7 @@ class CompanyController extends FormController
         $this->get('session')->set('mautic.company.page', $page);
 
         $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
-        $model      = $this->getModel('company');
+        $model      = $this->getModel('lead.company');
         $companyIds = array_keys($companies);
         $leadCounts = (!empty($companyIds)) ? $model->getRepository()->getLeadCount($companyIds) : [];
 
@@ -134,7 +134,7 @@ class CompanyController extends FormController
      */
     public function newAction($entity = null)
     {
-        $model = $this->getModel('company');
+        $model = $this->getModel('lead.company');
 
         if (!($entity instanceof Company)) {
             /** @var \Mautic\LeadBundle\Entity\Company $entity */
@@ -286,7 +286,7 @@ class CompanyController extends FormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
-        $model  = $this->getModel('company');
+        $model  = $this->getModel('lead.company');
         $entity = $model->getEntity($objectId);
 
         //set the page we came from
@@ -474,7 +474,7 @@ class CompanyController extends FormController
      */
     public function cloneAction($objectId)
     {
-        $model  = $this->getModel('company');
+        $model  = $this->getModel('lead.company');
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -512,7 +512,7 @@ class CompanyController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->getModel('company');
+            $model  = $this->getModel('lead.company');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
@@ -571,7 +571,7 @@ class CompanyController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model     = $this->getModel('company');
+            $model     = $this->getModel('lead.company');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = array();
 

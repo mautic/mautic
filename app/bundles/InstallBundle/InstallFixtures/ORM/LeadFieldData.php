@@ -113,7 +113,6 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
             }
             $indexHelper->executeChanges();
         }
-
     }
 
     /**

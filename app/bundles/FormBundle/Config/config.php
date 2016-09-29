@@ -284,7 +284,7 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.campaign.model.campaign',
                     'mautic.lead.model.field',
-                    'mautic.company.model.company',
+                    'mautic.lead.model.company',
                     'mautic.helper.form.field_helper',
                 ]
             ]

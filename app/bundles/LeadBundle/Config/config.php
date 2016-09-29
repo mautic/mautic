@@ -244,7 +244,7 @@ return [
         'forms'   => [
             'mautic.form.type.lead'                           => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\LeadType',
-                'arguments' => ['mautic.factory','mautic.company.model.company'],
+                'arguments' => ['mautic.factory','mautic.lead.model.company'],
                 'alias'     => 'lead'
             ],
             'mautic.form.type.leadlist'                       => [
@@ -388,7 +388,7 @@ return [
             ],
             'mautic.company.list.type.form'                  => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CompanyListType',
-                'arguments' => ['mautic.company.model.company',  'mautic.helper.user'],
+                'arguments' => ['mautic.lead.model.company',  'mautic.helper.user'],
                 'alias'     => 'company_list'
             ]
         ],
@@ -430,7 +430,7 @@ return [
                     'mautic.lead.model.field',
                     'mautic.lead.model.list',
                     'form.factory',
-                    'mautic.company.model.company'
+                    'mautic.lead.model.company'
                 ]
             ],
             'mautic.lead.model.field' => [
@@ -448,7 +448,7 @@ return [
             'mautic.lead.model.note' => [
                 'class' => 'Mautic\LeadBundle\Model\NoteModel'
             ],
-            'mautic.company.model.company' => [
+            'mautic.lead.model.company' => [
                 'class' => 'Mautic\LeadBundle\Model\CompanyModel',
                 'arguments' => [
                     'mautic.lead.model.field',

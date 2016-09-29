@@ -363,7 +363,7 @@ class AjaxController extends CommonAjaxController
 
         if (!empty($leadId) && !empty($companyId) && in_array($action, ['remove', 'add'])) {
             $leadModel = $this->getModel('lead');
-            $companyModel = $this->getModel('company');
+            $companyModel = $this->getModel('lead.company');
 
             $lead = $leadModel->getEntity($leadId);
             $company = $companyModel->getEntity($companyId);

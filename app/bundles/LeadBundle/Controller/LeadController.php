@@ -325,7 +325,7 @@ class LeadController extends FormController
         $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
         /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
-        $companyModel      = $this->getModel('company');
+        $companyModel      = $this->getModel('lead.company');
         $companiesRepo     = $companyModel->getRepository();
         $companies         = $companiesRepo->getCompaniesByLeadId($objectId);
         // Set the social profile templates
@@ -1226,7 +1226,7 @@ class LeadController extends FormController
             )
         ) {
             /** @var \Mautic\LeadBundle\Model\CompanyModel $companyModel */
-            $companyModel = $this->getModel('company');
+            $companyModel = $this->getModel('lead.company');
             $companies     = $companyModel->getUserCompanies();
 
             // Get a list of lists for the lead
@@ -2294,7 +2294,7 @@ class LeadController extends FormController
     public function batchCompaniesAction($objectId = 0)
     {
         /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
-        $companyModel = $this->getModel('company');
+        $companyModel = $this->getModel('lead.company');
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
