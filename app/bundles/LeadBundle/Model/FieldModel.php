@@ -167,17 +167,6 @@ class FieldModel extends FormModel
 
     static public $coreCompanyFields   = [
         // Listed according to $order for installation
-        'companynumber'     => [
-            'fixed' => true,
-            'group' => 'other',
-            'object'     => 'company'
-        ],
-        'companyindustry'  => [
-            'type'       => 'lookup',
-            'properties' => ['list' => 'Agriculture|Apparel|Banking|Biotechnology|Chemicals|Communications|Construction|Education|Electronics|Energy|Engineering|Entertainment|Environmental|Finance|Food & Beverage|Government|Healthcare|Hospitality|Insurance|Machinery|Manufacturing|Media|Not for Profit|Recreation|Retail|Shipping|Technology|Telecommunications|Transportation|Utilities|Other'],
-            'fixed'      => true,
-            'object'     => 'company'
-        ],
         'companyaddress1'          => [
             'fixed' => true,
             'listable' => true,
@@ -221,25 +210,26 @@ class FieldModel extends FormModel
             'fixed' => true,
             'object'=> 'company'
         ],
-        'companydescription'         => [
-            'fixed'    => true,
-            'object'   => 'company'
-        ],
         'companyname'            => [
             'fixed' => true,
             'object'=> 'company'
+        ],
+        'companywebsite'          => [
+            'type'     => 'url',
+            'listable' => true,
+            'object'   => 'company'
         ],
         'companynumber_of_employees' => [
             'type'       => 'number',
             'properties' => ['roundmode' => 4, 'precision' => 0],
             'fixed' => true,
-            'group' => 'other',
+            'group' => 'professional',
             'object'=> 'company'
         ],
         'companyfax' => [
             'type'     => 'tel',
             'listable' => true,
-            'group' => 'other',
+            'group' => 'professional',
             'object'   => 'company'
         ],
         'companyannual_revenue'      => [
@@ -247,12 +237,19 @@ class FieldModel extends FormModel
             'properties' => ['roundmode' => 4, 'precision' => 2],
             'fixed'      => true,
             'listable'   => true,
-            'group' => 'other',
+            'group' => 'professional',
             'object'     => 'company'
         ],
-        'companywebsite'          => [
-            'type'     => 'url',
-            'listable' => true,
+        'companyindustry'  => [
+            'type'       => 'lookup',
+            'group'    => 'professional',
+            'properties' => ['list' => 'Agriculture|Apparel|Banking|Biotechnology|Chemicals|Communications|Construction|Education|Electronics|Energy|Engineering|Entertainment|Environmental|Finance|Food & Beverage|Government|Healthcare|Hospitality|Insurance|Machinery|Manufacturing|Media|Not for Profit|Recreation|Retail|Shipping|Technology|Telecommunications|Transportation|Utilities|Other'],
+            'fixed'      => true,
+            'object'     => 'company'
+        ],
+        'companydescription'         => [
+            'fixed'    => true,
+            'group'    => 'professional',
             'object'   => 'company'
         ]
     ];
