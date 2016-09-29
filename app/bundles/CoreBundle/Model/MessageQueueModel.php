@@ -26,6 +26,7 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 
+
 /**
  * Class MessageQueueModel
  */
@@ -140,7 +141,7 @@ class MessageQueueModel extends FormModel
         if ($queue) {
             $queue->setAttempts($queue->getAttempts() + 1);
             $queue->setLastAttempt(new \DateTime());
-            $queue->setScheduledDate($queue->getScheduledDate()->add(new DateInterval('PT'.$rescheduleDate)));
+            $queue->setScheduledDate($queue->getScheduledDate()->add(new \DateInterval('PT'.$rescheduleDate)));
             $queue->setStatus('rescheduled');
             $this->saveEntity($queue);
         }
