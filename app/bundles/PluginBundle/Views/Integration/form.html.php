@@ -12,7 +12,10 @@ if (!$hasSupportedFeatures = (isset($form['supportedFeatures']) && count($form['
     }
 }
 
-$hasFields = (isset($form['featureSettings']) && count($form['featureSettings']['leadFields']));
+if (!$hasFields = (isset($form['featureSettings']) && count($form['featureSettings']['leadFields']))) {
+    // Unset if set to prevent features tab from showing when there's no feature to show
+    unset($form['featureSettings']['leadFields']);
+}
 if (!$hasFeatureSettings = (isset($form['featureSettings']) && (($hasFields && count($form['featureSettings']) > 1) || (!$hasFields && count($form['featureSettings']))))) {
     if (isset($form['featureSettings'])) {
         $form['featureSettings']->setRendered();
