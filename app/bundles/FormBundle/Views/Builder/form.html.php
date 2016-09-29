@@ -8,7 +8,9 @@
  */
 
 $formName  = '_'.$form->generateFormName();
-$fields    = $form->getFields();
+if (!isset($fields)) {
+    $fields = $form->getFields();
+}
 $pageCount = 1;
 ?>
 
