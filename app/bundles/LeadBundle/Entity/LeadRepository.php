@@ -847,7 +847,7 @@ class LeadRepository extends CommonRepository
                     ->where(
                         $sq->expr()->andX(
                             $sq->expr()->eq('l.id', 'x.lead_id'),
-                            $sq->expr()->$eqFunc('t.tag', ":$unique")
+                            $sq->expr()->$likeFunc('t.tag', ":$unique")
                         )
                     );
 

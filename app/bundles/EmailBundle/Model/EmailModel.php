@@ -1187,7 +1187,7 @@ class EmailModel extends FormModel
         }
 
         $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('email', $leadIds, $listId, $defaultFrequencyNumber, $defaultFrequencyTime);
-
+        $this->logger->error(print_r($emailType,true));
         if (!empty($dontSendTo) and $emailType != 'transactional') {
             foreach ($dontSendTo as $frequencyRuleMet)
             {
@@ -1221,7 +1221,8 @@ class EmailModel extends FormModel
 
         // Setup the mailer
         $mailer = $this->mailHelper->getMailer(!$sendBatchMail);
-
+        $mailer->enableQueue();
+		
         // Flushes the batch in case of using API mailers
         $flushQueue = function ($reset = true) use (&$mailer, &$saveEntities, &$errors, &$emailSentCounts, $sendBatchMail) {
 

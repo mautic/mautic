@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 /**
  * Class Mailbox
  */
-class Mailbox extends \PHPUnit_Framework_TestCase
+class MailboxTest extends \PHPUnit_Framework_TestCase
 {
 
     public function testSettingsForMonitoredEmailWithoutOverride()

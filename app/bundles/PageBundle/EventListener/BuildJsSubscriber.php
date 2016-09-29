@@ -102,8 +102,12 @@ class BuildJsSubscriber extends CommonSubscriber
             m.trackingPixel = new Image();
 
             if (typeof pageview[3] === 'object') {
-                if (typeof pageview[3]['onload'] === 'function') {
-                    m.trackingPixel.onload = pageview[3]['onload'];
+                var events = ['onabort', 'onerror', 'onload'];
+                for (var i = 0; i < events.length; i++) {
+                    var e = events[i];
+                    if (typeof pageview[3][e] === 'function') {
+                        m.trackingPixel[e] = pageview[3][e];
+                    }
                 }
             }
 
